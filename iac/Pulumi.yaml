@@ -1,0 +1,4 @@
+name: compass
+runtime:
+  name: python
+description: Tabiya compass
