@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "compass backend"
+version = "0.0.0"
+description = ""
+authors = ["Tabiya <tabiya@tabiya.org>"]
+readme = "README.md"
+packages = [
+    { include = "app" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+uvicorn = ">=0.23.2,<0.24.0"
+langserve = {extras = ["server"], version = ">=0.0.51"}
+pydantic = "<2"
+python-dotenv = "^1.0.1"
+
+
+[tool.poetry.group.dev.dependencies]
+langchain-cli = ">=0.0.20"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
