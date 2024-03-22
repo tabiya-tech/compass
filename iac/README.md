@@ -90,6 +90,15 @@ gcloud auth configure-docker <LOCATION>-docker.pkg.dev
 ```
 
 ### Running pulumi locally
+The deployment requires the following environment variables to be set:
+- `MONGO_URI`: The URI of the MongoDB instance to use where the ESCO data is stored.
+
+It is recommended to use a `.env` file to set the environment variables. Create a `.env` file in the root directory of the project and add the following content:
+
+```shell
+# .env file
+MONGO_URI="<URI_TO_MONGODB>"
+```
 
 Run the pulumi code locally, using the appropriate commands. For example, to preview the changes for the dev stack, run the following command:
 
