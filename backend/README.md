@@ -104,24 +104,26 @@ docker run -v ~/.config/gcloud/:/root/.config/gcloud/ -e GCLOUD_PROJECT="$(gclou
 #### Option 2: Using Service Account Key File
 
 You can use the service account key file to authenticate with Google Cloud and run the backend.
+This is the most convenient way to run the backend locally, but it is less secure than service account impersonation. It is recommended to use this method only for development purposes.
 
 >ATTENTION: The service account key file should be kept secure and not shared with others.
 > It should not be committed to the repository.
 >
 
-##### Launch LangServe locally
-Start the LangServe server with the following command:
+To authenticate with the service account key file, set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to the path of the service account key file and run the backend.
+
+### Environment Variables & Configuration
+
+The backend uses the following environment variables:
+- `GOOGLE_APPLICATION_CREDENTIALS`: The path to the service account key file.   
+- `MONGO_URI`: The URI of the MongoDB instance to use where the ESCO data is stored.
+
+The backend supports the use of a `.env` file to set the environment variables. Create a `.env` file in the root directory of the backend project and set the environment variables as follows:
 
 ```shell
-GOOGLE_APPLICATION_CREDENTIALS="<PATH_TO_KEY_FILE>" langchain serve --host 0.0.0.0 --port 8080
-```
-
-##### Running the Image Locally
-
-To run the image, you'll need to supply the service account key file as an environment variable and mount the file to the container.
-
-```shell
-docker run -v "<PATH_TO_KEY_FILE>:/root/credentials.json" -e GOOGLE_APPLICATION_CREDENTIALS="/root/credentials.json" -p 8080:8080 compass-backend
+# .env file
+GOOGLE_APPLICATION_CREDENTIALS="<PATH_TO_KEY_FILE>"
+MONGO_URI="<URI_TO_MONGODB>"
 ```
 
 ### Building the Image locally
@@ -132,6 +134,23 @@ To build the image:
 docker build . -t compass-backend
 ```
 
+### Running the Image Locally
+
+To run the image, you'll need to supply the service account key file as an environment variable and mount the file to the container.
+
+```shell
+docker run -v "<PATH_TO_KEY_FILE>:/code/credentials.json" -e GOOGLE_APPLICATION_CREDENTIALS="/code/credentials.json" -e MONGO_URI="<URI_TO_MONGODB>" -p 8080:8080 compass-backend
+```
+
+If you have set up the `.env` file, you can run the image using the `--env-file` option.
+
+For example:
+
+```shell
+# assuming the .env file is in the root directory of the backend project
+# and the service account key file named credentials.json is in the same directory
+ docker run -v "$(pwd)/credentials.json:/code/credentials.json" --env-file .env compass-backend
+```
 
 
 

@@ -1,5 +1,9 @@
 import pulumi
 from deploy_backend import deploy_backend
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 def main():
