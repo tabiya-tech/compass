@@ -14,6 +14,7 @@ uvicorn = ">=0.23.2,<0.24.0"
 langserve = {extras = ["server"], version = ">=0.0.51"}
 pydantic = "<2"
 python-dotenv = "^1.0.1"
+langchain-google-vertexai = ">=0.1.1"
 
 
 [tool.poetry.group.dev.dependencies]

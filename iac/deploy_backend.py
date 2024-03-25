@@ -53,6 +53,23 @@ def _get_fully_qualified_image_name(project: str, location: str, repository_name
 # See https://cloud.google.com/run/docs/overview/what-is-cloud-run for more information
 def _deploy_cloud_run_service(project: str, location: str, fully_qualified_image_name: str,
                               dependencies: list[pulumi.Resource]):
+    # See https://cloud.google.com/run/docs/securing/service-identity#per-service-identity for more information
+    # Create a service account for the Cloud Run service
+    service_account = gcp.serviceaccount.Account('compass-backend-service-account',
+                                                 account_id='compass-backend-service',
+                                                 display_name=
+                                                 'The dedicated service account for the Compass backend service',
+                                                 project=project,
+                                                 )
+
+    # Assign the necessary roles to the service account for Vertex AI access
+    gcp.projects.IAMBinding('ai-user-binding',
+                            members=[
+                                service_account.email.apply(lambda email: f'serviceAccount:{email}')],
+                            role='roles/aiplatform.user',
+                            project=project,
+                            )
+
     # Deploy cloud run service
     service = gcp.cloudrunv2.Service("default",
                                      name="compass-service",
@@ -63,6 +80,7 @@ def _deploy_cloud_run_service(project: str, location: str, fully_qualified_image
                                          containers=[gcp.cloudrunv2.ServiceTemplateContainerArgs(
                                              image=fully_qualified_image_name,
                                          )],
+                                         service_account=service_account.email,
                                      ),
                                      opts=pulumi.ResourceOptions(depends_on=dependencies)
                                      )
@@ -92,11 +110,16 @@ def deploy_backend(project: str, location: str):
     # Enable the necessary services for building and pushing the image
     required_services = ["artifactregistry.googleapis.com",
                          "cloudbuild.googleapis.com",
-                         "run.googleapis.com"
+                         "run.googleapis.com",
+                         # Required for listing regions
+                         "compute.googleapis.com",
+                         # Required for VertexAI see https://cloud.google.com/vertex-ai/docs/start/cloud-environment
+                         "aiplatform.googleapis.com",
+                         "cloudresourcemanager.googleapis.com"
                          ]
     services = _enable_services(project, required_services)
 
-    # Create a artifact repository
+    # Create an artifact repository
     repository = _create_repository(project, location, repository_name, services)
 
     # Build and push image to gcr repository
