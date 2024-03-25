@@ -15,7 +15,7 @@ RUN poetry install --no-interaction --no-ansi --no-root --without dev
 
 # Using alpine image to reduce the image size further
 # Alternatively, you can use python:3.11-slim with a slightly larger image size
-FROM python:3.11-alpine
+FROM python:3.11-slim
 
 # Copy the dependencies from the builder image
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
