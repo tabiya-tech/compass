@@ -9,7 +9,7 @@ from esco_search.esco_abs_search_service import VectorSearchConfig
 from esco_search.skill_search.skill_search_service import SkillSearchService, SkillEntity
 
 
-def add_skills_search_routes(app: FastAPI, db: Database, embedder: Embeddings):
+def add_skills_search_routes(app: FastAPI, db: Database, embedder: Embeddings) -> SkillSearchService:
     skill_vector_search_config = VectorSearchConfig(
         embedding_model=embedder,
         collection_name="skillmodels",
@@ -57,3 +57,5 @@ def add_skills_search_routes(app: FastAPI, db: Database, embedder: Embeddings):
     ):
         skills = await skill_search_service.search_mmr(query, k=top_k, fetch_k=fetch_k, lambda_mult=lambda_mult)
         return SkillsResponse(skills=skills)
+
+    return skill_search_service
