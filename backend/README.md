@@ -139,7 +139,7 @@ path of the service account key file and run the backend.
 The backend uses the following environment variables:
 
 - `GOOGLE_APPLICATION_CREDENTIALS`: The path to the service account key file.
-- `MONGO_URI`: The URI of the MongoDB Atlas instance to use where the ESCO data is stored.
+- `MONGODB_URI`: The URI of the MongoDB Atlas instance to use where the ESCO data is stored.
 
 The backend supports the use of a `.env` file to set the environment variables. Create a `.env` file in the root
 directory of the backend project and set the environment variables as follows:
@@ -147,7 +147,7 @@ directory of the backend project and set the environment variables as follows:
 ```dotenv
 # .env file
 GOOGLE_APPLICATION_CREDENTIALS=<PATH_TO_KEY_FILE>
-MONGO_URI=<URI_TO_MONGODB>
+MONGODB_URI=<URI_TO_MONGODB>
 ```
 
 > ATTENTION: The .env file should be kept secure and not shared with others as it contains sensitive information.
@@ -167,7 +167,7 @@ docker build . -t compass-backend
 To run the image, you'll need to mount a volume with the service account key and the supply an environment variables to the container:
 
 ```shell
-docker run -v "<PATH_TO_KEY_FILE>:/code/credentials.json" -e GOOGLE_APPLICATION_CREDENTIALS="/code/credentials.json" -e MONGO_URI="<URI_TO_MONGODB>" -p 8080:8080 compass-backend
+docker run -v "<PATH_TO_KEY_FILE>:/code/credentials.json" -e GOOGLE_APPLICATION_CREDENTIALS="/code/credentials.json" -e MONGODB_URI="<URI_TO_MONGODB>" -p 8080:8080 compass-backend
 ```
 
 If you have set up the `.env` file, you can run the image using the `--env-file` option.
@@ -177,7 +177,7 @@ For example:
 Assuming the `.env` file is in the root directory of the project and the service account key file named `credentials.json` is in a folder named `keys` in the root directory:
 
 ```dotenv
-MONGO_URI=<URI_TO_MONGODB>
+MONGODB_URI=<URI_TO_MONGODB>
 GOOGLE_APPLICATION_CREDENTIALS=keys/credentials.json
 VERSION=0.0.1
 ```

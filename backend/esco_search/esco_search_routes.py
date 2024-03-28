@@ -6,9 +6,10 @@ from esco_search.database_service import DatabaseService
 from esco_search.embeddings.google_gecko.google_gecko import GoogleGeckoConfig, GoogleGecko
 from esco_search.occupation_search.occupation_search_routes import add_occupation_search_routes
 from esco_search.skill_search.skill_search_routes import add_skills_search_routes
+from esco_search.skill_search.skill_search_service import SkillSearchService
 
 
-def add_esco_search_routes(app: FastAPI):
+def add_esco_search_routes(app: FastAPI) -> SkillSearchService:
     # Embedder route
     google_gecko_config = GoogleGeckoConfig(
         version="latest",
@@ -25,10 +26,12 @@ def add_esco_search_routes(app: FastAPI):
         embeddings = await embeddings_service.aembed_query(query)
         return {"embedding": embeddings}
 
-    db = DatabaseService.connect_to_sync_mongo_db(os.getenv("MONGO_URI"), "compass-poc")
+    db = DatabaseService.connect_to_sync_mongo_db(os.getenv("MONGODB_URI"), "compass-poc")
 
     # Add routes relevant for skill search
-    add_skills_search_routes(app, db, embeddings_service)
+    skill_search_service = add_skills_search_routes(app, db, embeddings_service)
 
     # Add routes relevant for occupations search
     add_occupation_search_routes(app, db, embeddings_service)
+
+    return skill_search_service
