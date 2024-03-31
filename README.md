@@ -15,7 +15,7 @@ their skills and interests based on their lived experiences
 
 ## Contribution Guidelines
 
-🎉 Thank you for considering contributing to the Taxonomy Model App! 🎉
+🎉 Thank you for considering contributing to Tabiya Compass! 🎉
 
 ### Conventional Commits
 
