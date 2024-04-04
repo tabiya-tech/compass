@@ -126,7 +126,9 @@ def deploy_backend(project: str, location: str):
                          "compute.googleapis.com",
                          # Required for VertexAI see https://cloud.google.com/vertex-ai/docs/start/cloud-environment
                          "aiplatform.googleapis.com",
-                         "cloudresourcemanager.googleapis.com"
+                         "cloudresourcemanager.googleapis.com",
+                         # Required for de-identifying data 
+                         "dlp.googleapis.com"
                          ]
     services = _enable_services(project, required_services)
 
