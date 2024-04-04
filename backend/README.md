@@ -56,7 +56,8 @@ has the necessary permissions required by the backend. Additionally, set the pro
 
 The principal used to run the backend should have the following roles:
 
-- `roles/aiplatform.user`
+- `roles/aiplatform.user`, needed to use the AI Platform API for embeddings and LLM.
+- `roles/dlp.user`, needed to use the DLP API to de-identify the data.
 
 ### Authenticate with Google Cloud
 
