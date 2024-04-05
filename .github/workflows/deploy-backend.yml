@@ -1,0 +1,50 @@
+name: Tabiya Compass Build And Deploy
+on:
+  workflow_call:
+    inputs:
+      target-environment:
+        required: true
+        type: string
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.target-environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set Version Info
+        id: setVersionInfo
+        # see https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
+        # for multiline strings
+        run: |
+          ./pipeline/setVersionInfo.sh ./backend/app/version.json
+          cat ./backend/app/version.json
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "version-info<<$EOF" >> "$GITHUB_OUTPUT"
+          echo "$(cat ./backend/app/version.json)" >> "$GITHUB_OUTPUT"
+          echo "$EOF" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip' # caching pip dependencies
+      - name: Install python package
+        run: pip install -r requirements.txt
+        working-directory: iac
+      - id: google-cloud-auth
+        uses: google-github-actions/auth@v2.1.2
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+      - name: Authenticate to docker
+        # TODO the region should be extracted from the pulumi yaml
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev
+      - name: Deploy backend
+        id: pulumi
+        uses: pulumi/actions@v5
+        with:
+          work-dir: iac
+          command: up
+          stack-name: tabiya-tech/compass-backend/${{ inputs.target-environment }}
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}

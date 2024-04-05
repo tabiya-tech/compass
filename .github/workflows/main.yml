@@ -1,0 +1,23 @@
+name: Main CI
+on: push
+  #push:
+  # branches:
+  #   - main
+  #pull_request:
+#  types: [ opened, synchronize, reopened ]
+
+jobs:
+  # Backend
+  test-backend:
+    uses: ./.github/workflows/unit-test-backend.yml
+    secrets: inherit
+    with:
+      target-environment: dev
+  deploy-backend:
+    # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
+    if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
+    needs: [ test-backend ]
+    uses: ./.github/workflows/deploy-backend.yml
+    secrets: inherit
+    with:
+      target-environment: dev

@@ -1,4 +1,4 @@
-name: compass
+name: compass-backend
 runtime:
   name: python
 description: Tabiya compass

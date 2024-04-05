@@ -1,3 +1,4 @@
+import json
 import os
 
 from dotenv import load_dotenv
@@ -17,12 +18,22 @@ app = FastAPI()
 ############################################
 @app.get("/")
 async def root():
-    return {"Hello Tabiya"}
+    return {"msg": "Hello Tabiya"}
+
+
+# Determine the absolute path of the directory where the current script resides
+script_directory = os.path.dirname(os.path.abspath(__file__))
+
+# Construct the absolute path to the JSON file, assuming it's in the same directory as the script
+version_file_path = os.path.join(script_directory, 'version.json')
+
+with open(version_file_path, 'r') as fp:
+    version_info = json.load(fp)
 
 
 @app.get("/version")
-async def version():
-    return {"version": os.getenv("VERSION")}
+async def get_version():
+    return {"version": version_info}
 
 
 ############################################
