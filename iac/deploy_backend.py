@@ -72,9 +72,9 @@ def _deploy_cloud_run_service(project: str, location: str, fully_qualified_image
                             )
 
     # Deploy cloud run service
-    mongodb_uri = os.getenv("MONGO_URI")
+    mongodb_uri = os.getenv("MONGODB_URI")
     if not mongodb_uri:
-        raise ValueError("MONGO_URI environment variable is not set")
+        raise ValueError("MONGODB_URI environment variable is not set")
     service = gcp.cloudrunv2.Service("default",
                                      name="compass-service",
                                      project=project,
@@ -85,7 +85,7 @@ def _deploy_cloud_run_service(project: str, location: str, fully_qualified_image
                                              image=fully_qualified_image_name,
                                              envs=[
                                                  gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
-                                                     name="MONGO_URI",
+                                                     name="MONGODB_URI",
                                                      value=mongodb_uri
                                                  ),
                                                  # Add more environment variables here

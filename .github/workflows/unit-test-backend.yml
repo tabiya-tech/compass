@@ -1,0 +1,43 @@
+name: Tabiya Compass Unit Tests
+on:
+  workflow_call:
+    inputs:
+      target-environment:
+        required: true
+        type: string
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.target-environment }}
+    steps:
+      - id: checkout-code
+        uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Load cached Poetry installation
+        id: cached-poetry
+        uses: actions/cache@v4
+        with:
+          path: ~/.local
+          key: poetry-0
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+      - name: Load cached Poetry cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry
+          key: poetry-cache-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ env.POETRY_VERSION }}
+      - id: install-dependencies
+        shell: bash
+        run: poetry install --no-interaction
+        working-directory: backend
+      - id: google-cloud-auth
+        uses: google-github-actions/auth@v2.1.2
+        with:
+          credentials_json:
+            ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+      - id: unit-test
+        shell: bash
+        run: poetry run pytest
+        working-directory: backend
