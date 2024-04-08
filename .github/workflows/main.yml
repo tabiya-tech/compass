@@ -21,3 +21,11 @@ jobs:
     secrets: inherit
     with:
       target-environment: dev
+  smoke-test-backend:
+    needs: [ deploy-backend ]
+    uses: ./.github/workflows/smoke-test-version.yml
+    secrets: inherit
+    with:
+      component: backend
+      expected-version-info: ${{ needs.deploy-backend.outputs.version-info }}
+      component-url: ${{ needs.deploy-backend.outputs.backendRestApiURLBase }}

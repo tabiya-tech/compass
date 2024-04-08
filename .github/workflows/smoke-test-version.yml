@@ -1,14 +1,23 @@
-name: Tabiya Compass Unit Tests
+name: Smoke Test the version of the backend/frontend
 on:
   workflow_call:
     inputs:
-      target-environment:
+      component:
+        description: Either 'frontend' or 'backend'
+        required: true
+        type: string
+      component-url:
+        description: The urlbase of the 'frontend' or 'backend'
+        required: true
+        type: string
+      expected-version-info:
+        description: The expected version info. It is a json string, see the version.json file in the backend/app folder
         required: true
         type: string
 jobs:
-  unit-test:
+  smoke-test:
+    name: ${{ inputs.component }}
     runs-on: ubuntu-latest
-    environment: ${{ inputs.target-environment }}
     steps:
       - id: checkout-code
         uses: actions/checkout@v4
@@ -32,12 +41,10 @@ jobs:
         shell: bash
         run: poetry install --no-interaction
         working-directory: backend
-      - id: google-cloud-auth
-        uses: google-github-actions/auth@v2.1.2
-        with:
-          credentials_json:
-            ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
-      - id: unit-test
+      - id: smoke-test
         shell: bash
-        run: poetry run pytest -k "not smoke_test"
-        working-directory: backend
+        run: |
+          export EXPECTED_VERSION_INFO='${{ inputs.expected-version-info }}'
+          export E2E_BASE_URL=${{ inputs.component-url }}
+          poetry run pytest smoke_test/test_version.py
+        working-directory: ${{ inputs.component }}

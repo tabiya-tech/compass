@@ -5,11 +5,22 @@ on:
       target-environment:
         required: true
         type: string
+    outputs:
+      backendRestApiURLBase:
+        description: "The backend api url"
+        value: ${{ jobs.deploy.outputs.backendRestApiURLBase }}
+      version-info:
+        description: "The backend version info"
+        value: ${{ jobs.deploy.outputs.version-info }}
 
 jobs:
-  deploy-backend:
+  deploy:
     runs-on: ubuntu-latest
     environment: ${{ inputs.target-environment }}
+    outputs:
+      version-info: ${{ steps.setVersionInfo.outputs.version-info }}
+      backendRestApiURLBase: ${{ steps.pulumi.outputs.cloud_run_url }}
+      resourcesBaseUrl: ${{ steps.pulumi.outputs.resourcesBaseUrl }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
