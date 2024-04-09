@@ -4,7 +4,7 @@ from fastapi import FastAPI
 
 from esco_search.database_service import DatabaseService
 from esco_search.embeddings.google_gecko.google_gecko import GoogleGeckoConfig, GoogleGecko
-from esco_search.occoupation_search.occupation_search_routes import add_occupation_search_routes
+from esco_search.occupation_search.occupation_search_routes import add_occupation_search_routes
 from esco_search.skill_search.skill_search_routes import add_skills_search_routes
 
 
