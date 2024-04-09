@@ -6,7 +6,7 @@ from pydantic.main import BaseModel
 from pymongo.database import Database
 
 from esco_search.esco_abs_search_service import VectorSearchConfig
-from esco_search.occoupation_search.occupation_search_service import OccupationSearchService, OccupationEntity
+from esco_search.occupation_search.occupation_search_service import OccupationSearchService, OccupationEntity
 
 
 def add_occupation_search_routes(app: FastAPI, db: Database, embedder: Embeddings) -> None:
