@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from esco_search.esco_search_routes import add_esco_search_routes
 from agent.agent_director import AgentDirector
 from agent.agent_types import AgentInput, AgentOutput, ConversationHistory
+from sensitive_filter.filter_sensitive_info import add_filter_routes
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +61,12 @@ add_routes(
 # Add routes relevant for esco_search
 ############################################
 skill_search_service = add_esco_search_routes(app)
+
+############################################
+# Add routes relevant for pii filtering
+############################################
+
+add_filter_routes(app)
 
 ############################################
 # Add routes relevant for the conversation agent
