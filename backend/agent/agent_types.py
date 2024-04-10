@@ -24,11 +24,16 @@ class AgentOutput(BaseModel):
 ConversationHistory: TypeAlias = List[Tuple[AgentInput, AgentOutput]]
 
 
+class ConversationHistoryFormatter:
+    @staticmethod
+    def format_for_prompt(history: ConversationHistory):
+        return "Current conversation:\n" + "\n".join(
+            [f"User: {agent_input.message}\n{agent_output.agent_type.value}: {agent_output.message_for_user}" for
+             agent_input, agent_output in history])
+
+
 class Agent(ABC):
     @abstractmethod
-    async def execute(self, user_input: AgentInput) -> AgentOutput:
+    async def execute(self, user_input: AgentInput, history: ConversationHistory) -> AgentOutput:
         raise NotImplementedError()
 
-    @abstractmethod
-    async def reset(self):
-        raise NotImplementedError()
