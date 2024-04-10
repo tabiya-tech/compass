@@ -1,7 +1,6 @@
 import logging
-from typing import List, Tuple
 
-from agent.agent_types import Agent, AgentInput, AgentOutput
+from agent.agent_types import Agent, AgentInput, AgentOutput, ConversationHistory
 from agent.farewell_agent import FarewellAgent
 from agent.skill_explore_agent import SkillExplorerAgent
 from agent.welcome_agent import WelcomeAgent
@@ -20,19 +19,18 @@ class AgentDirector:
             SkillExplorerAgent(),
             FarewellAgent()
         ]
-        self._conversation_history: List[Tuple[AgentInput, AgentOutput]] = []
+        self._conversation_history: ConversationHistory = []
 
     async def reset(self):
-        # Reset all agents
+        # Reset agent index
         self._current_agent_index = 0
-        for agent in self._agents:
-            await agent.reset()
         # Reset conversation history
         self._conversation_history = []
 
-    async def get_conversation_history(self) -> List[Tuple[AgentInput, AgentOutput]]:
+    async def get_conversation_history(self) -> ConversationHistory:
         return self._conversation_history
 
+    # Is there a reason this is an async function?
     def get_current_agent(self) -> Agent | None:
         if 0 <= self._current_agent_index < len(self._agents):
             return self._agents[self._current_agent_index]
@@ -45,9 +43,9 @@ class AgentDirector:
     async def run_task(self, user_input: AgentInput) -> AgentOutput:
         try:
             current_agent = self.get_current_agent()
-            agent_output = None
+            history = await self.get_conversation_history()
             if current_agent:
-                agent_output = await current_agent.execute(user_input)
+                agent_output = await current_agent.execute(user_input, history)
                 if agent_output.finished:
                     self._current_agent_index += 1
             else:
