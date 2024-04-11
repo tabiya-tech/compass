@@ -36,7 +36,6 @@ async def obfuscate(query: str) -> str:
         }
     }
 
-    # Call the API
     response = dlp.deidentify_content(
         request={
             "parent": parent,
