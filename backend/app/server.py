@@ -91,4 +91,4 @@ async def welcome(user_input: str, clear_memory: bool = False):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    uvicorn.run(app, host="0.0.0.0", port=8080)  # nosec B104 # this will be run in a container
