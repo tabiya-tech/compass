@@ -32,6 +32,10 @@ jobs:
         shell: bash
         run: poetry install --no-interaction
         working-directory: backend
+      - id: linting-bandit
+        shell: bash
+        run: poetry run bandit -c bandit.yaml -r .
+        working-directory: backend
       - id: google-cloud-auth
         uses: google-github-actions/auth@v2.1.2
         with:
