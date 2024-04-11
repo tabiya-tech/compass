@@ -19,9 +19,10 @@ jobs:
     name: ${{ inputs.component }}
     runs-on: ubuntu-latest
     steps:
-      - id: checkout-code
+      - name: Checkout code
         uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Setup python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - name: Load cached Poetry installation
@@ -37,11 +38,11 @@ jobs:
         with:
           path: ~/.cache/pypoetry
           key: poetry-cache-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ env.POETRY_VERSION }}
-      - id: install-dependencies
+      - name: Install dependencies
         shell: bash
         run: poetry install --no-interaction
         working-directory: backend
-      - id: smoke-test
+      - name: Run smoke tests
         shell: bash
         run: |
           export EXPECTED_VERSION_INFO='${{ inputs.expected-version-info }}'
