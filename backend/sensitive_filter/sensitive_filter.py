@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from google.auth import default as gcp_credentials
 
 import google.cloud.dlp
 
@@ -22,9 +23,8 @@ async def obfuscate(query: str) -> str:
       :param query: The string to obfuscate.
       :return: An obfuscated string transforming sensitive information into placeholders.
     """
-    project = "compass-dev-418218"
-    # TODO(kingam): Stop hard-coding the project name
-    parent = f"projects/{project}/locations/global"
+    _, project = gcp_credentials()
+    parent = f"projects/{project}"
 
     dlp = google.cloud.dlp_v2.DlpServiceClient()
 
