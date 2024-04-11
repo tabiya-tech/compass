@@ -35,14 +35,15 @@ jobs:
           echo "version-info<<$EOF" >> "$GITHUB_OUTPUT"
           echo "$(cat ./backend/app/version.json)" >> "$GITHUB_OUTPUT"
           echo "$EOF" >> "$GITHUB_OUTPUT"
-      - uses: actions/setup-python@v5
+      - name: Setup python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip' # caching pip dependencies
-      - name: Install python package
+      - name: Install python packages
         run: pip install -r requirements.txt
         working-directory: iac
-      - id: google-cloud-auth
+      - name: Setup google-cloud-auth
         uses: google-github-actions/auth@v2.1.2
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
