@@ -1,0 +1,1 @@
+exclude_dirs: ['venv-backend','*/test_*.py', './smoke_test']
