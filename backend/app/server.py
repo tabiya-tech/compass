@@ -1,8 +1,11 @@
+import json
 import logging
 import os
+
 from dotenv import load_dotenv
 from fastapi import FastAPI
-import json
+from fastapi.middleware.cors import CORSMiddleware
+
 from langchain_community.chat_models import ChatVertexAI as DeprecatedChatVertexAI
 from langchain_google_vertexai import ChatVertexAI
 from langserve import add_routes
@@ -15,6 +18,17 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 app = FastAPI()
+
+origins = [
+    "*"
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 ############################################
