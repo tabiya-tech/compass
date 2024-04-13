@@ -45,6 +45,11 @@ To work with this repository you should have a system with a bash compatible ter
 
 Happy contributing! 🚀
 
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
+
+## Funders and Partners
+<img src="https://github.com/tabiya-tech/compass-docs/blob/main/.gitbook/assets/logo_Google.org_Support_FullColor_cmyk%20coated_stacked.png" alt="Google.org Logo" width=200/>
+
