@@ -92,6 +92,7 @@ async def welcome(user_input: str, clear_memory: bool = False):
     try:
         if clear_memory:
             await agent_director.reset()
+            return {"msg": "Memory cleared!"}
 
         agent_output = await agent_director.run_task(AgentInput(message=user_input))
         history = await agent_director.get_conversation_history()
