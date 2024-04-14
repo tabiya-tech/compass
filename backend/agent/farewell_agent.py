@@ -52,6 +52,3 @@ class FarewellAgent(Agent):
                                finished=last["finished"],
                                agent_type=AgentType.FAREWELL_AGENT)
         return response
-
-    def get_chain(self) -> ChatVertexAI:
-        return self._chain

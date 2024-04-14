@@ -71,6 +71,3 @@ class WelcomeAgent(Agent):
                                finished=last["finished"],
                                agent_type=AgentType.WELCOME_AGENT)
         return response
-
-    def get_chain(self) -> ChatVertexAI:
-        return self._chain
