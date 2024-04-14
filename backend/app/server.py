@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 
@@ -13,6 +12,7 @@ from pydantic import BaseModel
 from esco_search.esco_search_routes import add_esco_search_routes
 from agent.agent_director import AgentDirector
 from agent.agent_types import AgentInput, AgentOutput, ConversationHistory
+from app.version.version_routes import add_version_routes
 
 logger = logging.getLogger(__name__)
 
@@ -38,24 +38,10 @@ app.add_middleware(
 async def root():
     return {"msg": "Hello Tabiya"}
 
-
-# Determine the absolute path of the directory where the current script resides
-script_directory = os.path.dirname(os.path.abspath(__file__))
-
-# Construct the absolute path to the JSON file, assuming it's in the same directory as the script
-version_file_path = os.path.join(script_directory, 'version.json')
-
-with open(version_file_path, 'r') as fp:
-    version_info = json.load(fp)
-
-
-@app.get(path="/version",
-         description="""
-         Returns the version of the application
-         """, )
-async def _get_version():
-    return {"version": version_info}
-
+############################################
+# Add version routes
+############################################
+add_version_routes(app)
 
 ############################################
 # Add routes for the different chat models
