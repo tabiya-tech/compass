@@ -37,6 +37,7 @@ class ConversationHistoryFormatter:
     """
     A Formatter for conversation history
     """
+
     @staticmethod
     def format_for_prompt(history: ConversationHistory):
         """
@@ -53,6 +54,7 @@ class Agent(ABC):
     """
     An abstract class for an agent.
     """
+
     @abstractmethod
     async def execute(self, user_input: AgentInput, history: ConversationHistory) -> AgentOutput:
         """

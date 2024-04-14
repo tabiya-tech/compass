@@ -31,7 +31,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 ############################################
 # Add version routes
 ############################################
@@ -81,19 +80,20 @@ class ConversationResponse(BaseModel):
 
 @app.get(path="/conversation",
          description="""Temporary route used to interact with the conversation agent.""", )
-async def _welcome(user_input: str, clear_memory: bool = False, filter_pii: bool = True):
+async def _welcome(user_input: str, clear_memory: bool = False, filter_pii: bool = True,
+                   session_id: int = 1):
     try:
         if clear_memory:
-            await agent_director.reset()
-            return {"msg": "Memory cleared!"}
+            await agent_director.reset(session_id)
+            return {"msg": f"Memory cleared for session {session_id}!"}
         if filter_pii:
             user_input = await sensitive_filter.obfuscate(user_input)
 
-        agent_output = await agent_director.run_task(AgentInput(message=user_input))
-        history = await agent_director.get_conversation_history()
+        agent_output = await agent_director.run_task(session_id, AgentInput(message=user_input))
+        history = await agent_director.get_conversation_history(session_id)
         response = ConversationResponse(last=agent_output, conversation_history=history)
         return response
-    except Exception as e: # pylint: disable=broad-except # this is the main entry point, so we need to catch all exceptions
+    except Exception as e:  # pylint: disable=broad-except # this is the main entry point, so we need to catch all exceptions
         logger.exception(e)
         return {"error": "oops! something went wrong!"}
 
