@@ -72,6 +72,3 @@ class SkillExplorerAgent(Agent):
                                finished=last["finished"],
                                agent_type=AgentType.SKILL_EXPLORER_AGENT)
         return response
-
-    def get_chain(self) -> ChatVertexAI:
-        return self._chain
