@@ -9,6 +9,10 @@ logger = logging.getLogger(__name__)
 
 
 class AgentDirector:
+    """
+    Receives user input, understands the conversation context and the user intent and routes
+    the user input to the appropriate agent.
+    """
 
     # current agent index
 
@@ -22,25 +26,40 @@ class AgentDirector:
         self._conversation_history: ConversationHistory = []
 
     async def reset(self):
+        """
+        Reset the state of the conversation
+        """
         # Reset agent index
         self._current_agent_index = 0
         # Reset conversation history
         self._conversation_history = []
 
     async def get_conversation_history(self) -> ConversationHistory:
+        """
+        Get the conversation history
+        """
         return self._conversation_history
 
     # Is there a reason this is an async function?
     def get_current_agent(self) -> Agent | None:
+        """
+        Get the current agent
+        """
         if 0 <= self._current_agent_index < len(self._agents):
             return self._agents[self._current_agent_index]
         else:
             return None
 
     def set_current_agent(self, agent_index):
+        """
+        Set the current agent
+        """
         self._current_agent_index = agent_index
 
     async def run_task(self, user_input: AgentInput) -> AgentOutput:
+        """
+        Run the conversation task for the current user input
+        """
         try:
             current_agent = self.get_current_agent()
             history = await self.get_conversation_history()

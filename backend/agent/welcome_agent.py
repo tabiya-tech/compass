@@ -13,14 +13,18 @@ logger = logging.getLogger(__name__)
 
 
 class SimpleWelcomeAgent(Agent):
-
+    """
+    Simple agent that provides a simple response, should be used for testing purposes only
+    """
     async def execute(self, user_input: AgentInput, history: ConversationHistory) -> AgentOutput:
         print(user_input.message + " from WelcomeAgent")
         return AgentOutput(message_for_user="WelcomeAgent done", finished=True, agent_type=AgentType.WELCOME_AGENT)
 
 
 class WelcomeAgent(Agent):
-
+    """
+    Agent that welcomes the user and provides a response based on the task
+    """
     def __init__(self):
         self._agent_type = AgentType.WELCOME_AGENT
         # Define the response part of the prompt with some example responses
