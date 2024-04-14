@@ -47,8 +47,7 @@ class AgentDirector:
         """
         if 0 <= self._current_agent_index < len(self._agents):
             return self._agents[self._current_agent_index]
-        else:
-            return None
+        return None
 
     def set_current_agent(self, agent_index):
         """
@@ -69,9 +68,10 @@ class AgentDirector:
                     self._current_agent_index += 1
             else:
                 # No more agents to run
-                agent_output = AgentOutput(message_for_user="Conversation finished, all agents are done! ", finished=True, agent_type=None)
+                agent_output = AgentOutput(message_for_user="Conversation finished, all agents are done! ",
+                                           finished=True, agent_type=None)
             self._conversation_history.append((user_input, agent_output))
             return agent_output
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except # executring an agent can raise any number of unknown exceptions
             logger.exception(e)
             return AgentOutput(message_for_user="Conversation forcefully ended", finished=True, agent_type=None)
