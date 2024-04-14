@@ -10,6 +10,10 @@ from esco_search.skill_search.skill_search_service import SkillSearchService
 
 
 def add_esco_search_routes(app: FastAPI) -> SkillSearchService:
+    """
+    Temporary function to add the routes for the esco search
+    service to the FastAPI app for testing purposes.
+    """
     # Embedder route
     google_gecko_config = GoogleGeckoConfig(
         version="latest",
@@ -22,7 +26,7 @@ def add_esco_search_routes(app: FastAPI) -> SkillSearchService:
     # Add routes relevant for generating embeddings
     # This is a temp route and will be removed in the future.
     @app.get("/embedding/gecko")
-    async def embed_query(query: str):
+    async def _embed_query(query: str):
         embeddings = await embeddings_service.aembed_query(query)
         return {"embedding": embeddings}
 
