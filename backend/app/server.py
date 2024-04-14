@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+# pylint: disable-next=no-name-in-module # unclear why this is being flagged by pylint
 from langchain_community.chat_models import ChatVertexAI as DeprecatedChatVertexAI
 from langchain_google_vertexai import ChatVertexAI
 from langserve import add_routes
