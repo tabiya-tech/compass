@@ -13,6 +13,7 @@ from esco_search.esco_search_routes import add_esco_search_routes
 from agent.agent_director import AgentDirector
 from agent.agent_types import AgentInput, AgentOutput, ConversationHistory
 from app.version.version_routes import add_version_routes
+from sensitive_filter import sensitive_filter
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +59,12 @@ add_routes(
 skill_search_service = add_esco_search_routes(app)
 
 ############################################
+# Add routes relevant for pii filtering
+############################################
+
+sensitive_filter.add_filter_routes(app)
+
+############################################
 # Add routes relevant for the conversation agent
 ############################################
 
@@ -74,11 +81,13 @@ class ConversationResponse(BaseModel):
 
 @app.get(path="/conversation",
          description="""Temporary route used to interact with the conversation agent.""", )
-async def _welcome(user_input: str, clear_memory: bool = False):
+async def _welcome(user_input: str, clear_memory: bool = False, filter_pii: bool = True):
     try:
         if clear_memory:
             await agent_director.reset()
             return {"msg": "Memory cleared!"}
+        if filter_pii:
+            user_input = await sensitive_filter.obfuscate(user_input)
 
         agent_output = await agent_director.run_task(AgentInput(message=user_input))
         history = await agent_director.get_conversation_history()
