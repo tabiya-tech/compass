@@ -6,6 +6,9 @@ from esco_search.esco_abs_search_service import AbstractEscoSearchService
 
 
 class OccupationEntity(BaseModel):
+    """
+    Represents an occupation entity.
+    """
     id: str
     preferredLabel: str
     UUID: str
@@ -17,12 +20,12 @@ class OccupationEntity(BaseModel):
 
 class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
     """
-    A class to perform similarity searches on the occupations collection.
+    A service class to perform similarity searches on the occupations collection.
     """
 
     def to_entity(self, doc: dict) -> OccupationEntity:
         """
-        Convert a Document object to an OccupationDocument object.
+        Convert a Document object to an OccupationEntity object.
         """
 
         return OccupationEntity(

@@ -5,6 +5,9 @@ from esco_search.embeddings.google_gecko.google_gecko import GoogleGecko, Google
 
 
 class TestGoogleGecko(unittest.TestCase):
+    """
+    Test class for the GoogleGecko class.
+    """
     @patch('esco_search.embeddings.google_gecko.google_gecko.VertexAIEmbeddings')
     def test_vertexai_embeddings_called_with_config_args(self, mock_vertexai_embeddings):
         """Should call VertexAIEmbeddings with the correct model name and arguments"""

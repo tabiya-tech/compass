@@ -10,6 +10,9 @@ from esco_search.skill_search.skill_search_service import SkillSearchService, Sk
 
 
 def add_skills_search_routes(app: FastAPI, db: Database, embedder: Embeddings) -> SkillSearchService:
+    """
+    Temporary function to add the routes for the skill search service to the FastAPI app for testing purposes.
+    """
     skill_vector_search_config = VectorSearchConfig(
         embedding_model=embedder,
         collection_name="skillmodels",
@@ -22,6 +25,9 @@ def add_skills_search_routes(app: FastAPI, db: Database, embedder: Embeddings) -
     skill_search_service = SkillSearchService(db=db, config=skill_vector_search_config)
 
     class SkillsResponse(BaseModel):
+        """
+        The response model for the skills search endpoint.
+        """
         skills: list[SkillEntity]
 
     # Add routes relevant for skills search
@@ -31,7 +37,7 @@ def add_skills_search_routes(app: FastAPI, db: Database, embedder: Embeddings) -
              Semantically search for skills based on a query. The search is based on the embeddings of the skills, and uses
              the cosine similarity to find the most similar skills.""",
              )
-    async def search_skills(
+    async def _search_skills(
             query: Annotated[str, Query(max_length=3000, description="The text to search for matching skills")],
             top_k: Annotated[int, Query(ge=1, le=100, description="The number of skills to return")] = 5):
         skills = await skill_search_service.search(query, k=top_k)
@@ -44,7 +50,7 @@ def add_skills_search_routes(app: FastAPI, db: Database, embedder: Embeddings) -
              The search is based on the embeddings of the skills, and uses
              the cosine similarity to find the most similar skills.""",
              )
-    async def search_mmr_skills(
+    async def _search_mmr_skills(
             query: Annotated[str, Query(max_length=3000, description="The text to search for matching skills")],
             top_k: Annotated[int, Query(ge=1, le=100, description="The number of skills to return")] = 5,
             fetch_k: Annotated[

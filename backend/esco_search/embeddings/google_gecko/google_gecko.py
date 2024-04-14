@@ -19,7 +19,8 @@ class GoogleGeckoConfig(BaseModel):
     """
     Version of gecko embeddings to use.
     Possible values 'latest', '001', '002', '003'.
-    See https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text-embeddings#model_versions for more information.
+    See https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/text-embeddings#model_versions 
+    for more information.
     """
 
     max_retries: int
@@ -29,7 +30,9 @@ class GoogleGeckoConfig(BaseModel):
 
 
 class GoogleGecko:
-
+    """
+    Class to create a VertexAIEmbeddings object that uses the textembedding-gecko model.
+    """
     @staticmethod
     @deprecated("""
     The PaLM API is deprecated and will be decommissioned from August 2024. 
