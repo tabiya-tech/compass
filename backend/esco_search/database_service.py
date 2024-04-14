@@ -2,6 +2,9 @@ from pymongo import MongoClient
 
 
 class DatabaseService:
+    """
+    A service class for connecting to the MongoDB database.
+    """
     @staticmethod
     def connect_to_sync_mongo_db(uri: str, database_name: str):
         """

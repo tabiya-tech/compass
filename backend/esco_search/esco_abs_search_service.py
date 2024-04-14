@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Generic, TypeVar
 
 from langchain_core.embeddings.embeddings import Embeddings
 from langchain_mongodb import MongoDBAtlasVectorSearch
@@ -7,20 +8,30 @@ from pymongo.database import Database
 
 
 class VectorSearchConfig(BaseModel):
+    """
+    A configuration class for the vector search.
+    """
+
     embedding_model: Embeddings
     """
     The embedding model to use for calculating the embeddings of the search queries.
     """
 
     @validator('embedding_model', pre=True)
-    def validate_embedding_model(cls, v):
+    def _validate_embedding_model(cls, v):
         if not isinstance(v, Embeddings):
             raise ValueError("embedding_model must be an instance of Embeddings")
         # Return the value
         return v
 
     class Config:
+        """
+        Configuration settings for the VectorSearchConfig model.
+        """
         arbitrary_types_allowed = True
+        """
+        Allow arbitrary types for the model as the embedding model is a custom class.
+        """
 
     collection_name: str
     """
@@ -49,8 +60,6 @@ class VectorSearchConfig(BaseModel):
     """
 
 
-from typing import Generic, TypeVar
-
 # Define a type variable
 T = TypeVar('T')
 
@@ -59,9 +68,11 @@ class AbstractEscoSearchService(ABC, Generic[T]):
     """
     An abstract class to perform similarity searches on esco entities.
     It uses the MongoDBAtlasVectorSearch to perform the similarity search.
-    The embedding model used is provided in the config along with the collection name, index name, and other parameters.
+    The embedding model used is provided in the config along with the collection name,
+    index name, and other parameters.
 
-    Subclasses must implement the to_entity method to convert the document returned by the vector search to an entity object of type ``T``.
+    Subclasses must implement the to_entity method to convert the document returned by the vector search
+    to an entity object of type ``T``.
     """
 
     def __init__(self, db: Database, config: VectorSearchConfig):

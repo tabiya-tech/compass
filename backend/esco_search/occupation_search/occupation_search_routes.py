@@ -10,6 +10,9 @@ from esco_search.occupation_search.occupation_search_service import OccupationSe
 
 
 def add_occupation_search_routes(app: FastAPI, db: Database, embedder: Embeddings) -> None:
+    """
+    Temporary function to add the routes for the occupation search service to the FastAPI app for testing purposes.
+    """
     occupation_vector_search_config = VectorSearchConfig(
         embedding_model=embedder,
         collection_name="occupationmodels",
@@ -22,6 +25,9 @@ def add_occupation_search_routes(app: FastAPI, db: Database, embedder: Embedding
     occupation_search = OccupationSearchService(db=db, config=occupation_vector_search_config)
 
     class OccupationsResponse(BaseModel):
+        """
+        The response model for the occupations search endpoint.
+        """
         occupations: list[OccupationEntity]
 
     @app.get("/search/occupations",
@@ -31,7 +37,7 @@ def add_occupation_search_routes(app: FastAPI, db: Database, embedder: Embedding
              The search is based on the embeddings of the occupations, and uses
              the cosine similarity to find the most similar occupations.""",
              )
-    async def search_occupations(
+    async def _search_occupations(
             query: Annotated[str, Query(max_length=3000, description="The text to search for matching occupations")],
             top_k: Annotated[int, Query(ge=1, le=100, description="The number of occupations to return")] = 5):
         occupations = await occupation_search.search(query, k=top_k)
@@ -44,7 +50,7 @@ def add_occupation_search_routes(app: FastAPI, db: Database, embedder: Embedding
              The search is based on the embeddings of the occupations, and uses
              the cosine similarity to find the most similar occupations.""",
              )
-    async def search_mmr_occupations(
+    async def _search_mmr_occupations(
             query: Annotated[str, Query(max_length=3000, description="The text to search for matching occupations")],
             top_k: Annotated[int, Query(ge=1, le=100, description="The number of occupations to return")] = 5,
             fetch_k: Annotated[

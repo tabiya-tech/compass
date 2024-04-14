@@ -49,8 +49,11 @@ with open(version_file_path, 'r') as fp:
     version_info = json.load(fp)
 
 
-@app.get("/version")
-async def get_version():
+@app.get(path="/version",
+         description="""
+         Returns the version of the application
+         """, )
+async def _get_version():
     return {"version": version_info}
 
 
@@ -83,12 +86,16 @@ agent_director = AgentDirector()
 
 
 class ConversationResponse(BaseModel):
+    """
+    The response model for the conversation endpoint.
+    """
     last: AgentOutput
     conversation_history: ConversationHistory
 
 
-@app.get("/conversation")
-async def welcome(user_input: str, clear_memory: bool = False):
+@app.get(path="/conversation",
+         description="""Temporary route used to interact with the conversation agent.""", )
+async def _welcome(user_input: str, clear_memory: bool = False):
     try:
         if clear_memory:
             await agent_director.reset()
