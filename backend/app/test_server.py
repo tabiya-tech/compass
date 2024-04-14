@@ -9,14 +9,12 @@ from app.server import app
 client = TestClient(app)
 
 
-def test_read_main():
+def test_version():
     """
-    Test the root endpoint
-    WHEN a GET request is made to the root endpoint
-    THEN it should return withO OK
-    AND a JSON response with the message "Hello Tabiya"
+    Test the version endpoint
+    WHEN a GET request is made to the version endpoint
+    THEN it should return with OK
     :return:
     """
-    response = client.get("/")
+    response = client.get("/version")
     assert response.status_code == 200
-    assert response.json() == {"msg":"Hello Tabiya"}

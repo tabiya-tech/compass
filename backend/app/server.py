@@ -1,5 +1,4 @@
 import logging
-import os
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
@@ -30,13 +29,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-############################################
-# Add std routes
-############################################
-@app.get("/")
-async def root():
-    return {"msg": "Hello Tabiya"}
 
 ############################################
 # Add version routes
@@ -91,7 +83,7 @@ async def _welcome(user_input: str, clear_memory: bool = False):
         history = await agent_director.get_conversation_history()
         response = ConversationResponse(last=agent_output, conversation_history=history)
         return response
-    except Exception as e:
+    except Exception as e: # pylint: disable=broad-except # this is the main entry point, so we need to catch all exceptions
         logger.exception(e)
         return {"error": "oops! something went wrong!"}
 
