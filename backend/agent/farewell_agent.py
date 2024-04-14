@@ -12,13 +12,18 @@ logger = logging.getLogger(__name__)
 
 
 class SimpleFarewellAgent(Agent):
-
+    """
+    Simple agent that provides a simple response, should be used for testing purposes only
+    """
     async def execute(self, user_input: AgentInput, history: ConversationHistory) -> AgentOutput:
         print(user_input.message + " from FarewellAgent")
         return AgentOutput(message_for_user="FarewellAgent done", finished=True, agent_type=AgentType.FAREWELL_AGENT)
 
 
 class FarewellAgent(Agent):
+    """
+    Agent that farewells the user and provides a response based on the task
+    """
     def __init__(self):
         self._agent_type = AgentType.FAREWELL_AGENT
         # Define the response part of the prompt with some example responses
