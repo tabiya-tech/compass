@@ -39,7 +39,7 @@ class WelcomeAgent(Agent):
         self._prompt = dedent(f"""\
         You are a {self._agent_type.value} at a job counseling agency. 
         Your task is to welcome the user and introduce them to the job counseling process. 
-        For answering user questions, you can use the _Information_ section below.
+        For answering user questions, you can use the _ABOUT_ section below.
         If you are unsure and the question contains information that is not explicitly related to your task 
         and can't be found in the _ABOUT_ section, you will answer with 
         "Sorry, I don't know how to help with that."            
