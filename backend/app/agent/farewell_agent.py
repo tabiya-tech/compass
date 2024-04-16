@@ -4,9 +4,11 @@ from textwrap import dedent
 
 from langchain_google_vertexai import ChatVertexAI
 
-from app.agent.agent_types import AgentInput, AgentOutput, Agent, AgentType, ConversationHistory, \
-    ConversationHistoryFormatter
+from app.agent.agent import Agent
+from app.agent.agent_types import AgentInput, AgentOutput, AgentType
 from app.agent.prompt_reponse_template import ModelResponse, get_json_response_instructions
+from app.conversation_memory.conversation_memory_manager import ConversationHistory
+from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +17,7 @@ class SimpleFarewellAgent(Agent):
     """
     Simple agent that provides a simple response, should be used for testing purposes only
     """
+
     async def execute(self, user_input: AgentInput, history: ConversationHistory) -> AgentOutput:
         print(user_input.message + " from FarewellAgent")
         return AgentOutput(message_for_user="FarewellAgent done", finished=True, agent_type=AgentType.FAREWELL_AGENT)
@@ -24,6 +27,7 @@ class FarewellAgent(Agent):
     """
     Agent that farewells the user and provides a response based on the task
     """
+
     def __init__(self):
         self._agent_type = AgentType.FAREWELL_AGENT
         # Define the response part of the prompt with some example responses
@@ -35,7 +39,7 @@ class FarewellAgent(Agent):
         self._prompt = dedent(f"""\
             You are a {self._agent_type.value} at a job counseling agency.
             Your task is to say goodbye to the user and end the conversation.
-            """)+ '\n' + response_part + '\n' + dedent("""\
+            """) + '\n' + response_part + '\n' + dedent("""\
             Farewell the user with a warm goodbye.
             """)
         self._chain = ChatVertexAI(model_name="gemini-pro")

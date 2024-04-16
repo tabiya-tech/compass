@@ -1,17 +1,17 @@
 import logging
-from typing import TypeAlias, Dict
+from typing import TypeAlias
 from collections import defaultdict
 
-from app.agent.agent_types import Agent, AgentInput, AgentOutput, \
-    ConversationHistory
+from app.agent.agent import Agent
+from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.farewell_agent import FarewellAgent
 from app.agent.skill_explore_agent import SkillExplorerAgent
 from app.agent.welcome_agent import WelcomeAgent
-from app.agent.conversation_manager import ConversationManager
+from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager, ConversationHistory
 
 logger = logging.getLogger(__name__)
 
-CurrentIndexDict: TypeAlias = Dict[int, int]
+CurrentIndexDict: TypeAlias = dict[int, int]
 
 
 class AgentDirector:
@@ -20,7 +20,7 @@ class AgentDirector:
     the user input to the appropriate agent.
     """
 
-    def __init__(self):
+    def __init__(self, conversation_manager: ConversationMemoryManager):
         # set the default agent index to 0
         self._current_agent_index: CurrentIndexDict = defaultdict(int)
         # initialize the agents
@@ -30,14 +30,14 @@ class AgentDirector:
             FarewellAgent()
         ]
         # initialize the conversation manager
-        self._conversation_manager = ConversationManager()
+        self._conversation_manager = conversation_manager
 
     async def reset(self, session_id: int) -> None:
         """
         Reset the state of the conversation
         """
         # Reset agent index for a specific session
-        await self.set_current_agent(session_id, 0)
+        await self._set_current_agent(session_id, 0)
         # Reset conversation history for a specific session
         await self._conversation_manager.reset(session_id)
 
@@ -53,7 +53,7 @@ class AgentDirector:
         return await self._conversation_manager.get_conversation_history(
             session_id)
 
-    def get_current_agent(self, session_id: int) -> tuple[int, Agent | None]:
+    def _get_current_agent(self, session_id: int) -> tuple[int, Agent | None]:
         """
         Get the current agent index and the current agent for a specific session.
 
@@ -67,7 +67,7 @@ class AgentDirector:
         # If the index is out of range, return None
         return current_agent_index, None
 
-    async def set_current_agent(self, session_id: int, agent_index: int) -> None:
+    async def _set_current_agent(self, session_id: int, agent_index: int) -> None:
         """
         Set the current agent index for a specific session.
 
@@ -76,8 +76,8 @@ class AgentDirector:
         """
         self._current_agent_index[session_id] = agent_index
 
-    async def run_task(self, session_id: int,
-                       user_input: AgentInput) -> AgentOutput:
+    async def execute(self, session_id: int,
+                      user_input: AgentInput) -> AgentOutput:
         """
         Run the conversation task for the current user input and specific session.
 
@@ -90,12 +90,12 @@ class AgentDirector:
         :return: The output from the agent
         """
         try:
-            current_agent_index, current_agent = self.get_current_agent(session_id)
+            current_agent_index, current_agent = self._get_current_agent(session_id)
             if current_agent:
                 history = await self.get_conversation_history(session_id)
                 agent_output = await current_agent.execute(user_input, history)
                 if agent_output.finished:  # If the agent is finished, move to the next agent
-                    await self.set_current_agent(session_id, current_agent_index + 1)
+                    await self._set_current_agent(session_id, current_agent_index + 1)
                 await self._conversation_manager.update_history(session_id, user_input,
                                                                 agent_output)
             else:
