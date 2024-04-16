@@ -2,12 +2,12 @@ import logging
 from typing import TypeAlias, Dict
 from collections import defaultdict
 
-from agent.agent_types import Agent, AgentInput, AgentOutput, \
+from app.agent.agent_types import Agent, AgentInput, AgentOutput, \
     ConversationHistory
-from agent.farewell_agent import FarewellAgent
-from agent.skill_explore_agent import SkillExplorerAgent
-from agent.welcome_agent import WelcomeAgent
-from agent.conversation_manager import ConversationManager
+from app.agent.farewell_agent import FarewellAgent
+from app.agent.skill_explore_agent import SkillExplorerAgent
+from app.agent.welcome_agent import WelcomeAgent
+from app.agent.conversation_manager import ConversationManager
 
 logger = logging.getLogger(__name__)
 
