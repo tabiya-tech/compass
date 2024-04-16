@@ -61,8 +61,11 @@ class ConversationResponse(BaseModel):
 
 @app.get(path="/conversation",
          description="""Temporary route used to interact with the conversation agent.""", )
-async def _welcome(user_input: str, clear_memory: bool = False, filter_pii: bool = True,
+async def welcome(user_input: str, clear_memory: bool = False, filter_pii: bool = True,
                    session_id: int = 1):
+    """
+    Endpoint responsible for managing the conversation with the user.
+    """
     try:
         if clear_memory:
             await agent_director.reset(session_id)

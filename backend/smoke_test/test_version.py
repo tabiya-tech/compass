@@ -1,9 +1,15 @@
-import httpx
 import json
 import os
 
+import httpx
+import pytest
 
+
+@pytest.mark.smoke_test
 def test_version_info():
+    """
+    Test that the version info endpoint returns the expected version info.
+    """
     # GIVEN the base URL of the deployed service
     base_url = os.environ.get("E2E_BASE_URL")
     # AND the expected version info, a JSON string

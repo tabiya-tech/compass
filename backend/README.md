@@ -216,9 +216,18 @@ poetry run bandit -c bandit.yaml -r .
 To run the unit tests, use the following command:
 
 ```shell
- poetry run pytest -v -k "not smoke_test" 
+ poetry run pytest -v -m "not (smoke_test or evaluation_test)" 
+```
+### Running the smoke tests
+
+To run the smoke tests, use the following command:
+
+```shell
+ poetry run pytest -v -m "smoke_test" 
 ```
 
+### Running the evaluation tests
+Evaluation tests will be run separately from other tests, full documentation [here](EVALUATION_TESTS_README.md).
 
 
 
