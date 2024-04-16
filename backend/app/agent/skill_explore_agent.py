@@ -4,10 +4,12 @@ from textwrap import dedent
 
 from langchain_google_vertexai import ChatVertexAI
 
-from app.agent.agent_types import AgentInput, AgentOutput, AgentType, Agent, ConversationHistory, \
-    ConversationHistoryFormatter
+from app.agent.agent import Agent
+from app.agent.agent_types import AgentInput, AgentOutput, AgentType
 from app.agent.prompt_reponse_template import ModelResponse, get_json_response_instructions, \
     get_conversation_finish_instructions
+from app.conversation_memory.conversation_memory_manager import ConversationHistory
+from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +18,7 @@ class SimpleSkillExplorerAgent(Agent):
     """
     Simple agent that provides a simple response, should be used for testing purposes only
     """
+
     async def execute(self, user_input: AgentInput, history: ConversationHistory) -> AgentOutput:
         print(user_input.message + " from SkillExplorerAgent")
         return AgentOutput(message_for_user="SkillExplorerAgent done", finished=True,
@@ -26,6 +29,7 @@ class SkillExplorerAgent(Agent):
     """
     Agent that expores with with the the user and provides a response based on the task
     """
+
     def __init__(self):
         self._agent_type = AgentType.SKILL_EXPLORER_AGENT
         # Define the response part of the prompt with some example responses
