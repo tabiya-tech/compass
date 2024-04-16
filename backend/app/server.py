@@ -10,8 +10,8 @@ from langchain_google_vertexai import ChatVertexAI
 from langserve import add_routes
 from pydantic import BaseModel
 from esco_search.esco_search_routes import add_esco_search_routes
-from agent.agent_director import AgentDirector
-from agent.agent_types import AgentInput, AgentOutput, ConversationHistory
+from app.agent.agent_director import AgentDirector
+from app.agent.agent_types import AgentInput, AgentOutput, ConversationHistory
 from app.version.version_routes import add_version_routes
 from app.sensitive_filter import sensitive_filter
 

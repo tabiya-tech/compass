@@ -23,7 +23,6 @@ COPY --from=builder /usr/local/bin/uvicorn /usr/local/bin/uvicorn
 
 WORKDIR /code
 
-COPY ./agent ./agent
 COPY ./app ./app
 COPY ./esco_search ./esco_search
 
