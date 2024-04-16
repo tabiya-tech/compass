@@ -52,5 +52,5 @@ jobs:
             ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
       - name: Run unit tests
         shell: bash
-        run: poetry run pytest -k "not smoke_test"
+        run: poetry run pytest -m 'not (evaluation_test or smoke_test)'
         working-directory: backend
