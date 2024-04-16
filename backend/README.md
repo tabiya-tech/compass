@@ -27,7 +27,10 @@ source venv-backend/bin/activate
 Install the dependencies:
 
 ```shell
-poetry install
+# Use the version of the dependencies specified in the lock file
+poetry lock --no-update
+# Install missing and remove unreferenced packages
+poetry install --sync
 ```
 
 > Note:
@@ -164,7 +167,8 @@ docker build . -t compass-backend
 
 ### Running the Image Locally
 
-To run the image, you'll need to mount a volume with the service account key and the supply an environment variables to the container:
+To run the image, you'll need to mount a volume with the service account key and the supply an environment variables to
+the container:
 
 ```shell
 docker run -v "<PATH_TO_KEY_FILE>:/code/credentials.json" -e GOOGLE_APPLICATION_CREDENTIALS="/code/credentials.json" -e MONGODB_URI="<URI_TO_MONGODB>" -p 8080:8080 compass-backend
@@ -174,7 +178,8 @@ If you have set up the `.env` file, you can run the image using the `--env-file`
 
 For example:
 
-Assuming the `.env` file is in the root directory of the project and the service account key file named `credentials.json` is in a folder named `keys` in the root directory:
+Assuming the `.env` file is in the root directory of the project and the service account key file
+named `credentials.json` is in a folder named `keys` in the root directory:
 
 ```dotenv
 MONGODB_URI=<URI_TO_MONGODB>

@@ -31,7 +31,9 @@ jobs:
           key: poetry-cache-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ env.POETRY_VERSION }}
       - name: Install dependencies
         shell: bash
-        run: poetry install --no-interaction
+        run: |
+          poetry lock --no-update --no-interaction
+          poetry install --no-interaction
         working-directory: backend
       - name: Linting Bandit
         shell: bash
