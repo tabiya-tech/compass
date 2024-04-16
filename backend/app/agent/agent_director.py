@@ -64,8 +64,8 @@ class AgentDirector:
         current_agent_index = self._current_agent_index[session_id]
         if 0 <= current_agent_index < len(self._agents):
             return current_agent_index, self._agents[current_agent_index]
-        else:
-            return current_agent_index, None
+        # If the index is out of range, return None
+        return current_agent_index, None
 
     async def set_current_agent(self, session_id: int, agent_index: int) -> None:
         """
