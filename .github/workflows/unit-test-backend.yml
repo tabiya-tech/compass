@@ -43,7 +43,7 @@ jobs:
         shell: bash
         # Do not fail the build if there are linting errors (--exit-zero)
         # Once we have fixed all the linting errors, we can remove this flag
-        run:  poetry run pylint --exit-zero --load-plugins pylint_pydantic agent app esco_search
+        run:  poetry run pylint --exit-zero app esco_search
         working-directory: backend
       - name: Setup google-cloud-auth
         uses: google-github-actions/auth@v2.1.2
