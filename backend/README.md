@@ -193,6 +193,31 @@ Run the image using the following command:
  docker run -v "$(pwd)/keys/credentials.json:/code/keys/credentials.json" --env-file .env compass-backend
 ```
 
+## Testing Locally
+
+### Running the linter
+
+The project uses `pylint` as the linter. To run the linter, use the following command:
+
+```shell
+# Run the linter on the app and esco_search directories
+poetry run pylint app esco_search  
+```
+
+Additionally, the project uses `bandit` to check for security vulnerabilities. To run `bandit`, use the following command:
+
+```shell
+# Run bandit on the app and esco_search directories
+poetry run bandit -c bandit.yaml -r .
+```
+
+### Running the tests
+
+To run the unit tests, use the following command:
+
+```shell
+ poetry run pytest -v -k "not smoke_test" 
+```
 
 
 
