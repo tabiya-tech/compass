@@ -4,10 +4,6 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# pylint: disable-next=no-name-in-module # unclear why this is being flagged by pylint
-from langchain_community.chat_models import ChatVertexAI as DeprecatedChatVertexAI
-from langchain_google_vertexai import ChatVertexAI
-from langserve import add_routes
 from pydantic import BaseModel
 from esco_search.esco_search_routes import add_esco_search_routes
 from app.agent.agent_director import AgentDirector
@@ -36,22 +32,7 @@ app.add_middleware(
 ############################################
 add_version_routes(app)
 
-############################################
-# Add routes for the different chat models
-############################################
-# Route for Gemini Pro
-add_routes(
-    app,
-    ChatVertexAI(model_name="gemini-pro", convert_system_message_to_human=True),
-    path="/google/gemini-pro",
-)
 
-# Route for olden chat-bison
-add_routes(
-    app,
-    DeprecatedChatVertexAI(),
-    path="/google/chat-bison",
-)
 ############################################
 # Add routes relevant for esco_search
 ############################################
