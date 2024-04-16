@@ -1,7 +1,7 @@
 from collections import defaultdict
 from typing import List, Tuple, TypeAlias, Dict
 
-from agent.agent_types import AgentInput, AgentOutput, ConversationHistory
+from app.agent.agent_types import AgentInput, AgentOutput, ConversationHistory
 
 ConversationSummary: TypeAlias = List[str]
 ConversationContext: TypeAlias = Tuple[ConversationHistory, ConversationSummary]

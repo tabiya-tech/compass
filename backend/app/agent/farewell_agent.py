@@ -4,9 +4,9 @@ from textwrap import dedent
 
 from langchain_google_vertexai import ChatVertexAI
 
-from agent.agent_types import AgentInput, AgentOutput, Agent, AgentType, ConversationHistory, \
+from app.agent.agent_types import AgentInput, AgentOutput, Agent, AgentType, ConversationHistory, \
     ConversationHistoryFormatter
-from agent.prompt_reponse_template import ModelResponse, get_json_response_instructions
+from app.agent.prompt_reponse_template import ModelResponse, get_json_response_instructions
 
 logger = logging.getLogger(__name__)
 
