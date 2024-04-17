@@ -4,6 +4,8 @@ import re
 
 from pydantic import BaseModel
 
+from fix_busted_json import repair_json
+
 T = TypeVar('T', bound=BaseModel)
 
 # Regular expression to match simple JSON objects
@@ -13,6 +15,8 @@ _JSON_REGEX = r'\{.*\}'
 def extract_json(text: str, model: Type[T]) -> T:
     """
     Extract a JSON object from a text and validate it with a Pydantic model.
+    Capable of extracting JSON objects from Markdown code blocks and plain text.
+    Capable of repairing broken JSON objects.
     :param text: The text to extract the JSON object from
     :param model: The Pydantic model to validate the JSON object
     :return: An instance of the Pydantic model if the JSON object is valid, otherwise raise an exception
@@ -27,7 +31,13 @@ def extract_json(text: str, model: Type[T]) -> T:
     extracted_text = match.group(0)
     try:
         # Parse the JSON text and validate it with the Pydantic model
-        data = json.loads(extracted_text)
+        cleaned_json = repair_json(extracted_text)
+    except Exception as e:  # pylint: disable=broad-except
+        raise InvalidJSON(f"Failed to clean JSON: {e}") from e
+
+    try:
+        # Parse the JSON text and validate it with the Pydantic model
+        data = json.loads(cleaned_json)
         return model(**data)
     except json.JSONDecodeError as e:
         raise InvalidJSON(f"Failed to decode JSON: {e}") from e
@@ -37,7 +47,6 @@ def extract_json(text: str, model: Type[T]) -> T:
 
 class ExtractJSONError(Exception):
     """Base class for extracting JSON exceptions"""
-
 
 
 class InvalidJSON(ExtractJSONError):

@@ -19,6 +19,7 @@ class TestExtractJson(unittest.TestCase):
     """
     Test the extract_json function
     """
+
     def test_valid_json_block(self):
         """Should return and instance of the model from a valid JSON block"""
         # GIVEN a model class GivenExampleModel
@@ -65,6 +66,26 @@ class TestExtractJson(unittest.TestCase):
         self.assertFalse(result.boolean)
         self.assertEqual(result.numeral, 123)
 
+    def test_repair_json(self):
+        """Should return and instance of the model if the JSON in the text can be repaired"""
+        # GIVEN a model class GivenExampleModel
+        # AND a string that contains an incomplete json
+        given_text_with_incomplete_json = """
+            {'text': "\nSpecial chars" 
+            'boolean': "True",
+            'numeral': 123}
+            """
+
+        # WHEN extracting the JSON
+        result: GivenExampleModel = extract_json(given_text_with_incomplete_json, GivenExampleModel)
+
+        # THEN an InvalidJSON exception should be raised
+        self.assertIsInstance(result, GivenExampleModel)
+        self.assertEqual(result.text, "\nSpecial chars")
+        self.assertTrue(result.boolean)
+        self.assertEqual(result.numeral, 123)
+
+
     def test_non_conforming_json(self):
         """Should raise ValidationError if there is valid JSON block that DOES NOT conform to the model"""
         # GIVEN a model class GivenExampleModel
@@ -93,8 +114,8 @@ class TestExtractJson(unittest.TestCase):
             # WHEN extracting the JSON
             extract_json(given_text_without_json, GivenExampleModel)
 
-    def test_incomplete_json(self):
-        """Should raise InvalidJSON if there is incomplete JSON in the text"""
+    def test_irreparable_json(self):
+        """Should raise InvalidJSON if there is irreparable JSON in the text"""
         # GIVEN a model class GivenExampleModel
         # AND a string that contains an incomplete json
         given_text_with_incomplete_json = """
