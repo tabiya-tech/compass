@@ -1,4 +1,3 @@
-import json
 import logging
 from textwrap import dedent
 
@@ -6,10 +5,11 @@ from langchain_google_vertexai import ChatVertexAI
 
 from app.agent.agent import Agent
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType
+from app.agent.extract_json import extract_json, ExtractJSONError
 from app.agent.prompt_reponse_template import ModelResponse, get_json_response_instructions, \
     get_conversation_finish_instructions
-from app.conversation_memory.conversation_memory_manager import ConversationHistory
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
+from app.conversation_memory.conversation_memory_manager import ConversationHistory
 
 logger = logging.getLogger(__name__)
 
@@ -68,14 +68,12 @@ class WelcomeAgent(Agent):
             history) + "\nUser: " + user_input.message
         conversation = await self._chain.ainvoke(model_input)
         try:
-            last: ModelResponse = json.loads(conversation.content)
-        except json.JSONDecodeError as e:
+            last: ModelResponse = extract_json(conversation.content, ModelResponse)
+        except ExtractJSONError as e:
             logger.exception(e)
-            last = {
-                "message": str(conversation.content),
-                "finished": False
-            }
-        response = AgentOutput(message_for_user=last["message"],
-                               finished=last["finished"],
+            last = ModelResponse(message=str(conversation.content), finished=False)
+
+        response = AgentOutput(message_for_user=last.message,
+                               finished=last.finished,
                                agent_type=AgentType.WELCOME_AGENT)
         return response
