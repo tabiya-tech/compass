@@ -45,10 +45,26 @@ class ConversationEvaluationRecord(BaseModel):
     """
     Full record of the test run. This includes the conversation record and evaluation record.
     """
+
     test_case: str
+    """
+    The test case name.
+    """
+
     simulated_user_prompt: str
+    """
+    The simulated user prompt.
+    """
+
     conversation: list[ConversationRecord] = Field(default_factory=list)
+    """
+    The conversation records a perceived by the simulated user.
+    """
+
     evaluations: list[EvaluationResult] = Field(default_factory=list)
+    """
+    The evaluation results.
+    """
 
     def add_conversation_record(self, conversation_record: ConversationRecord):
         """
@@ -110,7 +126,7 @@ class ConversationEvaluationRecord(BaseModel):
         :return:
         """
         base_path = os.path.join(folder, base_file_name)
-        print(f'The full conversation and evaluation is saved at {base_path}')
+        print(f'The full conversation and evaluation is saved at file:///{base_path}.json \n file:///{base_path}.md')
         # Save the evaluation result to a json file
         _save_to_file(base_path + '.json',
                       lambda f: json.dump(json.loads(self.json()), f, ensure_ascii=False, indent=4))
