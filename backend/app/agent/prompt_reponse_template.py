@@ -1,8 +1,9 @@
-from typing import TypedDict
 from textwrap import dedent
 
+from pydantic import BaseModel
 
-class ModelResponse(TypedDict):
+
+class ModelResponse(BaseModel):
     """
     A model for a response of LLMs.
     """
@@ -18,7 +19,7 @@ def get_conversation_finish_instructions(condition: str) -> str:
     including how to set the "finished" key in the response.
     """
     return condition + ", " + dedent("""\
-    return the json that matches the _Response_Template_ schema  with the "finished" key in the set to true.
+    return a well-formed JSON that matches the _Response_Template_ schema  with the "finished" key in the set to true.
     """)
 
 
@@ -29,7 +30,7 @@ def get_json_response_instructions(examples: list[ModelResponse]) -> str:
     :return: A string with the instructions for the model to return a json.
     """
     template_parts = [dedent("""\
-    Your response will be in text form of a valid, well-formed JSON, that matches the _Response_Template_  bellow.
+    Your response will be in the form of a valid, well-formed JSON that matches the _Response_Template_  bellow.
     
     _Response_Template_:
         {
@@ -42,8 +43,8 @@ def get_json_response_instructions(examples: list[ModelResponse]) -> str:
         part = dedent(f"""\
         Example responses {i + 1}:
             {{
-            "message":  "{example["message"]}",
-            "finished": {"true" if example["finished"] is True else "false"}
+            "message":  "{example.message}",
+            "finished": {"true" if example.finished is True else "false"}
             }}
         """)
         template_parts.append(part)
