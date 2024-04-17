@@ -427,6 +427,17 @@ typing-extensions = ">=4.8.0"
 all = ["email-validator (>=2.0.0)", "httpx (>=0.23.0)", "itsdangerous (>=1.1.0)", "jinja2 (>=2.11.2)", "orjson (>=3.2.1)", "pydantic-extra-types (>=2.0.0)", "pydantic-settings (>=2.0.0)", "python-multipart (>=0.0.7)", "pyyaml (>=5.3.1)", "ujson (>=4.0.1,!=4.0.2,!=4.1.0,!=4.2.0,!=4.3.0,!=5.0.0,!=5.1.0)", "uvicorn[standard] (>=0.12.0)"]
 
 [[package]]
+name = "fix-busted-json"
+version = "0.0.17"
+description = "Fixes broken JSON string objects"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "fix-busted-json-0.0.17.tar.gz", hash = "sha256:64d3f11896b51812238174f55e001311e02eca3d3be3618724c42d72d894d60d"},
+    {file = "fix_busted_json-0.0.17-py3-none-any.whl", hash = "sha256:1011fb26d664fb280b63d0f9a402a9b88bc1bfb82c7d74425b6b30325e32797b"},
+]
+
+[[package]]
 name = "frozenlist"
 version = "1.4.1"
 description = "A list-like structure which implements collections.abc.MutableSequence"
@@ -2715,4 +2726,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "abb7083f3f8d9a5e2819cff7c19ad644135123ef15adf60a3a050c6c8173a8c6"
+content-hash = "653392cb26b87cec7a5037684e83c8a1fc699084b8e446322d4a371da61a034e"
