@@ -1,9 +1,10 @@
-import asyncio
 import json
+import os
 import pprint
 
-from dotenv import load_dotenv
+import pytest as pytest
 import vertexai
+from dotenv import load_dotenv
 from vertexai.generative_models import GenerativeModel
 
 from app.server import welcome
@@ -11,7 +12,10 @@ from evaluation_tests.evaluation_result import TestEvaluationRecord, Conversatio
 
 
 # TODO(kingam): Make that into a pytest
-async def create_conversation():
+@pytest.mark.asyncio
+async def test_conversation():
+    load_dotenv()
+    test_case = "e2e_test"
     prompt = """
         Pretend you are a young student from Kenya trying to find a job.
         Make your messages specific and make sure to only act as the student. 
@@ -24,7 +28,7 @@ async def create_conversation():
         "gemini-1.0-pro",
         system_instruction=[prompt])
     chat = model.start_chat()
-    evaluation_result = TestEvaluationRecord(simulated_user_prompt=prompt, test_case="E2E Test")
+    evaluation_result = TestEvaluationRecord(simulated_user_prompt=prompt, test_case="")
     user_output = ""
 
     # TODO(kingam): Also finish the conversation when Compass is done.
@@ -35,8 +39,10 @@ async def create_conversation():
         user_output = chat.send_message(agent_output, stream=False).text
         evaluation_result.add_conversation_record(
             ConversationRecord(message=user_output, actor=Actor.SIMULATED_USER))
+
     pprint.pprint(json.loads(evaluation_result.to_json()), indent=4)
 
-
-load_dotenv()
-asyncio.run(create_conversation())
+    file_path = os.path.dirname(__file__) + "/test_output/" + test_case + '.json'
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, 'w', encoding='utf-8') as f:
+        json.dump(json.loads(evaluation_result.to_json()), f, ensure_ascii=False, indent=4)
