@@ -27,7 +27,7 @@ async def test_conversation():
         "gemini-1.0-pro",
         system_instruction=[prompt])
     chat = model.start_chat()
-    evaluation_result = TestEvaluationRecord(simulated_user_prompt=prompt, test_case="")
+    evaluation_result = TestEvaluationRecord(simulated_user_prompt=prompt, test_case=test_case)
     user_output = ""
 
     # TODO(kingam): Also finish the conversation when Compass is done.
