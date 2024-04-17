@@ -11,7 +11,6 @@ from app.server import welcome
 from evaluation_tests.evaluation_result import TestEvaluationRecord, ConversationRecord, Actor
 
 
-# TODO(kingam): Make that into a pytest
 @pytest.mark.asyncio
 async def test_conversation():
     load_dotenv()
