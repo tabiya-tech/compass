@@ -7,12 +7,12 @@ from pydantic.main import BaseModel
 from tqdm import tqdm
 from vertexai.generative_models import Content
 
-from app.conversation_memory.conversation_memory_manager import save_conversation_history_to_json, \
-    save_conversation_history_to_markdown
+from app.conversation_memory.save_conversation_context import save_conversation_context_to_json, \
+    save_conversation_context_to_markdown
 from common_libs.llm.gemini import GeminiChatLLM, LLMConfig
 from evaluation_tests.conversation_libs import conversation_generator
 from evaluation_tests.conversation_libs.agent_executors import ExecuteAgentCallable, CheckAgentFinishedCallable, \
-    GetConversationHistoryCallable, ExecuteSimulatedUserCallable
+    ExecuteSimulatedUserCallable, GetConversationContextCallable
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationEvaluationRecord, EvaluationType
 from evaluation_tests.conversation_libs.evaluators.evaluator_builder import create_evaluator
 
@@ -32,6 +32,13 @@ class EvaluationTestCase(BaseModel):
     name: str
     simulated_user_prompt: str
     evaluations: list[Evaluation]
+
+
+class ScriptedUserEvaluationTestCase(EvaluationTestCase):
+    """
+    The definition of the test cases to be run.
+    """
+    scripted_user: list[str]
 
 
 @pytest.fixture(scope="session")
@@ -59,7 +66,7 @@ class ConversationTestConfig(BaseModel):
     execute_evaluated_agent: ExecuteAgentCallable
     execute_simulated_user: ExecuteSimulatedUserCallable
     is_finished: CheckAgentFinishedCallable
-    get_conversation_history: GetConversationHistoryCallable
+    get_conversation_context: GetConversationContextCallable
 
     class Config:
         """
@@ -97,12 +104,12 @@ async def conversation_test_function(*, config: ConversationTestConfig):
     time_now = datetime.now(timezone.utc).isoformat()
     evaluation_result.save_data(folder=config.output_folder, base_file_name=config.test_case.name + time_now)
 
-    # Save the conversation history
-    # save the internal conversation history
-    history = await config.get_conversation_history()
-    history_path = os.path.join(config.output_folder, config.test_case.name + '_conversation_history' + time_now)
-    save_conversation_history_to_json(history, history_path + ".json")
-    save_conversation_history_to_markdown("Test Case:" + config.test_case.name, history, history_path + ".md")
+    # Save the agent's internal conversation context
+    context = await config.get_conversation_context()
+    context_path = os.path.join(config.output_folder, config.test_case.name + '_conversation_context' + time_now)
+    save_conversation_context_to_json(context=context, file_path=context_path + ".json")
+    save_conversation_context_to_markdown(title="Test Case:" + config.test_case.name, context=context,
+                                          file_path=context_path + ".md")
 
     # Run the actual asserts at the end, to make sure that all data is calculated/stored properly.
     assert len(evaluation_result.evaluations) == len(config.test_case.evaluations)
@@ -152,4 +159,7 @@ class ScriptedSimulatedUser:
         :param message_for_user: The message that the user should respond to.
         :return: The response from the simulated user.
         """
+        if turn_number >= len(self._script):
+            print(f"Turn number {turn_number} is out of bounds for the script.")
+            return ""
         return self._script[turn_number]

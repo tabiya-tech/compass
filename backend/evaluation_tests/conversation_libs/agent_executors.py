@@ -1,6 +1,6 @@
 from typing import Protocol, runtime_checkable
 from app.agent.agent_types import AgentOutput, AgentInput
-from app.conversation_memory.conversation_memory_manager import ConversationHistory
+from app.conversation_memory.conversation_memory_types import ConversationContext
 
 
 @runtime_checkable
@@ -32,12 +32,12 @@ class CheckAgentFinishedCallable(Protocol):
 
 
 @runtime_checkable
-class GetConversationHistoryCallable(Protocol):
+class GetConversationContextCallable(Protocol):
     """
-    A function that returns the conversation history.
+    A function that returns the conversation context.
     """
 
-    async def __call__(self) -> ConversationHistory:
+    async def __call__(self) -> ConversationContext:
         raise NotImplementedError
 
 

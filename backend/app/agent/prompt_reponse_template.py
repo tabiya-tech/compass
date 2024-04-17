@@ -1,6 +1,6 @@
 from textwrap import dedent
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class ModelResponse(BaseModel):
@@ -20,6 +20,7 @@ def get_conversation_finish_instructions(condition: str) -> str:
     """
     return condition + ", " + dedent("""\
     return a JSON object with the "finished" key in the set to true.
+    
     Allways return a JSON object. 
     """)
 
