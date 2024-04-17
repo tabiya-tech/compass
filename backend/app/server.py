@@ -3,14 +3,15 @@ import logging
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
 from pydantic import BaseModel
-from esco_search.esco_search_routes import add_esco_search_routes
+
 from app.agent.agent_director import AgentDirector
 from app.agent.agent_types import AgentInput, AgentOutput
-from app.conversation_memory.conversation_memory_manager import ConversationHistory, ConversationMemoryManager
-from app.version.version_routes import add_version_routes
+from app.conversation_memory.conversation_memory_manager import ConversationContext, ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
+from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
+from app.version.version_routes import add_version_routes
+from esco_search.esco_search_routes import add_esco_search_routes
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +49,9 @@ sensitive_filter.add_filter_routes(app)
 # Add routes relevant for the conversation agent
 ############################################
 
-agent_director = AgentDirector(ConversationMemoryManager())
+
+agent_director = AgentDirector(ConversationMemoryManager(
+        UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE))
 
 
 class ConversationResponse(BaseModel):
@@ -56,7 +59,7 @@ class ConversationResponse(BaseModel):
     The response model for the conversation endpoint.
     """
     last: AgentOutput
-    conversation_history: ConversationHistory
+    conversation_context: ConversationContext
 
 
 @app.get(path="/conversation",
@@ -74,8 +77,8 @@ async def welcome(user_input: str, clear_memory: bool = False, filter_pii: bool 
             user_input = await sensitive_filter.obfuscate(user_input)
 
         agent_output = await agent_director.execute(session_id, AgentInput(message=user_input))
-        history = await agent_director.get_conversation_history(session_id)
-        response = ConversationResponse(last=agent_output, conversation_history=history)
+        context = await agent_director.get_conversation_context(session_id)
+        response = ConversationResponse(last=agent_output, conversation_context=context)
         return response
     except Exception as e:  # pylint: disable=broad-except
         # this is the main entry point, so we need to catch all exceptions
@@ -83,15 +86,15 @@ async def welcome(user_input: str, clear_memory: bool = False, filter_pii: bool 
         return {"error": "oops! something went wrong!"}
 
 
-@app.get(path="/conversation_history",
-         description="""Temporary route used to get the conversation history of a user.""", )
-async def get_history(session_id: int):
+@app.get(path="/conversation_context",
+         description="""Temporary route used to get the conversation context of a user.""", )
+async def get_conversation_context(session_id: int):
     """
-    Get the conversation history of a user.
+    Get the conversation context of a user.
     """
     try:
-        history = await agent_director.get_conversation_history(session_id)
-        return history
+        context = await agent_director.get_conversation_context(session_id)
+        return context
     except Exception as e:  # pylint: disable=broad-except
         # this is the main entry point, so we need to catch all exceptions
         logger.exception(e)

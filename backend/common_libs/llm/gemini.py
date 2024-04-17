@@ -118,7 +118,27 @@ class Retry(Generic[T]):
 ###### GeminiLLM Wrapper ######
 
 DEFAULT_GENERATION_CONFIG = GenerationConfig(
+    temperature=0.1,
+    candidate_count=1,
+)
+
+ZERO_TEMPERATURE_GENERATION_CONFIG = GenerationConfig(
+    temperature=0.0,
+    candidate_count=1,
+)
+
+MEDIUM_TEMPERATURE_GENERATION_CONFIG = GenerationConfig(
     temperature=0.5,
+    candidate_count=1,
+)
+
+HIGH_TEMPERATURE_GENERATION_CONFIG = GenerationConfig(
+    temperature=1.0,
+    candidate_count=1,
+)
+
+CRAZY_TEMPERATURE_GENERATION_CONFIG = GenerationConfig(
+    temperature=2.0,
     candidate_count=1,
 )
 
@@ -136,11 +156,26 @@ DEFAULT_SAFETY_SETTINGS: frozenset[SafetySetting] = frozenset([
                   threshold=HarmBlockThreshold.BLOCK_ONLY_HIGH),
 ])
 
+SAFETY_OFF_SETTINGS: frozenset[SafetySetting] = frozenset([
+    SafetySetting(category=HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                  threshold=HarmBlockThreshold.BLOCK_NONE),
+    SafetySetting(category=HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                  threshold=HarmBlockThreshold.BLOCK_NONE),
+    SafetySetting(category=HarmCategory.HARM_CATEGORY_HARASSMENT,
+                  threshold=HarmBlockThreshold.BLOCK_NONE),
+    SafetySetting(category=HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                  threshold=HarmBlockThreshold.BLOCK_NONE),
+    SafetySetting(category=HarmCategory.HARM_CATEGORY_UNSPECIFIED,
+                  threshold=HarmBlockThreshold.BLOCK_NONE),
+])
+
 
 class LLMConfig(BaseModel):
     """
     Configuration for the Gemini LLM.
     """
+    # gemini-1.0-pro is an auto update version the points to the most recent stable version
+    # see https://cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versioning#auto-updated-version
     model_name: str = "gemini-1.0-pro"
     location: str = DEFAULT_VERTEX_API_REGION
     generation_config: GenerationConfig = DEFAULT_GENERATION_CONFIG
@@ -201,13 +236,14 @@ class GeminiChatLLM:
         async def _send_message_async() -> str:
             try:
                 # noinspection PyProtectedMember
-                logger.debug("Sending message via chat to resource:%s", self._model._prediction_resource_name)
+                logger.debug("Sending message via chat to resource:%s",
+                             self._model._prediction_resource_name)  # pylint: disable=protected-access
                 response = await self._chat.send_message_async(message, stream=False)
                 return response.text
             except Exception as e:
                 # noinspection PyProtectedMember
                 logger.error("An error occurred while sending a message in the chat to resource:%s",
-                             self._model._prediction_resource_name, exc_info=True)
+                             self._model._prediction_resource_name, exc_info=True)  # pylint: disable=protected-access
                 raise e
 
         return await Retry[str].call_with_exponential_backoff_async(_send_message_async, self._retry_config)
@@ -224,13 +260,14 @@ class GeminiChatLLM:
         def _send_message() -> str:
             try:
                 # noinspection PyProtectedMember
-                logger.debug("Sending message via chat to resource:%s", self._model._prediction_resource_name)
+                logger.debug("Sending message via chat to resource:%s",
+                             self._model._prediction_resource_name)  # pylint: disable=protected-access
                 response = self._chat.send_message(message, stream=False)
                 return response.text
             except Exception as e:
                 # noinspection PyProtectedMember
                 logger.error("An error occurred while sending a message in the chat to resource:%s",
-                             self._model._prediction_resource_name, exc_info=True)
+                             self._model._prediction_resource_name, exc_info=True)  # pylint: disable=protected-access
                 raise e
 
         return Retry[str].call_with_exponential_backoff(_send_message, self._retry_config)
@@ -241,11 +278,14 @@ class GeminiGenerativeLLM:
     A wrapper for the Gemini LLM that provides retry logic with exponential backoff and jitter for generating content.
     """
 
-    def __init__(self, *, config: LLMConfig = LLMConfig()):
+    def __init__(self, *,
+                 system_instructions: list[str] | str | None = None,
+                 config: LLMConfig = LLMConfig()):
         # Before constructing the GenerativeModel, we need to initialize the VertexAI client
         # as the init function may have been called in another module with different parameters
         vertexai.init(location=config.location)
         self._model = GenerativeModel(model_name=config.model_name,
+                                      system_instruction=system_instructions,
                                       generation_config=config.generation_config,
                                       safety_settings=list(config.safety_settings)
                                       )
@@ -263,13 +303,14 @@ class GeminiGenerativeLLM:
         async def _generate_content_async() -> str:
             try:
                 # noinspection PyProtectedMember
-                logger.debug("Generating content with resource:%s", self._model._prediction_resource_name)
+                logger.debug("Generating content with resource:%s",
+                             self._model._prediction_resource_name)  # pylint: disable=protected-access
                 response = await self._model.generate_content_async(contents=contents)
                 return response.text
             except Exception as e:
                 # noinspection PyProtectedMember
                 logger.error("An error occurred while generating content with resource:%s",
-                             self._model._prediction_resource_name, exc_info=True)
+                             self._model._prediction_resource_name, exc_info=True)  # pylint: disable=protected-access
                 raise e
 
         return await Retry[str].call_with_exponential_backoff_async(_generate_content_async)
@@ -286,13 +327,67 @@ class GeminiGenerativeLLM:
         def _generate_content() -> str:
             try:
                 # noinspection PyProtectedMember
-                logger.debug("Generating content with resource:%s", self._model._prediction_resource_name)
+                logger.debug("Generating content with resource:%s",
+                             self._model._prediction_resource_name)  # pylint: disable=protected-access
                 response = self._model.generate_content(contents=contents)
                 return response.text
             except Exception as e:
                 # noinspection PyProtectedMember
                 logger.error("An error occurred while generating content with resource:%s",
-                             self._model._prediction_resource_name, exc_info=True)
+                             self._model._prediction_resource_name, exc_info=True)  # pylint: disable=protected-access
                 raise e
 
         return await Retry[str].call_with_exponential_backoff(_generate_content)
+
+
+class GeminiStatelessChatLLM:
+    """
+    A wrapper for the Gemini LLM that includes retry logic with exponential backoff and jitter
+    for sending messages in a stateless chat session which is created and destroyed for each message.
+
+    """
+
+    def __init__(self,
+                 *,
+                 system_instructions: list[str] | str,
+                 config: LLMConfig = LLMConfig()):
+        # Before constructing the GenerativeModel, we need to initialize the VertexAI client
+        # as the init function may have been called in another module with different parameters
+        vertexai.init(location=config.location)
+        self._model = GenerativeModel(model_name=config.model_name,
+                                      system_instruction=system_instructions,
+                                      generation_config=config.generation_config,
+                                      safety_settings=list(config.safety_settings)
+                                      )
+        self._retry_config = config.retry_config
+
+    async def send_message_async(self, *, history: list[Content], message: str,
+                                 generation_config: GenerationConfig = None) -> str:
+        """
+        Chat using the Gemini LLM.
+        It creates a new temporary chat session for each message,
+        sends the message and returns the response from the model.
+        It also includes retry logic with exponential backoff and jitter.
+        :param generation_config: Optionally specify a different generation config for the message. This is useful
+        for example when you want to use a different temperature for a specific message.
+        :param history: The history of the conversation.
+        :param message: The message to send as a "user".
+        :return: The generated response as a "model".
+        """
+
+        chat = self._model.start_chat(history=history)
+
+        async def _send_message_async() -> str:
+            try:
+                # noinspection PyProtectedMember
+                logger.debug("Sending message via chat to resource:%s",
+                             self._model._prediction_resource_name)  # pylint: disable=protected-access
+                response = await chat.send_message_async(message, generation_config=generation_config, stream=False)
+                return response.text
+            except Exception as e:
+                # noinspection PyProtectedMember
+                logger.error("An error occurred while sending a message in the chat to resource:%s",
+                             self._model._prediction_resource_name, exc_info=True)  # pylint: disable=protected-access
+                raise e
+
+        return await Retry[str].call_with_exponential_backoff_async(_send_message_async, self._retry_config)

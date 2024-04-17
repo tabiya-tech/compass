@@ -1,42 +1,11 @@
-import json
-import os
 from collections import defaultdict
-from typing import TypeAlias
+from textwrap import dedent
 
 from app.agent.agent_types import AgentInput, AgentOutput
-
-ConversationHistory: TypeAlias = list[tuple[AgentInput, AgentOutput]]
-
-ConversationSummary: TypeAlias = list[str]
-ConversationContext: TypeAlias = tuple[ConversationHistory, ConversationSummary]
-ConversationSummaryDict: TypeAlias = dict[int, list[str]]
-ConversationContextDict: TypeAlias = dict[
-    int, tuple[ConversationHistory, ConversationSummary]]
-ConversationHistoryDict: TypeAlias = dict[int, ConversationHistory]
-
-
-def save_conversation_history_to_json(history: ConversationHistory, file_path: str) -> None:
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    with open(file_path, 'w') as f:
-        to_dict = [
-            {'AgentInput': agent_input.dict(), 'AgentOutput': agent_output.dict()}
-            for agent_input, agent_output in history
-
-        ]
-        json.dump(to_dict, f, indent=4)
-
-
-def save_conversation_history_to_markdown(title: str, history: ConversationHistory, file_path: str) -> None:
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    with open(file_path, 'w') as f:
-        f.write(f"# {title}\n\n")
-        f.write("## Conversation History\n\n")
-        for agent_input, agent_output in history:
-            f.write("### Turn\n\n")
-            f.write(f"**User**: {agent_input.message}\\\n")
-            f.write(f"**{agent_output.agent_type}**: {agent_output.message_for_user}\\\n")
-            f.write(f"**Finished**: {agent_output.finished}\n")
-            f.write("\n\n")
+from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
+from app.conversation_memory.conversation_memory_types import ConversationHistory, ConversationHistoryDict, \
+    ConversationContext, ConversationTurn, ConversationSummaryDict
+from common_libs.llm.gemini import GeminiGenerativeLLM, LLMConfig
 
 
 class ConversationMemoryManager:
@@ -44,45 +13,79 @@ class ConversationMemoryManager:
     Manages the conversation history
     """
 
-    def __init__(self):
-        self._all_history: ConversationHistoryDict = defaultdict(list)
-        self._recent_history: ConversationHistoryDict = defaultdict(list)
-        # move const outside of class
-        self._N = 3
+    def __init__(self, unsummarized_window_size, to_be_summarized_window_size):
+        self._all_history: ConversationHistoryDict = defaultdict(ConversationHistory)
+        self._unsummarized_history: ConversationHistoryDict = defaultdict(ConversationHistory)
+        self._to_be_summarized_history: ConversationHistoryDict = defaultdict(ConversationHistory)
+        self._summary: ConversationSummaryDict = defaultdict(str)
+        self._unsummarized_window_size = unsummarized_window_size
+        self._to_be_summarized_window_size = to_be_summarized_window_size
+
+        self._system_instructions = dedent("""\
+            You are a summarization expert summarizing the conversation between multiple conversation partners.
+            You will get
+            - the summary: _SUMMARY_
+            - the current conversation: _CURRENT_CONVERSATION_
+            Your task is
+            - to update the summary by incorporating new information from the current conversation.
+            You will respond with the new updated summary in third person.
+            Your response will be in a raw formatted non markdown text form no longer than 100 words.
+            """)
+        self._llm = GeminiGenerativeLLM(config=LLMConfig())
 
     async def reset(self, session_id: int) -> None:
         """
         Reset the conversation history for a session
         :param session_id: The session id
         """
-        self._all_history[session_id] = []
-        self._recent_history[session_id] = []
+        self._all_history[session_id].turns = []
+        self._unsummarized_history[session_id].turns = []
+        self._to_be_summarized_history[session_id].turns = []
 
-    async def get_conversation_history(self, session_id: int) -> ConversationHistory:
+    async def get_conversation_context(self, session_id: int) -> ConversationContext:
         """
-        Get the conversation history for a session that has been summarized as needed and should be passed to an agent.
+        Get the conversation context for a session that has been summarized as needed and should be passed to an agent.
         :param session_id: The session id
-        :return: The conversation history
+        :return: The conversation context
         """
-        return self._all_history[session_id]
+        return ConversationContext(
+            history=ConversationHistory(
+                turns=(self._to_be_summarized_history[session_id].turns + self._unsummarized_history[session_id].turns)
+            ),
+            summary=self._summary[session_id]
+        )
 
-    async def summarize(self, history: ConversationHistory):
-        # WIP
-        pass
+    async def _summarize(self, session_id: int, history: ConversationHistory):
+        """
+            Update the conversation summary to include the given history input
+            :param history: the new history to include in the summary
+        """
+        model_input = ConversationHistoryFormatter.format_for_summary_prompt(self._system_instructions,
+                                                                             ConversationContext(history=history,
+                                                                                                 summary=self._summary[
+                                                                                                     session_id]))
+        llm_response = await self._llm.generate_content_async(model_input)
+        self._summary[session_id] = llm_response
 
     async def update_history(self, session_id: int, user_input: AgentInput, agent_output: AgentOutput) -> None:
         """
         Update the conversation history for a session by appending the user input and agent output to the history.
-        Additionally the history will be summarized if the to be summarized history window is full
+        Additionally, the history will be summarized if the to be summarized history window is full
 
         :param session_id: The session id
         :param user_input: The user input
         :param agent_output: The agent output
         """
-        self._all_history[session_id].append((user_input, agent_output))
-        self._recent_history[session_id].append((user_input, agent_output))
+        count = len(self._all_history[session_id].turns) + 1
+        turn = ConversationTurn(index=count, input=user_input, output=agent_output)
+        self._all_history[session_id].turns.append(turn)
+        if len(self._unsummarized_history[session_id].turns) == self._unsummarized_window_size:
+            self._to_be_summarized_history[session_id].turns.append(self._unsummarized_history[session_id].turns[0])
+            self._unsummarized_history[session_id].turns.pop(0)
 
-        # WIP if the window is full, we summarize and delete the recent history
-        if len(self._recent_history[session_id]) > self._N:
-            await self.summarize(self._recent_history[session_id])
-            self._recent_history[session_id] = []
+        self._unsummarized_history[session_id].turns.append(turn)
+
+        # If the to_be_summarized_history window is full, we perform summarization
+        if len(self._to_be_summarized_history[session_id].turns) == self._to_be_summarized_window_size:
+            await self._summarize(session_id, self._to_be_summarized_history[session_id])
+            self._to_be_summarized_history[session_id].turns = []
