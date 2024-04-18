@@ -37,7 +37,7 @@ class FarewellAgent(Agent):
         ])
 
         self._prompt = dedent(f"""\
-            You are a {self._agent_type.value} at a job counseling agency.
+            You are a {self._agent_type.value} at a skills exploration agency.
             Your task is to say goodbye to the user and end the conversation.
             """) + '\n' + response_part + '\n' + dedent("""\
             Farewell the user with a warm goodbye.
