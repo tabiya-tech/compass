@@ -34,7 +34,7 @@ def get_json_response_instructions(examples: list[ModelResponse]) -> str:
     
     _Response_Template_:
         {
-        "message":  "" # The message to the user in double quotes formatted as a json string 
+        "message":  "" # The message to the user formatted as a json string. It should not be in markup language.  
         "finished": true | false # A boolean flag to signal that the  conversation is finished
         }
     """)]
