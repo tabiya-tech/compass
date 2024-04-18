@@ -34,8 +34,6 @@ class PromptGenerator:
 
     @staticmethod
     def generate_prompt(conversation: str, context: str, criteria: EvaluationType) -> str:
-
-        print(criteria)
         criteria_string = PromptGenerator.get_criteria_string(criteria)
         if criteria_string is None:
             raise ValueError("Invalid criteria value")

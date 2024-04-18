@@ -22,9 +22,6 @@ class CriteriaEvaluator(BaseEvaluator):
     async def evaluate(self) -> EvaluationResult:
         result = (await self.llm.ainvoke(self.prompt)).content
         # TODO(shaheen): Fix the JSON parsing issue.
-        try:
-            parsed_result = json.loads(result)
-            return EvaluationResult(evalation_type=self.criteria, score=int(parsed_result['score']),
-                                    reasoning=parsed_result['reason'])
-        except Exception:
-            raise ValueError()
+        # Score is 0 for now, since often JSON doesn't parse correctly.
+        return EvaluationResult(type=self.criteria, score=0,
+                                reasoning=result)

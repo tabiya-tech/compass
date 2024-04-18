@@ -40,13 +40,13 @@ async def test_conversation():
         evaluation_result.add_conversation_record(
             ConversationRecord(message=user_output, actor=Actor.SIMULATED_USER))
 
+    evaluators = [CriteriaEvaluator(EvaluationType.CONCISENESS, evaluation_result)]
+    for evaluator in evaluators:
+        evaluation_result.add_evaluation_result(await evaluator.evaluate())
+
     pprint.pprint(json.loads(evaluation_result.to_json()), indent=4)
 
     file_path = os.path.dirname(__file__) + "/test_output/" + test_case + '.json'
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     with open(file_path, 'w', encoding='utf-8') as f:
         json.dump(json.loads(evaluation_result.to_json()), f, ensure_ascii=False, indent=4)
-
-    evaluators = [CriteriaEvaluator(EvaluationType.CONCISENESS, evaluation_result)]
-    for evaluator in evaluators:
-        evaluation_result.add_evaluation_result(await evaluator.evaluate())
