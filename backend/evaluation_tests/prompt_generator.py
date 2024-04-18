@@ -1,31 +1,42 @@
 import textwrap
-from evaluation_type import EvaluationType
+
+from evaluation_result import EvaluationType
 
 
 class PromptGenerator:
+
+    @staticmethod
+    def get_criteria_string(criteria: EvaluationType):
+        match criteria:
+            case EvaluationType.CONCISENESS:
+                return f"""
+                Your task is to evaluate how concise the responses are from both the SIMULATED_USER and the 
+                EVALUATED_AGENT, focusing on the following aspects:
+        
+                - Response Length: Are the EVALUATED_AGENT responses reasonably concise and to-the-point, 
+                or do they tend to be verbose or rambling? Do the human's messages convey their point concisely?
+        
+                - Extraneous Information: Do the EVALUATED_AGENT responses stay focused on directly addressing the 
+                user's 
+                question/concern, or do they include a lot of unnecessary preamble, repetition, or tangential 
+                information?
+        
+                - Clarity: Despite being concise, are the key points still communicated clearly by both parties, 
+                without critical details being omitted?
+        
+                - Appropriate Depth: While aiming for conciseness, do the responses still provide enough relevant 
+                depth and 
+                detail to adequately counsel the user on identifying required job skills?
+        
+                """
+            case _:
+                raise NotImplementedError()
+
     @staticmethod
     def generate_prompt(conversation: str, context: str, criteria: EvaluationType) -> str:
 
-        criteria_format = {
-            EvaluationType.CONCISENESS: f"""
-        Your task is to evaluate how concise the responses are from both the human and the chatbot, focusing on the following aspects:
-
-        - Response Length: Are the chatbot's responses reasonably concise and to-the-point, 
-        or do they tend to be verbose or rambling? Do the human's messages convey their point concisely?
-
-        - Extraneous Information: Do the chatbot's responses stay focused on directly addressing the user's question/concern, 
-        or do they include a lot of unnecessary preamble, repetition, or tangential information?
-
-        - Clarity: Despite being concise, are the key points still communicated clearly by both parties, 
-        without critical details being omitted?
-
-        - Appropriate Depth: While aiming for conciseness, do the responses still provide enough relevant depth and detail to adequately counsel the user on identifying required job skills?
-
-       
-        """
-        }
-
-        criteria_string = criteria_format.get(criteria)
+        print(criteria)
+        criteria_string = PromptGenerator.get_criteria_string(criteria)
         if criteria_string is None:
             raise ValueError("Invalid criteria value")
 

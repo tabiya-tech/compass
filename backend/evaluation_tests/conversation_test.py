@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 from vertexai.generative_models import GenerativeModel
 
 from app.server import welcome
-from evaluation_tests.evaluation_result import TestEvaluationRecord, ConversationRecord, Actor
+from criteria_evaluator import CriteriaEvaluator
+from evaluation_result import TestEvaluationRecord, ConversationRecord, Actor, EvaluationType
 
 
 @pytest.mark.asyncio
@@ -45,3 +46,7 @@ async def test_conversation():
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     with open(file_path, 'w', encoding='utf-8') as f:
         json.dump(json.loads(evaluation_result.to_json()), f, ensure_ascii=False, indent=4)
+
+    evaluators = [CriteriaEvaluator(EvaluationType.CONCISENESS, evaluation_result)]
+    for evaluator in evaluators:
+        evaluation_result.add_evaluation_result(await evaluator.evaluate())

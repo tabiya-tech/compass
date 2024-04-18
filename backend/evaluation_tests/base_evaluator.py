@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional
-from evaluation_result import TestEvaluationRecord, EvaluationResult
-from evaluation_type import EvaluationType
+from evaluation_result import TestEvaluationRecord, EvaluationResult, EvaluationType
 
 
 class BaseEvaluator(ABC):

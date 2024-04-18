@@ -5,8 +5,8 @@ from dataclasses_json import dataclass_json
 
 
 class Actor(Enum):
-    SIMULATED_USER = "Human"
-    EVALUATED_AGENT = "Bot"
+    SIMULATED_USER = "SIMULATED_USER"
+    EVALUATED_AGENT = "EVALUATED_AGENT"
 
 
 @dataclass_json
@@ -16,11 +16,21 @@ class ConversationRecord:
     actor: Actor
 
 
+class EvaluationType(Enum):
+    """
+    An enumeration for Evaluation types
+    """
+    CONCISENESS = "Conciseness"
+    RELEVANCE = "Relevance"
+    CORRECTNESS = "Correctness"
+    COHERENCE = "Coherence"
+
+
 @dataclass_json
 @dataclass
 class EvaluationResult:
-    type: str
-    score: float
+    type: EvaluationType
+    score: int
     reasoning: str
 
 
