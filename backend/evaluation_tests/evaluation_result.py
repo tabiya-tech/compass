@@ -5,8 +5,8 @@ from dataclasses_json import dataclass_json
 
 
 class Actor(Enum):
-    SIMULATED_USER = "SIMULATED_USER"
-    EVALUATED_AGENT = "EVALUATED_AGENT"
+    SIMULATED_USER = "Human"
+    EVALUATED_AGENT = "Bot"
 
 
 @dataclass_json
@@ -37,3 +37,9 @@ class TestEvaluationRecord:
 
     def add_evaluation_result(self, evaluation_result: EvaluationResult):
         self.evaluations.append(evaluation_result)
+
+    def generate_conversation(self):
+        formatted_conversation = ""
+        for record in self.conversation:
+            formatted_conversation += f"{record.actor.value}: {record.message}\n"
+        return formatted_conversation
