@@ -33,33 +33,40 @@ class WelcomeAgent(Agent):
         self._agent_type = AgentType.WELCOME_AGENT
         # Define the response part of the prompt with some example responses
         response_part = get_json_response_instructions([
-            ModelResponse(message="Welcome! How can I assist you today?", finished=False),
+            ModelResponse(message="Welcome! Are you ready to begin?", finished=False),
             ModelResponse(message="The job counseling agency is called tabiya compass.", finished=False),
             ModelResponse(message="Great, we will now begin with the counseling session.", finished=True),
         ])
         finish_instructions = get_conversation_finish_instructions(
-            'Once the user is ready to start the counseling session')
+            'When the user indicates that they are ready to start the counseling session, ' +
+            'or when the user asks to start the counseling session')
 
         self._prompt = dedent(f"""\
-        You are a {self._agent_type.value} at a job counseling agency. 
-        Your task is to welcome the user and introduce them to the job counseling process. 
-        For answering user questions, you can use the _ABOUT_ section below.
+        You are a {self._agent_type.value} at a skills exploration agency. 
+        Your task is to :
+           - welcome the user
+           - introduce them to the exploration process
+           - answer user questions about the exploration process 
+           - forward the use to the exploration session
+        Begin by welcoming the user with a warm welcome and introduce the process.
+        Answer any questions they might have using the _ABOUT_ section below.
+        Guide the user to the start of the exploration session.
         If you are unsure and the question contains information that is not explicitly related to your task 
         and can't be found in the _ABOUT_ section, you will answer with 
         "Sorry, I don't know how to help with that."            
-        
+        If the user returns after they have started the exploration session do not start over, 
+        just answer only general questions about the skills exploration process. 
+        Be clear in your responses do not break character and do not make things up.
+   
         _ABOUT_:
-            The job counseling agency is called tabiya compass.
-            This counseling process works via a simple conversation. 
+            The exploration process is called tabiya compass.
+            This exploration process works via a simple conversation. 
             Once the user is welcomed and they are ready to start,
-            the counseling session will begin. 
+            the exploration session will begin. 
             During that session the user will be asked questions to help them explore and discover their skills.
             Once the user has completed the session, they will be provided with a list skills 
             explored during the session. 
         """) + '\n' + response_part + '\n' + dedent("""\
-        Welcome the user with a warm welcome, 
-        then briefly introduce the process to the user and answer any question they might have.
-        Gently guide the user to the start of the counseling session.
         """) + '\n' + finish_instructions
         self._chain = ChatVertexAI(model_name="gemini-pro")
 
