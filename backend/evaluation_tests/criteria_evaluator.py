@@ -1,5 +1,3 @@
-import json
-
 from langchain_google_vertexai import ChatVertexAI
 
 from base_evaluator import BaseEvaluator
