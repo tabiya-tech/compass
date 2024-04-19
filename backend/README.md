@@ -219,6 +219,7 @@ To run the unit tests, use the following command:
  poetry run pytest -v -k "not smoke_test" 
 ```
 
+Evaluation tests will be run with other unit tests, full documentation [here](evaluation_tests/README.md).
 
 
 

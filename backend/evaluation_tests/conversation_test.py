@@ -1,6 +1,7 @@
 import json
 import os
 import pprint
+import time
 
 import pytest as pytest
 import vertexai
@@ -8,8 +9,9 @@ from dotenv import load_dotenv
 from vertexai.generative_models import GenerativeModel
 
 from app.server import welcome
-from criteria_evaluator import CriteriaEvaluator
-from evaluation_result import TestEvaluationRecord, ConversationRecord, Actor, EvaluationType
+from evaluation_tests.evaluators.evaluation_result import TestEvaluationRecord, ConversationRecord, Actor, \
+    EvaluationType
+from evaluators.criteria_evaluator import CriteriaEvaluator
 
 
 @pytest.mark.asyncio
@@ -46,7 +48,7 @@ async def test_conversation():
 
     pprint.pprint(json.loads(evaluation_result.to_json()), indent=4)
 
-    file_path = os.path.dirname(__file__) + "/test_output/" + test_case + '.json'
+    file_path = os.path.dirname(__file__) + "/test_output/" + test_case + "_" + (str(time.time())) + '.json'
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     with open(file_path, 'w', encoding='utf-8') as f:
         json.dump(json.loads(evaluation_result.to_json()), f, ensure_ascii=False, indent=4)

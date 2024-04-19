@@ -1,8 +1,8 @@
 from langchain_google_vertexai import ChatVertexAI
 
-from base_evaluator import BaseEvaluator
-from evaluation_result import TestEvaluationRecord, EvaluationResult, EvaluationType
-from prompt_generator import PromptGenerator
+from evaluation_tests.evaluators.base_evaluator import BaseEvaluator
+from evaluation_tests.evaluators.evaluation_result import TestEvaluationRecord, EvaluationResult, EvaluationType
+from evaluation_tests.evaluators.prompt_generator import PromptGenerator
 
 
 class CriteriaEvaluator(BaseEvaluator):
