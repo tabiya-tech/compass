@@ -2,6 +2,9 @@ import json
 import os
 import pprint
 import time
+from io import TextIOBase
+from textwrap import dedent
+from typing import Callable
 
 import pytest as pytest
 import vertexai
@@ -18,7 +21,7 @@ from evaluators.criteria_evaluator import CriteriaEvaluator
 async def test_conversation():
     load_dotenv()
     test_case = "e2e_test"
-    prompt = """
+    prompt = dedent("""
         Pretend you are a young student from Kenya trying to find a job.
         Make your messages specific and make sure to only act as the student. 
         Your messages should be concise and precise and you should never go out of character. You should talk like a
@@ -48,7 +51,15 @@ async def test_conversation():
 
     pprint.pprint(json.loads(evaluation_result.to_json()), indent=4)
 
-    file_path = os.path.dirname(__file__) + "/test_output/" + test_case + "_" + (str(time.time())) + '.json'
+    base_path = os.path.dirname(__file__) + "/test_output/" + test_case + "_" + (str(time.time()))
+    # Save the evaluation result to a json file
+    save_to_file(base_path + '.json',
+                 lambda f: json.dump(json.loads(evaluation_result.to_json()), f, ensure_ascii=False, indent=4))
+    # Save the evaluation result to a markdown file
+    save_to_file(base_path + '.md', lambda f: f.write(evaluation_result.to_markdown()))
+
+
+def save_to_file(file_path: str, callback: Callable[[TextIOBase], None]):
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     with open(file_path, 'w', encoding='utf-8') as f:
-        json.dump(json.loads(evaluation_result.to_json()), f, ensure_ascii=False, indent=4)
+        callback(f)

@@ -51,5 +51,22 @@ class TestEvaluationRecord:
     def generate_conversation(self):
         formatted_conversation = ""
         for record in self.conversation:
-            formatted_conversation += f"{record.actor.value}: {record.message}\n"
+            formatted_conversation += f"{record.actor.value}: {record.message}\n\n"
         return formatted_conversation
+
+    def to_markdown(self):
+        # create a markdown representation of the evaluation results
+        evaluations_str = ""
+        for evaluation in self.evaluations:
+            evaluations_str += f"{evaluation.type}: {evaluation.score}\n{evaluation.reasoning}\n\n"
+
+        # create a markdown representation of the evaluation results
+        formatted_conversation = ""
+        for record in self.conversation:
+            formatted_conversation += f"**{record.actor.value}**: {record.message}\n\n"
+
+        # return a text representation of the test case run
+        return (f"# Test case: {self.test_case}\n\n"
+                f"## Simulated user prompt: \n{self.simulated_user_prompt}\n\n"
+                f"## Conversation:\n{formatted_conversation}\n\n"
+                f"## Evaluations:\n{evaluations_str}")
