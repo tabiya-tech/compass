@@ -7,7 +7,7 @@ To run the tests navigate to the `backend/` directory and run  `pytest evaluatio
 
 The tests use the `.env` file for credentials, so you need to run it from the same directory as where that file is located.
 
-The logs from the tests is shown in command line if the test failed. The conversation record is additionally saved in `backend/evaluation_tests/test_output/` directory. If you would like to see all logs you can add `-s` parameter to the command, i.e. run `pyteest evaluation_tests -s`.
+The logs from the tests is shown in command line if the test failed. The conversation record is additionally saved in `backend/evaluation_tests/test_output/` directory. If you would like to see the progress of the conversation and the evaluation logs you can add `-s` parameter to the command, i.e. run `pyteest evaluation_tests -s`.
 
 At the moment the test is set to stop after 5 iterations. You can locally change that number in the file. Setting it from command line is work in progress.
 
