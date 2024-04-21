@@ -201,7 +201,7 @@ The project uses `pylint` as the linter. To run the linter, use the following co
 
 ```shell
 # Run the linter on the app and esco_search directories
-poetry run pylint app esco_search  
+poetry run pylint app esco_search evaluation_tests 
 ```
 
 Additionally, the project uses `bandit` to check for security vulnerabilities. To run `bandit`, use the following command:
