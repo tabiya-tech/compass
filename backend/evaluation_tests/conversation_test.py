@@ -15,7 +15,7 @@ from vertexai.generative_models import GenerativeModel
 from app.server import welcome
 from evaluation_tests.evaluators.evaluation_result import TestEvaluationRecord, ConversationRecord, Actor, \
     EvaluationType
-from evaluators.criteria_evaluator import CriteriaEvaluator
+from evaluation_tests.evaluators.criteria_evaluator import CriteriaEvaluator
 
 
 @pytest.mark.asyncio
