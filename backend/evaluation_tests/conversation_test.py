@@ -3,9 +3,8 @@ import os
 import pprint
 
 from datetime import timezone, datetime
-from io import TextIOBase
 from textwrap import dedent
-from typing import Callable
+from typing import Callable, TextIO
 
 import pytest
 import vertexai
@@ -66,7 +65,7 @@ async def test_conversation():
     save_to_file(base_path + '.md', lambda f: f.write(evaluation_result.to_markdown()))
 
 
-def save_to_file(file_path: str, callback: Callable[[TextIOBase], None]):
+def save_to_file(file_path: str, callback: Callable[[TextIO], None]):
     """
     Save contents to a file.
     :param file_path: The path to the file, including the file name. If the paths do not exist, they will be created.
