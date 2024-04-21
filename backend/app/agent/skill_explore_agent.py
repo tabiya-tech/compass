@@ -27,7 +27,7 @@ class SimpleSkillExplorerAgent(Agent):
 
 class SkillExplorerAgent(Agent):
     """
-    Agent that expores with with the the user and provides a response based on the task
+    Agent that explores the skills of the user and provides a response based on the task
     """
 
     def __init__(self):
@@ -71,8 +71,8 @@ class SkillExplorerAgent(Agent):
 
         try:
             last: ModelResponse = extract_json(conversation.content, ModelResponse)
-        except ExtractJSONError as e:
-            logger.exception(e)
+        except ExtractJSONError:
+            logger.warning("Error extracting JSON from conversation content '%s'", conversation.content, exc_info=True)
             last = ModelResponse(message=str(conversation.content), finished=False)
 
         response = AgentOutput(message_for_user=last.message,
