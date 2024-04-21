@@ -26,10 +26,10 @@ async def test_conversation():
     load_dotenv()
     test_case = "e2e_test"
     prompt = dedent("""
-        Pretend you are a young student from Kenya trying to find a job.
-        Make your messages specific and make sure to only act as the student. 
-        Your messages should be concise and precise and you should never go out of character. You should talk like a
-        human and make sure to answer only to the specific prompts you are asked. Answer like a human would answer chat
+        You are a young student from Kenya trying to find a job.
+        Make your responses specific and make sure to only act as the student. 
+        Your responses should be concise and precise and you should never go out of character. You should talk like a
+        human and make sure to answer only to the specific questions you are asked. Answer like a human would answer chat
         messages, answer only what the student would write. Don't use placeholders, instead make up something.
         """)
     vertexai.init()
