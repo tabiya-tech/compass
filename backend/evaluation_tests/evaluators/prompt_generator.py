@@ -9,12 +9,17 @@ class PromptGenerator:
     def get_criteria_string(criteria: EvaluationType):
         match criteria:
             case EvaluationType.CONCISENESS:
-                return f"""
+                return textwrap.dedent(f"""
                 Your task is to evaluate how concise the responses are from both the SIMULATED_USER and the 
                 EVALUATED_AGENT, focusing on the following aspects:
         
                 - Response Length: Are the EVALUATED_AGENT responses reasonably concise and to-the-point, 
                 or do they tend to be verbose or rambling? Do the human's messages convey their point concisely?
+        
+                - Repetition: Are the EVALUATED_AGENT responses repeating identical or similar sentences 
+                or phrases with similar meanings or intents, even if the wording differs within the same 
+                or across multiple conversational turns? Could the same, or similar, information be conveyed 
+                in fewer words, sentences or conversational turns?
         
                 - Extraneous Information: Do the EVALUATED_AGENT responses stay focused on directly addressing the 
                 user's 
@@ -27,8 +32,7 @@ class PromptGenerator:
                 - Appropriate Depth: While aiming for conciseness, do the responses still provide enough relevant 
                 depth and 
                 detail to adequately counsel the user on identifying required job skills?
-        
-                """
+                """)
             case _:
                 raise NotImplementedError()
 
@@ -50,10 +54,8 @@ class PromptGenerator:
                 [Conversation]: 
                 
                 {conversation}
-                
-                
+                        
                 [Criteria]: {criteria}
-                
                 
                 [END DATA]
 
@@ -80,8 +82,6 @@ class PromptGenerator:
                 }}
                 
                 Double check if the response is a valid json which only contains the key "score" and "reason"
-
-
                 """)
 
         formatted_template = template.format(
