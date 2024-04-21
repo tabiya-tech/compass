@@ -1,17 +1,15 @@
 import json
 import os
 import pprint
-
 from datetime import timezone, datetime
 from textwrap import dedent
 from typing import Callable, TextIO
 
 import pytest
-import vertexai
 from dotenv import load_dotenv
 from tqdm import tqdm
-from vertexai.generative_models import GenerativeModel
 
+from app.llm.gemini import GeminiChatLLM
 from app.server import welcome
 from evaluation_tests.evaluators.evaluation_result import TestEvaluationRecord, ConversationRecord, Actor, \
     EvaluationType
@@ -31,11 +29,10 @@ async def test_conversation():
         human and make sure to answer only to the specific questions you are asked. Answer like a human would answer chat
         messages, answer only what the student would write. Don't use placeholders, instead make up something.
         """)
-    vertexai.init()
-    model = GenerativeModel(
-        "gemini-1.0-pro",
-        system_instruction=[prompt])
-    simulated_user = model.start_chat()
+    # Using GeminiChatLLM for the simulated user as
+    # we want to conduct a conversation with an in-memory state (history)
+    # and not manage the history ourselves.
+    simulated_user = GeminiChatLLM(system_instructions=prompt)
     evaluation_result = TestEvaluationRecord(simulated_user_prompt=prompt, test_case=test_case)
     user_output = ""
 
@@ -46,7 +43,7 @@ async def test_conversation():
         evaluation_result.add_conversation_record(
             ConversationRecord(message=agent_output, actor=Actor.EVALUATED_AGENT))
         # Get a response from the simulated user
-        user_output = simulated_user.send_message(agent_output, stream=False).text
+        user_output = simulated_user.send_message(agent_output)
         evaluation_result.add_conversation_record(
             ConversationRecord(message=user_output, actor=Actor.SIMULATED_USER))
 

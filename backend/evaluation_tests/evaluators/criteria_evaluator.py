@@ -1,4 +1,4 @@
-from langchain_google_vertexai import ChatVertexAI
+from app.llm.gemini import GeminiGenerativeLLM
 
 from evaluation_tests.evaluators.base_evaluator import BaseEvaluator
 from evaluation_tests.evaluators.evaluation_result import TestEvaluationRecord, EvaluationResult, EvaluationType
@@ -13,12 +13,12 @@ class CriteriaEvaluator(BaseEvaluator):
         self.prompt = PromptGenerator.generate_prompt(conversation=data.generate_conversation(),
                                                       context=data.simulated_user_prompt,
                                                       criteria=criteria)
-
-        # TODO(shaheen): Change to use VertexAI directly.
-        self.llm = ChatVertexAI(model_name="gemini-pro")
+        # Use GeminiGenerativeLLM as the LLM for evaluation
+        # as we are not interested in conducting a conversation, with an in-memory state (history).
+        self.llm = GeminiGenerativeLLM()
 
     async def evaluate(self) -> EvaluationResult:
-        result = (await self.llm.ainvoke(self.prompt)).content
+        result = await self.llm.generate_content_async(self.prompt)
         # TODO(shaheen): Fix the JSON parsing issue.
         # Score is 0 for now, since often JSON doesn't parse correctly.
         return EvaluationResult(type=self.criteria, score=0,
