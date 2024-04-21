@@ -105,6 +105,6 @@ class AgentDirector:
                     finished=True, agent_type=None)
             return agent_output
         except Exception as e:  # pylint: disable=broad-except # executing an agent can raise any number of unknown exceptions
-            logger.exception(e)
+            logger.error("Error while executing the agent director: %s", e, exc_info=True)
             return AgentOutput(message_for_user="Conversation forcefully ended",
                                finished=True, agent_type=None)

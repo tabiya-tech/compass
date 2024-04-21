@@ -76,8 +76,8 @@ class WelcomeAgent(Agent):
         conversation = await self._chain.ainvoke(model_input)
         try:
             last: ModelResponse = extract_json(conversation.content, ModelResponse)
-        except ExtractJSONError as e:
-            logger.exception(e)
+        except ExtractJSONError:
+            logger.warning("Error extracting JSON from conversation content '%s'", conversation.content, exc_info=True)
             last = ModelResponse(message=str(conversation.content), finished=False)
 
         response = AgentOutput(message_for_user=last.message,
