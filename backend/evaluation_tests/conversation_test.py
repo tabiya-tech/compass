@@ -1,7 +1,8 @@
 import json
 import os
 import pprint
-import time
+
+from datetime import timezone, datetime
 from io import TextIOBase
 from textwrap import dedent
 from typing import Callable
@@ -57,7 +58,7 @@ async def test_conversation():
     #  Currently much information is printed in the console. I found it more useful to see the progress
     #  of the conversation as it take long and I am not sure when it will finish.
     pprint.pprint(json.loads(evaluation_result.to_json()), indent=4)
-    base_path = os.path.dirname(__file__) + "/test_output/" + test_case + "_" + (str(time.time()))
+    base_path = os.path.dirname(__file__) + "/test_output/" + test_case + "_" + datetime.now(timezone.utc).isoformat()
     # Save the evaluation result to a json file
     save_to_file(base_path + '.json',
                  lambda f: json.dump(json.loads(evaluation_result.to_json()), f, ensure_ascii=False, indent=4))
