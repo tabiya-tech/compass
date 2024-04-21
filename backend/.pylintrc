@@ -1,5 +1,7 @@
 # For options and defaults see https://github.com/pylint-dev/pylint/blob/main/pylintrc
 [MASTER]
+# Solve "Unable to import error" when running pylint, see https://stackoverflow.com/questions/1899436/pylint-unable-to-import-error-how-to-set-pythonpath
+init-hook='import os, sys; sys.path.append(os.path.dirname("."))'
 
 # whitelisting pydantic see https://github.com/pydantic/pydantic/issues/1961
 extension-pkg-whitelist=pydantic
