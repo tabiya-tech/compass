@@ -11,23 +11,23 @@ from tqdm import tqdm
 
 from app.llm.gemini import GeminiChatLLM
 from app.server import welcome
+from evaluation_tests.evaluators.criteria_evaluator import CriteriaEvaluator
 from evaluation_tests.evaluators.evaluation_result import TestEvaluationRecord, ConversationRecord, Actor, \
     EvaluationType
-from evaluation_tests.evaluators.criteria_evaluator import CriteriaEvaluator
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test
-async def test_conversation():
+@pytest.mark.evaluation_tests
+async def test_conversation(max_iterations: int):
     """Test for CONCISENESS: 'young student from Kenya trying to find a job'"""
     load_dotenv()
     test_case = "e2e_test"
     prompt = dedent("""
         You are a young student from Kenya trying to find a job.
-        Make your responses specific and make sure to only act as the student. 
+        Make your responses specific and make sure to only act as the student.
         Your responses should be concise and precise and you should never go out of character. You should talk like a
-        human and make sure to answer only to the specific questions you are asked. Answer like a human would answer chat
-        messages, answer only what the student would write. Don't use placeholders, instead make up something.
+        human and make sure to answer only to the specific questions you are asked. Answer like a human would answer 
+        chat messages, answer only what the student would write. Don't use placeholders, instead make up something.
         """)
     # Using GeminiChatLLM for the simulated user as
     # we want to conduct a conversation with an in-memory state (history)
@@ -37,7 +37,7 @@ async def test_conversation():
     user_output = ""
 
     # TODO(kingam): Also finish the conversation when Compass is done.
-    for _ in tqdm(range(0, 5), desc="Conversation progress"):
+    for _ in tqdm(range(0, max_iterations), desc="Conversation progress"):
         # Get a response from the evaluated agent
         agent_output = (await welcome(user_input=user_output)).last.message_for_user
         evaluation_result.add_conversation_record(

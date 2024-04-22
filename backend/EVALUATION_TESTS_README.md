@@ -24,13 +24,9 @@ The tests use the `.env` file for credentials, so you need to run it from the sa
 
 The logs from the tests is shown in command line if the test failed. The conversation record is additionally saved in `backend/evaluation_tests/test_output/` directory. 
 
-If you would like to see the progress of the conversation and the evaluation logs you can add `-s` parameter to the command, i.e. run: 
-```bash
-pytest evaluation_tests -s
-```
-
-> **Note**: At the moment the test is set to stop after 5 iterations. You can locally change that number in the file. Setting it from command line is work in progress.
-
+Optional useful parameters:
+ - `-s` allows you to see the log output even for tests that pass
+ - `-max_terations <number>` allows you to set the number of messages the chatbot is allowed to make.
 
 ## Troubleshooting
 If when you run it python complains about an unknown parameter, re-install poetry components using:
