@@ -9,6 +9,8 @@ extension-pkg-whitelist=pydantic
 # Load plugins to avoid passing --load-plugins=pylint_pydantic
 load-plugins=pylint_pydantic
 
+# Files or directories to be skipped
+ignore-paths=venv-backend,conftest.py
 
 [FORMAT]
 

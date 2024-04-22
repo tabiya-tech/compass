@@ -23,7 +23,7 @@ function checkActivatedVenv() {
 function backend() {
   local project="backend"
     printTitle ${project}
-  (cd backend/ && activateBackendVenv &&  poetry lock --no-update --no-interaction; poetry install --sync --no-interaction && poetry run bandit -c bandit.yaml -r . && poetry run pylint --exit-zero app esco_search evaluation_tests; poetry run pytest -k "not smoke_test";deactivateBackendVenv)
+  (cd backend/ && activateBackendVenv &&  poetry lock --no-update --no-interaction; poetry install --sync --no-interaction && poetry run bandit -c bandit.yaml -r . && poetry run pylint --exit-zero --recursive=y .; poetry run pytest -k "not smoke_test";deactivateBackendVenv)
    # if the previous command fails, exit this script with a non-zero error code
   if [ $? -ne 0 ]; then
     printError ${project}

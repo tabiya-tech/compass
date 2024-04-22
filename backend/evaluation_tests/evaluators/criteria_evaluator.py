@@ -1,4 +1,4 @@
-from app.llm.gemini import GeminiGenerativeLLM
+from common_libs.llm.gemini import GeminiGenerativeLLM
 
 from evaluation_tests.evaluators.base_evaluator import BaseEvaluator
 from evaluation_tests.evaluators.evaluation_result import TestEvaluationRecord, EvaluationResult, EvaluationType

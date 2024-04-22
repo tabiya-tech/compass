@@ -10,7 +10,7 @@ import pytest
 from dotenv import load_dotenv
 from tqdm import tqdm
 
-from app.llm.gemini import GeminiChatLLM
+from common_libs.llm.gemini import GeminiChatLLM
 from app.server import welcome
 from evaluation_tests.evaluators.evaluation_result import TestEvaluationRecord, ConversationRecord, Actor, \
     EvaluationType

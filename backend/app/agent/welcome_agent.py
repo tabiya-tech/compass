@@ -5,11 +5,11 @@ from langchain_google_vertexai import ChatVertexAI
 
 from app.agent.agent import Agent
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType
-from app.agent.extract_json import extract_json, ExtractJSONError
 from app.agent.prompt_reponse_template import ModelResponse, get_json_response_instructions, \
     get_conversation_finish_instructions
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_manager import ConversationHistory
+from common_libs.text_formatters.extract_json import extract_json, ExtractJSONError
 
 logger = logging.getLogger(__name__)
 

@@ -2,7 +2,7 @@ import unittest
 
 from pydantic import BaseModel
 
-from app.agent.extract_json import extract_json, ValidationError, InvalidJSON, NoJSONFound
+from common_libs.text_formatters.extract_json import extract_json, ValidationError, InvalidJSON, NoJSONFound
 
 
 # GIVEN a model class
