@@ -197,11 +197,11 @@ Run the image using the following command:
 
 ### Running the linter
 
-The project uses `pylint` as the linter. To run the linter, use the following command:
+The project uses `pylint` as the linter. To run the linter, use the following command
 
 ```shell
-# Run the linter on the app and esco_search directories
-poetry run pylint app esco_search evaluation_tests 
+# Run the linter recursively in the backend directory
+ poetry run pylint --recursive=y . 
 ```
 
 Additionally, the project uses `bandit` to check for security vulnerabilities. To run `bandit`, use the following command:
