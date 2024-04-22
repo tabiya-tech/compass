@@ -29,21 +29,25 @@ async def test_conversation(max_iterations: int):
         human and make sure to answer only to the specific questions you are asked. Answer like a human would answer 
         chat messages, answer only what the student would write. Don't use placeholders, instead make up something.
         """)
-    # Using GeminiChatLLM for the simulated user as
-    # we want to conduct a conversation with an in-memory state (history)
+    # Using GeminiChatLLM for the simulated user as we want to conduct a conversation with an in-memory state (history)
     # and not manage the history ourselves.
     simulated_user = GeminiChatLLM(system_instructions=prompt)
     evaluation_result = TestEvaluationRecord(simulated_user_prompt=prompt, test_case=test_case)
     user_output = ""
 
-    # TODO(kingam): Also finish the conversation when Compass is done.
     for _ in tqdm(range(0, max_iterations), desc="Conversation progress"):
         # Get a response from the evaluated agent
-        agent_output = (await welcome(user_input=user_output)).last.message_for_user
+        agent_output = await welcome(user_input=user_output)
+        agent_message = agent_output.last.message_for_user
+        # Checks whether the chatbot is done. This is very implementation specific. We might want to change the API
+        # moving forward.
+        is_finished = agent_output.last.finished and agent_output.last.agent_type is None
+        if is_finished:
+            break
         evaluation_result.add_conversation_record(
-            ConversationRecord(message=agent_output, actor=Actor.EVALUATED_AGENT))
+            ConversationRecord(message=agent_message, actor=Actor.EVALUATED_AGENT))
         # Get a response from the simulated user
-        user_output = simulated_user.send_message(agent_output)
+        user_output = simulated_user.send_message(agent_message)
         evaluation_result.add_conversation_record(
             ConversationRecord(message=user_output, actor=Actor.SIMULATED_USER))
 
