@@ -4,12 +4,15 @@ from evaluation_tests.evaluators.evaluation_result import EvaluationType
 
 
 class PromptGenerator:
+    """
+    Generates the prompt used by the evaluators.
+    """
 
     @staticmethod
-    def get_criteria_string(criteria: EvaluationType):
+    def _get_criteria_string(criteria: EvaluationType):
         match criteria:
             case EvaluationType.CONCISENESS:
-                return textwrap.dedent(f"""
+                return textwrap.dedent("""
                 Your task is to evaluate how concise the responses are from both the SIMULATED_USER and the 
                 EVALUATED_AGENT, focusing on the following aspects:
         
@@ -38,7 +41,10 @@ class PromptGenerator:
 
     @staticmethod
     def generate_prompt(conversation: str, context: str, criteria: EvaluationType) -> str:
-        criteria_string = PromptGenerator.get_criteria_string(criteria)
+        """
+        Generates the prompt to be used in the evaluators.
+        """
+        criteria_string = PromptGenerator._get_criteria_string(criteria)
         if criteria_string is None:
             raise ValueError("Invalid criteria value")
 

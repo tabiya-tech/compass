@@ -7,10 +7,14 @@ class BaseEvaluator(ABC):
     An abstract class for a BaseEvaluator.
     """
 
-    def __init__(self, criteria: EvaluationType, data: TestEvaluationRecord):
+    def __init__(self, criteria: EvaluationType):
         self.criteria = criteria
-        self.data = data
 
     @abstractmethod
-    async def evaluate(self) -> EvaluationResult:
+    async def evaluate(self, actual: TestEvaluationRecord) -> EvaluationResult:
+        """
+        Evaluates the input based on the criteria set during initialization.
+        :param actual: The input to be evaluated.
+        :return: An EvaluationResult object with the finished evaluations.
+        """
         raise NotImplementedError()
