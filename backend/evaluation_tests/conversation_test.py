@@ -1,6 +1,6 @@
+import asyncio
 import json
 import os
-import pprint
 import sys
 from datetime import timezone, datetime
 from textwrap import dedent
@@ -18,6 +18,9 @@ from evaluation_tests.evaluators.evaluator_builder import create_evaluator
 
 
 class EvaluationTestCase(TypedDict):
+    """
+    The definition of the test cases to be run.
+    """
     name: str
     context: str
     evaluations: list[EvaluationType]
@@ -65,24 +68,49 @@ test_cases = [
 
 
 def get_test_cases_to_run() -> list[EvaluationTestCase]:
+    """
+    Returns the test cases to be run. Filters to only test cases specified in a command line flag is set.
+    """
+    # Using sys.argv instead of pytest constructs, since this needs to be used in a fixture.
+    # A fixture cannot call another fixture.
     if '--test_cases_to_run' not in sys.argv:
         return test_cases
     cases_to_run = sys.argv[sys.argv.index('--test_cases_to_run') + 1].split(',')
     return [case for case in test_cases if case['name'] in cases_to_run]
 
 
+@pytest.fixture(scope="session")
+def event_loop():
+    """
+    Makes sure that all the async calls finish.
+
+    Without it, the tests sometimes fail with "Event loop is closed" error.
+    """
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+    yield loop
+    loop.close()
+
+
 @pytest.mark.asyncio
 @pytest.mark.evaluation_tests
 @pytest.mark.parametrize('test_case', get_test_cases_to_run())
 async def test_conversation(max_iterations: int, test_case: EvaluationTestCase):
+    """
+    E2E conversation test, based on the test cases specified above. It calls the same endpoint as the frontend
+    would call and does not mock any of the tested components.
+    """
+    print(f"Running test case {test_case['name']}")
     load_dotenv()
     common_prompt = """
         Make your responses specific and make sure to only act as the person you are pretending to be.
         Your responses should be concise and precise and you should never go out of character. You should talk like a
         human and make sure to answer only to the specific questions you are asked. Answer like that character would. 
-        Be concise. Don't use bullet point lists, subheadings or numbered lists in your answers. Your answers should 
-        be at most 10 sentences long. Don't use placeholders, instead make up something. Try to make the conversation 
-        flow naturally.
+        Be concise. Don't use bullet point lists, subheadings or numbered lists in your answers. Don't add context in 
+        brackets, don't use ## in your answers. Your answers should be at most 10 sentences long. Don't use placeholders, 
+        instead make up something. Try to make the conversation flow naturally.
         """
     prompt = dedent(test_case['context'] + common_prompt)
     # Using GeminiChatLLM for the simulated user as we want to conduct a conversation with an in-memory state (history)
@@ -91,14 +119,15 @@ async def test_conversation(max_iterations: int, test_case: EvaluationTestCase):
     evaluation_result = TestEvaluationRecord(simulated_user_prompt=prompt, test_case=test_case['name'])
     user_output = ""
 
-    for _ in tqdm(range(0, max_iterations), desc='Conversation progress'):
+    for i in tqdm(range(0, max_iterations), desc='Conversation progress'):
         # Get a response from the evaluated agent
-        agent_output = await welcome(user_input=user_output)
+        agent_output = await welcome(user_input=user_output, session_id=(hash(test_case['name']) % 10 ** 10))
         agent_message = agent_output.last.message_for_user
         # Checks whether the chatbot is done. This is very implementation specific. We might want to change the API
         # moving forward.
         is_finished = agent_output.last.finished and agent_output.last.agent_type is None
         if is_finished:
+            print(f'Conversation finished earlier, after {i} out of {max_iterations} iterations.')
             break
         evaluation_result.add_conversation_record(
             ConversationRecord(message=agent_message, actor=Actor.EVALUATED_AGENT))
@@ -106,16 +135,15 @@ async def test_conversation(max_iterations: int, test_case: EvaluationTestCase):
         user_output = simulated_user.send_message(agent_message)
         evaluation_result.add_conversation_record(
             ConversationRecord(message=user_output, actor=Actor.SIMULATED_USER))
-
     evaluators = [create_evaluator(evaluation) for evaluation in test_case['evaluations']]
     for evaluator in tqdm(evaluators, desc='Evaluating'):
         evaluation_result.add_evaluation_result(await evaluator.evaluate(evaluation_result))
-    # TODO(kingam):  From Apostolos: I would suggest to print here a summary of the evaluation results.
-    #  Currently much information is printed in the console. I found it more useful to see the progress
-    #  of the conversation as it take long and I am not sure when it will finish.
-    pprint.pprint(json.loads(evaluation_result.to_json()), indent=4)
+    for evaluation in evaluation_result.evaluations:
+        # TODO: Add evaluation score once we properly parse it.
+        print(f'Evaluation for {evaluation.type.name}: {evaluation.reasoning}')
     base_path = os.path.dirname(__file__) + '/test_output/' + test_case['name'] + "_" + datetime.now(
         timezone.utc).isoformat()
+    print(f'The full conversation and evaluation is saved at {base_path}')
     # Save the evaluation result to a json file
     save_to_file(base_path + '.json',
                  lambda f: json.dump(json.loads(evaluation_result.to_json()), f, ensure_ascii=False, indent=4))

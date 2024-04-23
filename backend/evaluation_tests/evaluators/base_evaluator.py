@@ -12,4 +12,9 @@ class BaseEvaluator(ABC):
 
     @abstractmethod
     async def evaluate(self, actual: TestEvaluationRecord) -> EvaluationResult:
+        """
+        Evaluates the input based on the criteria set during initialization.
+        :param actual: The input to be evaluated.
+        :return: An EvaluationResult object with the finished evaluations.
+        """
         raise NotImplementedError()

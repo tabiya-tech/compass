@@ -6,6 +6,9 @@ from evaluation_tests.evaluators.prompt_generator import PromptGenerator
 
 
 class CriteriaEvaluator(BaseEvaluator):
+    """
+    An evaluator that uses an LLM to produce a score based on the evaluation criteria.
+    """
 
     def __init__(self, criteria: EvaluationType):
         super().__init__(criteria)
