@@ -1,8 +1,18 @@
-from common_libs.llm.gemini import GeminiGenerativeLLM
+from pydantic import BaseModel
 
+from common_libs.llm.gemini import GeminiGenerativeLLM, LLMConfig
+from common_libs.text_formatters import extract_json
 from evaluation_tests.evaluators.base_evaluator import BaseEvaluator
 from evaluation_tests.evaluators.evaluation_result import TestEvaluationRecord, EvaluationResult, EvaluationType
 from evaluation_tests.evaluators.prompt_generator import PromptGenerator
+
+
+class LlmEvaluatorOutput(BaseModel):
+    """
+    Class used to parse the json returned from the llm evaluator.
+    """
+    score: int
+    reason: str
 
 
 class CriteriaEvaluator(BaseEvaluator):
@@ -15,14 +25,12 @@ class CriteriaEvaluator(BaseEvaluator):
         self.criteria = criteria
         # Use GeminiGenerativeLLM as the LLM for evaluation
         # as we are not interested in conducting a conversation, with an in-memory state (history).
-        self.llm = GeminiGenerativeLLM()
+        self.llm = GeminiGenerativeLLM(config=LLMConfig(model_name="gemini-1.5-pro-preview-0409"))
 
     async def evaluate(self, actual: TestEvaluationRecord) -> EvaluationResult:
         prompt = PromptGenerator.generate_prompt(conversation=actual.generate_conversation(),
-                                                 context=actual.simulated_user_prompt,
                                                  criteria=self.criteria)
         result = await self.llm.generate_content_async(prompt)
-        # TODO(shaheen): Fix the JSON parsing issue.
-        # Score is 0 for now, since often JSON doesn't parse correctly.
-        return EvaluationResult(type=self.criteria, score=0,
-                                reasoning=result)
+        parsed_result = extract_json.extract_json(result, LlmEvaluatorOutput)
+        return EvaluationResult(type=self.criteria, score=parsed_result.score,
+                                reasoning=parsed_result.reason)
