@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from evaluation_tests.evaluators.evaluation_result import TestEvaluationRecord, EvaluationResult, EvaluationType
 
 

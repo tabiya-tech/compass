@@ -141,6 +141,7 @@ class LLMConfig(BaseModel):
     """
     Configuration for the Gemini LLM.
     """
+    model_name: str = "gemini-1.0-pro"
     location: str = DEFAULT_VERTEX_API_REGION
     generation_config: GenerationConfig = DEFAULT_GENERATION_CONFIG
     safety_settings: frozenset[SafetySetting] = DEFAULT_SAFETY_SETTINGS
@@ -180,7 +181,7 @@ class GeminiChatLLM:
         # Before constructing the GenerativeModel, we need to initialize the VertexAI client
         # as the init function may have been called in another module with different parameters
         vertexai.init(location=config.location)
-        self._model = GenerativeModel(model_name="gemini-1.0-pro",
+        self._model = GenerativeModel(model_name=config.model_name,
                                       system_instruction=system_instructions,
                                       generation_config=config.generation_config,
                                       safety_settings=list(config.safety_settings)
@@ -244,7 +245,7 @@ class GeminiGenerativeLLM:
         # Before constructing the GenerativeModel, we need to initialize the VertexAI client
         # as the init function may have been called in another module with different parameters
         vertexai.init(location=config.location)
-        self._model = GenerativeModel(model_name="gemini-1.0-pro",
+        self._model = GenerativeModel(model_name=config.model_name,
                                       generation_config=config.generation_config,
                                       safety_settings=list(config.safety_settings)
                                       )
