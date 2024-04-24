@@ -226,7 +226,20 @@ To run the smoke tests, use the following command:
 ```
 
 ### Running the evaluation tests
+
 Evaluation tests will be run separately from other tests, full documentation [here](EVALUATION_TESTS_README.md).
 
+### Live Logs
 
+The default log level is `INFO` and set in the `pytest.ini` file.
+
+You can change the logging level by passing a `--log-cli-level` argument to the `pytest` command.
+
+For example, to set the log level to `DEBUG`, run the following command:
+
+```shell
+poetry run pytest --log-cli-level=DEBUG -v -m "not (smoke_test or evaluation_test)"
+```
+
+> Note: See [here](https://docs.pytest.org/en/latest/how-to/logging.html) for more information on logging in pytest.
 
