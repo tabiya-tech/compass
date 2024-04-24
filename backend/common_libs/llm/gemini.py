@@ -1,17 +1,32 @@
 import asyncio
 import logging
+import os
 import random
 import time
 from typing import Callable, TypeVar, Coroutine, Any, Generic
 
 import vertexai
+from dotenv import load_dotenv
 from google.api_core.exceptions import ResourceExhausted
 from pydantic import BaseModel, validator
 from vertexai.generative_models import GenerativeModel, Content, HarmCategory, HarmBlockThreshold, GenerationConfig, \
     SafetySetting
 
 logger = logging.getLogger(__name__)
-###### Retry logic with exponential backoff and jitter ######
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Initialize the default region for the Vertex AI client
+
+DEFAULT_VERTEX_API_REGION = os.getenv("VERTEX_API_REGION")
+if not DEFAULT_VERTEX_API_REGION:
+    logging.warning("Default Vertex AI region is not set. Using 'us-central1' as the default region.")
+    DEFAULT_VERTEX_API_REGION = "us-central1"
+else:
+    logging.debug("Default Vertex AI region is %s", DEFAULT_VERTEX_API_REGION)
+
+# Retry logic with exponential backoff and jitter #
 
 T = TypeVar('T', bound=BaseModel)
 
@@ -96,7 +111,7 @@ class Retry(Generic[T]):
     def _get_random_wait_time(previous_wait: float, base_backoff_factor: float, jitter: float) -> float:
         # Multiply the backoff factor with a random jitter that varies from 1 - jitter to 1 + jitter
         randomized_backoff = \
-            base_backoff_factor * (1 + jitter * (random.random() - 0.5) * 2) # nosec B311 # random is used for jitter
+            base_backoff_factor * (1 + jitter * (random.random() - 0.5) * 2)  # nosec B311 # random is used for jitter
         return previous_wait * randomized_backoff
 
 
@@ -126,6 +141,7 @@ class LLMConfig(BaseModel):
     """
     Configuration for the Gemini LLM.
     """
+    location: str = DEFAULT_VERTEX_API_REGION
     generation_config: GenerationConfig = DEFAULT_GENERATION_CONFIG
     safety_settings: frozenset[SafetySetting] = DEFAULT_SAFETY_SETTINGS
     retry_config: RetryConfig = DEFAULT_RETRY_CONFIG
@@ -161,7 +177,9 @@ class GeminiChatLLM:
                  system_instructions: list[str] | str,
                  history: list[Content] = None,
                  config: LLMConfig = LLMConfig()):
-        vertexai.init()
+        # Before constructing the GenerativeModel, we need to initialize the VertexAI client
+        # as the init function may have been called in another module with different parameters
+        vertexai.init(location=config.location)
         self._model = GenerativeModel(model_name="gemini-1.0-pro",
                                       system_instruction=system_instructions,
                                       generation_config=config.generation_config,
@@ -180,8 +198,16 @@ class GeminiChatLLM:
         """
 
         async def _send_message_async() -> str:
-            response = await self._chat.send_message_async(message, stream=False)
-            return response.text
+            try:
+                # noinspection PyProtectedMember
+                logger.debug("Sending message via chat to resource:%s", self._model._prediction_resource_name)
+                response = await self._chat.send_message_async(message, stream=False)
+                return response.text
+            except Exception as e:
+                # noinspection PyProtectedMember
+                logger.error("An error occurred while sending a message in the chat to resource:%s",
+                             self._model._prediction_resource_name, exc_info=True)
+                raise e
 
         return await Retry[str].call_with_exponential_backoff_async(_send_message_async, self._retry_config)
 
@@ -195,8 +221,16 @@ class GeminiChatLLM:
         """
 
         def _send_message() -> str:
-            response = self._chat.send_message(message, stream=False)
-            return response.text
+            try:
+                # noinspection PyProtectedMember
+                logger.debug("Sending message via chat to resource:%s", self._model._prediction_resource_name)
+                response = self._chat.send_message(message, stream=False)
+                return response.text
+            except Exception as e:
+                # noinspection PyProtectedMember
+                logger.error("An error occurred while sending a message in the chat to resource:%s",
+                             self._model._prediction_resource_name, exc_info=True)
+                raise e
 
         return Retry[str].call_with_exponential_backoff(_send_message, self._retry_config)
 
@@ -207,7 +241,9 @@ class GeminiGenerativeLLM:
     """
 
     def __init__(self, *, config: LLMConfig = LLMConfig()):
-        vertexai.init()
+        # Before constructing the GenerativeModel, we need to initialize the VertexAI client
+        # as the init function may have been called in another module with different parameters
+        vertexai.init(location=config.location)
         self._model = GenerativeModel(model_name="gemini-1.0-pro",
                                       generation_config=config.generation_config,
                                       safety_settings=list(config.safety_settings)
@@ -224,8 +260,16 @@ class GeminiGenerativeLLM:
         """
 
         async def _generate_content_async() -> str:
-            response = await self._model.generate_content_async(contents=contents)
-            return response.text
+            try:
+                # noinspection PyProtectedMember
+                logger.debug("Generating content with resource:%s", self._model._prediction_resource_name)
+                response = await self._model.generate_content_async(contents=contents)
+                return response.text
+            except Exception as e:
+                # noinspection PyProtectedMember
+                logger.error("An error occurred while generating content with resource:%s",
+                             self._model._prediction_resource_name, exc_info=True)
+                raise e
 
         return await Retry[str].call_with_exponential_backoff_async(_generate_content_async)
 
@@ -239,7 +283,15 @@ class GeminiGenerativeLLM:
         """
 
         def _generate_content() -> str:
-            response = self._model.generate_content(contents=contents)
-            return response.text
+            try:
+                # noinspection PyProtectedMember
+                logger.debug("Generating content with resource:%s", self._model._prediction_resource_name)
+                response = self._model.generate_content(contents=contents)
+                return response.text
+            except Exception as e:
+                # noinspection PyProtectedMember
+                logger.error("An error occurred while generating content with resource:%s",
+                             self._model._prediction_resource_name, exc_info=True)
+                raise e
 
         return await Retry[str].call_with_exponential_backoff(_generate_content)

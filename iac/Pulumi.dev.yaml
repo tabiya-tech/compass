@@ -3,3 +3,4 @@ config:
   gcp:region: "us-central1"
   backend_repository_name: "compass-docker-repository"
   backend_image_name: "compass-backend"
+  backend_vertex_api_region: "us-central1"

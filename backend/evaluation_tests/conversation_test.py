@@ -7,7 +7,6 @@ from textwrap import dedent
 from typing import Callable, TextIO, TypedDict
 
 import pytest
-from dotenv import load_dotenv
 from tqdm import tqdm
 
 from common_libs.llm.gemini import GeminiChatLLM
@@ -103,7 +102,6 @@ async def test_conversation(max_iterations: int, test_case: EvaluationTestCase):
     would call and does not mock any of the tested components.
     """
     print(f"Running test case {test_case['name']}")
-    load_dotenv()
     common_prompt = """
         Make your responses specific and make sure to only act as the person you are pretending to be.
         Your responses should be concise and precise and you should never go out of character. You should talk like a
