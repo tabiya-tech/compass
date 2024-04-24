@@ -95,7 +95,7 @@ def event_loop():
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_tests
+@pytest.mark.evaluation_test
 @pytest.mark.parametrize('test_case', get_test_cases_to_run())
 async def test_conversation(max_iterations: int, test_case: EvaluationTestCase):
     """
