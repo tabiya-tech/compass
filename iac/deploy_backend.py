@@ -52,7 +52,10 @@ def _get_fully_qualified_image_name(project: str, location: str, repository_name
 
 # Deploy cloud run service
 # See https://cloud.google.com/run/docs/overview/what-is-cloud-run for more information
-def _deploy_cloud_run_service(project: str, location: str, fully_qualified_image_name: str,
+def _deploy_cloud_run_service(*, project: str,
+                              location: str,
+                              fully_qualified_image_name: str,
+                              vertex_api_region: str,
                               dependencies: list[pulumi.Resource]):
     # See https://cloud.google.com/run/docs/securing/service-identity#per-service-identity for more information
     # Create a service account for the Cloud Run service
@@ -88,6 +91,10 @@ def _deploy_cloud_run_service(project: str, location: str, fully_qualified_image
                                                      name="MONGODB_URI",
                                                      value=mongodb_uri
                                                  ),
+                                                 gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                                                     name="VERTEX_API_REGION",
+                                                     value=vertex_api_region
+                                                 ),
                                                  # Add more environment variables here
                                              ]
                                          )],
@@ -117,7 +124,8 @@ def deploy_backend(project: str, location: str):
     pulumi.info(f'Using backend_repository:{repository_name}')
     image_name = config.require("backend_image_name")
     pulumi.info(f"Using backend_image_name: {image_name}")
-
+    vertex_api_region = config.require("backend_vertex_api_region")
+    pulumi.info(f"Using backend_vertex_api_region: {vertex_api_region}")
     # Enable the necessary services for building and pushing the image
     required_services = ["artifactregistry.googleapis.com",
                          "cloudbuild.googleapis.com",
@@ -142,4 +150,8 @@ def deploy_backend(project: str, location: str):
     image = _build_and_push_image(fully_qualified_image_name, [repository])
 
     # Deploy the image as a cloud run service
-    _deploy_cloud_run_service(project, location, fully_qualified_image_name, [image])
+    _deploy_cloud_run_service(project=project,
+                              location=location,
+                              fully_qualified_image_name=fully_qualified_image_name,
+                              vertex_api_region=vertex_api_region,
+                              dependencies=[image])

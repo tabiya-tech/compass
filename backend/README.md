@@ -143,6 +143,7 @@ The backend uses the following environment variables:
 
 - `GOOGLE_APPLICATION_CREDENTIALS`: The path to the service account key file.
 - `MONGODB_URI`: The URI of the MongoDB Atlas instance to use where the ESCO data is stored.
+- `VERTEX_API_REGION`: The region of the Vertex API to use.
 
 The backend supports the use of a `.env` file to set the environment variables. Create a `.env` file in the root
 directory of the backend project and set the environment variables as follows:
@@ -151,6 +152,7 @@ directory of the backend project and set the environment variables as follows:
 # .env file
 GOOGLE_APPLICATION_CREDENTIALS=<PATH_TO_KEY_FILE>
 MONGODB_URI=<URI_TO_MONGODB>
+VERTEX_API_REGION=<REGION>
 ```
 
 > ATTENTION: The .env file should be kept secure and not shared with others as it contains sensitive information.
@@ -171,7 +173,7 @@ To run the image, you'll need to mount a volume with the service account key and
 the container:
 
 ```shell
-docker run -v "<PATH_TO_KEY_FILE>:/code/credentials.json" -e GOOGLE_APPLICATION_CREDENTIALS="/code/credentials.json" -e MONGODB_URI="<URI_TO_MONGODB>" -p 8080:8080 compass-backend
+docker run -v "<PATH_TO_KEY_FILE>:/code/credentials.json" -e GOOGLE_APPLICATION_CREDENTIALS="/code/credentials.json" -e MONGODB_URI="<URI_TO_MONGODB>" -e VERTEX_API_REGION="<REGION>" -p 8080:8080 compass-backend
 ```
 
 If you have set up the `.env` file, you can run the image using the `--env-file` option.
@@ -184,6 +186,7 @@ named `credentials.json` is in a folder named `keys` in the root directory:
 ```dotenv
 MONGODB_URI=<URI_TO_MONGODB>
 GOOGLE_APPLICATION_CREDENTIALS=keys/credentials.json
+VERTEX_API_REGION=<REGION>
 ```
 
 Run the image using the following command:
@@ -203,7 +206,8 @@ The project uses `pylint` as the linter. To run the linter, use the following co
  poetry run pylint --recursive=y . 
 ```
 
-Additionally, the project uses `bandit` to check for security vulnerabilities. To run `bandit`, use the following command:
+Additionally, the project uses `bandit` to check for security vulnerabilities. To run `bandit`, use the following
+command:
 
 ```shell
 # Run bandit on the app and esco_search directories
@@ -217,6 +221,7 @@ To run the unit tests, use the following command:
 ```shell
  poetry run pytest -v -m "not (smoke_test or evaluation_test)" 
 ```
+
 ### Running the smoke tests
 
 To run the smoke tests, use the following command:
