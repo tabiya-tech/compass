@@ -184,7 +184,6 @@ named `credentials.json` is in a folder named `keys` in the root directory:
 ```dotenv
 MONGODB_URI=<URI_TO_MONGODB>
 GOOGLE_APPLICATION_CREDENTIALS=keys/credentials.json
-VERSION=0.0.1
 ```
 
 Run the image using the following command:
