@@ -13,34 +13,16 @@ class PromptGenerator:
         match criteria:
             case EvaluationType.CONCISENESS:
                 return textwrap.dedent("""
-                Your task is to evaluate how concise the responses are from both the SIMULATED_USER and the 
-                EVALUATED_AGENT, focusing on the following aspects:
-        
-                - Response Length: Are the EVALUATED_AGENT responses reasonably concise and to-the-point, 
-                or do they tend to be verbose or rambling? Do the human's messages convey their point concisely?
-        
-                - Repetition: Are the EVALUATED_AGENT responses repeating identical or similar sentences 
-                or phrases with similar meanings or intents, even if the wording differs within the same 
-                or across multiple conversational turns? Could the same, or similar, information be conveyed 
-                in fewer words, sentences or conversational turns?
-        
-                - Extraneous Information: Do the EVALUATED_AGENT responses stay focused on directly addressing the 
-                user's 
-                question/concern, or do they include a lot of unnecessary preamble, repetition, or tangential 
-                information?
-        
-                - Clarity: Despite being concise, are the key points still communicated clearly by both parties, 
-                without critical details being omitted?
-        
-                - Appropriate Depth: While aiming for conciseness, do the responses still provide enough relevant 
-                depth and 
-                detail to adequately counsel the user on identifying required job skills?
-                """)
+                            Could any of the responses made by EVALUATED_AGENT be expressed more concisely without 
+                            losing meaning? Are there any phrases said by EVALUATED_AGENT that are repeated 
+                            unnecessarily within this segment of the conversation? Are all the questions by 
+                            EVALUATED_AGENT focused and easy to understand?
+                        """)
             case _:
                 raise NotImplementedError()
 
     @staticmethod
-    def generate_prompt(conversation: str, context: str, criteria: EvaluationType) -> str:
+    def generate_prompt(conversation: str, criteria: EvaluationType) -> str:
         """
         Generates the prompt to be used in the evaluators.
         """
@@ -48,53 +30,31 @@ class PromptGenerator:
         if criteria_string is None:
             raise ValueError("Invalid criteria value")
 
-        template = textwrap.dedent("""
-                You are assessing a conversation between a human and a job counselor AI chatbot.
-                {context}
-                Your goal is to evaluate the conversation based on the specified criteria and generate a response
-                as per the Response Type.  
-                Here is the data:
-                
-                [BEGIN DATA]
-                
-                [Conversation]: 
-                
-                {conversation}
-                        
-                [Criteria]: {criteria}
-                
-                [END DATA]
+        template = textwrap.dedent(f"""
+            You are assessing a conversation between a human (SIMULATED_USER) and a job 
+            counselor AI chatbot (EVALUATED_AGENT). {criteria_string}
+            
+            Rate it from 0 to 100, 0 being worst 100 being best.
+                    
+            Respond only using a valid JSON format as follows:
+            
+            {{
+                "score": 0, 
+                "reason": ""
+            }}
+            
+            Example Response:
+            
+            {{
+                "score":50,
+                "reason": "The conversation is somewhat concise, but the EVALUATED_AGENT repeats instructions, 
+                    and the SIMULATED_USER could ask more focused questions."
+            }}
+    
+            Conversation Data:
+            [BEGIN DATA]
+            [Conversation]: {conversation}
+            [END DATA] 
+        """)
 
-                {criteria_string}
-                Please rate the overall {criteria} of the conversation as "score" on a scale between 0 to 100.
-
-                Generate your reasoning as "reason" in a step by step manner to be sure that your conclusion is correct
-
-                [Response Type]
-
-                Generate the response in a valid, well-formed JSON format, that matches the _Response_Template_  below.
-
-                _Response_Template_:
-                {{  
-                    "score":  "", # Based on the criteria of evaluation, between 0 to 100 
-                    "reason": "" # String value that contains the reasoning for the conclusion
-                }}
-
-                Example Response: 
-
-                {{
-                    "score":  "50", 
-                    "reason": "The conversation seems concise enough"
-                }}
-                
-                Double check if the response is a valid json which only contains the key "score" and "reason"
-                """)
-
-        formatted_template = template.format(
-            context=context,
-            conversation=conversation,
-            criteria=criteria.value,
-            criteria_string=criteria_string
-        )
-
-        return formatted_template
+        return template
