@@ -195,6 +195,21 @@ Run the image using the following command:
  docker run -v "$(pwd)/keys/credentials.json:/code/keys/credentials.json" --env-file .env compass-backend
 ```
 
+### Logging
+
+The backend uses the Python logging module to log messages.
+
+By default, the backend will load the logger configuration from the [logging.cfg.yaml](app/logging.cfg.yaml) file in the `app/` directory.
+
+It is possible to override the logging configuration by setting the `LOG_CONFIG_FILE` environment variable to the path of the logging configuration file.
+
+For example for the local development environment, you can set the `LOG_CONFIG_FILE` environment variable to the path of the `logging.cfg.dev.yaml`
+
+```dotenv
+# .env file
+LOG_CONFIG_FILE=logging.cfg.dev.yaml
+```
+
 ## Testing Locally
 
 ### Running the linter
@@ -247,4 +262,3 @@ poetry run pytest --log-cli-level=DEBUG -v -m "not (smoke_test or evaluation_tes
 ```
 
 > Note: See [here](https://docs.pytest.org/en/latest/how-to/logging.html) for more information on logging in pytest.
-
