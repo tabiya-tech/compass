@@ -37,6 +37,7 @@ class SimpleLLMAgent(Agent):
     async def execute(self, user_input: AgentInput, history: ConversationHistory) -> AgentOutput:
         model_input = self._system_instructions + "\n" + ConversationHistoryFormatter.format_for_prompt(
             history) + "\nUser: " + user_input.message
+        self._logger.debug("%s Model input: %s", self._agent_type, model_input)
         llm_response = await self._llm.generate_content_async(model_input)
         try:
             last: ModelResponse = extract_json(llm_response, ModelResponse)
@@ -44,6 +45,7 @@ class SimpleLLMAgent(Agent):
             self._logger.warning("Error extracting JSON from conversation content '%s'", llm_response, exc_info=True)
             last = ModelResponse(message=str(llm_response), finished=False)
 
+        self._logger.debug("%s Model output: %s", self._agent_type, last)
         response = AgentOutput(message_for_user=last.message,
                                finished=last.finished,
                                agent_type=self._agent_type)
