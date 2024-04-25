@@ -33,7 +33,7 @@ in `backend/evaluation_tests/test_output/` directory.
 Optional useful parameters:
 
 - `-s` allows you to see the log output even for tests that pass
-- `--max_terations <number>` allows you to set the number of messages the chatbot is allowed to make.
+- `--max_iterations <number>` allows you to set the number of messages the chatbot is allowed to make.
 - `--test_cases_to_run` allows you to set specific test cases to be run. This should mostly be used for local
   development. Takes a comma separated list. The names of the test cases can be found in the conversation_test.py file.
 
