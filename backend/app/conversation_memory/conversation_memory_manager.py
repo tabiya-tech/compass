@@ -1,3 +1,5 @@
+import json
+import os
 from collections import defaultdict
 from typing import TypeAlias
 
@@ -11,6 +13,30 @@ ConversationSummaryDict: TypeAlias = dict[int, list[str]]
 ConversationContextDict: TypeAlias = dict[
     int, tuple[ConversationHistory, ConversationSummary]]
 ConversationHistoryDict: TypeAlias = dict[int, ConversationHistory]
+
+
+def save_conversation_history_to_json(history: ConversationHistory, file_path: str) -> None:
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, 'w') as f:
+        to_dict = [
+            {'AgentInput': agent_input.dict(), 'AgentOutput': agent_output.dict()}
+            for agent_input, agent_output in history
+
+        ]
+        json.dump(to_dict, f, indent=4)
+
+
+def save_conversation_history_to_markdown(title: str, history: ConversationHistory, file_path: str) -> None:
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, 'w') as f:
+        f.write(f"# {title}\n\n")
+        f.write("## Conversation History\n\n")
+        for agent_input, agent_output in history:
+            f.write("### Turn\n\n")
+            f.write(f"**User**: {agent_input.message}\\\n")
+            f.write(f"**{agent_output.agent_type}**: {agent_output.message_for_user}\\\n")
+            f.write(f"**Finished**: {agent_output.finished}\n")
+            f.write("\n\n")
 
 
 class ConversationMemoryManager:
@@ -31,7 +57,6 @@ class ConversationMemoryManager:
         """
         self._all_history[session_id] = []
         self._recent_history[session_id] = []
-
 
     async def get_conversation_history(self, session_id: int) -> ConversationHistory:
         """

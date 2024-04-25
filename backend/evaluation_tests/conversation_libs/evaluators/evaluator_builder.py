@@ -1,6 +1,6 @@
-from evaluation_tests.evaluators.base_evaluator import BaseEvaluator
-from evaluation_tests.evaluators.criteria_evaluator import CriteriaEvaluator
-from evaluation_tests.evaluators.evaluation_result import EvaluationType
+from evaluation_tests.conversation_libs.evaluators.base_evaluator import BaseEvaluator
+from evaluation_tests.conversation_libs.evaluators.criteria_evaluator import CriteriaEvaluator
+from evaluation_tests.conversation_libs.evaluators.evaluation_result import EvaluationType
 
 
 def create_evaluator(evaluations_type: EvaluationType) -> BaseEvaluator:

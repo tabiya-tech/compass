@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from evaluation_tests.evaluators.evaluation_result import TestEvaluationRecord, EvaluationResult, EvaluationType
+from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationEvaluationRecord, EvaluationResult, EvaluationType
 
 
 class BaseEvaluator(ABC):
@@ -12,7 +12,7 @@ class BaseEvaluator(ABC):
         self.criteria = criteria
 
     @abstractmethod
-    async def evaluate(self, actual: TestEvaluationRecord) -> EvaluationResult:
+    async def evaluate(self, actual: ConversationEvaluationRecord) -> EvaluationResult:
         """
         Evaluates the input based on the criteria set during initialization.
         :param actual: The input to be evaluated.
