@@ -2,9 +2,9 @@ from pydantic import BaseModel
 
 from common_libs.llm.gemini import GeminiGenerativeLLM, LLMConfig
 from common_libs.text_formatters import extract_json
-from evaluation_tests.evaluators.base_evaluator import BaseEvaluator
-from evaluation_tests.evaluators.evaluation_result import TestEvaluationRecord, EvaluationResult, EvaluationType
-from evaluation_tests.evaluators.prompt_generator import PromptGenerator
+from evaluation_tests.conversation_libs.evaluators.base_evaluator import BaseEvaluator
+from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationEvaluationRecord, EvaluationResult, EvaluationType
+from evaluation_tests.conversation_libs.evaluators.prompt_generator import PromptGenerator
 
 
 class LlmEvaluatorOutput(BaseModel):
@@ -27,7 +27,7 @@ class CriteriaEvaluator(BaseEvaluator):
         # as we are not interested in conducting a conversation, with an in-memory state (history).
         self.llm = GeminiGenerativeLLM(config=LLMConfig(model_name="gemini-1.5-pro-preview-0409"))
 
-    async def evaluate(self, actual: TestEvaluationRecord) -> EvaluationResult:
+    async def evaluate(self, actual: ConversationEvaluationRecord) -> EvaluationResult:
         prompt = PromptGenerator.generate_prompt(conversation=actual.generate_conversation(),
                                                  criteria=self.criteria)
         result = await self.llm.generate_content_async(prompt)

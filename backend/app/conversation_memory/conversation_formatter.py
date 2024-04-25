@@ -14,5 +14,5 @@ class ConversationHistoryFormatter:
         :return: A formatted string
         """
         return "Current conversation:\n" + "\n".join(
-            [f"User: {agent_input.message}\n{agent_output.agent_type.value}: {agent_output.message_for_user}" for
+            [f"User: {agent_input.message}\n{agent_output.agent_type}: {agent_output.message_for_user}" for
              agent_input, agent_output in history])
