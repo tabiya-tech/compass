@@ -1,6 +1,6 @@
 import textwrap
 
-from evaluation_tests.evaluators.evaluation_result import EvaluationType
+from evaluation_tests.conversation_libs.evaluators.evaluation_result import EvaluationType
 
 
 class PromptGenerator:

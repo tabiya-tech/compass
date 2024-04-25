@@ -62,7 +62,7 @@ class ConversationResponse(BaseModel):
 @app.get(path="/conversation",
          description="""Temporary route used to interact with the conversation agent.""", )
 async def welcome(user_input: str, clear_memory: bool = False, filter_pii: bool = True,
-                   session_id: int = 1):
+                  session_id: int = 1):
     """
     Endpoint responsible for managing the conversation with the user.
     """
@@ -77,7 +77,23 @@ async def welcome(user_input: str, clear_memory: bool = False, filter_pii: bool 
         history = await agent_director.get_conversation_history(session_id)
         response = ConversationResponse(last=agent_output, conversation_history=history)
         return response
-    except Exception as e:  # pylint: disable=broad-except # this is the main entry point, so we need to catch all exceptions
+    except Exception as e:  # pylint: disable=broad-except
+        # this is the main entry point, so we need to catch all exceptions
+        logger.exception(e)
+        return {"error": "oops! something went wrong!"}
+
+
+@app.get(path="/conversation_history",
+         description="""Temporary route used to get the conversation history of a user.""", )
+async def get_history(session_id: int):
+    """
+    Get the conversation history of a user.
+    """
+    try:
+        history = await agent_director.get_conversation_history(session_id)
+        return history
+    except Exception as e:  # pylint: disable=broad-except
+        # this is the main entry point, so we need to catch all exceptions
         logger.exception(e)
         return {"error": "oops! something went wrong!"}
 
