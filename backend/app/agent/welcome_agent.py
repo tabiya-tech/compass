@@ -20,7 +20,8 @@ class WelcomeAgent(SimpleLLMAgent):
         ])
         finish_instructions = get_conversation_finish_instructions(
             'When the user indicates that they are ready to start the counseling session, ' +
-            'or when the user asks to start the counseling session')
+            'or when the user asks to start the counseling session, '
+            'or when the user is ready to start.')
 
         system_instructions_template = dedent("""\
         You are a Receptionist at a skills exploration agency. 
@@ -28,10 +29,10 @@ class WelcomeAgent(SimpleLLMAgent):
            - welcome the user
            - introduce them to the exploration process
            - answer user questions about the exploration process 
-           - forward the use to the exploration session
+           - forward the user to the exploration session
         Begin by welcoming the user with a warm welcome and introduce the process.
         Answer any questions they might have using the _ABOUT_ section below.
-        Guide the user to the start of the exploration session.
+        Guide the user to start the exploration session.
         If you are unsure and the question contains information that is not explicitly related to your task 
         and can't be found in the _ABOUT_ section, you will answer with 
         "Sorry, I don't know how to help with that."            
