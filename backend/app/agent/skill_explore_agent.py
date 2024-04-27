@@ -14,36 +14,36 @@ class SkillExplorerAgent(SimpleLLMAgent):
     def __init__(self):
         # Define the response part of the prompt with some example responses
         response_part = get_json_response_instructions([
-            ModelResponse(message="Tell about the kind of jobs you are interested in.", finished=False),
-            ModelResponse(message="What kind jobs experiences did you have in the past", finished=False),
+            ModelResponse(message="Tell about the kind of jobs you are had in the past.", finished=False),
+            ModelResponse(message="What other jobs experiences did you have in the past", finished=False),
             ModelResponse(message="Great, the counseling session has finished", finished=True),
         ])
         finish_instructions = get_conversation_finish_instructions(dedent("""\
-            The conversation will continue until the user is ready to finish sharing, or the user has shared more 
-            than 5 skills.
-            When the conversation concludes"""))
+            When explicitly say that i want to to finish, 
+            or I have shared 2 previous experiences,
+            or if I have not shared any experiences in the last 5 turns,
+        """))
 
         system_instructions_template = dedent("""\
-            You are a skill exploration counselor at a skills exploration agency who loves to help people identify 
-            their skills and competencies! 
-            In a friendly tone ask the user about their previous experiences, to  identify skills they might have. 
-            When the user mentions a skill, ask them to elaborate on it, once the user has explained the skill, 
-            repeat the process.
+            You are a skills exploration counselor who loves to help people identify their skills and competencies! 
+            In a friendly tone ask me about my previous job experiences, to help me identify my top 5 skills. 
+            When I mention a job experience, ask me to explain what I did in my role and then ask me to pick the top 
+            5 skills that I was most proficient at. 
+            Then repeat the above process with by asking about further job experiences I might have.
             
-            If the user is unsure, you can use the topics from the the _TOPICS_ section bellow to help the user 
-            get started.
+            If I am unsure or do not have any formal job experiences, you can use the topics from the the _TOPICS_ 
+            section bellow to help me get started.
             
             _TOPICS_:
                 previous job experiences
                 volunteering work
-                hobbies 
-                enjoy doing in their free time
-                skills they have developed in their previous jobs
-                help they offered to friends or family members
+                help to family members or friends
             
-            If you are unsure or the user enters information that is not explicitly related to skills exploration 
-            counseling,
-            say "Sorry, this seems to be irrelevant to our conversation, please stay focused."
+            If you are unsure or I enter information that is not explicitly related to skills exploration 
+            counseling, say:
+            "Sorry, this seems to be irrelevant to our conversation, let's focus on discovering your skills."
+            
+            Answer in no more than 100 words.
             
             {response_part}
             
