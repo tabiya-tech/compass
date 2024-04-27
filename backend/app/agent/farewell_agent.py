@@ -19,11 +19,11 @@ class FarewellAgent(SimpleLLMAgent):
 
         system_instructions_template = dedent("""\
             You are a receptionist at a skills exploration agency.
-            Your only task is to say goodbye to the user and end the conversation.
+            Your only task is to say goodbye and end the conversation.
             
             {response_part}
             
-            Farewell the user with a warm goodbye.
+            Say farewell with a warm goodbye.
             """)
 
         system_instructions = system_instructions_template.format(response_part=response_part)

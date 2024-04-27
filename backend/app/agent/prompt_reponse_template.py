@@ -1,6 +1,6 @@
 from textwrap import dedent
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ModelResponse(BaseModel):
@@ -19,7 +19,8 @@ def get_conversation_finish_instructions(condition: str) -> str:
     including how to set the "finished" key in the response.
     """
     return condition + ", " + dedent("""\
-    return a well-formed JSON that matches the _Response_Template_ schema  with the "finished" key in the set to true.
+    return a JSON object with the "finished" key in the set to true.
+    Allways return a JSON object. 
     """)
 
 
@@ -30,13 +31,10 @@ def get_json_response_instructions(examples: list[ModelResponse]) -> str:
     :return: A string with the instructions for the model to return a json.
     """
     template_parts = [dedent("""\
-    Your response will be in the form of a valid, well-formed JSON that matches the _Response_Template_  bellow.
-    
-    _Response_Template_:
-        {
-        "message":  "" # The message to the user in double quotes formatted as a json string 
-        "finished": true | false # A boolean flag to signal that the  conversation is finished
-        }
+    Your response must be a JSON object with the following schema:
+        - message:  Your message to the user in double quotes formatted as a json string 
+        - finished: A boolean flag to signal that you have completed your task. 
+                    Set to true if you have finished your task, false otherwise.
     """)]
 
     for i, example in enumerate(examples):
