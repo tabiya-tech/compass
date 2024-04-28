@@ -8,7 +8,8 @@ import pytest
 from app.agent.agent_types import AgentOutput, AgentInput
 from app.conversation_memory.conversation_memory_manager import ConversationHistory
 from app.server import welcome, get_history
-from evaluation_tests.conversation_libs.conversation_test_function import conversation_test_function, EvaluationTestCase, Evaluation
+from evaluation_tests.conversation_libs.conversation_test_function import conversation_test_function, \
+    EvaluationTestCase, Evaluation, LLMSimulatedUser, ConversationTestConfig
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import EvaluationType
 
 test_cases = [
@@ -81,7 +82,7 @@ class _AppChatExecutor:
 
 
 class _AppGetHistoryExecutor:
-    def __init__(self, session_id: int):
+    def __init__(self, *, session_id: int):
         self._session_id = session_id
 
     async def __call__(self) -> ConversationHistory:
@@ -118,10 +119,13 @@ async def test_main_app_chat(max_iterations: int, test_case: EvaluationTestCase)
     session_id = hash(test_case.name) % 10 ** 10
     output_folder = os.path.join(os.path.dirname(__file__), 'test_output/e2e', test_case.name)
     await conversation_test_function(
-        max_iterations=max_iterations,
-        test_case=test_case,
-        output_folder=output_folder,
-        execute_evaluated_agent=_AppChatExecutor(session_id=session_id),
-        is_finished=_AppChatIsFinished(),
-        get_conversation_history=_AppGetHistoryExecutor(session_id=session_id)
+        config=ConversationTestConfig(
+            max_iterations=max_iterations,
+            test_case=test_case,
+            output_folder=output_folder,
+            execute_evaluated_agent=_AppChatExecutor(session_id=session_id),
+            execute_simulated_user=LLMSimulatedUser(system_instructions=test_case.simulated_user_prompt),
+            is_finished=_AppChatIsFinished(),
+            get_conversation_history=_AppGetHistoryExecutor(session_id=session_id)
+        )
     )
