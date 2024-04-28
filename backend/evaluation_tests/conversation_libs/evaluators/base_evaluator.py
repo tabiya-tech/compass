@@ -9,7 +9,7 @@ class BaseEvaluator(ABC):
     An abstract class for a BaseEvaluator.
     """
 
-    def __init__(self, criteria: EvaluationType):
+    def __init__(self, criteria: EvaluationType, **kwargs):
         self.criteria = criteria
 
     @abstractmethod
