@@ -17,7 +17,7 @@ test_cases = [
         simulated_user_prompt=dedent("""
             You are a young student from Kenya trying to find a job. 
             """),
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
+        evaluations=[Evaluation(type=EvaluationType.RELEVANCE, expected=70)]
     ),
     EvaluationTestCase(
         name='genZ_student_e2e',
@@ -27,7 +27,7 @@ test_cases = [
             others graphic design, transcription, the whole digital skills thing. You even help people without fancy 
             degrees get started online.
             """),
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
+        evaluations=[Evaluation(type=EvaluationType.COHERENCE, expected=70)]
     ),
     EvaluationTestCase(
         name='creative_writer_e2e',
@@ -37,7 +37,7 @@ test_cases = [
             deal. They even had this mentorship program, and before I knew it, I was working with nine guys!  It's been 
             amazing, helping others find their path, just like Huum helped me.
             """),
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
+        evaluations=[Evaluation(type=EvaluationType.CORRECTNESS, expected=70)]
     ),
 ]
 
