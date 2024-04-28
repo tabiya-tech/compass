@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
-from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationEvaluationRecord, EvaluationResult, EvaluationType
+from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationEvaluationRecord, \
+    EvaluationResult, EvaluationType
 
 
 class BaseEvaluator(ABC):
