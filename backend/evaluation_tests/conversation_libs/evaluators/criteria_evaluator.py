@@ -3,7 +3,8 @@ from pydantic import BaseModel
 from common_libs.llm.gemini import GeminiGenerativeLLM, LLMConfig
 from common_libs.text_formatters import extract_json
 from evaluation_tests.conversation_libs.evaluators.base_evaluator import BaseEvaluator
-from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationEvaluationRecord, EvaluationResult, EvaluationType
+from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationEvaluationRecord, \
+    EvaluationResult, EvaluationType
 from evaluation_tests.conversation_libs.evaluators.prompt_generator import PromptGenerator
 
 
