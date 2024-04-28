@@ -30,6 +30,7 @@ class EvaluationType(Enum):
     RELEVANCE = "Relevance"
     CORRECTNESS = "Correctness"
     COHERENCE = "Coherence"
+    EXCEPTION = "Exception"
 
 
 class EvaluationResult(BaseModel):
