@@ -1,5 +1,6 @@
 from vertexai.generative_models import Content, Part
 
+from app.agent.prompt_reponse_template import ModelResponse
 from app.conversation_memory.conversation_memory_types import ConversationContext
 
 
@@ -29,8 +30,13 @@ class ConversationHistoryFormatter:
         for turn in context.history.turns:
             ConversationHistoryFormatter._append_part(contents, ConversationHistoryFormatter.USER,
                                                       turn.input.message)
+            # Since the agent should respond with a ModelResponse JSON object,
+            # we will append the JSON object. This reinforces the model to respond with a JSON object.
+            # Not doing this will cause the model to respond with a non-JSON object as the conversation history
+            # acts as an example for the model to follow.
+            model_response = ModelResponse(message=turn.output.message_for_user, finished=turn.output.finished)
             ConversationHistoryFormatter._append_part(contents, ConversationHistoryFormatter.MODEL,
-                                                      turn.output.message_for_user)
+                                                      f'{model_response.json()}')
         return contents
 
     @staticmethod
