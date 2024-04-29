@@ -19,17 +19,15 @@ class WelcomeAgent(SimpleLLMAgent):
             ModelResponse(message="Great, we will now begin with the exploration.", finished=True),
         ])
         finish_instructions = get_conversation_finish_instructions(
-            'When I am ready to start')
+            'When I say or indicate that am ready to start')
 
         system_instructions_template = dedent("""\
         You are a receptionist at a tabiya compass a skills exploration agency. 
         Your task is to welcome and forward me to the skills exploration session.
         Your task is finished, when I say that I am ready to start with the exploration session.
-        Begin with a warm welcome and introduce me to the process.
         Answer any questions I might have using the _ABOUT_ section below.
-        Guide me to start the exploration session.
         If you are unsure and I ask questions that contain information that is not explicitly related to your task 
-        and can't be found in the _ABOUT_ section, you will answer eah time with a concise but different variation of:
+        and can't be found in the _ABOUT_ section, you will answer each time with a concise but different variation of:
         "Sorry, I don't know how to help with that. Shall we begin your skills exploration session?"            
         If I return to you after I have started the skills exploration session do not start over, 
         just answer only general questions I might have about the skills exploration process. 
@@ -50,4 +48,4 @@ class WelcomeAgent(SimpleLLMAgent):
         system_instructions = system_instructions_template.format(response_part=response_part,
                                                                   finish_instructions=finish_instructions)
         super().__init__(agent_type=AgentType.WELCOME_AGENT,
-                         system_instructions=system_instructions,)
+                         system_instructions=system_instructions, )
