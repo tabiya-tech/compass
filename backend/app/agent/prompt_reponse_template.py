@@ -21,7 +21,7 @@ def get_conversation_finish_instructions(condition: str) -> str:
     return condition + ", " + dedent("""\
     return a JSON object with the "finished" key in the set to true.
     
-    Allways return a JSON object. 
+    Allways return a JSON object. Compare your response with the schema above.
     """)
 
 
@@ -36,16 +36,11 @@ def get_json_response_instructions(examples: list[ModelResponse]) -> str:
         - message:  Your message to the user in double quotes formatted as a json string 
         - finished: A boolean flag to signal that you have completed your task. 
                     Set to true if you have finished your task, false otherwise.
+    Example responses:
     """)]
 
     for i, example in enumerate(examples):
-        part = dedent(f"""\
-        Example responses {i + 1}:
-            {{
-            "message":  "{example.message}",
-            "finished": {"true" if example.finished is True else "false"}
-            }}
-        """)
+        part = f'{example.json()}'
         template_parts.append(part)
 
     return "\n".join(template_parts)
