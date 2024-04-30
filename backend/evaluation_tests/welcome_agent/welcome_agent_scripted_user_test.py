@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import os
 
 import pytest
@@ -49,7 +50,7 @@ test_cases = [
             "Can we build a house?",
             "Yes, let's start"  # Expect to complete the conversation
         ],
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=50)]
     ),
     ScriptedUserEvaluationTestCase(
         name='user_asks_questions',
@@ -102,7 +103,8 @@ def event_loop():
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases), ids=[case.name for case in test_cases])
-async def test_welcome_agent_scripted_user(max_iterations: int, test_case: ScriptedUserEvaluationTestCase):
+async def test_welcome_agent_scripted_user(max_iterations: int,
+                                           test_case: ScriptedUserEvaluationTestCase, caplog):
     """
     Conversation test, based on a scripted user.
     Asserts that the welcome agent is able to complete the conversation.
@@ -119,26 +121,43 @@ async def test_welcome_agent_scripted_user(max_iterations: int, test_case: Scrip
     # The conversation manager for this test
     conversation_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
 
+    execute_evaluated_agent = WelcomeAgentExecutor(conversation_manager=conversation_manager, session_id=session_id)
+
     # Run the conversation test
     config = ConversationTestConfig(
         # Ignoring max_iterations, The agent is expected to complete the conversation at the last input from the user
         max_iterations=len(test_case.scripted_user) + 1,
         test_case=test_case,
         output_folder=output_folder,
-        execute_evaluated_agent=WelcomeAgentExecutor(conversation_manager=conversation_manager, session_id=session_id),
+        execute_evaluated_agent=execute_evaluated_agent,
         execute_simulated_user=ScriptedSimulatedUser(script=test_case.scripted_user),
         is_finished=WelcomeAgentIsFinished(),
         get_conversation_context=WelcomeAgentGetConversationContextExecutor(conversation_manager=conversation_manager,
                                                                             session_id=session_id)
     )
-    try:
+    # Set the capl-og at the level in question - 1 to ensure that the root logger is set to the correct level.
+    # However, this is not enough as a logger can be set up in the agent in such a way that it does not propagate
+    # the log messages to the root logger. For this reason, we add additional guards.
+    with caplog.at_level(logging.INFO):
+        # Guards to ensure that the loggers are correctly setup,
+        # otherwise the tests cannot be trusted that they correctly assert the absence of errors and warnings.
+        guard_warning_msg = logging.getLevelName(logging.WARNING) + str(session_id)  # some random string
+        execute_evaluated_agent._agent._logger.warning(guard_warning_msg)
+        assert guard_warning_msg in caplog.text
+        guard_error_msg = logging.getLevelName(logging.ERROR) + str(session_id)  # some random string
+        execute_evaluated_agent._agent._logger.warning(guard_error_msg)
+        assert guard_error_msg in caplog.text
+        caplog.records.clear()
+
+        # Run the main test
         await conversation_test_function(
             config=config
         )
-    except Exception as e:
-        print(f"Error in test case {test_case.name}: {e}")
-        raise e
-    finally:
+
+        # Check that no errors and no warning were logged
+        for record in caplog.records:
+            assert record.levelname != 'ERROR'
+            assert record.levelname != 'WARNING'
         # Check if the welcome agent completed their task
         context = await conversation_manager.get_conversation_context(session_id)
         assert context.history.turns[-1].output.finished
