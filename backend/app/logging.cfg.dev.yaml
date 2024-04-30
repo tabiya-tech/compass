@@ -20,7 +20,7 @@ loggers:
   _template: &template_logger  # Define an anchor
     level: DEBUG
     handlers: [ console, file ]
-    propagate: no
+    propagate: yes
   WelcomeAgent: *template_logger
   SkillExplorerAgent: *template_logger
   FarewellAgent: *template_logger
