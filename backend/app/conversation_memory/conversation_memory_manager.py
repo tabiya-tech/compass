@@ -38,6 +38,7 @@ class ConversationMemoryManager:
         Reset the conversation history for a session
         :param session_id: The session id
         """
+        self._summary[session_id] = ""
         self._all_history[session_id].turns = []
         self._unsummarized_history[session_id].turns = []
         self._to_be_summarized_history[session_id].turns = []
