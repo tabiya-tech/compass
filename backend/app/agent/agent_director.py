@@ -1,17 +1,37 @@
 import logging
-from typing import TypeAlias
-from collections import defaultdict
+from enum import Enum
+
+from pydantic import BaseModel
 
 from app.agent.agent import Agent
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.farewell_agent import FarewellAgent
 from app.agent.skill_explore_agent import SkillExplorerAgent
 from app.agent.welcome_agent import WelcomeAgent
-from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager, ConversationContext
+from app.conversation_memory.conversation_memory_manager import \
+    ConversationMemoryManager
 
-logger = logging.getLogger(__name__)
 
-CurrentIndexDict: TypeAlias = dict[int, int]
+class ConversationPhase(Enum):
+    """
+    An enumeration for conversation phases
+    """
+    INTRO = 0
+    CONSULTING = 1
+    CHECKOUT = 2
+    ENDED = 3
+
+
+class AgentDirectorState(BaseModel):
+    """
+    The state of the agent director
+    """
+    session_id: int
+    current_phase: ConversationPhase
+
+    def __init__(self, session_id):
+        super().__init__(session_id=session_id,
+                         current_phase=ConversationPhase.INTRO)
 
 
 class AgentDirector:
@@ -21,79 +41,61 @@ class AgentDirector:
     """
 
     def __init__(self, conversation_manager: ConversationMemoryManager):
-        # set the default agent index to 0
-        self._current_agent_index: CurrentIndexDict = defaultdict(int)
+        # Initialize the logger
+        self._logger = logging.getLogger(AgentDirector.__class__.__name__)
+
         # initialize the agents
-        self._agents: list[Agent] = [
-            WelcomeAgent(),
-            SkillExplorerAgent(),
-            FarewellAgent()
-        ]
-        # initialize the conversation manager
+        self._agents: dict[ConversationPhase, Agent] = {
+            ConversationPhase.INTRO: WelcomeAgent(),
+            ConversationPhase.CONSULTING: SkillExplorerAgent(),
+            ConversationPhase.CHECKOUT: FarewellAgent()
+        }
+
+        # set the conversation manager
         self._conversation_manager = conversation_manager
 
-    async def reset(self, session_id: int) -> None:
-        """
-        Reset the state of the conversation
-        """
-        # Reset agent index for a specific session
-        await self._set_current_agent(session_id, 0)
-        # Reset conversation history for a specific session
-        await self._conversation_manager.reset(session_id)
+        self._state: AgentDirectorState | None = None
 
-    async def get_conversation_context(self, session_id: int) -> ConversationContext:
+    def _get_current_agent(self) -> Agent | None:
         """
-        Get the conversation context for a specific session.
-
-        :param session_id: The session id of the conversation
-
-        :return: The conversation context for the specific session
+        Get the current agent for a specific state.
+        :return: The current agent for the state, or None if conversation has ended
         """
-        return await self._conversation_manager.get_conversation_context(session_id)
 
-    def _get_current_agent(self, session_id: int) -> tuple[int, Agent | None]:
+        return self._agents.get(self._state.current_phase, None)
+
+    def _transition_to_next_phase(self):
         """
-        Get the current agent index and the current agent for a specific session.
-
-        :param session_id: The session id of the conversation
-        :return: A tuple of the index of current agent and the current agent.
-                 None if the index is out of range
+        Transition to the next phase of the conversation.
         """
-        current_agent_index = self._current_agent_index[session_id]
-        if 0 <= current_agent_index < len(self._agents):
-            return current_agent_index, self._agents[current_agent_index]
-        # If the index is out of range, return None
-        return current_agent_index, None
+        if self._state.current_phase != ConversationPhase.ENDED:
+            self._state.current_phase = ConversationPhase(self._state.current_phase.value + 1)
 
-    async def _set_current_agent(self, session_id: int, agent_index: int) -> None:
+    def set_state(self, state: AgentDirectorState):
         """
-        Set the current agent index for a specific session.
-
-        :param session_id: The session id of the conversation
-        :param agent_index: The index of the agent to set as current
+        Set the agent director state
+        :param state: the agent director state
         """
-        self._current_agent_index[session_id] = agent_index
+        self._state = state
 
-    async def execute(self, session_id: int, user_input: AgentInput) -> AgentOutput:
+    async def execute(self, user_input: AgentInput) -> AgentOutput:
         """
-        Run the conversation task for the current user input and specific session.
-
-        If the agent has finished, set the next agent as the current agent.
+        Run the conversation task for the current user input and specific state.
 
         When all agents are done, return a message to the user that the conversation is finished.
 
-        :param session_id: The session id of the conversation
         :param user_input: The user input
         :return: The output from the agent
         """
         try:
-            current_agent_index, current_agent = self._get_current_agent(session_id)
+            current_agent = self._get_current_agent()
             if current_agent:
-                context = await self.get_conversation_context(session_id)
+                context = await self._conversation_manager.get_conversation_context()
                 agent_output = await current_agent.execute(user_input, context)
                 if agent_output.finished:  # If the agent is finished, move to the next agent
-                    await self._set_current_agent(session_id, current_agent_index + 1)
-                await self._conversation_manager.update_history(session_id, user_input, agent_output)
+                    self._transition_to_next_phase()
+                    # Update the conversation history
+                await self._conversation_manager.update_history(user_input, agent_output)
             else:
                 # No more agents to run
                 agent_output = AgentOutput(
@@ -102,6 +104,6 @@ class AgentDirector:
             return agent_output
         # executing an agent can raise any number of unknown exceptions
         except Exception as e:  # pylint: disable=broad-except
-            logger.error("Error while executing the agent director: %s", e, exc_info=True)
+            self._logger.error("Error while executing the agent director: %s", e, exc_info=True)
             return AgentOutput(message_for_user="Conversation forcefully ended",
                                finished=True, agent_type=None)

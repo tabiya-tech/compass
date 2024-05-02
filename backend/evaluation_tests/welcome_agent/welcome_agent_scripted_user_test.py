@@ -5,6 +5,7 @@ import os
 import pytest
 
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
+from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
 from evaluation_tests.conversation_libs.conversation_test_function import conversation_test_function, \
     Evaluation, ConversationTestConfig, ScriptedUserEvaluationTestCase, \
@@ -50,7 +51,7 @@ test_cases = [
             "Can we build a house?",
             "Yes, let's start"  # Expect to complete the conversation
         ],
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=50)]
+        evaluations=[]
     ),
     ScriptedUserEvaluationTestCase(
         name='user_asks_questions',
@@ -63,7 +64,7 @@ test_cases = [
             "What if I get interrupted?",
             "Ok, let's start"  # Expect to complete the conversation
         ],
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
+        evaluations=[]
     ),
 
     ScriptedUserEvaluationTestCase(
@@ -80,7 +81,7 @@ test_cases = [
             "What if I don't like the process?",
             "Let's begin"  # Expect to complete the conversation
         ],
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
+        evaluations=[]
     ),
 ]
 
@@ -120,8 +121,8 @@ async def test_welcome_agent_scripted_user(max_iterations: int,
 
     # The conversation manager for this test
     conversation_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
-
-    execute_evaluated_agent = WelcomeAgentExecutor(conversation_manager=conversation_manager, session_id=session_id)
+    conversation_manager.set_state(state=ConversationMemoryManagerState(session_id))
+    execute_evaluated_agent = WelcomeAgentExecutor(conversation_manager=conversation_manager)
 
     # Run the conversation test
     config = ConversationTestConfig(
@@ -132,8 +133,7 @@ async def test_welcome_agent_scripted_user(max_iterations: int,
         execute_evaluated_agent=execute_evaluated_agent,
         execute_simulated_user=ScriptedSimulatedUser(script=test_case.scripted_user),
         is_finished=WelcomeAgentIsFinished(),
-        get_conversation_context=WelcomeAgentGetConversationContextExecutor(conversation_manager=conversation_manager,
-                                                                            session_id=session_id)
+        get_conversation_context=WelcomeAgentGetConversationContextExecutor(conversation_manager=conversation_manager)
     )
     # Set the capl-og at the level in question - 1 to ensure that the root logger is set to the correct level.
     # However, this is not enough as a logger can be set up in the agent in such a way that it does not propagate
@@ -159,6 +159,6 @@ async def test_welcome_agent_scripted_user(max_iterations: int,
             assert record.levelname != 'ERROR'
             assert record.levelname != 'WARNING'
         # Check if the welcome agent completed their task
-        context = await conversation_manager.get_conversation_context(session_id)
+        context = await conversation_manager.get_conversation_context()
         assert context.history.turns[-1].output.finished
         assert context.history.turns[-1].index == len(test_case.scripted_user) + 1

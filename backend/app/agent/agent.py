@@ -53,7 +53,8 @@ class SimpleLLMAgent(Agent):
             if retry_count < 3:
                 # If the agent failed to respond with a JSON object,
                 # remind that the response should be a JSON object
-                # TODO: reduce temperature for the retry?
+                # This is helpful, when the model "forgets" it's instructions because the
+                # conversation is too long.
                 msg += "\n, also remember your instructions and that you should respond with a JSON object."
             retry_count -= 1
             llm_response = await self._llm.generate_content_async(
@@ -107,7 +108,8 @@ class _SimpleStatelessChatLLMAgent(Agent):
             if retry_count < 3:
                 # If the agent failed to respond with a JSON object,
                 # remind that the response should be a JSON object
-                # TODO: reduce temperature for the retry?
+                # This is helpful, when the model "forgets" it's instructions because the
+                # conversation is too long.
                 msg += "\n, also remember your instructions and that you should respond with a JSON object."
             retry_count -= 1
             llm_response = await self._llm.send_message_async(

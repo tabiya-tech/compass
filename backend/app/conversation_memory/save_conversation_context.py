@@ -1,6 +1,7 @@
 import os
+from typing import TextIO
 
-from app.conversation_memory.conversation_memory_types import ConversationContext
+from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationTurn
 
 
 def save_conversation_context_to_json(*, context: ConversationContext, file_path: str) -> None:
@@ -26,10 +27,17 @@ def save_conversation_context_to_markdown(*, title: str, context: ConversationCo
         f.write(f"# {title}\n\n")
         f.write("## Conversation Summary\n\n")
         f.write(f"{context.summary}\n\n")
-        f.write("## Conversation History\n\n")
+        f.write("## Conversation Recent History\n\n")
         for turn in context.history.turns:
-            f.write(f"### Turn {turn.index}\n\n")
-            f.write(f"**User**: {turn.input.message}\\\n")
-            f.write(f"**{turn.output.agent_type}**: {turn.output.message_for_user}\\\n")
-            f.write(f"**Finished**: {turn.output.finished}\n")
-            f.write("\n\n")
+            _write_turn(f, turn)
+        f.write("## Conversation All History\n\n")
+        for turn in context.all_history.turns:
+            _write_turn(f, turn)
+
+
+def _write_turn(f: TextIO, turn: ConversationTurn):
+    f.write(f"### Turn {turn.index}\n\n")
+    f.write(f"**User**: {turn.input.message}\\\n")
+    f.write(f"**{turn.output.agent_type}**: {turn.output.message_for_user}\\\n")
+    f.write(f"**Finished**: {turn.output.finished}\n")
+    f.write("\n\n")
