@@ -28,8 +28,6 @@ class AgentOutput(BaseModel):
     finished: bool
     agent_type: Optional[AgentType] = None
 
-    # TODO: add info if errors have occurred
-
     class Config:
         """
         Pydantic configuration
