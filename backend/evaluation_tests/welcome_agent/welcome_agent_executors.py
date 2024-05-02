@@ -9,18 +9,17 @@ class WelcomeAgentExecutor:
     Executes the welcome agent
     """
 
-    def __init__(self, conversation_manager: ConversationMemoryManager, session_id: int):
+    def __init__(self, conversation_manager: ConversationMemoryManager):
         self._agent = WelcomeAgent()
         self._conversation_manager = conversation_manager
-        self._session_id = session_id
 
     async def __call__(self, agent_input: AgentInput) -> AgentOutput:
         """
         Executes the welcome agent
         """
-        context = await self._conversation_manager.get_conversation_context(self._session_id)
+        context = await self._conversation_manager.get_conversation_context()
         agent_output = await self._agent.execute(agent_input, context)
-        await self._conversation_manager.update_history(self._session_id, agent_input, agent_output)
+        await self._conversation_manager.update_history(agent_input, agent_output)
         return agent_output
 
 
@@ -28,15 +27,15 @@ class WelcomeAgentGetConversationContextExecutor:
     """
     Returns the conversation context
     """
-    def __init__(self, conversation_manager: ConversationMemoryManager, session_id: int):
+
+    def __init__(self, conversation_manager: ConversationMemoryManager):
         self._conversation_manager = conversation_manager
-        self._session_id = session_id
 
     async def __call__(self) -> ConversationContext:
         """
         Returns the conversation context
         """
-        return await self._conversation_manager.get_conversation_context(session_id=self._session_id)
+        return await self._conversation_manager.get_conversation_context()
 
 
 class WelcomeAgentIsFinished:

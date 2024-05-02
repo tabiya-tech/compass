@@ -1,15 +1,19 @@
 from textwrap import dedent
 
 from app.agent.agent import SimpleLLMAgent
-from app.agent.agent_types import AgentType
+from app.agent.agent_types import AgentType, AgentInput, AgentOutput
 from app.agent.prompt_reponse_template import ModelResponse, get_json_response_instructions, \
     get_conversation_finish_instructions
+from app.conversation_memory.conversation_memory_types import ConversationContext
 
 
 class SkillExplorerAgent(SimpleLLMAgent):
     """
     Agent that explores the skills of the user and provides a response based on the task
     """
+
+    async def execute(self, user_input: AgentInput, context: ConversationContext) -> AgentOutput:
+        return await super().execute(user_input, context)
 
     def __init__(self):
         # Define the response part of the prompt with some example responses
