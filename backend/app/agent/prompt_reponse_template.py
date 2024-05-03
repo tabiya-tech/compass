@@ -14,11 +14,12 @@ class ModelResponse(BaseModel):
 def get_conversation_finish_instructions(condition: str) -> str:
     """
     Get the instructions for finishing a conversation. This can be added to the prompt.
-    :param condition: A text that describes the condition for finishing the conversation
-    :return: A string with the instructions for finishing a conversation,
+    :param condition: A text that describes the conditional clause for finishing the conversation.
+    The text should be in the for of "When ...".
+    :return: A conditional and main clauses with the instructions for finishing a conversation,
     including how to set the "finished" key in the response.
     """
-    return condition + ", " + dedent("""\
+    return condition + ", then " + dedent("""\
     return a JSON object with the "finished" key in the set to true.
     
     Allways return a JSON object. Compare your response with the schema above.
@@ -39,7 +40,7 @@ def get_json_response_instructions(examples: list[ModelResponse]) -> str:
     Example responses:
     """)]
 
-    for i, example in enumerate(examples):
+    for example in examples:
         part = f'{example.json()}'
         template_parts.append(part)
 
