@@ -28,7 +28,7 @@ class WelcomeAgent(SimpleLLMAgent):
         Answer any questions I might have using the _ABOUT_ section below.
         If you are unsure and I ask questions that contain information that is not explicitly related to your task 
         and can't be found in the _ABOUT_ section, you will answer each time with a concise but different variation of:
-        "Sorry, I don't know how to help with that. Shall we begin your skills exploration session?"            
+        "Sorry, I don't know how to help you with that. Shall we begin your skills exploration session?"            
         If I return to you after I have started the skills exploration session do not start over, 
         just answer only general questions I might have about the skills exploration process. 
         Be clear and concise in your responses do not break character and do not make things up.
