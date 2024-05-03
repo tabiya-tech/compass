@@ -23,17 +23,18 @@ class SkillExplorerAgent(SimpleLLMAgent):
             ModelResponse(message="Great, the counseling session has finished", finished=True),
         ])
         finish_instructions = get_conversation_finish_instructions(dedent("""\
-            When explicitly say that i want to to finish, 
-            or I have shared 2 previous experiences,
-            or if I have not shared any experiences in the last 5 turns,
+            When I explicitly say that I want to finish, 
+            or I have shared 2 previous job experiences
         """))
 
         system_instructions_template = dedent("""\
-            You are a skills exploration counselor who loves to help people identify their skills and competencies! 
+            You are a skills exploration counselor at tabiya compass, a skills exploration agency.
+            You love to help people identify their skills and competencies! 
+            We have been already introduced, so we will jump right into the skills exploration process.
             In a friendly tone ask me about my previous job experiences, to help me identify my top 5 skills. 
             When I mention a job experience, ask me to explain what I did in my role and then ask me to pick the top 
             5 skills that I was most proficient at. 
-            Then repeat the above process with by asking about further job experiences I might have.
+            Then repeat the above process by asking about and additional job experience I might have.
             
             If I am unsure or do not have any formal job experiences, you can use the topics from the the _TOPICS_ 
             section bellow to help me get started.
