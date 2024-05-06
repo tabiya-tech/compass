@@ -204,6 +204,16 @@ class LLMConfig(BaseModel):
         """
 
 
+class LLMResponse(BaseModel):
+    """Response from the Gemini LLM."""
+    text: str
+    """The generated text."""
+    prompt_token_count: int
+    """The number of tokens in the prompt."""
+    response_token_count: int
+    """The number of tokens in the response."""
+
+
 class GeminiChatLLM:
     """
     A wrapper for the Gemini LLM that includes retry logic with exponential backoff and jitter
@@ -296,22 +306,24 @@ class GeminiGenerativeLLM:
                                       )
         self._retry_config = config.retry_config
 
-    async def generate_content_async(self, contents: list[Content] | str) -> str:
+    async def generate_content_async(self, contents: list[Content] | str) -> LLMResponse:
         """
         Generate content using the Gemini LLM.
         Wrapper for the asynchronous `generate_content_async` method of `GenerativeModel`
         that provides retry logic with exponential backoff.
         :param contents: Either a list of `Content` objects for chat, or a string for general generative content.
-        :return: The generated content.
+        :return: The generated content with the number of tokens in the prompt and response.
         """
 
-        async def _generate_content_async() -> str:
+        async def _generate_content_async() -> LLMResponse:
             try:
                 # noinspection PyProtectedMember
                 logger.debug("Generating content with resource:%s",
                              self._model._prediction_resource_name)  # pylint: disable=protected-access
                 response = await self._model.generate_content_async(contents=contents)
-                return response.text
+                return LLMResponse(text=response.text,
+                                   prompt_token_count=response.usage_metadata.prompt_token_count,
+                                   response_token_count=response.usage_metadata.candidates_token_count)
             except Exception as e:
                 # noinspection PyProtectedMember
                 logger.error("An error occurred while generating content with resource:%s",
@@ -320,22 +332,24 @@ class GeminiGenerativeLLM:
 
         return await Retry[str].call_with_exponential_backoff_async(_generate_content_async)
 
-    async def generate_content(self, contents: list[Content] | str) -> str:
+    async def generate_content(self, contents: list[Content] | str) -> LLMResponse:
         """
         Generate content using the Gemini LLM.
         Wrapper for the synchronous `generate_content` method of `GenerativeModel`
         that provides retry logic with exponential backoff.
         :param contents: Either a list of `Content` objects for chat, or a string for general generative content.
-        :return: The generated content.
+        :return: The generated content with the number of tokens in the prompt and response.
         """
 
-        def _generate_content() -> str:
+        def _generate_content() -> LLMResponse:
             try:
                 # noinspection PyProtectedMember
                 logger.debug("Generating content with resource:%s",
                              self._model._prediction_resource_name)  # pylint: disable=protected-access
                 response = self._model.generate_content(contents=contents)
-                return response.text
+                return LLMResponse(text=response.text,
+                                   prompt_token_count=response.usage_metadata.prompt_token_count,
+                                   response_token_count=response.usage_metadata.candidates_token_count)
             except Exception as e:
                 # noinspection PyProtectedMember
                 logger.error("An error occurred while generating content with resource:%s",

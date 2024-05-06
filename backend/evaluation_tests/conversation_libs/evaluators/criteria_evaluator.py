@@ -32,6 +32,6 @@ class CriteriaEvaluator(BaseEvaluator):
         prompt = PromptGenerator.generate_prompt(conversation=actual.generate_conversation(),
                                                  criteria=self.criteria)
         result = await self.llm.generate_content_async(prompt)
-        parsed_result = extract_json.extract_json(result, LlmEvaluatorOutput)
+        parsed_result = extract_json.extract_json(result.text, LlmEvaluatorOutput)
         return EvaluationResult(type=self.criteria, score=parsed_result.score,
                                 reasoning=parsed_result.reason)
