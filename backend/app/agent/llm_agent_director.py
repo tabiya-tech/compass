@@ -15,6 +15,8 @@ DEFAULT_AGENT = "DefaultAgent"
 
 
 # TODO should return json with CoT reasoning to improve performance
+#  additionally it should include the LLM stats for the router model
+#  and should be persisted in the agent director state
 class RouterModelResponse(BaseModel):
     """
     The response from the router model
@@ -122,7 +124,7 @@ class LLMAgentDirector(AbstractAgentDirector):
         if phase == ConversationPhase.CONSULTING:
             model_input = f"{self._get_system_instructions(phase)}\nUser Input: {user_input.message}\n"
             try:
-                router_model_response = (await self._model.generate_content_async(model_input)).strip()
+                router_model_response = (await self._model.generate_content_async(model_input)).text.strip()
                 self._logger.debug("Router Model Response: %s", router_model_response)
                 if router_model_response == DEFAULT_AGENT:
                     return AgentType.SKILL_EXPLORER_AGENT
@@ -181,7 +183,9 @@ class LLMAgentDirector(AbstractAgentDirector):
                     message_for_user="Conversation finished, nothing to do!",
                     finished=True,
                     agent_type=None,
-                    reasoning="Conversation has ended"
+                    reasoning="Conversation has ended",
+                    agent_response_time_in_sec=0,  # artificial value as there is no LLM call
+                    llm_stats=[]  # artificial value as there is no LLM call
                 )
 
             # Get the context
@@ -207,10 +211,16 @@ class LLMAgentDirector(AbstractAgentDirector):
                 # instead, run the next agent in the sequence
                 next_agent_output = await self.execute(user_input=AgentInput(message="(silence)"))
                 return AgentOutput(
+                    #  Combine the messages from the current and the next agent,
+                    #  so that the user can see the two responses in last message of the conversation.
+                    #  Returning a list of messages is also an option, but it requires more complex handling
+                    #  in the frontend, as the (silence) message should not be displayed to the user.
                     message_for_user=agent_output.message_for_user + "\n\n" + next_agent_output.message_for_user,
                     finished=next_agent_output.finished,
                     agent_type=next_agent_output.agent_type,
-                    reasoning=next_agent_output.reasoning
+                    reasoning=next_agent_output.reasoning,
+                    agent_response_time_in_sec=next_agent_output.agent_response_time_in_sec,
+                    llm_stats=next_agent_output.llm_stats
                 )
 
             # return the agent output
@@ -222,5 +232,7 @@ class LLMAgentDirector(AbstractAgentDirector):
                 message_for_user="Conversation forcefully ended",
                 finished=True,
                 agent_type=None,
-                reasoning="Error while executing the agent director"
+                reasoning="Error while executing the agent director",
+                agent_response_time_in_sec=0,  # TODO(Apostolos): for now an artificial value. TBC if it should be 0
+                llm_stats=[]  # TODO (Apostolos): for now an artificial value. TBC if it should be an empty list
             )

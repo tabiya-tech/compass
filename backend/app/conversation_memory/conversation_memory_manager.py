@@ -70,8 +70,9 @@ class ConversationMemoryManager:
 
             self._logger.debug("Summarizing conversation: %s", model_input)
             llm_response = await self._llm.generate_content_async(model_input)
-            self._state.summary = llm_response
-            self._logger.debug("New Summarized conversation: %s", llm_response)
+            # TODO(Zohar): include the LLM stats in the summary
+            self._state.summary = llm_response.text
+            self._logger.debug("New Summarized conversation: %s", self._state.summary)
             # Clear the to be summarized history
             self._state.to_be_summarized_history.turns.clear()
         except Exception as e:
