@@ -35,7 +35,9 @@ To work with this repository you should have a system with a bash compatible ter
 
 2. Create a new branch for your changes.
 
-3. After making your changes, ensure the code is clean, properly formatted and passes all tests.
+3. Set up each individual subproject. e.g. if you are working on `backend/` follow instructions in `backend/README.md`
+
+4. After making your changes, ensure the code is clean, properly formatted and passes all tests.
 
     You can use the provided script, `run-before-merge.sh`, for assistance. This script performs checking of the code formatting, linting, building, and testing on the subprojects of the repository. To run it, use the following command:
       
@@ -43,7 +45,7 @@ To work with this repository you should have a system with a bash compatible ter
     ./run-before-merge.sh
     ```
       
-    If you get any errors, fix them before proceeding.
+    If you get any errors, fix them before proceeding. A common source of errors is not fully completing step `3` from above.
 
 4. Commit them, and push to your fork.
 
