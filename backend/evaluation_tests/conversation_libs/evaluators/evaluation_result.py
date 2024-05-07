@@ -30,6 +30,7 @@ class EvaluationType(Enum):
     RELEVANCE = "Relevance"
     CORRECTNESS = "Correctness"
     COHERENCE = "Coherence"
+    CUSTOM_PROMPT = "CustomPrompt"
 
 
 class EvaluationResult(BaseModel):
