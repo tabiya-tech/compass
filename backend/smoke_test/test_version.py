@@ -17,8 +17,11 @@ def test_version_info():
     version_json = json.loads(expected_version)
 
     # WHEN the client requests the version info
-    client = httpx.Client(base_url=base_url)
-    response = client.get("/version")
+    client = httpx.Client(base_url=base_url, timeout=25.0)
+    try:
+        response = client.get("/version")
+    except httpx.RequestError as e:
+        pytest.fail(f"Request failed: {e}")
 
     # THEN the response should be successful
     assert response.status_code == 200
