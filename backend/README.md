@@ -16,7 +16,7 @@
 ## Installation
 
 #### Set up virtualenv
-In the **root directory** of the backend project (so, one level up from here), run the following commands:
+In the **root directory** of the backend project (so, the same directory as this README file), run the following commands:
 
 ```shell
 # create a virtual environment
@@ -25,8 +25,6 @@ python3 -m venv venv-backend
 # activate the virtual environment
 source venv-backend/bin/activate
 ```
-
-> Note: The `run_before_merge` script require that the virtualenv is named `venv-backend`, use this name.
 
 #### Install the dependencies
 
