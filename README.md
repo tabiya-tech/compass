@@ -35,7 +35,7 @@ To work with this repository you should have a system with a bash compatible ter
 
 2. Create a new branch for your changes.
 
-3. Set up your virtualenv-based development environment: follow instructions in `backend/README.md`
+3. Set up each individual subproject. e.g. if you are working on `backend/` follow instructions in `backend/README.md`
 
 4. After making your changes, ensure the code is clean, properly formatted and passes all tests.
 
