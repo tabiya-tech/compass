@@ -5,6 +5,7 @@
 - A recent version of [git](https://git-scm.com/) (e.g. ^2.37 )
 - [Python 3.8 or higher](https://www.python.org/downloads/)
 - [Poerty](https://python-poetry.org/)
+  > Note: to install Poetry run `apt-get install python3-poetry` (assuming: you have a debian-like os)
   > Note: When you install Poetry, you may encounter an `SSL: CERTIFICATE_VERIFY_FAILED`.
   See [here](https://github.com/python-poetry/install.python-poetry.org/issues/112#issuecomment-1555925766) on how to
   resolve the issue.
@@ -14,7 +15,8 @@
 
 ## Installation
 
-In the root directory of the backend project, run the following commands:
+#### Set up virtualenv
+In the **root directory** of the backend project (so, one level up from here), run the following commands:
 
 ```shell
 # create a virtual environment
@@ -24,7 +26,9 @@ python3 -m venv venv-backend
 source venv-backend/bin/activate
 ```
 
-Install the dependencies:
+> Note: The `run_before_merge` script require that the virtualenv is named `venv-backend`, use this name.
+
+#### Install the dependencies
 
 ```shell
 # Use the version of the dependencies specified in the lock file
@@ -32,6 +36,8 @@ poetry lock --no-update
 # Install missing and remove unreferenced packages
 poetry install --sync
 ```
+
+> Note: Install poetry system-wide (not in a virtualenv).
 
 > Note:
 > Before running performing any tasks such as building the image or running the code locally, activate the virtual
