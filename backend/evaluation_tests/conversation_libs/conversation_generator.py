@@ -3,8 +3,6 @@ from typing import Callable
 from tqdm import tqdm
 
 from app.agent.agent_types import AgentInput
-from evaluation_tests.conversation_libs.agent_executors import ExecuteAgentCallable, CheckAgentFinishedCallable, \
-    ExecuteSimulatedUserCallable
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationRecord, Actor
 
 

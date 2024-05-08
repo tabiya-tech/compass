@@ -20,11 +20,11 @@ class FakeConversationContext(ConversationContext):
     """
 
     def __init__(self):
-        """ Initializes the fake conversation context with empty history and summary."""
+        """ Initializes the fake conversation context with empty history and summary. """
         super().__init__(all_history=[], history=[], summary="")
 
     def fill_conversation(self, conversation: list[ConversationRecord], summary: str):
-        """ Fills the conversation history with the given conversation records."""
+        """ Fills the conversation history with the given conversation records. """
         agent_responses = [c for c in conversation if c.actor == Actor.EVALUATED_AGENT]
         user_responses = []
         # The format_history_for_agent_generative_prompt function assumes that the first message is from the user

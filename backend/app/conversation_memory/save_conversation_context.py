@@ -5,6 +5,8 @@ from app.conversation_memory.conversation_memory_types import ConversationContex
 from app.agent.agent_types import LLMStats
 
 
+# TODO: Delete this file once everything users the fake_conversation_context.py file
+
 def save_conversation_context_to_json(*, context: ConversationContext, file_path: str) -> None:
     """
     Save the conversation context to a json file
