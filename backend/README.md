@@ -74,7 +74,7 @@ There are [multiple ways you can authenticate with Google Cloud](https://cloud.g
 
 As a best practice, we recommend using service account impersonation when running the code locally.
 
-Alternatively, you can use the service account key file to authenticate with Google Cloud and run the backend.
+Alternatively, you can use the service account key file to authenticate with Google Cloud and run the backend. This second option is faster to setup and may be used to start.
 This is useful when you want to run the backend and at the same time use the Google Cloud SDK for other tasks (e.g.
 deploy the infrastructure).
 
