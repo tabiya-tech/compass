@@ -3,9 +3,11 @@
 ## Prerequisites
 
 - A recent version of [git](https://git-scm.com/) (e.g. ^2.37 )
-- [Python 3.8 or higher](https://www.python.org/downloads/)
-- [Poerty](https://python-poetry.org/)
-  > Note: to install Poetry run `apt-get install python3-poetry` (assuming: you have a debian-like os)
+- [Python 3.11 or higher](https://www.python.org/downloads/)
+  > Note: use `poetry env use <PYTHON_VERSION>` to set the python used.
+- [Poetry](https://python-poetry.org/)
+  > Note: `apt-get install python3-poetry` is deprecated, use `curl -sSL https://install.python-poetry.org | python3 -`(assuming: you have a debian-like os).
+
   > Note: When you install Poetry, you may encounter an `SSL: CERTIFICATE_VERIFY_FAILED`.
   See [here](https://github.com/python-poetry/install.python-poetry.org/issues/112#issuecomment-1555925766) on how to
   resolve the issue.
