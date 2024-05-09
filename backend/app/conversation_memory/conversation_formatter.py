@@ -95,7 +95,7 @@ class ConversationHistoryFormatter:
         """
         text = system_instructions + ConversationHistoryFormatter.SUMMARY_TITLE + context.summary + \
                ConversationHistoryFormatter.CONVERSATION_TITLE + "\n".join(
-            [f"User: {turn.input.message}\n{turn.output.agent_type}: {turn.output.message_for_user}" for turn
+            [f"user: {turn.input.message}\nmodel: {turn.output.message_for_user}" for turn
              in context.history.turns])
 
         return [Content.from_dict({'role': ConversationHistoryFormatter.USER, 'parts': [{'text': text}]})]

@@ -27,10 +27,3 @@ class AgentOutput(BaseModel):
     message_for_user: str
     finished: bool
     agent_type: Optional[AgentType] = None
-
-    class Config:
-        """
-        Pydantic configuration
-        """
-        # Configure Pydantic to use the string values of enums
-        use_enum_values = True
