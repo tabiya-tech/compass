@@ -48,6 +48,7 @@ class SimpleLLMAgent(Agent):
             user_input.message = "(silence)"
         success = False
         retry_count = 3
+        model_response: ModelResponse | None = None
         while not success and retry_count > 0:
             msg = user_input.message
             if retry_count < 3:
@@ -60,8 +61,9 @@ class SimpleLLMAgent(Agent):
             llm_response = await self._llm.generate_content_async(
                 contents=ConversationHistoryFormatter.format_for_agent_generative_prompt(context, msg)
             )
+
             try:
-                last: ModelResponse = extract_json(llm_response, ModelResponse)
+                model_response = extract_json(llm_response, ModelResponse)
                 success = True
             except ExtractJSONError:
                 log_message = "Failed to extract JSON from conversation content '%s'"
@@ -73,11 +75,17 @@ class SimpleLLMAgent(Agent):
                     self._logger.warning(log_message, llm_response)
                 # If the agent failed to respond with a JSON object, set the response to the model output
                 # and hope that the conversation can continue
-                last = ModelResponse(message=str(llm_response), finished=False)
+                model_response = ModelResponse(message=str(llm_response), finished=False)
 
-        self._logger.debug("Model output: %s", last)
-        response = AgentOutput(message_for_user=last.message,
-                               finished=last.finished,
+        if model_response is None:
+            # If the model response is None, set the response to the model output
+            # and hope that the conversation can continue
+            model_response = ModelResponse(message=str("Model response is None"), finished=False)
+
+        self._logger.debug("Model input: %s", user_input.message)
+        self._logger.debug("Model output: %s", model_response)
+        response = AgentOutput(message_for_user=model_response.message,
+                               finished=model_response.finished,
                                agent_type=self._agent_type)
         return response
 
