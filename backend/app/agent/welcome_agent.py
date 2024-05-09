@@ -19,7 +19,7 @@ class WelcomeAgent(SimpleLLMAgent):
             ModelResponse(message="Great, we will now begin with the exploration.", finished=True),
         ])
         finish_instructions = get_conversation_finish_instructions(
-            'When I say or indicate that am ready to start')
+            'When I say or indicate that I am ready to start')
 
         system_instructions_template = dedent("""\
         You are a receptionist at a tabiya compass a skills exploration agency. 
