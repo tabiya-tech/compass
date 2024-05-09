@@ -38,6 +38,6 @@ def save_conversation_context_to_markdown(*, title: str, context: ConversationCo
 def _write_turn(f: TextIO, turn: ConversationTurn):
     f.write(f"### Turn {turn.index}\n\n")
     f.write(f"**User**: {turn.input.message}\\\n")
-    f.write(f"**{turn.output.agent_type}**: {turn.output.message_for_user}\\\n")
+    f.write(f"**{turn.output.agent_type.value}**: {turn.output.message_for_user}\\\n")
     f.write(f"**Finished**: {turn.output.finished}\n")
     f.write("\n\n")

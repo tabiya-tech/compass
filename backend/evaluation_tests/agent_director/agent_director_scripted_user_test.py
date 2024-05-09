@@ -170,5 +170,5 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture, setup_age
     ]
     for i, expected_state in enumerate(expected_agent_states):
         turn = context.all_history.turns[i]
-        actual_state = AgentState(i, AgentType(turn.output.agent_type), turn.output.finished)
+        actual_state = AgentState(i, turn.output.agent_type, turn.output.finished)
         assert actual_state == expected_state, f"Agent actual state: {actual_state} did have the expected state: {expected_state}"
