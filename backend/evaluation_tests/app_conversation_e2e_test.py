@@ -6,8 +6,7 @@ import pytest
 from app.agent.agent_types import AgentOutput, AgentInput
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.server import welcome, get_conversation_context
-from common_libs.llm.gemini import LLMConfig, SAFETY_OFF_SETTINGS, \
-    MEDIUM_TEMPERATURE_GENERATION_CONFIG
+from common_libs.llm.models_utils import LLMConfig, MEDIUM_TEMPERATURE_GENERATION_CONFIG
 from evaluation_tests.conversation_libs.conversation_test_function import conversation_test_function, \
     EvaluationTestCase, LLMSimulatedUser, ConversationTestConfig
 from evaluation_tests.core_e2e_tests_cases import test_cases
@@ -81,8 +80,7 @@ async def test_main_app_chat(max_iterations: int, test_case: EvaluationTestCase)
             execute_evaluated_agent=_AppChatExecutor(session_id=session_id),
             execute_simulated_user=LLMSimulatedUser(system_instructions=test_case.simulated_user_prompt,
                                                     llm_config=LLMConfig(
-                                                        generation_config=MEDIUM_TEMPERATURE_GENERATION_CONFIG,
-                                                        safety_settings=SAFETY_OFF_SETTINGS)),
+                                                        generation_config=MEDIUM_TEMPERATURE_GENERATION_CONFIG)),
             is_finished=_AppChatIsFinished(),
             get_conversation_context=_AppGetConversationContextExecutor(session_id=session_id)
         )

@@ -2,8 +2,8 @@ import pytest
 
 from app.agent.agent_types import AgentInput
 from app.agent.qna_agent import QnaAgent
-from common_libs.llm.gemini import GeminiGenerativeLLM, LLMConfig, SAFETY_OFF_SETTINGS, \
-    MEDIUM_TEMPERATURE_GENERATION_CONFIG
+from common_libs.llm.models_utils import LLMConfig, MEDIUM_TEMPERATURE_GENERATION_CONFIG
+from common_libs.llm.generative_models import GeminiGenerativeLLM
 from evaluation_tests.conversation_libs.conversation_generator import generate
 from evaluation_tests.conversation_libs.conversation_test_function import LLMSimulatedUser
 from evaluation_tests.conversation_libs.evaluators.criteria_evaluator import CriteriaEvaluator
@@ -14,7 +14,7 @@ from evaluation_tests.conversation_libs.fake_conversation_context import FakeCon
 
 async def _evaluate_with_llm(prompt: str) -> str:
     llm = GeminiGenerativeLLM(config=LLMConfig(model_name="gemini-1.5-pro-preview-0409"))
-    return (await llm.generate_content_async(prompt)).text
+    return (await llm.generate_content(prompt)).text
 
 
 @pytest.mark.asyncio
@@ -152,9 +152,7 @@ async def test_qna_agent_responds_to_multiple_questions_in_a_row(fake_conversati
     fake_conversation_context.set_summary("The user is asking generic questions about the process.")
     simulated_user = LLMSimulatedUser(
         system_instructions=prompt,
-        llm_config=LLMConfig(
-            generation_config=MEDIUM_TEMPERATURE_GENERATION_CONFIG,
-            safety_settings=SAFETY_OFF_SETTINGS))
+        llm_config=LLMConfig(generation_config=MEDIUM_TEMPERATURE_GENERATION_CONFIG))
     evaluation_record = ConversationEvaluationRecord(test_case="qna_agent_responds_to_multiple_questions_in_a_row",
                                                      simulated_user_prompt=prompt)
 

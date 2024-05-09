@@ -9,7 +9,8 @@ from app.agent.farewell_agent import FarewellAgent
 from app.agent.skill_explore_agent import SkillExplorerAgent
 from app.agent.welcome_agent import WelcomeAgent
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
-from common_libs.llm.gemini import GeminiGenerativeLLM, LLMConfig
+from common_libs.llm.models_utils import LLMConfig
+from common_libs.llm.generative_models import GeminiGenerativeLLM
 
 DEFAULT_AGENT = "DefaultAgent"
 
@@ -124,7 +125,7 @@ class LLMAgentDirector(AbstractAgentDirector):
         if phase == ConversationPhase.CONSULTING:
             model_input = f"{self._get_system_instructions(phase)}\nUser Input: {user_input.message}\n"
             try:
-                router_model_response = (await self._model.generate_content_async(model_input)).text.strip()
+                router_model_response = (await self._model.generate_content(model_input)).text.strip()
                 self._logger.debug("Router Model Response: %s", router_model_response)
                 if router_model_response == DEFAULT_AGENT:
                     return AgentType.SKILL_EXPLORER_AGENT
