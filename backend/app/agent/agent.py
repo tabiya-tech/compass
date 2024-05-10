@@ -9,6 +9,9 @@ from common_libs.llm.gemini import GeminiGenerativeLLM, LLMConfig, GeminiStatele
     ZERO_TEMPERATURE_GENERATION_CONFIG
 from common_libs.text_formatters.extract_json import extract_json, ExtractJSONError
 
+# Number or retries to get a JSON object from the model
+_MAX_RETRIES = 3
+
 
 class Agent(ABC):
     """
@@ -46,22 +49,22 @@ class SimpleLLMAgent(Agent):
             # If the user input is empty, set it to "(silence)"
             # This is to avoid the agent failing to respond to an empty input
             user_input.message = "(silence)"
+        msg = user_input.message.strip()  # Remove leading and trailing whitespaces
         success = False
-        retry_count = 3
+        retry_count = 0
         model_response: ModelResponse | None = None
-        while not success and retry_count > 0:
-            msg = user_input.message
-            if retry_count < 3:
+        while not success and retry_count < _MAX_RETRIES:
+            _msg = msg
+            if retry_count > 0:
                 # If the agent failed to respond with a JSON object,
                 # remind that the response should be a JSON object
                 # This is helpful, when the model "forgets" it's instructions because the
                 # conversation is too long.
-                msg += "\n, also remember your instructions and that you should respond with a JSON object."
-            retry_count -= 1
+                _msg += "\n, also remember your instructions and that you should respond with a JSON object."
+            retry_count += 1
             llm_response = await self._llm.generate_content_async(
-                contents=ConversationHistoryFormatter.format_for_agent_generative_prompt(context, msg)
+                contents=ConversationHistoryFormatter.format_for_agent_generative_prompt(context, _msg)
             )
-
             try:
                 model_response = extract_json(llm_response, ModelResponse)
                 success = True
