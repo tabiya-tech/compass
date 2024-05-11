@@ -17,14 +17,18 @@ class ConversationMemoryManager:
         self._unsummarized_window_size = unsummarized_window_size
         self._to_be_summarized_window_size = to_be_summarized_window_size
 
-        self._system_instructions = dedent("""\
+        self._summarize_system_instructions = dedent("""\
             You are a summarization expert summarizing the conversation between multiple conversation partners.
             You will get
             - the summary: _SUMMARY_
             - the current conversation: _CURRENT_CONVERSATION_
             Your task is
             - to update the summary by incorporating new information from the current conversation.
-            You will respond with the new updated summary in third person.
+            The summary should be formulated from my perspective.
+            "I" in the summary will refer to me "the user". Example: "I told you ..."
+            "You" in the summary will refer to you "the model". Example: "You asked me ..."
+            The summary should be concise and capture the essence of the conversation, not the details.
+            You will respond with the new updated summary.
             Your response will be in a raw formatted non markdown text form no longer than 100 words.
             """)
         self._llm = GeminiGenerativeLLM(config=LLMConfig())
@@ -54,7 +58,7 @@ class ConversationMemoryManager:
             Update the conversation summary to include the given history input
             :param history: the new history to include in the summary
         """
-        model_input = ConversationHistoryFormatter.format_for_summary_prompt(self._system_instructions,
+        model_input = ConversationHistoryFormatter.format_for_summary_prompt(self._summarize_system_instructions,
                                                                              ConversationContext(
                                                                                  all_history=ConversationHistory(
                                                                                      turns=self._state.all_history.turns
