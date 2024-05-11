@@ -1,6 +1,6 @@
 from vertexai.generative_models import Content, Part
 
-from app.agent.prompt_reponse_template import ModelResponse
+from app.agent.prompt_reponse_template import MODEL_RESPONSE_INSTRUCTIONS
 from app.conversation_memory.conversation_memory_types import ConversationContext
 
 
@@ -30,13 +30,8 @@ class ConversationHistoryFormatter:
         for turn in context.history.turns:
             ConversationHistoryFormatter._append_part(contents, ConversationHistoryFormatter.USER,
                                                       turn.input.message)
-            # Since the agent should respond with a ModelResponse JSON object,
-            # we will append the JSON object. This reinforces the model to respond with a JSON object.
-            # Not doing this will cause the model to respond with a non-JSON object as the conversation history
-            # acts as an example for the model to follow.
-            model_response = ModelResponse(message=turn.output.message_for_user, finished=turn.output.finished)
             ConversationHistoryFormatter._append_part(contents, ConversationHistoryFormatter.MODEL,
-                                                      f'{model_response.json()}')
+                                                      turn.output.message_for_user)
         return contents
 
     @staticmethod
@@ -60,6 +55,12 @@ class ConversationHistoryFormatter:
         # Finally the user input
         ConversationHistoryFormatter._append_part(contents, ConversationHistoryFormatter.USER, user_input)
 
+        # Finally, add instructions for the model to return a JSON object.
+        # This reinforces that the model should respond with a JSON object.
+        # Without these instructions, the model might respond with a non-JSON object,
+        # as it tends to adapt to the conversation history and may overlook the JSON format requirements.
+        ConversationHistoryFormatter._append_part(contents, ConversationHistoryFormatter.USER,
+                                                  "\n" + MODEL_RESPONSE_INSTRUCTIONS)
         return contents
 
     @staticmethod
