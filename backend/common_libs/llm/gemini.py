@@ -77,8 +77,8 @@ class Retry(Generic[T]):
                 logger.warning("Attempt %d to call %s failed, error: %s, retrying in %.2f seconds", attempt + 1,
                                callback.__name__, e, wait_time)
                 await asyncio.sleep(wait_time)
-                wait_time *= Retry._get_random_wait_time(wait_time, retry_config.base_backoff_factor,
-                                                         retry_config.jitter)
+                wait_time = Retry._get_random_wait_time(wait_time, retry_config.base_backoff_factor,
+                                                        retry_config.jitter)
             # rethrow other exceptions
             except Exception as e:
                 logger.error("An error occurred", exc_info=True)
@@ -99,8 +99,8 @@ class Retry(Generic[T]):
                 logger.warning("Attempt %d to call %s failed, error: %s, retrying in %.2f seconds", attempt + 1,
                                callback.__name__, e, wait_time)
                 time.sleep(wait_time)
-                wait_time *= Retry._get_random_wait_time(wait_time, retry_config.base_backoff_factor,
-                                                         retry_config.jitter)
+                wait_time = Retry._get_random_wait_time(wait_time, retry_config.base_backoff_factor,
+                                                        retry_config.jitter)
             # rethrow other exceptions
             except Exception as e:
                 logger.error("An error occurred", exc_info=True)
