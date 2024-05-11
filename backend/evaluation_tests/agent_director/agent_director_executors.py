@@ -1,4 +1,4 @@
-from app.agent.agent_director import AgentDirector
+from app.agent.agent_director import AbstractAgentDirector
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationContext
@@ -9,7 +9,7 @@ class AgentDirectorExecutor:
     Executes the agent director
     """
 
-    def __init__(self, agent_director: AgentDirector):
+    def __init__(self, agent_director: AbstractAgentDirector):
         self._agent = agent_director
 
     async def __call__(self, agent_input: AgentInput) -> AgentOutput:
