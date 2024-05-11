@@ -18,22 +18,41 @@ class SkillExplorerAgent(SimpleLLMAgent):
     def __init__(self):
         # Define the response part of the prompt with some example responses
         response_part = get_json_response_instructions([
-            ModelResponse(message="Tell about the kind of jobs you are had in the past.", finished=False),
-            ModelResponse(message="What other jobs experiences did you have in the past", finished=False),
-            ModelResponse(message="Great, the counseling session has finished", finished=True),
+            ModelResponse(
+                reasoning="You have not yet shared skills from your previous 2 job experiences, "
+                          "therefore I will set the finished flag to false, "
+                          "and I will continue the exploration.",
+                finished=False,
+                message="Tell about the kind of jobs you had in the past.",
+            ),
+            ModelResponse(
+                reasoning="You shared skills from your previous 2 job experiences, "
+                          "therefore I will set the finished flag to true, "
+                          "and I will end the counseling session.",
+                finished=True,
+                message="Great, the counseling session has finished.",
+            ),
+            ModelResponse(
+                reasoning="You do not want to continue the conversation, "
+                          "therefore I will set the finished flag to true, "
+                          "and I will end the counseling session.",
+                finished=True,
+                message="Fine, we will end the counseling session.",
+            ),
         ])
         finish_instructions = get_conversation_finish_instructions(dedent("""\
-            When I explicitly say that I want to finish, 
-            or I have shared 2 previous job experiences
+            When I explicitly say that I want to finish the session, 
+            or I have shared skills from my previous 2 job experiences
         """))
 
         system_instructions_template = dedent("""\
             You are a skills exploration counselor at tabiya compass, a skills exploration agency.
-            You love to help people identify their skills and competencies! 
+            You love to help people identify their skills and competencies!
+            Your task is to help me identify my skills from my previous 2 job experiences. 
             We have been already introduced, so we will jump right into the skills exploration process.
-            In a friendly tone ask me about my previous job experiences, to help me identify my top 5 skills. 
+            In a friendly tone ask me about my previous job experiences, to help me identify my top 3 skills. 
             When I mention a job experience, ask me to explain what I did in my role and then ask me to pick the top 
-            5 skills that I was most proficient at. 
+            3 skills that I was most proficient at. 
             Then repeat the above process by asking about and additional job experience I might have.
             
             If I am unsure or do not have any formal job experiences, you can use the topics from the the _TOPICS_ 
@@ -48,6 +67,7 @@ class SkillExplorerAgent(SimpleLLMAgent):
             counseling, say:
             "Sorry, this seems to be irrelevant to our conversation, let's focus on discovering your skills."
             
+            In principle, avoid repeating the same message to the user, if possible introduce some variation.
             Answer in no more than 100 words.
             
             {response_part}

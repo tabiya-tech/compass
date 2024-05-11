@@ -14,16 +14,35 @@ class WelcomeAgent(SimpleLLMAgent):
     def __init__(self):
         # Define the response part of the prompt with some example responses
         response_part = get_json_response_instructions([
-            ModelResponse(message="Welcome! Are you ready to begin?", finished=False),
-            ModelResponse(message="My name is Tabiya Compass.", finished=False),
-            ModelResponse(message="Great, we will now begin with the exploration.", finished=True),
+            ModelResponse(
+                reasoning="It is our first encounter, "
+                          "therefore I will set the finished flag to false, "
+                          "and I will welcome you.",
+                finished=False,
+                message="Welcome! Are you ready to begin?",
+            ),
+            ModelResponse(
+                reasoning="You asked a question and did not indicate that you are ready to start, "
+                          "therefore I will set the finished flag to false, "
+                          "and I will answer your question.",
+                finished=False,
+                message="My name is Tabiya Compass.",
+            ),
+            ModelResponse(
+                reasoning="You clearly indicated that you are ready to start, "
+                          "therefore I will set the finished flag to true, "
+                          "and I will direct you to the exploration session.",
+                finished=True,
+                message="Great, you can not begin the skills exploration session.",
+            ),
         ])
         finish_instructions = get_conversation_finish_instructions(
-            'When I say or indicate that I am ready to start')
+            'When I say or indicate or show desire or intention that I am ready to start')
 
         system_instructions_template = dedent("""\
         You are a receptionist at a tabiya compass a skills exploration agency. 
         Your task is to welcome and forward me to the skills exploration session.
+        You will not conduct the skills exploration session.
         Your task is finished, when I say that I am ready to start with the exploration session.
         Answer any questions I might have using the _ABOUT_ section below.
         If I return to you after I have started the skills exploration session do not start over, 
@@ -48,4 +67,5 @@ class WelcomeAgent(SimpleLLMAgent):
         system_instructions = system_instructions_template.format(response_part=response_part,
                                                                   finish_instructions=finish_instructions)
         super().__init__(agent_type=AgentType.WELCOME_AGENT,
+
                          system_instructions=system_instructions, )
