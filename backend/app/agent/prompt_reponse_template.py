@@ -26,6 +26,16 @@ def get_conversation_finish_instructions(condition: str) -> str:
     """)
 
 
+MODEL_RESPONSE_INSTRUCTIONS = dedent("""\
+    Your response must always be a JSON object with the following schema:
+        - message:  Your message to the user in double quotes formatted as a json string 
+        - finished: A boolean flag to signal that you have completed your task. 
+                    Set to true if you have finished your task, false otherwise.
+    
+    Compare your response with the schema above.    
+    """)
+
+
 def get_json_response_instructions(examples: list[ModelResponse]) -> str:
     """
     Get the instructions so that the model can return a json. This can be added to the prompt.
@@ -41,7 +51,7 @@ def get_json_response_instructions(examples: list[ModelResponse]) -> str:
     """)]
 
     for example in examples:
-        part = f'{example.json()}'
+        part = example.json()
         template_parts.append(part)
 
     return "\n".join(template_parts)
