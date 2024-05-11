@@ -1,5 +1,6 @@
 import logging
 from enum import Enum
+from abc import ABC, abstractmethod
 
 from pydantic import BaseModel
 
@@ -34,15 +35,48 @@ class AgentDirectorState(BaseModel):
                          current_phase=ConversationPhase.INTRO)
 
 
-class AgentDirector:
+class AbstractAgentDirector(ABC):
     """
-    Receives user input, understands the conversation context and the user intent and routes
-    the user input to the appropriate agent.
+    An abstract class for an agent director. Receives user input,
+    understands the conversation context and the latest user message and routes the user input to the appropriate agent.
+    It maintains the state of the conversation which is divided into phases.
     """
 
     def __init__(self, conversation_manager: ConversationMemoryManager):
         # Initialize the logger
-        self._logger = logging.getLogger(AgentDirector.__class__.__name__)
+        self._logger = logging.getLogger(self.__class__.__name__)
+
+        # set the conversation manager
+        self._conversation_manager = conversation_manager
+
+        self._state: AgentDirectorState | None = None
+
+    def set_state(self, state: AgentDirectorState):
+        """
+        Set the agent director state
+        :param state: the agent director state
+        """
+        self._state = state
+
+    @abstractmethod
+    async def execute(self, user_input: AgentInput) -> AgentOutput:
+        """
+        Run the conversation task for the current user input and specific state.
+        :param user_input:
+        :return:
+        """
+        raise NotImplementedError()
+
+
+class AgentDirector(AbstractAgentDirector):
+    """
+    A simple implementation of an agent director. It transitions sequentially through the conversation phases and
+    delegates the conversation to the appropriate agent for each phase.
+    There is always one agent responsible for each phase.
+    """
+
+    def __init__(self, conversation_manager: ConversationMemoryManager):
+        super().__init__(conversation_manager)
 
         # initialize the agents
         self._agents: dict[ConversationPhase, Agent] = {
@@ -51,17 +85,11 @@ class AgentDirector:
             ConversationPhase.CHECKOUT: FarewellAgent()
         }
 
-        # set the conversation manager
-        self._conversation_manager = conversation_manager
-
-        self._state: AgentDirectorState | None = None
-
     def _get_current_agent(self) -> Agent | None:
         """
         Get the current agent for a specific state.
         :return: The current agent for the state, or None if conversation has ended
         """
-
         return self._agents.get(self._state.current_phase, None)
 
     def _transition_to_next_phase(self):
@@ -71,19 +99,10 @@ class AgentDirector:
         if self._state.current_phase != ConversationPhase.ENDED:
             self._state.current_phase = ConversationPhase(self._state.current_phase.value + 1)
 
-    def set_state(self, state: AgentDirectorState):
-        """
-        Set the agent director state
-        :param state: the agent director state
-        """
-        self._state = state
-
     async def execute(self, user_input: AgentInput) -> AgentOutput:
         """
         Run the conversation task for the current user input and specific state.
-
         When all agents are done, return a message to the user that the conversation is finished.
-
         :param user_input: The user input
         :return: The output from the agent
         """
