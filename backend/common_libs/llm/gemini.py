@@ -127,6 +127,11 @@ ZERO_TEMPERATURE_GENERATION_CONFIG = GenerationConfig(
     candidate_count=1,
 )
 
+LOW_TEMPERATURE_GENERATION_CONFIG = GenerationConfig(
+    temperature=0.1,
+    candidate_count=1,
+)
+
 MEDIUM_TEMPERATURE_GENERATION_CONFIG = GenerationConfig(
     temperature=0.5,
     candidate_count=1,

@@ -143,7 +143,7 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture, setup_age
             "Ok, Let's start",  # END of Welcome
             "ok",  # Acknowledge forwarding to the next agent
             "I worked as a backer",  # <--- Job 1
-            "made pastry and bread",  # <--- skills
+            "pastry and bread making",  # <--- skills
             "no, I dont have more to say about this",
             "Let's finish the conversation",  # END of Skill Explore
             "What now?"  # END of Farewell

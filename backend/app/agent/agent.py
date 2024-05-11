@@ -6,7 +6,7 @@ from app.agent.prompt_reponse_template import ModelResponse
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_manager import ConversationContext
 from common_libs.llm.gemini import GeminiGenerativeLLM, LLMConfig, GeminiStatelessChatLLM, \
-    ZERO_TEMPERATURE_GENERATION_CONFIG
+    LOW_TEMPERATURE_GENERATION_CONFIG
 from common_libs.text_formatters.extract_json import extract_json, ExtractJSONError
 
 # Number of retries to get a JSON object from the model
@@ -35,7 +35,7 @@ class SimpleLLMAgent(Agent):
     """
 
     def __init__(self, *, agent_type: AgentType, system_instructions: str,
-                 config: LLMConfig = LLMConfig(generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG)):
+                 config: LLMConfig = LLMConfig(generation_config=LOW_TEMPERATURE_GENERATION_CONFIG)):
         self._agent_type = agent_type
         self._system_instructions = system_instructions
         # We should pass the system instructions to the LLM
@@ -69,19 +69,22 @@ class SimpleLLMAgent(Agent):
                     self._logger.error(log_message, llm_response)
                 else:
                     self._logger.warning(log_message, llm_response)
-                # If the agent failed to respond with a JSON object, set the response to the model output
-                # and hope that the conversation can continue
-                model_response = ModelResponse(message=str(llm_response), finished=False)
+                    # If the agent failed to respond with a JSON object, set the response to the model output
+                    # and hope that the conversation can continue
+                    model_response = ModelResponse(message=str(llm_response), finished=False,
+                                                   reasoning="Failed to respond with JSON")
 
         if model_response is None:
             # If the model response is None, set the response to the model output
             # and hope that the conversation can continue
-            model_response = ModelResponse(message=str("Model response is None"), finished=False)
+            model_response = ModelResponse(message=str("Model response is None"), finished=False,
+                                           reasoning="Failed to get a response")
 
         self._logger.debug("Model input: %s", user_input.message)
         self._logger.debug("Model output: %s", model_response)
         response = AgentOutput(message_for_user=model_response.message,
                                finished=model_response.finished,
+                               reasoning=model_response.reasoning,
                                agent_type=self._agent_type)
         return response
 
@@ -105,30 +108,41 @@ class _SimpleStatelessChatLLMAgent(Agent):
             # If the user input is empty, set it to "(silence)"
             # This is to avoid the agent failing to respond to an empty input
             user_input.message = "(silence)"
+        msg = user_input.message.strip()  # Remove leading and trailing whitespaces
         success = False
-        retry_count = 3
-        while not success and retry_count > 0:
-            msg = user_input.message
-            if retry_count < 3:
-                # If the agent failed to respond with a JSON object,
-                # remind that the response should be a JSON object
-                # This is helpful, when the model "forgets" it's instructions because the
-                # conversation is too long.
-                msg += "\n, also remember your instructions and that you should respond with a JSON object."
-            retry_count -= 1
+        retry_count = 0
+        model_response: ModelResponse | None = None
+        while not success and retry_count < _MAX_RETRIES:
+            retry_count += 1
             llm_response = await self._llm.send_message_async(
                 history=ConversationHistoryFormatter.format_history_for_agent_generative_prompt(context),
                 message=msg)
             try:
-                last: ModelResponse = extract_json(llm_response, ModelResponse)
+                model_response = extract_json(llm_response, ModelResponse)
                 success = True
             except ExtractJSONError:
-                self._logger.warning("Error extracting JSON from conversation content '%s'", llm_response,
-                                     exc_info=False)  # no need to log the stack trace
-                last = ModelResponse(message=str(llm_response), finished=False)
+                log_message = "Failed to extract JSON from conversation content '%s'"
+                if retry_count == 0:
+                    # If the agent failed to respond with a JSON object after the last retry,
+                    # log the error
+                    self._logger.error(log_message, llm_response)
+                else:
+                    self._logger.warning(log_message, llm_response)
+                    # If the agent failed to respond with a JSON object, set the response to the model output
+                    # and hope that the conversation can continue
+                    model_response = ModelResponse(message=str(llm_response), finished=False,
+                                                   reasoning="Failed to respond with JSON")
 
-        self._logger.debug("Model output: %s", last)
-        response = AgentOutput(message_for_user=last.message,
-                               finished=last.finished,
+        if model_response is None:
+            # If the model response is None, set the response to the model output
+            # and hope that the conversation can continue
+            model_response = ModelResponse(message=str("Model response is None"), finished=False,
+                                           reasoning="Failed to get a response")
+
+        self._logger.debug("Model input: %s", user_input.message)
+        self._logger.debug("Model output: %s", model_response)
+        response = AgentOutput(message_for_user=model_response.message,
+                               finished=model_response.finished,
+                               reasoning=model_response.reasoning,
                                agent_type=self._agent_type)
         return response
