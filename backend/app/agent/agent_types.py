@@ -27,3 +27,4 @@ class AgentOutput(BaseModel):
     message_for_user: str
     finished: bool
     agent_type: Optional[AgentType] = None
+    reasoning: str
