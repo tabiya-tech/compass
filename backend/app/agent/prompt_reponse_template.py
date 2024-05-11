@@ -22,7 +22,7 @@ def get_conversation_finish_instructions(condition: str) -> str:
     return condition + ", then " + dedent("""\
     return a JSON object with the "finished" key in the set to true.
     
-    Allways return a JSON object. Compare your response with the schema above.
+    Always return a JSON object. Compare your response with the schema above.
     """)
 
 
