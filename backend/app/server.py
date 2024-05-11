@@ -5,8 +5,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from app.agent.agent_director import AgentDirector
 from app.agent.agent_types import AgentInput, AgentOutput
+from app.agent.llm_agent_director import LLMAgentDirector
 from app.conversation_memory.conversation_memory_manager import ConversationContext, ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
@@ -56,7 +56,7 @@ sensitive_filter.add_filter_routes(app)
 # TODO: use the Fast api dependency injection pattern to inject them into the routes
 application_state_manager = ApplicationStateManager(InMemoryApplicationStateStore())
 conversation_memory_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
-agent_director = AgentDirector(conversation_memory_manager)
+agent_director = LLMAgentDirector(conversation_memory_manager)
 
 
 class ConversationResponse(BaseModel):
