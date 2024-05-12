@@ -10,7 +10,7 @@ from common_libs.llm.gemini import GeminiGenerativeLLM, LLMConfig, GeminiStatele
 from common_libs.text_formatters.extract_json import extract_json, ExtractJSONError
 
 # Number of retries to get a JSON object from the model
-_MAX_RETRIES = 3
+_MAX_ATTEMPTS = 3
 
 
 class Agent(ABC):
@@ -51,10 +51,10 @@ class SimpleLLMAgent(Agent):
             user_input.message = "(silence)"
         msg = user_input.message.strip()  # Remove leading and trailing whitespaces
         success = False
-        retry_count = 0
+        attempt_count = 0
         model_response: ModelResponse | None = None
-        while not success and retry_count < _MAX_RETRIES:
-            retry_count += 1
+        while not success and attempt_count < _MAX_ATTEMPTS:
+            attempt_count += 1
             llm_response = await self._llm.generate_content_async(
                 contents=ConversationHistoryFormatter.format_for_agent_generative_prompt(context, msg)
             )
@@ -62,23 +62,26 @@ class SimpleLLMAgent(Agent):
                 model_response = extract_json(llm_response, ModelResponse)
                 success = True
             except ExtractJSONError:
-                log_message = "Failed to extract JSON from conversation content '%s'"
-                if retry_count == 0:
-                    # If the agent failed to respond with a JSON object after the last retry,
-                    # log the error
-                    self._logger.error(log_message, llm_response)
-                else:
-                    self._logger.warning(log_message, llm_response)
-                    # If the agent failed to respond with a JSON object, set the response to the model output
-                    # and hope that the conversation can continue
+                log_message = "Attempt %d failed to extract JSON from conversation content '%s'"
+                if attempt_count == _MAX_ATTEMPTS:
+                    # The agent failed to respond with a JSON object after the last attempt,
+                    self._logger.error(log_message, attempt_count, llm_response)
+                    # And set the response to the model output and hope that the conversation can continue
                     model_response = ModelResponse(message=str(llm_response), finished=False,
                                                    reasoning="Failed to respond with JSON")
+                else:
+                    self._logger.warning(log_message, attempt_count, llm_response)
+            # Any other exception should be caught and logged
+            except Exception as e:  # pylint: disable=broad-except
+                self._logger.error("An error occurred while requesting a response from the model: %s",
+                                   e, exc_info=True)
 
+        # If it was not possible to get a model response, set the response to a default message
         if model_response is None:
-            # If the model response is None, set the response to the model output
-            # and hope that the conversation can continue
-            model_response = ModelResponse(message=str("Model response is None"), finished=False,
-                                           reasoning="Failed to get a response")
+            model_response = ModelResponse(
+                reasoning="Failed to get a response",
+                message="I am facing some difficulties right now, could you please repeat what you said?",
+                finished=False)
 
         self._logger.debug("Model input: %s", user_input.message)
         self._logger.debug("Model output: %s", model_response)
@@ -112,7 +115,7 @@ class _SimpleStatelessChatLLMAgent(Agent):
         success = False
         retry_count = 0
         model_response: ModelResponse | None = None
-        while not success and retry_count < _MAX_RETRIES:
+        while not success and retry_count < _MAX_ATTEMPTS:
             retry_count += 1
             llm_response = await self._llm.send_message_async(
                 history=ConversationHistoryFormatter.format_history_for_agent_generative_prompt(context),
