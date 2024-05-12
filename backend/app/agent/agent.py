@@ -62,7 +62,7 @@ class SimpleLLMAgent(Agent):
                 model_response = extract_json(llm_response, ModelResponse)
                 success = True
             except ExtractJSONError:
-                log_message = "Attempt %d failed to extract JSON from conversation content '%s'"
+                log_message = "Attempt %d failed to extract JSON from conversation content: '%s'"
                 if attempt_count == _MAX_ATTEMPTS:
                     # The agent failed to respond with a JSON object after the last attempt,
                     self._logger.error(log_message, attempt_count, llm_response)
