@@ -1,7 +1,7 @@
 from vertexai.generative_models import Content, Part
 
 from app.agent.prompt_reponse_template import MODEL_RESPONSE_INSTRUCTIONS
-from app.conversation_memory.conversation_memory_types import ConversationContext
+from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationTurn
 
 
 class ConversationHistoryFormatter:
@@ -86,17 +86,22 @@ class ConversationHistoryFormatter:
             contents.append(Content(role=role, parts=[Part.from_text(new_text)]))
 
     @staticmethod
-    def format_for_summary_prompt(system_instructions: str, context: ConversationContext) -> list[Content]:
+    def format_for_summary_prompt(system_instructions: str, current_summary: str,
+                                  add_to_summary: list[ConversationTurn]) -> list[Content]:
         """
-        Format the system_instructions and the conversation context in a suitable way to pass as an input to the summary
-        LLM. For the summary LLM all the input is considered as a USER role.
+        Format the system_instructions, the current summary and the turns to be incorporated in the new summary
+        in a suitable way to pass as an input to the LLM that will generate the new summary.
+        For the LLM all the input is considered as a USER role.
         :param system_instructions: The system instructions for the summary LLM
-        :param context: The conversation context to be formatted
+        :param current_summary: The current summary
+        :param add_to_summary: The turns to be incorporated in the new summary
         :return: A list of Content protos
         """
-        text = system_instructions + ConversationHistoryFormatter.SUMMARY_TITLE + context.summary + \
-               ConversationHistoryFormatter.CONVERSATION_TITLE + "\n".join(
-            [f"user: {turn.input.message}\nmodel: {turn.output.message_for_user}" for turn
-             in context.history.turns])
 
-        return [Content.from_dict({'role': ConversationHistoryFormatter.USER, 'parts': [{'text': text}]})]
+        add_to_summary_text = "\n".join(
+            [f"user: {turn.input.message}\nmodel: {turn.output.message_for_user}" for turn in add_to_summary])
+
+        text = system_instructions + ConversationHistoryFormatter.SUMMARY_TITLE + current_summary + \
+               ConversationHistoryFormatter.CONVERSATION_TITLE + add_to_summary_text
+
+        return [Content(role=ConversationHistoryFormatter.USER, parts=[Part.from_text(text)])]
