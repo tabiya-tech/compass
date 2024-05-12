@@ -1,3 +1,4 @@
+import logging
 from textwrap import dedent
 
 from app.agent.agent_types import AgentInput, AgentOutput
@@ -13,25 +14,28 @@ class ConversationMemoryManager:
     """
 
     def __init__(self, unsummarized_window_size, to_be_summarized_window_size):
-        self._state = None
+        self._state: ConversationMemoryManagerState | None = None
         self._unsummarized_window_size = unsummarized_window_size
         self._to_be_summarized_window_size = to_be_summarized_window_size
 
         self._summarize_system_instructions = dedent("""\
             You are a summarization expert summarizing the conversation between multiple conversation partners.
             You will get
-            - the summary: _SUMMARY_
+            - the current summary: _SUMMARY_
             - the current conversation: _CURRENT_CONVERSATION_
             Your task is
-            - to update the summary by incorporating new information from the current conversation.
-            The summary should be formulated from my perspective.
+            - to update the current summary by incorporating new information from the current conversation.
+            The new summary should be formulated from my perspective.
             "I" in the summary will refer to me "the user". Example: "I told you ..."
             "You" in the summary will refer to you "the model". Example: "You asked me ..."
             The summary should be concise and capture the essence of the conversation, not the details.
-            You will respond with the new updated summary.
-            Your response will be in a raw formatted non markdown text form no longer than 100 words.
+            You will respond with the new updated summary text
+            Do not include the '_SUMMARY_' tag in the response.
+            Your response will be in a raw formatted non markdown text 
+            It should be no longer than 100 words.
             """)
         self._llm = GeminiGenerativeLLM(config=LLMConfig())
+        self._logger = logging.getLogger(self.__class__.__name__)
 
     def set_state(self, state: ConversationMemoryManagerState):
         """
@@ -53,20 +57,25 @@ class ConversationMemoryManager:
             summary=self._state.summary
         )
 
-    async def _summarize(self, history: ConversationHistory):
+    async def _summarize(self):
         """
-            Update the conversation summary to include the given history input
-            :param history: the new history to include in the summary
+        Update the conversation summary to include the given history input
         """
-        model_input = ConversationHistoryFormatter.format_for_summary_prompt(self._summarize_system_instructions,
-                                                                             ConversationContext(
-                                                                                 all_history=ConversationHistory(
-                                                                                     turns=self._state.all_history.turns
-                                                                                 ),
-                                                                                 history=history,
-                                                                                 summary=self._state.summary))
-        llm_response = await self._llm.generate_content_async(model_input)
-        self._state.summary = llm_response
+        try:
+            # Generate the new summary
+            model_input = ConversationHistoryFormatter.format_for_summary_prompt(
+                system_instructions=self._summarize_system_instructions,
+                current_summary=self._state.summary,
+                add_to_summary=self._state.to_be_summarized_history.turns)
+
+            self._logger.debug("Summarizing conversation: %s", model_input)
+            llm_response = await self._llm.generate_content_async(model_input)
+            self._state.summary = llm_response
+            self._logger.debug("New Summarized conversation: %s", llm_response)
+            # Clear the to be summarized history
+            self._state.to_be_summarized_history.turns.clear()
+        except Exception as e:
+            self._logger.error("Error summarizing conversation: %s", e, exc_info=True)
 
     async def update_history(self, user_input: AgentInput, agent_output: AgentOutput) -> None:
         """
@@ -87,5 +96,4 @@ class ConversationMemoryManager:
 
         # If the to_be_summarized_history window is full, we perform summarization
         if len(self._state.to_be_summarized_history.turns) == self._to_be_summarized_window_size:
-            await self._summarize(self._state.to_be_summarized_history)
-            self._state.to_be_summarized_history.turns = []
+            await self._summarize()
