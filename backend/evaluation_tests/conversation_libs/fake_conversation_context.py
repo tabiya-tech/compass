@@ -50,8 +50,6 @@ class FakeConversationContext(ConversationContext):
         """ Adds a turn to the conversation history."""
         self.all_history.turns.append(ConversationTurn(index=len(self.all_history.turns), input=agent_input,
                                                        output=agent_output))
-        self.history.turns.append(ConversationTurn(index=len(self.all_history.turns), input=agent_input,
-                                                   output=agent_output))
         self.history.turns = self.all_history.turns[-5:]
         if summary:
             self.summary = summary

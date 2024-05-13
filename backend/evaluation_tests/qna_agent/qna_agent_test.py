@@ -52,7 +52,7 @@ async def test_qna_agent_returns_finished_true(fake_conversation_context: FakeCo
     """ Tests the QnA agent with a simple question."""
     qna_agent = QnaAgent()
 
-    output = await qna_agent.execute(AgentInput(message="What will do you with my data?"),
+    output = await qna_agent.execute(AgentInput(message="What will you do with my data?"),
                                      fake_conversation_context)
 
     assert output.finished, f"output: {output}"
