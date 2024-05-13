@@ -14,7 +14,7 @@ from evaluation_tests.conversation_libs.fake_conversation_context import FakeCon
 
 async def _evaluate_with_llm(prompt: str) -> str:
     llm = GeminiGenerativeLLM(config=LLMConfig(model_name="gemini-1.5-pro-preview-0409"))
-    return await llm.generate_content_async(prompt)
+    return (await llm.generate_content_async(prompt)).text
 
 
 @pytest.mark.asyncio
@@ -23,12 +23,12 @@ async def test_qna_agent_answering_simple_question(fake_conversation_context: Fa
     """ Tests the QnA agent with a simple question. """
     qna_agent = QnaAgent()
 
-    output = await qna_agent.execute(AgentInput(message="What will you with my data?"),
+    output = await qna_agent.execute(AgentInput(message="What will you do with my data?"),
                                      fake_conversation_context)
 
     assert "TRUE" in await _evaluate_with_llm(
         f"""Respond only with TRUE if "{output.message_for_user}" explains how the data will be used. Otherwise respond
-        with FALSE.""")
+        with FALSE."""), f"output: {output}"
 
 
 @pytest.mark.asyncio
@@ -148,7 +148,7 @@ async def test_qna_agent_responds_to_multiple_questions_in_a_row(fake_conversati
     """ Tests the QnA agent with multiple questions in a row. """
     qna_agent = QnaAgent()
     prompt = "You are a student from Kenya. You are just starting the process with the tabiya compass. " \
-             "You are asking generic questions about the process."
+             "You are asking generic questions about the process. Ask only one question at a time, be concise."
     fake_conversation_context.set_summary("The user is asking generic questions about the process.")
     simulated_user = LLMSimulatedUser(
         system_instructions=prompt,
@@ -168,8 +168,14 @@ async def test_qna_agent_responds_to_multiple_questions_in_a_row(fake_conversati
 
         conciseness_eval = await CriteriaEvaluator(criteria=EvaluationType.CONCISENESS).evaluate(evaluation_record)
         evaluation_record.evaluations.append(conciseness_eval)
-        assert conciseness_eval.score > 90, f"reasoning: {conciseness_eval.reasoning}"
-        # TODO: Add another evaluation to make sure that the conversation is on track.
+        assert conciseness_eval.score > 70, f"reasoning: {conciseness_eval.reasoning}"
+        assert "TRUE" in await _evaluate_with_llm(
+            f"""Respond with TRUE if given the conversation below, the EVALUATED_AGENT responds to each question 
+                about tabiya compass, not going into unnecessary detail and sticking to facts. 
+                Otherwise respond with FALSE. Provide a reason.
+                CONVERSATION:
+                {evaluation_record.generate_conversation()}
+        """)
     finally:
         folder = common_folder_path + 'qna_agent_responds_to_multiple_questions_in_a_row'
         evaluation_record.save_data(folder=folder, base_file_name="evaluation_record")

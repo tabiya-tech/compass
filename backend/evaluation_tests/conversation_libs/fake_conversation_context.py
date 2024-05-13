@@ -38,7 +38,10 @@ class FakeConversationContext(ConversationContext):
             agent_message = agent_responses[i].message if i < len(agent_responses) else ""
             self.all_history.turns.append(ConversationTurn(index=i, input=AgentInput(message=user_message),
                                                            output=AgentOutput(message_for_user=agent_message,
-                                                                              finished=False)))
+                                                                              finished=False,
+                                                                              reasoning="Placeholder",
+                                                                                        agent_response_time_in_sec=0,
+                                                                              llm_stats=[])))
             i += 1
         self.summary = summary
         self.history.turns = self.all_history.turns[-5:]
