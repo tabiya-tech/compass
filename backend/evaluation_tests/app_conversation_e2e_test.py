@@ -4,7 +4,6 @@ import os
 import pytest
 
 from app.agent.agent_types import AgentOutput, AgentInput
-
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.server import welcome, get_conversation_context
 from common_libs.llm.gemini import LLMConfig, SAFETY_OFF_SETTINGS, \
@@ -63,7 +62,8 @@ class _AppChatIsFinished:
 
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test
-@pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases), ids=[case.name for case in test_cases])
+@pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases),
+                         ids=[case.name for case in get_test_cases_to_run(test_cases)])
 async def test_main_app_chat(max_iterations: int, test_case: EvaluationTestCase):
     """
     E2E conversation test, based on the test cases specified above. It calls the same endpoint as the frontend
