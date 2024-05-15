@@ -1,15 +1,15 @@
+from typing import Callable
+
 from tqdm import tqdm
 
 from app.agent.agent_types import AgentInput
-from evaluation_tests.conversation_libs.agent_executors import ExecuteAgentCallable, CheckAgentFinishedCallable, \
-    ExecuteSimulatedUserCallable
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationRecord, Actor
 
 
 async def generate(*, max_iterations: int,
-                   execute_evaluated_agent: ExecuteAgentCallable,
-                   execute_simulated_user: ExecuteSimulatedUserCallable,
-                   is_finished: CheckAgentFinishedCallable) -> list[ConversationRecord]:
+                   execute_evaluated_agent: Callable,
+                   execute_simulated_user: Callable,
+                   is_finished: Callable) -> list[ConversationRecord]:
     """
     Generates a complete conversation between a simulated_user and the actor.
     :param max_iterations: The maximum number of iterations for the conversions.
