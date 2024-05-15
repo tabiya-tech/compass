@@ -11,6 +11,7 @@ class AgentType(Enum):
     WELCOME_AGENT = "WelcomeAgent"
     SKILL_EXPLORER_AGENT = "SkillExplorerAgent"
     FAREWELL_AGENT = "FarewellAgent"
+    QNA_AGENT = "QnaAgent"
 
 
 class AgentInput(BaseModel):
