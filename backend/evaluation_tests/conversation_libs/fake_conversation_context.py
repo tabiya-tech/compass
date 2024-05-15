@@ -32,17 +32,15 @@ class FakeConversationContext(ConversationContext):
         if conversation[0].actor != Actor.SIMULATED_USER:
             user_responses = [ConversationRecord(message="", actor=Actor.SIMULATED_USER)]
         user_responses.extend([c for c in conversation if c.actor == Actor.SIMULATED_USER])
-        i = 0
-        while i < max(len(agent_responses), len(user_responses)):
+        for i in range(max(len(agent_responses), len(user_responses))):
             user_message = user_responses[i].message if i < len(user_responses) else ""
             agent_message = agent_responses[i].message if i < len(agent_responses) else ""
             self.all_history.turns.append(ConversationTurn(index=i, input=AgentInput(message=user_message),
                                                            output=AgentOutput(message_for_user=agent_message,
                                                                               finished=False,
                                                                               reasoning="Placeholder",
-                                                                                        agent_response_time_in_sec=0,
+                                                                              agent_response_time_in_sec=0,
                                                                               llm_stats=[])))
-            i += 1
         self.summary = summary
         self.history.turns = self.all_history.turns[-5:]
 
