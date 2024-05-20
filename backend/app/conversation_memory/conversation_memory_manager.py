@@ -1,12 +1,11 @@
 import logging
-from textwrap import dedent
 
 from app.agent.agent_types import AgentInput, AgentOutput
-from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationHistory, \
     ConversationContext, ConversationTurn, ConversationMemoryManagerState
 from common_libs.llm.models_utils import LLMConfig
 from common_libs.llm.generative_models import GeminiGenerativeLLM
+from app.conversation_memory.summarizer import Summarizer
 
 
 class ConversationMemoryManager:
@@ -18,24 +17,7 @@ class ConversationMemoryManager:
         self._state: ConversationMemoryManagerState | None = None
         self._unsummarized_window_size = unsummarized_window_size
         self._to_be_summarized_window_size = to_be_summarized_window_size
-
-        self._summarize_system_instructions = dedent("""\
-            You are a summarization expert summarizing the conversation between multiple conversation partners.
-            You will get
-            - the current summary: _SUMMARY_
-            - the current conversation: _CURRENT_CONVERSATION_
-            Your task is
-            - to update the current summary by incorporating new information from the current conversation.
-            The new summary should be formulated from my perspective.
-            "I" in the summary will refer to me "the user". Example: "I told you ..."
-            "You" in the summary will refer to you "the model". Example: "You asked me ..."
-            The summary should be concise and capture the essence of the conversation, not the details.
-            You will respond with the new updated summary text
-            Do not include the '_SUMMARY_' tag in the response.
-            Your response will be in a raw formatted non markdown text 
-            It should be no longer than 100 words.
-            """)
-        self._llm = GeminiGenerativeLLM(config=LLMConfig())
+        self._summarizer = Summarizer()
         self._logger = logging.getLogger(self.__class__.__name__)
 
     def set_state(self, state: ConversationMemoryManagerState):
@@ -51,11 +33,11 @@ class ConversationMemoryManager:
         :return: The conversation context
         """
         return ConversationContext(
-            all_history=self._state.all_history,
-            history=ConversationHistory(
-                turns=(self._state.to_be_summarized_history.turns + self._state.unsummarized_history.turns)
-            ),
-            summary=self._state.summary
+                all_history=self._state.all_history,
+                history=ConversationHistory(
+                        turns=(self._state.to_be_summarized_history.turns + self._state.unsummarized_history.turns)
+                ),
+                summary=self._state.summary
         )
 
     async def _summarize(self):
@@ -64,15 +46,11 @@ class ConversationMemoryManager:
         """
         try:
             # Generate the new summary
-            model_input = ConversationHistoryFormatter.format_for_summary_prompt(
-                system_instructions=self._summarize_system_instructions,
-                current_summary=self._state.summary,
-                add_to_summary=self._state.to_be_summarized_history.turns)
-
-            self._logger.debug("Summarizing conversation: %s", model_input)
-            llm_response = await self._llm.generate_content(model_input)
-            # TODO(Zohar): include the LLM stats in the summary
-            self._state.summary = llm_response.text
+            self._logger.debug("Summarizing conversation:")
+            self._state.summary = await self._summarizer.summarize(ConversationContext(
+                                                                   all_history=[],
+                                                                   history=self._state.to_be_summarized_history,
+                                                                   summary=self._state.summary))
             self._logger.debug("New Summarized conversation: %s", self._state.summary)
             # Clear the to be summarized history
             self._state.to_be_summarized_history.turns.clear()
