@@ -70,7 +70,7 @@ tests that mock the LLM prompts and test the logic of the class.
 - You can conduct a fake conversation using the `generate_conversation.generate` function script. Here as well evaluate
   the conversation with as specific criteria as possible.
   - It is advisable to save the content of the conversation. Use a fixture or a finally block to save the conversation
-    to make sure it is saved even if the test fails.
+    to make sure it is saved even if the test fails. You can look at the test `test_qna_agent_responds_to_multiple_questions_in_a_row` in `qna_agent_test.py` for an example.
 - Greater quantity but smaller tests is better than one big test.
 - There is a set of fixtures in `conftest.py` that can be re-used in all tests. In particular:
   - Use the `common_folder_path` whenever saving a file.
