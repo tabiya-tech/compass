@@ -10,12 +10,13 @@ from pydantic import BaseModel
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.llm_agent_director import LLMAgentDirector
 from app.agent.welcome_agent import WelcomeAgent
+from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
 from app.conversation_memory.conversation_memory_manager import ConversationContext, ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
+from app.vector_search.occupation_search_routes import add_occupation_search_routes
+from app.vector_search.skill_search_routes import add_skill_search_routes
 from app.version.version_routes import add_version_routes
-from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
-from esco_search.esco_search_routes import add_esco_search_routes
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +42,9 @@ add_version_routes(app)
 ############################################
 # Add routes relevant for esco_search
 ############################################
-skill_search_service = add_esco_search_routes(app)
+
+add_occupation_search_routes(app)
+add_skill_search_routes(app)
 
 ############################################
 # Add routes relevant for pii filtering
