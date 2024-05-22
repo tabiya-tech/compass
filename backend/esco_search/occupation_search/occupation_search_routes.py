@@ -5,8 +5,8 @@ from langchain_core.embeddings.embeddings import Embeddings
 from pydantic.main import BaseModel
 from pymongo.database import Database
 
-from esco_search.esco_abs_search_service import VectorSearchConfig
-from esco_search.occupation_search.occupation_search_service import OccupationSearchService, OccupationEntity
+from app.vector_search.esco_entities import OccupationEntity
+from app.vector_search.esco_search_serivce import OccupationSearchService, VectorSearchConfig
 
 
 def add_occupation_search_routes(app: FastAPI, db: Database, embedder: Embeddings) -> None:
@@ -46,7 +46,7 @@ def add_occupation_search_routes(app: FastAPI, db: Database, embedder: Embedding
     @app.get("/search_mmr/occupations",
              response_model=OccupationsResponse,
              description="""
-             Semantically search for occupations based on a query using max marginal relevance (MMR) to diversify the search results.  
+             Semantically search for occupations based on a query using max marginal relevance (MMR) to diversify the search results.
              The search is based on the embeddings of the occupations, and uses
              the cosine similarity to find the most similar occupations.""",
              )
