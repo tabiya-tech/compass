@@ -11,7 +11,7 @@ from langchain_core.embeddings.embeddings import Embeddings
 from pymongo import MongoClient
 from tqdm import tqdm
 
-from esco_search.embeddings.google_gecko.google_gecko import GoogleGeckoConfig, GoogleGecko
+from esco_search.embeddings.google_gecko.google_gecko import GoogleGecko, GoogleGeckoConfig
 
 load_dotenv()
 
@@ -164,7 +164,6 @@ if __name__ == "__main__":
             version="latest",
             location="europe-west3",
             max_retries=3
-
         )
         model = GoogleGecko.create(config)
     else:
