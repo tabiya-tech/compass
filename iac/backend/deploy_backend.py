@@ -36,7 +36,7 @@ def _build_and_push_image(fully_qualified_image_name: str, dependencies: list[pu
     # Build and push image to gcr repository
     image = docker.Image("compass-image",
                          image_name=fully_qualified_image_name,
-                         build=docker.DockerBuildArgs(context="../backend", platform="linux/amd64"),
+                         build=docker.DockerBuildArgs(context="../../backend", platform="linux/amd64"),
                          registry=None,  # use gcloud for authentication.
                          opts=pulumi.ResourceOptions(depends_on=dependencies)
                          )

@@ -13,6 +13,11 @@ jobs:
     secrets: inherit
     with:
       target-environment: dev
+  test-frontend:
+    uses: ./.github/workflows/test-frontend.yml
+    secrets: inherit
+    with:
+      target-environment: dev
   deploy-backend:
     # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
     if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
@@ -21,6 +26,15 @@ jobs:
     secrets: inherit
     with:
       target-environment: dev
+  deploy-frontend:
+    # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
+    if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
+    needs: [ test-frontend, deploy-backend ]
+    uses: ./.github/workflows/deploy-frontend.yml
+    secrets: inherit
+    with:
+      target-environment: dev
+      backendRestApiURLBase: ${{ needs.deploy-backend.outputs.backendRestApiURLBase }}
   smoke-test-backend:
     needs: [ deploy-backend ]
     uses: ./.github/workflows/smoke-test-version.yml
