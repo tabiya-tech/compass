@@ -13,6 +13,8 @@ their skills and interests based on their lived experiences.
 
 ## Table of Contents
 
+- **[Frontend](frontend-new)**: Explore the Frontend directory for detailed insights about the frontend project.
+
 - **[Backend](backend)**: Explore the Backend directory for detailed insights about the backend project.
 
 - **[Frontend](frontend)**: Explore the Frontend directory for detailed insights about the frontend project.
