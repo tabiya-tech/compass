@@ -1,31 +1,16 @@
-import asyncio
-import os
-
 import pytest
+from tqdm import tqdm
 
 from app.agent.agent_types import AgentOutput, AgentInput
-from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.server import conversation, get_conversation_context
-from common_libs.llm.models_utils import LLMConfig, MEDIUM_TEMPERATURE_GENERATION_CONFIG
-from evaluation_tests.conversation_libs.conversation_test_function import conversation_test_function, \
-    EvaluationTestCase, LLMSimulatedUser, ConversationTestConfig
+from common_libs.llm.models_utils import MEDIUM_TEMPERATURE_GENERATION_CONFIG, LLMConfig
+from evaluation_tests.conversation_libs import conversation_generator
+from evaluation_tests.conversation_libs.conversation_test_function import EvaluationTestCase, LLMSimulatedUser
+from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationEvaluationRecord
+from evaluation_tests.conversation_libs.evaluators.evaluator_builder import create_evaluator
+from evaluation_tests.conversation_libs.fake_conversation_context import save_conversation
 from evaluation_tests.core_e2e_tests_cases import test_cases
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
-
-
-@pytest.fixture(scope="session")
-def event_loop():
-    """
-    Makes sure that all the async calls finish.
-
-    Without it, the tests sometimes fail with "Event loop is closed" error.
-    """
-    try:
-        loop = asyncio.get_running_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-    yield loop
-    loop.close()
 
 
 class _AppChatExecutor:
@@ -37,17 +22,6 @@ class _AppChatExecutor:
         Executes the application chat route
         """
         return (await conversation(user_input=agent_input.message, session_id=self._session_id)).last
-
-
-class _AppGetConversationContextExecutor:
-    def __init__(self, session_id: int):
-        self._session_id = session_id
-
-    async def __call__(self) -> ConversationContext:
-        """
-        Returns the conversation context from the application
-        """
-        return await get_conversation_context(session_id=self._session_id)
 
 
 class _AppChatIsFinished:
@@ -63,7 +37,7 @@ class _AppChatIsFinished:
 @pytest.mark.evaluation_test
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases),
                          ids=[case.name for case in get_test_cases_to_run(test_cases)])
-async def test_main_app_chat(max_iterations: int, test_case: EvaluationTestCase):
+async def test_main_app_chat(max_iterations: int, test_case: EvaluationTestCase, common_folder_path: str):
     """
     E2E conversation test, based on the test cases specified above. It calls the same endpoint as the frontend
     would call and does not mock any of the tested components.
@@ -71,17 +45,27 @@ async def test_main_app_chat(max_iterations: int, test_case: EvaluationTestCase)
     print(f"Running test case {test_case.name}")
 
     session_id = hash(test_case.name) % 10 ** 10
-    output_folder = os.path.join(os.getcwd(), 'test_output/app_e2e', test_case.name)
-    await conversation_test_function(
-        config=ConversationTestConfig(
-            max_iterations=max_iterations,
-            test_case=test_case,
-            output_folder=output_folder,
-            execute_evaluated_agent=_AppChatExecutor(session_id=session_id),
-            execute_simulated_user=LLMSimulatedUser(system_instructions=test_case.simulated_user_prompt,
-                                                    llm_config=LLMConfig(
-                                                        generation_config=MEDIUM_TEMPERATURE_GENERATION_CONFIG)),
-            is_finished=_AppChatIsFinished(),
-            get_conversation_context=_AppGetConversationContextExecutor(session_id=session_id)
-        )
-    )
+    evaluation_result = ConversationEvaluationRecord(simulated_user_prompt=test_case.simulated_user_prompt,
+                                                     test_case=test_case.name)
+    try:
+        evaluation_result.add_conversation_records(
+            await conversation_generator.generate(max_iterations=max_iterations,
+                                                  execute_simulated_user=LLMSimulatedUser(
+                                                      system_instructions=test_case.simulated_user_prompt,
+                                                      llm_config=LLMConfig(
+                                                          generation_config=MEDIUM_TEMPERATURE_GENERATION_CONFIG)),
+                                                  execute_evaluated_agent=_AppChatExecutor(session_id=session_id),
+                                                  is_finished=_AppChatIsFinished()))
+
+        for evaluation in tqdm(test_case.evaluations, desc='Evaluating'):
+            output = await create_evaluator(evaluation.type).evaluate(evaluation_result)
+            evaluation_result.add_evaluation_result(output)
+            print(f'Evaluation for {evaluation.type.name}: {output.score} {output.reasoning}')
+            assert output.score >= evaluation.expected, f"{evaluation.type.name} expected " \
+                                                        f"{evaluation.expected} actual {output.score}"
+
+    finally:
+        output_folder = common_folder_path + test_case.name
+        evaluation_result.save_data(folder=output_folder, base_file_name='evaluation_record')
+        context = await get_conversation_context(session_id=session_id)
+        save_conversation(context, title=test_case.name, folder_path=output_folder)
