@@ -117,9 +117,7 @@ class AbstractEscoSearchService(SimilaritySearchService[T]):
         The ``embed_query`` method of the embedding model is used to generate the embedding.
         :param k: The number of results to return.
         """
-        # Perform the search
         results = await self.store.asimilarity_search_with_score(query, k=k)
-        # Extract the metadata from the documents
         return [self._to_entity(document.metadata) for document, _ in results]
 
     async def search_mmr(self, query: str, k: int = 5, fetch_k: int = 100, lambda_mult: float = 0.5) -> list[T]:
