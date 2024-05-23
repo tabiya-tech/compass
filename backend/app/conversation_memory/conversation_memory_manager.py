@@ -5,7 +5,8 @@ from app.agent.agent_types import AgentInput, AgentOutput
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationHistory, \
     ConversationContext, ConversationTurn, ConversationMemoryManagerState
-from common_libs.llm.gemini import GeminiGenerativeLLM, LLMConfig
+from common_libs.llm.models_utils import LLMConfig
+from common_libs.llm.generative_models import GeminiGenerativeLLM
 
 
 class ConversationMemoryManager:
@@ -69,7 +70,7 @@ class ConversationMemoryManager:
                 add_to_summary=self._state.to_be_summarized_history.turns)
 
             self._logger.debug("Summarizing conversation: %s", model_input)
-            llm_response = await self._llm.generate_content_async(model_input)
+            llm_response = await self._llm.generate_content(model_input)
             # TODO(Zohar): include the LLM stats in the summary
             self._state.summary = llm_response.text
             self._logger.debug("New Summarized conversation: %s", self._state.summary)

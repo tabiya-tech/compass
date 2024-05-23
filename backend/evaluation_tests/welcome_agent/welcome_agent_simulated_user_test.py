@@ -6,7 +6,6 @@ import pytest
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
-from common_libs.llm.gemini import LLMConfig, SAFETY_OFF_SETTINGS
 from evaluation_tests.conversation_libs.conversation_test_function import conversation_test_function, \
     EvaluationTestCase, ConversationTestConfig, LLMSimulatedUser
 from evaluation_tests.core_e2e_tests_cases import test_cases
@@ -54,8 +53,7 @@ async def test_welcome_agent_simulated_user(max_iterations: int, test_case: Eval
         test_case=test_case,
         output_folder=output_folder,
         execute_evaluated_agent=execute_evaluated_agent,
-        execute_simulated_user=LLMSimulatedUser(system_instructions=test_case.simulated_user_prompt,
-                                                llm_config=LLMConfig(safety_settings=SAFETY_OFF_SETTINGS)),
+        execute_simulated_user=LLMSimulatedUser(system_instructions=test_case.simulated_user_prompt),
         is_finished=WelcomeAgentIsFinished(),
         get_conversation_context=WelcomeAgentGetConversationContextExecutor(conversation_manager=conversation_manager)
     )
