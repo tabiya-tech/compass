@@ -93,5 +93,3 @@ class FakeConversationContext(ConversationContext):
 
     def save_conversation(self, title: str, folder_path: str):
         save_conversation(self, title, folder_path)
-
-

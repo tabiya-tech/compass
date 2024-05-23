@@ -3,7 +3,6 @@ from tqdm import tqdm
 
 from app.agent.agent_types import AgentOutput, AgentInput
 from app.server import conversation, get_conversation_context
-from common_libs.llm.models_utils import MEDIUM_TEMPERATURE_GENERATION_CONFIG, LLMConfig
 from evaluation_tests.conversation_libs import conversation_generator
 from evaluation_tests.conversation_libs.conversation_test_function import EvaluationTestCase, LLMSimulatedUser
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationEvaluationRecord
@@ -51,9 +50,7 @@ async def test_main_app_chat(max_iterations: int, test_case: EvaluationTestCase,
         evaluation_result.add_conversation_records(
             await conversation_generator.generate(max_iterations=max_iterations,
                                                   execute_simulated_user=LLMSimulatedUser(
-                                                      system_instructions=test_case.simulated_user_prompt,
-                                                      llm_config=LLMConfig(
-                                                          generation_config=MEDIUM_TEMPERATURE_GENERATION_CONFIG)),
+                                                      system_instructions=test_case.simulated_user_prompt),
                                                   execute_evaluated_agent=_AppChatExecutor(session_id=session_id),
                                                   is_finished=_AppChatIsFinished()))
 
@@ -65,7 +62,7 @@ async def test_main_app_chat(max_iterations: int, test_case: EvaluationTestCase,
                                                         f"{evaluation.expected} actual {output.score}"
 
     finally:
-        output_folder = common_folder_path + test_case.name
+        output_folder = common_folder_path + 'e2e_test_' + test_case.name
         evaluation_result.save_data(folder=output_folder, base_file_name='evaluation_record')
         context = await get_conversation_context(session_id=session_id)
         save_conversation(context, title=test_case.name, folder_path=output_folder)
