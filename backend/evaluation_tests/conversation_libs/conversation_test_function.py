@@ -5,11 +5,11 @@ from datetime import datetime, timezone
 import pytest
 from pydantic.main import BaseModel
 from tqdm import tqdm
-from vertexai.generative_models import Content
 
 from app.conversation_memory.save_conversation_context import save_conversation_context_to_json, \
     save_conversation_context_to_markdown
-from common_libs.llm.gemini import GeminiChatLLM, LLMConfig
+from common_libs.llm.models_utils import LLMConfig, LLMInput
+from common_libs.llm.chat_models import GeminiChatLLM
 from evaluation_tests.conversation_libs import conversation_generator
 from evaluation_tests.conversation_libs.agent_executors import ExecuteAgentCallable, CheckAgentFinishedCallable, \
     ExecuteSimulatedUserCallable, GetConversationContextCallable
@@ -124,14 +124,14 @@ class LLMSimulatedUser:
     A simulated user that uses the GeminiChatLLM.
     """
 
-    def __init__(self, *, system_instructions: str, history: list[Content] | None = None,
+    def __init__(self, *, system_instructions: str, llm_input: LLMInput | None = None,
                  llm_config: LLMConfig = LLMConfig()):
         """
         :param system_instructions: The system instructions to be used by the simulated user.
-        :param history: An optional history to be used by the simulated user.
+        :param llm_input: An optional LLM input to be used by the simulated user.
         :param llm_config: The configuration for the GeminiChatLLM.
         """
-        self._chat = GeminiChatLLM(system_instructions=system_instructions, history=history, config=llm_config)
+        self._chat = GeminiChatLLM(system_instructions=system_instructions, llm_input=llm_input, config=llm_config)
 
     async def __call__(self, turn_number: int, message_for_user: str) -> str:
         """
@@ -139,7 +139,8 @@ class LLMSimulatedUser:
         :param message_for_user: The message that the user should respond to.
         :return: The response from the simulated user.
         """
-        return await self._chat.send_message_async(message_for_user)
+        llm_response = await self._chat.generate_content(message_for_user)
+        return llm_response.text
 
 
 class ScriptedSimulatedUser:
