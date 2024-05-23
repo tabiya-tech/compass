@@ -14,6 +14,42 @@ def _write_turn(f: TextIO, turn: ConversationTurn):
     f.write("\n\n")
 
 
+def _save_conversation_context_to_json(context: ConversationContext, file_path: str) -> None:
+    """
+    Save the conversation context to a json file
+    :param file_path: The file path
+    """
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, 'w', encoding='utf-8') as f:
+        f.write(context.json(indent=4))
+
+
+def _save_conversation_context_to_markdown(context: ConversationContext, title: str, file_path: str) -> None:
+    """
+    Save the conversation context to a markdown file
+    :param title: A title for the markdown document
+    :param file_path: The file path
+    """
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, 'w', encoding='utf-8') as f:
+        f.write(f"# {title}\n\n")
+        f.write("## Conversation Summary\n\n")
+        f.write(f"{context.summary}\n\n")
+        f.write("## Conversation Recent History\n\n")
+        for turn in context.history.turns:
+            _write_turn(f, turn)
+        f.write("## Conversation All History\n\n")
+        for turn in context.all_history.turns:
+            _write_turn(f, turn)
+
+
+def save_conversation(context: ConversationContext, title: str, folder_path: str):
+    """ Saves the conversation context to a json and markdown file."""
+    _save_conversation_context_to_json(context, os.path.join(folder_path, "conversation_context.json"))
+    _save_conversation_context_to_markdown(context, title=title,
+                                           file_path=os.path.join(folder_path, "conversation_context.md"))
+
+
 class FakeConversationContext(ConversationContext):
     """
     A fake conversation context that can be used in tests.
@@ -55,35 +91,7 @@ class FakeConversationContext(ConversationContext):
     def set_summary(self, summary: str):
         self.summary = summary
 
-    def _save_conversation_context_to_json(self, file_path: str) -> None:
-        """
-        Save the conversation context to a json file
-        :param file_path: The file path
-        """
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(self.json(indent=4))
-
-    def _save_conversation_context_to_markdown(self, title: str, file_path: str) -> None:
-        """
-        Save the conversation context to a markdown file
-        :param title: A title for the markdown document
-        :param file_path: The file path
-        """
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(f"# {title}\n\n")
-            f.write("## Conversation Summary\n\n")
-            f.write(f"{self.summary}\n\n")
-            f.write("## Conversation Recent History\n\n")
-            for turn in self.history.turns:
-                _write_turn(f, turn)
-            f.write("## Conversation All History\n\n")
-            for turn in self.all_history.turns:
-                _write_turn(f, turn)
-
     def save_conversation(self, title: str, folder_path: str):
-        """ Saves the conversation context to a json and markdown file."""
-        self._save_conversation_context_to_json(os.path.join(folder_path, "conversation_context.json"))
-        self._save_conversation_context_to_markdown(title=title,
-                                                    file_path=os.path.join(folder_path, "conversation_context.md"))
+        save_conversation(self, title, folder_path)
+
+
