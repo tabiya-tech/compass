@@ -26,11 +26,11 @@ async def generate(*, max_iterations: int,
         agent_output = await execute_evaluated_agent(agent_input=AgentInput(message=simulated_user_output))
         message_for_user = agent_output.message_for_user
         # Checks whether the chatbot is done. And finishes the loop if so.
+        conversation.append(
+            ConversationRecord(message=message_for_user, actor=Actor.EVALUATED_AGENT))
         if is_finished(agent_output=agent_output):
             print(f'Conversation finished earlier, after {i} out of {max_iterations} iterations.')
             break
-        conversation.append(
-            ConversationRecord(message=message_for_user, actor=Actor.EVALUATED_AGENT))
         # Get a response from the simulated user.
         simulated_user_output = await execute_simulated_user(turn_number=i, message_for_user=message_for_user)
         conversation.append(
