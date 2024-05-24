@@ -7,6 +7,6 @@ test("should render correctly", () => {
   render(<App />);
 
   // THEN expect the hello world text to be in the DOM
-  const helloWorldElement = screen.getByText(/hello world/i);
+  const helloWorldElement = screen.getByText(/Welcome to Tabiya Compass/i);
   expect(helloWorldElement).toBeInTheDocument();
 });
