@@ -19,8 +19,7 @@ jobs:
     environment: ${{ inputs.target-environment }}
     outputs:
       version-info: ${{ steps.setVersionInfo.outputs.version-info }}
-      backendRestApiURLBase: ${{ steps.pulumi.outputs.cloud_run_url }}
-      resourcesBaseUrl: ${{ steps.pulumi.outputs.resourcesBaseUrl }}
+      backendRestApiURLBase: ${{ steps.pulumi.outputs.apigateway_url }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -60,3 +59,5 @@ jobs:
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          GCP_OAUTH_CLIENT_ID: ${{ secrets.GCP_OAUTH_CLIENT_ID }}
+          GCP_OAUTH_CLIENT_SECRET: ${{ secrets.GCP_OAUTH_CLIENT_SECRET }}
