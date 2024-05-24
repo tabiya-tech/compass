@@ -1,0 +1,4 @@
+config:
+  compass-frontend:frontend_bucket_name: compass-frontend-dev-418218
+  gcp:project: "compass-dev-418218"
+  gcp:region: "us-central1"

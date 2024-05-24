@@ -1,5 +1,5 @@
 import pulumi
-from deploy_backend import deploy_backend
+from deploy_frontend import deploy_frontend
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -14,9 +14,8 @@ def main():
     location = config.require("region")
     pulumi.info(f'Using location:{location}')
 
-    # Deploy the backend
-    deploy_backend(project, location)
-
+    # Deploy the frontend
+    deploy_frontend(project, location)
 
 if __name__ == "__main__":
     main()
