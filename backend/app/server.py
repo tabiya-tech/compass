@@ -1,8 +1,10 @@
 import logging
+import base64
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from app.agent.agent_types import AgentInput, AgentOutput
@@ -158,6 +160,18 @@ async def get_conversation_context(session_id: int):
         # this is the main entry point, so we need to catch all exceptions
         logger.exception(e)
         return {"error": "oops! something went wrong!"}
+
+
+# Temporary REST API EP for returning the incoming authentication information
+# from the request. This is for testing purposes until the UI supports auth
+# and must be removed later.
+@app.get(path="/authinfo",
+         description="Returns the authentication info (JWT token claims)")
+async def _get_auth_info(request: Request):
+    auth_info_b64 = request.headers.get('x-apigateway-api-userinfo')
+    # some python magic
+    auth_info = base64.b64decode(auth_info_b64.encode() + b'==').decode()
+    return JSONResponse(auth_info)
 
 
 if __name__ == "__main__":

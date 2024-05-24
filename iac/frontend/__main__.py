@@ -13,9 +13,12 @@ def main():
     pulumi.info(f'Using project:{project}')
     location = config.require("region")
     pulumi.info(f'Using location:{location}')
+    environment = pulumi.get_stack()
+    pulumi.info(f"Using Environment: {environment}")
 
     # Deploy the frontend
-    deploy_frontend(project, location)
+    deploy_frontend(project, location, environment)
+
 
 if __name__ == "__main__":
     main()
