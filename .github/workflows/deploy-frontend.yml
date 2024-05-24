@@ -112,8 +112,6 @@ jobs:
           stack-name: tabiya-tech/compass-frontend/${{ inputs.target-environment }}
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-          MONGODB_URI: ${{ secrets.MONGODB_URI }}
-          NEXT_PUBLIC_COMPASS_URL: ${{ inputs.backendRestApiURLBase }}
       - name: Show frontend URL
         run: |
           echo "frontend-url<<${{ steps.pulumi.outputs.bucket_url }}"
