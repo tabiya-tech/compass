@@ -32,6 +32,17 @@ function backend() {
   printSuccess ${project}
 }
 
+function frontend() {
+    local project="frontend"
+    printTitle ${project}
+    (cd frontend/ && yarn install && yarn lint && yarn format:check && yarn build)
+    if [ $? -ne 0 ]; then
+        printError ${project}
+        exit 1
+    fi
+    printSuccess ${project}
+}
+
 function printTitle() {
   local blue='\033[1;30;44m'
   local title="Begin to build the ${1}"
@@ -70,19 +81,22 @@ function printFormatError() {
 
 PS3="Select what you want to build and test: "
 
-OPTIONS="All Backend"
+OPTIONS="All Backend Frontend"
 select opt in $OPTIONS; do
-  if [ "$REPLY" = "1" ]; then
-      echo "******************" &&
-      echo "Building all" &&
-      echo "******************" &&
-      backend
-      exit $?
-  elif [ "$REPLY" = "2" ]; then
-    backend
-    exit $?
-  else
-    clear
-    echo bad option
-  fi
+    if [ "$REPLY" = "1" ]; then
+        echo "******************"
+        echo "Building all"
+        echo "******************"
+        backend && frontend
+        exit $?
+    elif [ "$REPLY" = "2" ]; then
+        backend
+        exit $?
+    elif [ "$REPLY" = "3" ]; then
+        frontend
+        exit $?
+    else
+        clear
+        echo bad option
+    fi
 done

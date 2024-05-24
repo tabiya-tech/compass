@@ -1,0 +1,4 @@
+name: compass-frontend
+runtime:
+  name: python
+description: Tabiya compass

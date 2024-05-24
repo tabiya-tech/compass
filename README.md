@@ -15,6 +15,8 @@ their skills and interests based on their lived experiences.
 
 - **[Backend](backend)**: Explore the Backend directory for detailed insights about the backend project.
 
+- **[Frontend](frontend)**: Explore the Frontend directory for detailed insights about the frontend project.
+
 - **[Infrastructure As Code (IaC)](iac)**: Explore the Infrastructure as code(IAC) directory for detailed insights about
   the infrastructure-as-code components.
 
