@@ -1,18 +1,31 @@
 import os
 from typing import TextIO
 
-from app.agent.agent_types import AgentInput, AgentOutput
+from app.agent.agent_types import AgentInput, AgentOutput, LLMStats
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationTurn
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationRecord, Actor
+
+
+def _write_stats(f: TextIO, stats: LLMStats, index: int):
+    f.write(f"***LLM call stats {index + 1}:***\n")
+    if stats.error != '':
+        f.write(f"* *Error*: {stats.error}\n")
+    f.write(f"* *Prompt Token Count*: {stats.prompt_token_count}\n")
+    f.write(f"* *Response Token Count*: {stats.response_token_count}\n")
+    f.write(f"* *Response Time (sec)*: {stats.response_time_in_sec}\n")
+    f.write("\n")
 
 
 def _write_turn(f: TextIO, turn: ConversationTurn):
     f.write(f"### Turn {turn.index}\n\n")
     f.write(f"**User**: {turn.input.message}\\\n")
-    f.write(f"**{turn.output.agent_type}**: {turn.output.message_for_user}\\\n")
-    f.write(f"**Finished**: {turn.output.finished}\n")
+    f.write(f"**{turn.output.agent_type.value}**: {turn.output.message_for_user}\\\n")
+    f.write(f"**Finished**: {turn.output.finished}\\\n")
+    f.write(f"**Reasoning**: {turn.output.reasoning}\\\n")
+    f.write(f"**Agent Response Time (sec)**: {turn.output.agent_response_time_in_sec}\\\n")
+    for i, stats in enumerate(turn.output.llm_stats):
+        _write_stats(f, stats, i)
     f.write("\n\n")
-
 
 def _save_conversation_context_to_json(context: ConversationContext, file_path: str) -> None:
     """
