@@ -15,3 +15,15 @@ To run the demo chat UI and connect to a local instance of the backend:
    ```sh
    yarn install
    yarn run dev
+   
+## Use the conversation sandbox UI
+
+The UI can be configured to use an alternative path for the conversation backend.
+This is useful for testing and reviewing an individual agant's conversation manually in a configurable way without having to conduct a full conversation.
+
+To do this, ensure your backend is running and the desired path  agent is available at the specified endpoint.
+
+Then, set the `NEXT_PUBLIC_COMPASS_ENDPOINT` environment variable to the desired path in the `.env.development` file:
+```
+NEXT_PUBLIC_COMPASS_ENDPOINT=/conversation_sandbox
+```

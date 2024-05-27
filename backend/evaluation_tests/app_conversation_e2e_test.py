@@ -5,7 +5,7 @@ import pytest
 
 from app.agent.agent_types import AgentOutput, AgentInput
 from app.conversation_memory.conversation_memory_types import ConversationContext
-from app.server import welcome, get_conversation_context
+from app.server import conversation, get_conversation_context
 from common_libs.llm.models_utils import LLMConfig, MEDIUM_TEMPERATURE_GENERATION_CONFIG
 from evaluation_tests.conversation_libs.conversation_test_function import conversation_test_function, \
     EvaluationTestCase, LLMSimulatedUser, ConversationTestConfig
@@ -36,7 +36,7 @@ class _AppChatExecutor:
         """
         Executes the application chat route
         """
-        return (await welcome(user_input=agent_input.message, session_id=self._session_id)).last
+        return (await conversation(user_input=agent_input.message, session_id=self._session_id)).last
 
 
 class _AppGetConversationContextExecutor:
