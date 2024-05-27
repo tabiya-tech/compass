@@ -14,8 +14,8 @@ class GeminiGenerativeLLM(BasicLLM):
     """
 
     def __init__(self, *,
-            system_instructions: list[str] | str | None = None,
-            config: LLMConfig = LLMConfig()):
+                 system_instructions: list[str] | str | None = None,
+                 config: LLMConfig = LLMConfig()):
         super().__init__(config=config)
         self._model = GenerativeModel(model_name=config.model_name,
                                       system_instruction=system_instructions,
@@ -27,7 +27,7 @@ class GeminiGenerativeLLM(BasicLLM):
 
     async def internal_generate_content(self, llm_input: LLMInput | str) -> LLMResponse:
         contents = llm_input if type(llm_input) == str else [
-                Content(role=turn.role, parts=[Part.from_text(turn.content)]) for turn in llm_input.turns]
+            Content(role=turn.role, parts=[Part.from_text(turn.content)]) for turn in llm_input.turns]
         response = await self._model.generate_content_async(contents=contents)
         return LLMResponse(text=response.text,
                            prompt_token_count=response.usage_metadata.prompt_token_count,
@@ -48,7 +48,7 @@ class PalmTextGenerativeLLM(BasicLLM):
 
     async def internal_generate_content(self, llm_input: LLMInput | str) -> LLMResponse:
         contents = llm_input if type(llm_input) == str else "Current conversation:\n" + "\n".join(
-                [f"{turn.role}: {turn.content}" for turn in llm_input.turns])
+            [f"{turn.role}: {turn.content}" for turn in llm_input.turns])
         prompt = contents
         if self._system_instructions:
             prompt = self._system_instructions + "\n" + contents
