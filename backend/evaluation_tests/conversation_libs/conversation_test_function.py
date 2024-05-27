@@ -8,8 +8,8 @@ from tqdm import tqdm
 
 from app.conversation_memory.save_conversation_context import save_conversation_context_to_json, \
     save_conversation_context_to_markdown
-from common_libs.llm.models_utils import LLMConfig, LLMInput
 from common_libs.llm.chat_models import GeminiChatLLM
+from common_libs.llm.models_utils import LLMConfig, LLMInput, MEDIUM_TEMPERATURE_GENERATION_CONFIG
 from evaluation_tests.conversation_libs import conversation_generator
 from evaluation_tests.conversation_libs.agent_executors import ExecuteAgentCallable, CheckAgentFinishedCallable, \
     ExecuteSimulatedUserCallable, GetConversationContextCallable
@@ -125,7 +125,8 @@ class LLMSimulatedUser:
     """
 
     def __init__(self, *, system_instructions: str, llm_input: LLMInput | None = None,
-                 llm_config: LLMConfig = LLMConfig()):
+                 llm_config: LLMConfig = LLMConfig(
+                     generation_config=MEDIUM_TEMPERATURE_GENERATION_CONFIG)):
         """
         :param system_instructions: The system instructions to be used by the simulated user.
         :param llm_input: An optional LLM input to be used by the simulated user.
