@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.llm_agent_director import LLMAgentDirector
+from app.agent.welcome_agent import WelcomeAgent
 from app.conversation_memory.conversation_memory_manager import ConversationContext, ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
@@ -68,11 +69,11 @@ class ConversationResponse(BaseModel):
 
 
 @app.get(path="/conversation",
-         description="""Temporary route used to interact with the conversation agent.""", )
-async def welcome(user_input: str, clear_memory: bool = False, filter_pii: bool = True,
-                  session_id: int = 1):
+         description="""The main conversation route used to interact with the agent.""", )
+async def conversation(user_input: str, clear_memory: bool = False, filter_pii: bool = True,
+                       session_id: int = 1):
     """
-    Endpoint responsible for managing the conversation with the user.
+    Endpoint for conducting the conversation with the agent.
     """
     try:
         if clear_memory:
@@ -88,6 +89,48 @@ async def welcome(user_input: str, clear_memory: bool = False, filter_pii: bool 
 
         # Handle the user input
         agent_output = await agent_director.execute(AgentInput(message=user_input))
+        context = await conversation_memory_manager.get_conversation_context()
+        response = ConversationResponse(last=agent_output, conversation_context=context)
+
+        # save the state, before responding to the user
+        await application_state_manager.save_state(session_id, state)
+        return response
+    except Exception as e:  # pylint: disable=broad-except
+        # this is the main entry point, so we need to catch all exceptions
+        logger.exception(e)
+        return {"error": "oops! something went wrong!"}
+
+
+@app.get(path="/conversation_sandbox",
+         description="""Temporary route used to interact with the conversation agent.""", )
+async def _test_conversation(user_input: str, clear_memory: bool = False, filter_pii: bool = False,
+                             session_id: int = 1):
+    """
+    As a developer, you can use this endpoint to test the conversation agent with any user input.
+    You can adjust the front-end to use this endpoint for testing locally an agent in a configurable way.
+    """
+    try:
+        if clear_memory:
+            await application_state_manager.delete_state(session_id)
+            return {"msg": f"Memory cleared for session {session_id}!"}
+        if filter_pii:
+            user_input = await sensitive_filter.obfuscate(user_input)
+
+        # set the state of the conversation memory manager
+        state = await application_state_manager.get_state(session_id)
+        conversation_memory_manager.set_state(state.conversation_memory_manager_state)
+
+        # ##################### ADD YOUR AGENT HERE ######################
+        # Initialize the agent you want to use for the evaluation^
+        agent = WelcomeAgent()
+        # ################################################################
+
+        # handle the user input
+        context = await conversation_memory_manager.get_conversation_context()
+        agent_output = await agent.execute(user_input=AgentInput(message=user_input), context=context)
+        await conversation_memory_manager.update_history(AgentInput(message=user_input), agent_output)
+
+        # get the context again after updating the history
         context = await conversation_memory_manager.get_conversation_context()
         response = ConversationResponse(last=agent_output, conversation_context=context)
 
