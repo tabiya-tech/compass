@@ -65,7 +65,7 @@ class Retry(Generic[T]):
 
     @staticmethod
     async def call_with_exponential_backoff(callback: Callable[[], Coroutine[Any, Any, T]],
-                                                  retry_config: RetryConfig = DEFAULT_RETRY_CONFIG) -> T:
+                                            retry_config: RetryConfig = DEFAULT_RETRY_CONFIG) -> T:
         """ Call `callback()` with exponential backoff and jitter."""
         wait_time = retry_config.initial_wait
         for attempt in range(retry_config.max_retries):
@@ -94,60 +94,60 @@ class Retry(Generic[T]):
 
 
 DEFAULT_GENERATION_CONFIG = {
-        "temperature": 0.1,
-        "candidate_count": 1,
+    "temperature": 0.1,
+    "candidate_count": 1,
 }
 
 ZERO_TEMPERATURE_GENERATION_CONFIG = {
-        "temperature": 0.0,
-        "candidate_count":1,
+    "temperature": 0.0,
+    "candidate_count": 1,
 }
 
 LOW_TEMPERATURE_GENERATION_CONFIG = {
-        "temperature":0.1,
-        "candidate_count":1
+    "temperature": 0.1,
+    "candidate_count": 1
 }
 
 MEDIUM_TEMPERATURE_GENERATION_CONFIG = {
-        "temperature":0.5,
-        "candidate_count":1,
+    "temperature": 0.5,
+    "candidate_count": 1,
 }
 
 HIGH_TEMPERATURE_GENERATION_CONFIG = {
-        "temperature":1.0,
-        "candidate_count":1,
+    "temperature": 1.0,
+    "candidate_count": 1,
 }
 
 CRAZY_TEMPERATURE_GENERATION_CONFIG = {
-        "temperature":2.0,
-        "candidate_count":1,
+    "temperature": 2.0,
+    "candidate_count": 1,
 }
 
 # Todo(apostolos): Specify the safety settings after we have some relevant tests
 DEFAULT_SAFETY_SETTINGS: frozenset[SafetySetting] = frozenset([
-        SafetySetting(category=SafetySetting.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-                      threshold=SafetySetting.HarmBlockThreshold.BLOCK_ONLY_HIGH),
-        SafetySetting(category=HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-                      threshold=HarmBlockThreshold.BLOCK_ONLY_HIGH),
-        SafetySetting(category=HarmCategory.HARM_CATEGORY_HARASSMENT,
-                      threshold=HarmBlockThreshold.BLOCK_ONLY_HIGH),
-        SafetySetting(category=HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-                      threshold=HarmBlockThreshold.BLOCK_ONLY_HIGH),
-        SafetySetting(category=HarmCategory.HARM_CATEGORY_UNSPECIFIED,
-                      threshold=HarmBlockThreshold.BLOCK_ONLY_HIGH),
+    SafetySetting(category=SafetySetting.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                  threshold=SafetySetting.HarmBlockThreshold.BLOCK_ONLY_HIGH),
+    SafetySetting(category=HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                  threshold=HarmBlockThreshold.BLOCK_ONLY_HIGH),
+    SafetySetting(category=HarmCategory.HARM_CATEGORY_HARASSMENT,
+                  threshold=HarmBlockThreshold.BLOCK_ONLY_HIGH),
+    SafetySetting(category=HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                  threshold=HarmBlockThreshold.BLOCK_ONLY_HIGH),
+    SafetySetting(category=HarmCategory.HARM_CATEGORY_UNSPECIFIED,
+                  threshold=HarmBlockThreshold.BLOCK_ONLY_HIGH),
 ])
 
 SAFETY_OFF_SETTINGS: frozenset[SafetySetting] = frozenset([
-        SafetySetting(category=HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-                      threshold=HarmBlockThreshold.BLOCK_NONE),
-        SafetySetting(category=HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-                      threshold=HarmBlockThreshold.BLOCK_NONE),
-        SafetySetting(category=HarmCategory.HARM_CATEGORY_HARASSMENT,
-                      threshold=HarmBlockThreshold.BLOCK_NONE),
-        SafetySetting(category=HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-                      threshold=HarmBlockThreshold.BLOCK_NONE),
-        SafetySetting(category=HarmCategory.HARM_CATEGORY_UNSPECIFIED,
-                      threshold=HarmBlockThreshold.BLOCK_NONE),
+    SafetySetting(category=HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                  threshold=HarmBlockThreshold.BLOCK_NONE),
+    SafetySetting(category=HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                  threshold=HarmBlockThreshold.BLOCK_NONE),
+    SafetySetting(category=HarmCategory.HARM_CATEGORY_HARASSMENT,
+                  threshold=HarmBlockThreshold.BLOCK_NONE),
+    SafetySetting(category=HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                  threshold=HarmBlockThreshold.BLOCK_NONE),
+    SafetySetting(category=HarmCategory.HARM_CATEGORY_UNSPECIFIED,
+                  threshold=HarmBlockThreshold.BLOCK_NONE),
 ])
 
 
@@ -200,7 +200,6 @@ class LLMResponse(BaseModel):
     """The number of tokens in the response."""
 
 
-
 class LLM(ABC):
     """
     An abstract class for a LLM.
@@ -245,4 +244,3 @@ class BasicLLM(LLM):
 
     async def internal_generate_content(self, llm_input: LLMInput | str) -> LLMResponse:
         raise NotImplementedError()
-
