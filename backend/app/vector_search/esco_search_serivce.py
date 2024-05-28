@@ -69,7 +69,7 @@ T = TypeVar('T')
 
 class AbstractEscoSearchService(SimilaritySearchService[T]):
     """
-    An abstract class to perform similarity searches on esco entities.
+    An abstract class to perform similarity searches on esco entities using a MongoDB database.
     It uses the MongoDBAtlasVectorSearch to perform the similarity search.
     The embedding model used is provided in the config along with the collection name,
     index name, and other parameters.
