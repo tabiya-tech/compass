@@ -1,8 +1,9 @@
 import logging
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer
 from pydantic import BaseModel
 
 from app.agent.agent_types import AgentInput, AgentOutput
@@ -30,6 +31,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+############################################
+# Security Definitions
+############################################
+# Used for adding the security definitions for OpenAPI docs
+# auto_error=False means an error won't be thrown if the "Authorization: Bearer"
+# header is missing. It should be set to True when the APIs will be used from
+# the UI and the API Gateway is running in front of this service.
+http_bearer = HTTPBearer(auto_error=False, scheme_name="JWT_auth")
 
 ############################################
 # Add version routes
@@ -69,9 +79,10 @@ class ConversationResponse(BaseModel):
 
 
 @app.get(path="/conversation",
-         description="""The main conversation route used to interact with the agent.""", )
+         description="""The main conversation route used to interact with the agent.""",
+         operation_id="conversation")
 async def conversation(user_input: str, clear_memory: bool = False, filter_pii: bool = True,
-                       session_id: int = 1):
+                       session_id: int = 1, authorization = Depends(http_bearer)):
     """
     Endpoint for conducting the conversation with the agent.
     """
@@ -102,9 +113,10 @@ async def conversation(user_input: str, clear_memory: bool = False, filter_pii: 
 
 
 @app.get(path="/conversation_sandbox",
-         description="""Temporary route used to interact with the conversation agent.""", )
+         description="""Temporary route used to interact with the conversation agent.""",
+         operation_id="conversation_sandbox")
 async def _test_conversation(user_input: str, clear_memory: bool = False, filter_pii: bool = False,
-                             session_id: int = 1):
+                             session_id: int = 1, authorization = Depends(http_bearer)):
     """
     As a developer, you can use this endpoint to test the conversation agent with any user input.
     You can adjust the front-end to use this endpoint for testing locally an agent in a configurable way.
@@ -144,8 +156,9 @@ async def _test_conversation(user_input: str, clear_memory: bool = False, filter
 
 
 @app.get(path="/conversation_context",
-         description="""Temporary route used to get the conversation context of a user.""", )
-async def get_conversation_context(session_id: int):
+         description="""Temporary route used to get the conversation context of a user.""",
+         operation_id="conversation_context")
+async def get_conversation_context(session_id: int, authorization = Depends(http_bearer)):
     """
     Get the conversation context of a user.
     """
