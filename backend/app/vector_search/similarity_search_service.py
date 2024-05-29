@@ -6,7 +6,8 @@ T = TypeVar("T")
 
 class SimilaritySearchService(ABC, Generic[T]):
     """
-    An abstract class for a search service that uses a vector store to perform similarity searches.
+    An abstract class for a search service to perform similarity searches (see
+    https://en.wikipedia.org/wiki/Similarity_search).
     """
 
     @abstractmethod
