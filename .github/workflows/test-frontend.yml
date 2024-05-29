@@ -6,7 +6,7 @@ on:
         required: true
         type: string
 jobs:
-    lint:
+    poc-lint:
         runs-on: ubuntu-latest
         environment: ${{ inputs.target-environment }}
         steps:
@@ -21,6 +21,58 @@ jobs:
           - name: Install node packages
             run: yarn install
             working-directory: frontend
-          - name: Lint
+          - name: Lint POC Frontend
             run: yarn run lint
             working-directory: frontend
+    test:
+        runs-on: ubuntu-latest
+        environment: ${{ inputs.target-environment }}
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v4
+          - name: Use Node.js 20.x
+            uses: actions/setup-node@v4
+            with:
+              node-version: 20.x
+              cache: 'yarn'
+              cache-dependency-path: frontend-new/yarn.lock
+          - name: Install node packages
+            run: yarn install
+            working-directory: frontend-new
+          - name: Lint new Frontend
+            run: yarn run lint
+            working-directory: frontend-new
+          - name: Test new Frontend
+            run: yarn run test
+            working-directory: frontend-new
+          - name: Archive code coverage results
+            uses: actions/upload-artifact@v4
+            with:
+              name: frontend.lcov.info
+              path: frontend-new/coverage/lcov.info
+              retention-days: 1
+    accessibility:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+        - name: Use Node.js 20.x
+          uses: actions/setup-node@v4
+          with:
+            node-version: 20.x
+            cache: 'yarn'
+            cache-dependency-path: frontend-new/yarn.lock
+        - name: Cache Playwright browsers
+          uses: actions/cache@v3
+          with:
+            path: ~/.cache/ms-playwright
+            key: playwright-browsers-${{ runner.os }}-v1
+            restore-keys: playwright-browsers-${{ runner.os }}-
+        - name: Install dependencies
+          run: yarn install
+          working-directory: frontend-new
+        - name: Accessibility Tests
+          run: |
+            npx playwright install
+            yarn run build-storybook && yarn run test:accessibility
+          working-directory: frontend-new
