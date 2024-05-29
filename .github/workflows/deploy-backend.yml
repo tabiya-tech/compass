@@ -42,7 +42,7 @@ jobs:
           cache: 'pip' # caching pip dependencies
       - name: Install python packages
         run: pip install -r requirements.txt
-        working-directory: iac/backend
+        working-directory: iac
       - name: Setup google-cloud-auth
         uses: google-github-actions/auth@v2.1.2
         with:
