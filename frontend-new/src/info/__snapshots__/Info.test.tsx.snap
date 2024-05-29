@@ -1,0 +1,83 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Testing Info component it should show frontend info successfully 1`] = `
+<div
+  data-testid="version-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
+  style="width: 100%; height: 100%;"
+>
+  <div
+    class="MuiBox-root css-1tnxox3"
+  >
+    <div
+      class="MuiBox-root css-1spy2rg"
+      data-testid="version-frontend-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
+    >
+      <h6
+        class="MuiTypography-root MuiTypography-h6 css-yyitj4-MuiTypography-root"
+      >
+        Version
+      </h6>
+      <div
+        class="MuiBox-root css-1ed85oj"
+      >
+        <div
+          class="MuiBox-root css-1dhnkf1"
+        >
+          <h6
+            class="MuiTypography-root MuiTypography-h6 css-yyitj4-MuiTypography-root"
+          >
+            Date
+          </h6>
+          <p
+            class="MuiTypography-root MuiTypography-body1 css-3ahvbo-MuiTypography-root"
+          >
+            fooFrontend
+          </p>
+        </div>
+        <div
+          class="MuiBox-root css-1dhnkf1"
+        >
+          <h6
+            class="MuiTypography-root MuiTypography-h6 css-yyitj4-MuiTypography-root"
+          >
+            Branch
+          </h6>
+          <p
+            class="MuiTypography-root MuiTypography-body1 css-3ahvbo-MuiTypography-root"
+          >
+            barFrontend
+          </p>
+        </div>
+        <div
+          class="MuiBox-root css-1dhnkf1"
+        >
+          <h6
+            class="MuiTypography-root MuiTypography-h6 css-yyitj4-MuiTypography-root"
+          >
+            Build Number
+          </h6>
+          <p
+            class="MuiTypography-root MuiTypography-body1 css-3ahvbo-MuiTypography-root"
+          >
+            bazFrontend
+          </p>
+        </div>
+        <div
+          class="MuiBox-root css-1dhnkf1"
+        >
+          <h6
+            class="MuiTypography-root MuiTypography-h6 css-yyitj4-MuiTypography-root"
+          >
+            GIT SHA
+          </h6>
+          <p
+            class="MuiTypography-root MuiTypography-body1 css-3ahvbo-MuiTypography-root"
+          >
+            gooFrontend
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
