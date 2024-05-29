@@ -1,10 +1,13 @@
-from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from abc import abstractmethod
+from typing import TypeVar
 
 from langchain_core.embeddings.embeddings import Embeddings
 from langchain_mongodb import MongoDBAtlasVectorSearch
 from pydantic import BaseModel, constr, validator
 from pymongo.database import Database
+
+from app.vector_search.esco_entities import OccupationEntity, SkillEntity
+from app.vector_search.similarity_search_service import SimilaritySearchService
 
 
 class VectorSearchConfig(BaseModel):
@@ -64,9 +67,9 @@ class VectorSearchConfig(BaseModel):
 T = TypeVar('T')
 
 
-class AbstractEscoSearchService(ABC, Generic[T]):
+class AbstractEscoSearchService(SimilaritySearchService[T]):
     """
-    An abstract class to perform similarity searches on esco entities.
+    An abstract class to perform similarity searches on esco entities using a MongoDB database.
     It uses the MongoDBAtlasVectorSearch to perform the similarity search.
     The embedding model used is provided in the config along with the collection name,
     index name, and other parameters.
@@ -95,16 +98,16 @@ class AbstractEscoSearchService(ABC, Generic[T]):
         )
 
     @abstractmethod
-    def to_entity(self, doc: dict) -> T:
+    def _to_entity(self, doc: dict) -> T:
         """
         Convert a Document object to a T object.
         This method should be implemented by the subclass.
-        :param doc:
-        :return:
+        :param doc: The Document object to convert.
+        :return: An object of type T.
         """
         raise NotImplementedError
 
-    async def search(self, query, k=5) -> list[T]:
+    async def search(self, query: str, k: int = 5) -> list[T]:
         """
         Perform a similarity search on the vector store.
         See MongoDBAtlasVectorSearch.asimilarity_search for more information.
@@ -114,12 +117,10 @@ class AbstractEscoSearchService(ABC, Generic[T]):
         The ``embed_query`` method of the embedding model is used to generate the embedding.
         :param k: The number of results to return.
         """
-        # Perform the search
         results = await self.store.asimilarity_search_with_score(query, k=k)
-        # Extract the metadata from the documents
-        return [self.to_entity(document.metadata) for document, _ in results]
+        return [self._to_entity(document.metadata) for document, _ in results]
 
-    async def search_mmr(self, query, k=5, fetch_k=100, lambda_mult=0.5) -> list[T]:
+    async def search_mmr(self, query: str, k: int = 5, fetch_k: int = 100, lambda_mult: float = 0.5) -> list[T]:
         """
         Perform a Maximal Marginal Relevance search on the vector store.
         See MongoDBAtlasVectorSearch.amax_marginal_relevance_search for more information.
@@ -132,4 +133,44 @@ class AbstractEscoSearchService(ABC, Generic[T]):
         :param lambda_mult: The lambda multiplier for the MMR algorythm.
         """
         results = await self.store.amax_marginal_relevance_search(query, k=k, fetch_k=fetch_k, lambda_mult=lambda_mult)
-        return [self.to_entity(document.metadata) for document in results]
+        return [self._to_entity(document.metadata) for document in results]
+
+
+class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
+    """
+    A service class to perform similarity searches on the occupations' collection.
+    """
+
+    def _to_entity(self, doc: dict) -> OccupationEntity:
+        """
+        Convert a Document object to an OccupationEntity object.
+        """
+
+        return OccupationEntity(
+            id=str(doc.get("_id", "")),
+            UUID=doc.get("UUID", ""),
+            code=doc.get("code", ""),
+            preferredLabel=doc.get("preferredLabel", ""),
+            description=doc.get("description", ""),
+            altLabels=doc.get("altLabels", []),
+        )
+
+
+class SkillSearchService(AbstractEscoSearchService[SkillEntity]):
+    """
+    A service class to perform similarity searches on the skills' collection.
+    """
+
+    def _to_entity(self, doc: dict) -> SkillEntity:
+        """
+        Convert a Document object to a SkillEntity object.
+        """
+
+        return SkillEntity(
+            id=str(doc.get("_id", "")),
+            UUID=doc.get("UUID", ""),
+            preferredLabel=doc.get("preferredLabel", ""),
+            description=doc.get("description", ""),
+            altLabels=doc.get("altLabels", []),
+            skillType=doc.get("skillType", ""),
+        )

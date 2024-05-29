@@ -2,11 +2,11 @@ import os
 
 from fastapi import FastAPI
 
+from app.vector_search.esco_search_serivce import SkillSearchService
 from esco_search.database_service import DatabaseService
 from esco_search.embeddings.google_gecko.google_gecko import GoogleGeckoConfig, GoogleGecko
 from esco_search.occupation_search.occupation_search_routes import add_occupation_search_routes
 from esco_search.skill_search.skill_search_routes import add_skills_search_routes
-from esco_search.skill_search.skill_search_service import SkillSearchService
 
 
 def add_esco_search_routes(app: FastAPI) -> SkillSearchService:
@@ -17,7 +17,7 @@ def add_esco_search_routes(app: FastAPI) -> SkillSearchService:
     # Embedder route
     google_gecko_config = GoogleGeckoConfig(
         version="latest",
-        location="europe-west3",
+        location="us-central1",
         max_retries=3
     )
 
