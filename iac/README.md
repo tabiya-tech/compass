@@ -11,7 +11,7 @@ https://www.pulumi.com/ai/answers/15xDqB9xyu6D17Kb297Dfi/configuring-google-clou
 
 
 ## Installation
-In the root directory of the project, run the following commands:
+In the iac directory, run the following commands:
 
 ```shell
 # create a virtual environment
