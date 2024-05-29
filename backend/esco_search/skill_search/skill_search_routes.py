@@ -5,8 +5,8 @@ from langchain_core.embeddings.embeddings import Embeddings
 from pydantic.main import BaseModel
 from pymongo.database import Database
 
-from esco_search.esco_abs_search_service import VectorSearchConfig
-from esco_search.skill_search.skill_search_service import SkillSearchService, SkillEntity
+from app.vector_search.esco_entities import SkillEntity
+from app.vector_search.esco_search_serivce import SkillSearchService, VectorSearchConfig
 
 
 def add_skills_search_routes(app: FastAPI, db: Database, embedder: Embeddings) -> SkillSearchService:
