@@ -23,11 +23,13 @@ def _create_bucket(project: str, bucket_name: str, location: str, dependencies: 
                               ),
                               opts=pulumi.ResourceOptions(depends_on=dependencies))
 
-def _upload_directory_to_bucket(bucket_name: str, source_dir: str, dependencies: list[pulumi.Resource]) -> None:
+def _upload_directory_to_bucket(bucket_name: str, source_dir: str, prefix: str, dependencies: list[pulumi.Resource]) -> None:
     for root, _, files in os.walk(source_dir):
         for file in files:
             file_path = os.path.join(root, file)
             relative_path = os.path.relpath(file_path, source_dir)
+            if prefix:
+                relative_path = os.path.join(prefix, relative_path)
             mime_type, _ = mimetypes.guess_type(file_path)
             print(f"Uploading {file_path} as {relative_path} with MIME type {mime_type}")
             gcp.storage.BucketObject(
@@ -57,9 +59,13 @@ def deploy_frontend(project: str, location: str):
     bucket = _create_bucket(project, bucket_name, location, services)
 
     frontend_out_dir = "../../frontend/out"
-    _upload_directory_to_bucket(bucket.name, frontend_out_dir, [bucket])
+    _upload_directory_to_bucket(bucket.name, frontend_out_dir, "", [bucket])
+
+    new_ui_build_dir = "../../frontend-new/build"
+    _upload_directory_to_bucket(bucket.name, new_ui_build_dir, "newUI", [bucket])
 
     _make_bucket_public(bucket.name, [bucket])
 
     pulumi.export('bucket_name', bucket.name)
     pulumi.export('bucket_url', pulumi.Output.concat("http://", bucket.name, ".storage.googleapis.com/index.html"))
+    pulumi.export('new_ui_url', pulumi.Output.concat("http://", bucket.name, ".storage.googleapis.com/newUI/index.html"))

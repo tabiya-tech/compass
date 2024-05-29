@@ -1,5 +1,6 @@
 # Compass Frontend
 
+The deployed version can be found here: [Frontend URL](http://compass-frontend-dev-418218-6a5e4c1.storage.googleapis.com/newUI/index.html)
 ## Prerequisites
 
 To develop the frontend locally, you must install the following:
