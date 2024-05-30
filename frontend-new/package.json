@@ -2,6 +2,7 @@
   "name": "frontend-new",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/newUI",
   "devDependencies": {
     "@chromatic-com/storybook": "^1.4.0",
     "@faker-js/faker": "^8.4.1",
