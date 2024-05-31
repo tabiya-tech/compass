@@ -83,8 +83,6 @@ jobs:
       - name: Build new frontend
         run: yarn run build
         working-directory: frontend-new
-        env:
-          PUBLIC_URL: "/newUI"
       - name: Archive new frontend build
         uses: actions/upload-artifact@v4
         with:
