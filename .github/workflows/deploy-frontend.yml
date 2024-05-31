@@ -60,7 +60,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: poc-frontend-build
-          path: frontend/.next
+          path: frontend/out
           retention-days: 1
       - name: Set Version Info for new frontend
         id: setNewVersionInfo
@@ -87,7 +87,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: new-frontend-build
-          path: frontend-new/public
+          path: frontend-new/build
           retention-days: 1
       - name: Setup python
         uses: actions/setup-python@v5
