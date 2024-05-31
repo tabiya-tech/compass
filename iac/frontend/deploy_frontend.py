@@ -53,11 +53,11 @@ def _create_bucket(basic_config: ProjectBaseConfig, bucket_name: str,
 
 def _upload_directory_to_bucket(basic_config: ProjectBaseConfig, bucket_name: pulumi.Output, source_dir: str,
                                 target_dir: str,
-                                dependencies: list[pulumi.Resource]) -> None:
+                                do_not_cache: list[str] = [],
+                                dependencies: list[pulumi.Resource] = []) -> None:
     print(f"Uploading files from folder {os.path.abspath(source_dir)}")
     for root, _, files in os.walk(source_dir):  # source_dir can be relative or absolute
         for file in files:
-
             absolute_file_path = os.path.abspath(os.path.join(root, file))
             file_path = os.path.relpath(absolute_file_path, source_dir)
             mime_type, _ = mimetypes.guess_type(absolute_file_path)
@@ -72,6 +72,7 @@ def _upload_directory_to_bucket(basic_config: ProjectBaseConfig, bucket_name: pu
                 bucket=bucket_name,
                 source=pulumi.FileAsset(absolute_file_path),
                 content_type=mime_type,  # Ensure correct MIME type
+                cache_control="no-store" if file_path in do_not_cache else None,  # Do not cache index.html
                 opts=pulumi.ResourceOptions(depends_on=dependencies)
             )
 
@@ -96,10 +97,12 @@ def deploy_frontend(project: str, location: str, environment: str):
     bucket = _create_bucket(basic_config, "frontend", services)
 
     frontend_out_dir = "../../frontend/out"
-    _upload_directory_to_bucket(basic_config, bucket.name, frontend_out_dir, "", [bucket])
+    _upload_directory_to_bucket(basic_config, bucket.name, frontend_out_dir, "",
+                                ["index.html"], [bucket])
 
     new_ui_build_dir = "../../frontend-new/build"
-    _upload_directory_to_bucket(basic_config, bucket.name, new_ui_build_dir, "new-ui", [bucket])
+    _upload_directory_to_bucket(basic_config, bucket.name, new_ui_build_dir, "new-ui",
+                                ["index.html", "data/version.json"], [bucket])
 
     _make_bucket_public(basic_config, bucket.name, [bucket])
 
