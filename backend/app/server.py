@@ -108,7 +108,7 @@ async def conversation(user_input: str, clear_memory: bool = False, filter_pii: 
 @app.get(path="/conversation_sandbox",
          description="""Temporary route used to interact with the conversation agent.""", )
 async def _test_conversation(user_input: str, clear_memory: bool = False, filter_pii: bool = False,
-                             session_id: int = 1, only_reply: bool = True):
+                             session_id: int = 1, only_reply: bool = False):
     """
     As a developer, you can use this endpoint to test the conversation agent with any user input.
     You can adjust the front-end to use this endpoint for testing locally an agent in a configurable way.
@@ -138,8 +138,9 @@ async def _test_conversation(user_input: str, clear_memory: bool = False, filter
 
         # get the context again after updating the history
         context = await conversation_memory_manager.get_conversation_context()
-        response_raw = ConversationResponse(last=agent_output, conversation_context=context)
-        response = "Agent response: " + response_raw.last.message_for_user
+        response = ConversationResponse(last=agent_output, conversation_context=context)
+        if only_reply:
+            response = "Agent response: " + response.last.message_for_user
 
         # save the state, before responding to the user
         await application_state_manager.save_state(session_id, state)
