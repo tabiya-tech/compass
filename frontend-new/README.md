@@ -88,6 +88,23 @@ Failing to comply to WAG 2.0 A rules will generate errors.
 Failing to comply to WAG 2.0 AA, WAG 2.0 AAA, or Best Practice Rules will only generate warnings.
 
 See [UI Guidlines](ui-guidelines.md#accessibility) for more information on accessibility.
+
+## End-to-End Testing
+
+The application uses [Playwright](https://playwright.dev/) to run end-to-end tests. The tests can be run in the terminal or in the browser.
+
+To run Tests in the terminal execute the following command:
+
+```shell
+yarn test:e2e
+```
+
+To run Tests in the browser execute the following command:
+
+```shell
+yarn test:e2e:ui
+```
+
 ## Building
 
 To build the React application, execute the following command:

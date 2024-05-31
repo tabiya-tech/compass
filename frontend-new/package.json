@@ -6,6 +6,7 @@
   "devDependencies": {
     "@chromatic-com/storybook": "^1.4.0",
     "@faker-js/faker": "^8.4.1",
+    "@playwright/test": "^1.44.1",
     "@storybook/addon-a11y": "^8.1.3",
     "@storybook/addon-essentials": "^8.1.3",
     "@storybook/addon-interactions": "^8.1.3",
@@ -69,11 +70,13 @@
     "build": "react-scripts build",
     "test": "react-scripts test --coverage --watchAll=false",
     "eject": "react-scripts eject",
-    "test:smoke": "jest --config jest.smoke.config.js --runInBand test/smoke/*.test.ts",
+    "test:smoke": "jest --config jest.smoke.config.js --runInBand tests/smoke/*.test.ts",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test-storybook": "test-storybook",
     "test:accessibility": "npx concurrently -k -s first -n 'STORYBOOK,TEST' -c 'magenta,blue' 'npx http-server storybook-static --port 6007 --silent' 'npx wait-on http://127.0.0.1:6007 && yarn test-storybook --url http://127.0.0.1:6007'",
+    "test:e2e": "playwright test tests/e2e/*.spec.ts",
+    "test:e2e-ui": "playwright test --ui tests/e2e/*.spec.ts",
     "format:check": "prettier --check src/",
     "format": "prettier --write src/"
   },
