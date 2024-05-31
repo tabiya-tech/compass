@@ -6,8 +6,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from app.agent.agent_types import AgentInput, AgentOutput
-from app.agent.llm_agent_director import LLMAgentDirector
-from app.agent.welcome_agent import WelcomeAgent
+from app.agent.agent_director import AgentDirector
+from app.agent.welcome_agent import WelcomeAgent # for sandbox testing
+from app.agent.experiences_explorer_agent import ExperiencesExplorerAgent # for sandbox testing
 from app.conversation_memory.conversation_memory_manager import ConversationContext, ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
@@ -57,7 +58,9 @@ sensitive_filter.add_filter_routes(app)
 # TODO: use the Fast api dependency injection pattern to inject them into the routes
 application_state_manager = ApplicationStateManager(InMemoryApplicationStateStore())
 conversation_memory_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
-agent_director = LLMAgentDirector(conversation_memory_manager)
+# TODO: Use the LLM AgentDirector instead the oldschool AgentDirector
+# The oldschool AgentDirector is used temporarily during the early stages of Milestone1 (for enabling faster development of the agents)
+agent_director = AgentDirector(conversation_memory_manager)
 
 
 class ConversationResponse(BaseModel):
@@ -85,6 +88,7 @@ async def conversation(user_input: str, clear_memory: bool = False, filter_pii: 
         # set the state of the agent director and the conversation memory manager
         state = await application_state_manager.get_state(session_id)
         agent_director.set_state(state.agent_director_state)
+        agent_director.get_experiences_explorer_agent().set_state(state.experiences_explorer_state)
         conversation_memory_manager.set_state(state.conversation_memory_manager_state)
 
         # Handle the user input
@@ -104,7 +108,7 @@ async def conversation(user_input: str, clear_memory: bool = False, filter_pii: 
 @app.get(path="/conversation_sandbox",
          description="""Temporary route used to interact with the conversation agent.""", )
 async def _test_conversation(user_input: str, clear_memory: bool = False, filter_pii: bool = False,
-                             session_id: int = 1):
+                             session_id: int = 1, only_reply: bool = True):
     """
     As a developer, you can use this endpoint to test the conversation agent with any user input.
     You can adjust the front-end to use this endpoint for testing locally an agent in a configurable way.
@@ -121,8 +125,10 @@ async def _test_conversation(user_input: str, clear_memory: bool = False, filter
         conversation_memory_manager.set_state(state.conversation_memory_manager_state)
 
         # ##################### ADD YOUR AGENT HERE ######################
-        # Initialize the agent you want to use for the evaluation^
-        agent = WelcomeAgent()
+        # Initialize the agent you want to use for the evaluation
+        agent = ExperiencesExplorerAgent()
+        logger.debug("ExperinecesExplorerAgent initialized for sandbox testing")
+        agent.set_state(state.experiences_explorer_state)
         # ################################################################
 
         # handle the user input
@@ -132,7 +138,8 @@ async def _test_conversation(user_input: str, clear_memory: bool = False, filter
 
         # get the context again after updating the history
         context = await conversation_memory_manager.get_conversation_context()
-        response = ConversationResponse(last=agent_output, conversation_context=context)
+        response_raw = ConversationResponse(last=agent_output, conversation_context=context)
+        response = "Agent response: " + response_raw.last.message_for_user
 
         # save the state, before responding to the user
         await application_state_manager.save_state(session_id, state)
