@@ -3,15 +3,16 @@
 ## Prerequisites
 
 - A recent version of [git](https://git-scm.com/) (e.g. ^2.37 )
-- [Python 3.8 or higher](https://www.python.org/downloads/)
-- [Poerty](https://python-poetry.org/)
-  > Note: to install Poetry run `apt-get install python3-poetry` (assuming: you have a debian-like os)
+- [Python 3.11 or higher](https://www.python.org/downloads/)
+- [Poerty 1.8 or higher](https://python-poetry.org/)
+  > Note: to install Poetry consult the [Poetry documentation](https://python-poetry.org/docs/#installing-with-the-official-installer) 
+  > 
   > Note: When you install Poetry, you may encounter an `SSL: CERTIFICATE_VERIFY_FAILED`.
   See [here](https://github.com/python-poetry/install.python-poetry.org/issues/112#issuecomment-1555925766) on how to
   resolve the issue.
 - [Google Cloud SDK (gcloud)](https://cloud.google.com/sdk/docs/install)
 - Access to a MongoDB Atlas instance with the ESCO data.
-- optionally, [Docker](https://www.docker.com/) if you want to build and run the backend in a container.
+- Optionally, [Docker](https://www.docker.com/) if you want to build and run the backend in a container.
 
 ## Installation
 
@@ -52,7 +53,7 @@ poetry install --sync
 
 ## Running the code locally
 
-The backend is a FastAPI, LangServe app that serves the Compass API.
+The backend is a FastAPI app that serves the Compass API.
 
 When running the code locally, the backend will use the credentials and the project set in the Google Cloud SDK.
 
@@ -70,15 +71,26 @@ The principal used to run the backend should have the following roles:
 
 There are [multiple ways you can authenticate with Google Cloud](https://cloud.google.com/sdk/gcloud/reference/auth).
 
-As a best practice, we recommend using service account impersonation when running the code locally.
+Using the [service account credentials, authenticate with Google Cloud](https://cloud.google.com/sdk/gcloud/reference/auth/activate-service-account) is the way preferred when running in a CI/CD environment and the most convenient method for running pulumi locally. 
 
-Alternatively, you can use the service account key file to authenticate with Google Cloud and run the backend.
-This is useful when you want to run the backend and at the same time use the Google Cloud SDK for other tasks (e.g.
-deploy the infrastructure).
+The best practice is to use [service account impersonation](#option-2-service-account-impersonation) when running the code locally, it can be more complex to opearate as it requires a more complex setup  and additionally the user is required to refresh the authentication token occasionally.
 
 Bellow you can find the steps to authenticate.
 
-#### Option 1: Service Account Impersonation
+#### Option 1: Authenticate via service account keys (preffered method)
+
+You can use the service account key file to authenticate with Google Cloud and run the backend.
+This is the most convenient way to run the backend locally, but it is less secure than service account impersonation. It
+is recommended to use this method for development purposes.
+
+> ATTENTION: The service account key file should be kept secure and not shared with others.
+> It should not be committed to the repository.
+>
+
+To authenticate with the service account key file, set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to the
+path of the service account key file and run the backend.
+
+#### Option 2: Service Account Impersonation
 
 Initially authenticate with your personal Google Cloud account:
 
@@ -111,7 +123,7 @@ gcloud config set project <PROJECT>
 Start the LangServe server with the following command:
 
 ```shell
-langchain serve --host 0.0.0.0 --port 8080
+python app/server.py
 ```
 
 > NOTE:
@@ -128,19 +140,6 @@ We also expose port 8080 with the `-p 8080:8080` option.
 docker run -v ~/.config/gcloud/:/root/.config/gcloud/ -e GCLOUD_PROJECT="$(gcloud config get project)" -p 8080:8080 compass-backend
 ```
 
-#### Option 2: Using Service Account Key File
-
-You can use the service account key file to authenticate with Google Cloud and run the backend.
-This is the most convenient way to run the backend locally, but it is less secure than service account impersonation. It
-is recommended to use this method only for development purposes.
-
-> ATTENTION: The service account key file should be kept secure and not shared with others.
-> It should not be committed to the repository.
->
-
-To authenticate with the service account key file, set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to the
-path of the service account key file and run the backend.
-
 ### Environment Variables & Configuration
 
 The backend uses the following environment variables:
@@ -148,7 +147,7 @@ The backend uses the following environment variables:
 - `GOOGLE_APPLICATION_CREDENTIALS`: The path to the service account key file.
 - `MONGODB_URI`: The URI of the MongoDB Atlas instance to use where the ESCO data is stored.
 - `VERTEX_API_REGION`: The region of the Vertex API to use.
-
+- `LOG_CONFIG_FILE`: See the [Logging](#logging) section for more information.
 The backend supports the use of a `.env` file to set the environment variables. Create a `.env` file in the root
 directory of the backend project and set the environment variables as follows:
 
@@ -157,13 +156,37 @@ directory of the backend project and set the environment variables as follows:
 GOOGLE_APPLICATION_CREDENTIALS=<PATH_TO_KEY_FILE>
 MONGODB_URI=<URI_TO_MONGODB>
 VERTEX_API_REGION=<REGION>
+LOG_CONFIG_FILE=<YAML_FILE>
 ```
 
 > ATTENTION: The .env file should be kept secure and not shared with others as it contains sensitive information.
 > It should not be committed to the repository.
 >
 
-### Building the Image locally
+### Logging
+
+The backend uses the Python logging module to log messages.
+
+By default, the backend will load the logger configuration from the [logging.cfg.yaml](app/logging.cfg.yaml) file in the `app/` directory.
+
+It is possible to override the logging configuration by setting the `LOG_CONFIG_FILE` environment variable to the path of the logging configuration file.
+
+For example for the local development environment, you can set the `LOG_CONFIG_FILE` environment variable to the path of the `logging.cfg.dev.yaml`
+
+```dotenv
+# .env file
+LOG_CONFIG_FILE=logging.cfg.dev.yaml
+```
+### Running the backend
+
+To run the backend, use the following command from the root directory of the backend project:
+
+```shell
+python server.py
+```
+
+### Running the backend with Docker
+#### Building the Image locally
 
 To build the image:
 
@@ -171,7 +194,7 @@ To build the image:
 docker build . -t compass-backend
 ```
 
-### Running the Image Locally
+#### Running the Image Locally
 
 To run the image, you'll need to mount a volume with the service account key and the supply an environment variables to
 the container:
@@ -191,28 +214,18 @@ named `credentials.json` is in a folder named `keys` in the root directory:
 MONGODB_URI=<URI_TO_MONGODB>
 GOOGLE_APPLICATION_CREDENTIALS=keys/credentials.json
 VERTEX_API_REGION=<REGION>
+LOG_CONFIG_FILE=logging.cfg.dev.yaml
 ```
 
 Run the image using the following command:
 
 ```shell
- docker run -v "$(pwd)/keys/credentials.json:/code/keys/credentials.json" --env-file .env compass-backend
+ docker run -v "$(pwd)/keys/credentials.json:/code/keys/credentials.json" -v "$(pwd)/logs/:/code/logs/" --env-file .env -p 8080:8080 compass-backend
 ```
 
-### Logging
+> Note: The `-v "$(pwd)/logs/:/code/logs/"` option is used to mount a volume to store the logs  specified in `logging.cfg.dev.yaml`
+>
 
-The backend uses the Python logging module to log messages.
-
-By default, the backend will load the logger configuration from the [logging.cfg.yaml](app/logging.cfg.yaml) file in the `app/` directory.
-
-It is possible to override the logging configuration by setting the `LOG_CONFIG_FILE` environment variable to the path of the logging configuration file.
-
-For example for the local development environment, you can set the `LOG_CONFIG_FILE` environment variable to the path of the `logging.cfg.dev.yaml`
-
-```dotenv
-# .env file
-LOG_CONFIG_FILE=logging.cfg.dev.yaml
-```
 
 ## Testing Locally
 
