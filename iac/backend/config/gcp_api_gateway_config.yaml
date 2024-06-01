@@ -58,3 +58,22 @@ paths:
           description: A successful response
           schema:
             type: string
+# For enabling the swagger ui docs endpoint
+  /docs:
+    get:
+      summary: Docs endpoint
+      operationId: api_docs
+      responses:
+        '200':
+          description: Docs page
+          schema:
+            type: string
+  /openapi.json:
+    get:
+      summary: OAS file
+      operationId: oas_file
+      responses:
+        '200':
+          description: OAS file
+          schema:
+            type: string
