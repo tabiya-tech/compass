@@ -39,12 +39,16 @@ class SimpleLLMAgent(Agent):
     def __init__(self, *, agent_type: AgentType, system_instructions: str,
             config: LLMConfig = LLMConfig(generation_config=LOW_TEMPERATURE_GENERATION_CONFIG)):
         self._agent_type = agent_type
+        self._llm_config = config
         self._system_instructions = system_instructions
         # We should pass the system instructions to the LLM
         # Passing the system instructions as a user part manually in the content,
         # does not seem to work well with the model as it does follow the instructions correctly.
         self._llm = GeminiGenerativeLLM(system_instructions=system_instructions, config=config)
         self._logger = logging.getLogger(self.__class__.__name__)
+
+    def get_llm_config(self):
+        return self._llm_config
 
     async def execute(self, user_input: AgentInput, context: ConversationContext) -> AgentOutput:
         agent_start_time = time.time()
