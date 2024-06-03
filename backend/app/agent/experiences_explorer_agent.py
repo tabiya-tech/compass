@@ -82,7 +82,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         if s.conversation_phase == ConversationPhase.INIT:
             use_llm_for_reply = False
             reply_raw = \
-                "[META: Hello, I am the ExperinecesExplorerAgent.] In this session, we will explore your past livelihood experiences," \
+                "[META: ExperinecesExplorerAgent active] In this session, we will explore your past livelihood experiences," \
                 " e.g. formal work experiences other similar hassles that kept you busy in the last years. Tell me about your most recent work experience."
             # Advance the conversation
             s.conversation_phase = ConversationPhase.WARMUP

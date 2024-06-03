@@ -140,7 +140,7 @@ async def _test_conversation(user_input: str, clear_memory: bool = False, filter
         context = await conversation_memory_manager.get_conversation_context()
         response = ConversationResponse(last=agent_output, conversation_context=context)
         if only_reply:
-            response = "Agent response: " + response.last.message_for_user
+            response = response.last.message_for_user
 
         # save the state, before responding to the user
         await application_state_manager.save_state(session_id, state)
