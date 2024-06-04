@@ -1273,6 +1273,41 @@ tenacity = ">=8.1.0,<9.0.0"
 extended-testing = ["jinja2 (>=3,<4)"]
 
 [[package]]
+name = "langchain-google-vertexai"
+version = "1.0.4"
+description = "An integration package connecting Google VertexAI and LangChain"
+optional = false
+python-versions = "<4.0,>=3.8.1"
+files = [
+    {file = "langchain_google_vertexai-1.0.4-py3-none-any.whl", hash = "sha256:f9d217df2d5cfafb2e551ddd5f1c43611222f542ee0df0cc3b5faed82e657ee3"},
+    {file = "langchain_google_vertexai-1.0.4.tar.gz", hash = "sha256:bb2d2e93cc2896b9bdc96789c2df247f6392184dffc0c3dddc06889f2b530465"},
+]
+
+[package.dependencies]
+google-cloud-aiplatform = ">=1.47.0,<2.0.0"
+google-cloud-storage = ">=2.14.0,<3.0.0"
+langchain-core = ">=0.1.42,<0.3"
+
+[package.extras]
+anthropic = ["anthropic[vertexai] (>=0.23.0,<1)"]
+
+[[package]]
+name = "langchain-mongodb"
+version = "0.1.5"
+description = "An integration package connecting MongoDB and LangChain"
+optional = false
+python-versions = "<4.0,>=3.8.1"
+files = [
+    {file = "langchain_mongodb-0.1.5-py3-none-any.whl", hash = "sha256:04c3a6993cad7b81dcc2a0854c2ef60605031b1f8464140dc098071472c5aa1a"},
+    {file = "langchain_mongodb-0.1.5.tar.gz", hash = "sha256:ed7bf55a8e495f9576441e4f2d639cc72d947097f90746baa8161714f26b8f54"},
+]
+
+[package.dependencies]
+langchain-core = ">=0.1.46,<0.3"
+numpy = ">=1,<2"
+pymongo = ">=4.6.1,<5.0"
+
+[[package]]
 name = "langserve"
 version = "0.2.1"
 description = ""
@@ -3042,4 +3077,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "ca5f2e6469ac20d1f245aba21025fa50897877a37ae1b7313a83e3eb4054d881"
+content-hash = "a1c61018c2cd562677b87f0504efba871bdb0ce06c274069ab91bd526cae087b"
