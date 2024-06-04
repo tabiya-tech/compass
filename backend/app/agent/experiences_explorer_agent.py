@@ -105,11 +105,15 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
     def _handle_dive_in_phase(self, user_input_msg: str) -> str:
         # TODO: COM-237 Let the LLM handle this phase. The dive-in will be done by a separate agent.
         s = self._state
+        dive_in_done = False
         if user_input_msg != "No":
-            # Process the reply
+            # Process the reply and keep asking followups
             return "Thank you. Is there anything else want to add to this experience? Just say 'No' when you are done."
         else:
-            # Mark this DIVE_IN as done
+            dive_in_done = True
+
+        if dive_in_done:
+            # Mark this experience as: dive in = done
             old_exp: ExperienceMetadata = s.experiences[s.current_experience]
             old_exp.done_with_deep_dive = True
             s.deep_dive_count += 1
@@ -118,12 +122,12 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
             if len(left_to_process) > 0:
                 s.current_experience = left_to_process[0]
                 exp: ExperienceMetadata = s.experiences[s.current_experience]
-                # Advance the conversation
+                # Advance the conversation: dive in again into the next eperience
                 s.conversation_phase = ConversationPhase.DIVE_IN
                 return "Let's move on to the other experinece you mentioned (we already covererd {a} out of {b}). ".format(a=s.deep_dive_count, b=len(s.experiences)) + \
                             "You said you had an experience as a " + exp.experience_descr + ". Tell me more about it. When did it happen?"
             else:
-                # Advance the conversation
+                # Advance the conversation: wrap up
                 s.conversation_phase = ConversationPhase.WRAPUP
                 return "We are done with exploring your skills. Any last remarks that you wnat to share with me?"
                 s.conversation_phase = ConversationPhase.WRAPUP
