@@ -72,7 +72,6 @@ def _precision_at_k(prediction: List[List[str]], true: List[str], k: Optional[in
     Calculates the average precision at k considering for each prediction the number of correct retrieved nodes
     divided by the number of total retrieved nodes.
     """
-    assert len(prediction) == len(true)
     total_precision = 0
     for pred_list, true_val in zip(prediction, true):
         if k:
@@ -89,7 +88,6 @@ def _recall_at_k(prediction: List[List[str]], true: List[str], k: Optional[int] 
     Calculates the average recall at k considering for each prediction the number of correct retrieved nodes
     divided by the number of total correct nodes.
     """
-    assert len(prediction) == len(true)
     total_recall = 0
     for pred_list, true_val in zip(prediction, true):
         if k:
