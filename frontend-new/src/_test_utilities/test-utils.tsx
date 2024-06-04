@@ -1,12 +1,19 @@
 // Based on https://testing-library.com/docs/react-testing-library/setup/
-
 import React, { ReactElement } from "react";
 import { render, renderHook, RenderHookOptions, RenderOptions } from "@testing-library/react";
 import { ThemeProvider } from "@mui/material";
 import applicationTheme, { ThemeMode } from "src/theme/applicationTheme/applicationTheme";
+import { AuthProvider } from "src/auth/AuthProvider";
+
+// Import the Firebase mock utilities
+import "src/_test_utilities/firebaseMock";
 
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
-  return <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>{children}</ThemeProvider>;
+  return (
+    <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
+      <AuthProvider>{children}</AuthProvider>
+    </ThemeProvider>
+  );
 };
 
 const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) =>

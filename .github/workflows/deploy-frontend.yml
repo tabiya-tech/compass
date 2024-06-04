@@ -8,6 +8,12 @@ on:
       backend-url:
         required: true
         type: string
+      identity_platform_client_api_key:
+        required: true
+        type: string
+      identity_platform_client_firebase_auth_domain:
+        required: true
+        type: string
     outputs:
       version-info:
         description: 'The frontend version info'
@@ -102,6 +108,16 @@ jobs:
         uses: google-github-actions/auth@v2.1.2
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+      - name: Build frontend-new env.js file
+        # we are basically creating a js file with the passed env variables
+        # that can be executed in the client browser when the js file is loaded
+        run: |
+          touch frontend-new/build/data/env.js
+          echo "window.tabiyaConfig = {" > frontend-new/build/data/env.js
+          echo "\"FIREBASE_API_KEY\": btoa(\"${{ inputs.identity_platform_client_api_key }}\")," >> frontend-new/build/data/env.js
+          echo "\"FIREBASE_AUTH_DOMAIN\": btoa(\"${{ inputs.identity_platform_client_firebase_auth_domain }}\")," >> frontend-new/build/data/env.js
+          echo "};" >> frontend-new/build/data/env.js
+          cat frontend-new/build/data/env.js
       - name: Deploy both frontends
         id: pulumi
         uses: pulumi/actions@v5

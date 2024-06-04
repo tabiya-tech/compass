@@ -60,6 +60,8 @@ jobs:
     with:
       target-environment: dev
       backend-url: ${{ needs.setup-env.outputs.backend-url }}
+      identity_platform_client_api_key: ${{ needs.deploy-auth.outputs.identity_platform_client_api_key }}
+      identity_platform_client_firebase_auth_domain: ${{ needs.deploy-auth.outputs.identity_platform_client_firebase_auth_domain }}
   deploy-common:
     # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
     if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))

@@ -316,6 +316,15 @@ export const applicationTheme = (theme: ThemeMode) => {
           },
         },
       },
+      MuiLink: {
+        styleOverrides: {
+          root: {
+            color: activePalette.text!!.textAccent,
+            textDecoration: "none",
+            fontStyle: "italic",
+          },
+        },
+      },
     },
   };
   return createTheme(activeTheme);

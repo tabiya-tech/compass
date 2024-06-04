@@ -1,4 +1,5 @@
 import { CssBaseline, ThemeProvider } from "@mui/material";
+import { BrowserRouter as Router } from "react-router-dom";
 import { applicationTheme, ThemeMode } from "../src/theme/applicationTheme/applicationTheme";
 // Load fonts
 // The application font are typically loaded in the index.html, index.css or index.tsx file
@@ -16,6 +17,7 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 */
 import type { Preview } from "@storybook/react";
+import { AuthProvider } from "../src/auth/AuthProvider";
 
 const preview: Preview = {
   parameters: {
@@ -48,13 +50,15 @@ export default preview;
 
 export const decorators = [
   (Story) => (
-    <>
-      <CssBaseline />
-      <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
-        <div style={{ height: "100vh" }}>
-          <Story />
-        </div>
-      </ThemeProvider>
-    </>
+    <Router>
+      <AuthProvider>
+        <CssBaseline />
+        <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
+          <div style={{ height: "100vh" }}>
+            <Story />
+          </div>
+        </ThemeProvider>
+      </AuthProvider>
+    </Router>
   ),
 ];

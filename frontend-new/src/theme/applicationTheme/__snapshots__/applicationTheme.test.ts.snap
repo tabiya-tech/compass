@@ -90,6 +90,15 @@ Object {
         },
       },
     },
+    "MuiLink": Object {
+      "styleOverrides": Object {
+        "root": Object {
+          "color": "#265EA7",
+          "fontStyle": "italic",
+          "textDecoration": "none",
+        },
+      },
+    },
     "MuiSvgIcon": Object {
       "styleOverrides": Object {
         "fontSizeLarge": Object {
@@ -785,6 +794,15 @@ Object {
           "::placeholder": Object {
             "color": "#43474E",
           },
+        },
+      },
+    },
+    "MuiLink": Object {
+      "styleOverrides": Object {
+        "root": Object {
+          "color": "#265EA7",
+          "fontStyle": "italic",
+          "textDecoration": "none",
         },
       },
     },

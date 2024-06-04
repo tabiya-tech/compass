@@ -63,12 +63,19 @@ def _setup_identity_platform(*, basic_config: ProjectBaseConfig, frontend_domain
         mfa=gcp.identityplatform.ConfigMfaArgs(
             state="DISABLED",
         ),
+        sign_in=gcp.identityplatform.ConfigSignInArgs(
+            allow_duplicate_emails=False,
+            email=gcp.identityplatform.ConfigSignInEmailArgs(
+                enabled=True,
+                password_required=True,
+            ),
+        ),
         project=basic_config.project,
         opts=pulumi.ResourceOptions(depends_on=dependencies)
     )
 
-    pulumi.export("identity_platform_client_api_key", default.client.api_key)
-    pulumi.export("identity_platform_client_firebase_subdomain", default.client.firebase_subdomain)
+    pulumi.export("identity_platform_client_api_key", default.client.api_key.unsecret(default.client.api_key))
+    pulumi.export("identity_platform_client_firebase_subdomain", default.client.firebase_subdomain.unsecret(default.client.firebase_subdomain))
 
     # https://compass-dev-425015.firebaseapp.com/__/auth/handler
     # Enable Google Authentication
@@ -81,7 +88,6 @@ def _setup_identity_platform(*, basic_config: ProjectBaseConfig, frontend_domain
         project=basic_config.project,
         opts=pulumi.ResourceOptions(depends_on=dependencies + [default]),
     )
-
 
 def deploy_auth(project: str, location: str, environment: str, frontend_domain: str):
     _basic_config = ProjectBaseConfig(project=project, location=location, environment=environment)

@@ -51,6 +51,15 @@ export interface InfoProps {
   sha: string;
 }
 
+const ApplicationInfoMain = (props: { versions: InfoProps[] }) => {
+  const theme = useTheme();
+  return (
+    <Box display="flex" flexDirection="column" gap={theme.tabiyaSpacing.xl}>
+      <VersionContainer title="Version" info={props.versions[0]} dataTestId={DATA_TEST_ID.VERSION_FRONTEND_ROOT} />
+    </Box>
+  );
+};
+
 const Info = () => {
   const [versions, setVersions] = useState<InfoProps[]>([]);
 
@@ -92,12 +101,3 @@ const Info = () => {
 };
 
 export default Info;
-
-const ApplicationInfoMain = (props: { versions: InfoProps[] }) => {
-  const theme = useTheme();
-  return (
-    <Box display="flex" flexDirection="column" gap={theme.tabiyaSpacing.xl}>
-      <VersionContainer title="Version" info={props.versions[0]} dataTestId={DATA_TEST_ID.VERSION_FRONTEND_ROOT} />
-    </Box>
-  );
-};
