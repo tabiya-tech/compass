@@ -63,6 +63,71 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
     Agent that explores the skills of the user and provides a response based on the task
     """
 
+    def _handle_init_phase(self, user_input_msg: str) -> str:
+        # Advance the conversation
+        self._state.conversation_phase = ConversationPhase.WARMUP
+        # In this version, we do a hardcoded reply (agnostic of the imput message)
+        return \
+            "[META: ExperinecesExplorerAgent active] In this session, we will explore your past livelihood experiences," \
+            " e.g. formal work experiences other similar hassles that kept you busy in the last years. Tell me about your most recent work experience."
+
+    def _handle_warmup_phase(self, user_input_msg: str) -> str:
+        # Handle the WARMUP phase of the conversation.
+        # Returns the reply to be sent to the user
+        s = self._state
+        # Process the user's reply
+        logger.debug("Phase1. The user said: {msg}".format(msg=user_input_msg))
+        # Use the LLM to find out what was the experience the user is talking about
+        # (e.g. "baker" or "looking after sick family member")
+        # In this version, we handle only one experience per user message
+        # TODO: COM-262 handle multiple expereineces (P3)
+        experinece_descr = self._extract_experience_from_user_reply(user_input_msg)
+        experience_id = self._sanitized_experience_descr(experinece_descr, s.experiences)
+
+        s.current_experience = experience_id
+        s.experiences[experience_id] = ExperienceMetadata(
+            experience_descr=experinece_descr, done_with_deep_dive=False)
+        # In this version we have the exit criteria of a fixed 3 experiences.
+        # TODO: COM-263 handle a more dynamic exit criteria from the WARMUP phase (P1)
+        if len(s.experiences) >= 3:
+            # Start over in iterating the experiences (order is underfined, in this version)
+            s.current_experience = list(s.experiences.keys())[0]
+            exp: ExperienceMetadata = s.experiences[s.current_experience]
+            # Advance the conversation
+            s.conversation_phase = ConversationPhase.DIVE_IN
+            return \
+              "Thank you for telling me about your experiences. I think I got the initial picture. " \
+              "Now let's understand them in more detail, one by one. " \
+              "You said you had an experience as a " + exp.experience_descr + ". Tell me more about it. When did it happen?"
+        else:
+            return "Great response, I will process that... Tell me about another relevant experience, which you had before this one"
+
+    def _handle_dive_in_phase(self, user_input_msg: str) -> str:
+        # TODO: COM-237 Let the LLM handle this phase. The dive-in will be done by a separate agent.
+        s = self._state
+        if user_input_msg != "No":
+            # Process the reply
+            return "Thank you. Is there anything else want to add to this experience? Just say 'No' when you are done."
+        else:
+            # Mark this DIVE_IN as done
+            old_exp: ExperienceMetadata = s.experiences[s.current_experience]
+            old_exp.done_with_deep_dive = True
+            s.deep_dive_count += 1
+            # Continue with iterating the experiences (order is underfined, in this version)
+            left_to_process = [k for (k, v) in s.experiences.items() if not v.done_with_deep_dive]
+            if len(left_to_process) > 0:
+                s.current_experience = left_to_process[0]
+                exp: ExperienceMetadata = s.experiences[s.current_experience]
+                # Advance the conversation
+                s.conversation_phase = ConversationPhase.DIVE_IN
+                return "Let's move on to the other experinece you mentioned (we already covererd {a} out of {b}). ".format(a=s.deep_dive_count, b=len(s.experiences)) + \
+                            "You said you had an experience as a " + exp.experience_descr + ". Tell me more about it. When did it happen?"
+            else:
+                # Advance the conversation
+                s.conversation_phase = ConversationPhase.WRAPUP
+                return "We are done with exploring your skills. Any last remarks that you wnat to share with me?"
+                s.conversation_phase = ConversationPhase.WRAPUP
+
     async def execute(self, user_input: AgentInput,
         context: ConversationContext) -> AgentOutput:
         if self._state is None:
@@ -75,78 +140,23 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
 
         # Some of the logic will be implemented 'manually' and some is done through an LLM.
         # In future version of the logic, more and more logic will be handled by the LLM.
-        use_llm_for_reply = True
+        use_llm_for_reply = False
         finished = False
 
         # Phase1 - first round
         if s.conversation_phase == ConversationPhase.INIT:
-            use_llm_for_reply = False
-            reply_raw = \
-                "[META: ExperinecesExplorerAgent active] In this session, we will explore your past livelihood experiences," \
-                " e.g. formal work experiences other similar hassles that kept you busy in the last years. Tell me about your most recent work experience."
-            # Advance the conversation
-            s.conversation_phase = ConversationPhase.WARMUP
+            reply_raw = self._handle_init_phase(user_input.message)
 
         # Phase1 - followup rounds, until we have a minimum 3 occupations on the radar.
         elif s.conversation_phase == ConversationPhase.WARMUP:
-            use_llm_for_reply = False
-            # Process the user's reply
-            logger.debug("Phase1. The user said: {msg}".format(msg=user_input.message))
-            # Use the LLM to find out what was the experience the user is talking about
-            # (e.g. "baker" or "looking after sick family member")
-            # In this version, we handle only one experience per user message
-            # TODO: COM-262 handle multiple expereineces (P3)
-            experinece_descr = self._extract_experience_from_user_reply(user_input.message)
-            experience_id = self._sanitized_experience_descr(experinece_descr, s.experiences)
-
-            s.current_experience = experience_id
-            s.experiences[experience_id] = ExperienceMetadata(
-                  experience_descr=experinece_descr, done_with_deep_dive=False)
-            # In this version we have the exit criteria of a fixed 3 experiences.
-            # TODO: COM-263 handle a more dynamic exit criteria from the WARMUP phase (P1)
-            if len(s.experiences) >= 3:
-                # Start over in iterating the experiences (order is underfined, in this version)
-                s.current_experience = list(s.experiences.keys())[0]
-                exp: ExperienceMetadata = s.experiences[s.current_experience]
-                # Advance the conversation
-                s.conversation_phase = ConversationPhase.DIVE_IN
-                reply_raw = \
-                    "Thank you for telling me about your experiences. I think I got the initial picture. " \
-                    "Now let's understand them in more detail, one by one. " \
-                    "You said you had an experience as a " + exp.experience_descr + ". Tell me more about it. When did it happen?"
-            else:
-                reply_raw = "Great response, I will process that... Tell me about another relevant experience, which you had before this one"
+            reply_raw = self._handle_warmup_phase(user_input.message)
 
         # Phase2 - innerloop - outerloop
         elif s.conversation_phase == ConversationPhase.DIVE_IN:
-            use_llm_for_reply = False
-            # TODO: COM-237 Let the LLM handle this. The dive-in will be done by a separate agent.
-            if user_input.message != "No":
-                # Process the reply
-                reply_raw = "Thank you. Is there anything else want to add to this experience? Just say 'No' when you are done."
-            else:
-                # Mark this DIVE_IN as done
-                old_exp: ExperienceMetadata = s.experiences[s.current_experience]
-                old_exp.done_with_deep_dive = True
-                s.deep_dive_count += 1
-                # Continue with iterating the experiences (order is underfined, in this version)
-                left_to_process = [k for (k, v) in s.experiences.items() if not v.done_with_deep_dive]
-                if len(left_to_process) > 0:
-                    s.current_experience = left_to_process[0]
-                    exp: ExperienceMetadata = s.experiences[s.current_experience]
-                    # Advance the conversation
-                    s.conversation_phase = ConversationPhase.DIVE_IN
-                    reply_raw = "Let's move on to the other experinece you mentioned (we already covererd {a} out of {b}). ".format(a=s.deep_dive_count, b=len(s.experiences)) + \
-                                "You said you had an experience as a " + exp.experience_descr + ". Tell me more about it. When did it happen?"
-                else:
-                    # Advance the conversation
-                    s.conversation_phase = ConversationPhase.WRAPUP
-                    reply_raw = "We are done with exploring your skills. Any last remarks that you wnat to share with me?"
-                    s.conversation_phase = ConversationPhase.WRAPUP
+            reply_raw = self._handle_dive_in_phase(user_input.message)
 
         # Phase3
         elif s.conversation_phase == ConversationPhase.WRAPUP:
-            use_llm_for_reply = False
             reply_raw = "[META: Under development] I am still under development. In the future, I will share my summarized findings here. Bye!"
             finished = True
 
