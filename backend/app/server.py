@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from app.agent.agent_types import AgentInput, AgentOutput
-from app.agent.agent_director import AgentDirector
+from app.agent.llm_agent_director import LLMAgentDirector
 from app.agent.welcome_agent import WelcomeAgent # for sandbox testing
 from app.agent.experiences_explorer_agent import ExperiencesExplorerAgent # for sandbox testing
 from app.conversation_memory.conversation_memory_manager import ConversationContext, ConversationMemoryManager
@@ -58,9 +58,7 @@ sensitive_filter.add_filter_routes(app)
 # TODO: use the Fast api dependency injection pattern to inject them into the routes
 application_state_manager = ApplicationStateManager(InMemoryApplicationStateStore())
 conversation_memory_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
-# TODO: Use the LLM AgentDirector instead the oldschool AgentDirector
-# The oldschool AgentDirector is used temporarily during the early stages of Milestone1 (for enabling faster development of the agents)
-agent_director = AgentDirector(conversation_memory_manager)
+agent_director = LLMAgentDirector(conversation_memory_manager)
 
 
 class ConversationResponse(BaseModel):
