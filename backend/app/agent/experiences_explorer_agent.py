@@ -95,7 +95,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
             # Use the LLM to find out what was the experience the user is talking about
             # (e.g. "baker" or "looking after sick family member")
             # In this version, we handle only one experience per user message
-            # TODO: create JIRA ticket to handle multiple expereineces (P3)
+            # TODO: COM-262 handle multiple expereineces (P3)
             experinece_descr = self._extract_experience_from_user_reply(user_input.message)
             experience_id = self._sanitized_experience_descr(experinece_descr, s.experiences)
 
@@ -103,7 +103,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
             s.experiences[experience_id] = ExperienceMetadata(
                   experience_descr=experinece_descr, done_with_deep_dive=False)
             # In this version we have the exit criteria of a fixed 3 experiences.
-            # TODO: create JIRA ticket to handle a more dynamic exit criteria from the WARMUP phase (P1)
+            # TODO: COM-263 handle a more dynamic exit criteria from the WARMUP phase (P1)
             if len(s.experiences) >= 3:
                 # Start over in iterating the experiences (order is underfined, in this version)
                 s.current_experience = list(s.experiences.keys())[0]
@@ -120,8 +120,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         # Phase2 - innerloop - outerloop
         elif s.conversation_phase == ConversationPhase.DIVE_IN:
             use_llm_for_reply = False
-            # TODO: Let the LLM handle this.
-            # TODO: Create a JIRA ticket to create a prompt for this (P0)
+            # TODO: COM-237 Let the LLM handle this. The dive-in will be done by a separate agent.
             if user_input.message != "No":
                 # Process the reply
                 reply_raw = "Thank you. Is there anything else want to add to this experience? Just say 'No' when you are done."
@@ -153,7 +152,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
 
         # In this version the conversation structure is: 1. WARMUP, 2. INNER_LOOP/OUTER_LOOP back and forth.
         # In the future we wish to skip or reduce the WARMUP phase and dive in as to the details of the experience as soon as we got it from the user.
-        # TODO: Cretae JIRA ticket for redesigning the conversation structure - reducing/eliminating the WARMUP phase (P1)
+        # TODO: COM-264 redesign the conversation structure - reducing/eliminating the WARMUP phase (P1)
 
         # Send the prepared reply to the user
         if use_llm_for_reply:
@@ -175,9 +174,9 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         while experience_descr in experiences:
              experience_descr = experience_descr + "-x"
         return  experience_descr
+
     def _extract_experience_from_user_reply(self, user_str: str) -> str:
-        # TODO: use the LLM to find out what was the experience the user is talking about
-        # TODO: Cretae JIRA ticket for this (P0)
+        # TODO: COM-245 use the LLM to find out what was the experience the user is talking about
         # Corner cutting: For now, assume the LLM got us: "baker"
         return "baker"
 
@@ -212,8 +211,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
               """))
       experience = "[EXPERIENCE]"
 
-      # system instructions for the DIVE_IN
-      si_dive_in_template = dedent("""\
+      system_instructions_template = dedent("""\
                   You are a job counselor. We have been introduced and we talked a bit about my past experience as: {experience}.
                   Your your is to ask me more details about this experience.
                   Your goal is to help me identify what skills I gained during my experience that would help me find a good job in the future.
@@ -227,7 +225,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
                   {finish_instructions}             
                   """)
 
-      system_instructions = si_dive_in_template.format(
+      system_instructions = system_instructions_template.format(
           experience=experience,
           response_part=response_part,
           finish_instructions=finish_instructions)
