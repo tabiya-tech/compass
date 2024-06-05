@@ -251,6 +251,7 @@ def _setup_api_gateway(
     )
 
     pulumi.export("apigateway_url", apigw_gateway.default_hostname.apply(lambda hostname: f"https://{hostname}"))
+    pulumi.export("apigateway_id", apigw_gateway.gateway_id)
     return apigw_gateway
 
 
@@ -388,6 +389,74 @@ def _deploy_cloud_run_service(
     pulumi.export("cloud_run_url", service.uri)
     return service
 
+def _setup_loadbalancer(*, basic_config: ProjectBaseConfig, api_gateway: pulumi.Resource):
+    ipaddress = gcp.compute.GlobalAddress(
+        _get_resource_name(environment=basic_config.environment, resource="lb-ipaddress"),
+        project=basic_config.project,
+        address_type="EXTERNAL",
+        opts=pulumi.ResourceOptions(depends_on=[api_gateway]),
+    )
+
+    pulumi.export("loadbalancer_ip_address", ipaddress.address)
+
+    endpoint_group = gcp.compute.RegionNetworkEndpointGroup(
+        _get_resource_name(environment=basic_config.environment, resource="lb-endpoint-group"),
+        network_endpoint_type="SERVERLESS",
+        project=basic_config.project,
+        region=basic_config.location,
+        opts=pulumi.ResourceOptions(depends_on=[api_gateway]),
+        serverless_deployment=gcp.compute.RegionNetworkEndpointGroupServerlessDeploymentArgs(
+            platform="apigateway.googleapis.com",
+            resource=api_gateway.gateway_id
+        )
+    )
+
+    service = gcp.compute.BackendService(
+        _get_resource_name(environment=basic_config.environment, resource="lb-backendservice"),
+        project=basic_config.project,
+        connection_draining_timeout_sec=10,
+        protocol="HTTP",
+        load_balancing_scheme="EXTERNAL_MANAGED",
+        backends=[gcp.compute.BackendServiceBackendArgs(group=endpoint_group.id)],
+        log_config=gcp.compute.BackendServiceLogConfigArgs(enable=True),
+        opts=pulumi.ResourceOptions(depends_on=[endpoint_group]),
+    )
+
+    http_url_map = gcp.compute.URLMap(
+        _get_resource_name(environment=basic_config.environment, resource="http-urlmap"),
+        project=basic_config.project,
+        default_service=service.id,
+        host_rules=[
+            gcp.compute.URLMapHostRuleArgs(
+                hosts=[api_gateway.default_hostname],
+                path_matcher="all-paths",
+            )
+        ],
+        path_matchers=[gcp.compute.URLMapPathMatcherArgs(
+            name="all-paths",
+            default_service=service.id,
+            path_rules=[gcp.compute.URLMapPathMatcherPathRuleArgs(paths=["/*"], service=service.id)],
+        )],
+        opts=pulumi.ResourceOptions(depends_on=[service]),
+    )
+    
+    http_proxy = gcp.compute.TargetHttpProxy(
+        _get_resource_name(environment=basic_config.environment, resource="http-proxy"),
+        project=basic_config.project,
+        url_map=http_url_map.id,
+        opts=pulumi.ResourceOptions(depends_on=[http_url_map]),
+    )
+
+    http_forwarding_rule = gcp.compute.GlobalForwardingRule(
+        _get_resource_name(environment=basic_config.environment, resource="http-global-fw-rule"),
+        project=basic_config.project,
+        target=http_proxy.id,
+        ip_address=ipaddress.address,
+        port_range=80,
+        load_balancing_scheme="EXTERNAL_MANAGED",
+        opts=pulumi.ResourceOptions(depends_on=[http_proxy]),
+    )
+
 
 # export a function build_and_push_image that will be used in the main pulumi program
 def deploy_backend(project: str, location: str, environment: str):
@@ -428,3 +497,5 @@ def deploy_backend(project: str, location: str, environment: str):
     _setup_identity_platform(
         basic_config=basic_config, gateway_uri=api_gateway.default_hostname, dependencies=services + [api_gateway]
     )
+
+    _setup_loadbalancer(basic_config=basic_config, api_gateway=api_gateway)
