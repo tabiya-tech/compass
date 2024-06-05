@@ -121,7 +121,8 @@ async def _get_predictions(embedding_service: EmbeddingService, queries: List[st
     return predictions
 
 
-async def get_metrics(embedding_service: EmbeddingService, ground_truth: List[str], synthetic_queries: List[str], k: int = 10):
+async def get_metrics(embedding_service: EmbeddingService, ground_truth: List[str], synthetic_queries: List[str],
+                      k: int = 10):
     """ Evaluate the embeddings using ground truth data and synthetic queries."""
     predictions = await _get_predictions(embedding_service, synthetic_queries, k)
     ground_truth = [[elem] for elem in ground_truth]
@@ -138,4 +139,5 @@ if __name__ == "__main__":
     # TODO: Update this script to also evaluate the skill embeddings.
     dataset = load_dataset(OCCUPATION_REPO_ID, data_files=[OCCUPATION_FILENAME],
                            token=os.environ["HF_ACCESS_TOKEN"]).get("train")
-    asyncio.get_event_loop().run_until_complete(get_metrics(gecko_embedding_service, dataset["esco_code"], dataset["synthetic_query"]))
+    asyncio.get_event_loop().run_until_complete(get_metrics(gecko_embedding_service, dataset["esco_code"],
+                                                            dataset["synthetic_query"]))
