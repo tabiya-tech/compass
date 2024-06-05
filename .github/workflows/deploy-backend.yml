@@ -42,6 +42,9 @@ jobs:
       - name: Install python packages
         run: pip install -r requirements.txt
         working-directory: iac
+      - name: Export OpenAPI2 docs (required in Pulumi)
+        run: bash export_openapi2.sh
+        working-directory: backend/scripts
       - name: Setup google-cloud-auth
         uses: google-github-actions/auth@v2.1.2
         with:
