@@ -7,7 +7,7 @@ from datasets import load_dataset
 from motor.motor_asyncio import AsyncIOMotorClient
 from tqdm import tqdm
 
-from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
+from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService, EmbeddingService
 from app.vector_search.esco_entities import OccupationEntity
 
 OCCUPATION_REPO_ID = "tabiya/hahu_test"
@@ -19,11 +19,12 @@ EMBEDDINGS_COLLECTION = 'occupationmodelsembeddings'
 
 # TODO: Use the OccupationSearchService to perform a similarity search on the vector store, once we migrate everything
 #  to the new structure.
-async def search(query: str, k: int = 5) -> List[OccupationEntity]:
+async def _search(embedding_service: EmbeddingService, query: str, k: int = 5) -> List[OccupationEntity]:
     """
         Perform a similarity search on the vector store. It uses the default similarity search set during vector
         generation.
 
+        :param embedding_service: The embedding service to use to embed the queries.
         :param query: The query to search for.
         :param k: The number of results to return.
         :return: A list of T objects.
@@ -67,32 +68,32 @@ def _to_entity(doc: dict) -> OccupationEntity:
     )
 
 
-def _precision_at_k(prediction: List[List[str]], true: List[str], k: Optional[int] = None):
+def _precision_at_k(prediction: List[List[str]], true: List[List[str]], k: Optional[int] = None):
     """
     Calculates the average precision at k considering for each prediction the number of correct retrieved nodes
     divided by the number of total retrieved nodes.
     """
     total_precision = 0
-    for pred_list, true_val in zip(prediction, true):
+    for pred_list, true_vals in zip(prediction, true):
         if k:
             pred_list = pred_list[:k]
             tot_samples = k
         else:
             tot_samples = len(pred_list)
-        total_precision += (true_val in pred_list) / tot_samples
+        total_precision += len(set(true_vals).intersection(set(pred_list))) / tot_samples
     return total_precision / len(true)
 
 
-def _recall_at_k(prediction: List[List[str]], true: List[str], k: Optional[int] = None):
+def _recall_at_k(prediction: List[List[str]], true: List[List[str]], k: Optional[int] = None):
     """
     Calculates the average recall at k considering for each prediction the number of correct retrieved nodes
     divided by the number of total correct nodes.
     """
     total_recall = 0
-    for pred_list, true_val in zip(prediction, true):
+    for pred_list, true_vals in zip(prediction, true):
         if k:
             pred_list = pred_list[:k]
-        total_recall += (true_val in pred_list)
+        total_recall += len(set(true_vals).intersection(set(pred_list))) / len(true_vals)
     return total_recall / len(true)
 
 
@@ -101,7 +102,7 @@ def _get_f_score(prec: float, rec: float) -> float:
     return 2 * prec * rec / (prec + rec)
 
 
-def _get_all_metrics(predictions: List[List[str]], true_values: List[str], k: Optional[int] = None) \
+def _get_all_metrics(predictions: List[List[str]], true_values: List[List[str]], k: Optional[int] = None) \
         -> Tuple[float, float, float]:
     """Get recall, precision and F-score for given results and true values. """
     rec_at_k = _recall_at_k(predictions, true_values, k)
@@ -110,19 +111,20 @@ def _get_all_metrics(predictions: List[List[str]], true_values: List[str], k: Op
     return rec_at_k, prec_at_k, f_score_at_k
 
 
-async def _get_predictions(queries: List[str], k: int = 10):
+async def _get_predictions(embedding_service: EmbeddingService, queries: List[str], k: int = 10):
     # We could run predictions in batches to make it quicker, however there is a quota limit on the gecko embeddings
     # API. We are running it sequentially to avoid hitting the limit.
     predictions = []
     for query in tqdm(queries):
-        result = await search(query, k)
+        result = await _search(embedding_service, query, k)
         predictions.append([e.code for e in result])
     return predictions
 
 
-async def get_metrics(ground_truth: List[str], synthetic_queries: List[str], k: int = 10):
+async def get_metrics(embedding_service: EmbeddingService, ground_truth: List[str], synthetic_queries: List[str], k: int = 10):
     """ Evaluate the embeddings using ground truth data and synthetic queries."""
-    predictions = await _get_predictions(synthetic_queries, k)
+    predictions = await _get_predictions(embedding_service, synthetic_queries, k)
+    ground_truth = [[elem] for elem in ground_truth]
     for k in [1, 3, 5, 10]:
         recall, precision, f_score = _get_all_metrics(predictions, ground_truth, k)
         print(f"K = {k}, recall: {recall}, precision: {precision}, f_score: {f_score}")
@@ -132,7 +134,8 @@ if __name__ == "__main__":
     vertexai.init()
     compass_db = AsyncIOMotorClient(os.getenv('MONGODB_URI')).get_database(DATABASE_NAME)
     collection = compass_db[EMBEDDINGS_COLLECTION]
-    embedding_service = GoogleGeckoEmbeddingService()
+    gecko_embedding_service = GoogleGeckoEmbeddingService()
+    # TODO: Update this script to also evaluate the skill embeddings.
     dataset = load_dataset(OCCUPATION_REPO_ID, data_files=[OCCUPATION_FILENAME],
                            token=os.environ["HF_ACCESS_TOKEN"]).get("train")
-    asyncio.get_event_loop().run_until_complete(get_metrics(dataset["esco_code"], dataset["synthetic_query"]))
+    asyncio.get_event_loop().run_until_complete(get_metrics(gecko_embedding_service, dataset["esco_code"], dataset["synthetic_query"]))
