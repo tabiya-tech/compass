@@ -79,7 +79,7 @@ async def _embed_document(collection: AsyncIOMotorCollection,
     except Exception as e:
         if isinstance(e, ResourceExhausted) and retry_count < MAX_RETRIES:
             logging.debug(f"Retriable resource exhausted for document {document['UUID']}: {e}.")
-            await asyncio.sleep(randint(5, 10) * (retry_count + 1))
+            await asyncio.sleep(randint(5, 10) * (retry_count + 1))  # nosec
             await _embed_document(collection, embedding_service, field, document, errors, retry_count + 1)
         else:
             logging.error(f"Error embedding document UUID:{document['UUID']}, label: {document['preferredLabel']}: {e}")
