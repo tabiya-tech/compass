@@ -1,20 +1,23 @@
 import logging
+import base64
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.llm_agent_director import LLMAgentDirector
 from app.agent.welcome_agent import WelcomeAgent # for sandbox testing
 from app.agent.experiences_explorer_agent import ExperiencesExplorerAgent # for sandbox testing
+from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
 from app.conversation_memory.conversation_memory_manager import ConversationContext, ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
+from app.vector_search.occupation_search_routes import add_occupation_search_routes
+from app.vector_search.skill_search_routes import add_skill_search_routes
 from app.version.version_routes import add_version_routes
-from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
-from esco_search.esco_search_routes import add_esco_search_routes
 
 logger = logging.getLogger(__name__)
 
@@ -38,9 +41,11 @@ app.add_middleware(
 add_version_routes(app)
 
 ############################################
-# Add routes relevant for esco_search
+# Add routes relevant for esco search
 ############################################
-skill_search_service = add_esco_search_routes(app)
+
+add_occupation_search_routes(app)
+add_skill_search_routes(app)
 
 ############################################
 # Add routes relevant for pii filtering
@@ -164,6 +169,18 @@ async def get_conversation_context(session_id: int):
         # this is the main entry point, so we need to catch all exceptions
         logger.exception(e)
         return {"error": "oops! something went wrong!"}
+
+
+# Temporary REST API EP for returning the incoming authentication information
+# from the request. This is for testing purposes until the UI supports auth
+# and must be removed later.
+@app.get(path="/authinfo",
+         description="Returns the authentication info (JWT token claims)")
+async def _get_auth_info(request: Request):
+    auth_info_b64 = request.headers.get('x-apigateway-api-userinfo')
+    # some python magic
+    auth_info = base64.b64decode(auth_info_b64.encode() + b'==').decode()
+    return JSONResponse(auth_info)
 
 
 if __name__ == "__main__":

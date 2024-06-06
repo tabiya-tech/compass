@@ -18,12 +18,12 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.target-environment }}
     outputs:
-      version-info: ${{ steps.setVersionInfo.outputs.version-info }}
+      version-info: ${{ steps.setPOCVersionInfo.outputs.version-info }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Set Version Info
-        id: setVersionInfo
+      - name: Set Version Info for POC frontend
+        id: setPOCVersionInfo
         run: |
           ./pipeline/setVersionInfo.sh frontend/public/data/version.json
           cat frontend/public/data/version.json
@@ -31,21 +31,64 @@ jobs:
           echo "version-info<<$EOF" >> "$GITHUB_OUTPUT"
           echo "$(cat ./frontend/public/data/version.json)" >> "$GITHUB_OUTPUT"
           echo "$EOF" >> "$GITHUB_OUTPUT"
-      - name: Use Node.js 20.x
+      - name: Use Node.js 20.x for POC frontend
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
           cache: 'yarn'
           cache-dependency-path: frontend/yarn.lock
-      - name: Install node packages
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v4
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Install node packages in POC frontend
         run: yarn install
         working-directory: frontend
-      - name: build
+      - name: build POC frontend
         run: yarn run build
         working-directory: frontend
         env:
           NEXT_PUBLIC_COMPASS_URL: ${{ inputs.backendRestApiURLBase }}
           NEXT_PUBLIC_COMPASS_ENDPOINT: '/conversation'
+      - name: Archive POC frontend build
+        uses: actions/upload-artifact@v4
+        with:
+          name: poc-frontend-build
+          path: frontend/out
+          retention-days: 1
+      - name: Set Version Info for new frontend
+        id: setNewVersionInfo
+        run: |
+          ./pipeline/setVersionInfo.sh frontend-new/public/data/version.json
+          cat frontend-new/public/data/version.json
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "version-info<<$EOF" >> "$GITHUB_OUTPUT"
+          echo "$(cat ./frontend-new/public/data/version.json)" >> "$GITHUB_OUTPUT"
+          echo "$EOF" >> "$GITHUB_OUTPUT"
+      - name: Use Node.js 20.x for new frontend
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'yarn'
+          cache-dependency-path: frontend-new/yarn.lock
+      - name: Install node packages in new frontend
+        run: yarn install
+        working-directory: frontend-new
+      - name: Build new frontend
+        run: yarn run build
+        working-directory: frontend-new
+      - name: Archive new frontend build
+        uses: actions/upload-artifact@v4
+        with:
+          name: new-frontend-build
+          path: frontend-new/build
+          retention-days: 1
       - name: Setup python
         uses: actions/setup-python@v5
         with:
@@ -53,12 +96,12 @@ jobs:
           cache: 'pip' # caching pip dependencies
       - name: Install python packages
         run: pip install -r requirements.txt
-        working-directory: iac/frontend
+        working-directory: iac
       - name: Setup google-cloud-auth
         uses: google-github-actions/auth@v2.1.2
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
-      - name: Deploy frontend
+      - name: Deploy both frontends
         id: pulumi
         uses: pulumi/actions@v5
         with:
@@ -67,7 +110,7 @@ jobs:
           stack-name: tabiya-tech/compass-frontend/${{ inputs.target-environment }}
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-          MONGODB_URI: ${{ secrets.MONGODB_URI }}
-          NEXT_PUBLIC_COMPASS_URL: ${{ inputs.backendRestApiURLBase }}
       - name: Show frontend URL
-        run: echo "frontend-url<<${{ steps.pulumi.outputs.bucket_url }}"
+        run: |
+          echo "frontend-url<<${{ steps.pulumi.outputs.bucket_url }}"
+          echo "newUI-url<<${{ steps.pulumi.outputs.new_ui_url }}"

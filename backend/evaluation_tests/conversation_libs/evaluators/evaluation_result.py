@@ -30,6 +30,8 @@ class EvaluationType(Enum):
     RELEVANCE = "Relevance"
     CORRECTNESS = "Correctness"
     COHERENCE = "Coherence"
+    SUMMARY_CONSISTENCY = "Summary Consistency"
+    SUMMARY_RELEVANCE = "Summary Relevance"
 
 
 class EvaluationResult(BaseModel):
@@ -40,20 +42,11 @@ class EvaluationResult(BaseModel):
     score: int
     reasoning: str
 
-
-class ConversationEvaluationRecord(BaseModel):
-    """
-    Full record of the test run. This includes the conversation record and evaluation record.
-    """
+class EvaluationRecord(BaseModel):
 
     test_case: str
     """
     The test case name.
-    """
-
-    simulated_user_prompt: str
-    """
-    The simulated user prompt.
     """
 
     conversation: list[ConversationRecord] = Field(default_factory=list)
@@ -93,29 +86,8 @@ class ConversationEvaluationRecord(BaseModel):
             formatted_conversation += f"{record.actor.value}: {record.message}\n\n"
         return formatted_conversation
 
-    def to_markdown(self) -> str:
-        """
-        Formats the conversation and evaluation into markdown.
-        """
-        # create a markdown representation of the evaluation results
-        evaluations_str = ""
-        for evaluation in self.evaluations:
-            evaluations_str += f"**{evaluation.type}**: {evaluation.score}\\\n**Reasoning**:{evaluation.reasoning}\n\n"
-
-        # create a markdown representation of the evaluation results
-        formatted_conversation = ""
-        for i, record in enumerate(self.conversation, start=1):
-            if i % 2 == 0:
-                suffix = "\n\n"
-            else:
-                suffix = "\\\n"
-            formatted_conversation += f"**{record.actor.value}**: {record.message}{suffix}"
-
-        # return a text representation of the test case run
-        return (f"# Test case: {self.test_case}\n\n"
-                f"## Simulated user prompt:\n{self.simulated_user_prompt}\n\n"
-                f"## Conversation:\n{formatted_conversation}\n\n"
-                f"## Evaluations:\n{evaluations_str}")
+    def _to_markdown(self) -> str:
+        raise NotImplementedError()
 
     def save_data(self, folder: str, base_file_name: str):
         """
@@ -131,7 +103,84 @@ class ConversationEvaluationRecord(BaseModel):
         _save_to_file(base_path + '.json',
                       lambda f: json.dump(json.loads(self.json()), f, ensure_ascii=False, indent=4))
         # Save the evaluation result to a markdown file
-        _save_to_file(base_path + '.md', lambda f: f.write(self.to_markdown()))
+        _save_to_file(base_path + '.md', lambda f: f.write(self._to_markdown()))
+
+    def _get_evaluations_str(self) -> str:
+        """
+        create a markdown representation of the evaluation results
+        :return:
+        """
+        evaluations_str = ""
+        for evaluation in self.evaluations:
+            evaluations_str += f"**{evaluation.type}**: {evaluation.score}\\\n**Reasoning**:{evaluation.reasoning}\n\n"
+        return evaluations_str
+
+    def _get_formatted_conversation(self) -> str:
+        """
+        create a markdown representation of the evaluation results
+        :return:
+        """
+        formatted_conversation = ""
+        for i, record in enumerate(self.conversation, start=1):
+            if i % 2 == 0:
+                suffix = "\n\n"
+            else:
+                suffix = "\\\n"
+            formatted_conversation += f"**{record.actor.value}**: {record.message}{suffix}"
+        return formatted_conversation
+
+
+class ConversationEvaluationRecord(EvaluationRecord):
+    """
+    Full record of the conversation test run. This includes the conversation record and evaluation record.
+    """
+
+    simulated_user_prompt: str
+    """
+    The simulated user prompt.
+    """
+
+    def _to_markdown(self) -> str:
+        """
+        Formats the conversation and evaluation into markdown.
+        """
+        # return a text representation of the test case run
+        return (f"# Test case: {self.test_case}\n\n"
+                f"## Simulated user prompt:\n{self.simulated_user_prompt}\n\n"
+                f"## Conversation:\n{self._get_formatted_conversation()}\n\n"
+                f"## Evaluations:\n{self._get_evaluations_str()}")
+
+
+class SummaryEvaluationRecord(EvaluationRecord):
+    """
+    Full record of the summary test run. This includes the summaries, the conversation record and evaluation record.
+    """
+
+    current_summary: str
+    """
+    The current summary of the conversation.
+    """
+
+    new_summary: str
+    """
+    The new generated summary of the conversation.
+    """
+
+    evaluations: list[EvaluationResult] = Field(default_factory=list)
+    """
+    The evaluation results.
+    """
+
+    def _to_markdown(self) -> str:
+        """
+        Formats the summary, conversation and evaluation into markdown.
+        """
+        # return a text representation of the test case run
+        return (f"# Test case: {self.test_case}\n\n"
+                f"## Current summary:\n{self.current_summary}\n\n"
+                f"## Conversation:\n{self._get_formatted_conversation()}\n\n"
+                f"## New summary:\n{self.new_summary}\n\n"
+                f"## Evaluations:\n{self._get_evaluations_str()}")
 
 
 def _save_to_file(file_path: str, callback: Callable[[TextIO], None]):

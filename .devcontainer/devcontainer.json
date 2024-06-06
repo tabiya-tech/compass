@@ -6,7 +6,9 @@
 	"image": "mcr.microsoft.com/devcontainers/python:1-3.12-bookworm",
 	"features": {
 		"ghcr.io/devcontainers-contrib/features/poetry:2": {},
-		"ghcr.io/dhoeric/features/google-cloud-cli:1": {}
+		"ghcr.io/dhoeric/features/google-cloud-cli:1": {},
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
+		"ghcr.io/devcontainers-contrib/features/pulumi:1": {}
 	},
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
