@@ -7,6 +7,12 @@ on: push
 #  types: [ opened, synchronize, reopened ]
 
 jobs:
+  # Setup envs
+  setup-env:
+    uses: ./.github/workflows/setup-env.yml
+    secrets: inherit
+    with:
+      target-environment: dev
   # Backend
   test-backend:
     uses: ./.github/workflows/unit-test-backend.yml
