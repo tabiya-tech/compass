@@ -1,0 +1,54 @@
+name: Setup envs
+
+on:
+  workflow_call:
+    inputs:
+      target-environment:
+        required: true
+        type: string
+    outputs:
+      domain-name:
+        description: "The domain name in the target environment"
+        value: ${{ jobs.setup.outputs.domainName }}
+      frontend-url:
+        description: "The frontend url in the target environment"
+        value: ${{ jobs.setup.outputs.frontendURL }}
+      backend-url:
+        description: "The backend url in the target environment, including the base path /api"
+        value: ${{ jobs.setup.outputs.backendUrl }}
+      frontend-domain:
+        description: "The frontend domain in the target environment"
+        value: ${{ jobs.setup.outputs.frontendDomain }}
+      backend-domain:
+        description: "The backend domain in the target environment"
+        value: ${{ jobs.setup.outputs.backendDomain }}
+
+jobs:
+  setup-env:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.target-environment }}
+    outputs:
+      domain-name: ${{ steps.setup.outputs.domain_name }}
+      frontend-url: ${{ steps.setup.outputs.frontend_url }}
+      backend-url: ${{ steps.setup.outputs.backend_url }}
+      frontend-domain: ${{ steps.setup.outputs.frontend_domain }}
+      backend-domain: ${{ steps.setup.outputs.backend_domain }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run setup script
+        id: setup
+        run: |
+           chmod +x setupEnv.sh
+           ./setupEnv.sh ${{ inputs.target-environment }}
+        env:
+          BASE_DOMAIN_NAME: ${{ env.baseDomainName }}
+        working-directory: pipeline
+      - name: Log set envs
+        run: |
+          echo "domain-name: ${{ steps.setup.outputs.domain_name }}"
+          echo "frontend-url: ${{ steps.setup.outputs.frontend_url }}"
+          echo "backend-url: ${{ steps.setup.outputs.backend_url }}"
+          echo "frontend-domain: ${{ steps.setup.outputs.frontend_domain }}"
+          echo "backend-domain: ${{ steps.setup.outputs.backend_domain }}"
