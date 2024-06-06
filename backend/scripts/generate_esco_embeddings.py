@@ -9,10 +9,10 @@ import os
 from datetime import datetime
 from typing import List
 
-from tqdm import tqdm
 import vertexai
 from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorDatabase, AsyncIOMotorCollection, AsyncIOMotorClient
+from tqdm import tqdm
 
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService, EmbeddingService
 
@@ -100,7 +100,7 @@ async def generate_embeddings(
     pbar.close()
 
 
-async def create_indexes(db: AsyncIOMotorDatabase):
+async def upsert_indexes(db: AsyncIOMotorDatabase):
     """Creates the search index for the embeddings."""
     collection = db[EMBEDDINGS_COLLECTION]
     definition = {'mappings': {
@@ -128,14 +128,23 @@ async def create_collection(db: AsyncIOMotorDatabase, drop=True):
     else:
         return
     await db.create_collection(EMBEDDINGS_COLLECTION)
+    await db[EMBEDDINGS_COLLECTION].create_index(
+        {'UUID': 1, 'embedded_field': 1},
+        unique=True, name='UUID_embedded_field_index')
+    await db[EMBEDDINGS_COLLECTION].create_index(
+        {'UUID': 1}, name='UUID_index')
 
 
-if __name__ == "__main__":
+async def main():
     args = parser.parse_args()
     gecko_embedding_service = GoogleGeckoEmbeddingService()
     compass_db = AsyncIOMotorClient(os.getenv('MONGODB_URI')).get_database(DATABASE_NAME)
-    asyncio.get_event_loop().run_until_complete(create_collection(compass_db, drop=args.drop_collection))
-    asyncio.get_event_loop().run_until_complete(asyncio.gather(
+    await create_collection(compass_db, drop=args.drop_collection)
+    await asyncio.gather(
         *[generate_embeddings(compass_db, gecko_embedding_service, label, args.uuids) for label in
-          ['preferredLabel', 'altLabels', 'description']]))
-    asyncio.get_event_loop().run_until_complete(create_indexes(compass_db))
+          ['preferredLabel', 'altLabels', 'description']])
+    await upsert_indexes(compass_db)
+
+
+if __name__ == "__main__":
+    asyncio.get_event_loop().run_until_complete(main())
