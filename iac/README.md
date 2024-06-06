@@ -140,7 +140,9 @@ The deployment requires the following environment variables to be set:
 - `GITHUB_SHA`: GitHub commit SHA that will be used as the docker image label. This does not have to be an actual git commit SHA, but using a static SHA (like `latest`) might have weird consequences (like the service not picking up the latest version).
 - `GCP_OAUTH_CLIENT_ID`: The OAuth client ID used to authenticate the application with Firebase.
 - `GCP_OAUTH_CLIENT_SECRET`: The OAuth client secret used to authenticate the application with Firebase.
+- `DOMAIN_NAME`: The domain name of the environment, typically it is `<ENVIRONMENT>.compass.tabiya.tech`
 - `FRONTEND_DOMAIN` : The domain of the frontend application, typically it is `<ENVIRONMENT>.compass.tabiya.tech`
+- `FRONTEND_URL`: The URL of the frontend application, typically it is `https://<ENVIRONMENT>.compass.tabiya.tech`
 
 It is recommended to use a `.env` file to set the environment variables. Create a `.env` file in the root directory of the project and add the following content:
 
@@ -150,7 +152,9 @@ MONGODB_URI="<URI_TO_MONGODB>"
 GITHUB_SHA="<GIT_COMMIT_SHA>"
 GCP_OAUTH_CLIENT_ID="<GCP_OAUTH_CLIENT_ID>"
 GCP_OAUTH_CLIENT_SECRET="<GCP_OAUTH_CLIENT_SECRET>"
+DOMAIN_NAME="<DOMAIN_NAME>"
 FRONTEND_DOMAIN="<FRONTEND_DOMAIN>"
+FRONTEND_URL="<FRONTEND_URL>"
 ```
 
 ## Running Pulumi locally
