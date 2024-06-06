@@ -50,6 +50,26 @@ jobs:
     with:
       target-environment: dev
       backendRestApiURLBase: ${{ needs.deploy-backend.outputs.backendRestApiURLBase }}
+  deploy-common:
+    # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
+    if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
+    needs: [ setup-env, deploy-frontend ]
+    uses: ./.github/workflows/deploy-common.yml
+    secrets: inherit
+    with:
+      target-environment: dev
+      domain-name: ${{ needs.setup-env.outputs.domain-name }}
+      frontend-domain: ${{ needs.setup-env.outputs.frontend-domain }}
+      frontend-url: ${{ needs.setup-env.outputs.frontend-url }}
+  deploy-aws-ns:
+    # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
+    if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
+    needs: [ setup-env, deploy-common ]
+    uses: ./.github/workflows/deploy-aws-ns.yml
+    secrets: inherit
+    with:
+      target-environment: dev
+      domain-name: ${{ needs.setup-env.outputs.domain-name }}
   smoke-test-backend:
     needs: [ deploy-backend ]
     uses: ./.github/workflows/smoke-test-version.yml

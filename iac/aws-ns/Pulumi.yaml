@@ -1,0 +1,4 @@
+name: compass-aws-ns
+runtime:
+  name: python
+description: Tabiya compass
