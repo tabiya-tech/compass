@@ -9,19 +9,19 @@ on:
     outputs:
       domain-name:
         description: "The domain name in the target environment"
-        value: ${{ jobs.setup.outputs.domainName }}
+        value: ${{ jobs.setup-env.outputs.domain-name }}
       frontend-url:
         description: "The frontend url in the target environment"
-        value: ${{ jobs.setup.outputs.frontendURL }}
+        value: ${{ jobs.setup-env.outputs.frontend-url }}
       backend-url:
         description: "The backend url in the target environment, including the base path /api"
-        value: ${{ jobs.setup.outputs.backendUrl }}
+        value: ${{ jobs.setup-env.outputs.backend-url }}
       frontend-domain:
         description: "The frontend domain in the target environment"
-        value: ${{ jobs.setup.outputs.frontendDomain }}
+        value: ${{ jobs.setup-env.outputs.frontend-domain }}
       backend-domain:
         description: "The backend domain in the target environment"
-        value: ${{ jobs.setup.outputs.backendDomain }}
+        value: ${{ jobs.setup-env.outputs.backend-domain }}
 
 jobs:
   setup-env:
