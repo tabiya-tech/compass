@@ -73,11 +73,11 @@ There are [multiple ways you can authenticate with Google Cloud](https://cloud.g
 
 Using the [service account credentials, authenticate with Google Cloud](https://cloud.google.com/sdk/gcloud/reference/auth/activate-service-account) is the way preferred when running in a CI/CD environment and the most convenient method for running pulumi locally. 
 
-The best practice is to use [service account impersonation](#option-2-service-account-impersonation) when running the code locally, it can be more complex to opearate as it requires a more complex setup  and additionally the user is required to refresh the authentication token occasionally.
+The best practice is to use [service account impersonation](#option-2-service-account-impersonation) when running the code locally, it can be more complex to operate as it requires a more complex setup  and additionally the user is required to refresh the authentication token occasionally.
 
 Bellow you can find the steps to authenticate.
 
-#### Option 1: Authenticate via service account keys (preffered method)
+#### Option 1: Authenticate via service account keys (preferred method)
 
 You can use the service account key file to authenticate with Google Cloud and run the backend.
 This is the most convenient way to run the backend locally, but it is less secure than service account impersonation. It
@@ -242,7 +242,6 @@ Additionally, the project uses `bandit` to check for security vulnerabilities. T
 command:
 
 ```shell
-# Run bandit on the app and esco_search directories
 poetry run bandit -c bandit.yaml -r .
 ```
 
@@ -279,3 +278,31 @@ poetry run pytest --log-cli-level=DEBUG -v -m "not (smoke_test or evaluation_tes
 ```
 
 > Note: See [here](https://docs.pytest.org/en/latest/how-to/logging.html) for more information on logging in pytest.
+
+# One-Off Scripts
+
+## ESCO Embedding Generation
+
+The script `generate_esco_embeddings.py` is used to generate the embeddings for the ESCO occupations. The script reads
+the ESCO occupations from a collection in the MongoDB database and generates the embeddings for the occupations. The
+embeddings are stored in a different collection in the MongoDB database. The names of the collections and database are
+specified in the `generate_esco_embeddings.py` file.
+
+To run the script use the following command:
+
+```shell
+ python3 scripts/generate_esco_embeddings.py
+```
+
+Make sure to run it from the `/backend` directory. as it contains the necessary environment variables (specifically
+MongoDB access keys and Google Cloud access keys). Due to quota limitations the script will take a while to run. If any
+of the records fail to be parsed the script will print out the UUIDs of the records that failed. You can then fix the
+problem and re-run only those using the `--uuids` argument.
+
+You can optionally use the `--uuids` argument to specify the UUIDs of the ESCO occupations for which the embeddings
+should be generated. And the `--drop_collection` argument to delete and re-create the embeddings' collection. For
+example:
+
+```shell
+ python3 scripts/generate_esco_embeddings.py --uuids uuid1 uuid2 --drop_collection
+```

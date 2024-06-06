@@ -40,7 +40,7 @@ app.add_middleware(
 add_version_routes(app)
 
 ############################################
-# Add routes relevant for esco_search
+# Add routes relevant for esco search
 ############################################
 
 add_occupation_search_routes(app)
