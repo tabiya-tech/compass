@@ -7,6 +7,7 @@ import asyncio
 import logging
 import os
 from datetime import datetime
+from random import randint
 from typing import List
 
 from google.api_core.exceptions import ResourceExhausted
@@ -27,7 +28,7 @@ OCCUPATION_EMBEDDINGS_COLLECTION = 'occupationmodelsembeddings'
 SKILLS_COLLECTION_NAME = 'skillmodels'
 SKILLS_EMBEDDINGS_COLLECTION = 'skillsmodelsembeddings'
 
-PARALLEL_TASK_SIZE = 10
+PARALLEL_TASK_SIZE = 5
 MAX_RETRIES = 3
 
 logger = logging.getLogger(__name__)
@@ -61,7 +62,7 @@ async def _embed_document(collection: AsyncIOMotorCollection,
         #  from the Platform taxonomy database.
         embedded_text = _field_to_string(field, document)
         if embedded_text == "":
-            logging.info(f"Document UUID:{document['UUID']} has no text in field {field}. Skipping.")
+            logging.debug(f"Document UUID:{document['UUID']} has no text in field {field}. Skipping.")
             return
         embedding = await embedding_service.embed(embedded_text)
         # TODO: The embedding key should also be set in a config and shared between creation and search.
@@ -77,7 +78,8 @@ async def _embed_document(collection: AsyncIOMotorCollection,
             upsert=True)
     except Exception as e:
         if isinstance(e, ResourceExhausted) and retry_count < MAX_RETRIES:
-            await asyncio.sleep(5 * (retry_count + 1))
+            logging.debug(f"Retriable resource exhausted for document {document['UUID']}: {e}.")
+            await asyncio.sleep(randint(5, 10) * (retry_count + 1))
             await _embed_document(collection, embedding_service, field, document, errors, retry_count + 1)
         else:
             logging.error(f"Error embedding document UUID:{document['UUID']}, label: {document['preferredLabel']}: {e}")
