@@ -10,6 +10,7 @@ class AgentType(Enum):
     """
     WELCOME_AGENT = "WelcomeAgent"
     SKILL_EXPLORER_AGENT = "SkillExplorerAgent"
+    EXPERIENCES_EXPLORER_AGENT = "ExperiencesExplorerAgent"
     FAREWELL_AGENT = "FarewellAgent"
     QNA_AGENT = "QnaAgent"
 
