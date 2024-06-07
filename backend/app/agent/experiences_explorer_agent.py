@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 from app.agent.agent import SimpleLLMAgent
 from app.agent.agent_types import AgentType, AgentInput, AgentOutput
+from app.tool.extract_experience_tool import ExtractExperienceTool
 from app.agent.prompt_reponse_template import ModelResponse, \
     get_json_response_instructions, \
     get_conversation_finish_instructions
@@ -81,7 +82,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         # (e.g. "baker" or "looking after sick family member")
         # In this version, we handle only one experience per user message
         # TODO: COM-262 handle multiple expereineces (P3)
-        experinece_descr = self._extract_experience_from_user_reply(user_input_msg)
+        experinece_descr = await self._extract_experience_from_user_reply(user_input_msg)
         experience_id = self._sanitized_experience_descr(experinece_descr, s.experiences)
 
         s.current_experience = experience_id
@@ -189,10 +190,10 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
             experience_descr = experience_descr + "-x"
         return  experience_descr
 
-    def _extract_experience_from_user_reply(self, user_str: str) -> str:
-        # TODO: COM-245 use the LLM to find out what was the experience the user is talking about
-        # Corner cutting: For now, assume the LLM got us: "baker"
-        return "baker"
+    async def _extract_experience_from_user_reply(self, user_str: str) -> str:
+        # Use the LLM to find out what was the experience the user is talking about
+        llm_response = await self._extract_experience_tool.extract_experience_from_user_reply(user_str)
+        return llm_response
 
     def __init__(self):
         # Define the response part of the prompt with some example responses
@@ -248,3 +249,5 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
 
         super().__init__(agent_type=AgentType.EXPERIENCES_EXPLORER_AGENT,
                          system_instructions=system_instructions)
+
+        self._extract_experience_tool = ExtractExperienceTool(self.get_llm_config())
