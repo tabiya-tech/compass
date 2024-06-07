@@ -45,11 +45,14 @@ The target project is the project where the Compass resources are to be created.
 - For deploying the firebase authentication via pulumi, the following steps must be performed manually in the target project:
     - Set up a consent screen in the Google Cloud Console 
     - Set up an OAuth 2.0 client ID in the Google Cloud Console. \
+      When creating the OAuth 2.0 client ID, the **Authorized redirect URIs** must be set to `https://<TARGET-PROJECT-ID>.firebaseapp.com/__/auth/handler`. In the future, they should be adjusted to the actual authentication domain of the environment e.g. `https://auth.<ENVIRONMENT>.compass.tabiya.tech/__/auth/handler`. \
       The client ID and client secret used to authenticate the application with Firebase are passed to pulumi as environment variables:
       ```shell
       GCP_OAUTH_CLIENT_ID="<GCP_OAUTH_CLIENT_ID>"
       GCP_OAUTH_CLIENT_SECRET="<GCP_OAUTH_CLIENT_SECRET>"
       ```
+      > Note: To the best of our knowledge, the OAuth 2.0 client ID and client secret cannot be created via pulumi/terraform. They must be created manually in the Google Cloud Console as the there is no API for creating/reading or updating OAuth 2.0 client IDs.
+
 ## Installation
 In the iac directory, run the following commands:
 
@@ -137,6 +140,7 @@ The deployment requires the following environment variables to be set:
 - `GITHUB_SHA`: GitHub commit SHA that will be used as the docker image label. This does not have to be an actual git commit SHA, but using a static SHA (like `latest`) might have weird consequences (like the service not picking up the latest version).
 - `GCP_OAUTH_CLIENT_ID`: The OAuth client ID used to authenticate the application with Firebase.
 - `GCP_OAUTH_CLIENT_SECRET`: The OAuth client secret used to authenticate the application with Firebase.
+- `FRONTEND_DOMAIN` : The domain of the frontend application, typically it is `<ENVIRONMENT>.compass.tabiya.tech`
 
 It is recommended to use a `.env` file to set the environment variables. Create a `.env` file in the root directory of the project and add the following content:
 
@@ -146,6 +150,7 @@ MONGODB_URI="<URI_TO_MONGODB>"
 GITHUB_SHA="<GIT_COMMIT_SHA>"
 GCP_OAUTH_CLIENT_ID="<GCP_OAUTH_CLIENT_ID>"
 GCP_OAUTH_CLIENT_SECRET="<GCP_OAUTH_CLIENT_SECRET>"
+FRONTEND_DOMAIN="<FRONTEND_DOMAIN>"
 ```
 
 ## Running Pulumi locally
@@ -182,3 +187,22 @@ See the [Pulumi documentation](https://www.pulumi.com/docs/) for more informatio
 See the [Pulumi GCP provider documentation](https://www.pulumi.com/docs/reference/clouds/gcp/) for more information on how to use the GCP provider.
 
 You can read more about how to configure pulumi with a a google cloud project in python [here](https://www.pulumi.com/ai/answers/15xDqB9xyu6D17Kb297Dfi/configuring-google-cloud-project-with-python)
+
+##  Some caveats
+
+There are some caveats to be aware of when using Pulumi to manage the Compass infrastructure in GCP: 
+
+- auth: When deploying the auth infrastucture, we enable and configure the Identity Platform API. This API has some limitations, in that it can be enabled in a GCP project, but not disabled.
+If you write code that disables or deletes the Identity Platform API, pulumi will only remove it from the pulumi state file, but the API will still be enabled in the GCP project. This can lead to unexpected behavior when trying to re-enable the API.
+You may get the error
+> Error creating Config: googleapi: Error 400: INVALID_PROJECT_ID : Identity Platform has already been enabled for this project.
+
+In this case, you will need to manually import the identity platform API configuration into pulumi. This can be done by running the following command:
+```shell
+GOOGLE_CREDENTIALS=<KEYFILE> pulumi -C auth -s dev import gcp:identityplatform/config:Config default projects/<GCP_PROJECT_ID>/config
+```
+Replace `<GCP_PROJECT_ID>` with the GCP project ID where the Identity Platform API is enabled.
+
+Once the configuration is imported, you can run pulumi commands as usual.
+
+> Note: Don't forget to unprotect the imported resource, since imported resources are protected by default. It is important to do this, since pulumi will not allow you to destroy a protected resource.
