@@ -41,11 +41,6 @@ REQUIRED_SERVICES = [
     "cloudbuild.googleapis.com",
     # Cloud Data Loss Prevention - Required for de-identifying data
     "dlp.googleapis.com",
-    # Firebase
-    "firebasehosting.googleapis.com",
-    "firebase.googleapis.com",
-    # GCP Identity Platform
-    "identitytoolkit.googleapis.com",
     # GCP Cloud Run
     "run.googleapis.com",
 ]
@@ -266,35 +261,6 @@ def _setup_api_gateway(
 """
 
 
-def _setup_identity_platform(*, basic_config: ProjectBaseConfig, gateway_uri: pulumi.Output[str],
-                             dependencies: list[pulumi.Resource]):
-    # GCP OAuth clients cannot be created automatically, but must be created from the Google Cloud Console.
-    gcp_oauth_client_id = os.getenv("GCP_OAUTH_CLIENT_ID")
-    gcp_oauth_client_secret = os.getenv("GCP_OAUTH_CLIENT_SECRET")
-
-    # Use name "default" as we may require to import this from GCP
-    default = gcp.identityplatform.Config(
-        "default",
-        authorized_domains=[gateway_uri],
-        mfa=gcp.identityplatform.ConfigMfaArgs(
-            state="DISABLED",
-        ),
-        project=basic_config.project,
-        opts=pulumi.ResourceOptions(depends_on=dependencies),
-    )
-
-    # Enable Google Authentication
-    gcp.identityplatform.DefaultSupportedIdpConfig(
-        _get_resource_name(environment=basic_config.environment, resource="google_idp_config"),
-        client_id=gcp_oauth_client_id,
-        client_secret=gcp_oauth_client_secret,
-        idp_id="google.com",
-        enabled=True,
-        project=basic_config.project,
-        opts=pulumi.ResourceOptions(depends_on=dependencies + [default]),
-    )
-
-
 def _create_repository(
         basic_config: ProjectBaseConfig, repository_name: str, dependencies: list[pulumi.Resource]
 ) -> gcp.artifactregistry.Repository:
@@ -422,9 +388,4 @@ def deploy_backend(project: str, location: str, environment: str):
     api_gateway = _setup_api_gateway(
         basic_config=basic_config, cloudrun=cloud_run,
         dependencies=services + [cloud_run]
-    )
-
-    # Setup Google Cloud Identity Platform that provides Firebase based authentications
-    _setup_identity_platform(
-        basic_config=basic_config, gateway_uri=api_gateway.default_hostname, dependencies=services + [api_gateway]
     )

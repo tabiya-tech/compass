@@ -24,6 +24,13 @@ jobs:
     secrets: inherit
     with:
       target-environment: dev
+  deploy-auth:
+    uses: ./.github/workflows/deploy-auth.yml
+    needs: [ setup-env ]
+    secrets: inherit
+    with:
+      target-environment: dev
+      frontend-domain: ${{ needs.setup-env.outputs.frontend-domain }}
   deploy-backend:
     # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
     if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
@@ -35,7 +42,7 @@ jobs:
   deploy-frontend:
     # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
     if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
-    needs: [ test-frontend, deploy-backend ]
+    needs: [ test-frontend, setup-env, deploy-auth, deploy-backend ]
     uses: ./.github/workflows/deploy-frontend.yml
     secrets: inherit
     with:
