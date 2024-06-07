@@ -72,7 +72,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
             "[META: ExperinecesExplorerAgent active] In this session, we will explore your past livelihood experiences," \
             " e.g. formal work experiences other similar hassles that kept you busy in the last years. Tell me about your most recent work experience."
 
-    def _handle_warmup_phase(self, user_input_msg: str) -> str:
+    async def _handle_warmup_phase(self, user_input_msg: str) -> str:
         # Handle the WARMUP phase of the conversation.
         # Returns the reply to be sent to the user
         s = self._state
@@ -101,7 +101,8 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
                     "Now let's understand them in more detail, one by one. " \
                     "You said you had an experience as a " + exp.experience_descr + ". Tell me more about it. When did it happen?"
         else:
-            return "Great response, I will process that... Tell me about another relevant experience, which you had before this one"
+            return f"Great response ({experience_id}),"\
+                   " I will process that... Tell me about another relevant experience, which you had before this one"
 
     def _handle_dive_in_phase(self, user_input_msg: str) -> str:
         # TODO: COM-237 Let the LLM handle this phase. The dive-in will be done by a separate agent.
@@ -154,7 +155,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
 
         # Phase1 - followup rounds, until we have a minimum 3 occupations on the radar.
         elif s.conversation_phase == ConversationPhase.WARMUP:
-            reply_raw = self._handle_warmup_phase(user_input.message)
+            reply_raw = await self._handle_warmup_phase(user_input.message)
 
         # Phase2 - innerloop - outerloop
         elif s.conversation_phase == ConversationPhase.DIVE_IN:
@@ -188,7 +189,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         # Ensure uniqueness or experience_descr in the experiences dict
         while experience_descr in experiences:
             experience_descr = experience_descr + "-x"
-        return  experience_descr
+        return  experience_descr.strip()
 
     async def _extract_experience_from_user_reply(self, user_str: str) -> str:
         # Use the LLM to find out what was the experience the user is talking about
