@@ -6,11 +6,12 @@ from pydantic import BaseModel
 
 from app.agent.agent import SimpleLLMAgent
 from app.agent.agent_types import AgentType, AgentInput, AgentOutput
+from app.tool.extract_experience_tool import ExtractExperienceTool
 from app.agent.prompt_reponse_template import ModelResponse, \
-  get_json_response_instructions, \
-  get_conversation_finish_instructions
+    get_json_response_instructions, \
+    get_conversation_finish_instructions
 from app.conversation_memory.conversation_memory_types import \
-  ConversationContext
+    ConversationContext
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +72,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
             "[META: ExperinecesExplorerAgent active] In this session, we will explore your past livelihood experiences," \
             " e.g. formal work experiences other similar hassles that kept you busy in the last years. Tell me about your most recent work experience."
 
-    def _handle_warmup_phase(self, user_input_msg: str) -> str:
+    async def _handle_warmup_phase(self, user_input_msg: str) -> str:
         # Handle the WARMUP phase of the conversation.
         # Returns the reply to be sent to the user
         s = self._state
@@ -81,7 +82,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         # (e.g. "baker" or "looking after sick family member")
         # In this version, we handle only one experience per user message
         # TODO: COM-262 handle multiple expereineces (P3)
-        experinece_descr = self._extract_experience_from_user_reply(user_input_msg)
+        experinece_descr = await self._extract_experience_from_user_reply(user_input_msg)
         experience_id = self._sanitized_experience_descr(experinece_descr, s.experiences)
 
         s.current_experience = experience_id
@@ -96,11 +97,12 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
             # Advance the conversation
             s.conversation_phase = ConversationPhase.DIVE_IN
             return \
-              "Thank you for telling me about your experiences. I think I got the initial picture. " \
-              "Now let's understand them in more detail, one by one. " \
-              "You said you had an experience as a " + exp.experience_descr + ". Tell me more about it. When did it happen?"
+                    "Thank you for telling me about your experiences. I think I got the initial picture. " \
+                    "Now let's understand them in more detail, one by one. " \
+                    "You said you had an experience as a " + exp.experience_descr + ". Tell me more about it. When did it happen?"
         else:
-            return "Great response, I will process that... Tell me about another relevant experience, which you had before this one"
+            return f"Great response ({experience_id}),"\
+                   " I will process that... Tell me about another relevant experience, which you had before this one"
 
     def _handle_dive_in_phase(self, user_input_msg: str) -> str:
         # TODO: COM-237 Let the LLM handle this phase. The dive-in will be done by a separate agent.
@@ -125,7 +127,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
                 # Advance the conversation: dive in again into the next eperience
                 s.conversation_phase = ConversationPhase.DIVE_IN
                 return "Let's move on to the other experinece you mentioned (we already covererd {a} out of {b}). ".format(a=s.deep_dive_count, b=len(s.experiences)) + \
-                            "You said you had an experience as a " + exp.experience_descr + ". Tell me more about it. When did it happen?"
+                    "You said you had an experience as a " + exp.experience_descr + ". Tell me more about it. When did it happen?"
             else:
                 # Advance the conversation: wrap up
                 s.conversation_phase = ConversationPhase.WRAPUP
@@ -153,7 +155,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
 
         # Phase1 - followup rounds, until we have a minimum 3 occupations on the radar.
         elif s.conversation_phase == ConversationPhase.WARMUP:
-            reply_raw = self._handle_warmup_phase(user_input.message)
+            reply_raw = await self._handle_warmup_phase(user_input.message)
 
         # Phase2 - innerloop - outerloop
         elif s.conversation_phase == ConversationPhase.DIVE_IN:
@@ -181,51 +183,51 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
             return response
 
     def set_state(self, state: ExperiencesAgentState):
-      self._state = state
+        self._state = state
 
     def _sanitized_experience_descr(selfself, experience_descr: str, experiences) -> str:
         # Ensure uniqueness or experience_descr in the experiences dict
         while experience_descr in experiences:
-             experience_descr = experience_descr + "-x"
-        return  experience_descr
+            experience_descr = experience_descr + "-x"
+        return  experience_descr.strip()
 
-    def _extract_experience_from_user_reply(self, user_str: str) -> str:
-        # TODO: COM-245 use the LLM to find out what was the experience the user is talking about
-        # Corner cutting: For now, assume the LLM got us: "baker"
-        return "baker"
+    async def _extract_experience_from_user_reply(self, user_str: str) -> str:
+        # Use the LLM to find out what was the experience the user is talking about
+        llm_response = await self._extract_experience_tool.extract_experience_from_user_reply(user_str)
+        return llm_response
 
     def __init__(self):
-      # Define the response part of the prompt with some example responses
-      response_part = get_json_response_instructions([
-          ModelResponse(
-              reasoning="You have not yet shared skills from your previous 2 job experiences, "
-                        "therefore I will set the finished flag to false, "
-                        "and I will continue the exploration.",
-              finished=False,
-              message="Tell about the kind of jobs you had in the past.",
-          ),
-          ModelResponse(
-              reasoning="You shared skills from your previous 2 job experiences, "
-                        "therefore I will set the finished flag to true, "
-                        "and I will end the counseling session.",
-              finished=True,
-              message="Great, the counseling session has finished.",
-          ),
-          ModelResponse(
-              reasoning="You do not want to continue the conversation, "
-                        "therefore I will set the finished flag to true, "
-                        "and I will end the counseling session.",
-              finished=True,
-              message="Fine, we will end the counseling session.",
-          ),
-      ])
-      finish_instructions = get_conversation_finish_instructions(dedent("""\
+        # Define the response part of the prompt with some example responses
+        response_part = get_json_response_instructions([
+            ModelResponse(
+                reasoning="You have not yet shared skills from your previous 2 job experiences, "
+                          "therefore I will set the finished flag to false, "
+                          "and I will continue the exploration.",
+                finished=False,
+                message="Tell about the kind of jobs you had in the past.",
+            ),
+            ModelResponse(
+                reasoning="You shared skills from your previous 2 job experiences, "
+                          "therefore I will set the finished flag to true, "
+                          "and I will end the counseling session.",
+                finished=True,
+                message="Great, the counseling session has finished.",
+            ),
+            ModelResponse(
+                reasoning="You do not want to continue the conversation, "
+                          "therefore I will set the finished flag to true, "
+                          "and I will end the counseling session.",
+                finished=True,
+                message="Fine, we will end the counseling session.",
+            ),
+        ])
+        finish_instructions = get_conversation_finish_instructions(dedent("""\
                   When I explicitly say that I want to finish the session, 
                   or I have shared skills from my previous 2 job experiences
               """))
-      experience = "[EXPERIENCE]"
+        experience = "[EXPERIENCE]"
 
-      system_instructions_template = dedent("""\
+        system_instructions_template = dedent("""\
                   You are a job counselor. We have been introduced and we talked a bit about my past experience as: {experience}.
                   Your your is to ask me more details about this experience.
                   Your goal is to help me identify what skills I gained during my experience that would help me find a good job in the future.
@@ -239,12 +241,14 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
                   {finish_instructions}             
                   """)
 
-      system_instructions = system_instructions_template.format(
-          experience=experience,
-          response_part=response_part,
-          finish_instructions=finish_instructions)
+        system_instructions = system_instructions_template.format(
+            experience=experience,
+            response_part=response_part,
+            finish_instructions=finish_instructions)
 
-      self.__logger = logging.getLogger(self.__class__.__name__)
+        self.__logger = logging.getLogger(self.__class__.__name__)
 
-      super().__init__(agent_type=AgentType.EXPERIENCES_EXPLORER_AGENT,
-                       system_instructions=system_instructions)
+        super().__init__(agent_type=AgentType.EXPERIENCES_EXPLORER_AGENT,
+                         system_instructions=system_instructions)
+
+        self._extract_experience_tool = ExtractExperienceTool(self.get_llm_config())
