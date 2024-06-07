@@ -9,11 +9,11 @@ from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService, Embe
 from app.vector_search.esco_entities import OccupationEntity
 from tqdm import tqdm
 
-OUTPUT_FILENAME = "data/output.csv"
+OUTPUT_FILENAME = "data/output_test.csv"
 OCCUPATION_FILENAME = "data/OUTPUT_DATA_transition1_all_multiples_for_nlp_proc(in).csv"
 DATABASE_NAME = 'compass-test'
 EMBEDDINGS_COLLECTION = 'occupationmodelsembeddings'
-START_ROW = 25401
+START_ROW = 0
 
 # TODO: Use the OccupationSearchService to perform a similarity search on the vector store, once we migrate everything
 #  to the new structure.
@@ -145,7 +145,7 @@ if __name__ == "__main__":
 
 
     # Load the dataset
-    df = pd.read_csv(OCCUPATION_FILENAME)
+    df = pd.read_csv(OCCUPATION_FILENAME, nrows=1000)
 
     # Remove rows with missing values
     df.dropna(inplace=True)
