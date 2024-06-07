@@ -25,6 +25,8 @@ jobs:
     with:
       target-environment: dev
   deploy-auth:
+    # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
+    if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
     uses: ./.github/workflows/deploy-auth.yml
     needs: [ setup-env ]
     secrets: inherit
