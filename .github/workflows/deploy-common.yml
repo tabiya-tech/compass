@@ -14,6 +14,12 @@ on:
       frontend-url:
         required: true
         type: string
+      backend-domain:
+        required: true
+        type: string
+      backend-url:
+        required: true
+        type: string
     outputs:
       dns-ns-records:
         description: "The dns ns records for the domain to be added to the parent domain server"
@@ -52,3 +58,5 @@ jobs:
           DOMAIN_NAME: ${{ inputs.domain-name }}
           FRONTEND_DOMAIN: ${{ inputs.frontend-domain }}
           FRONTEND_URL: ${{ inputs.frontend-url }}
+          BACKEND_DOMAIN: ${{ inputs.backend-domain }}
+          BACKEND_URL: ${{ inputs.backend-url }}

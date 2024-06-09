@@ -246,6 +246,7 @@ def _setup_api_gateway(
     )
 
     pulumi.export("apigateway_url", apigw_gateway.default_hostname.apply(lambda hostname: f"https://{hostname}"))
+    pulumi.export("apigateway_id", apigw_gateway.gateway_id)
     return apigw_gateway
 
 
@@ -328,6 +329,14 @@ def _deploy_cloud_run_service(
     if not mongodb_uri:
         raise ValueError("MONGODB_URI environment variable is not set")
 
+    frontend_url = os.getenv("FRONTEND_URL")
+    if not frontend_url:
+        raise ValueError("FRONTEND_URL environment variable is not set")
+
+    backend_url = os.getenv("BACKEND_URL")
+    if not backend_url:
+        raise ValueError("BACKEND_URL environment variable is not set")
+
     service = gcp.cloudrunv2.Service(
         _get_resource_name(environment=basic_config.environment, resource="cloudrun-service"),
         name=_get_resource_name(environment=basic_config.environment, resource="cloudrun-service"),
@@ -343,6 +352,8 @@ def _deploy_cloud_run_service(
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="VERTEX_API_REGION", value=vertex_api_region
                         ),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="BACKEND_URL", value=backend_url),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="FRONTEND_URL", value=frontend_url),
                         # Add more environment variables here
                     ],
                 )

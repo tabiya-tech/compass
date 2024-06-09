@@ -148,6 +148,9 @@ The backend uses the following environment variables:
 - `MONGODB_URI`: The URI of the MongoDB Atlas instance to use where the ESCO data is stored.
 - `VERTEX_API_REGION`: The region of the Vertex API to use.
 - `LOG_CONFIG_FILE`: See the [Logging](#logging) section for more information.
+- `BACKEND_URL`: The URL of the backend. It is used to correctly configure Swagger UI to make requests to the backend. If not set, the default value is `/`
+- `FRONTEND_DOMAIN`: The domain of the frontend. It is used to set the CORS policy. If not set, the default value is `*`
+
 The backend supports the use of a `.env` file to set the environment variables. Create a `.env` file in the root
 directory of the backend project and set the environment variables as follows:
 
@@ -157,6 +160,8 @@ GOOGLE_APPLICATION_CREDENTIALS=<PATH_TO_KEY_FILE>
 MONGODB_URI=<URI_TO_MONGODB>
 VERTEX_API_REGION=<REGION>
 LOG_CONFIG_FILE=<YAML_FILE>
+BACKEND_URL=<URL>
+FRONTEND_DOMAIN=<DOMAIN>
 ```
 
 > ATTENTION: The .env file should be kept secure and not shared with others as it contains sensitive information.
@@ -215,6 +220,8 @@ MONGODB_URI=<URI_TO_MONGODB>
 GOOGLE_APPLICATION_CREDENTIALS=keys/credentials.json
 VERTEX_API_REGION=<REGION>
 LOG_CONFIG_FILE=logging.cfg.dev.yaml
+BACKEND_URL=http://0.0.0.0:8080
+FRONTEND_DOMAIN=*
 ```
 
 Run the image using the following command:

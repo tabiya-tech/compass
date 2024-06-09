@@ -1,16 +1,18 @@
 import logging
 import base64
+import os
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from urllib.parse import urlparse
 
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.llm_agent_director import LLMAgentDirector
-from app.agent.welcome_agent import WelcomeAgent # for sandbox testing
-from app.agent.experiences_explorer_agent import ExperiencesExplorerAgent # for sandbox testing
+from app.agent.welcome_agent import WelcomeAgent  # for sandbox testing
+from app.agent.experiences_explorer_agent import ExperiencesExplorerAgent  # for sandbox testing
 from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
 from app.conversation_memory.conversation_memory_manager import ConversationContext, ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
@@ -22,11 +24,23 @@ from app.version.version_routes import add_version_routes
 logger = logging.getLogger(__name__)
 
 load_dotenv()
-app = FastAPI()
+
+# Retrieve the backend URL from the environment variables,
+# and set the server URL to the backend URL, so that Swagger UI can correctly call the backend paths
+app = FastAPI(
+    servers=[
+        {
+            "url": os.getenv("BACKEND_URL") or "/",
+            "description": "The backend server"
+        }]
+)
 
 origins = [
-    "*"
+    os.getenv("FRONTEND_URL") or "*",
+    (os.getenv("BACKEND_URL") or "*") + "/docs",
 ]
+logger.info(f"Allowed origins: {origins}")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
