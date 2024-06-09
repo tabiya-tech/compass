@@ -5,10 +5,16 @@ on:
       target-environment:
         required: true
         type: string
+      backend-url:
+        required: true
+        type: string
+      frontend-url:
+        required: true
+        type: string
     outputs:
-      backendRestApiURLBase:
-        description: "The backend api url"
-        value: ${{ jobs.deploy.outputs.backendRestApiURLBase }}
+      api-gateway-url:
+        description: "The backend rest api url via the api gateway"
+        value: ${{ jobs.deploy.outputs.api-gateway-url }}
       version-info:
         description: "The backend version info"
         value: ${{ jobs.deploy.outputs.version-info }}
@@ -18,8 +24,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.target-environment }}
     outputs:
+      api-gateway-url: ${{ steps.pulumi.outputs.apigateway_url }}
       version-info: ${{ steps.setVersionInfo.outputs.version-info }}
-      backendRestApiURLBase: ${{ steps.pulumi.outputs.apigateway_url }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -61,3 +67,5 @@ jobs:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           GCP_OAUTH_CLIENT_ID: ${{ secrets.GCP_OAUTH_CLIENT_ID }}
           GCP_OAUTH_CLIENT_SECRET: ${{ secrets.GCP_OAUTH_CLIENT_SECRET }}
+          BACKEND_URL: ${{ inputs.backend-url }}
+          FRONTEND_URL: ${{ inputs.frontend-url }}
