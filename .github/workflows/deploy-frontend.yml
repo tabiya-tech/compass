@@ -5,7 +5,7 @@ on:
       target-environment:
         required: true
         type: string
-      backendRestApiURLBase:
+      backend-url:
         required: true
         type: string
     outputs:
@@ -54,7 +54,7 @@ jobs:
         run: yarn run build
         working-directory: frontend
         env:
-          NEXT_PUBLIC_COMPASS_URL: ${{ inputs.backendRestApiURLBase }}
+          NEXT_PUBLIC_COMPASS_URL: ${{ inputs.backend-url }}
           NEXT_PUBLIC_COMPASS_ENDPOINT: '/conversation'
       - name: Archive POC frontend build
         uses: actions/upload-artifact@v4

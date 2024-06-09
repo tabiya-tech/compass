@@ -47,13 +47,38 @@ def main():
         sys.exit(1)
     pulumi.info(f"Frontend URL: {frontend_url}")
 
-    parsed_url = urlparse(frontend_url)
-    if parsed_url.hostname != frontend_domain:
+    frontend_parsed_url = urlparse(frontend_url)
+    if frontend_parsed_url.hostname != frontend_domain:
         pulumi.error(f"Frontend URL domain {frontend_url} does not match the given domain {frontend_domain}")
         sys.exit(1)
 
+    backend_domain = os.getenv("BACKEND_DOMAIN")
+    if not backend_domain:
+        pulumi.error("environment variable BACKEND_DOMAIN is not set")
+        sys.exit(1)
+    pulumi.info(f"Backend Domain: {backend_domain}")
+
+    if backend_domain != frontend_domain:
+        pulumi.error(f"Backend domain {backend_domain} is not equal to the frontend domain {frontend_domain}")
+        sys.exit(1)
+
+    backend_url = os.getenv("BACKEND_URL")
+    if not backend_url:
+        pulumi.error("environment variable BACKEND_URL is not set")
+        sys.exit(1)
+    if backend_url == frontend_url:
+        pulumi.error("environment variable BACKEND_URL should not be equal to FRONTEND_URL")
+        sys.exit(1)
+    pulumi.info(f"Backend URL: {backend_url}")
+
+    backend_parsed_url = urlparse(backend_url)
+    if backend_parsed_url.hostname != backend_domain:
+        pulumi.error(f"Backend URL domain {backend_url} does not match the given domain {backend_domain}")
+        sys.exit(1)
+
+
     # Deploy common
-    deploy_common(project, location, environment, domain_name, frontend_domain, frontend_url)
+    deploy_common(project, location, environment, domain_name, frontend_domain, frontend_url, backend_url)
 
 
 if __name__ == "__main__":
