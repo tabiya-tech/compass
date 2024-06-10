@@ -18,6 +18,7 @@ google-cloud-dlp="^3.16.0"
 fix-busted-json=">=0.0.17,<1.0.0"
 motor = "^3.4.0"
 google-cloud-aiplatform = "^1.53.0"
+fastapi = "^0.111.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
