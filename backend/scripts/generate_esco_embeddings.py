@@ -5,31 +5,27 @@ of a database in MongoDB and save the embeddings.
 import argparse
 import asyncio
 import logging
-import os
 from datetime import datetime
 from random import randint
 from typing import List
 
-from google.api_core.exceptions import ResourceExhausted
 import vertexai
 from dotenv import load_dotenv
+from google.api_core.exceptions import ResourceExhausted
 from motor.motor_asyncio import AsyncIOMotorDatabase, AsyncIOMotorCollection, AsyncIOMotorClient
 from tqdm import tqdm
 
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService, EmbeddingService
+from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
+from scripts.base_data_settings import ScriptSettings
 
 load_dotenv()
 vertexai.init()
 
-# TODO: Save them in a config file and load them here.
-DATABASE_NAME = 'compass-test'
-OCCUPATION_COLLECTION_NAME = 'occupationmodels'
-OCCUPATION_EMBEDDINGS_COLLECTION = 'occupationmodelsembeddings'
-SKILLS_COLLECTION_NAME = 'skillmodels'
-SKILLS_EMBEDDINGS_COLLECTION = 'skillsmodelsembeddings'
-
 PARALLEL_TASK_SIZE = 5
 MAX_RETRIES = 3
+MONGO_SETTINGS = MongoDbSettings()
+BASE_SETTINGS = ScriptSettings().base_data_settings
 
 logger = logging.getLogger(__name__)
 parser = argparse.ArgumentParser(
@@ -65,8 +61,7 @@ async def _embed_document(collection: AsyncIOMotorCollection,
             logging.debug(f"Document UUID:{document['UUID']} has no text in field {field}. Skipping.")
             return
         embedding = await embedding_service.embed(embedded_text)
-        # TODO: The embedding key should also be set in a config and shared between creation and search.
-        document['embedding'] = embedding
+        document[MONGO_SETTINGS.embedding_settings.embedding_key] = embedding
         document['embedded_field'] = field
         document['embedded_text'] = embedded_text
         document['updatedAt'] = datetime.utcnow()
@@ -80,7 +75,8 @@ async def _embed_document(collection: AsyncIOMotorCollection,
         if isinstance(e, ResourceExhausted) and retry_count < MAX_RETRIES:
             logging.debug(f"Retriable resource exhausted for document {document['UUID']}: {e}.")
             await asyncio.sleep(randint(5, 10) * (retry_count + 1))  # nosec
-            await _embed_document(collection, embedding_service, field, document, errors, retry_count + 1)
+            await _embed_document(collection, embedding_service, field, document, errors,
+                                  retry_count + 1)
         else:
             logging.error(f"Error embedding document UUID:{document['UUID']}, label: {document['preferredLabel']}: {e}")
             errors.append(document['UUID'])
@@ -89,7 +85,7 @@ async def _embed_document(collection: AsyncIOMotorCollection,
 async def generate_embeddings(
         db: AsyncIOMotorDatabase,
         model: EmbeddingService,
-        embedding_collection_name: str,
+        collection_name: str,
         clean_data_collection_name: str,
         uuids: List[str] = None
 ) -> None:
@@ -104,21 +100,23 @@ async def generate_embeddings(
         :param db: The MongoDB database to use.
         :param model: The embedding model to use.
         :param clean_data_collection_name: The name of the collection to use for data.
-        :param embedding_collection_name: The name of the collection to store the embeddings.
+        :param collection_name: The settings of the collection to store the embeddings.
         :param uuids: A list of UUIDs to embed. If None, all the documents in the collection will be embedded.
     """
     # This could be a collection from the Platform taxonomy database.
     clean_data_collection = db[clean_data_collection_name]
-    embeddings_collection = db[embedding_collection_name]
+    embeddings_collection = db[collection_name]
     search_filter = {'UUID': {'$in': uuids}} if uuids else {}
-    pbar = tqdm(desc=f'Embedding progress for {embedding_collection_name}',
+    pbar = tqdm(desc=f'Embedding progress for {collection_name}',
                 total=await clean_data_collection.count_documents(search_filter))
     i = 0
     tasks = []
     errors = []
     async for document in clean_data_collection.find(search_filter, {'_id': 0}):
-        tasks += [_embed_document(embeddings_collection, model, field, document, errors) for field in
-                  ['preferredLabel', 'altLabels', 'description']]
+        tasks += [
+            _embed_document(embeddings_collection, model, field, document,
+                            errors) for field in
+            ['preferredLabel', 'altLabels', 'description']]
         i += 1
         pbar.update()
         if len(tasks) > PARALLEL_TASK_SIZE:
@@ -127,16 +125,17 @@ async def generate_embeddings(
     await asyncio.gather(*tasks)
     pbar.close()
     if len(errors) > 0:
-        logging.error(f"Errors embedding documents in collection {embedding_collection_name}: {errors}")
+        logging.error(
+            f"Errors embedding documents in collection {collection_name}: {errors}")
 
 
-async def upsert_indexes(db: AsyncIOMotorDatabase, embedding_collection_name: str):
+async def upsert_indexes(db: AsyncIOMotorDatabase, collection_name: str):
     """Creates the search index for the embeddings."""
-    collection = db[embedding_collection_name]
+    collection = db[collection_name]
     definition = {'mappings': {
         'dynamic': True,
         'fields': {
-            'embedding': {
+            MONGO_SETTINGS.embedding_settings.embedding_key: {
                 'dimensions': 768,
                 'similarity': 'cosine',
                 'type': 'knnVector'
@@ -144,9 +143,10 @@ async def upsert_indexes(db: AsyncIOMotorDatabase, embedding_collection_name: st
         }
     }}
     if 'embedding_index' in [index['name'] for index in await collection.list_search_indexes().to_list(length=None)]:
-        await collection.update_search_index('embedding_index', definition)
+        await collection.update_search_index(MONGO_SETTINGS.embedding_settings.embedding_index, definition)
     else:
-        await collection.create_search_index({'name': 'embedding_index', 'definition': definition})
+        await collection.create_search_index(
+            {'name': MONGO_SETTINGS.embedding_settings.embedding_index, 'definition': definition})
 
 
 async def create_collection(db: AsyncIOMotorDatabase, embedding_collection_name: str, drop=True):
@@ -166,25 +166,29 @@ async def create_collection(db: AsyncIOMotorDatabase, embedding_collection_name:
 async def generate_embeddings_for_collection(
         db: AsyncIOMotorDatabase,
         embedding_service: EmbeddingService,
-        embedding_collection_name: str,
+        collection_name: str,
         clean_data_collection_name: str,
         arguments: argparse.Namespace,
 ) -> None:
     """Embeds the entire collection in a MongoDB database. """
-    await create_collection(db, embedding_collection_name, drop=arguments.drop_collection)
-    await generate_embeddings(db, embedding_service, embedding_collection_name, clean_data_collection_name,
+    await create_collection(db, collection_name, drop=arguments.drop_collection)
+    await generate_embeddings(db, embedding_service, collection_name,
+                              clean_data_collection_name,
                               arguments.uuids)
-    await upsert_indexes(db, embedding_collection_name)
+    await upsert_indexes(db, collection_name)
 
 
 async def main():
     args = parser.parse_args()
     gecko_embedding_service = GoogleGeckoEmbeddingService()
-    compass_db = AsyncIOMotorClient(os.getenv('MONGODB_URI')).get_database(DATABASE_NAME)
-    await generate_embeddings_for_collection(compass_db, gecko_embedding_service, OCCUPATION_EMBEDDINGS_COLLECTION,
-                                             OCCUPATION_COLLECTION_NAME, args)
-    await generate_embeddings_for_collection(compass_db, gecko_embedding_service, SKILLS_EMBEDDINGS_COLLECTION,
-                                             SKILLS_COLLECTION_NAME, args)
+    compass_db = AsyncIOMotorClient(MONGO_SETTINGS.mongodb_uri).get_database(MONGO_SETTINGS.database_name)
+    await generate_embeddings_for_collection(compass_db, gecko_embedding_service,
+                                             MONGO_SETTINGS.embedding_settings.occupation_collection_name,
+                                             BASE_SETTINGS.occupation_collection_name, args)
+    await generate_embeddings_for_collection(compass_db, gecko_embedding_service,
+                                             MONGO_SETTINGS.embedding_settings.skill_collection_name,
+                                             BASE_SETTINGS.skill_collection_name,
+                                             args)
 
 
 if __name__ == "__main__":

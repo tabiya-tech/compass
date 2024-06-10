@@ -1,22 +1,24 @@
 import asyncio
-import os
 from typing import List, Optional, Tuple
 
 import vertexai
 from datasets import load_dataset, Features, Value, VerificationMode
+from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorCollection
 from tqdm import tqdm
 
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService, EmbeddingService
+from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
+from scripts.base_data_settings import ScriptSettings
 
 OCCUPATION_REPO_ID = "tabiya/hahu_test"
 OCCUPATION_FILENAME = "redacted_hahu_test_with_id.csv"
 SKILL_REPO_ID = "tabiya/esco_skills_test"
 SKILL_FILENAME = "data/processed_skill_test_set_with_id.parquet"
-# TODO: Load the database name and collection name from the environment variables.
-DATABASE_NAME = 'compass-test'
-OCCUPATION_EMBEDDINGS_COLLECTION = 'occupationmodelsembeddings'
-SKILLS_EMBEDDINGS_COLLECTION = 'skillsmodelsembeddings'
+
+load_dotenv()
+MONGO_SETTINGS = MongoDbSettings()
+SCRIPT_SETTINGS = ScriptSettings()
 
 
 # TODO: Use the OccupationSearchService to perform a similarity search on the vector store, once we migrate everything
@@ -34,10 +36,10 @@ async def _search(embedding_service: EmbeddingService, collection: AsyncIOMotorC
     """
     params = {
         "queryVector": await embedding_service.embed(query),
-        "path": "embedding",
+        "path": MONGO_SETTINGS.embedding_settings.embedding_key,
         "numCandidates": k * 10 * 3,
         "limit": k * 3,
-        "index": "embedding_index",
+        "index": MONGO_SETTINGS.embedding_settings.embedding_index,
     }
     pipeline = [
         {"$vectorSearch": params},
@@ -124,13 +126,13 @@ async def get_metrics(embedding_service: EmbeddingService, collection: AsyncIOMo
 
 if __name__ == "__main__":
     vertexai.init()
-    compass_db = AsyncIOMotorClient(os.getenv('MONGODB_URI')).get_database(DATABASE_NAME)
+    compass_db = AsyncIOMotorClient(MONGO_SETTINGS.mongodb_uri).get_database(MONGO_SETTINGS.database_name)
     gecko_embedding_service = GoogleGeckoEmbeddingService()
     occupation_dataset = load_dataset(OCCUPATION_REPO_ID, data_files=[OCCUPATION_FILENAME],
-                                      token=os.environ["HF_ACCESS_TOKEN"]).get("train")
+                                      token=SCRIPT_SETTINGS.hf_access_token).get("train")
     # Load the skill dataset. The columns are not consistent with the definition in the dataset so we need to override
     # it and disable verification.
-    skill_dataset = load_dataset(SKILL_REPO_ID, data_files=[SKILL_FILENAME], token=os.environ["HF_ACCESS_TOKEN"],
+    skill_dataset = load_dataset(SKILL_REPO_ID, data_files=[SKILL_FILENAME], token=SCRIPT_SETTINGS.hf_access_token,
                                  features=Features(
                                      {
                                          "label": Value(dtype="string"),
@@ -146,9 +148,13 @@ if __name__ == "__main__":
                                  split="train",
                                  verification_mode=VerificationMode.NO_CHECKS)
     asyncio.get_event_loop().run_until_complete(
-        asyncio.gather(*[get_metrics(gecko_embedding_service, compass_db[OCCUPATION_EMBEDDINGS_COLLECTION],
-                                     occupation_dataset["esco_code"],
-                                     occupation_dataset["synthetic_query"], evaluated_field="code"),
-                         get_metrics(gecko_embedding_service, compass_db[SKILLS_EMBEDDINGS_COLLECTION],
-                                     skill_dataset["label"],
-                                     skill_dataset["synthetic_query"], evaluated_field="preferredLabel")]))
+        asyncio.gather(
+            *[get_metrics(gecko_embedding_service,
+                          compass_db[MONGO_SETTINGS.embedding_settings.occupation_collection_name],
+                          occupation_dataset["esco_code"],
+                          occupation_dataset["synthetic_query"], evaluated_field="code"),
+              # get_metrics(gecko_embedding_service, compass_db[MONGO_SETTINGS.embedding_settings.skill_collection_name],
+              #             skill_dataset["label"],
+              #             skill_dataset["synthetic_query"], evaluated_field="preferredLabel")
+              ])
+    )
