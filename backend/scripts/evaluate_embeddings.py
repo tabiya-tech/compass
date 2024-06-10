@@ -1,16 +1,13 @@
 import asyncio
-from enum import Enum
-from typing import List, Optional, Tuple, Any
+from typing import List, Optional, Tuple
 
 import vertexai
 from datasets import load_dataset, Features, Value, VerificationMode
 from dotenv import load_dotenv
-from motor.motor_asyncio import AsyncIOMotorClient
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorCollection
 from tqdm import tqdm
 
-from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
-from app.vector_search.esco_search_service import VectorSearchConfig, OccupationSearchService, SkillSearchService
-from app.vector_search.similarity_search_service import SimilaritySearchService
+from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService, EmbeddingService
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
 from scripts.base_data_settings import ScriptSettings
 
@@ -24,12 +21,41 @@ MONGO_SETTINGS = MongoDbSettings()
 SCRIPT_SETTINGS = ScriptSettings()
 
 
-class Type(Enum):
+# TODO: Use the OccupationSearchService to perform a similarity search on the vector store, once we migrate everything
+#  to the new structure.
+async def _search(embedding_service: EmbeddingService, collection: AsyncIOMotorCollection, query: str, k: int = 5) -> \
+        List[dict]:
     """
-    An enumeration class to define the type of the entity.
+        Perform a similarity search on the vector store. It uses the default similarity search set during vector
+        generation.
+
+        :param embedding_service: The embedding service to use to embed the queries.
+        :param query: The query to search for.
+        :param k: The number of results to return.
+        :return: A list of T objects.
     """
-    OCCUPATION = "occupation"
-    SKILL = "skill"
+    params = {
+        "queryVector": await embedding_service.embed(query),
+        "path": MONGO_SETTINGS.embedding_settings.embedding_key,
+        "numCandidates": k * 10 * 3,
+        "limit": k * 3,
+        "index": MONGO_SETTINGS.embedding_settings.embedding_index,
+    }
+    pipeline = [
+        {"$vectorSearch": params},
+        {"$set": {"score": {"$meta": "vectorSearchScore"}}},
+        {"$group": {"_id": "$UUID",
+                    "preferredLabel": {"$first": "$preferredLabel"},
+                    "description": {"$first": "$description"},
+                    "altLabels": {"$first": "$altLabels"},
+                    "code": {"$first": "$code"},
+                    "score": {"$max": "$score"},
+                    }
+         },
+        {"$sort": {"score": -1}},
+        {"$limit": k},
+    ]
+    return [entry async for entry in collection.aggregate(pipeline)]
 
 
 def _precision_at_k(prediction: List[List[str]], true: List[List[str]], k: Optional[int] = None):
@@ -75,33 +101,23 @@ def _get_all_metrics(predictions: List[List[str]], true_values: List[List[str]],
     return rec_at_k, prec_at_k, f_score_at_k
 
 
-def _get_evaluated_field(entity: Any, evaluated_type: Type) -> str:
-    """Get the field to evaluate based on the entity type."""
-    if evaluated_type == Type.OCCUPATION:
-        return entity.code
-    elif evaluated_type == Type.SKILL:
-        return entity.preferredLabel
-    else:
-        raise ValueError(f"Invalid entity type: {evaluated_type}")
-
-
-async def _get_predictions(search_service: SimilaritySearchService, queries: List[str],
-                           evaluated_type: Type, k: int = 10):
+async def _get_predictions(embedding_service: EmbeddingService, collection: AsyncIOMotorCollection, queries: List[str],
+                           evaluated_field: str = "code", k: int = 10):
     # We could run predictions in batches to make it quicker, however there is a quota limit on the gecko embeddings
     # API. We are running it sequentially to avoid hitting the limit.
     predictions = []
     for query in tqdm(queries):
-        result = await search_service.search(query, k=k)
-        predictions.append([_get_evaluated_field(e, evaluated_type) for e in result])
+        result = await _search(embedding_service, collection, query, k)
+        predictions.append([e[evaluated_field] for e in result])
     return predictions
 
 
-async def get_metrics(search_service: SimilaritySearchService, ground_truth: List[str],
-                      synthetic_queries: List[str], evaluated_type: Type):
+async def get_metrics(embedding_service: EmbeddingService, collection: AsyncIOMotorCollection, ground_truth: List[str],
+                      synthetic_queries: List[str], evaluated_field: str = "code"):
     """ Evaluate the embeddings using ground truth data and synthetic queries."""
-    predictions = await _get_predictions(search_service, synthetic_queries, evaluated_type, k=10)
+    predictions = await _get_predictions(embedding_service, collection, synthetic_queries, evaluated_field, k=10)
     ground_truth = [[elem] for elem in ground_truth]
-    print(f"Metrics for the {evaluated_type.name} embeddings:")
+    print(f"Metrics for the embeddings: {collection.name}")
     for k in [1, 3, 5, 10]:
         recall, precision, f_score = _get_all_metrics(predictions, ground_truth, k)
         print(f"K = {k}, recall: {recall}, precision: {precision}, f_score: {f_score}")
@@ -111,20 +127,6 @@ if __name__ == "__main__":
     vertexai.init()
     compass_db = AsyncIOMotorClient(MONGO_SETTINGS.mongodb_uri).get_database(MONGO_SETTINGS.database_name)
     gecko_embedding_service = GoogleGeckoEmbeddingService()
-    occupation_vector_search_config = VectorSearchConfig(
-        collection_name=MONGO_SETTINGS.embedding_settings.occupation_collection_name,
-        index_name=MONGO_SETTINGS.embedding_settings.embedding_index,
-        embedding_key=MONGO_SETTINGS.embedding_settings.embedding_key,
-    )
-    _occupation_search_service = OccupationSearchService(compass_db, gecko_embedding_service,
-                                                         occupation_vector_search_config)
-    skill_vector_search_config = VectorSearchConfig(
-        collection_name=MONGO_SETTINGS.embedding_settings.skill_collection_name,
-        index_name=MONGO_SETTINGS.embedding_settings.embedding_index,
-        embedding_key=MONGO_SETTINGS.embedding_settings.embedding_key,
-    )
-    _skill_search_service = SkillSearchService(compass_db, gecko_embedding_service,
-                                               skill_vector_search_config)
     occupation_dataset = load_dataset(OCCUPATION_REPO_ID, data_files=[OCCUPATION_FILENAME],
                                       token=SCRIPT_SETTINGS.hf_access_token).get("train")
     # Load the skill dataset. The columns are not consistent with the definition in the dataset so we need to override
@@ -146,11 +148,12 @@ if __name__ == "__main__":
                                  verification_mode=VerificationMode.NO_CHECKS)
     asyncio.get_event_loop().run_until_complete(
         asyncio.gather(
-            *[get_metrics(_occupation_search_service,
+            *[get_metrics(gecko_embedding_service,
+                          compass_db[MONGO_SETTINGS.embedding_settings.occupation_collection_name],
                           occupation_dataset["esco_code"],
-                          occupation_dataset["synthetic_query"], Type.OCCUPATION),
-              get_metrics(_skill_search_service,
+                          occupation_dataset["synthetic_query"], evaluated_field="code"),
+              get_metrics(gecko_embedding_service, compass_db[MONGO_SETTINGS.embedding_settings.skill_collection_name],
                           skill_dataset["label"],
-                          skill_dataset["synthetic_query"], Type.SKILL)
+                          skill_dataset["synthetic_query"], evaluated_field="preferredLabel")
               ])
     )
