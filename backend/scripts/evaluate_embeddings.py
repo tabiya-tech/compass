@@ -113,10 +113,9 @@ async def _get_predictions(embedding_service: EmbeddingService, collection: Asyn
 
 
 async def get_metrics(embedding_service: EmbeddingService, collection: AsyncIOMotorCollection, ground_truth: List[str],
-                      synthetic_queries: List[str], evaluated_field: str = "code",
-                      k: int = 10):
+                      synthetic_queries: List[str], evaluated_field: str = "code"):
     """ Evaluate the embeddings using ground truth data and synthetic queries."""
-    predictions = await _get_predictions(embedding_service, collection, synthetic_queries, evaluated_field, k)
+    predictions = await _get_predictions(embedding_service, collection, synthetic_queries, evaluated_field, k=10)
     ground_truth = [[elem] for elem in ground_truth]
     print(f"Metrics for the embeddings: {collection.name}")
     for k in [1, 3, 5, 10]:
@@ -153,8 +152,8 @@ if __name__ == "__main__":
                           compass_db[MONGO_SETTINGS.embedding_settings.occupation_collection_name],
                           occupation_dataset["esco_code"],
                           occupation_dataset["synthetic_query"], evaluated_field="code"),
-              # get_metrics(gecko_embedding_service, compass_db[MONGO_SETTINGS.embedding_settings.skill_collection_name],
-              #             skill_dataset["label"],
-              #             skill_dataset["synthetic_query"], evaluated_field="preferredLabel")
+              get_metrics(gecko_embedding_service, compass_db[MONGO_SETTINGS.embedding_settings.skill_collection_name],
+                          skill_dataset["label"],
+                          skill_dataset["synthetic_query"], evaluated_field="preferredLabel")
               ])
     )
