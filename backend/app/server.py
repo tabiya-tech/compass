@@ -3,7 +3,7 @@ import base64
 import os
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -95,6 +95,11 @@ async def conversation(user_input: str, clear_memory: bool = False, filter_pii: 
     """
     Endpoint for conducting the conversation with the agent.
     """
+    # Do not allow user input that is too long,
+    # as a basic measure to prevent abuse.
+    if len(user_input) > 1000:
+        raise HTTPException(status_code=413, detail="To long user input")
+
     try:
         if clear_memory:
             await application_state_manager.delete_state(session_id)
@@ -130,6 +135,11 @@ async def _test_conversation(user_input: str, clear_memory: bool = False, filter
     As a developer, you can use this endpoint to test the conversation agent with any user input.
     You can adjust the front-end to use this endpoint for testing locally an agent in a configurable way.
     """
+    # Do not allow user input that is too long,
+    # as a basic measure to prevent abuse.
+    if len(user_input) > 1000:
+        raise HTTPException(status_code=413, detail="To long user input")
+
     try:
         if clear_memory:
             await application_state_manager.delete_state(session_id)
