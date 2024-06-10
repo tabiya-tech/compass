@@ -35,11 +35,12 @@ class ExperienceMetadata(BaseModel):
     Store a part of the ExperiencesAgentState
     """
 
-    # A short max 5-word description of how the user refere to an experience, e.g. "teacher", "working in the garden", "looking after sick mother"
+    # A short max 5-word description of how the user refer to an experience, e.g. "teacher", "working in the
+    # garden", "looking after sick mother"
     experience_descr: str
 
-    # for the agent, to know if a deepdive should be perfomed
-    done_with_deep_dive = False
+    # for the agent, to know if a deepdive should be performed
+    done_with_deep_dive: bool = False
 
 
 class ExperiencesAgentState(BaseModel):
@@ -50,7 +51,7 @@ class ExperiencesAgentState(BaseModel):
 
     # Experiences on the radar - under discussion with this user.
     # These were mentioned by the user, and the Agent needs to understand them deeper.
-    experiences = {}
+    experiences: dict = {}
     current_experience: str = None
     deep_dive_count: int = 0
 
@@ -81,7 +82,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         # Use the LLM to find out what was the experience the user is talking about
         # (e.g. "baker" or "looking after sick family member")
         # In this version, we handle only one experience per user message
-        # TODO: COM-262 handle multiple expereineces (P3)
+        # TODO: COM-262 handle multiple experiences (P3)
         experinece_descr = await self._extract_experience_from_user_reply(user_input_msg)
         experience_id = self._sanitized_experience_descr(experinece_descr, s.experiences)
 
@@ -131,8 +132,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
             else:
                 # Advance the conversation: wrap up
                 s.conversation_phase = ConversationPhase.WRAPUP
-                return "We are done with exploring your skills. Any last remarks that you wnat to share with me?"
-                s.conversation_phase = ConversationPhase.WRAPUP
+                return "We are done with exploring your skills. Any last remarks that you want to share with me?"
 
     async def execute(self, user_input: AgentInput,
         context: ConversationContext) -> AgentOutput:

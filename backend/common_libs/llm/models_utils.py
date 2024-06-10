@@ -157,7 +157,7 @@ class LLMConfig(BaseModel):
     """
     # gemini-1.5-flash is an auto update version the points to the most recent stable version
     # see https://cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versioning#auto-updated-version
-    model_name: str = "gemini-1.5-flash"
+    language_model_name: str = "gemini-1.5-flash"
     location: str = DEFAULT_VERTEX_API_REGION
     generation_config: dict = DEFAULT_GENERATION_CONFIG
     safety_settings: frozenset[SafetySetting] = DEFAULT_SAFETY_SETTINGS
