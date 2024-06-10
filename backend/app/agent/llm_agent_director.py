@@ -23,7 +23,7 @@ class RouterModelResponse(BaseModel):
     """
     The response from the router model
     """
-    model_name: AgentType
+    agent_type: AgentType
 
 
 class AgentTasking(BaseModel):
