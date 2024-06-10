@@ -130,7 +130,7 @@ async def generate_embeddings(
         logging.error(f"Errors embedding documents in collection {embedding_collection_name}: {errors}")
 
 
-async def create_indexes(db: AsyncIOMotorDatabase, embedding_collection_name: str):
+async def upsert_indexes(db: AsyncIOMotorDatabase, embedding_collection_name: str):
     """Creates the search index for the embeddings."""
     collection = db[embedding_collection_name]
     definition = {'mappings': {
@@ -174,7 +174,7 @@ async def generate_embeddings_for_collection(
     await create_collection(db, embedding_collection_name, drop=arguments.drop_collection)
     await generate_embeddings(db, embedding_service, embedding_collection_name, clean_data_collection_name,
                               arguments.uuids)
-    await create_indexes(db, embedding_collection_name)
+    await upsert_indexes(db, embedding_collection_name)
 
 
 async def main():
