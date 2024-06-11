@@ -19,4 +19,21 @@ securityDefinitions:
     x-google-jwks_uri: "https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com"
     x-google-audiences: "{0}"
 paths:
-  insert-paths-here
+  /docs:
+    get:
+      summary: Docs endpoint
+      operationId: api_docs
+      responses:
+        '200':
+          description: Docs page
+          schema:
+            type: string
+  /openapi.json:
+    get:
+      summary: OAS file
+      operationId: oas_file
+      responses:
+        '200':
+          description: OAS file
+          schema:
+            type: string
