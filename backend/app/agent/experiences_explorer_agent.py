@@ -99,7 +99,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
 
         s.current_experience = experience_id
         s.experiences[experience_id] = ExperienceMetadata(
-            experience_descr=experience_descr, done_with_deep_dive=False)
+            experience_descr=experience_id, done_with_deep_dive=False)
         # In this version we have the exit criteria of a fixed 3 experiences.
         # TODO: COM-263 handle a more dynamic exit criteria from the WARMUP phase (P1)
         if len(s.experiences) >= 3:
@@ -109,8 +109,8 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
             # Advance the conversation
             s.conversation_phase = ConversationPhase.DIVE_IN
             return "Thank you for telling me about your experiences. I think I got the initial picture. Now let's " \
-                   "understand them in more detail, one by one. You said you had an experience as a " + \
-                exp.experience_descr + ". Tell me more about it. When did it happen?"
+                   "understand them in more detail, one by one. You said you had an experience as "\
+                   f"'{exp.experience_descr}'. Tell me more about it. When did it happen?"
 
         return f"Great response ({experience_id})," \
                " I will process that... Tell me about another relevant experience, which you had before this one"
@@ -133,9 +133,9 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
             exp: ExperienceMetadata = s.experiences[s.current_experience]
             # Advance the conversation: dive in again into the next experience
             s.conversation_phase = ConversationPhase.DIVE_IN
-            return dedent(f"""Let's move on to the other experience you mentioned (we already covered
-                   {s.deep_dive_count} out of {len(s.experiences)}). You said you had an experience as a
-                   {exp.experience_descr}. Tell me more about it. When did it happen?""")
+            return f"Let's move on to the other experience you mentioned (we already covered " \
+                   f"{s.deep_dive_count} out of {len(s.experiences)}). You said you had an experience as a " \
+                   f"{exp.experience_descr}. Tell me more about it. When did it happen?"
         else:
             # Advance the conversation: wrap up
             s.conversation_phase = ConversationPhase.WRAPUP
