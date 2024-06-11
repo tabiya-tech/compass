@@ -58,7 +58,5 @@ jobs:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           GCP_OAUTH_CLIENT_ID: ${{ secrets.GCP_OAUTH_CLIENT_ID }}
           GCP_OAUTH_CLIENT_SECRET: ${{ secrets.GCP_OAUTH_CLIENT_SECRET }}
-          BACKEND_URL: ${{ inputs.backend-url }}
-          FRONTEND_URL: ${{ inputs.frontend-url }}
-          DATABASE_NAME: ${{ vars.DATABASE_NAME }}
-          EMBEDDING_SETTINGS: ${{ vars.EMBEDDING_SETTINGS }}
+          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+          EMBEDDING_SETTINGS: ${{ secrets.EMBEDDING_SETTINGS }}
