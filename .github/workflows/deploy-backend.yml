@@ -70,5 +70,5 @@ jobs:
           BACKEND_URL: ${{ inputs.backend-url }}
           FRONTEND_URL: ${{ inputs.frontend-url }}
           # TODO: Change them to vars once we figure out how to propagate them.
-          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
-          EMBEDDING_SETTINGS: ${{ secrets.EMBEDDING_SETTINGS }}
+          DATABASE_NAME: ${{ vars.DATABASE_NAME }}
+          EMBEDDING_SETTINGS: ${{ vars.EMBEDDING_SETTINGS }}
