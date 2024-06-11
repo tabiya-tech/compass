@@ -9,8 +9,8 @@ import pytest
 from _pytest.logging import LogCaptureFixture
 
 from app.agent.agent_director import AgentDirectorState
-from app.agent.llm_agent_director import LLMAgentDirector
 from app.agent.agent_types import AgentType
+from app.agent.llm_agent_director import LLMAgentDirector
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager, \
     ConversationMemoryManagerState
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
@@ -19,6 +19,7 @@ from evaluation_tests.agent_director.agent_director_executors import AgentDirect
 from evaluation_tests.conversation_libs.conversation_test_function import conversation_test_function, \
     ConversationTestConfig, ScriptedUserEvaluationTestCase, \
     ScriptedSimulatedUser
+from evaluation_tests.conversation_libs.fake_occupation_search_service import FakeOccupationSimilaritySearchService
 
 
 @pytest.fixture(scope="session")
@@ -48,7 +49,7 @@ def setup_agent_director() -> tuple[
     # The conversation manager for this test
     conversation_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
     conversation_manager.set_state(state=ConversationMemoryManagerState(session_id))
-    agent_director = LLMAgentDirector(conversation_manager)
+    agent_director = LLMAgentDirector(conversation_manager, FakeOccupationSimilaritySearchService())
     agent_director.set_state(AgentDirectorState(session_id))
 
     async def agent_director_exec(caplog, test_case):

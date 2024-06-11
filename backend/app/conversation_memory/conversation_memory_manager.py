@@ -3,8 +3,6 @@ import logging
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.conversation_memory.conversation_memory_types import ConversationHistory, \
     ConversationContext, ConversationTurn, ConversationMemoryManagerState
-from common_libs.llm.models_utils import LLMConfig
-from common_libs.llm.generative_models import GeminiGenerativeLLM
 from app.conversation_memory.summarizer import Summarizer
 
 
@@ -48,9 +46,9 @@ class ConversationMemoryManager:
             # Generate the new summary
             self._logger.debug("Summarizing conversation:")
             self._state.summary = await self._summarizer.summarize(ConversationContext(
-                                                                   all_history=[],
-                                                                   history=self._state.to_be_summarized_history,
-                                                                   summary=self._state.summary))
+                all_history=ConversationHistory(turns=[]),
+                history=self._state.to_be_summarized_history,
+                summary=self._state.summary))
             self._logger.debug("New Summarized conversation: %s", self._state.summary)
             # Clear the to be summarized history
             self._state.to_be_summarized_history.turns.clear()
