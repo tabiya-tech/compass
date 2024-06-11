@@ -107,24 +107,28 @@ async def get_metrics(search_service: SimilaritySearchService, ground_truth: Lis
         print(f"K = {k}, recall: {recall}, precision: {precision}, f_score: {f_score}")
 
 
+def _get_vector_search_config(evaluated_type: Type) -> VectorSearchConfig:
+    if evaluated_type == Type.OCCUPATION:
+        collection_name = MONGO_SETTINGS.embedding_settings.occupation_collection_name
+    elif evaluated_type == Type.SKILL:
+        collection_name = MONGO_SETTINGS.embedding_settings.skill_collection_name
+    else:
+        raise ValueError(f"Invalid entity type: {evaluated_type}")
+    return VectorSearchConfig(
+        collection_name=collection_name,
+        index_name=MONGO_SETTINGS.embedding_settings.embedding_index,
+        embedding_key=MONGO_SETTINGS.embedding_settings.embedding_key,
+    )
+
+
 if __name__ == "__main__":
     vertexai.init()
     compass_db = AsyncIOMotorClient(MONGO_SETTINGS.mongodb_uri).get_database(MONGO_SETTINGS.database_name)
     gecko_embedding_service = GoogleGeckoEmbeddingService()
-    occupation_vector_search_config = VectorSearchConfig(
-        collection_name=MONGO_SETTINGS.embedding_settings.occupation_collection_name,
-        index_name=MONGO_SETTINGS.embedding_settings.embedding_index,
-        embedding_key=MONGO_SETTINGS.embedding_settings.embedding_key,
-    )
     _occupation_search_service = OccupationSearchService(compass_db, gecko_embedding_service,
-                                                         occupation_vector_search_config)
-    skill_vector_search_config = VectorSearchConfig(
-        collection_name=MONGO_SETTINGS.embedding_settings.skill_collection_name,
-        index_name=MONGO_SETTINGS.embedding_settings.embedding_index,
-        embedding_key=MONGO_SETTINGS.embedding_settings.embedding_key,
-    )
+                                                         _get_vector_search_config(Type.OCCUPATION))
     _skill_search_service = SkillSearchService(compass_db, gecko_embedding_service,
-                                               skill_vector_search_config)
+                                               _get_vector_search_config(Type.SKILL))
     occupation_dataset = load_dataset(OCCUPATION_REPO_ID, data_files=[OCCUPATION_FILENAME],
                                       token=SCRIPT_SETTINGS.hf_access_token).get("train")
     # Load the skill dataset. The columns are not consistent with the definition in the dataset so we need to override

@@ -81,6 +81,10 @@ class AbstractEscoSearchService(SimilaritySearchService[T]):
         :param k: The number of results to return.
         :return: A list of T objects.
         """
+        # Each ESCO entity is duplicated three times, each duplication has a different embedding, one for the
+        # preferredLabel, one for the description and one for the altLabels. The search is performed on all three
+        # fields, so we need to multiply the number of results by 3 to account for the possible duplication. Those
+        # are then grouped by the UUID and the best score is selected. The final number of results is limited to k.
         params = {
             "queryVector": await self.embedding_service.embed(query),
             "path": self.config.embedding_key,
