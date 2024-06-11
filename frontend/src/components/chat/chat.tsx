@@ -10,6 +10,7 @@ interface ChatProps {
 
 export function Chat({ isMobile, sessionId }: Readonly<ChatProps>) {
   const [messagesState, setMessagesState] = useState<Message[]>([]);
+  const [initialized, setInitialized] = useState<boolean>(false);
 
   const START_PROMPT = "~~~START_CONVERSATION~~~";
 
@@ -28,12 +29,12 @@ export function Chat({ isMobile, sessionId }: Readonly<ChatProps>) {
         if (!availableEndpoints.includes(urlSearchParams.get("compass_endpoint"))) {
           console.log(`Invalid compass endpoint from query params: ${urlSearchParams.get("compass_endpoint")}`);
           console.log(`Using default compass endpoint: ${process.env.NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT}/`);
-          return `${process.env.NEXT_PUBLIC_COMPASS_URL}/${process.env.NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT}/?user_input=${encodeURIComponent(userInput)}&session_id=${sessionId}`;
+          return `${process.env.NEXT_PUBLIC_COMPASS_URL}/${process.env.NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT}?user_input=${encodeURIComponent(userInput)}&session_id=${sessionId}`;
         }
         console.log(`Using compass endpoint from query params: ${urlSearchParams.get("compass_endpoint")}`);
-        return `${process.env.NEXT_PUBLIC_COMPASS_URL}/${urlSearchParams.get("compass_endpoint")}/?user_input=${encodeURIComponent(userInput)}&session_id=${sessionId}`;
+        return `${process.env.NEXT_PUBLIC_COMPASS_URL}/${urlSearchParams.get("compass_endpoint")}?user_input=${encodeURIComponent(userInput)}&session_id=${sessionId}`;
       } else {
-        return `${process.env.NEXT_PUBLIC_COMPASS_URL}/${process.env.NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT}/?user_input=${encodeURIComponent(userInput)}&session_id=${sessionId}`;
+        return `${process.env.NEXT_PUBLIC_COMPASS_URL}/${process.env.NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT}?user_input=${encodeURIComponent(userInput)}&session_id=${sessionId}`;
       }
     },
     [sessionId]
@@ -63,7 +64,6 @@ export function Chat({ isMobile, sessionId }: Readonly<ChatProps>) {
       try {
         const response = await axios.get(constructCompassUrl(START_PROMPT));
         console.log({ data: response.data });
-        setTyping(false);
         response.data.conversation_context.history.turns.forEach((historyItem: any) => {
           console.log(
             START_PROMPT,
@@ -79,9 +79,11 @@ export function Chat({ isMobile, sessionId }: Readonly<ChatProps>) {
         });
         return response;
       } catch (error) {
-        setTyping(false);
         console.error(error);
+        addMessage(generateTabiyaMessageFromResponse("I'm sorry, I'm having trouble connecting to the server. Please try again later."));
         throw error;
+      } finally {
+        setTyping(false);
       }
     },
     [setTyping, constructCompassUrl]
@@ -108,18 +110,18 @@ export function Chat({ isMobile, sessionId }: Readonly<ChatProps>) {
       console.log({ data: response.data.last });
       const tabiyaResponse = generateTabiyaMessageFromResponse(response.data.last.message_for_user);
       addMessage(tabiyaResponse);
-      setTyping(false);
     } catch (error) {
       console.error(error);
+    } finally {
       setTyping(false);
     }
   };
 
   useEffect(() => {
-    if (messagesState.length === 0) {
-      getConversation();
+    if (!initialized) {
+      getConversation().then(() => setInitialized(true));
     }
-  }, [getConversation, messagesState.length]);
+  }, [getConversation, initialized]);
 
   return (
     <div className="flex flex-col justify-between w-full h-full">
