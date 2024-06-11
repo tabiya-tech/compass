@@ -1,12 +1,11 @@
 import base64
 import os
-from pathlib import Path
-
 import pulumi
 import pulumi_docker as docker
 import pulumi_gcp as gcp
 import pulumiverse_time as time
 from dataclasses import dataclass
+from pathlib import Path
 
 
 @dataclass
@@ -337,6 +336,14 @@ def _deploy_cloud_run_service(
     if not backend_url:
         raise ValueError("BACKEND_URL environment variable is not set")
 
+    database_name = os.getenv("DATABASE_NAME")
+    if not database_name:
+        raise ValueError("DATABASE_NAME environment variable is not set")
+
+    embedding_settings = os.getenv("EMBEDDING_SETTINGS")
+    if not backend_url:
+        raise ValueError("EMBEDDING_SETTINGS environment variable is not set")
+
     service = gcp.cloudrunv2.Service(
         _get_resource_name(environment=basic_config.environment, resource="cloudrun-service"),
         name=_get_resource_name(environment=basic_config.environment, resource="cloudrun-service"),
@@ -354,6 +361,9 @@ def _deploy_cloud_run_service(
                         ),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="BACKEND_URL", value=backend_url),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="FRONTEND_URL", value=frontend_url),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="DATABASE_NAME", value=database_name),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="EMBEDDING_SETTINGS",
+                                                                       value=embedding_settings),
                         # Add more environment variables here
                     ],
                 )
