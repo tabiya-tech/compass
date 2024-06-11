@@ -54,3 +54,11 @@ jobs:
         shell: bash
         run: poetry run pytest -m 'not (evaluation_test or smoke_test)'
         working-directory: backend
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          GCP_OAUTH_CLIENT_ID: ${{ secrets.GCP_OAUTH_CLIENT_ID }}
+          GCP_OAUTH_CLIENT_SECRET: ${{ secrets.GCP_OAUTH_CLIENT_SECRET }}
+          BACKEND_URL: ${{ inputs.backend-url }}
+          FRONTEND_URL: ${{ inputs.frontend-url }}
+          DATABASE_NAME: ${{ vars.DATABASE_NAME }}
+          EMBEDDING_SETTINGS: ${{ vars.EMBEDDING_SETTINGS }}
