@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import axios, { AxiosResponse } from "axios";
 import { ChatList } from "./chat-list";
 import { generateTabiyaMessageFromResponse, generateUserMessageFromResponse, Message } from "@/app/data";
@@ -17,6 +17,27 @@ export function Chat({ isMobile, sessionId }: Readonly<ChatProps>) {
   const addMessage = (message: Message) => {
     setMessagesState((prevMessages) => [...prevMessages, message]);
   };
+
+  // Helper function to construct the compass url
+  const constructCompassUrl = useCallback(
+    (userInput: string) => {
+      const urlSearchParams = new URLSearchParams(window.location.search);
+      const availableEndpoints = JSON.parse(process.env.NEXT_PUBLIC_AVAILABLE_COMPASS_ENDPOINTS!) || [];
+      if (urlSearchParams.has("compass_endpoint")) {
+        // if the endpoint is not in the available endpoints, return the default endpoint
+        if (!availableEndpoints.includes(urlSearchParams.get("compass_endpoint"))) {
+          console.log(`Invalid compass endpoint from query params: ${urlSearchParams.get("compass_endpoint")}`);
+          console.log(`Using default compass endpoint: ${process.env.NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT}/`);
+          return `${process.env.NEXT_PUBLIC_COMPASS_URL}/${process.env.NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT}/?user_input=${encodeURIComponent(userInput)}&session_id=${sessionId}`;
+        }
+        console.log(`Using compass endpoint from query params: ${urlSearchParams.get("compass_endpoint")}`);
+        return `${process.env.NEXT_PUBLIC_COMPASS_URL}/${urlSearchParams.get("compass_endpoint")}/?user_input=${encodeURIComponent(userInput)}&session_id=${sessionId}`;
+      } else {
+        return `${process.env.NEXT_PUBLIC_COMPASS_URL}/${process.env.NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT}/?user_input=${encodeURIComponent(userInput)}&session_id=${sessionId}`;
+      }
+    },
+    [sessionId]
+  );
 
   // Typing state
   const setTyping = useMemo(
@@ -40,9 +61,7 @@ export function Chat({ isMobile, sessionId }: Readonly<ChatProps>) {
       console.log("Getting conversation history");
       setTyping(true);
       try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_COMPASS_URL}${process.env.NEXT_PUBLIC_COMPASS_ENDPOINT}?user_input=${START_PROMPT}&session_id=${sessionId}`
-        );
+        const response = await axios.get(constructCompassUrl(START_PROMPT));
         console.log({ data: response.data });
         setTyping(false);
         response.data.conversation_context.history.turns.forEach((historyItem: any) => {
@@ -65,7 +84,7 @@ export function Chat({ isMobile, sessionId }: Readonly<ChatProps>) {
         throw error;
       }
     },
-    [setTyping]
+    [setTyping, constructCompassUrl]
   );
 
   const getConversation = useMemo(
@@ -85,9 +104,7 @@ export function Chat({ isMobile, sessionId }: Readonly<ChatProps>) {
     addMessage(newMessage);
     setTyping(true);
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_COMPASS_URL}${process.env.NEXT_PUBLIC_COMPASS_ENDPOINT}?user_input=${encodeURIComponent(newMessage.message)}&session_id=${sessionId}`
-      );
+      const response = await axios.get(constructCompassUrl(newMessage.message));
       console.log({ data: response.data.last });
       const tabiyaResponse = generateTabiyaMessageFromResponse(response.data.last.message_for_user);
       addMessage(tabiyaResponse);
