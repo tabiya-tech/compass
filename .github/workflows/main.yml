@@ -2,11 +2,17 @@ name: Main CI
 on: push
   #push:
   # branches:
-  #   - main
-  #pull_request:
+#   - main
+#pull_request:
 #  types: [ opened, synchronize, reopened ]
 
 jobs:
+  # Setup envs
+  setup-env:
+    uses: ./.github/workflows/setup-env.yml
+    secrets: inherit
+    with:
+      target-environment: dev
   # Backend
   test-backend:
     uses: ./.github/workflows/unit-test-backend.yml
@@ -18,23 +24,25 @@ jobs:
     secrets: inherit
     with:
       target-environment: dev
+  deploy-auth:
+    # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
+    if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
+    uses: ./.github/workflows/deploy-auth.yml
+    needs: [ setup-env ]
+    secrets: inherit
+    with:
+      target-environment: dev
+      frontend-domain: ${{ needs.setup-env.outputs.frontend-domain }}
   deploy-backend:
     # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
     if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
-    needs: [ test-backend ]
+    needs: [ test-backend, setup-env ]
     uses: ./.github/workflows/deploy-backend.yml
     secrets: inherit
     with:
       target-environment: dev
-  deploy-frontend:
-    # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
-    if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
-    needs: [ test-frontend, deploy-backend ]
-    uses: ./.github/workflows/deploy-frontend.yml
-    secrets: inherit
-    with:
-      target-environment: dev
-      backendRestApiURLBase: ${{ needs.deploy-backend.outputs.backendRestApiURLBase }}
+      backend-url: ${{ needs.setup-env.outputs.backend-url }}
+      frontend-url: ${{ needs.setup-env.outputs.frontend-url }}
   smoke-test-backend:
     needs: [ deploy-backend ]
     uses: ./.github/workflows/smoke-test-version.yml
@@ -42,4 +50,35 @@ jobs:
     with:
       component: backend
       expected-version-info: ${{ needs.deploy-backend.outputs.version-info }}
-      component-url: ${{ needs.deploy-backend.outputs.backendRestApiURLBase }}
+      component-url: ${{ needs.deploy-backend.outputs.api-gateway-url }}
+  deploy-frontend:
+    # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
+    if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
+    needs: [ setup-env, test-frontend, deploy-auth ]
+    uses: ./.github/workflows/deploy-frontend.yml
+    secrets: inherit
+    with:
+      target-environment: dev
+      backend-url: ${{ needs.setup-env.outputs.backend-url }}
+  deploy-common:
+    # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
+    if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
+    needs: [ setup-env, deploy-frontend, smoke-test-backend ]
+    uses: ./.github/workflows/deploy-common.yml
+    secrets: inherit
+    with:
+      target-environment: dev
+      domain-name: ${{ needs.setup-env.outputs.domain-name }}
+      frontend-domain: ${{ needs.setup-env.outputs.frontend-domain }}
+      frontend-url: ${{ needs.setup-env.outputs.frontend-url }}
+      backend-domain: ${{ needs.setup-env.outputs.backend-domain }}
+      backend-url: ${{ needs.setup-env.outputs.backend-url }}
+  deploy-aws-ns:
+    # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
+    if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
+    needs: [ setup-env, deploy-common ]
+    uses: ./.github/workflows/deploy-aws-ns.yml
+    secrets: inherit
+    with:
+      target-environment: dev
+      domain-name: ${{ needs.setup-env.outputs.domain-name }}

@@ -24,7 +24,6 @@ COPY --from=builder /usr/local/bin/uvicorn /usr/local/bin/uvicorn
 WORKDIR /code
 
 COPY ./app ./app
-COPY ./esco_search ./esco_search
 COPY ./common_libs ./common_libs
 
 EXPOSE 8080

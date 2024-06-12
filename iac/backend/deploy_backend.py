@@ -1,12 +1,11 @@
 import base64
 import os
-from pathlib import Path
-
 import pulumi
 import pulumi_docker as docker
 import pulumi_gcp as gcp
 import pulumiverse_time as time
 from dataclasses import dataclass
+from pathlib import Path
 
 
 @dataclass
@@ -41,11 +40,6 @@ REQUIRED_SERVICES = [
     "cloudbuild.googleapis.com",
     # Cloud Data Loss Prevention - Required for de-identifying data
     "dlp.googleapis.com",
-    # Firebase
-    "firebasehosting.googleapis.com",
-    "firebase.googleapis.com",
-    # GCP Identity Platform
-    "identitytoolkit.googleapis.com",
     # GCP Cloud Run
     "run.googleapis.com",
 ]
@@ -251,6 +245,7 @@ def _setup_api_gateway(
     )
 
     pulumi.export("apigateway_url", apigw_gateway.default_hostname.apply(lambda hostname: f"https://{hostname}"))
+    pulumi.export("apigateway_id", apigw_gateway.gateway_id)
     return apigw_gateway
 
 
@@ -264,35 +259,6 @@ def _setup_api_gateway(
 # where {{project}} is for example auth-poc-422113 or compass-dev-418218.
 # After the resource has been imported to the pulumi stack, the code is able to update the configs again.
 """
-
-
-def _setup_identity_platform(*, basic_config: ProjectBaseConfig, gateway_uri: pulumi.Output[str],
-                             dependencies: list[pulumi.Resource]):
-    # GCP OAuth clients cannot be created automatically, but must be created from the Google Cloud Console.
-    gcp_oauth_client_id = os.getenv("GCP_OAUTH_CLIENT_ID")
-    gcp_oauth_client_secret = os.getenv("GCP_OAUTH_CLIENT_SECRET")
-
-    # Use name "default" as we may require to import this from GCP
-    default = gcp.identityplatform.Config(
-        "default",
-        authorized_domains=[gateway_uri],
-        mfa=gcp.identityplatform.ConfigMfaArgs(
-            state="DISABLED",
-        ),
-        project=basic_config.project,
-        opts=pulumi.ResourceOptions(depends_on=dependencies),
-    )
-
-    # Enable Google Authentication
-    gcp.identityplatform.DefaultSupportedIdpConfig(
-        _get_resource_name(environment=basic_config.environment, resource="google_idp_config"),
-        client_id=gcp_oauth_client_id,
-        client_secret=gcp_oauth_client_secret,
-        idp_id="google.com",
-        enabled=True,
-        project=basic_config.project,
-        opts=pulumi.ResourceOptions(depends_on=dependencies + [default]),
-    )
 
 
 def _create_repository(
@@ -362,6 +328,22 @@ def _deploy_cloud_run_service(
     if not mongodb_uri:
         raise ValueError("MONGODB_URI environment variable is not set")
 
+    frontend_url = os.getenv("FRONTEND_URL")
+    if not frontend_url:
+        raise ValueError("FRONTEND_URL environment variable is not set")
+
+    backend_url = os.getenv("BACKEND_URL")
+    if not backend_url:
+        raise ValueError("BACKEND_URL environment variable is not set")
+
+    database_name = os.getenv("DATABASE_NAME")
+    if not database_name:
+        raise ValueError("DATABASE_NAME environment variable is not set")
+
+    embedding_settings = os.getenv("EMBEDDING_SETTINGS")
+    if not backend_url:
+        raise ValueError("EMBEDDING_SETTINGS environment variable is not set")
+
     service = gcp.cloudrunv2.Service(
         _get_resource_name(environment=basic_config.environment, resource="cloudrun-service"),
         name=_get_resource_name(environment=basic_config.environment, resource="cloudrun-service"),
@@ -377,6 +359,11 @@ def _deploy_cloud_run_service(
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="VERTEX_API_REGION", value=vertex_api_region
                         ),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="BACKEND_URL", value=backend_url),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="FRONTEND_URL", value=frontend_url),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="DATABASE_NAME", value=database_name),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="EMBEDDING_SETTINGS",
+                                                                       value=embedding_settings),
                         # Add more environment variables here
                     ],
                 )
@@ -422,9 +409,4 @@ def deploy_backend(project: str, location: str, environment: str):
     api_gateway = _setup_api_gateway(
         basic_config=basic_config, cloudrun=cloud_run,
         dependencies=services + [cloud_run]
-    )
-
-    # Setup Google Cloud Identity Platform that provides Firebase based authentications
-    _setup_identity_platform(
-        basic_config=basic_config, gateway_uri=api_gateway.default_hostname, dependencies=services + [api_gateway]
     )

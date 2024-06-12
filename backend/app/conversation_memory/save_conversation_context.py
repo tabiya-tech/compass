@@ -15,7 +15,7 @@ def save_conversation_context_to_json(*, context: ConversationContext, file_path
     """
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     with open(file_path, 'w', encoding='utf-8') as f:
-        f.write(context.json(indent=4))
+        f.write(context.model_dump_json(indent=4))
 
 
 def save_conversation_context_to_markdown(*, title: str, context: ConversationContext, file_path: str) -> None:

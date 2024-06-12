@@ -66,6 +66,12 @@ class AbstractEscoSearchService(SimilaritySearchService[T]):
         """
         raise NotImplementedError
 
+    def _group_fields(self) -> dict:
+        """
+        Fields to extract when grouping the results of the vector search.
+        """
+        raise NotImplementedError
+
     async def search(self, query: str, k: int = 5) -> List[T]:
         """
         Perform a similarity search on the vector store. It uses the default similarity search set during vector
@@ -75,17 +81,25 @@ class AbstractEscoSearchService(SimilaritySearchService[T]):
         :param k: The number of results to return.
         :return: A list of T objects.
         """
+        # Each ESCO entity is duplicated three times, each duplication has a different embedding, one for the
+        # preferredLabel, one for the description and one for the altLabels. The search is performed on all three
+        # fields, so we need to multiply the number of results by 3 to account for the possible duplication. Those
+        # are then grouped by the UUID and the best score is selected. The final number of results is limited to k.
         params = {
             "queryVector": await self.embedding_service.embed(query),
             "path": self.config.embedding_key,
-            "numCandidates": k * 10,
-            "limit": k,
+            "numCandidates": k * 10 * 3,
+            "limit": k * 3,
             "index": self.config.index_name,
         }
-        query = {"$vectorSearch": params}
+        fields = self._group_fields().copy()
+        fields.update({"score": {"$max": "$score"}})
         pipeline = [
-            query,
+            {"$vectorSearch": params},
             {"$set": {"score": {"$meta": "vectorSearchScore"}}},
+            {"$group": fields},
+            {"$sort": {"score": -1}},
+            {"$limit": k},
         ]
         return [self._to_entity(entry) async for entry in self.collection.aggregate(pipeline)]
 
@@ -94,6 +108,15 @@ class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
     """
     A service class to perform similarity searches on the occupations' collection.
     """
+
+    def _group_fields(self) -> dict:
+        return {"_id": "$UUID",
+                "UUID": {"$first": "$UUID"},
+                "preferredLabel": {"$first": "$preferredLabel"},
+                "description": {"$first": "$description"},
+                "altLabels": {"$first": "$altLabels"},
+                "code": {"$first": "$code"},
+                }
 
     def _to_entity(self, doc: dict) -> OccupationEntity:
         """
@@ -128,3 +151,12 @@ class SkillSearchService(AbstractEscoSearchService[SkillEntity]):
             altLabels=doc.get("altLabels", []),
             skillType=doc.get("skillType", ""),
         )
+
+    def _group_fields(self) -> dict:
+        return {"_id": "$UUID",
+                "UUID": {"$first": "$UUID"},
+                "preferredLabel": {"$first": "$preferredLabel"},
+                "description": {"$first": "$description"},
+                "altLabels": {"$first": "$altLabels"},
+                "skillType": {"$first": "skillType"},
+                }

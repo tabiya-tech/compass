@@ -2,7 +2,7 @@ import os
 from typing import TextIO
 
 from app.agent.agent_types import AgentInput, AgentOutput, LLMStats
-from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationTurn
+from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationTurn, ConversationHistory
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationRecord, Actor
 
 
@@ -27,6 +27,7 @@ def _write_turn(f: TextIO, turn: ConversationTurn):
         _write_stats(f, stats, i)
     f.write("\n\n")
 
+
 def _save_conversation_context_to_json(context: ConversationContext, file_path: str) -> None:
     """
     Save the conversation context to a json file
@@ -34,7 +35,7 @@ def _save_conversation_context_to_json(context: ConversationContext, file_path: 
     """
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     with open(file_path, 'w', encoding='utf-8') as f:
-        f.write(context.json(indent=4))
+        f.write(context.model_dump_json(indent=4))
 
 
 def _save_conversation_context_to_markdown(context: ConversationContext, title: str, file_path: str) -> None:
@@ -70,7 +71,7 @@ class FakeConversationContext(ConversationContext):
 
     def __init__(self):
         """ Initializes the fake conversation context with empty history and summary. """
-        super().__init__(all_history=[], history=[], summary="")
+        super().__init__(all_history=ConversationHistory(turns=[]), history=ConversationHistory(turns=[]), summary="")
 
     def fill_conversation(self, conversation: list[ConversationRecord], summary: str):
         """ Fills the conversation history with the given conversation records. """

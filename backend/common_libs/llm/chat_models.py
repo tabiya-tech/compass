@@ -23,7 +23,7 @@ class GeminiChatLLM(BasicLLM):
                  llm_input: LLMInput = None,
                  config: LLMConfig = LLMConfig()):
         super().__init__(config=config)
-        self._model = GenerativeModel(model_name=config.model_name,
+        self._model = GenerativeModel(model_name=config.language_model_name,
                                       system_instruction=system_instructions,
                                       generation_config=GenerationConfig.from_dict(config.generation_config),
                                       safety_settings=list(config.safety_settings)
@@ -53,7 +53,7 @@ class GeminiStatelessChatLLM(BasicLLM):
                  system_instructions: list[str] | str,
                  config: LLMConfig = LLMConfig()):
         super().__init__(config=config)
-        self._model = GenerativeModel(model_name=config.model_name,
+        self._model = GenerativeModel(model_name=config.language_model_name,
                                       system_instruction=system_instructions,
                                       generation_config=GenerationConfig.from_dict(config.generation_config),
                                       safety_settings=list(config.safety_settings)

@@ -9,15 +9,18 @@ from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService, \
 from app.vector_search.esco_entities import SkillEntity, OccupationEntity
 from app.vector_search.esco_search_service import SkillSearchService, VectorSearchConfig, OccupationSearchService
 from app.vector_search.similarity_search_service import SimilaritySearchService
+from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
 
 logger = logging.getLogger(__name__)
 
 # Define a singleton instance of the Google VertexAI embeddings
 _embeddings = GoogleGeckoEmbeddingService()
 
+_settings = MongoDbSettings()
+
 
 def get_gecko_embeddings() -> GoogleGeckoEmbeddingService:
-    """ Get the Google VertexAI embeddings singletone instance."""
+    """ Get the Google VertexAI embeddings singleton instance."""
     return _embeddings
 
 
@@ -38,9 +41,9 @@ def get_skill_search_service(db: AsyncIOMotorDatabase = Depends(get_mongo_db),
             if _skill_search_service_singleton is None:  # double check after acquiring the lock
                 logger.info("Creating a new instance of the skill search service.")
                 skill_vector_search_config = VectorSearchConfig(
-                    collection_name="skillmodels",
-                    index_name="all_skill_gecko_embeddings_vector_index",
-                    embedding_key="all_skill_gecko_embeddings",
+                    collection_name=_settings.embedding_settings.skill_collection_name,
+                    index_name=_settings.embedding_settings.embedding_index,
+                    embedding_key=_settings.embedding_settings.embedding_key,
                 )
                 _skill_search_service_singleton = SkillSearchService(db, embedding_model, skill_vector_search_config)
 
@@ -61,9 +64,9 @@ def get_occupation_search_service(db: AsyncIOMotorDatabase = Depends(get_mongo_d
             if _occupation_search_service_singleton is None: # double check after acquiring the lock
                 logger.info("Creating a new instance of the occupation search service.")
                 occupation_vector_search_config = VectorSearchConfig(
-                    collection_name="occupationmodels",
-                    index_name="all_occupation_gecko_embeddings_vector_index",
-                    embedding_key="all_occupation_gecko_embeddings",
+                    collection_name=_settings.embedding_settings.occupation_collection_name,
+                    index_name=_settings.embedding_settings.embedding_index,
+                    embedding_key=_settings.embedding_settings.embedding_key,
                 )
                 _occupation_search_service_singleton = OccupationSearchService(db, embedding_model,
                                                                                occupation_vector_search_config)

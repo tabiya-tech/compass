@@ -1,16 +1,25 @@
 import logging
-from enum import Enum
 from abc import ABC, abstractmethod
+from enum import Enum
 
 from pydantic import BaseModel
 
 from app.agent.agent import Agent
 from app.agent.agent_types import AgentInput, AgentOutput
+from app.agent.experiences_explorer_agent import ExperiencesExplorerAgent
 from app.agent.farewell_agent import FarewellAgent
 from app.agent.skill_explore_agent import SkillExplorerAgent
 from app.agent.welcome_agent import WelcomeAgent
 from app.conversation_memory.conversation_memory_manager import \
     ConversationMemoryManager
+from app.vector_search.similarity_search_service import SimilaritySearchService
+
+
+class AgentState(BaseModel):
+    """
+    Abstract base class for all agent-specific states.
+    """
+    pass
 
 
 class ConversationPhase(Enum):
@@ -19,9 +28,9 @@ class ConversationPhase(Enum):
     """
     INTRO = 0
     CONSULTING = 1
-    CHECKOUT = 2
-    ENDED = 3
-
+    CONSULTING_EXPERIENCES = 2
+    CHECKOUT = 3
+    ENDED = 4
 
 class AgentDirectorState(BaseModel):
     """
@@ -33,7 +42,6 @@ class AgentDirectorState(BaseModel):
     def __init__(self, session_id):
         super().__init__(session_id=session_id,
                          current_phase=ConversationPhase.INTRO)
-
 
 class AbstractAgentDirector(ABC):
     """
@@ -75,15 +83,20 @@ class AgentDirector(AbstractAgentDirector):
     There is always one agent responsible for each phase.
     """
 
-    def __init__(self, conversation_manager: ConversationMemoryManager):
+    def __init__(self, conversation_manager: ConversationMemoryManager,
+                 similarity_search_service: SimilaritySearchService):
         super().__init__(conversation_manager)
 
         # initialize the agents
         self._agents: dict[ConversationPhase, Agent] = {
             ConversationPhase.INTRO: WelcomeAgent(),
+            ConversationPhase.CONSULTING_EXPERIENCES: ExperiencesExplorerAgent(similarity_search_service),
             ConversationPhase.CONSULTING: SkillExplorerAgent(),
             ConversationPhase.CHECKOUT: FarewellAgent()
         }
+
+    def get_experiences_explorer_agent(self):
+        return self._agents[ConversationPhase.CONSULTING_EXPERIENCES]
 
     def _get_current_agent(self) -> Agent | None:
         """
@@ -106,6 +119,7 @@ class AgentDirector(AbstractAgentDirector):
         :param user_input: The user input
         :return: The output from the agent
         """
+
         try:
             current_agent = self._get_current_agent()
             if current_agent:

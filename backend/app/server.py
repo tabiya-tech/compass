@@ -1,32 +1,48 @@
-import logging
 import base64
+import logging
+import os
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request, Depends
+
+from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
 from pydantic import BaseModel
 
 from app.agent.agent_types import AgentInput, AgentOutput
+from app.agent.experiences_explorer_agent import ExperiencesExplorerAgent  # for sandbox testing
 from app.agent.llm_agent_director import LLMAgentDirector
-from app.agent.welcome_agent import WelcomeAgent
 from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
 from app.conversation_memory.conversation_memory_manager import ConversationContext, ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
-from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
+from app.server_dependencies import get_conversation_memory_manager
 from app.vector_search.occupation_search_routes import add_occupation_search_routes
+from app.vector_search.similarity_search_service import SimilaritySearchService
 from app.vector_search.skill_search_routes import add_skill_search_routes
+from app.vector_search.vector_search_dependencies import get_occupation_search_service
 from app.version.version_routes import add_version_routes
 
 logger = logging.getLogger(__name__)
 
 load_dotenv()
-app = FastAPI()
+
+# Retrieve the backend URL from the environment variables,
+# and set the server URL to the backend URL, so that Swagger UI can correctly call the backend paths
+app = FastAPI(
+    servers=[
+        {
+            "url": os.getenv("BACKEND_URL") or "/",
+            "description": "The backend server"
+        }]
+)
 
 origins = [
-    "*"
+    os.getenv("FRONTEND_URL") or "*",
+    (os.getenv("BACKEND_URL") or "*") + "/docs",
 ]
+logger.info(f"Allowed origins: {origins}")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -51,7 +67,7 @@ firebase = HTTPBearer(scheme_name="firebase")
 add_version_routes(app)
 
 ############################################
-# Add routes relevant for esco_search
+# Add routes relevant for esco search
 ############################################
 
 add_occupation_search_routes(app)
@@ -72,8 +88,13 @@ sensitive_filter.add_filter_routes(app)
 # but this can be replaced with a persistent store based on environment variables
 # TODO: use the Fast api dependency injection pattern to inject them into the routes
 application_state_manager = ApplicationStateManager(InMemoryApplicationStateStore())
-conversation_memory_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
-agent_director = LLMAgentDirector(conversation_memory_manager)
+
+
+def get_agent_director(conversation_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager),
+                       similarity_search: SimilaritySearchService = Depends(
+                           get_occupation_search_service)) -> LLMAgentDirector:
+    """ Get the agent manager instance."""
+    return LLMAgentDirector(conversation_manager, similarity_search)
 
 
 class ConversationResponse(BaseModel):
@@ -87,10 +108,20 @@ class ConversationResponse(BaseModel):
 @app.get(path="/conversation",
          description="""The main conversation route used to interact with the agent.""", )
 async def conversation(user_input: str, clear_memory: bool = False, filter_pii: bool = True,
-                       session_id: int = 1, authorization = Depends(http_bearer)):
+                       session_id: int = 1,
+                       conversation_memory_manager: ConversationMemoryManager = Depends(
+                           get_conversation_memory_manager),
+                       agent_director: LLMAgentDirector = Depends(get_agent_director),
+                       authorization = Depends(http_bearer)):
+
     """
     Endpoint for conducting the conversation with the agent.
     """
+    # Do not allow user input that is too long,
+    # as a basic measure to prevent abuse.
+    if len(user_input) > 1000:
+        raise HTTPException(status_code=413, detail="To long user input")
+
     try:
         if clear_memory:
             await application_state_manager.delete_state(session_id)
@@ -100,7 +131,9 @@ async def conversation(user_input: str, clear_memory: bool = False, filter_pii: 
 
         # set the state of the agent director and the conversation memory manager
         state = await application_state_manager.get_state(session_id)
+
         agent_director.set_state(state.agent_director_state)
+        agent_director.get_experiences_explorer_agent().set_state(state.experiences_explorer_state)
         conversation_memory_manager.set_state(state.conversation_memory_manager_state)
 
         # Handle the user input
@@ -120,11 +153,21 @@ async def conversation(user_input: str, clear_memory: bool = False, filter_pii: 
 @app.get(path="/conversation_sandbox",
          description="""Temporary route used to interact with the conversation agent.""", )
 async def _test_conversation(user_input: str, clear_memory: bool = False, filter_pii: bool = False,
-                             session_id: int = 1, authorization = Depends(http_bearer)):
+                             session_id: int = 1, only_reply: bool = False,
+                             similarity_search: SimilaritySearchService = Depends(get_occupation_search_service),
+                             conversation_memory_manager: ConversationMemoryManager = Depends(
+                                 get_conversation_memory_manager), 
+                             authorization = Depends(http_bearer)):
+
     """
     As a developer, you can use this endpoint to test the conversation agent with any user input.
     You can adjust the front-end to use this endpoint for testing locally an agent in a configurable way.
     """
+    # Do not allow user input that is too long,
+    # as a basic measure to prevent abuse.
+    if len(user_input) > 1000:
+        raise HTTPException(status_code=413, detail="To long user input")
+
     try:
         if clear_memory:
             await application_state_manager.delete_state(session_id)
@@ -137,8 +180,10 @@ async def _test_conversation(user_input: str, clear_memory: bool = False, filter
         conversation_memory_manager.set_state(state.conversation_memory_manager_state)
 
         # ##################### ADD YOUR AGENT HERE ######################
-        # Initialize the agent you want to use for the evaluation^
-        agent = WelcomeAgent()
+        # Initialize the agent you want to use for the evaluation
+        agent = ExperiencesExplorerAgent(similarity_search)
+        logger.debug("ExperinecesExplorerAgent initialized for sandbox testing")
+        agent.set_state(state.experiences_explorer_state)
         # ################################################################
 
         # handle the user input
@@ -149,6 +194,8 @@ async def _test_conversation(user_input: str, clear_memory: bool = False, filter
         # get the context again after updating the history
         context = await conversation_memory_manager.get_conversation_context()
         response = ConversationResponse(last=agent_output, conversation_context=context)
+        if only_reply:
+            response = response.last.message_for_user
 
         # save the state, before responding to the user
         await application_state_manager.save_state(session_id, state)
@@ -161,7 +208,9 @@ async def _test_conversation(user_input: str, clear_memory: bool = False, filter
 
 @app.get(path="/conversation_context",
          description="""Temporary route used to get the conversation context of a user.""", )
-async def get_conversation_context(session_id: int, authorization = Depends(http_bearer)):
+async def get_conversation_context(session_id: int, conversation_memory_manager: ConversationMemoryManager = Depends(
+    get_conversation_memory_manager), authorization = Depends(http_bearer)):
+  
     """
     Get the conversation context of a user.
     """

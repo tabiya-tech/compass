@@ -10,6 +10,7 @@ from _pytest.logging import LogCaptureFixture
 
 from app.agent.agent_director import AgentDirector, AgentDirectorState
 from app.agent.agent_types import AgentType
+from app.agent.experiences_explorer_agent import ExperiencesAgentState
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager, \
     ConversationMemoryManagerState
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
@@ -18,6 +19,7 @@ from evaluation_tests.agent_director.agent_director_executors import AgentDirect
 from evaluation_tests.conversation_libs.conversation_test_function import conversation_test_function, \
     ConversationTestConfig, ScriptedUserEvaluationTestCase, \
     ScriptedSimulatedUser
+from evaluation_tests.conversation_libs.fake_occupation_search_service import FakeOccupationSimilaritySearchService
 
 
 @pytest.fixture(scope="session")
@@ -42,8 +44,9 @@ def setup_agent_director() -> tuple[ConversationMemoryManager, Callable[
     # The conversation manager for this test
     conversation_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
     conversation_manager.set_state(state=ConversationMemoryManagerState(session_id))
-    agent_director = AgentDirector(conversation_manager)
+    agent_director = AgentDirector(conversation_manager, FakeOccupationSimilaritySearchService())
     agent_director.set_state(AgentDirectorState(session_id))
+    agent_director.get_experiences_explorer_agent().set_state(ExperiencesAgentState(session_id))
 
     async def agent_director_exec(caplog, test_case):
         print(f"Running test case {test_case.name}")
