@@ -3,9 +3,11 @@ import logging
 import os
 
 from dotenv import load_dotenv
+
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.security import HTTPBearer
 from pydantic import BaseModel
 
 from app.agent.agent_types import AgentInput, AgentOutput
@@ -48,6 +50,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+############################################
+# Security Definitions
+############################################
+# Used for adding the security definitions for OpenAPI docs
+# auto_error=False means an error won't be thrown if the "Authorization: Bearer"
+# header is missing. It should be set to True when the APIs will be used from
+# the UI and the API Gateway is running in front of this service.
+http_bearer = HTTPBearer(auto_error=False, scheme_name="JWT_auth")
+firebase = HTTPBearer(scheme_name="firebase")
 
 ############################################
 # Add version routes
@@ -99,7 +111,9 @@ async def conversation(user_input: str, clear_memory: bool = False, filter_pii: 
                        session_id: int = 1,
                        conversation_memory_manager: ConversationMemoryManager = Depends(
                            get_conversation_memory_manager),
-                       agent_director: LLMAgentDirector = Depends(get_agent_director)):
+                       agent_director: LLMAgentDirector = Depends(get_agent_director),
+                       authorization = Depends(http_bearer)):
+
     """
     Endpoint for conducting the conversation with the agent.
     """
@@ -142,7 +156,9 @@ async def _test_conversation(user_input: str, clear_memory: bool = False, filter
                              session_id: int = 1, only_reply: bool = False,
                              similarity_search: SimilaritySearchService = Depends(get_occupation_search_service),
                              conversation_memory_manager: ConversationMemoryManager = Depends(
-                                 get_conversation_memory_manager)):
+                                 get_conversation_memory_manager), 
+                             authorization = Depends(http_bearer)):
+
     """
     As a developer, you can use this endpoint to test the conversation agent with any user input.
     You can adjust the front-end to use this endpoint for testing locally an agent in a configurable way.
@@ -193,7 +209,8 @@ async def _test_conversation(user_input: str, clear_memory: bool = False, filter
 @app.get(path="/conversation_context",
          description="""Temporary route used to get the conversation context of a user.""", )
 async def get_conversation_context(session_id: int, conversation_memory_manager: ConversationMemoryManager = Depends(
-    get_conversation_memory_manager)):
+    get_conversation_memory_manager), authorization = Depends(http_bearer)):
+  
     """
     Get the conversation context of a user.
     """
@@ -213,7 +230,7 @@ async def get_conversation_context(session_id: int, conversation_memory_manager:
 # and must be removed later.
 @app.get(path="/authinfo",
          description="Returns the authentication info (JWT token claims)")
-async def _get_auth_info(request: Request):
+async def _get_auth_info(request: Request, authorization = Depends(firebase)):
     auth_info_b64 = request.headers.get('x-apigateway-api-userinfo')
     # some python magic
     auth_info = base64.b64decode(auth_info_b64.encode() + b'==').decode()
