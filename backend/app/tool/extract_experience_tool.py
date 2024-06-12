@@ -1,13 +1,17 @@
 import logging
+from abc import ABC
 from textwrap import dedent
-from abc import ABC, abstractmethod
+from typing import List, Optional
 
-from common_libs.llm.chat_models import GeminiStatelessChatLLM
+from pydantic.main import BaseModel
+
+from app.vector_search.esco_entities import OccupationEntity
+from app.vector_search.similarity_search_service import SimilaritySearchService
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, LOW_TEMPERATURE_GENERATION_CONFIG
 
-
 logger = logging.getLogger(__name__)
+
 
 class Tool(ABC):
     """
@@ -15,34 +19,50 @@ class Tool(ABC):
     """
 
 
+class ExperienceEntity(BaseModel):
+    """
+    A class to represent a skill experience.
+    """
+    esco_occupations: Optional[List[OccupationEntity]] = []
+    job_title: str
+    # TODO: Add more fields, especially the skills. Also decide whether we want skills to be directly connected to each
+    #  occupation or not.
+
+
 class ExtractExperienceTool(Tool):
     """
-    This tool takes a user input text and uses an LLM to decide what past experience is the user talking about.
+    This tool takes a user input text and uses an LLM to decide what past experiences is the user talking about.
     The experience can be a formal work experience (e.g. baker) or an informal experience (e.g. cooking for the family).
-
-    The tool returns the answer in form of a 1-5 word string.
-    Some agents will use this answer in their interaction with the user.
-
-    In this version, the tool does not ground itself in the ESCO database, but in future versions it might.
+    Those are then parsed, looked-up in ESCO and returned as a list of ExperienceEntity.
     """
-    def __init__(self, config: LLMConfig = LLMConfig(generation_config=LOW_TEMPERATURE_GENERATION_CONFIG)):
-        # system instructions for the identifying the past work experience
-        self._system_instructions = dedent("""\
-                    Identify in the following text, in a few words (min 1 word, ideally 2 words, max 5 words), what work experience in the person talking about.
-                    If the person is not talking about a work experience but they are talking about an informal occupation or time spent to develop a skill
-                    (e.g. working in my garden, studying, looking after my sick mother"), then identify that.
-                    If you think the person is not talking about any work experience, then say a single worr: "NOT_WORK_EXPERIENCE".
+
+    def __init__(self, occupation_search_service: SimilaritySearchService[OccupationEntity],
+                 config: LLMConfig = LLMConfig(generation_config=LOW_TEMPERATURE_GENERATION_CONFIG)):
+        # TODO: Consider using json to be consistent with the agents.
+        self._system_instructions = dedent(""" 
+                    Given a conversation between a user and an assistant of an employment agency, list all the 
+                    relevant occupations, places of work, dates and whether it was in the unseen economy or not. The 
+                    format should be:
+
+                    {JOB_TITLE}; {UNSEEN_OR_FORMAL_ECONOMY}; {PLACE_OF_WORK}; {DATES_WORKED}
                     
-                    Reply in one line text, in English.
+                    each variable should be separated by semicolon and each position should be separated by a newline. 
+                    If you are unsure about a variable, return NOT_CLEAR
               """)
         self._llm = GeminiGenerativeLLM(system_instructions=self._system_instructions, config=config)
+        self._occupation_search_service = occupation_search_service
 
-    async def extract_experience_from_user_reply(self, user_str: str) -> str:
-        # Use the LLM to find out what was the experience the user is talking about
+    async def extract_experience_from_user_reply(self, user_str: str) -> List[ExperienceEntity]:
+        # Use the LLM to find out what was the experiences the user is talking about
         llm_response = await self._llm.generate_content(user_str)
-        logger.debug("LLM said: {rsp} for user input {inp}".format(rsp=llm_response.text, inp=user_str))
         response_text = llm_response.text
-        if response_text == "NOT_WORK_EXPERIENCE":
-            return None
-        else:
-            return llm_response.text
+        experiences: List[ExperienceEntity] = []
+        for line in response_text.split("\n"):
+            if line.strip() == "":
+                continue
+            elements = line.split(";")
+            experience = ExperienceEntity(job_title=elements[0])
+            experience.esco_occupations = await self._occupation_search_service.search(elements[0])
+            # TODO: Add more fields, especially the skills.
+            experiences.append(experience)
+        return experiences

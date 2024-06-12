@@ -10,6 +10,7 @@ from app.agent.skill_explore_agent import SkillExplorerAgent
 from app.agent.experiences_explorer_agent import ExperiencesExplorerAgent
 from app.agent.welcome_agent import WelcomeAgent
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
+from app.vector_search.similarity_search_service import SimilaritySearchService
 from common_libs.llm.models_utils import LLMConfig
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 
@@ -41,13 +42,13 @@ class LLMAgentDirector(AbstractAgentDirector):
     the user input to the appropriate agent.
     """
 
-    def __init__(self, conversation_manager: ConversationMemoryManager):
+    def __init__(self, conversation_manager: ConversationMemoryManager, skill_search_service: SimilaritySearchService):
         super().__init__(conversation_manager)
         # initialize the agents
         self._agents: dict[AgentType, Agent] = {
             AgentType.WELCOME_AGENT: WelcomeAgent(),
             AgentType.SKILL_EXPLORER_AGENT: SkillExplorerAgent(),
-            AgentType.EXPERIENCES_EXPLORER_AGENT: ExperiencesExplorerAgent(),
+            AgentType.EXPERIENCES_EXPLORER_AGENT: ExperiencesExplorerAgent(skill_search_service),
             AgentType.FAREWELL_AGENT: FarewellAgent()
         }
         # define the tasks that each agent is responsible for

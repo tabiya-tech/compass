@@ -19,6 +19,7 @@ from evaluation_tests.agent_director.agent_director_executors import AgentDirect
 from evaluation_tests.conversation_libs.conversation_test_function import conversation_test_function, \
     ConversationTestConfig, ScriptedUserEvaluationTestCase, \
     ScriptedSimulatedUser
+from evaluation_tests.conversation_libs.fake_occupation_search_service import FakeOccupationSimilaritySearchService
 
 
 @pytest.fixture(scope="session")
@@ -43,7 +44,7 @@ def setup_agent_director() -> tuple[ConversationMemoryManager, Callable[
     # The conversation manager for this test
     conversation_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
     conversation_manager.set_state(state=ConversationMemoryManagerState(session_id))
-    agent_director = AgentDirector(conversation_manager)
+    agent_director = AgentDirector(conversation_manager, FakeOccupationSimilaritySearchService())
     agent_director.set_state(AgentDirectorState(session_id))
     agent_director.get_experiences_explorer_agent().set_state(ExperiencesAgentState(session_id))
 

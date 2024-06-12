@@ -13,7 +13,9 @@ from app.agent.prompt_reponse_template import get_conversation_finish_instructio
 from app.agent.prompt_reponse_template import get_json_response_instructions
 from app.conversation_memory.conversation_memory_types import \
     ConversationContext
-from app.tool.extract_experience_tool import ExtractExperienceTool
+from app.tool.extract_experience_tool import ExtractExperienceTool, ExperienceEntity
+from app.vector_search.esco_entities import OccupationEntity
+from app.vector_search.similarity_search_service import SimilaritySearchService
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +24,7 @@ class ConversationPhase(Enum):
     """
     The agent keeps track of where we are in the conversation.
     The intended structure is that we have an "outer loop" where we orient ourselves on
-    the potential occupations to be explored; and there is an "inner loop" wehere we
+    the potential occupations to be explored; and there is an "inner loop" where we
     dig deeper into each occupation on the radar.
     """
     INIT = 0
@@ -92,14 +94,13 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         logger.debug("Phase1. The user said: %s", user_input_msg)
         # Use the LLM to find out what was the experience the user is talking about
         # (e.g. "baker" or "looking after sick family member")
-        # In this version, we handle only one experience per user message
-        # TODO: COM-262 handle multiple experiences (P3)
-        experience_descr = await self._extract_experience_from_user_reply(user_input_msg)
-        experience_id = _sanitized_experience_descr(experience_descr, s.experiences)
+        experiences = await self._extract_experience_from_user_reply(user_input_msg)
+        for experience in experiences:
+            experience_id = _sanitized_experience_descr(experience.job_title, s.experiences)
+            # TODO: Store the entire ExperienceEntity here instead of just the title.
+            s.experiences[experience_id] = ExperienceMetadata(
+                experience_descr=experience.job_title, done_with_deep_dive=False)
 
-        s.current_experience = experience_id
-        s.experiences[experience_id] = ExperienceMetadata(
-            experience_descr=experience_id, done_with_deep_dive=False)
         # In this version we have the exit criteria of a fixed 3 experiences.
         # TODO: COM-263 handle a more dynamic exit criteria from the WARMUP phase (P1)
         if len(s.experiences) >= 3:
@@ -112,7 +113,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
                    "understand them in more detail, one by one. You said you had an experience as "\
                    f"'{exp.experience_descr}'. Tell me more about it. When did it happen?"
 
-        return f"Great response ({experience_id})," \
+        return f"Great response ({', '.join([e.job_title for e in experiences])})," \
                " I will process that... Tell me about another relevant experience, which you had before this one"
 
     def _handle_dive_in_phase(self, user_input_msg: str) -> str:
@@ -198,12 +199,12 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         """
         self._state = state
 
-    async def _extract_experience_from_user_reply(self, user_str: str) -> str:
+    async def _extract_experience_from_user_reply(self, user_str: str) -> list[ExperienceEntity]:
         # Use the LLM to find out what was the experience the user is talking about
-        llm_response = await self._extract_experience_tool.extract_experience_from_user_reply(user_str)
-        return llm_response
+        return await self._extract_experience_tool.extract_experience_from_user_reply(user_str)
 
-    def __init__(self):
+    # TODO: Figure out how to do dependency injection. This is a workaround for now.
+    def __init__(self, similarity_search: SimilaritySearchService[OccupationEntity]):
         # Define the response part of the prompt with some example responses
         response_part = get_json_response_instructions([
             ModelResponse(
@@ -255,6 +256,6 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         super().__init__(agent_type=AgentType.EXPERIENCES_EXPLORER_AGENT,
                          system_instructions=system_instructions)
 
-        self._extract_experience_tool = ExtractExperienceTool(self.get_llm_config())
+        self._extract_experience_tool = ExtractExperienceTool(similarity_search, self.get_llm_config())
 
         self._state = None
