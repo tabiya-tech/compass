@@ -97,6 +97,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         experiences = await self._extract_experience_from_user_reply(user_input_msg)
         for experience in experiences:
             experience_id = _sanitized_experience_descr(experience.job_title, s.experiences)
+            # TODO: Store the entire ExperienceEntity here instead of just the title.
             s.experiences[experience_id] = ExperienceMetadata(
                 experience_descr=experience.job_title, done_with_deep_dive=False)
 
