@@ -34,7 +34,7 @@ class AgentTasking(BaseModel):
     agent_type_name: str
     # LLM-targeted text description of the tasks that this agent can handle.
     tasks: str
-    # Exaples of user input
+    # Examples of user input
     examples: list[str]
 
 
