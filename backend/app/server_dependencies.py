@@ -14,9 +14,6 @@ def get_mongo_db() -> AsyncIOMotorDatabase:
     return _mongo_db
 
 
-_conversation_memory_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
-
-
 def get_conversation_memory_manager() -> ConversationMemoryManager:
     """ Get the conversation memory manager instance."""
-    return _conversation_memory_manager
+    return ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)

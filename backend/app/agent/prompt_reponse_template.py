@@ -61,7 +61,7 @@ def get_json_response_instructions(examples: list[ModelResponse]) -> str:
                       "\nExample responses. Treat them as examples, do not repeat them exactly as they are:"]
 
     for example in examples:
-        part = example.json()
+        part = example.model_dump_json()
         template_parts.append(part)
 
     return "\n".join(template_parts)
