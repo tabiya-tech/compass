@@ -45,16 +45,44 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip' # caching pip dependencies
-      - name: Install python packages
+      - name: Install IaC python packages
         run: pip install -r requirements.txt
         working-directory: iac
-      - name: Export OpenAPI2 docs (required in Pulumi)
-        run: bash export_openapi2.sh
-        working-directory: backend/scripts
+      - name: Load cached Poetry installation
+        id: cached-poetry
+        uses: actions/cache@v4
+        with:
+          path: ~/.local
+          key: poetry-0
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+      - name: Load cached Poetry cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry
+          key: poetry-cache-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ env.POETRY_VERSION }}
+      - name: Install dependencies
+        shell: bash
+        run: |
+          poetry lock --no-update --no-interaction
+          poetry install --no-interaction
+        working-directory: backend
       - name: Setup google-cloud-auth
         uses: google-github-actions/auth@v2.1.2
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+      - name: Export OpenAPI2 docs (required in Pulumi)
+        shell: bash
+        working-directory: ./backend/scripts
+        run: |
+          poetry run export_openapi
+          poetry run convert_openapi
+          cp openapi2.yaml ../../iac/backend/config/gcp_api_gateway_config.yaml
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          # TODO: Change them to vars once we figure out how to propagate them.
+          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+          EMBEDDING_SETTINGS: ${{ secrets.EMBEDDING_SETTINGS }}
       - name: Authenticate to docker
         # TODO the region should be extracted from the pulumi yaml
         run: gcloud auth configure-docker us-central1-docker.pkg.dev
