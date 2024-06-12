@@ -1,8 +1,10 @@
 import pytest
+from fastapi.testclient import TestClient
 from tqdm import tqdm
 
 from app.agent.agent_types import AgentOutput, AgentInput
-from app.server import conversation, get_conversation_context
+from app.conversation_memory.conversation_memory_types import ConversationContext
+from app.server import app
 from evaluation_tests.conversation_libs import conversation_generator
 from evaluation_tests.conversation_libs.conversation_test_function import EvaluationTestCase, LLMSimulatedUser
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationEvaluationRecord
@@ -20,7 +22,9 @@ class _AppChatExecutor:
         """
         Executes the application chat route
         """
-        return (await conversation(user_input=agent_input.message, session_id=self._session_id)).last
+        response = client.get('/conversation', params={'user_input': agent_input.message,
+                                                       'session_id': self._session_id})
+        return AgentOutput.model_validate(response.json()['last'])
 
 
 class _AppChatIsFinished:
@@ -30,6 +34,9 @@ class _AppChatIsFinished:
         Checks if the application chat route is finished
         """
         return agent_output.finished and agent_output.agent_type is None
+
+
+client = TestClient(app)
 
 
 @pytest.mark.asyncio
@@ -64,5 +71,6 @@ async def test_main_app_chat(max_iterations: int, test_case: EvaluationTestCase,
     finally:
         output_folder = common_folder_path + 'e2e_test_' + test_case.name
         evaluation_result.save_data(folder=output_folder, base_file_name='evaluation_record')
-        context = await get_conversation_context(session_id=session_id)
+        context = ConversationContext.model_validate(
+            client.get("/conversation_context", params={'session_id': session_id}).json())
         save_conversation(context, title=test_case.name, folder_path=output_folder)

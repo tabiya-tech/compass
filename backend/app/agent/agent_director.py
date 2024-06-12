@@ -1,24 +1,26 @@
 import logging
-from enum import Enum
-
 from abc import ABC, abstractmethod
+from enum import Enum
 
 from pydantic import BaseModel
 
 from app.agent.agent import Agent
 from app.agent.agent_types import AgentInput, AgentOutput
+from app.agent.experiences_explorer_agent import ExperiencesExplorerAgent
 from app.agent.farewell_agent import FarewellAgent
 from app.agent.skill_explore_agent import SkillExplorerAgent
-from app.agent.experiences_explorer_agent import ExperiencesExplorerAgent
 from app.agent.welcome_agent import WelcomeAgent
 from app.conversation_memory.conversation_memory_manager import \
     ConversationMemoryManager
+from app.vector_search.similarity_search_service import SimilaritySearchService
+
 
 class AgentState(BaseModel):
     """
     Abstract base class for all agent-specific states.
     """
     pass
+
 
 class ConversationPhase(Enum):
     """
@@ -81,13 +83,14 @@ class AgentDirector(AbstractAgentDirector):
     There is always one agent responsible for each phase.
     """
 
-    def __init__(self, conversation_manager: ConversationMemoryManager):
+    def __init__(self, conversation_manager: ConversationMemoryManager,
+                 similarity_search_service: SimilaritySearchService):
         super().__init__(conversation_manager)
 
         # initialize the agents
         self._agents: dict[ConversationPhase, Agent] = {
             ConversationPhase.INTRO: WelcomeAgent(),
-            ConversationPhase.CONSULTING_EXPERIENCES: ExperiencesExplorerAgent(),
+            ConversationPhase.CONSULTING_EXPERIENCES: ExperiencesExplorerAgent(similarity_search_service),
             ConversationPhase.CONSULTING: SkillExplorerAgent(),
             ConversationPhase.CHECKOUT: FarewellAgent()
         }
