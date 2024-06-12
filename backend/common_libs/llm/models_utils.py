@@ -9,7 +9,7 @@ import vertexai
 
 from dotenv import load_dotenv
 from google.api_core.exceptions import ResourceExhausted
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from vertexai.generative_models import HarmCategory, HarmBlockThreshold, SafetySetting
 
 logger = logging.getLogger(__name__)
@@ -162,15 +162,7 @@ class LLMConfig(BaseModel):
     generation_config: dict = DEFAULT_GENERATION_CONFIG
     safety_settings: frozenset[SafetySetting] = DEFAULT_SAFETY_SETTINGS
     retry_config: RetryConfig = DEFAULT_RETRY_CONFIG
-
-    class Config:
-        """
-        Configuration settings for the LLMConfig model.
-        """
-        arbitrary_types_allowed = True
-        """
-        Allow arbitrary types for the model as the generation_config is a custom class.
-        """
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 class LLMTurn(BaseModel):

@@ -5,14 +5,14 @@ from pydantic import BaseModel
 from app.agent.agent import Agent
 from app.agent.agent_director import AbstractAgentDirector, ConversationPhase
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType
+from app.agent.experiences_explorer_agent import ExperiencesExplorerAgent
 from app.agent.farewell_agent import FarewellAgent
 from app.agent.skill_explore_agent import SkillExplorerAgent
-from app.agent.experiences_explorer_agent import ExperiencesExplorerAgent
 from app.agent.welcome_agent import WelcomeAgent
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.vector_search.similarity_search_service import SimilaritySearchService
-from common_libs.llm.models_utils import LLMConfig
 from common_libs.llm.generative_models import GeminiGenerativeLLM
+from common_libs.llm.models_utils import LLMConfig
 
 DEFAULT_AGENT = "DefaultAgent"
 
@@ -197,7 +197,8 @@ class LLMAgentDirector(AbstractAgentDirector):
 
             # Get the context
             context = await self._conversation_manager.get_conversation_context()
-            clean_input: AgentInput = user_input.copy()  # make a copy of the user input to avoid modifying the original
+            clean_input: AgentInput = user_input.model_copy()  # make a copy of the user input to avoid modifying the
+            # original
             clean_input.message = clean_input.message.strip()  # Remove leading and trailing whitespaces
 
             # Get the agent to run

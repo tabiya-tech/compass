@@ -17,7 +17,6 @@ def pytest_generate_tests(metafunc):
     if 'max_iterations' in metafunc.fixturenames and max_iterations_value is not None:
         metafunc.parametrize("max_iterations", [int(max_iterations_value)])
 
-
 @pytest.fixture(scope="session")
 def event_loop():
     """
@@ -31,6 +30,14 @@ def event_loop():
         loop = asyncio.new_event_loop()
     yield loop
     loop.close()
+
+# @pytest.fixture(scope="session")
+# def event_loop():
+#
+#     """Create an instance of the default event loop for each test case."""
+#     loop = asyncio.get_event_loop_policy().new_event_loop()
+#     yield loop
+#     loop.close()
 
 
 @pytest.fixture

@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 
 import pytest
 from pydantic.main import BaseModel
+from pydantic import ConfigDict
 from tqdm import tqdm
 
 from app.conversation_memory.save_conversation_context import save_conversation_context_to_json, \
@@ -68,14 +69,7 @@ class ConversationTestConfig(BaseModel):
     is_finished: CheckAgentFinishedCallable
     get_conversation_context: GetConversationContextCallable
 
-    class Config:
-        """
-        Pydantic configuration.
-        """
-        arbitrary_types_allowed = True
-        """
-        Allow arbitrary types for the model as the various callables are custom types.
-        """
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 async def conversation_test_function(*, config: ConversationTestConfig):
