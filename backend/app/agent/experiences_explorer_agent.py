@@ -1,12 +1,14 @@
 import logging
+import time
 from enum import Enum
 from textwrap import dedent
+from common_libs.text_formatters.extract_json import extract_json, ExtractJSONError
 
 from pydantic import BaseModel
 
 from app.agent.agent import SimpleLLMAgent
-from app.agent.agent_types import AgentInput
-from app.agent.agent_types import AgentOutput
+from app.agent.agent_types import AgentInput, AgentOutput, LLMStats
+from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.agent.agent_types import AgentType
 from app.agent.prompt_reponse_template import ModelResponse
 from app.agent.prompt_reponse_template import get_conversation_finish_instructions
@@ -19,6 +21,8 @@ from app.vector_search.similarity_search_service import SimilaritySearchService
 
 logger = logging.getLogger(__name__)
 
+# Number of retries to get a JSON object from the model
+_MAX_ATTEMPTS = 1
 
 class ConversationPhase(Enum):
     """
@@ -82,42 +86,93 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
     def _handle_init_phase(self, _user_input_msg: str) -> str:
         # Advance the conversation
         self._state.conversation_phase = ConversationPhase.WARMUP
-        # In this version, we do a hardcoded reply (agnostic of the input message)
-        return \
-            "[META: ExperiencesExplorerAgent active] In this session, we will explore your past livelihood " \
-            "experiences, e.g. formal work experiences other similar hassles that kept you busy in the last years. " \
-            "Tell me about your most recent work experience."
+        return dedent("""[META: ExperiencesExplorerAgent activated] Let's explore your past livelihood experiences, 
+        e.g. formal work experiences other similar hassles that kept you busy in the last years. Shall we begin?""")
 
-    async def _handle_warmup_phase(self, user_input_msg: str) -> str:
-        # Handle the WARMUP phase of the conversation.
-        # Returns the reply to be sent to the user
+    async def _llm_conversation_reply(self, user_input: AgentInput, context: ConversationContext) -> ModelResponse:
+        agent_start_time = time.time()
+        llm_stats_list: list[LLMStats] = []
+        msg = user_input.message.strip()
+        success = False
+        attempt_count = 0
+        model_response: ModelResponse | None = None
+        while not success and attempt_count < _MAX_ATTEMPTS:
+            attempt_count += 1
+            llm_start_time = time.time()
+            llm_response = await self._llm.generate_content(
+                llm_input=ConversationHistoryFormatter.format_for_agent_generative_prompt(context, msg)
+            )
+            llm_end_time = time.time()
+            llm_stats = LLMStats(prompt_token_count=llm_response.prompt_token_count,
+                                 response_token_count=llm_response.response_token_count,
+                                 response_time_in_sec=round(llm_end_time - llm_start_time, 2))
+            response_text = llm_response.text
+            try:
+                model_response = extract_json(response_text, ModelResponse)
+                success = True
+            except ExtractJSONError:
+                log_message = (f"Attempt {attempt_count} failed to extract JSON "
+                               f"from conversation content: '{response_text}")
+                llm_stats.error = log_message
+                if attempt_count == _MAX_ATTEMPTS:
+                    # The agent failed to respond with a JSON object after the last attempt,
+                    logger.error(log_message)
+                    # And set the response to the model output and hope that the conversation can continue
+                    model_response = ModelResponse(message=response_text, finished=False,
+                                                   reasoning="Failed to respond with JSON")
+                else:
+                    logger.warning(log_message)
+            # Any other exception should be caught and logged
+            except Exception as e:  # pylint: disable=broad-except
+                logger.error("An error occurred while requesting a response from the model: %s",
+                                   e, exc_info=True)
+                llm_stats.error = str(e)
+            finally:
+                llm_stats_list.append(llm_stats)
+
+        # If it was not possible to get a model response, set the response to a default message
+        if model_response is None:
+            model_response = ModelResponse(
+                reasoning="Failed to get a response",
+                message="[META: ExperiencesExplorerAgent LLM error] I am facing some difficulties right now, "
+                        "could you please repeat what you said?",
+                finished=False)
+
+        logger.debug("Model input: %s", user_input.message)
+        logger.debug("Model output: %s", model_response)
+        agent_end_time = time.time()
+        # TODO: return the response and the finished flag
+
+        # response = AgentOutput(message_for_user=model_response.message,
+        #                        finished=model_response.finished,
+        #                        reasoning=model_response.reasoning,
+        #                        agent_type=self._agent_type,
+        #                        agent_response_time_in_sec=round(agent_end_time - agent_start_time, 2),
+        #                        llm_stats=llm_stats_list)
+        # return response
+
+        return model_response
+
+    async def _handle_warmup_phase(self, user_input: AgentInput, context: ConversationContext) -> str:
         s = self._state
         # Process the user's reply
-        logger.debug("Phase1. The user said: %s", user_input_msg)
-        # Use the LLM to find out what was the experience the user is talking about
-        # (e.g. "baker" or "looking after sick family member")
-        experiences = await self._extract_experience_from_user_reply(user_input_msg)
-        for experience in experiences:
-            experience_id = _sanitized_experience_descr(experience.job_title, s.experiences)
-            s.experiences[experience_id] = ExperienceMetadata(
-                experience_descr=experience.job_title, done_with_deep_dive=False, esco_entity=experience)
-
-        # In this version we have the exit criteria of a fixed 3 experiences.
-        # TODO: COM-263 handle a more dynamic exit criteria from the WARMUP phase (P1)
-        if len(s.experiences) >= 3:
-            # Start over in iterating the experiences (order is undefined, in this version)
-            s.current_experience = list(s.experiences.keys())[0]
-            exp: ExperienceMetadata = s.experiences[s.current_experience]
-            # Advance the conversation
+        logger.debug("Phase1. The user said: %s", user_input.message)
+        # Let the LLM rock the boat.
+        model_response = await self._llm_conversation_reply(user_input, context)
+        meta_msg = ""
+        if model_response.finished:
             s.conversation_phase = ConversationPhase.DIVE_IN
-            return f"Thank you for telling me about your experiences. We've identified those experiences: " \
-                   f"{', '.join([e.job_title for e in experiences])} I think I got the initial picture. Now let's " \
-                   "understand them in more detail, one by one. You said you had an experience as " \
-                   f"'{exp.experience_descr}'. Tell me more about it. When did it happen?" \
-                   f"[META ESCO Occupations Identified: {[e.esco_occupations[0].preferredLabel for e in experiences]}]"
+            # experiences = await self._extract_experience_from_user_reply(user_input_msg)
+            # for experience in experiences:
+            #     experience_id = _sanitized_experience_descr(experience.job_title, s.experiences)
+            #     s.experiences[experience_id] = ExperienceMetadata(
+            #         experience_descr=experience.job_title, done_with_deep_dive=False, esco_entity=experience)
 
-        return f"Great response ({', '.join([e.job_title for e in experiences])})," \
-               " I will process that... Tell me about another relevant experience, which you had before this one"
+            # meta_msg = f"[META: ESCO Occupations Identified: {[e.esco_occupations[0].preferredLabel for e in experiences]}]"
+
+        return  model_response.message + meta_msg
+
+        # If the LLM says we are finished, move on to the next phase (update the state)
 
     def _handle_dive_in_phase(self, user_input_msg: str) -> str:
         # TODO: COM-237 Let the LLM handle this phase. The dive-in will be done by a separate agent.
@@ -217,55 +272,23 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         # Use the LLM to find out what was the experience the user is talking about
         return await self._extract_experience_tool.extract_experience_from_user_reply(user_str)
 
+    def _create_llm_system_instructions(self) -> str:
+        base_prompt = dedent("""" You work for an employment agency helping the user outline their previous experiences and 
+        reframe them for the job market. You should be explicit in saying that past experience can also reflect work 
+        in the unseen economy, such as care work for family and this should be included in your investigation. You 
+        want to first get all past experiences, one by one, and investigate exclusively the date and the place at 
+        which the position was held. Keep asking the user if they have more experience they would like to talk about 
+        until they explicitly state that they don't. When the user has no more experiences to talk about, 
+        send them to your colleague who will investigate relevant skills. Before doing that, ask if the user would 
+        like to add anything else. Your message should be concise and professional, but also polite and empathetic.""")
+
+        # TODO: make the finish instructions more explicit
+        # TODO: add CoT reasoning (and ask for the answer to be in a specific json format)
+        return base_prompt
+
     # TODO: Figure out how to do dependency injection. This is a workaround for now.
     def __init__(self, similarity_search: SimilaritySearchService[OccupationEntity]):
-        # Define the response part of the prompt with some example responses
-        response_part = get_json_response_instructions([
-            ModelResponse(
-                reasoning="You have not yet shared skills from your previous 2 job experiences, "
-                          "therefore I will set the finished flag to false, "
-                          "and I will continue the exploration.",
-                finished=False,
-                message="Tell about the kind of jobs you had in the past.",
-            ),
-            ModelResponse(
-                reasoning="You shared skills from your previous 2 job experiences, "
-                          "therefore I will set the finished flag to true, "
-                          "and I will end the counseling session.",
-                finished=True,
-                message="Great, the counseling session has finished.",
-            ),
-            ModelResponse(
-                reasoning="You do not want to continue the conversation, "
-                          "therefore I will set the finished flag to true, "
-                          "and I will end the counseling session.",
-                finished=True,
-                message="Fine, we will end the counseling session.",
-            ),
-        ])
-        finish_instructions = get_conversation_finish_instructions(dedent("""\
-                  When I explicitly say that I want to finish the session, 
-                  or I have shared skills from my previous 2 job experiences
-              """))
-        experience = "[EXPERIENCE]"
-
-        system_instructions_template = dedent("""You are a job counselor. We have been introduced and we talked a
-        bit about my past experience as: {experience}. Your your is to ask me more details about this experience.
-        Your goal is to help me identify what skills I gained during my experience that would help me find a good job
-        in the future. In a friendly and encouraging tone ask me about the circumstances of my past experience
-        including when it happened. If you are unsure or I enter information that is not explicitly related my past
-        experience as {experience} say: "Sorry, this seems to be irrelevant to our conversation abut "{experience}", 
-        let's focus on that for now." Answer in no more than 100 words.
-                  
-                  {response_part}
-                  
-                  {finish_instructions}             
-                  """)
-
-        system_instructions = system_instructions_template.format(
-            experience=experience,
-            response_part=response_part,
-            finish_instructions=finish_instructions)
+        system_instructions = self._create_llm_system_instructions()
 
         super().__init__(agent_type=AgentType.EXPERIENCES_EXPLORER_AGENT,
                          system_instructions=system_instructions)
