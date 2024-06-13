@@ -227,10 +227,12 @@ exports[`Testing Register component with AuthProvider it should show register fo
       class="MuiTypography-root MuiTypography-body2 css-odp70e-MuiTypography-root"
       data-testid="register-login-link-ab02918f-d559-47ba-9662-ea6b3a3606d0"
     >
-      Already have an account? 
+      Already have an account?
+       
       <a
-        class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-rqydg1-MuiTypography-root-MuiLink-root"
-        href="/login"
+        class="css-1sbs6hl"
+        href="#/login"
+        style="color: rgb(38, 94, 167); font-style: italic;"
       >
         Login
       </a>

@@ -38,20 +38,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       errorCallback: (error: any) => void
     ) => {
       const authService = AuthService.getInstance();
-      authService.handleLogin(
-        email,
-        password,
-        (user) => {
-          setUser(user);
-          sucessCallback(user);
-        },
-        (error) => {
-          console.error(error);
-          errorCallback(error);
-        }
-      );
+      authService
+        .handleLogin(
+          email,
+          password,
+          (user) => {
+            setUser(user);
+            sucessCallback(user);
+          },
+          (error) => {
+            console.error(error);
+            errorCallback(error);
+          }
+        )
+        .then((data: TFirebaseTokenResponse | undefined) => {
+          if (!data) return;
+          tokens.setIDToken(data.id_token);
+        });
     },
-    [setUser]
+    [setUser, tokens]
   );
 
   /**

@@ -13,6 +13,7 @@ jest.mock("react-router-dom", () => {
     HashRouter: jest.fn().mockImplementation(({ children }) => <div data-testid="hash-router-id">{children}</div>),
     Route: jest.fn().mockImplementation(({ children }) => <div data-testid="route-id">{children}</div>),
     Routes: jest.fn().mockImplementation(({ children }) => <div data-testid="routes-id">{children}</div>),
+    NavLink: jest.fn().mockImplementation(({ children }) => <div data-testid="nav-link-id">{children}</div>),
   };
 });
 

@@ -7,7 +7,7 @@ import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import { LanguageOutlined } from "@mui/icons-material";
 import IDPAuth from "src/auth/components/IDPAuth/IDPAuth";
 
-const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
+const uniqueId = "7ce9ba1f-bde0-48e2-88df-e4f697945cc4";
 
 const StyledNavLink = styled(RouterNavLink)(({ theme }) => ({
   color: theme.palette.text.textAccent,
@@ -19,34 +19,32 @@ const StyledNavLink = styled(RouterNavLink)(({ theme }) => ({
 }));
 
 export const DATA_TEST_ID = {
-  REGISTER_CONTAINER: `register-container-${uniqueId}`,
-  LOGO: `register-logo-${uniqueId}`,
-  TITLE: `register-title-${uniqueId}`,
-  SUBTITLE: `register-subtitle-${uniqueId}`,
-  FORM: `register-form-${uniqueId}`,
-  NAME_INPUT: `register-name-input-${uniqueId}`,
-  EMAIL_INPUT: `register-email-input-${uniqueId}`,
-  PASSWORD_INPUT: `register-password-input-${uniqueId}`,
-  REGISTER_BUTTON: `register-button-${uniqueId}`,
-  FORGOT_PASSWORD_LINK: `register-forgot-password-link-${uniqueId}`,
-  REGISTER_USING: `register-using-${uniqueId}`,
+  LOGIN_CONTAINER: `login-container-${uniqueId}`,
+  LOGO: `login-logo-${uniqueId}`,
+  TITLE: `login-title-${uniqueId}`,
+  SUBTITLE: `login-subtitle-${uniqueId}`,
+  FORM: `login-form-${uniqueId}`,
+  EMAIL_INPUT: `login-email-input-${uniqueId}`,
+  PASSWORD_INPUT: `login-password-input-${uniqueId}`,
+  LOGIN_BUTTON: `login-button-${uniqueId}`,
+  FORGOT_PASSWORD_LINK: `login-forgot-password-link-${uniqueId}`,
+  LOGIN_USING: `login-using-${uniqueId}`,
   FIREBASE_AUTH_CONTAINER: `firebase-auth-container-${uniqueId}`,
-  LOGIN_LINK: `register-login-link-${uniqueId}`,
-  LANGUAGE_SELECTOR: `register-language-selector-${uniqueId}`,
+  LOGIN_LINK: `login-login-link-${uniqueId}`,
+  LANGUAGE_SELECTOR: `login-language-selector-${uniqueId}`,
 };
 
-const Register: React.FC = () => {
+const Login: React.FC = () => {
   const theme = useTheme();
 
-  const [, setName] = useState(""); // we will need this later
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { register } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
 
   const navigate = useNavigate();
-  const handleRegister = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    register(
+    login(
       email,
       password,
       (user) => {
@@ -59,7 +57,7 @@ const Register: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.REGISTER_CONTAINER}>
+    <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.LOGIN_CONTAINER}>
       <Box
         display="flex"
         flexDirection="column"
@@ -92,18 +90,9 @@ const Register: React.FC = () => {
           Welcome to Compass!
         </Typography>
         <Typography variant="body2" gutterBottom data-testid={DATA_TEST_ID.SUBTITLE}>
-          We need some information to get started
+          Login to your account to continue
         </Typography>
-        <Box component="form" mt={2} onSubmit={handleRegister} data-testid={DATA_TEST_ID.FORM}>
-          <TextField
-            fullWidth
-            label="Name"
-            variant="outlined"
-            margin="normal"
-            required
-            onChange={(e) => setName(e.target.value)}
-            inputProps={{ "data-testid": DATA_TEST_ID.NAME_INPUT }}
-          />
+        <Box component="form" mt={2} onSubmit={handleLogin} data-testid={DATA_TEST_ID.FORM}>
           <TextField
             fullWidth
             label="Email"
@@ -130,11 +119,14 @@ const Register: React.FC = () => {
             color="primary"
             style={{ marginTop: 16 }}
             type="submit"
-            data-testid={DATA_TEST_ID.REGISTER_BUTTON}
+            data-testid={DATA_TEST_ID.LOGIN_BUTTON}
           >
-            Register
+            Login
           </Button>
         </Box>
+        <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.FORGOT_PASSWORD_LINK}>
+          Forgot your password? <StyledNavLink to={routerPaths.FORGOT_PASSWORD}>Click here</StyledNavLink>
+        </Typography>
         <Box
           display="flex"
           flexDirection="column"
@@ -143,7 +135,7 @@ const Register: React.FC = () => {
           mt={(theme) => theme.tabiyaSpacing.lg}
           data-testid={DATA_TEST_ID.FIREBASE_AUTH_CONTAINER}
         >
-          <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.REGISTER_USING}>
+          <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.LOGIN_USING}>
             Or register using
           </Typography>
           <Box mt={2} width="100%">
@@ -151,15 +143,15 @@ const Register: React.FC = () => {
           </Box>
         </Box>
         <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.LOGIN_LINK}>
-          Already have an account?{" "}
+          Dont have an account?{" "}
           <StyledNavLink
-            to={routerPaths.LOGIN}
+            to={routerPaths.REGISTER}
             style={{
               color: theme.palette.text.textAccent,
               fontStyle: "italic",
             }}
           >
-            Login
+            Register
           </StyledNavLink>
         </Typography>
       </Box>
@@ -167,4 +159,4 @@ const Register: React.FC = () => {
   );
 };
 
-export default Register;
+export default Login;

@@ -3,6 +3,7 @@ import Home from "src/homePage/Home";
 import NotFound from "src/errorPage/NotFound";
 import { routerPaths } from "./routerPaths";
 import Register from "src/auth/components/Register/Register";
+import Login from "src/auth/components/Login/Login";
 
 const routerConfig = [
   {
@@ -19,6 +20,11 @@ const routerConfig = [
     path: routerPaths.REGISTER,
     element: <Register />,
     errorElement: <div>Sorry, registration could not be shown</div>,
+  },
+  {
+    path: routerPaths.LOGIN,
+    element: <Login />,
+    errorElement: <div>Sorry, login could not be shown</div>,
   },
   {
     path: "*",
