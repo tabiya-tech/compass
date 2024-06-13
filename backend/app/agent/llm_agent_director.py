@@ -56,8 +56,8 @@ class LLMAgentDirector(AbstractAgentDirector):
                                            tasks="Welcomes the user and answers any questions "
                                                  "regarding the process and the tool.",
                                            examples=["How does the counseling process work?"])
-        skill_explorer_agent_tasks = AgentTasking(agent_type_name=AgentType.SKILL_EXPLORER_AGENT.value,
-                                                  tasks="Explore and verify the users skill.",
+        experiences_explorer_agent_tasks = AgentTasking(agent_type_name=AgentType.EXPERIENCES_EXPLORER_AGENT.value,
+                                                  tasks="Explore and verify the users skills and work experiences.",
                                                   examples=["I worked as a software developer for 5 years.",
                                                             "I am ready to explore my skills."])
         farewell_agent_tasks = AgentTasking(agent_type_name=AgentType.FAREWELL_AGENT.value,
@@ -71,7 +71,7 @@ class LLMAgentDirector(AbstractAgentDirector):
         # define the tasks for each phase
         self._agent_tasking_for_phase: dict[ConversationPhase, list[AgentTasking]] = {
             ConversationPhase.INTRO: [welcome_agent_tasks, default_agent_tasks],
-            ConversationPhase.CONSULTING: [welcome_agent_tasks, skill_explorer_agent_tasks, default_agent_tasks],
+            ConversationPhase.CONSULTING: [welcome_agent_tasks, experiences_explorer_agent_tasks, default_agent_tasks],
             ConversationPhase.CHECKOUT: [farewell_agent_tasks, default_agent_tasks]
         }
         # initialize the router model
@@ -134,12 +134,13 @@ class LLMAgentDirector(AbstractAgentDirector):
                 router_model_response = (await self._model.generate_content(model_input)).text.strip()
                 self._logger.debug("Router Model Response: %s", router_model_response)
                 if router_model_response == DEFAULT_AGENT:
-                    return AgentType.SKILL_EXPLORER_AGENT
+                    self._logger.debug("Could not find the right agent, falling back to the experiences explorer")
+                    return AgentType.EXPERIENCES_EXPLORER_AGENT
                 return AgentType(router_model_response)
             except Exception as e:  # pylint: disable=broad-except
                 self._logger.error("Error while getting the suitable agent: %s", e)
                 # If the model fails to respond, return the default agent for the consulting phase
-                return AgentType.SKILL_EXPLORER_AGENT
+                return AgentType.EXPERIENCES_EXPLORER_AGENT
 
         # In the checkout phase, only the farewell agent is active
         if phase == ConversationPhase.CHECKOUT:
@@ -161,9 +162,9 @@ class LLMAgentDirector(AbstractAgentDirector):
                 and agent_output.finished):
             return ConversationPhase.CONSULTING
 
-        # In the consulting phase, only the skill explorer agent can end the phase
+        # In the consulting phase, only the experiences explorer agent can end the phase
         if (current_phase == ConversationPhase.CONSULTING
-                and agent_output.agent_type == AgentType.SKILL_EXPLORER_AGENT
+                and agent_output.agent_type == AgentType.EXPERIENCES_EXPLORER_AGENT
                 and agent_output.finished):
             return ConversationPhase.CHECKOUT
 
