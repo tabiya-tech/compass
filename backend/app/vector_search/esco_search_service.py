@@ -85,8 +85,9 @@ class AbstractEscoSearchService(SimilaritySearchService[T]):
         # preferredLabel, one for the description and one for the altLabels. The search is performed on all three
         # fields, so we need to multiply the number of results by 3 to account for the possible duplication. Those
         # are then grouped by the UUID and the best score is selected. The final number of results is limited to k.
+        embedding = await self.embedding_service.embed(query)
         params = {
-            "queryVector": await self.embedding_service.embed(query),
+            "queryVector": embedding,
             "path": self.config.embedding_key,
             "numCandidates": k * 10 * 3,
             "limit": k * 3,
@@ -101,7 +102,8 @@ class AbstractEscoSearchService(SimilaritySearchService[T]):
             {"$sort": {"score": -1}},
             {"$limit": k},
         ]
-        return [self._to_entity(entry) async for entry in self.collection.aggregate(pipeline)]
+        entries = await self.collection.aggregate(pipeline).to_list(length=5)
+        return [self._to_entity(entry) for entry in entries]
 
 
 class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
