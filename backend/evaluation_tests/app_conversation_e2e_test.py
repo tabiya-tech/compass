@@ -12,6 +12,7 @@ from evaluation_tests.conversation_libs.evaluators.evaluator_builder import crea
 from evaluation_tests.conversation_libs.fake_conversation_context import save_conversation
 from evaluation_tests.core_e2e_tests_cases import test_cases
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
+from httpx import AsyncClient
 
 
 class _AppChatExecutor:
@@ -22,8 +23,9 @@ class _AppChatExecutor:
         """
         Executes the application chat route
         """
-        response = client.get('/conversation', params={'user_input': agent_input.message,
-                                                       'session_id': self._session_id})
+        async with AsyncClient(app=app, base_url="http://test") as ac:
+            response = await ac.get('/conversation', params={'user_input': agent_input.message,
+                                                             'session_id': self._session_id})
         return AgentOutput.model_validate(response.json()['last'])
 
 

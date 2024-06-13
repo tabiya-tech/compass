@@ -46,6 +46,8 @@ class ExperienceMetadata(BaseModel):
     # for the agent, to know if a deepdive should be performed
     done_with_deep_dive: bool = False
 
+    esco_entity: ExperienceEntity
+
 
 class ExperiencesAgentState(BaseModel):
     """
@@ -97,9 +99,8 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         experiences = await self._extract_experience_from_user_reply(user_input_msg)
         for experience in experiences:
             experience_id = _sanitized_experience_descr(experience.job_title, s.experiences)
-            # TODO: Store the entire ExperienceEntity here instead of just the title.
             s.experiences[experience_id] = ExperienceMetadata(
-                experience_descr=experience.job_title, done_with_deep_dive=False)
+                experience_descr=experience.job_title, done_with_deep_dive=False, esco_entity=experience)
 
         # In this version we have the exit criteria of a fixed 3 experiences.
         # TODO: COM-263 handle a more dynamic exit criteria from the WARMUP phase (P1)
@@ -121,7 +122,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
     def _handle_dive_in_phase(self, user_input_msg: str) -> str:
         # TODO: COM-237 Let the LLM handle this phase. The dive-in will be done by a separate agent.
         s = self._state
-        if "No" not in user_input_msg:
+        if "no" not in user_input_msg.lower():
             # Process the reply and keep asking followups
             return "Thank you. Is there anything else want to add to this experience? Just say 'No' when you are done."
 
@@ -173,8 +174,12 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
 
         # Phase3
         elif s.conversation_phase == ConversationPhase.WRAPUP:
+            esco_occupations = await self._get_esco_preferred_labels(s)
+            top_occupations = [e.esco_entity.esco_occupations[0].preferredLabel for e in s.experiences.values()]
             reply_raw = "[META: Under development] I am still under development. In the future, I will share my " \
-                        "summarized findings here. Bye!"
+                        "summarized findings here. Bye! \n" \
+                        f"[META: Top ESCO Occupations Identified: {'; '.join(top_occupations)}] \n" \
+                        f"[META: All ESCO Occupations Identified: {'; '.join(esco_occupations)}]"
             finished = True
 
         # In this version the conversation structure is: 1. WARMUP, 2. INNER_LOOP/OUTER_LOOP back and forth. In the
@@ -194,6 +199,13 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
                                    reasoning="handwritten code",
                                    agent_response_time_in_sec=0.1, llm_stats=[])
             return response
+
+    async def _get_esco_preferred_labels(self, state: ExperiencesAgentState) -> set[str]:
+        esco_occupations = set()
+        for experience in state.experiences.values():
+            for occupation in experience.esco_entity.esco_occupations:
+                esco_occupations.add(occupation.preferredLabel)
+        return esco_occupations
 
     def set_state(self, state: ExperiencesAgentState):
         """

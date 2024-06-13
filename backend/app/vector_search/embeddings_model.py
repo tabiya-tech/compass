@@ -26,5 +26,5 @@ class GoogleGeckoEmbeddingService(EmbeddingService):
     async def embed(self, query: str) -> List[float]:
         """Embeds texts with a pre-trained, foundational model."""
         inputs = TextEmbeddingInput(query, self._TASK)
-        embeddings = self.model.get_embeddings([inputs])
+        embeddings = await self.model.get_embeddings_async([inputs])
         return embeddings[0].values
