@@ -57,7 +57,7 @@ If the LLM fails to give something useful, we have a fallback choice of an agent
 ## Skill exploration agents
 
 This is the most complex part of the application. At the moment, it consists of 2 separate agents:
-* **ExperiencesExplorerAgent** which is responsible for the overall skill exploration.
+* **ExperiencesExplorerAgent** which is responsible for the overall skill exploration
 * **SkillExplorerAgent** which is responsible for "diving in" into a concrete experience
 
 The ExperiencesExplorerAgent is handling formal job experiences e.g. *"Baker"* or *"Ski instructor"*, as well as
