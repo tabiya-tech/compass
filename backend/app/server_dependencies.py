@@ -22,4 +22,4 @@ _conversation_memory_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZ
 
 def get_conversation_memory_manager() -> ConversationMemoryManager:
     """ Get the conversation memory manager instance."""
-    return _conversation_memory_manager
+    return ConversationMemoryManager(20, TO_BE_SUMMARIZED_WINDOW_SIZE)

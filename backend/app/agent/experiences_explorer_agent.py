@@ -109,9 +109,11 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
             exp: ExperienceMetadata = s.experiences[s.current_experience]
             # Advance the conversation
             s.conversation_phase = ConversationPhase.DIVE_IN
-            return "Thank you for telling me about your experiences. I think I got the initial picture. Now let's " \
-                   "understand them in more detail, one by one. You said you had an experience as "\
-                   f"'{exp.experience_descr}'. Tell me more about it. When did it happen?"
+            return f"Thank you for telling me about your experiences. We've identified those experiences: " \
+                   f"{', '.join([e.job_title for e in experiences])} I think I got the initial picture. Now let's " \
+                   "understand them in more detail, one by one. You said you had an experience as " \
+                   f"'{exp.experience_descr}'. Tell me more about it. When did it happen?" \
+                   f"[META ESCO Occupations Identified: {[e.esco_occupations[0].preferredLabel for e in experiences]}]"
 
         return f"Great response ({', '.join([e.job_title for e in experiences])})," \
                " I will process that... Tell me about another relevant experience, which you had before this one"
@@ -119,7 +121,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
     def _handle_dive_in_phase(self, user_input_msg: str) -> str:
         # TODO: COM-237 Let the LLM handle this phase. The dive-in will be done by a separate agent.
         s = self._state
-        if user_input_msg != "No":
+        if "No" not in user_input_msg:
             # Process the reply and keep asking followups
             return "Thank you. Is there anything else want to add to this experience? Just say 'No' when you are done."
 
