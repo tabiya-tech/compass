@@ -6,7 +6,10 @@ from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
 
 _settings = MongoDbSettings()
 
-_mongo_db: AsyncIOMotorDatabase = AsyncIOMotorClient(_settings.mongodb_uri).get_database(_settings.database_name)
+_mongo_db: AsyncIOMotorDatabase = AsyncIOMotorClient(
+    _settings.mongodb_uri,
+    tls=True, tlsAllowInvalidCertificates=True
+    ).get_database(_settings.database_name)
 
 
 def get_mongo_db() -> AsyncIOMotorDatabase:
