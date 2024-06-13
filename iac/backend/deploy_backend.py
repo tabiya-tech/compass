@@ -344,6 +344,11 @@ def _deploy_cloud_run_service(
     if not backend_url:
         raise ValueError("EMBEDDING_SETTINGS environment variable is not set")
 
+    target_environment = os.getenv("TARGET_ENVIRONMENT")
+    if not target_environment:
+        raise ValueError("TARGET_ENVIRONMENT environment variable is not set")
+
+
     service = gcp.cloudrunv2.Service(
         _get_resource_name(environment=basic_config.environment, resource="cloudrun-service"),
         name=_get_resource_name(environment=basic_config.environment, resource="cloudrun-service"),
@@ -359,6 +364,7 @@ def _deploy_cloud_run_service(
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="VERTEX_API_REGION", value=vertex_api_region
                         ),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="TARGET_ENVIRONMENT", value=target_environment),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="BACKEND_URL", value=backend_url),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="FRONTEND_URL", value=frontend_url),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="DATABASE_NAME", value=database_name),

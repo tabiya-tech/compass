@@ -94,6 +94,7 @@ jobs:
           command: up
           stack-name: tabiya-tech/compass-backend/${{ inputs.target-environment }}
         env:
+          TARGET_ENVIRONMENT: ${{ inputs.target-environment }}
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           GCP_OAUTH_CLIENT_ID: ${{ secrets.GCP_OAUTH_CLIENT_ID }}
