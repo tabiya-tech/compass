@@ -23,7 +23,7 @@ jest.doMock("react-dom/client", () => {
 });
 
 // mock CompassApp
-jest.mock("./App", () => {
+jest.mock("./app", () => {
   const mCompassApp = () => (
     <div id="compass-app-id" data-testid="compass-app-id">
       Mock CompassApp

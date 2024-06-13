@@ -1,7 +1,20 @@
-import type {StorybookConfig} from "@storybook/react-webpack5";
+import type { StorybookConfig } from "@storybook/react-webpack5";
 
 const config: StorybookConfig = {
+  // Inject custom script into the preview head
+  previewHead: (head) => `
+    ${head}
+    <script>{
+      window.tabiyaConfig = {
+        "FIREBASE_API_KEY": btoa("some-key"),
+        "FIREBASE_AUTH_DOMAIN": btoa("some-domain")
+      };
+    }
+    </script>
+  `,
+  // Define story locations
   stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
+  // Addons for additional functionality
   addons: [
     "@storybook/addon-links",
     "@storybook/addon-essentials",
@@ -10,15 +23,19 @@ const config: StorybookConfig = {
     "@storybook/addon-a11y",
     "@storybook/addon-styling-webpack",
     "@storybook/addon-themes",
-    "storybook-addon-mock"
+    "storybook-addon-mock",
   ],
+  // Framework configuration
   framework: {
     name: "@storybook/react-webpack5",
     options: {},
   },
+  // Documentation configuration
   docs: {
     autodocs: "tag",
   },
+  // Specify static directories
   staticDirs: ["../public"],
 };
+
 export default config;

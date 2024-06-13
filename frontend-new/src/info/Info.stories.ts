@@ -17,7 +17,6 @@ const API_URL = "https://compass.tabiya.tech/info";
 export const Shown: Story = {
   args: {},
   parameters: {
-    docs: { disable: true },
     mockData: [
       {
         url: API_URL,
