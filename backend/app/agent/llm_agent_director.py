@@ -32,9 +32,15 @@ class AgentTasking(BaseModel):
     The tasks that the agent is responsible for
     """
     agent_type_name: str
-    # LLM-targeted text description of the tasks that this agent can handle.
+
+    """
+    LLM-targeted text description of the tasks that this agent can handle.
+    """
     tasks: str
-    # Examples of user input
+    
+    """
+    Examples of user input
+    """
     examples: list[str]
 
 
