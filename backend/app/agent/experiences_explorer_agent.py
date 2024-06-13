@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 # Number of retries to get a JSON object from the model
 _MAX_ATTEMPTS = 1
 
+
 class ConversationPhase(Enum):
     """
     The agent keeps track of where we are in the conversation.
@@ -86,8 +87,9 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
     def _handle_init_phase(self, _user_input_msg: str) -> str:
         # Advance the conversation
         self._state.conversation_phase = ConversationPhase.WARMUP
-        return dedent("""[META: ExperiencesExplorerAgent activated] Let's explore your past livelihood experiences, 
-        e.g. formal work experiences other similar hassles that kept you busy in the last years. Shall we begin?""")
+        return "[META: ExperiencesExplorerAgent activated] Let's explore your past livelihood experiences, " \
+               "e.g. formal work experiences other similar hassles that kept you busy in the last years. Shall we " \
+               "begin?"
 
     async def _llm_conversation_reply(self, user_input: AgentInput, context: ConversationContext) -> ModelResponse:
         agent_start_time = time.time()
@@ -125,7 +127,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
             # Any other exception should be caught and logged
             except Exception as e:  # pylint: disable=broad-except
                 logger.error("An error occurred while requesting a response from the model: %s",
-                                   e, exc_info=True)
+                             e, exc_info=True)
                 llm_stats.error = str(e)
             finally:
                 llm_stats_list.append(llm_stats)
@@ -211,7 +213,6 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
 
         # Some logic will be implemented 'manually' and some is done through an LLM.
         # In future version of the logic, more and more logic will be handled by the LLM.
-        use_llm_for_reply = False
         finished = False
         reply_raw = ""
 
@@ -221,7 +222,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
 
         # Phase1 - followup rounds, until we have a minimum 3 occupations on the radar.
         elif s.conversation_phase == ConversationPhase.WARMUP:
-            reply_raw = await self._handle_warmup_phase(user_input.message)
+            reply_raw = await self._handle_warmup_phase(user_input, context)
 
         # Phase2 - inner loop - outerloop
         elif s.conversation_phase == ConversationPhase.DIVE_IN:
@@ -244,16 +245,12 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         #  WARMUP phase (P1)
 
         # Send the prepared reply to the user
-        if use_llm_for_reply:
-            # LLM-handled reply
-            return await super().execute(user_input, context)
-        else:
-            # Manual
-            response = AgentOutput(message_for_user=reply_raw, finished=finished,
-                                   agent_type=self._agent_type,
-                                   reasoning="handwritten code",
-                                   agent_response_time_in_sec=0.1, llm_stats=[])
-            return response
+        # TODO: pass the LLM reasoning in case the answer was from an LLM
+        response = AgentOutput(message_for_user=reply_raw, finished=finished,
+                               agent_type=self._agent_type,
+                               reasoning="handwritten code",
+                               agent_response_time_in_sec=0.1, llm_stats=[])
+        return response
 
     async def _get_esco_preferred_labels(self, state: ExperiencesAgentState) -> set[str]:
         esco_occupations = set()
