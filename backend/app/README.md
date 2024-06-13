@@ -48,17 +48,19 @@ async def execute(user_input: AgentInput) -> AgentOutput
 
 ... but it does not do any logic itself, other than routing to the appropriate agent.
 
-#### How the LLM works
+#### How the LLM in the AgentDirector works
 For each conversation phase there is a configured list of suitable agents, which is a subset of all agents.
 Each agent has an LLM-targeted task description and example user inputs.
 Based on this, we ask the LLM to choose the most appropriate agent for a given user input.
 If the LLM fails to give something useful, we have a fallback choice of an agent.
 
-## Skill exploration agents
+## Skill exploration-related agents
 
-This is the most complex part of the application. At the moment, it consists of 2 separate agents:
-* **ExperiencesExplorerAgent** which is responsible for the overall skill exploration
-* **SkillExplorerAgent** which is responsible for "diving in" into a concrete experience
+This is the most complex part of the application, with several agents working together.
 
-The ExperiencesExplorerAgent is handling formal job experiences e.g. *"Baker"* or *"Ski instructor"*, as well as
-informal and unseen economy experiences, e.g. *"Cooking for the family"*, *"Caring for a sick family member"*.
+At the moment, it consists only of the **ExperiencesExplorerAgent**, which is responsible for the overall skill 
+exploration, starting from exploring the past work experiences. As we add more logic, we will delegate
+some responsibilities to other agents and tools.
+
+When we say work experiences, we think broadly, covering:  formal job experiences e.g. *"Baker"* or *"Ski instructor"*,
+as well as informal and unseen economy experiences, e.g. *"Cooking for the family"*, *"Caring for a sick family member"*.
