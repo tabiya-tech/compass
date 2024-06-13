@@ -15,8 +15,8 @@ base_domain="compass.tabiya.tech"
 domain_name="${environment}.${base_domain}"
 
 # Define the target domain name and URLs
-frontend_url="http://${domain_name}"
-backend_url="http://${domain_name}/api"
+frontend_url="https://${domain_name}"
+backend_url="https://${domain_name}/api"
 # Added in case the backend and frontend domains diverge in the future
 frontend_domain="$domain_name"
 backend_domain="$domain_name"
