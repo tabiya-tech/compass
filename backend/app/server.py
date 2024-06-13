@@ -109,7 +109,7 @@ class ConversationResponse(BaseModel):
 
 @app.get(path="/conversation",
          description="""The main conversation route used to interact with the agent.""", )
-async def conversation(user_input: str, clear_memory: bool = False, filter_pii: bool = True,
+async def conversation(user_input: str, clear_memory: bool = False, filter_pii: bool = False,
                        session_id: int = 1,
                        conversation_memory_manager: ConversationMemoryManager = Depends(
                            get_conversation_memory_manager),
