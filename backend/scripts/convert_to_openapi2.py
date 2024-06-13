@@ -22,13 +22,18 @@ def convert():
                 for response in openapi3['paths'][path][method]['responses']:
                     openapi3['paths'][path][method]['responses'][response].pop('content',None)
 
+            # remove response contents as not required in GCP API Gateway configs
+            if 'requestBody' in openapi3['paths'][path][method]:
+                openapi3['paths'][path][method].pop('requestBody')
+
+
             # remove JWT_auth for now as UI does not support it
             if 'security' in openapi3['paths'][path][method]:
                 for security in openapi3['paths'][path][method]['security']:
                     if 'JWT_auth' in security:
                         openapi3['paths'][path][method].pop('security')
 
-    openapi2['paths'] = openapi3['paths']
+    openapi2['paths'].update(openapi3['paths'])
 
     with open('openapi2.yaml', 'w') as f:
         yaml.dump(openapi2, f)
