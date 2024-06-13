@@ -1,3 +1,7 @@
+"""
+User Preferences Module
+"""
+
 from fastapi import APIRouter, HTTPException
 
 from app.users.repositories import UserPreferenceRepository
