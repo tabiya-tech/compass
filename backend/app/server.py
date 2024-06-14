@@ -23,7 +23,7 @@ from app.vector_search.skill_search_routes import add_skill_search_routes
 from app.vector_search.vector_search_dependencies import get_occupation_search_service
 from app.version.version_routes import add_version_routes
 
-from app.users import router as users_router
+from app.users import add_users_routes
 
 logger = logging.getLogger(__name__)
 
@@ -238,7 +238,7 @@ async def _get_auth_info(request: Request, authorization = Depends(firebase)):
     auth_info = base64.b64decode(auth_info_b64.encode() + b'==').decode()
     return JSONResponse(auth_info)
 
-app.include_router(users_router)
+add_users_routes(app)
 
 if __name__ == "__main__":
     import uvicorn
