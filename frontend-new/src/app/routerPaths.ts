@@ -4,4 +4,5 @@ export const routerPaths = {
   REGISTER: "/register",
   LOGIN: "/login",
   FORGOT_PASSWORD: "/reset",
+  DPA: "/dpa",
 };

@@ -1,9 +1,10 @@
 import "src/_test_utilities/consoleMock";
 import React from "react";
-import { render, screen, waitFor } from "src/_test_utilities/test-utils";
+import { render, waitFor } from "src/_test_utilities/test-utils";
 import IDPAuth from "./IDPAuth";
 import * as firebaseui from "firebaseui";
 import { HashRouter } from "react-router-dom";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -11,6 +12,7 @@ jest.mock("src/envService", () => ({
   getFirebaseDomain: jest.fn(() => "mock-auth-domain"),
 }));
 
+// mock the firebaseConfig module
 jest.mock("src/auth/firebaseConfig", () => {
   const auth = jest.fn(() => ({
     signInWithCustomToken: jest.fn(),
@@ -24,6 +26,7 @@ jest.mock("src/auth/firebaseConfig", () => {
   };
 });
 
+// mock the firebase module
 jest.mock("firebase/compat/app", () => {
   return {
     initializeApp: jest.fn(),
@@ -33,6 +36,7 @@ jest.mock("firebase/compat/app", () => {
   };
 });
 
+// mock the firebaseui module
 jest.mock("firebaseui", () => {
   return {
     auth: {
@@ -41,6 +45,19 @@ jest.mock("firebaseui", () => {
         getInstance: jest.fn(),
       })),
     },
+  };
+});
+
+// mock the snackbar provider
+jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
+  const actual = jest.requireActual("src/theme/SnackbarProvider/SnackbarProvider");
+  return {
+    ...actual,
+    __esModule: true,
+    useSnackbar: jest.fn().mockReturnValue({
+      enqueueSnackbar: jest.fn(),
+      closeSnackbar: jest.fn(),
+    }),
   };
 });
 
@@ -69,7 +86,7 @@ describe("IDPAuth tests", () => {
 
     // THEN expect success message to be in the document
     await waitFor(() => {
-      expect(screen.getByText("Successfully signed in with google account!")).toBeInTheDocument();
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Login successful", { variant: "success" });
     });
   });
 
@@ -90,7 +107,7 @@ describe("IDPAuth tests", () => {
 
     // THEN expect error message to be in the document
     await waitFor(() => {
-      expect(screen.getByText("Sign-in failed")).toBeInTheDocument();
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Login failed", { variant: "error" });
     });
   });
 });

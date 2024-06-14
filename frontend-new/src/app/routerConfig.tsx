@@ -4,6 +4,7 @@ import NotFound from "src/errorPage/NotFound";
 import { routerPaths } from "./routerPaths";
 import Register from "src/auth/components/Register/Register";
 import Login from "src/auth/components/Login/Login";
+import DataProtectionAgreement from "../auth/components/PolicyNotice/DataProtectionPolicy";
 
 const routerConfig = [
   {
@@ -25,6 +26,11 @@ const routerConfig = [
     path: routerPaths.LOGIN,
     element: <Login />,
     errorElement: <div>Sorry, login could not be shown</div>,
+  },
+  {
+    path: routerPaths.DPA,
+    element: <DataProtectionAgreement />,
+    errorElement: <div>Sorry, data protection policy could not be shown</div>,
   },
   {
     path: "*",

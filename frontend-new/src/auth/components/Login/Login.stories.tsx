@@ -6,12 +6,13 @@ import { AuthContext, authContextDefaultValue } from "src/auth/AuthProvider";
 
 const meta: Meta<typeof Login> = {
   title: "Auth/Login",
+  tags: ["autodocs"],
   component: Login,
   decorators: [
     (Story) => {
       const mockAuthContextValue = {
         ...authContextDefaultValue,
-        register: action("register"),
+        login: action("login"),
       };
 
       return (

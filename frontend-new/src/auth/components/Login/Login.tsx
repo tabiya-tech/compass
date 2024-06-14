@@ -6,6 +6,7 @@ import { routerPaths } from "src/app/routerPaths";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import { LanguageOutlined } from "@mui/icons-material";
 import IDPAuth from "src/auth/components/IDPAuth/IDPAuth";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 
 const uniqueId = "7ce9ba1f-bde0-48e2-88df-e4f697945cc4";
 
@@ -42,16 +43,20 @@ const Login: React.FC = () => {
   const { login } = useContext(AuthContext);
 
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
   const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     login(
       email,
       password,
       (user) => {
-        navigate(routerPaths.ROOT);
+        enqueueSnackbar("Login successful", { variant: "success" });
+        navigate(routerPaths.DPA);
+        console.log("User logged in", { user });
       },
       (error) => {
-        console.error(error);
+        enqueueSnackbar("Login failed", { variant: "error" });
+        console.error(error); // TODO: add a better mechanism for logging service errors
       }
     );
   };
