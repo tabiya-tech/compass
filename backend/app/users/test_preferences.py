@@ -9,6 +9,7 @@ from pymongo.results import InsertOneResult
 from app.users.types import datetime, UserPreferences, UserLanguage
 
 from app.users.preferences import get_user_preferences, create_user_preferences, update_user_language
+from app.users.repositories import UserPreferenceRepository
 
 given_user_id = "foo"
 given_language = "bar"
@@ -21,6 +22,8 @@ given_user_preference = {
     "accepted_tc": given_accepted_tc
 }
 
+mocked_repository = UserPreferenceRepository()
+
 
 class TestGetUserPreferences:
     @pytest.mark.asyncio
@@ -31,7 +34,7 @@ class TestGetUserPreferences:
 
         # WHEN the get_user_preferences function is called with the argument "foo" and raises an HTTPException,
         with pytest.raises(HTTPException) as exec_info:
-            _response = await get_user_preferences("foo")
+            _response = await get_user_preferences(mocked_repository, "foo")
 
         # THEN the exception should contain "user not found" in its message and "404" in its status.
         assert "user not found" in str(exec_info.value)
@@ -42,7 +45,7 @@ class TestGetUserPreferences:
         # GIVEN: The function `get_user_preferences` is called without a required parameter `user_id`
         with pytest.raises(TypeError) as exec_info:
             # WHEN: The `get_user_preferences` function is called without `user_id`
-            _response = await get_user_preferences()
+            _response = await get_user_preferences(mocked_repository)
 
         # THEN: A `TypeError` is raised and the error message contains "user_id"
         assert "user_id" in str(exec_info.value)
@@ -54,7 +57,7 @@ class TestGetUserPreferences:
         mocker.return_value = given_user_preference
 
         # WHEN: The `get_user_preferences` function is called with `given_user_id`
-        response = await get_user_preferences(given_user_id)
+        response = await get_user_preferences(mocked_repository, given_user_id)
 
         # THEN: The response should contain the correct user preferences
         assert response.get("accepted_tc") == given_accepted_tc
@@ -71,6 +74,7 @@ class TestCreateUserPreferences:
 
         # WHEN: The `create_user_preferences` function is called with user preferences data
         _response = await create_user_preferences(
+            mocked_repository,
             UserPreferences(user_id="foo", language="bar", accepted_tc=datetime.now()))
 
         # THEN: The response should contain the correct `user_preference_id`
@@ -85,6 +89,7 @@ class TestCreateUserPreferences:
         # WHEN: The `create_user_preferences` function is called with user preferences data
         with pytest.raises(HTTPException) as exec_info:
             _response = await create_user_preferences(
+                mocked_repository,
                 UserPreferences(user_id="foo", language="bar", accepted_tc=datetime.now()))
 
         # THEN: An `HTTPException` is raised with a message indicating the user already exists
@@ -101,7 +106,7 @@ class TestUpdateLanguage:
 
         # WHEN: The `get_user_preferences` function is called with a user ID that does not exist
         with pytest.raises(HTTPException) as exec_info:
-            _response = await get_user_preferences("foo")
+            _response = await get_user_preferences(mocked_repository, "foo")
 
         # THEN: An `HTTPException` is raised with a message indicating the user is not found
         assert "user not found" in str(exec_info.value)
@@ -121,8 +126,10 @@ class TestUpdateLanguage:
 
         # WHEN: The `update_user_language` function is called with user language data
         _response = await update_user_language(
+            mocked_repository,
             UserLanguage(user_id="foo", language="bar")
         )
 
         # THEN: The response should contain the correct `user_id`
-        assert _response.get("user_id") == "foo"
+        assert _response.language == "bar"
+        assert _response.user_id == "foo"

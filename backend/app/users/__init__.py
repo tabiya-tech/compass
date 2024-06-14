@@ -1,7 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, FastAPI
 
-from app.users.preferences import router as user_preferences_router
+from app.users.preferences import add_user_preference_routes
 
-router = APIRouter(prefix="/users")
 
-router.include_router(user_preferences_router)
+def add_users_routes(app: FastAPI):
+    users_router = APIRouter(prefix="/users")
+
+    add_user_preference_routes(users_router)
+
+    app.include_router(users_router)
