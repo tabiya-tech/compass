@@ -1,20 +1,26 @@
-"""
-User Preferences Module
-"""
-
 from fastapi import APIRouter, HTTPException
 
 from app.users.repositories import UserPreferenceRepository
 from app.users.types import UserLanguage, UserPreferences
 
-router = APIRouter(prefix="/preferences", tags=["user-preferences"])
 
-user_preference_repository = UserPreferenceRepository()
+async def update_user_language(repository: UserPreferenceRepository, user_preferences: UserLanguage):
+    user_language = await repository.get_user_preference_by_user_id(user_preferences.user_id)
+
+    if user_language is None:
+        raise HTTPException(status_code=404, detail="user not found")
+
+    await repository.update_user_preference({
+        "user_id": user_preferences.user_id
+    }, {
+        "language": user_preferences.language
+    })
+
+    return user_preferences
 
 
-@router.get("")
-async def get_user_preferences(user_id: str):
-    user = await user_preference_repository.get_user_preference_by_user_id(user_id)
+async def get_user_preferences(repository: UserPreferenceRepository, user_id: str):
+    user = await repository.get_user_preference_by_user_id(user_id)
     if user is None:
         raise HTTPException(
             status_code=404,
@@ -22,14 +28,14 @@ async def get_user_preferences(user_id: str):
         )
 
     return {
+        "user_id": user_id,
         "accepted_tc": user.get("accepted_tc"),
         "language": user.get("language")
     }
 
 
-@router.post("")
-async def create_user_preferences(user: UserPreferences):
-    user_already_exists = await user_preference_repository.get_user_preference_by_user_id(user.user_id)
+async def create_user_preferences(repository: UserPreferenceRepository, user: UserPreferences):
+    user_already_exists = await repository.get_user_preference_by_user_id(user.user_id)
 
     if user_already_exists:
         raise HTTPException(
@@ -37,7 +43,7 @@ async def create_user_preferences(user: UserPreferences):
             detail="user already exists"
         )
 
-    created = await user_preference_repository.insert_user_preference({
+    created = await repository.insert_user_preference({
         "user_id": user.user_id,
         "language": user.language,
         "accepted_tc": user.accepted_tc
@@ -49,17 +55,33 @@ async def create_user_preferences(user: UserPreferences):
     }
 
 
-@router.put("/update-language")
-async def update_user_language(user_preferences: UserLanguage):
-    user_language = await user_preference_repository.get_user_preference_by_user_id(user_preferences.user_id)
+def add_user_preference_routes(_router: APIRouter):
+    router = APIRouter(prefix="/preferences", tags=["user-preferences"])
 
-    if user_language is None:
-        raise HTTPException(status_code=404, detail="user not found")
+    user_preference_repository = UserPreferenceRepository()
 
-    user_language = await user_preference_repository.update_user_preference({
-        "user_preference_id": user_preferences.user_id
-    }, {
-        "language": user_preferences.language
-    })
+    @router.get("",
+                response_model=UserPreferences,
+                name="get user preferences",
+                description="Get user preferences, (language and time when they accepted terms and conditions)")
+    async def get_user_preferences_handler(user_id: str):
+        return await get_user_preferences(user_preference_repository, user_id)
 
-    return user_language
+    @router.post("",
+                 status_code=201,
+                 name="add user preferences",
+                 description="Add user preferences, (language and time when they accepted terms and conditions)"
+                 )
+    async def create_handler(user: UserPreferences):
+        return await create_user_preferences(user_preference_repository, user)
+
+    @router.put("/update-language",
+                response_model=UserLanguage,
+                name="update user preferences, specifically language",
+                description="Update user preferences - language"
+                )
+    async def update_user_language_handler(user: UserLanguage):
+
+        return await update_user_language(user_preference_repository, user)
+
+    _router.include_router(router)
