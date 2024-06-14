@@ -1,13 +1,13 @@
-name: Smoke Test the version of the backend/frontend
+name: Smoke Test the version of the backend
 on:
   workflow_call:
     inputs:
       component:
-        description: Either 'frontend' or 'backend'
+        description: backend
         required: true
         type: string
       component-url:
-        description: The urlbase of the 'frontend' or 'backend'
+        description: The urlbase of the 'backend'
         required: true
         type: string
       expected-version-info:
@@ -20,7 +20,7 @@ on:
         type: string
 jobs:
   smoke-test:
-    name: ${{ inputs.component }}
+    name: Smoke tests - backend
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

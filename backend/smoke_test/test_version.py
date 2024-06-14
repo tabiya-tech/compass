@@ -29,8 +29,4 @@ def test_version_info():
     assert response.status_code == 200
     # AND the response should contain the expected version info
     response_json = response.json()
-    if "version" in response_json:
-        sha = response_json.get("version").get("sha")
-    else:
-        sha = response_json.get("sha")
-    assert version_json.get("sha") == sha
+    assert version_json.get("sha") == response_json.get("sha")
