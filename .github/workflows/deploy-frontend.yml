@@ -19,6 +19,7 @@ on:
         description: 'The frontend version info'
         value: ${{ jobs.build.outputs.version-info }}
 
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -63,12 +64,11 @@ jobs:
           NEXT_PUBLIC_COMPASS_URL: ${{ inputs.backend-url }}
           NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT: 'conversation'
           NEXT_PUBLIC_AVAILABLE_COMPASS_ENDPOINTS: '["conversation", "conversation_sandbox"]'
-      - name: Archive POC frontend build
-        uses: actions/upload-artifact@v4
+      - name: Download frontend build bundle
+        uses: actions/download-artifact@v4
         with:
-          name: poc-frontend-build
-          path: frontend/out
-          retention-days: 1
+          name: frontend.build.folder
+          path: frontend-new/build/
       - name: Set Version Info for new frontend
         id: setNewVersionInfo
         run: |
@@ -78,24 +78,6 @@ jobs:
           echo "version-info<<$EOF" >> "$GITHUB_OUTPUT"
           echo "$(cat ./frontend-new/public/data/version.json)" >> "$GITHUB_OUTPUT"
           echo "$EOF" >> "$GITHUB_OUTPUT"
-      - name: Use Node.js 20.x for new frontend
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.x
-          cache: 'yarn'
-          cache-dependency-path: frontend-new/yarn.lock
-      - name: Install node packages in new frontend
-        run: yarn install
-        working-directory: frontend-new
-      - name: Build new frontend
-        run: yarn run build
-        working-directory: frontend-new
-      - name: Archive new frontend build
-        uses: actions/upload-artifact@v4
-        with:
-          name: new-frontend-build
-          path: frontend-new/build
-          retention-days: 1
       - name: Setup python
         uses: actions/setup-python@v5
         with:

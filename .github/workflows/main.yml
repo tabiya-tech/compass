@@ -19,8 +19,8 @@ jobs:
     secrets: inherit
     with:
       target-environment: dev
-  test-frontend:
-    uses: ./.github/workflows/test-frontend.yml
+  build-frontend:
+    uses: ./.github/workflows/build-frontend.yml
     secrets: inherit
     with:
       target-environment: dev
@@ -54,7 +54,7 @@ jobs:
   deploy-frontend:
     # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
     if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
-    needs: [ setup-env, test-frontend, deploy-auth ]
+    needs: [ setup-env, build-frontend, deploy-auth ]
     uses: ./.github/workflows/deploy-frontend.yml
     secrets: inherit
     with:
