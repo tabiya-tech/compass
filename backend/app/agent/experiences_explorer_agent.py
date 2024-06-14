@@ -60,13 +60,22 @@ class ExperiencesAgentState(BaseModel):
     """
     session_id: int
 
-    # Experiences on the radar - under discussion with this user.
-    # These were mentioned by the user, and the Agent needs to understand them deeper.
+    """
+    Experiences on the radar - under discussion with this user.
+    These were mentioned by the user, and the Agent needs to understand them deeper.
+    """
     experiences: dict = {}
     current_experience: str = None
     deep_dive_count: int = 0
 
     conversation_phase: ConversationPhase = ConversationPhase.INIT
+
+    """
+    Raw conversation history with this agent. (We should store this in the central state, but for now, we need to
+    prevent the summarizer to summarize it so we store it here too. In the future we should find a more elegant way
+    to isolate the conversation history specific to an agent.)
+    """
+    conversation_history: str = ""
 
     def __init__(self, session_id):
         super().__init__(session_id=session_id)
@@ -138,20 +147,14 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
                 reasoning="Failed to get a response",
                 message="[META: ExperiencesExplorerAgent LLM error] I am facing some difficulties right now, "
                         "could you please repeat what you said?",
-                finished=False)
+                finished=True)
 
         logger.debug("Model input: %s", user_input.message)
         logger.debug("Model output: %s", model_response)
         agent_end_time = time.time()
-        # TODO: return the response and the finished flag
 
-        # response = AgentOutput(message_for_user=model_response.message,
-        #                        finished=model_response.finished,
-        #                        reasoning=model_response.reasoning,
-        #                        agent_type=self._agent_type,
-        #                        agent_response_time_in_sec=round(agent_end_time - agent_start_time, 2),
-        #                        llm_stats=llm_stats_list)
-        # return response
+        if model_response.finished:
+            logger.debug("Model thinks we are finished.")
 
         return model_response
 
@@ -159,11 +162,14 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         s = self._state
         # Process the user's reply
         logger.debug("Phase1. The user said: %s", user_input.message)
-        # Let the LLM rock the boat.
+        s.conversation_history += user_input.message + "\n"
+        # Let the LLM drive the conversation, based on the system prompt
         model_response = await self._llm_conversation_reply(user_input, context)
+        s.conversation_history += model_response.message + "\n"
         meta_msg = ""
         if model_response.finished:
             s.conversation_phase = ConversationPhase.DIVE_IN
+            # TODO: Extract the data form the conversation
             # experiences = await self._extract_experience_from_user_reply(user_input_msg)
             # for experience in experiences:
             #     experience_id = _sanitized_experience_descr(experience.job_title, s.experiences)
@@ -279,8 +285,6 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         send them to your colleague who will investigate relevant skills. Before doing that, ask if the user would 
         like to add anything else. Your message should be concise and professional, but also polite and empathetic.""")
 
-        # TODO: make the finish instructions more explicit
-        # TODO: add CoT reasoning (and ask for the answer to be in a specific json format)
         return base_prompt
 
     # TODO: Figure out how to do dependency injection. This is a workaround for now.
