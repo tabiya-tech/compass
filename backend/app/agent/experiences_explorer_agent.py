@@ -34,7 +34,6 @@ class ConversationPhase(Enum):
     """
     INIT = 0
     WARMUP = 1
-    DONE_WITH_WARMUP = 2
     DIVE_IN = 2
     WRAPUP = 3
 
@@ -168,17 +167,21 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         s.conversation_history += model_response.message + "\n"
         meta_msg = ""
         if model_response.finished:
-            s.conversation_phase = ConversationPhase.DIVE_IN
-            # TODO: Extract the data form the conversation
-            # experiences = await self._extract_experience_from_user_reply(user_input_msg)
-            # for experience in experiences:
-            #     experience_id = _sanitized_experience_descr(experience.job_title, s.experiences)
-            #     s.experiences[experience_id] = ExperienceMetadata(
-            #         experience_descr=experience.job_title, done_with_deep_dive=False, esco_entity=experience)
+            # Extract the data form the conversation
+            experiences = await self._extract_experience_from_user_reply(s.conversation_history)
+            for experience in experiences:
+                experience_id = _sanitized_experience_descr(experience.job_title, s.experiences)
+                s.experiences[experience_id] = ExperienceMetadata(
+                    experience_descr=experience.job_title, done_with_deep_dive=False, esco_entity=experience)
 
-            # meta_msg = f"[META: ESCO Occupations Identified: {[e.esco_occupations[0].preferredLabel for e in experiences]}]"
+            meta_msg = f"[META: ESCO Occupations identified: " \
+                       f"{[e.esco_occupations[0].preferredLabel for e in experiences]}]"
+            # Advance the conversation, go directly the WRAPUP
+            # We skip the DIVE_IN, because it is needs more logic before it is worth connecting it to the conversation
+            # flow (which will be added after the P1 Prototype).
+            s.conversation_phase = ConversationPhase.WRAPUP
 
-        return  model_response.message + meta_msg
+        return model_response.message + meta_msg
 
         # If the LLM says we are finished, move on to the next phase (update the state)
 
@@ -276,14 +279,15 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         return await self._extract_experience_tool.extract_experience_from_user_reply(user_str)
 
     def _create_llm_system_instructions(self) -> str:
-        base_prompt = dedent("""" You work for an employment agency helping the user outline their previous experiences and 
-        reframe them for the job market. You should be explicit in saying that past experience can also reflect work 
-        in the unseen economy, such as care work for family and this should be included in your investigation. You 
-        want to first get all past experiences, one by one, and investigate exclusively the date and the place at 
-        which the position was held. Keep asking the user if they have more experience they would like to talk about 
-        until they explicitly state that they don't. When the user has no more experiences to talk about, 
-        send them to your colleague who will investigate relevant skills. Before doing that, ask if the user would 
-        like to add anything else. Your message should be concise and professional, but also polite and empathetic.""")
+        base_prompt = dedent("""" You work for an employment agency helping the user outline their previous 
+        experiences and reframe them for the job market. You should be explicit in saying that past experience can 
+        also reflect work in the unseen economy, such as care work for family and this should be included in your 
+        investigation. You want to first get all past experiences, one by one, and investigate exclusively the date 
+        and the place at which the position was held. Keep asking the user if they have more experience they would 
+        like to talk about until they explicitly state that they don't. When the user has no more experiences to talk 
+        about, send them to your colleague who will investigate relevant skills. Before doing that, ask if the user 
+        would like to add anything else. Your message should be concise and professional, but also polite and 
+        empathetic.""")
 
         return base_prompt
 
