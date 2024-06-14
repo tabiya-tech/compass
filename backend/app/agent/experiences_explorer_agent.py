@@ -255,11 +255,10 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
 
         # Send the prepared reply to the user
         # TODO: pass the LLM reasoning in case the answer was from an LLM
-        response = AgentOutput(message_for_user=reply_raw, finished=finished,
+        return AgentOutput(message_for_user=reply_raw, finished=finished,
                                agent_type=self._agent_type,
                                reasoning="handwritten code",
                                agent_response_time_in_sec=0.1, llm_stats=[])
-        return response
 
     async def _get_esco_preferred_labels(self, state: ExperiencesAgentState) -> set[str]:
         esco_occupations = set()
