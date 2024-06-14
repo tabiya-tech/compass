@@ -6,6 +6,7 @@ import { routerPaths } from "src/app/routerPaths";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import { LanguageOutlined } from "@mui/icons-material";
 import IDPAuth from "src/auth/components/IDPAuth/IDPAuth";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -44,15 +45,18 @@ const Register: React.FC = () => {
   const { register } = useContext(AuthContext);
 
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
   const handleRegister = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     register(
       email,
       password,
       (user) => {
+        enqueueSnackbar("Registration successful", { variant: "success" });
         navigate(routerPaths.ROOT);
       },
       (error) => {
+        enqueueSnackbar("Registration failed", { variant: "error" });
         console.error(error);
       }
     );

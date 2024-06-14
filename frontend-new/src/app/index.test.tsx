@@ -17,14 +17,6 @@ jest.mock("react-router-dom", () => {
   };
 });
 
-// mock the auth provider
-jest.mock("src/auth/AuthProvider", () => {
-  return {
-    __esModule: true,
-    AuthProvider: jest.fn().mockImplementation(({ children }) => <div data-testid="auth-provider-id">{children}</div>),
-  };
-});
-
 describe("main compass app test", () => {
   test("should render app successfully", () => {
     // WHEN the app is rendered
@@ -36,9 +28,6 @@ describe("main compass app test", () => {
     // AND the HASH ROUTER to be in the document
     const router = screen.getByTestId("hash-router-id");
     expect(router).toBeInTheDocument();
-    // AND the auth provider to be in the document
-    const authProvider = screen.getByTestId("auth-provider-id");
-    expect(authProvider).toBeInTheDocument();
     // AND for each path to have a route configured
     const allRoutes = screen.queryAllByTestId("route-id");
     expect(allRoutes.length).toBe(routerConfig.length);

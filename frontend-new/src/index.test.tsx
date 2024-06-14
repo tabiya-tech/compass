@@ -48,6 +48,28 @@ jest.mock("@mui/material", () => {
   };
 });
 
+// mock AuthProvider
+jest.mock("./auth/AuthProvider", () => {
+  const mAuthProvider = jest
+    .fn()
+    .mockImplementation(({ children }) => <div data-testid="auth-provider-id">{children}</div>);
+  return {
+    __esModule: true,
+    AuthProvider: mAuthProvider,
+  };
+});
+
+// mock SnackbarProvider
+jest.mock("./theme/SnackbarProvider/SnackbarProvider", () => {
+  const mSnackbarProvider = jest
+    .fn()
+    .mockImplementation(({ children }) => <div data-testid="snackbar-provider-id">{children}</div>);
+  return {
+    __esModule: true,
+    default: mSnackbarProvider,
+  };
+});
+
 describe("test the application bootstrapping", () => {
   beforeEach(() => {
     (console.error as jest.Mock).mockClear();

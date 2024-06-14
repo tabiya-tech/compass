@@ -11,7 +11,7 @@ const meta: Meta<typeof Login> = {
     (Story) => {
       const mockAuthContextValue = {
         ...authContextDefaultValue,
-        register: action("register"),
+        login: action("login"),
       };
 
       return (
