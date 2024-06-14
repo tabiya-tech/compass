@@ -51,7 +51,8 @@ const Login: React.FC = () => {
       password,
       (user) => {
         enqueueSnackbar("Login successful", { variant: "success" });
-        navigate(routerPaths.ROOT);
+        navigate(routerPaths.DPA);
+        console.log("User logged in", { user });
       },
       (error) => {
         enqueueSnackbar("Login failed", { variant: "error" });

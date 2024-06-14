@@ -93,6 +93,14 @@ describe("test the application bootstrapping", () => {
       const cssBaselineElement = screen.getByTestId("css-baseline-id");
       expect(cssBaselineElement).toBeInTheDocument();
 
+      // AND expect the auth provider to be in the DOM and to be a child of the theme provider
+      const authProviderElement = within(themeProviderElement).getByTestId("auth-provider-id");
+      expect(authProviderElement).toBeInTheDocument();
+
+      // AND expect the snackbar provider to be in the DOM and to be a child of the theme provider
+      const snackbarProviderElement = within(themeProviderElement).getByTestId("snackbar-provider-id");
+      expect(snackbarProviderElement).toBeInTheDocument();
+
       // AND expect the compass app to be in the DOM and to be a child of the theme provider
       const compassAppElement = within(themeProviderElement).getByTestId("compass-app-id");
       expect(compassAppElement).toBeInTheDocument();

@@ -53,7 +53,7 @@ const Register: React.FC = () => {
       password,
       (user) => {
         enqueueSnackbar("Registration successful", { variant: "success" });
-        navigate(routerPaths.ROOT);
+        navigate(routerPaths.DPA);
       },
       (error) => {
         enqueueSnackbar("Registration failed", { variant: "error" });

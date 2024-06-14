@@ -95,9 +95,10 @@ const SnackbarProvider: React.FC<OriginalSnackbarProviderProps> = ({
   children,
   ...props
 }: Readonly<OriginalSnackbarProviderProps>) => {
+  const DEFAULT_AUTO_HIDE_DURATION = 5000;
   const notistackOptions: OriginalSnackbarProviderProps = {
     maxSnack: 10,
-    autoHideDuration: null,
+    autoHideDuration: DEFAULT_AUTO_HIDE_DURATION,
     transitionDuration: { enter: 500, exit: 500 },
     anchorOrigin: {
       vertical: "top",

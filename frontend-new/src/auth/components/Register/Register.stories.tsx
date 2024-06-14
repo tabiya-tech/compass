@@ -7,6 +7,7 @@ import { AuthContext, authContextDefaultValue } from "src/auth/AuthProvider";
 const meta: Meta<typeof Register> = {
   title: "Auth/Register",
   component: Register,
+  tags: ["autodocs"],
   decorators: [
     (Story) => {
       const mockAuthContextValue = {

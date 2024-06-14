@@ -29,7 +29,7 @@ const IDPAuth = () => {
         signInSuccessWithAuthResult: (data: any) => {
           enqueueSnackbar("Login successful", { variant: "success" });
           setLoading(false);
-          navigate(routerPaths.ROOT);
+          navigate(routerPaths.DPA);
           return false;
         },
         signInFailure: (error: { message: SetStateAction<string> }) => {
