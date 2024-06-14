@@ -7,11 +7,14 @@ import { AuthProvider } from "src/auth/AuthProvider";
 
 // Import the Firebase mock utilities
 import "src/_test_utilities/firebaseMock";
+import SnackbarProvider from "src/theme/SnackbarProvider/SnackbarProvider";
 
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
-      <AuthProvider>{children}</AuthProvider>
+      <AuthProvider>
+        <SnackbarProvider>{children}</SnackbarProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 };

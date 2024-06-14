@@ -3,6 +3,7 @@ import IDPAuth from "./IDPAuth";
 
 const meta: Meta<typeof IDPAuth> = {
   title: "Auth/IDPAuth",
+  tags: ["autodocs"],
   component: IDPAuth,
 };
 
