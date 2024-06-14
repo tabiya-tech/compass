@@ -10,8 +10,8 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
   padding: 0,
   color: theme.palette.primary.main,
   ":hover": {
-    backgroundColor: theme.palette.primary.dark,
-    color: theme.palette.primary.contrastText,
+    backgroundColor: theme.palette.secondary.dark,
+    color: theme.palette.secondary.contrastText,
   },
   ":active": {
     backgroundColor: theme.palette.primary.main,

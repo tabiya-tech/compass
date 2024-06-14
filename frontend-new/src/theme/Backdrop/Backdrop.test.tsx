@@ -3,12 +3,15 @@ import "src/_test_utilities/consoleMock";
 
 import { render, screen } from "src/_test_utilities/test-utils";
 import { Backdrop, DATA_TEST_ID } from "./Backdrop";
+import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 
 describe("Backdrop render tests", () => {
   beforeEach(() => {
     (console.error as jest.Mock).mockClear();
     (console.warn as jest.Mock).mockClear();
   });
+
+  beforeAll(() => mockUseTokens());
 
   it("should be shown", () => {
     // GIVEN a message

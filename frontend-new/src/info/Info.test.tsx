@@ -4,6 +4,7 @@ import "src/_test_utilities/consoleMock";
 import Info, { DATA_TEST_ID, InfoProps } from "./Info";
 import { render, screen, act } from "src/_test_utilities/test-utils";
 import InfoService from "./info.service";
+import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 
 // Mock the info service
 jest.mock("./info.service", () => {
@@ -15,6 +16,8 @@ jest.mock("./info.service", () => {
 });
 
 describe("Testing Info component", () => {
+  beforeAll(() => mockUseTokens());
+
   test("it should show frontend info successfully", async () => {
     // GIVEN some frontend and backend info data are available and loaded
     const expectedFrontendInfoData: InfoProps = {

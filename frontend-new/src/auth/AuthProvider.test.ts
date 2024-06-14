@@ -4,12 +4,12 @@ import "src/_test_utilities/consoleMock";
 import { useContext } from "react";
 import { AuthContext, authContextDefaultValue } from "src/auth/AuthProvider";
 import { renderHook } from "src/_test_utilities/test-utils";
-import { AuthPersistentStorage } from "src/auth/services/AuthPersistentStorage";
+import { AuthPersistentStorage } from "src/auth/services/AuthPersistentStorage/AuthPersistentStorage";
 import * as useTokensHook from "src/auth/hooks/useTokens";
 import { act } from "@testing-library/react";
 import { mockLoggedInUser } from "src/_test_utilities/mockLoggedInUser";
 import { defaultUseTokensResponse } from "src/auth/hooks/useTokens";
-import { AuthService } from "./services/AuthService";
+import { AuthService } from "./services/AuthService/AuthService";
 
 jest.mock("src/auth/hooks/useAuthUser");
 jest.mock("src/auth/hooks/useTokens");
@@ -62,7 +62,7 @@ describe("AuthProvider module", () => {
   });
 
   describe("Logout functionality", () => {
-    test("it should clear the refresh token when the logout function is called", async () => {
+    test("it should clear the id token when the logout function is called", async () => {
       const clearTokens = jest.fn();
 
       (useTokensHook.useTokens as jest.Mock).mockReturnValue({ clearTokens });
@@ -70,14 +70,14 @@ describe("AuthProvider module", () => {
       // GIVEN the Auth Provider is rendered and auth context is accessed
       const { result } = renderAuthContext();
 
-      // AND the refresh token is set
-      AuthPersistentStorage.setRefreshToken("foo");
+      // AND the id token is set
+      AuthPersistentStorage.setIDToken("foo");
 
       // WHEN the logout function is called
       act(() => result.current?.logout());
 
-      // THEN the refresh token should be cleared
-      expect(AuthPersistentStorage.getRefreshToken()).toBeNull();
+      // THEN the id token should be cleared
+      expect(AuthPersistentStorage.getIDToken()).toBeNull();
 
       // AND the clear function should be called
       expect(clear).toHaveBeenCalled();
@@ -95,17 +95,24 @@ describe("AuthProvider module", () => {
       // WHEN the register function is called
       const givenEmail = "foo@bar.baz";
       const givenPassword = "password";
+      const givenName = "foo";
       const givenSuccessCallback = jest.fn();
       const givenErrorCallback = jest.fn();
 
       const registerSpy = jest.spyOn(authService, "handleRegister");
 
       act(() => {
-        result.current?.register(givenEmail, givenPassword, givenSuccessCallback, givenErrorCallback);
+        result.current?.register(givenEmail, givenPassword, givenName, givenSuccessCallback, givenErrorCallback);
       });
 
       // THEN the auth service handleRegister function should be called with the correct parameters
-      expect(registerSpy).toHaveBeenCalledWith(givenEmail, givenPassword, expect.any(Function), expect.any(Function));
+      expect(registerSpy).toHaveBeenCalledWith(
+        givenEmail,
+        givenPassword,
+        givenName,
+        expect.any(Function),
+        expect.any(Function)
+      );
     });
   });
 
