@@ -14,6 +14,10 @@ on:
         description: The expected version info. It is a json string, see the version.json file in the backend/app folder
         required: true
         type: string
+      get-version-url:
+        description: the url for getting the version information.
+        required: true
+        type: string
 jobs:
   smoke-test:
     name: ${{ inputs.component }}
@@ -49,5 +53,6 @@ jobs:
         run: |
           export EXPECTED_VERSION_INFO='${{ inputs.expected-version-info }}'
           export E2E_BASE_URL=${{ inputs.component-url }}
+          export GET_VERSION_URL=${{ inputs.get-version-url }}
           poetry run pytest smoke_test/test_version.py
-        working-directory: ${{ inputs.component }}
+        working-directory: backend
