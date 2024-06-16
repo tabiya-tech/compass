@@ -17,7 +17,7 @@ on:
     outputs:
       version-info:
         description: 'The frontend version info'
-        value: ${{ jobs.build.outputs.version-info }}
+        value: ${{ jobs.deploy.outputs.version-info }}
 
 
 jobs:
