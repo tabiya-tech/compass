@@ -28,12 +28,10 @@ france_prompt = dedent("""
     
     Some additional context you may need:
         QPV: These areas in France defined as priority neighborhoods for urban policy are among the most 
-        disadvantaged in 
-        France, and therefore face a number of socio-economic challenges. 
+        disadvantaged in France, and therefore face a number of socio-economic challenges. 
         Civic service: An opportunity for young people aged 16 to 25 (or 30 if they are disabled) to volunteer for 
         assignments for 6 to 12 months. They do not need a degree or experience and are compensated for their service 
-        (€580 a 
-        month, or €688 if volunteers have higher education grants or qualify for RSA supplemental income).
+        (€580 a month, or €688 if volunteers have higher education grants or qualify for RSA supplemental income).
 """)
 
 test_cases = [
