@@ -3,27 +3,21 @@ from textwrap import dedent
 from evaluation_tests.conversation_libs.conversation_test_function import EvaluationTestCase, Evaluation
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import EvaluationType
 
-sa_prompt = dedent("""
+system_instruction_prompt = dedent("""
     You are going to be interacting with a GenAI-driven conversational agent to help you identify what your skills 
     are. You will interact with this agent by typing responses, so reply in a way that is typical of type responses 
     rather than verbal, meaning you speak concisely and directly.
-        
+""")
+
+sa_prompt = system_instruction_prompt + dedent("""       
     You talk in English, like a young person from South Africa would.
 """)
 
-kenya_prompt = dedent("""‘
-    You are going to be interacting with a GenAI-driven conversational agent to help you 
-    identify what your skills are. You will interact with this agent by typing responses, so reply in a way that is 
-    typical of type responses rather than verbal, meaning you speak concisely and directly.
-    
+kenya_prompt = system_instruction_prompt + dedent("""‘
     You talk in English, like a young person from Kenya would.
 """)
 
-france_prompt = dedent("""
-    You are going to be interacting with a GenAI-driven conversational agent to help you identify what your skills 
-    are. You will interact with this agent by typing responses, so reply in a way that is typical of type responses 
-    rather than verbal, meaning you speak concisely and directly.
-    
+france_prompt = system_instruction_prompt + dedent("""   
     Talk in English, like a young person would. 
     
     Some additional context you may need:
