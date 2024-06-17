@@ -44,7 +44,6 @@ def convert():
                         openapi3['paths'][path][method].pop('security')
 
     openapi2['paths'].update(openapi3['paths'])
-    openapi2.pop('x-tabiya-quota')
     
     with open('openapi2.yaml', 'w') as f:
         yaml.dump(openapi2, f)

@@ -8,9 +8,6 @@ schemes:
   - https
 produces:
   - application/json
-x-tabiya-quota:
-  metricCosts:
-    request-metric: 1
 x-google-management:
   # Read https://cloud.google.com/endpoints/docs/openapi/quotas-configure for more information
   # on how to configure quotas
