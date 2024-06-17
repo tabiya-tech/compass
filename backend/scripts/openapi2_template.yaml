@@ -8,6 +8,24 @@ schemes:
   - https
 produces:
   - application/json
+x-tabiya-quota:
+  metricCosts:
+    request-metric: 1
+x-google-management:
+  # Read https://cloud.google.com/endpoints/docs/openapi/quotas-configure for more information
+  # on how to configure quotas
+  metrics:
+    - name: "request-metric"
+      displayName: "Request metric"
+      valueType: INT64
+      metricKind: DELTA
+  quota:
+    limits:
+      - name: "request-limit"
+        metric: "request-metric"
+        unit: "1/min/{{project}}"
+        values:
+          STANDARD: 20 # requests per minute
 x-google-backend:
   address: "{1}"
 securityDefinitions:
