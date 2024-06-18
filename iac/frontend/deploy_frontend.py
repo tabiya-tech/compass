@@ -109,4 +109,4 @@ def deploy_frontend(project: str, location: str, environment: str):
     pulumi.export('bucket_name', bucket.name)
     pulumi.export('bucket_url', pulumi.Output.concat("http://", bucket.name, ".storage.googleapis.com/index.html"))
     pulumi.export('new_ui_url',
-                  pulumi.Output.concat("http://", bucket.name, ".storage.googleapis.com/new-ui/index.html"))
+                  pulumi.Output.concat("http://", bucket.name, ".storage.googleapis.com/new-ui"))

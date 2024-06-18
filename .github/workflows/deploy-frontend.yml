@@ -15,17 +15,16 @@ on:
         required: true
         type: string
     outputs:
-      version-info:
-        description: 'The frontend version info'
-        value: ${{ jobs.deploy.outputs.version-info }}
-
+      frontend-url:
+        description: 'The bucket frontend url'
+        value: ${{ jobs.deploy.outputs.frontend-url }}
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: ${{ inputs.target-environment }}
     outputs:
-      version-info: ${{ steps.setPOCVersionInfo.outputs.version-info }}
+      frontend-url: ${{ steps.pulumi.outputs.new_ui_url }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -69,15 +68,6 @@ jobs:
         with:
           name: frontend.build.folder
           path: frontend-new/build/
-      - name: Set Version Info for new frontend
-        id: setNewVersionInfo
-        run: |
-          ./pipeline/setVersionInfo.sh frontend-new/public/data/version.json
-          cat frontend-new/public/data/version.json
-          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "version-info<<$EOF" >> "$GITHUB_OUTPUT"
-          echo "$(cat ./frontend-new/public/data/version.json)" >> "$GITHUB_OUTPUT"
-          echo "$EOF" >> "$GITHUB_OUTPUT"
       - name: Setup python
         uses: actions/setup-python@v5
         with:

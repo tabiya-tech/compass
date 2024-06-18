@@ -5,6 +5,10 @@ on:
       target-environment:
         required: true
         type: string
+    outputs:
+      version-info:
+        description: 'The frontend version info'
+        value: ${{ jobs.build.outputs.version-info }}
 jobs:
     poc-lint:
         runs-on: ubuntu-latest
@@ -54,6 +58,8 @@ jobs:
     build:
       runs-on: ubuntu-latest
       environment: ${{ inputs.target-environment }}
+      outputs:
+        version-info: ${{ steps.setNewVersionInfo.outputs.version-info }}
       steps:
         - name: Checkout code
           uses: actions/checkout@v4
@@ -66,6 +72,15 @@ jobs:
         - name: Install node packages
           run: yarn install
           working-directory: frontend-new
+        - name: Set Version Info for new frontend
+          id: setNewVersionInfo
+          run: |
+            ./pipeline/setVersionInfo.sh frontend-new/public/data/version.json
+            cat frontend-new/public/data/version.json
+            EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+            echo "version-info<<$EOF" >> "$GITHUB_OUTPUT"
+            echo "$(cat ./frontend-new/public/data/version.json)" >> "$GITHUB_OUTPUT"
+            echo "$EOF" >> "$GITHUB_OUTPUT"
         - name: Build
           run: yarn build
           working-directory: frontend-new
