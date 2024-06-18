@@ -40,9 +40,13 @@ app = FastAPI(
 )
 
 origins = [
-    os.getenv("FRONTEND_URL") or "*",
+    (os.getenv("FRONTEND_URL") or "*"),
     (os.getenv("BACKEND_URL") or "*") + "/docs",
 ]
+
+if os.getenv("TARGET_ENVIRONMENT") == "dev":
+    origins.append("*")
+
 logger.info(f"Allowed origins: {origins}")
 
 app.add_middleware(

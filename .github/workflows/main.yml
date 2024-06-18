@@ -45,7 +45,7 @@ jobs:
       frontend-url: ${{ needs.setup-env.outputs.frontend-url }}
   smoke-test-backend-apigateway:
     needs: [ deploy-backend ]
-    uses: ./.github/workflows/smoke-test-version.yml
+    uses: ./.github/workflows/smoke-test-backend-version.yml
     secrets: inherit
     with:
       component: backend
@@ -87,7 +87,7 @@ jobs:
       domain-name: ${{ needs.setup-env.outputs.domain-name }}
   smoke-test-backend:
     needs: [  setup-env, deploy-backend, deploy-aws-ns ]
-    uses: ./.github/workflows/smoke-test-version.yml
+    uses: ./.github/workflows/smoke-test-backend-version.yml
     secrets: inherit
     with:
       component: backend
@@ -95,11 +95,10 @@ jobs:
       component-url: ${{ needs.setup-env.outputs.backend-url }}
       get-version-url: /version
   smoke-test-frontend:
-    needs: [  setup-env, deploy-frontend, deploy-aws-ns ]
-    uses: ./.github/workflows/smoke-test-version.yml
+    needs: [  setup-env, build-frontend, deploy-frontend, deploy-aws-ns ]
+    uses: ./.github/workflows/smoke-test-frontend-version.yml
     secrets: inherit
     with:
-      component: frontend
-      expected-version-info: ${{ needs.deploy-frontend.outputs.version-info }}
+      component: frontend-new
+      expected-version-info: ${{ needs.build-frontend.outputs.version-info }}
       component-url: ${{ needs.setup-env.outputs.frontend-url }}
-      get-version-url: /data/version.json

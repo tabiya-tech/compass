@@ -12,7 +12,7 @@ const meta: Meta<typeof Info> = {
 export default meta;
 type Story = StoryObj<typeof Info>;
 
-const API_URL = "https://compass.tabiya.tech/info";
+const API_URL = "http://dev.compass.tabiya.tech/api/version";
 
 export const Shown: Story = {
   args: {},
@@ -28,6 +28,28 @@ export const Shown: Story = {
         url: "data/version.json",
         method: "GET",
         status: 200,
+        response: getFakerVersion(),
+      },
+    ],
+  },
+};
+
+export const ShownFetchIsSlow: Story = {
+  args: {},
+  parameters: {
+    mockData: [
+      {
+        url: API_URL,
+        method: "GET",
+        status: 200,
+        delay: 5000,
+        response: getFakerVersion(),
+      },
+      {
+        url: "data/version.json",
+        method: "GET",
+        status: 200,
+        delay: 5000,
         response: getFakerVersion(),
       },
     ],

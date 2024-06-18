@@ -1,54 +1,62 @@
+// mute the console
 import "src/_test_utilities/consoleMock";
-import Info, { DATA_TEST_ID } from "./Info";
-import { render, screen, waitFor } from "src/_test_utilities/test-utils";
-import { setupFetchSpy } from "src/_test_utilities/fetchSpy";
+
+import Info, { DATA_TEST_ID, InfoProps } from "./Info";
+import { render, screen, act } from "src/_test_utilities/test-utils";
+import InfoService from "./info.service";
+
+// Mock the info service
+jest.mock("./info.service", () => {
+  const mockInfoService = jest.fn();
+  mockInfoService.prototype.loadInfo = jest.fn().mockImplementation(() => {
+    return Promise.resolve([]);
+  });
+  return mockInfoService;
+});
 
 describe("Testing Info component", () => {
-  beforeEach(() => {
-    // Mock the fetch API using setupFetchSpy
-    setupFetchSpy(
-      200,
-      {
-        date: "fooFrontend",
-        branch: "barFrontend",
-        buildNumber: "bazFrontend",
-        sha: "gooFrontend",
-      },
-      "application/json;charset=UTF-8"
-    );
-
-    // Clear console mocks
-    (console.error as jest.Mock).mockClear();
-    (console.warn as jest.Mock).mockClear();
-  });
-
-  afterEach(() => {
-    // Restore the original fetch implementation
-    jest.restoreAllMocks();
-  });
-
   test("it should show frontend info successfully", async () => {
+    // GIVEN some frontend and backend info data are available and loaded
+    const expectedFrontendInfoData: InfoProps = {
+      date: "fooFrontend",
+      branch: "barFrontend",
+      buildNumber: "bazFrontend",
+      sha: "gooFrontend",
+    };
+    const expectedBackendInfoData: InfoProps = {
+      date: "fooBackend",
+      branch: "barBackend",
+      buildNumber: "bazBackend",
+      sha: "gooBackend",
+    };
+    const infoDataPromise = Promise.resolve([expectedFrontendInfoData, expectedBackendInfoData]);
+
+    // @ts-ignore
+    InfoService.mockImplementationOnce(() => {
+      return {
+        loadInfo: () => {
+          return infoDataPromise;
+        },
+      };
+    });
+
     // WHEN the component is rendered
     render(<Info />);
+    await act(async () => {
+      await infoDataPromise;
+    });
 
     // THEN expect no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
-
     // AND the component should be rendered
     expect(screen.getByTestId(DATA_TEST_ID.INFO_ROOT)).toBeDefined();
+    expect(screen.getByTestId(DATA_TEST_ID.INFO_ROOT)).toMatchSnapshot(DATA_TEST_ID.INFO_ROOT);
     // AND the frontend info should be displayed
-
-    // AND the frontend info should be displayed
-    await waitFor(() => {
-      expect(screen.getByText("fooFrontend")).toBeInTheDocument();
-    });
-
-    expect(screen.getByText("barFrontend")).toBeInTheDocument();
-    expect(screen.getByText("bazFrontend")).toBeInTheDocument();
-    expect(screen.getByText("gooFrontend")).toBeInTheDocument();
-
-    // AND the component should match the snapshot
-    expect(screen.getByTestId(DATA_TEST_ID.INFO_ROOT)).toMatchSnapshot();
+    expect(screen.getByTestId(DATA_TEST_ID.VERSION_FRONTEND_ROOT)).toBeDefined();
+    expect(screen.getByTestId(DATA_TEST_ID.VERSION_FRONTEND_ROOT)).toMatchSnapshot(DATA_TEST_ID.VERSION_FRONTEND_ROOT);
+    // AND the backend info should be displayed
+    expect(screen.getByTestId(DATA_TEST_ID.VERSION_BACKEND_ROOT)).toBeDefined();
+    expect(screen.getByTestId(DATA_TEST_ID.VERSION_BACKEND_ROOT)).toMatchSnapshot(DATA_TEST_ID.VERSION_BACKEND_ROOT);
   });
 });

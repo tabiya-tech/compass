@@ -23,4 +23,4 @@ def add_version_routes(app: FastAPI):
              Returns the version of the application
              """, )
     async def _get_version():
-        return {"version": version_info}
+        return version_info
