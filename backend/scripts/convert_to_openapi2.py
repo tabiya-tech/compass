@@ -24,7 +24,7 @@ def convert():
             
             # Add quota/rate-limiter
             metric_costs = collections.defaultdict(dict)
-            metric_costs['metricCosts']['request_metric'] = 1
+            metric_costs['metricCosts']['request-metric'] = 1
             openapi3['paths'][path][method]['x-google-quota'] = metric_costs
 
             # remove response contents as not required in GCP API Gateway configs
