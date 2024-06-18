@@ -34,7 +34,7 @@ COMPASS_DB = AsyncIOMotorClient(MONGO_SETTINGS.mongodb_uri).get_database(MONGO_S
 GECKO_EMBEDDING_SERVICE = GoogleGeckoEmbeddingService()
 
 # The model ID to use for the embeddings. We dont' want to copy more than one model for now.
-# TODO: Support multiple models (e.g. French ESCO).
+# TODO: COM-328 Support multiple models (e.g. French ESCO).
 RELEVANT_MODEL_ID = ObjectId("6613c0a34436e3a6dbb41b66")
 
 PER_TYPE_SETTINGS = {
