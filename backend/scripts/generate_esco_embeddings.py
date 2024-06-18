@@ -10,14 +10,15 @@ from random import randint
 from typing import List
 
 import vertexai
+from bson.objectid import ObjectId
 from dotenv import load_dotenv
 from google.api_core.exceptions import ResourceExhausted
-from motor.motor_asyncio import AsyncIOMotorDatabase, AsyncIOMotorCollection, AsyncIOMotorClient
+from motor.motor_asyncio import AsyncIOMotorCollection, AsyncIOMotorClient
 from tqdm import tqdm
 
-from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService, EmbeddingService
+from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
-from scripts.base_data_settings import ScriptSettings
+from scripts.base_data_settings import ScriptSettings, Type, TabiyaDatabaseConfig
 
 load_dotenv()
 vertexai.init()
@@ -25,7 +26,31 @@ vertexai.init()
 PARALLEL_TASK_SIZE = 5
 MAX_RETRIES = 3
 MONGO_SETTINGS = MongoDbSettings()
-BASE_SETTINGS = ScriptSettings().base_data_settings
+SCRIPT_SETTINGS = ScriptSettings()
+TABIYA_CONFIG = TabiyaDatabaseConfig()
+TABIYA_DB = AsyncIOMotorClient(SCRIPT_SETTINGS.tabiya_mongodb_uri).get_database(
+    TABIYA_CONFIG.db_name)
+COMPASS_DB = AsyncIOMotorClient(MONGO_SETTINGS.mongodb_uri).get_database(MONGO_SETTINGS.database_name)
+GECKO_EMBEDDING_SERVICE = GoogleGeckoEmbeddingService()
+
+# The model ID to use for the embeddings. We dont' want to copy more than one model for now.
+# TODO: Support multiple models (e.g. French ESCO).
+RELEVANT_MODEL_ID = ObjectId("6613c0a34436e3a6dbb41b66")
+
+PER_TYPE_SETTINGS = {
+    Type.OCCUPATION: {
+        'clean_data_collection_name': TABIYA_CONFIG.occupation_collection_name,
+        'collection_name': MONGO_SETTINGS.embedding_settings.occupation_collection_name,
+        'fields': ['preferredLabel', 'altLabels', 'description', 'UUID', 'code'],
+        'id_field_name': 'occupationId'
+    },
+    Type.SKILL: {
+        'clean_data_collection_name': TABIYA_CONFIG.skill_collection_name,
+        'collection_name': MONGO_SETTINGS.embedding_settings.occupation_collection_name,
+        'fields': ['preferredLabel', 'altLabels', 'description', 'UUID', 'skillType'],
+        'id_field_name': 'skillId'
+    }
+}
 
 logger = logging.getLogger(__name__)
 parser = argparse.ArgumentParser(
@@ -46,7 +71,7 @@ def _field_to_string(field, document):
 
 
 async def _embed_document(collection: AsyncIOMotorCollection,
-                          embedding_service: EmbeddingService,
+                          type: Type,
                           field: str,
                           document,
                           errors: List[str] = None,
@@ -54,28 +79,28 @@ async def _embed_document(collection: AsyncIOMotorCollection,
     if errors is None:
         errors = []
     try:
-        # TODO: We might want to only copy relevant fields, not all. This will become relevant once we start copying
-        #  from the Platform taxonomy database.
         embedded_text = _field_to_string(field, document)
         if embedded_text == "":
             logging.debug(f"Document UUID:{document['UUID']} has no text in field {field}. Skipping.")
             return
-        embedding = await embedding_service.embed(embedded_text)
+        embedding = await GECKO_EMBEDDING_SERVICE.embed(embedded_text)
         document[MONGO_SETTINGS.embedding_settings.embedding_key] = embedding
-        document['embedded_field'] = field
-        document['embedded_text'] = embedded_text
-        document['updatedAt'] = datetime.utcnow()
+        document_to_save = {k: v for k, v in document.items() if k in PER_TYPE_SETTINGS[type]['fields']}
+        document_to_save['embedded_field'] = field
+        document_to_save['embedded_text'] = embedded_text
+        document_to_save['updatedAt'] = datetime.utcnow()
+        document_to_save[PER_TYPE_SETTINGS[type]['id_field_name']] = document['_id']
         await collection.replace_one(
-            {'$and': [
+            {'$and': [  # Make sure we only have one embedding per field per occupation.
                 {'UUID': document['UUID']},
                 {'embedded_field': field}]},
-            document,
+            document_to_save,
             upsert=True)
     except Exception as e:
         if isinstance(e, ResourceExhausted) and retry_count < MAX_RETRIES:
             logging.debug(f"Retriable resource exhausted for document {document['UUID']}: {e}.")
             await asyncio.sleep(randint(5, 10) * (retry_count + 1))  # nosec
-            await _embed_document(collection, embedding_service, field, document, errors,
+            await _embed_document(collection, type, field, document, errors,
                                   retry_count + 1)
         else:
             logging.error(f"Error embedding document UUID:{document['UUID']}, label: {document['preferredLabel']}: {e}")
@@ -83,10 +108,7 @@ async def _embed_document(collection: AsyncIOMotorCollection,
 
 
 async def generate_embeddings(
-        db: AsyncIOMotorDatabase,
-        model: EmbeddingService,
-        collection_name: str,
-        clean_data_collection_name: str,
+        type: Type,
         uuids: List[str] = None
 ) -> None:
     """Embeds the entire collection in a MongoDB database.
@@ -97,24 +119,22 @@ async def generate_embeddings(
     unique, if it already exists, it will be updated, if not it will be created.
 
     Args:
-        :param db: The MongoDB database to use.
-        :param model: The embedding model to use.
-        :param clean_data_collection_name: The name of the collection to use for data.
-        :param collection_name: The settings of the collection to store the embeddings.
+        :param type: The type of the entity to embed.
         :param uuids: A list of UUIDs to embed. If None, all the documents in the collection will be embedded.
     """
     # This could be a collection from the Platform taxonomy database.
-    clean_data_collection = db[clean_data_collection_name]
-    embeddings_collection = db[collection_name]
-    search_filter = {'UUID': {'$in': uuids}} if uuids else {}
-    pbar = tqdm(desc=f'Embedding progress for {collection_name}',
+    clean_data_collection = TABIYA_DB[PER_TYPE_SETTINGS[type]['clean_data_collection_name']]
+    embeddings_collection = COMPASS_DB[PER_TYPE_SETTINGS[type]['collection_name']]
+    search_filter: dict = {'UUID': {'$in': uuids}} if uuids else {}
+    search_filter.update({"modelId": RELEVANT_MODEL_ID})
+    pbar = tqdm(desc=f'Embedding progress for {type.name}',
                 total=await clean_data_collection.count_documents(search_filter))
     i = 0
     tasks = []
     errors = []
-    async for document in clean_data_collection.find(search_filter, {'_id': 0}):
+    async for document in clean_data_collection.find(search_filter):
         tasks += [
-            _embed_document(embeddings_collection, model, field, document,
+            _embed_document(embeddings_collection, type, field, document,
                             errors) for field in
             ['preferredLabel', 'altLabels', 'description']]
         i += 1
@@ -125,13 +145,12 @@ async def generate_embeddings(
     await asyncio.gather(*tasks)
     pbar.close()
     if len(errors) > 0:
-        logging.error(
-            f"Errors embedding documents in collection {collection_name}: {errors}")
+        logging.error(f"Errors embedding documents in collection {type.name}: {errors}")
 
 
-async def upsert_indexes(db: AsyncIOMotorDatabase, collection_name: str):
+async def upsert_indexes(collection_name: str):
     """Creates the search index for the embeddings."""
-    collection = db[collection_name]
+    collection = COMPASS_DB[collection_name]
     definition = {'mappings': {
         'dynamic': True,
         'fields': {
@@ -149,46 +168,48 @@ async def upsert_indexes(db: AsyncIOMotorDatabase, collection_name: str):
             {'name': MONGO_SETTINGS.embedding_settings.embedding_index, 'definition': definition})
 
 
-async def create_collection(db: AsyncIOMotorDatabase, embedding_collection_name: str, drop=True):
+async def create_collection(embedding_collection_name: str, drop=True):
     """Creates the collection to store the embeddings. If it already exists and drop = True, it will be dropped and
     recreated."""
-    collist = await db.list_collection_names()
+    collist = await COMPASS_DB.list_collection_names()
     if embedding_collection_name in collist and drop:
-        await db.drop_collection(embedding_collection_name)
+        await COMPASS_DB.drop_collection(embedding_collection_name)
     else:
         return
-    await db.create_collection(embedding_collection_name)
-    await db[embedding_collection_name].create_index({'UUID': 1, 'embedded_field': 1}, name='UUID_embedded_field_index')
-    await db[embedding_collection_name].create_index({'UUID': 1}, name='UUID_index')
+    await COMPASS_DB.create_collection(embedding_collection_name)
+    await COMPASS_DB[embedding_collection_name].create_index({'UUID': 1, 'embedded_field': 1},
+                                                             name='UUID_embedded_field_index')
+    await COMPASS_DB[embedding_collection_name].create_index({'UUID': 1}, name='UUID_index')
     await asyncio.sleep(3)  # Wait for the indexes to be created.
 
 
 async def generate_embeddings_for_collection(
-        db: AsyncIOMotorDatabase,
-        embedding_service: EmbeddingService,
-        collection_name: str,
-        clean_data_collection_name: str,
+        type: Type,
         arguments: argparse.Namespace,
 ) -> None:
     """Embeds the entire collection in a MongoDB database. """
-    await create_collection(db, collection_name, drop=arguments.drop_collection)
-    await generate_embeddings(db, embedding_service, collection_name,
-                              clean_data_collection_name,
-                              arguments.uuids)
-    await upsert_indexes(db, collection_name)
+    await create_collection(PER_TYPE_SETTINGS[type]["collection_name"], drop=arguments.drop_collection)
+    await generate_embeddings(type, arguments.uuids)
+    await upsert_indexes(PER_TYPE_SETTINGS[type]["collection_name"])
+
+
+async def copy_relationship_model(drop=False):
+    """Copies the occupation to skill relationship model from the Tabiya database to the Compass database."""
+    relation_collection_name = TABIYA_CONFIG.relation_collection_name
+    collist = await COMPASS_DB.list_collection_names()
+    if relation_collection_name in collist and drop:
+        await COMPASS_DB.drop_collection(relation_collection_name)
+
+    await asyncio.gather(*[COMPASS_DB[relation_collection_name].insert_one(document) async for document in
+                           TABIYA_DB[relation_collection_name].find({"modelId": RELEVANT_MODEL_ID})])
 
 
 async def main():
     args = parser.parse_args()
-    gecko_embedding_service = GoogleGeckoEmbeddingService()
-    compass_db = AsyncIOMotorClient(MONGO_SETTINGS.mongodb_uri).get_database(MONGO_SETTINGS.database_name)
-    await generate_embeddings_for_collection(compass_db, gecko_embedding_service,
-                                             MONGO_SETTINGS.embedding_settings.occupation_collection_name,
-                                             BASE_SETTINGS.occupation_collection_name, args)
-    await generate_embeddings_for_collection(compass_db, gecko_embedding_service,
-                                             MONGO_SETTINGS.embedding_settings.skill_collection_name,
-                                             BASE_SETTINGS.skill_collection_name,
-                                             args)
+
+    await generate_embeddings_for_collection(Type.OCCUPATION, args)
+    await generate_embeddings_for_collection(Type.SKILL, args)
+    await copy_relationship_model(drop=args.drop_collection)
 
 
 if __name__ == "__main__":
