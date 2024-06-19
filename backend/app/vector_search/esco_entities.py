@@ -27,6 +27,7 @@ class SkillEntity(BaseModel):
     skillType: str
     relationType: str
 
+
 class OccupationSkillEntity(BaseModel):
     """
     Represents an occupation and its associated skills.

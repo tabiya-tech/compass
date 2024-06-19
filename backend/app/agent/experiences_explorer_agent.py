@@ -226,7 +226,8 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         # Phase3
         elif s.conversation_phase == ConversationPhase.WRAPUP:
             esco_occupations = await self._get_esco_preferred_labels(s)
-            top_occupations = [e.esco_entity.esco_occupations[0].occupation.preferredLabel for e in s.experiences.values()]
+            top_occupations = [e.esco_entity.esco_occupations[0].occupation.preferredLabel for e in
+                               s.experiences.values()]
             reply_raw = "[META: Under development] I am still under development. In the future, I will share my " \
                         "summarized findings here. Bye! \n" \
                         f"[META: Top ESCO Occupations Identified: {'; '.join(top_occupations)}] \n" \
@@ -242,15 +243,15 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         # Send the prepared reply to the user
         # TODO: pass the LLM reasoning in case the answer was from an LLM
         return AgentOutput(message_for_user=reply_raw, finished=finished,
-                               agent_type=self._agent_type,
-                               reasoning="handwritten code",
-                               agent_response_time_in_sec=0.1, llm_stats=[])
+                           agent_type=self._agent_type,
+                           reasoning="handwritten code",
+                           agent_response_time_in_sec=0.1, llm_stats=[])
 
     async def _get_esco_preferred_labels(self, state: ExperiencesAgentState) -> set[str]:
         esco_occupations = set()
         for experience in state.experiences.values():
-            for occupation in experience.esco_entity.esco_occupations:
-                esco_occupations.add(occupation.occupation.preferredLabel)
+            for occupation_skills in experience.esco_entity.esco_occupations:
+                esco_occupations.add(occupation_skills.occupation.preferredLabel)
         return esco_occupations
 
     def set_state(self, state: ExperiencesAgentState):
