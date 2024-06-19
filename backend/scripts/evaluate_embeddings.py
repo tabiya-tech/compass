@@ -1,5 +1,4 @@
 import asyncio
-from enum import Enum
 from typing import List, Optional, Tuple, Any
 
 import vertexai
@@ -12,7 +11,7 @@ from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
 from app.vector_search.esco_search_service import VectorSearchConfig, OccupationSearchService, SkillSearchService
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
-from scripts.base_data_settings import ScriptSettings
+from scripts.base_data_settings import ScriptSettings, Type
 
 OCCUPATION_REPO_ID = "tabiya/hahu_test"
 OCCUPATION_FILENAME = "redacted_hahu_test_with_id.csv"
@@ -22,14 +21,6 @@ SKILL_FILENAME = "data/processed_skill_test_set_with_id.parquet"
 load_dotenv()
 MONGO_SETTINGS = MongoDbSettings()
 SCRIPT_SETTINGS = ScriptSettings()
-
-
-class Type(Enum):
-    """
-    An enumeration class to define the type of the entity.
-    """
-    OCCUPATION = "occupation"
-    SKILL = "skill"
 
 
 def _precision_at_k(prediction: List[List[str]], true: List[List[str]], k: Optional[int] = None):
