@@ -21,12 +21,15 @@ class Tool(ABC):
 
 class ExperienceEntity(BaseModel):
     """
-    A class to represent a skill experience.
+    A class to represent a work experience (formal, informal or unseen economy).
     """
-    esco_occupations: Optional[List[OccupationEntity]] = []
+
+    # The job title as referred by the user (i.e. not necessarily the official ESCO occupation label)
     job_title: str
-    # TODO: Add more fields, especially the skills. Also decide whether we want skills to be directly connected to each
-    #  occupation or not.
+    # The occupation records in the ESCO db that we think are related to this experience
+    esco_occupations: Optional[List[OccupationEntity]] = []
+    # TODO: Add more fields, especially the skills. Also decide whether we want skills to be directly connected to
+    #  each occupation or not.
 
 
 class ExtractExperienceTool(Tool):
@@ -38,7 +41,7 @@ class ExtractExperienceTool(Tool):
 
     def __init__(self, occupation_search_service: SimilaritySearchService[OccupationEntity],
                  config: LLMConfig = LLMConfig(generation_config=LOW_TEMPERATURE_GENERATION_CONFIG)):
-        # TODO: Consider using json to be consistent with the agents.
+        # TODO: Consider using json (now we use a CSV-like format) to be consistent with the agents.
         self._system_instructions = dedent(""" 
                     Given a conversation between a user and an assistant of an employment agency, list all the 
                     relevant occupations, places of work, dates and whether it was in the unseen economy or not. The 
