@@ -19,7 +19,8 @@ from app.sensitive_filter import sensitive_filter
 from app.server_dependencies import get_conversation_memory_manager
 from app.vector_search.occupation_search_routes import add_occupation_search_routes
 from app.vector_search.similarity_search_service import SimilaritySearchService
-from app.vector_search.vector_search_dependencies import get_occupation_search_service
+from app.vector_search.vector_search_dependencies import get_occupation_search_service, \
+    get_occupation_skill_search_service
 from app.version.version_routes import add_version_routes
 
 from app.users import add_users_routes
@@ -96,7 +97,7 @@ application_state_manager = ApplicationStateManager(InMemoryApplicationStateStor
 
 def get_agent_director(conversation_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager),
                        similarity_search: SimilaritySearchService = Depends(
-                           get_occupation_search_service)) -> LLMAgentDirector:
+                           get_occupation_skill_search_service)) -> LLMAgentDirector:
     """ Get the agent manager instance."""
     return LLMAgentDirector(conversation_manager, similarity_search)
 

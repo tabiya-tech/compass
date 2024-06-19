@@ -5,7 +5,7 @@ from typing import List, Optional
 
 from pydantic.main import BaseModel
 
-from app.vector_search.esco_entities import OccupationEntity
+from app.vector_search.esco_entities import OccupationSkillEntity
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, LOW_TEMPERATURE_GENERATION_CONFIG
@@ -21,7 +21,7 @@ class ExperienceEntity(BaseModel):
     # The job title as referred by the user (i.e. not necessarily the official ESCO occupation label)
     job_title: str
     # The occupation records in the ESCO db that we think are related to this experience
-    esco_occupations: Optional[List[OccupationEntity]] = []
+    esco_occupations: Optional[List[OccupationSkillEntity]] = []
     # TODO: Add more fields, especially the skills. Also decide whether we want skills to be directly connected to
     #  each occupation or not.
 
@@ -33,7 +33,7 @@ class ExtractExperienceTool:
     Those are then parsed, looked-up in ESCO and returned as a list of ExperienceEntity.
     """
 
-    def __init__(self, occupation_search_service: SimilaritySearchService[OccupationEntity],
+    def __init__(self, occupation_search_service: SimilaritySearchService[OccupationSkillEntity],
                  config: LLMConfig = LLMConfig(generation_config=LOW_TEMPERATURE_GENERATION_CONFIG)):
         # TODO: Consider using json (now we use a CSV-like format) to be consistent with the agents.
         self._system_instructions = dedent(""" 

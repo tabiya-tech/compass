@@ -2,22 +2,19 @@ import logging
 import time
 from enum import Enum
 from textwrap import dedent
-from common_libs.text_formatters.extract_json import extract_json, ExtractJSONError
 
 from pydantic import BaseModel
 
 from app.agent.agent import SimpleLLMAgent
 from app.agent.agent_types import AgentInput, AgentOutput, LLMStats
-from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.agent.agent_types import AgentType
 from app.agent.prompt_reponse_template import ModelResponse
-from app.agent.prompt_reponse_template import get_conversation_finish_instructions
-from app.agent.prompt_reponse_template import get_json_response_instructions
+from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import \
     ConversationContext
 from app.tool.extract_experience_tool import ExtractExperienceTool, ExperienceEntity
-from app.vector_search.esco_entities import OccupationEntity
 from app.vector_search.similarity_search_service import SimilaritySearchService
+from common_libs.text_formatters.extract_json import extract_json, ExtractJSONError
 
 logger = logging.getLogger(__name__)
 
@@ -168,7 +165,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
                     experience_descr=experience.job_title, done_with_deep_dive=False, esco_entity=experience)
 
             meta_msg = f"[META: ESCO Occupations identified: " \
-                       f"{[e.esco_occupations[0].preferredLabel for e in experiences]}]"
+                       f"{[e.esco_occupations[0].occupation.preferredLabel for e in experiences]}]"
             # Advance the conversation, go directly the WRAPUP
             # We skip the DIVE_IN, because it is needs more logic before it is worth connecting it to the conversation
             # flow (which will be added after the P1 Prototype).
@@ -229,7 +226,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         # Phase3
         elif s.conversation_phase == ConversationPhase.WRAPUP:
             esco_occupations = await self._get_esco_preferred_labels(s)
-            top_occupations = [e.esco_entity.esco_occupations[0].preferredLabel for e in s.experiences.values()]
+            top_occupations = [e.esco_entity.esco_occupations[0].occupation.preferredLabel for e in s.experiences.values()]
             reply_raw = "[META: Under development] I am still under development. In the future, I will share my " \
                         "summarized findings here. Bye! \n" \
                         f"[META: Top ESCO Occupations Identified: {'; '.join(top_occupations)}] \n" \
@@ -253,7 +250,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         esco_occupations = set()
         for experience in state.experiences.values():
             for occupation in experience.esco_entity.esco_occupations:
-                esco_occupations.add(occupation.preferredLabel)
+                esco_occupations.add(occupation.occupation.preferredLabel)
         return esco_occupations
 
     def set_state(self, state: ExperiencesAgentState):
@@ -280,7 +277,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         return base_prompt
 
     # TODO: Figure out how to do dependency injection. This is a workaround for now.
-    def __init__(self, similarity_search: SimilaritySearchService[OccupationEntity]):
+    def __init__(self, similarity_search: SimilaritySearchService):
         system_instructions = self._create_llm_system_instructions()
 
         super().__init__(agent_type=AgentType.EXPERIENCES_EXPLORER_AGENT,
