@@ -8,9 +8,10 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from tqdm import tqdm
 
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
-from app.vector_search.esco_search_service import VectorSearchConfig, OccupationSearchService, SkillSearchService
+from app.vector_search.esco_search_service import VectorSearchConfig, OccupationSearchService
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
+from constants.database import EmbeddingConfig
 from scripts.base_data_settings import ScriptSettings, Type
 
 OCCUPATION_REPO_ID = "tabiya/hahu_test"
@@ -21,6 +22,7 @@ SKILL_FILENAME = "data/processed_skill_test_set_with_id.parquet"
 load_dotenv()
 MONGO_SETTINGS = MongoDbSettings()
 SCRIPT_SETTINGS = ScriptSettings()
+EMBEDDING_SETTINGS = EmbeddingConfig()
 
 
 def _precision_at_k(prediction: List[List[str]], true: List[List[str]], k: Optional[int] = None):
@@ -100,15 +102,15 @@ async def get_metrics(search_service: SimilaritySearchService, ground_truth: Lis
 
 def _get_vector_search_config(evaluated_type: Type) -> VectorSearchConfig:
     if evaluated_type == Type.OCCUPATION:
-        collection_name = MONGO_SETTINGS.embedding_settings.occupation_collection_name
+        collection_name = EMBEDDING_SETTINGS.occupation_collection_name
     elif evaluated_type == Type.SKILL:
-        collection_name = MONGO_SETTINGS.embedding_settings.skill_collection_name
+        collection_name = EMBEDDING_SETTINGS.skill_collection_name
     else:
         raise ValueError(f"Invalid entity type: {evaluated_type}")
     return VectorSearchConfig(
         collection_name=collection_name,
-        index_name=MONGO_SETTINGS.embedding_settings.embedding_index,
-        embedding_key=MONGO_SETTINGS.embedding_settings.embedding_key,
+        index_name=EMBEDDING_SETTINGS.embedding_index,
+        embedding_key=EMBEDDING_SETTINGS.embedding_key,
     )
 
 
@@ -118,8 +120,7 @@ if __name__ == "__main__":
     gecko_embedding_service = GoogleGeckoEmbeddingService()
     _occupation_search_service = OccupationSearchService(compass_db, gecko_embedding_service,
                                                          _get_vector_search_config(Type.OCCUPATION))
-    _skill_search_service = SkillSearchService(compass_db, gecko_embedding_service,
-                                               _get_vector_search_config(Type.SKILL))
+    # TODO: Evaluate the skill embeddings too, but using the OccupationSkillSearchService.
     occupation_dataset = load_dataset(OCCUPATION_REPO_ID, data_files=[OCCUPATION_FILENAME],
                                       token=SCRIPT_SETTINGS.hf_access_token).get("train")
     # Load the skill dataset. The columns are not consistent with the definition in the dataset so we need to override
@@ -140,12 +141,7 @@ if __name__ == "__main__":
                                  split="train",
                                  verification_mode=VerificationMode.NO_CHECKS)
     asyncio.get_event_loop().run_until_complete(
-        asyncio.gather(
-            *[get_metrics(_occupation_search_service,
-                          occupation_dataset["esco_code"],
-                          occupation_dataset["synthetic_query"], Type.OCCUPATION),
-              get_metrics(_skill_search_service,
-                          skill_dataset["label"],
-                          skill_dataset["synthetic_query"], Type.SKILL)
-              ])
+        asyncio.gather(get_metrics(_occupation_search_service,
+                                   occupation_dataset["esco_code"],
+                                   occupation_dataset["synthetic_query"], Type.OCCUPATION))
     )

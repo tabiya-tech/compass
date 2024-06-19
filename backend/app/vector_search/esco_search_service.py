@@ -162,7 +162,6 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
         :return: A list of SkillEntity objects.
         """
         # The skills are the ones that have the occupation UUID in their occupationId field.
-        print(occupation.id)
         query = {"requiringOccupationId": ObjectId(occupation.id)}
 
         skills = await self.database.get_collection(
