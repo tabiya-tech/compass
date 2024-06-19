@@ -25,3 +25,11 @@ class SkillEntity(BaseModel):
     description: str
     altLabels: List[str]
     skillType: str
+    relationType: str
+
+class OccupationSkillEntity(BaseModel):
+    """
+    Represents an occupation and its associated skills.
+    """
+    occupation: OccupationEntity
+    skills: List[SkillEntity]

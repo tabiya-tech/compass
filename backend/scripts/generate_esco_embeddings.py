@@ -18,14 +18,16 @@ from tqdm import tqdm
 
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
+from constants.database import EmbeddingConfig
 from scripts.base_data_settings import ScriptSettings, Type, TabiyaDatabaseConfig
 
 load_dotenv()
 vertexai.init()
 
-PARALLEL_TASK_SIZE = 5
+PARALLEL_TASK_SIZE = 10
 MAX_RETRIES = 3
 MONGO_SETTINGS = MongoDbSettings()
+EMBEDDING_SETTINGS = EmbeddingConfig()
 SCRIPT_SETTINGS = ScriptSettings()
 TABIYA_CONFIG = TabiyaDatabaseConfig()
 TABIYA_DB = AsyncIOMotorClient(SCRIPT_SETTINGS.tabiya_mongodb_uri).get_database(
@@ -40,13 +42,13 @@ RELEVANT_MODEL_ID = ObjectId("6613c0a34436e3a6dbb41b66")
 PER_TYPE_SETTINGS = {
     Type.OCCUPATION: {
         'clean_data_collection_name': TABIYA_CONFIG.occupation_collection_name,
-        'collection_name': MONGO_SETTINGS.embedding_settings.occupation_collection_name,
+        'collection_name': EMBEDDING_SETTINGS.occupation_collection_name,
         'fields': ['preferredLabel', 'altLabels', 'description', 'UUID', 'code'],
         'id_field_name': 'occupationId'
     },
     Type.SKILL: {
         'clean_data_collection_name': TABIYA_CONFIG.skill_collection_name,
-        'collection_name': MONGO_SETTINGS.embedding_settings.occupation_collection_name,
+        'collection_name': EMBEDDING_SETTINGS.skill_collection_name,
         'fields': ['preferredLabel', 'altLabels', 'description', 'UUID', 'skillType'],
         'id_field_name': 'skillId'
     }
@@ -84,8 +86,8 @@ async def _embed_document(collection: AsyncIOMotorCollection,
             logging.debug(f"Document UUID:{document['UUID']} has no text in field {field}. Skipping.")
             return
         embedding = await GECKO_EMBEDDING_SERVICE.embed(embedded_text)
-        document[MONGO_SETTINGS.embedding_settings.embedding_key] = embedding
         document_to_save = {k: v for k, v in document.items() if k in PER_TYPE_SETTINGS[type]['fields']}
+        document_to_save[EMBEDDING_SETTINGS.embedding_key] = embedding
         document_to_save['embedded_field'] = field
         document_to_save['embedded_text'] = embedded_text
         document_to_save['updatedAt'] = datetime.utcnow()
@@ -145,7 +147,7 @@ async def generate_embeddings(
     await asyncio.gather(*tasks)
     pbar.close()
     if len(errors) > 0:
-        logging.error(f"Errors embedding documents in collection {type.name}: {errors}")
+        logging.error(f"Errors embedding documents in collection {type.name}: {' '.join(errors)}")
 
 
 async def upsert_indexes(collection_name: str):
@@ -154,7 +156,7 @@ async def upsert_indexes(collection_name: str):
     definition = {'mappings': {
         'dynamic': True,
         'fields': {
-            MONGO_SETTINGS.embedding_settings.embedding_key: {
+            EMBEDDING_SETTINGS.embedding_key: {
                 'dimensions': 768,
                 'similarity': 'cosine',
                 'type': 'knnVector'
@@ -162,15 +164,16 @@ async def upsert_indexes(collection_name: str):
         }
     }}
     if 'embedding_index' in [index['name'] for index in await collection.list_search_indexes().to_list(length=None)]:
-        await collection.update_search_index(MONGO_SETTINGS.embedding_settings.embedding_index, definition)
+        await collection.update_search_index(EMBEDDING_SETTINGS.embedding_index, definition)
     else:
         await collection.create_search_index(
-            {'name': MONGO_SETTINGS.embedding_settings.embedding_index, 'definition': definition})
+            {'name': EMBEDDING_SETTINGS.embedding_index, 'definition': definition})
 
 
-async def create_collection(embedding_collection_name: str, drop=True):
+async def create_collection(type: Type, drop=True):
     """Creates the collection to store the embeddings. If it already exists and drop = True, it will be dropped and
     recreated."""
+    embedding_collection_name = PER_TYPE_SETTINGS[type]["collection_name"]
     collist = await COMPASS_DB.list_collection_names()
     if embedding_collection_name in collist and drop:
         await COMPASS_DB.drop_collection(embedding_collection_name)
@@ -180,6 +183,8 @@ async def create_collection(embedding_collection_name: str, drop=True):
     await COMPASS_DB[embedding_collection_name].create_index({'UUID': 1, 'embedded_field': 1},
                                                              name='UUID_embedded_field_index')
     await COMPASS_DB[embedding_collection_name].create_index({'UUID': 1}, name='UUID_index')
+    id_field_name = PER_TYPE_SETTINGS[type]['id_field_name']
+    await COMPASS_DB[embedding_collection_name].create_index({id_field_name: 1}, name=id_field_name + '_index')
     await asyncio.sleep(3)  # Wait for the indexes to be created.
 
 
@@ -188,7 +193,7 @@ async def generate_embeddings_for_collection(
         arguments: argparse.Namespace,
 ) -> None:
     """Embeds the entire collection in a MongoDB database. """
-    await create_collection(PER_TYPE_SETTINGS[type]["collection_name"], drop=arguments.drop_collection)
+    await create_collection(type, drop=arguments.drop_collection)
     await generate_embeddings(type, arguments.uuids)
     await upsert_indexes(PER_TYPE_SETTINGS[type]["collection_name"])
 
@@ -199,7 +204,11 @@ async def copy_relationship_model(drop=False):
     collist = await COMPASS_DB.list_collection_names()
     if relation_collection_name in collist and drop:
         await COMPASS_DB.drop_collection(relation_collection_name)
-
+    if relation_collection_name not in collist:
+        await COMPASS_DB.create_collection(relation_collection_name)
+        await COMPASS_DB[relation_collection_name].create_index({'requiredSkillId': 1}, name='requiredSkillId_index')
+        await COMPASS_DB[relation_collection_name].create_index({'requiredOccupationId': 1},
+                                                                name='requiredOccupationId_index')
     await asyncio.gather(*[COMPASS_DB[relation_collection_name].insert_one(document) async for document in
                            TABIYA_DB[relation_collection_name].find({"modelId": RELEVANT_MODEL_ID})])
 

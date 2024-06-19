@@ -1,13 +1,15 @@
 from abc import abstractmethod
 from typing import TypeVar, List
 
+from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pydantic import BaseModel
 
 from app.vector_search.embeddings_model import EmbeddingService
-from app.vector_search.esco_entities import OccupationEntity
+from app.vector_search.esco_entities import OccupationEntity, OccupationSkillEntity
 from app.vector_search.esco_entities import SkillEntity
 from app.vector_search.similarity_search_service import SimilaritySearchService
+from constants.database import EmbeddingConfig
 
 
 class VectorSearchConfig(BaseModel):
@@ -102,7 +104,7 @@ class AbstractEscoSearchService(SimilaritySearchService[T]):
             {"$sort": {"score": -1}},
             {"$limit": k},
         ]
-        entries = await self.collection.aggregate(pipeline).to_list(length=5)
+        entries = await self.collection.aggregate(pipeline).to_list(length=k)
         return [self._to_entity(entry) for entry in entries]
 
 
@@ -113,6 +115,7 @@ class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
 
     def _group_fields(self) -> dict:
         return {"_id": "$UUID",
+                "occupationId": {"$first": "$occupationId"},
                 "UUID": {"$first": "$UUID"},
                 "preferredLabel": {"$first": "$preferredLabel"},
                 "description": {"$first": "$description"},
@@ -126,7 +129,7 @@ class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
         """
 
         return OccupationEntity(
-            id=str(doc.get("_id", "")),
+            id=str(doc.get("occupationId", "")),
             UUID=doc.get("UUID", ""),
             code=doc.get("code", ""),
             preferredLabel=doc.get("preferredLabel", ""),
@@ -135,30 +138,64 @@ class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
         )
 
 
-class SkillSearchService(AbstractEscoSearchService[SkillEntity]):
-    """
-    A service class to perform similarity searches on the skills' collection.
-    """
+class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity]):
 
-    def _to_entity(self, doc: dict) -> SkillEntity:
+    def __init__(self, db: AsyncIOMotorDatabase, embedding_service: EmbeddingService):
         """
-        Convert a Document object to a SkillEntity object.
+        Initialize the OccupationSkillSearch object.
+        :param db: The MongoDB database object.
+        :param embedding_service: The embedding service to use to embed the queries.
         """
+        self.embedding_config = EmbeddingConfig()
+        self.embedding_service = embedding_service
+        self.database = db
+        occupation_vector_search_config = VectorSearchConfig(
+            collection_name=self.embedding_config.occupation_collection_name,
+            index_name=self.embedding_config.embedding_index,
+            embedding_key=self.embedding_config.embedding_key)
+        self.occupation_search_service = OccupationSearchService(db, embedding_service, occupation_vector_search_config)
 
-        return SkillEntity(
-            id=str(doc.get("_id", "")),
-            UUID=doc.get("UUID", ""),
-            preferredLabel=doc.get("preferredLabel", ""),
-            description=doc.get("description", ""),
-            altLabels=doc.get("altLabels", []),
-            skillType=doc.get("skillType", ""),
-        )
+    async def _find_skills_from_occupation(self, occupation: OccupationEntity):
+        """
+        Find the skills associated with an occupation.
+        :param occupation: The occupation entity.
+        :return: A list of SkillEntity objects.
+        """
+        # The skills are the ones that have the occupation UUID in their occupationId field.
+        print(occupation.id)
+        query = {"requiringOccupationId": ObjectId(occupation.id)}
 
-    def _group_fields(self) -> dict:
-        return {"_id": "$UUID",
-                "UUID": {"$first": "$UUID"},
-                "preferredLabel": {"$first": "$preferredLabel"},
-                "description": {"$first": "$description"},
-                "altLabels": {"$first": "$altLabels"},
-                "skillType": {"$first": "skillType"},
-                }
+        skills = await self.database.get_collection(
+            self.embedding_config.occupation_to_skill_collection_name).aggregate([
+                {"$match": query},
+                {"$lookup": {
+                    "from": self.embedding_config.skill_collection_name,
+                    "localField": "requiredSkillId",
+                    "foreignField": "skillId",
+                    "as": "skills"
+                }},
+                {"$unwind": "$skills"},
+                {"$group": {"_id": "$skills.UUID",
+                            "skillId": {"$first": "$skills.skillId"},
+                            "UUID": {"$first": "$skills.UUID"},
+                            "preferredLabel": {"$first": "$skills.preferredLabel"},
+                            "description": {"$first": "$skills.description"},
+                            "altLabels": {"$first": "$skills.altLabels"},
+                            "skillType": {"$first": "$skills.skillType"},
+                            "relationType": {"$first": "$relationType"},
+                            }}
+            ]).to_list(length=None)
+        return [SkillEntity(
+            id=str(skill.get("skillId", "")),
+            UUID=skill.get("UUID", ""),
+            preferredLabel=skill.get("preferredLabel", ""),
+            description=skill.get("description", ""),
+            altLabels=skill.get("altLabels", []),
+            skillType=skill.get("skillType", ""),
+            relationType=skill.get("relationType", ""),
+        ) for skill in skills]
+
+    async def search(self, query: str, k: int = 5) -> list[OccupationSkillEntity]:
+        occupations = await self.occupation_search_service.search(query, k)
+        return [OccupationSkillEntity(occupation=occupation, skills=await self._find_skills_from_occupation(occupation))
+                for occupation in occupations]
