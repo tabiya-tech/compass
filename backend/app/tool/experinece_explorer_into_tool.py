@@ -13,9 +13,9 @@ class ExperienceIntroTool:
     """
 
     def __init__(self, config: LLMConfig = LLMConfig(generation_config=LOW_TEMPERATURE_GENERATION_CONFIG)):
-        self._system_instructions = dedent("""You are a job counselor. In sentence, tell me that you are about to 
-        engage in conversation with me to get to know my past work expediences covering from formal jobs, 
-        self employment as well as time spent in unseen economy (give an example here). Ask me: 'Are you 
+        self._system_instructions = dedent("""You are a job counselor. In sentence, tell me that you are about to
+        engage in conversation with me to get to know my past work experiences covering from formal jobs,
+        self employment as well as time spent in unseen economy (give an example here). Ask me: 'Are you
         ready?'""")
         self._llm = GeminiGenerativeLLM(system_instructions=self._system_instructions, config=config)
 
