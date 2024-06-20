@@ -198,9 +198,9 @@ Object {
     },
     "secondary": Object {
       "contrastText": "#fff",
-      "dark": "rgb(26, 65, 116)",
-      "light": "rgb(81, 126, 184)",
-      "main": "#265EA7",
+      "dark": "rgb(21, 79, 71)",
+      "light": "rgb(75, 141, 132)",
+      "main": "#1E7166",
     },
     "success": Object {
       "contrastText": "rgba(0, 0, 0, 0.87)",
@@ -896,9 +896,9 @@ Object {
     },
     "secondary": Object {
       "contrastText": "#fff",
-      "dark": "rgb(26, 65, 116)",
-      "light": "rgb(81, 126, 184)",
-      "main": "#265EA7",
+      "dark": "rgb(21, 79, 71)",
+      "light": "rgb(75, 141, 132)",
+      "main": "#1E7166",
     },
     "success": Object {
       "contrastText": "rgba(0, 0, 0, 0.87)",

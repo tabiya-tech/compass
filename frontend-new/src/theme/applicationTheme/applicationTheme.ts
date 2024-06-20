@@ -26,6 +26,7 @@ const TabiyaBasicColors = {
   LightBlue: "#265EA7",
   Yellow: "#EEFF41",
   Green: "#00FF91",
+  DarkGreen: "#1E7166",
   Gray: "#F3F1EE",
   GrayDark: "#43474E",
 };
@@ -47,7 +48,7 @@ export const TabiyaIconStyles = {
 const lightPalette: PaletteOptions = {
   contrastThreshold: 4.5, // WCAG 2.0 (AA) ensure color-contrast is at least 4.5:1
   primary: augmentedThemeColor(TabiyaBasicColors.Green),
-  secondary: augmentedThemeColor(TabiyaBasicColors.LightBlue),
+  secondary: augmentedThemeColor(TabiyaBasicColors.DarkGreen),
   tabiyaYellow: augmentedThemeColor(TabiyaBasicColors.Yellow),
   tabiyaBlue: augmentedThemeColor(TabiyaBasicColors.DarkBlue),
   containerBackground: {

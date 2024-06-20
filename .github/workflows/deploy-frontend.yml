@@ -88,6 +88,7 @@ jobs:
           echo "window.tabiyaConfig = {" > frontend-new/build/data/env.js
           echo "\"FIREBASE_API_KEY\": btoa(\"${{ inputs.identity_platform_client_api_key }}\")," >> frontend-new/build/data/env.js
           echo "\"FIREBASE_AUTH_DOMAIN\": btoa(\"${{ inputs.identity_platform_client_firebase_auth_domain }}\")," >> frontend-new/build/data/env.js
+          echo "\"BACKEND_URL\": btoa(\"${{ inputs.backend-url }}\")" >> frontend-new/build/data/env.js
           echo "};" >> frontend-new/build/data/env.js
           cat frontend-new/build/data/env.js
       - name: Deploy both frontends

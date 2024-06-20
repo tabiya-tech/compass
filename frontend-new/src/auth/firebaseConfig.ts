@@ -1,6 +1,6 @@
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
-import { getFirebaseAPIKey, getFirebaseDomain } from "../envService";
+import { getFirebaseAPIKey, getFirebaseDomain } from "src/envService";
 
 // Get the firebase config from the environment variables
 const firebaseConfig = {

@@ -1,7 +1,9 @@
 import { render, screen } from "src/_test_utilities/test-utils";
 import NotFound, { DATA_TEST_ID } from "./NotFound";
+import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 
 describe("NotFound", () => {
+  beforeAll(() => mockUseTokens());
   test("NotFound page renders correctly", () => {
     // GIVEN a NotFound page
     jest.spyOn(console, "error");

@@ -3,10 +3,9 @@ import { Container, Box, TextField, Button, Typography, useTheme, styled } from 
 import { AuthContext } from "src/auth/AuthProvider";
 import { NavLink as RouterNavLink, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
-import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
-import { LanguageOutlined } from "@mui/icons-material";
 import IDPAuth from "src/auth/components/IDPAuth/IDPAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import AuthContextMenu from "src/auth/components/AuthContextMenu/AuthContextMenu";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -38,26 +37,31 @@ export const DATA_TEST_ID = {
 
 const Register: React.FC = () => {
   const theme = useTheme();
-
-  const [, setName] = useState(""); // we will need this later
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const { register } = useContext(AuthContext);
-
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
+
+  const [name, setName] = useState(""); // we will need this later
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  /**
+   * Handle the register form submission
+   * @param event
+   */
   const handleRegister = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     register(
       email,
       password,
+      name,
       (user) => {
-        enqueueSnackbar("Registration successful", { variant: "success" });
-        navigate(routerPaths.DPA);
+        navigate(routerPaths.VERIFY_EMAIL, { replace: true });
+        enqueueSnackbar("Verification Email Sent!", { variant: "success" });
       },
       (error) => {
-        enqueueSnackbar("Registration failed", { variant: "error" });
         console.error(error);
+        enqueueSnackbar("Registration failed", { variant: "error" });
       }
     );
   };
@@ -79,18 +83,7 @@ const Register: React.FC = () => {
             style={{ maxWidth: "60%", margin: "10%" }}
             data-testid={DATA_TEST_ID.LOGO}
           />
-          <PrimaryIconButton
-            sx={{
-              color: theme.palette.common.black,
-              alignSelf: "flex-start",
-              justifySelf: "flex-end",
-              margin: theme.tabiyaSpacing.lg,
-            }}
-            data-testid={DATA_TEST_ID.LANGUAGE_SELECTOR}
-            title={"Language Selector"}
-          >
-            <LanguageOutlined />
-          </PrimaryIconButton>
+          <AuthContextMenu />
         </Box>
         <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.TITLE}>
           Welcome to Compass!
@@ -148,7 +141,7 @@ const Register: React.FC = () => {
           data-testid={DATA_TEST_ID.FIREBASE_AUTH_CONTAINER}
         >
           <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.REGISTER_USING}>
-            Or register using
+            Or continue with
           </Typography>
           <Box mt={2} width="100%">
             <IDPAuth />

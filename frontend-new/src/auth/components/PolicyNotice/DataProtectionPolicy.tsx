@@ -1,14 +1,19 @@
-import React from "react";
-import { Container, Box, Button, Typography, useTheme, styled } from "@mui/material";
+import React, { useCallback, useContext } from "react";
+import { Box, Button, Container, styled, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
-import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
-import { LanguageOutlined } from "@mui/icons-material";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import UserPreferencesService from "src/auth/services/UserPreferences/userPreferences.service";
+import { AuthContext } from "src/auth/AuthProvider";
+import { Language, UserPreference } from "src/auth/services/UserPreferences/userPreferences.types";
+import { ServiceError } from "src/error/error";
+import ErrorConstants from "src/error/error.constants";
+import { StatusCodes } from "http-status-codes";
+import AuthContextMenu from "src/auth/components/AuthContextMenu/AuthContextMenu";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
-const HiglightedSpan = styled("span")(({ theme }) => ({
+const HighlightedSpan = styled("span")(({ theme }) => ({
   backgroundColor: theme.palette.tabiyaYellow.light,
 }));
 
@@ -23,14 +28,47 @@ export const DATA_TEST_ID = {
 };
 
 const DataProtectionAgreement: React.FC = () => {
-  const theme = useTheme();
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-
   const { enqueueSnackbar } = useSnackbar();
 
-  const handleAcceptedDPA = () => {
-    enqueueSnackbar("Data Protection Agreement Accepted", { variant: "success" });
-    navigate(routerPaths.ROOT);
+  /**
+   * Persist the user's chosen preferences to the backend
+   */
+  const createUserPreferences = useCallback(async () => {
+    const userPreferencesService = new UserPreferencesService();
+    if (!user) {
+      throw new ServiceError(
+        "UserPreferenceService",
+        "createUserPreferences",
+        "POST",
+        "users/preferences",
+        StatusCodes.NOT_FOUND,
+        ErrorConstants.ErrorCodes.NOT_FOUND,
+        "User not found",
+        ""
+      );
+    }
+    const newUserPreferenceSpecs: UserPreference = {
+      user_id: user.id,
+      language: Language.en,
+      accepted_tc: new Date(),
+    };
+    try {
+      await userPreferencesService.createUserPreferences(newUserPreferenceSpecs);
+      enqueueSnackbar("Data Protection Agreement Accepted", { variant: "success" });
+      navigate(routerPaths.ROOT, { replace: true });
+    } catch (e) {
+      enqueueSnackbar("Failed to create user preferences", { variant: "error" });
+      console.error("Failed to create user preferences", e);
+    }
+  }, [user, enqueueSnackbar, navigate]);
+
+  /**
+   * Handle when a user accepts the data protection agreement
+   */
+  const handleAcceptedDPA = async () => {
+    await createUserPreferences();
   };
 
   return (
@@ -50,18 +88,7 @@ const DataProtectionAgreement: React.FC = () => {
             style={{ maxWidth: "60%", margin: "10%" }}
             data-testid={DATA_TEST_ID.LOGO}
           />
-          <PrimaryIconButton
-            sx={{
-              color: theme.palette.common.black,
-              alignSelf: "flex-start",
-              justifySelf: "flex-end",
-              margin: theme.tabiyaSpacing.lg,
-            }}
-            data-testid={DATA_TEST_ID.LANGUAGE_SELECTOR}
-            title={"Language Selector"}
-          >
-            <LanguageOutlined />
-          </PrimaryIconButton>
+          <AuthContextMenu />
         </Box>
         <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.TITLE}>
           Thank you for using Tabiya Compass.
@@ -71,7 +98,7 @@ const DataProtectionAgreement: React.FC = () => {
           discover new opportunities.
           <br />
           <br />
-          <HiglightedSpan>Please use AI responsibly!</HiglightedSpan>
+          <HighlightedSpan>Please use AI responsibly!</HighlightedSpan>
           <br />
           <br />
           AI technology is new and far from perfect. It doesn't understand context like humans do.

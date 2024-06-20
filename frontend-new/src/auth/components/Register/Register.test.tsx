@@ -1,10 +1,12 @@
 import "src/_test_utilities/consoleMock";
 import React from "react";
 import { render, screen, waitFor, fireEvent } from "src/_test_utilities/test-utils";
-import { HashRouter } from "react-router-dom";
+import { HashRouter, useNavigate } from "react-router-dom";
 import Register, { DATA_TEST_ID } from "./Register";
-import { AuthContext } from "src/auth/AuthProvider";
-import { useSnackbar } from "../../../theme/SnackbarProvider/SnackbarProvider";
+import { AuthContext, TabiyaUser } from "src/auth/AuthProvider";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import { routerPaths } from "src/app/routerPaths";
+import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 
 //mock the IDPAuth component
 jest.mock("src/auth/components/IDPAuth/IDPAuth", () => {
@@ -13,7 +15,7 @@ jest.mock("src/auth/components/IDPAuth/IDPAuth", () => {
     ...actual,
     __esModule: true,
     default: jest.fn().mockImplementation(() => {
-      return <div data-testid={actual.DATA_TEST_ID.FIREBASE_AUTH_CONTAINER}></div>;
+      return <span data-testid={actual.DATA_TEST_ID.FIREBASE_AUTH_CONTAINER}></span>;
     }),
   };
 });
@@ -31,6 +33,19 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   };
 });
 
+// mock the router
+jest.mock("react-router-dom", () => {
+  const actual = jest.requireActual("react-router-dom");
+  return {
+    ...actual,
+    __esModule: true,
+    useNavigate: jest.fn().mockReturnValue(jest.fn()),
+    NavLink: jest.fn().mockImplementation(() => {
+      return <></>;
+    }),
+  };
+});
+
 describe("Testing Register component with AuthProvider", () => {
   const registerMock = jest.fn();
 
@@ -39,17 +54,24 @@ describe("Testing Register component with AuthProvider", () => {
     user: null,
     login: jest.fn(),
     logout: jest.fn(),
+    handlePageLoad: jest.fn(),
   };
 
   beforeEach(() => {
     // Clear console mocks and mock functions
     (console.error as jest.Mock).mockClear();
     (console.warn as jest.Mock).mockClear();
-    registerMock.mockClear();
+    jest.clearAllMocks();
   });
 
+  beforeAll(() => mockUseTokens());
+
   test("it should show register form successfully", async () => {
-    // Render the component within the AuthContext and Router
+    // GIVEN a user to register
+    const givenName = "Foo Bar";
+    const givenEmail = "foo@bar.baz";
+    const givenPassword = "password";
+    // WHEN the component is rendered within the AuthContext and Router
     render(
       <HashRouter>
         <AuthContext.Provider value={authContextValue}>
@@ -72,9 +94,9 @@ describe("Testing Register component with AuthProvider", () => {
     expect(screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON)).toBeInTheDocument();
 
     // Simulate form input and submission
-    fireEvent.change(screen.getByTestId(DATA_TEST_ID.NAME_INPUT), { target: { value: "Foo Bar" } });
-    fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: "john.doe@example.com" } });
-    fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: "password" } });
+    fireEvent.change(screen.getByTestId(DATA_TEST_ID.NAME_INPUT), { target: { value: givenName } });
+    fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: givenEmail } });
+    fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: givenPassword } });
 
     // Trigger form submission
     fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
@@ -82,8 +104,9 @@ describe("Testing Register component with AuthProvider", () => {
     // Expect the register function to have been called
     await waitFor(() => {
       expect(registerMock).toHaveBeenCalledWith(
-        "john.doe@example.com",
-        "password",
+        givenEmail,
+        givenPassword,
+        givenName,
         expect.any(Function),
         expect.any(Function)
       );
@@ -93,13 +116,16 @@ describe("Testing Register component with AuthProvider", () => {
     expect(screen.getByTestId(DATA_TEST_ID.REGISTER_CONTAINER)).toMatchSnapshot();
   });
 
-  test("it should show successful register message", async () => {
+  test("it should show success message on successful registration", async () => {
     // GIVEN a successful registration
-    registerMock.mockImplementation((email, password, onSuccess) => {
-      onSuccess();
+    const givenName = "Foo Bar";
+    const givenEmail = "foo@bar.baz";
+    const givenPassword = "password";
+    registerMock.mockImplementation((email, password, name, onSuccess, onError) => {
+      onSuccess({ id: "mock-id", email: givenEmail, name: givenName } as TabiyaUser);
     });
 
-    // WHEN the register form is submitted
+    // WHEN the component is rendered
     render(
       <HashRouter>
         <AuthContext.Provider value={authContextValue}>
@@ -108,26 +134,42 @@ describe("Testing Register component with AuthProvider", () => {
       </HashRouter>
     );
 
-    fireEvent.change(screen.getByTestId(DATA_TEST_ID.NAME_INPUT), { target: { value: "Foo Bar" } });
-    fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: "foo@bar.baz" } });
-    fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: "password" } });
+    // AND the register form is submitted
+    fireEvent.change(screen.getByTestId(DATA_TEST_ID.NAME_INPUT), { target: { value: givenName } });
+    fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: givenEmail } });
+    fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: givenPassword } });
 
     fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
 
     // THEN expect the register function to have been called
     await waitFor(() => {
-      expect(registerMock).toHaveBeenCalledWith("foo@bar.baz", "password", expect.any(Function), expect.any(Function));
+      expect(registerMock).toHaveBeenCalledWith(
+        givenEmail,
+        givenPassword,
+        givenName,
+        expect.any(Function),
+        expect.any(Function)
+      );
     });
 
+    // AND no errors or warning to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
+
+    // AND the user should be redirected to the data protection Agreement page
+    expect(useNavigate()).toHaveBeenCalledWith(routerPaths.VERIFY_EMAIL, { replace: true });
     // AND the success message should be displayed
-    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Registration successful", { variant: "success" });
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Verification Email Sent!", { variant: "success" });
   });
 
   test("it should show error message on failed registration", async () => {
     // GIVEN a failed registration
-    registerMock.mockImplementation((email, password, onSuccess, onError) => {
+    registerMock.mockImplementation((email, password, name, onSuccess, onError) => {
       onError();
     });
+    const givenName = "Foo Bar";
+    const givenEmail = "foo@bar.baz";
+    const givenPassword = "password";
 
     // WHEN the register form is submitted
     render(
@@ -138,15 +180,21 @@ describe("Testing Register component with AuthProvider", () => {
       </HashRouter>
     );
 
-    fireEvent.change(screen.getByTestId(DATA_TEST_ID.NAME_INPUT), { target: { value: "Foo Bar" } });
-    fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: "foo@bar.baz" } });
-    fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: "password" } });
+    fireEvent.change(screen.getByTestId(DATA_TEST_ID.NAME_INPUT), { target: { value: givenName } });
+    fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: givenEmail } });
+    fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: givenPassword } });
 
     fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
 
     // THEN expect the register function to have been called
     await waitFor(() => {
-      expect(registerMock).toHaveBeenCalledWith("foo@bar.baz", "password", expect.any(Function), expect.any(Function));
+      expect(registerMock).toHaveBeenCalledWith(
+        givenEmail,
+        givenPassword,
+        givenName,
+        expect.any(Function),
+        expect.any(Function)
+      );
     });
 
     // AND the error message should be displayed
