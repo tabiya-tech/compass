@@ -156,7 +156,7 @@ class SkillSearchService(AbstractEscoSearchService[SkillEntity]):
             description=doc.get("description", ""),
             altLabels=doc.get("altLabels", []),
             skillType=doc.get("skillType", ""),
-            relationType="N/A",
+            relationType="",
         )
 
     def _group_fields(self) -> dict:
@@ -165,7 +165,7 @@ class SkillSearchService(AbstractEscoSearchService[SkillEntity]):
                 "preferredLabel": {"$first": "$preferredLabel"},
                 "description": {"$first": "$description"},
                 "altLabels": {"$first": "$altLabels"},
-                "skillType": {"$first": "skillType"},
+                "skillType": {"$first": "$skillType"},
                 }
 
 
