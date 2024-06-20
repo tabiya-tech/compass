@@ -171,23 +171,51 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
             experiences = await self._extract_experience_from_user_reply(s.conversation_history)
             for experience in experiences:
                 experience_id = _sanitized_experience_descr(experience.job_title, s.experiences)
+                # Store the identified experience in the mental model of this agent
                 s.experiences[experience_id] = ExperienceMetadata(
                     experience_descr=experience.job_title, done_with_deep_dive=False, esco_entity=experience)
 
             meta_msg = f"[META: ESCO Occupations identified: " \
                        f"{[e.esco_occupations[0].preferredLabel for e in experiences]}]"
-            # Advance the conversation, go directly the WRAPUP
-            # We skip the DIVE_IN, because it is needs more logic before it is worth connecting it to the conversation
-            # flow (which will be added after the P1 Prototype).
-            s.conversation_phase = ConversationPhase.WRAPUP
+            # Advance the conversation
+            s.conversation_phase = ConversationPhase.DIVE_IN
 
         return model_response.message + meta_msg
 
         # If the LLM says we are finished, move on to the next phase (update the state)
 
     def _handle_dive_in_phase(self, user_input_msg: str) -> str:
-        # TODO: COM-237 Let the LLM handle this phase. The dive-in will be done by a separate agent.
         s = self._state
+        # Identify which experience we are diving into and tell this to the user. At the same time, start the
+        # conversation about the context of the experience.
+        left_to_process = [k for (k, v) in s.experiences.items() if not v.done_with_deep_dive]
+        agent_reply_txt = ""
+        if not s.current_experience and left_to_process > 0:
+            # First experience to dive into
+            s.current_experience = left_to_process[0]
+            exp: ExperienceMetadata = s.experiences[s.current_experience]
+            # TODO: delegate this to the context agent
+            # Question: how to get back here?
+            agent_reply_txt = f"Let's dive in to the experiences you mentioned (I counted {len(s.experiences)}). " \
+                              "You said you had an experience as a " \
+                              f"{exp.experience_descr}. Was this a formal work experience?"
+        elif len(left_to_process) > 0:
+            # Normal dive-in
+            s.current_experience = left_to_process[0]
+            exp: ExperienceMetadata = s.experiences[s.current_experience]
+            # TODO: delegate this to the context agent
+            agent_reply_txt = f"Let's move on to the other experience you mentioned (we already covered " \
+                   f"{s.deep_dive_count} out of {len(s.experiences)}). You said you had an experience as a " \
+                   f"{exp.experience_descr}. Was this a formal work experience?"
+        else:
+            # We are done with all the dive-ins
+            agent_reply_txt = "We are done with exploring your skills. Any last remarks that you want to share with me?"
+            # Advance the conversation
+            s.conversation_phase = ConversationPhase.WRAPUP
+
+        return agent_reply_txt
+
+        # Old code
         if "no" not in user_input_msg.lower():
             # Process the reply and keep asking followups
             return "Thank you. Is there anything else want to add to this experience? Just say 'No' when you are done."
@@ -284,9 +312,9 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         investigation. You want to first get all past experiences, one by one, and investigate exclusively the date 
         and the place at which the position was held. Keep asking the user if they have more experience they would 
         like to talk about until they explicitly state that they don't. When the user has no more experiences to talk 
-        about, send them to your colleague who will investigate relevant skills. Before doing that, ask if the user 
-        would like to add anything else. Your message should be concise and professional, but also polite and 
-        empathetic.""")
+        about, tell them that you will now dive in to each experience to know more details about it. Before doing
+        that, ask if the user would like to add anything else. Your message should be concise and professional,
+        but also polite and empathetic.""")
 
         return base_prompt
 
