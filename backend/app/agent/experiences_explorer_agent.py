@@ -33,7 +33,7 @@ class ConversationPhase(Enum):
     the potential occupations to be explored; and there is an "inner loop" where we
     dig deeper into each occupation on the radar.
     """
-    INIT = 0
+    INIT = 0  # we skip this phase for now (start with warmup)
     WARMUP = 1
     DIVE_IN = 2
     WRAPUP = 3
@@ -68,7 +68,7 @@ class ExperiencesAgentState(BaseModel):
     current_experience: str = None
     deep_dive_count: int = 0
 
-    conversation_phase: ConversationPhase = ConversationPhase.INIT
+    conversation_phase: ConversationPhase = ConversationPhase.WARMUP
 
     """
     Raw conversation history with this agent. (We should store this in the central state, but for now, we need to
@@ -92,13 +92,6 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
     """
     Agent that explores the skills of the user and provides a response based on the task
     """
-
-    async def _handle_init_phase(self, _user_input_msg: str) -> str:
-        # Advance the conversation
-        line: str = await self._into_tool.create_intro_message()
-        line = line.strip()
-        self._state.conversation_phase = ConversationPhase.WARMUP
-        return "[META: ExperiencesExplorerAgent activated] " + line
 
     async def _llm_conversation_reply(self, user_input: AgentInput, context: ConversationContext) -> ModelResponse:
         agent_start_time = time.time()
@@ -226,12 +219,8 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         finished = False
         reply_raw = ""
 
-        # Phase1 - first round
-        if s.conversation_phase == ConversationPhase.INIT:
-            reply_raw = await self._handle_init_phase(user_input.message)
-
-        # Phase1 - followup rounds, until we have a minimum 3 occupations on the radar.
-        elif s.conversation_phase == ConversationPhase.WARMUP:
+        # Phase1 - warmpup
+        if s.conversation_phase == ConversationPhase.WARMUP:
             reply_raw = await self._handle_warmup_phase(user_input, context)
 
         # Phase2 - inner loop - outerloop
