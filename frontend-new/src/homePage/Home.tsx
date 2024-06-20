@@ -1,9 +1,10 @@
-import { NavLink, useNavigate } from "react-router-dom";
-import { Box, Typography, useTheme } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { Box } from "@mui/material";
 import { AuthContext } from "src/auth/AuthProvider";
 import { useContext, useEffect } from "react";
 import { routerPaths } from "src/app/routerPaths";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import Chat from "src/chat/Chat";
 
 const uniqueId = "13cb726d-b36d-4ea6-a518-9bf8f1e7356f";
 
@@ -15,7 +16,6 @@ export const DATA_TEST_ID = {
 };
 
 const Home = () => {
-  const theme = useTheme();
   const { handlePageLoad } = useContext(AuthContext);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -31,24 +31,8 @@ const Home = () => {
   }, [enqueueSnackbar, handlePageLoad, navigate]);
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      gap={2}
-      padding={theme.tabiyaSpacing.lg}
-      data-testid={DATA_TEST_ID.HOME_CONTAINER}
-    >
-      <Typography variant="h2" align="center" data-testid={DATA_TEST_ID.HOME_TITLE}>
-        Welcome to Tabiya Compass!
-      </Typography>
-      <Box display="flex" flexDirection="column" alignItems="center">
-        <Typography variant="h5" data-testid={DATA_TEST_ID.HOME_INFO}>
-          Click here to view the application page.
-        </Typography>
-        <NavLink to="/settings" data-testid={DATA_TEST_ID.HOME_BUTTON}>
-          Go to Info Page
-        </NavLink>
-      </Box>
+    <Box data-testid={DATA_TEST_ID.HOME_CONTAINER}>
+      <Chat />
     </Box>
   );
 };
