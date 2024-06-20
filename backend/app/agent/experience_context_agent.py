@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 _MAX_ATTEMPTS = 1
 
 
-class ExperiencesExplorerAgent(SimpleLLMAgent):
+class ExperienceContextAgent(SimpleLLMAgent):
     """
     Agent that determines the context of a work experience.
     """
