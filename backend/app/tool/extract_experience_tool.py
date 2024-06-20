@@ -28,6 +28,8 @@ class ExperienceEntity(BaseModel):
     job_title: str
     # The occupation records in the ESCO db that we think are related to this experience
     esco_occupations: Optional[List[OccupationEntity]] = []
+    # the dates in a simple string format as stated by the user
+    dates: str
     # TODO: Add more fields, especially the skills. Also decide whether we want skills to be directly connected to
     #  each occupation or not.
 
@@ -64,7 +66,7 @@ class ExtractExperienceTool(Tool):
             if line.strip() == "":
                 continue
             elements = line.split(";")
-            experience = ExperienceEntity(job_title=elements[0])
+            experience = ExperienceEntity(job_title=elements[0], dates=elements[3])
             experience.esco_occupations = await self._occupation_search_service.search(elements[0])
             # TODO: Add more fields, especially the skills.
             experiences.append(experience)
