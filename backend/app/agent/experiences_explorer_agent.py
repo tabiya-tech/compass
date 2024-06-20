@@ -194,8 +194,8 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
             # First experience to dive into
             s.current_experience = left_to_process[0]
             exp: ExperienceMetadata = s.experiences[s.current_experience]
-            # TODO: delegate this to the context agent
-            # Question: how to get back here?
+            # TODO: delegate this to the context agent (instead of creating this agent_reply_txt below)
+            # TODO: figure out how to get back here, once the ExperienceContextAgent finishes.
             agent_reply_txt = f"Let's dive in to the experiences you mentioned (I counted {len(s.experiences)}). " \
                               "You said you had an experience as a " \
                               f"{exp.experience_descr}. Was this a formal work experience?"
@@ -203,7 +203,8 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
             # Normal dive-in
             s.current_experience = left_to_process[0]
             exp: ExperienceMetadata = s.experiences[s.current_experience]
-            # TODO: delegate this to the context agent
+            # TODO: delegate this to the context agent (instead of creating this agent_reply_txt below)
+            # TODO: figure out how to get back here, once the ExperienceContextAgent finishes.
             agent_reply_txt = f"Let's move on to the other experience you mentioned (we already covered " \
                    f"{s.deep_dive_count} out of {len(s.experiences)}). You said you had an experience as a " \
                    f"{exp.experience_descr}. Was this a formal work experience?"
