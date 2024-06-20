@@ -18,8 +18,8 @@ exports[`Testing Register component with AuthProvider it should show register fo
         style="max-width: 60%; margin: 10%;"
       />
       <button
-        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-19lljko-MuiButtonBase-root-MuiIconButton-root"
-        data-testid="register-language-selector-ab02918f-d559-47ba-9662-ea6b3a3606d0"
+        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1xvhgyt-MuiButtonBase-root-MuiIconButton-root"
+        data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
         tabindex="0"
         title="Language Selector"
         type="button"
@@ -215,12 +215,12 @@ exports[`Testing Register component with AuthProvider it should show register fo
         class="MuiTypography-root MuiTypography-body2 css-odp70e-MuiTypography-root"
         data-testid="register-using-ab02918f-d559-47ba-9662-ea6b3a3606d0"
       >
-        Or register using
+        Or continue with
       </p>
       <div
         class="MuiBox-root css-u23omq"
       >
-        <div />
+        <span />
       </div>
     </div>
     <p
@@ -229,13 +229,6 @@ exports[`Testing Register component with AuthProvider it should show register fo
     >
       Already have an account?
        
-      <a
-        class="css-1sbs6hl"
-        href="#/login"
-        style="color: rgb(38, 94, 167); font-style: italic;"
-      >
-        Login
-      </a>
     </p>
   </div>
 </div>

@@ -5,13 +5,14 @@ export function mockLoggedInUser(mockedValues: Partial<AuthContextValue>) {
   jest.spyOn(require("src/auth/hooks/useAuthUser"), "useAuthUser").mockReturnValue({
     ...authContextDefaultValue,
     user: user,
-    setUser: (user: TabiyaUser) => null,
+    updateUser: (user: TabiyaUser) => null,
     updateUserByAccessToken: () => {},
     ...mockedValues,
   });
 }
 
 export const TestUser = {
+  id: "0001",
   name: "Test User",
   email: "test@email.com",
 };

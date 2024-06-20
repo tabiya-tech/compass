@@ -1,16 +1,24 @@
 import React, { createContext, useCallback, useMemo } from "react";
 import { useTokens } from "src/auth/hooks/useTokens";
 import { useAuthUser } from "src/auth/hooks/useAuthUser";
-import { AuthService } from "src/auth/services/AuthService";
-import { AuthContextValue, AuthProviderProps, TabiyaUser, TFirebaseTokenResponse } from "src/auth/auth.types";
-import { AuthPersistentStorage } from "src/auth/services/AuthPersistentStorage";
+import { AuthService } from "src/auth/services/AuthService/AuthService";
+import {
+  AuthContextValue,
+  AuthProviderProps,
+  FirebaseIDToken,
+  TabiyaUser,
+  TFirebaseTokenResponse,
+} from "src/auth/auth.types";
+import { AuthPersistentStorage } from "src/auth/services/AuthPersistentStorage/AuthPersistentStorage";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
+import { jwtDecode } from "jwt-decode";
 
 export const authContextDefaultValue: AuthContextValue = {
   user: null,
   login: () => {},
   logout: () => {},
   register: () => {},
+  handlePageLoad: () => {},
 };
 
 /**
@@ -24,8 +32,27 @@ export const AuthContext = createContext<AuthContextValue>(authContextDefaultVal
  * @constructor
  */
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const { user, setUser, updateUserByAccessToken } = useAuthUser();
-  const tokens = useTokens({ updateUserByIDToken: updateUserByAccessToken });
+  const { user, updateUser, updateUserByIDToken } = useAuthUser();
+  const tokens = useTokens({ updateUserByIDToken: updateUserByIDToken });
+
+  const handlePageLoad = useCallback(
+    (successCallback: (user: TabiyaUser) => void, errorCallback: (error: any) => void) => {
+      const accessToken = AuthPersistentStorage.getIDToken();
+      if (accessToken) {
+        updateUserByIDToken(accessToken);
+        const decodedUser: FirebaseIDToken = jwtDecode(accessToken);
+        const newUser: TabiyaUser = {
+          id: decodedUser.user_id,
+          name: decodedUser.name,
+          email: decodedUser.email,
+        };
+        successCallback(newUser);
+      } else {
+        errorCallback("No access token");
+      }
+    },
+    [updateUserByIDToken]
+  );
 
   /**
    * Logs in the user with an email and password
@@ -34,7 +61,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     (
       email: string,
       password: string,
-      sucessCallback: (user: TabiyaUser) => void,
+      successCallback: (user: TabiyaUser) => void,
       errorCallback: (error: any) => void
     ) => {
       const authService = AuthService.getInstance();
@@ -42,9 +69,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         .handleLogin(
           email,
           password,
-          (user) => {
-            setUser(user);
-            sucessCallback(user);
+          (response: TFirebaseTokenResponse) => {
+            updateUserByIDToken(response.id_token);
+            const decodedUser: FirebaseIDToken = jwtDecode(response.id_token);
+            const newUser: TabiyaUser = {
+              id: decodedUser.user_id,
+              name: decodedUser.name,
+              email: decodedUser.email,
+            };
+            successCallback(newUser);
           },
           (error) => {
             console.error(error);
@@ -56,7 +89,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           tokens.setIDToken(data.id_token);
         });
     },
-    [setUser, tokens]
+    [updateUserByIDToken, tokens]
   );
 
   /**
@@ -66,8 +99,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = useCallback(() => {
     AuthPersistentStorage.clear();
     tokens.clearTokens();
-    setUser(null);
-  }, [setUser, tokens]);
+    updateUser(null);
+  }, [updateUser, tokens]);
 
   /**
    * Registers the user with an email and password
@@ -76,32 +109,38 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     (
       email: string,
       password: string,
+      name: string,
       successCallback: (user: TabiyaUser) => void,
       errorCallback: (error: any) => void
     ) => {
       const authService = AuthService.getInstance();
-      authService
-        .handleRegister(
-          email,
-          password,
-          (user) => {
-            setUser(user);
-            successCallback(user);
-          },
-          (error) => {
-            console.error(error);
-            errorCallback(error);
-          }
-        )
-        .then((data: TFirebaseTokenResponse | undefined) => {
-          if (!data) return;
-          tokens.setIDToken(data.id_token);
-        });
+      authService.handleRegister(
+        email,
+        password,
+        name,
+        (response: TFirebaseTokenResponse) => {
+          updateUserByIDToken(response.id_token);
+          const decodedUser: FirebaseIDToken = jwtDecode(response.id_token);
+          const newUser: TabiyaUser = {
+            id: decodedUser.user_id,
+            name: decodedUser.name,
+            email: decodedUser.email,
+          };
+          successCallback(newUser);
+        },
+        (error) => {
+          console.error(error);
+          errorCallback(error);
+        }
+      );
     },
-    [setUser, tokens]
+    [updateUserByIDToken]
   );
 
-  const value = useMemo(() => ({ user, login, logout, register }), [logout, user, login, register]);
+  const value = useMemo(
+    () => ({ user, login, logout, register, handlePageLoad }),
+    [logout, user, login, register, handlePageLoad]
+  );
 
   return (
     <AuthContext.Provider value={value}>

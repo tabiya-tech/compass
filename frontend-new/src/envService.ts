@@ -21,3 +21,7 @@ export const getFirebaseDomain = () => {
 export const getFirebaseAPIKey = () => {
   return getEnv("FIREBASE_API_KEY");
 };
+
+export const getBackendUrl = () => {
+  return getEnv("BACKEND_URL");
+};

@@ -4,7 +4,8 @@ import NotFound from "src/errorPage/NotFound";
 import { routerPaths } from "./routerPaths";
 import Register from "src/auth/components/Register/Register";
 import Login from "src/auth/components/Login/Login";
-import DataProtectionAgreement from "../auth/components/PolicyNotice/DataProtectionPolicy";
+import DataProtectionAgreement from "src/auth/components/PolicyNotice/DataProtectionPolicy";
+import VerifyEmail from "src/auth/components/VerifyEmail/VerifyEmail";
 
 const routerConfig = [
   {
@@ -31,6 +32,11 @@ const routerConfig = [
     path: routerPaths.DPA,
     element: <DataProtectionAgreement />,
     errorElement: <div>Sorry, data protection policy could not be shown</div>,
+  },
+  {
+    path: routerPaths.VERIFY_EMAIL,
+    element: <VerifyEmail />,
+    errorElement: <div>Sorry, email verification could not be shown</div>,
   },
   {
     path: "*",

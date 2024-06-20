@@ -1,10 +1,20 @@
 import "src/_test_utilities/consoleMock";
 import React from "react";
 import { render, screen, waitFor, fireEvent } from "src/_test_utilities/test-utils";
-import { HashRouter } from "react-router-dom";
+import { HashRouter, useNavigate } from "react-router-dom";
 import Login, { DATA_TEST_ID } from "./Login";
-import { AuthContext } from "src/auth/AuthProvider";
-import { useSnackbar } from "../../../theme/SnackbarProvider/SnackbarProvider";
+import { AuthContext, TabiyaUser } from "src/auth/AuthProvider";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import UserPreferencesService from "src/auth/services/UserPreferences/userPreferences.service";
+import { routerPaths } from "src/app/routerPaths";
+import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
+
+// Mock the envService module
+jest.mock("src/envService", () => ({
+  getFirebaseAPIKey: jest.fn(() => "mock-api-key"),
+  getFirebaseDomain: jest.fn(() => "mock-auth-domain"),
+  getBackendUrl: jest.fn(() => "mock-backend-url"),
+}));
 
 //mock the IDPAuth component
 jest.mock("src/auth/components/IDPAuth/IDPAuth", () => {
@@ -13,7 +23,7 @@ jest.mock("src/auth/components/IDPAuth/IDPAuth", () => {
     ...actual,
     __esModule: true,
     default: jest.fn().mockImplementation(() => {
-      return <div data-testid={actual.DATA_TEST_ID.FIREBASE_AUTH_CONTAINER}></div>;
+      return <span data-testid={actual.DATA_TEST_ID.FIREBASE_AUTH_CONTAINER}></span>;
     }),
   };
 });
@@ -31,6 +41,28 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   };
 });
 
+// mock the UserPreferencesService
+jest.mock("src/auth/services/UserPreferences/userPreferences.service", () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+      getUserPreferences: jest.fn(),
+    };
+  });
+});
+
+// mock the router
+jest.mock("react-router-dom", () => {
+  const actual = jest.requireActual("react-router-dom");
+  return {
+    ...actual,
+    __esModule: true,
+    useNavigate: jest.fn().mockReturnValue(jest.fn()),
+    NavLink: jest.fn().mockImplementation(() => {
+      return <></>;
+    }),
+  };
+});
+
 describe("Testing Login component with AuthProvider", () => {
   const loginMock = jest.fn();
 
@@ -39,14 +71,17 @@ describe("Testing Login component with AuthProvider", () => {
     user: null,
     register: jest.fn(),
     logout: jest.fn(),
+    handlePageLoad: jest.fn(),
   };
 
   beforeEach(() => {
     // Clear console mocks and mock functions
     (console.error as jest.Mock).mockClear();
     (console.warn as jest.Mock).mockClear();
-    loginMock.mockClear();
+    jest.clearAllMocks();
   });
+
+  beforeAll(() => mockUseTokens());
 
   test("it should show login form successfully", async () => {
     // Render the component within the AuthContext and Router
@@ -91,13 +126,84 @@ describe("Testing Login component with AuthProvider", () => {
     expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toMatchSnapshot();
   });
 
-  test("it should show successful login message", async () => {
-    // GIVEN the login function will succeed
+  test.each([
+    ["accepted", new Date(), routerPaths.ROOT],
+    ["not accepted", null, routerPaths.DPA],
+  ])(
+    "it should handle successful login for a user who has %s terms and conditions",
+    async (_description: string, tc: Date | null, expectedPath: string) => {
+      // GIVEN the login function will succeed
+      const givenUser: TabiyaUser = {
+        id: "0001",
+        email: "foo@bar.baz",
+        name: "Foo Bar",
+      };
+      loginMock.mockImplementation((email, password, onSuccess, onError) => {
+        onSuccess({ id: "0001" });
+      });
+
+      // AND the user preferences service will return a user who has either accepted or not accepted terms and conditions
+      const userPreferencesServiceMock = {
+        getUserPreferences: jest.fn().mockResolvedValue({ accepted_tc: tc }),
+      };
+      (UserPreferencesService as jest.Mock).mockImplementation(() => userPreferencesServiceMock);
+
+      // AND the Login component is rendered within the AuthContext and Router
+      render(
+        <HashRouter>
+          <AuthContext.Provider value={authContextValue}>
+            <Login />
+          </AuthContext.Provider>
+        </HashRouter>
+      );
+
+      // THEN expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+
+      // AND the component should be rendered
+      expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toBeDefined();
+
+      // AND the form inputs and button should be displayed
+      expect(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT)).toBeInTheDocument();
+      expect(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT)).toBeInTheDocument();
+      expect(screen.getByTestId(DATA_TEST_ID.LOGIN_BUTTON)).toBeInTheDocument();
+
+      // Simulate form input and submission
+      fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: "foo@bar.baz" } });
+      fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: "password" } });
+
+      // Trigger form submission
+      fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
+
+      // THEN expect the login function to have been called
+      await waitFor(() => {
+        expect(loginMock).toHaveBeenCalledWith("foo@bar.baz", "password", expect.any(Function), expect.any(Function));
+      });
+
+      // AND the user preferences service should have been called
+      await waitFor(() => {
+        expect(userPreferencesServiceMock.getUserPreferences).toHaveBeenCalledWith(givenUser.id);
+      });
+      // AND the user should be redirected to the expected path
+      await waitFor(() => {
+        expect(useNavigate()).toHaveBeenCalledWith(expectedPath, { replace: true });
+      });
+
+      // AND the success message should be displayed
+      await waitFor(() => {
+        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Login successful", { variant: "success" });
+      });
+    }
+  );
+
+  test("it should show an error message if the user's email is not verified", async () => {
+    // GIVEN the login function will fail with an error message
     loginMock.mockImplementation((email, password, onSuccess, onError) => {
-      onSuccess();
+      onError(new Error("Email not verified"));
     });
 
-    // WHEN the Login component is rendered within the AuthContext and Router
+    // AND the Login component is rendered within the AuthContext and Router
     render(
       <HashRouter>
         <AuthContext.Provider value={authContextValue}>
@@ -130,11 +236,84 @@ describe("Testing Login component with AuthProvider", () => {
       expect(loginMock).toHaveBeenCalledWith("foo@bar.baz", "password", expect.any(Function), expect.any(Function));
     });
 
-    // AND the success message should be displayed
+    // AND the error message should be displayed
     await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Login successful", { variant: "success" });
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Please verify your email", { variant: "error" });
     });
+
+    // AND the user should not be redirected
+    expect(useNavigate()).not.toHaveBeenCalled();
   });
+
+  test("it should show an error message if the user preferences cannot be fetched", async () => {
+    // GIVEN the login function will succeed
+    const givenUser: TabiyaUser = {
+      id: "0001",
+      email: "foo@bar.baz",
+      name: "Foo Bar",
+    };
+    loginMock.mockImplementation((email, password, onSuccess, onError) => {
+      onSuccess(givenUser);
+    });
+
+    // AND the user preferences service will fail
+    const userPreferencesServiceMock = {
+      getUserPreferences: jest.fn().mockRejectedValue(new Error("Failed to fetch user preferences")),
+    };
+    (UserPreferencesService as jest.Mock).mockImplementation(() => userPreferencesServiceMock);
+
+    // AND the Login component is rendered within the AuthContext and Router
+    render(
+      <HashRouter>
+        <AuthContext.Provider value={authContextValue}>
+          <Login />
+        </AuthContext.Provider>
+      </HashRouter>
+    );
+
+    // THEN expect no errors or warning to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
+
+    // AND the component should be rendered
+    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toBeDefined();
+
+    // AND the form inputs and button should be displayed
+    expect(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT)).toBeInTheDocument();
+    expect(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT)).toBeInTheDocument();
+    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_BUTTON)).toBeInTheDocument();
+
+    // Simulate form input and submission
+    fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: "foo@bar.baz" } });
+    fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: "password" } });
+
+    // Trigger form submission
+    fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
+
+    // THEN expect the login function to have been called
+    await waitFor(() => {
+      expect(loginMock).toHaveBeenCalledWith("foo@bar.baz", "password", expect.any(Function), expect.any(Function));
+    });
+
+    // AND the user preferences service should have been called
+    await waitFor(() => {
+      expect(userPreferencesServiceMock.getUserPreferences).toHaveBeenCalledWith(givenUser.id);
+    });
+
+    // AND the error message should be displayed
+    await waitFor(() => {
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to fetch user preferences", {
+        variant: "error",
+      });
+    });
+
+    // AND the error should be logged
+    expect(console.error).toHaveBeenCalledWith("Failed to fetch user preferences", expect.any(Error));
+
+    // AND the user should not be redirected
+    expect(useNavigate()).not.toHaveBeenCalled();
+  });
+
   test("it should show error message when login fails", async () => {
     // GIVEN the login function will fail
     loginMock.mockImplementation((email, password, onSuccess, onError) => {

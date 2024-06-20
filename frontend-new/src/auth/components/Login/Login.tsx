@@ -1,12 +1,12 @@
-import React, { useContext, useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import { Container, Box, TextField, Button, Typography, useTheme, styled } from "@mui/material";
-import { AuthContext } from "src/auth/AuthProvider";
+import { AuthContext, TabiyaUser } from "src/auth/AuthProvider";
 import { NavLink as RouterNavLink, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
-import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
-import { LanguageOutlined } from "@mui/icons-material";
 import IDPAuth from "src/auth/components/IDPAuth/IDPAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import UserPreferencesService from "src/auth/services/UserPreferences/userPreferences.service";
+import AuthContextMenu from "src/auth/components/AuthContextMenu/AuthContextMenu";
 
 const uniqueId = "7ce9ba1f-bde0-48e2-88df-e4f697945cc4";
 
@@ -37,26 +37,59 @@ export const DATA_TEST_ID = {
 
 const Login: React.FC = () => {
   const theme = useTheme();
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useContext(AuthContext);
 
-  const navigate = useNavigate();
-  const { enqueueSnackbar } = useSnackbar();
-  const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
+  /**
+   * Check if the user has accepted the terms and conditions
+   * @param user
+   */
+  const checkUserPreferences = useCallback(
+    async (user: TabiyaUser) => {
+      const userPreferencesService = new UserPreferencesService();
+      try {
+        const userPreferences = await userPreferencesService.getUserPreferences(user.id);
+        const acceptedTcDate = new Date(userPreferences.accepted_tc);
+        // If the accepted_tc is not set or is not a valid date, redirect to the DPA page
+        // this is to ensure that even if the accepted_tc is manipulated in the database, the user will be redirected to the DPA page
+        // and will have to accept the terms and conditions again
+        if (!userPreferences.accepted_tc || isNaN(acceptedTcDate.getTime())) {
+          navigate(routerPaths.DPA, { replace: true });
+        } else {
+          navigate(routerPaths.ROOT, { replace: true });
+        }
+      } catch (e) {
+        enqueueSnackbar("Failed to fetch user preferences", { variant: "error" });
+        console.error("Failed to fetch user preferences", e);
+      }
+    },
+    [navigate, enqueueSnackbar]
+  );
+
+  /**
+   * Handle the login form submission
+   * @param event
+   */
+  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     login(
       email,
       password,
-      (user) => {
+      async (user) => {
+        await checkUserPreferences(user);
         enqueueSnackbar("Login successful", { variant: "success" });
-        navigate(routerPaths.DPA);
-        console.log("User logged in", { user });
       },
       (error) => {
+        if (error.message === "Email not verified") {
+          enqueueSnackbar("Please verify your email", { variant: "error" });
+          return;
+        }
+        console.error("Login failed", error);
         enqueueSnackbar("Login failed", { variant: "error" });
-        console.error(error); // TODO: add a better mechanism for logging service errors
       }
     );
   };
@@ -78,18 +111,7 @@ const Login: React.FC = () => {
             style={{ maxWidth: "60%", margin: "10%" }}
             data-testid={DATA_TEST_ID.LOGO}
           />
-          <PrimaryIconButton
-            sx={{
-              color: theme.palette.common.black,
-              alignSelf: "flex-start",
-              justifySelf: "flex-end",
-              margin: theme.tabiyaSpacing.lg,
-            }}
-            data-testid={DATA_TEST_ID.LANGUAGE_SELECTOR}
-            title={"Language Selector"}
-          >
-            <LanguageOutlined />
-          </PrimaryIconButton>
+          <AuthContextMenu />
         </Box>
         <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.TITLE}>
           Welcome to Compass!
@@ -129,9 +151,6 @@ const Login: React.FC = () => {
             Login
           </Button>
         </Box>
-        <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.FORGOT_PASSWORD_LINK}>
-          Forgot your password? <StyledNavLink to={routerPaths.FORGOT_PASSWORD}>Click here</StyledNavLink>
-        </Typography>
         <Box
           display="flex"
           flexDirection="column"
@@ -141,7 +160,7 @@ const Login: React.FC = () => {
           data-testid={DATA_TEST_ID.FIREBASE_AUTH_CONTAINER}
         >
           <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.LOGIN_USING}>
-            Or register using
+            Or continue with
           </Typography>
           <Box mt={2} width="100%">
             <IDPAuth />
