@@ -7,9 +7,9 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.server_dependencies import get_mongo_db
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService, \
     EmbeddingService
-from app.vector_search.esco_entities import OccupationEntity, OccupationSkillEntity
+from app.vector_search.esco_entities import OccupationEntity, OccupationSkillEntity, SkillEntity
 from app.vector_search.esco_search_service import VectorSearchConfig, OccupationSearchService, \
-    OccupationSkillSearchService
+    OccupationSkillSearchService, SkillSearchService
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
 from constants.database import EmbeddingConfig
@@ -31,6 +31,27 @@ def get_gecko_embeddings() -> GoogleGeckoEmbeddingService:
 # Lock to ensure that the singleton instances are thread-safe
 _lock = Lock()
 
+# Define a singleton instance of the skill search service
+_skill_search_service_singleton: SimilaritySearchService[SkillEntity] = None
+
+
+def get_skill_search_service(db: AsyncIOMotorDatabase = Depends(get_mongo_db),
+                             embedding_model: EmbeddingService = Depends(get_gecko_embeddings)) -> \
+        SimilaritySearchService[SkillEntity]:
+    """ Get the skill search service singleton instance."""
+    global _skill_search_service_singleton
+    if _skill_search_service_singleton is None:  # initial check
+        with _lock:  # before modifying the singleton instance, acquire the lock
+            if _skill_search_service_singleton is None:  # double check after acquiring the lock
+                logger.info("Creating a new instance of the skill search service.")
+                skill_vector_search_config = VectorSearchConfig(
+                    collection_name=_embedding_settings.skill_collection_name,
+                    index_name=_embedding_settings.embedding_index,
+                    embedding_key=_embedding_settings.embedding_key,
+                )
+                _skill_search_service_singleton = SkillSearchService(db, embedding_model, skill_vector_search_config)
+
+    return _skill_search_service_singleton
 
 # Define a singleton instance of the occupation search service
 _occupation_search_service_singleton = None

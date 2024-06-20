@@ -24,7 +24,7 @@ from scripts.base_data_settings import ScriptSettings, Type, TabiyaDatabaseConfi
 load_dotenv()
 vertexai.init()
 
-PARALLEL_TASK_SIZE = 10
+PARALLEL_TASK_SIZE = 5
 MAX_RETRIES = 3
 MONGO_SETTINGS = MongoDbSettings()
 EMBEDDING_SETTINGS = EmbeddingConfig()

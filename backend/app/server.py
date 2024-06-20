@@ -19,6 +19,7 @@ from app.sensitive_filter import sensitive_filter
 from app.server_dependencies import get_conversation_memory_manager
 from app.vector_search.occupation_search_routes import add_occupation_search_routes
 from app.vector_search.similarity_search_service import SimilaritySearchService
+from app.vector_search.skill_search_routes import add_skill_search_routes
 from app.vector_search.vector_search_dependencies import get_occupation_search_service, \
     get_occupation_skill_search_service
 from app.version.version_routes import add_version_routes
@@ -77,6 +78,7 @@ add_version_routes(app)
 ############################################
 
 add_occupation_search_routes(app)
+add_skill_search_routes(app)
 
 ############################################
 # Add routes relevant for pii filtering

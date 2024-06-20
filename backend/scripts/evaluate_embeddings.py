@@ -8,7 +8,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from tqdm import tqdm
 
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
-from app.vector_search.esco_search_service import VectorSearchConfig, OccupationSearchService
+from app.vector_search.esco_search_service import VectorSearchConfig, OccupationSearchService, SkillSearchService
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
 from constants.database import EmbeddingConfig
@@ -120,7 +120,9 @@ if __name__ == "__main__":
     gecko_embedding_service = GoogleGeckoEmbeddingService()
     _occupation_search_service = OccupationSearchService(compass_db, gecko_embedding_service,
                                                          _get_vector_search_config(Type.OCCUPATION))
-    # TODO: Evaluate the skill embeddings too, but using the OccupationSkillSearchService.
+    # TODO: Also evaluate the OccupationSkillSearchService.
+    _skill_search_service = SkillSearchService(compass_db, gecko_embedding_service,
+                                               _get_vector_search_config(Type.SKILL))
     occupation_dataset = load_dataset(OCCUPATION_REPO_ID, data_files=[OCCUPATION_FILENAME],
                                       token=SCRIPT_SETTINGS.hf_access_token).get("train")
     # Load the skill dataset. The columns are not consistent with the definition in the dataset so we need to override
@@ -141,7 +143,12 @@ if __name__ == "__main__":
                                  split="train",
                                  verification_mode=VerificationMode.NO_CHECKS)
     asyncio.get_event_loop().run_until_complete(
-        asyncio.gather(get_metrics(_occupation_search_service,
-                                   occupation_dataset["esco_code"],
-                                   occupation_dataset["synthetic_query"], Type.OCCUPATION))
+        asyncio.gather(
+            *[get_metrics(_occupation_search_service,
+                          occupation_dataset["esco_code"],
+                          occupation_dataset["synthetic_query"], Type.OCCUPATION),
+              get_metrics(_skill_search_service,
+                          skill_dataset["label"],
+                          skill_dataset["synthetic_query"], Type.SKILL)
+              ])
     )

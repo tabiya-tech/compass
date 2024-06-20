@@ -138,6 +138,37 @@ class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
         )
 
 
+# TODO: Merge this with the OccupationSkillSearch to avoid duplication.
+class SkillSearchService(AbstractEscoSearchService[SkillEntity]):
+    """
+    A service class to perform similarity searches on the skills' collection.
+    """
+
+    def _to_entity(self, doc: dict) -> SkillEntity:
+        """
+        Convert a Document object to a SkillEntity object.
+        """
+
+        return SkillEntity(
+            id=str(doc.get("_id", "")),
+            UUID=doc.get("UUID", ""),
+            preferredLabel=doc.get("preferredLabel", ""),
+            description=doc.get("description", ""),
+            altLabels=doc.get("altLabels", []),
+            skillType=doc.get("skillType", ""),
+            relationType="N/A",
+        )
+
+    def _group_fields(self) -> dict:
+        return {"_id": "$UUID",
+                "UUID": {"$first": "$UUID"},
+                "preferredLabel": {"$first": "$preferredLabel"},
+                "description": {"$first": "$description"},
+                "altLabels": {"$first": "$altLabels"},
+                "skillType": {"$first": "skillType"},
+                }
+
+
 class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity]):
 
     def __init__(self, db: AsyncIOMotorDatabase, embedding_service: EmbeddingService):
@@ -165,24 +196,24 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
 
         skills = await self.database.get_collection(
             self.embedding_config.occupation_to_skill_collection_name).aggregate([
-                {"$match": query},
-                {"$lookup": {
-                    "from": self.embedding_config.skill_collection_name,
-                    "localField": "requiredSkillId",
-                    "foreignField": "skillId",
-                    "as": "skills"
-                }},
-                {"$unwind": "$skills"},
-                {"$group": {"_id": "$skills.UUID",
-                            "skillId": {"$first": "$skills.skillId"},
-                            "UUID": {"$first": "$skills.UUID"},
-                            "preferredLabel": {"$first": "$skills.preferredLabel"},
-                            "description": {"$first": "$skills.description"},
-                            "altLabels": {"$first": "$skills.altLabels"},
-                            "skillType": {"$first": "$skills.skillType"},
-                            "relationType": {"$first": "$relationType"},
-                            }}
-            ]).to_list(length=None)
+            {"$match": query},
+            {"$lookup": {
+                "from": self.embedding_config.skill_collection_name,
+                "localField": "requiredSkillId",
+                "foreignField": "skillId",
+                "as": "skills"
+            }},
+            {"$unwind": "$skills"},
+            {"$group": {"_id": "$skills.UUID",
+                        "skillId": {"$first": "$skills.skillId"},
+                        "UUID": {"$first": "$skills.UUID"},
+                        "preferredLabel": {"$first": "$skills.preferredLabel"},
+                        "description": {"$first": "$skills.description"},
+                        "altLabels": {"$first": "$skills.altLabels"},
+                        "skillType": {"$first": "$skills.skillType"},
+                        "relationType": {"$first": "$relationType"},
+                        }}
+        ]).to_list(length=None)
         # TODO: Also use embeddings for the skills.
         return [SkillEntity(
             id=str(skill.get("skillId", "")),
