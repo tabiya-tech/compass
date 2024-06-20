@@ -13,12 +13,6 @@ from common_libs.llm.models_utils import LLMConfig, LOW_TEMPERATURE_GENERATION_C
 logger = logging.getLogger(__name__)
 
 
-class Tool(ABC):
-    """
-    An abstract class for an LLM tool.
-    """
-
-
 class ExperienceEntity(BaseModel):
     """
     A class to represent a work experience (formal, informal or unseen economy).
@@ -32,7 +26,7 @@ class ExperienceEntity(BaseModel):
     #  each occupation or not.
 
 
-class ExtractExperienceTool(Tool):
+class ExtractExperienceTool:
     """
     This tool takes a user input text and uses an LLM to decide what past experiences is the user talking about.
     The experience can be a formal work experience (e.g. baker) or an informal experience (e.g. cooking for the family).

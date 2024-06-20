@@ -16,6 +16,7 @@ from app.agent.prompt_reponse_template import get_json_response_instructions
 from app.conversation_memory.conversation_memory_types import \
     ConversationContext
 from app.tool.extract_experience_tool import ExtractExperienceTool, ExperienceEntity
+from app.tool.experinece_explorer_into_tool import ExperienceIntroTool
 from app.vector_search.esco_entities import OccupationEntity
 from app.vector_search.similarity_search_service import SimilaritySearchService
 
@@ -92,12 +93,12 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
     Agent that explores the skills of the user and provides a response based on the task
     """
 
-    def _handle_init_phase(self, _user_input_msg: str) -> str:
+    async def _handle_init_phase(self, _user_input_msg: str) -> str:
         # Advance the conversation
+        line: str = await self._into_tool.create_intro_message()
+        line = line.strip()
         self._state.conversation_phase = ConversationPhase.WARMUP
-        return "[META: ExperiencesExplorerAgent activated] Let's explore your past livelihood experiences, " \
-               "e.g. formal work experiences other similar hassles that kept you busy in the last years. Shall we " \
-               "begin?"
+        return "[META: ExperiencesExplorerAgent activated] " + line
 
     async def _llm_conversation_reply(self, user_input: AgentInput, context: ConversationContext) -> ModelResponse:
         agent_start_time = time.time()
@@ -227,7 +228,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
 
         # Phase1 - first round
         if s.conversation_phase == ConversationPhase.INIT:
-            reply_raw = self._handle_init_phase(user_input.message)
+            reply_raw = await self._handle_init_phase(user_input.message)
 
         # Phase1 - followup rounds, until we have a minimum 3 occupations on the radar.
         elif s.conversation_phase == ConversationPhase.WARMUP:
@@ -297,6 +298,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         super().__init__(agent_type=AgentType.EXPERIENCES_EXPLORER_AGENT,
                          system_instructions=system_instructions)
 
+        self._into_tool = ExperienceIntroTool(self.get_llm_config())
         self._extract_experience_tool = ExtractExperienceTool(similarity_search, self.get_llm_config())
 
         self._state = None
