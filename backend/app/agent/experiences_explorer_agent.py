@@ -286,7 +286,6 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         super().__init__(agent_type=AgentType.EXPERIENCES_EXPLORER_AGENT,
                          system_instructions=system_instructions)
 
-        self._into_tool = ExperienceIntroTool(self.get_llm_config())
         self._extract_experience_tool = ExtractExperienceTool(similarity_search, self.get_llm_config())
 
         self._state = None
