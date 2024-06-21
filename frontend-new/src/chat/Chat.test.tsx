@@ -19,8 +19,18 @@ jest.mock("src/chat/ChatHeader/ChatHeader", () => {
   };
 });
 
+jest.mock("src/chat/ChatService/ChatService", () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+      sendMessage: jest.fn().mockResolvedValue({
+        message_for_user: "Hello, I'm Compass",
+      }),
+      getSessionId: jest.fn().mockReturnValue("1234"),
+    };
+  });
+});
 test("should render the Chat", () => {
-  // WHEN the chat is rendered
+  // WHEN the chat header is rendered
   render(<Chat />);
 
   // THEN expect no errors or warning to have occurred

@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import { styled } from "@mui/system";
-import { ChatMessageOrigin, ChatMessageProps } from "./ChatMessage.types";
+import { ChatMessageOrigin, IChatMessage } from "src/chat/Chat.types";
 
 const uniqueId = "2fbaf2ef-9eab-485a-bd28-b4a164e18b06";
 
@@ -31,11 +31,15 @@ const TimeStamp = styled(Typography)(({ theme }) => ({
   marginTop: "5px",
 }));
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ origin, message, time }) => {
+type ChatMessageProps = {
+  chatMessage: IChatMessage;
+};
+
+const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage }) => {
   return (
-    <MessageContainer origin={origin} data-testid={DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}>
-      <MessageBubble origin={origin}>{message}</MessageBubble>
-      <TimeStamp variant="caption">{time.toLocaleTimeString()}</TimeStamp>
+    <MessageContainer origin={chatMessage.origin} data-testid={DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}>
+      <MessageBubble origin={chatMessage.origin}>{chatMessage.message}</MessageBubble>
+      <TimeStamp variant="caption">{chatMessage.timestamp.toString()}</TimeStamp>
     </MessageContainer>
   );
 };
