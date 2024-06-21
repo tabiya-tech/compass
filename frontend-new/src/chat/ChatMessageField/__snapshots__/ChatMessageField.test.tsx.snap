@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ChatMessageField should render ChatMessageField correctly 1`] = `
+<textarea
+  aria-invalid="false"
+  class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiInputBase-inputAdornedEnd css-111mkcg-MuiInputBase-input-MuiOutlinedInput-input"
+  data-testid="chat-message-field-container-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
+  id=":r0:"
+  maxlength="1000"
+  placeholder="Type your message..."
+  style="height: 0px; overflow: hidden;"
+>
+  foo
+</textarea>
+`;

@@ -5,7 +5,10 @@ const meta: Meta<typeof ChatMessageField> = {
   title: "Chat/ChatMessageField",
   component: ChatMessageField,
   tags: ["autodocs"],
-  argTypes: {},
+  argTypes: {
+    handleSend: { action: "handleSend" },
+    notifyChange: { action: "notifyChange" },
+  },
 };
 
 export default meta;
@@ -13,5 +16,8 @@ export default meta;
 type Story = StoryObj<typeof ChatMessageField>;
 
 export const Shown: Story = {
-  args: {},
+  args: {
+    message: "",
+    notifyChange: () => {},
+  },
 };
