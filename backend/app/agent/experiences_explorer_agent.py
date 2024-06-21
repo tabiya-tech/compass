@@ -16,7 +16,6 @@ from app.agent.prompt_reponse_template import get_json_response_instructions
 from app.conversation_memory.conversation_memory_types import \
     ConversationContext
 from app.tool.extract_experience_tool import ExtractExperienceTool, ExperienceEntity
-from app.tool.experinece_explorer_into_tool import ExperienceIntroTool
 from app.vector_search.esco_entities import OccupationEntity
 from app.vector_search.similarity_search_service import SimilaritySearchService
 
