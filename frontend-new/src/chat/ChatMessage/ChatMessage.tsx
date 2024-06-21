@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Typography, styled } from "@mui/material";
 import { ChatMessageOrigin, IChatMessage } from "src/chat/Chat.types";
+import { getDurationBetweenDates } from "src/utils/getDurationBetweenDates";
 
 const uniqueId = "2fbaf2ef-9eab-485a-bd28-b4a164e18b06";
 
@@ -37,10 +38,16 @@ type ChatMessageProps = {
 };
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage }) => {
+  let duration;
+  try {
+    duration = getDurationBetweenDates(new Date(chatMessage.timestamp), new Date());
+  } catch (e) {
+    console.error(e);
+  }
   return (
     <MessageContainer origin={chatMessage.origin} data-testid={DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}>
       <MessageBubble origin={chatMessage.origin}>{chatMessage.message}</MessageBubble>
-      <TimeStamp variant="caption">{chatMessage.timestamp.toString()}</TimeStamp>
+      <TimeStamp variant="caption">sent {duration}</TimeStamp>
     </MessageContainer>
   );
 };

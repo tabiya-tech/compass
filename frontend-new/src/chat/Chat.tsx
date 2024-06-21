@@ -36,8 +36,7 @@ const Chat = () => {
       addMessage(initialMessage);
     } catch (error) {
       console.error("Failed to initialize chat:", error);
-      //TODO: fix this
-      enqueueSnackbar(JSON.stringify(error, null, 2), { variant: "error" });
+      enqueueSnackbar("Something went wrong... Please try again later.", { variant: "error" });
     } finally {
       setIsTyping(false);
     }
