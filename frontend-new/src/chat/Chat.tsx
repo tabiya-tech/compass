@@ -3,6 +3,7 @@ import ChatService from "src/chat/ChatService/ChatService";
 import ChatList from "src/chat/ChatList/ChatList";
 import { IChatMessage } from "./Chat.types";
 import { generateCompassMessage, generateUserMessage } from "./util";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Box } from "@mui/material";
 import ChatHeader from "./ChatHeader/ChatHeader";
 import ChatMessageField from "./ChatMessageField/ChatMessageField";
@@ -21,6 +22,8 @@ const Chat = () => {
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const chatService = useMemo(() => new ChatService(), []);
 
+  const { enqueueSnackbar } = useSnackbar();
+
   const addMessage = (message: IChatMessage) => {
     setMessages((prevMessages) => [...prevMessages, message]);
   };
@@ -28,18 +31,17 @@ const Chat = () => {
   const initializeChat = useCallback(async () => {
     try {
       setIsTyping(true);
-      const response = await chatService.sendMessage({
-        user_id: chatService.getSessionId(),
-        message: START_PROMPT,
-      });
+      const response = await chatService.sendMessage(START_PROMPT);
       const initialMessage = generateCompassMessage(response.message_for_user);
       addMessage(initialMessage);
     } catch (error) {
       console.error("Failed to initialize chat:", error);
+      //TODO: fix this
+      enqueueSnackbar(JSON.stringify(error, null, 2), { variant: "error" });
     } finally {
       setIsTyping(false);
     }
-  }, [chatService]);
+  }, [chatService, enqueueSnackbar]);
 
   const sendMessage = useCallback(
     async (userMessage: string) => {
@@ -47,10 +49,7 @@ const Chat = () => {
       addMessage(message);
       try {
         setIsTyping(true);
-        const response = await chatService.sendMessage({
-          user_id: chatService.getSessionId(),
-          message: userMessage,
-        });
+        const response = await chatService.sendMessage(userMessage);
         const botMessage = generateCompassMessage(response.message_for_user);
         addMessage(botMessage);
       } catch (error) {
@@ -68,14 +67,15 @@ const Chat = () => {
   const clearMessages = useCallback(async () => {
     try {
       setIsTyping(true);
-      await chatService.clearChat(chatService.getSessionId());
+      await chatService.clearChat();
       setMessages([]);
     } catch (error) {
-      console.error("Failed to clear messages:", error);
+      console.error("Failed to clear chat:", error);
+      enqueueSnackbar("Failed to clear chat", { variant: "error" });
     } finally {
       setIsTyping(false);
     }
-  }, [chatService]);
+  }, [chatService, enqueueSnackbar]);
 
   useEffect(() => {
     if (!initialized) {
@@ -91,7 +91,7 @@ const Chat = () => {
   };
 
   return (
-    <Box data-testid={DATA_TEST_ID.CHAT_CONTAINER}>
+    <Box width="100%" height="100%" data-testid={DATA_TEST_ID.CHAT_CONTAINER}>
       <ChatHeader />
       <ChatList messages={messages} sendMessage={sendMessage} clearMessages={clearMessages} isTyping={isTyping} />
       <Box

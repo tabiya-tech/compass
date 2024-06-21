@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Box } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { AuthContext } from "src/auth/AuthProvider";
 import { useContext, useEffect } from "react";
 import { routerPaths } from "src/app/routerPaths";
@@ -10,12 +10,10 @@ const uniqueId = "13cb726d-b36d-4ea6-a518-9bf8f1e7356f";
 
 export const DATA_TEST_ID = {
   HOME_CONTAINER: `home-container-${uniqueId}`,
-  HOME_TITLE: `home-title-${uniqueId}`,
-  HOME_INFO: `home-info-${uniqueId}`,
-  HOME_BUTTON: `home-button-${uniqueId}`,
 };
 
 const Home = () => {
+  const theme = useTheme();
   const { handlePageLoad } = useContext(AuthContext);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -31,7 +29,13 @@ const Home = () => {
   }, [enqueueSnackbar, handlePageLoad, navigate]);
 
   return (
-    <Box data-testid={DATA_TEST_ID.HOME_CONTAINER}>
+    <Box
+      display="flex"
+      height="100%"
+      width="100%"
+      padding={theme.tabiyaSpacing.lg}
+      data-testid={DATA_TEST_ID.HOME_CONTAINER}
+    >
       <Chat />
     </Box>
   );

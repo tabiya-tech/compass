@@ -14,7 +14,8 @@ import SnackbarProvider from "src/theme/SnackbarProvider/SnackbarProvider";
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
 root.render(
-  <React.StrictMode>
+  // <React.StrictMode>
+  <>
     <CssBaseline />
     <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
       <AuthProvider>
@@ -23,7 +24,7 @@ root.render(
         </SnackbarProvider>
       </AuthProvider>
     </ThemeProvider>
-  </React.StrictMode>
+  </>
 );
 
 // If you want to start measuring performance in your app, pass a function

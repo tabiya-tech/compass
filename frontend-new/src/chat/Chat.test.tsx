@@ -29,7 +29,18 @@ jest.mock("src/chat/ChatService/ChatService", () => {
     };
   });
 });
-test("should render the Chat", () => {
+
+// mock the ChatList component
+jest.mock("src/chat/ChatList/ChatList", () => {
+  const originalModule = jest.requireActual("src/chat/ChatList/ChatList");
+  return {
+    __esModule: true,
+    ...originalModule,
+    default: jest.fn(() => <div data-testid={originalModule.DATA_TEST_ID.CHAT_LIST_CONTAINER}></div>),
+  };
+});
+
+test("should render the Chat Header", () => {
   // WHEN the chat header is rendered
   render(<Chat />);
 

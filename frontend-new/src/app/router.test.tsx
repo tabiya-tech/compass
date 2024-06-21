@@ -93,6 +93,75 @@ function renderWithRouter(route: string) {
 
   return { router };
 }
+// mock the home component
+jest.mock("src/homePage/Home", () => {
+  const originalModule = jest.requireActual("src/homePage/Home");
+  return {
+    __esModule: true,
+    ...originalModule,
+    default: jest.fn(() => <div data-testid={originalModule.DATA_TEST_ID.HOME_CONTAINER}></div>),
+  };
+});
+
+// mock the info component
+jest.mock("src/info/Info", () => {
+  const originalModule = jest.requireActual("src/info/Info");
+  return {
+    __esModule: true,
+    ...originalModule,
+    default: jest.fn(() => <div data-testid={originalModule.DATA_TEST_ID.INFO_ROOT}></div>),
+  };
+});
+
+// mock the register component
+jest.mock("src/auth/components/Register/Register", () => {
+  const originalModule = jest.requireActual("src/auth/components/Register/Register");
+  return {
+    __esModule: true,
+    ...originalModule,
+    default: jest.fn(() => <div data-testid={originalModule.DATA_TEST_ID.REGISTER_CONTAINER}></div>),
+  };
+});
+
+// mock the login component
+jest.mock("src/auth/components/Login/Login", () => {
+  const originalModule = jest.requireActual("src/auth/components/Login/Login");
+  return {
+    __esModule: true,
+    ...originalModule,
+    default: jest.fn(() => <div data-testid={originalModule.DATA_TEST_ID.LOGIN_CONTAINER}></div>),
+  };
+});
+
+// mock the verify email component
+jest.mock("src/auth/components/VerifyEmail/VerifyEmail", () => {
+  const originalModule = jest.requireActual("src/auth/components/VerifyEmail/VerifyEmail");
+  return {
+    __esModule: true,
+    ...originalModule,
+    default: jest.fn(() => <div data-testid={originalModule.DATA_TEST_ID.VERIFY_EMAIL_CONTAINER}></div>),
+  };
+});
+
+// mock the DPA component
+jest.mock("src/auth/components/PolicyNotice/DataProtectionPolicy", () => {
+  const originalModule = jest.requireActual("src/auth/components/PolicyNotice/DataProtectionPolicy");
+  return {
+    __esModule: true,
+    ...originalModule,
+    default: jest.fn(() => <div data-testid={originalModule.DATA_TEST_ID.DPA_CONTAINER}></div>),
+  };
+});
+
+// mock the error page component
+jest.mock("src/errorPage/NotFound", () => {
+  const originalModule = jest.requireActual("src/errorPage/NotFound");
+  return {
+    __esModule: true,
+    ...originalModule,
+    default: jest.fn(() => <div data-testid={originalModule.DATA_TEST_ID.NOT_FOUND_CONTAINER}></div>),
+  };
+});
 
 describe("Tests for router config", () => {
   beforeAll(() => mockLoggedInUser({}));

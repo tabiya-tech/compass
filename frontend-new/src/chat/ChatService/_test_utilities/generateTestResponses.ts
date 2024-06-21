@@ -1,4 +1,4 @@
-import { LastMessage, RootObject } from "src/chat/ChatService/Chat.types";
+import { LastMessage, RootObject } from "src/chat/ChatService/ChatService.types";
 
 export const generateRootObjectResponse = (): RootObject => ({
   last: {

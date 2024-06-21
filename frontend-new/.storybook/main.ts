@@ -7,7 +7,8 @@ const config: StorybookConfig = {
     <script>{
       window.tabiyaConfig = {
         "FIREBASE_API_KEY": btoa("some-key"),
-        "FIREBASE_AUTH_DOMAIN": btoa("some-domain")
+        "FIREBASE_AUTH_DOMAIN": btoa("some-domain"),
+        "BACKEND_URL": btoa("http://foo.bar.com/api")
       };
     }
     </script>

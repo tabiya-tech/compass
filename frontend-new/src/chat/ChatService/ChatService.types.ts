@@ -45,12 +45,3 @@ export interface RootObject {
   last: LastMessage;
   conversation_context: ConversationContext;
 }
-
-export type INewChatSpecification = {
-  user_id: string;
-};
-
-export type IMessageSpecification = {
-  user_id: string;
-  message: string;
-};

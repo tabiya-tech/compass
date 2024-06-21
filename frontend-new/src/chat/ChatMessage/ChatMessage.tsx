@@ -1,6 +1,5 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
-import { styled } from "@mui/system";
+import { Box, Typography, styled } from "@mui/material";
 import { ChatMessageOrigin, IChatMessage } from "src/chat/Chat.types";
 
 const uniqueId = "2fbaf2ef-9eab-485a-bd28-b4a164e18b06";
@@ -13,22 +12,24 @@ const MessageContainer = styled(Box)<{ origin: ChatMessageOrigin }>(({ theme, or
   display: "flex",
   flexDirection: "column",
   alignItems: origin === ChatMessageOrigin.ME ? "flex-end" : "flex-start",
-  margin: "10px 0",
+  marginBottom: theme.spacing(theme.tabiyaSpacing.sm),
+  width: "100%",
 }));
 
 const MessageBubble = styled(Box)<{ origin: ChatMessageOrigin }>(({ theme, origin }) => ({
   maxWidth: "70%",
-  padding: "10px",
-  borderRadius: "10px",
+  padding: theme.spacing(theme.tabiyaSpacing.sm),
+  borderRadius: theme.spacing(theme.tabiyaSpacing.sm),
   backgroundColor: origin === ChatMessageOrigin.ME ? theme.palette.primary.light : theme.palette.grey[300],
   color: origin === ChatMessageOrigin.ME ? theme.palette.primary.contrastText : theme.palette.text.primary,
   position: "relative",
+  alignSelf: origin === ChatMessageOrigin.ME ? "flex-end" : "flex-start",
 }));
 
 const TimeStamp = styled(Typography)(({ theme }) => ({
-  fontSize: "0.75rem",
+  fontSize: theme.typography.body2.fontSize,
   color: theme.palette.text.secondary,
-  marginTop: "5px",
+  marginTop: theme.spacing(theme.tabiyaSpacing.xs),
 }));
 
 type ChatMessageProps = {

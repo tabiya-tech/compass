@@ -3,17 +3,12 @@ import { StatusCodes } from "http-status-codes";
 import { fetchWithAuth } from "src/apiService/APIService";
 import ErrorConstants from "src/error/error.constants";
 import { getBackendUrl } from "src/envService";
-import { RootObject, LastMessage } from "./Chat.types";
-
-export type IMessageSpecification = {
-  user_id: string;
-  message: string;
-};
+import { RootObject, LastMessage } from "./ChatService.types";
 
 export default class ChatService {
   readonly chatEndpointUrl: string;
   readonly apiServerUrl: string;
-  private sessionId: string;
+  private sessionId: number;
 
   constructor() {
     this.apiServerUrl = getBackendUrl();
@@ -21,40 +16,36 @@ export default class ChatService {
     this.sessionId = this.generateSessionId();
   }
 
-  private generateSessionId(): string {
-    return Math.random().toString(36).substring(2);
+  private generateSessionId(): number {
+    return Math.floor(Math.random() * 1000000);
   }
 
-  public getSessionId(): string {
+  public getSessionId(): number {
     return this.sessionId;
   }
 
-  public async sendMessage(messageSpec: IMessageSpecification): Promise<LastMessage> {
+  public async sendMessage(message: string): Promise<LastMessage> {
     const serviceName = "ChatService";
     const serviceFunction = "sendMessage";
-    const method = "POST";
-    const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, this.chatEndpointUrl);
-    const requestBody = JSON.stringify({
-      ...messageSpec,
-      session_id: this.sessionId,
-    });
+    const method = "GET";
+    const qualifiedURL = `${this.chatEndpointUrl}?user_input=${message}&session_id=${this.getSessionId()}`;
+    const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, qualifiedURL);
 
-    const response = await fetchWithAuth(this.chatEndpointUrl, {
+    const response = await fetchWithAuth(qualifiedURL, {
       method: method,
       headers: {
         "Content-Type": "application/json",
       },
-      body: requestBody,
       expectedStatusCode: StatusCodes.OK,
       serviceName,
       serviceFunction,
-      failureMessage: `Failed to send message for user with id ${messageSpec.user_id}`,
+      failureMessage: `Failed to send message with session id ${this.getSessionId()}`,
       expectedContentType: "application/json",
     });
 
     const responseBody = await response.text();
 
-    let messageResponse: LastMessage;
+    let messageResponse: RootObject;
     try {
       messageResponse = JSON.parse(responseBody);
     } catch (e: any) {
@@ -69,10 +60,10 @@ export default class ChatService {
       );
     }
 
-    return messageResponse;
+    return messageResponse.last;
   }
 
-  public async clearChat(userId: string): Promise<RootObject> {
+  public async clearChat(): Promise<RootObject> {
     const serviceName = "ChatService";
     const serviceFunction = "clearChat";
     const method = "GET";
@@ -86,7 +77,7 @@ export default class ChatService {
         expectedStatusCode: StatusCodes.OK,
         serviceName,
         serviceFunction,
-        failureMessage: `Failed to clear chat for user with id ${userId}`,
+        failureMessage: `Failed to clear chat for session id ${this.getSessionId()}`,
         expectedContentType: "application/json",
       }
     );
