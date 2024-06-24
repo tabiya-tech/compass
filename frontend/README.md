@@ -26,13 +26,13 @@ To do this, ensure your backend is running and the desired path agent is availab
 For the development environment, you can simply set the `NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT` environment variable to the desired path in the `.env.development` file:
 
 ```
-NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT=/conversation
+NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT=conversation
 ```
 
-On the deployed version you can acheive the same by adding the `?compass_endpoint` query parameter to the URL:
+On the deployed version you can achieve the same by adding the `?compass_endpoint` query parameter to the URL:
 
 ```
-http://dev.compass.tabiya.tech?compass_endpoint=/conversation_sandbox
+https://dev.compass.tabiya.tech?compass_endpoint=conversation_sandbox
 ```
 
 > The `?compass_endpoint` query parameter should be one of the paths defined in the separate `NEXT_PUBLIC_COMPASS_AVAILABLE_ENDPOINTS` environment variable, or the `NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT` environment variable  will be used instead.
