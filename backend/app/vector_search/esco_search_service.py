@@ -9,7 +9,7 @@ from app.vector_search.embeddings_model import EmbeddingService
 from app.vector_search.esco_entities import OccupationEntity, OccupationSkillEntity
 from app.vector_search.esco_entities import SkillEntity
 from app.vector_search.similarity_search_service import SimilaritySearchService
-from constants.database import EmbeddingConfig
+from common_libs.environment_settings.constants import EmbeddingConfig
 
 
 class VectorSearchConfig(BaseModel):
