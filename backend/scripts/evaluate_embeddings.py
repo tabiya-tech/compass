@@ -11,6 +11,7 @@ from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
 from app.vector_search.esco_search_service import VectorSearchConfig, OccupationSearchService, SkillSearchService
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
+from constants.database import EmbeddingConfig
 from scripts.base_data_settings import ScriptSettings, Type
 
 OCCUPATION_REPO_ID = "tabiya/hahu_test"
@@ -21,6 +22,7 @@ SKILL_FILENAME = "data/processed_skill_test_set_with_id.parquet"
 load_dotenv()
 MONGO_SETTINGS = MongoDbSettings()
 SCRIPT_SETTINGS = ScriptSettings()
+EMBEDDING_SETTINGS = EmbeddingConfig()
 
 
 def _precision_at_k(prediction: List[List[str]], true: List[List[str]], k: Optional[int] = None):
@@ -100,15 +102,15 @@ async def get_metrics(search_service: SimilaritySearchService, ground_truth: Lis
 
 def _get_vector_search_config(evaluated_type: Type) -> VectorSearchConfig:
     if evaluated_type == Type.OCCUPATION:
-        collection_name = MONGO_SETTINGS.embedding_settings.occupation_collection_name
+        collection_name = EMBEDDING_SETTINGS.occupation_collection_name
     elif evaluated_type == Type.SKILL:
-        collection_name = MONGO_SETTINGS.embedding_settings.skill_collection_name
+        collection_name = EMBEDDING_SETTINGS.skill_collection_name
     else:
         raise ValueError(f"Invalid entity type: {evaluated_type}")
     return VectorSearchConfig(
         collection_name=collection_name,
-        index_name=MONGO_SETTINGS.embedding_settings.embedding_index,
-        embedding_key=MONGO_SETTINGS.embedding_settings.embedding_key,
+        index_name=EMBEDDING_SETTINGS.embedding_index,
+        embedding_key=EMBEDDING_SETTINGS.embedding_key,
     )
 
 
@@ -118,6 +120,7 @@ if __name__ == "__main__":
     gecko_embedding_service = GoogleGeckoEmbeddingService()
     _occupation_search_service = OccupationSearchService(compass_db, gecko_embedding_service,
                                                          _get_vector_search_config(Type.OCCUPATION))
+    # TODO: Also evaluate the OccupationSkillSearchService.
     _skill_search_service = SkillSearchService(compass_db, gecko_embedding_service,
                                                _get_vector_search_config(Type.SKILL))
     occupation_dataset = load_dataset(OCCUPATION_REPO_ID, data_files=[OCCUPATION_FILENAME],

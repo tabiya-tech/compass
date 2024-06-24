@@ -4,7 +4,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 from app.tool.extract_experience_tool import ExtractExperienceTool
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
-from app.vector_search.esco_search_service import VectorSearchConfig, OccupationSearchService
+from app.vector_search.esco_search_service import OccupationSkillSearchService
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig
@@ -21,15 +21,9 @@ async def _evaluate_with_llm(prompt: str) -> str:
 @pytest.fixture()
 def extract_experience_tool():
     # TODO: Consider mocking some of those dependencies.
-    config = VectorSearchConfig(
-        collection_name=MONGO_SETTINGS.embedding_settings.occupation_collection_name,
-        index_name=MONGO_SETTINGS.embedding_settings.embedding_index,
-        embedding_key=MONGO_SETTINGS.embedding_settings.embedding_key,
-    )
     compass_db = AsyncIOMotorClient(MONGO_SETTINGS.mongodb_uri).get_database(MONGO_SETTINGS.database_name)
     gecko_embedding_service = GoogleGeckoEmbeddingService()
-    _occupation_search_service = OccupationSearchService(compass_db, gecko_embedding_service,
-                                                         config)
+    _occupation_search_service = OccupationSkillSearchService(compass_db, gecko_embedding_service, )
     return ExtractExperienceTool(occupation_search_service=_occupation_search_service)
 
 
@@ -41,7 +35,9 @@ async def test_extract_one_simple_experience_simple_reply(extract_experience_too
         "I have been working as a baker for 5 years.")
     assert len(output) == 1
     assert output[0].job_title == "Baker"
-    assert "baker" in [o.preferredLabel.lower() for o in output[0].esco_occupations]
+    assert "baker" in [o.occupation.preferredLabel.lower() for o in output[0].esco_occupations]
+    assert "bakery production methods" in [skill.preferredLabel for skill_occupations in output[0].esco_occupations for
+                                           skill in skill_occupations.skills]
 
 
 @pytest.mark.asyncio
@@ -53,8 +49,8 @@ async def test_extract_multiple_experience_simple_reply(extract_experience_tool:
     assert len(output) == 2
     assert output[0].job_title.lower() == "baker"
     assert output[1].job_title.lower() == "ski instructor"
-    assert "baker" in [o.preferredLabel.lower() for o in output[0].esco_occupations]
-    assert "ski instructor" in [o.preferredLabel.lower() for o in output[1].esco_occupations]
+    assert "baker" in [o.occupation.preferredLabel.lower() for o in output[0].esco_occupations]
+    assert "ski instructor" in [o.occupation.preferredLabel.lower() for o in output[1].esco_occupations]
 
 
 @pytest.mark.asyncio
@@ -90,6 +86,6 @@ async def test_extract_multiple_experiences_conversation(extract_experience_tool
     assert output[0].job_title.lower() == "baker"
     assert output[1].job_title.lower() == "ski instructor"
     assert output[2].job_title.lower() == "caregiver"
-    assert "baker" in [o.preferredLabel.lower() for o in output[0].esco_occupations]
-    assert "ski instructor" in [o.preferredLabel.lower() for o in output[1].esco_occupations]
-    assert "care at home worker" in [o.preferredLabel.lower() for o in output[2].esco_occupations]
+    assert "baker" in [o.occupation.preferredLabel.lower() for o in output[0].esco_occupations]
+    assert "ski instructor" in [o.occupation.preferredLabel.lower() for o in output[1].esco_occupations]
+    assert "care at home worker" in [o.occupation.preferredLabel.lower() for o in output[2].esco_occupations]
