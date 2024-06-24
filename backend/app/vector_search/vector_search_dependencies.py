@@ -12,7 +12,7 @@ from app.vector_search.esco_search_service import VectorSearchConfig, Occupation
     OccupationSkillSearchService, SkillSearchService
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
-from constants.database import EmbeddingConfig
+from common_libs.environment_settings.constants import EmbeddingConfig
 
 logger = logging.getLogger(__name__)
 
