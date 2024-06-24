@@ -18,7 +18,7 @@ from tqdm import tqdm
 
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
-from constants.database import EmbeddingConfig
+from common_libs.environment_settings.constants import EmbeddingConfig
 from scripts.base_data_settings import ScriptSettings, Type, TabiyaDatabaseConfig
 
 load_dotenv()

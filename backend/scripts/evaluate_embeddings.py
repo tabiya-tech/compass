@@ -11,7 +11,7 @@ from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
 from app.vector_search.esco_search_service import VectorSearchConfig, OccupationSearchService, SkillSearchService
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
-from constants.database import EmbeddingConfig
+from common_libs.environment_settings.constants import EmbeddingConfig
 from scripts.base_data_settings import ScriptSettings, Type
 
 OCCUPATION_REPO_ID = "tabiya/hahu_test"
