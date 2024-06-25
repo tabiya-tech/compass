@@ -1,14 +1,10 @@
 import { getServiceErrorFactory } from "src/error/error";
-import { Language, UserPreference, UserPreferenceResponse } from "./userPreferences.types";
+import { UserPreference, UserPreferenceResponse, UserPreferenceSpecs } from "./userPreferences.types";
 import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/error.constants";
 import { getBackendUrl } from "src/envService";
+import { PersistentStorageService } from "src/persistentStorageService/PersistentStorageService";
 
-export type INewUserPreferenceSpecification = {
-  user_id: string;
-  language: Language;
-  accepted_tc: Date;
-};
 export default class UserPreferencesService {
   readonly userPreferencesEndpointUrl: string;
   readonly apiServerUrl: string;
@@ -22,9 +18,7 @@ export default class UserPreferencesService {
    * Creates an entry for the user preferences of a user with an ID
    *
    */
-  public async createUserPreferences(
-    newUserPreferencesSpec: INewUserPreferenceSpecification
-  ): Promise<UserPreferenceResponse> {
+  public async createUserPreferences(newUserPreferencesSpec: UserPreferenceSpecs): Promise<UserPreferenceResponse> {
     const serviceName = "UserPreferencesService";
     const serviceFunction = "createUserPreferences";
     const method = "POST";
@@ -79,6 +73,8 @@ export default class UserPreferencesService {
         }
       );
     }
+
+    PersistentStorageService.setChatSessionID(userPreferencesResponse.user_preferences.sessions[0].toString());
 
     return {
       ...userPreferencesResponse,
@@ -154,6 +150,10 @@ export default class UserPreferencesService {
         }
       );
     }
+
+    // set the first session id to session storage for now
+    // when the user gets to have access to multiple sessions, we can pick the appropriate session from the list
+    PersistentStorageService.setChatSessionID(userPreferencesResponse.sessions[0].toString());
 
     return {
       ...userPreferencesResponse,

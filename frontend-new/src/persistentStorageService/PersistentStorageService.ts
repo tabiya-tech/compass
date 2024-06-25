@@ -1,10 +1,11 @@
 export const ID_TOKEN_KEY = "IDToken";
+export const CHAT_SESSION_ID_KEY = "ChatSessionID";
 
 /**
  * This class is used to store the tokens in the session storage.
  *   eg: refresh token
  */
-export class AuthPersistentStorage {
+export class PersistentStorageService {
   static readonly storage = sessionStorage;
 
   /**
@@ -28,6 +29,29 @@ export class AuthPersistentStorage {
    */
   static setIDToken(IDToken: string): void {
     this.storage.setItem(ID_TOKEN_KEY, IDToken);
+  }
+
+  /**
+   *  Returns the chat session id from the storage
+   * @returns string | null - The session id
+   */
+  static getChatSessionID(): string | null {
+    return this.storage.getItem(CHAT_SESSION_ID_KEY);
+  }
+
+  /**
+   * Sets the chat session id in the storage
+   * @param sessionID
+   */
+  static setChatSessionID(sessionID: string): void {
+    this.storage.setItem(CHAT_SESSION_ID_KEY, sessionID);
+  }
+
+  /**
+   * Clears the chat session id from the storage
+   */
+  static clearChatSessionID(): void {
+    this.storage.removeItem(CHAT_SESSION_ID_KEY);
   }
 
   /**

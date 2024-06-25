@@ -14,11 +14,13 @@ from app.users.repositories import UserPreferenceRepository
 given_user_id = "foo"
 given_language = "bar"
 given_accepted_tc = datetime
+given_sessions = [1234, 5678]
 
 given_user_preference = {
     "inserted_id": "foo-object-id",
     "user_id": given_user_id,
     "language": given_language,
+    "sessions":  given_sessions,
     "accepted_tc": given_accepted_tc
 }
 
@@ -62,6 +64,26 @@ class TestGetUserPreferences:
         # THEN: The response should contain the correct user preferences
         assert response.get("accepted_tc") == given_accepted_tc
         assert response.get("language") == given_language
+    @pytest.mark.asyncio
+    @patch('app.users.repositories.UserPreferenceRepository.get_user_preference_by_user_id', new_callable=AsyncMock)
+    async def test_get_user_preferences_empty_sessions(self, mocker):
+        # GIVEN: A mocked return value for `get_user_preference_by_user_id` with an empty sessions array
+        mocker.return_value = {
+            "user_id": given_user_id,
+            "language": given_language,
+            "sessions": [],
+            "accepted_tc": given_accepted_tc
+        }
+        # WHEN: The `get_sessions` function is called with `given_user_id`
+        response = await get_user_preferences(mocked_repository, given_user_id)
+        # THEN: The response should contain an array with a newly created session
+        assert response.get("sessions") is not None
+        # AND the session id is an int
+        assert isinstance(response.get("sessions")[0], int)
+        # AND the rest of the user preferences are correct
+        assert response.get("accepted_tc") == given_accepted_tc
+        assert response.get("language") == given_language
+        assert response.get("user_id") == given_user_id
 
 
 class TestCreateUserPreferences:
@@ -75,7 +97,7 @@ class TestCreateUserPreferences:
         # WHEN: The `create_user_preferences` function is called with user preferences data
         _response = await create_user_preferences(
             mocked_repository,
-            UserPreferences(user_id="foo", language="bar", accepted_tc=datetime.now()))
+            UserPreferences(user_id="foo", language="bar", accepted_tc=datetime.now(), sessions=[]))
 
         # THEN: The response should contain the correct `user_preference_id`
         assert _response.get("user_preference_id") == given_inserted_id
@@ -90,7 +112,7 @@ class TestCreateUserPreferences:
         with pytest.raises(HTTPException) as exec_info:
             _response = await create_user_preferences(
                 mocked_repository,
-                UserPreferences(user_id="foo", language="bar", accepted_tc=datetime.now()))
+                UserPreferences(user_id="foo", language="bar", accepted_tc=datetime.now(), sessions=[]))
 
         # THEN: An `HTTPException` is raised with a message indicating the user already exists
         assert "user already exists" in str(exec_info.value)
@@ -133,3 +155,4 @@ class TestUpdateLanguage:
         # THEN: The response should contain the correct `user_id`
         assert _response.language == "bar"
         assert _response.user_id == "foo"
+

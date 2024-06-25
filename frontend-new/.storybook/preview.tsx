@@ -9,7 +9,7 @@ import { applicationTheme, ThemeMode } from "../src/theme/applicationTheme/appli
 import "../src/index.css";
 // Load the application theme css file here
 import "../src/theme/applicationTheme/application-theme.css";
-//If the application fonts are loaded from the index.tsx file via an import, then the fonts can be loaded here as well
+// If the application fonts are loaded from the index.tsx file via an import, then the fonts can be loaded here as well
 /*
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
@@ -49,18 +49,26 @@ const preview: Preview = {
 
 export default preview;
 
+// Define the sessionStorage decorator
+const withSessionStorage = (Story) => {
+  // Set the sessionStorage before rendering the stories (used for chat components)
+  sessionStorage.setItem('ChatSessionID', '1234');
+  return <Story />;
+};
+
 export const decorators = [
+  withSessionStorage,
   (Story) => (
     <Router>
       <AuthProvider>
         <CssBaseline />
-          <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
-            <SnackbarProvider>
+        <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
+          <SnackbarProvider>
             <div style={{ height: "100vh" }}>
               <Story />
             </div>
-            </SnackbarProvider>
-          </ThemeProvider>
+          </SnackbarProvider>
+        </ThemeProvider>
       </AuthProvider>
     </Router>
   ),

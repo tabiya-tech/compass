@@ -1,13 +1,173 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
 
-import ChatMessageField, { DATA_TEST_ID } from "./ChatMessageField";
-import { render, screen } from "src/_test_utilities/test-utils";
+import ChatMessageField, { DATA_TEST_ID, CHAT_MESSAGE_MAX_LENGTH } from "./ChatMessageField";
+import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
 
-test("should render the Chat Header", () => {
-  // WHEN the chat header is rendered
-  render(<ChatMessageField />);
+describe("ChatMessageField", () => {
+  test("should render ChatMessageField correctly", () => {
+    // WHEN ChatMessageField is rendered
+    render(<ChatMessageField handleSend={jest.fn()} message="foo" notifyChange={jest.fn()} />);
 
-  // THEN expect the chat header to be visible
-  expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER)).toBeInTheDocument();
+    //THEN expect no errors or warnings has occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
+    // AND the ChatMessageField container to be in the document
+    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER)).toBeInTheDocument();
+    // AND the ChatMessageField input to be in the document
+    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD)).toBeInTheDocument();
+    // AND the ChatMessageField button to be in the document
+    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON)).toBeInTheDocument();
+    // AND the ChatMessageField icon to be in the document
+    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_ICON)).toBeInTheDocument();
+    // AND to match the snapshot
+    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER)).toMatchSnapshot();
+  });
+
+  test("should render ChatMessageField correctly with error message when message is too long", () => {
+    // GIVEN a long message
+    const message = "a".repeat(CHAT_MESSAGE_MAX_LENGTH + 2);
+    // AND handleChange function
+    const handleChange = jest.fn();
+
+    // WHEN ChatMessageField is rendered
+    render(<ChatMessageField handleSend={jest.fn()} message="" notifyChange={handleChange} />);
+    // AND the input is changed
+    const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
+    fireEvent.change(ChatMessageFieldInput, { target: { value: message } });
+
+    // THEN expect notifyChange to be called
+    expect(handleChange).toHaveBeenCalled();
+    // AND the error message to be in the document
+    expect(screen.getByText("Message limit is 1000 characters.")).toBeInTheDocument();
+    // AND the icon button to be disabled
+    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON)).toBeDisabled();
+  });
+
+  test("should render ChatMessageField correctly with error message when message contains invalid characters", () => {
+    // WHEN a message that contains invalid characters
+    const invalidMessage = "foo$%bar";
+    // AND handleChange function
+    const handleChange = jest.fn();
+
+    // WHEN ChatMessageField is rendered
+    render(<ChatMessageField handleSend={jest.fn()} message="" notifyChange={handleChange} />);
+    // AND the input is changed
+    const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
+    fireEvent.change(ChatMessageFieldInput, { target: { value: invalidMessage } });
+
+    // THEN expect notifyChange to be called
+    expect(handleChange).toHaveBeenCalled();
+    // AND the error message to be in the document
+    expect(screen.getByText("Invalid special characters.")).toBeInTheDocument();
+    // AND the icon button to be disabled
+    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON)).toBeDisabled();
+  });
+
+  test("should render ChatMessageField correctly with no error message when message is valid", () => {
+    // GIVEN a valid message
+    const validMessage = "foo bar";
+    // AND handleChange function
+    const handleChange = jest.fn();
+
+    // WHEN ChatMessageField is rendered
+    render(<ChatMessageField handleSend={jest.fn()} message="" notifyChange={handleChange} />);
+    // AND the input is changed
+    const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
+    fireEvent.change(ChatMessageFieldInput, { target: { value: validMessage } });
+
+    // THEN expect notifyChange to be called
+    expect(handleChange).toHaveBeenCalled();
+    // AND no error message to be in the document
+    expect(screen.queryByText("Message limit is 1000 characters.")).toBeNull();
+    expect(screen.queryByText("Invalid special characters.")).toBeNull();
+  });
+
+  describe("character counter", () => {
+    test("should render Character counter when the message is longer than 75% of the max allowed length", () => {
+      // GIVEN a long message (76%)
+      const message = "a".repeat(CHAT_MESSAGE_MAX_LENGTH * 0.76);
+
+      // AND handleChange function
+      const handleChange = jest.fn();
+
+      // WHEN ChatMessageField is rendered
+      render(<ChatMessageField handleSend={jest.fn()} message="" notifyChange={handleChange} />);
+
+      // AND the input is changed
+      const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
+
+      fireEvent.change(ChatMessageFieldInput, { target: { value: message } });
+
+      // THEN expect the character counter to be in the document
+      expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_CHAR_COUNTER)).toBeInTheDocument();
+      // AND the character counter to be correct
+      expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_CHAR_COUNTER)).toHaveTextContent(
+        `${message.length}/${CHAT_MESSAGE_MAX_LENGTH}`
+      );
+    });
+
+    test("should not render the character counter when the message is shorter than or equal to 75% of the max allowed length", () => {
+      // GIVEN a short message (75%)
+      const message = "a".repeat(CHAT_MESSAGE_MAX_LENGTH * 0.75);
+
+      // AND handleChange function
+      const handleChange = jest.fn();
+
+      // WHEN ChatMessageField is rendered
+      render(<ChatMessageField handleSend={jest.fn()} message="" notifyChange={handleChange} />);
+
+      // AND the input is changed
+      const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
+
+      fireEvent.change(ChatMessageFieldInput, { target: { value: message } });
+
+      // THEN expect the character counter not to be in the document
+      expect(screen.queryByTestId(DATA_TEST_ID.CHAT_MESSAGE_CHAR_COUNTER)).not.toBeInTheDocument();
+    });
+  });
+
+  describe("ChatMessageField action tests", () => {
+    test("should call handleSend when button is clicked", () => {
+      // GIVEN handleSend function
+      const handleSend = jest.fn();
+
+      // WHEN ChatMessageField is rendered
+      render(<ChatMessageField handleSend={handleSend} message="foo" notifyChange={jest.fn()} />);
+      // AND the button is clicked
+      const ChatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
+      fireEvent.click(ChatMessageFieldButton);
+
+      // THEN expect handleSend to be called
+      expect(handleSend).toHaveBeenCalled();
+    });
+
+    test("should call handleSend when enter key is pressed", () => {
+      // GIVEN handleSend function
+      const handleSend = jest.fn();
+
+      // WHEN ChatMessageField is rendered
+      render(<ChatMessageField handleSend={handleSend} message="foo" notifyChange={jest.fn()} />);
+      // AND the enter key is pressed
+      const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
+      fireEvent.keyDown(ChatMessageFieldInput, { key: "Enter", code: "Enter" });
+
+      // THEN expect handleSend to be called
+      expect(handleSend).toHaveBeenCalled();
+    });
+
+    test("should call notifyChange when input is changed", () => {
+      // GIVEN notifyChange function
+      const notifyChange = jest.fn();
+
+      // WHEN ChatMessageField is rendered
+      render(<ChatMessageField handleSend={jest.fn()} message="foo" notifyChange={notifyChange} />);
+      // AND the input is changed
+      const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
+      fireEvent.change(ChatMessageFieldInput, { target: { value: "bar" } });
+
+      // THEN expect notifyChange to be called
+      expect(notifyChange).toHaveBeenCalled();
+    });
+  });
 });
