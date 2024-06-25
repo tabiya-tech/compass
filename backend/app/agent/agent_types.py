@@ -9,7 +9,10 @@ class AgentType(Enum):
     An enumeration for agent types
     """
     WELCOME_AGENT = "WelcomeAgent"
-    EXPERIENCES_EXPLORER_AGENT = "ExperiencesExplorerAgent"
+    EXPLORE_EXPERIENCES_AGENT = "ExploreExperiencesAgentDirector"
+    COLLECT_EXPERIENCES_AGENT = "CollectExperiencesAgent"
+    INFER_OCCUPATIONS_AGENT = "InferOccupationsAgent"
+    EXPLORE_SKILLS_AGENT = "ExploreSkillsAgent"
     FAREWELL_AGENT = "FarewellAgent"
     QNA_AGENT = "QnaAgent"
 

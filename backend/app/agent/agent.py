@@ -30,6 +30,10 @@ class Agent(ABC):
         """
         return self._is_responsible_for_conversation_history
 
+    @property
+    def agent_type(self) -> AgentType:
+        return self._agent_type
+
     @abstractmethod
     async def execute(self, user_input: AgentInput, context: ConversationContext) -> AgentOutput:
         """

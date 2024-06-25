@@ -25,12 +25,15 @@ class AgentState(BaseModel):
 P = TypeVar('P')
 
 
-class StatefulAgent(ABC, Agent, Generic[S, P]):
+class StatefulAgent(Agent, ABC, Generic[S, P]):
     """
     An abstract class for a stateful agent.
     """
 
-    def __init__(self, *, agent_type: AgentType, config: LLMConfig = LLMConfig()):
+    def __init__(self, *, agent_type: AgentType, is_responsible_for_conversation_history,
+                 config: LLMConfig = LLMConfig()):
+        super().__init__(agent_type=agent_type,
+                         is_responsible_for_conversation_history=is_responsible_for_conversation_history)
         self._agent_type = agent_type
         self._state: S | None = None
         self._logger = logging.getLogger(self.__class__.__name__)

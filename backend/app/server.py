@@ -11,7 +11,6 @@ from fastapi.security import HTTPBearer
 from pydantic import BaseModel
 
 from app.agent.agent_types import AgentInput, AgentOutput
-from app.agent.experiences_explorer_agent import ExperiencesExplorerAgent  # for sandbox testing
 from app.agent.llm_agent_director import LLMAgentDirector
 from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
 from app.conversation_memory.conversation_memory_manager import ConversationContext, ConversationMemoryManager
@@ -151,7 +150,8 @@ class ConversationResponse(BaseModel):
             _new_output.agent_response_time_in_sec += turn.output.agent_response_time_in_sec
 
         _new_output.message_for_user = _new_output.message_for_user.strip()
-        return ConversationResponse(last=_new_output, messages_for_user=_messages_for_user, conversation_context=context)
+        return ConversationResponse(last=_new_output, messages_for_user=_messages_for_user,
+                                    conversation_context=context)
 
 
 @app.get(path="/conversation",
@@ -181,7 +181,7 @@ async def conversation(request: Request, user_input: str, clear_memory: bool = F
         state = await application_state_manager.get_state(session_id)
 
         agent_director.set_state(state.agent_director_state)
-        agent_director.get_experiences_explorer_agent().set_state(state.experiences_explorer_state)
+        agent_director.get_explore_experiences_agent().set_state(state.explore_experiences_director_state)
         conversation_memory_manager.set_state(state.conversation_memory_manager_state)
 
         # Handle the user input
@@ -211,7 +211,7 @@ async def conversation(request: Request, user_input: str, clear_memory: bool = F
          description="""Temporary route used to interact with the conversation agent.""", )
 async def _test_conversation(request: Request, user_input: str, clear_memory: bool = False, filter_pii: bool = False,
                              session_id: int = 1, only_reply: bool = False,
-                             similarity_search: SimilaritySearchService = Depends(get_occupation_search_service),
+                             similarity_search: SimilaritySearchService = Depends(get_occupation_skill_search_service),
                              conversation_memory_manager: ConversationMemoryManager = Depends(
                                  get_conversation_memory_manager),
                              authorization=Depends(http_bearer)):
@@ -242,10 +242,10 @@ async def _test_conversation(request: Request, user_input: str, clear_memory: bo
 
         # ##################### ADD YOUR AGENT HERE ######################
         # Initialize the agent you want to use for the evaluation
-        agent = ExperiencesExplorerAgent(similarity_search=similarity_search,
-                                         conversation_manager=conversation_memory_manager)
-        logger.debug("ExperinecesExplorerAgent initialized for sandbox testing")
-        agent.set_state(state.experiences_explorer_state)
+        from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirector
+        agent = ExploreExperiencesAgentDirector(conversation_manager=conversation_memory_manager)
+        logger.debug("ExploreExperiencesAgentDirector initialized for sandbox testing")
+        agent.set_state(state.explore_experiences_director_state)
         # ################################################################
 
         agent_output = await agent.execute(user_input=AgentInput(message=user_input), context=context)
