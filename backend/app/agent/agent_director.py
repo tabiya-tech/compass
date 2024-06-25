@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from app.agent.agent import Agent
 from app.agent.agent_types import AgentInput, AgentOutput
-from app.agent.experiences_explorer_agent import ExperiencesExplorerAgent
+from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirector
 from app.agent.farewell_agent import FarewellAgent
 from app.agent.welcome_agent import WelcomeAgent
 from app.conversation_memory.conversation_memory_manager import \
@@ -83,11 +83,11 @@ class AgentDirector(AbstractAgentDirector):
         # initialize the agents
         self._agents: dict[ConversationPhase, Agent] = {
             ConversationPhase.INTRO: WelcomeAgent(),
-            ConversationPhase.COUNSELING: ExperiencesExplorerAgent(similarity_search_service),
+            ConversationPhase.COUNSELING: ExploreExperiencesAgentDirector(conversation_manager=conversation_manager),
             ConversationPhase.CHECKOUT: FarewellAgent()
         }
 
-    def get_experiences_explorer_agent(self):
+    def get_explore_experiences_agent(self):
         return self._agents[ConversationPhase.COUNSELING]
 
     def _get_current_agent(self) -> Agent | None:

@@ -10,7 +10,7 @@ from _pytest.logging import LogCaptureFixture
 
 from app.agent.agent_director import AgentDirectorState
 from app.agent.agent_types import AgentType
-from app.agent.experiences_explorer_agent import ExperiencesAgentState
+from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState
 from app.agent.llm_agent_director import LLMAgentDirector
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager, \
     ConversationMemoryManagerState
@@ -52,7 +52,7 @@ def setup_agent_director() -> tuple[
     conversation_manager.set_state(state=ConversationMemoryManagerState(session_id))
     agent_director = LLMAgentDirector(conversation_manager, FakeOccupationSimilaritySearchService())
     agent_director.set_state(AgentDirectorState(session_id))
-    agent_director.get_experiences_explorer_agent().set_state(ExperiencesAgentState(session_id))
+    agent_director.get_explore_experiences_agent().set_state(ExploreExperiencesAgentDirectorState(session_id))
 
     async def agent_director_exec(caplog, test_case):
         print(f"Running test case {test_case.name}")
@@ -170,12 +170,12 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture, setup_age
         AgentState(0, AgentType.WELCOME_AGENT, False),  # WelcomeAgent say hi
         AgentState(1, AgentType.WELCOME_AGENT, False),
         AgentState(2, AgentType.WELCOME_AGENT, True),  # WelcomeAgent completes task
-        AgentState(3, AgentType.EXPERIENCES_EXPLORER_AGENT, False),  # Start of Skill Explore
-        AgentState(4, AgentType.EXPERIENCES_EXPLORER_AGENT, False),  # Job 1
-        AgentState(5, AgentType.EXPERIENCES_EXPLORER_AGENT, False),  # skills
-        AgentState(6, AgentType.EXPERIENCES_EXPLORER_AGENT, False),  # No more to say
+        AgentState(3, AgentType.EXPLORE_EXPERIENCES_AGENT, False),  # Start of Skill Explore
+        AgentState(4, AgentType.EXPLORE_EXPERIENCES_AGENT, False),  # Job 1
+        AgentState(5, AgentType.EXPLORE_EXPERIENCES_AGENT, False),  # skills
+        AgentState(6, AgentType.EXPLORE_EXPERIENCES_AGENT, False),  # No more to say
         AgentState(7, AgentType.WELCOME_AGENT, False),  # WelcomeAgent explains
-        AgentState(8, AgentType.EXPERIENCES_EXPLORER_AGENT, True),  # SkillsAgent completes task
+        AgentState(8, AgentType.EXPLORE_EXPERIENCES_AGENT, True),  # SkillsAgent completes task
         AgentState(9, AgentType.FAREWELL_AGENT, True)  # FarewellAgent completes task
     ]
     for i, expected_state in enumerate(expected_agent_states):

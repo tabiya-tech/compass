@@ -4,7 +4,7 @@ import pytest
 from pydantic import TypeAdapter
 
 from app.agent.agent_types import AgentInput
-from app.agent.experience_state import ExperienceState
+from app.agent.experience.experience_entity import ExperienceEntity
 from app.agent.skill_explorer_agent import SkillExplorerAgent
 from app.vector_search.esco_entities import OccupationSkillEntity
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationRecord, Actor
@@ -20,10 +20,11 @@ def baker_occupation() -> OccupationSkillEntity:
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test
 async def test_skill_explorer_agent(fake_conversation_context: FakeConversationContext,
-                                    baker_occupation: OccupationSkillEntity):
+                                    baker_occupation_with_skills: OccupationSkillEntity):
     """ Tests the QnA agent with a simple question after a conversation. """
-    occupations = [baker_occupation]
-    state: ExperienceState = ExperienceState(job_title="Baker", esco_occupations=occupations, top_skills=[])
+    occupations_with_skills = [baker_occupation_with_skills]
+    state: ExperienceEntity = ExperienceEntity(experience_title="Baker")
+    state.esco_occupations = occupations_with_skills
     skill_explorer_agent = SkillExplorerAgent(state)
 
     fake_conversation_context.fill_conversation(conversation=[

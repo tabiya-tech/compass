@@ -6,7 +6,7 @@ from app.agent.agent import Agent
 from app.agent.agent_director import AbstractAgentDirector, ConversationPhase
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType
 from app.agent.farewell_agent import FarewellAgent
-from app.agent.experiences_explorer_agent import ExperiencesExplorerAgent
+from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirector
 from app.agent.llm_caller import LLMCaller
 from app.agent.welcome_agent import WelcomeAgent
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
@@ -65,7 +65,8 @@ class LLMAgentDirector(AbstractAgentDirector):
         # initialize the agents
         self._agents: dict[AgentType, Agent] = {
             AgentType.WELCOME_AGENT: WelcomeAgent(),
-            AgentType.EXPERIENCES_EXPLORER_AGENT: ExperiencesExplorerAgent(skill_search_service),
+            AgentType.EXPLORE_EXPERIENCES_AGENT: ExploreExperiencesAgentDirector(
+                conversation_manager=conversation_manager),
             AgentType.FAREWELL_AGENT: FarewellAgent()
         }
         # define the tasks that each agent is responsible for
@@ -76,7 +77,7 @@ class LLMAgentDirector(AbstractAgentDirector):
             examples=["How does the counseling process work?"]
         )
         experiences_explorer_agent_tasks = AgentTasking(
-            agent_type_name=AgentType.EXPERIENCES_EXPLORER_AGENT.value,
+            agent_type_name=AgentType.EXPLORE_EXPERIENCES_AGENT.value,
             tasks="Explore and verify the users skills and work experiences.",
             examples=["I worked as a software developer for 5 years.",
                       "I am ready to explore my skills."]
@@ -103,8 +104,8 @@ class LLMAgentDirector(AbstractAgentDirector):
         self._model = GeminiGenerativeLLM(config=LLMConfig())
         self._llm_caller: LLMCaller[RouterModelResponse] = LLMCaller[RouterModelResponse]()
 
-    def get_experiences_explorer_agent(self):
-        return self._agents[AgentType.EXPERIENCES_EXPLORER_AGENT]
+    def get_explore_experiences_agent(self):
+        return self._agents[AgentType.EXPLORE_EXPERIENCES_AGENT]
 
     def _get_system_instructions(self, user_input: str, conversation_history: str, phase: ConversationPhase) -> str:
         """
@@ -173,7 +174,7 @@ class LLMAgentDirector(AbstractAgentDirector):
         if phase == ConversationPhase.INTRO:
             return AgentType.WELCOME_AGENT
         if phase == ConversationPhase.COUNSELING:
-            return AgentType.EXPERIENCES_EXPLORER_AGENT
+            return AgentType.EXPLORE_EXPERIENCES_AGENT
         if phase == ConversationPhase.CHECKOUT:
             return AgentType.FAREWELL_AGENT
         if phase == ConversationPhase.ENDED:
@@ -253,9 +254,9 @@ class LLMAgentDirector(AbstractAgentDirector):
                 and agent_output.finished):
             return ConversationPhase.COUNSELING
 
-        # In the consulting phase, only the experiences explorer agent can end the phase
+        # In the consulting phase, only the explore experiences agent can end the phase
         if (current_phase == ConversationPhase.COUNSELING
-                and agent_output.agent_type == AgentType.EXPERIENCES_EXPLORER_AGENT
+                and agent_output.agent_type == AgentType.EXPLORE_EXPERIENCES_AGENT
                 and agent_output.finished):
             return ConversationPhase.CHECKOUT
 
@@ -281,14 +282,17 @@ class LLMAgentDirector(AbstractAgentDirector):
             agent_output: AgentOutput | None = None
             while first_call or transitioned_to_new_phase:
                 if self._state.current_phase == ConversationPhase.ENDED:
-                    return AgentOutput(
-                        message_for_user="Conversation finished, nothing to do!",
+                    agent_output = AgentOutput(
+                        message_for_user="The conversation has finished, there is nothing else to say!",
                         finished=True,
                         agent_type=None,
                         reasoning="Conversation has ended",
                         agent_response_time_in_sec=0,  # artificial value as there is no LLM call
                         llm_stats=[]  # artificial value as there is no LLM call
                     )
+                    await self._conversation_manager.update_history(user_input, agent_output)
+                    return agent_output
+
                 first_call = False
                 # Get the context
                 context = await self._conversation_manager.get_conversation_context()

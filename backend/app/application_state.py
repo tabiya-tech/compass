@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from pydantic import BaseModel
 
 from app.agent.agent_director import AgentDirectorState
-from app.agent.experiences_explorer_agent import ExperiencesAgentState
+from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
 
 
@@ -14,13 +14,13 @@ class ApplicationState(BaseModel):
     """
     session_id: int
     agent_director_state: AgentDirectorState
-    experiences_explorer_state: ExperiencesAgentState
+    explore_experiences_director_state: ExploreExperiencesAgentDirectorState
     conversation_memory_manager_state: ConversationMemoryManagerState
 
     def __init__(self, session_id):
         super().__init__(session_id=session_id,
                          agent_director_state=AgentDirectorState(session_id),
-                         experiences_explorer_state=ExperiencesAgentState(session_id),
+                         explore_experiences_director_state=ExploreExperiencesAgentDirectorState(session_id),
                          conversation_memory_manager_state=ConversationMemoryManagerState(session_id)
                          )
 
