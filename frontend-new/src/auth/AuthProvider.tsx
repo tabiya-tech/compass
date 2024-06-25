@@ -9,7 +9,7 @@ import {
   TabiyaUser,
   TFirebaseTokenResponse,
 } from "src/auth/auth.types";
-import { AuthPersistentStorage } from "src/auth/services/AuthPersistentStorage/AuthPersistentStorage";
+import { PersistentStorageService } from "src/persistentStorageService/PersistentStorageService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import { jwtDecode } from "jwt-decode";
 
@@ -37,7 +37,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const handlePageLoad = useCallback(
     (successCallback: (user: TabiyaUser) => void, errorCallback: (error: any) => void) => {
-      const accessToken = AuthPersistentStorage.getIDToken();
+      const accessToken = PersistentStorageService.getIDToken();
       if (accessToken) {
         updateUserByIDToken(accessToken);
         const decodedUser: FirebaseIDToken = jwtDecode(accessToken);
@@ -97,7 +97,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
    * @returns void
    */
   const logout = useCallback(() => {
-    AuthPersistentStorage.clear();
+    PersistentStorageService.clear();
     tokens.clearTokens();
     updateUser(null);
   }, [updateUser, tokens]);

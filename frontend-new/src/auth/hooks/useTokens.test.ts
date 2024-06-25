@@ -1,7 +1,7 @@
 import "src/_test_utilities/consoleMock";
 import { useTokens } from "src/auth/hooks/useTokens";
 import { renderHook, act, waitFor } from "@testing-library/react";
-import { AuthPersistentStorage } from "src/auth/services/AuthPersistentStorage/AuthPersistentStorage";
+import { PersistentStorageService } from "src/persistentStorageService/PersistentStorageService";
 import firebase from "firebase/compat/app";
 
 import "src/_test_utilities/firebaseMock";
@@ -11,10 +11,10 @@ const TOKEN_VALUE = "foo";
 const updateUserByIDToken = jest.fn();
 const params = { updateUserByIDToken };
 
-jest.mock("src/auth/services/AuthPersistentStorage/AuthPersistentStorage", () => {
+jest.mock("src/persistentStorageService/PersistentStorageService", () => {
   return {
     __esModule: true,
-    AuthPersistentStorage: {
+    PersistentStorageService: {
       getIDToken: jest.fn(),
       clearIDToken: jest.fn(),
       setIDToken: jest.fn(),
@@ -51,12 +51,12 @@ describe("useTokens hook tests", () => {
     });
 
     // THEN the storage should be cleared
-    expect(AuthPersistentStorage.clear).toHaveBeenCalled();
+    expect(PersistentStorageService.clear).toHaveBeenCalled();
   });
 
   describe("Refreshing of tokens", () => {
     beforeEach(() => {
-      AuthPersistentStorage.clear();
+      PersistentStorageService.clear();
       jest.clearAllMocks();
     });
 
@@ -156,7 +156,7 @@ describe("useTokens hook tests", () => {
     });
 
     // THEN the storage should be cleared
-    expect(AuthPersistentStorage.clear).toHaveBeenCalled();
+    expect(PersistentStorageService.clear).toHaveBeenCalled();
     // AND the user should not be authenticated
     expect(result.current.isAuthenticated).toBe(false);
   });
