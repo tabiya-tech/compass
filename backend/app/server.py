@@ -161,7 +161,7 @@ async def conversation(user_input: str, clear_memory: bool = False, filter_pii: 
          description="""Temporary route used to interact with the conversation agent.""", )
 async def _test_conversation(user_input: str, clear_memory: bool = False, filter_pii: bool = False,
                              session_id: int = 1, only_reply: bool = False,
-                             similarity_search: SimilaritySearchService = Depends(get_occupation_search_service),
+                             similarity_search: SimilaritySearchService = Depends(get_occupation_skill_search_service),
                              conversation_memory_manager: ConversationMemoryManager = Depends(
                                  get_conversation_memory_manager), 
                              authorization = Depends(http_bearer)):

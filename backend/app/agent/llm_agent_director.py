@@ -7,6 +7,7 @@ from app.agent.agent_director import AbstractAgentDirector, ConversationPhase
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType
 from app.agent.farewell_agent import FarewellAgent
 from app.agent.skill_explore_agent import SkillExplorerAgent
+from app.agent.collect_experiences_agent import CollectExperiencesAgent
 from app.agent.experiences_explorer_agent import ExperiencesExplorerAgent
 from app.agent.welcome_agent import WelcomeAgent
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
@@ -57,6 +58,7 @@ class LLMAgentDirector(AbstractAgentDirector):
             AgentType.WELCOME_AGENT: WelcomeAgent(),
             AgentType.SKILL_EXPLORER_AGENT: SkillExplorerAgent(),
             AgentType.EXPERIENCES_EXPLORER_AGENT: ExperiencesExplorerAgent(skill_search_service),
+            AgentType.COLLECT_EXPERIENCES_AGENT: CollectExperiencesAgent(),
             AgentType.FAREWELL_AGENT: FarewellAgent()
         }
         # define the tasks that each agent is responsible for
