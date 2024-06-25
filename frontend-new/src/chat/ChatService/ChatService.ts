@@ -4,6 +4,7 @@ import { fetchWithAuth } from "src/apiService/APIService";
 import ErrorConstants from "src/error/error.constants";
 import { getBackendUrl } from "src/envService";
 import { RootObject } from "./ChatService.types";
+import { PersistentStorageService } from "src/persistentStorageService/PersistentStorageService";
 
 export default class ChatService {
   readonly chatEndpointUrl: string;
@@ -17,7 +18,11 @@ export default class ChatService {
   }
 
   private generateSessionId(): number {
-    return Math.floor(Math.random() * 1000000);
+    const storedSessionId = PersistentStorageService.getChatSessionID();
+    if (!storedSessionId) throw new Error("No session id found");
+    const sessionId = Number(storedSessionId);
+    if (isNaN(sessionId)) throw new Error("Session id found is not a number");
+    return sessionId;
   }
 
   public getSessionId(): number {

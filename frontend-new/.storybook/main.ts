@@ -5,11 +5,14 @@ const config: StorybookConfig = {
   previewHead: (head) => `
     ${head}
     <script>{
+      // used for auth components  
       window.tabiyaConfig = {
         "FIREBASE_API_KEY": btoa("some-key"),
         "FIREBASE_AUTH_DOMAIN": btoa("some-domain"),
         "BACKEND_URL": btoa("http://foo.bar.com/api")
       };
+      //used for chat components
+      sessionStorage.setItem("ChatSessionID", "1234")
     }
     </script>
   `,

@@ -6,6 +6,6 @@ class UserLanguage(BaseModel):
     user_id: str
     language: str
 
-
 class UserPreferences(UserLanguage):
     accepted_tc: datetime
+    sessions: list[int]

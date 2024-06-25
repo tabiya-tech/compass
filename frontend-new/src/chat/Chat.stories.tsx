@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import Chat from "./Chat";
-import { getBackendUrl } from "../envService";
+import { getBackendUrl } from "src/envService";
 
 const meta: Meta<typeof Chat> = {
   title: "Chat/Chat-Component",
@@ -13,7 +13,7 @@ export default meta;
 
 type Story = StoryObj<typeof Chat>;
 
-const CONVERSATION_URL = getBackendUrl() + "/conversation";
+const CONVERSATION_URL = getBackendUrl() + "/conversation&";
 
 export const Shown: Story = {
   args: {},

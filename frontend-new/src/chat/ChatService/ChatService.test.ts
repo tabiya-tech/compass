@@ -5,6 +5,16 @@ import { ServiceError } from "src/error/error";
 import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 import ErrorConstants from "src/error/error.constants";
 import { generateRootObjectResponse } from "src/chat/ChatService/_test_utilities/generateTestResponses";
+import { PersistentStorageService } from "../../persistentStorageService/PersistentStorageService";
+
+jest.mock("src/persistentStorageService/PersistentStorageService", () => {
+  return {
+    __esModule: true,
+    PersistentStorageService: {
+      getChatSessionID: jest.fn().mockReturnValue("1234"),
+    },
+  };
+});
 
 describe("ChatService", () => {
   let givenApiServerUrl: string = "/path/to/api";
@@ -12,7 +22,7 @@ describe("ChatService", () => {
     jest.spyOn(require("src/envService"), "getBackendUrl").mockReturnValue(givenApiServerUrl);
   });
   afterEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   test("should construct the service successfully", () => {
@@ -24,6 +34,24 @@ describe("ChatService", () => {
 
     // AND the service should have the correct endpoint url
     expect(service.chatEndpointUrl).toEqual(`${givenApiServerUrl}/conversation`);
+  });
+
+  test("should throw if a sessionId could not be found", () => {
+    // GIVEN the service is constructed without a sessionId
+    jest.spyOn(PersistentStorageService, "getChatSessionID").mockReturnValueOnce(null);
+
+    // WHEN the service is constructed
+    // THEN expect it to throw
+    expect(() => new ChatService()).toThrow();
+  });
+
+  test("should throw if the sessionId found was not valid", () => {
+    // GIVEN the service is constructed with an invalid sessionId
+    jest.spyOn(PersistentStorageService, "getChatSessionID").mockReturnValueOnce("invalid");
+
+    // WHEN the service is constructed
+    // THEN expect it to throw
+    expect(() => new ChatService()).toThrow();
   });
 
   describe("sendMessage", () => {

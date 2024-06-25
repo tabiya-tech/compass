@@ -16,13 +16,20 @@ export const DATA_TEST_ID = {
 export const START_PROMPT = "~~~START_CONVERSATION~~~";
 
 const Chat = () => {
+  const { enqueueSnackbar } = useSnackbar();
   const [messages, setMessages] = useState<IChatMessage[]>([]);
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const [initialized, setInitialized] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
-  const chatService = useMemo(() => new ChatService(), []);
+  const chatService = useMemo(() => {
+    try {
+      return new ChatService();
+    } catch (error) {
+      console.error("Failed to create chat service:", error);
+      return;
+    }
+  }, []);
 
-  const { enqueueSnackbar } = useSnackbar();
 
   const addMessage = (message: IChatMessage) => {
     setMessages((prevMessages) => [...prevMessages, message]);
@@ -30,6 +37,7 @@ const Chat = () => {
 
   const initializeChat = useCallback(async () => {
     try {
+      if(!chatService) throw new Error("Chat service is not initialized");
       setIsTyping(true);
 
       const response = await chatService.sendMessage(START_PROMPT);
@@ -42,7 +50,7 @@ const Chat = () => {
       });
     } catch (error) {
       console.error("Failed to initialize chat:", error);
-      enqueueSnackbar("Something went wrong... Please try again later.", { variant: "error" });
+      enqueueSnackbar("Something went wrong... Please try logging in again", { variant: "error" });
     } finally {
       setIsTyping(false);
     }
@@ -53,6 +61,7 @@ const Chat = () => {
       const message = generateUserMessage(userMessage);
       addMessage(message);
       try {
+        if(!chatService) throw new Error("Chat service is not initialized");
         setIsTyping(true);
         const response = await chatService.sendMessage(userMessage);
         const botMessage = generateCompassMessage(response.last.message_for_user);
@@ -71,6 +80,7 @@ const Chat = () => {
 
   const clearMessages = useCallback(async () => {
     try {
+      if(!chatService) throw new Error("Chat service is not initialized");
       setIsTyping(true);
       await chatService.clearChat();
       setMessages([]);
@@ -91,8 +101,8 @@ const Chat = () => {
 
   const handleSend = useCallback(async () => {
     if (currentMessage.trim()) {
-      await sendMessage(currentMessage);
       setCurrentMessage("");
+      await sendMessage(currentMessage);
     }
   }, [currentMessage, sendMessage]);
 
