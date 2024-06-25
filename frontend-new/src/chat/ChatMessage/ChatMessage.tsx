@@ -7,6 +7,7 @@ const uniqueId = "2fbaf2ef-9eab-485a-bd28-b4a164e18b06";
 
 export const DATA_TEST_ID = {
   CHAT_MESSAGE_CONTAINER: `chat-message-container-${uniqueId}`,
+  CHAT_MESSAGE_TIMESTAMP: `chat-message-timestamp-${uniqueId}`,
 };
 
 const MessageContainer = styled(Box)<{ origin: ChatMessageOrigin }>(({ theme, origin }) => ({
@@ -20,7 +21,7 @@ const MessageContainer = styled(Box)<{ origin: ChatMessageOrigin }>(({ theme, or
 const MessageBubble = styled(Box)<{ origin: ChatMessageOrigin }>(({ theme, origin }) => ({
   maxWidth: "70%",
   padding: theme.spacing(theme.tabiyaSpacing.sm),
-  borderRadius: theme.spacing(theme.tabiyaSpacing.sm),
+  borderRadius: theme.spacing(theme.tabiyaRounding.md),
   backgroundColor: origin === ChatMessageOrigin.ME ? theme.palette.primary.light : theme.palette.grey[300],
   color: origin === ChatMessageOrigin.ME ? theme.palette.primary.contrastText : theme.palette.text.primary,
   position: "relative",
@@ -35,9 +36,10 @@ const TimeStamp = styled(Typography)(({ theme }) => ({
 
 type ChatMessageProps = {
   chatMessage: IChatMessage;
+  isTyping: boolean;
 };
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage }) => {
+const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage, isTyping }) => {
   let duration;
   try {
     duration = getDurationBetweenDates(new Date(chatMessage.timestamp), new Date());
@@ -47,7 +49,11 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage }) => {
   return (
     <MessageContainer origin={chatMessage.origin} data-testid={DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}>
       <MessageBubble origin={chatMessage.origin}>{chatMessage.message}</MessageBubble>
-      <TimeStamp variant="caption">sent {duration}</TimeStamp>
+      {!isTyping && (
+        <TimeStamp data-testid={DATA_TEST_ID.CHAT_MESSAGE_TIMESTAMP} variant="caption">
+          sent {duration}
+        </TimeStamp>
+      )}
     </MessageContainer>
   );
 };

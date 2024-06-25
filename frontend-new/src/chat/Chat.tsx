@@ -31,9 +31,15 @@ const Chat = () => {
   const initializeChat = useCallback(async () => {
     try {
       setIsTyping(true);
+
       const response = await chatService.sendMessage(START_PROMPT);
-      const initialMessage = generateCompassMessage(response.message_for_user);
-      addMessage(initialMessage);
+      response.conversation_context.all_history.turns.forEach((historyItem: any) => {
+        const userMessage =
+          historyItem.input.message !== START_PROMPT && generateUserMessage(historyItem.input.message);
+        const tabiyaMessage = generateCompassMessage(historyItem.output.message_for_user);
+        if (userMessage) addMessage(userMessage);
+        addMessage(tabiyaMessage);
+      });
     } catch (error) {
       console.error("Failed to initialize chat:", error);
       enqueueSnackbar("Something went wrong... Please try again later.", { variant: "error" });
@@ -49,7 +55,7 @@ const Chat = () => {
       try {
         setIsTyping(true);
         const response = await chatService.sendMessage(userMessage);
-        const botMessage = generateCompassMessage(response.message_for_user);
+        const botMessage = generateCompassMessage(response.last.message_for_user);
         addMessage(botMessage);
       } catch (error) {
         console.error("Failed to send message:", error);

@@ -3,7 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import { fetchWithAuth } from "src/apiService/APIService";
 import ErrorConstants from "src/error/error.constants";
 import { getBackendUrl } from "src/envService";
-import { RootObject, LastMessage } from "./ChatService.types";
+import { RootObject } from "./ChatService.types";
 
 export default class ChatService {
   readonly chatEndpointUrl: string;
@@ -24,7 +24,7 @@ export default class ChatService {
     return this.sessionId;
   }
 
-  public async sendMessage(message: string): Promise<LastMessage> {
+  public async sendMessage(message: string): Promise<RootObject> {
     const serviceName = "ChatService";
     const serviceFunction = "sendMessage";
     const method = "GET";
@@ -60,7 +60,7 @@ export default class ChatService {
       );
     }
 
-    return messageResponse.last;
+    return messageResponse;
   }
 
   public async clearChat(): Promise<RootObject> {

@@ -59,7 +59,7 @@ describe("ChatService", () => {
       );
 
       // AND returns the message response
-      expect(actualMessageResponse).toEqual(expectedRootMessageResponse.last);
+      expect(actualMessageResponse).toEqual(expectedRootMessageResponse);
     });
 
     test("on fail to fetch, should reject with the expected service error", async () => {

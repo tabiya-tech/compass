@@ -49,7 +49,12 @@ const ChatHeader = () => {
       padding={theme.spacing(theme.tabiyaSpacing.xl)}
     >
       <NavLink style={{ lineHeight: 0 }} to={routerPaths.ROOT} data-testid={DATA_TEST_ID.CHAT_HEADER_LOGO_LINK}>
-        <img src="/compass.svg" alt="Compass" height="48px" data-testid={DATA_TEST_ID.CHAT_HEADER_LOGO} />
+        <img
+          src={`${process.env.PUBLIC_URL}/compass.svg`}
+          alt="Compass"
+          height="48px"
+          data-testid={DATA_TEST_ID.CHAT_HEADER_LOGO}
+        />
       </NavLink>
       <Typography variant="h1">compass</Typography>
       <PrimaryIconButton

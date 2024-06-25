@@ -75,7 +75,7 @@ const ChatList: React.FC<ChatListProps> = ({ messages, clearMessages, sendMessag
                 transition={{ duration: 0.3 }}
                 sx={{ width: "100%" }}
               >
-                <ChatMessage chatMessage={message} />
+                <ChatMessage chatMessage={message} isTyping={false} />
               </ListItem>
             ))}
             {isTyping && (
@@ -89,7 +89,7 @@ const ChatList: React.FC<ChatListProps> = ({ messages, clearMessages, sendMessag
                 transition={{ duration: 0.3 }}
                 sx={{ width: "100%" }}
               >
-                <ChatMessage chatMessage={loadingMessage} />
+                <ChatMessage chatMessage={loadingMessage} isTyping={true} />
               </ListItem>
             )}
           </AnimatePresence>

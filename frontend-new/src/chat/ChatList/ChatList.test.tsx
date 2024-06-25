@@ -62,6 +62,7 @@ describe("ChatList", () => {
       1,
       {
         chatMessage: givenMessages[0],
+        isTyping: false,
       },
       {}
     );
@@ -69,6 +70,7 @@ describe("ChatList", () => {
       2,
       {
         chatMessage: givenMessages[1],
+        isTyping: false,
       },
       {}
     );
@@ -82,6 +84,7 @@ describe("ChatList", () => {
           origin: ChatMessageOrigin.COMPASS,
           timestamp: expect.any(Number),
         },
+        isTyping: true,
       },
       {}
     );

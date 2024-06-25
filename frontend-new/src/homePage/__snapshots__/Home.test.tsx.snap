@@ -2,117 +2,11 @@
 
 exports[`Home should render the home page 1`] = `
 <div
-  class="MuiBox-root css-0"
+  class="MuiBox-root css-79col"
   data-testid="home-container-13cb726d-b36d-4ea6-a518-9bf8f1e7356f"
 >
   <div
-    class="MuiBox-root css-0"
     data-testid="chat-container-b7ea1e82-0002-432d-a768-11bdcd186e1d"
-  >
-    <div
-      class="MuiBox-root css-1h7bnqy"
-      data-testid="chat-header-container-7413b63a-887b-4f41-b930-89e9770db12b"
-    >
-      <h1
-        class="MuiTypography-root MuiTypography-h1 css-1ku1uae-MuiTypography-root"
-      >
-        compass
-      </h1>
-      <button
-        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1v8l01o-MuiButtonBase-root-MuiIconButton-root"
-        data-testid="chat-header-button-user-7413b63a-887b-4f41-b930-89e9770db12b"
-        tabindex="0"
-        title="user info"
-        type="button"
-      >
-        <svg
-          aria-hidden="true"
-          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
-          data-testid="chat-header-icon-user-7413b63a-887b-4f41-b930-89e9770db12b"
-          focusable="false"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M12 5.9c1.16 0 2.1.94 2.1 2.1s-.94 2.1-2.1 2.1S9.9 9.16 9.9 8s.94-2.1 2.1-2.1m0 9c2.97 0 6.1 1.46 6.1 2.1v1.1H5.9V17c0-.64 3.13-2.1 6.1-2.1M12 4C9.79 4 8 5.79 8 8s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4m0 9c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4"
-          />
-        </svg>
-        <span
-          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-        />
-      </button>
-    </div>
-    <div
-      class="MuiBox-root css-3w7jbt"
-    >
-      <div
-        class="MuiBox-root css-79elbk"
-      >
-        <div
-          class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-p7hw24-MuiFormControl-root-MuiTextField-root"
-        >
-          <div
-            class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline MuiInputBase-adornedEnd css-t9ilqs-MuiInputBase-root-MuiOutlinedInput-root"
-          >
-            <textarea
-              aria-invalid="false"
-              class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiInputBase-inputAdornedEnd css-111mkcg-MuiInputBase-input-MuiOutlinedInput-input"
-              data-testid="chat-message-field-container-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
-              id=":r0:"
-              maxlength="1000"
-              placeholder="Type your message..."
-              style="height: 0px; overflow: hidden;"
-            />
-            <textarea
-              aria-hidden="true"
-              class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiInputBase-inputAdornedEnd css-111mkcg-MuiInputBase-input-MuiOutlinedInput-input"
-              readonly=""
-              style="visibility: hidden; position: absolute; overflow: hidden; height: 0px; top: 0px; left: 0px; transform: translateZ(0); padding-top: 0px; padding-bottom: 0px; width: 100%;"
-              tabindex="-1"
-            />
-            <div
-              class="MuiInputAdornment-root MuiInputAdornment-positionEnd MuiInputAdornment-outlined MuiInputAdornment-sizeMedium css-1laqsz7-MuiInputAdornment-root"
-            >
-              <button
-                class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1ifbsno-MuiButtonBase-root-MuiIconButton-root"
-                data-testid="chat-message-field-button-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
-                tabindex="0"
-                title="send message"
-                type="button"
-              >
-                <svg
-                  aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-ldtitb-MuiSvgIcon-root"
-                  data-testid="chat-message-field-icon-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
-                  focusable="false"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"
-                  />
-                </svg>
-                <span
-                  class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-                />
-              </button>
-            </div>
-            <fieldset
-              aria-hidden="true"
-              class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
-            >
-              <legend
-                class="css-ihdtdm"
-              >
-                <span
-                  class="notranslate"
-                >
-                  ​
-                </span>
-              </legend>
-            </fieldset>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  />
 </div>
 `;

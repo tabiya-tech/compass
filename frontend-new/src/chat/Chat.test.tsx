@@ -25,6 +25,7 @@ jest.mock("src/chat/ChatService/ChatService", () => {
       sendMessage: jest.fn().mockResolvedValue({
         message_for_user: "Hello, I'm Compass",
       }),
+      getConversationFromHistory: jest.fn(),
       getSessionId: jest.fn().mockReturnValue("1234"),
     };
   });
