@@ -13,7 +13,7 @@ export const DATA_TEST_ID = {
   CHAT_MESSAGE_FIELD_CONTAINER: `chat-message-field-container-${uniqueId}`,
   CHAT_MESSAGE_FIELD_BUTTON: `chat-message-field-button-${uniqueId}`,
   CHAT_MESSAGE_FIELD_ICON: `chat-message-field-icon-${uniqueId}`,
-  CHAT_MESSAGE_CHAR_COUNTER: `chat-message-char-counter-${uniqueId}`
+  CHAT_MESSAGE_CHAR_COUNTER: `chat-message-char-counter-${uniqueId}`,
 };
 
 export const CHAT_MESSAGE_MAX_LENGTH = 1000;

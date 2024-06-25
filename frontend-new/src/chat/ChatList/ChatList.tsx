@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from "react";
 import { ChatMessageOrigin, IChatMessage } from "src/chat/Chat.types";
 import { Box, List, ListItem } from "@mui/material";
 import { styled } from "@mui/system";
-import ChatMessageField from "src/chat/ChatMessageField/ChatMessageField";
 import ChatMessage from "src/chat/ChatMessage/ChatMessage";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -97,7 +96,6 @@ const ChatList: React.FC<ChatListProps> = ({ messages, clearMessages, sendMessag
         </List>
         <div ref={messagesEndRef} />
       </MessagesContainer>
-      <ChatMessageField />
     </ChatListContainer>
   );
 };

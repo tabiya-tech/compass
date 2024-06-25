@@ -83,23 +83,20 @@ const Chat = () => {
     }
   }, [initializeChat, initialized]);
 
-  const handleSend = () => {
+  const handleSend = useCallback(async () => {
     if (currentMessage.trim()) {
+      await sendMessage(currentMessage);
       setCurrentMessage("");
     }
-  };
+  }, [currentMessage, sendMessage]);
 
   return (
-    <Box width="100%" height="100%" data-testid={DATA_TEST_ID.CHAT_CONTAINER}>
+    <Box width="100%" height="100%" display="flex" flexDirection="column" data-testid={DATA_TEST_ID.CHAT_CONTAINER}>
       <ChatHeader />
-      <ChatList messages={messages} sendMessage={sendMessage} clearMessages={clearMessages} isTyping={isTyping} />
-      <Box
-        bgcolor="white"
-        padding={(theme) => theme.tabiyaSpacing.lg}
-        sx={{ borderRadius: "10px", margin: "auto", display: "flex", flexDirection: "column" }}
-        height="100%"
-        maxWidth="800px"
-      >
+      <Box sx={{ flex: 1, overflowY: "auto" }}>
+        <ChatList messages={messages} sendMessage={sendMessage} clearMessages={clearMessages} isTyping={isTyping} />
+      </Box>
+      <Box sx={{ flexShrink: 0 }}>
         <ChatMessageField handleSend={handleSend} message={currentMessage} notifyChange={setCurrentMessage} />
       </Box>
     </Box>
