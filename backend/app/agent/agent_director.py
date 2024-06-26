@@ -15,13 +15,6 @@ from app.conversation_memory.conversation_memory_manager import \
 from app.vector_search.similarity_search_service import SimilaritySearchService
 
 
-class AgentState(BaseModel):
-    """
-    Abstract base class for all agent-specific states.
-    """
-    pass
-
-
 class ConversationPhase(Enum):
     """
     An enumeration for conversation phases
@@ -31,6 +24,7 @@ class ConversationPhase(Enum):
     CONSULTING_EXPERIENCES = 2
     CHECKOUT = 3
     ENDED = 4
+
 
 class AgentDirectorState(BaseModel):
     """
@@ -42,6 +36,7 @@ class AgentDirectorState(BaseModel):
     def __init__(self, session_id):
         super().__init__(session_id=session_id,
                          current_phase=ConversationPhase.INTRO)
+
 
 class AbstractAgentDirector(ABC):
     """
