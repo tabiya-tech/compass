@@ -6,7 +6,6 @@ from app.agent.agent import Agent
 from app.agent.agent_director import AbstractAgentDirector, ConversationPhase
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType
 from app.agent.farewell_agent import FarewellAgent
-from app.agent.skill_explore_agent import SkillExplorerAgent
 from app.agent.experiences_explorer_agent import ExperiencesExplorerAgent
 from app.agent.welcome_agent import WelcomeAgent
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
@@ -37,7 +36,7 @@ class AgentTasking(BaseModel):
     LLM-targeted text description of the tasks that this agent can handle.
     """
     tasks: str
-    
+
     """
     Examples of user input
     """
@@ -55,31 +54,38 @@ class LLMAgentDirector(AbstractAgentDirector):
         # initialize the agents
         self._agents: dict[AgentType, Agent] = {
             AgentType.WELCOME_AGENT: WelcomeAgent(),
-            AgentType.SKILL_EXPLORER_AGENT: SkillExplorerAgent(),
             AgentType.EXPERIENCES_EXPLORER_AGENT: ExperiencesExplorerAgent(skill_search_service),
             AgentType.FAREWELL_AGENT: FarewellAgent()
         }
         # define the tasks that each agent is responsible for
-        welcome_agent_tasks = AgentTasking(agent_type_name=AgentType.WELCOME_AGENT.value,
-                                           tasks="Welcomes the user and answers any questions "
-                                                 "regarding the process and the tool.",
-                                           examples=["How does the counseling process work?"])
-        experiences_explorer_agent_tasks = AgentTasking(agent_type_name=AgentType.EXPERIENCES_EXPLORER_AGENT.value,
-                                                  tasks="Explore and verify the users skills and work experiences.",
-                                                  examples=["I worked as a software developer for 5 years.",
-                                                            "I am ready to explore my skills."])
-        farewell_agent_tasks = AgentTasking(agent_type_name=AgentType.FAREWELL_AGENT.value,
-                                            tasks="Ends the conversation with the user.",
-                                            examples=["I want to finish the conversation."])
-        default_agent_tasks = AgentTasking(agent_type_name=DEFAULT_AGENT,
-                                           tasks="Handles all other queries that do not fall under the purview "
-                                                 "of the other agents, or when it is not clear "
-                                                 "which agent is most suitable.",
-                                           examples=[])
+        welcome_agent_tasks = AgentTasking(
+            agent_type_name=AgentType.WELCOME_AGENT.value,
+            tasks="Welcomes the user and answers any questions "
+                  "regarding the process and the tool.",
+            examples=["How does the counseling process work?"]
+        )
+        experiences_explorer_agent_tasks = AgentTasking(
+            agent_type_name=AgentType.EXPERIENCES_EXPLORER_AGENT.value,
+            tasks="Explore and verify the users skills and work experiences.",
+            examples=["I worked as a software developer for 5 years.",
+                      "I am ready to explore my skills."]
+        )
+        farewell_agent_tasks = AgentTasking(
+            agent_type_name=AgentType.FAREWELL_AGENT.value,
+            tasks="Ends the conversation with the user.",
+            examples=["I want to finish the conversation."]
+        )
+        default_agent_tasks = AgentTasking(
+            agent_type_name=DEFAULT_AGENT,
+            tasks="Handles all other queries that do not fall under the purview "
+                  "of the other agents, or when it is not clear "
+                  "which agent is most suitable.",
+            examples=[]
+        )
         # define the tasks for each phase
         self._agent_tasking_for_phase: dict[ConversationPhase, list[AgentTasking]] = {
             ConversationPhase.INTRO: [welcome_agent_tasks, default_agent_tasks],
-            ConversationPhase.CONSULTING: [welcome_agent_tasks, experiences_explorer_agent_tasks, default_agent_tasks],
+            ConversationPhase.COUNSELING: [welcome_agent_tasks, experiences_explorer_agent_tasks, default_agent_tasks],
             ConversationPhase.CHECKOUT: [farewell_agent_tasks, default_agent_tasks]
         }
         # initialize the router model
@@ -136,7 +142,7 @@ class LLMAgentDirector(AbstractAgentDirector):
             return AgentType.WELCOME_AGENT
 
         # In the consulting phase, the agent type is determined by the user's intent
-        if phase == ConversationPhase.CONSULTING:
+        if phase == ConversationPhase.COUNSELING:
             model_input = f"{self._get_system_instructions(phase)}\nUser Input: {user_input.message}\n"
             try:
                 router_model_response = (await self._model.generate_content(model_input)).text.strip()
@@ -168,10 +174,10 @@ class LLMAgentDirector(AbstractAgentDirector):
         if (current_phase == ConversationPhase.INTRO
                 and agent_output.agent_type == AgentType.WELCOME_AGENT
                 and agent_output.finished):
-            return ConversationPhase.CONSULTING
+            return ConversationPhase.COUNSELING
 
         # In the consulting phase, only the experiences explorer agent can end the phase
-        if (current_phase == ConversationPhase.CONSULTING
+        if (current_phase == ConversationPhase.COUNSELING
                 and agent_output.agent_type == AgentType.EXPERIENCES_EXPLORER_AGENT
                 and agent_output.finished):
             return ConversationPhase.CHECKOUT
