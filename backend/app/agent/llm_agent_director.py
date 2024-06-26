@@ -114,7 +114,7 @@ class LLMAgentDirector(AbstractAgentDirector):
                     Return: {agent_tasking.agent_type_name}
                 """)
 
-        instructions = dedent(f"""\
+        instructions = dedent(""" \
         Process the user input and return the name of the most suitable model for handling the user input, 
         based on the tasks each model is responsible for. 
         The Model Name and the tasks it is responsible for are as follows:
@@ -123,6 +123,9 @@ class LLMAgentDirector(AbstractAgentDirector):
         {examples}
         Return only the model name as a string, do not format it.
         """)
+        instructions = instructions.format(
+            agent_responsible_for_phase_instructions=agent_responsible_for_phase_instructions,
+            examples=examples)
         return instructions
 
     async def _get_suitable_agent_type(self, user_input: AgentInput, phase: ConversationPhase) -> AgentType:
