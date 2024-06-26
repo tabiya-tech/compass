@@ -14,6 +14,7 @@ class ApplicationState(BaseModel):
     This is an aggregation of the states of the different components of the application.
     """
     session_id: int
+    country_of_interest: Country = Country.UNSPECIFIED
     agent_director_state: AgentDirectorState
     explore_experiences_director_state: ExploreExperiencesAgentDirectorState
     conversation_memory_manager_state: ConversationMemoryManagerState

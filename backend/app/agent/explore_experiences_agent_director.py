@@ -4,8 +4,10 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from app.countries import Country
 from app.agent.collect_experiences_agent import CollectExperiencesAgent
 from app.agent.experience.experience_entity import ExperienceEntity
+from app.agent.infer_occupation_tool.infer_occupation_tool import InferOccupationTool
 from app.agent.skill_explorer_agent import SkillExplorerAgent
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 
@@ -126,10 +128,23 @@ class ExploreExperiencesAgentDirector(Agent):
         transitioned_between_states = False
         if current_experience.dive_in_phase == DiveInPhase.INFERRING_OCCUPATIONS:
             # The agent will infer the occupations for the experience and update the experience entity
-            self._infer_occupations_agent.set_experience(current_experience.experience)
-            agent_output: AgentOutput = await self._infer_occupations_agent.execute(user_input, context)
 
+            inferred_occupations = await self._infer_occupations_tool.execute(
+                country_of_interest=Country.SOUTH_AFRICA,
+                experience=current_experience.experience
+            )
+            current_experience.experience.contextual_title = inferred_occupations.contextualized_title
+            current_experience.experience.esco_occupations = inferred_occupations.esco_occupations
+            agent_output: AgentOutput = AgentOutput(
+                message_for_user=f"I have inferred the occupations for the experience: "
+                                 f"{current_experience.experience.contextual_title}",
+                finished=True,
+                agent_type=self._agent_type,
+                agent_response_time_in_sec=inferred_occupations.stats.response_time_in_sec,
+                llm_stats=[inferred_occupations.stats]
+            )
             await self._conversation_manager.update_history(user_input, agent_output)
+
             if not agent_output.finished:
                 return agent_output
 
@@ -225,56 +240,8 @@ class ExploreExperiencesAgentDirector(Agent):
         self._conversation_manager = conversation_manager
         self._state: ExploreExperiencesAgentDirectorState | None = None
         self._collect_experiences_agent = CollectExperiencesAgent()
-        self._infer_occupations_agent = _InferOccupationsAgentStub()
+        self._infer_occupations_tool = InferOccupationTool(search_services.occupation_skill_search_service)
         self._exploring_skills_agent = SkillExplorerAgent()
 
     def get_collect_experiences_agent(self) -> CollectExperiencesAgent:
         return self._collect_experiences_agent
-
-
-# ######################################################################################################################
-# TODO: Remove when the real agents are implemented
-
-
-def _get_backer_occupation() -> OccupationSkillEntity:
-    import os
-    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'baker_occupations.json')) as f:
-        from pydantic import TypeAdapter
-        return TypeAdapter(OccupationSkillEntity).validate_json(f.read())
-
-
-class _InferOccupationsAgentStub(Agent):
-    """
-    A stub for the InferOccupationsAgent. This is a placeholder for the real agent that will be implemented later.
-    """
-
-    def __init__(self):
-        super().__init__(agent_type=AgentType.INFER_OCCUPATIONS_AGENT,
-                         is_responsible_for_conversation_history=False)
-        self._experience: ExperienceEntity | None = None
-
-        self._mocked_occupations = [_get_backer_occupation()]
-
-    def set_experience(self, experience: ExperienceEntity):
-        self._experience = experience
-
-    async def execute(self, user_input: AgentInput, context: ConversationContext) -> AgentOutput:
-        if self._experience is None:
-            raise ValueError("SkillExplorerAgent: execute() called before experience was set")
-
-        self._experience.contextual_title = f"Contextual title for {self._experience.experience_title}"
-        self._experience.esco_occupations = self._mocked_occupations
-
-        return AgentOutput(
-            message_for_user=f"(placeholder for the InferOccupationsAgent agent.)\n"
-                             f"Based on the company {self._experience.company} and location {self._experience.location}"
-                             f"and work type {self._experience.work_type}.\n"
-                             f"The inferred occupation title for {self._experience.experience_title} "
-                             f"     is {self._experience.contextual_title}\n"
-                             f"Additionally, here are the occupations that match to your experience are "
-                             f"     {self._experience.esco_occupations[0].occupation.preferredLabel}",
-            finished=True,
-            agent_type=AgentType.EXPLORE_SKILLS_AGENT,
-            agent_response_time_in_sec=0.0,
-            llm_stats=[]
-        )
