@@ -8,7 +8,6 @@ from app.agent.agent import Agent
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.experiences_explorer_agent import ExperiencesExplorerAgent
 from app.agent.farewell_agent import FarewellAgent
-from app.agent.skill_explore_agent import SkillExplorerAgent
 from app.agent.welcome_agent import WelcomeAgent
 from app.conversation_memory.conversation_memory_manager import \
     ConversationMemoryManager
@@ -20,10 +19,9 @@ class ConversationPhase(Enum):
     An enumeration for conversation phases
     """
     INTRO = 0
-    CONSULTING = 1
-    CONSULTING_EXPERIENCES = 2
-    CHECKOUT = 3
-    ENDED = 4
+    COUNSELING = 1
+    CHECKOUT = 2
+    ENDED = 3
 
 
 class AgentDirectorState(BaseModel):
@@ -85,13 +83,12 @@ class AgentDirector(AbstractAgentDirector):
         # initialize the agents
         self._agents: dict[ConversationPhase, Agent] = {
             ConversationPhase.INTRO: WelcomeAgent(),
-            ConversationPhase.CONSULTING_EXPERIENCES: ExperiencesExplorerAgent(similarity_search_service),
-            ConversationPhase.CONSULTING: SkillExplorerAgent(),
+            ConversationPhase.COUNSELING: ExperiencesExplorerAgent(similarity_search_service),
             ConversationPhase.CHECKOUT: FarewellAgent()
         }
 
     def get_experiences_explorer_agent(self):
-        return self._agents[ConversationPhase.CONSULTING_EXPERIENCES]
+        return self._agents[ConversationPhase.COUNSELING]
 
     def _get_current_agent(self) -> Agent | None:
         """
