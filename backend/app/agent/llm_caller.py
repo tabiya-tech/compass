@@ -27,7 +27,7 @@ class LLMCaller(Generic[P]):
     @staticmethod
     async def call_llm(*,
                        llm: GeminiGenerativeLLM,
-                       llm_input: LLMInput,
+                       llm_input: LLMInput | str,
                        logger: logging.Logger,
                        model_response_type: Type[P]
                        ) -> Tuple[P | None, list[LLMStats]]:
