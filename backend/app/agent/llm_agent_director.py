@@ -289,7 +289,13 @@ class LLMAgentDirector(AbstractAgentDirector):
                 self._state.current_phase = new_phase
                 # When transitioning to a new phase do not return the control back to the user,
                 # instead, run the next agent in the sequence
-                next_agent_output = await self.execute(user_input=AgentInput(message="(silence)"))
+                new_phase_agent = self._agents.get(self._get_default_agent_type_for_phase(new_phase))
+                # TODO(Apostolos): models should be able to handle transitions between phases seamlessly,
+                #  so they should have information how to handle the user entering from a different phase
+                transition_input = AgentInput(message="Hi, I can here from the previous agent.")
+                next_agent_output = await new_phase_agent.execute(user_input=transition_input, context=context)
+                await self._conversation_manager.update_history(transition_input, next_agent_output)
+
                 return AgentOutput(
                     #  Combine the messages from the current and the next agent,
                     #  so that the user can see the two responses in last message of the conversation.
