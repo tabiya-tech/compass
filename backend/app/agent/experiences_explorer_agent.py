@@ -12,7 +12,8 @@ from app.agent.prompt_reponse_template import ModelResponse
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import \
     ConversationContext
-from app.tool.extract_experience_tool import ExtractExperienceTool, ExperienceEntity
+from app.tool.extract_experience_tool import ExtractExperienceTool
+from app.agent.experience_state import ExperienceState
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from common_libs.text_formatters.extract_json import extract_json, ExtractJSONError
 
@@ -47,7 +48,7 @@ class ExperienceMetadata(BaseModel):
     # for the agent, to know if a deepdive should be performed
     done_with_deep_dive: bool = False
 
-    esco_entity: ExperienceEntity
+    esco_entity: ExperienceState
 
 
 class ExperiencesAgentState(BaseModel):
@@ -260,7 +261,7 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         """
         self._state = state
 
-    async def _extract_experience_from_user_reply(self, user_str: str) -> list[ExperienceEntity]:
+    async def _extract_experience_from_user_reply(self, user_str: str) -> list[ExperienceState]:
         # Use the LLM to find out what was the experience the user is talking about
         return await self._extract_experience_tool.extract_experience_from_user_reply(user_str)
 
