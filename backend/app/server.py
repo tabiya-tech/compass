@@ -114,13 +114,12 @@ class ConversationResponse(BaseModel):
 
 @app.get(path="/conversation",
          description="""The main conversation route used to interact with the agent.""", )
-async def conversation(user_input: str, clear_memory: bool = False, filter_pii: bool = False,
+async def conversation(request: Request, user_input: str, clear_memory: bool = False, filter_pii: bool = False,
                        session_id: int = 1,
                        conversation_memory_manager: ConversationMemoryManager = Depends(
                            get_conversation_memory_manager),
                        agent_director: LLMAgentDirector = Depends(get_agent_director),
-                       authorization = Depends(http_bearer)):
-
+                       authorization=Depends(http_bearer)):
     """
     Endpoint for conducting the conversation with the agent.
     """
@@ -136,7 +135,7 @@ async def conversation(user_input: str, clear_memory: bool = False, filter_pii: 
         if filter_pii:
             user_input = await sensitive_filter.obfuscate(user_input)
 
-        # set the state of the agent director and the conversation memory manager
+        # set the state of the agent director, the conversation memory manager and all the agents
         state = await application_state_manager.get_state(session_id)
 
         agent_director.set_state(state.agent_director_state)
@@ -152,20 +151,25 @@ async def conversation(user_input: str, clear_memory: bool = False, filter_pii: 
         await application_state_manager.save_state(session_id, state)
         return response
     except Exception as e:  # pylint: disable=broad-except
-        # this is the main entry point, so we need to catch all exceptions
-        logger.exception(e)
-        return {"error": "oops! something went wrong!"}
+        logger.exception(
+            "Error for request: %s %s?%s with session id: %s : %s",
+            request.method,
+            request.url.path,
+            request.query_params,
+            session_id,
+            e
+        )
+        raise HTTPException(status_code=500, detail="Oops! something went wrong")
 
 
 @app.get(path="/conversation_sandbox",
          description="""Temporary route used to interact with the conversation agent.""", )
-async def _test_conversation(user_input: str, clear_memory: bool = False, filter_pii: bool = False,
+async def _test_conversation(request: Request, user_input: str, clear_memory: bool = False, filter_pii: bool = False,
                              session_id: int = 1, only_reply: bool = False,
                              similarity_search: SimilaritySearchService = Depends(get_occupation_search_service),
                              conversation_memory_manager: ConversationMemoryManager = Depends(
-                                 get_conversation_memory_manager), 
-                             authorization = Depends(http_bearer)):
-
+                                 get_conversation_memory_manager),
+                             authorization=Depends(http_bearer)):
     """
     As a developer, you can use this endpoint to test the conversation agent with any user input.
     You can adjust the front-end to use this endpoint for testing locally an agent in a configurable way.
@@ -208,16 +212,23 @@ async def _test_conversation(user_input: str, clear_memory: bool = False, filter
         await application_state_manager.save_state(session_id, state)
         return response
     except Exception as e:  # pylint: disable=broad-except
-        # this is the main entry point, so we need to catch all exceptions
-        logger.exception(e)
-        return {"error": "oops! something went wrong!"}
+        logger.exception(
+            "Error for request: %s %s?%s with session id: %s : %s",
+            request.method,
+            request.url.path,
+            request.query_params,
+            session_id,
+            e
+        )
+        raise HTTPException(status_code=500, detail="Oops! something went wrong")
 
 
 @app.get(path="/conversation_context",
          description="""Temporary route used to get the conversation context of a user.""", )
-async def get_conversation_context(session_id: int, conversation_memory_manager: ConversationMemoryManager = Depends(
-    get_conversation_memory_manager), authorization = Depends(http_bearer)):
-  
+async def get_conversation_context(
+        session_id: int,
+        conversation_memory_manager: ConversationMemoryManager = Depends(
+            get_conversation_memory_manager), authorization=Depends(http_bearer)):
     """
     Get the conversation context of a user.
     """
@@ -237,11 +248,12 @@ async def get_conversation_context(session_id: int, conversation_memory_manager:
 # and must be removed later.
 @app.get(path="/authinfo",
          description="Returns the authentication info (JWT token claims)")
-async def _get_auth_info(request: Request, authorization = Depends(firebase)):
+async def _get_auth_info(request: Request, authorization=Depends(firebase)):
     auth_info_b64 = request.headers.get('x-apigateway-api-userinfo')
     # some python magic
     auth_info = base64.b64decode(auth_info_b64.encode() + b'==').decode()
     return JSONResponse(auth_info)
+
 
 add_users_routes(app)
 
