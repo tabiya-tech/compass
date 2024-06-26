@@ -1,5 +1,5 @@
 from app.server_dependencies import get_mongo_db
-from app.constants.database import Collections
+from common_libs.environment_settings.constants import Collections
 
 
 class UserPreferenceRepository:
