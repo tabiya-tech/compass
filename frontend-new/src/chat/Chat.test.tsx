@@ -201,8 +201,8 @@ describe("test send message", () => {
       </HashRouter>
     );
 
-    const input = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD);
-    const sendButton = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
+    const input = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER);
+    const sendButton = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON);
 
     fireEvent.change(input, { target: { value: "Test message" } });
     fireEvent.click(sendButton);
@@ -266,8 +266,8 @@ describe("test send message", () => {
     // Now mock sendMessage to fail for the user message
     mockSendMessage.mockRejectedValueOnce(new Error("Sending message failed"));
 
-    const input = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD);
-    const sendButton = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
+    const input = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER);
+    const sendButton = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON);
 
     fireEvent.change(input, { target: { value: "Test message" } });
     fireEvent.click(sendButton);
