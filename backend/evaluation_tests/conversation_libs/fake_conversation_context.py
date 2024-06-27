@@ -94,6 +94,17 @@ class FakeConversationContext(ConversationContext):
         self.summary = summary
         self.history.turns = self.all_history.turns[-5:]
 
+    def add_turn(self, user_input: str, agent_response: str):
+        """ Adds a turn to the conversation history."""
+        self.all_history.turns.append(ConversationTurn(index=len(self.all_history.turns),
+                                                       input=AgentInput(message=user_input),
+                                                       output=AgentOutput(message_for_user=agent_response,
+                                                                          finished=False,
+                                                                          reasoning="Placeholder",
+                                                                          agent_response_time_in_sec=0,
+                                                                          llm_stats=[])))
+        self.history.turns = self.all_history.turns[-5:]
+
     def add_history(self, agent_input: AgentInput, agent_output: AgentOutput, summary: str = None):
         """ Adds a turn to the conversation history."""
         self.all_history.turns.append(ConversationTurn(index=len(self.all_history.turns), input=agent_input,

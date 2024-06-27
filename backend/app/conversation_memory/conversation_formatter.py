@@ -70,19 +70,35 @@ class ConversationHistoryFormatter:
 
         # If the list is empty, we add the first part
         if len(llm_input.turns) == 0:
-            llm_input.turns.append(LLMTurn(role=role,content=text))
+            llm_input.turns.append(LLMTurn(role=role, content=text))
             return
         # If the list is not empty, we will check the last part's role
         # and decide whether to append the new part or create a new content
         last_turn: LLMTurn = llm_input.turns[-1]
         if last_turn.role != role:
             # last part's role is different from the new part's role, so create a new content
-            llm_input.turns.append(LLMTurn(role=role,content=text))
+            llm_input.turns.append(LLMTurn(role=role, content=text))
         else:
             # last part's role is the same as the new part's role, so append the new part's text to the last content
             new_text = last_turn.content + "\n" + text
             llm_input.turns.pop(-1)
-            llm_input.turns.append(LLMTurn(role=role,content=new_text))
+            llm_input.turns.append(LLMTurn(role=role, content=new_text))
+
+    @staticmethod
+    def format_to_string(context: ConversationContext, user_message: str = "") -> str:
+        """
+        Format the conversation history as a string.
+        """
+        output = ""
+        if context.summary != "":
+            output += ConversationHistoryFormatter.USER + ":" + ConversationHistoryFormatter.SUMMARY_TITLE + " " + \
+                      context.summary + "\n"
+        output += "\n".join(
+            [f"{ConversationHistoryFormatter.USER}: {turn.input.message}\n{ConversationHistoryFormatter.MODEL}: "
+             f"{turn.output.message_for_user}" for turn in context.history.turns])
+        if user_message != "":
+            output += f"\n{ConversationHistoryFormatter.USER}: {user_message}"
+        return output
 
     @staticmethod
     def format_for_summary_prompt(system_instructions: str, current_summary: str,
@@ -103,4 +119,4 @@ class ConversationHistoryFormatter:
         text = system_instructions + ConversationHistoryFormatter.SUMMARY_TITLE + current_summary + \
                ConversationHistoryFormatter.CONVERSATION_TITLE + add_to_summary_text
 
-        return  LLMInput(turns=[LLMTurn(role=ConversationHistoryFormatter.USER, content=text)])
+        return LLMInput(turns=[LLMTurn(role=ConversationHistoryFormatter.USER, content=text)])

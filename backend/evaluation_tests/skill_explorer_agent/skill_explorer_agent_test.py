@@ -42,11 +42,15 @@ async def test_skill_explorer_agent(fake_conversation_context: FakeConversationC
         ConversationRecord(
             message="What company did you work for?",
             actor=Actor.EVALUATED_AGENT),
-        ConversationRecord(
-            message="I worked for a small bakery called 'Bread and Butter'.",
-            actor=Actor.SIMULATED_USER),
     ],
         summary="The user and the agent are discussing a time when the user had to come a challenge. The user is "
                 "explaining how they used their arch skills to come up with new ideas.")
-    await skill_explorer_agent.execute(AgentInput(message="ignored", ), fake_conversation_context)
-    assert len(state.top_skills) == skill_explorer_agent.TOP_COUNT
+    output = None
+    for user_input in ["I worked for a small bakery called 'Bread and Butter'.", "I cleaned the floor",
+                       "I didn't do anything else.", "No, I really didn't do anything else."]:
+        output = await skill_explorer_agent.execute(
+            AgentInput(message=user_input, ),
+            fake_conversation_context)
+        fake_conversation_context.add_turn(user_input, output.message_for_user)
+    assert output.finished, fake_conversation_context.model_dump_json(indent=4)
+    assert 'ensure sanitation' in [str(skill) for skill in state.top_skills]
