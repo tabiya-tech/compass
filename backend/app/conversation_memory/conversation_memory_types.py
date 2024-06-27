@@ -24,8 +24,11 @@ class ConversationContext(BaseModel):
       A model for a conversation context, constructed from the conversation history and summary
     """
     all_history: ConversationHistory
+    """The full conversation history"""
     history: ConversationHistory
+    """The most recent conversation history that has not be summarized"""
     summary: str
+    """The summary of the conversation"""
 
 
 class ConversationMemoryManagerState(BaseModel):
