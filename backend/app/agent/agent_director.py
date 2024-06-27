@@ -2,7 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 from enum import Enum
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 
 from app.agent.agent import Agent
 from app.agent.agent_types import AgentInput, AgentOutput
@@ -31,9 +31,13 @@ class AgentDirectorState(BaseModel):
     session_id: int
     current_phase: ConversationPhase
 
-    def __init__(self, session_id):
+    def __init__(self, session_id: int, current_phase: str = "INTRO"):
         super().__init__(session_id=session_id,
-                         current_phase=ConversationPhase.INTRO)
+                         current_phase=ConversationPhase[current_phase])
+
+    @field_serializer("current_phase")
+    def serialize_group(self, current_phase: ConversationPhase, _info):
+        return current_phase.name
 
 
 class AbstractAgentDirector(ABC):

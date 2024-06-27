@@ -13,7 +13,7 @@ from pydantic import BaseModel
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.experiences_explorer_agent import ExperiencesExplorerAgent  # for sandbox testing
 from app.agent.llm_agent_director import LLMAgentDirector
-from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
+from app.application_state import ApplicationStateManager, DatabaseApplicationStateStore
 from app.conversation_memory.conversation_memory_manager import ConversationContext, ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
 from app.server_dependencies import get_conversation_memory_manager
@@ -94,7 +94,7 @@ sensitive_filter.add_filter_routes(app)
 # Currently, using an in-memory store for the application state,
 # but this can be replaced with a persistent store based on environment variables
 # TODO: use the Fast api dependency injection pattern to inject them into the routes
-application_state_manager = ApplicationStateManager(InMemoryApplicationStateStore())
+application_state_manager = ApplicationStateManager(DatabaseApplicationStateStore())
 
 
 def get_agent_director(conversation_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager),

@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 class Collections:
     USER_PREFERENCES: str = "user_preferences"
+    APPLICATION_STATE: str = "application_state"
 
 
 class EmbeddingConfig(BaseModel):

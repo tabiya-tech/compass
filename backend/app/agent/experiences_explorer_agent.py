@@ -3,7 +3,7 @@ import time
 from enum import Enum
 from textwrap import dedent
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 
 from app.agent.agent import SimpleLLMAgent
 from app.agent.agent_types import AgentInput, AgentOutput, LLMStats
@@ -61,21 +61,28 @@ class ExperiencesAgentState(BaseModel):
     Experiences on the radar - under discussion with this user.
     These were mentioned by the user, and the Agent needs to understand them deeper.
     """
-    experiences: dict = {}
-    current_experience: str = None
-    deep_dive_count: int = 0
+    experiences: dict
+    current_experience: str
+    deep_dive_count: int
 
-    conversation_phase: ConversationPhase = ConversationPhase.WARMUP
+    conversation_phase: ConversationPhase
 
     """
     Raw conversation history with this agent. (We should store this in the central state, but for now, we need to
     prevent the summarizer to summarize it so we store it here too. In the future we should find a more elegant way
     to isolate the conversation history specific to an agent.)
     """
-    conversation_history: str = ""
+    conversation_history: str
 
-    def __init__(self, session_id):
-        super().__init__(session_id=session_id)
+    def __init__(self, session_id, experiences={}, current_experience="", deep_dive_count=0,
+            conversation_phase: str = "WARMUP", conversation_history=""):
+        super().__init__(session_id=session_id, experiences=experiences, current_experience=current_experience,
+                         deep_dive_count=deep_dive_count, conversation_phase=ConversationPhase[conversation_phase],
+                         conversation_history=conversation_history)
+
+    @field_serializer("conversation_phase")
+    def serialize_group(self, conversation_phase: ConversationPhase, _info):
+        return conversation_phase.name
 
 
 def _sanitized_experience_descr(experience_descr: str, experiences) -> str:

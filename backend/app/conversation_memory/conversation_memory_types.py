@@ -41,9 +41,13 @@ class ConversationMemoryManagerState(BaseModel):
     to_be_summarized_history: ConversationHistory
     summary: str
 
-    def __init__(self, session_id):
+    def __init__(self, session_id, all_history=ConversationHistory(),
+            unsummarized_history=ConversationHistory(),
+            to_be_summarized_history=ConversationHistory(),
+            summary=""):
         super().__init__(session_id=session_id,
-                         all_history=ConversationHistory(),
-                         unsummarized_history=ConversationHistory(),
-                         to_be_summarized_history=ConversationHistory(),
-                         summary="")
+                         all_history=all_history,
+                         unsummarized_history=unsummarized_history,
+                         to_be_summarized_history=to_be_summarized_history,
+                         summary=summary)
+

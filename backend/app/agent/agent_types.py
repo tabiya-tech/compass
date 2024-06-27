@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Optional, TypeVar, Generic
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 
 
 class AgentType(Enum):
@@ -65,3 +65,7 @@ class AgentOutput(BaseModel, Generic[P]):
 
     llm_stats: list[LLMStats]
     """The stats for each call to an LLM that was used to generate the response"""
+
+    @field_serializer("agent_type")
+    def serialize_group(self, agent_type: AgentType, _info):
+        return agent_type.value
