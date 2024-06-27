@@ -6,8 +6,10 @@ from common_libs.text_formatters.extract_json import extract_json, ExtractJSONEr
 
 from pydantic import BaseModel
 
+from app.conversation_memory.conversation_memory_types import ConversationHistory
 from app.agent.agent import SimpleLLMAgent
 from app.agent.agent_types import AgentInput, AgentOutput, LLMStats
+from app.agent.timeline_explorer_agent import TimelineExplorerAgent
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.agent.agent_types import AgentType
 from app.agent.prompt_reponse_template import ModelResponse
@@ -36,6 +38,7 @@ class ConversationPhase(Enum):
     WARMUP = 1
     DIVE_IN = 2
     WRAPUP = 3
+    TIMELINE_DEEP_DIVE = 4
 
 
 class ExperienceMetadata(BaseModel):
@@ -51,6 +54,12 @@ class ExperienceMetadata(BaseModel):
     done_with_deep_dive: bool = False
 
     esco_entity: ExperienceEntity
+
+class TimelineAgentState(BaseModel):
+    agent:  TimelineExplorerAgent = TimelineExplorerAgent("")
+    current_experience: str = ""
+    finished: bool = False
+    context: ConversationContext = ConversationContext()
 
 
 class ExperiencesAgentState(BaseModel):
@@ -68,6 +77,7 @@ class ExperiencesAgentState(BaseModel):
     deep_dive_count: int = 0
 
     conversation_phase: ConversationPhase = ConversationPhase.INIT
+    timeline_state: TimelineAgentState = TimelineAgentState()
 
     """
     Raw conversation history with this agent. (We should store this in the central state, but for now, we need to
@@ -75,6 +85,7 @@ class ExperiencesAgentState(BaseModel):
     to isolate the conversation history specific to an agent.)
     """
     conversation_history: str = ""
+
 
     def __init__(self, session_id):
         super().__init__(session_id=session_id)
@@ -174,12 +185,12 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
                 s.experiences[experience_id] = ExperienceMetadata(
                     experience_descr=experience.job_title, done_with_deep_dive=False, esco_entity=experience)
 
-            meta_msg = f"[META: ESCO Occupations identified: " \
-                       f"{[e.esco_occupations[0].preferredLabel for e in experiences]}]"
+            # meta_msg = f"[META: ESCO Occupations identified: " \
+            #            f"{[e.esco_occupations[0].preferredLabel for e in experiences]}]"
             # Advance the conversation, go directly the WRAPUP
             # We skip the DIVE_IN, because it is needs more logic before it is worth connecting it to the conversation
             # flow (which will be added after the P1 Prototype).
-            s.conversation_phase = ConversationPhase.WRAPUP
+            s.conversation_phase = ConversationPhase.TIMELINE_DEEP_DIVE
 
         return model_response.message + meta_msg
 
@@ -211,6 +222,15 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
             s.conversation_phase = ConversationPhase.WRAPUP
             return "We are done with exploring your skills. Any last remarks that you want to share with me?"
 
+    async def _handle_timeline_deep_dive(self, user_input: AgentInput, context: ConversationContext, past_experiences: dict) -> str:
+        for i in past_experiences:
+            context = ConversationContext(all_history=ConversationHistory(), history=ConversationHistory(), summary="")
+            timeline_explorer_agent = TimelineExplorerAgent(past_experiences[i].esco_entity.job_title)
+            user_input.message = ""
+            response = await timeline_explorer_agent.execute(user_input, context)
+            return response
+
+
     async def execute(self, user_input: AgentInput, context: ConversationContext) -> AgentOutput:
         if self._state is None:
             logger.critical("ExperiencesExplorerAgent: execute() called before state was initialized")
@@ -236,6 +256,10 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         # Phase2 - inner loop - outerloop
         elif s.conversation_phase == ConversationPhase.DIVE_IN:
             reply_raw = self._handle_dive_in_phase(user_input.message)
+
+        elif s.conversation_phase == ConversationPhase.TIMELINE_DEEP_DIVE:
+            agent_output =  await self._handle_timeline_deep_dive(user_input, context, s.experiences)
+            return agent_output
 
         # Phase3
         elif s.conversation_phase == ConversationPhase.WRAPUP:
@@ -281,12 +305,10 @@ class ExperiencesExplorerAgent(SimpleLLMAgent):
         base_prompt = dedent("""" You work for an employment agency helping the user outline their previous 
         experiences and reframe them for the job market. You should be explicit in saying that past experience can 
         also reflect work in the unseen economy, such as care work for family and this should be included in your 
-        investigation. You want to first get all past experiences, one by one, and investigate exclusively the date 
-        and the place at which the position was held. Keep asking the user if they have more experience they would 
-        like to talk about until they explicitly state that they don't. When the user has no more experiences to talk 
-        about, send them to your colleague who will investigate relevant skills. Before doing that, ask if the user 
-        would like to add anything else. Your message should be concise and professional, but also polite and 
-        empathetic.""")
+        investigation. You want to first get all past experiences, one by one. Keep asking the user if they have more
+        experience they would like to talk about until they explicitly state that they don't.
+        When the user has no more experiences to talk about, finish the conversation.
+        Your message should be concise and professional, but also polite and empathetic.""")
 
         return base_prompt
 

@@ -29,7 +29,7 @@ class ExperienceEntity(BaseModel):
     # The occupation records in the ESCO db that we think are related to this experience
     esco_occupations: Optional[List[OccupationEntity]] = []
     # the dates in a simple string format as stated by the user
-    dates: str
+    dates: str = ""
     # TODO: Add more fields, especially the skills. Also decide whether we want skills to be directly connected to
     #  each occupation or not.
 
@@ -46,10 +46,10 @@ class ExtractExperienceTool(Tool):
         # TODO: Consider using json (now we use a CSV-like format) to be consistent with the agents.
         self._system_instructions = dedent(""" 
                     Given a conversation between a user and an assistant of an employment agency, list all the 
-                    relevant occupations, places of work, dates and whether it was in the unseen economy or not. The 
+                    relevant occupations and whether it was in the unseen economy or not. The 
                     format should be:
 
-                    {JOB_TITLE}; {UNSEEN_OR_FORMAL_ECONOMY}; {PLACE_OF_WORK}; {DATES_WORKED}
+                    {JOB_TITLE}; {UNSEEN_OR_FORMAL_ECONOMY};
                     
                     each variable should be separated by semicolon and each position should be separated by a newline. 
                     If you are unsure about a variable, return NOT_CLEAR
@@ -66,7 +66,7 @@ class ExtractExperienceTool(Tool):
             if line.strip() == "":
                 continue
             elements = line.split(";")
-            experience = ExperienceEntity(job_title=elements[0], dates=elements[3])
+            experience = ExperienceEntity(job_title=elements[0])
             experience.esco_occupations = await self._occupation_search_service.search(elements[0])
             # TODO: Add more fields, especially the skills.
             experiences.append(experience)

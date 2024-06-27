@@ -13,6 +13,7 @@ class AgentType(Enum):
     EXPERIENCES_EXPLORER_AGENT = "ExperiencesExplorerAgent"
     FAREWELL_AGENT = "FarewellAgent"
     QNA_AGENT = "QnaAgent"
+    TIMELINE_EXPLORER_AGENT = "TimelineExplorerAgent"
 
 
 class AgentInput(BaseModel):
