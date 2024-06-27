@@ -24,7 +24,7 @@ def get_conversation_finish_instructions(condition: str) -> str:
 # The order the output components strategically to improve model predictions.
 # Include Chain of Thought in the response to improve the agent's completion of the task.
 MODEL_RESPONSE_INSTRUCTIONS = dedent("""\
-    Your response must always bea a JSON object with the following schema:
+    Your response must always be a JSON object with the following schema:
         - reasoning: A step by step explanation of how my message relates to your instructions, 
                      why you set the finished flag to the specific value and why you chose the message.  
                      In the form of "..., therefore I will set the finished flag to true|false, and I will ...", 
