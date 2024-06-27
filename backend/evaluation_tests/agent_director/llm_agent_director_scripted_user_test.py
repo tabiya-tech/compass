@@ -10,6 +10,7 @@ from _pytest.logging import LogCaptureFixture
 
 from app.agent.agent_director import AgentDirectorState
 from app.agent.agent_types import AgentType
+from app.agent.experiences_explorer_agent import ExperiencesAgentState
 from app.agent.llm_agent_director import LLMAgentDirector
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager, \
     ConversationMemoryManagerState
@@ -51,6 +52,7 @@ def setup_agent_director() -> tuple[
     conversation_manager.set_state(state=ConversationMemoryManagerState(session_id))
     agent_director = LLMAgentDirector(conversation_manager, FakeOccupationSimilaritySearchService())
     agent_director.set_state(AgentDirectorState(session_id))
+    agent_director.get_experiences_explorer_agent().set_state(ExperiencesAgentState(session_id))
 
     async def agent_director_exec(caplog, test_case):
         print(f"Running test case {test_case.name}")
@@ -104,8 +106,8 @@ def setup_agent_director() -> tuple[
 async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture, setup_agent_director):
     """
     Conversation test, based on a scripted user.
-    Asserts that the agent director is able to complete the conversation.
-      """
+    Asserts that the agent director routes the conversation and does not complete it.
+    """
 
     given_test_case = ScriptedUserEvaluationTestCase(
         name='user_says_yes',
@@ -168,12 +170,12 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture, setup_age
         AgentState(0, AgentType.WELCOME_AGENT, False),  # WelcomeAgent say hi
         AgentState(1, AgentType.WELCOME_AGENT, False),
         AgentState(2, AgentType.WELCOME_AGENT, True),  # WelcomeAgent completes task
-        AgentState(3, AgentType.SKILL_EXPLORER_AGENT, False),  # Start of Skill Explore
-        AgentState(4, AgentType.SKILL_EXPLORER_AGENT, False),  # Job 1
-        AgentState(5, AgentType.SKILL_EXPLORER_AGENT, False),  # skills
-        AgentState(6, AgentType.SKILL_EXPLORER_AGENT, False),  # No more to say
+        AgentState(3, AgentType.EXPERIENCES_EXPLORER_AGENT, False),  # Start of Skill Explore
+        AgentState(4, AgentType.EXPERIENCES_EXPLORER_AGENT, False),  # Job 1
+        AgentState(5, AgentType.EXPERIENCES_EXPLORER_AGENT, False),  # skills
+        AgentState(6, AgentType.EXPERIENCES_EXPLORER_AGENT, False),  # No more to say
         AgentState(7, AgentType.WELCOME_AGENT, False),  # WelcomeAgent explains
-        AgentState(8, AgentType.SKILL_EXPLORER_AGENT, True),  # SkillsAgent completes task
+        AgentState(8, AgentType.EXPERIENCES_EXPLORER_AGENT, True),  # SkillsAgent completes task
         AgentState(9, AgentType.FAREWELL_AGENT, True)  # FarewellAgent completes task
     ]
     for i, expected_state in enumerate(expected_agent_states):
