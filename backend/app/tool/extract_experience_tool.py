@@ -1,10 +1,8 @@
 import logging
-from abc import ABC
 from textwrap import dedent
-from typing import List, Optional
+from typing import List
 
-from pydantic.main import BaseModel
-
+from app.agent.experience_state import ExperienceState
 from app.vector_search.esco_entities import OccupationSkillEntity
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from common_libs.llm.generative_models import GeminiGenerativeLLM
@@ -13,24 +11,11 @@ from common_libs.llm.models_utils import LLMConfig, LOW_TEMPERATURE_GENERATION_C
 logger = logging.getLogger(__name__)
 
 
-class ExperienceEntity(BaseModel):
-    """
-    A class to represent a work experience (formal, informal or unseen economy).
-    """
-
-    # The job title as referred by the user (i.e. not necessarily the official ESCO occupation label)
-    job_title: str
-    # The occupation records in the ESCO db that we think are related to this experience
-    esco_occupations: Optional[List[OccupationSkillEntity]] = []
-    # TODO: Add more fields, especially the skills. Also decide whether we want skills to be directly connected to
-    #  each occupation or not.
-
-
 class ExtractExperienceTool:
     """
     This tool takes a user input text and uses an LLM to decide what past experiences is the user talking about.
     The experience can be a formal work experience (e.g. baker) or an informal experience (e.g. cooking for the family).
-    Those are then parsed, looked-up in ESCO and returned as a list of ExperienceEntity.
+    Those are then parsed, looked-up in ESCO and returned as a list of ExperienceState.
     """
 
     def __init__(self, occupation_search_service: SimilaritySearchService[OccupationSkillEntity],
@@ -49,16 +34,16 @@ class ExtractExperienceTool:
         self._llm = GeminiGenerativeLLM(system_instructions=self._system_instructions, config=config)
         self._occupation_search_service = occupation_search_service
 
-    async def extract_experience_from_user_reply(self, user_str: str) -> List[ExperienceEntity]:
+    async def extract_experience_from_user_reply(self, user_str: str) -> List[ExperienceState]:
         # Use the LLM to find out what was the experiences the user is talking about
         llm_response = await self._llm.generate_content(user_str)
         response_text = llm_response.text
-        experiences: List[ExperienceEntity] = []
+        experiences: List[ExperienceState] = []
         for line in response_text.split("\n"):
             if line.strip() == "":
                 continue
             elements = line.split(";")
-            experience = ExperienceEntity(job_title=elements[0])
+            experience = ExperienceState(job_title=elements[0])
             experience.esco_occupations = await self._occupation_search_service.search(elements[0])
             # TODO: Add more fields, especially the skills.
             experiences.append(experience)
