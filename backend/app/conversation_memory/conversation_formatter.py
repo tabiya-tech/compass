@@ -1,4 +1,4 @@
-from app.agent.prompt_reponse_template import MODEL_RESPONSE_INSTRUCTIONS
+from app.agent.prompt_response_template import MODEL_RESPONSE_INSTRUCTIONS
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationTurn
 from common_libs.llm.models_utils import LLMInput, LLMTurn
 
