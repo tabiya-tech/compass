@@ -72,20 +72,18 @@ export default class ChatService {
     const serviceName = "ChatService";
     const serviceFunction = "clearChat";
     const method = "GET";
-    const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, this.chatEndpointUrl);
+    const qualifiedURL = `${this.chatEndpointUrl}?user_input=&clear_memory=true&session_id=${this.getSessionId()}`;
+    const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, qualifiedURL);
 
-    const response = await fetchWithAuth(
-      `${this.chatEndpointUrl}?user_input=&clear_memory=true&session_id=${this.sessionId}`,
-      {
-        method: method,
-        headers: { "Content-Type": "application/json" },
-        expectedStatusCode: StatusCodes.OK,
-        serviceName,
-        serviceFunction,
-        failureMessage: `Failed to clear chat for session id ${this.getSessionId()}`,
-        expectedContentType: "application/json",
-      }
-    );
+    const response = await fetchWithAuth(qualifiedURL, {
+      method: method,
+      headers: { "Content-Type": "application/json" },
+      expectedStatusCode: StatusCodes.OK,
+      serviceName,
+      serviceFunction,
+      failureMessage: `Failed to clear chat for session id ${this.getSessionId()}`,
+      expectedContentType: "application/json",
+    });
 
     const responseBody = await response.text();
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography, styled } from "@mui/material";
 import { ChatMessageOrigin, IChatMessage } from "src/chat/Chat.types";
-import { getDurationBetweenDates } from "src/utils/getDurationBetweenDates";
+import { getDurationFromNow } from "src/utils/getDurationFromNow";
 
 const uniqueId = "2fbaf2ef-9eab-485a-bd28-b4a164e18b06";
 
@@ -20,9 +20,12 @@ const MessageContainer = styled(Box)<{ origin: ChatMessageOrigin }>(({ theme, or
 
 const MessageBubble = styled(Box)<{ origin: ChatMessageOrigin }>(({ theme, origin }) => ({
   maxWidth: "70%",
-  padding: theme.spacing(theme.tabiyaSpacing.sm),
-  borderRadius: theme.spacing(theme.tabiyaRounding.md),
-  backgroundColor: origin === ChatMessageOrigin.ME ? theme.palette.primary.light : theme.palette.grey[300],
+  minWidth: "30%",
+  variants: "outlined",
+  wordWrap: "break-word",
+  padding: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+  borderRadius: theme.rounding(theme.tabiyaRounding.xs),
+  backgroundColor: origin === ChatMessageOrigin.ME ? theme.palette.primary.light : theme.palette.grey[200],
   color: origin === ChatMessageOrigin.ME ? theme.palette.primary.contrastText : theme.palette.text.primary,
   position: "relative",
   alignSelf: origin === ChatMessageOrigin.ME ? "flex-end" : "flex-start",
@@ -42,7 +45,7 @@ type ChatMessageProps = {
 const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage, isTyping }) => {
   let duration;
   try {
-    duration = getDurationBetweenDates(new Date(chatMessage.timestamp), new Date());
+    duration = getDurationFromNow(new Date(chatMessage.timestamp));
   } catch (e) {
     console.error(e);
   }

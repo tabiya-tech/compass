@@ -185,5 +185,30 @@ describe("ChatService", () => {
       // THEN expected it to reject with the same error thrown by fetchWithAuth
       await expect(service.clearChat()).rejects.toMatchObject(givenFetchError);
     });
+
+    test("on 200, should reject with an error ERROR_CODE.INVALID_RESPONSE_BODY if response is a string", async () => {
+      // GIVEN the clear chat REST API will respond with OK and some response that does not conform to the messageResponseSchema
+      setupAPIServiceSpy(StatusCodes.OK, "foo", "application/json;charset=UTF-8");
+
+      // WHEN the clearChat function is called
+      const service = new ChatService();
+      const clearChatPromise = service.clearChat();
+
+      // THEN expected it to reject with the error response
+      const expectedError = {
+        ...new ServiceError(
+          ChatService.name,
+          "clearChat",
+          "GET",
+          `${givenApiServerUrl}/conversation?user_input=&clear_memory=true&session_id=${service.getSessionId()}`,
+          StatusCodes.OK,
+          ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
+          "",
+          ""
+        ),
+        details: expect.anything(),
+      };
+      await expect(clearChatPromise).rejects.toMatchObject(expectedError);
+    });
   });
 });

@@ -31,3 +31,41 @@ export const Shown: Story = {
     ],
   },
 };
+
+export const Empty: Story = {
+  args: {
+    messages: [],
+  },
+};
+
+export const Typing: Story = {
+  args: {
+    messages: [
+      {
+        id: 1,
+        origin: ChatMessageOrigin.ME,
+        message: "Hello, how can I help you?",
+        timestamp: Date.now(),
+      },
+    ],
+    isTyping: true,
+  },
+};
+
+export const TypingWhenEmpty: Story = {
+  args: {
+    messages: [],
+    isTyping: true,
+  },
+};
+
+export const LongConversation: Story = {
+  args: {
+    messages: Array.from({ length: 100 }, (_, i) => ({
+      id: i,
+      origin: i % 2 === 0 ? ChatMessageOrigin.COMPASS : ChatMessageOrigin.ME,
+      message: `Message ${i}`,
+      timestamp: Date.now() - i * 1000,
+    })),
+  },
+};

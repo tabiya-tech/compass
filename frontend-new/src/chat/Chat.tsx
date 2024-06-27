@@ -30,14 +30,13 @@ const Chat = () => {
     }
   }, []);
 
-
   const addMessage = (message: IChatMessage) => {
     setMessages((prevMessages) => [...prevMessages, message]);
   };
 
   const initializeChat = useCallback(async () => {
     try {
-      if(!chatService) throw new Error("Chat service is not initialized");
+      if (!chatService) throw new Error("Chat service is not initialized");
       setIsTyping(true);
 
       const response = await chatService.sendMessage(START_PROMPT);
@@ -58,10 +57,11 @@ const Chat = () => {
 
   const sendMessage = useCallback(
     async (userMessage: string) => {
+      // optimistically add the user's message for a more responsive feel
       const message = generateUserMessage(userMessage);
       addMessage(message);
       try {
-        if(!chatService) throw new Error("Chat service is not initialized");
+        if (!chatService) throw new Error("Chat service is not initialized");
         setIsTyping(true);
         const response = await chatService.sendMessage(userMessage);
         const botMessage = generateCompassMessage(response.last.message_for_user);
@@ -77,20 +77,6 @@ const Chat = () => {
     },
     [chatService]
   );
-
-  const clearMessages = useCallback(async () => {
-    try {
-      if(!chatService) throw new Error("Chat service is not initialized");
-      setIsTyping(true);
-      await chatService.clearChat();
-      setMessages([]);
-    } catch (error) {
-      console.error("Failed to clear chat:", error);
-      enqueueSnackbar("Failed to clear chat", { variant: "error" });
-    } finally {
-      setIsTyping(false);
-    }
-  }, [chatService, enqueueSnackbar]);
 
   useEffect(() => {
     if (!initialized) {
@@ -110,7 +96,7 @@ const Chat = () => {
     <Box width="100%" height="100%" display="flex" flexDirection="column" data-testid={DATA_TEST_ID.CHAT_CONTAINER}>
       <ChatHeader />
       <Box sx={{ flex: 1, overflowY: "auto" }}>
-        <ChatList messages={messages} sendMessage={sendMessage} clearMessages={clearMessages} isTyping={isTyping} />
+        <ChatList messages={messages} isTyping={isTyping} />
       </Box>
       <Box sx={{ flexShrink: 0 }}>
         <ChatMessageField handleSend={handleSend} message={currentMessage} notifyChange={setCurrentMessage} />

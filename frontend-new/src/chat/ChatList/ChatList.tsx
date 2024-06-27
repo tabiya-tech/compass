@@ -12,8 +12,6 @@ export const DATA_TEST_ID = {
 
 export type ChatListProps = {
   messages: IChatMessage[];
-  sendMessage: (message: string) => void;
-  clearMessages: () => void;
   isTyping: boolean;
 };
 
@@ -21,9 +19,10 @@ const ChatListContainer = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   height: "100%",
+  overflowX: "hidden",
   [theme.breakpoints.up("md")]: {
     height: "90%",
-    width: "80%",
+    width: "60%",
     margin: "auto",
   },
 }));
@@ -34,7 +33,7 @@ const MessagesContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
 }));
 
-const ChatList: React.FC<ChatListProps> = ({ messages, clearMessages, sendMessage, isTyping }) => {
+const ChatList: React.FC<ChatListProps> = ({ messages, isTyping }) => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -57,7 +56,7 @@ const ChatList: React.FC<ChatListProps> = ({ messages, clearMessages, sendMessag
 
   return (
     <ChatListContainer data-testid={DATA_TEST_ID.CHAT_LIST_CONTAINER}>
-      <MessagesContainer>
+      <MessagesContainer tabIndex={0}>
         <List
           sx={{
             width: "100%",

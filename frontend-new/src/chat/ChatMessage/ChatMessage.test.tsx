@@ -4,7 +4,7 @@ import "src/_test_utilities/consoleMock";
 import ChatMessage, { DATA_TEST_ID } from "./ChatMessage";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { ChatMessageOrigin } from "src/chat/Chat.types";
-import * as getDurationBetweenDates from "src/utils/getDurationBetweenDates";
+import * as GetDurationFromNow from "src/utils/getDurationFromNow";
 
 describe("render tests", () => {
   beforeAll(() => {
@@ -26,7 +26,7 @@ describe("render tests", () => {
       timestamp: givenDate,
     };
 
-    jest.spyOn(getDurationBetweenDates, "getDurationBetweenDates").mockReturnValue("Some Date");
+    jest.spyOn(GetDurationFromNow, "getDurationFromNow").mockReturnValue("Some Date");
 
     render(<ChatMessage chatMessage={givenMessage} isTyping={false} />);
 
@@ -35,11 +35,14 @@ describe("render tests", () => {
     // AND expect the timeout to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_TIMESTAMP)).toBeInTheDocument();
     // AND the getDurationBetweenDates to have been called with the given date
-    expect(getDurationBetweenDates.getDurationBetweenDates).toHaveBeenCalledWith(new Date(givenDate), new Date());
+    expect(GetDurationFromNow.getDurationFromNow).toHaveBeenCalledWith(new Date(givenDate));
     // AND the correct date to have been displayed
     expect(screen.getByText("sent Some Date", { exact: false })).toBeInTheDocument();
     // AND expect the message to be visible
     expect(screen.getByText(givenMessage.message)).toBeInTheDocument();
+
+    // AND expect the component to match the snapshot
+    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_CONTAINER)).toMatchSnapshot();
   });
   test("should render the Chat message without a timestamp when typing is set to true", () => {
     // WHEN the chat header is rendered

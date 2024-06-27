@@ -24,7 +24,7 @@ describe("ChatList", () => {
     jest.clearAllMocks();
   });
 
-  test("should render the Chat Header", () => {
+  test("should render the Chat List", () => {
     // GIVEN a message list, a clear message function, a send message function, and a typing status
     const givenMessages = [
       {
@@ -40,19 +40,10 @@ describe("ChatList", () => {
         timestamp: Date.now(),
       },
     ];
-    const givenClearMessages = jest.fn();
-    const givenSendMessage = jest.fn();
     const givenIsTyping = true; // Simulate typing state
 
     // WHEN the chat header is rendered
-    render(
-      <ChatList
-        messages={givenMessages}
-        sendMessage={givenSendMessage}
-        clearMessages={givenClearMessages}
-        isTyping={givenIsTyping}
-      />
-    );
+    render(<ChatList messages={givenMessages} isTyping={givenIsTyping} />);
 
     // THEN expect the chat header to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
@@ -88,5 +79,11 @@ describe("ChatList", () => {
       },
       {}
     );
+
+    // AND expect the scrollIntoView function to be called
+    expect(window.HTMLElement.prototype.scrollIntoView).toHaveBeenCalled();
+
+    // AND expect the component to match the snapshot
+    expect(screen.getByTestId(DATA_TEST_ID.CHAT_LIST_CONTAINER)).toMatchSnapshot();
   });
 });

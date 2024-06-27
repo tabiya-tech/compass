@@ -14,6 +14,8 @@ describe("ChatMessageField", () => {
     expect(console.warn).not.toHaveBeenCalled();
     // AND the ChatMessageField container to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER)).toBeInTheDocument();
+    // AND the ChatMessageField input to be in the document
+    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD)).toBeInTheDocument();
     // AND the ChatMessageField button to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON)).toBeInTheDocument();
     // AND the ChatMessageField icon to be in the document
@@ -31,7 +33,7 @@ describe("ChatMessageField", () => {
     // WHEN ChatMessageField is rendered
     render(<ChatMessageField handleSend={jest.fn()} message="" notifyChange={handleChange} />);
     // AND the input is changed
-    const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER);
+    const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
     fireEvent.change(ChatMessageFieldInput, { target: { value: message } });
 
     // THEN expect notifyChange to be called
@@ -51,7 +53,7 @@ describe("ChatMessageField", () => {
     // WHEN ChatMessageField is rendered
     render(<ChatMessageField handleSend={jest.fn()} message="" notifyChange={handleChange} />);
     // AND the input is changed
-    const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER);
+    const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
     fireEvent.change(ChatMessageFieldInput, { target: { value: invalidMessage } });
 
     // THEN expect notifyChange to be called
@@ -71,7 +73,7 @@ describe("ChatMessageField", () => {
     // WHEN ChatMessageField is rendered
     render(<ChatMessageField handleSend={jest.fn()} message="" notifyChange={handleChange} />);
     // AND the input is changed
-    const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER);
+    const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
     fireEvent.change(ChatMessageFieldInput, { target: { value: validMessage } });
 
     // THEN expect notifyChange to be called
@@ -93,7 +95,7 @@ describe("ChatMessageField", () => {
       render(<ChatMessageField handleSend={jest.fn()} message="" notifyChange={handleChange} />);
 
       // AND the input is changed
-      const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER);
+      const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
 
       fireEvent.change(ChatMessageFieldInput, { target: { value: message } });
 
@@ -116,7 +118,7 @@ describe("ChatMessageField", () => {
       render(<ChatMessageField handleSend={jest.fn()} message="" notifyChange={handleChange} />);
 
       // AND the input is changed
-      const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER);
+      const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
 
       fireEvent.change(ChatMessageFieldInput, { target: { value: message } });
 
@@ -147,7 +149,7 @@ describe("ChatMessageField", () => {
       // WHEN ChatMessageField is rendered
       render(<ChatMessageField handleSend={handleSend} message="foo" notifyChange={jest.fn()} />);
       // AND the enter key is pressed
-      const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER);
+      const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
       fireEvent.keyDown(ChatMessageFieldInput, { key: "Enter", code: "Enter" });
 
       // THEN expect handleSend to be called
@@ -161,7 +163,7 @@ describe("ChatMessageField", () => {
       // WHEN ChatMessageField is rendered
       render(<ChatMessageField handleSend={jest.fn()} message="foo" notifyChange={notifyChange} />);
       // AND the input is changed
-      const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER);
+      const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
       fireEvent.change(ChatMessageFieldInput, { target: { value: "bar" } });
 
       // THEN expect notifyChange to be called

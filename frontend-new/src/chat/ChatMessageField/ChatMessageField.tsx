@@ -11,6 +11,7 @@ export interface ChatMessageFieldProps {
 const uniqueId = "2a76494f-351d-409d-ba58-e1b2cfaf2a53";
 export const DATA_TEST_ID = {
   CHAT_MESSAGE_FIELD_CONTAINER: `chat-message-field-container-${uniqueId}`,
+  CHAT_MESSAGE_FIELD: `chat-message-field-${uniqueId}`,
   CHAT_MESSAGE_FIELD_BUTTON: `chat-message-field-button-${uniqueId}`,
   CHAT_MESSAGE_FIELD_ICON: `chat-message-field-icon-${uniqueId}`,
   CHAT_MESSAGE_CHAR_COUNTER: `chat-message-char-counter-${uniqueId}`,
@@ -23,7 +24,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
     "& fieldset": {
       borderColor: theme.palette.primary.main,
-      borderWidth: "2px",
+      borderWidth: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
     },
     "&:hover fieldset": {
       borderColor: theme.palette.primary.dark,
@@ -71,10 +72,16 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     }
   };
 
+  const handleButtonClick = () => {
+    props.handleSend();
+    setErrorMessage("");
+    setCharCount(0);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      props.handleSend();
+      handleButtonClick();
     }
   };
 
@@ -85,52 +92,71 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     charCount >= CHAT_MESSAGE_MAX_LENGTH * 0.95 ? theme.palette.error.main : theme.palette.text.secondary;
 
   return (
-    <Box position="relative">
-      <StyledTextField
-        placeholder="Type your message..."
-        variant="outlined"
-        fullWidth
-        multiline
-        maxRows={4}
-        value={props.message}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-        error={!!errorMessage}
-        helperText={errorMessage}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton
-                data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON}
-                onClick={props.handleSend}
-                title="send message"
-                disabled={!!errorMessage}
-              >
-                <SendIcon
-                  data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_ICON}
-                  sx={{
-                    color: errorMessage ? theme.palette.action.disabled : theme.palette.primary.dark,
-                  }}
-                />
-              </IconButton>
-            </InputAdornment>
-          ),
-          inputProps: {
-            maxLength: 1000,
-            "data-testid": DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER,
+    <Box
+      position="relative"
+      data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER}
+      sx={{
+        width: "100%",
+        alignItems: "center",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <Box
+        sx={{
+          width: {
+            xs: "100%",
+            md: "60%",
           },
+          position: "relative",
         }}
-      />
-      {showCharCounter && (
-        <Typography
-          data-testid={DATA_TEST_ID.CHAT_MESSAGE_CHAR_COUNTER}
-          variant="caption"
-          color={counterColor}
-          sx={{ position: "absolute", bottom: -20, right: 10 }}
-        >
-          {charCount}/{CHAT_MESSAGE_MAX_LENGTH}
-        </Typography>
-      )}
+      >
+        <StyledTextField
+          placeholder="Type your message..."
+          variant="outlined"
+          fullWidth
+          multiline
+          maxRows={4}
+          value={props.message}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          error={!!errorMessage}
+          helperText={errorMessage}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON}
+                  onClick={handleButtonClick}
+                  title="send message"
+                  disabled={!!errorMessage}
+                >
+                  <SendIcon
+                    data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_ICON}
+                    sx={{
+                      color: errorMessage ? theme.palette.action.disabled : theme.palette.primary.dark,
+                    }}
+                  />
+                </IconButton>
+              </InputAdornment>
+            ),
+            inputProps: {
+              maxLength: 1000,
+              "data-testid": DATA_TEST_ID.CHAT_MESSAGE_FIELD,
+            },
+          }}
+        />
+        {showCharCounter && (
+          <Typography
+            data-testid={DATA_TEST_ID.CHAT_MESSAGE_CHAR_COUNTER}
+            variant="caption"
+            color={counterColor}
+            sx={{ position: "absolute", bottom: 0, right: 10 }}
+          >
+            {charCount}/{CHAT_MESSAGE_MAX_LENGTH}
+          </Typography>
+        )}
+      </Box>
     </Box>
   );
 };

@@ -2,7 +2,7 @@
 
 exports[`ChatHeader should render the Chat Header 1`] = `
 <div
-  class="MuiBox-root css-1h7bnqy"
+  class="MuiBox-root css-1ddfroy"
   data-testid="chat-header-container-7413b63a-887b-4f41-b930-89e9770db12b"
 >
   <a

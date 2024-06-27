@@ -46,7 +46,7 @@ const ChatHeader = () => {
       alignItems="center"
       justifyContent="space-between"
       data-testid={DATA_TEST_ID.CHAT_HEADER_CONTAINER}
-      padding={theme.spacing(theme.tabiyaSpacing.xl)}
+      padding={theme.spacing(theme.tabiyaSpacing.md)}
     >
       <NavLink style={{ lineHeight: 0 }} to={routerPaths.ROOT} data-testid={DATA_TEST_ID.CHAT_HEADER_LOGO_LINK}>
         <img
