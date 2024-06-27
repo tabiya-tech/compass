@@ -1,0 +1,1427 @@
+{
+  "occupation": {
+    "id": "6613c0d42c477928e7d46861",
+    "UUID": "97354279-6ae2-44c9-bca5-3d2fe4cccb04",
+    "preferredLabel": "baker",
+    "code": "7512.1",
+    "description": "Bakers make a wide range of breads, pastries, and other baked goods. They follow all the processes from receipt and storage of raw materials, preparation of raw materials for bread-making, measurement and mixing of ingredients into dough and proof. They tend ovens to bake products to an adequate temperature and time. \n",
+    "altLabels": [
+      "bakery specialist",
+      "bakery employee",
+      "bread baker",
+      "baker"
+    ]
+  },
+  "skills": [
+    {
+      "id": "6613c0ce2c477928e7d45540",
+      "UUID": "82e8381c-17a1-4c71-88b6-c915a5aff166",
+      "preferredLabel": "lift heavy weights",
+      "description": "Lift heavy weights and apply ergonomic lifting techniques to avoid damaging the body.",
+      "altLabels": [
+        "uphold heavy weights",
+        "lifting heavy weights",
+        "lift heavy weights",
+        "erect heavy weights",
+        "mount heavy weights",
+        "elevate heavy weights",
+        "lift heavy weight"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0cd2c477928e7d445ca",
+      "UUID": "0dc44679-f8cd-4815-82d7-cfb0fdf5b5bb",
+      "preferredLabel": "biotechnology",
+      "description": "The technology that uses, modifies or harnesses biological systems, organisms and cellular components to develop new technologies and products for specific uses.",
+      "altLabels": [
+        "biotechnology",
+        "bio-tech",
+        "bio-science",
+        "science of bio-science",
+        "bio-technology",
+        "science of bio-technology",
+        "field of biotechnology",
+        "field of bio-technology",
+        "field of bioscience",
+        "field of bio-science",
+        "science of bioscience",
+        "science of biotechnology"
+      ],
+      "skillType": "knowledge",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0c92c477928e7d43193",
+      "UUID": "00578f47-54fd-4b12-825b-9d468b3b50d7",
+      "preferredLabel": "monitor flour unloading equipment",
+      "description": "Monitor flour unloading equipment and flour processing systems. Ensure ingredients are delivered on time.",
+      "altLabels": [
+        "oversee flour unloading equipment",
+        "undertake monitoring of flour processing systems",
+        "perform flour unloading equipment monitoring",
+        "monitor flour unloading equipment",
+        "carry out flour unloading equipment monitoring activities",
+        "monitor flour unloading apparatus",
+        "monitor equipment used to unload flour",
+        "conduct flour unloading equipment monitoring",
+        "oversee equipment used to unload flour",
+        "monitor operation of flour unloading equipment",
+        "carry out monitoring of flour processing systems",
+        "perform flour processing systems monitoring activities"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0c92c477928e7d442f9",
+      "UUID": "56e600af-cc31-4c11-a7a6-65daffabf84b",
+      "preferredLabel": "follow written instructions",
+      "description": "Follow written directions in order to perform a task or carry out a step-by-step procedure.",
+      "altLabels": [
+        "follow written instructions",
+        "follow guidebook",
+        "execute tasks in accordance with written instructions",
+        "adhere to written instructions",
+        "perform tasks according to written instructions",
+        "carry out tasks in accordance with written directions",
+        "adhere to written directions",
+        "follow manual",
+        "follow written directions",
+        "complete tasks according to written instructions",
+        "perform procedures according to written directions"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0cd2c477928e7d44965",
+      "UUID": "678c5558-ce15-4ac7-a1db-d17b499c00bf",
+      "preferredLabel": "execute chilling processes to food products",
+      "description": "Carry out chilling, freezing and cooling operation processes to food products such as fruit and vegetables, fish, meat, catering food. Prepare food products for extended periods of storage or half prepared food. Ensure safety and nutrition qualities of frozen goods and preserve products in accordance with specified temperatures.",
+      "altLabels": [
+        "execute chilling processes of a food product",
+        "achieve chilling processes to food products",
+        "execute chilling processes of the food products",
+        "carry out chilling processes to food products",
+        "execute the chilling processes of food products",
+        "enact execute chilling processes to food products",
+        "undertake chilling processes to food products",
+        "execute chilling processes to food products"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0c92c477928e7d44345",
+      "UUID": "3d94836c-c776-4554-8447-543b3dfe7fd2",
+      "preferredLabel": "bake goods",
+      "description": "Perform all tasks for baking such as oven preparation and product loading, until the baked goods are discharged from it.",
+      "altLabels": [
+        "bake a good",
+        "bake",
+        "bake products",
+        "baking goods",
+        "bake goods"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0c92c477928e7d43c77",
+      "UUID": "4521e038-d136-40c0-9f13-e6cdbdc46268",
+      "preferredLabel": "handle delivery of raw materials",
+      "description": "Receive raw materials from the suppliers. Check their quality and accuracy and move them into the warehouse. Make sure that raw materials are adequately stored until they are required by the production department.",
+      "altLabels": [
+        "maintain delivery of raw materials",
+        "manage the delivery of raw materials",
+        "oversee delivery of raw materials",
+        "supervise delivery of raw materials",
+        "manage delivery of a raw material",
+        "regulate delivery of raw materials",
+        "manage delivery of raw materials",
+        "manage the delivery of a raw material"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0c92c477928e7d439bd",
+      "UUID": "c25c05ec-8232-466f-a5d0-a592cc42f88e",
+      "preferredLabel": "store raw food materials",
+      "description": "Keep in reserve raw materials and other food supplies, following stock control procedures.",
+      "altLabels": [
+        "stored raw food materials",
+        "store raw food materials",
+        "stock raw prime ingredients",
+        "store materials of raw food",
+        "stock raw food materials"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0ce2c477928e7d451e0",
+      "UUID": "c0b1dc3f-e84a-4f62-84a4-b5639bd04898",
+      "preferredLabel": "monitor operations of cleaning machines",
+      "description": "Monitor the operation of cleaning equipment; stop machines or immediately notify supervisors should incidents or malfunctions occur.",
+      "altLabels": [
+        "view operations of cleaning machines",
+        "monitor the operations of a cleaning machines",
+        "monitor operations of cleaning machines",
+        "watch operations of cleaning machines",
+        "monitoring operations of cleaning machines",
+        "monitor the operation of cleaning machines",
+        "supervise operations of cleaning machines",
+        "oversee operations of cleaning machines"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0cd2c477928e7d44ce0",
+      "UUID": "bb21da18-8d70-45b4-9437-69d84460c7a0",
+      "preferredLabel": "assist in the development of standard operating procedures in the food chain",
+      "description": "Assist in the development of Standard Operating Procedures (SOP) in the food chain by working with line operators. Understand current operating procedures and identify best techniques. Help document new procedures and update existing ones.",
+      "altLabels": [
+        "assist in the development of a standard operating procedure in the food chain",
+        "assist in the development of standard operating procedures in the food chain",
+        "undertake the development of standard operating procedures in the food chain",
+        "assist in the development of standard operating processes in the food chain",
+        "implement  test the development of standard operating procedures in the food chain",
+        "complete the development of standard operating procedures in the food chain",
+        "operate test on the development of standard operating procedures in the food chain"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0c92c477928e7d43cba",
+      "UUID": "d5bed870-0310-48cd-ba5a-a58181222568",
+      "preferredLabel": "crafting",
+      "description": "The ability to work with the hands in order to create something artistic.",
+      "altLabels": [
+        "craft",
+        "crafting",
+        "hand work",
+        "hand working",
+        "work with hands"
+      ],
+      "skillType": "knowledge",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0cd2c477928e7d44aeb",
+      "UUID": "a1b9dd3f-5b95-4116-8a13-a6a987643e6c",
+      "preferredLabel": "make artistic food creations",
+      "description": "Use ingredients, mixes and instruments to create artistic food preparations e.g. cakes. Be imaginative and resourceful, and combine colours and shapes to good effect. Turn designs into reality, caring for aesthetic and presentation.",
+      "altLabels": [
+        "making artistic food creations",
+        "create artistic food creations",
+        "assemble artistic food creations",
+        "make an artistic food creation",
+        "produce artistic food creations",
+        "make artistic food creations",
+        "make complete artistic food creations"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0ce2c477928e7d45327",
+      "UUID": "d1274190-2995-4fa5-9a04-7580f615e338",
+      "preferredLabel": "work according to recipe",
+      "description": "Perform tasks in food preparation according to recipe or specification in order to preserve the quality of ingredients and to ensure replication accuracy of the recipe. Select the appropriate materials to follow the recipe, taking into account the current situation.",
+      "altLabels": [
+        "work according to recipes",
+        "employ according to recipe",
+        "work according to recipe",
+        "working according to recipes",
+        "prepare according to recipe",
+        "conduct according to recipe",
+        "create according to recipe"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0cd2c477928e7d44f85",
+      "UUID": "96736939-246e-4f92-8241-1b17b357687a",
+      "preferredLabel": "mould doughs",
+      "description": "Operate moulding by crafting or using different equipment to have a certain shape of doughs.",
+      "altLabels": [
+        "undertake moulding of doughs",
+        "operate molding  of doughs",
+        "execute moulding of doughs",
+        "conduct moulding of doughs",
+        "operate the moulding of doughs",
+        "perform moulding of doughs"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0d12c477928e7d45898",
+      "UUID": "41e46c4d-bddc-4b76-a1f8-5d6b7d54d250",
+      "preferredLabel": "apply requirements concerning manufacturing of food and beverages",
+      "description": "Apply and follow national, international, and internal requirements quoted in standards, regulations and other specifications related with manufacturing of food and beverages.",
+      "altLabels": [
+        "administer requirements concerning manufacturing of food and beverages",
+        "utilise requirements concerning manufacturing of food and beverages",
+        "implement requirements concerning manufacturing of food and beverages",
+        "apply requirements concerning the manufacture of food and beverages",
+        "employ requirements concerning manufacturing of food and beverages",
+        "apply requirements concerning the manufacturing of food and beverages",
+        "apply requirements concerning manufacturing of food and beverages"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0d12c477928e7d45c81",
+      "UUID": "726594eb-ba33-4f91-b446-ba243cf68dc1",
+      "preferredLabel": "Ensure correct use of bakery equipment",
+      "description": "Use the utensils, machinery and equipment for the production of bakery and farinaceous products such as kneading machines, proofing equipment, vessels, knives, baking ovens, slicers, wrappers, mixers, and glazers. Keep all tools in good condition.",
+      "altLabels": [
+        "maintain correct use of bakery equipment",
+        "establish correct use of bakery equipment",
+        "ensure the correct use of bakery equipment",
+        "assure correct use of bakery equipment",
+        "secure correct use of bakery equipment",
+        "ensure correct use of bakery equipment",
+        "ensure correct use of a bakery equipment"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0d12c477928e7d45d24",
+      "UUID": "a34840d3-5f88-48c3-8dbd-cb59bcae1e84",
+      "preferredLabel": "operate weighing machine",
+      "description": "Work with a weighing machine to measure raw, half-finished and finished products.",
+      "altLabels": [
+        "handle a weighing machine",
+        "operate weighing machine",
+        "utilise a weighing machine",
+        "work a weighing machine",
+        "use a weighing machine",
+        "operate a weighing machine"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0c92c477928e7d433e8",
+      "UUID": "94edca46-5ca1-430e-8ddc-94bdb8866014",
+      "preferredLabel": "care for food aesthetic",
+      "description": "Convey presentation and aesthetic elements into the production of food. Cut products properly, manage right quantities into the product, care for the attractiveness of the product.",
+      "altLabels": [
+        "maintain food aesthetics",
+        "manage food aesthetics",
+        "care for food aesthetic",
+        "care of food aesthetics",
+        "care for food aesthetics",
+        "caring for food aesthetics",
+        "preserve food aesthetics",
+        "look after food aesthetics"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0d12c477928e7d46168",
+      "UUID": "2584d666-b496-4075-821e-486af4367ade",
+      "preferredLabel": "select adequate packaging for food products",
+      "description": "Choose the appropriate packages for food products taking into account attractiveness and suitability of the package. Use proper packaging for sending it safely and at a reasonable cost. Have awareness that packaging can also influence the product characteristics such as shape, weight or solidity. Balance out various aspects such as cost, attractivity and compliance with regulations and environment protection.",
+      "altLabels": [
+        "select adequate packaging for a food product",
+        "selecting adequate packaging for food products",
+        "identify adequate packaging for food products",
+        "select adequate packaging for food products",
+        "choose adequate packaging for food products",
+        "use adequate packaging for food products",
+        "pick adequate packaging for food products"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0ce2c477928e7d45763",
+      "UUID": "822849fa-9bdf-45a5-aef6-f3c9267bce58",
+      "preferredLabel": "select adequate ingredients",
+      "description": "Select adequate ingredients based in their technological function to execute ideas. Strive for consistent good quality of the ingredients and use them adequately to obtain a satisfactory final product.",
+      "altLabels": [
+        "pick adequate ingredients",
+        "identify adequate ingredients",
+        "choose an adequate ingredient",
+        "select an adequate ingredient",
+        "selecting adequate ingredients",
+        "select adequate ingredients",
+        "choose adequate ingredients"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0d12c477928e7d463d0",
+      "UUID": "c4c83e8e-4a14-468a-95dd-81f9a0ec3a96",
+      "preferredLabel": "liaise with managers",
+      "description": "Liaise with managers of other departments ensuring effective service and communication, i.e. sales, planning, purchasing, trading, distribution and technical.",
+      "altLabels": [
+        "liaise with a manager",
+        "work with managers",
+        "work together with managers",
+        "collaborate with managers",
+        "liaise with managers",
+        "cooperate with managers",
+        "liaising with managers"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0d12c477928e7d4646d",
+      "UUID": "f3f59478-99e6-4774-8400-5c7ea28601c5",
+      "preferredLabel": "processes of foods and beverages manufacturing",
+      "description": "Raw materials and production processes for getting finished food products. Importance of quality control and other techniques for the food and beverage industry.",
+      "altLabels": [
+        "processes of food and beverage manufacturing",
+        "mechanisms of foods and beverages manufacturing",
+        "systems of foods and beverages manufacturing",
+        "methods of foods and beverages manufacturing",
+        "the processes of foods and beverages manufacture",
+        "processes of foods and beverages manufacturing",
+        "the processes of foods and beverages manufacturing",
+        "measures of foods and beverages manufacturing"
+      ],
+      "skillType": "knowledge",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0d12c477928e7d4612f",
+      "UUID": "7c45c80a-1de2-4752-80de-0072601e965c",
+      "preferredLabel": "operate mixing of food products",
+      "description": "Perform all kinds of mixing operations of raw materials, half-finished products and foodstuffs.",
+      "altLabels": [
+        "operate mixing of food products",
+        "operate the mixing of food products",
+        "conduct blending of food product",
+        "operating of food products mixing",
+        "undertake blending of food product",
+        "perform blending of food product",
+        "operate mixing of food product",
+        "execute blending of food product"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0c92c477928e7d43fc1",
+      "UUID": "bcfcfa47-17df-44ab-acf8-62ce6bb45b08",
+      "preferredLabel": "apply flame handling regulations",
+      "description": "Apply the laws and organisation rules for the safe storage and use of flammables.",
+      "altLabels": [
+        "apply flame handling statutes",
+        "applying flame handling regulations",
+        "apply flame handling rules",
+        "apply flame handling laws",
+        "apply flame handling ordinances",
+        "apply flame handling regulations"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0c92c477928e7d43b02",
+      "UUID": "e4af7f17-87cf-49b8-b80e-8789cf18faf5",
+      "preferredLabel": "mark differences in colours",
+      "description": "Identify differences between colours, such as shades of colour.",
+      "altLabels": [
+        "mark a difference in colours",
+        "register changes in colours",
+        "marking differences in colours",
+        "document changes in colours",
+        "mark differences in colors",
+        "acknowledge changes in colours",
+        "marking a difference in colours",
+        "note changes in colours"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0c92c477928e7d43122",
+      "UUID": "c7999a68-372f-4c43-aff2-f8a0d211a2ed",
+      "preferredLabel": "tend packaging machines",
+      "description": "Tend packaging machines such as filling, labelling, and sealing machines. Stock and sort products to be processed according to specifications. Replenish packaging supplies as required, such as boxes, cartons, wrapping paper, plastic sheet, glue, ink, or labels.",
+      "altLabels": [
+        "tend packaging machines",
+        "mind packaging machines",
+        "tend a packaging machines",
+        "look after packaging machines",
+        "watch packaging machines",
+        "take care of packaging machines",
+        "tend packaging machinery"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0cd2c477928e7d44b46",
+      "UUID": "e243d23d-71ba-457d-a2b8-0cbc50cd5529",
+      "preferredLabel": "milling machines",
+      "description": "Milling and mills and their operation in theory and practice.",
+      "altLabels": [
+        "powdering machines",
+        "milling machines",
+        "mill machines",
+        "mill machine",
+        "granulating machines",
+        "pressing machines",
+        "farming machines"
+      ],
+      "skillType": "knowledge",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0c92c477928e7d43e59",
+      "UUID": "e6ea2300-7ac6-4a8a-be80-827a37649db0",
+      "preferredLabel": "food safety principles",
+      "description": "Scientific background of food safety which includes preparation, handling, and storage of food to minimise the risk of foodborne illness and other health hazards.",
+      "altLabels": [
+        "food safety measures",
+        "food safety tenets",
+        "a food safety principle",
+        "principles of food safety",
+        "food safety principles",
+        "food safety rules",
+        "a principle of food safety",
+        "food safety procedures"
+      ],
+      "skillType": "knowledge",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0d12c477928e7d45a63",
+      "UUID": "6a24380c-f515-4855-bd2c-c10e34d3865d",
+      "preferredLabel": "monitor temperature in farinaceous processes",
+      "description": "Monitor and control the temperature in the different phases of farinaceous processes such as fermentation, proofing, and baking. Adhere to specifications or recipes.",
+      "altLabels": [
+        "monitor temperature in farinaceous processes",
+        "view temperature in farinaceous processes",
+        "oversee temperature in farinaceous processes",
+        "monitor of temperature in farinaceous processes",
+        "supervise temperature in farinaceous processes",
+        "watch temperature in farinaceous processes",
+        "monitor temperature in a farinaceous processes"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0d12c477928e7d45c85",
+      "UUID": "5f0672ef-4777-4603-9334-de1258756613",
+      "preferredLabel": "adapt efficient food processing practices",
+      "description": "Ensure to adapt the most efficient production techniques to accomplish food processing tasks with the least amount of time, effort and costs.",
+      "altLabels": [
+        "vary  efficient food processing practices",
+        "review  efficient food processing practices",
+        "adapt an efficient food processing practice",
+        "adapting efficient food processing practices",
+        "adapt efficient food processing practices",
+        "alter  efficient food processing practices",
+        "amend  efficient food processing practices"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0d12c477928e7d462f8",
+      "UUID": "39a68140-8d69-416a-9266-c66bf3740603",
+      "preferredLabel": "work in a food processing team",
+      "description": "Collaborate in a team with other food processing professionals in service of the food &amp; beverages industry.",
+      "altLabels": [
+        "perform in a food processing team",
+        "operate in a food processing team",
+        "labour in a food processing team",
+        "toil in a food processing team",
+        "work within a food processing team",
+        "work in a food processing team",
+        "work in food processing teams"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0c92c477928e7d4352e",
+      "UUID": "ff352df3-93ce-43ba-b911-b540c422ba06",
+      "preferredLabel": "operate a heat treatment process",
+      "description": "Apply heat treatment aimed at preparing and preserving half-finished or finished food products.",
+      "altLabels": [
+        "operating heat treatment process",
+        "perform a heat treatment process",
+        "operate heat treatment processes",
+        "operate a heat treatment process",
+        "conduct a heat treatment process",
+        "run a heat treatment process",
+        "undertake a heat treatment process"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0d12c477928e7d4635a",
+      "UUID": "fbcea52f-065c-4e5e-8f68-f3d2fcf2f226",
+      "preferredLabel": "analyse characteristics of food products at reception",
+      "description": "Analyse characteristics, composition, and other properties of food products at reception.",
+      "altLabels": [
+        "search characteristics of food products at reception",
+        "scrutinise characteristics of food products at reception",
+        "analyze  characteristics of food products at reception",
+        "test characteristics of food products at reception",
+        "analyse the characteristics of food products at reception",
+        "investigate characteristics of food products at reception"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0d12c477928e7d460d0",
+      "UUID": "4a8a1444-c6d9-493e-be3c-e3aff288a34e",
+      "preferredLabel": "bakery production methods",
+      "description": "The bakery production methods used to make baked products such as leaven, unleaven, sour dough, and predough.",
+      "altLabels": [
+        "bakery production method",
+        "bakery production techniques",
+        "bakery production procedures",
+        "methods of bakery production",
+        "bakery production methodology",
+        "bakery production methods",
+        "bakery production processes",
+        "bakery production systems"
+      ],
+      "skillType": "knowledge",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0d12c477928e7d46678",
+      "UUID": "226a9fb3-247b-4e18-a252-0b00884ec861",
+      "preferredLabel": "manage production changeovers",
+      "description": "Plan and oversee changeovers and related activities on a timely basis, in order to successfully execute the required production schedule.",
+      "altLabels": [
+        "ensure successful changeovers to meet production schedule",
+        "implement effective changeovers to meet production schedule",
+        "manage production changeovers",
+        "manage changeovers in production",
+        "oversee production changeovers",
+        "plan and implement production changeovers and related activities",
+        "oversee changeovers in production",
+        "supervise production changeovers",
+        "ensure execution of efficient production changeovers"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0d12c477928e7d4608a",
+      "UUID": "7e17df68-c737-4e11-8396-bff445d9b353",
+      "preferredLabel": "control of expenses",
+      "description": "Monitor and maintain effective cost controls, in regards to efficiencies, waste, overtime and staffing. Assessing excesses and strives for efficiency and productivity.",
+      "altLabels": [
+        "administer expenses",
+        "oversee expenses",
+        "expenses controls",
+        "control of expenses",
+        "supervise expenses",
+        "control expenses",
+        "controlling expenses"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0ce2c477928e7d455c9",
+      "UUID": "dc8ee22d-71f4-459b-b692-758d23ffee97",
+      "preferredLabel": "administer lactic ferment cultures to manufacturing products",
+      "description": "Add specified quantity of lactic ferment cultures to food preparations such as pasteurised milk to obtain starter for sour dairy products, such as buttermilk, cheese, and sour cream. Also, to dough making in bakery.",
+      "altLabels": [
+        "organise lactic ferment cultures to manufacturing products",
+        "control lactic ferment cultures to manufacturing products",
+        "administer lactic ferment cultures to manufacturing products",
+        "utilise lactic ferment cultures to manufacturing products",
+        "apply lactic ferment cultures to manufacturing products",
+        "administer lactic ferment cultures to manufactured products",
+        "administer lactic ferment cultures to a manufactured product"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0c92c477928e7d4349e",
+      "UUID": "c9fc4041-bb92-4238-95a7-91b54a378be3",
+      "preferredLabel": "work in an organised manner",
+      "description": "Stay focused on the project at hand, at any time. Organise, manage time, plan, schedule and meet deadlines.",
+      "altLabels": [
+        "plan work according to deadlines",
+        "organize work according to deadlines",
+        "work in an organized manner",
+        "work in an orderly manner",
+        "show organizational abilities",
+        "organize work",
+        "work according to deadlines and priorities",
+        "organise work",
+        "organise work according to deadlines",
+        "be organized",
+        "be organised",
+        "show organisational abilities"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0d12c477928e7d45ea6",
+      "UUID": "a166ceaa-5401-46e4-911d-3e7fac41009b",
+      "preferredLabel": "knead food products",
+      "description": "Perform all kinds of kneading operations of raw materials, half-finished products and foodstuffs.",
+      "altLabels": [
+        "operate kneading of a food product",
+        "perform kneading of food products",
+        "operate kneading of food products",
+        "kneading of food products operation",
+        "conduct kneading of food products",
+        "undertake kneading of food products"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0d12c477928e7d45f18",
+      "UUID": "bf478948-801f-436b-abe6-274151a81452",
+      "preferredLabel": "dispose food waste",
+      "description": "Dispose or collect food waste with the purpose of recycling or throwing away from the production process. Follow established procedures for their disposal taking care of the environment and the safety matters according to legislations.",
+      "altLabels": [
+        "dispose food waste",
+        "disposing food waste",
+        "get rid of food waste",
+        "throw away food waste",
+        "throw out food waste",
+        "recycle food waste"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0ce2c477928e7d4577b",
+      "UUID": "0f1cc061-2685-4582-91de-68efb8b193b7",
+      "preferredLabel": "monitor roasting ",
+      "description": "Monitor the roasting of coffee beans and grains for proper degree of roasting to produce the desired flavours and colours.",
+      "altLabels": [
+        "monitor roasting",
+        "supervise coffee roasting",
+        "watch coffee roasting",
+        "view coffee roasting",
+        "monitor a roasting",
+        "oversee coffee roasting",
+        "monitoring roasting",
+        "monitor the roasting"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0d12c477928e7d459c3",
+      "UUID": "95eef184-1761-4283-a9c7-3f20221e343b",
+      "preferredLabel": "create new recipes",
+      "description": "Combine innovative and creative ideas to come up with new recipes and preparations to extend the product of range of a company. Make modifications to recipes in order to enhance taste, reach productivity goals, develop and improve products.",
+      "altLabels": [
+        "create a new recipe",
+        "create new recipes",
+        "produce new recipes",
+        "establish new recipes",
+        "design new recipes",
+        "develop new recipes"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0c92c477928e7d44212",
+      "UUID": "9d1ff44b-9e9c-4df7-9a1a-78bf1d3cbe40",
+      "preferredLabel": "prepare bakery products",
+      "description": "Make bakery products such as bread and pasta by preparing dough, using proper techniques, recipes and equipment to achieve ready bakery items, combining with other products if necessary.",
+      "altLabels": [
+        "prepare dough products",
+        "bake bread",
+        "cook bakery products",
+        "cook cakes and biscuits",
+        "cook and finish chocolate products",
+        "prepare bakery products",
+        "prepare products of bakery",
+        "prepare bread"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0d12c477928e7d45f75",
+      "UUID": "a02a22b8-1edf-4c3b-a03d-973235b895df",
+      "preferredLabel": "food and beverage industry",
+      "description": "The respective industry and the processes involved in the food and beverage industry, such as raw material selection, processing, packaging, and storage.",
+      "altLabels": [
+        "food and beverage trading",
+        "food and beverage commerce",
+        "food and beverage business",
+        "the food and beverage industry",
+        "food and beverage industries",
+        "food and beverage industry"
+      ],
+      "skillType": "knowledge",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0d12c477928e7d46327",
+      "UUID": "94531b1d-8d17-4e19-905f-8715faa9e4a7",
+      "preferredLabel": "identify the factors causing changes in food during storage",
+      "description": "Recognize the most relevant factors (chemical, physical, environmental etc) that can alter the food during its storage.",
+      "altLabels": [
+        "identify the factors that cause changes in food during storage",
+        "analyse the factors causing changes in food during storage",
+        "classify the factors causing changes in food during storage",
+        "identify the factors causing changes in food during storage",
+        "establish the factors causing changes in food during storage",
+        "diagnose  the factors causing changes in food during storage",
+        "identify factors causing changes in food during storage"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0d12c477928e7d4647a",
+      "UUID": "8f5b98bb-5e05-4a42-a29a-6585a830505a",
+      "preferredLabel": "enforce health and safety regulations for bread products",
+      "description": "Monitor activities to ensure bread products are handled in accordance with safety and hygiene standards.",
+      "altLabels": [
+        "impose health and safety regulations for bread products",
+        "enforce the health and safety regulations for bread products",
+        "enforce health and safety regulations for  a bread product",
+        "implement health and safety regulations for bread products",
+        "carry out  health and safety regulations for bread products",
+        "enforce health and safety regulations for bread products",
+        "apply health and safety regulations for bread products",
+        "enforcing health and safety regulations for bread products"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0d12c477928e7d46632",
+      "UUID": "63303744-aa65-4864-a1ba-743d77fa1bed",
+      "preferredLabel": "follow verbal instructions",
+      "description": "Have the ability to follow spoken instructions received from colleagues. Strive to understand and clarify what is being requested.",
+      "altLabels": [
+        "work according to verbal instructions",
+        "follow verbal directions",
+        "follow spoken instructions",
+        "adhere to verbal instructions",
+        "perform work tasks according to spoken instructions",
+        "perform work tasks according to verbal instructions",
+        "carry out work tasks according to verbal directions",
+        "adhere to verbal directions",
+        "follow verbal instructions",
+        "adhere to spoken directions",
+        "work according to verbal directions",
+        "follow spoken directions"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0d12c477928e7d4640f",
+      "UUID": "10fd914b-387e-4b51-a8ae-41134c35e1c5",
+      "preferredLabel": "exert quality control to processing food",
+      "description": "Ensure the quality of all factors involved in a food production process.",
+      "altLabels": [
+        "exert quality oversight to processing food",
+        "exerting quality control to processing food",
+        "exert quality control to food processing",
+        "exert quality management to processing food",
+        "exert quality control to processing food",
+        "exert quality supervision to processing food",
+        "exert quality control to systems food"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0c92c477928e7d43364",
+      "UUID": "f9a22a1d-1afb-4e32-ba3f-e04263bea3b8",
+      "preferredLabel": "ensure sanitation",
+      "description": "Keep workspaces and equipment free from dirt, infection, and disease by removing waste, trash and providing for appropriate cleaning.",
+      "altLabels": [
+        "provide sanitation",
+        "ensure sanitation",
+        "safeguard sanitation",
+        "secure sanitation",
+        "assure sanitation",
+        "ensure adequate sanitation",
+        "ensuring sanitation",
+        "ensure correct sanitation"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0ce2c477928e7d453a1",
+      "UUID": "00239a92-5735-40fd-91d4-02dcfd030b02",
+      "preferredLabel": "follow hygienic procedures during food processing",
+      "description": "Ensure a clean working space according to hygienic standards in the food processing industry.",
+      "altLabels": [
+        "following hygienic procedures during food processing",
+        "follow hygienic procedure during food processing",
+        "align with hygiene procedures",
+        "supervise hygiene procedures",
+        "regulate hygiene procedures",
+        "follow hygienic procedures during food processing",
+        "moderate hygiene procedures"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0cd2c477928e7d45045",
+      "UUID": "ed93b9e0-8836-4ec2-9e81-d8a8726ee8fa",
+      "preferredLabel": "hire new personnel",
+      "description": "Hire new personnel for a company or organisation payroll via a prepared set of procedures. Make staffing decisions and direct selection co-workers.",
+      "altLabels": [
+        "recruit new personnel",
+        "hire new personnel",
+        "hiring new personnel",
+        "employ new personnel"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0c92c477928e7d432cf",
+      "UUID": "a0b04bde-d697-412c-b816-805818a8de11",
+      "preferredLabel": "provide training on quality management supervision",
+      "description": "Provide training to production employees, in groups or individually, on standard operating procedures, product specifications, visual quality inspection criteria, SPC, production controls, formulas, GMP, and food safety procedures.",
+      "altLabels": [
+        "transmit training on general quality management supervision",
+        "communicate training on general quality management supervision",
+        "impart training on general quality management supervision",
+        "convey training on general quality management supervision",
+        "impart training on quality management supervision",
+        "reveal training on general quality management supervision",
+        "impart training about general quality management supervision"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0ce2c477928e7d4527a",
+      "UUID": "9c508018-3adb-46a7-93d3-2915a6fe9658",
+      "preferredLabel": "liaise with colleagues",
+      "description": "Liaise with fellow colleagues to ensure common understanding on work related affairs and agree on the necessary compromises the parties might need to face. Negotiate compromises between parties as to ensure that work in general run efficiently towards the achievement of the objectives.",
+      "altLabels": [
+        "liaise with the colleagues",
+        "cooperate with colleagues",
+        "work together with colleagues",
+        "collaborate with colleagues",
+        "liaise with a colleague",
+        "work with colleagues",
+        "liaise with colleagues"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0ce2c477928e7d45348",
+      "UUID": "8d644460-11f2-476d-8817-c97a6d7b6f85",
+      "preferredLabel": "set up machine controls",
+      "description": "Set up or adjust machine controls to regulate conditions such as material flow, temperature, or pressure.",
+      "altLabels": [
+        "set up of machine controls",
+        "set up machine controls",
+        "prepare machine controls",
+        "erect machine controls",
+        "arrange machine controls",
+        "assemble machine controls",
+        "set up machine control",
+        "setting up machine controls"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0d12c477928e7d45949",
+      "UUID": "4cef2cdc-1857-4b42-8225-27ff26954682",
+      "preferredLabel": "mill operations",
+      "description": "Details of milling operations related to grind size, particle size distribution, heat evolution. Milling processes for different cereals and grains.",
+      "altLabels": [
+        "mill operation",
+        "mill production",
+        "mill working",
+        "mill operations",
+        "mill performance"
+      ],
+      "skillType": "knowledge",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0ca2c477928e7d443b3",
+      "UUID": "395beca4-f7e6-46b6-bdfa-bb1bc0c63f87",
+      "preferredLabel": "bake confections",
+      "description": "Bake cakes, tarts and confectioneries using ingredients such as flour, sugar, eggs, and butter or oil, with some varieties also requiring liquid such as milk or water and leavening agents such as yeast or baking powder. Add flavourful ingredients like fruit purées, nuts or extracts and numerous substitutions for the primary ingredients.",
+      "altLabels": [
+        "bake confections",
+        "heat confections",
+        "cook confections",
+        "prepare confections",
+        "baking of confections",
+        "bake confection",
+        "simmer confections"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0d12c477928e7d45cc0",
+      "UUID": "b03e1f07-03b5-4f13-b74c-ed54f6a9cb73",
+      "preferredLabel": "measure precise food processing operations",
+      "description": "Carry out accurately measured assignments with suitable tools and equipment in the process of producing food and beverages.",
+      "altLabels": [
+        "measure the precise food processing operations",
+        "measure precise food processing operations",
+        "calibrate precise food processing operations",
+        "assign precise food processing operations",
+        "carry out precise food processing operations"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0c92c477928e7d44069",
+      "UUID": "3bcc17d0-c885-4ad5-9678-b35b92a58475",
+      "preferredLabel": "manufacturing of confectionery",
+      "description": "Managing the development and production of bakers' confectionery, also called flour confections, including pastries, cakes, and similar baked goods.",
+      "altLabels": [
+        "confectionery manufacturing",
+        "the manufacturing of confectionery",
+        "construction of pastry",
+        "fabrication of pastry",
+        "creation of pastry",
+        "development of pastry",
+        "manufacturing of confectionery"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0d12c477928e7d4594f",
+      "UUID": "290c4f3c-46df-4a1b-acb3-e124ddd6ceec",
+      "preferredLabel": "apply GMP",
+      "description": "Apply regulations regarding manufacture of food and food safety compliance. Employ food safety procedures based on Good Manufacturing Practices (GMP).",
+      "altLabels": [
+        "applying GMP",
+        "utilise GMP",
+        "apply GMP",
+        "implement GMP",
+        "administer GMP",
+        "employ GMP"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0c92c477928e7d4430b",
+      "UUID": "e1a274b3-c68a-4b30-ac40-38cfae13b52e",
+      "preferredLabel": "clean food and beverage machinery",
+      "description": "Clean machinery used for food or beverage production processes. Prepare the appropriate solutions for cleaning. Prepare all parts and assure that they are clean enough to avoid deviation or errors in the production process.",
+      "altLabels": [
+        "clean food and beverage machines",
+        "clear food and beverage machinery",
+        "tidy food and beverage machinery",
+        "clean food and beverage machine",
+        "wash food and beverage machinery",
+        "cleanse food and beverage machinery",
+        "clean food and beverage machinery"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0cd2c477928e7d444b9",
+      "UUID": "5b6fe0d0-ffc4-4e98-97f4-541fd1c486cf",
+      "preferredLabel": "check quality of products on the production line",
+      "description": "Check products for quality on the production line and remove defective items before and after packaging.",
+      "altLabels": [
+        "check quality of products on the production line",
+        "checking quality of products on the production line",
+        "check production line for deviations",
+        "test production line for deviations",
+        "check the quality of products on the production line",
+        "audit production line for deviations",
+        "assess production line for deviations"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0cd2c477928e7d44c75",
+      "UUID": "99501513-c03e-4e59-927e-b22362a60e25",
+      "preferredLabel": "financial capability",
+      "description": "Financial operations such as calculations, cost estimations, budget management taking relevant commercial and statistical data into account such as data for materials, supplies and manpower.",
+      "altLabels": [
+        "financial knowledge",
+        "financial capabilities",
+        "financial capability",
+        "financial acumen",
+        "financial abilities",
+        "financial skills"
+      ],
+      "skillType": "knowledge",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0d12c477928e7d465e2",
+      "UUID": "e508eb35-0126-4d27-8526-23e4785a526c",
+      "preferredLabel": "label samples",
+      "description": "Label raw material/product samples for laboratory checks, according to implemented quality system.",
+      "altLabels": [
+        "label a sample",
+        "marking samples",
+        "mark a samples",
+        "mark samples",
+        "label samples",
+        "sample label"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0d12c477928e7d4593e",
+      "UUID": "a9652f5c-9cf2-419d-a976-3d22a8e2e00c",
+      "preferredLabel": "identify market niches",
+      "description": "Analyse the composition of the markets, segment these into groups, and highlight the opportunities that each one of these niches represent in terms of new products.",
+      "altLabels": [
+        "diagnose market niches",
+        "analyse market niches",
+        "classify market niches",
+        "identify market niches",
+        "establish market niches",
+        "identify a market niche"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0c92c477928e7d4320f",
+      "UUID": "7d000af3-30a9-411d-b0e8-321aac59b0a9",
+      "preferredLabel": "maintain cutting equipment",
+      "description": "Maintenance of the cutting equipment (knives, cutters, and other elements).",
+      "altLabels": [
+        "manage cutting equipment",
+        "maintaining cutting equipment",
+        "control cutting equipment",
+        "maintain cutting equipment",
+        "preserve cutting equipment",
+        "sustain cutting equipment",
+        "maintain the cutting equipment"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0d12c477928e7d4629c",
+      "UUID": "6ed42640-9a76-4477-bb47-b215f2b7be5b",
+      "preferredLabel": "perform services in a flexible manner",
+      "description": "Adapt service approach when circumstances change.",
+      "altLabels": [
+        "be flexible",
+        "adapt service according to circumstances",
+        "execute services in a flexible manner",
+        "perform services flexibly",
+        "perform services in a flexible manner",
+        "perform flexible services"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0d12c477928e7d46495",
+      "UUID": "7927d644-e616-49d2-ac0b-ba7adaae6113",
+      "preferredLabel": "examine production samples",
+      "description": "Examine production samples visually or manually to verify properties such as clarity, cleanliness, consistency, humidity and texture.",
+      "altLabels": [
+        "examine a production sample",
+        "examine production samples",
+        "inspect production samples",
+        "assess production samples",
+        "check production samples",
+        "audit production samples"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0c92c477928e7d438ad",
+      "UUID": "6e6d5df3-10be-43dc-88b4-59d31c4936d3",
+      "preferredLabel": "disassemble equipment",
+      "description": "Disassembles equipment using hand tools in order to clean equipments and to perform regular operational maintenance.",
+      "altLabels": [
+        "disassemble of equipment",
+        "break up equipment",
+        "disassemble equipment",
+        "take apart equipment",
+        "break down equipment",
+        "take down equipment"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0d12c477928e7d466c2",
+      "UUID": "a5e0989f-d60b-4425-8b5a-25ec13e8d681",
+      "preferredLabel": "stand high temperatures",
+      "description": "Stand high temperatures while keeping concentration and efficiency under demanding circumstances.",
+      "altLabels": [
+        "continue high temperatures",
+        "hold high temperatures",
+        "maintain high temperatures",
+        "stand high temperatures",
+        "standing high temperatures",
+        "stand a high temperatures",
+        "keep high temperatures",
+        "stand of high temperatures"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0c92c477928e7d4378c",
+      "UUID": "870a535f-c026-40a5-beea-c523dd735469",
+      "preferredLabel": "manage challenging work conditions during food processing operations",
+      "description": "Handle stressful and challenging work conditions in a limited time frame to ensure qualitative food and beverage products are created in time.",
+      "altLabels": [
+        "manage a challenging work condition during food processing operations",
+        "oversee challenging work conditions during food processing operations",
+        "regulate challenging work conditions during food processing operations",
+        "maintain challenging work conditions during food processing operations",
+        "manage challenging work conditions during food processing operations",
+        "supervise challenging work conditions during food processing operations"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0cd2c477928e7d44c01",
+      "UUID": "ca7d566b-940d-480e-9637-316b2f62b456",
+      "preferredLabel": "negotiate price",
+      "description": "Arrange an agreement on price of products or services provided or offered.",
+      "altLabels": [
+        "negotiate the price",
+        "negotiate price",
+        "agree on prices",
+        "discuss prices"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0cd2c477928e7d44a5f",
+      "UUID": "2dfcc035-715e-4a08-9b99-dc7c4ad9b6b6",
+      "preferredLabel": "tend bakery ovens",
+      "description": "Operate ovens using the right thermal regime to bake different types of dough and maintain equipment in order to ensure effective and correct operation.",
+      "altLabels": [
+        "tend of bakery ovens",
+        "tend bakery ovens",
+        "mind packaging machines",
+        "take care of packaging machines",
+        "tend to bakery ovens",
+        "watch packaging machines",
+        "tend the bakery ovens",
+        "look after packaging machines"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0c92c477928e7d438ce",
+      "UUID": "386444da-a905-4b75-82aa-d2459fd82a70",
+      "preferredLabel": "act reliably",
+      "description": "Proceed in a way that one can be relied on or depended on.",
+      "altLabels": [
+        "be reliable",
+        "acting reliably",
+        "act reliably",
+        "be dependable",
+        "act in a reliable way"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0d12c477928e7d464f8",
+      "UUID": "1dba09ce-ec08-4e2b-aff3-993da124bf01",
+      "preferredLabel": "ensure compliance with environmental legislation in food production",
+      "description": "Make sure to comply with environmental legislation in food production. Understand the legislation related to environmental matters in food manufacturing and apply it in practice.",
+      "altLabels": [
+        "ensure compliance with environmental legislation in food production",
+        "assure compliance with environmental legislation in food production",
+        "secure compliance with environmental legislation in food production",
+        "establish compliance with environmental legislation in food production",
+        "ensure compliance with environmental legislation in the production of food",
+        "maintain compliance with environmental legislation in food production",
+        "ensure the  compliance with environmental legislation in food production"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0c92c477928e7d43c5c",
+      "UUID": "f4845d59-d15b-4889-a246-6530ede8b1b5",
+      "preferredLabel": "keep inventory of goods in production",
+      "description": "Keep inventory of goods whether they are goods in the front end (i.e. raw materials), intermediate, or back end (i.e. finished products). Count goods and store them for the following production and distribution activities.",
+      "altLabels": [
+        "the inventory of goods in production kept",
+        "possess inventory of goods in production",
+        "keep inventory of goods in production",
+        "keep an inventory of goods in production",
+        "maintain inventory of goods in production",
+        "keep the inventory of goods in production",
+        "hold inventory of goods in production",
+        "retain inventory of goods in production"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0cd2c477928e7d44468",
+      "UUID": "5eb92c8e-dad5-4c01-b59a-70a110468e3f",
+      "preferredLabel": "apply HACCP",
+      "description": "Apply regulations regarding manufacture of food and food safety compliance. Employ food safety procedures based on Hazard Analysis Critical Control Points (HACCP).",
+      "altLabels": [
+        "applying HACCP",
+        "employ HACCP",
+        "implement HACCP",
+        "administer HACCP",
+        "utilise HACCP",
+        "apply HACCP"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0ce2c477928e7d45119",
+      "UUID": "99f0c4c4-6886-42cd-b050-2cf8b37ed0fd",
+      "preferredLabel": "improvise to occuring food processing situations",
+      "description": "Adapt a flexible approach to occuring problems in the process of creating food and beverages.",
+      "altLabels": [
+        "concoct to occurring food processing situations",
+        "improvise to occuring food processing situations",
+        "invent occurring food processing situations",
+        "devise occurring food processing situations",
+        "improvise occurring food processing situations",
+        "contrive occurring food processing situations"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0d12c477928e7d45b67",
+      "UUID": "8102aeb0-8acb-4d7c-92f7-72f0fb35e3b3",
+      "preferredLabel": "follow production schedule",
+      "description": "Follow production schedule taking into account all requirements, times and needs. This schedule outlines what individual commodities must be produced in each time period and encapsulates various concerns like production, staffing, inventory, etc. It is usually linked to manufacturing where the plan indicates when and how much of each product will be demanded. Utilise all the information in the actual implementation of the plan.",
+      "altLabels": [
+        "comply with production schedules",
+        "follow production schedules",
+        "comply with workplan",
+        "follow production schedule",
+        "ensure compliance with production schedules",
+        "read production schedules",
+        "consider production schedules",
+        "use production schedules",
+        "respect production schedules",
+        "utilise production schedules",
+        "follow a production schedule",
+        "comply with schedule for production",
+        "comply with production schedule"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0cd2c477928e7d44717",
+      "UUID": "c0047629-a0aa-4365-8bb7-0fab5db40203",
+      "preferredLabel": "administer ingredients in food production",
+      "description": "Ingredients to be added and the required amounts according to the recipe and the way those ingredients are to be administered.",
+      "altLabels": [
+        "apply ingredients in food production",
+        "administer ingredients in food production",
+        "administering ingredients in food production",
+        "utilise ingredients in food production",
+        "control ingredients in food production",
+        "administrate ingredients in food production",
+        "organise ingredients in food production",
+        "administer an ingredient in food production"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0c92c477928e7d43e66",
+      "UUID": "4fddf748-64a2-4bbb-8823-2b73c6b5b485",
+      "preferredLabel": "bakery ingredients",
+      "description": "The raw materials and other ingredients used in baked goods.",
+      "altLabels": [
+        "ingredients in a bakery",
+        "bakery raw materials",
+        "bakery ingredient",
+        "bakery ingredients",
+        "baking ingredients",
+        "bakery consumables",
+        "bakery materials"
+      ],
+      "skillType": "knowledge",
+      "relationType": "essential"
+    },
+    {
+      "id": "6613c0cd2c477928e7d44ad8",
+      "UUID": "967650f8-5c83-4376-8d71-84768fccb428",
+      "preferredLabel": "fermentation processes of food",
+      "description": "Conversion of carbohydrates into alcohol and carbon dioxide. This process happens using bacteria or yeasts, or a combination of the two under anaerobic conditions. Food fermentation is also involved in the process of leavening bread and the process of producing lactic acid in foods such as dry sausages, sauerkraut, yogurt, pickles, and kimchi.",
+      "altLabels": [
+        "fermentation mechanisms of food",
+        "fermentation systems of food",
+        "fermentation of food processing",
+        "fermentation procedures of food",
+        "fermentation measures of food",
+        "fermentation of food processed",
+        "fermentation processes of food",
+        "the fermentation process of food"
+      ],
+      "skillType": "knowledge",
+      "relationType": "optional"
+    },
+    {
+      "id": "6613c0c92c477928e7d435e7",
+      "UUID": "b508529f-b8ef-44e1-a744-96157e0ddb35",
+      "preferredLabel": "monitor machine operations",
+      "description": "Observing machine operations and evaluating product quality thereby ensuring conformity to standards.",
+      "altLabels": [
+        "supervise machine operations",
+        "oversee machine operations",
+        "view machine operations",
+        "monitor machines operations",
+        "monitor machine operations",
+        "watch machine operations",
+        "monitor machine operation",
+        "monitor machinery operations"
+      ],
+      "skillType": "skill/competence",
+      "relationType": "essential"
+    }
+  ]
+}
