@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from app.agent.agent import SimpleLLMAgent
 from app.agent.agent_types import AgentInput, AgentOutput, LLMStats
 from app.agent.agent_types import AgentType
-from app.agent.prompt_reponse_template import ModelResponse
+from app.agent.prompt_response_template import ModelResponse
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import \
     ConversationContext
