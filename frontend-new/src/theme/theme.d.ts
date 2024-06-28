@@ -2,7 +2,7 @@ import "@mui/material/styles";
 import { PaletteColor, PaletteColorOptions } from "@mui/material/styles";
 
 // Definitions for custom theme configurations
-type TabiyaSizeKeys = "none" | "xs" | "sm" | "md" | "lg" | "xl";
+type TabiyaSizeKeys = "none" | "xxs" | "xs" | "sm" | "md" | "lg" | "xl";
 type TabiyaSize = Record<TabiyaSizeKeys, number>;
 
 interface TabiyaRounding extends TabiyaSize {

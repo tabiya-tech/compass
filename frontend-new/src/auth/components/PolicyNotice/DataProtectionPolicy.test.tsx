@@ -110,6 +110,7 @@ describe("Testing Data Protection Policy component with AuthProvider", () => {
         user_id: givenUser.id,
         language: Language.en,
         accepted_tc: new Date(),
+        sessions: [],
       },
     };
 

@@ -5,6 +5,7 @@ export type UserLanguage = {
 
 export type UserPreference = UserLanguage & {
   accepted_tc: Date;
+  sessions: number[];
 };
 
 export enum Language {
@@ -16,3 +17,5 @@ export type UserPreferenceResponse = {
   user_preference_id: string;
   user_preferences: UserPreference;
 };
+
+export type UserPreferenceSpecs = Omit<UserPreference, "sessions">;

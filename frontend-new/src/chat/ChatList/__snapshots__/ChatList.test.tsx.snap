@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ChatList should render the Chat List 1`] = `
+<div
+  class="MuiBox-root css-nlgo7k"
+  data-testid="chat-list-container-0397ee51-f637-4453-9e2f-5cc8900c9554"
+>
+  <div
+    class="MuiBox-root css-1u7k2j3"
+    tabindex="0"
+  >
+    <ul
+      class="MuiList-root MuiList-padding css-1lbrbe2-MuiList-root"
+    >
+      <li
+        class="MuiListItem-root MuiListItem-gutters MuiListItem-padding css-7c5ds3-MuiListItem-root"
+        style="opacity: 1; transform: none;"
+      >
+        <div
+          data-testid="chat-message-container-2fbaf2ef-9eab-485a-bd28-b4a164e18b06"
+        />
+      </li>
+      <li
+        class="MuiListItem-root MuiListItem-gutters MuiListItem-padding css-7c5ds3-MuiListItem-root"
+        style="opacity: 1; transform: none;"
+      >
+        <div
+          data-testid="chat-message-container-2fbaf2ef-9eab-485a-bd28-b4a164e18b06"
+        />
+      </li>
+      <li
+        class="MuiListItem-root MuiListItem-gutters MuiListItem-padding css-7c5ds3-MuiListItem-root"
+        style="opacity: 1; transform: none;"
+      >
+        <div
+          data-testid="chat-message-container-2fbaf2ef-9eab-485a-bd28-b4a164e18b06"
+        />
+      </li>
+    </ul>
+    <div />
+  </div>
+</div>
+`;

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
-import { AuthPersistentStorage } from "src/auth/services/AuthPersistentStorage/AuthPersistentStorage";
+import { PersistentStorageService } from "src/persistentStorageService/PersistentStorageService";
 
 type TUseTokensParams = {
   updateUserByIDToken: (idToken: string) => void;
@@ -19,7 +19,7 @@ export function useTokens({ updateUserByIDToken }: TUseTokensParams) {
   const _setIDToken = useCallback(
     (token: string) => {
       updateUserByIDToken(token);
-      AuthPersistentStorage.setIDToken(token);
+      PersistentStorageService.setIDToken(token);
     },
     [updateUserByIDToken]
   );
@@ -32,7 +32,7 @@ export function useTokens({ updateUserByIDToken }: TUseTokensParams) {
         setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
-        AuthPersistentStorage.clear();
+        PersistentStorageService.clear();
       }
       setIsAuthenticating(false);
     });
@@ -41,7 +41,7 @@ export function useTokens({ updateUserByIDToken }: TUseTokensParams) {
   }, [_setIDToken]);
 
   const clearTokens = () => {
-    AuthPersistentStorage.clear();
+    PersistentStorageService.clear();
     setIsAuthenticated(false);
   };
 

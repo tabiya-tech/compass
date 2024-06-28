@@ -84,8 +84,8 @@ const lightPalette: PaletteOptions = {
     600: "#74726F",
     500: "#9D9B98",
     400: "#BBB9B5",
-    300: "#DFDDD9",
-    200: "#EDEBE8",
+    300: "#D9D9D9",
+    200: "#F5F5F5",
     100: TabiyaBasicColors.Gray,
     50: "#F8F6F3",
     A100: "#F0F3EE",
@@ -158,6 +158,7 @@ export const applicationTheme = (theme: ThemeMode) => {
     },
     tabiyaSpacing: {
       none: 0,
+      xxs: 0.25,
       xs: 0.5,
       sm: 1,
       md: 2,
@@ -169,6 +170,7 @@ export const applicationTheme = (theme: ThemeMode) => {
     },
     tabiyaRounding: {
       none: 0,
+      xxs: 0.25,
       xs: 0.5,
       sm: 1,
       md: 2,

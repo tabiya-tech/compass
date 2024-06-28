@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Home should render the home page 1`] = `
+<div
+  class="MuiBox-root css-79col"
+  data-testid="home-container-13cb726d-b36d-4ea6-a518-9bf8f1e7356f"
+>
+  <div
+    data-testid="chat-container-b7ea1e82-0002-432d-a768-11bdcd186e1d"
+  />
+</div>
+`;

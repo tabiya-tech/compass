@@ -1,12 +1,23 @@
 // mute the console output
 import "src/_test_utilities/consoleMock";
 
-import UserPreferencesService, { INewUserPreferenceSpecification } from "./userPreferences.service";
+import UserPreferencesService from "./userPreferences.service";
 import { StatusCodes } from "http-status-codes";
 import { ServiceError } from "src/error/error";
 import { setupFetchSpy } from "src/_test_utilities/fetchSpy";
 import ErrorConstants from "src/error/error.constants";
-import { Language, UserPreference, UserPreferenceResponse } from "./userPreferences.types";
+import { Language, UserPreference, UserPreferenceResponse, UserPreferenceSpecs } from "./userPreferences.types";
+import { PersistentStorageService } from "src/persistentStorageService/PersistentStorageService";
+
+// mock the persistent storage service
+jest.mock("src/persistentStorageService/PersistentStorageService", () => {
+  return {
+    __esModule: true,
+    PersistentStorageService: {
+      setChatSessionID: jest.fn(),
+    },
+  };
+});
 
 describe("UserPreferencesService", () => {
   // GIVEN a backend URL is returned by the envService
@@ -36,6 +47,7 @@ describe("UserPreferencesService", () => {
         user_id: "1",
         language: Language.en,
         accepted_tc: new Date(),
+        sessions: [1234],
       };
 
       const fetchSpy = setupFetchSpy(StatusCodes.OK, givenResponseBody, "application/json;charset=UTF-8");
@@ -57,6 +69,9 @@ describe("UserPreferencesService", () => {
 
       // AND expect it to return the user preferences
       expect(actualUserPreferences).toEqual(givenResponseBody);
+
+      // AND expect the service to have set the chat session ID
+      expect(PersistentStorageService.setChatSessionID).toHaveBeenCalledWith(givenResponseBody.sessions[0].toString());
     });
 
     test("on 404, getUserPreferences should return an empty object", async () => {
@@ -131,7 +146,7 @@ describe("UserPreferencesService", () => {
   describe("createUserPreferences", () => {
     test("should fetch the correct URL, with POST and the correct headers and payload successfully", async () => {
       // GIVEN some user preference specification to create
-      const givenUserPreferencesSpec: INewUserPreferenceSpecification = {
+      const givenUserPreferencesSpec: UserPreferenceSpecs = {
         user_id: "foo",
         language: Language.en,
         accepted_tc: new Date(),
@@ -139,8 +154,11 @@ describe("UserPreferencesService", () => {
       // AND the create model REST API will respond with OK and some newly create model
       const expectedUserPreferenceResponse = {
         user_preference_id: "bar",
-        user_preferences: givenUserPreferencesSpec as UserPreference,
-      } as UserPreferenceResponse;
+        user_preferences: {
+          ...givenUserPreferencesSpec,
+          sessions: [1234],
+        },
+      } as unknown as UserPreferenceResponse;
       const fetchSpy = setupFetchSpy(
         StatusCodes.CREATED,
         expectedUserPreferenceResponse,
@@ -162,10 +180,15 @@ describe("UserPreferencesService", () => {
 
       // AND returns the newly created user preferences
       expect(actualCreatedModel).toEqual(expectedUserPreferenceResponse);
+
+      // AND expect the service to have set the chat session ID
+      expect(PersistentStorageService.setChatSessionID).toHaveBeenCalledWith(
+        expectedUserPreferenceResponse.user_preferences.sessions[0].toString()
+      );
     });
 
     test("on fail to fetch, it should reject with the expected service error", async () => {
-      const givenUserPreferencesSpec: INewUserPreferenceSpecification = {
+      const givenUserPreferencesSpec: UserPreferenceSpecs = {
         user_id: "1",
         language: Language.en,
         accepted_tc: new Date(),
@@ -187,7 +210,7 @@ describe("UserPreferencesService", () => {
       "on 201, should reject with an error ERROR_CODE.INVALID_RESPONSE_BODY if response %s",
       async (description, givenResponse) => {
         // GIVEN some user preference specification to create
-        const givenUserPreferencesSpec: INewUserPreferenceSpecification = {
+        const givenUserPreferencesSpec: UserPreferenceSpecs = {
           user_id: "1",
           language: Language.en,
           accepted_tc: new Date(),

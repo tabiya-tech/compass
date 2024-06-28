@@ -4,7 +4,7 @@ import "src/_test_utilities/consoleMock";
 import { useContext } from "react";
 import { AuthContext, authContextDefaultValue } from "src/auth/AuthProvider";
 import { renderHook } from "src/_test_utilities/test-utils";
-import { AuthPersistentStorage } from "src/auth/services/AuthPersistentStorage/AuthPersistentStorage";
+import { PersistentStorageService } from "src/persistentStorageService/PersistentStorageService";
 import * as useTokensHook from "src/auth/hooks/useTokens";
 import { act } from "@testing-library/react";
 import { mockLoggedInUser } from "src/_test_utilities/mockLoggedInUser";
@@ -14,7 +14,7 @@ import { AuthService } from "./services/AuthService/AuthService";
 jest.mock("src/auth/hooks/useAuthUser");
 jest.mock("src/auth/hooks/useTokens");
 
-const clear = jest.spyOn(AuthPersistentStorage, "clear");
+const clear = jest.spyOn(PersistentStorageService, "clear");
 
 function defaultSetup() {
   mockLoggedInUser({});
@@ -71,13 +71,13 @@ describe("AuthProvider module", () => {
       const { result } = renderAuthContext();
 
       // AND the id token is set
-      AuthPersistentStorage.setIDToken("foo");
+      PersistentStorageService.setIDToken("foo");
 
       // WHEN the logout function is called
       act(() => result.current?.logout());
 
       // THEN the id token should be cleared
-      expect(AuthPersistentStorage.getIDToken()).toBeNull();
+      expect(PersistentStorageService.getIDToken()).toBeNull();
 
       // AND the clear function should be called
       expect(clear).toHaveBeenCalled();

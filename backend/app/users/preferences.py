@@ -3,6 +3,8 @@ from fastapi import APIRouter, HTTPException
 from app.users.repositories import UserPreferenceRepository
 from app.users.types import UserLanguage, UserPreferences
 
+import random
+
 
 async def update_user_language(repository: UserPreferenceRepository, user_preferences: UserLanguage):
     user_language = await repository.get_user_preference_by_user_id(user_preferences.user_id)
@@ -27,10 +29,21 @@ async def get_user_preferences(repository: UserPreferenceRepository, user_id: st
             detail="user not found"
         )
 
+    # Check if the sessions field is missing or empty, and add a new session if needed
+    if 'sessions' not in user or not user['sessions']:
+        session_id = random.randint(1000000000, 9999999999)  # nosec
+        await repository.update_user_preference({
+            "user_id": user_id
+        }, {
+            "sessions": [session_id]
+        })
+        user['sessions'] = [session_id]
+
     return {
         "user_id": user_id,
         "accepted_tc": user.get("accepted_tc"),
-        "language": user.get("language")
+        "language": user.get("language"),
+        "sessions": user.get("sessions")
     }
 
 
@@ -46,7 +59,8 @@ async def create_user_preferences(repository: UserPreferenceRepository, user: Us
     created = await repository.insert_user_preference({
         "user_id": user.user_id,
         "language": user.language,
-        "accepted_tc": user.accepted_tc
+        "accepted_tc": user.accepted_tc,
+        "sessions": []
     })
 
     return {
@@ -81,7 +95,6 @@ def add_user_preference_routes(_router: APIRouter):
                 description="Update user preferences - language"
                 )
     async def update_user_language_handler(user: UserLanguage):
-
         return await update_user_language(user_preference_repository, user)
 
     _router.include_router(router)
