@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render tests should render the Chat message with timestamp when typing is set to false 1`] = `
+<div
+  class="MuiBox-root css-ak906n"
+  data-testid="chat-message-container-2fbaf2ef-9eab-485a-bd28-b4a164e18b06"
+  origin="compass"
+>
+  <div
+    class="MuiBox-root css-p1ouje"
+    origin="compass"
+  >
+    Hello, I'm Compass
+  </div>
+  <span
+    class="MuiTypography-root MuiTypography-caption css-1q7uxfb-MuiTypography-root"
+    data-testid="chat-message-timestamp-2fbaf2ef-9eab-485a-bd28-b4a164e18b06"
+  >
+    sent 
+    Some Date
+  </span>
+</div>
+`;

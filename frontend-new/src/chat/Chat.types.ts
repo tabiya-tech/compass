@@ -3,8 +3,9 @@ export enum ChatMessageOrigin {
   ME = "me",
 }
 
-export type ChatMessageProps = {
+export type IChatMessage = {
+  id: number;
   origin: ChatMessageOrigin;
   message: string;
-  time: Date;
+  timestamp: number;
 };
