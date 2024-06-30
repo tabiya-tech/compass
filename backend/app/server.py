@@ -91,8 +91,7 @@ sensitive_filter.add_filter_routes(app)
 ############################################
 
 # Initialize the application state manager, conversation memory manager and the agent director
-# Currently, using an in-memory store for the application state,
-# but this can be replaced with a persistent store based on environment variables
+# Currently, using a mongoDB store for the application state
 # TODO: use the Fast api dependency injection pattern to inject them into the routes
 application_state_manager = ApplicationStateManager(DatabaseApplicationStateStore())
 
