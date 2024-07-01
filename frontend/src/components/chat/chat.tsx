@@ -107,9 +107,17 @@ export function Chat({ isMobile, sessionId }: Readonly<ChatProps>) {
     setTyping(true);
     try {
       const response = await axios.get(constructCompassUrl(newMessage.message));
-      console.log({ data: response.data.last });
-      const tabiyaResponse = generateTabiyaMessageFromResponse(response.data.last.message_for_user);
-      addMessage(tabiyaResponse);
+      if (response.data.messages_for_user) {
+        console.log("New interface detected, using new message format");
+        console.log({ data: response.data.messages_for_user });
+        response.data.messages_for_user.forEach((message: any) => {
+          addMessage(generateTabiyaMessageFromResponse(message));
+        });
+      }else {
+        console.log("Using old message format");
+        console.log({ data: response.data.last });
+        addMessage(generateTabiyaMessageFromResponse(response.data.last.message_for_user));
+      }
     } catch (error) {
       console.error(error);
     } finally {

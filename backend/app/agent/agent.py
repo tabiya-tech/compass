@@ -14,7 +14,21 @@ from common_libs.llm.models_utils import LLMConfig, LOW_TEMPERATURE_GENERATION_C
 class Agent(ABC):
     """
     An abstract class for an agent.
+
+    Implementations of this class that are responsible for the conversation history, should have access to the
+    conversation manager and handle the conversation history themselves.
+    Otherwise, their owner should handle the conversation history.
     """
+
+    def __init__(self, *, agent_type: AgentType, is_responsible_for_conversation_history: bool = False):
+        self._agent_type = agent_type
+        self._is_responsible_for_conversation_history = is_responsible_for_conversation_history
+
+    def is_responsible_for_conversation_history(self) -> bool:
+        """
+        Check if the agent is responsible for the conversation history
+        """
+        return self._is_responsible_for_conversation_history
 
     @abstractmethod
     async def execute(self, user_input: AgentInput, context: ConversationContext) -> AgentOutput:
@@ -37,7 +51,7 @@ class SimpleLLMAgent(Agent, Generic[P]):
 
     def __init__(self, *, agent_type: AgentType, system_instructions: str,
                  config: LLMConfig = LLMConfig(generation_config=LOW_TEMPERATURE_GENERATION_CONFIG)):
-        self._agent_type = agent_type
+        super().__init__(agent_type=agent_type, is_responsible_for_conversation_history=False)
         self._llm_config = config
         self._system_instructions = system_instructions
         # We should pass the system instructions to the LLM
