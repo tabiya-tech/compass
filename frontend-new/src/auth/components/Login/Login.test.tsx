@@ -8,6 +8,10 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import UserPreferencesService from "src/auth/services/UserPreferences/userPreferences.service";
 import { routerPaths } from "src/app/routerPaths";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
+import { ServiceError } from "src/error/error";
+import ErrorConstants from "src/error/error.constants";
+import ErrorCodes = ErrorConstants.ErrorCodes;
+import { StatusCodes } from "http-status-codes";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -194,18 +198,23 @@ describe("Testing Login component with AuthProvider", () => {
       await waitFor(() => {
         expect(useNavigate()).toHaveBeenCalledWith(expectedPath, { replace: true });
       });
-
-      // AND the success message should be displayed
-      await waitFor(() => {
-        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Login successful", { variant: "success" });
-      });
     }
   );
 
   test("it should show an error message if the user's email is not verified", async () => {
     // GIVEN the login function will fail with an error message
     loginMock.mockImplementation((email, password, onSuccess, onError) => {
-      onError(new Error("Email not verified"));
+      const mockServiceError = new ServiceError(
+        "AuthService",
+        "handleLogin",
+        "POST",
+        "/signInWithEmailAndPassword",
+        StatusCodes.FORBIDDEN,
+        ErrorConstants.FirebaseErrorCodes.EMAIL_NOT_VERIFIED,
+        "auth/email-not-verified"
+      );
+
+      onError(mockServiceError);
     });
 
     // AND the Login component is rendered within the AuthContext and Router
@@ -243,7 +252,10 @@ describe("Testing Login component with AuthProvider", () => {
 
     // AND the error message should be displayed
     await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Please verify your email", { variant: "error" });
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+        "The email you are using is registered, but you have not yet verified it. Please verify your email to continue.",
+        { variant: "error" }
+      );
     });
 
     // AND the user should not be redirected
@@ -263,7 +275,19 @@ describe("Testing Login component with AuthProvider", () => {
 
     // AND the user preferences service will fail
     const userPreferencesServiceMock = {
-      getUserPreferences: jest.fn().mockRejectedValue(new Error("Failed to fetch user preferences")),
+      getUserPreferences: jest
+        .fn()
+        .mockRejectedValue(
+          new ServiceError(
+            "ServiceName",
+            "ServiceFunction",
+            "GET",
+            "/api/path",
+            StatusCodes.NOT_FOUND,
+            ErrorCodes.API_ERROR,
+            "Failed to fetch user preferences"
+          )
+        ),
     };
     (UserPreferencesService as jest.Mock).mockImplementation(() => userPreferencesServiceMock);
 
@@ -307,9 +331,12 @@ describe("Testing Login component with AuthProvider", () => {
 
     // AND the error message should be displayed
     await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to fetch user preferences", {
-        variant: "error",
-      });
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+        "The requested resource was not found. Please clear your browser's cache and refresh the page.",
+        {
+          variant: "error",
+        }
+      );
     });
 
     // AND the error should be logged
@@ -360,7 +387,10 @@ describe("Testing Login component with AuthProvider", () => {
 
     // AND the error message should be displayed
     await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Login failed", { variant: "error" });
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+        "An unexpected error occurred. Please try again later.",
+        { variant: "error" }
+      );
     });
   });
 
