@@ -31,7 +31,7 @@ async def get_user_preferences(repository: UserPreferenceRepository, user_id: st
 
     # Check if the sessions field is missing or empty, and add a new session if needed
     if 'sessions' not in user or not user['sessions']:
-        session_id = random.randint(1000000000, 9999999999)  # nosec
+        session_id = random.randint(0, (1 << 48) - 1) # nosec
         await repository.update_user_preference({
             "user_id": user_id
         }, {
@@ -55,12 +55,14 @@ async def create_user_preferences(repository: UserPreferenceRepository, user: Us
             status_code=409,
             detail="user already exists"
         )
+    # Generating a 64-bit integer session ID
+    session_id = random.randint(0, (1 << 48) - 1)  # nosec
 
     created = await repository.insert_user_preference({
         "user_id": user.user_id,
         "language": user.language,
         "accepted_tc": user.accepted_tc,
-        "sessions": []
+        "sessions": [session_id]
     })
 
     return {

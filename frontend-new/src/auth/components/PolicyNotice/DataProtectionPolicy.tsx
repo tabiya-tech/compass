@@ -5,7 +5,7 @@ import { routerPaths } from "src/app/routerPaths";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import UserPreferencesService from "src/auth/services/UserPreferences/userPreferences.service";
 import { AuthContext } from "src/auth/AuthProvider";
-import { Language, UserPreferenceSpecs } from "src/auth/services/UserPreferences/userPreferences.types";
+import { Language, UserPreference } from "src/auth/services/UserPreferences/userPreferences.types";
 import { ServiceError } from "src/error/error";
 import ErrorConstants from "src/error/error.constants";
 import { StatusCodes } from "http-status-codes";
@@ -49,10 +49,11 @@ const DataProtectionAgreement: React.FC = () => {
         ""
       );
     }
-    const newUserPreferenceSpecs: UserPreferenceSpecs = {
+    const newUserPreferenceSpecs: UserPreference = {
       user_id: user.id,
       language: Language.en,
       accepted_tc: new Date(),
+      sessions: [],
     };
     try {
       await userPreferencesService.createUserPreferences(newUserPreferenceSpecs);

@@ -6,7 +6,7 @@ import { StatusCodes } from "http-status-codes";
 import { ServiceError } from "src/error/error";
 import { setupFetchSpy } from "src/_test_utilities/fetchSpy";
 import ErrorConstants from "src/error/error.constants";
-import { Language, UserPreference, UserPreferenceResponse, UserPreferenceSpecs } from "./userPreferences.types";
+import { Language, UserPreference, UserPreferenceResponse } from "./userPreferences.types";
 import { PersistentStorageService } from "src/persistentStorageService/PersistentStorageService";
 
 // mock the persistent storage service
@@ -146,10 +146,11 @@ describe("UserPreferencesService", () => {
   describe("createUserPreferences", () => {
     test("should fetch the correct URL, with POST and the correct headers and payload successfully", async () => {
       // GIVEN some user preference specification to create
-      const givenUserPreferencesSpec: UserPreferenceSpecs = {
+      const givenUserPreferencesSpec: UserPreference = {
         user_id: "foo",
         language: Language.en,
         accepted_tc: new Date(),
+        sessions: [],
       };
       // AND the create model REST API will respond with OK and some newly create model
       const expectedUserPreferenceResponse = {
@@ -188,10 +189,11 @@ describe("UserPreferencesService", () => {
     });
 
     test("on fail to fetch, it should reject with the expected service error", async () => {
-      const givenUserPreferencesSpec: UserPreferenceSpecs = {
+      const givenUserPreferencesSpec: UserPreference = {
         user_id: "1",
         language: Language.en,
         accepted_tc: new Date(),
+        sessions: [],
       };
       // GIVEN fetch rejects with some unknown error
       const givenFetchError = new Error();
@@ -210,10 +212,11 @@ describe("UserPreferencesService", () => {
       "on 201, should reject with an error ERROR_CODE.INVALID_RESPONSE_BODY if response %s",
       async (description, givenResponse) => {
         // GIVEN some user preference specification to create
-        const givenUserPreferencesSpec: UserPreferenceSpecs = {
+        const givenUserPreferencesSpec: UserPreference = {
           user_id: "1",
           language: Language.en,
           accepted_tc: new Date(),
+          sessions: [],
         };
         // AND the create model REST API will respond with OK and some response that does conform to the userPreferencesResponseSchema even if it states that it is application/json
         setupFetchSpy(StatusCodes.CREATED, givenResponse, "application/json;charset=UTF-8");
