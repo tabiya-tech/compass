@@ -24,24 +24,21 @@ class FarewellAgent(SimpleLLMAgent):
                                     "and I will provide you with a summary of your skills.")
         ])
 
-        finish_instructions = get_conversation_finish_instructions(dedent("""Complete your task"""))
+        finish_instructions = get_conversation_finish_instructions(dedent("""Once you have completed your task"""))
 
         system_instructions_template = dedent("""\
-            Your task is to summarize my experiences and skills discussed 
-            in the skill exploration session and say goodbye.
+            Your task is to summarize my experiences and skills discovered 
+            in the skill exploration session between me and others agents and say goodbye.
+            Do not ask any questions.
             Do not make things up.
+            Do not explore skills further. 
             Do not make any other suggestions.
             Do not answer any of my questions.
             Do not format or style your response.
             There aren't any follow-up steps.
-            If you are unsure and I ask questions that contain information that is not explicitly related to your task 
-            and can't be found in the _ABOUT_ section, 
-            you will answer each time with a concise but different variation of:
+            If i ask questions you are unsure, you will answer each time with a concise but different variation of:
             "Sorry, I don't know how to help you with that."
-            Ensure the total response, including the goodbye, does not exceed 100 words.
-            
-            _ABOUT_:
-                There aren't any follow-up steps.
+            Ensure the total response, including the goodbye, does not exceed 100 words.          
             
             {response_part}
             
