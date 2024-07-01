@@ -1,5 +1,5 @@
 import { getServiceErrorFactory } from "src/error/error";
-import { UserPreference, UserPreferenceResponse, UserPreferenceSpecs } from "./userPreferences.types";
+import { UserPreference, UserPreferenceResponse } from "./userPreferences.types";
 import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/error.constants";
 import { getBackendUrl } from "src/envService";
@@ -18,7 +18,7 @@ export default class UserPreferencesService {
    * Creates an entry for the user preferences of a user with an ID
    *
    */
-  public async createUserPreferences(newUserPreferencesSpec: UserPreferenceSpecs): Promise<UserPreferenceResponse> {
+  public async createUserPreferences(newUserPreferencesSpec: UserPreference): Promise<UserPreferenceResponse> {
     const serviceName = "UserPreferencesService";
     const serviceFunction = "createUserPreferences";
     const method = "POST";
