@@ -6,6 +6,7 @@ import { routerPaths } from "src/app/routerPaths";
 import IDPAuth from "src/auth/components/IDPAuth/IDPAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import AuthContextMenu from "src/auth/components/AuthContextMenu/AuthContextMenu";
+import { validatePassword } from "src/auth/components/Register/utils/validatePassword";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -41,9 +42,10 @@ const Register: React.FC = () => {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
-  const [name, setName] = useState(""); // we will need this later
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState<string>("");
 
   /**
    * Handle the register form submission
@@ -51,19 +53,25 @@ const Register: React.FC = () => {
    */
   const handleRegister = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    register(
-      email,
-      password,
-      name,
-      (user) => {
-        navigate(routerPaths.VERIFY_EMAIL, { replace: true });
-        enqueueSnackbar("Verification Email Sent!", { variant: "success" });
-      },
-      (error) => {
-        console.error(error);
-        enqueueSnackbar("Registration failed", { variant: "error" });
-      }
-    );
+
+    const passwordValidationResult = validatePassword(password)
+    setPasswordError(passwordValidationResult);
+
+    if(passwordValidationResult  === "") {
+      register(
+        email,
+        password,
+        name,
+        (user) => {
+          navigate(routerPaths.VERIFY_EMAIL, { replace: true });
+          enqueueSnackbar("Verification Email Sent!", { variant: "success" });
+        },
+        (error) => {
+          console.error(error);
+          enqueueSnackbar("Registration failed", { variant: "error" });
+        }
+      );
+    }
   };
 
   return (
@@ -120,6 +128,8 @@ const Register: React.FC = () => {
             required
             onChange={(e) => setPassword(e.target.value)}
             inputProps={{ "data-testid": DATA_TEST_ID.PASSWORD_INPUT }}
+            error={!!passwordError}
+            helperText={passwordError}
           />
           <Button
             fullWidth

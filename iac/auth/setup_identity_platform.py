@@ -67,7 +67,7 @@ def _setup_identity_platform(*, basic_config: ProjectBaseConfig, frontend_domain
             allow_duplicate_emails=False,
             email=gcp.identityplatform.ConfigSignInEmailArgs(
                 enabled=True,
-                password_required=True,
+                password_required=True
             ),
         ),
         project=basic_config.project,
