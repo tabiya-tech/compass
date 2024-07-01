@@ -142,6 +142,7 @@ describe("Testing Data Protection Policy component with AuthProvider", () => {
       user_id: givenUser.id,
       language: Language.en,
       accepted_tc: new Date(),
+      sessions: [],
     };
     await waitFor(() => {
       expect(userPreferencesServiceMock.createUserPreferences).toHaveBeenCalledWith(expectedUserPreferenceSpecs);
@@ -198,6 +199,7 @@ describe("Testing Data Protection Policy component with AuthProvider", () => {
       user_id: givenUser.id,
       language: Language.en,
       accepted_tc: new Date(),
+      sessions: [],
     };
 
     await waitFor(() => {
