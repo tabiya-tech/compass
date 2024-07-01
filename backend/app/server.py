@@ -108,8 +108,50 @@ class ConversationResponse(BaseModel):
     """
     The response model for the conversation endpoint.
     """
+    # TODO: remove this field, as the complete conversation history should not be sent to the client because it leaks
+    #  information about the agent's internal state
     last: AgentOutput
+    """
+    The last message from the agent in the conversation.
+    """
+    messages_for_user: list[str] = []
+    """
+    The messages for the user.
+    """
+    # TODO: remove this field, as the complete conversation history should not be sent to the client because it leaks
+    #  information about the agent's internal state
     conversation_context: ConversationContext
+    """
+    The complete conversation context.
+    """
+
+    @staticmethod
+    async def from_conversation_manager(context: ConversationContext, from_index: int):
+        """
+        Construct the response to the user from the conversation context.
+        """
+        # concatenate the message to the user into a single string
+        # to produce a coherent conversation flow with all the messages that have been added to the history
+        # during this conversation turn with the user
+        _hist = context.all_history
+        _last = _hist.turns[-1]
+        _new_output: AgentOutput = AgentOutput(message_for_user="",
+                                               reasoning=_last.output.reasoning,
+                                               agent_type=_last.output.agent_type,
+                                               data=_last.output.data,
+                                               finished=_last.output.finished,
+                                               agent_response_time_in_sec=0,
+                                               llm_stats=[]
+                                               )
+        _messages_for_user = []
+        for turn in _hist.turns[from_index:]:
+            _messages_for_user.append(turn.output.message_for_user)
+            _new_output.message_for_user += turn.output.message_for_user + "\n\n"
+            _new_output.llm_stats += turn.output.llm_stats
+            _new_output.agent_response_time_in_sec += turn.output.agent_response_time_in_sec
+
+        _new_output.message_for_user = _new_output.message_for_user.strip()
+        return ConversationResponse(last=_new_output, messages_for_user=_messages_for_user, conversation_context=context)
 
 
 @app.get(path="/conversation",
@@ -143,10 +185,13 @@ async def conversation(request: Request, user_input: str, clear_memory: bool = F
         conversation_memory_manager.set_state(state.conversation_memory_manager_state)
 
         # Handle the user input
-        agent_output = await agent_director.execute(AgentInput(message=user_input))
         context = await conversation_memory_manager.get_conversation_context()
-        response = ConversationResponse(last=agent_output, conversation_context=context)
-
+        # get the current index in the conversation history, so that we can return only the new messages
+        current_index = len(context.all_history.turns)
+        await agent_director.execute(AgentInput(message=user_input))
+        # get the context again after updating the history
+        context = await conversation_memory_manager.get_conversation_context()
+        response = await ConversationResponse.from_conversation_manager(context, from_index=current_index)
         # save the state, before responding to the user
         await application_state_manager.save_state(session_id, state)
         return response
@@ -190,21 +235,26 @@ async def _test_conversation(request: Request, user_input: str, clear_memory: bo
         state = await application_state_manager.get_state(session_id)
         conversation_memory_manager.set_state(state.conversation_memory_manager_state)
 
+        # handle the user input
+        context = await conversation_memory_manager.get_conversation_context()
+        # get the current index in the conversation history, so that we can return only the new messages
+        current_index = len(context.all_history.turns)
+
         # ##################### ADD YOUR AGENT HERE ######################
         # Initialize the agent you want to use for the evaluation
-        agent = ExperiencesExplorerAgent(similarity_search)
+        agent = ExperiencesExplorerAgent(similarity_search=similarity_search,
+                                         conversation_manager=conversation_memory_manager)
         logger.debug("ExperinecesExplorerAgent initialized for sandbox testing")
         agent.set_state(state.experiences_explorer_state)
         # ################################################################
 
-        # handle the user input
-        context = await conversation_memory_manager.get_conversation_context()
         agent_output = await agent.execute(user_input=AgentInput(message=user_input), context=context)
-        await conversation_memory_manager.update_history(AgentInput(message=user_input), agent_output)
+        if agent.is_responsible_for_conversation_history():
+            await conversation_memory_manager.update_history(AgentInput(message=user_input), agent_output)
 
         # get the context again after updating the history
         context = await conversation_memory_manager.get_conversation_context()
-        response = ConversationResponse(last=agent_output, conversation_context=context)
+        response = await ConversationResponse.from_conversation_manager(context, from_index=current_index)
         if only_reply:
             response = response.last.message_for_user
 

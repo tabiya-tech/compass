@@ -276,60 +276,52 @@ class LLMAgentDirector(AbstractAgentDirector):
         :return: The output from the agent
         """
         try:
-            current_phase = self._state.current_phase
-            if current_phase == ConversationPhase.ENDED:
-                return AgentOutput(
-                    message_for_user="Conversation finished, nothing to do!",
-                    finished=True,
-                    agent_type=None,
-                    reasoning="Conversation has ended",
-                    agent_response_time_in_sec=0,  # artificial value as there is no LLM call
-                    llm_stats=[]  # artificial value as there is no LLM call
-                )
+            first_call: bool = True
+            transitioned_to_new_phase: bool = False
+            agent_output: AgentOutput | None = None
+            while first_call or transitioned_to_new_phase:
+                if self._state.current_phase == ConversationPhase.ENDED:
+                    return AgentOutput(
+                        message_for_user="Conversation finished, nothing to do!",
+                        finished=True,
+                        agent_type=None,
+                        reasoning="Conversation has ended",
+                        agent_response_time_in_sec=0,  # artificial value as there is no LLM call
+                        llm_stats=[]  # artificial value as there is no LLM call
+                    )
+                first_call = False
+                # Get the context
+                context = await self._conversation_manager.get_conversation_context()
+                clean_input: AgentInput = user_input.copy()  # make a copy of the user input to avoid modifying the original
+                clean_input.message = clean_input.message.strip()  # Remove leading and trailing whitespaces
 
-            # Get the context
-            context = await self._conversation_manager.get_conversation_context()
-            clean_input: AgentInput = user_input.copy()  # make a copy of the user input to avoid modifying the original
-            clean_input.message = clean_input.message.strip()  # Remove leading and trailing whitespaces
+                # Get the agent to run
+                suitable_agent_type = await self._get_suitable_agent_type(clean_input, self._state.current_phase,
+                                                                          context)
+                self._logger.debug("Running agent: %s", {suitable_agent_type})
+                agent_for_task = self._agents.get(suitable_agent_type)
 
-            # Get the agent to run
-            suitable_agent_type = await self._get_suitable_agent_type(clean_input, current_phase, context)
-            self._logger.debug("Running agent: %s", {suitable_agent_type})
-            agent_for_task = self._agents.get(suitable_agent_type)
+                # Perform the task
+                agent_output = await agent_for_task.execute(clean_input, context)
+                if not agent_for_task.is_responsible_for_conversation_history():
+                    await self._conversation_manager.update_history(clean_input, agent_output)
 
-            # Perform the task
-            agent_output = await agent_for_task.execute(clean_input, context)
-            await self._conversation_manager.update_history(clean_input, agent_output)
+                # Update the conversation phase
+                new_phase = self._get_new_phase(agent_output)
+                self._logger.debug("Transitioned phase from %s --to-> %s", self._state.current_phase, new_phase)
 
-            # Update the conversation phase
-            new_phase = self._get_new_phase(agent_output)
-            self._logger.debug("Transitioned phase from %s --to-> %s", current_phase, new_phase)
-            if current_phase != new_phase:
-                self._state.current_phase = new_phase
-                # When transitioning to a new phase do not return the control back to the user,
-                # instead, run the next agent in the sequence
-                new_phase_agent = self._agents.get(self._get_default_agent_type_for_phase(new_phase))
-                # TODO(Apostolos): models should be able to handle transitions between phases seamlessly,
-                #  so they should have information how to handle the user entering from a different phase
-                transition_input = AgentInput(message="Hi, I can here from the previous agent.")
-                next_agent_output = await new_phase_agent.execute(user_input=transition_input, context=context)
-                await self._conversation_manager.update_history(transition_input, next_agent_output)
+                transitioned_to_new_phase = self._state.current_phase != new_phase
+                if transitioned_to_new_phase:
+                    # TODO(Apostolos): models should be able to handle transitions between phases seamlessly,
+                    #  so they should have information how to handle the user entering from a different phase
+                    user_input = AgentInput(
+                        message=f"Hi, I come to you ({self._get_default_agent_type_for_phase(new_phase).value}) "
+                                f"from {self._get_default_agent_type_for_phase(self._state.current_phase).value}")
+                    self._state.current_phase = new_phase
 
-                return AgentOutput(
-                    #  Combine the messages from the current and the next agent,
-                    #  so that the user can see the two responses in last message of the conversation.
-                    #  Returning a list of messages is also an option, but it requires more complex handling
-                    #  in the frontend, as the (silence) message should not be displayed to the user.
-                    message_for_user=agent_output.message_for_user + "\n\n" + next_agent_output.message_for_user,
-                    finished=next_agent_output.finished,
-                    agent_type=next_agent_output.agent_type,
-                    reasoning=next_agent_output.reasoning,
-                    agent_response_time_in_sec=next_agent_output.agent_response_time_in_sec,
-                    llm_stats=next_agent_output.llm_stats
-                )
-
-            # return the agent output
+            # return the last agent output in case
             return agent_output
+
         # executing an agent can raise any number of unknown exceptions
         except Exception as e:  # pylint: disable=broad-except
             self._logger.error("Error while executing the agent director: %s", e, exc_info=True)
