@@ -20,22 +20,21 @@ class TopSkills(BaseModel):
 
 
 SYSTEM_INSTRUCTIONS = """
-You are an AI assistant working for an employment agency. Your primary goal is to identify the top 10 most relevant 
-skills a job seeker possesses based on the experience being discussed. Focus on one experience.
+You are an AI assistant working for an employment agency. Your primary goal is to identify the relevant 
+skills a job seeker possesses based on the experience being discussed. Focus only on the {experience}.
 
 Instructions:
 
 Analyze Conversation: Carefully review the information provided by the user about their work history, projects, 
 and accomplishments.
 
-Extract Skills: Identify specific skills demonstrated by the user's experiences. Prioritize transferable skills 
-applicable across various roles.
-
 Seek Clarification (If Needed): If the context is unclear or you need more information to differentiate between 
-skills, ask the user direct and concise questions. Do not repeat questions.
+skills, ask the user direct and concise questions. Do not repeat questions. Base the questions on the possible skills
+and the already identified skills.
 
-Refine and Prioritize: Narrow down your list to the 10 most impactful and relevant skills. If after questions the 
-user does not provide more skills, use your best judgement.
+The conversation is going to be used to identify the skills the user possesses. 
+The full list of skills the user might have: {all_skills}
+The already identified skills are: {identified_skills}
 
 Finished: The conversation is finished if the user has no more information to provide or if you have identified all the 
 skills the user demonstrated.
@@ -44,6 +43,7 @@ Example Questions for Clarification:
 "What have you done in your [job/experience]?"
 "In your experience with [software/tool mentioned], what specific tasks did you perform that demonstrate your 
 proficiency?"
+
 Additional Considerations:
 
 Tone: Write like you would to a young person over text messaging app. Keep it simple and engaging.
@@ -55,7 +55,6 @@ SKILL_PARSER_SYSTEM_INSTRUCTIONS = """
   
   Your response must always bea a JSON object with the following schema:
     - skills:  A list of strings representing the top 10 skills that the user possesses.
-
 
     Example: {"skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6", "Skill 7", "Skill 8"]}
 """
@@ -76,21 +75,23 @@ class SkillExplorerAgent(Agent):
                           message="Example response. Your answer to the user's question.",
                           ),
         ])
-        formatted_skills = "SKILLS:" + "; ".join([str(skill[1]) for skill in essential_skills.items()])
-        system_instructions = SYSTEM_INSTRUCTIONS + "\n" + formatted_skills + "\n" + response_part
-        convo_llm = GeminiGenerativeLLM(
-            system_instructions=system_instructions)
+        formatted_skills = "; ".join([str(skill[1]) for skill in essential_skills.items()])
+        top_skills_formatted = "; ".join([str(skill) for skill in self.experience_state.top_skills])
+        system_instructions = SYSTEM_INSTRUCTIONS.format(experience="baker", all_skills=formatted_skills,
+                                                         identified_skills=top_skills_formatted) + response_part
+        convo_llm = GeminiGenerativeLLM(system_instructions=system_instructions)
         llm_input = "\nThe conversation so far:" + ConversationHistoryFormatter.format_to_string(context,
                                                                                                  user_input.message
                                                                                                  )
         convo_output = await LLMCaller.call_llm(
             llm=convo_llm,
             llm_input=ConversationHistoryFormatter.format_for_agent_generative_prompt(
-                context, user_input.message), logger=logging.Logger(name="xyz"),
+                context, user_input.message), logger=logging.Logger(name="SkillExplorerAgent"),
             model_response_type=ModelResponse)
         skill_llm = GeminiGenerativeLLM(
-            system_instructions=SKILL_PARSER_SYSTEM_INSTRUCTIONS + "\n" + formatted_skills)
-        top_skills = await LLMCaller.call_llm(llm=skill_llm, llm_input=llm_input, logger=logging.Logger(name="xyz"),
+            system_instructions=SKILL_PARSER_SYSTEM_INSTRUCTIONS + "\nSKILLS:" + formatted_skills)
+        top_skills = await LLMCaller.call_llm(llm=skill_llm, llm_input=llm_input,
+                                              logger=logging.Logger(name="SkillExplorerAgent"),
                                               model_response_type=TopSkills)
         self.experience_entity.top_skills = []
         for skill in top_skills[0].skills:

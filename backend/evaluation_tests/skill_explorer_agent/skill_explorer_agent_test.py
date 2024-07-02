@@ -52,5 +52,7 @@ async def test_skill_explorer_agent(fake_conversation_context: FakeConversationC
             AgentInput(message=user_input, ),
             fake_conversation_context)
         fake_conversation_context.add_turn(user_input, output.message_for_user)
+        print(user_input)
+        print(output.message_for_user)
     assert output.finished, fake_conversation_context.model_dump_json(indent=4)
     assert 'ensure sanitation' in [str(skill) for skill in state.top_skills]
