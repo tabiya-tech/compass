@@ -17,6 +17,7 @@ from app.conversation_memory.conversation_memory_types import \
     ConversationContext
 from app.vector_search.esco_entities import OccupationSkillEntity
 from app.vector_search.similarity_search_service import SimilaritySearchService
+from app.agent.collect_experiences_agent import CollectExperiencesAgent
 
 logger = logging.getLogger(__name__)
 
@@ -191,7 +192,7 @@ class ExploreExperiencesAgentDirector(Agent):
             if not agent_output.finished:
                 return agent_output
 
-            # Collecting has finished update the state with the experiences
+            # Collecting has finished, update the state with the experiences
             experiences = self._collect_experiences_agent.get_experiences()
             for exp in experiences:
                 s.experiences_state[exp.uuid] = ExperienceState(experience=exp)
@@ -226,7 +227,7 @@ class ExploreExperiencesAgentDirector(Agent):
                          is_responsible_for_conversation_history=True)
         self._conversation_manager = conversation_manager
         self._state: ExploreExperiencesAgentDirectorState | None = None
-        self._collect_experiences_agent = _CollectExperiencesAgentStub()
+        self._collect_experiences_agent = CollectExperiencesAgent()
         self._infer_occupations_agent = _InferOccupationsAgentStub()
         self._exploring_skills_agent = SkillExplorerAgent()
 
