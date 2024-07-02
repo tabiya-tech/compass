@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useMemo } from "react";
+import React, { createContext, useCallback, useMemo, useState } from "react";
 import { useTokens } from "src/auth/hooks/useTokens";
 import { useAuthUser } from "src/auth/hooks/useAuthUser";
 import { AuthService } from "src/auth/services/AuthService/AuthService";
@@ -15,6 +15,8 @@ import { jwtDecode } from "jwt-decode";
 
 export const authContextDefaultValue: AuthContextValue = {
   user: null,
+  isLoggingIn: false,
+  isRegistering: false,
   login: () => {},
   logout: () => {},
   register: () => {},
@@ -34,6 +36,10 @@ export const AuthContext = createContext<AuthContextValue>(authContextDefaultVal
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { user, updateUser, updateUserByIDToken } = useAuthUser();
   const tokens = useTokens({ updateUserByIDToken: updateUserByIDToken });
+
+  // State to track if the user is logging in/registering
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
 
   const handlePageLoad = useCallback(
     (successCallback: (user: TabiyaUser) => void, errorCallback: (error: any) => void) => {
@@ -65,6 +71,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       errorCallback: (error: any) => void
     ) => {
       const authService = AuthService.getInstance();
+      setIsLoggingIn(true);
       authService
         .handleLogin(
           email,
@@ -81,12 +88,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           },
           (error) => {
             console.error(error);
+            setIsLoggingIn(false);
             errorCallback(error);
           }
         )
         .then((data: TFirebaseTokenResponse | undefined) => {
+          setIsLoggingIn(false);
           if (!data) return;
           tokens.setIDToken(data.id_token);
+        })
+        .catch((e) => {
+          setIsLoggingIn(false);
         });
     },
     [updateUserByIDToken, tokens]
@@ -114,12 +126,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       errorCallback: (error: any) => void
     ) => {
       const authService = AuthService.getInstance();
+      setIsRegistering(true);
       authService.handleRegister(
         email,
         password,
         name,
         (response: TFirebaseTokenResponse) => {
           updateUserByIDToken(response.id_token);
+          setIsRegistering(false);
           const decodedUser: FirebaseIDToken = jwtDecode(response.id_token);
           const newUser: TabiyaUser = {
             id: decodedUser.user_id,
@@ -130,6 +144,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         },
         (error) => {
           console.error(error);
+          setIsRegistering(false);
           errorCallback(error);
         }
       );
@@ -138,8 +153,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 
   const value = useMemo(
-    () => ({ user, login, logout, register, handlePageLoad }),
-    [logout, user, login, register, handlePageLoad]
+    () => ({
+      user,
+      login,
+      logout,
+      register,
+      isLoggingIn,
+      isRegistering,
+      handlePageLoad,
+    }),
+    [logout, isLoggingIn, isRegistering, user, login, register, handlePageLoad]
   );
 
   return (
