@@ -77,8 +77,12 @@ class SkillExplorerAgent(Agent):
         super().__init__(agent_type=AgentType.EXPLORE_SKILLS_AGENT, is_responsible_for_conversation_history=False)
         self.experience_entity = experience_entity
         self.TOP_COUNT = 10
+        self.logger = logging.Logger(name="SkillExplorerAgent")
 
     async def execute(self, user_input: AgentInput, context: ConversationContext) -> AgentOutput:
+        if not self.experience_entity.esco_occupations or not self.experience_entity.experience_title or \
+                self.experience_entity.esco_occupations == []:
+            raise ValueError("The experience entity must have a title and at least one occupation.")
         essential_skills = self._get_essential_skills(self.experience_entity.esco_occupations)
         response_part = get_json_response_instructions(examples=[
             ModelResponse(reasoning="Example reason.",
@@ -92,26 +96,35 @@ class SkillExplorerAgent(Agent):
                                                          all_skills=formatted_skills,
                                                          identified_skills=top_skills_formatted) + response_part
         convo_llm = GeminiGenerativeLLM(system_instructions=system_instructions)
-        llm_input = "\nThe conversation so far:" + ConversationHistoryFormatter.format_to_string(context,
-                                                                                                 user_input.message
-                                                                                                 )
         convo_output = await LLMCaller.call_llm(
             llm=convo_llm,
             llm_input=ConversationHistoryFormatter.format_for_agent_generative_prompt(
-                context, user_input.message), logger=logging.Logger(name="SkillExplorerAgent"),
+                context, user_input.message), logger=self.logger,
             model_response_type=ModelResponse)
-        skill_llm = GeminiGenerativeLLM(
-            system_instructions=SKILL_PARSER_SYSTEM_INSTRUCTIONS + "\nSKILLS:" + formatted_skills)
-        top_skills = await LLMCaller.call_llm(llm=skill_llm, llm_input=llm_input,
-                                              logger=logging.Logger(name="SkillExplorerAgent"),
-                                              model_response_type=TopSkills)
-        self.experience_entity.top_skills = []
-        for skill in top_skills[0].skills:
-            self.experience_entity.top_skills.append(essential_skills[skill])
+        await self._set_top_skills(context, essential_skills, formatted_skills, user_input.message)
         return AgentOutput(finished=convo_output[0].finished, agent_type=AgentType.EXPLORE_SKILLS_AGENT,
                            reasoning=convo_output[0].reasoning,
                            agent_response_time_in_sec=0.0, llm_stats=convo_output[1],
                            message_for_user=convo_output[0].message)
+
+    async def _set_top_skills(self, context: ConversationContext, essential_skills: dict[str, SkillEntity],
+                              formatted_skills: str,
+                              user_message: str) -> None:
+        # TODO: Consider improving the skill ranking, e.g. using esco and statistical models. COM-360
+        skill_llm = GeminiGenerativeLLM(
+            system_instructions=SKILL_PARSER_SYSTEM_INSTRUCTIONS + "\nSKILLS:" + formatted_skills)
+        llm_input = "\nThe conversation so far:" + ConversationHistoryFormatter.format_to_string(context,
+                                                                                                 user_message
+                                                                                                 )
+        top_skills = await LLMCaller.call_llm(llm=skill_llm, llm_input=llm_input,
+                                              logger=self.logger,
+                                              model_response_type=TopSkills)
+        self.experience_entity.top_skills = []
+        for skill in top_skills[0].skills:
+            if skill in essential_skills:
+                self.experience_entity.top_skills.append(essential_skills[skill])
+            else:
+                self.logger.debug("Skill %s is not on the list of skills", skill)
 
     def _get_essential_skills(self, occupations: List[OccupationSkillEntity]) -> Dict[str, SkillEntity]:
         return dict([(skill.preferredLabel, skill) for skill_occupations in occupations for
