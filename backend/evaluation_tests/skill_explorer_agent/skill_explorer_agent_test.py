@@ -21,7 +21,7 @@ def baker_occupation_with_skills() -> OccupationSkillEntity:
 @pytest.mark.evaluation_test
 async def test_skill_explorer_agent(fake_conversation_context: FakeConversationContext,
                                     baker_occupation_with_skills: OccupationSkillEntity):
-    """ Tests the QnA agent with a simple question after a conversation. """
+    """ Tests the SkillExplorerAgent agent with a simple conversation. """
     occupations_with_skills = [baker_occupation_with_skills]
     state: ExperienceEntity = ExperienceEntity(experience_title="Baker")
     state.esco_occupations = occupations_with_skills
