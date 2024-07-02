@@ -54,7 +54,7 @@ SKILL_PARSER_SYSTEM_INSTRUCTIONS = """
   Based on the prior conversation return a JSON object containing a list of string representing the top 10 skills 
   that the user possesses. A full set of skills you can chose from is set under SKILLS.
   
-  Your response must always bea a JSON object with the following schema:
+  Your response must always be a JSON object with the following schema:
     - skills:  A list of strings representing the top 10 skills that the user possesses.
 
     Example: {"skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6", "Skill 7", "Skill 8"]}
