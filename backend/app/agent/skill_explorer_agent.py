@@ -48,6 +48,7 @@ Additional Considerations:
 
 Tone: Write like you would to a young person over text messaging app. Keep it simple and engaging.
 """
+# TODO: Unify the tone across all agents.
 
 SKILL_PARSER_SYSTEM_INSTRUCTIONS = """
   Based on the prior conversation return a JSON object containing a list of string representing the top 10 skills 
