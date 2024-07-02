@@ -10,6 +10,7 @@ from _pytest.logging import LogCaptureFixture
 
 from app.agent.agent_director import AgentDirector, AgentDirectorState
 from app.agent.agent_types import AgentType
+from app.agent.collect_experiences_agent import CollectExperiencesAgentState
 from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager, \
     ConversationMemoryManagerState
@@ -46,7 +47,9 @@ def setup_agent_director() -> tuple[ConversationMemoryManager, Callable[
     conversation_manager.set_state(state=ConversationMemoryManagerState(session_id))
     agent_director = AgentDirector(conversation_manager, FakeOccupationSimilaritySearchService())
     agent_director.set_state(AgentDirectorState(session_id))
-    agent_director.get_explore_experiences_agent().set_state(ExploreExperiencesAgentDirectorState(session_id))
+    explore_experiences_agent = agent_director.get_explore_experiences_agent()
+    explore_experiences_agent.set_state(ExploreExperiencesAgentDirectorState(session_id))
+    explore_experiences_agent.get_collect_experiences_agent().set_state(CollectExperiencesAgentState(session_id))
 
     async def agent_director_exec(caplog, test_case):
         print(f"Running test case {test_case.name}")

@@ -220,6 +220,8 @@ async def conversation(request: Request, user_input: str, clear_memory: bool = F
 
         agent_director.set_state(state.agent_director_state)
         agent_director.get_explore_experiences_agent().set_state(state.explore_experiences_director_state)
+        agent_director.get_explore_experiences_agent().get_collect_experiences_agent().set_state(
+            state.collect_experience_state)
         conversation_memory_manager.set_state(state.conversation_memory_manager_state)
 
         # Handle the user input
@@ -278,16 +280,21 @@ async def _test_conversation(request: Request, user_input: str, clear_memory: bo
         # get the current index in the conversation history, so that we can return only the new messages
         current_index = len(context.all_history.turns)
 
+        from app.agent.agent import Agent
+        agent: Agent
         # ##################### ADD YOUR AGENT HERE ######################
         # Initialize the agent you want to use for the evaluation
-        from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirector
-        agent = ExploreExperiencesAgentDirector(conversation_manager=conversation_memory_manager)
-        logger.debug("ExploreExperiencesAgentDirector initialized for sandbox testing")
-        agent.set_state(state.explore_experiences_director_state)
+        # from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirector
+        # agent = ExploreExperiencesAgentDirector(conversation_manager=conversation_memory_manager)
+        # agent.set_state(state.explore_experiences_director_state)
+        from app.agent.collect_experiences_agent import CollectExperiencesAgent
+        agent = CollectExperiencesAgent()
+
         # ################################################################
+        logger.debug("%s initialized for sandbox testing", agent.agent_type.value)
 
         agent_output = await agent.execute(user_input=AgentInput(message=user_input), context=context)
-        if agent.is_responsible_for_conversation_history():
+        if not agent.is_responsible_for_conversation_history():
             await conversation_memory_manager.update_history(AgentInput(message=user_input), agent_output)
 
         # get the context again after updating the history

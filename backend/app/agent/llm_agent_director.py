@@ -105,8 +105,12 @@ class LLMAgentDirector(AbstractAgentDirector):
         self._llm_caller: LLMCaller[RouterModelResponse] = LLMCaller[RouterModelResponse](
             model_response_type=RouterModelResponse)
 
-    def get_explore_experiences_agent(self):
-        return self._agents[AgentType.EXPLORE_EXPERIENCES_AGENT]
+    def get_explore_experiences_agent(self) -> ExploreExperiencesAgentDirector:
+        #  cast the agent to the ExploreExperiencesAgentDirector
+        agent = self._agents[AgentType.EXPLORE_EXPERIENCES_AGENT]
+        if not isinstance(agent, ExploreExperiencesAgentDirector):
+            raise ValueError("The agent is not an instance of ExploreExperiencesAgentDirector")
+        return agent
 
     def _get_system_instructions(self, user_input: str, conversation_history: str, phase: ConversationPhase) -> str:
         """
