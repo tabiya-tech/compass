@@ -1,53 +1,42 @@
 from fastapi import APIRouter, HTTPException
 
 from app.users.repositories import UserPreferenceRepository
-from app.users.types import UserLanguage, UserPreferences
+from app.users.types import UserPreferencesUpdateRequest, UserPreferences, UpdateUserLanguageRequest, \
+    CreateUserPreferencesRequest
 
 import random
 
 
-async def update_user_language(repository: UserPreferenceRepository, user_preferences: UserLanguage):
+async def _update_user_language(repository: UserPreferenceRepository,
+                                user_preferences: UpdateUserLanguageRequest) -> UserPreferences:
     user_language = await repository.get_user_preference_by_user_id(user_preferences.user_id)
 
     if user_language is None:
         raise HTTPException(status_code=404, detail="user not found")
 
-    await repository.update_user_preference({
-        "user_id": user_preferences.user_id
-    }, {
-        "language": user_preferences.language
-    })
-
-    return user_preferences
+    return await repository.update_user_preference(user_preferences.user_id,
+                                                   UserPreferencesUpdateRequest(language=user_preferences.language))
 
 
-async def get_user_preferences(repository: UserPreferenceRepository, user_id: str):
-    user = await repository.get_user_preference_by_user_id(user_id)
-    if user is None:
+async def _get_user_preferences(repository: UserPreferenceRepository, user_id: str) -> UserPreferences:
+    user_preferences = await repository.get_user_preference_by_user_id(user_id)
+    if user_preferences is None:
         raise HTTPException(
             status_code=404,
             detail="user not found"
         )
 
     # Check if the sessions field is missing or empty, and add a new session if needed
-    if 'sessions' not in user or not user['sessions']:
-        session_id = random.randint(0, (1 << 48) - 1) # nosec
-        await repository.update_user_preference({
-            "user_id": user_id
-        }, {
-            "sessions": [session_id]
-        })
-        user['sessions'] = [session_id]
+    if 'sessions' not in user_preferences or not user_preferences['sessions']:
+        session_id = random.randint(0, (1 << 48) - 1)  # nosec
+        user_preferences = await repository.update_user_preference(user_id,
+                                                                   UserPreferencesUpdateRequest(sessions=[session_id]))
 
-    return {
-        "user_id": user_id,
-        "accepted_tc": user.get("accepted_tc"),
-        "language": user.get("language"),
-        "sessions": user.get("sessions")
-    }
+    return user_preferences
 
 
-async def create_user_preferences(repository: UserPreferenceRepository, user: UserPreferences):
+async def _create_user_preferences(repository: UserPreferenceRepository, user: CreateUserPreferencesRequest) \
+        -> UserPreferences:
     user_already_exists = await repository.get_user_preference_by_user_id(user.user_id)
 
     if user_already_exists:
@@ -58,17 +47,11 @@ async def create_user_preferences(repository: UserPreferenceRepository, user: Us
     # Generating a 64-bit integer session ID
     session_id = random.randint(0, (1 << 48) - 1)  # nosec
 
-    created = await repository.insert_user_preference({
-        "user_id": user.user_id,
-        "language": user.language,
-        "accepted_tc": user.accepted_tc,
-        "sessions": [session_id]
-    })
+    user.sessions = [session_id]
 
-    return {
-        "user_preference_id": str(created.inserted_id),
-        "user_preferences": user
-    }
+    created = await repository.insert_user_preference(user.user_id, UserPreferences(**user.dict()))
+
+    return created
 
 
 def add_user_preference_routes(_router: APIRouter):
@@ -80,23 +63,24 @@ def add_user_preference_routes(_router: APIRouter):
                 response_model=UserPreferences,
                 name="get user preferences",
                 description="Get user preferences, (language and time when they accepted terms and conditions)")
-    async def get_user_preferences_handler(user_id: str):
-        return await get_user_preferences(user_preference_repository, user_id)
+    async def _get_user_preferences_handler(user_id: str):
+        return await _get_user_preferences(user_preference_repository, user_id)
 
     @router.post("",
+                 response_model=UserPreferences,
                  status_code=201,
                  name="add user preferences",
                  description="Add user preferences, (language and time when they accepted terms and conditions)"
                  )
-    async def create_handler(user: UserPreferences):
-        return await create_user_preferences(user_preference_repository, user)
+    async def _create_handler(user_preferences: CreateUserPreferencesRequest):
+        return await _create_user_preferences(user_preference_repository, user_preferences)
 
     @router.put("/update-language",
-                response_model=UserLanguage,
+                response_model=UserPreferences,
                 name="update user preferences, specifically language",
                 description="Update user preferences - language"
                 )
-    async def update_user_language_handler(user: UserLanguage):
-        return await update_user_language(user_preference_repository, user)
+    async def _update_user_language_handler(user: UpdateUserLanguageRequest):
+        return await _update_user_language(user_preference_repository, user)
 
     _router.include_router(router)
