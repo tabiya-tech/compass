@@ -68,6 +68,8 @@ describe("Testing Login component with AuthProvider", () => {
 
   const authContextValue = {
     login: loginMock,
+    isLoggingIn: false,
+    isRegistering: false,
     user: null,
     register: jest.fn(),
     logout: jest.fn(),
@@ -104,6 +106,9 @@ describe("Testing Login component with AuthProvider", () => {
     expect(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT)).toBeInTheDocument();
     expect(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT)).toBeInTheDocument();
     expect(screen.getByTestId(DATA_TEST_ID.LOGIN_BUTTON)).toBeInTheDocument();
+
+    // AND the login button should not be disabled
+    expect(screen.queryByTestId(DATA_TEST_ID.LOGIN_BUTTON_CIRCULAR_PROGRESS)).not.toBeInTheDocument();
 
     // Simulate form input and submission
     fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: "john.doe@example.com" } });
@@ -358,4 +363,31 @@ describe("Testing Login component with AuthProvider", () => {
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Login failed", { variant: "error" });
     });
   });
+
+  it("should disable everything when logging in", () => {
+    // GIVEN the isLoggingIn flag is set to true
+    const _authContextValue = {
+      ...authContextValue,
+      isLoggingIn: true,
+    };
+
+    // WHEN the Login component is rendered within the AuthContext and Router
+    render(
+      <HashRouter>
+        <AuthContext.Provider value={_authContextValue}>
+          <Login />
+        </AuthContext.Provider>
+      </HashRouter>
+    );
+
+    // THEN expect the login button to be disabled
+    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_BUTTON)).toBeDisabled();
+    // AND the email input to be disabled
+    expect(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT)).toBeDisabled();
+    // AND the password input to be disabled
+    expect(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT)).toBeDisabled();
+
+    // AND login button circular progress to be displayed
+    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_BUTTON_CIRCULAR_PROGRESS)).toBeInTheDocument();
+  })
 });

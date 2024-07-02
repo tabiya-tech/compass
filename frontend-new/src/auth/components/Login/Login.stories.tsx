@@ -29,3 +29,20 @@ export default meta;
 export const Shown: StoryObj<typeof Login> = {
   args: {},
 };
+
+
+export const LoggingIn: StoryObj<typeof Login> = {
+  args: {},
+  render: (props) => {
+    return (
+      <AuthContext.Provider
+        value={{
+          ...authContextDefaultValue,
+          isLoggingIn: true,
+        }}
+      >
+        <Login {...props} />
+      </AuthContext.Provider>
+    );
+  }
+};

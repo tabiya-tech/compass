@@ -56,6 +56,8 @@ describe("Testing Register component with AuthProvider", () => {
 
   const authContextValue = {
     register: registerMock,
+    isLoggingIn: false,
+    isRegistering: false,
     user: null,
     login: jest.fn(),
     logout: jest.fn(),
@@ -97,6 +99,7 @@ describe("Testing Register component with AuthProvider", () => {
     expect(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT)).toBeInTheDocument();
     expect(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT)).toBeInTheDocument();
     expect(screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON)).toBeInTheDocument();
+    expect(screen.queryByTestId(DATA_TEST_ID.REGISTER_BUTTON_CIRCULAR_PROGRESS)).not.toBeInTheDocument();
 
     // Simulate form input and submission
     fireEvent.change(screen.getByTestId(DATA_TEST_ID.NAME_INPUT), { target: { value: givenName } });
@@ -267,4 +270,27 @@ describe("Testing Register component with AuthProvider", () => {
     });
     expect(screen.getByText("Password must be at least 8 characters long")).toBeInTheDocument();
   });
+
+  test("should disable everything if registering is still in progress", () => {
+    // GIVEN the component is rendering
+    render(
+      <HashRouter>
+        <AuthContext.Provider
+          value={{
+            ...authContextValue,
+            isRegistering: true,
+          }}
+        >
+          <Register />
+        </AuthContext.Provider>
+      </HashRouter>
+    );
+
+    // THEN expect all inputs and buttons to be disabled
+    expect(screen.getByTestId(DATA_TEST_ID.NAME_INPUT)).toBeDisabled();
+    expect(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT)).toBeDisabled();
+    expect(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT)).toBeDisabled();
+    expect(screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON)).toBeDisabled();
+    expect(screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON_CIRCULAR_PROGRESS)).toBeInTheDocument();
+  })
 });

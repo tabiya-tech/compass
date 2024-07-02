@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useState } from "react";
-import { Container, Box, TextField, Button, Typography, useTheme, styled } from "@mui/material";
+import { Container, Box, TextField, Button, Typography, useTheme, styled, CircularProgress } from "@mui/material";
 import { AuthContext, TabiyaUser } from "src/auth/AuthProvider";
 import { NavLink as RouterNavLink, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -28,6 +28,7 @@ export const DATA_TEST_ID = {
   EMAIL_INPUT: `login-email-input-${uniqueId}`,
   PASSWORD_INPUT: `login-password-input-${uniqueId}`,
   LOGIN_BUTTON: `login-button-${uniqueId}`,
+  LOGIN_BUTTON_CIRCULAR_PROGRESS: `login-button-circular-progress-${uniqueId}`,
   FORGOT_PASSWORD_LINK: `login-forgot-password-link-${uniqueId}`,
   LOGIN_USING: `login-using-${uniqueId}`,
   FIREBASE_AUTH_CONTAINER: `firebase-auth-container-${uniqueId}`,
@@ -37,7 +38,7 @@ export const DATA_TEST_ID = {
 
 const Login: React.FC = () => {
   const theme = useTheme();
-  const { login } = useContext(AuthContext);
+  const { login, isLoggingIn } = useContext(AuthContext);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -126,6 +127,7 @@ const Login: React.FC = () => {
             type="email"
             variant="outlined"
             margin="normal"
+            disabled={isLoggingIn}
             required
             onChange={(e) => setEmail(e.target.value)}
             inputProps={{ "data-testid": DATA_TEST_ID.EMAIL_INPUT }}
@@ -135,6 +137,7 @@ const Login: React.FC = () => {
             label="Password"
             type="password"
             variant="outlined"
+            disabled={isLoggingIn}
             margin="normal"
             required
             onChange={(e) => setPassword(e.target.value)}
@@ -146,9 +149,20 @@ const Login: React.FC = () => {
             color="primary"
             style={{ marginTop: 16 }}
             type="submit"
+            disabled={isLoggingIn}
             data-testid={DATA_TEST_ID.LOGIN_BUTTON}
           >
-            Login
+            {isLoggingIn ? (
+              <CircularProgress
+                color={"secondary"}
+                data-testid={DATA_TEST_ID.LOGIN_BUTTON_CIRCULAR_PROGRESS}
+                aria-label={"Logging in"}
+                size={16}
+                sx={{ marginTop: theme.tabiyaSpacing.sm, marginBottom: theme.tabiyaSpacing.sm }}
+              />
+            ) : (
+              "Login"
+            )}
           </Button>
         </Box>
         <Box
