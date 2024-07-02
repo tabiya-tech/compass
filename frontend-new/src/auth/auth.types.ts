@@ -31,6 +31,8 @@ export type AuthProviderProps = {
 
 export type AuthContextValue = {
   user: TabiyaUser | null;
+  isLoggingIn: boolean;
+  isRegistering: boolean;
   login: (
     email: string,
     password: string,

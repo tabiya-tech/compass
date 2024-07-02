@@ -29,3 +29,19 @@ export default meta;
 export const Shown: StoryObj<typeof Register> = {
   args: {},
 };
+
+export const Registering: StoryObj<typeof Register> = {
+    args: {},
+    render: (props) => {
+        return (
+            <AuthContext.Provider
+            value={{
+                ...authContextDefaultValue,
+                isRegistering: true,
+            }}
+            >
+            <Register {...props} />
+            </AuthContext.Provider>
+        );
+    }
+}

@@ -40,7 +40,7 @@ describe("AuthProvider module", () => {
   beforeAll(defaultSetup);
 
   describe("Login functionality", () => {
-    test("should call the login url with the correct parameters", () => {
+    test("should call the login url with the correct parameters", async() => {
       // GIVEN: The Auth Provider is rendered and auth context is accessed
       const { result } = renderAuthContext();
 
@@ -52,12 +52,18 @@ describe("AuthProvider module", () => {
 
       const loginSpy = jest.spyOn(authService, "handleLogin");
 
+      //initially isLogging in should be false.
+      expect(result.current.isLoggingIn).toBe(false);
+
       act(() => {
         result.current?.login(givenEmail, givenPassword, givenSuccessCallback, givenErrorCallback);
       });
 
       // THEN the auth service handleLogin function should be called with the correct parameters
       expect(loginSpy).toHaveBeenCalledWith(givenEmail, givenPassword, expect.any(Function), expect.any(Function));
+
+      // AND isLogging in should be false.
+      expect(result.current.isLoggingIn).toBe(false);
     });
   });
 
@@ -101,6 +107,9 @@ describe("AuthProvider module", () => {
 
       const registerSpy = jest.spyOn(authService, "handleRegister");
 
+      // Initially isRegistering should be false.
+      expect(result.current.isRegistering).toBe(false);
+
       act(() => {
         result.current?.register(givenEmail, givenPassword, givenName, givenSuccessCallback, givenErrorCallback);
       });
@@ -113,6 +122,9 @@ describe("AuthProvider module", () => {
         expect.any(Function),
         expect.any(Function)
       );
+
+      // AND isRegistering in should be false.
+      expect(result.current.isRegistering).toBe(false);
     });
   });
 

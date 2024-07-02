@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Container, Box, TextField, Button, Typography, useTheme, styled } from "@mui/material";
+import { Container, Box, TextField, Button, Typography, useTheme, styled, CircularProgress } from "@mui/material";
 import { AuthContext } from "src/auth/AuthProvider";
 import { NavLink as RouterNavLink, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -29,6 +29,7 @@ export const DATA_TEST_ID = {
   EMAIL_INPUT: `register-email-input-${uniqueId}`,
   PASSWORD_INPUT: `register-password-input-${uniqueId}`,
   REGISTER_BUTTON: `register-button-${uniqueId}`,
+  REGISTER_BUTTON_CIRCULAR_PROGRESS: `register-button-circular-progress-${uniqueId}`,
   FORGOT_PASSWORD_LINK: `register-forgot-password-link-${uniqueId}`,
   REGISTER_USING: `register-using-${uniqueId}`,
   FIREBASE_AUTH_CONTAINER: `firebase-auth-container-${uniqueId}`,
@@ -38,7 +39,7 @@ export const DATA_TEST_ID = {
 
 const Register: React.FC = () => {
   const theme = useTheme();
-  const { register } = useContext(AuthContext);
+  const { register, isRegistering } = useContext(AuthContext);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -54,10 +55,10 @@ const Register: React.FC = () => {
   const handleRegister = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const passwordValidationResult = validatePassword(password)
+    const passwordValidationResult = validatePassword(password);
     setPasswordError(passwordValidationResult);
 
-    if(passwordValidationResult  === "") {
+    if (passwordValidationResult === "") {
       register(
         email,
         password,
@@ -105,6 +106,7 @@ const Register: React.FC = () => {
             label="Name"
             variant="outlined"
             margin="normal"
+            disabled={isRegistering}
             required
             onChange={(e) => setName(e.target.value)}
             inputProps={{ "data-testid": DATA_TEST_ID.NAME_INPUT }}
@@ -113,6 +115,7 @@ const Register: React.FC = () => {
             fullWidth
             label="Email"
             type="email"
+            disabled={isRegistering}
             variant="outlined"
             margin="normal"
             required
@@ -123,6 +126,7 @@ const Register: React.FC = () => {
             fullWidth
             label="Password"
             type="password"
+            disabled={isRegistering}
             variant="outlined"
             margin="normal"
             required
@@ -137,9 +141,20 @@ const Register: React.FC = () => {
             color="primary"
             style={{ marginTop: 16 }}
             type="submit"
+            disabled={isRegistering}
             data-testid={DATA_TEST_ID.REGISTER_BUTTON}
           >
-            Register
+            {isRegistering ? (
+              <CircularProgress
+                color={"secondary"}
+                aria-label={"Registering"}
+                data-testid={DATA_TEST_ID.REGISTER_BUTTON_CIRCULAR_PROGRESS}
+                size={16}
+                sx={{ marginTop: theme.tabiyaSpacing.sm, marginBottom: theme.tabiyaSpacing.sm }}
+              />
+            ) : (
+              "Register"
+            )}
           </Button>
         </Box>
         <Box
