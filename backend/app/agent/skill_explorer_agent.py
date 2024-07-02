@@ -5,12 +5,12 @@ from pydantic import BaseModel
 
 from app.agent.agent import Agent
 from app.agent.agent_types import AgentOutput, AgentInput, AgentType
+from app.agent.experience.experience_entity import ExperienceEntity
 from app.agent.llm_caller import LLMCaller
 from app.agent.llm_response import ModelResponse
 from app.agent.prompt_response_template import get_json_response_instructions
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
-from app.agent.experience.experience_entity import ExperienceEntity
 from app.vector_search.esco_entities import OccupationSkillEntity, SkillEntity
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 
@@ -68,7 +68,7 @@ class SkillExplorerAgent(Agent):
         self.TOP_COUNT = 10
 
     async def execute(self, user_input: AgentInput, context: ConversationContext) -> AgentOutput:
-        essential_skills = self._get_essential_skills(self.experience_state.esco_occupations)
+        essential_skills = self._get_essential_skills(self.experience_entity.esco_occupations)
         response_part = get_json_response_instructions(examples=[
             ModelResponse(reasoning="Example reason.",
                           finished=False,
@@ -76,8 +76,9 @@ class SkillExplorerAgent(Agent):
                           ),
         ])
         formatted_skills = "; ".join([str(skill[1]) for skill in essential_skills.items()])
-        top_skills_formatted = "; ".join([str(skill) for skill in self.experience_state.top_skills])
-        system_instructions = SYSTEM_INSTRUCTIONS.format(experience="baker", all_skills=formatted_skills,
+        top_skills_formatted = "; ".join([str(skill) for skill in self.experience_entity.top_skills])
+        system_instructions = SYSTEM_INSTRUCTIONS.format(experience=self.experience_entity.experience_title,
+                                                         all_skills=formatted_skills,
                                                          identified_skills=top_skills_formatted) + response_part
         convo_llm = GeminiGenerativeLLM(system_instructions=system_instructions)
         llm_input = "\nThe conversation so far:" + ConversationHistoryFormatter.format_to_string(context,

@@ -12,7 +12,7 @@ from evaluation_tests.conversation_libs.fake_conversation_context import FakeCon
 
 
 @pytest.fixture()
-def baker_occupation() -> OccupationSkillEntity:
+def baker_occupation_with_skills() -> OccupationSkillEntity:
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'baker_occupations.json')) as f:
         return TypeAdapter(OccupationSkillEntity).validate_json(f.read())
 
@@ -52,7 +52,5 @@ async def test_skill_explorer_agent(fake_conversation_context: FakeConversationC
             AgentInput(message=user_input, ),
             fake_conversation_context)
         fake_conversation_context.add_turn(user_input, output.message_for_user)
-        print(user_input)
-        print(output.message_for_user)
     assert output.finished, fake_conversation_context.model_dump_json(indent=4)
     assert 'ensure sanitation' in [str(skill) for skill in state.top_skills]
