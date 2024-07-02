@@ -63,10 +63,18 @@ jobs:
       backend-url: ${{ needs.setup-env.outputs.backend-url }}
       identity_platform_client_api_key: ${{ needs.deploy-auth.outputs.identity_platform_client_api_key }}
       identity_platform_client_firebase_auth_domain: ${{ needs.deploy-auth.outputs.identity_platform_client_firebase_auth_domain }}
+  smoke-test-frontend-bucket:
+    needs: [ setup-env, build-frontend, deploy-frontend ]
+    uses: ./.github/workflows/smoke-test-frontend-version.yml
+    secrets: inherit
+    with:
+      component: frontend-new
+      expected-version-info: ${{ needs.build-frontend.outputs.version-info }}
+      component-url: ${{ needs.deploy-frontend.outputs.frontend-url }}
   deploy-common:
     # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
     if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
-    needs: [ setup-env, deploy-frontend, smoke-test-backend-apigateway ]
+    needs: [ setup-env, deploy-frontend, smoke-test-backend-apigateway, smoke-test-frontend-bucket ]
     uses: ./.github/workflows/deploy-common.yml
     secrets: inherit
     with:
@@ -101,4 +109,4 @@ jobs:
     with:
       component: frontend-new
       expected-version-info: ${{ needs.build-frontend.outputs.version-info }}
-      component-url: ${{ needs.setup-env.outputs.frontend-url }}
+      component-url: ${{ needs.setup-env.outputs.frontend-url }}/new-ui
