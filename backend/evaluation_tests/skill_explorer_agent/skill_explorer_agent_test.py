@@ -25,6 +25,7 @@ async def test_skill_explorer_agent(fake_conversation_context: FakeConversationC
     occupations_with_skills = [baker_occupation_with_skills]
     state: ExperienceEntity = ExperienceEntity(experience_title="Baker")
     state.esco_occupations = occupations_with_skills
+    state.experience_title = "Baker"
     skill_explorer_agent = SkillExplorerAgent(state)
 
     fake_conversation_context.fill_conversation(conversation=[

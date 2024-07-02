@@ -61,6 +61,16 @@ SKILL_PARSER_SYSTEM_INSTRUCTIONS = """
 
 
 class SkillExplorerAgent(Agent):
+    """
+    An agent that explores the skills of a user based on their experience.
+
+    This agent assumes that the ExperienceEntity object is populated with:
+      - `experience_title` - The title of the experience the user is discussing.
+      - `esco_occupations` - The list of occupations the user has worked in, in a format of `OccupationSkillEntity`.
+
+    This agent will identify the skills the user demonstrated in their experience and set the `top_skills` attribute of
+    `ExperienceEntity`.
+    """
 
     def __init__(self, experience_entity: ExperienceEntity):
         super().__init__(agent_type=AgentType.EXPLORE_SKILLS_AGENT, is_responsible_for_conversation_history=False)
