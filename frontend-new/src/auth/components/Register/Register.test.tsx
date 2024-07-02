@@ -7,6 +7,11 @@ import { AuthContext, TabiyaUser } from "src/auth/AuthProvider";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { routerPaths } from "src/app/routerPaths";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
+import { validatePassword } from "src/auth/components/Register/utils/validatePassword";
+
+jest.mock("src/auth/components/Register/utils/validatePassword", () => ({
+  validatePassword: jest.fn().mockReturnValue(""),
+}));
 
 //mock the IDPAuth component
 jest.mock("src/auth/components/IDPAuth/IDPAuth", () => {
@@ -199,5 +204,67 @@ describe("Testing Register component with AuthProvider", () => {
 
     // AND the error message should be displayed
     expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Registration failed", { variant: "error" });
+  });
+  test("it should call validatePassword on form submission", async () => {
+    // GIVEN a user to register
+    const givenName = "Foo Bar";
+    const givenEmail = "foo@bar.baz";
+    const givenPassword = "password";
+
+    // Mock the validation function to return no errors
+    (validatePassword as jest.Mock).mockReturnValueOnce("");
+
+    // WHEN the component is rendered within the AuthContext and Router
+    render(
+      <HashRouter>
+        <AuthContext.Provider value={authContextValue}>
+          <Register />
+        </AuthContext.Provider>
+      </HashRouter>
+    );
+
+    // Simulate form input and submission
+    fireEvent.change(screen.getByTestId(DATA_TEST_ID.NAME_INPUT), { target: { value: givenName } });
+    fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: givenEmail } });
+    fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: givenPassword } });
+
+    // Trigger form submission
+    fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
+
+    // THEN expect the validatePassword function to have been called with the correct password
+    await waitFor(() => {
+      expect(validatePassword).toHaveBeenCalledWith(givenPassword);
+    });
+  });
+
+  test("it should show error message if password validation fails", async () => {
+    // GIVEN a user to register with an invalid password
+    const givenName = "Foo Bar";
+    const givenEmail = "foo@bar.baz";
+    const givenPassword = "password";
+
+    // Mock the validation function to return an error message
+    (validatePassword as jest.Mock).mockReturnValue("Password must be at least 8 characters long");
+
+    // WHEN the component is rendered within the AuthContext and Router
+    render(
+      <HashRouter>
+        <AuthContext.Provider value={authContextValue}>
+          <Register />
+        </AuthContext.Provider>
+      </HashRouter>
+    );
+
+    // Simulate form input and submission
+    fireEvent.change(screen.getByTestId(DATA_TEST_ID.NAME_INPUT), { target: { value: givenName } });
+    fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: givenEmail } });
+    fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: givenPassword } });
+    fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
+
+    // THEN expect an error message to be displayed on the password field
+    await waitFor(() => {
+      expect(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT)).toHaveValue(givenPassword);
+    });
+    expect(screen.getByText("Password must be at least 8 characters long")).toBeInTheDocument();
   });
 });
