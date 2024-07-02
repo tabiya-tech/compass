@@ -87,8 +87,12 @@ class AgentDirector(AbstractAgentDirector):
             ConversationPhase.CHECKOUT: FarewellAgent()
         }
 
-    def get_explore_experiences_agent(self):
-        return self._agents[ConversationPhase.COUNSELING]
+    def get_explore_experiences_agent(self) -> ExploreExperiencesAgentDirector:
+        #  cast the agent to the ExploreExperiencesAgentDirector
+        agent = self._agents[ConversationPhase.COUNSELING]
+        if not isinstance(agent, ExploreExperiencesAgentDirector):
+            raise ValueError("The agent is not an instance of ExploreExperiencesAgentDirector")
+        return agent
 
     def _get_current_agent(self) -> Agent | None:
         """
