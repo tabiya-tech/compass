@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from app.agent.experience.experience_entity import ExperienceEntity
 from app.agent.experience.timeline import Timeline
 from app.agent.experience.work_type import WorkType
+from app.agent.skill_explorer_agent import SkillExplorerAgent
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 
 from app.agent.agent import Agent
@@ -227,7 +228,7 @@ class ExploreExperiencesAgentDirector(Agent):
         self._state: ExploreExperiencesAgentDirectorState | None = None
         self._collect_experiences_agent = _CollectExperiencesAgentStub()
         self._infer_occupations_agent = _InferOccupationsAgentStub()
-        self._exploring_skills_agent = _SkillExplorerAgentStub()
+        self._exploring_skills_agent = SkillExplorerAgent()
 
 
 # ######################################################################################################################
@@ -307,40 +308,6 @@ class _InferOccupationsAgentStub(Agent):
                              f"     is {self._experience.contextual_title}\n"
                              f"Additionally, here are the occupations that match to your experience are "
                              f"     {self._experience.esco_occupations[0].occupation.preferredLabel}",
-            finished=True,
-            agent_type=AgentType.EXPLORE_SKILLS_AGENT,
-            reasoning="hardcoded",
-            agent_response_time_in_sec=0.0,
-            llm_stats=[]
-        )
-
-
-class _SkillExplorerAgentStub(Agent):
-    """
-    A stub for the SkillExplorerAgent. This is a placeholder for the real agent that will be implemented later.
-    """
-
-    def __init__(self):
-        super().__init__(agent_type=AgentType.EXPLORE_SKILLS_AGENT,
-                         is_responsible_for_conversation_history=False)
-        self._experience: ExperienceEntity | None = None
-        self._mocked_skills = _get_backer_occupation().skills[:2]
-
-    def set_experience(self, experience: ExperienceEntity):
-        self._experience = experience
-
-    async def execute(self, user_input: AgentInput, context: ConversationContext) -> AgentOutput:
-        if self._experience is None:
-            raise ValueError("SkillExplorerAgent: execute() called before experience was set")
-
-        self._experience.mentioned_tasks_and_skills = ["task1", "task2"]
-        self._experience.top_skills = self._mocked_skills
-
-        return AgentOutput(
-            message_for_user=f"(placeholder for the SkillExplorerAgent agent(.\n"
-                             f"We explored {self._experience.experience_title} ({self._experience.contextual_title})\n"
-                             f"And you  mentioned the following tasks and skills {self._experience.mentioned_tasks_and_skills}\n"
-                             f"Here are the top skills for this experience {self._experience.top_skills}",
             finished=True,
             agent_type=AgentType.EXPLORE_SKILLS_AGENT,
             reasoning="hardcoded",
