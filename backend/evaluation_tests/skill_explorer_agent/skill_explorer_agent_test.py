@@ -12,7 +12,7 @@ from evaluation_tests.conversation_libs.fake_conversation_context import FakeCon
 
 
 @pytest.fixture()
-def baker_occupation() -> OccupationSkillEntity:
+def baker_occupation_with_skills() -> OccupationSkillEntity:
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'baker_occupations.json')) as f:
         return TypeAdapter(OccupationSkillEntity).validate_json(f.read())
 
@@ -21,10 +21,11 @@ def baker_occupation() -> OccupationSkillEntity:
 @pytest.mark.evaluation_test
 async def test_skill_explorer_agent(fake_conversation_context: FakeConversationContext,
                                     baker_occupation_with_skills: OccupationSkillEntity):
-    """ Tests the QnA agent with a simple question after a conversation. """
+    """ Tests the SkillExplorerAgent agent with a simple conversation. """
     occupations_with_skills = [baker_occupation_with_skills]
     state: ExperienceEntity = ExperienceEntity(experience_title="Baker")
     state.esco_occupations = occupations_with_skills
+    state.experience_title = "Baker"
     skill_explorer_agent = SkillExplorerAgent(state)
 
     fake_conversation_context.fill_conversation(conversation=[
@@ -42,11 +43,15 @@ async def test_skill_explorer_agent(fake_conversation_context: FakeConversationC
         ConversationRecord(
             message="What company did you work for?",
             actor=Actor.EVALUATED_AGENT),
-        ConversationRecord(
-            message="I worked for a small bakery called 'Bread and Butter'.",
-            actor=Actor.SIMULATED_USER),
     ],
         summary="The user and the agent are discussing a time when the user had to come a challenge. The user is "
                 "explaining how they used their arch skills to come up with new ideas.")
-    await skill_explorer_agent.execute(AgentInput(message="ignored", ), fake_conversation_context)
-    assert len(state.top_skills) == skill_explorer_agent.TOP_COUNT
+    output = None
+    for user_input in ["I worked for a small bakery called 'Bread and Butter'.", "I cleaned the floor",
+                       "I didn't do anything else.", "No, I really didn't do anything else."]:
+        output = await skill_explorer_agent.execute(
+            AgentInput(message=user_input, ),
+            fake_conversation_context)
+        fake_conversation_context.add_turn(user_input, output.message_for_user)
+    assert output.finished, fake_conversation_context.model_dump_json(indent=4)
+    assert 'ensure sanitation' in [str(skill) for skill in state.top_skills]
