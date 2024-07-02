@@ -36,6 +36,6 @@ jobs:
         shell: bash
         run: |
           export EXPECTED_VERSION_INFO='${{ inputs.expected-version-info }}'
-          export E2E_BASE_URL='${{ inputs.component-url }}/new-ui'
+          export E2E_BASE_URL='${{ inputs.component-url }}'
           yarn run test:smoke
         working-directory: frontend-new
