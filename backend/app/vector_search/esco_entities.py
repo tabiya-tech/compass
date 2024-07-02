@@ -27,6 +27,9 @@ class SkillEntity(BaseModel):
     skillType: str
     relationType: str
 
+    def __str__(self):
+        return self.preferredLabel
+
 
 class OccupationSkillEntity(BaseModel):
     """

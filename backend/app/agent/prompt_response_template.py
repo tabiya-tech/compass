@@ -1,7 +1,5 @@
 from textwrap import dedent
 
-from pydantic import BaseModel
-
 from app.agent.llm_response import ModelResponse
 
 
