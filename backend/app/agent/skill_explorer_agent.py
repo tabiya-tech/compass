@@ -73,15 +73,18 @@ class SkillExplorerAgent(Agent):
     `ExperienceEntity`.
     """
 
-    def __init__(self, experience_entity: ExperienceEntity):
+    def __init__(self):
         super().__init__(agent_type=AgentType.EXPLORE_SKILLS_AGENT, is_responsible_for_conversation_history=False)
-        self.experience_entity = experience_entity
+        self.experience_entity = None
         self.TOP_COUNT = 10
         self.logger = logging.Logger(name="SkillExplorerAgent")
 
+    def set_experience(self, experience_entity: ExperienceEntity) -> None:
+        self.experience_entity = experience_entity
+
     async def execute(self, user_input: AgentInput, context: ConversationContext) -> AgentOutput:
-        if not self.experience_entity.esco_occupations or not self.experience_entity.experience_title or \
-                self.experience_entity.esco_occupations == []:
+        if not self.experience_entity or not self.experience_entity.esco_occupations or not \
+                self.experience_entity.experience_title or self.experience_entity.esco_occupations == []:
             raise ValueError("The experience entity must have a title and at least one occupation.")
         essential_skills = self._get_essential_skills(self.experience_entity.esco_occupations)
         response_part = get_json_response_instructions(examples=[
