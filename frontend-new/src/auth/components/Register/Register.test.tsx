@@ -295,5 +295,5 @@ describe("Testing Register component with AuthProvider", () => {
     expect(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT)).toBeDisabled();
     expect(screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON)).toBeDisabled();
     expect(screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON_CIRCULAR_PROGRESS)).toBeInTheDocument();
-  })
+  });
 });

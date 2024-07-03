@@ -1,19 +1,20 @@
-import { ChatMessageOrigin, IChatMessage } from "src/chat/Chat.types";
+import { IChatMessage } from "src/chat/Chat.types";
+import { ConversationMessageSender } from "./ChatService/ChatService.types";
 
-export const generateUserMessage = (message: string): IChatMessage => {
+export const generateUserMessage = (message: string, sent_at: string): IChatMessage => {
   return {
     id: Math.floor(Math.random() * 1000),
-    origin: ChatMessageOrigin.ME,
+    sender: ConversationMessageSender.USER,
     message: message,
-    timestamp: Date.now(),
+    sent_at: sent_at,
   };
 };
 
-export const generateCompassMessage = (message: string): IChatMessage => {
+export const generateCompassMessage = (message: string, sent_at: string): IChatMessage => {
   return {
     id: Math.floor(Math.random() * 1000),
-    origin: ChatMessageOrigin.COMPASS,
+    sender: ConversationMessageSender.COMPASS,
     message: message,
-    timestamp: Date.now(),
+    sent_at: sent_at,
   };
 };

@@ -1,21 +1,24 @@
 import base64
 import logging
 import os
+from datetime import datetime
+from typing import List, Annotated
 
 from dotenv import load_dotenv
 
-from fastapi import FastAPI, Request, HTTPException, Depends
+from fastapi import FastAPI, Request, HTTPException, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
-from pydantic import BaseModel
 
-from app.agent.agent_types import AgentInput, AgentOutput
+from app.agent.agent_types import AgentInput
 from app.agent.llm_agent_director import LLMAgentDirector
 from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
-from app.conversation_memory.conversation_memory_manager import ConversationContext, ConversationMemoryManager
+from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
 from app.server_dependencies import get_conversation_memory_manager, initialize_mongo_db
+from app.chat.chat_types import ConversationMessage
+from app.chat.chat_utils import filter_conversation_history, get_messages_from_conversation_manager
 from app.vector_search.occupation_search_routes import add_occupation_search_routes
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from app.vector_search.skill_search_routes import add_skill_search_routes
@@ -143,61 +146,11 @@ def get_agent_director(conversation_manager: ConversationMemoryManager = Depends
     return LLMAgentDirector(conversation_manager, similarity_search)
 
 
-class ConversationResponse(BaseModel):
-    """
-    The response model for the conversation endpoint.
-    """
-    # TODO: remove this field, as the complete conversation history should not be sent to the client because it leaks
-    #  information about the agent's internal state
-    last: AgentOutput
-    """
-    The last message from the agent in the conversation.
-    """
-    messages_for_user: list[str] = []
-    """
-    The messages for the user.
-    """
-    # TODO: remove this field, as the complete conversation history should not be sent to the client because it leaks
-    #  information about the agent's internal state
-    conversation_context: ConversationContext
-    """
-    The complete conversation context.
-    """
-
-    @staticmethod
-    async def from_conversation_manager(context: ConversationContext, from_index: int):
-        """
-        Construct the response to the user from the conversation context.
-        """
-        # concatenate the message to the user into a single string
-        # to produce a coherent conversation flow with all the messages that have been added to the history
-        # during this conversation turn with the user
-        _hist = context.all_history
-        _last = _hist.turns[-1]
-        _new_output: AgentOutput = AgentOutput(message_for_user="",
-                                               agent_type=_last.output.agent_type,
-                                               finished=_last.output.finished,
-                                               agent_response_time_in_sec=0,
-                                               llm_stats=[]
-                                               )
-        _messages_for_user = []
-        for turn in _hist.turns[from_index:]:
-            _messages_for_user.append(turn.output.message_for_user)
-            _new_output.message_for_user += turn.output.message_for_user + "\n\n"
-            _new_output.llm_stats += turn.output.llm_stats
-            _new_output.agent_response_time_in_sec += turn.output.agent_response_time_in_sec
-
-        _new_output.message_for_user = _new_output.message_for_user.strip()
-        return ConversationResponse(last=_new_output, messages_for_user=_messages_for_user,
-                                    conversation_context=context)
-
-
 @app.get(path="/conversation",
-         description="""The main conversation route used to interact with the agent.""", )
+         description="""The main conversation route used to interact with the agent.""")
 async def conversation(request: Request, user_input: str, clear_memory: bool = False, filter_pii: bool = False,
                        session_id: int = 1,
-                       conversation_memory_manager: ConversationMemoryManager = Depends(
-                           get_conversation_memory_manager),
+                       conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager),
                        agent_director: LLMAgentDirector = Depends(get_agent_director),
                        authorization=Depends(http_bearer)):
     """
@@ -206,7 +159,7 @@ async def conversation(request: Request, user_input: str, clear_memory: bool = F
     # Do not allow user input that is too long,
     # as a basic measure to prevent abuse.
     if len(user_input) > 1000:
-        raise HTTPException(status_code=413, detail="To long user input")
+        raise HTTPException(status_code=413, detail="Too long user input")
 
     try:
         if clear_memory:
@@ -214,6 +167,9 @@ async def conversation(request: Request, user_input: str, clear_memory: bool = F
             return {"msg": f"Memory cleared for session {session_id}!"}
         if filter_pii:
             user_input = await sensitive_filter.obfuscate(user_input)
+
+        # set the sent_at for the user input
+        user_input = AgentInput(message=user_input, sent_at=datetime.now())
 
         # set the state of the agent director, the conversation memory manager and all the agents
         state = await application_state_manager.get_state(session_id)
@@ -228,10 +184,10 @@ async def conversation(request: Request, user_input: str, clear_memory: bool = F
         context = await conversation_memory_manager.get_conversation_context()
         # get the current index in the conversation history, so that we can return only the new messages
         current_index = len(context.all_history.turns)
-        await agent_director.execute(AgentInput(message=user_input))
+        await agent_director.execute(user_input=user_input)
         # get the context again after updating the history
         context = await conversation_memory_manager.get_conversation_context()
-        response = await ConversationResponse.from_conversation_manager(context, from_index=current_index)
+        response = await get_messages_from_conversation_manager(context, from_index=current_index)
         # save the state, before responding to the user
         await application_state_manager.save_state(session_id, state)
         return response
@@ -244,6 +200,27 @@ async def conversation(request: Request, user_input: str, clear_memory: bool = F
             session_id,
             e
         )
+        raise HTTPException(status_code=500, detail="Oops! something went wrong")
+
+
+@app.get(path="/conversation/history",
+         response_model=List[ConversationMessage],
+         description="""Endpoint for retrieving the conversation history.""")
+async def get_conversation_history(
+    session_id: Annotated[int, Query(description="The session id for the conversation history.")],
+    conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager),
+    authorization=Depends(http_bearer)
+):
+    """
+    Endpoint for retrieving the conversation history.
+    """
+    try:
+        state = await application_state_manager.get_state(session_id)
+        conversation_memory_manager.set_state(state.conversation_memory_manager_state)
+        context = await conversation_memory_manager.get_conversation_context()
+        return filter_conversation_history(context.all_history)
+    except Exception as e:
+        logger.exception(e)
         raise HTTPException(status_code=500, detail="Oops! something went wrong")
 
 
@@ -293,13 +270,13 @@ async def _test_conversation(request: Request, user_input: str, clear_memory: bo
         # ################################################################
         logger.debug("%s initialized for sandbox testing", agent.agent_type.value)
 
-        agent_output = await agent.execute(user_input=AgentInput(message=user_input), context=context)
+        agent_output = await agent.execute(user_input=AgentInput(message=user_input, sent_at=datetime.now()), context=context)
         if not agent.is_responsible_for_conversation_history():
-            await conversation_memory_manager.update_history(AgentInput(message=user_input), agent_output)
+            await conversation_memory_manager.update_history(AgentInput(message=user_input, sent_at=datetime.now()), agent_output)
 
         # get the context again after updating the history
         context = await conversation_memory_manager.get_conversation_context()
-        response = await ConversationResponse.from_conversation_manager(context, from_index=current_index)
+        response = await get_messages_from_conversation_manager(context, from_index=current_index)
         if only_reply:
             response = response.last.message_for_user
 

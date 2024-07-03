@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import Chat, { START_PROMPT } from "./Chat";
+import Chat from "./Chat";
 import { getBackendUrl } from "src/envService";
 
 const meta: Meta<typeof Chat> = {
@@ -59,7 +59,7 @@ export const ShownWithRealisticConversation: Story = {
             all_history: {
               turns: [
                 {
-                  input: { message: START_PROMPT },
+                  input: { message: "" },
                   output: { message_for_user: "Welcome! Are you ready to begin your skills exploration session?" },
                 },
                 {

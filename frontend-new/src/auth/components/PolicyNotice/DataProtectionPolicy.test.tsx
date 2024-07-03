@@ -6,7 +6,7 @@ import { HashRouter, useNavigate } from "react-router-dom";
 import { mockLoggedInUser } from "src/_test_utilities/mockLoggedInUser";
 import { waitFor } from "@testing-library/react";
 import UserPreferencesService from "src/auth/services/UserPreferences/userPreferences.service";
-import { Language, UserPreferenceResponse } from "src/auth/services/UserPreferences/userPreferences.types";
+import { Language, UserPreference } from "src/auth/services/UserPreferences/userPreferences.types";
 import { routerPaths } from "src/app/routerPaths";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { TabiyaUser } from "src/auth/auth.types";
@@ -104,14 +104,11 @@ describe("Testing Data Protection Policy component with AuthProvider", () => {
       name: "Foo Bar",
     };
     mockLoggedInUser({ user: givenUser });
-    const newUserPreferences: UserPreferenceResponse = {
-      user_preference_id: "0002",
-      user_preferences: {
+    const newUserPreferences: UserPreference = {
         user_id: givenUser.id,
         language: Language.en,
         accepted_tc: new Date(),
         sessions: [],
-      },
     };
 
     // AND the user preferences service will successfully create the user preferences

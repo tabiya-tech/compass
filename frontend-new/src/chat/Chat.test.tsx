@@ -1,63 +1,51 @@
 import "src/_test_utilities/consoleMock";
-import Chat, { DATA_TEST_ID, START_PROMPT } from "./Chat";
+import Chat, { DATA_TEST_ID } from "./Chat";
 import { fireEvent, render, screen, waitFor } from "src/_test_utilities/test-utils";
 import { DATA_TEST_ID as CHAT_HEADER_TEST_ID } from "./ChatHeader/ChatHeader";
 import ChatList, { DATA_TEST_ID as CHAT_LIST_TEST_ID } from "./ChatList/ChatList";
 import { DATA_TEST_ID as CHAT_MESSAGE_FIELD_TEST_ID } from "./ChatMessageField/ChatMessageField";
 import { HashRouter } from "react-router-dom";
-import { ChatMessageOrigin } from "./Chat.types";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import ChatService from "./ChatService/ChatService";
+import { ConversationMessageSender } from "./ChatService/ChatService.types";
 
-const mockSendMessage = jest.fn().mockResolvedValue({
-  conversation_context: {
-    all_history: {
-      turns: [
-        {
-          input: { message: "Hello" },
-          output: { message_for_user: "Hello, I'm Compass" },
-        },
-      ],
-    },
-  },
-  last: {
-    message_for_user: "Hello, I'm Compass",
-  },
-});
+const mockSendMessage = jest.fn();
 
 const mockClearChat = jest.fn();
+const mockGetChatHistory = jest.fn();
 
 jest.mock("src/chat/ChatService/ChatService", () => {
   return jest.fn().mockImplementation(() => {
     return {
       sendMessage: mockSendMessage,
       clearChat: mockClearChat,
+      getChatHistory: mockGetChatHistory,
     };
   });
 });
 
 jest.mock("src/chat/ChatList/ChatList", () => {
-  const originalModule = jest.requireActual("src/chat/ChatList/ChatList");
+  const senderalModule = jest.requireActual("src/chat/ChatList/ChatList");
   return {
     __esModule: true,
-    ...originalModule,
-    default: jest.fn(() => <div data-testid={originalModule.DATA_TEST_ID.CHAT_LIST_CONTAINER}></div>),
+    ...senderalModule,
+    default: jest.fn(() => <div data-testid={senderalModule.DATA_TEST_ID.CHAT_LIST_CONTAINER}></div>),
   };
 });
 
 jest.mock("src/chat/ChatMessageField/ChatMessageField", () => {
-  const originalModule = jest.requireActual("src/chat/ChatMessageField/ChatMessageField");
+  const senderalModule = jest.requireActual("src/chat/ChatMessageField/ChatMessageField");
   return {
     __esModule: true,
-    ...originalModule,
+    ...senderalModule,
     default: jest.fn(({ handleSend, message, notifyChange }) => (
-      <div data-testid={originalModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER}>
+      <div data-testid={senderalModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER}>
         <input
-          data-testid={originalModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD}
+          data-testid={senderalModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD}
           value={message}
           onChange={(e) => notifyChange(e.target.value)}
         />
-        <button data-testid={originalModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON} onClick={handleSend}>
+        <button data-testid={senderalModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON} onClick={handleSend}>
           Send
         </button>
       </div>
@@ -104,13 +92,37 @@ describe("render tests", () => {
     expect(screen.getByTestId(CHAT_LIST_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
     // AND the chat message field to be in the document
     expect(screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER)).toBeInTheDocument();
-    // AND the compoenent to match the snapshot
+    // AND the component to match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER)).toMatchSnapshot();
   });
 });
 
 describe("test Chat Initialization", () => {
   test("should initialize chat on mount", async () => {
+    mockGetChatHistory.mockResolvedValueOnce(
+      [
+        {
+            message: "",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.USER,
+        },
+        {
+            message: "Hello, I'm Compass",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.COMPASS,
+        },
+        {
+            message: "Hi, Compass, I'm foo",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.USER,
+        },
+        {
+            message: "Hello foo, would you like to begin your skill exploration session?",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.COMPASS,
+        },
+      ],
+    );
     // GIVEN a chat component
     // WHEN the chat is rendered with a router
     render(
@@ -124,26 +136,39 @@ describe("test Chat Initialization", () => {
       expect(screen.getByTestId(CHAT_LIST_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
     });
 
-    expect(mockSendMessage).toHaveBeenCalledWith(START_PROMPT);
+    expect(mockGetChatHistory).toHaveBeenCalledWith();
 
     // AND the ChatList component to be called with the history returned to the initialization
     await waitFor(() => {
-      expect(ChatList).toHaveBeenCalledWith(
+      expect(ChatList).toHaveBeenNthCalledWith(3,
         expect.objectContaining({
           messages: [
             {
               id: expect.any(Number),
-              origin: ChatMessageOrigin.ME,
-              message: "Hello",
-              timestamp: expect.any(Number),
+              sender: ConversationMessageSender.COMPASS,
+              message: "",
+              sent_at: expect.any(String),
             },
             {
               id: expect.any(Number),
-              origin: ChatMessageOrigin.COMPASS,
+              sender: ConversationMessageSender.COMPASS,
               message: "Hello, I'm Compass",
-              timestamp: expect.any(Number),
+              sent_at: expect.any(String),
+            },
+            {
+              id: expect.any(Number),
+              sender: ConversationMessageSender.USER,
+              message: "Hi, Compass, I'm foo",
+              sent_at: expect.any(String),
+            },
+            {
+              id: expect.any(Number),
+              sender: ConversationMessageSender.COMPASS,
+              message: "Hello foo, would you like to begin your skill exploration session?",
+              sent_at: expect.any(String),
             },
           ],
+          isTyping: false,
         }),
         {}
       );
@@ -152,7 +177,7 @@ describe("test Chat Initialization", () => {
 
   test("should show an error message if initialization fails", async () => {
     // GIVEN a chat component
-    mockSendMessage.mockRejectedValueOnce(new Error("Initialization failed"));
+    mockGetChatHistory.mockRejectedValueOnce(new Error("Initialization failed"));
 
     // WHEN the chat is rendered with a router and snackbar provider
     render(
@@ -193,6 +218,13 @@ describe("test Chat Initialization", () => {
 
 describe("test send message", () => {
   test("should send a message", async () => {
+    mockSendMessage.mockResolvedValueOnce(
+       [{
+         message: "Hello, I'm Compass",
+         sent_at: new Date().toISOString(),
+       }],
+    );
+
     // GIVEN a chat component
     // WHEN a user sends a message with a router
     render(
@@ -221,9 +253,15 @@ describe("test send message", () => {
           messages: [
             {
               id: expect.any(Number),
-              origin: ChatMessageOrigin.ME,
+              sender: ConversationMessageSender.USER,
               message: "Test message",
-              timestamp: expect.any(Number),
+              sent_at: expect.any(String),
+            },
+            {
+              id: expect.any(Number),
+              sender: ConversationMessageSender.COMPASS,
+              message: "Hello, I'm Compass",
+              sent_at: expect.any(String),
             },
           ],
         }),
@@ -233,22 +271,11 @@ describe("test send message", () => {
   });
 
   test("should show an error message if sending a message fails", async () => {
+    mockSendMessage.mockRejectedValueOnce(new Error("Sending message failed"));
     // GIVEN a chat component
     // First, we need the initialization to succeed
     mockSendMessage.mockResolvedValueOnce({
-      conversation_context: {
-        all_history: {
-          turns: [
-            {
-              input: { message: "Hello" },
-              output: { message_for_user: "Hello, I'm Compass" },
-            },
-          ],
-        },
-      },
-      last: {
-        message_for_user: "Hello, I'm Compass",
-      },
+      messages_for_user: ["Hello, I'm Compass"],
     });
 
     // WHEN a user sends a message with a router and snackbar provider
@@ -260,7 +287,7 @@ describe("test send message", () => {
 
     // Ensure initialization is successful
     await waitFor(() => {
-      expect(mockSendMessage).toHaveBeenCalledWith(START_PROMPT);
+      expect(mockGetChatHistory).toHaveBeenCalledWith();
     });
 
     // Now mock sendMessage to fail for the user message
@@ -274,20 +301,21 @@ describe("test send message", () => {
 
     // THEN expect an error message to be shown in the chat
     await waitFor(() => {
-      expect(ChatList).toHaveBeenCalledWith(
+      expect(ChatList).toHaveBeenNthCalledWith(
+        6,
         expect.objectContaining({
           messages: expect.arrayContaining([
             {
               id: expect.any(Number),
-              origin: ChatMessageOrigin.ME,
+              sender: ConversationMessageSender.USER,
               message: "Test message",
-              timestamp: expect.any(Number),
+              sent_at: expect.any(String),
             },
             {
               id: expect.any(Number),
-              origin: ChatMessageOrigin.COMPASS,
+              sender: ConversationMessageSender.COMPASS,
               message: "I'm sorry, I'm having trouble connecting to the server. Please try again later.",
-              timestamp: expect.any(Number),
+              sent_at: expect.any(String),
             },
           ]),
         }),

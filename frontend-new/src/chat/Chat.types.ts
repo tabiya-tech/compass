@@ -1,11 +1,5 @@
-export enum ChatMessageOrigin {
-  COMPASS = "compass",
-  ME = "me",
-}
+import { ConversationMessage } from "./ChatService/ChatService.types";
 
-export type IChatMessage = {
+export type IChatMessage = ConversationMessage &  {
   id: number;
-  origin: ChatMessageOrigin;
-  message: string;
-  timestamp: number;
 };

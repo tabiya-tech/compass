@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ChatService from "src/chat/ChatService/ChatService";
 import ChatList from "src/chat/ChatList/ChatList";
 import { IChatMessage } from "./Chat.types";
@@ -9,13 +9,12 @@ import ChatHeader from "./ChatHeader/ChatHeader";
 import ChatMessageField from "./ChatMessageField/ChatMessageField";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/error";
 import { writeServiceErrorToLog } from "src/error/logger";
+import { ConversationMessage, ConversationMessageSender } from "./ChatService/ChatService.types";
 
 const uniqueId = "b7ea1e82-0002-432d-a768-11bdcd186e1d";
 export const DATA_TEST_ID = {
   CHAT_CONTAINER: `chat-container-${uniqueId}`,
 };
-
-export const START_PROMPT = "~~~START_CONVERSATION~~~";
 
 const Chat = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -36,47 +35,24 @@ const Chat = () => {
     setMessages((prevMessages) => [...prevMessages, message]);
   };
 
-  const initializeChat = useCallback(async () => {
-    try {
-      if (!chatService) throw new Error("Chat service is not initialized");
-      setIsTyping(true);
-
-      const response = await chatService.sendMessage(START_PROMPT);
-      response.conversation_context.all_history.turns.forEach((historyItem: any) => {
-        const userMessage =
-          historyItem.input.message !== START_PROMPT && generateUserMessage(historyItem.input.message);
-        const tabiyaMessage = generateCompassMessage(historyItem.output.message_for_user);
-        if (userMessage) addMessage(userMessage);
-        addMessage(tabiyaMessage);
-      });
-    } catch (e) {
-      if (e instanceof ServiceError) {
-        writeServiceErrorToLog(e, console.error);
-      } else {
-        console.error("failed to initialize chat", e);
-      }
-      const errorMessage = getUserFriendlyErrorMessage(e as Error);
-      enqueueSnackbar(errorMessage, { variant: "error" });
-    } finally {
-      setIsTyping(false);
-    }
-  }, [chatService, enqueueSnackbar]);
-
   const sendMessage = useCallback(
     async (userMessage: string) => {
-      // optimistically add the user's message for a more responsive feel
-      const message = generateUserMessage(userMessage);
-      addMessage(message);
+      const sent_at = new Date().toISOString(); // Generate current sent_at
+      if(userMessage) {
+        // optimistically add the user's message for a more responsive feel
+        const message = generateUserMessage(userMessage, sent_at);
+        addMessage(message);
+      }
       try {
         if (!chatService) throw new Error("Chat service is not initialized");
         setIsTyping(true);
         const response = await chatService.sendMessage(userMessage);
-        const botMessage = generateCompassMessage(response.last.message_for_user);
-        addMessage(botMessage);
+        const botMessages = response.map((messageItem) => generateCompassMessage(messageItem.message, messageItem.sent_at));
+        botMessages.forEach((message) => addMessage(message));
       } catch (error) {
         console.error("Failed to send message:", error);
         addMessage(
-          generateCompassMessage("I'm sorry, I'm having trouble connecting to the server. Please try again later.")
+          generateCompassMessage("I'm sorry, I'm having trouble connecting to the server. Please try again later.", sent_at)
         );
       } finally {
         setIsTyping(false);
@@ -84,6 +60,41 @@ const Chat = () => {
     },
     [chatService]
   );
+
+  const initializeChat = useCallback(async () => {
+    try {
+      if (!chatService) {
+        console.error("Chat service is not initialized");
+        return;
+      }
+      setIsTyping(true);
+
+      const history = await chatService.getChatHistory();
+      if (history.length) {
+        history.forEach((historyItem: ConversationMessage) => {
+          if(historyItem.sender === ConversationMessageSender.USER && historyItem.message !== "") {
+            addMessage(generateUserMessage(historyItem.message, historyItem.sent_at));
+          }
+          else {
+            addMessage(generateCompassMessage(historyItem.message, historyItem.sent_at));
+          }
+        });
+      }
+      else {
+        await sendMessage("");
+      }
+    } catch (e) {
+      if (e instanceof ServiceError) {
+        writeServiceErrorToLog(e, console.error);
+      } else {
+        console.error("Failed to initialize chat", e);
+      }
+      const errorMessage = getUserFriendlyErrorMessage(e as Error);
+      enqueueSnackbar(errorMessage, { variant: "error" });
+    } finally {
+      setIsTyping(false);
+    }
+  }, [chatService, enqueueSnackbar, sendMessage]);
 
   useEffect(() => {
     if (!initialized) {

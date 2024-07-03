@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import ChatList from "./ChatList";
-import { ChatMessageOrigin } from "../Chat.types";
+import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 
 const meta: Meta<typeof ChatList> = {
   title: "Chat/ChatList",
@@ -18,15 +18,15 @@ export const Shown: Story = {
     messages: [
       {
         id: 1,
-        origin: ChatMessageOrigin.COMPASS,
+        sender: ConversationMessageSender.COMPASS,
         message: "Hello, how can I help you?",
-        timestamp: Date.now(),
+        sent_at: new Date().toISOString(),
       },
       {
         id: 2,
-        origin: ChatMessageOrigin.ME,
+        sender: ConversationMessageSender.USER,
         message: "I need help with something",
-        timestamp: Date.now(),
+        sent_at: new Date().toString(),
       },
     ],
   },
@@ -43,9 +43,9 @@ export const Typing: Story = {
     messages: [
       {
         id: 1,
-        origin: ChatMessageOrigin.ME,
+        sender: ConversationMessageSender.USER,
         message: "Hello, how can I help you?",
-        timestamp: Date.now(),
+        sent_at: new Date().toISOString(),
       },
     ],
     isTyping: true,
@@ -63,9 +63,9 @@ export const LongConversation: Story = {
   args: {
     messages: Array.from({ length: 100 }, (_, i) => ({
       id: i,
-      origin: i % 2 === 0 ? ChatMessageOrigin.COMPASS : ChatMessageOrigin.ME,
+      sender: i % 2 === 0 ? ConversationMessageSender.COMPASS : ConversationMessageSender.USER,
       message: `Message ${i}`,
-      timestamp: Date.now() - i * 1000,
+      sent_at: new Date( Date.now() - i * 1000 * 60 * 60 * 24 ).toISOString(),
     })),
   },
 };

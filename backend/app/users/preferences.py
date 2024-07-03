@@ -25,13 +25,6 @@ async def _get_user_preferences(repository: UserPreferenceRepository, user_id: s
             status_code=404,
             detail="user not found"
         )
-
-    # Check if the sessions field is missing or empty, and add a new session if needed
-    if 'sessions' not in user_preferences or not user_preferences['sessions']:
-        session_id = random.randint(0, (1 << 48) - 1)  # nosec
-        user_preferences = await repository.update_user_preference(user_id,
-                                                                   UserPreferencesUpdateRequest(sessions=[session_id]))
-
     return user_preferences
 
 
