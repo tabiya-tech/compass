@@ -19,8 +19,7 @@ from app.server_dependencies import get_conversation_memory_manager
 from app.vector_search.occupation_search_routes import add_occupation_search_routes
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from app.vector_search.skill_search_routes import add_skill_search_routes
-from app.vector_search.vector_search_dependencies import get_occupation_search_service, \
-    get_occupation_skill_search_service
+from app.vector_search.vector_search_dependencies import get_occupation_skill_search_service
 from app.version.version_routes import add_version_routes
 
 from app.users import add_users_routes
@@ -39,14 +38,34 @@ app = FastAPI(
         }]
 )
 
+# Setup CORS policy
+# Keep the backend, frontend urls and the environment as separate env variables as a failsafe measure,
+# as we want to be certain that both the backend, frontend urls are set correctly,
+# especially in non dev or local environments.
+
+if not os.getenv("FRONTEND_URL"):
+    raise ValueError("Mandatory FRONTEND_URL env variable is not set! Please set it to the frontend URL as it is "
+                     "required to set the CORS policy correctly.")
+logger.info(f"Frontend URL: {os.getenv('FRONTEND_URL')}")
+
+if not os.getenv("BACKEND_URL"):
+    raise ValueError("Mandatory BACKEND_URL env variable is not set! Please set it to the backend URL as it is "
+                     "required to set the CORS policy correctly for the api documentation /docs.")
+logger.info(f"Backend URL: {os.getenv('BACKEND_URL')}")
+
 origins = [
-    (os.getenv("FRONTEND_URL") or "*"),
-    (os.getenv("BACKEND_URL") or "*") + "/docs",
+    os.getenv("FRONTEND_URL"),
+    os.getenv("BACKEND_URL") + "/docs",
 ]
 
-if os.getenv("TARGET_ENVIRONMENT") == "dev":
+target_env = os.getenv("TARGET_ENVIRONMENT")
+logger.info(f"Target environment: {target_env}")
+
+if target_env == "dev" or target_env == "local":
+    logger.info(f"Setting CORS to allow all origins for the {target_env} environment.")
     origins.append("*")
 
+origins = list(set(origins))  # remove duplicates
 logger.info(f"Allowed origins: {origins}")
 
 app.add_middleware(
@@ -56,6 +75,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# Check mandatory environment variables and raise an early exception if they are not set
+if not os.getenv('MONGODB_URI'):
+    raise ValueError("Mandatory MONGODB_URI env variable is not set!")
+if not os.getenv("DATABASE_NAME"):
+    raise ValueError("Mandatory DATABASE_NAME environment variable is not set")
 
 ############################################
 # Security Definitions

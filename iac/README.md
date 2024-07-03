@@ -136,7 +136,6 @@ Then, impersonate the service account that has the necessary roles to manage the
 
 ### Environment variables
 The deployment requires the following environment variables to be set:
-- `MONGODB_URI`: The URI of the MongoDB instance to use where the ESCO data is stored.
 - `GITHUB_SHA`: GitHub commit SHA that will be used as the docker image label. This does not have to be an actual git commit SHA, but using a static SHA (like `latest`) might have weird consequences (like the service not picking up the latest version).
 - `GCP_OAUTH_CLIENT_ID`: The OAuth client ID used to authenticate the application with Firebase.
 - `GCP_OAUTH_CLIENT_SECRET`: The OAuth client secret used to authenticate the application with Firebase.
@@ -145,12 +144,14 @@ The deployment requires the following environment variables to be set:
 - `FRONTEND_URL`: The URL of the frontend application, typically it is `https://<ENVIRONMENT>.compass.tabiya.tech`
 - `BACKEND_DOMAIN` : The domain of the backend api, typically it is `<ENVIRONMENT>.compass.tabiya.tech`, for now should be equal to `FRONTEND_DOMAIN`
 - `BACKEND_URL`: The URL of the backend api, typically it is `https://<ENVIRONMENT>.compass.tabiya.tech/api`. Should be different than `FRONTEND_URL`
+- `MONGODB_URI`: The URI of the MongoDB instance to use where the ESCO data is stored.
+- `DATABASE_NAME`: The name of the database the backend will use.
+- `VERTEX_API_REGION`: The region of the Vertex API that will be used by the backend.
 
 It is recommended to use a `.env` file to set the environment variables. Create a `.env` file in the root directory of the project and add the following content:
 
 ```shell
 # .env file
-MONGODB_URI="<URI_TO_MONGODB>"
 GITHUB_SHA="<GIT_COMMIT_SHA>"
 GCP_OAUTH_CLIENT_ID="<GCP_OAUTH_CLIENT_ID>"
 GCP_OAUTH_CLIENT_SECRET="<GCP_OAUTH_CLIENT_SECRET>"
@@ -159,7 +160,11 @@ FRONTEND_DOMAIN="<FRONTEND_DOMAIN>"
 FRONTEND_URL="<FRONTEND_URL>"
 BACKEND_DOMAIN="<BACKEND_DOMAIN>"
 BACKEND_URL="<BACKEND_URL>"
+MONGODB_URI="<URI_TO_MONGODB>"
+DATABASE_NAME="<DATABASE_NAME>"
+VERTEX_API_REGION="<REGION>"
 ```
+Refer to the backend and frontend projects for information on the environment variables.
 
 ## Running Pulumi locally
 
@@ -200,7 +205,7 @@ You can read more about how to configure pulumi with a a google cloud project in
 
 There are some caveats to be aware of when using Pulumi to manage the Compass infrastructure in GCP: 
 
-- auth: When deploying the auth infrastucture, we enable and configure the Identity Platform API. This API has some limitations, in that it can be enabled in a GCP project, but not disabled.
+- auth: When deploying the auth infrastructure, we enable and configure the Identity Platform API. This API has some limitations, in that it can be enabled in a GCP project, but not disabled.
 If you write code that disables or deletes the Identity Platform API, pulumi will only remove it from the pulumi state file, but the API will still be enabled in the GCP project. This can lead to unexpected behavior when trying to re-enable the API.
 You may get the error
 > Error creating Config: googleapi: Error 400: INVALID_PROJECT_ID : Identity Platform has already been enabled for this project.

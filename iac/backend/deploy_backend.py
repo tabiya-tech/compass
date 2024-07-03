@@ -296,12 +296,27 @@ def _get_fully_qualified_image_name(basic_config: ProjectBaseConfig, repository_
 
 
 # Deploy cloud run service
+
+@dataclass
+class BackendEnvVarsConfig:
+    """
+    Environment variables for the backend service
+    See the backend service for more information on the environment variables
+    """
+    MONGODB_URI: str
+    DATABASE_NAME: str
+    VERTEX_API_REGION: str
+    TARGET_ENVIRONMENT: str
+    BACKEND_URL: str
+    FRONTEND_URL: str
+
+
 # See https://cloud.google.com/run/docs/overview/what-is-cloud-run for more information
 def _deploy_cloud_run_service(
         *,
         basic_config: ProjectBaseConfig,
         fully_qualified_image_name: str,
-        vertex_api_region: str,
+        backend_env_vars_cfg: BackendEnvVarsConfig,
         dependencies: list[pulumi.Resource],
 ):
     # See https://cloud.google.com/run/docs/securing/service-identity#per-service-identity for more information
@@ -324,30 +339,6 @@ def _deploy_cloud_run_service(
     )
 
     # Deploy cloud run service
-    mongodb_uri = os.getenv("MONGODB_URI")
-    if not mongodb_uri:
-        raise ValueError("MONGODB_URI environment variable is not set")
-
-    frontend_url = os.getenv("FRONTEND_URL")
-    if not frontend_url:
-        raise ValueError("FRONTEND_URL environment variable is not set")
-
-    backend_url = os.getenv("BACKEND_URL")
-    if not backend_url:
-        raise ValueError("BACKEND_URL environment variable is not set")
-
-    database_name = os.getenv("DATABASE_NAME")
-    if not database_name:
-        raise ValueError("DATABASE_NAME environment variable is not set")
-
-    embedding_settings = os.getenv("EMBEDDING_SETTINGS")
-    if not backend_url:
-        raise ValueError("EMBEDDING_SETTINGS environment variable is not set")
-
-    target_environment = os.getenv("TARGET_ENVIRONMENT")
-    if not target_environment:
-        raise ValueError("TARGET_ENVIRONMENT environment variable is not set")
-
 
     service = gcp.cloudrunv2.Service(
         _get_resource_name(environment=basic_config.environment, resource="cloudrun-service"),
@@ -360,16 +351,19 @@ def _deploy_cloud_run_service(
                 gcp.cloudrunv2.ServiceTemplateContainerArgs(
                     image=fully_qualified_image_name,
                     envs=[
-                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="MONGODB_URI", value=mongodb_uri),
-                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
-                            name="VERTEX_API_REGION", value=vertex_api_region
-                        ),
-                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="TARGET_ENVIRONMENT", value=target_environment),
-                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="BACKEND_URL", value=backend_url),
-                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="FRONTEND_URL", value=frontend_url),
-                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="DATABASE_NAME", value=database_name),
-                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="EMBEDDING_SETTINGS",
-                                                                       value=embedding_settings),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="MONGODB_URI",
+                                                                       value=backend_env_vars_cfg.MONGODB_URI),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="DATABASE_NAME",
+                                                                       value=backend_env_vars_cfg.DATABASE_NAME),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="VERTEX_API_REGION",
+                                                                       value=backend_env_vars_cfg.VERTEX_API_REGION),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="TARGET_ENVIRONMENT",
+                                                                       value=backend_env_vars_cfg.TARGET_ENVIRONMENT),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="BACKEND_URL",
+                                                                       value=backend_env_vars_cfg.BACKEND_URL),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="FRONTEND_URL",
+                                                                       value=backend_env_vars_cfg.FRONTEND_URL),
+
                         # Add more environment variables here
                     ],
                 )
@@ -382,14 +376,40 @@ def _deploy_cloud_run_service(
     return service
 
 
+def _get_backend_env_vars(environment: str):
+    mongodb_uri = os.getenv("MONGODB_URI")
+    if not mongodb_uri:
+        raise ValueError("MONGODB_URI environment variable is not set")
+
+    database_name = os.getenv("DATABASE_NAME")
+    if not database_name:
+        raise ValueError("DATABASE_NAME environment variable is not set")
+
+    vertex_api_region = os.getenv("VERTEX_API_REGION")
+    if not vertex_api_region:
+        raise ValueError("VERTEX_API_REGION environment variable is not set")
+
+    frontend_url = os.getenv("FRONTEND_URL")
+    if not frontend_url:
+        raise ValueError("FRONTEND_URL environment variable is not set")
+
+    backend_url = os.getenv("BACKEND_URL")
+    if not backend_url:
+        raise ValueError("BACKEND_URL environment variable is not set")
+
+    return BackendEnvVarsConfig(
+        MONGODB_URI=mongodb_uri,
+        DATABASE_NAME=database_name,
+        VERTEX_API_REGION=vertex_api_region,
+        TARGET_ENVIRONMENT=environment,
+        BACKEND_URL=backend_url,
+        FRONTEND_URL=frontend_url,
+    )
+
+
 # export a function build_and_push_image that will be used in the main pulumi program
 def deploy_backend(project: str, location: str, environment: str):
     basic_config = ProjectBaseConfig(project=project, location=location, environment=environment)
-
-    # Get the configuration values from the stack
-    config = pulumi.Config()
-    vertex_api_region = config.require("backend_vertex_api_region")
-    pulumi.info(f"Using backend_vertex_api_region: {vertex_api_region}")
 
     # Enable the necessary services for building and pushing the image
     services = _enable_services(basic_config=basic_config)
@@ -408,7 +428,7 @@ def deploy_backend(project: str, location: str, environment: str):
     cloud_run = _deploy_cloud_run_service(
         basic_config=basic_config,
         fully_qualified_image_name=fully_qualified_image_name,
-        vertex_api_region=vertex_api_region,
+        backend_env_vars_cfg=_get_backend_env_vars(environment),
         dependencies=services + [image],
     )
 
