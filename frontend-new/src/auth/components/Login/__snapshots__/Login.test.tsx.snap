@@ -181,7 +181,7 @@ exports[`Testing Login component with AuthProvider it should show login form suc
       class="MuiTypography-root MuiTypography-body2 css-odp70e-MuiTypography-root"
       data-testid="login-login-link-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
     >
-      Dont have an account?
+      Don't have an account?
        
     </p>
   </div>

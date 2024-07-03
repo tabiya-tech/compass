@@ -10,6 +10,8 @@ import { TabiyaUser } from "src/auth/auth.types";
 import UserPreferencesService from "src/auth/services/UserPreferences/userPreferences.service";
 import { useTokens } from "src/auth/hooks/useTokens";
 import { useAuthUser } from "src/auth/hooks/useAuthUser";
+import { getUserFriendlyErrorMessage, ServiceError } from "src/error/error";
+import { writeServiceErrorToLog } from "src/error/logger";
 
 const uniqueId = "f0324e97-83fd-49e6-95c3-1043751fa1db";
 export const DATA_TEST_ID = {
@@ -45,8 +47,13 @@ const IDPAuth = () => {
           navigate(routerPaths.ROOT, { replace: true });
         }
       } catch (e) {
-        enqueueSnackbar("Failed to fetch user preferences", { variant: "error" });
-        console.error("Failed to fetch user preferences", e);
+        if (e instanceof ServiceError) {
+          writeServiceErrorToLog(e, console.error);
+        } else {
+          console.error(e);
+        }
+        const errorMessage = getUserFriendlyErrorMessage(e as Error);
+        enqueueSnackbar(errorMessage, { variant: "error" });
       }
     },
     [navigate, enqueueSnackbar]

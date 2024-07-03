@@ -206,7 +206,10 @@ describe("Testing Register component with AuthProvider", () => {
     });
 
     // AND the error message should be displayed
-    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Registration failed", { variant: "error" });
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+      "An unexpected error occurred. Please try again later.",
+      { variant: "error" }
+    );
   });
   test("it should call validatePassword on form submission", async () => {
     // GIVEN a user to register

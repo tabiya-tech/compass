@@ -7,6 +7,8 @@ import IDPAuth from "src/auth/components/IDPAuth/IDPAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import AuthContextMenu from "src/auth/components/AuthContextMenu/AuthContextMenu";
 import { validatePassword } from "src/auth/components/Register/utils/validatePassword";
+import { getUserFriendlyErrorMessage, ServiceError } from "src/error/error";
+import { writeServiceErrorToLog } from "src/error/logger";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -67,9 +69,14 @@ const Register: React.FC = () => {
           navigate(routerPaths.VERIFY_EMAIL, { replace: true });
           enqueueSnackbar("Verification Email Sent!", { variant: "success" });
         },
-        (error) => {
-          console.error(error);
-          enqueueSnackbar("Registration failed", { variant: "error" });
+        (e) => {
+          if (e instanceof ServiceError) {
+            writeServiceErrorToLog(e, console.error);
+          } else {
+            console.error(e);
+          }
+          const errorMessage = getUserFriendlyErrorMessage(e);
+          enqueueSnackbar(errorMessage, { variant: "error" });
         }
       );
     }

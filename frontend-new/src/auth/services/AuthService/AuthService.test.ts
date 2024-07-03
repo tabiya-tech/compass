@@ -100,7 +100,11 @@ describe("AuthService class tests", () => {
       await authService.handleLogin(givenEmail, givenPassword, successCallback, errorCallback);
 
       // THEN the error callback should be called with Email not verified
-      await expect(errorCallback).toHaveBeenCalledWith(new Error("Email not verified"));
+      await expect(errorCallback).toHaveBeenCalledWith(
+        new Error(
+          "The email you are using is registered, but you have not yet verified it. Please verify your email to continue."
+        )
+      );
 
       // AND the success callback should not be called
       await expect(successCallback).not.toHaveBeenCalled();
@@ -118,7 +122,9 @@ describe("AuthService class tests", () => {
       // WHEN the login is attempted
       await authService.handleLogin(givenEmail, givenPassword, successCallback, errorCallback);
       // THEN the error callback should be called with Failed to Fetch
-      await expect(errorCallback).toHaveBeenCalledWith(new Error("Failed to fetch"));
+      await expect(errorCallback).toHaveBeenCalledWith(
+        new Error("There is no user record corresponding to this email.")
+      );
     });
   });
 
@@ -227,7 +233,9 @@ describe("AuthService class tests", () => {
       // WHEN the registration is attempted
       await authService.handleRegister(givenEmail, givenPassword, givenName, successCallback, errorCallback);
       // THEN the error callback should be called with Failed to Fetch
-      await expect(errorCallback).toHaveBeenCalledWith(new Error("Failed to fetch"));
+      await expect(errorCallback).toHaveBeenCalledWith(
+        new Error("There is no user record corresponding to this email.")
+      );
     });
   });
 });
