@@ -123,6 +123,10 @@ CRAZY_TEMPERATURE_GENERATION_CONFIG = {
     "candidate_count": 1,
 }
 
+JSON_GENERATION_CONFIG = {
+    "response_mime_type": "application/json",
+}
+
 # Todo(apostolos): Specify the safety settings after we have some relevant tests
 DEFAULT_SAFETY_SETTINGS: frozenset[SafetySetting] = frozenset([
     SafetySetting(category=SafetySetting.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
