@@ -26,7 +26,8 @@ async def test_skill_explorer_agent(fake_conversation_context: FakeConversationC
     state: ExperienceEntity = ExperienceEntity(experience_title="Baker")
     state.esco_occupations = occupations_with_skills
     state.experience_title = "Baker"
-    skill_explorer_agent = SkillExplorerAgent(state)
+    skill_explorer_agent = SkillExplorerAgent()
+    skill_explorer_agent.set_experience(state)
 
     fake_conversation_context.fill_conversation(conversation=[
         ConversationRecord(message="Hello. Welcome. Are you ready to start?",
