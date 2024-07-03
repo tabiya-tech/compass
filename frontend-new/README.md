@@ -35,8 +35,11 @@ To develop this application locally, follow these steps:
     ```shell
     yarn install
     ```
-   
+5. Make sure to set up a `env.js` file in the public/data directory. You can use the [`env.example.js`](public/data/env.example.js) file as a template. Please request the necessary environment variables from the project team.
+
+
 ## Running the development server locally
+
 
 After installing and setting up the project locally, run the development server with the following command:
 
