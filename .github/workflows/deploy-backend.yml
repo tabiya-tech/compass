@@ -5,10 +5,16 @@ on:
       target-environment:
         required: true
         type: string
+      database-name:
+        required: true
+        type: string
       backend-url:
         required: true
         type: string
       frontend-url:
+        required: true
+        type: string
+      vertex-api-region:
         required: true
         type: string
     outputs:
@@ -80,9 +86,11 @@ jobs:
           cp openapi2.yaml ../../iac/backend/config/gcp_api_gateway_config.yaml
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
-          # TODO: Change them to vars once we figure out how to propagate them.
-          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
-          EMBEDDING_SETTINGS: ${{ secrets.EMBEDDING_SETTINGS }}
+          DATABASE_NAME: ${{ inputs.database-name }}
+          TARGET_ENVIRONMENT: ${{ inputs.target-environment }}
+          VERTEX_API_REGION: ${{ inputs.vertex-api-region }}
+          BACKEND_URL: ${{ inputs.backend-url }}
+          FRONTEND_URL: ${{ inputs.frontend-url }}
       - name: Authenticate to docker
         # TODO the region should be extracted from the pulumi yaml
         run: gcloud auth configure-docker us-central1-docker.pkg.dev
@@ -94,13 +102,10 @@ jobs:
           command: up
           stack-name: tabiya-tech/compass-backend/${{ inputs.target-environment }}
         env:
-          TARGET_ENVIRONMENT: ${{ inputs.target-environment }}
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
-          GCP_OAUTH_CLIENT_ID: ${{ secrets.GCP_OAUTH_CLIENT_ID }}
-          GCP_OAUTH_CLIENT_SECRET: ${{ secrets.GCP_OAUTH_CLIENT_SECRET }}
+          DATABASE_NAME: ${{ inputs.database-name }}
+          TARGET_ENVIRONMENT: ${{ inputs.target-environment }}
+          VERTEX_API_REGION: ${{ inputs.vertex-api-region }}
           BACKEND_URL: ${{ inputs.backend-url }}
           FRONTEND_URL: ${{ inputs.frontend-url }}
-          # TODO: Change them to vars once we figure out how to propagate them.
-          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
-          EMBEDDING_SETTINGS: ${{ secrets.EMBEDDING_SETTINGS }}

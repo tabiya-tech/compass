@@ -1,15 +1,16 @@
 #!/bin/bash
 
 # Check if environment argument is provided
-if [ "$#" -ne 1 ]; then
-  echo "Usage: $0 <environment>"
+if [ "$#" -ne 2 ]; then
+  echo "Usage: $0 <environment> <base_domain>"
   exit 1
 fi
 
-environment=$1
+environment=$1 # The environment to deploy to
 echo "Using Environment: $environment"
+base_domain=$2 # The base domain to use
+echo "Using Base Domain: $base_domain"
 
-base_domain="compass.tabiya.tech"
 
 # Construct the domain name
 domain_name="${environment}.${base_domain}"

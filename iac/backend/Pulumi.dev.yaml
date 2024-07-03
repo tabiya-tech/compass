@@ -1,5 +1,4 @@
 config:
   gcp:project: "compass-dev-425015"
   gcp:region: "us-central1"
-  backend_vertex_api_region: "us-central1"
   gcp_root_project: "compass-dev-root"

@@ -1,7 +1,7 @@
 name: Main CI
 on: push
   #push:
-  # branches:
+# branches:
 #   - main
 #pull_request:
 #  types: [ opened, synchronize, reopened ]
@@ -17,8 +17,13 @@ jobs:
   test-backend:
     uses: ./.github/workflows/unit-test-backend.yml
     secrets: inherit
+    needs: [ setup-env ]
     with:
       target-environment: dev
+      backend-url: ${{ needs.setup-env.outputs.backend-url }}
+      frontend-url: ${{ needs.setup-env.outputs.frontend-url }}
+      database-name: ${{ needs.setup-env.outputs.database-name }}
+      vertex-api-region: ${{ needs.setup-env.outputs.vertex-api-region }}
   build-frontend:
     uses: ./.github/workflows/build-frontend.yml
     secrets: inherit
@@ -43,6 +48,8 @@ jobs:
       target-environment: dev
       backend-url: ${{ needs.setup-env.outputs.backend-url }}
       frontend-url: ${{ needs.setup-env.outputs.frontend-url }}
+      database-name: ${{ needs.setup-env.outputs.database-name }}
+      vertex-api-region: ${{ needs.setup-env.outputs.vertex-api-region }}
   smoke-test-backend-apigateway:
     needs: [ deploy-backend ]
     uses: ./.github/workflows/smoke-test-backend-version.yml
@@ -95,7 +102,7 @@ jobs:
       target-environment: dev
       domain-name: ${{ needs.setup-env.outputs.domain-name }}
   smoke-test-backend:
-    needs: [  setup-env, deploy-backend, deploy-aws-ns ]
+    needs: [ setup-env, deploy-backend, deploy-aws-ns ]
     uses: ./.github/workflows/smoke-test-backend-version.yml
     secrets: inherit
     with:
@@ -104,7 +111,7 @@ jobs:
       component-url: ${{ needs.setup-env.outputs.backend-url }}
       get-version-url: /version
   smoke-test-frontend:
-    needs: [  setup-env, build-frontend, deploy-frontend, deploy-aws-ns ]
+    needs: [ setup-env, build-frontend, deploy-frontend, deploy-aws-ns ]
     uses: ./.github/workflows/smoke-test-frontend-version.yml
     secrets: inherit
     with:

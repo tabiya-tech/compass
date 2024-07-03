@@ -146,10 +146,14 @@ The backend uses the following environment variables:
 
 - `GOOGLE_APPLICATION_CREDENTIALS`: The path to the service account key file.
 - `MONGODB_URI`: The URI of the MongoDB Atlas instance to use where the ESCO data is stored.
-- `VERTEX_API_REGION`: The region of the Vertex API to use.
-- `LOG_CONFIG_FILE`: See the [Logging](#logging) section for more information.
-- `BACKEND_URL`: The URL of the backend. It is used to correctly configure Swagger UI to make requests to the backend. If not set, the default value is `/`
-- `FRONTEND_DOMAIN`: The domain of the frontend. It is used to set the CORS policy. If not set, the default value is `*`
+- `DATABASE_NAME`: The name of mongo db database
+- `VERTEX_API_REGION`: (optional) The region of the Vertex API to use. If not set defaults to `us-central1`.
+- `LOG_CONFIG_FILE`: (Optional) See the [Logging](#logging) section for more information. If not set defaults to `logging.cfg.yaml`.
+- `BACKEND_URL`: The URL of the backend. It is used to correctly configure Swagger UI and the CORS policy. 
+- `FRONTEND_URL`: The URL of the frontend. It is used to set the CORS policy.  
+- `TARGET_ENVIRONMENT`: (optional) The target environment where the backend is running. When set to `dev` or `local`, CORS will be set to allow all origins. 
+  > Note: The `FRONTEND_URL` should be set irrespective of the `TARGET_ENVIRONMENT` value.
+  >
 
 The backend supports the use of a `.env` file to set the environment variables. Create a `.env` file in the root
 directory of the backend project and set the environment variables as follows:
@@ -161,7 +165,8 @@ MONGODB_URI=<URI_TO_MONGODB>
 VERTEX_API_REGION=<REGION>
 LOG_CONFIG_FILE=<YAML_FILE>
 BACKEND_URL=<URL>
-FRONTEND_DOMAIN=<DOMAIN>
+FRONTEND_URL=<URL>
+TARGET_ENVIRONMENT=<ENVIRONMENT>
 ```
 
 > ATTENTION: The .env file should be kept secure and not shared with others as it contains sensitive information.
@@ -220,8 +225,9 @@ MONGODB_URI=<URI_TO_MONGODB>
 GOOGLE_APPLICATION_CREDENTIALS=keys/credentials.json
 VERTEX_API_REGION=<REGION>
 LOG_CONFIG_FILE=logging.cfg.dev.yaml
-BACKEND_URL=http://0.0.0.0:8080
-FRONTEND_DOMAIN=*
+BACKEND_URL=* # allow all origins
+FRONTEND_URL=* # allow all origins
+TARGET_ENVIRONMENT=local # will add CORS policy to allow all origins
 ```
 
 Run the image using the following command:
