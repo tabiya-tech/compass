@@ -237,7 +237,7 @@ class ExploreExperiencesAgentDirector(Agent):
 
 def _get_backer_occupation() -> OccupationSkillEntity:
     import os
-    with open(os.path.abspath("evaluation_tests/skill_explorer_agent/baker_occupations.json")) as f:
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'baker_occupations.json')) as f:
         from pydantic import TypeAdapter
         return TypeAdapter(OccupationSkillEntity).validate_json(f.read())
 
