@@ -7,6 +7,8 @@ import IDPAuth from "src/auth/components/IDPAuth/IDPAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import UserPreferencesService from "src/auth/services/UserPreferences/userPreferences.service";
 import AuthContextMenu from "src/auth/components/AuthContextMenu/AuthContextMenu";
+import { getUserFriendlyErrorMessage, ServiceError } from "src/error/error";
+import { writeServiceErrorToLog } from "src/error/logger";
 
 const uniqueId = "7ce9ba1f-bde0-48e2-88df-e4f697945cc4";
 
@@ -48,9 +50,10 @@ const Login: React.FC = () => {
   /**
    * Check if the user has accepted the terms and conditions
    * @param user
+   * @returns {Promise<void>}
    */
   const checkUserPreferences = useCallback(
-    async (user: TabiyaUser) => {
+    async (user: TabiyaUser): Promise<void> => {
       const userPreferencesService = new UserPreferencesService();
       try {
         const userPreferences = await userPreferencesService.getUserPreferences(user.id);
@@ -62,9 +65,11 @@ const Login: React.FC = () => {
           navigate(routerPaths.DPA, { replace: true });
         } else {
           navigate(routerPaths.ROOT, { replace: true });
+          enqueueSnackbar("Welcome back!", { variant: "success" });
         }
       } catch (e) {
-        enqueueSnackbar("Failed to fetch user preferences", { variant: "error" });
+        const errorMessage = getUserFriendlyErrorMessage(e as Error);
+        enqueueSnackbar(errorMessage, { variant: "error" });
         console.error("Failed to fetch user preferences", e);
       }
     },
@@ -81,16 +86,22 @@ const Login: React.FC = () => {
       email,
       password,
       async (user) => {
-        await checkUserPreferences(user);
-        enqueueSnackbar("Login successful", { variant: "success" });
-      },
-      (error) => {
-        if (error.message === "Email not verified") {
-          enqueueSnackbar("Please verify your email", { variant: "error" });
-          return;
+        try {
+          await checkUserPreferences(user);
+        } catch (e) {
+          const errorMessage = getUserFriendlyErrorMessage(e as Error);
+          enqueueSnackbar(errorMessage, { variant: "error" });
+          console.error("Error during login process", e);
         }
-        console.error("Login failed", error);
-        enqueueSnackbar("Login failed", { variant: "error" });
+      },
+      (e) => {
+        if (e instanceof ServiceError) {
+          writeServiceErrorToLog(e, console.error);
+        } else {
+          console.error(e);
+        }
+        const errorMessage = getUserFriendlyErrorMessage(e);
+        enqueueSnackbar(errorMessage, { variant: "error" });
       }
     );
   };
@@ -181,7 +192,7 @@ const Login: React.FC = () => {
           </Box>
         </Box>
         <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.LOGIN_LINK}>
-          Dont have an account?{" "}
+          Don't have an account?{" "}
           <StyledNavLink
             to={routerPaths.REGISTER}
             style={{

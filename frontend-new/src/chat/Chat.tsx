@@ -7,6 +7,8 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Box } from "@mui/material";
 import ChatHeader from "./ChatHeader/ChatHeader";
 import ChatMessageField from "./ChatMessageField/ChatMessageField";
+import { getUserFriendlyErrorMessage, ServiceError } from "src/error/error";
+import { writeServiceErrorToLog } from "src/error/logger";
 
 const uniqueId = "b7ea1e82-0002-432d-a768-11bdcd186e1d";
 export const DATA_TEST_ID = {
@@ -47,9 +49,14 @@ const Chat = () => {
         if (userMessage) addMessage(userMessage);
         addMessage(tabiyaMessage);
       });
-    } catch (error) {
-      console.error("Failed to initialize chat:", error);
-      enqueueSnackbar("Something went wrong... Please try logging in again", { variant: "error" });
+    } catch (e) {
+      if (e instanceof ServiceError) {
+        writeServiceErrorToLog(e, console.error);
+      } else {
+        console.error("failed to initialize chat", e);
+      }
+      const errorMessage = getUserFriendlyErrorMessage(e as Error);
+      enqueueSnackbar(errorMessage, { variant: "error" });
     } finally {
       setIsTyping(false);
     }

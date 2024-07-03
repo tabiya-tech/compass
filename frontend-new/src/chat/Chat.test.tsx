@@ -164,7 +164,7 @@ describe("test Chat Initialization", () => {
     // THEN expect an error message to be shown
     await waitFor(() => {
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        "Something went wrong... Please try logging in again",
+        "An unexpected error occurred. Please try again later.",
         { variant: "error" }
       );
     });

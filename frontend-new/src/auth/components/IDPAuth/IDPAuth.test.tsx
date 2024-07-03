@@ -186,9 +186,12 @@ describe("IDPAuth tests", () => {
 
     // THEN expect an error message to be shown
     await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to fetch user preferences", {
-        variant: "error",
-      });
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+        "An unexpected error occurred. Please try again later.",
+        {
+          variant: "error",
+        }
+      );
     });
   });
 
