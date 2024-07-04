@@ -16,9 +16,7 @@ from app.vector_search.esco_search_service import OccupationSkillSearchService
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import (LOW_TEMPERATURE_GENERATION_CONFIG,
-                                          LOW_TEMPERATURE_JSON_CONFIG,
-                                          LLMConfig)
+from common_libs.llm.models_utils import (LOW_TEMPERATURE_GENERATION_CONFIG, LLMConfig, JSON_GENERATION_CONFIG)
 from common_libs.text_formatters.extract_json import extract_json
 
 MONGO_SETTINGS = MongoDbSettings()
@@ -59,11 +57,13 @@ You should use the employer information only to infer the context and you should
 The output needs to be exclusively the contextualized job title. Don't output anything else. Do not include the employer information.
 """
 
+
 def get_request_prompt_for_contextual_title(experience_entity: ExperienceEntity):
     return f"""Job description: {experience_entity.experience_title}
 Employer name: {experience_entity.company if experience_entity.company is not None else "Undefined"}
 Employment type: {experience_entity.work_type if experience_entity.work_type is not None else "Undefined"}
 Contextualized job title: """
+
 
 OCCUPATION_INFERENCE_SYSTEM_PROMPT = """You work for an employment agency helping users outline their previous experiences.
 
@@ -84,9 +84,9 @@ Your response must always be a JSON object with the following schema:
 
 
 def get_prompt_for_occupation_inference(
-    experience_entity: ExperienceEntity,
-    conversation_context: ConversationContext,
-    message: str,
+        experience_entity: ExperienceEntity,
+        conversation_context: ConversationContext,
+        message: str,
 ):
     """Writes a prompt to infer the correct occupation for an ExperienceEntity"""
     esco_occupation_string = "\n".join(
@@ -110,7 +110,7 @@ class InferOccupationAgent(Agent):
     """
 
     def __init__(
-        self,
+            self,
     ):
         """The Agent should be initialized based on an ExperienceEntities class, as well as
         the conversation context up until that moment.
@@ -124,7 +124,7 @@ class InferOccupationAgent(Agent):
                 be the task of this agent.
         """
         super().__init__(agent_type=AgentType.INFER_OCCUPATIONS_AGENT,
-                         is_responsible_for_conversation_history=False) # Not sure
+                         is_responsible_for_conversation_history=False)  # Not sure
         compass_db = AsyncIOMotorClient(MONGO_SETTINGS.mongodb_uri).get_database(
             MONGO_SETTINGS.database_name
         )
@@ -150,10 +150,10 @@ class InferOccupationAgent(Agent):
             self.state = InferAgentStates.UNINFERRED
 
     async def find_contextual_title(
-        self,
-        config: LLMConfig = LLMConfig(
-            generation_config=LOW_TEMPERATURE_GENERATION_CONFIG
-        ),
+            self,
+            config: LLMConfig = LLMConfig(
+                generation_config=LOW_TEMPERATURE_GENERATION_CONFIG
+            ),
     ):
         """Runs an LLM query to get the contextualized title
         given the experience entity. Sets the corresponding attribute
@@ -191,12 +191,12 @@ class InferOccupationAgent(Agent):
         ]
 
     async def return_response(
-        self,
-        message: str,
-        conversation_context: ConversationContext,
-        config: LLMConfig = LLMConfig(
-            generation_config=LOW_TEMPERATURE_JSON_CONFIG
-        ),
+            self,
+            message: str,
+            conversation_context: ConversationContext,
+            config: LLMConfig = LLMConfig(
+                generation_config=LOW_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG
+            ),
     ) -> InferOccupationModelResponse:
         """Returns the output of the inference once the experience entity
         is enriched with the contextualized title and the esco occupations.
