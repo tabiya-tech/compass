@@ -37,19 +37,20 @@ MODEL_RESPONSE_INSTRUCTIONS = dedent("""\
     """)
 
 
-def get_json_response_instructions(examples: list[ModelResponse], custom_data_instructions: str = "") -> str:
+def get_json_response_instructions(examples: list[ModelResponse] = [], custom_data_instructions: str = "") -> str:
     """
     Get the instructions so that the model can return a json. This can be added to the prompt.
-    :param custom_data_instructions: Optionally a string with the instructions for the model to return custom data.
-    :param examples: A list of examples of responses for a few-shot learning task
+    :param custom_data_instructions: Optional instructions for the custom data field.
+    :param examples: A list of examples of responses for a few-shot learning task. The list can be empty
     :return: A string with the instructions for the model to return a json.
     """
     _custom_data_instructions = "- data: " + custom_data_instructions if custom_data_instructions else ""
-    template_parts = [MODEL_RESPONSE_INSTRUCTIONS.format(optional_data_instructions=_custom_data_instructions),
-                      "\nExample responses. Treat them as examples, do not repeat them exactly as they are:"]
+    template_parts = [MODEL_RESPONSE_INSTRUCTIONS.format(optional_data_instructions=_custom_data_instructions)]
 
-    for example in examples:
-        part = example.json()
-        template_parts.append(part)
+    if len(examples) > 0:
+        template_parts.append("\nExample responses. Treat them as examples, do not repeat them exactly as they are:")
+        for example in examples:
+            part = example.json()
+            template_parts.append(part)
 
     return "\n".join(template_parts)
