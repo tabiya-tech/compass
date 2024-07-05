@@ -2,16 +2,18 @@ from enum import Enum
 from time import time
 
 from motor.motor_asyncio import AsyncIOMotorClient
+from textwrap import dedent
+from typing import List, Optional, Generic, TypeVar
+from pydantic import BaseModel
 
 from app.agent.agent import Agent
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType
 from app.agent.experience.experience_entity import ExperienceEntity
-from app.agent.llm_response import InferOccupationModelResponse
 from app.conversation_memory.conversation_memory_manager import \
     ConversationContext
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
-from app.vector_search.esco_entities import OccupationSkillEntity
+from app.vector_search.esco_entities import OccupationSkillEntity, OccupationEntity
 from app.vector_search.esco_search_service import OccupationSkillSearchService
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
@@ -20,6 +22,7 @@ from common_libs.llm.models_utils import (LOW_TEMPERATURE_GENERATION_CONFIG, LLM
 from common_libs.text_formatters.extract_json import extract_json
 
 MONGO_SETTINGS = MongoDbSettings()
+P = TypeVar('P')
 
 
 class InferAgentStates(Enum):
@@ -35,37 +38,51 @@ class InferAgentStates(Enum):
     the ESCO results are unsatisfactory or return the correct occupation and close the task.
     """
 
-    # Beginning of the conversation, contextualized title needs to be retrieved
-    UNCONTEXTUALIZED = 0
+    # Beginning of the conversation, experience needs to be set.
+    INIT = 0
     # Contextualized title needs to be linked to ESCO taxonomy
-    UNLINKED = 1
+    LINKING_PHASE = 1
     # Validated ESCO job should be returned
-    UNINFERRED = 2
+    INFERENCE_PHASE = 2
 
+class InferOccupationModelResponse(BaseModel, Generic[P]):
+    """
+    Model for the response of LLM for the InferOccupationAgent.
+    """
+    reasoning: str
+    """Chain of Thought reasoning behind the response of the LLM"""
+    needs_more_info: bool
+    """A boolean flag to signal the need of more information from the user."""
+    response: str
+    """String request of more information to the user."""
+    finished: bool
+    """Flag indicating whether the LLM has finished its task"""
+    correct_occupation: str
+    """a string containing the correct occupation among the options if finished is set to True. Empty string otherwise."""
 
-def get_system_prompt_for_contextual_title(experience_entity: ExperienceEntity):
+def get_system_prompt_for_contextual_title(country_of_interest: str):
     """Writes a prompt to find the contextual title from the attributes
     of an ExperienceEntity
     """
-    return f"""You are an expert who needs to classify jobs from {experience_entity.location} to a European framework. The jobs are described in the context of {experience_entity.location} and use specific terminology from {experience_entity.location}. You should return a job description that does not include terminology from {experience_entity.location}, but rather European standards.
+    return dedent(f"""You are an expert who needs to classify jobs from {country_of_interest} to a European framework. The jobs are described in the context of {country_of_interest} and use specific terminology from {country_of_interest}. You should return a job description that does not include terminology from {country_of_interest}, but rather European standards.
 
-## Input Structure
-The input structure is composed of a job title, the employer name and the type of employment, among wage employment, unpaid labor or freelance work.
-You should use the employer information only to infer the context and you shouldn't return it as output. 
+        ## Input Structure
+        The input structure is composed of a job title, the employer name and the type of employment, among wage employment, unpaid labor or freelance work.
+        You should use the employer information only to infer the context and you shouldn't return it as output. 
 
-## Output Structure
-The output needs to be exclusively the contextualized job title. Don't output anything else. Do not include the employer information.
-"""
+        ## Output Structure
+        The output needs to be exclusively the contextualized job title. Don't output anything else. Do not include the employer information.
+        """)
 
 
 def get_request_prompt_for_contextual_title(experience_entity: ExperienceEntity):
-    return f"""Job description: {experience_entity.experience_title}
-Employer name: {experience_entity.company if experience_entity.company is not None else "Undefined"}
-Employment type: {experience_entity.work_type if experience_entity.work_type is not None else "Undefined"}
-Contextualized job title: """
+    return dedent(f"""Job description: {experience_entity.experience_title}
+        Employer name: {experience_entity.company if experience_entity.company is not None else "Undefined"}
+        Employment type: {experience_entity.work_type if experience_entity.work_type is not None else "Undefined"}
+        Contextualized job title: """)
 
 
-OCCUPATION_INFERENCE_SYSTEM_PROMPT = """You work for an employment agency helping users outline their previous experiences.
+OCCUPATION_INFERENCE_SYSTEM_PROMPT = dedent("""You work for an employment agency helping users outline their previous experiences.
 
 **Main Task**: You are tasked with understanding the proper definition of one of the user's occupations from the entire conversation history. 
 **Available Data**: You are given a list of options between which you can choose. If none of the options apply, you can ask for more options in the appropriate field.
@@ -80,7 +97,7 @@ Your response must always be a JSON object with the following schema:
         - response: A string request of more information to the user in case needs_more_info is set to True. Empty string otherwise.
         - finished: A boolean flag to signal that the task is finished and a single correct occupation among the options has been found.
             Set True if the occupation has been found. False otherwise.
-        - correct_occupation: a string containing the correct occupation among the options if finished is set to True. Empty string otherwise."""
+        - correct_occupation: a string containing the correct occupation among the options if finished is set to True. Empty string otherwise.""")
 
 
 def get_prompt_for_occupation_inference(
@@ -112,19 +129,10 @@ class InferOccupationAgent(Agent):
     def __init__(
             self,
     ):
-        """The Agent should be initialized based on an ExperienceEntities class, as well as
-        the conversation context up until that moment.
-
-        Args:
-            experience_entity (ExperienceEntities): The experience entity is partially initialized
-                from a previous iteration of the CollectExperienceInformation agent, which returns
-                fields such as experience title, company, work type, location and timeline.
-                Experience title and location are required fields, while the other can be set to None.
-                We admit contextualized title and esco occupations to be already filled, but this should
-                be the task of this agent.
+        """Initialized the agent and set it to INIT state.
         """
         super().__init__(agent_type=AgentType.INFER_OCCUPATIONS_AGENT,
-                         is_responsible_for_conversation_history=False)  # Not sure
+                         is_responsible_for_conversation_history=True)  # Not sure
         compass_db = AsyncIOMotorClient(MONGO_SETTINGS.mongodb_uri).get_database(
             MONGO_SETTINGS.database_name
         )
@@ -133,37 +141,66 @@ class InferOccupationAgent(Agent):
             OccupationSkillSearchService(compass_db, gecko_embedding_service)
         )
         self._experience: ExperienceEntity | None = None
+        self.country_of_interest : str | None = None
+        self.state = InferAgentStates.INIT
 
     def set_experience(self, experience: ExperienceEntity):
+        """
+        Sets the experience entity of the agent.
+        Args:
+            experience_entity (ExperienceEntities): The experience entity is partially initialized
+                from a previous iteration of the CollectExperienceInformation agent, which returns
+                fields such as experience title, company, work type, location and timeline.
+                Experience title and location are required fields, while the other can be set to None.
+                We admit contextualized title and esco occupations to be already filled, but this should
+                be the task of this agent.
+        """
+        if self.state != InferAgentStates.INIT:
+            raise ValueError("Experience already set")
         # Needs experience_title for localization and linking
         if experience.experience_title is None:
             raise ValueError("Input experience should have experience_title.")
-        # Needs location for localization
-        if experience.location is None:
-            raise ValueError("Input experience should have location.")
         self._experience = experience
-        if self._experience.contextual_title is None:
-            self.state = InferAgentStates.UNCONTEXTUALIZED
-        elif self._experience.esco_occupations is None:
-            self.state = InferAgentStates.UNLINKED
+        if self._experience.esco_occupations:
+            self.state = InferAgentStates.INFERENCE_PHASE
         else:
-            self.state = InferAgentStates.UNINFERRED
+            self.state = InferAgentStates.LINKING_PHASE
+
+    def set_country_of_interest(self, country_of_interest: str):
+        # TODO: Add logic and Enum
+        self.country_of_interest = country_of_interest
 
     async def find_contextual_title(
             self,
+            experience_entity: ExperienceEntity,
+            country_of_interest: str, #TODO: Enum possible countries
             config: LLMConfig = LLMConfig(
                 generation_config=LOW_TEMPERATURE_GENERATION_CONFIG
             ),
-    ):
+    ) -> str:
         """Runs an LLM query to get the contextualized title
-        given the experience entity. Sets the corresponding attribute
-        of the experience entity with the result of the LLM call.
+        given the experience entity and the country of interest
+        for the localization.
+
+        Args:
+            experience_entity (ExperienceEntity): ExperienceEntity 
+                to be localized.
+            country_of_interest (str): Name of the country to be localized
+            config (LLMConfig, optional): config file for the LLM.
+                Defaults to LLMConfig( generation_config=LOW_TEMPERATURE_GENERATION_CONFIG ).
+
+        Returns:
+            str: contextualized title to be returned
         """
+        # Currently the logic is that any location information
+        # would be contained in the experience entity. If None, 
+        # then the contextualized title and the experience_title
+        # coincide. This can be changed to add the location as input
         contextual_system_prompt = get_system_prompt_for_contextual_title(
-            self._experience
+            country_of_interest
         )
         contextual_request = get_request_prompt_for_contextual_title(
-            self._experience
+            experience_entity
         )
 
         llm = GeminiGenerativeLLM(
@@ -171,9 +208,9 @@ class InferOccupationAgent(Agent):
         )
         response = await llm.generate_content(contextual_request)
         # TODO: validate response
-        self._experience.contextual_title = response.text
+        return response.text
 
-    async def link_to_occupations(self, top_k: int = 10):
+    async def link_to_occupations(self, experience_title: str, top_k: int = 10) -> List[OccupationEntity]:
         """Calls ESCO search on the agent's experience entity
         contextualized title to get the top_k occupations. Sets
         the corresponding esco_occupations attribute of the
@@ -181,12 +218,16 @@ class InferOccupationAgent(Agent):
         search.
 
         Args:
+            experience_title (str): string to be linked to ESCO.
             top_k (int, optional): Number of occupations to return
                 from ESCO search. Defaults to 10.
+
+        Returns:
+            List[OccupationEntity]: list of top_k occupation entities
+                linked to the input string.
         """
-        query = self._experience.contextual_title
-        occupations = await self.occupation_search_service.search(query, top_k)
-        self._experience.esco_occupations = [
+        occupations = await self.occupation_search_service.search(experience_title, top_k)
+        return [
             occupation.occupation for occupation in occupations
         ]
 
@@ -202,10 +243,10 @@ class InferOccupationAgent(Agent):
         is enriched with the contextualized title and the esco occupations.
 
         Returns:
-            Dict[str,str]: A dictionary with the following keys:
+            InferOccupationModelResponse: An Enum with the following keys:
+            - reasoning: A string explanation of the decisions taken regarding the following parameters.  
             - needs_more_info: A boolean flag to signal that the model needs more information from the user.
             - response: A string request of more information to the user in case needs_more_info is set to True. Empty string otherwise.
-            - more_options: A boolean flag to signal that no answer can be found within the available ESCO Occupations.
             - finished: A boolean flag to signal that the task is finished and a single correct occupation among the options has been found.
             - correct_occupation: a string containing the correct occupation among the options if finished is set to True. Empty string otherwise.
 
@@ -228,10 +269,10 @@ class InferOccupationAgent(Agent):
     async def execute(self, agent_input: AgentInput, conversation_context: ConversationContext) -> AgentOutput:
         """Executes the main tasks of the InferOccupationAgent,
         depending on the state. In particular, depending on the state 
-        it will:
-        1. UNCONTEXTUALIZED - Find a contextualized title for the experience entity
-        2. UNLINKED - Link the contextualized title to ESCO occupations
-        3. UNINFERRED - Validate one of the possible occupations using either
+        it will perform different actions as follows:
+        1. INIT - Initialize an experience entity.
+        2. LINKING_PHASE - Find contextualized title and link it to ESCO occupations.
+        3. INFERENCE_PHASE - Validate one of the possible occupations using either
             chat history or a conversation with the user.
         The Agent fails if no ESCO match can be validated. 
 
@@ -246,20 +287,21 @@ class InferOccupationAgent(Agent):
                 whether the agent is finished or whether it failed.
         """
         s = time()
-        if self.state == InferAgentStates.UNCONTEXTUALIZED:
-            await self.find_contextual_title()
-            self.state = InferAgentStates.UNLINKED
-        if self.state == InferAgentStates.UNLINKED:
-            await self.link_to_occupations()
-            self.state = InferAgentStates.UNINFERRED
-        if self.state == InferAgentStates.UNINFERRED:
+        if self.state == InferAgentStates.INIT:
+            raise ValueError("Experience Entity needs to be set using InferOccupationAgent.set_experience.")
+        elif self.state == InferAgentStates.LINKING_PHASE:
+            if self.country_of_interest is not None:
+                # Finds a contextual title from the set experience and country of interest.
+                self._experience.contextual_title = await self.find_contextual_title(self._experience, self.country_of_interest)
+                # Links the contextual title to ESCO
+                self._experience.esco_occupations = await self.link_to_occupations(self._experience.contextual_title)
+            else:
+                # Links the experience title to ESCO
+                self._experience.esco_occupations = await self.link_to_occupations(self._experience.experience_title)
+            self.state = InferAgentStates.INFERENCE_PHASE
+        if self.state == InferAgentStates.INFERENCE_PHASE:
             message = agent_input.message
             response = await self.return_response(message, conversation_context)
-            # TODO: is this the right way to deal with conversation history?
-            if response.response:
-                self.is_responsible_for_conversation_history = True
-            else:
-                self.is_responsible_for_conversation_history = False
             return AgentOutput(
                 finished=response.finished,
                 agent_type=AgentType.INFER_OCCUPATIONS_AGENT,

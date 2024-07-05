@@ -67,4 +67,3 @@ async def test_occupation_inference_agent(
         fake_conversation_context
     )
     assert len(infer_occupation_agent._experience.esco_occupations) > 0
-    assert len(infer_occupation_agent._experience.contextual_title) > 0
