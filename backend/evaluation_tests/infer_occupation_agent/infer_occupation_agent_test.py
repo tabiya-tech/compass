@@ -2,7 +2,7 @@ import pytest
 
 from app.agent.agent_types import AgentInput
 from app.agent.experience.experience_entity import ExperienceEntity
-from app.agent.infer_occupation_agent import InferOccupationAgent
+from app.agent.infer_occupation_agent.infer_occupation_agent import InferOccupationAgent
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import (
     Actor,
     ConversationRecord,
@@ -60,6 +60,7 @@ async def test_occupation_inference_agent(
     )
     infer_occupation_agent = InferOccupationAgent()
     infer_occupation_agent.set_experience(state)
+    infer_occupation_agent.set_country_of_interest("South Africa")
     await infer_occupation_agent.execute(
         AgentInput(
             message="ignored",
@@ -67,3 +68,4 @@ async def test_occupation_inference_agent(
         fake_conversation_context
     )
     assert len(infer_occupation_agent._experience.esco_occupations) > 0
+    assert len(infer_occupation_agent._experience.contextual_title) > 0
