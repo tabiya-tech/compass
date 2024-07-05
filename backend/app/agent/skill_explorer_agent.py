@@ -102,7 +102,9 @@ class SkillExplorerAgent(Agent):
         convo_output = await LLMCaller.call_llm(
             llm=convo_llm,
             llm_input=ConversationHistoryFormatter.format_for_agent_generative_prompt(
-                context, user_input.message), logger=self.logger,
+                model_response_instructions=get_json_response_instructions(),
+                context=context,
+                user_input=user_input.message), logger=self.logger,
             model_response_type=ModelResponse)
         await self._set_top_skills(context, essential_skills, formatted_skills, user_input.message)
         return AgentOutput(finished=convo_output[0].finished, agent_type=AgentType.EXPLORE_SKILLS_AGENT,

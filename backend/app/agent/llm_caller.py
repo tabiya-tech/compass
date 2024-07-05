@@ -85,12 +85,19 @@ class LLMCaller(Generic[P]):
     async def call_llm_agent(*,
                              llm: GeminiGenerativeLLM,
                              agent_type: AgentType,
+                             model_response_instructions: str,
                              user_input: AgentInput,
                              context: ConversationContext,
                              logger: logging.Logger
                              ) -> AgentOutput[P]:
         """
         Call the LLM to generate a response for an agent.
+        It uses the conversation context , model response instructions and the user input to format the input to the LLM.
+        It expects that the model_response_instructions have been formulated in a way that the model
+        can generate a response that matches the ModelResponse[P] type.
+        It returns an AgentOutput[P]  that contains the data from the response of the agent.
+        The method logs the response time of the agent.
+        :param model_response_instructions: The instructions for the model to generate a response
         :param llm:  The LLM to call
         :param agent_type:  The type of the agent
         :param user_input:  The user input
@@ -108,7 +115,9 @@ class LLMCaller(Generic[P]):
         llm_stats_list: list[LLMStats]
         model_response, llm_stats_list = await LLMCaller.call_llm(
             llm=llm,
-            llm_input=ConversationHistoryFormatter.format_for_agent_generative_prompt(context, msg),
+            llm_input=ConversationHistoryFormatter.format_for_agent_generative_prompt(
+                model_response_instructions=model_response_instructions,
+                context=context, user_input=msg),
             logger=logger,
             model_response_type=ModelResponse[P]
         )

@@ -34,11 +34,12 @@ class ConversationHistoryFormatter:
         return llm_input
 
     @staticmethod
-    def format_for_agent_generative_prompt(context: ConversationContext,
+    def format_for_agent_generative_prompt(*, model_response_instructions: str, context: ConversationContext,
                                            user_input: str) -> LLMInput:
         """
         Format the conversation history and the user input in a suitable way to pass as an
-        input to the agent LLM
+        input to the agent LLM that converses with the user.
+        :param model_response_instructions: The instruction to the model to return a JSON object
         :param context: The conversation context to be formatted
         :param user_input: The user input
         :return: A LLMInput object
@@ -59,7 +60,7 @@ class ConversationHistoryFormatter:
         # Without these instructions, the model might respond with a non-JSON object,
         # as it tends to adapt to the conversation history and may overlook the JSON format requirements.
         ConversationHistoryFormatter._append_part(llm_input, ConversationHistoryFormatter.USER,
-                                                  "\n" + MODEL_RESPONSE_INSTRUCTIONS)
+                                                  "\n" + model_response_instructions)
         return llm_input
 
     @staticmethod
