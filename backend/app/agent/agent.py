@@ -5,6 +5,7 @@ from typing import Generic, TypeVar
 
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType
 from app.agent.llm_caller import LLMCaller
+from app.agent.prompt_response_template import get_json_response_instructions
 
 from app.conversation_memory.conversation_memory_manager import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
@@ -66,14 +67,23 @@ class SimpleLLMAgent(Agent, Generic[P]):
         self._logger = logging.getLogger(self.__class__.__name__)
         self._llm_caller = LLMCaller[P]()
 
-    # TODO: remove this as there is no need to expose the LLM config
-    def get_llm_config(self):
-        return self._llm_config
+    def get_model_response_instructions(self):
+        """
+        Return the instructions for the response that will be added at the end of the conversation as an additional
+        user input to reinforce that the model should respond with a JSON object.
+        See ConversationHistoryFormatter.format_for_agent_generative_prompt() for additional information
+
+        Agents that return a custom data type should override this method to provide the correct instructions.
+        :return: The instructions
+        """
+        # typical implementation would be
+        return get_json_response_instructions()
 
     async def execute(self, user_input: AgentInput, context: ConversationContext) -> AgentOutput[P]:
         return await self._llm_caller.call_llm_agent(
             llm=self._llm,
             agent_type=self._agent_type,
+            model_response_instructions=self.get_model_response_instructions(),
             user_input=user_input,
             context=context,
             logger=self._logger)
