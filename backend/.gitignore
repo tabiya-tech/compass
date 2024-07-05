@@ -3,3 +3,4 @@ venv-backend
 .env
 keys
 test_output/
+.idea/

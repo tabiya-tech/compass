@@ -15,18 +15,31 @@ from app.agent.llm_agent_director import LLMAgentDirector
 from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
 from app.conversation_memory.conversation_memory_manager import ConversationContext, ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
-from app.server_dependencies import get_conversation_memory_manager
+from app.server_dependencies import get_conversation_memory_manager, initialize_mongo_db
 from app.vector_search.occupation_search_routes import add_occupation_search_routes
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from app.vector_search.skill_search_routes import add_skill_search_routes
 from app.vector_search.vector_search_dependencies import get_occupation_skill_search_service
 from app.version.version_routes import add_version_routes
 
+from contextlib import asynccontextmanager
+
 from app.users import add_users_routes
 
 logger = logging.getLogger(__name__)
 
 load_dotenv()
+
+
+# Configure lifespan events for the FastAPI application
+# eg: for startup we need to initialize the database connection and create the indexes
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    # Startup logic
+    await initialize_mongo_db()
+    yield
+    # Shutdown logic
+    logger.info("Shutting down...")
 
 # Retrieve the backend URL from the environment variables,
 # and set the server URL to the backend URL, so that Swagger UI can correctly call the backend paths
@@ -35,7 +48,8 @@ app = FastAPI(
         {
             "url": os.getenv("BACKEND_URL") or "/",
             "description": "The backend server"
-        }]
+        }],
+    lifespan=lifespan
 )
 
 # Setup CORS policy
