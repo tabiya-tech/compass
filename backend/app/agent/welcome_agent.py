@@ -1,8 +1,9 @@
 from textwrap import dedent
 
-from app.agent.agent import SimpleLLMAgent
+from app.agent.simple_llm_agent.simple_llm_agent import SimpleLLMAgent
+from app.agent.simple_llm_agent.llm_response import ModelResponse
 from app.agent.agent_types import AgentType
-from app.agent.prompt_response_template import ModelResponse, get_json_response_instructions, \
+from app.agent.simple_llm_agent.prompt_response_template import get_json_response_instructions, \
     get_conversation_finish_instructions
 
 
@@ -67,5 +68,4 @@ class WelcomeAgent(SimpleLLMAgent):
         system_instructions = system_instructions_template.format(response_part=response_part,
                                                                   finish_instructions=finish_instructions)
         super().__init__(agent_type=AgentType.WELCOME_AGENT,
-
                          system_instructions=system_instructions, )

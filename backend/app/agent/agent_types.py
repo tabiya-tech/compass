@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional, TypeVar, Generic
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -23,6 +23,8 @@ class AgentInput(BaseModel):
     """
     message: str  # Bad idea, rename
 
+    class Config:
+        extra = "forbid"
 
 class LLMStats(BaseModel):
     """
@@ -40,19 +42,16 @@ class LLMStats(BaseModel):
     response_time_in_sec: float
     """The time it took to generate the response, it may include multiple retries"""
 
+    class Config:
+        extra = "forbid"
 
-P = TypeVar('P')
 
-
-class AgentOutput(BaseModel, Generic[P]):
+class AgentOutput(BaseModel):
     """
     The output of an agent
     """
     message_for_user: str
     """The message for the user"""
-
-    data: Optional[P] = None
-    """An optional structured data the agent may return"""
 
     finished: bool
     """Whether the the agent has finished its task"""
@@ -68,3 +67,6 @@ class AgentOutput(BaseModel, Generic[P]):
 
     llm_stats: list[LLMStats]
     """The stats for each call to an LLM that was used to generate the response"""
+
+    class Config:
+        extra = "forbid"

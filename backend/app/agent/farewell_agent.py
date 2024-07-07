@@ -1,8 +1,9 @@
 from textwrap import dedent
 
-from app.agent.agent import SimpleLLMAgent
+from app.agent.simple_llm_agent.llm_response import ModelResponse
+from app.agent.simple_llm_agent.simple_llm_agent import SimpleLLMAgent
 from app.agent.agent_types import AgentType, AgentInput, AgentOutput
-from app.agent.prompt_response_template import ModelResponse, get_json_response_instructions, \
+from app.agent.simple_llm_agent.prompt_response_template import get_json_response_instructions, \
     get_conversation_finish_instructions
 from app.conversation_memory.conversation_memory_types import ConversationContext
 
