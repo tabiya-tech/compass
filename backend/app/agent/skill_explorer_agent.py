@@ -1,4 +1,3 @@
-import logging
 from typing import List, Dict
 
 from pydantic import BaseModel
@@ -7,8 +6,8 @@ from app.agent.agent import Agent
 from app.agent.agent_types import AgentOutput, AgentInput, AgentType
 from app.agent.experience.experience_entity import ExperienceEntity
 from app.agent.llm_caller import LLMCaller
-from app.agent.llm_response import ModelResponse
-from app.agent.prompt_response_template import get_json_response_instructions
+from app.agent.simple_llm_agent.llm_response import ModelResponse
+from app.agent.simple_llm_agent.prompt_response_template import get_json_response_instructions
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.vector_search.esco_entities import OccupationSkillEntity, SkillEntity
@@ -77,7 +76,7 @@ class SkillExplorerAgent(Agent):
         super().__init__(agent_type=AgentType.EXPLORE_SKILLS_AGENT, is_responsible_for_conversation_history=False)
         self.experience_entity = None
         self.TOP_COUNT = 10
-        self.logger = logging.Logger(name="SkillExplorerAgent")
+        self._llm_caller = LLMCaller(model_response_type=ModelResponse)
 
     def set_experience(self, experience_entity: ExperienceEntity) -> None:
         self.experience_entity = experience_entity
@@ -99,13 +98,13 @@ class SkillExplorerAgent(Agent):
                                                          all_skills=formatted_skills,
                                                          identified_skills=top_skills_formatted) + response_part
         convo_llm = GeminiGenerativeLLM(system_instructions=system_instructions)
-        convo_output = await LLMCaller.call_llm(
+        convo_output = await self._llm_caller.call_llm(
             llm=convo_llm,
             llm_input=ConversationHistoryFormatter.format_for_agent_generative_prompt(
                 model_response_instructions=get_json_response_instructions(),
                 context=context,
-                user_input=user_input.message), logger=self.logger,
-            model_response_type=ModelResponse)
+                user_input=user_input.message),
+            logger=self.logger)
         await self._set_top_skills(context, essential_skills, formatted_skills, user_input.message)
         return AgentOutput(finished=convo_output[0].finished, agent_type=AgentType.EXPLORE_SKILLS_AGENT,
                            reasoning=convo_output[0].reasoning,
@@ -120,10 +119,12 @@ class SkillExplorerAgent(Agent):
             system_instructions=SKILL_PARSER_SYSTEM_INSTRUCTIONS + "\nSKILLS:" + formatted_skills)
         llm_input = "\nThe conversation so far:" + ConversationHistoryFormatter.format_to_string(context,
                                                                                                  user_message
+
                                                                                                  )
-        top_skills = await LLMCaller.call_llm(llm=skill_llm, llm_input=llm_input,
-                                              logger=self.logger,
-                                              model_response_type=TopSkills)
+        llm_caller = LLMCaller[TopSkills](model_response_type=TopSkills)
+        top_skills = await llm_caller.call_llm(llm=skill_llm,
+                                               llm_input=llm_input,
+                                               logger=self.logger)
         self.experience_entity.top_skills = []
         for skill in top_skills[0].skills:
             if skill in essential_skills:
