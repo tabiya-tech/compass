@@ -1,4 +1,3 @@
-from app.agent.prompt_response_template import MODEL_RESPONSE_INSTRUCTIONS
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationTurn
 from common_libs.llm.models_utils import LLMInput, LLMTurn
 
@@ -55,12 +54,13 @@ class ConversationHistoryFormatter:
         # Finally the user input
         ConversationHistoryFormatter._append_part(llm_input, ConversationHistoryFormatter.USER, user_input)
 
-        # Finally, add instructions for the model to return a JSON object.
+        # Eventually, add instructions for the model to return a JSON object.
         # This reinforces that the model should respond with a JSON object.
         # Without these instructions, the model might respond with a non-JSON object,
         # as it tends to adapt to the conversation history and may overlook the JSON format requirements.
-        ConversationHistoryFormatter._append_part(llm_input, ConversationHistoryFormatter.USER,
-                                                  "\n" + model_response_instructions)
+        if model_response_instructions:
+            ConversationHistoryFormatter._append_part(llm_input, ConversationHistoryFormatter.USER,
+                                                      "\n" + model_response_instructions)
         return llm_input
 
     @staticmethod

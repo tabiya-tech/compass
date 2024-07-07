@@ -102,7 +102,8 @@ class LLMAgentDirector(AbstractAgentDirector):
         }
         # initialize the router model
         self._model = GeminiGenerativeLLM(config=LLMConfig())
-        self._llm_caller: LLMCaller[RouterModelResponse] = LLMCaller[RouterModelResponse]()
+        self._llm_caller: LLMCaller[RouterModelResponse] = LLMCaller[RouterModelResponse](
+            model_response_type=RouterModelResponse)
 
     def get_explore_experiences_agent(self):
         return self._agents[AgentType.EXPLORE_EXPERIENCES_AGENT]
@@ -216,8 +217,7 @@ class LLMAgentDirector(AbstractAgentDirector):
                 router_model_response, _llm_stats_list = await self._llm_caller.call_llm(
                     llm=self._model,
                     llm_input=model_input,
-                    logger=self._logger,
-                    model_response_type=RouterModelResponse
+                    logger=self._logger
                 )
                 self._logger.debug("Router Model Response: %s", router_model_response)
 

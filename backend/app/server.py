@@ -177,7 +177,6 @@ class ConversationResponse(BaseModel):
         _new_output: AgentOutput = AgentOutput(message_for_user="",
                                                reasoning=_last.output.reasoning,
                                                agent_type=_last.output.agent_type,
-                                               data=_last.output.data,
                                                finished=_last.output.finished,
                                                agent_response_time_in_sec=0,
                                                llm_stats=[]

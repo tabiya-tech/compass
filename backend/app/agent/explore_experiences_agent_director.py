@@ -16,7 +16,6 @@ from app.agent.agent_types import AgentType
 from app.conversation_memory.conversation_memory_types import \
     ConversationContext
 from app.vector_search.esco_entities import OccupationSkillEntity
-from app.vector_search.similarity_search_service import SimilaritySearchService
 
 logger = logging.getLogger(__name__)
 
