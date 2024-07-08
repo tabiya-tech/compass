@@ -37,6 +37,7 @@ class SimpleLLMAgent(Agent):
             # If the user input is empty, set it to "(silence)"
             # This is to avoid the agent failing to respond to an empty input
             user_input.message = "(silence)"
+            user_input.is_artificial = True
         msg = user_input.message.strip()  # Remove leading and trailing whitespaces
         model_response: ModelResponse | None
         llm_stats_list: list[LLMStats]

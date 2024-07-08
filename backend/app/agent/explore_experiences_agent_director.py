@@ -142,7 +142,7 @@ class ExploreExperiencesAgentDirector(Agent):
         if current_experience.dive_in_phase == DiveInPhase.EXPLORING_SKILLS:
 
             if transitioned_between_states:
-                user_input = AgentInput(message="Hi, I am ready to explore my skills")
+                user_input = AgentInput(message="Hi, I am ready to explore my skills", is_artificial=True)
             # The agent will explore the skills for the experience and update the experience entity
             self._exploring_skills_agent.set_experience(current_experience.experience)
             agent_output: AgentOutput = await self._exploring_skills_agent.execute(user_input, context)
@@ -201,7 +201,7 @@ class ExploreExperiencesAgentDirector(Agent):
         if s.conversation_phase == ConversationPhase.DIVE_IN:
 
             if transitioned_between_states:
-                user_input = AgentInput(message="Hi, I am ready to dive into my experiences")
+                user_input = AgentInput(message="Hi, I am ready to dive into my experiences", is_artificial=True)
 
             # The conversation history is handled in dive_into_experiences method,
             # as there is another transition between sub-phases happening there
