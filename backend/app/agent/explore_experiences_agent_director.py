@@ -114,7 +114,6 @@ class ExploreExperiencesAgentDirector(Agent):
                 message_for_user="I am a bit confused, it seems that there no experiences to process.",
                 finished=False,
                 agent_type=self._agent_type,
-                reasoning="handwritten code",
                 agent_response_time_in_sec=0,
                 llm_stats=[]
             )
@@ -164,7 +163,6 @@ class ExploreExperiencesAgentDirector(Agent):
                     message_for_user="I have finished exploring all your experiences.",
                     finished=True,
                     agent_type=self._agent_type,
-                    reasoning="handwritten code",
                     agent_response_time_in_sec=0,
                     llm_stats=[]
                 )
@@ -271,7 +269,6 @@ class _CollectExperiencesAgentStub(Agent):
                              f"These are the experiences I have collected so far: {self.get_experiences()}",
             finished=True,
             agent_type=AgentType.COLLECT_EXPERIENCES_AGENT,
-            reasoning="hardcoded",
             agent_response_time_in_sec=0.0,
             llm_stats=[]
         )
@@ -309,7 +306,6 @@ class _InferOccupationsAgentStub(Agent):
                              f"     {self._experience.esco_occupations[0].occupation.preferredLabel}",
             finished=True,
             agent_type=AgentType.EXPLORE_SKILLS_AGENT,
-            reasoning="hardcoded",
             agent_response_time_in_sec=0.0,
             llm_stats=[]
         )

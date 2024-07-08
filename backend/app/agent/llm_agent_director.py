@@ -286,7 +286,6 @@ class LLMAgentDirector(AbstractAgentDirector):
                         message_for_user="The conversation has finished, there is nothing else to say!",
                         finished=True,
                         agent_type=None,
-                        reasoning="Conversation has ended",
                         agent_response_time_in_sec=0,  # artificial value as there is no LLM call
                         llm_stats=[]  # artificial value as there is no LLM call
                     )
@@ -333,7 +332,6 @@ class LLMAgentDirector(AbstractAgentDirector):
                 message_for_user="Conversation forcefully ended",
                 finished=True,
                 agent_type=None,
-                reasoning="Error while executing the agent director",
                 agent_response_time_in_sec=0,  # TODO(Apostolos): for now an artificial value. TBC if it should be 0
                 llm_stats=[]  # TODO (Apostolos): for now an artificial value. TBC if it should be an empty list
             )

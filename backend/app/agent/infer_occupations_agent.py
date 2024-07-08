@@ -28,7 +28,6 @@ class InferOccupationsAgent(SimpleLLMAgent):
 
         return AgentOutput(message_for_user=agent_reply_txt, finished=True,
                                    agent_type=self._agent_type,
-                                   reasoning="handwritten code",
                                    agent_response_time_in_sec=0.1, llm_stats=[])
 
     def __init__(self):
