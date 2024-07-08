@@ -41,6 +41,7 @@ async def lifespan(_app: FastAPI):
     # Shutdown logic
     logger.info("Shutting down...")
 
+
 # Retrieve the backend URL from the environment variables,
 # and set the server URL to the backend URL, so that Swagger UI can correctly call the backend paths
 app = FastAPI(
@@ -104,6 +105,7 @@ if not os.getenv("DATABASE_NAME"):
 # the UI and the API Gateway is running in front of this service.
 http_bearer = HTTPBearer(auto_error=False, scheme_name="JWT_auth")
 firebase = HTTPBearer(scheme_name="firebase")
+google = HTTPBearer(scheme_name="google")
 
 ############################################
 # Add version routes
@@ -336,7 +338,9 @@ async def get_conversation_context(
 # and must be removed later.
 @app.get(path="/authinfo",
          description="Returns the authentication info (JWT token claims)")
-async def _get_auth_info(request: Request, authorization=Depends(firebase)):
+async def _get_auth_info(request: Request,
+                         firebase_auth=Depends(firebase),
+                         googl_auth=Depends(google)):
     auth_info_b64 = request.headers.get('x-apigateway-api-userinfo')
     # some python magic
     auth_info = base64.b64decode(auth_info_b64.encode() + b'==').decode()
