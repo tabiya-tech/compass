@@ -177,9 +177,12 @@ def _enable_services(basic_config: ProjectBaseConfig) -> list[gcp.projects.Servi
 """
 
 
-def _setup_api_gateway(
-        *, basic_config: ProjectBaseConfig, cloudrun: gcp.cloudrunv2.Service, dependencies: list[pulumi.Resource]
-):
+def _setup_api_gateway(*,
+                       basic_config: ProjectBaseConfig,
+                       cloudrun: gcp.cloudrunv2.Service,
+                       gcp_oauth_client_id: str,
+                       dependencies: list[pulumi.Resource]
+                       ):
     apigw_service_account = gcp.serviceaccount.Account(
         resource_name=_get_resource_name(environment=basic_config.environment, resource="api-gateway-sa"),
         # unclear why the resource name is not used here, something to do with account_id constraints? Link to docs?
@@ -199,7 +202,7 @@ def _setup_api_gateway(
     # The GCP API Gateway uses OpenAPI 2.0 yaml files for the configurations.
     # The yaml must be base64 encoded.
     apigw_config_yaml = _get_file_as_string(GCP_API_GATEWAY_CONFIG_FILE)
-    apigw_config_yaml = pulumi.Output.format(apigw_config_yaml, basic_config.project, cloudrun.uri)
+    apigw_config_yaml = pulumi.Output.format(apigw_config_yaml, basic_config.project, cloudrun.uri, gcp_oauth_client_id)
 
     apigw_config_yaml_b64encoded = apigw_config_yaml.apply(lambda yaml: base64.b64encode(yaml.encode()).decode())
 
@@ -433,6 +436,8 @@ def deploy_backend(project: str, location: str, environment: str):
     )
 
     api_gateway = _setup_api_gateway(
-        basic_config=basic_config, cloudrun=cloud_run,
+        basic_config=basic_config,
+        cloudrun=cloud_run,
+        gcp_oauth_client_id=os.getenv("GCP_OAUTH_CLIENT_ID"),
         dependencies=services + [cloud_run]
     )
