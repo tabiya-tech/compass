@@ -319,7 +319,9 @@ class LLMAgentDirector(AbstractAgentDirector):
                     #  so they should have information how to handle the user entering from a different phase
                     user_input = AgentInput(
                         message=f"Hi, I come to you ({self._get_default_agent_type_for_phase(new_phase).value}) "
-                                f"from {self._get_default_agent_type_for_phase(self._state.current_phase).value}")
+                                f"from {self._get_default_agent_type_for_phase(self._state.current_phase).value}",
+                        is_artificial=True
+                    )
                     self._state.current_phase = new_phase
 
             # return the last agent output in case
