@@ -26,6 +26,7 @@ class AgentInput(BaseModel):
     class Config:
         extra = "forbid"
 
+
 class LLMStats(BaseModel):
     """
     The stats for an LLM call
@@ -59,14 +60,21 @@ class AgentOutput(BaseModel):
     agent_type: Optional[AgentType] = None
     """The type of the agent that produced the response"""
 
-    reasoning: str
-    """The CoT reasoning behind the response"""
-
     agent_response_time_in_sec: float
     """The total time it took the agent to produce a response. It may include multiple calls to LLMs or tools"""
 
     llm_stats: list[LLMStats]
     """The stats for each call to an LLM that was used to generate the response"""
+
+    class Config:
+        extra = "forbid"
+
+class AgentOutputWithReasoning(AgentOutput):
+    """
+    The output of an agent with reasoning
+    """
+    reasoning: str
+    """Chain of Thought reasoning behind the response of the LLM"""
 
     class Config:
         extra = "forbid"

@@ -1,7 +1,7 @@
 import time
 
 from app.agent.agent import Agent
-from app.agent.agent_types import AgentInput, AgentOutput, AgentType, LLMStats
+from app.agent.agent_types import AgentInput, AgentOutput, AgentType, LLMStats, AgentOutputWithReasoning
 from app.agent.llm_caller import LLMCaller
 from app.agent.simple_llm_agent.llm_response import ModelResponse
 from app.agent.simple_llm_agent.prompt_response_template import get_json_response_instructions
@@ -56,7 +56,7 @@ class SimpleLLMAgent(Agent):
                 finished=False)
 
         agent_end_time = time.time()
-        response = AgentOutput(
+        response = AgentOutputWithReasoning(
             message_for_user=model_response.message.strip('"'),
             finished=model_response.finished,
             reasoning=model_response.reasoning,
