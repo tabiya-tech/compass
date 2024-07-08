@@ -3,7 +3,7 @@ from typing import List, Dict
 from pydantic import BaseModel
 
 from app.agent.agent import Agent
-from app.agent.agent_types import AgentOutput, AgentInput, AgentType
+from app.agent.agent_types import AgentOutput, AgentOutputWithReasoning, AgentInput, AgentType
 from app.agent.experience.experience_entity import ExperienceEntity
 from app.agent.llm_caller import LLMCaller
 from app.agent.simple_llm_agent.llm_response import ModelResponse
@@ -76,7 +76,7 @@ class SkillExplorerAgent(Agent):
         super().__init__(agent_type=AgentType.EXPLORE_SKILLS_AGENT, is_responsible_for_conversation_history=False)
         self.experience_entity = None
         self.TOP_COUNT = 10
-        self._llm_caller = LLMCaller(model_response_type=ModelResponse)
+        self._llm_caller = LLMCaller[ModelResponse](model_response_type=ModelResponse)
 
     def set_experience(self, experience_entity: ExperienceEntity) -> None:
         self.experience_entity = experience_entity
@@ -106,7 +106,7 @@ class SkillExplorerAgent(Agent):
                 user_input=user_input.message),
             logger=self.logger)
         await self._set_top_skills(context, essential_skills, formatted_skills, user_input.message)
-        return AgentOutput(finished=convo_output[0].finished, agent_type=AgentType.EXPLORE_SKILLS_AGENT,
+        return AgentOutputWithReasoning(finished=convo_output[0].finished, agent_type=AgentType.EXPLORE_SKILLS_AGENT,
                            reasoning=convo_output[0].reasoning,
                            agent_response_time_in_sec=0.0, llm_stats=convo_output[1],
                            message_for_user=convo_output[0].message)

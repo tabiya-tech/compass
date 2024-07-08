@@ -21,7 +21,11 @@ def _write_turn(f: TextIO, turn: ConversationTurn):
     f.write(f"**User**: {turn.input.message}\\\n")
     f.write(f"**{turn.output.agent_type}**: {turn.output.message_for_user}\\\n")
     f.write(f"**Finished**: {turn.output.finished}\\\n")
-    f.write(f"**Reasoning**: {turn.output.reasoning}\\\n")
+    # Besides the sdtandard fields, we also want to write any additional fields
+    # from subclasses of AgentOutput
+    for key, value in turn.output.dict().items():
+        if key not in ["message_for_user", "finished", "agent_response_time_in_sec", "llm_stats"]:
+            f.write(f"**{key}**: {value}\\\n")
     f.write(f"**Agent Response Time (sec)**: {turn.output.agent_response_time_in_sec}\\\n")
     for i, stats in enumerate(turn.output.llm_stats):
         _write_stats(f, stats, i)
@@ -88,7 +92,6 @@ class FakeConversationContext(ConversationContext):
             self.all_history.turns.append(ConversationTurn(index=i, input=AgentInput(message=user_message),
                                                            output=AgentOutput(message_for_user=agent_message,
                                                                               finished=False,
-                                                                              reasoning="Placeholder",
                                                                               agent_response_time_in_sec=0,
                                                                               llm_stats=[])))
         self.summary = summary
@@ -100,7 +103,6 @@ class FakeConversationContext(ConversationContext):
                                                        input=AgentInput(message=user_input),
                                                        output=AgentOutput(message_for_user=agent_response,
                                                                           finished=False,
-                                                                          reasoning="Placeholder",
                                                                           agent_response_time_in_sec=0,
                                                                           llm_stats=[])))
         self.history.turns = self.all_history.turns[-5:]
