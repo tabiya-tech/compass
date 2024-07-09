@@ -4,9 +4,8 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from app.agent.collect_experiences_agent import CollectExperiencesAgent
 from app.agent.experience.experience_entity import ExperienceEntity
-from app.agent.experience.timeline import Timeline
-from app.agent.experience.work_type import WorkType
 from app.agent.skill_explorer_agent import SkillExplorerAgent
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 
@@ -201,7 +200,9 @@ class ExploreExperiencesAgentDirector(Agent):
         if s.conversation_phase == ConversationPhase.DIVE_IN:
 
             if transitioned_between_states:
-                user_input = AgentInput(message="Hi, I am ready to dive into my experiences", is_artificial=True)
+                user_input = AgentInput(
+                    message="Hi, I am ready to dive into my experiences, don't greet me, let get into it immediately",
+                    is_artificial=True)
 
             # The conversation history is handled in dive_into_experiences method,
             # as there is another transition between sub-phases happening there
@@ -227,6 +228,9 @@ class ExploreExperiencesAgentDirector(Agent):
         self._infer_occupations_agent = _InferOccupationsAgentStub()
         self._exploring_skills_agent = SkillExplorerAgent()
 
+    def get_collect_experiences_agent(self) -> CollectExperiencesAgent:
+        return self._collect_experiences_agent
+
 
 # ######################################################################################################################
 # TODO: Remove when the real agents are implemented
@@ -237,41 +241,6 @@ def _get_backer_occupation() -> OccupationSkillEntity:
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'baker_occupations.json')) as f:
         from pydantic import TypeAdapter
         return TypeAdapter(OccupationSkillEntity).validate_json(f.read())
-
-
-class _CollectExperiencesAgentStub(Agent):
-    """
-    A stub for the CollectExperiencesAgent. This is a placeholder for the real agent that will be implemented later.
-    """
-
-    def __init__(self):
-        super().__init__(agent_type=AgentType.COLLECT_EXPERIENCES_AGENT,
-                         is_responsible_for_conversation_history=False)
-        self._mocked_experiences = [ExperienceEntity(experience_title="Experience 1",
-                                                     company="Company 1",
-                                                     location="Location 1",
-                                                     work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
-                                                     timeline=Timeline(start="2020-01-01", end="2021-01-01")),
-                                    ExperienceEntity(experience_title="Experience 2",
-                                                     company="Company 2",
-                                                     location="Location 2",
-                                                     work_type=WorkType.SELF_EMPLOYMENT,
-                                                     timeline=Timeline(start="2021-02-02", end="2022-02-02"))
-                                    ]
-
-    def get_experiences(self) -> list[ExperienceEntity]:
-        # Stub code (will be replaced)
-        return self._mocked_experiences
-
-    async def execute(self, user_input: AgentInput, context: ConversationContext) -> AgentOutput:
-        return AgentOutput(
-            message_for_user=f"(placeholder for the CollectExperiencesAgent agent).\n"
-                             f"These are the experiences I have collected so far: {self.get_experiences()}",
-            finished=True,
-            agent_type=AgentType.COLLECT_EXPERIENCES_AGENT,
-            agent_response_time_in_sec=0.0,
-            llm_stats=[]
-        )
 
 
 class _InferOccupationsAgentStub(Agent):
