@@ -63,6 +63,11 @@ class CollectExperiencesAgent(Agent):
         if self._state is None:
             raise ValueError("CollectExperiencesAgent: execute() called before state was initialized")
 
+        if user_input.message == "":
+            # If the user input is empty, set it to "(silence)"
+            # This is to avoid the agent failing to respond to an empty input
+            user_input.message = "(silence)"
+
         collected_data = self._state.collected_data
         json_data = json.dumps([_data.dict() for _data in collected_data], indent=2)
 
