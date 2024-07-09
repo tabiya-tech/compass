@@ -18,7 +18,7 @@ export const DATA_TEST_ID = {
 };
 
 export const CHAT_MESSAGE_MAX_LENGTH = 1000;
-export const ALLOWED_CHARACTERS = /^[A-Za-z0-9 .,:;!?@'\n]*$/;
+export const DISALLOWED_CHARACTERS = /["\\{}()[\]*_#`<>\-+~|&/]/g;
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
@@ -50,25 +50,29 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     const inputValue = e.target.value;
     let errorMessage = "";
 
+    // Filter out disallowed characters
+    let filteredValue = inputValue.replace(DISALLOWED_CHARACTERS, "");
+    const invalidChar = inputValue.split("").filter((char) => DISALLOWED_CHARACTERS.test(char));
+
     // Update character count
-    if (inputValue) {
-      setCharCount(inputValue.length);
+    if (filteredValue) {
+      setCharCount(filteredValue.length);
     }
 
     // Check for character limit
-    if (inputValue.length >= CHAT_MESSAGE_MAX_LENGTH) {
+    if (filteredValue.length >= CHAT_MESSAGE_MAX_LENGTH) {
       errorMessage = "Message limit is 1000 characters.";
     }
 
-    // Check for special characters
-    if (!ALLOWED_CHARACTERS.test(inputValue)) {
-      errorMessage = "Invalid special characters.";
+    // Check for special characters in original input
+    if (inputValue !== filteredValue) {
+      errorMessage = `Invalid special characters: ${invalidChar}`;
     }
 
     setErrorMessage(errorMessage);
 
     if (props.notifyChange) {
-      props.notifyChange(inputValue);
+      props.notifyChange(filteredValue);
     }
   };
 
@@ -129,13 +133,10 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
                   data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON}
                   onClick={handleButtonClick}
                   title="send message"
-                  disabled={!!errorMessage}
                 >
                   <SendIcon
                     data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_ICON}
-                    sx={{
-                      color: errorMessage ? theme.palette.action.disabled : theme.palette.primary.dark,
-                    }}
+                    sx={{ color: theme.palette.primary.dark }}
                   />
                 </IconButton>
               </InputAdornment>
