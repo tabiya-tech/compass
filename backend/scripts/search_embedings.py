@@ -9,54 +9,26 @@ from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService, Embe
 from app.vector_search.esco_entities import OccupationEntity
 from tqdm import tqdm
 
-OUTPUT_FILENAME = "data/output_test.csv"
-OCCUPATION_FILENAME = "data/OUTPUT_DATA_transition1_all_multiples_for_nlp_proc(in).csv"
+# Parameters
+INPUT_FILENAME = "path/to/your/input.csv"
+INPUT_FIELD = 'JobTitle'
+OUTPUT_FILENAME = "path/to/your/output.csv"
+OUTPUT_FIELD = 'PredictionsJobTitle'
+
+# MongoDB constants - do not change
 DATABASE_NAME = 'compass-test'
 EMBEDDINGS_COLLECTION = 'occupationmodelsembeddings'
+
+# The row to start processing from in the input file
 START_ROW = 0
 
-# TODO: Use the OccupationSearchService to perform a similarity search on the vector store, once we migrate everything
-#  to the new structure.
-async def _search(embedding_service: EmbeddingService, query: str, k: int = 5) -> List[OccupationEntity]:
-    """
-        Perform a similarity search on the vector store. It uses the default similarity search set during vector
-        generation.
 
-        :param embedding_service: The embedding service to use to embed the queries.
-        :param query: The query to search for.
-        :param k: The number of results to return.
-        :return: A list of T objects.
-    """
-    params = {
-        "queryVector": await embedding_service.embed(query),
-        "path": "embedding",
-        "numCandidates": k * 10 * 3,
-        "limit": k * 3,
-        "index": "embedding_index",
-    }
-    pipeline = [
-        {"$vectorSearch": params},
-        {"$set": {"score": {"$meta": "vectorSearchScore"}}},
-        {"$group": {"_id": "$UUID",
-                    "preferredLabel": {"$first": "$preferredLabel"},
-                    "description": {"$first": "$description"},
-                    "altLabels": {"$first": "$altLabels"},
-                    "code": {"$first": "$code"},
-                    "score": {"$max": "$score"},
-                    }
-         },
-        {"$sort": {"score": -1}},
-        {"$limit": k},
-    ]
-    return [_to_entity(entry) async for entry in collection.aggregate(pipeline)]
-
-async def search(embedding: List[float], query: str, k: int = 10) -> List[OccupationEntity]:
+async def search(embedding: List[float], k: int = 10) -> List[OccupationEntity]:
     """
         Perform a similarity search on the vector store. It uses the default similarity search set during vector
         generation.
 
         :param embedding: The embedding to search for.
-        :param query: The query to search for.
         :param k: The number of results to return.
         :return: A list of T objects.
     """
@@ -67,7 +39,6 @@ async def search(embedding: List[float], query: str, k: int = 10) -> List[Occupa
         "limit": k * 3,
         "index": "embedding_index",
     }
-    # Ask explanation about the pipeline and is it doing what is it intended to do
     pipeline = [
         {"$vectorSearch": params},
         {"$set": {"score": {"$meta": "vectorSearchScore"}}},
@@ -88,7 +59,6 @@ def _to_entity(doc: dict) -> OccupationEntity:
     """
     Convert a Document object to an OccupationEntity object.
     """
-    # Ask kinga about the structure of the database and the structure of the request
     return OccupationEntity(
         id=str(doc.get("_id", "")),
         UUID=doc.get("UUID", ""),
@@ -98,7 +68,7 @@ def _to_entity(doc: dict) -> OccupationEntity:
         altLabels=doc.get("altLabels", []),
     )
 
-async def search_in_batch(embedding_service: EmbeddingService, queries: List[str], k: int = 10) -> List[List[OccupationEntity]]:
+async def search_in_batch(embedding_service: EmbeddingService, queries: List[str], k: int = 10) -> List[List[Tuple[str,str]]]:
     """
     Perform a similarity search on the vector store in batches. It uses the default similarity search set during vector
     generation.
@@ -108,23 +78,19 @@ async def search_in_batch(embedding_service: EmbeddingService, queries: List[str
     :param k: The number of results to return.
     :return: A list of T objects.
     """
-    embeddings = await embedding_service.embed_strings_in_batch(queries)
+    embeddings = await embedding_service.embed_batch(queries)
     results = []
-    for embedding, query in zip(embeddings, queries):
-        result = await search(embedding, query, k)
+    for embedding in embeddings:
+        result = await search(embedding, k)
         results.append([(e.code,e.preferredLabel) for e in result])
     return results
 
-async def _get_predictions(embedding_service: EmbeddingService, queries: List[str], k: int = 10):
-    # We could run predictions in batches to make it quicker, however there is a quota limit on the gecko embeddings
-    # API. We are running it sequentially to avoid hitting the limit.
-    results = []
-    for query in tqdm(queries):
-        result = await _search(embedding_service, query, k)
 
-        results.append([(e.code,e.preferredLabel) for e in result])
-    return results
-
+def format_string(input_str: List[List[Tuple[str,str]]]) -> List[str]:
+    """
+    Format the search results into a list of strings.
+    """
+    return ["\n".join([f"{code}; {preferredLabel}" for code,preferredLabel in result]) for result in input_str]
 
 # Function to write a batch to a CSV file
 def write_batch_to_csv(batch_df, file_name, mode='w'):
@@ -133,8 +99,9 @@ def write_batch_to_csv(batch_df, file_name, mode='w'):
 # Function to process a batch of data
 async def process_batch(batch_df, gecko_embedding_service, file_name, mode='w'):
     results = await search_in_batch(gecko_embedding_service, batch_df['JobTitle'], k=10)
+    formatted_results = format_string(results)
     batch_df = batch_df.copy()
-    batch_df.loc[:, 'Predictions'] = results
+    batch_df.loc[:, 'Predictions'] = formatted_results
     write_batch_to_csv(batch_df, file_name, mode=mode)
 
 if __name__ == "__main__":
@@ -145,10 +112,10 @@ if __name__ == "__main__":
 
 
     # Load the dataset
-    df = pd.read_csv(OCCUPATION_FILENAME, nrows=1000)
+    df = pd.read_csv(INPUT_FILENAME)
 
-    # Remove rows with missing values
-    df.dropna(inplace=True)
+    # Fill rows with missing values
+    df.fillna('', inplace=True)
 
     batch_size = 50
     num_batches = (len(df) - START_ROW + batch_size - 1) // batch_size  # Calculate the number of batches
@@ -163,6 +130,3 @@ if __name__ == "__main__":
             await process_batch(batch_df, gecko_embedding_service, OUTPUT_FILENAME, mode)
 
     asyncio.get_event_loop().run_until_complete(main())
-
-# Clean the ouput
-# Generate LLM new jobTitle prompt
