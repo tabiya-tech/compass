@@ -13,6 +13,13 @@ class EmbeddingService(ABC):
         Embeds the given query text.
         """
         raise NotImplementedError
+    
+    @abstractmethod
+    async def embed_batch(self, queries: List[str]) -> List[List[float]]:
+        """
+        Embeds the given batch of query texts.
+        """
+        raise NotImplementedError
 
 
 class GoogleGeckoEmbeddingService(EmbeddingService):
@@ -28,3 +35,9 @@ class GoogleGeckoEmbeddingService(EmbeddingService):
         inputs = TextEmbeddingInput(query, self._TASK)
         embeddings = await self.model.get_embeddings_async([inputs])
         return embeddings[0].values
+    
+    async def embed_batch(self, queries: List[str]) -> List[List[float]]:
+        """Embeds texts with a pre-trained, foundational model."""
+        inputs = [TextEmbeddingInput(query, self._TASK) for query in queries]
+        embeddings = await self.model.get_embeddings_async(inputs)
+        return [embedding.values for embedding in embeddings]
