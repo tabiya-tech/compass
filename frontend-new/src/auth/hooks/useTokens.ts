@@ -16,10 +16,10 @@ export function useTokens({ updateUserByIDToken }: TUseTokensParams) {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const _setIDToken = useCallback(
+  const _setAccessToken = useCallback(
     (token: string) => {
       updateUserByIDToken(token);
-      PersistentStorageService.setIDToken(token);
+      PersistentStorageService.setAccessToken(token);
     },
     [updateUserByIDToken]
   );
@@ -28,7 +28,7 @@ export function useTokens({ updateUserByIDToken }: TUseTokensParams) {
     const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
       if (user) {
         const idToken = await user.getIdToken(true);
-        _setIDToken(idToken);
+        _setAccessToken(idToken);
         setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
@@ -38,7 +38,7 @@ export function useTokens({ updateUserByIDToken }: TUseTokensParams) {
     });
 
     return () => unsubscribe();
-  }, [_setIDToken]);
+  }, [_setAccessToken]);
 
   const clearTokens = () => {
     PersistentStorageService.clear();
@@ -49,7 +49,7 @@ export function useTokens({ updateUserByIDToken }: TUseTokensParams) {
     isAuthenticating,
     isAuthenticated,
     setIsAuthenticated,
-    setIDToken: _setIDToken,
+    setAccessToken: _setAccessToken,
     clearTokens,
   };
 }
@@ -58,6 +58,6 @@ export const defaultUseTokensResponse: ReturnType<typeof useTokens> = {
   isAuthenticating: false,
   isAuthenticated: false,
   setIsAuthenticated: () => {},
-  setIDToken: () => {},
+  setAccessToken: () => {},
   clearTokens: () => {},
 };

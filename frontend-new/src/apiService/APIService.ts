@@ -1,9 +1,16 @@
 import { StatusCodes } from "http-status-codes";
 import { getServiceErrorFactory } from "src/error/error";
 import ErrorConstants from "src/error/error.constants";
+import {PersistentStorageService} from "../persistentStorageService/PersistentStorageService";
 
+// This function is used to make authenticated fetch requests
+// It adds the Authorization header with the IDToken from the session storage
+// It also checks if the response is in the expected format
+// It throws an error if the response is not in the expected format
+// It throws an error if the server responds with a status code that is not among the expected one.
+// A function can expect multiple status codes by passing an array of status codes to the expectedStatusCode field
 export type ExtendedRequestInit = RequestInit & {
-  expectedStatusCode: number;
+  expectedStatusCode: number | number[];
   serviceName: string;
   serviceFunction: string;
   failureMessage: string;
@@ -18,12 +25,18 @@ export const fetchWithAuth = async (
     failureMessage: "Unknown error",
   }
 ): Promise<Response> => {
-  const { expectedStatusCode, serviceName, serviceFunction, failureMessage, ...options } = init;
+  const { serviceName, serviceFunction, failureMessage, ...options } = init;
+
+  // check if the expected status code is an array or a single value
+  const expectedStatusCodes = Array.isArray(init.expectedStatusCode)
+    ? init.expectedStatusCode
+    : [init.expectedStatusCode];
 
   const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, init.method ?? "Unknown method", apiUrl);
   let response: Response;
   try {
-    const token = sessionStorage.getItem("IDToken");
+    const token = PersistentStorageService.getAccessToken();
+
     const headers = new Headers(init.headers || {});
     headers.append("Authorization", `Bearer ${token ?? "ANONYMOUS"}`);
 
@@ -34,7 +47,7 @@ export const fetchWithAuth = async (
     throw errorFactory(0, ErrorConstants.ErrorCodes.FAILED_TO_FETCH, failureMessage, e);
   }
   // check if the server responded with the expected status code
-  if (response.status !== expectedStatusCode) {
+  if (!expectedStatusCodes.includes(response.status)) {
     // Server responded with a status code that indicates that the resource was not the expected one
     // The responseBody should be an ErrorResponse but that is not guaranteed e.g. if a gateway in the middle returns a 502,
     // or if the server is not conforming to the error response schema

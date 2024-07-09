@@ -15,9 +15,9 @@ jest.mock("src/persistentStorageService/PersistentStorageService", () => {
   return {
     __esModule: true,
     PersistentStorageService: {
-      getIDToken: jest.fn(),
-      clearIDToken: jest.fn(),
-      setIDToken: jest.fn(),
+      getAccessToken: jest.fn(),
+      clearAccessToken: jest.fn(),
+      setAccessToken: jest.fn(),
       clear: jest.fn(),
     },
   };

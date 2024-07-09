@@ -4,6 +4,7 @@ import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/error.constants";
 import { getBackendUrl } from "src/envService";
 import { PersistentStorageService } from "src/persistentStorageService/PersistentStorageService";
+import { fetchWithAuth } from "src/apiService/APIService";
 
 export default class UserPreferencesService {
   readonly userPreferencesEndpointUrl: string;
@@ -26,11 +27,15 @@ export default class UserPreferencesService {
     let response;
     let responseBody: string;
     const requestBody = JSON.stringify(newUserPreferencesSpec);
-    response = await fetch(this.userPreferencesEndpointUrl, {
+    response = await fetchWithAuth(this.userPreferencesEndpointUrl, {
       method: method,
       headers: {
         "Content-Type": "application/json",
       },
+      expectedStatusCode: [StatusCodes.CREATED, StatusCodes.NOT_FOUND],
+      serviceName: serviceName,
+      serviceFunction: serviceFunction,
+      failureMessage: `Failed to create new user preferences for user with id ${newUserPreferencesSpec.user_id}`,
       body: requestBody,
     });
     responseBody = await response.text();
@@ -97,12 +102,17 @@ export default class UserPreferencesService {
       `${this.userPreferencesEndpointUrl}?user_id=${userId}`
     );
     let response;
-    response = await fetch(`${this.userPreferencesEndpointUrl}?user_id=${userId}`, {
+    response = await fetchWithAuth(`${this.userPreferencesEndpointUrl}?user_id=${userId}`, {
       method: method,
       headers: {
         "Content-Type": "application/json",
       },
+      expectedStatusCode: [StatusCodes.OK, StatusCodes.NOT_FOUND],
+      serviceName: serviceName,
+      serviceFunction: serviceFunction,
+      failureMessage: `Failed to get user preferences for user with id ${userId}`,
     });
+
     // check if the server responded with the expected status code
     const responseBody = await response.text();
     if (response.status !== StatusCodes.OK) {

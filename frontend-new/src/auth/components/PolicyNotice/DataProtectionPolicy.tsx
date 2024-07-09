@@ -68,6 +68,7 @@ const DataProtectionAgreement: React.FC<DataProtectionAgreementProps> = ({ isLoa
       enqueueSnackbar("Data Protection Agreement Accepted", { variant: "success" });
       navigate(routerPaths.ROOT, { replace: true });
     } catch (e) {
+      console.log(e)
       enqueueSnackbar("Failed to create user preferences", { variant: "error" });
       console.error("Failed to create user preferences", e);
     } finally {
