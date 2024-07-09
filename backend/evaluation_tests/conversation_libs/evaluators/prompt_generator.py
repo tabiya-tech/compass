@@ -18,6 +18,13 @@ class PromptGenerator:
                             unnecessarily within this segment of the conversation? Are all the questions by 
                             EVALUATED_AGENT focused and easy to understand?
                         """)
+            
+            case EvaluationType.FOCUS:
+                return textwrap.dedent("""
+                            Did the EVALUATED_AGENT lose focus on the topic of the conversation and on its
+                            task of investigating the experiences and skill of the user? Did the EVALUATED_AGENT give into
+                            a topic of conversation that is different from the experience and skill investigation?
+                        """)
 
             case EvaluationType.SUMMARY_CONSISTENCY:
                 return textwrap.dedent("""
@@ -57,6 +64,11 @@ class PromptGenerator:
                 return textwrap.dedent("""
                             The conversation is somewhat concise, but the EVALUATED_AGENT repeats instructions, 
                     and the SIMULATED_USER could ask more focused questions.
+                        """)
+            
+            case EvaluationType.FOCUS:
+                return textwrap.dedent("""
+                            The conversation is somewhat focused, but the EVALUATED_AGENT allows the user to drift off at times.
                         """)
 
             case EvaluationType.SUMMARY_CONSISTENCY:
