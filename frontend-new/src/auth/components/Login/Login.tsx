@@ -41,7 +41,7 @@ export const DATA_TEST_ID = {
 const Login: React.FC = () => {
   const theme = useTheme();
   const { login, isLoggingIn } = useContext(AuthContext);
-  const [ isCheckingPreferences, setIsCheckingPreferences ] = useState(false);
+  const [isCheckingPreferences, setIsCheckingPreferences] = useState(false);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -65,15 +65,15 @@ const Login: React.FC = () => {
         // this is to ensure that even if the accepted_tc is manipulated in the database, the user will be redirected to the DPA page
         // and will have to accept the terms and conditions again
         if (!userPreferences.accepted_tc || isNaN(acceptedTcDate.getTime())) {
-          setIsCheckingPreferences(false)
+          setIsCheckingPreferences(false);
           navigate(routerPaths.DPA, { replace: true });
         } else {
-          setIsCheckingPreferences(false)
+          setIsCheckingPreferences(false);
           navigate(routerPaths.ROOT, { replace: true });
           enqueueSnackbar("Welcome back!", { variant: "success" });
         }
       } catch (e) {
-        setIsCheckingPreferences(false)
+        setIsCheckingPreferences(false);
         const errorMessage = getUserFriendlyErrorMessage(e as Error);
         enqueueSnackbar(errorMessage, { variant: "error" });
         console.error("Failed to fetch user preferences", e);

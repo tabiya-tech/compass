@@ -44,11 +44,13 @@ describe("AuthProvider module", () => {
       // GIVEN: The Auth Provider is rendered and auth context is accessed
       const { result } = renderAuthContext();
 
+      // AND some callback functions
+      const givenSuccessCallback = jest.fn();
+      const givenErrorCallback = jest.fn();
+
       // WHEN the login function is called
       const givenEmail = "foo@bar.baz";
       const givenPassword = "password";
-      const givenSuccessCallback = jest.fn();
-      const givenErrorCallback = jest.fn();
 
       const loginSpy = jest.spyOn(authService, "handleLogin");
 
@@ -68,25 +70,34 @@ describe("AuthProvider module", () => {
   });
 
   describe("Logout functionality", () => {
-    test("it should clear the access token when the logout function is called", async () => {
+    test("it should clear the access token, session ids and call the success callback when the logout function is called", async () => {
       const clearTokens = jest.fn();
 
       (useTokensHook.useTokens as jest.Mock).mockReturnValue({ clearTokens });
 
       // GIVEN the Auth Provider is rendered and auth context is accessed
       const { result } = renderAuthContext();
+      // AND some callback functions
+      const givenSuccessCallback = jest.fn();
+      const givenErrorCallback = jest.fn();
 
       // AND the access token is set
       PersistentStorageService.setAccessToken("foo");
+      const logoutSpy = jest.spyOn(authService, "handleLogout");
 
       // WHEN the logout function is called
-      act(() => result.current?.logout());
+      act(() => result.current?.logout(givenSuccessCallback, givenErrorCallback));
 
       // THEN the access token should be cleared
       expect(PersistentStorageService.getAccessToken()).toBeNull();
+      // AND the session ids should be cleared
+      expect(PersistentStorageService.getChatSessionID()).toBeNull();
 
       // AND the clear function should be called
       expect(clear).toHaveBeenCalled();
+
+      // AND the success callback should be called
+      expect(logoutSpy).toHaveBeenCalledWith(givenSuccessCallback, givenErrorCallback);
 
       // AND clear tokens should be called
       expect(clearTokens).toHaveBeenCalled();

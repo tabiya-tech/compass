@@ -39,7 +39,7 @@ export type AuthContextValue = {
     successCallback: (user: TabiyaUser) => void,
     errorCallback: (error: Error) => void
   ) => void;
-  logout: () => void;
+  logout: (successCallback: () => void, errorCallback: (error: any) => void) => void;
   register: (
     email: string,
     password: string,

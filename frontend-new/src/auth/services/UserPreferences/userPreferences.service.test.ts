@@ -160,8 +160,8 @@ describe("UserPreferencesService", () => {
       };
       // AND the create model REST API will respond with OK and some newly create model
       const expectedUserPreferenceResponse = {
-          ...givenUserPreferencesSpec,
-          sessions: [1234],
+        ...givenUserPreferencesSpec,
+        sessions: [1234],
       } as unknown as UserPreference;
       const fetchSpy = setupFetchSpy(
         StatusCodes.CREATED,
