@@ -8,8 +8,8 @@ from fix_busted_json import repair_json
 
 T = TypeVar('T', bound=BaseModel)
 
-# Regular expression to match simple JSON objects
-_JSON_REGEX = r'\{.*\}'
+# Regular expression to match an array of simple JSON objects or simple JSON objects
+_JSON_REGEX = r'(\[\{.*\}\]|\{.*\})'
 
 
 def extract_json(text: str, model: Type[T]) -> T:
