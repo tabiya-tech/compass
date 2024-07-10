@@ -33,7 +33,8 @@ class ConversationHistoryFormatter:
         return llm_input
 
     @staticmethod
-    def format_for_agent_generative_prompt(*, model_response_instructions: str, context: ConversationContext,
+    def format_for_agent_generative_prompt(*, model_response_instructions: str | None = None,
+                                           context: ConversationContext,
                                            user_input: str) -> LLMInput:
         """
         Format the conversation history and the user input in a suitable way to pass as an

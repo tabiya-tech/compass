@@ -201,7 +201,7 @@ class ExploreExperiencesAgentDirector(Agent):
 
             if transitioned_between_states:
                 user_input = AgentInput(
-                    message="Hi, I am ready to dive into my experiences, don't greet me, let get into it immediately",
+                    message="I am ready to dive into my experiences, don't greet me, let's get into it immediately",
                     is_artificial=True)
 
             # The conversation history is handled in dive_into_experiences method,
