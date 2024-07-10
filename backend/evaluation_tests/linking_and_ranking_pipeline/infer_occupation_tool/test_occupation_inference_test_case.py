@@ -541,5 +541,124 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["unpaid volunteer unpaid help in enterprises owned by other households"],
         ),
+    InferOccupationToolTestCase(
+        name="Infer from responsibilities (ambiguous title)",
+        given_experience_title="Ambassador",
+        given_work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+        given_company="Mug Angels",
+        given_responsibilities=[
+                    # https://search67.com/2021/07/19/careers-employment-opportunity-for-youth-as-c0vid-19-screeners/
+                    "I publicize beauty products.",
+                    "I manage social media presence.",
+                    "I decide the branding strategy.",
+                ],
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        expected_occupations_found=["marketing manager"],
+    ),
+    InferOccupationToolTestCase(
+        name="Infer from company (ambiguous title)",
+        given_experience_title="Ambassador",
+        given_work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+        given_company="Mug Angels",
+        given_responsibilities=[],
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        expected_occupations_found=["marketing manager"],
+    ),
+    InferOccupationToolTestCase(
+        name="Infer from responsibilities (ambiguous title) 2",
+        given_experience_title="Trader",
+        given_work_type=WorkType.SELF_EMPLOYMENT,
+        given_company="",
+        # What if the responsibilities are divided 
+        # between multiple entries
+        given_responsibilities=[
+                    "I sell cows at the local market.",
+                    "I buy cows from farmers."
+                ],
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        expected_occupations_found=["wholesale merchant in live animals"],
+    ),
+    InferOccupationToolTestCase(
+        name="Infer from title (responsibilities are ambiguous)",
+        given_experience_title="Livestock Trader",
+        given_work_type=WorkType.SELF_EMPLOYMENT,
+        given_company="",
+        given_responsibilities=[
+                    "I buy and sell",
+                ],
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        expected_occupations_found=["wholesale merchant in live animals"],
+    ),
+    InferOccupationToolTestCase(
+        name="Infer from responsibilities",
+        given_experience_title="Plant Operator",
+        given_work_type=WorkType.SELF_EMPLOYMENT,
+        given_company="Pbarco",
+        given_responsibilities=[
+                    "I oversee the power plant production process",
+                    "I monitor equipment in the plant"
+                ],
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        expected_occupations_found=["power production plant operator"],
+    ),
+    InferOccupationToolTestCase(
+        name="generic title",
+        given_experience_title="Service Provider",
+        given_work_type=WorkType.SELF_EMPLOYMENT,
+        given_company="Mobile carwash",
+        given_responsibilities=[
+                    "I move my activity",
+                    "I wash cars"
+                ],
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        expected_occupations_found=["vehicle cleaner"],
+    ),
+    InferOccupationToolTestCase(
+        name="generic object",
+        given_experience_title="Goods seller",
+        given_work_type=WorkType.SELF_EMPLOYMENT,
+        given_company="",
+        given_responsibilities=[
+                    "I sell goods",
+                ],
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        expected_occupations_found=["sales workers not elsewhere classified"],
+    ),
+    InferOccupationToolTestCase(
+        name="new occupation",
+        given_experience_title="Influencer",
+        given_work_type=WorkType.SELF_EMPLOYMENT,
+        given_company="",
+        given_responsibilities=[
+                    "I create content for social media",
+                    "I work with brands for social media campaigns"
+                ],
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        expected_occupations_found=["digital marketing manager", "promoter"],
+    ),
+    InferOccupationToolTestCase(
+        name="role is not stable",
+        given_experience_title="Casual",
+        given_work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+        given_company="Spar",
+        given_responsibilities=[
+                    "Unload goods",
+                    "stock shelves"
+                ],
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        expected_occupations_found=["shelf filler", "sales assistant"],
+    ),
+    InferOccupationToolTestCase(
+        name="rare role",
+        given_experience_title="Voice over artist",
+        given_work_type=WorkType.SELF_EMPLOYMENT,
+        given_company="",
+        given_responsibilities=[
+                    "I do audiobook narrations",
+                    "I inform and educate communities"
+                ],
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        expected_occupations_found=["voice-over artist"],
+    ),
     # Add more test cases as needed
 ]

@@ -11,7 +11,6 @@ from app.vector_search.esco_search_service import OccupationSearchService, Occup
 from app.vector_search.settings import VectorSearchSettings
 from app.vector_search.vector_search_dependencies import SearchServices
 from common_libs.environment_settings.constants import EmbeddingConfig
-from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 
@@ -277,7 +276,137 @@ test_cases = [
             given_work_type=WorkType.UNSEEN_UNPAID,
             expected_top_skills=['guarantee customer satisfaction']
         ),
-    ]
+    ExperiencePipelineTestCase(
+        name="Brand Ambassador",
+        given_experience_title="Ambassador",
+        given_company_name="Beauty Queen",
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        given_work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+        given_responsibilities=["I publicize beauty products.",
+                                "I manage social media presence.",
+                                "I decide the branding strategy.",
+                                "I publish make-up tutorials for my followers"],
+        expected_top_skills=['content marketing strategy', #missing
+                         'make-up techniques',
+                         'social media management',
+                         'lead the brand strategic planning process',
+                         'plan social media marketing campaigns']
+    ),
+    ExperiencePipelineTestCase(
+        name="Livestock trader",
+        given_experience_title="Livestock Trader",
+        given_company_name="",
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        given_work_type=WorkType.SELF_EMPLOYMENT,
+        given_responsibilities=["I sell cows at the local market.",
+                                "I buy cows at the local market.",
+                                "I transport large animals."],
+        expected_top_skills=['select livestock',
+                         'manage livestock', #missing
+                         'manage the transportation of animals',
+                         'load animals for transportation',
+                         'negotiate sale of commodities']
+    ),
+    ExperiencePipelineTestCase(
+        name="Plant Operator",
+        given_experience_title="Plant Operator",
+        given_company_name="Pbarco",
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        given_work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+        given_responsibilities=["I oversee the power plant production process",
+                                "I monitor equipment in the plant",
+                                "I write weekly reports"],
+        expected_top_skills=['coordinate electricity generation',
+                             'monitor equipment condition',
+                             'write production reports',
+                             'monitor electric generators',
+                             'report on production results']
+    ),
+    ExperiencePipelineTestCase(
+        name="Carwash",
+        given_experience_title="Service provider",
+        given_company_name="",
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        given_work_type=WorkType.SELF_EMPLOYMENT,
+        given_responsibilities=["I move the van with all my equipment",
+                                "I wash cars",
+                                "I clean the interiors of cars"],
+        expected_top_skills=['clean vehicle exterior',
+                             'manoeuvre heavy trucks',
+                         'wash vehicles',
+                         'clean vehicles interior',
+                         'car cleaning procedures']
+    ),
+    ExperiencePipelineTestCase(
+        name="generic salesperson",
+        given_experience_title="Salesperson",
+        given_company_name="",
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        given_work_type=WorkType.SELF_EMPLOYMENT,
+        given_responsibilities=["I sell goods and wares on the street",
+                                "I contact my supplier to get household items",
+                                "I look through old stuff to see what could be sold",
+                                "I organize my stall every day"],
+        expected_top_skills=['work independently in sales',
+                             'maintain relationship with suppliers',
+                             'examine cost of antiquarian goods',
+                             'organise product display',
+                             'sell second-hand merchandise']
+    ),
+    ExperiencePipelineTestCase(
+        name="influencer",
+        given_experience_title="Influencer",
+        given_company_name="",
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        given_work_type=WorkType.SELF_EMPLOYMENT,
+        given_responsibilities=[
+                    "I create content for social media",
+                    "I work with brands for social media campaigns",
+                    "I make videos to publicize products"
+                ],
+        expected_top_skills=['plan social media marketing campaigns',
+                         'social media management',
+                         'perform video editing',
+                         'provide written content',
+                         'edit recorded sound']
+    ),
+    ExperiencePipelineTestCase(
+        name="casual worker",
+        given_experience_title="Casual worker",
+        given_company_name="Spar",
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        given_work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+        given_responsibilities=[
+                    "I fill shelves at the supermarket",
+                    "I unload products from the trucks",
+                    "I dispose of expired products"
+                ],
+        expected_top_skills=['stock shelves',
+                         'pallets loading',
+                         'dispose of non-hazardous waste',
+                         'manage stock rotation', #missing ('operate material handling equipment')
+                         'assess shelf life of food products']
+    ),
+    ExperiencePipelineTestCase(
+        name="voice-over artist",
+        given_experience_title="Voice-over Artist",
+        given_company_name="",
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        given_work_type=WorkType.SELF_EMPLOYMENT,
+        given_responsibilities=[
+                    "I do audiobook narrations",
+                    "I act according to the character",
+                    "I inform and educate communities",
+                    "I teach my skills", 
+                    "I edit some of my work"
+                ],
+        expected_top_skills=['perform scripted dialogue',
+                         'edit recorded sound',
+                         'study roles from scripts',
+                         'community education',
+                         'teaching and training']
+    )
+]
 
 
 @pytest.mark.asyncio
