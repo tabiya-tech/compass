@@ -1,5 +1,5 @@
-import React, { useCallback, useContext } from "react";
-import { Box, Button, Container, styled, Typography } from "@mui/material";
+import React, { useCallback, useContext, useState } from "react";
+import { Box, Button, CircularProgress, Container, styled, Typography, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -25,9 +25,16 @@ export const DATA_TEST_ID = {
   DPA: `dpa-form-${uniqueId}`,
   LANGUAGE_SELECTOR: `dpa-language-selector-${uniqueId}`,
   ACCEPT_DPA_BUTTON: `dpa-accept-button-${uniqueId}`,
+  CIRCULAR_PROGRESS: `dpa-circular-progress-${uniqueId}`,
 };
 
-const DataProtectionAgreement: React.FC = () => {
+interface DataProtectionAgreementProps {
+  isLoading?: boolean;
+}
+
+const DataProtectionAgreement: React.FC<DataProtectionAgreementProps> = ({ isLoading }) => {
+  const theme = useTheme();
+  const [isAcceptingDPA, setIsAcceptingDPA] = useState(false);
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -56,12 +63,15 @@ const DataProtectionAgreement: React.FC = () => {
       sessions: [],
     };
     try {
+      setIsAcceptingDPA(true);
       await userPreferencesService.createUserPreferences(newUserPreferenceSpecs);
       enqueueSnackbar("Data Protection Agreement Accepted", { variant: "success" });
       navigate(routerPaths.ROOT, { replace: true });
     } catch (e) {
       enqueueSnackbar("Failed to create user preferences", { variant: "error" });
       console.error("Failed to create user preferences", e);
+    } finally {
+      setIsAcceptingDPA(false);
     }
   }, [user, enqueueSnackbar, navigate]);
 
@@ -119,10 +129,21 @@ const DataProtectionAgreement: React.FC = () => {
           variant="contained"
           color="primary"
           style={{ marginTop: 16 }}
+          disabled={isLoading ?? isAcceptingDPA}
           data-testid={DATA_TEST_ID.ACCEPT_DPA_BUTTON}
           onClick={handleAcceptedDPA}
         >
-          Sure, I am ready.
+          {isLoading ?? isAcceptingDPA ? (
+            <CircularProgress
+              color="secondary"
+              aria-label="accepting DPA"
+              size={16}
+              sx={{ marginTop: theme.tabiyaSpacing.sm, marginBottom: theme.tabiyaSpacing.sm }}
+              data-testid={DATA_TEST_ID.CIRCULAR_PROGRESS}
+            />
+          ) : (
+            "Sure, I am ready."
+          )}
         </Button>
       </Box>
     </Container>

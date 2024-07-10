@@ -216,4 +216,38 @@ describe("Testing Data Protection Policy component with AuthProvider", () => {
     // AND the error should be logged
     expect(console.error).toHaveBeenCalledWith("Failed to create user preferences", expect.any(Error));
   });
+
+  test("should show loading spinner when accepting the data protection policy", async () => {
+    // GIVEN a user is logged in for the first time
+    const givenUser: TabiyaUser = {
+      id: "0001",
+      email: "janedoe@mail.com",
+      name: "Jane Doe",
+    };
+    mockLoggedInUser({ user: givenUser });
+    // AND the user preferences service will take a while to create the user preferences
+    const userPreferencesServiceMock = {
+      createUserPreferences: jest.fn().mockImplementation(() => new Promise(() => {})),
+    };
+
+    (UserPreferencesService as jest.Mock).mockImplementation(() => userPreferencesServiceMock);
+
+    // WHEN the component is rendered
+    render(
+      <HashRouter>
+        <DataProtectionAgreement />
+      </HashRouter>
+    );
+    // AND the user clicks the accept button
+    fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_BUTTON));
+
+    // THEN expect the loading spinner to be displayed
+    await waitFor(() => {
+      expect(screen.getByTestId(DATA_TEST_ID.CIRCULAR_PROGRESS)).toBeInTheDocument();
+    });
+    // AND the accept button should be disabled
+    await waitFor(() => {
+      expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_BUTTON)).toBeDisabled();
+    });
+  });
 });
