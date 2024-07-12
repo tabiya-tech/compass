@@ -11,15 +11,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.agent.agent_types import AgentInput
-from app.agent.llm_agent_director import LLMAgentDirector
+from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.users.auth import Authentication
 from app.conversation_memory.conversation_memory_manager import ConversationContext, ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
-from app.server_dependencies import get_conversation_memory_manager, initialize_mongo_db
 from app.chat.chat_types import ConversationMessage
 from app.chat.chat_utils import filter_conversation_history, get_messages_from_conversation_manager
+from app.server_dependecies.agent_director_dependencies import get_agent_director
+from app.server_dependecies.conversation_manager_dependencies import get_conversation_memory_manager
+from app.server_dependecies.db_dependecies import initialize_mongo_db
 from app.vector_search.occupation_search_routes import add_occupation_search_routes
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from app.vector_search.skill_search_routes import add_skill_search_routes
@@ -132,13 +134,6 @@ sensitive_filter.add_filter_routes(app)
 # but this can be replaced with a persistent store based on environment variables
 # TODO: use the Fast api dependency injection pattern to inject them into the routes
 application_state_manager = ApplicationStateManager(InMemoryApplicationStateStore())
-
-
-def get_agent_director(conversation_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager),
-                       similarity_search: SimilaritySearchService = Depends(
-                           get_occupation_skill_search_service)) -> LLMAgentDirector:
-    """ Get the agent manager instance."""
-    return LLMAgentDirector(conversation_manager, similarity_search)
 
 
 @app.get(path="/conversation",
@@ -261,9 +256,11 @@ async def _test_conversation(request: Request, user_input: str, clear_memory: bo
         # ################################################################
         logger.debug("%s initialized for sandbox testing", agent.agent_type.value)
 
-        agent_output = await agent.execute(user_input=AgentInput(message=user_input, sent_at=datetime.now()), context=context)
+        agent_output = await agent.execute(user_input=AgentInput(message=user_input, sent_at=datetime.now()),
+                                           context=context)
         if not agent.is_responsible_for_conversation_history():
-            await conversation_memory_manager.update_history(AgentInput(message=user_input, sent_at=datetime.now()), agent_output)
+            await conversation_memory_manager.update_history(AgentInput(message=user_input, sent_at=datetime.now()),
+                                                             agent_output)
 
         # get the context again after updating the history
         context = await conversation_memory_manager.get_conversation_context()

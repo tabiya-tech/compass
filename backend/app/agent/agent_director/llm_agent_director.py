@@ -3,7 +3,7 @@ from textwrap import dedent
 from pydantic import BaseModel
 
 from app.agent.agent import Agent
-from app.agent.agent_director import AbstractAgentDirector, ConversationPhase
+from app.agent.agent_director.abstract_agent_director import AbstractAgentDirector, ConversationPhase
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType
 from app.agent.farewell_agent import FarewellAgent
 from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirector
@@ -11,7 +11,7 @@ from app.agent.llm_caller import LLMCaller
 from app.agent.welcome_agent import WelcomeAgent
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationContext
-from app.vector_search.similarity_search_service import SimilaritySearchService
+from app.vector_search.vector_search_dependencies import SearchServices
 from common_libs.llm.models_utils import LLMConfig
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 
@@ -60,13 +60,18 @@ class LLMAgentDirector(AbstractAgentDirector):
     the user input to the appropriate agent.
     """
 
-    def __init__(self, conversation_manager: ConversationMemoryManager, skill_search_service: SimilaritySearchService):
+    def __init__(self,
+                 conversation_manager: ConversationMemoryManager,
+                 search_services: SearchServices,
+                 ):
         super().__init__(conversation_manager)
         # initialize the agents
         self._agents: dict[AgentType, Agent] = {
             AgentType.WELCOME_AGENT: WelcomeAgent(),
             AgentType.EXPLORE_EXPERIENCES_AGENT: ExploreExperiencesAgentDirector(
-                conversation_manager=conversation_manager),
+                conversation_manager=conversation_manager,
+                search_services=search_services,
+            ),
             AgentType.FAREWELL_AGENT: FarewellAgent()
         }
         # define the tasks that each agent is responsible for

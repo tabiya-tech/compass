@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 import pytest as pytest
 
 from evaluation_tests.conversation_libs.fake_conversation_context import FakeConversationContext
+from evaluation_tests.conversation_libs.search_service_fixtures import get_search_services
 
 
 def pytest_addoption(parser):
@@ -44,3 +45,8 @@ def common_folder_path() -> str:
     """ Returns a common folder path that should be used in tests. """
     time_now = datetime.now(timezone.utc).isoformat()
     return os.path.join(os.path.dirname(__file__), 'test_output', time_now + '_')
+
+
+@pytest.fixture(scope="function")
+def setup_search_services():
+    return get_search_services()

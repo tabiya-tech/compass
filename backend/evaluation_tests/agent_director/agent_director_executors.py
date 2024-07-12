@@ -1,4 +1,4 @@
-from app.agent.agent_director import AbstractAgentDirector
+from app.agent.agent_director.abstract_agent_director import AbstractAgentDirector
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationContext

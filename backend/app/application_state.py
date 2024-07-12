@@ -2,7 +2,8 @@ import logging
 from abc import ABC, abstractmethod
 from pydantic import BaseModel
 
-from app.agent.agent_director import AgentDirectorState
+from app.countries import Country
+from app.agent.agent_director.abstract_agent_director import AgentDirectorState
 from app.agent.collect_experiences_agent import CollectExperiencesAgentState
 from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
