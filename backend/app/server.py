@@ -142,6 +142,7 @@ def get_agent_director(conversation_manager: ConversationMemoryManager = Depends
 
 
 @app.get(path="/conversation",
+         response_model=List[ConversationMessage],
          description="""The main conversation route used to interact with the agent.""")
 async def conversation(request: Request, user_input: str, clear_memory: bool = False, filter_pii: bool = False,
                        session_id: int = 1,
