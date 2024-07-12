@@ -3,8 +3,8 @@ import "src/_test_utilities/consoleMock";
 
 import ChatMessage, { DATA_TEST_ID } from "./ChatMessage";
 import { render, screen } from "src/_test_utilities/test-utils";
-import { ChatMessageOrigin } from "src/chat/Chat.types";
 import * as GetDurationFromNow from "src/utils/getDurationFromNow";
+import { ConversationMessageSender } from "../ChatService/ChatService.types";
 
 describe("render tests", () => {
   beforeAll(() => {
@@ -16,14 +16,14 @@ describe("render tests", () => {
     jest.useRealTimers();
   });
 
-  test("should render the Chat message with timestamp when typing is set to false", () => {
+  test("should render the Chat message with sent_at when typing is set to false", () => {
     // WHEN the chat header is rendered
-    const givenDate = new Date(2024, 6, 25).getTime();
+    const givenDate = new Date(2024, 6, 25).toISOString();
     const givenMessage = {
       id: 1,
-      origin: ChatMessageOrigin.COMPASS,
+      sender: ConversationMessageSender.COMPASS,
       message: "Hello, I'm Compass",
-      timestamp: givenDate,
+      sent_at: givenDate,
     };
 
     jest.spyOn(GetDurationFromNow, "getDurationFromNow").mockReturnValue("Some Date");
@@ -44,13 +44,13 @@ describe("render tests", () => {
     // AND expect the component to match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_CONTAINER)).toMatchSnapshot();
   });
-  test("should render the Chat message without a timestamp when typing is set to true", () => {
+  test("should render the Chat message without a sent_at when typing is set to true", () => {
     // WHEN the chat header is rendered
     const givenMessage = {
       id: 1,
-      origin: ChatMessageOrigin.COMPASS,
+      sender: ConversationMessageSender.COMPASS,
       message: "Hello, I'm Compass",
-      timestamp: Date.now(),
+      sent_at: new Date().toISOString(),
     };
 
     render(<ChatMessage chatMessage={givenMessage} isTyping={true} />);

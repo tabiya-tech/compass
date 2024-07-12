@@ -12,8 +12,3 @@ export enum Language {
   en = "en",
   // fr = 'fr', // French in the future
 }
-
-export type UserPreferenceResponse = {
-  user_preference_id: string;
-  user_preferences: UserPreference;
-};

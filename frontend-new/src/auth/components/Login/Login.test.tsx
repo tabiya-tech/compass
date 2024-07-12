@@ -419,5 +419,5 @@ describe("Testing Login component with AuthProvider", () => {
 
     // AND login button circular progress to be displayed
     expect(screen.getByTestId(DATA_TEST_ID.LOGIN_BUTTON_CIRCULAR_PROGRESS)).toBeInTheDocument();
-  })
+  });
 });

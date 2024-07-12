@@ -91,7 +91,7 @@ describe("getDurationFromNow", () => {
       const result = getDurationFromNow(givenDate);
 
       // THEN expect the expected duration to be returned
-      expect(result).toBe(`on ${givenDate.toLocaleDateString()}`);
+      expect(result).toBe(`on ${givenDate.toLocaleDateString("en-GB", { timeZone: "UTC" })}`);
     });
 
     test("should return the formatted date when the duration is more than a month", () => {
@@ -102,7 +102,7 @@ describe("getDurationFromNow", () => {
       const result = getDurationFromNow(givenDate);
 
       // THEN expect the expected duration to be returned
-      expect(result).toBe(`on ${givenDate.toLocaleDateString()}`);
+      expect(result).toBe(`on ${givenDate.toLocaleDateString("en-GB", { timeZone: "UTC" })}`);
     });
   });
 

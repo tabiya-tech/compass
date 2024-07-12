@@ -1,47 +1,13 @@
-export interface LLMStats {
-  error: string;
-  prompt_token_count: number;
-  response_token_count: number;
-  response_time_in_sec: number;
+// Enum for the sender
+export enum ConversationMessageSender {
+  USER = "USER",
+  COMPASS = "COMPASS"
 }
 
-export interface AgentOutput {
-  message_for_user: string;
-  finished: boolean;
-  agent_type: string;
-  reasoning: string;
-  agent_response_time_in_sec: number;
-  llm_stats: LLMStats[];
-}
-
-export interface Turn {
-  index: number;
-  input: {
-    message: string;
-  };
-  output: AgentOutput;
-}
-
-export interface ConversationHistory {
-  turns: Turn[];
-}
-
-export interface ConversationContext {
-  all_history: ConversationHistory;
-  history: ConversationHistory;
-  summary: string;
-}
-
-export interface LastMessage {
-  message_for_user: string;
-  finished: boolean;
-  agent_type: string;
-  reasoning: string;
-  agent_response_time_in_sec: number;
-  llm_stats: LLMStats[];
-}
-
-export interface RootObject {
-  last: LastMessage;
-  conversation_context: ConversationContext;
+// Type for individual conversation messages
+export interface ConversationMessage {
+  message: string;
+  sent_at: string;  // ISO formatted datetime string
+  sender: ConversationMessageSender;  // Either 'USER' or 'COMPASS'
+  finished?: boolean;  // Optional because it is only applicable for COMPASS messages
 }

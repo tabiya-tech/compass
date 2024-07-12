@@ -40,7 +40,7 @@ describe("AuthProvider module", () => {
   beforeAll(defaultSetup);
 
   describe("Login functionality", () => {
-    test("should call the login url with the correct parameters", async() => {
+    test("should call the login url with the correct parameters", async () => {
       // GIVEN: The Auth Provider is rendered and auth context is accessed
       const { result } = renderAuthContext();
 
