@@ -4,7 +4,7 @@ from threading import Lock
 from fastapi import Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from app.server_dependencies import get_mongo_db
+from app.server_dependecies.db_dependecies import get_mongo_db
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService, \
     EmbeddingService
 from app.vector_search.esco_entities import OccupationEntity, OccupationSkillEntity, SkillEntity
@@ -53,6 +53,7 @@ def get_skill_search_service(db: AsyncIOMotorDatabase = Depends(get_mongo_db),
 
     return _skill_search_service_singleton
 
+
 # Define a singleton instance of the occupation search service
 _occupation_search_service_singleton = None
 
@@ -62,9 +63,9 @@ def get_occupation_search_service(db: AsyncIOMotorDatabase = Depends(get_mongo_d
         SimilaritySearchService[OccupationEntity]:
     """ Get the occupation search service singleton instance."""
     global _occupation_search_service_singleton
-    if _occupation_search_service_singleton is None: # initial check
+    if _occupation_search_service_singleton is None:  # initial check
         with _lock:  # before modifying the singleton instance, acquire the lock
-            if _occupation_search_service_singleton is None: # double check after acquiring the lock
+            if _occupation_search_service_singleton is None:  # double check after acquiring the lock
                 logger.info("Creating a new instance of the occupation search service.")
                 occupation_vector_search_config = VectorSearchConfig(
                     collection_name=_embedding_settings.occupation_collection_name,
@@ -92,3 +93,30 @@ def get_occupation_skill_search_service(db: AsyncIOMotorDatabase = Depends(get_m
                 _occupation_skill_search_service_singleton = OccupationSkillSearchService(db, embedding_model)
 
     return _occupation_skill_search_service_singleton
+
+
+class SearchServices:
+    """
+    A class to hold all the search services.
+    """
+
+    def __init__(self, skill_search_service: SkillSearchService,
+                 occupation_search_service: OccupationSearchService,
+                 occupation_skill_search_service: OccupationSkillSearchService):
+        self.skill_search_service: SkillSearchService = skill_search_service
+        self.occupation_search_service: OccupationSearchService = occupation_search_service
+        self.occupation_skill_search_service: OccupationSkillSearchService = occupation_skill_search_service
+
+
+def get_all_search_services(skill_search_service=Depends(get_skill_search_service),
+                            occupation_search_service=Depends(get_occupation_search_service),
+                            occupation_skill_search_service=Depends(get_occupation_skill_search_service)
+                            ) -> SearchServices:
+    """
+    Get all search services via FastAPI dependency injection.
+    """
+    return SearchServices(
+        skill_search_service,
+        occupation_search_service,
+        occupation_skill_search_service
+    )

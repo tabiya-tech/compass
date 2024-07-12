@@ -8,7 +8,8 @@ from typing import Coroutine, Callable
 import pytest
 from _pytest.logging import LogCaptureFixture
 
-from app.agent.agent_director import AgentDirector, AgentDirectorState
+from app.agent.agent_director.simple_agent_director import SimpleAgentDirector
+from app.agent.agent_director.abstract_agent_director import AgentDirectorState
 from app.agent.agent_types import AgentType
 from app.agent.collect_experiences_agent import CollectExperiencesAgentState
 from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState
@@ -18,9 +19,7 @@ from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_
 from evaluation_tests.agent_director.agent_director_executors import AgentDirectorExecutor, \
     AgentDirectorGetConversationContextExecutor, AgentDirectorIsFinished
 from evaluation_tests.conversation_libs.conversation_test_function import conversation_test_function, \
-    ConversationTestConfig, ScriptedUserEvaluationTestCase, \
-    ScriptedSimulatedUser
-from evaluation_tests.conversation_libs.fake_occupation_search_service import FakeOccupationSimilaritySearchService
+    ConversationTestConfig, ScriptedUserEvaluationTestCase, ScriptedSimulatedUser
 
 
 @pytest.fixture(scope="session")
@@ -39,13 +38,16 @@ def event_loop():
 
 
 @pytest.fixture(scope="function")
-def setup_agent_director() -> tuple[ConversationMemoryManager, Callable[
+def setup_agent_director(setup_search_services) -> tuple[ConversationMemoryManager, Callable[
     [LogCaptureFixture, ScriptedUserEvaluationTestCase], Coroutine[None, None, None]]]:
     session_id = session_id = random.randint(10 ** 9, 10 ** 10 - 1)  # nosec B311 # random number for a test session
     # The conversation manager for this test
     conversation_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
     conversation_manager.set_state(state=ConversationMemoryManagerState(session_id))
-    agent_director = AgentDirector(conversation_manager, FakeOccupationSimilaritySearchService())
+    # The Search Services for this test
+    search_services = setup_search_services
+
+    agent_director = SimpleAgentDirector(conversation_manager, search_services)
     agent_director.set_state(AgentDirectorState(session_id))
     explore_experiences_agent = agent_director.get_explore_experiences_agent()
     explore_experiences_agent.set_state(ExploreExperiencesAgentDirectorState(session_id))
@@ -167,11 +169,11 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture, setup_age
         AgentState(0, AgentType.WELCOME_AGENT, False),  # Welcome Agent say hi
         AgentState(1, AgentType.WELCOME_AGENT, False),
         AgentState(2, AgentType.WELCOME_AGENT, True),  # Welcome Agent completes task
-        AgentState(3, AgentType.SKILL_EXPLORER_AGENT, False),
-        AgentState(4, AgentType.SKILL_EXPLORER_AGENT, False),
-        AgentState(5, AgentType.SKILL_EXPLORER_AGENT, False),
-        AgentState(6, AgentType.SKILL_EXPLORER_AGENT, False),
-        AgentState(7, AgentType.SKILL_EXPLORER_AGENT, True),  # Skill Agent completes task
+        AgentState(3, AgentType.COLLECT_EXPERIENCES_AGENT, False),
+        AgentState(4, AgentType.COLLECT_EXPERIENCES_AGENT, False),
+        AgentState(5, AgentType.COLLECT_EXPERIENCES_AGENT, False),
+        AgentState(6, AgentType.EXPLORE_SKILLS_AGENT, False),
+        AgentState(7, AgentType.EXPLORE_SKILLS_AGENT, True),  # Skill Agent completes task
         AgentState(8, AgentType.FAREWELL_AGENT, True)  # Farewell Agent completes task
     ]
     for i, expected_state in enumerate(expected_agent_states):

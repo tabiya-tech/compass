@@ -16,7 +16,7 @@ from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.agent_types import AgentType
 from app.conversation_memory.conversation_memory_types import \
     ConversationContext
-from app.vector_search.esco_entities import OccupationSkillEntity
+from app.vector_search.vector_search_dependencies import SearchServices
 
 logger = logging.getLogger(__name__)
 
@@ -234,9 +234,13 @@ class ExploreExperiencesAgentDirector(Agent):
 
         self._state = state
 
-    def __init__(self, *, conversation_manager: ConversationMemoryManager):
+    def __init__(self, *,
+                 conversation_manager: ConversationMemoryManager,
+                 search_services: SearchServices,
+                 ):
         super().__init__(agent_type=AgentType.EXPLORE_EXPERIENCES_AGENT,
                          is_responsible_for_conversation_history=True)
+        self._search_services = search_services
         self._conversation_manager = conversation_manager
         self._state: ExploreExperiencesAgentDirectorState | None = None
         self._collect_experiences_agent = CollectExperiencesAgent()

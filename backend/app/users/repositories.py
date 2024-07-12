@@ -1,6 +1,6 @@
 import logging
 
-from app.server_dependencies import get_mongo_db
+from app.server_dependecies.db_dependecies import get_mongo_db
 from app.constants.database import Collections
 
 from app.users.types import UserPreferences, UserPreferencesUpdateRequest

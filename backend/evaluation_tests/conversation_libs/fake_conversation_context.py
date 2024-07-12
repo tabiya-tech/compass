@@ -21,7 +21,7 @@ def _write_turn(f: TextIO, turn: ConversationTurn):
     f.write(f"**User**: {turn.input.message}\\\n")
     f.write(f"**{turn.output.agent_type}**: {turn.output.message_for_user}\\\n")
     f.write(f"**Finished**: {turn.output.finished}\\\n")
-    # Besides the sdtandard fields, we also want to write any additional fields
+    # Besides the standard fields, we also want to write any additional fields
     # from subclasses of AgentOutput
     for key, value in turn.output.dict().items():
         if key not in ["message_for_user", "finished", "agent_response_time_in_sec", "llm_stats"]:
