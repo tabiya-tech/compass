@@ -119,12 +119,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   /**
    * Logs out the user by clearing tokens and user data
    */
-  const logout = useCallback(() => {
-    // Clear the tokens and user data
-    PersistentStorageService.clear();
-    tokens.clearTokens();
-    updateUser(null);
-  }, [updateUser, tokens]);
+  const logout = useCallback(
+    (successCallback: () => void, errorCallback: (error: any) => void) => {
+      const authService = AuthService.getInstance();
+      // Clear the tokens and user data
+      PersistentStorageService.clear();
+      tokens.clearTokens();
+      updateUser(null);
+      authService.handleLogout(successCallback, errorCallback);
+    },
+    [updateUser, tokens]
+  );
 
   /**
    * Registers the user with an email and password
@@ -139,25 +144,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     ) => {
       const authService = AuthService.getInstance();
       setIsRegistering(true);
-      authService.handleRegister(
-        email,
-        password,
-        name,
-        (_response: TFirebaseTokenResponse) => {
-          // since the registration will log the user out and prompt them to verify their email,
-          // we don't need to update the user state
+      authService
+        .handleRegister(
+          email,
+          password,
+          name,
+          () => {
+            // since the registration will log the user out and prompt them to verify their email,
+            // we don't need to update the user state
+            setIsRegistering(false);
+            successCallback();
+          },
+          (error) => {
+            console.error(error);
+            setIsRegistering(false);
+            errorCallback(error);
+          }
+        )
+        .finally(() => {
+          // we don't need to update the user state or tokens
           setIsRegistering(false);
-          successCallback();
-        },
-        (error) => {
-          console.error(error);
-          setIsRegistering(false);
-          errorCallback(error);
-        }
-      ).finally(() => {
-        // we don't need to update the user state or tokens
-        setIsRegistering(false);
-      });
+        });
     },
     []
   );

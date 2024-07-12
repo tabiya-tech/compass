@@ -99,30 +99,28 @@ describe("render tests", () => {
 
 describe("test Chat Initialization", () => {
   test("should initialize chat on mount", async () => {
-    mockGetChatHistory.mockResolvedValueOnce(
-      [
-        {
-            message: "",
-            sent_at: new Date().toISOString(),
-            sender: ConversationMessageSender.USER,
-        },
-        {
-            message: "Hello, I'm Compass",
-            sent_at: new Date().toISOString(),
-            sender: ConversationMessageSender.COMPASS,
-        },
-        {
-            message: "Hi, Compass, I'm foo",
-            sent_at: new Date().toISOString(),
-            sender: ConversationMessageSender.USER,
-        },
-        {
-            message: "Hello foo, would you like to begin your skill exploration session?",
-            sent_at: new Date().toISOString(),
-            sender: ConversationMessageSender.COMPASS,
-        },
-      ],
-    );
+    mockGetChatHistory.mockResolvedValueOnce([
+      {
+        message: "",
+        sent_at: new Date().toISOString(),
+        sender: ConversationMessageSender.USER,
+      },
+      {
+        message: "Hello, I'm Compass",
+        sent_at: new Date().toISOString(),
+        sender: ConversationMessageSender.COMPASS,
+      },
+      {
+        message: "Hi, Compass, I'm foo",
+        sent_at: new Date().toISOString(),
+        sender: ConversationMessageSender.USER,
+      },
+      {
+        message: "Hello foo, would you like to begin your skill exploration session?",
+        sent_at: new Date().toISOString(),
+        sender: ConversationMessageSender.COMPASS,
+      },
+    ]);
     // GIVEN a chat component
     // WHEN the chat is rendered with a router
     render(
@@ -140,7 +138,8 @@ describe("test Chat Initialization", () => {
 
     // AND the ChatList component to be called with the history returned to the initialization
     await waitFor(() => {
-      expect(ChatList).toHaveBeenNthCalledWith(3,
+      expect(ChatList).toHaveBeenNthCalledWith(
+        3,
         expect.objectContaining({
           messages: [
             {
@@ -218,12 +217,12 @@ describe("test Chat Initialization", () => {
 
 describe("test send message", () => {
   test("should send a message", async () => {
-    mockSendMessage.mockResolvedValueOnce(
-       [{
-         message: "Hello, I'm Compass",
-         sent_at: new Date().toISOString(),
-       }],
-    );
+    mockSendMessage.mockResolvedValueOnce([
+      {
+        message: "Hello, I'm Compass",
+        sent_at: new Date().toISOString(),
+      },
+    ]);
 
     // GIVEN a chat component
     // WHEN a user sends a message with a router
@@ -314,7 +313,7 @@ describe("test send message", () => {
             {
               id: expect.any(Number),
               sender: ConversationMessageSender.COMPASS,
-              message: "I'm sorry, I'm having trouble connecting to the server. Please try again later.",
+              message: "I'm sorry, Something seems to have gone wrong. Try logging in again.",
               sent_at: expect.any(String),
             },
           ]),

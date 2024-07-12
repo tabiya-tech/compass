@@ -54,6 +54,11 @@ exports[`ChatHeader should render the Chat Header 1`] = `
     >
       settings
     </div>
+    <div
+      data-testid="logout-button-7413b63a-887b-4f41-b930-89e9770db12b"
+    >
+      logout
+    </div>
     ;
   </div>
 </div>

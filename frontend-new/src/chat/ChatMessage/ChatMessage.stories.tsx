@@ -85,7 +85,7 @@ export const ShownWithDifferentTimestamps: Story = {
         chatMessage={{
           id: 2,
           sender: ConversationMessageSender.USER,
-          sent_at: new Date( Date.now() - 1000 * 60 * 60 ).toISOString(),
+          sent_at: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
           message: "sent an hour ago",
         }}
         isTyping={false}
@@ -94,7 +94,7 @@ export const ShownWithDifferentTimestamps: Story = {
         chatMessage={{
           id: 3,
           sender: ConversationMessageSender.USER,
-          sent_at: new Date( Date.now() - 1000 * 60 * 60 * 24 ).toISOString(),
+          sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
           message: "sent yesterday",
         }}
         isTyping={false}
@@ -103,24 +103,25 @@ export const ShownWithDifferentTimestamps: Story = {
         chatMessage={{
           id: 4,
           sender: ConversationMessageSender.USER,
-          sent_at: new Date( Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
+          sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
           message: "sent two days ago",
         }}
         isTyping={false}
       />
-      <ChatMessage chatMessage={
-        {
-          id: 5,
-          sender: ConversationMessageSender.USER,
-          sent_at: new Date( Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(),
-          message: "sent a week ago",
-        }
-      } isTyping={false} />
       <ChatMessage
         chatMessage={{
           id: 5,
           sender: ConversationMessageSender.USER,
-          sent_at: new Date( Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(),
+          sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(),
+          message: "sent a week ago",
+        }}
+        isTyping={false}
+      />
+      <ChatMessage
+        chatMessage={{
+          id: 5,
+          sender: ConversationMessageSender.USER,
+          sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(),
           message: "sent a month ago",
         }}
         isTyping={false}
@@ -129,7 +130,7 @@ export const ShownWithDifferentTimestamps: Story = {
         chatMessage={{
           id: 6,
           sender: ConversationMessageSender.USER,
-          sent_at: new Date( Date.now() - 1000 * 60 * 60 * 24 * 30 * 12).toISOString(),
+          sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30 * 12).toISOString(),
           message: "sent a year ago",
         }}
         isTyping={false}
