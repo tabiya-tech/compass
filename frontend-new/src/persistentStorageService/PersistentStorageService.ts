@@ -1,4 +1,4 @@
-export const ID_TOKEN_KEY = "IDToken";
+export const ACCESS_TOKEN_KEY = "access_token";
 export const CHAT_SESSION_ID_KEY = "ChatSessionID";
 
 /**
@@ -9,26 +9,26 @@ export class PersistentStorageService {
   static readonly storage = sessionStorage;
 
   /**
-   * Returns the ID token from the storage
-   * @returns string | null - The ID token
+   * Returns the access token from the storage
+   * @returns string | null - The access token
    */
-  static getIDToken(): string | null {
-    return this.storage.getItem(ID_TOKEN_KEY);
+  static getAccessToken(): string | null {
+    return this.storage.getItem(ACCESS_TOKEN_KEY);
   }
 
   /**
-   * Clears the ID token from the storage
+   * Clears the Access token from the storage
    */
-  static clearIDToken(): void {
-    this.storage.removeItem(ID_TOKEN_KEY);
+  static clearAccessToken(): void {
+    this.storage.removeItem(ACCESS_TOKEN_KEY);
   }
 
   /**
-   * Sets the ID token in the storage
-   * @param IDToken
+   * Sets the Access token in the storage
+   * @param accessToken
    */
-  static setIDToken(IDToken: string): void {
-    this.storage.setItem(ID_TOKEN_KEY, IDToken);
+  static setAccessToken(accessToken: string): void {
+    this.storage.setItem(ACCESS_TOKEN_KEY, accessToken);
   }
 
   /**

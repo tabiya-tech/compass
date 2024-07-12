@@ -72,7 +72,8 @@ const IDPAuth = () => {
             name: data.user.displayName,
             email: data.user.email,
           };
-          tokens.setIDToken(data.credential.idToken as string);
+          console.log({ data })
+          tokens.setAccessToken(data?.user?.multiFactor?.user?.accessToken as string);
           checkUserPreferences(newUser).then(() => {
             setLoading(false);
           });

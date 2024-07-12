@@ -9,52 +9,52 @@ describe("AuthPersistentStorage class tests", () => {
     PersistentStorageService.clear();
   });
 
-  describe("ID token tests", () => {
-    test("return correct previously set token ID token", () => {
-      // GIVEN The ID token is stored in the session storage
+  describe("Access token tests", () => {
+    test("return correct previously set token Access token", () => {
+      // GIVEN The Access token is stored in the session storage
       const givenIDToken = "foo";
-      PersistentStorageService.setIDToken(givenIDToken);
+      PersistentStorageService.setAccessToken(givenIDToken);
 
-      // WHEN The ID token is retrieved
-      const IDToken = PersistentStorageService.getIDToken();
+      // WHEN The Access token is retrieved
+      const IDToken = PersistentStorageService.getAccessToken();
 
-      // THEN The ID token should be returned
+      // THEN The Access token should be returned
       expect(IDToken).toEqual(givenIDToken);
     });
 
-    test("return null if ID token is not set", () => {
-      // GIVEN The ID token is not stored in the session storage
+    test("return null if Access token is not set", () => {
+      // GIVEN The Access token is not stored in the session storage
       // Nothing set
 
-      // WHEN The ID token is retrieved
-      const IDToken = PersistentStorageService.getIDToken();
+      // WHEN The Access token is retrieved
+      const IDToken = PersistentStorageService.getAccessToken();
 
       // THEN null should be returned
       expect(IDToken).toBeNull();
     });
 
-    test("clear ID token", () => {
-      // GIVEN The ID token is stored in the session storage
+    test("clear Access token", () => {
+      // GIVEN The Access token is stored in the session storage
       const givenIDToken = "foo";
-      PersistentStorageService.setIDToken(givenIDToken);
+      PersistentStorageService.setAccessToken(givenIDToken);
 
-      // WHEN The ID token is cleared
-      PersistentStorageService.clearIDToken();
+      // WHEN The Access token is cleared
+      PersistentStorageService.clearAccessToken();
 
-      // THEN The ID token should be cleared (null)
-      const IDToken = PersistentStorageService.getIDToken();
+      // THEN The Access token should be cleared (null)
+      const IDToken = PersistentStorageService.getAccessToken();
       expect(IDToken).toBeNull();
     });
 
-    test("set ID token", () => {
-      // GIVEN The ID token is not stored in the session storage
+    test("set Access token", () => {
+      // GIVEN The Access token is not stored in the session storage
       const givenIDToken = "foo";
 
-      // WHEN The ID token is set
-      PersistentStorageService.setIDToken(givenIDToken);
+      // WHEN The Access token is set
+      PersistentStorageService.setAccessToken(givenIDToken);
 
-      // THEN The ID token should be stored
-      const IDToken = PersistentStorageService.getIDToken();
+      // THEN The Access token should be stored
+      const IDToken = PersistentStorageService.getAccessToken();
       expect(IDToken).toEqual(givenIDToken);
     });
   });
@@ -110,15 +110,15 @@ describe("AuthPersistentStorage class tests", () => {
   });
 
   test("clear all tokens", () => {
-    // GIVEN The ID token is stored in the session storage
+    // GIVEN The Access token is stored in the session storage
     const givenID = "foo";
-    PersistentStorageService.setIDToken(givenID);
+    PersistentStorageService.setAccessToken(givenID);
 
-    // WHEN The ID token is cleared
+    // WHEN The Access token is cleared
     PersistentStorageService.clear();
 
-    // THEN The ID token should be cleared (null)
-    const IDToken = PersistentStorageService.getIDToken();
+    // THEN The Access token should be cleared (null)
+    const IDToken = PersistentStorageService.getAccessToken();
     expect(IDToken).toBeNull();
   });
 });

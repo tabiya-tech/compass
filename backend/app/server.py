@@ -9,12 +9,13 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Request, HTTPException, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi.security import HTTPBearer
 
 from app.agent.agent_types import AgentInput
 from app.agent.llm_agent_director import LLMAgentDirector
 from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
+from app.users.auth import Authentication
+from app.conversation_memory.conversation_memory_manager import ConversationContext, ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
 from app.server_dependencies import get_conversation_memory_manager, initialize_mongo_db
 from app.chat.chat_types import ConversationMessage
@@ -100,15 +101,9 @@ if not os.getenv("DATABASE_NAME"):
     raise ValueError("Mandatory DATABASE_NAME environment variable is not set")
 
 ############################################
-# Security Definitions
+# Initiate the Authentication Module for the FastAPI app
 ############################################
-# Used for adding the security definitions for OpenAPI docs
-# auto_error=False means an error won't be thrown if the "Authorization: Bearer"
-# header is missing. It should be set to True when the APIs will be used from
-# the UI and the API Gateway is running in front of this service.
-http_bearer = HTTPBearer(auto_error=False, scheme_name="JWT_auth")
-firebase = HTTPBearer(scheme_name="firebase")
-google = HTTPBearer(scheme_name="google")
+auth = Authentication()
 
 ############################################
 # Add version routes
@@ -151,8 +146,7 @@ def get_agent_director(conversation_manager: ConversationMemoryManager = Depends
 async def conversation(request: Request, user_input: str, clear_memory: bool = False, filter_pii: bool = False,
                        session_id: int = 1,
                        conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager),
-                       agent_director: LLMAgentDirector = Depends(get_agent_director),
-                       authorization=Depends(http_bearer)):
+                       agent_director: LLMAgentDirector = Depends(get_agent_director)):
     """
     Endpoint for conducting the conversation with the agent.
     """
@@ -208,8 +202,7 @@ async def conversation(request: Request, user_input: str, clear_memory: bool = F
          description="""Endpoint for retrieving the conversation history.""")
 async def get_conversation_history(
     session_id: Annotated[int, Query(description="The session id for the conversation history.")],
-    conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager),
-    authorization=Depends(http_bearer)
+    conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager)
 ):
     """
     Endpoint for retrieving the conversation history.
@@ -230,8 +223,7 @@ async def _test_conversation(request: Request, user_input: str, clear_memory: bo
                              session_id: int = 1, only_reply: bool = False,
                              similarity_search: SimilaritySearchService = Depends(get_occupation_skill_search_service),
                              conversation_memory_manager: ConversationMemoryManager = Depends(
-                                 get_conversation_memory_manager),
-                             authorization=Depends(http_bearer)):
+                                 get_conversation_memory_manager)):
     """
     As a developer, you can use this endpoint to test the conversation agent with any user input.
     You can adjust the front-end to use this endpoint for testing locally an agent in a configurable way.
@@ -300,7 +292,7 @@ async def _test_conversation(request: Request, user_input: str, clear_memory: bo
 async def get_conversation_context(
         session_id: int,
         conversation_memory_manager: ConversationMemoryManager = Depends(
-            get_conversation_memory_manager), authorization=Depends(http_bearer)):
+            get_conversation_memory_manager)):
     """
     Get the conversation context of a user.
     """
@@ -321,15 +313,16 @@ async def get_conversation_context(
 @app.get(path="/authinfo",
          description="Returns the authentication info (JWT token claims)")
 async def _get_auth_info(request: Request,
-                         firebase_auth=Depends(firebase),
-                         googl_auth=Depends(google)):
+                         credentials=Depends(auth.provider)):
     auth_info_b64 = request.headers.get('x-apigateway-api-userinfo')
     # some python magic
     auth_info = base64.b64decode(auth_info_b64.encode() + b'==').decode()
     return JSONResponse(auth_info)
 
-
-add_users_routes(app)
+############################################
+# Add routes relevant for the user management
+############################################
+add_users_routes(app, auth)
 
 if __name__ == "__main__":
     import uvicorn

@@ -36,14 +36,14 @@ describe("AuthService class tests", () => {
     const givenPassword = "password";
     const givenUser = { email: givenEmail, userId: "123" };
     const givenTokenResponse = {
-      id_token: "foo",
+      access_token: "foo",
       expires_in: 3600,
     };
 
     test("should call successCallback with user data on successful login for a user with a verified email", async () => {
       // GIVEN the login credentials are correct
       const mockUser = {
-        getIdToken: jest.fn().mockResolvedValue(givenTokenResponse.id_token),
+        getIdToken: jest.fn().mockResolvedValue(givenTokenResponse.access_token),
         emailVerified: true,
       } as Partial<firebase.User>;
       jest.spyOn(firebase.auth(), "signInWithEmailAndPassword").mockResolvedValue({
@@ -86,7 +86,7 @@ describe("AuthService class tests", () => {
     test("should throw an error when the email is not verified", async () => {
       // GIVEN the login credentials are correct but the email is not verified
       const mockUser = {
-        getIdToken: jest.fn().mockResolvedValue(givenTokenResponse.id_token),
+        getIdToken: jest.fn().mockResolvedValue(givenTokenResponse.access_token),
         emailVerified: false,
       } as Partial<firebase.User>;
       jest.spyOn(firebase.auth(), "signInWithEmailAndPassword").mockResolvedValue({
@@ -173,14 +173,14 @@ describe("AuthService class tests", () => {
     const givenName = "foo";
     const givenUser = { email: givenEmail, userId: "123" };
     const givenTokenResponse = {
-      id_token: "foo",
+      access_token: "foo",
       expires_in: 3600,
     };
 
     test("should call successCallback with user data on successful registration", async () => {
       // GIVEN the registration credentials are correct
       const mockUser = {
-        getIdToken: jest.fn().mockResolvedValue(givenTokenResponse.id_token),
+        getIdToken: jest.fn().mockResolvedValue(givenTokenResponse.access_token),
         updateProfile: jest.fn(),
         sendEmailVerification: jest.fn(),
       } as Partial<firebase.User>;
@@ -233,8 +233,8 @@ describe("AuthService class tests", () => {
       // WHEN the registration is attempted
       await authService.handleRegister(givenEmail, givenPassword, givenName, successCallback, errorCallback);
       // THEN the error callback should be called with Failed to Fetch
-      await expect(errorCallback).toHaveBeenCalledWith(
-        new Error("There is no user record corresponding to this email.")
+      expect(errorCallback).toHaveBeenCalledWith(
+          new Error("There is no user record corresponding to this email.")
       );
     });
   });
