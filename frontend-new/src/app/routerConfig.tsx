@@ -6,11 +6,16 @@ import Register from "src/auth/components/Register/Register";
 import Login from "src/auth/components/Login/Login";
 import DataProtectionAgreement from "src/auth/components/PolicyNotice/DataProtectionPolicy";
 import VerifyEmail from "src/auth/components/VerifyEmail/VerifyEmail";
+import ProtectedRoute from "src/auth/components/ProtectedRoute/ProtectedRoute";
 
 const routerConfig = [
   {
     path: routerPaths.ROOT,
-    element: <Home />,
+    element: (
+      <ProtectedRoute authenticationRequired={true}>
+        <Home />
+      </ProtectedRoute>
+    ),
     errorElement: <div>Sorry, something went wrong</div>,
   },
   {
@@ -20,17 +25,29 @@ const routerConfig = [
   },
   {
     path: routerPaths.REGISTER,
-    element: <Register />,
+    element: (
+      <ProtectedRoute authenticationRequired={false}>
+        <Register />
+      </ProtectedRoute>
+    ),
     errorElement: <div>Sorry, registration could not be shown</div>,
   },
   {
     path: routerPaths.LOGIN,
-    element: <Login />,
+    element: (
+      <ProtectedRoute authenticationRequired={false}>
+        <Login />
+      </ProtectedRoute>
+    ),
     errorElement: <div>Sorry, login could not be shown</div>,
   },
   {
     path: routerPaths.DPA,
-    element: <DataProtectionAgreement />,
+    element: (
+      <ProtectedRoute authenticationRequired={true}>
+        <DataProtectionAgreement />
+      </ProtectedRoute>
+    ),
     errorElement: <div>Sorry, data protection policy could not be shown</div>,
   },
   {

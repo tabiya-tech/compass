@@ -25,6 +25,10 @@ jest.mock("src/persistentStorageService/PersistentStorageService", () => {
 
 describe("useTokens hook tests", () => {
   beforeEach(() => {
+    // Mock the getIDToken to return a non-null value
+    // @ts-ignore
+    PersistentStorageService.getAccessToken.mockReturnValue("mock-token-value");
+
     // Mock Firebase's currentUser.getIdToken
     (firebase.auth().currentUser?.getIdToken as jest.Mock).mockResolvedValueOnce(TOKEN_VALUE);
 
