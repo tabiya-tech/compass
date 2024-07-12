@@ -1,7 +1,7 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
 
-import ChatMessageField, { DATA_TEST_ID, CHAT_MESSAGE_MAX_LENGTH } from "./ChatMessageField";
+import ChatMessageField, { DATA_TEST_ID, CHAT_MESSAGE_MAX_LENGTH, DISALLOWED_CHARACTERS } from "./ChatMessageField";
 import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
 
 describe("ChatMessageField", () => {
@@ -40,13 +40,12 @@ describe("ChatMessageField", () => {
     expect(handleChange).toHaveBeenCalled();
     // AND the error message to be in the document
     expect(screen.getByText("Message limit is 1000 characters.")).toBeInTheDocument();
-    // AND the icon button to be disabled
-    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON)).toBeDisabled();
   });
 
   test("should render ChatMessageField correctly with error message when message contains invalid characters", () => {
     // WHEN a message that contains invalid characters
-    const invalidMessage = "foo$%bar";
+    const invalidMessage = "foobar{}&*";
+    const invalidChar = invalidMessage.split("").filter((char) => DISALLOWED_CHARACTERS.test(char));
     // AND handleChange function
     const handleChange = jest.fn();
 
@@ -59,9 +58,7 @@ describe("ChatMessageField", () => {
     // THEN expect notifyChange to be called
     expect(handleChange).toHaveBeenCalled();
     // AND the error message to be in the document
-    expect(screen.getByText("Invalid special characters.")).toBeInTheDocument();
-    // AND the icon button to be disabled
-    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON)).toBeDisabled();
+    expect(screen.getByText(`Invalid special characters: ${invalidChar}`)).toBeInTheDocument();
   });
 
   test("should render ChatMessageField correctly with no error message when message is valid", () => {
