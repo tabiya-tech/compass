@@ -41,6 +41,7 @@ export const DATA_TEST_ID = {
 const Login: React.FC = () => {
   const theme = useTheme();
   const { login, isLoggingIn } = useContext(AuthContext);
+  const [ isCheckingPreferences, setIsCheckingPreferences ] = useState(false);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -54,26 +55,31 @@ const Login: React.FC = () => {
    */
   const checkUserPreferences = useCallback(
     async (user: TabiyaUser): Promise<void> => {
+      if (isCheckingPreferences) return;
       const userPreferencesService = new UserPreferencesService();
       try {
+        setIsCheckingPreferences(true);
         const userPreferences = await userPreferencesService.getUserPreferences(user.id);
         const acceptedTcDate = new Date(userPreferences.accepted_tc);
         // If the accepted_tc is not set or is not a valid date, redirect to the DPA page
         // this is to ensure that even if the accepted_tc is manipulated in the database, the user will be redirected to the DPA page
         // and will have to accept the terms and conditions again
         if (!userPreferences.accepted_tc || isNaN(acceptedTcDate.getTime())) {
+          setIsCheckingPreferences(false)
           navigate(routerPaths.DPA, { replace: true });
         } else {
+          setIsCheckingPreferences(false)
           navigate(routerPaths.ROOT, { replace: true });
           enqueueSnackbar("Welcome back!", { variant: "success" });
         }
       } catch (e) {
+        setIsCheckingPreferences(false)
         const errorMessage = getUserFriendlyErrorMessage(e as Error);
         enqueueSnackbar(errorMessage, { variant: "error" });
         console.error("Failed to fetch user preferences", e);
       }
     },
-    [navigate, enqueueSnackbar]
+    [navigate, enqueueSnackbar, isCheckingPreferences]
   );
 
   /**
@@ -138,7 +144,7 @@ const Login: React.FC = () => {
             type="email"
             variant="outlined"
             margin="normal"
-            disabled={isLoggingIn}
+            disabled={isLoggingIn || isCheckingPreferences}
             required
             onChange={(e) => setEmail(e.target.value)}
             inputProps={{ "data-testid": DATA_TEST_ID.EMAIL_INPUT }}
@@ -148,7 +154,7 @@ const Login: React.FC = () => {
             label="Password"
             type="password"
             variant="outlined"
-            disabled={isLoggingIn}
+            disabled={isLoggingIn || isCheckingPreferences}
             margin="normal"
             required
             onChange={(e) => setPassword(e.target.value)}
@@ -160,10 +166,10 @@ const Login: React.FC = () => {
             color="primary"
             style={{ marginTop: 16 }}
             type="submit"
-            disabled={isLoggingIn}
+            disabled={isLoggingIn || isCheckingPreferences}
             data-testid={DATA_TEST_ID.LOGIN_BUTTON}
           >
-            {isLoggingIn ? (
+            {isLoggingIn || isCheckingPreferences ? (
               <CircularProgress
                 color={"secondary"}
                 data-testid={DATA_TEST_ID.LOGIN_BUTTON_CIRCULAR_PROGRESS}
