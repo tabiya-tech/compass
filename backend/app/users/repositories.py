@@ -1,7 +1,12 @@
+import logging
+
 from app.server_dependencies import get_mongo_db
 from app.constants.database import Collections
 
 from app.users.types import UserPreferences, UserPreferencesUpdateRequest
+
+
+logger = logging.getLogger(__name__)
 
 
 class UserPreferenceRepository:
@@ -17,20 +22,21 @@ class UserPreferenceRepository:
         :return: UserPreferences | None
             The user preferences if found, else None
         """
-        _doc = await self.collection.find_one({"user_id": {"$eq": user_id}})
-
-        if not _doc:
-            return None
-
         try:
-            return UserPreferences(**_doc) if _doc else None
-        except ValueError as e:
-            print(e)
+            _doc = await self.collection.find_one({"user_id": {"$eq": user_id}})
+
+            if not _doc:
+                return None
+
             return UserPreferences(
-                language=_doc.get("language") | "en",
-                accepted_tc=_doc.get("accepted_tc") | None,
-                sessions=_doc.get("sessions") | []
+                language=_doc.get("language"),
+                accepted_tc=_doc.get("accepted_tc"),
+                sessions=_doc.get("sessions"),
             )
+
+        except Exception as e:
+            logger.exception(e)
+            raise Exception("Failed to get user preferences")
 
     async def insert_user_preference(self, user_id: str, user_preference: UserPreferences) -> UserPreferences:
         """
@@ -40,11 +46,15 @@ class UserPreferenceRepository:
         :return: UserPreferences
             The inserted user preferences
         """
-        payload = user_preference.dict()
-        payload["user_id"] = user_id
+        try:
+            payload = user_preference.dict()
+            payload["user_id"] = user_id
 
-        _doc = await self.collection.insert_one(payload)
-        return await self.get_user_preference_by_user_id(user_id=user_id)
+            _doc = await self.collection.insert_one(payload)
+            return await self.get_user_preference_by_user_id(user_id=user_id)
+        except Exception as e:
+            logger.exception(e)
+            raise e
 
     async def update_user_preference(self, user_id: str, update: UserPreferencesUpdateRequest) -> UserPreferences:
         """
@@ -55,7 +65,11 @@ class UserPreferenceRepository:
             The updated user preferences
         :raises ValueError: if the user is not found - update failed
         """
-        payload = update.dict(exclude_none=True)
-        _doc = await self.collection.update_one({"user_id": {"$eq": user_id}}, {"$set": payload})
+        try:
+            payload = update.dict(exclude_none=True)
+            _doc = await self.collection.update_one({"user_id": {"$eq": user_id}}, {"$set": payload})
 
-        return await self.get_user_preference_by_user_id(user_id=user_id)
+            return await self.get_user_preference_by_user_id(user_id=user_id)
+        except Exception as e:
+            logger.exception(e)
+            raise e

@@ -125,7 +125,10 @@ describe("IDPAuth tests", () => {
       (firebaseui.auth.AuthUI as unknown as jest.Mock).mockImplementation(() => ({
         start: (elementId: string, config: any) => {
           config.callbacks.signInSuccessWithAuthResult({
-            user: { id: "mock-id" },
+            user: {
+              id: "mock-id",
+              multiFactor: { user: { accessToken: "mock-access-token" } }
+            },
             credential: {
               idToken: "mock-id-token",
             },
@@ -164,7 +167,10 @@ describe("IDPAuth tests", () => {
     (firebaseui.auth.AuthUI as unknown as jest.Mock).mockImplementation(() => ({
       start: (elementId: string, config: any) => {
         config.callbacks.signInSuccessWithAuthResult({
-          user: { id: "mock-id" },
+          user: {
+            id: "mock-id",
+            multiFactor: { user: { accessToken: "mock-access-token" } }
+          },
           credential: {
             idToken: "mock-id-token",
           },

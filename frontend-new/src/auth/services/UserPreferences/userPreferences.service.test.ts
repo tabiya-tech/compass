@@ -4,10 +4,12 @@ import "src/_test_utilities/consoleMock";
 import UserPreferencesService from "./userPreferences.service";
 import { StatusCodes } from "http-status-codes";
 import { ServiceError } from "src/error/error";
-import { setupFetchSpy } from "src/_test_utilities/fetchSpy";
+import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 import ErrorConstants from "src/error/error.constants";
 import { Language, UserPreference } from "./userPreferences.types";
 import { PersistentStorageService } from "src/persistentStorageService/PersistentStorageService";
+
+const setupFetchSpy = setupAPIServiceSpy;
 
 // mock the persistent storage service
 jest.mock("src/persistentStorageService/PersistentStorageService", () => {
@@ -64,6 +66,10 @@ describe("UserPreferencesService", () => {
           headers: {
             "Content-Type": "application/json",
           },
+          expectedStatusCode: [200, 404],
+          failureMessage: `Failed to get user preferences for user with id ${givenResponseBody.user_id}`,
+          serviceFunction: "getUserPreferences",
+          serviceName: "UserPreferencesService",
         }
       );
 
@@ -89,7 +95,7 @@ describe("UserPreferencesService", () => {
     test("on fail to fetch, getUserPreferences should reject with the expected service error", async () => {
       // GIVEN fetch rejects with some unknown error
       const givenFetchError = new Error();
-      jest.spyOn(window, "fetch").mockRejectedValue(givenFetchError);
+      jest.spyOn(require("src/apiService/APIService"), "fetchWithAuth").mockRejectedValue(givenFetchError);
 
       // WHEN calling getUserPreferences function with some user id
       const service = new UserPreferencesService();
@@ -174,6 +180,10 @@ describe("UserPreferencesService", () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(givenUserPreferencesSpec),
+        expectedStatusCode: [201, 404],
+        failureMessage: `Failed to create new user preferences for user with id ${givenUserPreferencesSpec.user_id}`,
+        serviceName: "UserPreferencesService",
+        serviceFunction: "createUserPreferences",
       });
 
       // AND returns the newly created user preferences
@@ -194,7 +204,7 @@ describe("UserPreferencesService", () => {
       };
       // GIVEN fetch rejects with some unknown error
       const givenFetchError = new Error();
-      jest.spyOn(window, "fetch").mockRejectedValue(givenFetchError);
+      jest.spyOn(require("src/apiService/APIService"), "fetchWithAuth").mockRejectedValue(givenFetchError);
       // WHEN calling create model function
       const service = new UserPreferencesService();
 

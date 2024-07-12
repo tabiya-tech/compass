@@ -55,7 +55,7 @@ export type AuthContextValue = {
  */
 export type TFirebaseTokenResponse = {
   expires_in: number;
-  id_token: string;
+  access_token: string;
 };
 
 /**

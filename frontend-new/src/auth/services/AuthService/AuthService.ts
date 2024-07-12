@@ -59,8 +59,9 @@ export class AuthService {
         );
         return;
       }
+
       const data = {
-        id_token: await userCredential.user.getIdToken(),
+        access_token: await userCredential.user.getIdToken(),
         expires_in: 3600,
       };
       successCallback(data);
@@ -146,7 +147,7 @@ export class AuthService {
       await userCredential.user.sendEmailVerification();
       await auth.signOut();
       const data = {
-        id_token: await userCredential.user.getIdToken(),
+        access_token: await userCredential.user.getIdToken(),
         expires_in: 3600,
       };
       successCallback(data);

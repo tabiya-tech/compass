@@ -68,7 +68,7 @@ describe("AuthProvider module", () => {
   });
 
   describe("Logout functionality", () => {
-    test("it should clear the id token when the logout function is called", async () => {
+    test("it should clear the access token when the logout function is called", async () => {
       const clearTokens = jest.fn();
 
       (useTokensHook.useTokens as jest.Mock).mockReturnValue({ clearTokens });
@@ -76,14 +76,14 @@ describe("AuthProvider module", () => {
       // GIVEN the Auth Provider is rendered and auth context is accessed
       const { result } = renderAuthContext();
 
-      // AND the id token is set
-      PersistentStorageService.setIDToken("foo");
+      // AND the access token is set
+      PersistentStorageService.setAccessToken("foo");
 
       // WHEN the logout function is called
       act(() => result.current?.logout());
 
-      // THEN the id token should be cleared
-      expect(PersistentStorageService.getIDToken()).toBeNull();
+      // THEN the access token should be cleared
+      expect(PersistentStorageService.getAccessToken()).toBeNull();
 
       // AND the clear function should be called
       expect(clear).toHaveBeenCalled();

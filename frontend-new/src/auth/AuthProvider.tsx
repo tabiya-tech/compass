@@ -47,7 +47,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
    */
   const handlePageLoad = useCallback(
     (successCallback: (user: TabiyaUser) => void, errorCallback: (error: any) => void) => {
-      const accessToken = PersistentStorageService.getIDToken();
+      const accessToken = PersistentStorageService.getAccessToken();
       if (accessToken) {
         // If an access token exists, update the user state
         updateUserByIDToken(accessToken);
@@ -83,9 +83,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           email,
           password,
           (response: TFirebaseTokenResponse) => {
+            updateUserByIDToken(response.access_token);
+            PersistentStorageService.setAccessToken(response.access_token);
             // Update the user state
-            updateUserByIDToken(response.id_token);
-            const decodedUser: FirebaseIDToken = jwtDecode(response.id_token);
+            updateUserByIDToken(response.access_token);
+
+            const decodedUser: FirebaseIDToken = jwtDecode(response.access_token);
             const newUser: TabiyaUser = {
               id: decodedUser.user_id,
               name: decodedUser.name,
@@ -102,8 +105,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         )
         .then((data: TFirebaseTokenResponse | undefined) => {
           if (!data) return;
-          // Set the ID token in the tokens context once the login is complete
-          tokens.setIDToken(data.id_token);
+          // Set the access token in the tokens context once the login is complete
+          tokens.setAccessToken(data.access_token);
         })
         .finally(() => {
           // Once the login is complete, set the isLoggingIn state to false
@@ -140,7 +143,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email,
         password,
         name,
-        () => {
+        (_response: TFirebaseTokenResponse) => {
           // since the registration will log the user out and prompt them to verify their email,
           // we don't need to update the user state
           setIsRegistering(false);
