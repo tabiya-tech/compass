@@ -65,7 +65,7 @@ const Register: React.FC = () => {
         email,
         password,
         name,
-        (user) => {
+        () => {
           navigate(routerPaths.VERIFY_EMAIL, { replace: true });
           enqueueSnackbar("Verification Email Sent!", { variant: "success" });
         },

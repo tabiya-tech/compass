@@ -44,7 +44,7 @@ export type AuthContextValue = {
     email: string,
     password: string,
     name: string,
-    successCallback: (user: TabiyaUser) => void,
+    successCallback: () => void,
     errorCallback: (error: Error) => void
   ) => void;
   handlePageLoad: (successCallback: (user: TabiyaUser) => void, errorCallback: (error: Error) => void) => void;

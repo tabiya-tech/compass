@@ -13,6 +13,7 @@ import { PersistentStorageService } from "src/persistentStorageService/Persisten
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import { jwtDecode } from "jwt-decode";
 
+// Default values for AuthContext
 export const authContextDefaultValue: AuthContextValue = {
   user: null,
   isLoggingIn: false,
@@ -24,27 +25,31 @@ export const authContextDefaultValue: AuthContextValue = {
 };
 
 /**
- * AuthContext that provides the user, login, logout and hasRole functions
+ * AuthContext that provides the user, login, logout, and hasRole functions
  */
 export const AuthContext = createContext<AuthContextValue>(authContextDefaultValue);
 
 /**
  * AuthProvider component that provides the AuthContext to the application
- * @param children
+ * @param children - the child components that will have access to AuthContext
  * @constructor
  */
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { user, updateUser, updateUserByIDToken } = useAuthUser();
-  const tokens = useTokens({ updateUserByIDToken: updateUserByIDToken });
+  const tokens = useTokens({ updateUserByIDToken });
 
   // State to track if the user is logging in/registering
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
 
+  /**
+   * Handles page load to check and set the user if an access token exists
+   */
   const handlePageLoad = useCallback(
     (successCallback: (user: TabiyaUser) => void, errorCallback: (error: any) => void) => {
       const accessToken = PersistentStorageService.getIDToken();
       if (accessToken) {
+        // If an access token exists, update the user state
         updateUserByIDToken(accessToken);
         const decodedUser: FirebaseIDToken = jwtDecode(accessToken);
         const newUser: TabiyaUser = {
@@ -52,6 +57,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           name: decodedUser.name,
           email: decodedUser.email,
         };
+        // Call the success callback with the new user
         successCallback(newUser);
       } else {
         errorCallback("No access token");
@@ -77,6 +83,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           email,
           password,
           (response: TFirebaseTokenResponse) => {
+            // Update the user state
             updateUserByIDToken(response.id_token);
             const decodedUser: FirebaseIDToken = jwtDecode(response.id_token);
             const newUser: TabiyaUser = {
@@ -84,6 +91,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               name: decodedUser.name,
               email: decodedUser.email,
             };
+            // Call the success callback with the new user
             successCallback(newUser);
           },
           (error) => {
@@ -93,11 +101,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }
         )
         .then((data: TFirebaseTokenResponse | undefined) => {
-          setIsLoggingIn(false);
           if (!data) return;
+          // Set the ID token in the tokens context once the login is complete
           tokens.setIDToken(data.id_token);
         })
-        .catch((e) => {
+        .finally(() => {
+          // Once the login is complete, set the isLoggingIn state to false
           setIsLoggingIn(false);
         });
     },
@@ -105,10 +114,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 
   /**
-   * clears the refresh token and open the logout url
-   * @returns void
+   * Logs out the user by clearing tokens and user data
    */
   const logout = useCallback(() => {
+    // Clear the tokens and user data
     PersistentStorageService.clear();
     tokens.clearTokens();
     updateUser(null);
@@ -122,7 +131,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       email: string,
       password: string,
       name: string,
-      successCallback: (user: TabiyaUser) => void,
+      successCallback: () => void,
       errorCallback: (error: any) => void
     ) => {
       const authService = AuthService.getInstance();
@@ -131,27 +140,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email,
         password,
         name,
-        (response: TFirebaseTokenResponse) => {
-          updateUserByIDToken(response.id_token);
+        () => {
+          // since the registration will log the user out and prompt them to verify their email,
+          // we don't need to update the user state
           setIsRegistering(false);
-          const decodedUser: FirebaseIDToken = jwtDecode(response.id_token);
-          const newUser: TabiyaUser = {
-            id: decodedUser.user_id,
-            name: decodedUser.name,
-            email: decodedUser.email,
-          };
-          successCallback(newUser);
+          successCallback();
         },
         (error) => {
           console.error(error);
           setIsRegistering(false);
           errorCallback(error);
         }
-      );
+      ).finally(() => {
+        // we don't need to update the user state or tokens
+        setIsRegistering(false);
+      });
     },
-    [updateUserByIDToken]
+    []
   );
 
+  // Memoize the context value to optimize performance
   const value = useMemo(
     () => ({
       user,
