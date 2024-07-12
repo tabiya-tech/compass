@@ -51,7 +51,7 @@ async def test_skill_explorer_agent(fake_conversation_context: FakeConversationC
     for user_input in ["I worked for a small bakery called 'Bread and Butter'.", "I cleaned the floor",
                        "I didn't do anything else.", "No, I really didn't do anything else."]:
         output = await skill_explorer_agent.execute(
-            AgentInput(message=user_input, ),
+            AgentInput(message=user_input),
             fake_conversation_context)
         fake_conversation_context.add_turn(user_input, output.message_for_user)
     assert output.finished, fake_conversation_context.model_dump_json(indent=4)

@@ -3,8 +3,8 @@ import "src/_test_utilities/consoleMock";
 
 import ChatList, { DATA_TEST_ID } from "./ChatList";
 import { render, screen } from "src/_test_utilities/test-utils";
-import { ChatMessageOrigin } from "src/chat/Chat.types";
 import ChatMessage from "src/chat/ChatMessage/ChatMessage";
+import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 
 // mock the chat message component
 jest.mock("src/chat/ChatMessage/ChatMessage", () => {
@@ -29,15 +29,15 @@ describe("ChatList", () => {
     const givenMessages = [
       {
         id: 1,
-        origin: ChatMessageOrigin.ME,
+        sender: ConversationMessageSender.USER,
         message: "Hello",
-        timestamp: Date.now(),
+        sent_at: new Date().toISOString(),
       },
       {
         id: 2,
-        origin: ChatMessageOrigin.COMPASS,
+        sender: ConversationMessageSender.COMPASS,
         message: "Hi",
-        timestamp: Date.now(),
+        sent_at: new Date().toISOString(),
       },
     ];
     const givenIsTyping = true; // Simulate typing state
@@ -72,8 +72,8 @@ describe("ChatList", () => {
         chatMessage: {
           id: -1,
           message: "Typing...",
-          origin: ChatMessageOrigin.COMPASS,
-          timestamp: expect.any(Number),
+          sender: ConversationMessageSender.COMPASS,
+          sent_at: expect.any(String),
         },
         isTyping: true,
       },

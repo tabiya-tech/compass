@@ -30,7 +30,6 @@ export const Shown: StoryObj<typeof Login> = {
   args: {},
 };
 
-
 export const LoggingIn: StoryObj<typeof Login> = {
   args: {},
   render: (props) => {
@@ -44,5 +43,5 @@ export const LoggingIn: StoryObj<typeof Login> = {
         <Login {...props} />
       </AuthContext.Provider>
     );
-  }
+  },
 };

@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from "react";
-import { ChatMessageOrigin, IChatMessage } from "src/chat/Chat.types";
+import { IChatMessage } from "src/chat/Chat.types";
 import { Box, List, ListItem } from "@mui/material";
 import { styled } from "@mui/system";
 import ChatMessage from "src/chat/ChatMessage/ChatMessage";
 import { motion, AnimatePresence } from "framer-motion";
+import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 
 const uniqueId = "0397ee51-f637-4453-9e2f-5cc8900c9554";
 export const DATA_TEST_ID = {
@@ -45,8 +46,8 @@ const ChatList: React.FC<ChatListProps> = ({ messages, isTyping }) => {
   const loadingMessage: IChatMessage = {
     id: -1,
     message: "Typing...",
-    origin: ChatMessageOrigin.COMPASS,
-    timestamp: Date.now(),
+    sender: ConversationMessageSender.COMPASS,
+    sent_at: new Date().toISOString(),
   };
 
   const messageVariants = {

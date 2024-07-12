@@ -1,5 +1,8 @@
 export function getDurationFromNow(givenDate: Date): string {
-  const duration = getSafeDate(new Date()).getTime() - getSafeDate(givenDate).getTime();
+  const now = getSafeDate(new Date());
+  const given = getSafeDate(givenDate);
+
+  const duration = now.getTime() - given.getTime();
 
   if (duration < 0) throw new Error("Invalid date range: First date must be before second date");
 
@@ -8,8 +11,7 @@ export function getDurationFromNow(givenDate: Date): string {
   const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
 
   if (days > 7) {
-    const date = getSafeDate(givenDate);
-    return `on ${date.toLocaleDateString()}`;
+    return `on ${given.toLocaleDateString("en-GB", { timeZone: "UTC" })}`;
   }
 
   const output = [];
@@ -36,8 +38,7 @@ function pluralize(value: number, unit: string): string {
   return value === 1 ? unit : `${unit}s`;
 }
 
-// We need to ensure that the date is a valid Date object before we can use it.
-// For example storybook's date input returns a string, so we need to convert it to a Date object.
+// Ensure that the date is a valid Date object before using it and parse it as UTC
 function getSafeDate(date: Date | string): Date {
-  return date instanceof Date ? date : new Date(date);
+  return date instanceof Date ? new Date(date.toISOString()) : new Date(new Date(date).toISOString());
 }

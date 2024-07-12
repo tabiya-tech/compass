@@ -1,5 +1,5 @@
 import { getServiceErrorFactory } from "src/error/error";
-import { UserPreference, UserPreferenceResponse } from "./userPreferences.types";
+import { UserPreference } from "./userPreferences.types";
 import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/error.constants";
 import { getBackendUrl } from "src/envService";
@@ -18,7 +18,7 @@ export default class UserPreferencesService {
    * Creates an entry for the user preferences of a user with an ID
    *
    */
-  public async createUserPreferences(newUserPreferencesSpec: UserPreference): Promise<UserPreferenceResponse> {
+  public async createUserPreferences(newUserPreferencesSpec: UserPreference): Promise<UserPreference> {
     const serviceName = "UserPreferencesService";
     const serviceFunction = "createUserPreferences";
     const method = "POST";
@@ -59,7 +59,7 @@ export default class UserPreferencesService {
       );
     }
 
-    let userPreferencesResponse: UserPreferenceResponse;
+    let userPreferencesResponse: UserPreference;
     try {
       userPreferencesResponse = JSON.parse(responseBody);
     } catch (e: any) {
@@ -74,14 +74,11 @@ export default class UserPreferencesService {
       );
     }
 
-    PersistentStorageService.setChatSessionID(userPreferencesResponse.user_preferences.sessions[0].toString());
+    PersistentStorageService.setChatSessionID(userPreferencesResponse.sessions[0].toString());
 
     return {
-      ...userPreferencesResponse,
-      user_preferences: {
-        ...userPreferencesResponse.user_preferences,
-        accepted_tc: new Date(userPreferencesResponse.user_preferences.accepted_tc),
-      },
+        ...userPreferencesResponse,
+        accepted_tc: new Date(userPreferencesResponse.accepted_tc),
     };
   }
 

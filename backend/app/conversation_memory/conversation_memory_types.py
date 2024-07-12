@@ -8,8 +8,11 @@ class ConversationTurn(BaseModel):
       A model for a conversation turn
     """
     index: int
+    """The index of the turn in the conversation history"""
     input: AgentInput
+    """The input from the user to the agent"""
     output: AgentOutput
+    """The output from the agent to the user"""
 
 
 class ConversationHistory(BaseModel):
