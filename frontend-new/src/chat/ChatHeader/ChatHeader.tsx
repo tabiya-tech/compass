@@ -7,6 +7,10 @@ import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 
+export type ChatHeaderProps = {
+  notifyOnLogout: () => void;
+};
+
 const uniqueId = "7413b63a-887b-4f41-b930-89e9770db12b";
 export const DATA_TEST_ID = {
   CHAT_HEADER_CONTAINER: `chat-header-container-${uniqueId}`,
@@ -18,13 +22,15 @@ export const DATA_TEST_ID = {
 
 export const MENU_ITEM_ID = {
   SETTINGS_SELECTOR: `settings-selector-${uniqueId}`,
+  LOGOUT_BUTTON: `logout-button-${uniqueId}`,
 };
 
 export const MENU_ITEM_TEXT = {
   SETTINGS: "settings",
+  LOGOUT: "logout",
 };
 
-const ChatHeader = () => {
+const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({ notifyOnLogout }) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -37,6 +43,12 @@ const ChatHeader = () => {
       action: () => {
         navigate(routerPaths.SETTINGS);
       },
+    },
+    {
+      id: MENU_ITEM_ID.LOGOUT_BUTTON,
+      text: MENU_ITEM_TEXT.LOGOUT,
+      disabled: false,
+      action: notifyOnLogout,
     },
   ];
 

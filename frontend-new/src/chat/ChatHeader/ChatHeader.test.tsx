@@ -44,9 +44,10 @@ describe("ChatHeader", () => {
 
   test("should render the Chat Header", () => {
     // GIVEN a ChatHeader component
+    const givenNotifyOnLogout = jest.fn();
     const givenChatHeader = (
       <HashRouter>
-        <ChatHeader />
+        <ChatHeader notifyOnLogout={givenNotifyOnLogout} />
       </HashRouter>
     );
 
@@ -71,13 +72,16 @@ describe("ChatHeader", () => {
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_CONTAINER)).toMatchSnapshot();
   });
   describe("chatHeader action tests", () => {
-    testNavigateToPath(<ChatHeader />, "compass logo", DATA_TEST_ID.CHAT_HEADER_LOGO_LINK, routerPaths.ROOT);
+    const givenNotifyOnLogout = jest.fn();
+    const givenChatHeader = <ChatHeader notifyOnLogout={givenNotifyOnLogout} />;
+    testNavigateToPath(givenChatHeader, "compass logo", DATA_TEST_ID.CHAT_HEADER_LOGO_LINK, routerPaths.ROOT);
 
     test("should open the context menu when the user icon is clicked", async () => {
       // GIVEN a ChatHeader component
+      const givenNotifyOnLogout = jest.fn();
       const givenChatHeader = (
         <HashRouter>
-          <ChatHeader />
+          <ChatHeader notifyOnLogout={givenNotifyOnLogout} />
         </HashRouter>
       );
       // AND the chat header is rendered
@@ -101,9 +105,10 @@ describe("ChatHeader", () => {
 
     test("should navigate to settings when the settings menu item is clicked", async () => {
       // GIVEN a ChatHeader component
+      const givenNotifyOnLogout = jest.fn();
       const givenChatHeader = (
         <HashRouter>
-          <ChatHeader />
+          <ChatHeader notifyOnLogout={givenNotifyOnLogout} />
         </HashRouter>
       );
       // AND the chat header is rendered
@@ -143,9 +148,10 @@ describe("ChatHeader", () => {
 
     test("should close the context menu when notifyOnClose is called", async () => {
       // GIVEN a ChatHeader component
+      const givenNotifyOnLogout = jest.fn();
       const givenChatHeader = (
         <HashRouter>
-          <ChatHeader />
+          <ChatHeader notifyOnLogout={givenNotifyOnLogout} />
         </HashRouter>
       );
       // AND the chat header is rendered

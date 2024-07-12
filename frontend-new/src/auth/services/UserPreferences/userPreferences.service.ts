@@ -82,8 +82,8 @@ export default class UserPreferencesService {
     PersistentStorageService.setChatSessionID(userPreferencesResponse.sessions[0].toString());
 
     return {
-        ...userPreferencesResponse,
-        accepted_tc: new Date(userPreferencesResponse.accepted_tc),
+      ...userPreferencesResponse,
+      accepted_tc: new Date(userPreferencesResponse.accepted_tc),
     };
   }
 

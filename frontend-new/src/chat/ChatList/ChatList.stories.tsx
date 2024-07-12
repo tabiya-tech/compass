@@ -65,7 +65,7 @@ export const LongConversation: Story = {
       id: i,
       sender: i % 2 === 0 ? ConversationMessageSender.COMPASS : ConversationMessageSender.USER,
       message: `Message ${i}`,
-      sent_at: new Date( Date.now() - i * 1000 * 60 * 60 * 24 ).toISOString(),
+      sent_at: new Date(Date.now() - i * 1000 * 60 * 60 * 24).toISOString(),
     })),
   },
 };

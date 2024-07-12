@@ -105,10 +105,10 @@ describe("Testing Data Protection Policy component with AuthProvider", () => {
     };
     mockLoggedInUser({ user: givenUser });
     const newUserPreferences: UserPreference = {
-        user_id: givenUser.id,
-        language: Language.en,
-        accepted_tc: new Date(),
-        sessions: [],
+      user_id: givenUser.id,
+      language: Language.en,
+      accepted_tc: new Date(),
+      sessions: [],
     };
 
     // AND the user preferences service will successfully create the user preferences
