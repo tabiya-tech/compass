@@ -9,7 +9,7 @@ class CollectedData(BaseModel):
     The data collected during the conversation and store in the agents state.
     """
     index: int
-    experience_title: str
+    experience_title: Optional[str] = ""
     company: Optional[str] = ""
     location: Optional[str] = ""
     start_date_calculated: Optional[str] = ""
