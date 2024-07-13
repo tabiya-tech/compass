@@ -84,7 +84,7 @@ class CollectExperiencesAgent(Agent):
             index = 0
             for elem in data_extraction_llm_output.collected_experiences_data:
                 new_item = CollectedData(
-                    index=index + 1,
+                    index=index,
                     experience_title=elem.experience_title,
                     company=elem.company,
                     location=elem.location,
@@ -92,12 +92,16 @@ class CollectExperiencesAgent(Agent):
                     end_date_calculated=elem.end_date_calculated,
                     work_type=elem.work_type
                 )
+                # Sometimes the LLM may add an empty experience, so we skip it
+                if collect_experience_is_empty(new_item):
+                    self.logger.debug("Experience data is empty: %s", new_item)
+                    continue
                 # Sometimes the LLM may add duplicates, so we remove them
-                if not any(compare_collected_data(new_item, existing_item) for existing_item in collected_data):
-                    collected_data.append(new_item)
-                    index += 1
-                else:
+                if any(compare_collected_data(new_item, existing_item) for existing_item in collected_data):
                     self.logger.warning("Duplicate experience data detected: %s", new_item)
+                    continue
+                collected_data.append(new_item)
+                index += 1
 
         conversion_llm = _ConversationLLM()
         json_data = json.dumps([_data.dict() for _data in collected_data], indent=2)
@@ -136,6 +140,15 @@ class CollectExperiencesAgent(Agent):
             return WorkType[key]
 
         return None
+
+
+def collect_experience_is_empty(experience: CollectedData):
+    return all([experience.experience_title == "" or experience.experience_title is None,
+                experience.start_date_calculated == "" or experience.start_date_calculated is None,
+                experience.end_date_calculated == "" or experience.end_date_calculated is None,
+                experience.company == "" or experience.company is None,
+                experience.location == "" or experience.location is None,
+                ])
 
 
 def compare_collected_data(item1: CollectedData, item2: CollectedData):

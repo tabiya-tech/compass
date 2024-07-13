@@ -125,6 +125,8 @@ class _DataExtractionLLM:
                     - None: If it is not clear if the job seeker has work experience or not      
                 ##'experience_title' instructions
                     Extract the title of the experience from the conversation, but do not alter it.
+                    Empty string "" If you have not found this information yet.
+                    `null` if the user explicitly did not provide this information.    
                 ##'work_type' instructions
                     Classify the type of work the experience refers to.
                     Use one of the following values and criteria:
@@ -145,25 +147,29 @@ class _DataExtractionLLM:
                     in a single input or in separate inputs, as a period or as a single date in relative or absolute terms.
                     ###'dates_mentioned' instructions
                         Contains the conversational date input e.g., "March 2021" or "last month", "since n months", 
-                        "the last M years" etc or whatever I provide that can be interpreted as start or end date of the experience.
+                        "the last M years" etc or whatever I provide that can be interpreted as start or end date of the experience. 
                         Any dates I mention, either referring to the start or end date of the experience or a period.            
                     ###'start_date_calculated' instructions
                         If I provide a conversational date input for the start of an experience, you should accurately 
                         calculate these based on my current date.
-                        For reference, my current date is {current_date}    
+                        Empty string "" If you have not found this information yet.
+                        `null` if the user explicitly did not provide this information.
+                        For reference, my current date is {current_date}        
                     ###'end_date_calculated' instructions
                         If I provide a conversational date input for the end of an experience, you should accurately 
                         calculate these based on my current date. In case it is an ongoing experience, use the word "Present". 
+                        Empty string "" If you have not found this information yet.
+                        `null` if the user explicitly did not provide this information.
                         For reference, my current date is {current_date}    
                 ##'company' instructions
                     The type of company and its name.
                     Empty string "" If you have not found this information yet.
-                    None if the user explicitly did not provide this information.
+                    `null` if the user explicitly did not provide this information.
                     Do not insist on the user providing this information if they do not provide it. 
                 ##'location' instructions 
                     The location (City, Region, District) in which the job was performed.
                     Empty string "" If you have not found this information yet.
-                    None if the user explicitly did not provide this information.    
+                    `null` if the user explicitly did not provide this information.    
                     Do not insist on the user providing this information if they do not provide it.
             #JSON Output instructions
                 Your response must always be a JSON object with the following schema:
