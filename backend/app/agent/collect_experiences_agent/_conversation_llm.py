@@ -1,3 +1,5 @@
+import logging
+
 import time
 from textwrap import dedent
 
@@ -8,11 +10,13 @@ from app.conversation_memory.conversation_memory_types import ConversationContex
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import MEDIUM_TEMPERATURE_GENERATION_CONFIG, LLMConfig
 
+_FINAL_MESSAGE = "Thank you for sharing your experiences. Let's move on to the next step."
+
 
 class _ConversationLLM:
     @staticmethod
-    async def execute(user_input: AgentInput, context: ConversationContext,
-                      collected_experience_data: str = "") -> AgentOutput:
+    async def execute(*, user_input: AgentInput, context: ConversationContext,
+                      collected_experience_data: str = "", logger: logging.Logger) -> AgentOutput:
         """
         Converses with the user and asks probing questions to collect experiences.
         :param user_input: The last user input
@@ -43,9 +47,15 @@ class _ConversationLLM:
                              response_token_count=llm_response.response_token_count,
                              response_time_in_sec=round(llm_end_time - llm_start_time, 2))
         finished = False
-        if llm_response.text.strip() == "<END_OF_CONVERSATION>":
-            llm_response.text = "Thank you for sharing your experiences. Let's move on to the next step."
+        llm_response.text = llm_response.text.strip()
+        if llm_response.text == "<END_OF_CONVERSATION>":
+            llm_response.text = _FINAL_MESSAGE
             finished = True
+        if llm_response.text.find("<END_OF_CONVERSATION>") != -1:
+            llm_response.text = _FINAL_MESSAGE
+            finished = True
+            logger.warning("The response contains '<END_OF_CONVERSATION>' and additional text: %s", llm_response.text)
+
         return AgentOutput(
             message_for_user=llm_response.text,
             finished=finished,
@@ -198,8 +208,9 @@ class _ConversationLLM:
                 You will not ask any question or make any suggestion regarding the next step. 
                 It is not your responsibility to conduct the next step.
                 
-                After you have summarized my experiences and I have confirmed that I have nothing to add or change 
-                to the information collected, you will end the conversation by saying:
+                After you have summarized my experiences you will wait for me to respond that
+                I have confirmed that I have nothing to add or change  to the information collected, and then
+                you will end the conversation by saying:
                 <END_OF_CONVERSATION>                   
             """)
 
