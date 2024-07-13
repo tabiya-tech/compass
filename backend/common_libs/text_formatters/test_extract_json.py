@@ -85,7 +85,6 @@ class TestExtractJson(unittest.TestCase):
         self.assertTrue(result.boolean)
         self.assertEqual(result.numeral, 123)
 
-
     def test_non_conforming_json(self):
         """Should raise ValidationError if there is valid JSON block that DOES NOT conform to the model"""
         # GIVEN a model class GivenExampleModel

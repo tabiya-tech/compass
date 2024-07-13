@@ -57,9 +57,9 @@ class LLMCaller(Generic[RESPONSE_T]):
             try:
                 model_response = extract_json(response_text, self._model_response_type)
                 success = True
-            except ExtractJSONError:
+            except ExtractJSONError as e:
                 log_message = (f"Attempt {attempt_count} failed to extract JSON "
-                               f"from conversation content: '{response_text}")
+                               f"from conversation content: '{response_text}' - {e}")
                 llm_stats.error = log_message
                 if attempt_count == _MAX_ATTEMPTS:
                     # The agent failed to respond with a JSON object after the last attempt,
