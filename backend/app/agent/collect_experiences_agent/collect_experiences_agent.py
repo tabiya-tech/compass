@@ -81,21 +81,28 @@ class CollectExperiencesAgent(Agent):
 
         collected_data.clear()  # Overwrite the old with the new data, as it is difficult to merge them
         if data_extraction_llm_output and data_extraction_llm_output.collected_experiences_data:
-            for index, elem in enumerate(data_extraction_llm_output.collected_experiences_data):
-                collected_data.append(CollectedData(
-                    index=index,
+            index = 0
+            for elem in data_extraction_llm_output.collected_experiences_data:
+                new_item = CollectedData(
+                    index=index + 1,
                     experience_title=elem.experience_title,
                     company=elem.company,
                     location=elem.location,
                     start_date_calculated=elem.start_date_calculated,
                     end_date_calculated=elem.end_date_calculated,
                     work_type=elem.work_type
-                ))
+                )
+                # Sometimes the LLM may add duplicates, so we remove them
+                if not any(compare_collected_data(new_item, existing_item) for existing_item in collected_data):
+                    collected_data.append(new_item)
+                    index += 1
+                else:
+                    self.logger.warning("Duplicate experience data detected: %s", new_item)
 
         conversion_llm = _ConversationLLM()
         json_data = json.dumps([_data.dict() for _data in collected_data], indent=2)
         conversation_llm_output = await conversion_llm.execute(user_input=user_input, context=context,
-                                                               collected_experience_data=json_data)
+                                                               collected_experience_data=json_data, logger=self.logger)
         if conversation_llm_output.finished:
             for elem in collected_data:
                 self.logger.debug("Experience data collected: %s", elem)
@@ -129,3 +136,12 @@ class CollectExperiencesAgent(Agent):
             return WorkType[key]
 
         return None
+
+
+def compare_collected_data(item1: CollectedData, item2: CollectedData):
+    return (item1.experience_title == item2.experience_title and
+            item1.work_type == item2.work_type and
+            item1.start_date_calculated == item2.start_date_calculated and
+            item1.end_date_calculated == item2.end_date_calculated and
+            item1.company == item2.company and
+            item1.location == item2.location)
