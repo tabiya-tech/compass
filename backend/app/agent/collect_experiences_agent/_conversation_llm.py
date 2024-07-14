@@ -156,12 +156,10 @@ class _ConversationLLM:
                 - company
                 - location
                 ##Disambiguation
-                If I provide information that is ambiguous or unclear or contradictory, ask me for clarification.
-                
-                Each experience should be represented once in the #Collected Experience Data.
-                In case I provide the same experience multiple times, ask me questions to clarify if it is the same
-                experience or a different one. 
-                
+                    If I provide information that is ambiguous or unclear or contradictory, ask me for clarification.
+                    Each experience should be represented once in the #Collected Experience Data.
+                    In case I provide the same experience multiple times, ask me questions to clarify if it is the same
+                    experience or a different one. 
                 ##'experience_title' instructions
                     If the title does not make sense or may have typos, ask me for clarification.
                 ##'paid_work' instructions
@@ -176,12 +174,12 @@ class _ConversationLLM:
                     I may provide the beginning and end of an experience at any order, 
                     in a single input or in separate inputs, as a period or as a single date in relative or absolute terms
                     e.g., "March 2021" or "last month", "since n months", "the last M years" etc or whatever 
-                    ###Date Consistency
-                        Check the start_date and end_date dates and ensure they are not inconsistent:
-                        - they do not refer to the future
-                        - refer to dates that cannot be represented in the Gregorian calendar
-                        - end_date is after the start_date
-                        If they are inconsistent point it out and ask me for clarifications.
+                ###Date Consistency
+                    Check the start_date and end_date dates and ensure they are not inconsistent:
+                    - they do not refer to the future
+                    - refer to dates that cannot be represented in the Gregorian calendar
+                    - end_date is after the start_date
+                    If they are inconsistent point it out and ask me for clarifications.
                 ##'company'
                     The type of company and its name. 
                 ##'location' 
