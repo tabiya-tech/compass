@@ -159,7 +159,6 @@ async def conversation(request: Request, user_input: str, clear_memory: bool = F
     try:
         if clear_memory:
             await application_state_manager.delete_state(session_id)
-            return {"msg": f"Memory cleared for session {session_id}!"}
         if filter_pii:
             user_input = await sensitive_filter.obfuscate(user_input)
 
@@ -237,7 +236,6 @@ async def _test_conversation(request: Request, user_input: str, clear_memory: bo
     try:
         if clear_memory:
             await application_state_manager.delete_state(session_id)
-            return {"msg": f"Memory cleared for session {session_id}!"}
         if filter_pii:
             user_input = await sensitive_filter.obfuscate(user_input)
 
