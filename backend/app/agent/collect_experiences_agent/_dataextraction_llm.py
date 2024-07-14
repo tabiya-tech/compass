@@ -117,6 +117,8 @@ class _DataExtractionLLM:
                     Extract the title of the experience from the conversation, but do not alter it.
                     Empty string "" If you have not found this information yet.
                     `null` if the user explicitly did not provide this information.    
+                ##'paid_work' instructions
+                    Determine if the experience was for money or not.
                 ##'work_type' instructions
                     Classify the type of work the experience refers to.
                     Use one of the following values and criteria:
@@ -168,7 +170,9 @@ class _DataExtractionLLM:
                             - experience_title: A title for the experience. Formatted as a json string.
                             - company: The type of company and its name. Formatted as a json string.
                             - location: The location in which the job was performed. Formatted as a json string.
-                            - work_type_classification_reasoning: A explanation of the reasoning behind 
+                            - paid_work: A boolean value indicating whether the work was paid or not. 
+                                         Formatted as a json boolean.
+                            - work_type_classification_reasoning: A short explanation of the reasoning behind 
                                                                     the value chosen for the work_type.
                                                                     Formatted as a json string.
                             - work_type: type of work of the experience, Has_Work_Experience 'FORMAL_SECTOR_WAGED_EMPLOYMENT', 
