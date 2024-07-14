@@ -59,7 +59,7 @@ class ConversationHistoryFormatter:
         # This reinforces that the model should respond with a JSON object.
         # Without these instructions, the model might respond with a non-JSON object,
         # as it tends to adapt to the conversation history and may overlook the JSON format requirements.
-        if model_response_instructions:
+        if model_response_instructions != "" and model_response_instructions is not None:
             ConversationHistoryFormatter._append_part(llm_input, ConversationHistoryFormatter.USER,
                                                       "\n" + model_response_instructions)
         return llm_input
