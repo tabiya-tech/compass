@@ -25,9 +25,6 @@ export function useTokens({ updateUserByIDToken }: TUseTokensParams) {
   );
 
   useEffect(() => {
-    if (PersistentStorageService.getAccessToken() == null) return;
-    setIsAuthenticating(true);
-
     const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
       if (user) {
         const idToken = await user.getIdToken(true);

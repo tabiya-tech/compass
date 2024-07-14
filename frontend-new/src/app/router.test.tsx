@@ -10,10 +10,9 @@ import { DATA_TEST_ID as DPA_DATA_TEST_ID } from "src/auth/components/PolicyNoti
 import { DATA_TEST_ID as HOME_DATA_TEST_ID } from "src/homePage/Home";
 
 import { routerPaths } from "./routerPaths";
-import { mockLoggedInUser, TestUser } from "src/_test_utilities/mockLoggedInUser";
+import { mockLoggedInUser } from "src/_test_utilities/mockLoggedInUser";
 import * as firebaseui from "firebaseui";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
-import { AuthContext, TabiyaUser } from "src/auth/AuthProvider";
 
 // mock the firebase module
 jest.mock("firebase/compat/app", () => {
@@ -86,26 +85,11 @@ jest.mock("react-router-dom", () => {
   };
 });
 
-function renderWithRouter(route: string, user: TabiyaUser | null) {
-  const authContextValue = {
-    login: jest.fn(),
-    isLoggingIn: false,
-    isRegistering: false,
-    user: user,
-    register: jest.fn(),
-    logout: jest.fn(),
-    handlePageLoad: jest.fn(),
-  };
-
+function renderWithRouter(route: string) {
   const router = createMemoryRouter(routerConfig, {
     initialEntries: [route],
   });
-
-  render(
-    <AuthContext.Provider value={authContextValue}>
-      <RouterProvider router={router} />
-    </AuthContext.Provider>
-  );
+  render(<RouterProvider router={router} />);
 
   return { router };
 }
@@ -186,17 +170,16 @@ describe("Tests for router config", () => {
     firebaseui.auth.AuthUI.getInstance = jest.fn();
   });
   afterEach(() => jest.clearAllMocks());
-
   test.each([
-    ["Home", routerPaths.ROOT, HOME_DATA_TEST_ID.HOME_CONTAINER, TestUser],
-    ["Info", routerPaths.SETTINGS, INFO_DATA_TEST_ID.INFO_ROOT, null],
-    ["Register", routerPaths.REGISTER, REGISTER_DATA_TEST_ID.REGISTER_CONTAINER, null],
-    ["Login", routerPaths.LOGIN, LOGIN_DATA_TEST_ID.LOGIN_CONTAINER, null],
-    ["DPA", routerPaths.DPA, DPA_DATA_TEST_ID.DPA_CONTAINER, TestUser],
-    ["Verify", routerPaths.VERIFY_EMAIL, VERIFY_EMAIL_DATA_TEST_ID.VERIFY_EMAIL_CONTAINER, null],
-  ])("should render the %s component given the path %s", async (_description, givenRoute, expectedDataTestId, user) => {
+    ["Home", routerPaths.ROOT, HOME_DATA_TEST_ID.HOME_CONTAINER],
+    ["Info", routerPaths.SETTINGS, INFO_DATA_TEST_ID.INFO_ROOT],
+    ["Register", routerPaths.REGISTER, REGISTER_DATA_TEST_ID.REGISTER_CONTAINER],
+    ["Login", routerPaths.LOGIN, LOGIN_DATA_TEST_ID.LOGIN_CONTAINER],
+    ["DPA", routerPaths.DPA, DPA_DATA_TEST_ID.DPA_CONTAINER],
+    ["Verify", routerPaths.VERIFY_EMAIL, VERIFY_EMAIL_DATA_TEST_ID.VERIFY_EMAIL_CONTAINER],
+  ])("should render the %s component given the path %s", async (_description, givenRoute, expectedDataTestId) => {
     // WHEN the ROOT is chosen
-    renderWithRouter(givenRoute, user);
+    renderWithRouter(givenRoute);
 
     // THEN expect home to be the landing page
     expect(screen.getByTestId(expectedDataTestId)).toBeInTheDocument();
@@ -204,7 +187,7 @@ describe("Tests for router config", () => {
 
   test("should render the 404 page", async () => {
     // WHEN an invalid route is chosen
-    renderWithRouter("/invalid-route", null);
+    renderWithRouter("/invalid-route");
 
     // THEN expect the 404 page to be rendered
     expect(screen.getByTestId(ERROR_PAGE_DATA_TEST_ID.NOT_FOUND_CONTAINER)).toBeInTheDocument();
