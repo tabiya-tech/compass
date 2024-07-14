@@ -81,13 +81,16 @@ class _ConversationLLM:
             {agent_character}
             
             #Be explicit
-                Begin by clarifying if I have any work experience or not.
+                Begin by clarifying if I have paid work experience or not. 
+                This may include working for someone else or running own business.
+            
+                Do not assume that I have work experience or not.
                 
-                In case I have work experience start by asking me to share my these experiences, 
-                but also help me identify relevant experiences from the unseen economy 
-                and encourage me to share those experiences too.
+                In case I have paid work experience start by asking me to 
+                share these experiences, eventually also help me identify relevant experiences 
+                from the unseen economy and encourage me to share those experiences too.
                  
-                In case I am unsure or I don't have any work experience, help me identify relevant experiences 
+                In case I am unsure or I don't have any paid work experience, help me identify relevant experiences 
                 from the unseen economy. 
                 
                 Mention that experiences can include both paid and unpaid work, 

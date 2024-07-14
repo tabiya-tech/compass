@@ -32,8 +32,6 @@ class _CollectedDataWithReasoning(CollectedData):
 
 
 class _CollectedExperiences(BaseModel):
-    reasoning: Optional[str] = ""
-    job_seeker_class: Optional[str] = ""
     collected_experiences_data: Optional[list[_CollectedDataWithReasoning]] = None
 
     class Config:
@@ -87,8 +85,7 @@ class _DataExtractionLLM:
             #Extract data instructions
                 You will analyse a conversation from '#Last User Input' and '#Conversation History'
                 and use the data from the '#Previously Extracted Experience Data' 
-                to extract information for the following fields:
-                - job_seeker_class
+                to extract information.
                 For each experience, you will collect information for the following fields:
                 - experience_title 
                 - work_type
@@ -114,16 +111,8 @@ class _DataExtractionLLM:
                 - If you find an experience that is present twice in the  #Previously Extracted Experience Data
                   then you should merge the two experiences into one.
                 ##Missing/Incomplete Experience data handling    
-                - Record the available details in the 'collected_experiences_data' field, even if some of the fields are 
-                  not fully completed for an experience. 
-                      
-                ##'job_seeker_class' instructions
-                    You will analyse a conversation from '#Last User Input' and '#Conversation History'  
-                    and use the data from the '#Previously Extracted Experience Data' to classify the job seeker into one 
-                    of the following classes:
-                    - HAS_WORK_EXPERIENCE: If the job seeker has work experience
-                    - HAS_NO_WORK_EXPERIENCE: If the job seeker has no work experience   
-                    - None: If it is not clear if the job seeker has work experience or not      
+                  Record the available details in the 'collected_experiences_data' field, even if some of the fields are 
+                  not fully completed for an experience.     
                 ##'experience_title' instructions
                     Extract the title of the experience from the conversation, but do not alter it.
                     Empty string "" If you have not found this information yet.
@@ -163,8 +152,6 @@ class _DataExtractionLLM:
                     Do not insist on the user providing this information if they do not provide it.
             #JSON Output instructions
                 Your response must always be a JSON object with the following schema:
-                - job_seeker_class: The class of the job seeker. One of 'WORK_EXPERIENCE', 'NO_WORK_EXPERIENCE' or 'None'.
-                                    Formatted as a json string. 
                 - collected_experiences_data: [ list of dictionaries, one per experience containing
                         {{
                             - index: The index of the experience in the list. Formatted as a json integer.
