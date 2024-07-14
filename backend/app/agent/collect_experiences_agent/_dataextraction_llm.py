@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 from app.agent.agent_types import AgentInput, LLMStats
 from app.agent.collect_experiences_agent._types import CollectedData
+from app.agent.experience.work_type import WORK_TYPE_DEFINITIONS_FOR_PROMPT
 from app.agent.llm_caller import LLMCaller
 from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE, STD_AGENT_CHARACTER
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
@@ -130,18 +131,7 @@ class _DataExtractionLLM:
                 ##'work_type' instructions
                     Classify the type of work the experience refers to.
                     Use one of the following values and criteria:
-                        None: When there is not information to classify the work type in any of the categories below.    
-                        FORMAL_SECTOR_WAGED_EMPLOYMENT: Formal sector / Wage employment 
-                        FORMAL_SECTOR_UNPAID_TRAINEE: Formal sector / Unpaid trainee work
-                        SELF_EMPLOYMENT: Self-employment, micro entrepreneurship
-                        UNSEEN_UNPAID: Represents all unseen economy, 
-                            including:
-                            - Unpaid domestic services for household and family members
-                            - Unpaid caregiving services for household and family members
-                            - Unpaid direct volunteering for other households
-                            - Unpaid community- and organization-based volunteering
-                            excluding:
-                            - Unpaid trainee work, which is classified as FORMAL_SECTOR_UNPAID_TRAINEE     
+                        {work_type_definitions}   
                 ##Timeline instructions
                     The user may provide the beginning and end of an experience at any order, 
                     in a single input or in separate inputs, as a period or as a single date in relative or absolute terms.
@@ -223,4 +213,5 @@ class _DataExtractionLLM:
             agent_character=STD_AGENT_CHARACTER,
             language_style=STD_LANGUAGE_STYLE,
             previously_extracted_data=previously_extracted_data,
+            work_type_definitions=WORK_TYPE_DEFINITIONS_FOR_PROMPT
         )
