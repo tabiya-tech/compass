@@ -4,6 +4,7 @@ import time
 from textwrap import dedent
 
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType, LLMStats
+from app.agent.experience.work_type import WORK_TYPE_DEFINITIONS_FOR_PROMPT
 from app.agent.prompt_template.agent_prompt_template import STD_AGENT_CHARACTER, STD_LANGUAGE_STYLE
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
@@ -22,7 +23,8 @@ class _ConversationLLM:
         :param user_input: The last user input
         :param context: The conversation context including the conversation history
         :param collected_experience_data: The collected experience data so far
-        :return: The agent output with the next message for the user and finished flag set to True if the conversation is
+        :return: The agent output with the next message for the user and finished flag
+                 set to True if the conversation is
         finished.
         """
         llm = GeminiGenerativeLLM(
@@ -159,18 +161,7 @@ class _ConversationLLM:
                     If the title does not make sense or may have typos, ask me for clarification.
                 ##'work_type' instructions
                     It can have ne of the following values:
-                        None: When there is not information to classify the work type in any of the categories below.    
-                        FORMAL_SECTOR_WAGED_EMPLOYMENT: Formal sector / Wage employment 
-                        FORMAL_SECTOR_UNPAID_TRAINEE: Formal sector / Unpaid trainee work
-                        SELF_EMPLOYMENT: Self-employment, micro entrepreneurship
-                        UNSEEN_UNPAID: Represents all unseen economy, 
-                            including:
-                            - Unpaid domestic services for household and family members
-                            - Unpaid caregiving services for household and family members
-                            - Unpaid direct volunteering for other households
-                            - Unpaid community- and organization-based volunteering
-                            excluding:
-                            - Unpaid trainee work, which is classified as FORMAL_SECTOR_UNPAID_TRAINEE
+                        {work_type_definitions}
                     Ask me explicit questions to verify the value in the 'work_type' field.
                     These questions should be in simple English and must not contain any of the classification values 
                     or work type jargon.     
@@ -217,5 +208,6 @@ class _ConversationLLM:
         return system_instructions_template.format(
             agent_character=STD_AGENT_CHARACTER,
             language_style=STD_LANGUAGE_STYLE,
-            collected_experience_data=collected_experience_data
+            collected_experience_data=collected_experience_data,
+            work_type_definitions=WORK_TYPE_DEFINITIONS_FOR_PROMPT
         )
