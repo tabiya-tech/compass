@@ -53,7 +53,7 @@ class CollectExperiencesAgent(Agent):
     def set_state(self, state: CollectExperiencesAgentState):
         """
         Set the state of the agent.
-        This method should be called before the agent' execute() method is called.
+        This method should be called before the agent's execute() method is called.
         """
         self._state = state
 
@@ -73,9 +73,10 @@ class CollectExperiencesAgent(Agent):
 
         data_extraction_llm = _DataExtractionLLM(self.logger)
 
-        data_extraction_llm_output, data_extraction_llm_stats = await data_extraction_llm.execute(user_input=user_input,
-                                                                                                  context=context,
-                                                                                                  collected_experience_data=json_data)
+        data_extraction_llm_output, data_extraction_llm_stats = \
+            await data_extraction_llm.execute(user_input=user_input,
+                                              context=context,
+                                              collected_experience_data=json_data)
         self.logger.debug("Experience data from our conversation until now to be merged to the data response: %s",
                           data_extraction_llm_output)
 
@@ -93,11 +94,11 @@ class CollectExperiencesAgent(Agent):
                     work_type=elem.work_type
                 )
                 # Sometimes the LLM may add an empty experience, so we skip it
-                if collect_experience_is_empty(new_item):
+                if _collect_experience_is_empty(new_item):
                     self.logger.debug("Experience data is empty: %s", new_item)
                     continue
                 # Sometimes the LLM may add duplicates, so we remove them
-                if any(compare_collected_data(new_item, existing_item) for existing_item in collected_data):
+                if any(_compare_collected_data(new_item, existing_item) for existing_item in collected_data):
                     self.logger.warning("Duplicate experience data detected: %s", new_item)
                     continue
                 collected_data.append(new_item)
@@ -142,7 +143,7 @@ class CollectExperiencesAgent(Agent):
         return None
 
 
-def collect_experience_is_empty(experience: CollectedData):
+def _collect_experience_is_empty(experience: CollectedData):
     return all([experience.experience_title == "" or experience.experience_title is None,
                 experience.start_date_calculated == "" or experience.start_date_calculated is None,
                 experience.end_date_calculated == "" or experience.end_date_calculated is None,
@@ -151,7 +152,7 @@ def collect_experience_is_empty(experience: CollectedData):
                 ])
 
 
-def compare_collected_data(item1: CollectedData, item2: CollectedData):
+def _compare_collected_data(item1: CollectedData, item2: CollectedData):
     return (item1.experience_title == item2.experience_title and
             item1.work_type == item2.work_type and
             item1.start_date_calculated == item2.start_date_calculated and
