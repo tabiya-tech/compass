@@ -149,6 +149,7 @@ class _ConversationLLM:
                 
                 You will collect information for the following fields:
                 - experience_title 
+                - pay_work
                 - work_type
                 - start_date
                 - end_date
@@ -163,6 +164,8 @@ class _ConversationLLM:
                 
                 ##'experience_title' instructions
                     If the title does not make sense or may have typos, ask me for clarification.
+                ##'paid_work' instructions
+                    Ask explicit questions to determine if the experience was for money or not.
                 ##'work_type' instructions
                     It can have ne of the following values:
                         {work_type_definitions}

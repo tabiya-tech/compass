@@ -14,6 +14,7 @@ class CollectedData(BaseModel):
     location: Optional[str] = ""
     start_date_calculated: Optional[str] = ""
     end_date_calculated: Optional[str] = ""
+    paid_work: Optional[bool] = False
     work_type: Optional[str] = ""
 
     class Config:
