@@ -156,13 +156,12 @@ class _DataExtractionLLM:
                 - collected_experiences_data: [ list of dictionaries, one per experience containing
                         {{
                             - index: The index of the experience in the list. Formatted as a json integer.
-                            - data_extraction_references: An explanation in prosa (not in json) of what information 
-                                                was collected during this round 
-                                                and where exactly it was found in the input, or in the 
-                                                '#Previously Extracted Experience Data'. 
-                                                Include in the explanation the fields 'experience_title', 
-                                                'dates_mentioned', 'company' and 'location'. 
-                                                In this field do not conduct date calculations, or work type classification, 
+                            - data_extraction_references: Give an explanation in prosa (not in json) of what information 
+                                                you intend to collect during this round and if it was found in the last input, 
+                                                or in the '#Previously Extracted Experience Data'. 
+                                                Constrain the explanation to the data relevant for the fields 'experience_title', 
+                                                'dates_mentioned', 'company' and 'location' and 'paid_work'. 
+                                                Do not conduct date calculations, or work type classification, 
                                                 just provide any references to relevant parts of the conversation. 
                                                 Just explain what you found and where you found it.
                                                 Formatted as a json string.
@@ -171,10 +170,13 @@ class _DataExtractionLLM:
                             - location: The location in which the job was performed. Formatted as a json string.
                             - paid_work: A boolean value indicating whether the work was paid or not. 
                                          Formatted as a json boolean.
-                            - work_type_classification_reasoning: A short explanation of the reasoning behind 
-                                                                    the value chosen for the work_type.
-                                                                    Formatted as a json string.
-                            - work_type: type of work of the experience, Has_Work_Experience 'FORMAL_SECTOR_WAGED_EMPLOYMENT', 
+                            - work_type_classification_reasoning: A short explanation of how the information collected 
+                                                    during this round is used to classify the work type of the experience
+                                                    to one of the possible values 'FORMAL_SECTOR_WAGED_EMPLOYMENT', 
+                                                    'FORMAL_SECTOR_UNPAID_TRAINEE', 'SELF_EMPLOYMENT', 'UNSEEN_UNPAID' 
+                                                    or 'None'.
+                                                    Formatted as a json string.
+                            - work_type: type of work of the experience, 'FORMAL_SECTOR_WAGED_EMPLOYMENT', 
                                          'FORMAL_SECTOR_UNPAID_TRAINEE', 'SELF_EMPLOYMENT', 'UNSEEN_UNPAID' or 'None'. 
                                          Other values are not permitted.
                             - dates_mentioned: The experience dates mentioned in the conversation. 
