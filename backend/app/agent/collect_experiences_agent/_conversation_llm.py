@@ -135,6 +135,7 @@ class _ConversationLLM:
                     - "Thank you, ...?"
                     - "Thanks, ...?"
                     - "Cool, ...?"
+                    - "I am sorry to hear that, ...?"
                     - "...?"
                     
             #Gather Details
