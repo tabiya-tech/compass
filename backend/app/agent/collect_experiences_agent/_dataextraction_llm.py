@@ -22,7 +22,6 @@ class _CollectedDataWithReasoning(CollectedData):
     dates_mentioned: Optional[str] = ""
     dates_calculations: Optional[str] = ""
     work_type_classification_reasoning: Optional[str] = ""
-    all_data_collected: Optional[bool] = False
 
     class Config:
         """
@@ -189,7 +188,6 @@ class _DataExtractionLLM:
                             - end_date_calculated: The end date in YYYY/MM//DD or YYYY/MM or 'Present'
                                                     depending on what input was provided.
                                                     Formatted as a json string
-                            - all_data_collected: A boolean flag to signal that all information has been collected
                         }}
                         ]     
                 
