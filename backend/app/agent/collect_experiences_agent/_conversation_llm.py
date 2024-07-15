@@ -205,9 +205,11 @@ class _ConversationLLM:
                 It is not your responsibility to conduct the next step.
                 
                 After you have summarized my experiences you will wait for me to respond that
-                I have confirmed that I have nothing to add or change  to the information collected, and then
-                you will end the conversation by saying:
-                <END_OF_CONVERSATION>                   
+                I have confirmed that I have nothing to add or change to the information collected, and then
+                you will end the conversation by just saying:
+                <END_OF_CONVERSATION>
+                               
+                Do not add anything before or after the <END_OF_CONVERSATION> message.                   
             """)
 
         return system_instructions_template.format(
