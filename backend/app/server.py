@@ -51,6 +51,7 @@ async def lifespan(_app: FastAPI):
 # Retrieve the backend URL from the environment variables,
 # and set the server URL to the backend URL, so that Swagger UI can correctly call the backend paths
 app = FastAPI(
+    redirect_slashes=False,
     servers=[
         {
             "url": os.getenv("BACKEND_URL") or "/",
