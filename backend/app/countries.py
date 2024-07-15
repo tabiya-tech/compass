@@ -25,6 +25,7 @@ _GLOSSARY = {
         dedent("""\
         GDE Brigade member - A member of the Gauteng Department of Education's (GDE) Brigade program.
         Kotas - A South African street food. 
+        Bunny chow - Indian South African fast food dish.
         Crew Member - A member of a team but not necessarily in the aviation industry.
         Ambassador - A person who works ta public relation of a company.
         Braider - A person who specializes in creating beautiful African hairstyles.

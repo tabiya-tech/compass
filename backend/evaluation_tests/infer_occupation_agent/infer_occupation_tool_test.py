@@ -28,7 +28,27 @@ def get_test_cases():
                 experience_title="I sell kota to the local community",
                 work_type=WorkType.SELF_EMPLOYMENT,
                 company="",
-                location="down town",
+                location="downtown",
+            ),
+            Country.SOUTH_AFRICA,
+            False,
+        ),
+        (
+            ExperienceEntity(
+                experience_title="I make bunny chow",
+                work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+                company="Hungry Lion",
+                location="uptown",
+            ),
+            Country.SOUTH_AFRICA,
+            False,
+        ),
+        (
+            ExperienceEntity(
+                experience_title="I make bunny chow",
+                work_type=WorkType.SELF_EMPLOYMENT,
+                company="Hungry Tiger",
+                location="uptown",
             ),
             Country.SOUTH_AFRICA,
             False,
@@ -80,7 +100,7 @@ def setup_agent_tool():
 @pytest.mark.evaluation_test
 @pytest.mark.parametrize(
     "given_experience, given_country_of_interest,  expected_same_title", get_test_cases(),
-    ids=[case[0].experience_title for case in get_test_cases()])
+    ids=[f"{index} -  {case[0].experience_title}" for index, case in enumerate(get_test_cases())])
 async def test_occupation_inference_tool(given_experience,
                                          given_country_of_interest,
                                          expected_same_title,
@@ -92,7 +112,7 @@ async def test_occupation_inference_tool(given_experience,
     # WHEN the tool is executed with the given experience and country
 
     result = await tool.execute(given_country_of_interest, given_experience, top_k=given_top_k)
-    logging.log(logging.INFO, "Given Title %s -> Contextualized Title %s", given_experience.experience_title,
+    logging.log(logging.INFO, "Given Title '%s' -> Contextualized Title '%s'", given_experience.experience_title,
                 result.contextualized_title)
     # THEN the result should contain a contextualized title
     assert len(result.contextualized_title) > 0
@@ -109,3 +129,9 @@ async def test_occupation_inference_tool(given_experience,
         # depending on the search results for each title
         assert len(result.esco_occupations) >= given_top_k
         assert len(result.esco_occupations) <= 2 * given_top_k
+
+    # log the preferred labels of the occupations
+    labels = []
+    for skill_occupation in result.esco_occupations:
+        labels.append(skill_occupation.occupation.preferredLabel)
+    logging.log(logging.INFO, "Liked to ESCO Occupation: \n -%s", "\n -".join(labels))
