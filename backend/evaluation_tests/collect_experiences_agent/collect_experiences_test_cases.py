@@ -240,7 +240,7 @@ test_cases = [
             1. Delivery job for Uber Eats in Paris, from Janary 2021 to March 2023. This was a paid job with a contract.
             2. Selling old furniture at the Flea Market of rue Jean Henri Fabre, every Wednesday and Friday. 
             You started in 2019 with your older brother and are still doing it today. This is unformal labor, as you only get 100 euros at the end of the day, without any formal contract.
-            When asked about your experiences, answer with all the information at the same time.
+            When asked about your experiences, answer with all the information at the same time. Do not add additional information or invent information.
             """) + france_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
     ),
@@ -249,6 +249,7 @@ test_cases = [
         simulated_user_prompt=dedent("""
             You are a trained Dancer from Nairobi and would like to find a new job because the theatre you were working for is now closing.
             Your only previous experience is in the Chandaria Center for Performing Art, where you have been working since 2018. The job had a contract.
+            Do not add additional information or invent information.
             """) + kenya_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
     ),
