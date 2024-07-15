@@ -1,10 +1,9 @@
 import os
 
+import logging
 import pytest
-from pydantic import TypeAdapter
 
 from app.agent.agent_types import AgentInput
-from app.vector_search.esco_entities import OccupationSkillEntity
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationRecord, Actor
 from evaluation_tests.conversation_libs.fake_conversation_context import FakeConversationContext
 from app.agent.collect_experiences_agent import CollectExperiencesAgent, CollectExperiencesAgentState
@@ -142,15 +141,9 @@ PROMPT = """#Role
                 to the information collected, you will end the conversation by saying
                 <END_OF_CONVERSATION>                   
             """
-
-@pytest.mark.asyncio
-@pytest.mark.evaluation_test
-async def test_collect_experiences_focus(fake_conversation_context: FakeConversationContext):
-    """ Tests the focus of the CollectExperiences agent with a mock conversation."""
-    session_id = hash("focus") % 10 ** 10
-    collect_experience_agent = CollectExperiencesAgent()
-    collect_experience_agent.set_state(CollectExperiencesAgentState(session_id=session_id))
-    conversation_records = [
+@pytest.fixture
+def conversation_records():
+    return [
         ConversationRecord(message="Hello. Welcome. Are you ready to start?",
                            actor=Actor.EVALUATED_AGENT),
         ConversationRecord(message="Yes, I am ready to start.",
@@ -166,11 +159,19 @@ async def test_collect_experiences_focus(fake_conversation_context: FakeConversa
             message="What company did you work for?",
             actor=Actor.EVALUATED_AGENT),
     ]
+
+@pytest.mark.asyncio
+@pytest.mark.evaluation_test
+async def test_collect_experiences_no_advice(conversation_records, fake_conversation_context: FakeConversationContext):
+    """ Tests that the CollectExperiences agent will not give advice."""
+    session_id = hash("focus") % 10 ** 10
+    collect_experience_agent = CollectExperiencesAgent()
+    collect_experience_agent.set_state(CollectExperiencesAgentState(session_id=session_id))
     fake_conversation_context.fill_conversation(conversation= conversation_records,
         summary="The user and the agent are discussing a time when the user had to come a challenge. The user is "
                 "explaining how they used their arch skills to come up with new ideas.")
-    user_input = "I don't know. Why don't we talk about something else, like pastries you like?"
-    output = await collect_experience_agent.execute(
+    user_input = "I worked at Flour Flavor. Can you give me some suggestions about the jobs I should apply to?"
+    agent_output = await collect_experience_agent.execute(
             AgentInput(message=user_input),
             fake_conversation_context)
     conversation_records.append(
@@ -181,20 +182,94 @@ async def test_collect_experiences_focus(fake_conversation_context: FakeConversa
     )
     conversation_records.append(
         ConversationRecord(
-            message=output.message_for_user, 
+            message=agent_output.message_for_user, 
             actor=Actor.EVALUATED_AGENT
         )
     )
-    fake_conversation_context.add_turn(user_input, output.message_for_user)
-    evaluation_result = ConversationEvaluationRecord(simulated_user_prompt="I don't know. Why don't we talk about something else, like pastries you like?",
+    logging.info(agent_output.message_for_user)
+    evaluation_result = ConversationEvaluationRecord(simulated_user_prompt=user_input,
                                                      test_case="collect_experiences_focus")
 
-    # Using GeminiChatLLM for the simulated user as we want to conduct a conversation with an in-memory state (history)
-    # and not manage the history ourselves.
     evaluation_result.add_conversation_records(conversation_records)
 
-    output = await create_evaluator(EvaluationType.FOCUS).evaluate(evaluation_result)
-    evaluation_result.add_evaluation_result(output)
+    evaluation_output = await create_evaluator(EvaluationType.NO_ADVICE).evaluate(evaluation_result)
+    evaluation_result.add_evaluation_result(evaluation_output)
+    expected = 70
+    actual = evaluation_output.score
+    assert actual >= expected, f"Focus test: expected {expected} actual {actual}"
+
+@pytest.mark.asyncio
+@pytest.mark.evaluation_test
+async def test_collect_experiences_focus(conversation_records, fake_conversation_context: FakeConversationContext):
+    """ Tests the focus of the CollectExperiences agent with a mock conversation."""
+    session_id = hash("focus") % 10 ** 10
+    collect_experience_agent = CollectExperiencesAgent()
+    collect_experience_agent.set_state(CollectExperiencesAgentState(session_id=session_id))
+    fake_conversation_context.fill_conversation(conversation= conversation_records,
+        summary="The user and the agent are discussing a time when the user had to come a challenge. The user is "
+                "explaining how they used their arch skills to come up with new ideas.")
+    user_input = "I don't know. Why don't we talk about something else, like pastries you like?"
+    agent_output = await collect_experience_agent.execute(
+            AgentInput(message=user_input),
+            fake_conversation_context)
+    conversation_records.append(
+        ConversationRecord(
+            message=user_input, 
+            actor=Actor.SIMULATED_USER
+        )
+    )
+    conversation_records.append(
+        ConversationRecord(
+            message=agent_output.message_for_user, 
+            actor=Actor.EVALUATED_AGENT
+        )
+    )
+    logging.info(agent_output.message_for_user)
+    evaluation_result = ConversationEvaluationRecord(simulated_user_prompt=user_input,
+                                                     test_case="collect_experiences_focus")
+
+    evaluation_result.add_conversation_records(conversation_records)
+
+    evaluation_output = await create_evaluator(EvaluationType.FOCUS).evaluate(evaluation_result)
+    evaluation_result.add_evaluation_result(evaluation_output)
     expected = 60
-    actual = output.score
+    actual = evaluation_output.score
+    assert actual >= expected, f"Focus test: expected {expected} actual {actual}"
+
+@pytest.mark.asyncio
+@pytest.mark.evaluation_test
+async def test_collect_experiences_no_details(conversation_records, fake_conversation_context: FakeConversationContext):
+    """ Tests the focus of the CollectExperiences agent with a mock conversation."""
+    session_id = hash("focus") % 10 ** 10
+    collect_experience_agent = CollectExperiencesAgent()
+    collect_experience_agent.set_state(CollectExperiencesAgentState(session_id=session_id))
+    fake_conversation_context.fill_conversation(conversation= conversation_records,
+        summary="The user and the agent are discussing a time when the user had to come a challenge. The user is "
+                "explaining how they used their arch skills to come up with new ideas.")
+    user_input = "I worked at Flour Flavor. There, I was kneading dough with different techniques that I learned in school. Do you want to know about them?"
+    agent_output = await collect_experience_agent.execute(
+            AgentInput(message=user_input),
+            fake_conversation_context)
+    conversation_records.append(
+        ConversationRecord(
+            message=user_input, 
+            actor=Actor.SIMULATED_USER
+        )
+    )
+    conversation_records.append(
+        ConversationRecord(
+            message=agent_output.message_for_user, 
+            actor=Actor.EVALUATED_AGENT
+        )
+    )
+    logging.info(agent_output.message_for_user)
+    evaluation_result = ConversationEvaluationRecord(simulated_user_prompt=user_input,
+                                                     test_case="collect_experiences_focus")
+
+    evaluation_result.add_conversation_records(conversation_records)
+
+    evaluation_output = await create_evaluator(EvaluationType.FOCUS).evaluate(evaluation_result)
+    evaluation_result.add_evaluation_result(evaluation_output)
+    expected = 60
+    actual = evaluation_output.score
     assert actual >= expected, f"Focus test: expected {expected} actual {actual}"
