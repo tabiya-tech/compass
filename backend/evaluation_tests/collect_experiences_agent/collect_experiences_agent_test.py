@@ -11,7 +11,7 @@ from evaluation_tests.conversation_libs.conversation_test_function import conver
     ConversationTestConfig, LLMSimulatedUser
 from evaluation_tests.collect_experiences_agent.collect_experiences_test_cases import test_cases
 from evaluation_tests.collect_experiences_agent.collect_experiences_executor import CollectExperienceAgentGetConversationContextExecutor, \
-    CollectExperienceAgentisFinished, CollectExperiencesAgentExecutor
+    CollectExperienceAgentIsFinished, CollectExperiencesAgentExecutor
 from evaluation_tests.collect_experiences_agent.conversation_generator import generate
 
 TEST_DICTIONARY = {
@@ -56,7 +56,7 @@ async def test_collect_experiences_withholding_student():
         output_folder=output_folder,
         execute_evaluated_agent=execute_evaluated_agent,
         execute_simulated_user=LLMSimulatedUser(system_instructions=test_case.simulated_user_prompt),
-        is_finished=CollectExperienceAgentisFinished(),
+        is_finished=CollectExperienceAgentIsFinished(),
         get_conversation_context=CollectExperienceAgentGetConversationContextExecutor(conversation_manager=conversation_manager)
     )
 
@@ -102,7 +102,7 @@ async def test_collect_experiences_unexperienced_student():
         output_folder=output_folder,
         execute_evaluated_agent=execute_evaluated_agent,
         execute_simulated_user=LLMSimulatedUser(system_instructions=test_case.simulated_user_prompt),
-        is_finished=CollectExperienceAgentisFinished(),
+        is_finished=CollectExperienceAgentIsFinished(),
         get_conversation_context=CollectExperienceAgentGetConversationContextExecutor(conversation_manager=conversation_manager)
     )
     await generate(max_iterations=config.max_iterations,
@@ -139,7 +139,7 @@ async def test_collect_experiences_french_worker_typos():
         output_folder=output_folder,
         execute_evaluated_agent=execute_evaluated_agent,
         execute_simulated_user=LLMSimulatedUser(system_instructions=test_case.simulated_user_prompt),
-        is_finished=CollectExperienceAgentisFinished(),
+        is_finished=CollectExperienceAgentIsFinished(),
         get_conversation_context=CollectExperienceAgentGetConversationContextExecutor(conversation_manager=conversation_manager)
     )
     await generate(max_iterations=config.max_iterations,
@@ -188,7 +188,7 @@ async def test_collect_experiences_french_worker_infodump():
         output_folder=output_folder,
         execute_evaluated_agent=execute_evaluated_agent,
         execute_simulated_user=LLMSimulatedUser(system_instructions=test_case.simulated_user_prompt),
-        is_finished=CollectExperienceAgentisFinished(),
+        is_finished=CollectExperienceAgentIsFinished(),
         get_conversation_context=CollectExperienceAgentGetConversationContextExecutor(conversation_manager=conversation_manager)
     )
     await generate(max_iterations=config.max_iterations,
@@ -236,7 +236,7 @@ async def test_collect_experiences_single_experience():
         output_folder=output_folder,
         execute_evaluated_agent=execute_evaluated_agent,
         execute_simulated_user=LLMSimulatedUser(system_instructions=test_case.simulated_user_prompt),
-        is_finished=CollectExperienceAgentisFinished(),
+        is_finished=CollectExperienceAgentIsFinished(),
         get_conversation_context=CollectExperienceAgentGetConversationContextExecutor(conversation_manager=conversation_manager)
     )
     await generate(max_iterations=config.max_iterations,
@@ -276,7 +276,7 @@ async def test_collect_experiences_single_experience_mistake():
         output_folder=output_folder,
         execute_evaluated_agent=execute_evaluated_agent,
         execute_simulated_user=LLMSimulatedUser(system_instructions=test_case.simulated_user_prompt),
-        is_finished=CollectExperienceAgentisFinished(),
+        is_finished=CollectExperienceAgentIsFinished(),
         get_conversation_context=CollectExperienceAgentGetConversationContextExecutor(conversation_manager=conversation_manager)
     )
     await generate(max_iterations=config.max_iterations,
