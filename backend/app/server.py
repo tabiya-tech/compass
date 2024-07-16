@@ -1,4 +1,3 @@
-import base64
 import logging
 import os
 from datetime import datetime
@@ -8,13 +7,12 @@ from dotenv import load_dotenv
 
 from fastapi import FastAPI, Request, HTTPException, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 
-from app.agent.agent_types import AgentInput, AgentOutput
+from app.agent.agent_types import AgentInput
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
 from app.users.auth import Authentication
-from app.conversation_memory.conversation_memory_manager import ConversationContext, ConversationMemoryManager
+from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
 from app.chat.chat_types import ConversationMessage
 from app.chat.chat_utils import filter_conversation_history, get_messages_from_conversation_manager
@@ -25,7 +23,8 @@ from app.version.version_routes import add_version_routes
 
 from contextlib import asynccontextmanager
 
-from app.users import add_users_routes, add_poc_chat_routes
+from app.users import add_users_routes
+from app.poc import add_poc_routes
 
 logger = logging.getLogger(__name__)
 
@@ -193,19 +192,6 @@ async def get_conversation_history(
         logger.exception(e)
         raise HTTPException(status_code=500, detail="Oops! something went wrong")
 
-
-# Temporary REST API EP for returning the incoming authentication information
-# from the request. This is for testing purposes until the UI supports auth
-# and must be removed later.
-@app.get(path="/authinfo",
-         description="Returns the authentication info (JWT token claims)")
-async def _get_auth_info(request: Request,
-                         credentials=Depends(auth.provider)):
-    auth_info_b64 = request.headers.get('x-apigateway-api-userinfo')
-    # some python magic
-    auth_info = base64.b64decode(auth_info_b64.encode() + b'==').decode()
-    return JSONResponse(auth_info)
-
 ############################################
 # Add routes relevant for the user management
 ############################################
@@ -214,7 +200,7 @@ add_users_routes(app, auth)
 ############################################
 # Add POC chat routes
 ############################################
-add_poc_chat_routes(app)
+add_poc_routes(app, auth)
 
 if __name__ == "__main__":
     import uvicorn
