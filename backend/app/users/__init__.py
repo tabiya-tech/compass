@@ -31,3 +31,4 @@ def add_users_routes(app: FastAPI, authentication: Authentication):
     # Add the users router to the app
     ############################################
     app.include_router(users_router)
+

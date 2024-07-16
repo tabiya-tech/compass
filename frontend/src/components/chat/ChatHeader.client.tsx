@@ -9,9 +9,8 @@ interface ChatHeaderProps {
 export const ChatHeader = ({ sessionId }: Readonly<ChatHeaderProps>) => {
   const clearConversation = async () => {
     try {
-      console.log(`${process.env.NEXT_PUBLIC_COMPASS_URL}/${process.env.NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT}?user_input==&clear_memory=true&session_id=${sessionId}`)
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_COMPASS_URL}/${process.env.NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT}?user_input==&clear_memory=true&session_id=${sessionId}`
+        `${process.env.NEXT_PUBLIC_COMPASS_URL}${process.env.NEXT_PUBLIC_COMPASS_ENDPOINT}?user_input==&clear_memory=true&session_id=${sessionId}`
       );
       console.log({ data: response.data }, "Conversation Cleared");
       window.location.reload();

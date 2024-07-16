@@ -21,7 +21,7 @@ export function Chat({ isMobile, sessionId }: Readonly<ChatProps>) {
 
   // Helper function to construct the compass url
   const constructCompassUrl = useCallback(
-    (endpoint: string, userInput: string) => {
+    (userInput: string) => {
       const urlSearchParams = new URLSearchParams(window.location.search);
       const availableEndpoints = JSON.parse(process.env.NEXT_PUBLIC_AVAILABLE_COMPASS_ENDPOINTS!) || [];
       if (urlSearchParams.has("compass_endpoint")) {
@@ -29,12 +29,12 @@ export function Chat({ isMobile, sessionId }: Readonly<ChatProps>) {
         if (!availableEndpoints.includes(urlSearchParams.get("compass_endpoint"))) {
           console.log(`Invalid compass endpoint from query params: ${urlSearchParams.get("compass_endpoint")}`);
           console.log(`Using default compass endpoint: ${process.env.NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT}/`);
-          return `${process.env.NEXT_PUBLIC_COMPASS_URL}/${process.env.NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT}/${endpoint}?user_input=${encodeURIComponent(userInput)}&session_id=${sessionId}`;
+          return `${process.env.NEXT_PUBLIC_COMPASS_URL}/${process.env.NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT}?user_input=${encodeURIComponent(userInput)}&session_id=${sessionId}`;
         }
         console.log(`Using compass endpoint from query params: ${urlSearchParams.get("compass_endpoint")}`);
-        return `${process.env.NEXT_PUBLIC_COMPASS_URL}/${urlSearchParams.get("compass_endpoint")}/${endpoint}?user_input=${encodeURIComponent(userInput)}&session_id=${sessionId}`;
+        return `${process.env.NEXT_PUBLIC_COMPASS_URL}/${urlSearchParams.get("compass_endpoint")}?user_input=${encodeURIComponent(userInput)}&session_id=${sessionId}`;
       } else {
-        return `${process.env.NEXT_PUBLIC_COMPASS_URL}/${process.env.NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT}/${endpoint}?user_input=${encodeURIComponent(userInput)}&session_id=${sessionId}`;
+        return `${process.env.NEXT_PUBLIC_COMPASS_URL}/${process.env.NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT}?user_input=${encodeURIComponent(userInput)}&session_id=${sessionId}`;
       }
     },
     [sessionId]
@@ -62,20 +62,25 @@ export function Chat({ isMobile, sessionId }: Readonly<ChatProps>) {
       console.log("Getting conversation history");
       setTyping(true);
       try {
-        const response = await axios.get(constructCompassUrl("history", ""));
-        response.data.forEach((historyItem: any) => {
+        const response = await axios.get(constructCompassUrl(START_PROMPT));
+        console.log({ data: response.data });
+        response.data.conversation_context.history.turns.forEach((historyItem: any) => {
+          console.log(
+            START_PROMPT,
+            historyItem.input.message,
+            historyItem.output.message_for_user,
+            historyItem.input.message === START_PROMPT
+          );
           const userMessage =
-            historyItem.input.message !== START_PROMPT && generateUserMessageFromResponse(historyItem.message);
-          const tabiyaMessage = generateTabiyaMessageFromResponse(historyItem.message);
+            historyItem.input.message !== START_PROMPT && generateUserMessageFromResponse(historyItem.input.message);
+          const tabiyaMessage = generateTabiyaMessageFromResponse(historyItem.output.message_for_user);
           if (userMessage) addMessage(userMessage);
           addMessage(tabiyaMessage);
         });
         return response;
       } catch (error) {
         console.error(error);
-        addMessage(
-          generateTabiyaMessageFromResponse("I'm sorry, I'm having trouble connecting to the server. Please try again later.")
-        );
+        addMessage(generateTabiyaMessageFromResponse("I'm sorry, I'm having trouble connecting to the server. Please try again later."));
         throw error;
       } finally {
         setTyping(false);
@@ -90,38 +95,25 @@ export function Chat({ isMobile, sessionId }: Readonly<ChatProps>) {
       try {
         const response = await getConversationFromHistory();
         console.log({ data: response.data });
-        // Send the start prompt to the backend
-        const startResponse = await axios.get(constructCompassUrl("", START_PROMPT));
-        if (startResponse.data.length > 0) {
-          console.log("New interface detected, using new message format");
-          console.log({ data: startResponse.data });
-          startResponse.data.forEach((messageItem: any) => {
-            addMessage(generateTabiyaMessageFromResponse(messageItem.message));
-          });
-        } else {
-          console.log("Using old message format");
-          console.log({ data: startResponse.data.last });
-          addMessage(generateTabiyaMessageFromResponse(startResponse.data.last.message_for_user));
-        }
       } catch (error) {
         console.error(error);
       }
     },
-    [getConversationFromHistory, constructCompassUrl]
+    [getConversationFromHistory]
   );
 
   const sendMessage = async (newMessage: Message) => {
     addMessage(newMessage);
     setTyping(true);
     try {
-      const response = await axios.get(constructCompassUrl("", newMessage.message));
-      if (response.data.length > 0) {
+      const response = await axios.get(constructCompassUrl(newMessage.message));
+      if (response.data.messages_for_user) {
         console.log("New interface detected, using new message format");
         console.log({ data: response.data.messages_for_user });
-        response.data.forEach((messageItem: any) => {
-          addMessage(generateTabiyaMessageFromResponse(messageItem.message));
+        response.data.messages_for_user.forEach((message: any) => {
+          addMessage(generateTabiyaMessageFromResponse(message));
         });
-      } else {
+      }else {
         console.log("Using old message format");
         console.log({ data: response.data.last });
         addMessage(generateTabiyaMessageFromResponse(response.data.last.message_for_user));

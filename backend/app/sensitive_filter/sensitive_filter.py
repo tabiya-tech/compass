@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import FastAPI
+from fastapi import APIRouter
 from google.auth import default as gcp_credentials
 
 import google.cloud.dlp
@@ -8,7 +8,7 @@ import google.cloud.dlp
 logger = logging.getLogger(__name__)
 
 
-def add_filter_routes(app: FastAPI):
+def add_filter_routes(app: APIRouter):
     """
     Add temporary route used for testing only.
     """
