@@ -15,7 +15,8 @@ from app.server_dependecies.agent_director_dependencies import get_agent_directo
 from app.server_dependecies.conversation_manager_dependencies import get_conversation_memory_manager
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from app.vector_search.vector_search_dependencies import get_occupation_skill_search_service
-
+from app.vector_search.occupation_search_routes import add_occupation_search_routes
+from app.vector_search.skill_search_routes import add_skill_search_routes
 
 class ConversationResponse(BaseModel):
     """
@@ -76,6 +77,20 @@ application_state_manager = ApplicationStateManager(InMemoryApplicationStateStor
 http_bearer = HTTPBearer(auto_error=False, scheme_name="JWT_auth")
 firebase = HTTPBearer(scheme_name="firebase")
 google = HTTPBearer(scheme_name="google")
+
+
+############################################
+# Add routes relevant for esco search
+############################################
+
+add_occupation_search_routes(router)
+add_skill_search_routes(router)
+
+############################################
+# Add routes relevant for pii filtering
+############################################
+
+sensitive_filter.add_filter_routes(router)
 
 
 @router.get(path="/conversation",

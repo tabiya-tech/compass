@@ -21,8 +21,6 @@ from app.chat.chat_utils import filter_conversation_history, get_messages_from_c
 from app.server_dependecies.agent_director_dependencies import get_agent_director
 from app.server_dependecies.conversation_manager_dependencies import get_conversation_memory_manager
 from app.server_dependecies.db_dependecies import initialize_mongo_db
-from app.vector_search.occupation_search_routes import add_occupation_search_routes
-from app.vector_search.skill_search_routes import add_skill_search_routes
 from app.version.version_routes import add_version_routes
 
 from contextlib import asynccontextmanager
@@ -108,19 +106,6 @@ auth = Authentication()
 # Add version routes
 ############################################
 add_version_routes(app)
-
-############################################
-# Add routes relevant for esco search
-############################################
-
-add_occupation_search_routes(app)
-add_skill_search_routes(app)
-
-############################################
-# Add routes relevant for pii filtering
-############################################
-
-sensitive_filter.add_filter_routes(app)
 
 ############################################
 # Add routes relevant for the conversation agent

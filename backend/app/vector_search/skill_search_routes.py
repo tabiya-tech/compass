@@ -1,7 +1,7 @@
 import logging
 from typing import Annotated
 
-from fastapi import FastAPI, Depends, Query
+from fastapi import APIRouter, Depends, Query
 from pydantic.main import BaseModel
 
 from app.vector_search.esco_entities import SkillEntity
@@ -11,7 +11,8 @@ from app.vector_search.vector_search_dependencies import get_skill_search_servic
 
 logger = logging.getLogger(__name__)
 
-def add_skill_search_routes(app: FastAPI) -> None:
+
+def add_skill_search_routes(app: APIRouter) -> None:
     """
     Temporary function to add the routes for the skill search service to the FastAPI app for testing purposes.
     """
