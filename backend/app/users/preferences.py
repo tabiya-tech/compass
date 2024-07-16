@@ -16,10 +16,10 @@ async def _update_user_language(
         user_preferences: UpdateUserLanguageRequest,
         authed_user: UserInfo) -> UserPreferences:
     try:
-        user_language = await repository.get_user_preference_by_user_id(user_preferences.user_id)
-
         if authed_user.user_id != user_preferences.user_id:
             raise HTTPException(status_code=403, detail="forbidden")
+
+        user_language = await repository.get_user_preference_by_user_id(user_preferences.user_id)
 
         if user_language is None:
             raise HTTPException(status_code=404, detail="user not found")
