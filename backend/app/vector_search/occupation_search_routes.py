@@ -1,7 +1,7 @@
 import logging
 from typing import Annotated
 
-from fastapi import FastAPI, Depends, Query
+from fastapi import APIRouter, Depends, Query
 from pydantic.main import BaseModel
 
 from app.vector_search.esco_entities import OccupationEntity
@@ -11,7 +11,8 @@ from app.vector_search.vector_search_dependencies import get_occupation_search_s
 
 logger = logging.getLogger(__name__)
 
-def add_occupation_search_routes(app: FastAPI) -> None:
+
+def add_occupation_search_routes(app: APIRouter) -> None:
     """ Add the occupation search routes to the FastAPI app."""
     class OccupationsResponse(BaseModel):
         """

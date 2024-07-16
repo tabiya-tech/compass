@@ -61,8 +61,8 @@ jobs:
         working-directory: frontend
         env:
           NEXT_PUBLIC_COMPASS_URL: ${{ inputs.backend-url }}
-          NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT: 'conversation'
-          NEXT_PUBLIC_AVAILABLE_COMPASS_ENDPOINTS: '["conversation", "conversation_sandbox"]'
+          NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT: 'poc/conversation'
+          NEXT_PUBLIC_AVAILABLE_COMPASS_ENDPOINTS: '["poc/conversation", "poc/conversation_sandbox"]'
       - name: Download frontend build bundle
         uses: actions/download-artifact@v4
         with:
