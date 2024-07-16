@@ -10,10 +10,9 @@ from fastapi import FastAPI, Request, HTTPException, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.agent.agent_types import AgentInput
+from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
-from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.users.auth import Authentication
 from app.conversation_memory.conversation_memory_manager import ConversationContext, ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
@@ -23,14 +22,12 @@ from app.server_dependecies.agent_director_dependencies import get_agent_directo
 from app.server_dependecies.conversation_manager_dependencies import get_conversation_memory_manager
 from app.server_dependecies.db_dependecies import initialize_mongo_db
 from app.vector_search.occupation_search_routes import add_occupation_search_routes
-from app.vector_search.similarity_search_service import SimilaritySearchService
 from app.vector_search.skill_search_routes import add_skill_search_routes
-from app.vector_search.vector_search_dependencies import get_occupation_skill_search_service
 from app.version.version_routes import add_version_routes
 
 from contextlib import asynccontextmanager
 
-from app.users import add_users_routes
+from app.users import add_users_routes, add_poc_chat_routes
 
 logger = logging.getLogger(__name__)
 
@@ -212,97 +209,6 @@ async def get_conversation_history(
         raise HTTPException(status_code=500, detail="Oops! something went wrong")
 
 
-@app.get(path="/conversation_sandbox",
-         description="""Temporary route used to interact with the conversation agent.""", )
-async def _test_conversation(request: Request, user_input: str, clear_memory: bool = False, filter_pii: bool = False,
-                             session_id: int = 1, only_reply: bool = False,
-                             similarity_search: SimilaritySearchService = Depends(get_occupation_skill_search_service),
-                             conversation_memory_manager: ConversationMemoryManager = Depends(
-                                 get_conversation_memory_manager)):
-    """
-    As a developer, you can use this endpoint to test the conversation agent with any user input.
-    You can adjust the front-end to use this endpoint for testing locally an agent in a configurable way.
-    """
-    # Do not allow user input that is too long,
-    # as a basic measure to prevent abuse.
-    if len(user_input) > 1000:
-        raise HTTPException(status_code=413, detail="To long user input")
-
-    try:
-        if clear_memory:
-            await application_state_manager.delete_state(session_id)
-        if filter_pii:
-            user_input = await sensitive_filter.obfuscate(user_input)
-
-        # set the state of the conversation memory manager
-        state = await application_state_manager.get_state(session_id)
-        conversation_memory_manager.set_state(state.conversation_memory_manager_state)
-
-        # handle the user input
-        context = await conversation_memory_manager.get_conversation_context()
-        # get the current index in the conversation history, so that we can return only the new messages
-        current_index = len(context.all_history.turns)
-
-        from app.agent.agent import Agent
-        agent: Agent
-        # ##################### ADD YOUR AGENT HERE ######################
-        # Initialize the agent you want to use for the evaluation
-        # from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirector
-        # agent = ExploreExperiencesAgentDirector(conversation_manager=conversation_memory_manager)
-        # agent.set_state(state.explore_experiences_director_state)
-        from app.agent.collect_experiences_agent import CollectExperiencesAgent
-        agent = CollectExperiencesAgent()
-
-        # ################################################################
-        logger.debug("%s initialized for sandbox testing", agent.agent_type.value)
-
-        agent_output = await agent.execute(user_input=AgentInput(message=user_input, sent_at=datetime.now()),
-                                           context=context)
-        if not agent.is_responsible_for_conversation_history():
-            await conversation_memory_manager.update_history(AgentInput(message=user_input, sent_at=datetime.now()),
-                                                             agent_output)
-
-        # get the context again after updating the history
-        context = await conversation_memory_manager.get_conversation_context()
-        response = await get_messages_from_conversation_manager(context, from_index=current_index)
-        if only_reply:
-            response = response.last.message_for_user
-
-        # save the state, before responding to the user
-        await application_state_manager.save_state(session_id, state)
-        return response
-    except Exception as e:  # pylint: disable=broad-except
-        logger.exception(
-            "Error for request: %s %s?%s with session id: %s : %s",
-            request.method,
-            request.url.path,
-            request.query_params,
-            session_id,
-            e
-        )
-        raise HTTPException(status_code=500, detail="Oops! something went wrong")
-
-
-@app.get(path="/conversation_context",
-         description="""Temporary route used to get the conversation context of a user.""", )
-async def get_conversation_context(
-        session_id: int,
-        conversation_memory_manager: ConversationMemoryManager = Depends(
-            get_conversation_memory_manager)):
-    """
-    Get the conversation context of a user.
-    """
-    try:
-        state = await application_state_manager.get_state(session_id)
-        conversation_memory_manager.set_state(state.conversation_memory_manager_state)
-        context = await conversation_memory_manager.get_conversation_context()
-        return context
-    except Exception as e:  # pylint: disable=broad-except
-        # this is the main entry point, so we need to catch all exceptions
-        logger.exception(e)
-        return {"error": "oops! something went wrong!"}
-
-
 # Temporary REST API EP for returning the incoming authentication information
 # from the request. This is for testing purposes until the UI supports auth
 # and must be removed later.
@@ -319,6 +225,11 @@ async def _get_auth_info(request: Request,
 # Add routes relevant for the user management
 ############################################
 add_users_routes(app, auth)
+
+############################################
+# Add POC chat routes
+############################################
+add_poc_chat_routes(app)
 
 if __name__ == "__main__":
     import uvicorn
