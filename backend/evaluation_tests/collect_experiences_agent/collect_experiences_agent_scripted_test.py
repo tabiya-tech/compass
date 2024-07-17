@@ -2,22 +2,13 @@ import logging
 import pytest
 import textwrap
 
-from pydantic.main import BaseModel
-from typing import Optional
 
 from app.agent.agent_types import AgentInput
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationRecord, Actor
 from evaluation_tests.conversation_libs.fake_conversation_context import FakeConversationContext
 from app.agent.collect_experiences_agent import CollectExperiencesAgent, CollectExperiencesAgentState
-from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationEvaluationRecord, EvaluationType
-from evaluation_tests.conversation_libs.evaluators.evaluator_builder import create_evaluator
-from common_libs.llm.models_utils import LLMConfig
-from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.text_formatters import extract_json
-from evaluation_tests.conversation_libs.evaluators.base_evaluator import BaseEvaluator
-from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationEvaluationRecord, \
-    EvaluationResult, EvaluationType
-from evaluation_tests.conversation_libs.evaluators.prompt_generator import PromptGenerator
+from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationEvaluationRecord
+from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationEvaluationRecord
 from evaluation_tests.collect_experiences_agent.evaluators.focus_evaluator import FocusEvaluator
 from evaluation_tests.collect_experiences_agent.evaluators.no_advice_evaluator import NoAdviceEvaluator
 
