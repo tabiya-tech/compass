@@ -100,6 +100,7 @@ describe("IDPAuth tests", () => {
       language: Language.en,
       sessions: [],
     },
+    updateUserPreferences: jest.fn(),
     isLoading: false,
   };
 

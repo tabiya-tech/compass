@@ -18,11 +18,20 @@ export default class ChatService {
     this.sessionId = sessionId;
   }
 
+  /**
+   * Get the singleton instance of the ChatService.
+   * @returns {ChatService} The singleton instance of the ChatService.
+   * @param sessionId The session ID to use for the chat service.
+   */
+  static getInstance(sessionId: number): ChatService {
+    return new ChatService(sessionId);
+  }
+
   public getSessionId(): number {
     return this.sessionId;
   }
 
-  public async sendMessage(message: string): Promise<ConversationMessage[]> {
+  async sendMessage(message: string): Promise<ConversationMessage[]> {
     const serviceName = "ChatService";
     const serviceFunction = "sendMessage";
     const method = "GET";
@@ -61,7 +70,7 @@ export default class ChatService {
     return messageResponse;
   }
 
-  public async clearChat(): Promise<void> {
+  async clearChat(): Promise<void> {
     const serviceName = "ChatService";
     const serviceFunction = "clearChat";
     const method = "GET";

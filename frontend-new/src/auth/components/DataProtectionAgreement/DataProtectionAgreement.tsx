@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { Box, Button, Container, styled, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -30,11 +30,24 @@ export const DATA_TEST_ID = {
 };
 
 const DataProtectionAgreement = () => {
-  const { createUserPreferences } = useContext(UserPreferencesContext);
+  const { createUserPreferences, userPreferences } = useContext(UserPreferencesContext);
   const [isAcceptingDPA, setIsAcceptingDPA] = useState(false);
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
+
+  /**
+   * Redirect the user to the login page
+   * if they are already logged in
+   */
+  useEffect(() => {
+    // If the user is already logged in, redirect to the home page
+    if (user && userPreferences?.accepted_tc) {
+      navigate(routerPaths.ROOT, { replace: true });
+    } else if (!user) {
+      navigate(routerPaths.LOGIN, { replace: true });
+    }
+  }, [navigate, user, userPreferences]);
 
   /**
    * Persist the user's chosen preferences to the backend
@@ -69,11 +82,11 @@ const DataProtectionAgreement = () => {
         },
         (error) => {
           writeServiceErrorToLog(error, console.error);
-          throw error;
+          enqueueSnackbar("Failed to create user preferences", { variant: "error" });
         }
       );
     } catch (e) {
-      console.log(e);
+      console.error(e);
       enqueueSnackbar("Failed to create user preferences", { variant: "error" });
       console.error("Failed to create user preferences", e);
     } finally {

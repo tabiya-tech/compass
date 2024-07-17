@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Box, Button, CircularProgress, Container, styled, TextField, Typography, useTheme } from "@mui/material";
 import { AuthContext } from "src/auth/Providers/AuthProvider/AuthProvider";
 import { NavLink as RouterNavLink, useNavigate } from "react-router-dom";
@@ -40,14 +40,25 @@ export const DATA_TEST_ID = {
 
 const Login: React.FC = () => {
   const theme = useTheme();
-  const { login, isLoggingIn } = useContext(AuthContext);
+  const { login, isLoggingIn, user } = useContext(AuthContext);
   const [isCheckingPreferences, setIsCheckingPreferences] = useState(false);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const { getUserPreferences } = useContext(UserPreferencesContext);
+  const { getUserPreferences, userPreferences } = useContext(UserPreferencesContext);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  /**
+   * Redirect the user to the login page
+   * if they are already logged in
+   */
+  useEffect(() => {
+    // If the user is already logged in, redirect to the home page
+    if (user && userPreferences?.accepted_tc) {
+      navigate(routerPaths.ROOT, { replace: true });
+    }
+  }, [navigate, user, userPreferences]);
 
   /**
    * Handle the login form submission

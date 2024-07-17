@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import ChatService from "src/chat/ChatService/ChatService";
 import ChatList from "src/chat/ChatList/ChatList";
 import { IChatMessage } from "./Chat.types";
@@ -29,14 +29,6 @@ const Chat = () => {
   const { userPreferences } = useContext(UserPreferencesContext);
   const { logout } = useContext(AuthContext);
 
-  const chatService = useMemo(() => {
-    if (!userPreferences) {
-      console.log("User preferences not found");
-    } else {
-      return new ChatService(userPreferences.sessions[0]);
-    }
-  }, [userPreferences]);
-
   const navigate = useNavigate();
 
   const addMessage = (message: IChatMessage) => {
@@ -52,6 +44,17 @@ const Chat = () => {
         addMessage(message);
       }
       try {
+        if (!userPreferences?.sessions.length) {
+          console.error("User has no sessions");
+          addMessage(
+            generateCompassMessage(
+              "I'm sorry, I'm having trouble connecting to the server. Please try again later.",
+              sent_at
+            )
+          );
+          return;
+        }
+        const chatService = ChatService.getInstance(userPreferences.sessions[0]);
         if (!chatService) {
           console.error("Chat service is not initialized");
           addMessage(
@@ -71,13 +74,16 @@ const Chat = () => {
       } catch (error) {
         console.error("Failed to send message:", error);
         addMessage(
-          generateCompassMessage("I'm sorry, Something seems to have gone wrong. Try logging in again.", sent_at)
+          generateCompassMessage(
+            "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
+            sent_at
+          )
         );
       } finally {
         setIsTyping(false);
       }
     },
-    [chatService]
+    [userPreferences?.sessions]
   );
 
   const handleLogout = useCallback(() => {
@@ -95,11 +101,21 @@ const Chat = () => {
 
   const initializeChat = useCallback(async () => {
     try {
+      if (!userPreferences?.sessions.length) {
+        addMessage(
+          generateCompassMessage(
+            "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
+            new Date().toISOString()
+          )
+        );
+        return;
+      }
+      const chatService = ChatService.getInstance(userPreferences.sessions[0]);
       if (!chatService) {
         console.error("Chat service is not initialized");
         addMessage(
           generateCompassMessage(
-            "I'm sorry, Something seems to have gone wrong. Try logging in again.",
+            "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
             new Date().toISOString()
           )
         );
@@ -130,7 +146,7 @@ const Chat = () => {
     } finally {
       setIsTyping(false);
     }
-  }, [chatService, enqueueSnackbar, sendMessage]);
+  }, [enqueueSnackbar, sendMessage, userPreferences?.sessions]);
 
   useEffect(() => {
     if (!initialized) {

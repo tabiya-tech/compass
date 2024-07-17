@@ -26,4 +26,5 @@ export type UserPreferencesContextValue = {
     successCallback: (prefs: UserPreference) => void,
     errorCallback: (error: any) => void
   ) => void;
+  updateUserPreferences: (preferences: UserPreference | null) => void;
 };

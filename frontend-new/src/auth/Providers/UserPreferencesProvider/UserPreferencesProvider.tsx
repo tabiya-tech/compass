@@ -1,7 +1,8 @@
-import React, { createContext, useCallback, useMemo, useState, ReactNode, useEffect } from "react";
+import React, { createContext, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import UserPreferencesService from "src/auth/services/UserPreferences/userPreferences.service";
-import { UserPreferencesContextValue, UserPreference } from "src/auth/services/UserPreferences/userPreferences.types";
+import { UserPreference, UserPreferencesContextValue } from "src/auth/services/UserPreferences/userPreferences.types";
 import { PersistentStorageService } from "src/persistentStorageService/PersistentStorageService";
+import { Backdrop } from "src/theme/Backdrop/Backdrop";
 
 export type UserPreferencesProviderProps = {
   children: ReactNode;
@@ -12,15 +13,22 @@ export const userPreferencesContextDefaultValue: UserPreferencesContextValue = {
   isLoading: false,
   createUserPreferences: () => {},
   getUserPreferences: () => {},
+  updateUserPreferences: () => {},
 };
 
 export const UserPreferencesContext = createContext<UserPreferencesContextValue>(userPreferencesContextDefaultValue);
 
 export const UserPreferencesProvider: React.FC<UserPreferencesProviderProps> = ({ children }) => {
-  const [userPreferences, setUserPreferences] = useState<UserPreference | null>(() => {
-    return PersistentStorageService.getUserPreferences();
-  });
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [userPreferences, setUserPreferences] = useState<UserPreference | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const storedPreferences = PersistentStorageService.getUserPreferences();
+    if (storedPreferences) {
+      setUserPreferences(storedPreferences);
+    }
+    setIsLoading(false);
+  }, []);
 
   useEffect(() => {
     if (userPreferences) {
@@ -28,7 +36,7 @@ export const UserPreferencesProvider: React.FC<UserPreferencesProviderProps> = (
     } else {
       PersistentStorageService.clearUserPreferences();
     }
-  }, [userPreferences]);
+  }, [userPreferences, setUserPreferences]);
 
   /**
    * Create user preferences
@@ -76,20 +84,29 @@ export const UserPreferencesProvider: React.FC<UserPreferencesProviderProps> = (
     []
   );
 
-  const value = useMemo(
-    () => ({
-      userPreferences: userPreferences,
-      isLoading,
-      createUserPreferences: createUserPreferences,
-      getUserPreferences,
-    }),
-    [userPreferences, isLoading, createUserPreferences, getUserPreferences]
+  const updateUserPreferences = useCallback(
+    async (preferences: UserPreference | null) => {
+      setIsLoading(true);
+      setUserPreferences(preferences);
+      setIsLoading(false);
+    },
+    [setUserPreferences]
   );
 
-  //TODO: use backdrop for loading
+  const value = useMemo(
+    () => ({
+      userPreferences,
+      updateUserPreferences,
+      isLoading,
+      createUserPreferences,
+      getUserPreferences,
+    }),
+    [userPreferences, isLoading, createUserPreferences, getUserPreferences, updateUserPreferences]
+  );
+
   return (
     <UserPreferencesContext.Provider value={value}>
-      {isLoading ? <div>Loading...</div> : children}
+      {isLoading ? <Backdrop isShown={isLoading} message={"Authenticating, wait a moment..."} /> : children}
     </UserPreferencesContext.Provider>
   );
 };

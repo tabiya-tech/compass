@@ -32,7 +32,7 @@ export default class UserPreferencesService {
    * Creates an entry for the user preferences of a user with an ID
    *
    */
-  public async createUserPreferences(newUserPreferencesSpec: UserPreference): Promise<UserPreference> {
+  async createUserPreferences(newUserPreferencesSpec: UserPreference): Promise<UserPreference> {
     const serviceName = "UserPreferencesService";
     const serviceFunction = "createUserPreferences";
     const method = "POST";
@@ -108,7 +108,7 @@ export default class UserPreferencesService {
    * Gets the user preferences of a user with an ID
    *
    */
-  public async getUserPreferences(userId: string): Promise<UserPreference> {
+  async getUserPreferences(userId: string): Promise<UserPreference> {
     const serviceName = "UserPreferencesService";
     const serviceFunction = "getUserPreferences";
     const method = "GET";

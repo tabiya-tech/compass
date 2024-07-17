@@ -3,7 +3,7 @@ import "src/_test_utilities/consoleMock";
 
 import { useContext } from "react";
 import { AuthContext, authContextDefaultValue } from "src/auth/Providers/AuthProvider/AuthProvider";
-import { renderHook,  act, waitFor } from "src/_test_utilities/test-utils";
+import { renderHook, act, waitFor } from "src/_test_utilities/test-utils";
 import { PersistentStorageService } from "src/persistentStorageService/PersistentStorageService";
 import * as useTokensHook from "src/auth/hooks/useTokens";
 import { mockLoggedInUser } from "src/_test_utilities/mockLoggedInUser";
@@ -84,7 +84,7 @@ describe("AuthProvider module", () => {
       //@ts-ignore
       loginSpy.mockImplementationOnce((_email, _password, _successCallback, errorCallback) => {
         return Promise.resolve().then(() => errorCallback(loginError));
-      })
+      });
 
       //initially isLogging in should be false.
       expect(result.current.isLoggingIn).toBe(false);
@@ -99,7 +99,7 @@ describe("AuthProvider module", () => {
       // AND isLogging in should be false.
       await waitFor(() => {
         expect(result.current.isLoggingIn).toBe(false);
-      })
+      });
 
       // AND the error callback should be called
       expect(givenErrorCallback).toHaveBeenCalledWith(loginError);

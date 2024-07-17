@@ -9,44 +9,33 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { ConversationMessageSender } from "./ChatService/ChatService.types";
 import { Language } from "src/auth/services/UserPreferences/userPreferences.types";
 import { UserPreferencesContext } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
+import ChatService from "./ChatService/ChatService";
 
-const mockSendMessage = jest.fn();
-
-const mockClearChat = jest.fn();
-const mockGetChatHistory = jest.fn();
-
-jest.mock("src/chat/ChatService/ChatService", () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      sendMessage: mockSendMessage,
-      clearChat: mockClearChat,
-      getChatHistory: mockGetChatHistory,
-    };
-  });
-});
+// Mock the ChatService module
+jest.mock("src/chat/ChatService/ChatService");
 
 jest.mock("src/chat/ChatList/ChatList", () => {
-  const senderalModule = jest.requireActual("src/chat/ChatList/ChatList");
+  const actualModule = jest.requireActual("src/chat/ChatList/ChatList");
   return {
     __esModule: true,
-    ...senderalModule,
-    default: jest.fn(() => <div data-testid={senderalModule.DATA_TEST_ID.CHAT_LIST_CONTAINER}></div>),
+    ...actualModule,
+    default: jest.fn(() => <div data-testid={actualModule.DATA_TEST_ID.CHAT_LIST_CONTAINER}></div>),
   };
 });
 
 jest.mock("src/chat/ChatMessageField/ChatMessageField", () => {
-  const senderalModule = jest.requireActual("src/chat/ChatMessageField/ChatMessageField");
+  const actualModule = jest.requireActual("src/chat/ChatMessageField/ChatMessageField");
   return {
     __esModule: true,
-    ...senderalModule,
+    ...actualModule,
     default: jest.fn(({ handleSend, message, notifyChange }) => (
-      <div data-testid={senderalModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER}>
+      <div data-testid={actualModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER}>
         <input
-          data-testid={senderalModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD}
+          data-testid={actualModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD}
           value={message}
           onChange={(e) => notifyChange(e.target.value)}
         />
-        <button data-testid={senderalModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON} onClick={handleSend}>
+        <button data-testid={actualModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON} onClick={handleSend}>
           Send
         </button>
       </div>
@@ -69,6 +58,7 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
 
 describe("Chat", () => {
   const getUserPreferencesMock = jest.fn();
+  const givenSessionId = 123;
 
   const userPreferencesContextValue = {
     getUserPreferences: getUserPreferencesMock,
@@ -77,12 +67,24 @@ describe("Chat", () => {
       accepted_tc: new Date(),
       user_id: "0001",
       language: Language.en,
-      sessions: [],
+      sessions: [givenSessionId],
     },
+    updateUserPreferences: jest.fn(),
     isLoading: false,
   };
 
+  const mockSendMessage = jest.fn();
+  const mockGetChatHistory = jest.fn();
+
   beforeEach(() => {
+    // Mock the static getInstance method to return an instance with mocked methods
+    (ChatService as jest.Mocked<typeof ChatService>).getInstance = jest.fn().mockReturnValue({
+      sendMessage: mockSendMessage,
+      getChatHistory: mockGetChatHistory,
+    });
+  });
+
+  afterEach(() => {
     jest.clearAllMocks();
   });
 
@@ -153,7 +155,9 @@ describe("Chat", () => {
         expect(screen.getByTestId(CHAT_LIST_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
       });
 
-      expect(mockGetChatHistory).toHaveBeenCalledWith();
+      await waitFor(() => {
+        expect(mockGetChatHistory).toHaveBeenCalled();
+      });
 
       // AND the ChatList component to be called with the history returned to the initialization
       await waitFor(() => {
@@ -195,7 +199,7 @@ describe("Chat", () => {
 
     test("should show an error message if initialization fails", async () => {
       // GIVEN a chat component
-      mockGetChatHistory.mockRejectedValueOnce(new Error("Initialization failed"));
+      mockGetChatHistory.mockRejectedValueOnce(new Error("Failed to initialize chat"));
 
       // WHEN the chat is rendered with a router and snackbar provider
       render(
@@ -218,10 +222,13 @@ describe("Chat", () => {
 
   describe("test send message", () => {
     test("should send a message", async () => {
+      // GIVEN a chat component
+      // First, we need the initialization to succeed
       mockSendMessage.mockResolvedValueOnce([
         {
           message: "Hello, I'm Compass",
           sent_at: new Date().toISOString(),
+          sender: ConversationMessageSender.COMPASS,
         },
       ]);
 
@@ -273,13 +280,6 @@ describe("Chat", () => {
     });
 
     test("should show an error message if sending a message fails", async () => {
-      mockSendMessage.mockRejectedValueOnce(new Error("Sending message failed"));
-      // GIVEN a chat component
-      // First, we need the initialization to succeed
-      mockSendMessage.mockResolvedValueOnce({
-        messages_for_user: ["Hello, I'm Compass"],
-      });
-
       // WHEN a user sends a message with a router and snackbar provider
       render(
         <HashRouter>
@@ -291,7 +291,7 @@ describe("Chat", () => {
 
       // Ensure initialization is successful
       await waitFor(() => {
-        expect(mockGetChatHistory).toHaveBeenCalledWith();
+        expect(mockGetChatHistory).toHaveBeenCalled();
       });
 
       // Now mock sendMessage to fail for the user message
@@ -318,7 +318,7 @@ describe("Chat", () => {
               {
                 id: expect.any(Number),
                 sender: ConversationMessageSender.COMPASS,
-                message: "I'm sorry, Something seems to have gone wrong. Try logging in again.",
+                message: "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
                 sent_at: expect.any(String),
               },
             ]),

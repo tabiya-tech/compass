@@ -12,6 +12,7 @@ import { useAuthUser } from "src/auth/hooks/useAuthUser";
 import { getUserFriendlyErrorMessage } from "src/error/error";
 import { writeServiceErrorToLog } from "src/error/logger";
 import { UserPreferencesContext } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
+import { AuthContext } from "src/auth/Providers/AuthProvider/AuthProvider";
 
 const uniqueId = "f0324e97-83fd-49e6-95c3-1043751fa1db";
 export const DATA_TEST_ID = {
@@ -26,10 +27,22 @@ const IDPAuth = () => {
   const tokens = useTokens({ updateUserByIDToken: updateUserByIDToken });
 
   const [isCheckingPreferences, setIsCheckingPreferences] = useState(false);
-  const { getUserPreferences } = useContext(UserPreferencesContext);
+  const { user } = useContext(AuthContext);
+  const { getUserPreferences, userPreferences } = useContext(UserPreferencesContext);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  /**
+   * Redirect the user to the login page
+   * if they are already logged in
+   */
+  useEffect(() => {
+    // If the user is already logged in, redirect to the home page
+    if (user && userPreferences?.accepted_tc) {
+      navigate(routerPaths.ROOT, { replace: true });
+    }
+  }, [navigate, user, userPreferences]);
 
   /**
    * Check if the user has accepted the terms and conditions
@@ -46,7 +59,6 @@ const IDPAuth = () => {
             // If the accepted_tc is not set or is not a valid date, redirect to the DPA page
             // this is to ensure that even if the accepted_tc is manipulated in the database, the user will be redirected to the DPA page
             // and will have to accept the terms and conditions again
-            console.log({ prefs });
             if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
               setIsCheckingPreferences(false);
               navigate(routerPaths.DPA, { replace: true });
@@ -84,8 +96,8 @@ const IDPAuth = () => {
             name: data.user.displayName,
             email: data.user.email,
           };
-          console.log({ data });
           tokens.setAccessToken(data?.user?.multiFactor?.user?.accessToken as string);
+          updateUserByIDToken(data?.user?.multiFactor?.user?.accessToken as string);
           checkUserPreferences(newUser).then(() => {
             setLoading(false);
           });
@@ -101,7 +113,7 @@ const IDPAuth = () => {
     const ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
     ui.start("#firebaseui-auth-container", uiConfig);
     setLoading(false);
-  }, [navigate, enqueueSnackbar, checkUserPreferences, tokens]);
+  }, [navigate, enqueueSnackbar, checkUserPreferences, tokens, updateUserByIDToken]);
 
   return (
     <div data-test_id={DATA_TEST_ID.FIREBASE_AUTH}>

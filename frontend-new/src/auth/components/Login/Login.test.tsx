@@ -84,6 +84,7 @@ describe("Testing Login component with AuthProvider", () => {
       language: Language.en,
       sessions: [],
     },
+    updateUserPreferences: jest.fn(),
     isLoading: false,
   };
 
