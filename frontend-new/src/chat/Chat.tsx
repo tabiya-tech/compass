@@ -14,6 +14,9 @@ import { routerPaths } from "src/app/routerPaths";
 import { AuthContext } from "src/auth/Providers/AuthProvider/AuthProvider";
 import { ConversationMessage, ConversationMessageSender } from "./ChatService/ChatService.types";
 import { UserPreferencesContext } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
+import ExperiencesDrawer from "src/Experiences/ExperiencesDrawer";
+import { Experience } from "src/Experiences/ExperienceService/Experiences.types";
+import ExperienceService from "src/Experiences/ExperienceService/ExperienceService";
 
 const uniqueId = "b7ea1e82-0002-432d-a768-11bdcd186e1d";
 export const DATA_TEST_ID = {
@@ -29,6 +32,9 @@ const Chat = () => {
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const { userPreferences, updateUserPreferences } = useContext(UserPreferencesContext);
   const { logout } = useContext(AuthContext);
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const [experiences, setExperiences] = React.useState<Experience[]>([]);
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -184,22 +190,52 @@ const Chat = () => {
     }
   }, [initializeChat, updateUserPreferences, userPreferences, enqueueSnackbar]);
 
+  const handleOpenExperiencesDrawer = async () => {
+    setIsDrawerOpen(true);
+    setIsLoading(true);
+    try {
+      const experienceService = ExperienceService.getInstance(userPreferences?.sessions[0]!);
+      const data = await experienceService.getExperiences();
+      setExperiences(data);
+      setIsLoading(false);
+    } catch (error) {
+      enqueueSnackbar("Failed to retrieve experiences", { variant: "error" });
+      console.error("Failed to retrieve experiences", error);
+    }
+  };
+
+  const handleDrawerClose = () => {
+    setIsDrawerOpen(false);
+  };
+
   return (
-    <Box width="100%" height="100%" display="flex" flexDirection="column" data-testid={DATA_TEST_ID.CHAT_CONTAINER}>
-      <ChatHeader notifyOnLogout={handleLogout} startNewConversation={startNewConversation} />
-      <Box sx={{ flex: 1, overflowY: "auto" }}>
-        <ChatList messages={messages} isTyping={isTyping} />
-      </Box>
-      <Box sx={{ flexShrink: 0 }}>
-        <ChatMessageField
-          handleSend={handleSend}
-          aiIsTyping={isTyping}
-          isChatFinished={conversationCompleted}
-          message={currentMessage}
-          notifyChange={setCurrentMessage}
+    <>
+      <Box width="100%" height="100%" display="flex" flexDirection="column" data-testid={DATA_TEST_ID.CHAT_CONTAINER}>
+        <ChatHeader
+          notifyOnLogout={handleLogout}
+          startNewConversation={startNewConversation}
+          notifyOnExperiencesDrawerOpen={handleOpenExperiencesDrawer}
         />
+        <Box sx={{ flex: 1, overflowY: "auto" }}>
+          <ChatList messages={messages} isTyping={isTyping} />
+        </Box>
+        <Box sx={{ flexShrink: 0 }}>
+          <ChatMessageField
+            handleSend={handleSend}
+            aiIsTyping={isTyping}
+            isChatFinished={conversationCompleted}
+            message={currentMessage}
+            notifyChange={setCurrentMessage}
+          />
+        </Box>
       </Box>
-    </Box>
+      <ExperiencesDrawer
+        isOpen={isDrawerOpen}
+        notifyOnClose={handleDrawerClose}
+        isLoading={isLoading}
+        experiences={experiences}
+      />
+    </>
   );
 };
 

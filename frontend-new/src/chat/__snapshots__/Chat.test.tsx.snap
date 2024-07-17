@@ -50,6 +50,31 @@ exports[`Chat render tests should render the Chat Component 1`] = `
         class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
       />
     </button>
+    <div
+      data-testid="mock-context-menu"
+    >
+      <div
+        data-testid="start-new-conversation-7413b63a-887b-4f41-b930-89e9770db12b"
+      >
+        start new conversation
+      </div>
+      <div
+        data-testid="experiences-button-7413b63a-887b-4f41-b930-89e9770db12b"
+      >
+        view experiences
+      </div>
+      <div
+        data-testid="settings-selector-7413b63a-887b-4f41-b930-89e9770db12b"
+      >
+        settings
+      </div>
+      <div
+        data-testid="logout-button-7413b63a-887b-4f41-b930-89e9770db12b"
+      >
+        logout
+      </div>
+      ;
+    </div>
   </div>
   <div
     class="MuiBox-root css-177dxab"

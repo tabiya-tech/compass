@@ -1,12 +1,23 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import Chat from "./Chat";
 import { getBackendUrl } from "src/envService";
+import { mockExperiences } from "src/Experiences/ExperienceService/_test_utilities/mockExperiencesResponses";
 
 const meta: Meta<typeof Chat> = {
   title: "Chat/Chat-Component",
   component: Chat,
   tags: ["autodocs"],
   argTypes: {},
+  parameters: {
+    mockData: [
+      {
+        url: getBackendUrl() + "/conversation/experiences?session_id=1234",
+        method: "GET",
+        status: 200,
+        response: mockExperiences,
+      },
+    ],
+  },
 };
 
 export default meta;
@@ -19,6 +30,7 @@ export const Shown: Story = {
   args: {},
   parameters: {
     mockData: [
+      ...meta.parameters!.mockData,
       {
         url: CONVERSATION_HISTORY_URL,
         method: "GET",
@@ -43,8 +55,8 @@ export const Shown: Story = {
   },
 };
 
-const generateRealisticConversation = (finished: boolean) => {
-  return [
+const generateRealisticConversation = (finished: boolean, includeExperiences: boolean) => {
+  const conversationData = [
     {
       url: CONVERSATION_HISTORY_URL,
       method: "GET",
@@ -151,18 +163,25 @@ const generateRealisticConversation = (finished: boolean) => {
       },
     },
   ];
+
+  if (includeExperiences) {
+    conversationData.push(...meta.parameters!.mockData);
+  }
+
+  return conversationData;
 };
 
 export const ShownWithUnfinishedConversation: Story = {
   args: {},
   parameters: {
-    mockData: generateRealisticConversation(false),
+    mockData: generateRealisticConversation(false, false),
+    isLoading: true,
   },
 };
 
 export const ShownWithFinishedConversation: Story = {
   args: {},
   parameters: {
-    mockData: generateRealisticConversation(true),
+    mockData: generateRealisticConversation(true, true),
   },
 };
