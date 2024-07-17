@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Box, useTheme } from "@mui/material";
-import { AuthContext } from "src/auth/AuthProvider";
+import { AuthContext } from "src/auth/Providers/AuthProvider/AuthProvider";
 import { useContext, useEffect } from "react";
 import { routerPaths } from "src/app/routerPaths";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";

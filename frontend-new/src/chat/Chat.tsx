@@ -11,8 +11,9 @@ import { getUserFriendlyErrorMessage, ServiceError } from "src/error/error";
 import { writeServiceErrorToLog } from "src/error/logger";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
-import { AuthContext } from "src/auth/AuthProvider";
+import { AuthContext } from "src/auth/Providers/AuthProvider/AuthProvider";
 import { ConversationMessage, ConversationMessageSender } from "./ChatService/ChatService.types";
+import { UserPreferencesContext } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
 
 const uniqueId = "b7ea1e82-0002-432d-a768-11bdcd186e1d";
 export const DATA_TEST_ID = {
@@ -25,16 +26,16 @@ const Chat = () => {
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const [initialized, setInitialized] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
+  const { userPreferences } = useContext(UserPreferencesContext);
   const { logout } = useContext(AuthContext);
 
   const chatService = useMemo(() => {
-    try {
-      return new ChatService();
-    } catch (error) {
-      console.error("Failed to create chat service:", error);
-      return;
+    if (!userPreferences) {
+      console.log("User preferences not found");
+    } else {
+      return new ChatService(userPreferences.sessions[0]);
     }
-  }, []);
+  }, [userPreferences]);
 
   const navigate = useNavigate();
 

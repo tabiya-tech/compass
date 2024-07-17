@@ -6,7 +6,7 @@ import { DATA_TEST_ID as ERROR_PAGE_DATA_TEST_ID } from "src/errorPage/NotFound"
 import { DATA_TEST_ID as REGISTER_DATA_TEST_ID } from "src/auth/components/Register/Register";
 import { DATA_TEST_ID as LOGIN_DATA_TEST_ID } from "src/auth/components/Login/Login";
 import { DATA_TEST_ID as VERIFY_EMAIL_DATA_TEST_ID } from "src/auth/components/VerifyEmail/VerifyEmail";
-import { DATA_TEST_ID as DPA_DATA_TEST_ID } from "src/auth/components/PolicyNotice/DataProtectionPolicy";
+import { DATA_TEST_ID as DPA_DATA_TEST_ID } from "src/auth/components/DataProtectionAgreement/DataProtectionAgreement";
 import { DATA_TEST_ID as HOME_DATA_TEST_ID } from "src/homePage/Home";
 
 import { routerPaths } from "./routerPaths";
@@ -144,8 +144,8 @@ jest.mock("src/auth/components/VerifyEmail/VerifyEmail", () => {
 });
 
 // mock the DPA component
-jest.mock("src/auth/components/PolicyNotice/DataProtectionPolicy", () => {
-  const originalModule = jest.requireActual("src/auth/components/PolicyNotice/DataProtectionPolicy");
+jest.mock("src/auth/components/DataProtectionAgreement/DataProtectionAgreement", () => {
+  const originalModule = jest.requireActual("src/auth/components/DataProtectionAgreement/DataProtectionAgreement");
   return {
     __esModule: true,
     ...originalModule,

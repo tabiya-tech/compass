@@ -1,5 +1,7 @@
+import { UserPreference } from "src/auth/services/UserPreferences/userPreferences.types";
+
 export const ACCESS_TOKEN_KEY = "access_token";
-export const CHAT_SESSION_ID_KEY = "ChatSessionID";
+export const USER_PREFERENCES_KEY = "user_preferences";
 
 /**
  * This class is used to store the tokens in the session storage.
@@ -32,26 +34,34 @@ export class PersistentStorageService {
   }
 
   /**
-   *  Returns the chat session id from the storage
-   * @returns string | null - The session id
+   * Returns the user preferences from the storage
+   * @returns UserPreference | null - The user preferences
    */
-  static getChatSessionID(): string | null {
-    return this.storage.getItem(CHAT_SESSION_ID_KEY);
+  static getUserPreferences(): UserPreference | null {
+    const item = this.storage.getItem(USER_PREFERENCES_KEY);
+    return item
+      ? {
+          ...JSON.parse(item),
+          accepted_tc: new Date(JSON.parse(item).accepted_tc),
+        }
+      : null;
   }
 
   /**
-   * Sets the chat session id in the storage
-   * @param sessionID
+   * Sets the user preferences in the storage
+   * @param preferences
    */
-  static setChatSessionID(sessionID: string): void {
-    this.storage.setItem(CHAT_SESSION_ID_KEY, sessionID);
+  static setUserPreferences(preferences: UserPreference): void {
+    this.storage.setItem(USER_PREFERENCES_KEY, JSON.stringify(preferences));
   }
 
   /**
-   * Clears the chat session id from the storage
+   * Clears the user preferences from the storage
+   * @param preferences
+   * @returns void
    */
-  static clearChatSessionID(): void {
-    this.storage.removeItem(CHAT_SESSION_ID_KEY);
+  static clearUserPreferences(): void {
+    this.storage.removeItem(USER_PREFERENCES_KEY);
   }
 
   /**

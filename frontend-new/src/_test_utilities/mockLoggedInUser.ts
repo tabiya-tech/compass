@@ -1,4 +1,4 @@
-import { AuthContextValue, TabiyaUser, authContextDefaultValue } from "src/auth/AuthProvider";
+import { AuthContextValue, TabiyaUser, authContextDefaultValue } from "src/auth/Providers/AuthProvider/AuthProvider";
 
 export function mockLoggedInUser(mockedValues: Partial<AuthContextValue>) {
   let user: TabiyaUser = mockedValues.user || TestUser;

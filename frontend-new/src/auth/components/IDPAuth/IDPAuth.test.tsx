@@ -6,8 +6,9 @@ import * as firebaseui from "firebaseui";
 import { HashRouter, useNavigate } from "react-router-dom";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { routerPaths } from "src/app/routerPaths";
-import UserPreferencesService from "src/auth/services/UserPreferences/userPreferences.service";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
+import { Language } from "src/auth/services/UserPreferences/userPreferences.types";
+import { UserPreferencesContext } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -88,6 +89,20 @@ jest.mock("react-router-dom", () => {
 });
 
 describe("IDPAuth tests", () => {
+  const getUserPreferencesMock = jest.fn();
+
+  const userPreferencesContextValue = {
+    getUserPreferences: getUserPreferencesMock,
+    createUserPreferences: jest.fn(),
+    userPreferences: {
+      accepted_tc: new Date(),
+      user_id: "0001",
+      language: Language.en,
+      sessions: [],
+    },
+    isLoading: false,
+  };
+
   beforeEach(() => {
     (console.error as jest.Mock).mockClear();
     (console.warn as jest.Mock).mockClear();
@@ -106,7 +121,9 @@ describe("IDPAuth tests", () => {
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <IDPAuth />
+        <UserPreferencesContext.Provider value={userPreferencesContextValue}>
+          <IDPAuth />
+        </UserPreferencesContext.Provider>
       </HashRouter>
     );
 
@@ -127,7 +144,7 @@ describe("IDPAuth tests", () => {
           config.callbacks.signInSuccessWithAuthResult({
             user: {
               id: "mock-id",
-              multiFactor: { user: { accessToken: "mock-access-token" } }
+              multiFactor: { user: { accessToken: "mock-access-token" } },
             },
             credential: {
               idToken: "mock-id-token",
@@ -136,16 +153,22 @@ describe("IDPAuth tests", () => {
         },
       }));
 
-      // AND the user preferences service will return a user who has either accepted or not accepted terms and conditions
-      const userPreferencesServiceMock = {
-        getUserPreferences: jest.fn().mockResolvedValue({ accepted_tc: tc }),
-      };
-      (UserPreferencesService as jest.Mock).mockImplementation(() => userPreferencesServiceMock);
+      // AND the user preferences provider will return the user preferences
+      getUserPreferencesMock.mockImplementation((userId, onSuccess) => {
+        onSuccess({
+          accepted_tc: tc,
+          user_id: "0001",
+          language: Language.en,
+          sessions: [],
+        });
+      });
 
       // WHEN the component is rendered
       render(
         <HashRouter>
-          <IDPAuth />
+          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
+            <IDPAuth />
+          </UserPreferencesContext.Provider>
         </HashRouter>
       );
 
@@ -169,7 +192,7 @@ describe("IDPAuth tests", () => {
         config.callbacks.signInSuccessWithAuthResult({
           user: {
             id: "mock-id",
-            multiFactor: { user: { accessToken: "mock-access-token" } }
+            multiFactor: { user: { accessToken: "mock-access-token" } },
           },
           credential: {
             idToken: "mock-id-token",
@@ -177,16 +200,18 @@ describe("IDPAuth tests", () => {
         });
       },
     }));
-    // AND the user preferences service will fail
-    const userPreferencesServiceMock = {
-      getUserPreferences: jest.fn().mockRejectedValue(new Error("Failed to fetch user preferences")),
-    };
-    (UserPreferencesService as jest.Mock).mockImplementation(() => userPreferencesServiceMock);
+    // AND the user preferences provider will throw an error
+    const givenUserPreferencesError = new Error("User preferences error");
+    getUserPreferencesMock.mockImplementation((userId, onSuccess, onError) => {
+      onError(givenUserPreferencesError);
+    });
 
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <IDPAuth />
+        <UserPreferencesContext.Provider value={userPreferencesContextValue}>
+          <IDPAuth />
+        </UserPreferencesContext.Provider>
       </HashRouter>
     );
 
@@ -212,7 +237,9 @@ describe("IDPAuth tests", () => {
 
     render(
       <HashRouter>
-        <IDPAuth />
+        <UserPreferencesContext.Provider value={userPreferencesContextValue}>
+          <IDPAuth />
+        </UserPreferencesContext.Provider>
       </HashRouter>
     );
 
@@ -222,26 +249,3 @@ describe("IDPAuth tests", () => {
     });
   });
 });
-
-/*
- test("should handle successful sign-in", async () => {
-    // GIVEN a IDPAuth component
-    // WHEN the sign-in is successful
-    (firebaseui.auth.AuthUI as unknown as jest.Mock).mockImplementation(() => ({
-      start: (elementId: string, config: any) => {
-        config.callbacks.signInSuccessWithAuthResult({});
-      },
-    }));
-
-    render(
-      <HashRouter>
-        <IDPAuth />
-      </HashRouter>
-    );
-
-    // THEN expect success message to be in the document
-    await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Login successful", { variant: "success" });
-    });
-  });
- */

@@ -4,7 +4,7 @@ import NotFound from "src/errorPage/NotFound";
 import { routerPaths } from "./routerPaths";
 import Register from "src/auth/components/Register/Register";
 import Login from "src/auth/components/Login/Login";
-import DataProtectionAgreement from "src/auth/components/PolicyNotice/DataProtectionPolicy";
+import DataProtectionAgreement from "src/auth/components/DataProtectionAgreement/DataProtectionAgreement";
 import VerifyEmail from "src/auth/components/VerifyEmail/VerifyEmail";
 
 const routerConfig = [

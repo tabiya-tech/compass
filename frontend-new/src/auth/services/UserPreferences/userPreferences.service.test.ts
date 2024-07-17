@@ -16,7 +16,7 @@ jest.mock("src/persistentStorageService/PersistentStorageService", () => {
   return {
     __esModule: true,
     PersistentStorageService: {
-      setChatSessionID: jest.fn(),
+      setUserPreferences: jest.fn(),
     },
   };
 });
@@ -76,8 +76,8 @@ describe("UserPreferencesService", () => {
       // AND expect it to return the user preferences
       expect(actualUserPreferences).toEqual(givenResponseBody);
 
-      // AND expect the service to have set the chat session ID
-      expect(PersistentStorageService.setChatSessionID).toHaveBeenCalledWith(givenResponseBody.sessions[0].toString());
+      // AND expect the service to have set the user preferences in the persistent storage
+      expect(PersistentStorageService.setUserPreferences).toHaveBeenCalledWith(givenResponseBody);
     });
 
     test("on 404, getUserPreferences should return an empty object", async () => {
@@ -189,10 +189,8 @@ describe("UserPreferencesService", () => {
       // AND returns the newly created user preferences
       expect(actualCreatedModel).toEqual(expectedUserPreferenceResponse);
 
-      // AND expect the service to have set the chat session ID
-      expect(PersistentStorageService.setChatSessionID).toHaveBeenCalledWith(
-        expectedUserPreferenceResponse.sessions[0].toString()
-      );
+      // AND expect the service to have set the user preferences in the persistent storage
+      expect(PersistentStorageService.setUserPreferences).toHaveBeenCalledWith(expectedUserPreferenceResponse);
     });
 
     test("on fail to fetch, it should reject with the expected service error", async () => {

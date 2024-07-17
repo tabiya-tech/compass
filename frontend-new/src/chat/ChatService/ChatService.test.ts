@@ -8,13 +8,19 @@ import {
   generateTestChatResponses,
   generateTestHistory,
 } from "src/chat/ChatService/_test_utilities/generateTestChatResponses";
-import { PersistentStorageService } from "src/persistentStorageService/PersistentStorageService";
+import { UserPreference } from "src/auth/services/UserPreferences/userPreferences.types";
 
 jest.mock("src/persistentStorageService/PersistentStorageService", () => {
+  const mockUserPreference: UserPreference = {
+    user_id: "1",
+    language: "en",
+    accepted_tc: new Date(),
+    sessions: [1234],
+  } as UserPreference;
   return {
     __esModule: true,
     PersistentStorageService: {
-      getChatSessionID: jest.fn().mockReturnValue("1234"),
+      getUserPreferences: jest.fn().mockReturnValue(JSON.stringify(mockUserPreference)),
     },
   };
 });
@@ -30,31 +36,14 @@ describe("ChatService", () => {
 
   test("should construct the service successfully", () => {
     // GIVEN the service is constructed
-    const service = new ChatService();
+    const givenSessionId = 1234;
+    const service = new ChatService(givenSessionId);
 
     // THEN expect the service to be constructed successfully
     expect(service).toBeDefined();
 
     // AND the service should have the correct endpoint url
     expect(service.chatEndpointUrl).toEqual(`${givenApiServerUrl}/conversation`);
-  });
-
-  test("should throw if a sessionId could not be found", () => {
-    // GIVEN the service is constructed without a sessionId
-    jest.spyOn(PersistentStorageService, "getChatSessionID").mockReturnValueOnce(null);
-
-    // WHEN the service is constructed
-    // THEN expect it to throw
-    expect(() => new ChatService()).toThrow();
-  });
-
-  test("should throw if the sessionId found was not valid", () => {
-    // GIVEN the service is constructed with an invalid sessionId
-    jest.spyOn(PersistentStorageService, "getChatSessionID").mockReturnValueOnce("invalid");
-
-    // WHEN the service is constructed
-    // THEN expect it to throw
-    expect(() => new ChatService()).toThrow();
   });
 
   describe("sendMessage", () => {
@@ -70,7 +59,8 @@ describe("ChatService", () => {
       );
 
       // WHEN the sendMessage function is called with the given arguments
-      const service = new ChatService();
+      const givenSessionId = 1234;
+      const service = new ChatService(givenSessionId);
       const actualMessageResponse = await service.sendMessage(givenMessage);
 
       // THEN expect it to make a GET request
@@ -104,7 +94,8 @@ describe("ChatService", () => {
       });
 
       // WHEN calling sendMessage function
-      const service = new ChatService();
+      const givenSessionId = 1234;
+      const service = new ChatService(givenSessionId);
 
       // THEN expected it to reject with the same error thrown by fetchWithAuth
       await expect(service.sendMessage(givenMessage)).rejects.toMatchObject(givenFetchError);
@@ -122,7 +113,8 @@ describe("ChatService", () => {
         setupAPIServiceSpy(StatusCodes.OK, givenResponse, "application/json;charset=UTF-8");
 
         // WHEN the sendMessage function is called with the given arguments
-        const service = new ChatService();
+        const givenSessionId = 1234;
+        const service = new ChatService(givenSessionId);
         const sendMessagePromise = service.sendMessage(givenMessage);
 
         // THEN expected it to reject with the error response
@@ -149,9 +141,9 @@ describe("ChatService", () => {
       // GIVEN some history to return
       const givenTestHistoryResponse = generateTestHistory();
       const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, givenTestHistoryResponse, "application/json;charset=UTF-8");
-
       // WHEN the getChatHistory function is called
-      const service = new ChatService();
+      const givenSessionId = 1234;
+      const service = new ChatService(givenSessionId);
       const actualHistoryResponse = await service.getChatHistory();
 
       // THEN expect it to make a GET request
@@ -183,7 +175,8 @@ describe("ChatService", () => {
       });
 
       // WHEN calling getChatHistory function
-      const service = new ChatService();
+      const givenSessionId = 1234;
+      const service = new ChatService(givenSessionId);
 
       // THEN expected it to reject with the same error thrown by fetchWithAuth
       await expect(service.getChatHistory()).rejects.toMatchObject(givenFetchError);
@@ -200,7 +193,8 @@ describe("ChatService", () => {
         setupAPIServiceSpy(StatusCodes.OK, givenResponse, "application/json;charset=UTF-8");
 
         // WHEN the sendMessage function is called with the given arguments
-        const service = new ChatService();
+        const givenSessionId = 1234;
+        const service = new ChatService(givenSessionId);
         const sendMessagePromise = service.getChatHistory();
 
         // THEN expected it to reject with the error response
@@ -232,7 +226,8 @@ describe("ChatService", () => {
       );
 
       // WHEN the clearChat function is called
-      const service = new ChatService();
+      const givenSessionId = 1234;
+      const service = new ChatService(givenSessionId);
       await service.clearChat();
 
       // THEN expect it to make a GET request
@@ -261,7 +256,8 @@ describe("ChatService", () => {
       });
 
       // WHEN calling clearChat function
-      const service = new ChatService();
+      const givenSessionId = 1234;
+      const service = new ChatService(givenSessionId);
 
       // THEN expected it to reject with the same error thrown by fetchWithAuth
       await expect(service.clearChat()).rejects.toMatchObject(givenFetchError);

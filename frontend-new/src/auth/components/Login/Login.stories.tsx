@@ -2,7 +2,7 @@ import React from "react";
 import { Meta, StoryObj } from "@storybook/react";
 import { action } from "@storybook/addon-actions";
 import Login from "./Login";
-import { AuthContext, authContextDefaultValue } from "src/auth/AuthProvider";
+import { AuthContext, authContextDefaultValue } from "src/auth/Providers/AuthProvider/AuthProvider";
 
 const meta: Meta<typeof Login> = {
   title: "Auth/Login",

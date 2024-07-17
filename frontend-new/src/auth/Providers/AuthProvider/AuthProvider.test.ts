@@ -2,14 +2,13 @@
 import "src/_test_utilities/consoleMock";
 
 import { useContext } from "react";
-import { AuthContext, authContextDefaultValue } from "src/auth/AuthProvider";
-import { renderHook } from "src/_test_utilities/test-utils";
+import { AuthContext, authContextDefaultValue } from "src/auth/Providers/AuthProvider/AuthProvider";
+import { renderHook,  act, waitFor } from "src/_test_utilities/test-utils";
 import { PersistentStorageService } from "src/persistentStorageService/PersistentStorageService";
 import * as useTokensHook from "src/auth/hooks/useTokens";
-import { act } from "@testing-library/react";
 import { mockLoggedInUser } from "src/_test_utilities/mockLoggedInUser";
 import { defaultUseTokensResponse } from "src/auth/hooks/useTokens";
-import { AuthService } from "./services/AuthService/AuthService";
+import { AuthService } from "src/auth/services/AuthService/AuthService";
 
 jest.mock("src/auth/hooks/useAuthUser");
 jest.mock("src/auth/hooks/useTokens");
@@ -67,6 +66,44 @@ describe("AuthProvider module", () => {
       // AND isLogging in should be false.
       expect(result.current.isLoggingIn).toBe(false);
     });
+
+    test("should call the failure callback when the service login fails", async () => {
+      // GIVEN: The Auth Provider is rendered and auth context is accessed
+      const { result } = renderAuthContext();
+
+      // AND some callback functions
+      const givenSuccessCallback = jest.fn();
+      const givenErrorCallback = jest.fn();
+
+      // WHEN the login function is called
+      const givenEmail = "foo@bar.baz";
+      const givenPassword = "password";
+
+      const loginSpy = jest.spyOn(authService, "handleLogin");
+      const loginError = new Error("Login failed");
+      //@ts-ignore
+      loginSpy.mockImplementationOnce((_email, _password, _successCallback, errorCallback) => {
+        return Promise.resolve().then(() => errorCallback(loginError));
+      })
+
+      //initially isLogging in should be false.
+      expect(result.current.isLoggingIn).toBe(false);
+
+      act(() => {
+        result.current?.login(givenEmail, givenPassword, givenSuccessCallback, givenErrorCallback);
+      });
+
+      // THEN the auth service handleLogin function should be called with the correct parameters
+      expect(loginSpy).toHaveBeenCalledWith(givenEmail, givenPassword, expect.any(Function), expect.any(Function));
+
+      // AND isLogging in should be false.
+      await waitFor(() => {
+        expect(result.current.isLoggingIn).toBe(false);
+      })
+
+      // AND the error callback should be called
+      expect(givenErrorCallback).toHaveBeenCalledWith(loginError);
+    });
   });
 
   describe("Logout functionality", () => {
@@ -91,7 +128,7 @@ describe("AuthProvider module", () => {
       // THEN the access token should be cleared
       expect(PersistentStorageService.getAccessToken()).toBeNull();
       // AND the session ids should be cleared
-      expect(PersistentStorageService.getChatSessionID()).toBeNull();
+      expect(PersistentStorageService.getUserPreferences()).toBeNull();
 
       // AND the clear function should be called
       expect(clear).toHaveBeenCalled();
@@ -136,6 +173,50 @@ describe("AuthProvider module", () => {
 
       // AND isRegistering in should be false.
       expect(result.current.isRegistering).toBe(false);
+    });
+
+    test("should call the failure callback when the service register fails", async () => {
+      // GIVEN the Auth Provider is rendered and auth context is accessed
+      const { result } = renderAuthContext();
+
+      // WHEN the register function is called
+      const givenEmail = "foo@bar.baz";
+      const givenPassword = "password";
+
+      const givenName = "foo";
+      const givenSuccessCallback = jest.fn();
+      const givenErrorCallback = jest.fn();
+
+      const registerSpy = jest.spyOn(authService, "handleRegister");
+      const registerError = new Error("Register failed");
+      //@ts-ignore
+      registerSpy.mockImplementationOnce((_email, _password, _name, _successCallback, errorCallback) => {
+        return Promise.resolve().then(() => errorCallback(registerError));
+      });
+
+      // Initially isRegistering should be false.
+      expect(result.current.isRegistering).toBe(false);
+
+      act(() => {
+        result.current?.register(givenEmail, givenPassword, givenName, givenSuccessCallback, givenErrorCallback);
+      });
+
+      // THEN the auth service handleRegister function should be called with the correct parameters
+      expect(registerSpy).toHaveBeenCalledWith(
+        givenEmail,
+        givenPassword,
+        givenName,
+        expect.any(Function),
+        expect.any(Function)
+      );
+
+      // AND isRegistering in should be false.
+      await waitFor(() => {
+        expect(result.current.isRegistering).toBe(false);
+      });
+
+      // AND the error callback should be called
+      expect(givenErrorCallback).toHaveBeenCalledWith(registerError);
     });
   });
 

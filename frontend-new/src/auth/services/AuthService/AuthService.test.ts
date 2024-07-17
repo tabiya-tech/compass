@@ -233,9 +233,7 @@ describe("AuthService class tests", () => {
       // WHEN the registration is attempted
       await authService.handleRegister(givenEmail, givenPassword, givenName, successCallback, errorCallback);
       // THEN the error callback should be called with Failed to Fetch
-      expect(errorCallback).toHaveBeenCalledWith(
-          new Error("There is no user record corresponding to this email.")
-      );
+      expect(errorCallback).toHaveBeenCalledWith(new Error("There is no user record corresponding to this email."));
     });
   });
 });
