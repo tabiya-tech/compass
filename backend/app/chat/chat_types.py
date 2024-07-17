@@ -16,8 +16,20 @@ class ConversationMessage(BaseModel):
     """The time the message was sent, in ISO format, in UTC"""
     sender: ConversationMessageSender
     """The sender of the message, either USER or COMPASS"""
-    finished: Optional[bool] = None
-    """Whether the conversation is finished after this message, only present for COMPASS messages"""
+
     @field_serializer('sent_at')
     def serialize_sent_at(self, value: datetime) -> str:
         return value.astimezone(timezone.utc).isoformat()
+
+    class Config:
+        extra = "forbid"
+
+
+class ConverstaionResponse(BaseModel):
+    messages: list[ConversationMessage]
+    """The messages in the conversation"""
+    conversation_completed: bool = False
+    """Whether the conversation is finished"""
+
+    class Config:
+        extra = "forbid"

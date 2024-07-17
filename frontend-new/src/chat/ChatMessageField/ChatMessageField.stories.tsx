@@ -39,3 +39,22 @@ export const Shown: Story = {
     handleSend: action("Message sent"),
   },
 };
+
+
+export const AIIsTyping: Story = {
+  render: (args) => <ChatMessageFieldWrapper {...args} />,
+  args: {
+    message: "",
+    handleSend: action("Message sent"),
+    aiIsTyping: true,
+  },
+};
+
+export const ChatIsClosed: Story = {
+    render: (args) => <ChatMessageFieldWrapper {...args} />,
+    args: {
+        message: "",
+        handleSend: action("Message sent"),
+        isChatFinished: true,
+    },
+}

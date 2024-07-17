@@ -8,13 +8,15 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Request, HTTPException, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_types import AgentInput
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
+from app.constants.errors import HTTPErrorResponse
 from app.users.auth import Authentication
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
-from app.chat.chat_types import ConversationMessage
+from app.chat.chat_types import ConverstaionResponse
 from app.chat.chat_utils import filter_conversation_history, get_messages_from_conversation_manager
 from app.server_dependecies.agent_director_dependencies import get_agent_director
 from app.server_dependecies.conversation_manager_dependencies import get_conversation_memory_manager
@@ -120,7 +122,8 @@ application_state_manager = ApplicationStateManager(InMemoryApplicationStateStor
 
 
 @app.get(path="/conversation",
-         response_model=List[ConversationMessage],
+         response_model=ConverstaionResponse,
+         responses={400: {"model": HTTPErrorResponse}},
          description="""The main conversation route used to interact with the agent.""")
 async def conversation(request: Request, user_input: str, clear_memory: bool = False, filter_pii: bool = False,
                        session_id: int = 1,
@@ -146,6 +149,10 @@ async def conversation(request: Request, user_input: str, clear_memory: bool = F
         # set the state of the agent director, the conversation memory manager and all the agents
         state = await application_state_manager.get_state(session_id)
 
+        # Check if the conversation has ended
+        if state.agent_director_state.current_phase == ConversationPhase.ENDED:
+            raise HTTPException(status_code=400, detail="The conversation has ended.")
+
         agent_director.set_state(state.agent_director_state)
         agent_director.get_explore_experiences_agent().set_state(state.explore_experiences_director_state)
         agent_director.get_explore_experiences_agent().get_collect_experiences_agent().set_state(
@@ -162,7 +169,10 @@ async def conversation(request: Request, user_input: str, clear_memory: bool = F
         response = await get_messages_from_conversation_manager(context, from_index=current_index)
         # save the state, before responding to the user
         await application_state_manager.save_state(session_id, state)
-        return response
+        return ConverstaionResponse(
+            messages=response,
+            conversation_completed=state.agent_director_state.current_phase == ConversationPhase.ENDED
+        )
     except Exception as e:  # pylint: disable=broad-except
         logger.exception(
             "Error for request: %s %s?%s with session id: %s : %s",
@@ -176,7 +186,7 @@ async def conversation(request: Request, user_input: str, clear_memory: bool = F
 
 
 @app.get(path="/conversation/history",
-         response_model=List[ConversationMessage],
+         response_model=ConverstaionResponse,
          description="""Endpoint for retrieving the conversation history.""")
 async def get_conversation_history(
     session_id: Annotated[int, Query(description="The session id for the conversation history.")],
@@ -189,7 +199,12 @@ async def get_conversation_history(
         state = await application_state_manager.get_state(session_id)
         conversation_memory_manager.set_state(state.conversation_memory_manager_state)
         context = await conversation_memory_manager.get_conversation_context()
-        return filter_conversation_history(context.all_history)
+        messages = filter_conversation_history(context.all_history)
+
+        return ConverstaionResponse(
+            messages=messages,
+            conversation_completed=state.agent_director_state.current_phase == ConversationPhase.ENDED
+        )
     except Exception as e:
         logger.exception(e)
         raise HTTPException(status_code=500, detail="Oops! something went wrong")

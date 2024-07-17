@@ -9,7 +9,7 @@ exports[`ChatMessageField should render ChatMessageField correctly 1`] = `
     class="MuiBox-root css-zeiu9o"
   >
     <div
-      class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-p7hw24-MuiFormControl-root-MuiTextField-root"
+      class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-oap3n8-MuiFormControl-root-MuiTextField-root"
     >
       <div
         class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline MuiInputBase-adornedEnd css-t9ilqs-MuiInputBase-root-MuiOutlinedInput-root"
@@ -36,7 +36,7 @@ exports[`ChatMessageField should render ChatMessageField correctly 1`] = `
           class="MuiInputAdornment-root MuiInputAdornment-positionEnd MuiInputAdornment-outlined MuiInputAdornment-sizeMedium css-1laqsz7-MuiInputAdornment-root"
         >
           <button
-            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1ifbsno-MuiButtonBase-root-MuiIconButton-root"
+            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorError MuiIconButton-sizeMedium css-1fhje8j-MuiButtonBase-root-MuiIconButton-root"
             data-testid="chat-message-field-button-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
             tabindex="0"
             title="send message"

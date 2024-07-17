@@ -3,7 +3,7 @@ import Chat, { DATA_TEST_ID } from "./Chat";
 import { fireEvent, render, screen, waitFor } from "src/_test_utilities/test-utils";
 import { DATA_TEST_ID as CHAT_HEADER_TEST_ID } from "./ChatHeader/ChatHeader";
 import ChatList, { DATA_TEST_ID as CHAT_LIST_TEST_ID } from "./ChatList/ChatList";
-import { DATA_TEST_ID as CHAT_MESSAGE_FIELD_TEST_ID } from "./ChatMessageField/ChatMessageField";
+import ChatMessageField, { DATA_TEST_ID as CHAT_MESSAGE_FIELD_TEST_ID } from "./ChatMessageField/ChatMessageField";
 import { HashRouter } from "react-router-dom";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { ConversationMessageSender } from "./ChatService/ChatService.types";
@@ -113,33 +113,45 @@ describe("Chat", () => {
       expect(screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER)).toBeInTheDocument();
       // AND the component to match the snapshot
       expect(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER)).toMatchSnapshot();
+
+      // AND the ChatMessageField component to be called with the initial props
+      expect(ChatMessageField).toHaveBeenCalledWith({
+          message: expect.any(String),
+          notifyChange: expect.any(Function),
+          handleSend: expect.any(Function),
+          aiIsTyping: expect.any(Boolean),
+          isChatFinished: expect.any(Boolean),
+      }, {})
     });
   });
 
   describe("test Chat Initialization", () => {
     test("should initialize chat on mount", async () => {
-      mockGetChatHistory.mockResolvedValueOnce([
-        {
-          message: "",
-          sent_at: new Date().toISOString(),
-          sender: ConversationMessageSender.USER,
-        },
-        {
-          message: "Hello, I'm Compass",
-          sent_at: new Date().toISOString(),
-          sender: ConversationMessageSender.COMPASS,
-        },
-        {
-          message: "Hi, Compass, I'm foo",
-          sent_at: new Date().toISOString(),
-          sender: ConversationMessageSender.USER,
-        },
-        {
-          message: "Hello foo, would you like to begin your skill exploration session?",
-          sent_at: new Date().toISOString(),
-          sender: ConversationMessageSender.COMPASS,
-        },
-      ]);
+      mockGetChatHistory.mockResolvedValueOnce({
+        messages: [
+          {
+            message: "",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.USER,
+          },
+          {
+            message: "Hello, I'm Compass",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.COMPASS,
+          },
+          {
+            message: "Hi, Compass, I'm foo",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.USER,
+          },
+          {
+            message: "Hello foo, would you like to begin your skill exploration session?",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.COMPASS,
+          }
+        ],
+        conversation_completed: false
+      });
       // GIVEN a chat component
       // WHEN the chat is rendered with a router
       render(
@@ -224,13 +236,15 @@ describe("Chat", () => {
     test("should send a message", async () => {
       // GIVEN a chat component
       // First, we need the initialization to succeed
-      mockSendMessage.mockResolvedValueOnce([
-        {
-          message: "Hello, I'm Compass",
-          sent_at: new Date().toISOString(),
-          sender: ConversationMessageSender.COMPASS,
-        },
-      ]);
+      mockSendMessage.mockResolvedValueOnce({
+        messages: [
+          {
+            message: "Hello, I'm Compass",
+            sent_at: new Date().toISOString(),
+          },
+        ],
+        conversation_completed: false
+      });
 
       // GIVEN a chat component
       // WHEN a user sends a message with a router
