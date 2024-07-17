@@ -35,8 +35,6 @@ class EvaluationType(Enum):
     RELEVANCE = "Relevance"
     CORRECTNESS = "Correctness"
     COHERENCE = "Coherence"
-    FOCUS = "Focus"
-    NO_ADVICE = "No Advice"
     SUMMARY_CONSISTENCY = "Summary Consistency"
     SUMMARY_RELEVANCE = "Summary Relevance"
 
