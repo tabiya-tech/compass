@@ -6,46 +6,36 @@ import ChatList, { DATA_TEST_ID as CHAT_LIST_TEST_ID } from "./ChatList/ChatList
 import { DATA_TEST_ID as CHAT_MESSAGE_FIELD_TEST_ID } from "./ChatMessageField/ChatMessageField";
 import { HashRouter } from "react-router-dom";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import ChatService from "./ChatService/ChatService";
 import { ConversationMessageSender } from "./ChatService/ChatService.types";
+import { Language } from "src/auth/services/UserPreferences/userPreferences.types";
+import { UserPreferencesContext } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
+import ChatService from "./ChatService/ChatService";
 
-const mockSendMessage = jest.fn();
-
-const mockClearChat = jest.fn();
-const mockGetChatHistory = jest.fn();
-
-jest.mock("src/chat/ChatService/ChatService", () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      sendMessage: mockSendMessage,
-      clearChat: mockClearChat,
-      getChatHistory: mockGetChatHistory,
-    };
-  });
-});
+// Mock the ChatService module
+jest.mock("src/chat/ChatService/ChatService");
 
 jest.mock("src/chat/ChatList/ChatList", () => {
-  const senderalModule = jest.requireActual("src/chat/ChatList/ChatList");
+  const actualModule = jest.requireActual("src/chat/ChatList/ChatList");
   return {
     __esModule: true,
-    ...senderalModule,
-    default: jest.fn(() => <div data-testid={senderalModule.DATA_TEST_ID.CHAT_LIST_CONTAINER}></div>),
+    ...actualModule,
+    default: jest.fn(() => <div data-testid={actualModule.DATA_TEST_ID.CHAT_LIST_CONTAINER}></div>),
   };
 });
 
 jest.mock("src/chat/ChatMessageField/ChatMessageField", () => {
-  const senderalModule = jest.requireActual("src/chat/ChatMessageField/ChatMessageField");
+  const actualModule = jest.requireActual("src/chat/ChatMessageField/ChatMessageField");
   return {
     __esModule: true,
-    ...senderalModule,
+    ...actualModule,
     default: jest.fn(({ handleSend, message, notifyChange }) => (
-      <div data-testid={senderalModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER}>
+      <div data-testid={actualModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER}>
         <input
-          data-testid={senderalModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD}
+          data-testid={actualModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD}
           value={message}
           onChange={(e) => notifyChange(e.target.value)}
         />
-        <button data-testid={senderalModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON} onClick={handleSend}>
+        <button data-testid={actualModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON} onClick={handleSend}>
           Send
         </button>
       </div>
@@ -66,260 +56,276 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   };
 });
 
-beforeEach(() => {
-  jest.clearAllMocks();
-});
+describe("Chat", () => {
+  const getUserPreferencesMock = jest.fn();
+  const givenSessionId = 123;
 
-describe("render tests", () => {
-  test("should render the Chat Component", () => {
-    // GIVEN a chat component
+  const userPreferencesContextValue = {
+    getUserPreferences: getUserPreferencesMock,
+    createUserPreferences: jest.fn(),
+    userPreferences: {
+      accepted_tc: new Date(),
+      user_id: "0001",
+      language: Language.en,
+      sessions: [givenSessionId],
+    },
+    updateUserPreferences: jest.fn(),
+    isLoading: false,
+  };
 
-    // WHEN the chat header is rendered with a router
-    render(
-      <HashRouter>
-        <Chat />
-      </HashRouter>
-    );
+  const mockSendMessage = jest.fn();
+  const mockGetChatHistory = jest.fn();
 
-    // THEN expect no errors or warning to have occurred
-    expect(console.error).not.toHaveBeenCalled();
-    expect(console.warn).not.toHaveBeenCalled();
-    // AND the chat container to be visible
-    expect(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER)).toBeInTheDocument();
-    // AND the chat header to be in the document
-    expect(screen.getByTestId(CHAT_HEADER_TEST_ID.CHAT_HEADER_CONTAINER)).toBeInTheDocument();
-    // AND the chat list to be in the document
-    expect(screen.getByTestId(CHAT_LIST_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
-    // AND the chat message field to be in the document
-    expect(screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER)).toBeInTheDocument();
-    // AND the component to match the snapshot
-    expect(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER)).toMatchSnapshot();
+  beforeEach(() => {
+    // Mock the static getInstance method to return an instance with mocked methods
+    (ChatService as jest.Mocked<typeof ChatService>).getInstance = jest.fn().mockReturnValue({
+      sendMessage: mockSendMessage,
+      getChatHistory: mockGetChatHistory,
+    });
   });
-});
 
-describe("test Chat Initialization", () => {
-  test("should initialize chat on mount", async () => {
-    mockGetChatHistory.mockResolvedValueOnce([
-      {
-        message: "",
-        sent_at: new Date().toISOString(),
-        sender: ConversationMessageSender.USER,
-      },
-      {
-        message: "Hello, I'm Compass",
-        sent_at: new Date().toISOString(),
-        sender: ConversationMessageSender.COMPASS,
-      },
-      {
-        message: "Hi, Compass, I'm foo",
-        sent_at: new Date().toISOString(),
-        sender: ConversationMessageSender.USER,
-      },
-      {
-        message: "Hello foo, would you like to begin your skill exploration session?",
-        sent_at: new Date().toISOString(),
-        sender: ConversationMessageSender.COMPASS,
-      },
-    ]);
-    // GIVEN a chat component
-    // WHEN the chat is rendered with a router
-    render(
-      <HashRouter>
-        <Chat />
-      </HashRouter>
-    );
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
-    // THEN expect the initial message is added
-    await waitFor(() => {
+  describe("render tests", () => {
+    test("should render the Chat Component", () => {
+      // GIVEN a chat component
+      // WHEN the chat header is rendered with a router
+      render(
+        <HashRouter>
+          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
+            <Chat />
+          </UserPreferencesContext.Provider>
+        </HashRouter>
+      );
+
+      // THEN expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+      // AND the chat container to be visible
+      expect(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER)).toBeInTheDocument();
+      // AND the chat header to be in the document
+      expect(screen.getByTestId(CHAT_HEADER_TEST_ID.CHAT_HEADER_CONTAINER)).toBeInTheDocument();
+      // AND the chat list to be in the document
       expect(screen.getByTestId(CHAT_LIST_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
-    });
-
-    expect(mockGetChatHistory).toHaveBeenCalledWith();
-
-    // AND the ChatList component to be called with the history returned to the initialization
-    await waitFor(() => {
-      expect(ChatList).toHaveBeenNthCalledWith(
-        3,
-        expect.objectContaining({
-          messages: [
-            {
-              id: expect.any(Number),
-              sender: ConversationMessageSender.COMPASS,
-              message: "",
-              sent_at: expect.any(String),
-            },
-            {
-              id: expect.any(Number),
-              sender: ConversationMessageSender.COMPASS,
-              message: "Hello, I'm Compass",
-              sent_at: expect.any(String),
-            },
-            {
-              id: expect.any(Number),
-              sender: ConversationMessageSender.USER,
-              message: "Hi, Compass, I'm foo",
-              sent_at: expect.any(String),
-            },
-            {
-              id: expect.any(Number),
-              sender: ConversationMessageSender.COMPASS,
-              message: "Hello foo, would you like to begin your skill exploration session?",
-              sent_at: expect.any(String),
-            },
-          ],
-          isTyping: false,
-        }),
-        {}
-      );
+      // AND the chat message field to be in the document
+      expect(screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER)).toBeInTheDocument();
+      // AND the component to match the snapshot
+      expect(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER)).toMatchSnapshot();
     });
   });
 
-  test("should show an error message if initialization fails", async () => {
-    // GIVEN a chat component
-    mockGetChatHistory.mockRejectedValueOnce(new Error("Initialization failed"));
-
-    // WHEN the chat is rendered with a router and snackbar provider
-    render(
-      <HashRouter>
-        <Chat />
-      </HashRouter>
-    );
-
-    // THEN expect an error message to be shown
-    await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        "An unexpected error occurred. Please try again later.",
-        { variant: "error" }
+  describe("test Chat Initialization", () => {
+    test("should initialize chat on mount", async () => {
+      mockGetChatHistory.mockResolvedValueOnce([
+        {
+          message: "",
+          sent_at: new Date().toISOString(),
+          sender: ConversationMessageSender.USER,
+        },
+        {
+          message: "Hello, I'm Compass",
+          sent_at: new Date().toISOString(),
+          sender: ConversationMessageSender.COMPASS,
+        },
+        {
+          message: "Hi, Compass, I'm foo",
+          sent_at: new Date().toISOString(),
+          sender: ConversationMessageSender.USER,
+        },
+        {
+          message: "Hello foo, would you like to begin your skill exploration session?",
+          sent_at: new Date().toISOString(),
+          sender: ConversationMessageSender.COMPASS,
+        },
+      ]);
+      // GIVEN a chat component
+      // WHEN the chat is rendered with a router
+      render(
+        <HashRouter>
+          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
+            <Chat />
+          </UserPreferencesContext.Provider>
+        </HashRouter>
       );
+
+      // THEN expect the initial message is added
+      await waitFor(() => {
+        expect(screen.getByTestId(CHAT_LIST_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
+      });
+
+      await waitFor(() => {
+        expect(mockGetChatHistory).toHaveBeenCalled();
+      });
+
+      // AND the ChatList component to be called with the history returned to the initialization
+      await waitFor(() => {
+        expect(ChatList).toHaveBeenNthCalledWith(
+          3,
+          expect.objectContaining({
+            messages: [
+              {
+                id: expect.any(Number),
+                sender: ConversationMessageSender.COMPASS,
+                message: "",
+                sent_at: expect.any(String),
+              },
+              {
+                id: expect.any(Number),
+                sender: ConversationMessageSender.COMPASS,
+                message: "Hello, I'm Compass",
+                sent_at: expect.any(String),
+              },
+              {
+                id: expect.any(Number),
+                sender: ConversationMessageSender.USER,
+                message: "Hi, Compass, I'm foo",
+                sent_at: expect.any(String),
+              },
+              {
+                id: expect.any(Number),
+                sender: ConversationMessageSender.COMPASS,
+                message: "Hello foo, would you like to begin your skill exploration session?",
+                sent_at: expect.any(String),
+              },
+            ],
+            isTyping: false,
+          }),
+          {}
+        );
+      });
+    });
+
+    test("should show an error message if initialization fails", async () => {
+      // GIVEN a chat component
+      mockGetChatHistory.mockRejectedValueOnce(new Error("Failed to initialize chat"));
+
+      // WHEN the chat is rendered with a router and snackbar provider
+      render(
+        <HashRouter>
+          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
+            <Chat />
+          </UserPreferencesContext.Provider>
+        </HashRouter>
+      );
+
+      // THEN expect an error message to be shown
+      await waitFor(() => {
+        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+          "An unexpected error occurred. Please try again later.",
+          { variant: "error" }
+        );
+      });
     });
   });
 
-  test("should show a console error if ChatService constructor fails", async () => {
-    // GIVEN a failing ChatService constructor
-    const givenError = new Error("Constructor failed");
-    (ChatService as jest.Mock).mockImplementationOnce(() => {
-      throw givenError;
-    });
+  describe("test send message", () => {
+    test("should send a message", async () => {
+      // GIVEN a chat component
+      // First, we need the initialization to succeed
+      mockSendMessage.mockResolvedValueOnce([
+        {
+          message: "Hello, I'm Compass",
+          sent_at: new Date().toISOString(),
+          sender: ConversationMessageSender.COMPASS,
+        },
+      ]);
 
-    // WHEN the chat is rendered with a router and snackbar provider
-    render(
-      <HashRouter>
-        <Chat />
-      </HashRouter>
-    );
-
-    // THEN expect a console error to be logged
-    await waitFor(() => {
-      expect(console.error).toHaveBeenCalledWith("Failed to create chat service:", givenError);
-    });
-  });
-});
-
-describe("test send message", () => {
-  test("should send a message", async () => {
-    mockSendMessage.mockResolvedValueOnce([
-      {
-        message: "Hello, I'm Compass",
-        sent_at: new Date().toISOString(),
-      },
-    ]);
-
-    // GIVEN a chat component
-    // WHEN a user sends a message with a router
-    render(
-      <HashRouter>
-        <Chat />
-      </HashRouter>
-    );
-
-    const input = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD);
-    const sendButton = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
-
-    fireEvent.change(input, { target: { value: "Test message" } });
-    fireEvent.click(sendButton);
-
-    // THEN expect the message to be sent and the response to be received
-    await waitFor(() => {
-      expect(screen.getByTestId(CHAT_LIST_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
-    });
-
-    expect(mockSendMessage).toHaveBeenCalledWith("Test message");
-
-    // AND the ChatList component to be called with the new message
-    await waitFor(() => {
-      expect(ChatList).toHaveBeenCalledWith(
-        expect.objectContaining({
-          messages: [
-            {
-              id: expect.any(Number),
-              sender: ConversationMessageSender.USER,
-              message: "Test message",
-              sent_at: expect.any(String),
-            },
-            {
-              id: expect.any(Number),
-              sender: ConversationMessageSender.COMPASS,
-              message: "Hello, I'm Compass",
-              sent_at: expect.any(String),
-            },
-          ],
-        }),
-        {}
+      // GIVEN a chat component
+      // WHEN a user sends a message with a router
+      render(
+        <HashRouter>
+          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
+            <Chat />
+          </UserPreferencesContext.Provider>
+        </HashRouter>
       );
+
+      const input = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD);
+      const sendButton = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
+
+      fireEvent.change(input, { target: { value: "Test message" } });
+      fireEvent.click(sendButton);
+
+      // THEN expect the message to be sent and the response to be received
+      await waitFor(() => {
+        expect(screen.getByTestId(CHAT_LIST_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
+      });
+
+      expect(mockSendMessage).toHaveBeenCalledWith("Test message");
+
+      // AND the ChatList component to be called with the new message
+      await waitFor(() => {
+        expect(ChatList).toHaveBeenCalledWith(
+          expect.objectContaining({
+            messages: [
+              {
+                id: expect.any(Number),
+                sender: ConversationMessageSender.USER,
+                message: "Test message",
+                sent_at: expect.any(String),
+              },
+              {
+                id: expect.any(Number),
+                sender: ConversationMessageSender.COMPASS,
+                message: "Hello, I'm Compass",
+                sent_at: expect.any(String),
+              },
+            ],
+          }),
+          {}
+        );
+      });
     });
-  });
 
-  test("should show an error message if sending a message fails", async () => {
-    mockSendMessage.mockRejectedValueOnce(new Error("Sending message failed"));
-    // GIVEN a chat component
-    // First, we need the initialization to succeed
-    mockSendMessage.mockResolvedValueOnce({
-      messages_for_user: ["Hello, I'm Compass"],
-    });
-
-    // WHEN a user sends a message with a router and snackbar provider
-    render(
-      <HashRouter>
-        <Chat />
-      </HashRouter>
-    );
-
-    // Ensure initialization is successful
-    await waitFor(() => {
-      expect(mockGetChatHistory).toHaveBeenCalledWith();
-    });
-
-    // Now mock sendMessage to fail for the user message
-    mockSendMessage.mockRejectedValueOnce(new Error("Sending message failed"));
-
-    const input = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD);
-    const sendButton = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
-
-    fireEvent.change(input, { target: { value: "Test message" } });
-    fireEvent.click(sendButton);
-
-    // THEN expect an error message to be shown in the chat
-    await waitFor(() => {
-      expect(ChatList).toHaveBeenNthCalledWith(
-        6,
-        expect.objectContaining({
-          messages: expect.arrayContaining([
-            {
-              id: expect.any(Number),
-              sender: ConversationMessageSender.USER,
-              message: "Test message",
-              sent_at: expect.any(String),
-            },
-            {
-              id: expect.any(Number),
-              sender: ConversationMessageSender.COMPASS,
-              message: "I'm sorry, Something seems to have gone wrong. Try logging in again.",
-              sent_at: expect.any(String),
-            },
-          ]),
-        }),
-        {}
+    test("should show an error message if sending a message fails", async () => {
+      // WHEN a user sends a message with a router and snackbar provider
+      render(
+        <HashRouter>
+          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
+            <Chat />
+          </UserPreferencesContext.Provider>
+        </HashRouter>
       );
+
+      // Ensure initialization is successful
+      await waitFor(() => {
+        expect(mockGetChatHistory).toHaveBeenCalled();
+      });
+
+      // Now mock sendMessage to fail for the user message
+      mockSendMessage.mockRejectedValueOnce(new Error("Sending message failed"));
+
+      const input = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD);
+      const sendButton = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
+
+      fireEvent.change(input, { target: { value: "Test message" } });
+      fireEvent.click(sendButton);
+
+      // THEN expect an error message to be shown in the chat
+      await waitFor(() => {
+        expect(ChatList).toHaveBeenNthCalledWith(
+          6,
+          expect.objectContaining({
+            messages: expect.arrayContaining([
+              {
+                id: expect.any(Number),
+                sender: ConversationMessageSender.USER,
+                message: "Test message",
+                sent_at: expect.any(String),
+              },
+              {
+                id: expect.any(Number),
+                sender: ConversationMessageSender.COMPASS,
+                message: "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
+                sent_at: expect.any(String),
+              },
+            ]),
+          }),
+          {}
+        );
+      });
     });
   });
 });

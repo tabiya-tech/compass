@@ -1,14 +1,14 @@
-import React, { useCallback, useContext, useState } from "react";
-import { Container, Box, TextField, Button, Typography, useTheme, styled, CircularProgress } from "@mui/material";
-import { AuthContext, TabiyaUser } from "src/auth/AuthProvider";
+import React, { useContext, useEffect, useState } from "react";
+import { Box, Button, CircularProgress, Container, styled, TextField, Typography, useTheme } from "@mui/material";
+import { AuthContext } from "src/auth/Providers/AuthProvider/AuthProvider";
 import { NavLink as RouterNavLink, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import IDPAuth from "src/auth/components/IDPAuth/IDPAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import UserPreferencesService from "src/auth/services/UserPreferences/userPreferences.service";
 import AuthContextMenu from "src/auth/components/AuthContextMenu/AuthContextMenu";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/error";
 import { writeServiceErrorToLog } from "src/error/logger";
+import { UserPreferencesContext } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
 
 const uniqueId = "7ce9ba1f-bde0-48e2-88df-e4f697945cc4";
 
@@ -40,47 +40,25 @@ export const DATA_TEST_ID = {
 
 const Login: React.FC = () => {
   const theme = useTheme();
-  const { login, isLoggingIn } = useContext(AuthContext);
+  const { login, isLoggingIn, user } = useContext(AuthContext);
   const [isCheckingPreferences, setIsCheckingPreferences] = useState(false);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
+  const { getUserPreferences, userPreferences } = useContext(UserPreferencesContext);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   /**
-   * Check if the user has accepted the terms and conditions
-   * @param user
-   * @returns {Promise<void>}
+   * Redirect the user to the login page
+   * if they are already logged in
    */
-  const checkUserPreferences = useCallback(
-    async (user: TabiyaUser): Promise<void> => {
-      if (isCheckingPreferences) return;
-      const userPreferencesService = new UserPreferencesService();
-      try {
-        setIsCheckingPreferences(true);
-        const userPreferences = await userPreferencesService.getUserPreferences(user.id);
-        const acceptedTcDate = new Date(userPreferences.accepted_tc);
-        // If the accepted_tc is not set or is not a valid date, redirect to the DPA page
-        // this is to ensure that even if the accepted_tc is manipulated in the database, the user will be redirected to the DPA page
-        // and will have to accept the terms and conditions again
-        if (!userPreferences.accepted_tc || isNaN(acceptedTcDate.getTime())) {
-          setIsCheckingPreferences(false);
-          navigate(routerPaths.DPA, { replace: true });
-        } else {
-          setIsCheckingPreferences(false);
-          navigate(routerPaths.ROOT, { replace: true });
-          enqueueSnackbar("Welcome back!", { variant: "success" });
-        }
-      } catch (e) {
-        setIsCheckingPreferences(false);
-        const errorMessage = getUserFriendlyErrorMessage(e as Error);
-        enqueueSnackbar(errorMessage, { variant: "error" });
-        console.error("Failed to fetch user preferences", e);
-      }
-    },
-    [navigate, enqueueSnackbar, isCheckingPreferences]
-  );
+  useEffect(() => {
+    // If the user is already logged in, redirect to the home page
+    if (user && userPreferences?.accepted_tc) {
+      navigate(routerPaths.ROOT, { replace: true });
+    }
+  }, [navigate, user, userPreferences]);
 
   /**
    * Handle the login form submission
@@ -93,11 +71,31 @@ const Login: React.FC = () => {
       password,
       async (user) => {
         try {
-          await checkUserPreferences(user);
+          setIsCheckingPreferences(true);
+          getUserPreferences(
+            user.id,
+            (prefs) => {
+              // If the accepted_tc is not set or is not a valid date, redirect to the DPA page
+              // this is to ensure that even if the accepted_tc is manipulated in the database, the user will be redirected to the DPA page
+              // and will have to accept the terms and conditions again
+              if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
+                navigate(routerPaths.DPA, { replace: true });
+              } else {
+                navigate(routerPaths.ROOT, { replace: true });
+                enqueueSnackbar("Welcome back!", { variant: "success" });
+              }
+            },
+            (error) => {
+              writeServiceErrorToLog(error, console.error);
+              throw error;
+            }
+          );
         } catch (e) {
           const errorMessage = getUserFriendlyErrorMessage(e as Error);
           enqueueSnackbar(errorMessage, { variant: "error" });
           console.error("Error during login process", e);
+        } finally {
+          setIsCheckingPreferences(false);
         }
       },
       (e) => {

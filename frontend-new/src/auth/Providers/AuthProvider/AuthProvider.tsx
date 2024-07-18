@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { useTokens } from "src/auth/hooks/useTokens";
 import { useAuthUser } from "src/auth/hooks/useAuthUser";
 import { AuthService } from "src/auth/services/AuthService/AuthService";
@@ -12,6 +12,7 @@ import {
 import { PersistentStorageService } from "src/persistentStorageService/PersistentStorageService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import { jwtDecode } from "jwt-decode";
+import { UserPreferencesContext } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
 
 // Default values for AuthContext
 export const authContextDefaultValue: AuthContextValue = {
@@ -36,6 +37,7 @@ export const AuthContext = createContext<AuthContextValue>(authContextDefaultVal
  */
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { user, updateUser, updateUserByIDToken } = useAuthUser();
+  const { updateUserPreferences } = useContext(UserPreferencesContext);
   const tokens = useTokens({ updateUserByIDToken });
 
   // State to track if the user is logging in/registering
@@ -126,9 +128,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       PersistentStorageService.clear();
       tokens.clearTokens();
       updateUser(null);
+      updateUserPreferences(null);
       authService.handleLogout(successCallback, errorCallback);
     },
-    [updateUser, tokens]
+    [updateUser, tokens, updateUserPreferences]
   );
 
   /**

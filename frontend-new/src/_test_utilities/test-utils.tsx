@@ -3,17 +3,20 @@ import React, { ReactElement } from "react";
 import { render, renderHook, RenderHookOptions, RenderOptions } from "@testing-library/react";
 import { ThemeProvider } from "@mui/material";
 import applicationTheme, { ThemeMode } from "src/theme/applicationTheme/applicationTheme";
-import { AuthProvider } from "src/auth/AuthProvider";
+import { AuthProvider } from "src/auth/Providers/AuthProvider/AuthProvider";
 
 // Import the Firebase mock utilities
 import "src/_test_utilities/firebaseMock";
 import SnackbarProvider from "src/theme/SnackbarProvider/SnackbarProvider";
+import { UserPreferencesProvider } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
 
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
       <AuthProvider>
-        <SnackbarProvider>{children}</SnackbarProvider>
+        <UserPreferencesProvider>
+          <SnackbarProvider>{children}</SnackbarProvider>
+        </UserPreferencesProvider>
       </AuthProvider>
     </ThemeProvider>
   );

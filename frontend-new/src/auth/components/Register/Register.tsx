@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { Container, Box, TextField, Button, Typography, useTheme, styled, CircularProgress } from "@mui/material";
-import { AuthContext } from "src/auth/AuthProvider";
+import { AuthContext } from "src/auth/Providers/AuthProvider/AuthProvider";
 import { NavLink as RouterNavLink, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import IDPAuth from "src/auth/components/IDPAuth/IDPAuth";

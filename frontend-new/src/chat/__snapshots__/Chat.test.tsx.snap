@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`render tests should render the Chat Component 1`] = `
+exports[`Chat render tests should render the Chat Component 1`] = `
 <div
   class="MuiBox-root css-1v8gcgw"
   data-testid="chat-container-b7ea1e82-0002-432d-a768-11bdcd186e1d"

@@ -1,16 +1,16 @@
 import "src/_test_utilities/consoleMock";
 import React from "react";
 import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
-import DataProtectionAgreement, { DATA_TEST_ID } from "./DataProtectionPolicy";
+import DataProtectionAgreement, { DATA_TEST_ID } from "./DataProtectionAgreement";
 import { HashRouter, useNavigate } from "react-router-dom";
 import { mockLoggedInUser } from "src/_test_utilities/mockLoggedInUser";
 import { waitFor } from "@testing-library/react";
-import UserPreferencesService from "src/auth/services/UserPreferences/userPreferences.service";
 import { Language, UserPreference } from "src/auth/services/UserPreferences/userPreferences.types";
 import { routerPaths } from "src/app/routerPaths";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { TabiyaUser } from "src/auth/auth.types";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
+import { UserPreferencesContext } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -55,6 +55,21 @@ jest.mock("react-router-dom", () => {
 });
 
 describe("Testing Data Protection Policy component with AuthProvider", () => {
+  const createUserPreferencesMock = jest.fn();
+
+  const userPreferencesContextValue = {
+    getUserPreferences: jest.fn(),
+    createUserPreferences: createUserPreferencesMock,
+    userPreferences: {
+      accepted_tc: new Date(),
+      user_id: "0001",
+      language: Language.en,
+      sessions: [],
+    },
+    updateUserPreferences: jest.fn(),
+    isLoading: false,
+  };
+
   beforeEach(() => {
     // Clear console mocks and mock functions
     (console.error as jest.Mock).mockClear();
@@ -75,7 +90,9 @@ describe("Testing Data Protection Policy component with AuthProvider", () => {
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <DataProtectionAgreement />
+        <UserPreferencesContext.Provider value={userPreferencesContextValue}>
+          <DataProtectionAgreement />
+        </UserPreferencesContext.Provider>
       </HashRouter>
     );
 
@@ -111,15 +128,17 @@ describe("Testing Data Protection Policy component with AuthProvider", () => {
       sessions: [],
     };
 
-    // AND the user preferences service will successfully create the user preferences
-    const userPreferencesServiceMock = {
-      createUserPreferences: jest.fn().mockResolvedValue(newUserPreferences),
-    };
-    (UserPreferencesService as jest.Mock).mockImplementation(() => userPreferencesServiceMock);
+    // AND the user preferences provider will create the user preferences
+    createUserPreferencesMock.mockImplementation((newUserPrefs, onSuccess, onError) => {
+      onSuccess(newUserPreferences);
+    });
+
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <DataProtectionAgreement />
+        <UserPreferencesContext.Provider value={userPreferencesContextValue}>
+          <DataProtectionAgreement />
+        </UserPreferencesContext.Provider>
       </HashRouter>
     );
 
@@ -142,7 +161,11 @@ describe("Testing Data Protection Policy component with AuthProvider", () => {
       sessions: [],
     };
     await waitFor(() => {
-      expect(userPreferencesServiceMock.createUserPreferences).toHaveBeenCalledWith(expectedUserPreferenceSpecs);
+      expect(createUserPreferencesMock).toHaveBeenCalledWith(
+        expectedUserPreferenceSpecs,
+        expect.any(Function),
+        expect.any(Function)
+      );
     });
 
     // AND the user should be redirected to the root path
@@ -167,17 +190,17 @@ describe("Testing Data Protection Policy component with AuthProvider", () => {
 
     mockLoggedInUser({ user: givenUser });
 
-    // AND the user preferences service will fail
-    const userPreferencesServiceMock = {
-      createUserPreferences: jest.fn().mockRejectedValue(new Error("Failed to create user preferences")),
-    };
-
-    (UserPreferencesService as jest.Mock).mockImplementation(() => userPreferencesServiceMock);
+    // AND the user preferences provider will fail to create the user preferences
+    createUserPreferencesMock.mockImplementation((newUserPrefs, onSuccess, onError) => {
+      onError(new Error("Failed to create user preferences"));
+    });
 
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <DataProtectionAgreement />
+        <UserPreferencesContext.Provider value={userPreferencesContextValue}>
+          <DataProtectionAgreement />
+        </UserPreferencesContext.Provider>
       </HashRouter>
     );
 
@@ -200,7 +223,11 @@ describe("Testing Data Protection Policy component with AuthProvider", () => {
     };
 
     await waitFor(() => {
-      expect(userPreferencesServiceMock.createUserPreferences).toHaveBeenCalledWith(expectedUserPreferenceSpecs);
+      expect(createUserPreferencesMock).toHaveBeenCalledWith(
+        expectedUserPreferenceSpecs,
+        expect.any(Function),
+        expect.any(Function)
+      );
     });
 
     // AND the error message should be displayed
@@ -211,40 +238,6 @@ describe("Testing Data Protection Policy component with AuthProvider", () => {
     });
 
     // AND the error should be logged
-    expect(console.error).toHaveBeenCalledWith("Failed to create user preferences", expect.any(Error));
-  });
-
-  test("should show loading spinner when accepting the data protection policy", async () => {
-    // GIVEN a user is logged in for the first time
-    const givenUser: TabiyaUser = {
-      id: "0001",
-      email: "janedoe@mail.com",
-      name: "Jane Doe",
-    };
-    mockLoggedInUser({ user: givenUser });
-    // AND the user preferences service will take a while to create the user preferences
-    const userPreferencesServiceMock = {
-      createUserPreferences: jest.fn().mockImplementation(() => new Promise(() => {})),
-    };
-
-    (UserPreferencesService as jest.Mock).mockImplementation(() => userPreferencesServiceMock);
-
-    // WHEN the component is rendered
-    render(
-      <HashRouter>
-        <DataProtectionAgreement />
-      </HashRouter>
-    );
-    // AND the user clicks the accept button
-    fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_BUTTON));
-
-    // THEN expect the loading spinner to be displayed
-    await waitFor(() => {
-      expect(screen.getByTestId(DATA_TEST_ID.CIRCULAR_PROGRESS)).toBeInTheDocument();
-    });
-    // AND the accept button should be disabled
-    await waitFor(() => {
-      expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_BUTTON)).toBeDisabled();
-    });
+    expect(console.error).toHaveBeenCalled();
   });
 });

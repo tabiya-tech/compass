@@ -49,7 +49,7 @@ jest.mock("@mui/material", () => {
 });
 
 // mock AuthProvider
-jest.mock("./auth/AuthProvider", () => {
+jest.mock("./auth/Providers/AuthProvider/AuthProvider", () => {
   const mAuthProvider = jest
     .fn()
     .mockImplementation(({ children }) => <div data-testid="auth-provider-id">{children}</div>);
@@ -67,6 +67,15 @@ jest.mock("./theme/SnackbarProvider/SnackbarProvider", () => {
   return {
     __esModule: true,
     default: mSnackbarProvider,
+  };
+});
+
+// mock the UserPreferencesProvider
+jest.mock("./auth/Providers/UserPreferencesProvider/UserPreferencesProvider", () => {
+  const mUserPreferencesProvider = jest.fn().mockImplementation(({ children }) => children);
+  return {
+    __esModule: true,
+    UserPreferencesProvider: mUserPreferencesProvider,
   };
 });
 

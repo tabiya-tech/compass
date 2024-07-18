@@ -1,7 +1,7 @@
 import { mockLoggedInUser } from "src/_test_utilities/mockLoggedInUser";
 import { renderHook } from "src/_test_utilities/test-utils";
 import { useContext } from "react";
-import { AuthContext, TabiyaUser } from "src/auth/AuthProvider";
+import { AuthContext, TabiyaUser } from "src/auth/Providers/AuthProvider/AuthProvider";
 
 describe("Mock Logged In User", () => {
   test("it should return the access token when set", () => {
