@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from "@storybook/react";
-import DataProtectionAgreement from "./DataProtectionPolicy";
-import { AuthContext, authContextDefaultValue } from "src/auth/AuthProvider";
+import DataProtectionAgreement from "./DataProtectionAgreement";
+import { AuthContext, authContextDefaultValue } from "src/auth/Providers/AuthProvider/AuthProvider";
 
 const meta: Meta<typeof DataProtectionAgreement> = {
   title: "Auth/DataProtectionAgreement",

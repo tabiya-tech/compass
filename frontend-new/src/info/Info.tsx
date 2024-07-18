@@ -1,6 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Box, Skeleton, Typography, useTheme } from "@mui/material";
 import InfoService from "./info.service";
+import { routerPaths } from "../app/routerPaths";
+import { AuthContext } from "../auth/Providers/AuthProvider/AuthProvider";
+import { UserPreferencesContext } from "../auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
+import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 
 const uniqueId = "37d307ae-4f1e-4d8d-bafe-fd642f8af4dc";
 export const DATA_TEST_ID = {
@@ -66,10 +71,30 @@ const ApplicationInfoMain = (props: { versions: InfoProps[] }) => {
 const Info = () => {
   const [versions, setVersions] = useState<InfoProps[]>([]);
   const infoService = useMemo(() => new InfoService(), []);
+  const { handlePageLoad } = useContext(AuthContext);
+  const { userPreferences } = useContext(UserPreferencesContext);
+  const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     infoService.loadInfo().then((data) => setVersions(data));
   }, [infoService]);
+
+  useEffect(() => {
+    handlePageLoad(
+      (_user) => {
+        // If the user has not accepted the terms and conditions, redirect them to the login page
+        if (!userPreferences?.accepted_tc) {
+          navigate(routerPaths.LOGIN, { replace: true });
+        }
+      },
+      () => {
+        // If there is an error getting the user from the token, redirect the user to the login page
+        navigate(routerPaths.LOGIN, { replace: true });
+        enqueueSnackbar("Please login to continue...", { variant: "info" });
+      }
+    );
+  }, [enqueueSnackbar, handlePageLoad, navigate, userPreferences?.accepted_tc]);
 
   return (
     <div style={{ width: "100%", height: "100%" }} data-testid={DATA_TEST_ID.INFO_ROOT}>

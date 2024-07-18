@@ -1,4 +1,5 @@
 import { PersistentStorageService } from "src/persistentStorageService/PersistentStorageService";
+import { Language, UserPreference } from "src/auth/services/UserPreferences/userPreferences.types";
 
 describe("AuthPersistentStorage class tests", () => {
   beforeEach(() => {
@@ -10,7 +11,7 @@ describe("AuthPersistentStorage class tests", () => {
   });
 
   describe("Access token tests", () => {
-    test("return correct previously set token Access token", () => {
+    test("return correct previously set Access token", () => {
       // GIVEN The Access token is stored in the session storage
       const givenIDToken = "foo";
       PersistentStorageService.setAccessToken(givenIDToken);
@@ -59,53 +60,68 @@ describe("AuthPersistentStorage class tests", () => {
     });
   });
 
-  describe("chat session Id tests", () => {
-    test("return correct previously set chat session Id", () => {
-      // GIVEN The chat session Id is stored in the session storage
-      const givenChatSessionId = "foo";
-      PersistentStorageService.setChatSessionID(givenChatSessionId);
+  describe("user preferences tests", () => {
+    test("return correct previously set user preferences", () => {
+      // GIVEN The user preferences are stored in the session storage
+      const givenUserPreferences: UserPreference = {
+        user_id: "foo",
+        language: Language.en,
+        accepted_tc: new Date(),
+        sessions: [1, 2, 3],
+      };
+      PersistentStorageService.setUserPreferences(givenUserPreferences);
 
-      // WHEN The chat session Id is retrieved
-      const chatSessionId = PersistentStorageService.getChatSessionID();
+      // WHEN The user preferences are retrieved
+      const userPreferences = PersistentStorageService.getUserPreferences();
 
-      // THEN The chat session Id should be returned
-      expect(chatSessionId).toEqual(givenChatSessionId);
+      // THEN The user preferences should be returned
+      expect(userPreferences).toEqual(givenUserPreferences);
     });
 
-    test("return null if chat session Id is not set", () => {
-      // GIVEN The chat session Id is not stored in the session storage
+    test("return null if user preferences are not set", () => {
+      // GIVEN The user preferences are not stored in the session storage
       // Nothing set
 
-      // WHEN The chat session Id is retrieved
-      const chatSessionId = PersistentStorageService.getChatSessionID();
+      // WHEN The user preferences are retrieved
+      const userPreferences = PersistentStorageService.getUserPreferences();
 
       // THEN null should be returned
-      expect(chatSessionId).toBeNull();
+      expect(userPreferences).toBeNull();
     });
 
-    test("clear chat session Id", () => {
-      // GIVEN The chat session Id is stored in the session storage
-      const givenChatSessionId = "foo";
-      PersistentStorageService.setChatSessionID(givenChatSessionId);
+    test("clear user preferences", () => {
+      // GIVEN The user preferences are stored in the session storage
+      const givenUserPreferences: UserPreference = {
+        user_id: "foo",
+        language: Language.en,
+        accepted_tc: new Date(),
+        sessions: [1, 2, 3],
+      };
+      PersistentStorageService.setUserPreferences(givenUserPreferences);
 
-      // WHEN The chat session Id is cleared
-      PersistentStorageService.clearChatSessionID();
+      // WHEN The user preferences are cleared
+      PersistentStorageService.clearUserPreferences();
 
-      // THEN The chat session Id should be cleared (null)
-      const chatSessionId = PersistentStorageService.getChatSessionID();
-      expect(chatSessionId).toBeNull();
+      // THEN The user preferences should be cleared (null)
+      const userPreferences = PersistentStorageService.getUserPreferences();
+      expect(userPreferences).toBeNull();
     });
 
-    test("set chat session Id", () => {
-      // GIVEN The chat session Id is not stored in the session storage
-      const givenChatSessionId = "foo";
+    test("set user preferences", () => {
+      // GIVEN The user preferences are not stored in the session storage
+      const givenUserPreferences: UserPreference = {
+        user_id: "foo",
+        language: Language.en,
+        accepted_tc: new Date(),
+        sessions: [1, 2, 3],
+      };
 
-      // WHEN The chat session Id is set
-      PersistentStorageService.setChatSessionID(givenChatSessionId);
+      // WHEN The user preferences are set
+      PersistentStorageService.setUserPreferences(givenUserPreferences);
 
-      // THEN The chat session Id should be stored
-      const chatSessionId = PersistentStorageService.getChatSessionID();
-      expect(chatSessionId).toEqual(givenChatSessionId);
+      // THEN The user preferences should be stored
+      const userPreferences = PersistentStorageService.getUserPreferences();
+      expect(userPreferences).toEqual(givenUserPreferences);
     });
   });
 
@@ -120,5 +136,9 @@ describe("AuthPersistentStorage class tests", () => {
     // THEN The Access token should be cleared (null)
     const IDToken = PersistentStorageService.getAccessToken();
     expect(IDToken).toBeNull();
+
+    // AND The user preferences should be cleared (null)
+    const userPreferences = PersistentStorageService.getUserPreferences();
+    expect(userPreferences).toBeNull();
   });
 });

@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import { getServiceErrorFactory } from "src/error/error";
 import ErrorConstants from "src/error/error.constants";
-import {PersistentStorageService} from "../persistentStorageService/PersistentStorageService";
+import { PersistentStorageService } from "src/persistentStorageService/PersistentStorageService";
 
 // This function is used to make authenticated fetch requests
 // It adds the Authorization header with the IDToken from the session storage

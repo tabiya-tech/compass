@@ -2,9 +2,10 @@
 import "src/_test_utilities/consoleMock";
 
 import Info, { DATA_TEST_ID, InfoProps } from "./Info";
-import { render, screen, act } from "src/_test_utilities/test-utils";
+import { act, render, screen } from "src/_test_utilities/test-utils";
 import InfoService from "./info.service";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
+import { HashRouter } from "react-router-dom";
 
 // Mock the info service
 jest.mock("./info.service", () => {
@@ -44,7 +45,11 @@ describe("Testing Info component", () => {
     });
 
     // WHEN the component is rendered
-    render(<Info />);
+    render(
+      <HashRouter>
+        <Info />
+      </HashRouter>
+    );
     await act(async () => {
       await infoDataPromise;
     });

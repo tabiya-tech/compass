@@ -7,6 +7,8 @@ import { PersistentStorageService } from "src/persistentStorageService/Persisten
 import { fetchWithAuth } from "src/apiService/APIService";
 
 export default class UserPreferencesService {
+  private static instance: UserPreferencesService;
+
   readonly userPreferencesEndpointUrl: string;
   readonly apiServerUrl: string;
 
@@ -16,10 +18,21 @@ export default class UserPreferencesService {
   }
 
   /**
+   * Get the singleton instance of the UserPreferencesService.
+   * @returns {UserPreferencesService} The singleton instance of the UserPreferencesService.
+   */
+  static getInstance(): UserPreferencesService {
+    if (!UserPreferencesService.instance) {
+      UserPreferencesService.instance = new UserPreferencesService();
+    }
+    return UserPreferencesService.instance;
+  }
+
+  /**
    * Creates an entry for the user preferences of a user with an ID
    *
    */
-  public async createUserPreferences(newUserPreferencesSpec: UserPreference): Promise<UserPreference> {
+  async createUserPreferences(newUserPreferencesSpec: UserPreference): Promise<UserPreference> {
     const serviceName = "UserPreferencesService";
     const serviceFunction = "createUserPreferences";
     const method = "POST";
@@ -66,7 +79,10 @@ export default class UserPreferencesService {
 
     let userPreferencesResponse: UserPreference;
     try {
-      userPreferencesResponse = JSON.parse(responseBody);
+      userPreferencesResponse = {
+        ...JSON.parse(responseBody),
+        accepted_tc: new Date(JSON.parse(responseBody).accepted_tc),
+      };
     } catch (e: any) {
       throw errorFactory(
         response.status,
@@ -79,7 +95,8 @@ export default class UserPreferencesService {
       );
     }
 
-    PersistentStorageService.setChatSessionID(userPreferencesResponse.sessions[0].toString());
+    // store the user preferences in the local storage
+    PersistentStorageService.setUserPreferences(userPreferencesResponse);
 
     return {
       ...userPreferencesResponse,
@@ -91,7 +108,7 @@ export default class UserPreferencesService {
    * Gets the user preferences of a user with an ID
    *
    */
-  public async getUserPreferences(userId: string): Promise<UserPreference> {
+  async getUserPreferences(userId: string): Promise<UserPreference> {
     const serviceName = "UserPreferencesService";
     const serviceFunction = "getUserPreferences";
     const method = "GET";
@@ -145,7 +162,10 @@ export default class UserPreferencesService {
 
     let userPreferencesResponse: UserPreference;
     try {
-      userPreferencesResponse = JSON.parse(responseBody);
+      userPreferencesResponse = {
+        ...JSON.parse(responseBody),
+        accepted_tc: new Date(JSON.parse(responseBody).accepted_tc),
+      };
     } catch (e: any) {
       throw errorFactory(
         response.status,
@@ -158,9 +178,8 @@ export default class UserPreferencesService {
       );
     }
 
-    // set the first session id to session storage for now
-    // when the user gets to have access to multiple sessions, we can pick the appropriate session from the list
-    PersistentStorageService.setChatSessionID(userPreferencesResponse.sessions[0].toString());
+    // store the user preferences in the local storage
+    PersistentStorageService.setUserPreferences(userPreferencesResponse);
 
     return {
       ...userPreferencesResponse,

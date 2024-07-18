@@ -1,15 +1,16 @@
-import React, { useCallback, useContext, useState } from "react";
-import { Box, Button, CircularProgress, Container, styled, Typography, useTheme } from "@mui/material";
+import React, { useCallback, useContext, useEffect, useState } from "react";
+import { Box, Button, Container, styled, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import UserPreferencesService from "src/auth/services/UserPreferences/userPreferences.service";
-import { AuthContext } from "src/auth/AuthProvider";
+import { AuthContext } from "src/auth/Providers/AuthProvider/AuthProvider";
 import { Language, UserPreference } from "src/auth/services/UserPreferences/userPreferences.types";
 import { ServiceError } from "src/error/error";
 import ErrorConstants from "src/error/error.constants";
 import { StatusCodes } from "http-status-codes";
 import AuthContextMenu from "src/auth/components/AuthContextMenu/AuthContextMenu";
+import { UserPreferencesContext } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
+import { writeServiceErrorToLog } from "src/error/logger";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
@@ -28,59 +29,76 @@ export const DATA_TEST_ID = {
   CIRCULAR_PROGRESS: `dpa-circular-progress-${uniqueId}`,
 };
 
-interface DataProtectionAgreementProps {
-  isLoading?: boolean;
-}
-
-const DataProtectionAgreement: React.FC<DataProtectionAgreementProps> = ({ isLoading }) => {
-  const theme = useTheme();
+const DataProtectionAgreement = () => {
+  const { createUserPreferences, userPreferences } = useContext(UserPreferencesContext);
   const [isAcceptingDPA, setIsAcceptingDPA] = useState(false);
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
   /**
+   * Redirect the user to the login page
+   * if they are already logged in
+   */
+  useEffect(() => {
+    // If the user is already logged in, redirect to the home page
+    if (user && userPreferences?.accepted_tc) {
+      navigate(routerPaths.ROOT, { replace: true });
+    } else if (!user) {
+      navigate(routerPaths.LOGIN, { replace: true });
+    }
+  }, [navigate, user, userPreferences]);
+
+  /**
    * Persist the user's chosen preferences to the backend
    */
-  const createUserPreferences = useCallback(async () => {
-    const userPreferencesService = new UserPreferencesService();
-    if (!user) {
-      throw new ServiceError(
-        "UserPreferenceService",
-        "createUserPreferences",
-        "POST",
-        "users/preferences",
-        StatusCodes.NOT_FOUND,
-        ErrorConstants.ErrorCodes.NOT_FOUND,
-        "User not found",
-        ""
-      );
-    }
-    const newUserPreferenceSpecs: UserPreference = {
-      user_id: user.id,
-      language: Language.en,
-      accepted_tc: new Date(),
-      sessions: [],
-    };
+  const persistUserPreferences = useCallback(async () => {
     try {
+      if (!user) {
+        throw new ServiceError(
+          "UserPreferenceService",
+          "createUserPreferences",
+          "POST",
+          "users/preferences",
+          StatusCodes.NOT_FOUND,
+          ErrorConstants.ErrorCodes.NOT_FOUND,
+          "User not found",
+          ""
+        );
+      }
+      const newUserPreferenceSpecs: UserPreference = {
+        user_id: user.id,
+        language: Language.en,
+        accepted_tc: new Date(),
+        sessions: [],
+      };
       setIsAcceptingDPA(true);
-      await userPreferencesService.createUserPreferences(newUserPreferenceSpecs);
-      enqueueSnackbar("Data Protection Agreement Accepted", { variant: "success" });
-      navigate(routerPaths.ROOT, { replace: true });
+
+      createUserPreferences(
+        newUserPreferenceSpecs,
+        (_prefs) => {
+          enqueueSnackbar("Data Protection Agreement Accepted", { variant: "success" });
+          navigate(routerPaths.ROOT, { replace: true });
+        },
+        (error) => {
+          writeServiceErrorToLog(error, console.error);
+          enqueueSnackbar("Failed to create user preferences", { variant: "error" });
+        }
+      );
     } catch (e) {
-      console.log(e)
+      console.error(e);
       enqueueSnackbar("Failed to create user preferences", { variant: "error" });
       console.error("Failed to create user preferences", e);
     } finally {
       setIsAcceptingDPA(false);
     }
-  }, [user, enqueueSnackbar, navigate]);
+  }, [user, enqueueSnackbar, navigate, createUserPreferences]);
 
   /**
    * Handle when a user accepts the data protection agreement
    */
   const handleAcceptedDPA = async () => {
-    await createUserPreferences();
+    await persistUserPreferences();
   };
 
   return (
@@ -130,21 +148,11 @@ const DataProtectionAgreement: React.FC<DataProtectionAgreementProps> = ({ isLoa
           variant="contained"
           color="primary"
           style={{ marginTop: 16 }}
-          disabled={isLoading ?? isAcceptingDPA}
+          disabled={isAcceptingDPA}
           data-testid={DATA_TEST_ID.ACCEPT_DPA_BUTTON}
           onClick={handleAcceptedDPA}
         >
-          {isLoading ?? isAcceptingDPA ? (
-            <CircularProgress
-              color="secondary"
-              aria-label="accepting DPA"
-              size={16}
-              sx={{ marginTop: theme.tabiyaSpacing.sm, marginBottom: theme.tabiyaSpacing.sm }}
-              data-testid={DATA_TEST_ID.CIRCULAR_PROGRESS}
-            />
-          ) : (
-            "Sure, I am ready."
-          )}
+          Sure, I am ready.
         </Button>
       </Box>
     </Container>

@@ -3,7 +3,7 @@ import React from "react";
 import { render, screen, waitFor, fireEvent } from "src/_test_utilities/test-utils";
 import { HashRouter, useNavigate } from "react-router-dom";
 import Register, { DATA_TEST_ID } from "./Register";
-import { AuthContext, TabiyaUser } from "src/auth/AuthProvider";
+import { AuthContext, TabiyaUser } from "src/auth/Providers/AuthProvider/AuthProvider";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { routerPaths } from "src/app/routerPaths";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";

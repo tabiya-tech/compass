@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import ChatService from "src/chat/ChatService/ChatService";
 import ChatList from "src/chat/ChatList/ChatList";
 import { IChatMessage } from "./Chat.types";
@@ -11,8 +11,9 @@ import { getUserFriendlyErrorMessage, ServiceError } from "src/error/error";
 import { writeServiceErrorToLog } from "src/error/logger";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
-import { AuthContext } from "src/auth/AuthProvider";
+import { AuthContext } from "src/auth/Providers/AuthProvider/AuthProvider";
 import { ConversationMessage, ConversationMessageSender } from "./ChatService/ChatService.types";
+import { UserPreferencesContext } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
 
 const uniqueId = "b7ea1e82-0002-432d-a768-11bdcd186e1d";
 export const DATA_TEST_ID = {
@@ -25,16 +26,8 @@ const Chat = () => {
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const [initialized, setInitialized] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
+  const { userPreferences } = useContext(UserPreferencesContext);
   const { logout } = useContext(AuthContext);
-
-  const chatService = useMemo(() => {
-    try {
-      return new ChatService();
-    } catch (error) {
-      console.error("Failed to create chat service:", error);
-      return;
-    }
-  }, []);
 
   const navigate = useNavigate();
 
@@ -51,6 +44,17 @@ const Chat = () => {
         addMessage(message);
       }
       try {
+        if (!userPreferences?.sessions.length) {
+          console.error("User has no sessions");
+          addMessage(
+            generateCompassMessage(
+              "I'm sorry, I'm having trouble connecting to the server. Please try again later.",
+              sent_at
+            )
+          );
+          return;
+        }
+        const chatService = ChatService.getInstance(userPreferences.sessions[0]);
         if (!chatService) {
           console.error("Chat service is not initialized");
           addMessage(
@@ -70,13 +74,16 @@ const Chat = () => {
       } catch (error) {
         console.error("Failed to send message:", error);
         addMessage(
-          generateCompassMessage("I'm sorry, Something seems to have gone wrong. Try logging in again.", sent_at)
+          generateCompassMessage(
+            "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
+            sent_at
+          )
         );
       } finally {
         setIsTyping(false);
       }
     },
-    [chatService]
+    [userPreferences?.sessions]
   );
 
   const handleLogout = useCallback(() => {
@@ -94,11 +101,21 @@ const Chat = () => {
 
   const initializeChat = useCallback(async () => {
     try {
+      if (!userPreferences?.sessions.length) {
+        addMessage(
+          generateCompassMessage(
+            "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
+            new Date().toISOString()
+          )
+        );
+        return;
+      }
+      const chatService = ChatService.getInstance(userPreferences.sessions[0]);
       if (!chatService) {
         console.error("Chat service is not initialized");
         addMessage(
           generateCompassMessage(
-            "I'm sorry, Something seems to have gone wrong. Try logging in again.",
+            "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
             new Date().toISOString()
           )
         );
@@ -129,7 +146,7 @@ const Chat = () => {
     } finally {
       setIsTyping(false);
     }
-  }, [chatService, enqueueSnackbar, sendMessage]);
+  }, [enqueueSnackbar, sendMessage, userPreferences?.sessions]);
 
   useEffect(() => {
     if (!initialized) {

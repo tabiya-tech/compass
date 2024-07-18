@@ -4,7 +4,7 @@ import { ServiceError } from "src/error/error";
 import ErrorConstants from "src/error/error.constants";
 import { PersistentStorageService } from "src/persistentStorageService/PersistentStorageService";
 
-describe('Api Service tests', () => {
+describe("Api Service tests", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
