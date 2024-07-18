@@ -18,7 +18,7 @@ class CollectExperiencesEvaluationCriteria(Enum):
     # Agent prompts the user to discuss experiences from the unseen economy
     UNSEEN_ECONOMY = "unseen_economy"
     # Agent stays focus on the task of experience collection
-    COLLECT_EXPERIENCE_FOCUS = "focus"
+    FOCUS = "focus"
     # Agent asks further questions about ambiguous statements
     DISAMBIGUATION = "disambiguation"
     # Agent observes inconsistency of given dates

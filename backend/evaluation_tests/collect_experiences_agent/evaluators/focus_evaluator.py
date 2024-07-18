@@ -16,7 +16,7 @@ class FocusEvaluator(BaseEvaluator):
     """
 
     def __init__(self):
-        self.criteria = CollectExperiencesEvaluationCriteria.COLLECT_EXPERIENCE_FOCUS
+        self.criteria = CollectExperiencesEvaluationCriteria.FOCUS
         # Use GeminiGenerativeLLM as the LLM for evaluation
         # as we are not interested in conducting a conversation, with an in-memory state (history).
         self.llm = GeminiGenerativeLLM(config=LLMConfig(model_name="gemini-1.5-pro-preview-0409", response_mime_type="application/json"))
