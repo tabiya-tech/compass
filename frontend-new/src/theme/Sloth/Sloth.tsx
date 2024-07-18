@@ -69,7 +69,7 @@ export const Sloth = (props: SlothProps) => {
   const theme = useTheme();
   const slothStyle = {
     width: props.width ?? "48px",
-    strokeColor: props.strokeColor ?? theme.palette.primary.main,
+    strokeColor: props.strokeColor ?? theme.palette.tabiyaBlue.main,
     bodyColor: props.bodyColor ?? theme.palette.tabiyaYellow.dark,
     faceColor: props.faceColor ?? theme.palette.tabiyaYellow.main,
   };
