@@ -17,19 +17,10 @@ from evaluation_tests.conversation_libs.evaluators.evaluation_result import Conv
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 
 
-def _get_test_cases_to_run():
-    # if there are test case with force then run only those
-    for tc in get_test_cases_to_run(test_cases):
-        if tc.skip_force:
-            return [tc]
-    # if there are no test case with force then run all test cases that are not skipped
-    return [tc for tc in get_test_cases_to_run(test_cases) if tc.skip_force != "skip"]
-
-
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test
-@pytest.mark.parametrize('test_case', _get_test_cases_to_run(),
-                         ids=[case.name for case in _get_test_cases_to_run()])
+@pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases),
+                         ids=[case.name for case in get_test_cases_to_run(test_cases)])
 async def test_collect_experiences_agent_simulated_user(max_iterations: int, test_case: CollectExperiencesAgentTestCase,
                                                         caplog: LogCaptureFixture):
     """

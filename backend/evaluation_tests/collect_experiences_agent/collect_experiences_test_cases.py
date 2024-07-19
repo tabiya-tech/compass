@@ -1,5 +1,5 @@
 from textwrap import dedent
-from typing import Optional, Literal
+from typing import Any
 
 from evaluation_tests.conversation_libs.conversation_test_function import EvaluationTestCase, Evaluation
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import EvaluationType
@@ -31,15 +31,14 @@ france_prompt = system_instruction_prompt + dedent("""
 
 
 class CollectExperiencesAgentTestCase(EvaluationTestCase):
-    skip_force: Optional[Literal['skip', 'force']] = None
     expected_experiences_found_min: int
     expected_experiences_found_max: int
 
     def __init__(self, *, name: str, simulated_user_prompt: str, evaluations: list[Evaluation],
-                 expected_experiences_found_min: int, expected_experiences_found_max: int, skip_force: Optional[Literal['skip', 'force']] = None):
+                 expected_experiences_found_min: int, expected_experiences_found_max: int, **data: Any):
         super().__init__(name=name, simulated_user_prompt=simulated_user_prompt, evaluations=evaluations,
                          expected_experiences_found_min=expected_experiences_found_min, expected_experiences_found_max=expected_experiences_found_max,
-                         skip_force=skip_force)
+                         **data)
 
 
 test_cases = [
