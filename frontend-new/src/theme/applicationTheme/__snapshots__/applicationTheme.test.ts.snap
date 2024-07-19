@@ -221,7 +221,7 @@ Object {
       "main": "#EEFF41",
     },
     "text": Object {
-      "disabled": "#E0E2EC",
+      "disabled": "#000000",
       "primary": "#002147",
       "secondary": "#43474E",
       "textAccent": "#265EA7",
@@ -921,7 +921,7 @@ Object {
       "main": "#EEFF41",
     },
     "text": Object {
-      "disabled": "#E0E2EC",
+      "disabled": "#000000",
       "primary": "#002147",
       "secondary": "#43474E",
       "textAccent": "#265EA7",

@@ -45,9 +45,11 @@ describe("ChatHeader", () => {
   test("should render the Chat Header", () => {
     // GIVEN a ChatHeader component
     const givenNotifyOnLogout = jest.fn();
+    const givenStartNewConversation = jest.fn();
+
     const givenChatHeader = (
       <HashRouter>
-        <ChatHeader notifyOnLogout={givenNotifyOnLogout} />
+        <ChatHeader notifyOnLogout={givenNotifyOnLogout} startNewConversation={givenStartNewConversation} />
       </HashRouter>
     );
 
@@ -73,7 +75,8 @@ describe("ChatHeader", () => {
   });
   describe("chatHeader action tests", () => {
     const givenNotifyOnLogout = jest.fn();
-    const givenChatHeader = <ChatHeader notifyOnLogout={givenNotifyOnLogout} />;
+    const givenStartNewConversation = jest.fn();
+    const givenChatHeader = <ChatHeader notifyOnLogout={givenNotifyOnLogout} startNewConversation={givenStartNewConversation} />;
     testNavigateToPath(givenChatHeader, "compass logo", DATA_TEST_ID.CHAT_HEADER_LOGO_LINK, routerPaths.ROOT);
 
     test("should open the context menu when the user icon is clicked", async () => {
@@ -81,7 +84,7 @@ describe("ChatHeader", () => {
       const givenNotifyOnLogout = jest.fn();
       const givenChatHeader = (
         <HashRouter>
-          <ChatHeader notifyOnLogout={givenNotifyOnLogout} />
+          <ChatHeader notifyOnLogout={givenNotifyOnLogout} startNewConversation={givenStartNewConversation} />
         </HashRouter>
       );
       // AND the chat header is rendered
@@ -108,7 +111,7 @@ describe("ChatHeader", () => {
       const givenNotifyOnLogout = jest.fn();
       const givenChatHeader = (
         <HashRouter>
-          <ChatHeader notifyOnLogout={givenNotifyOnLogout} />
+          <ChatHeader notifyOnLogout={givenNotifyOnLogout} startNewConversation={givenStartNewConversation} />
         </HashRouter>
       );
       // AND the chat header is rendered
@@ -146,12 +149,48 @@ describe("ChatHeader", () => {
       expect(navigate).toHaveBeenCalledWith(routerPaths.SETTINGS);
     });
 
+    test("should call start new conversation when the start new conversation menu item is clicked", async () => {
+      // GIVEN a ChatHeader component
+        const givenNotifyOnLogout = jest.fn();
+        const givenStartNewConversation = jest.fn();
+        const givenChatHeader = (
+          <HashRouter>
+            <ChatHeader notifyOnLogout={givenNotifyOnLogout} startNewConversation={givenStartNewConversation} />
+          </HashRouter>
+        );
+
+        // AND the chat header is rendered
+        render(givenChatHeader);
+
+        // AND the user button is clicked
+        const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
+        fireEvent.click(userButton);
+
+        // AND the context menu is opened
+        await waitFor(() => {
+          expect(ContextMenu).toHaveBeenCalledWith(
+            expect.objectContaining({
+              anchorEl: userButton,
+              open: true,
+            }),
+            {}
+          );
+        });
+
+        // WHEN the start new conversation menu item is clicked
+        const startNewConversationMenuItem = screen.getByTestId(MENU_ITEM_ID.START_NEW_CONVERSATION);
+        fireEvent.click(startNewConversationMenuItem);
+
+        // THEN expect the start new conversation function to be called
+        expect(givenStartNewConversation).toHaveBeenCalled();
+    });
+
     test("should close the context menu when notifyOnClose is called", async () => {
       // GIVEN a ChatHeader component
       const givenNotifyOnLogout = jest.fn();
       const givenChatHeader = (
         <HashRouter>
-          <ChatHeader notifyOnLogout={givenNotifyOnLogout} />
+          <ChatHeader notifyOnLogout={givenNotifyOnLogout} startNewConversation={givenStartNewConversation} />
         </HashRouter>
       );
       // AND the chat header is rendered

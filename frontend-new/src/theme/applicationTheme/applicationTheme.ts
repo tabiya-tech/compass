@@ -99,7 +99,7 @@ const lightPalette: PaletteOptions = {
     textAccent: TabiyaBasicColors.LightBlue,
     textWhite: "#FFFFFF",
     textBlack: "#000000",
-    disabled: "#E0E2EC",
+    disabled: "#000000",
   },
   common: {
     white: "#ffffff",
