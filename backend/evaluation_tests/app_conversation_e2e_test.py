@@ -1,6 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from tqdm import tqdm
+import logging.config
 
 from app.agent.agent_types import AgentOutput, AgentInput
 from app.conversation_memory.conversation_memory_types import ConversationContext
@@ -14,6 +15,22 @@ from evaluation_tests.core_e2e_tests_cases import test_cases
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 from httpx import AsyncClient
 
+# Mute the logging of the httpx and httpcore
+LOGGING_CONFIG = {
+    "version": 1,
+    'loggers': {
+        'httpx': {
+            'level': 'WARN',
+        },
+        'httpcore': {
+            'level': 'WARN',
+        },
+    }
+}
+
+logging.config.dictConfig(LOGGING_CONFIG)
+logger = logging.getLogger()
+
 
 class _AppChatExecutor:
     def __init__(self, session_id: int):
@@ -24,8 +41,8 @@ class _AppChatExecutor:
         Executes the application chat route
         """
         async with AsyncClient(app=app, base_url="http://test") as ac:
-            response = await ac.get('/conversation', params={'user_input': agent_input.message,
-                                                             'session_id': self._session_id})
+            response = await ac.get('/poc/conversation', params={'user_input': agent_input.message,
+                                                                 'session_id': self._session_id})
         return AgentOutput.model_validate(response.json()['last'])
 
 
@@ -66,13 +83,14 @@ async def test_main_app_chat(max_iterations: int, test_case: EvaluationTestCase,
         for evaluation in tqdm(test_case.evaluations, desc='Evaluating'):
             output = await create_evaluator(evaluation.type).evaluate(evaluation_result)
             evaluation_result.add_evaluation_result(output)
-            print(f'Evaluation for {evaluation.type.name}: {output.score} {output.reasoning}')
+            logger.info(f'Evaluation for {evaluation.type.name}: {output.score} {output.reasoning}')
             assert output.score >= evaluation.expected, f"{evaluation.type.name} expected " \
                                                         f"{evaluation.expected} actual {output.score}"
-
+    except Exception as e:
+        logger.error(f"Error in test case {test_case.name}: {e}")
     finally:
         output_folder = common_folder_path + 'e2e_test_' + test_case.name
         evaluation_result.save_data(folder=output_folder, base_file_name='evaluation_record')
         context = ConversationContext.model_validate(
-            client.get("/conversation_context", params={'session_id': session_id}).json())
+            client.get("/poc/conversation_context", params={'session_id': session_id}).json())
         save_conversation(context, title=test_case.name, folder_path=output_folder)
