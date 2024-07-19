@@ -1,9 +1,12 @@
 import json
+import logging
 import os
 from enum import Enum
 from typing import Callable, TextIO
 
 from pydantic import BaseModel, Field
+
+logger = logging.getLogger()
 
 
 class Actor(Enum):
@@ -43,8 +46,8 @@ class EvaluationResult(BaseModel):
     score: int
     reasoning: str
 
-class EvaluationRecord(BaseModel):
 
+class EvaluationRecord(BaseModel):
     test_case: str
     """
     The test case name.
@@ -99,7 +102,7 @@ class EvaluationRecord(BaseModel):
         :return:
         """
         base_path = os.path.join(folder, base_file_name)
-        print(f'The full conversation and evaluation is saved at file:///{base_path}.json \n file:///{base_path}.md')
+        logger.info(f'The full conversation and evaluation is saved at file:///{base_path}.json \n file:///{base_path}.md')
         # Save the evaluation result to a json file
         _save_to_file(base_path + '.json',
                       lambda f: json.dump(json.loads(self.json()), f, ensure_ascii=False, indent=4))
