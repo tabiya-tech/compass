@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import os
 from datetime import datetime, timezone
 
@@ -15,6 +16,8 @@ from evaluation_tests.conversation_libs.agent_executors import ExecuteAgentCalla
     ExecuteSimulatedUserCallable, GetConversationContextCallable
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationEvaluationRecord, EvaluationType
 from evaluation_tests.conversation_libs.evaluators.evaluator_builder import create_evaluator
+
+logger = logging.getLogger()
 
 
 class Evaluation(BaseModel):
@@ -67,6 +70,7 @@ class ConversationTestConfig(BaseModel):
     execute_simulated_user: ExecuteSimulatedUserCallable
     is_finished: CheckAgentFinishedCallable
     get_conversation_context: GetConversationContextCallable
+    deferred_evaluation_assertions: bool = False
 
     class Config:
         """
@@ -83,7 +87,7 @@ async def conversation_test_function(*, config: ConversationTestConfig):
     E2E conversation test, based on the test cases specified above. It calls the same endpoint as the frontend
     would call and does not mock any of the tested components.
     """
-    print(f"Running test case {config.test_case.name}")
+    logger.info(f"Running test case {config.test_case.name}")
     evaluation_result = ConversationEvaluationRecord(simulated_user_prompt=config.test_case.simulated_user_prompt,
                                                      test_case=config.test_case.name)
 
@@ -98,7 +102,7 @@ async def conversation_test_function(*, config: ConversationTestConfig):
     for evaluation in tqdm(config.test_case.evaluations, desc='Evaluating'):
         output = await create_evaluator(evaluation.type).evaluate(evaluation_result)
         evaluation_result.add_evaluation_result(output)
-        print(f'Evaluation for {evaluation.type.name}: {output.score} {output.reasoning}')
+        logger.info(f'Evaluation for {evaluation.type.name}: {output.score} {output.reasoning}')
 
     # Save the conversation and evaluation results.
     time_now = datetime.now(timezone.utc).isoformat()
@@ -110,13 +114,26 @@ async def conversation_test_function(*, config: ConversationTestConfig):
     save_conversation_context_to_json(context=context, file_path=context_path + ".json")
     save_conversation_context_to_markdown(title="Test Case:" + config.test_case.name, context=context,
                                           file_path=context_path + ".md")
+    if not config.deferred_evaluation_assertions:
+        # Run the actual asserts at the end, to make sure that all data is calculated/stored properly.
+        assert_expected_evaluation_results(evaluation_result, config.test_case)
+    else:
+        logger.info("!!! ATTENTION !!!")
+        logger.info("!!! Deferred evaluation assertions are set to true. Don not forget to explicitly run the evaluation results!!!")
+    return evaluation_result
 
+
+def assert_expected_evaluation_results(evaluation_result: ConversationEvaluationRecord, test_case: EvaluationTestCase):
+    """
+    Asserts that the evaluation results match the expected results defined in the test case
+    It should be called after the conversation_test_function is run if the test is run with deferred evaluation assertions set to true.
+    """
     # Run the actual asserts at the end, to make sure that all data is calculated/stored properly.
-    assert len(evaluation_result.evaluations) == len(config.test_case.evaluations)
+    assert len(evaluation_result.evaluations) == len(test_case.evaluations)
     for i, evaluation in enumerate(evaluation_result.evaluations):
-        expected = config.test_case.evaluations[i].expected
+        expected = test_case.evaluations[i].expected
         actual = evaluation.score
-        assert actual >= expected, f"{config.test_case.evaluations[i].type.name} expected {expected} actual {actual}"
+        assert actual >= expected, f"{test_case.evaluations[i].type.name} expected {expected} actual {actual}"
 
 
 class LLMSimulatedUser:
@@ -162,6 +179,6 @@ class ScriptedSimulatedUser:
         :return: The response from the simulated user.
         """
         if turn_number >= len(self._script):
-            print(f"Turn number {turn_number} is out of bounds for the script.")
+            logger.error(f"Turn number {turn_number} is out of bounds for the script.")
             return ""
         return self._script[turn_number]
