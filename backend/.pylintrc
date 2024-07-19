@@ -15,7 +15,7 @@ ignore-paths=venv-backend,conftest.py
 [FORMAT]
 
 # Maximum number of characters on a single line.
-max-line-length=120 # Setting this to 120, can be changed as needed alter
+max-line-length=160 # Setting this to 160 for more modern screens, can be changed as needed alter
 
 [MESSAGES CONTROL]
 disable=missing-module-docstring,
