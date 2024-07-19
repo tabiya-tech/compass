@@ -324,11 +324,8 @@ class LLMAgentDirector(AbstractAgentDirector):
 
                 transitioned_to_new_phase = self._state.current_phase != new_phase
                 if transitioned_to_new_phase:
-                    # TODO(Apostolos): models should be able to handle transitions between phases seamlessly,
-                    #  so they should have information how to handle the user entering from a different phase
                     user_input = AgentInput(
-                        message=f"Hi, I come to you ({self._get_default_agent_type_for_phase(new_phase).value}) "
-                                f"from {self._get_default_agent_type_for_phase(self._state.current_phase).value}",
+                        message="(silence)",
                         is_artificial=True
                     )
                     self._state.current_phase = new_phase
