@@ -1,9 +1,12 @@
+import logging
 from typing import Callable
 
 from tqdm import tqdm
 
 from app.agent.agent_types import AgentInput
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationRecord, Actor
+
+logger = logging.getLogger()
 
 
 async def generate(*, max_iterations: int,
@@ -25,14 +28,17 @@ async def generate(*, max_iterations: int,
         # Get a response from the evaluated agent.
         agent_output = await execute_evaluated_agent(agent_input=AgentInput(message=simulated_user_output))
         message_for_user = agent_output.message_for_user
+        logger.info(f'Evaluated Agent: {message_for_user}')
         conversation.append(
             ConversationRecord(message=message_for_user, actor=Actor.EVALUATED_AGENT))
         # Checks whether the chatbot is done. And finishes the loop if so.
         if is_finished(agent_output=agent_output):
-            print(f'Conversation finished earlier, after {i} out of {max_iterations} iterations.')
+            logger.info(f'Conversation finished earlier, after {i} out of {max_iterations} iterations.')
             break
         # Get a response from the simulated user.
         simulated_user_output = await execute_simulated_user(turn_number=i, message_for_user=message_for_user)
+        simulated_user_output = simulated_user_output.strip()
+        logger.info(f'Simulated User: {simulated_user_output}')
         conversation.append(
             ConversationRecord(message=simulated_user_output, actor=Actor.SIMULATED_USER))
     return conversation
