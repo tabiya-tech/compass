@@ -13,7 +13,7 @@ from app.agent.agent_types import AgentInput
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
 from app.constants.errors import HTTPErrorResponse
-from app.users.auth import Authentication
+from app.users.auth import Authentication, UserInfo
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
 from app.chat.chat_types import ConverstaionResponse
@@ -21,6 +21,7 @@ from app.chat.chat_utils import filter_conversation_history, get_messages_from_c
 from app.server_dependecies.agent_director_dependencies import get_agent_director
 from app.server_dependecies.conversation_manager_dependencies import get_conversation_memory_manager
 from app.server_dependecies.db_dependecies import initialize_mongo_db
+from app.users.repositories import UserPreferenceRepository
 from app.version.version_routes import add_version_routes
 
 from contextlib import asynccontextmanager
@@ -123,15 +124,27 @@ application_state_manager = ApplicationStateManager(InMemoryApplicationStateStor
 
 @app.get(path="/conversation",
          response_model=ConverstaionResponse,
-         responses={400: {"model": HTTPErrorResponse}},
+         responses={400: {"model": HTTPErrorResponse}, 403: {"model": HTTPErrorResponse}, 413: {"model": HTTPErrorResponse},
+                    500: {"model": HTTPErrorResponse}},
          description="""The main conversation route used to interact with the agent.""")
 async def conversation(request: Request, user_input: str, clear_memory: bool = False, filter_pii: bool = False,
                        session_id: int = 1,
                        conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager),
-                       agent_director: LLMAgentDirector = Depends(get_agent_director)):
+                       agent_director: LLMAgentDirector = Depends(get_agent_director),
+                       user_info: UserInfo = Depends(auth.get_user_info())):
     """
     Endpoint for conducting the conversation with the agent.
     """
+
+    # check that the user making the request has the session_id in their user preferences
+    user_preference_repository = UserPreferenceRepository()
+    current_user_preferences = await user_preference_repository.get_user_preference_by_user_id(user_info.user_id)
+    if current_user_preferences is None or session_id not in current_user_preferences.sessions:
+        raise HTTPException(status_code=403, detail="User does not have permission to access this session")
+
+    # check that the session is the most recent session
+    if session_id != current_user_preferences.sessions[0]:
+        raise HTTPException(status_code=400, detail="Session is not active. Please use the most recent session.")
     # Do not allow user input that is too long,
     # as a basic measure to prevent abuse.
     if len(user_input) > 1000:
@@ -187,14 +200,26 @@ async def conversation(request: Request, user_input: str, clear_memory: bool = F
 
 @app.get(path="/conversation/history",
          response_model=ConverstaionResponse,
+         responses={400: {"model": HTTPErrorResponse}, 403: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
          description="""Endpoint for retrieving the conversation history.""")
 async def get_conversation_history(
     session_id: Annotated[int, Query(description="The session id for the conversation history.")],
-    conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager)
+    conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager),
+    user_info: UserInfo = Depends(auth.get_user_info())
 ):
     """
     Endpoint for retrieving the conversation history.
     """
+    # check that the user making the request has the session_id in their user preferences
+    user_preference_repository = UserPreferenceRepository()
+    current_user_preferences = await user_preference_repository.get_user_preference_by_user_id(user_info.user_id)
+    if current_user_preferences is None or session_id not in current_user_preferences.sessions:
+        raise HTTPException(status_code=403, detail="User does not have permission to access this session")
+
+    # check that the session is the most recent session
+    if session_id != current_user_preferences.sessions[0]:
+        raise HTTPException(status_code=400, detail="Session is not active. Please use the most recent session.")
+
     try:
         state = await application_state_manager.get_state(session_id)
         conversation_memory_manager.set_state(state.conversation_memory_manager_state)
