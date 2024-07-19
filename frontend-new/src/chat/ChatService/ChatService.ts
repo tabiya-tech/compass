@@ -3,7 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import { fetchWithAuth } from "src/apiService/APIService";
 import ErrorConstants from "src/error/error.constants";
 import { getBackendUrl } from "src/envService";
-import { ConversationMessage } from "./ChatService.types";
+import { ConverstaionResponse } from "./ChatService.types";
 
 export default class ChatService {
   readonly chatEndpointUrl: string;
@@ -31,7 +31,7 @@ export default class ChatService {
     return this.sessionId;
   }
 
-  async sendMessage(message: string): Promise<ConversationMessage[]> {
+  public async sendMessage(message: string): Promise<ConverstaionResponse> {
     const serviceName = "ChatService";
     const serviceFunction = "sendMessage";
     const method = "GET";
@@ -52,7 +52,7 @@ export default class ChatService {
 
     const responseBody = await response.text();
 
-    let messageResponse: ConversationMessage[];
+    let messageResponse: ConverstaionResponse;
     try {
       messageResponse = JSON.parse(responseBody);
     } catch (e: any) {
@@ -87,7 +87,7 @@ export default class ChatService {
     });
   }
 
-  public async getChatHistory(): Promise<ConversationMessage[]> {
+  public async getChatHistory(): Promise<ConverstaionResponse> {
     const serviceName = "ChatService";
     const serviceFunction = "getChatHistory";
     const method = "GET";
@@ -105,7 +105,7 @@ export default class ChatService {
 
     const responseBody = await response.text();
 
-    let chatHistory: ConversationMessage[];
+    let chatHistory: ConverstaionResponse
     try {
       chatHistory = JSON.parse(responseBody);
     } catch (e: any) {
