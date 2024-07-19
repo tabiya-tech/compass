@@ -1,27 +1,16 @@
 import logging
-from typing import Optional, Literal
 
 import pytest
-from pydantic import BaseModel
 
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.collect_experiences_agent import CollectedData
 from app.agent.collect_experiences_agent._dataextraction_llm import _DataExtractionLLM
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory, ConversationTurn
+from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 
 
-class _TestCaseDataExtraction(BaseModel):
-    skip_force: Optional[Literal['skip', 'force']] = None
-    """
-    If set to 'skip' the test case will be skipped. If set to 'force' the only this test case will run.
-    """
-
-    name: str
-    """
-    The name of the test case.
-    """
-
+class _TestCaseDataExtraction(CompassTestCase):
     # The GIVEN
     turns: list[tuple[str, str]]
     """
@@ -267,19 +256,10 @@ test_cases_data_extraction = [
 ]
 
 
-def _get_test_cases_to_run():
-    # if there are test case with force then run only those
-    for tc in get_test_cases_to_run(test_cases_data_extraction):
-        if tc.skip_force:
-            return [tc]
-    # if there are no test case with force then run all test cases that are not skipped
-    return [tc for tc in get_test_cases_to_run(test_cases_data_extraction) if tc.skip_force != "skip"]
-
-
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test
-@pytest.mark.parametrize('test_case', _get_test_cases_to_run(),
-                         ids=[case.name for case in _get_test_cases_to_run()])
+@pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases_data_extraction),
+                         ids=[case.name for case in get_test_cases_to_run(test_cases_data_extraction)])
 async def test_data_extraction(test_case: _TestCaseDataExtraction):
     context: ConversationContext = ConversationContext(
         all_history=ConversationHistory(turns=[]),
