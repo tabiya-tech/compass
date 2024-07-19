@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useMemo, useState} from "react";
 import { IconButton, InputAdornment, TextField, styled, useTheme, Typography, Box } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 
@@ -6,6 +6,8 @@ export interface ChatMessageFieldProps {
   message: string;
   notifyChange: React.Dispatch<React.SetStateAction<string>>;
   handleSend: () => void;
+  aiIsTyping: boolean;
+  isChatFinished: boolean;
 }
 
 const uniqueId = "2a76494f-351d-409d-ba58-e1b2cfaf2a53";
@@ -20,14 +22,14 @@ export const DATA_TEST_ID = {
 export const CHAT_MESSAGE_MAX_LENGTH = 1000;
 export const DISALLOWED_CHARACTERS = /["\\{}()[\]*_#`<>\-+~|&/]/g;
 
-const StyledTextField = styled(TextField)(({ theme }) => ({
+const StyledTextField = styled(TextField)(({ theme, disabled }) => ({
   "& .MuiOutlinedInput-root": {
     "& fieldset": {
       borderColor: theme.palette.primary.main,
       borderWidth: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
     },
     "&:hover fieldset": {
-      borderColor: theme.palette.primary.dark,
+      borderColor: !disabled ? theme.palette.primary.dark : theme.palette.grey[400],
     },
     "&.Mui-focused fieldset": {
       borderColor: theme.palette.primary.dark,
@@ -36,8 +38,13 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
       borderColor: theme.palette.error.main,
     },
   },
+
   "& .css-111mkcg-MuiInputBase-input-MuiOutlinedInput-input": {
     paddingRight: theme.spacing(4),
+
+    "&.Mui-disabled": {
+      WebkitTextFillColor: theme.palette.text.textBlack,
+    }
   },
 }));
 
@@ -77,6 +84,15 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
   };
 
   const handleButtonClick = () => {
+    // Prevent sending a message when the AI is typing, or a message is still being sent.
+    if(props.aiIsTyping) return;
+
+    // Prevent sending a message when the chat is finished.
+    if(props?.isChatFinished) return;
+
+    // Prevent sending an empty message
+    if(!props.message.length) return;
+
     props.handleSend();
     setErrorMessage("");
     setCharCount(0);
@@ -94,6 +110,18 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
   // The character counter turns red when only 1% is left
   const counterColor =
     charCount >= CHAT_MESSAGE_MAX_LENGTH * 0.95 ? theme.palette.error.main : theme.palette.text.secondary;
+
+  const placeHolder = useMemo(() => {
+    if (props.isChatFinished) {
+      return "Conversation has been completed. You can't send any more messages.";
+    }
+    if (props.aiIsTyping) {
+      return "AI is typing..., wait for it to finish.";
+    }
+    return "Type your message...";
+  }, [props.aiIsTyping, props.isChatFinished])
+
+  const isDisabled = props.isChatFinished || props.aiIsTyping;
 
   return (
     <Box
@@ -116,12 +144,13 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
         }}
       >
         <StyledTextField
-          placeholder="Type your message..."
+          placeholder={placeHolder}
           variant="outlined"
           fullWidth
           multiline
           maxRows={4}
           value={props.message}
+          disabled={isDisabled}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           error={!!errorMessage}
@@ -132,11 +161,17 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
                 <IconButton
                   data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON}
                   onClick={handleButtonClick}
+                  disabled={isDisabled}
+                  color={"error"}
                   title="send message"
                 >
                   <SendIcon
                     data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_ICON}
-                    sx={{ color: theme.palette.primary.dark }}
+                    sx={{
+                      color: (isDisabled)
+                          ? theme.palette.grey[400]
+                          : theme.palette.primary.dark
+                    }}
                   />
                 </IconButton>
               </InputAdornment>

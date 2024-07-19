@@ -3,6 +3,7 @@ from typing import List
 
 from app.conversation_memory.conversation_memory_types import ConversationHistory, ConversationContext
 from app.chat.chat_types import ConversationMessage, ConversationMessageSender
+from app.agent.agent_types import AgentType
 
 
 def filter_conversation_history(history: 'ConversationHistory') -> List[ConversationMessage]:
@@ -24,7 +25,6 @@ def filter_conversation_history(history: 'ConversationHistory') -> List[Conversa
             message=turn.output.message_for_user,
             sent_at=turn.output.sent_at.astimezone(timezone.utc).isoformat(),
             sender=ConversationMessageSender.COMPASS,
-            finished=turn.output.finished
         ))
     return messages
 
@@ -49,6 +49,5 @@ async def get_messages_from_conversation_manager(context: 'ConversationContext',
             message=turn.output.message_for_user,
             sent_at=turn.output.sent_at.astimezone(timezone.utc).isoformat(),
             sender=ConversationMessageSender.COMPASS,
-            finished=turn.output.finished
         ))
     return messages

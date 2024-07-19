@@ -23,6 +23,7 @@ export const DATA_TEST_ID = {
 const Chat = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [messages, setMessages] = useState<IChatMessage[]>([]);
+  const [conversationCompleted, setConversationCompleted] = useState<boolean>(false);
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const [initialized, setInitialized] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
@@ -67,7 +68,8 @@ const Chat = () => {
         }
         setIsTyping(true);
         const response = await chatService.sendMessage(userMessage);
-        const botMessages = response.map((messageItem) =>
+        setConversationCompleted(response.conversation_completed)
+        const botMessages = response.messages.map((messageItem) =>
           generateCompassMessage(messageItem.message, messageItem.sent_at)
         );
         botMessages.forEach((message) => addMessage(message));
@@ -124,12 +126,14 @@ const Chat = () => {
       setIsTyping(true);
 
       const history = await chatService.getChatHistory();
-      if (history.length) {
-        history.forEach((historyItem: ConversationMessage) => {
-          if (historyItem.sender === ConversationMessageSender.USER && historyItem.message !== "") {
-            addMessage(generateUserMessage(historyItem.message, historyItem.sent_at));
+      if(history.conversation_completed)
+        setConversationCompleted(true);
+      if (history.messages.length) {
+        history.messages.forEach((message: ConversationMessage) => {
+          if (message.sender === ConversationMessageSender.USER && message.message !== "") {
+            addMessage(generateUserMessage(message.message, message.sent_at));
           } else {
-            addMessage(generateCompassMessage(historyItem.message, historyItem.sent_at));
+            addMessage(generateCompassMessage(message.message, message.sent_at));
           }
         });
       } else {
@@ -162,6 +166,11 @@ const Chat = () => {
     }
   }, [currentMessage, sendMessage]);
 
+  console.log({
+    messages,
+    conversationCompleted
+  })
+
   return (
     <Box width="100%" height="100%" display="flex" flexDirection="column" data-testid={DATA_TEST_ID.CHAT_CONTAINER}>
       <ChatHeader notifyOnLogout={handleLogout} />
@@ -169,7 +178,13 @@ const Chat = () => {
         <ChatList messages={messages} isTyping={isTyping} />
       </Box>
       <Box sx={{ flexShrink: 0 }}>
-        <ChatMessageField handleSend={handleSend} message={currentMessage} notifyChange={setCurrentMessage} />
+        <ChatMessageField
+            handleSend={handleSend}
+            aiIsTyping={isTyping}
+            isChatFinished={conversationCompleted}
+            message={currentMessage}
+            notifyChange={setCurrentMessage}
+        />
       </Box>
     </Box>
   );
