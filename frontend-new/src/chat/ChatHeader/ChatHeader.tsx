@@ -9,6 +9,7 @@ import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 
 export type ChatHeaderProps = {
   notifyOnLogout: () => void;
+  startNewConversation: () => void;
 };
 
 const uniqueId = "7413b63a-887b-4f41-b930-89e9770db12b";
@@ -23,19 +24,27 @@ export const DATA_TEST_ID = {
 export const MENU_ITEM_ID = {
   SETTINGS_SELECTOR: `settings-selector-${uniqueId}`,
   LOGOUT_BUTTON: `logout-button-${uniqueId}`,
+  START_NEW_CONVERSATION: `start-new-conversation-${uniqueId}`,
 };
 
 export const MENU_ITEM_TEXT = {
   SETTINGS: "settings",
   LOGOUT: "logout",
+  START_NEW_CONVERSATION: "start new conversation",
 };
 
-const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({ notifyOnLogout }) => {
+const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({ notifyOnLogout, startNewConversation }) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   const contextMenuItems: MenuItemConfig[] = [
+    {
+      id: MENU_ITEM_ID.START_NEW_CONVERSATION,
+      text: MENU_ITEM_TEXT.START_NEW_CONVERSATION,
+      disabled: false,
+      action: startNewConversation,
+    },
     {
       id: MENU_ITEM_ID.SETTINGS_SELECTOR,
       text: MENU_ITEM_TEXT.SETTINGS,

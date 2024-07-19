@@ -27,7 +27,7 @@ const Chat = () => {
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const [initialized, setInitialized] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
-  const { userPreferences } = useContext(UserPreferencesContext);
+  const { userPreferences, updateUserPreferences } = useContext(UserPreferencesContext);
   const { logout } = useContext(AuthContext);
 
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ const Chat = () => {
   };
 
   const sendMessage = useCallback(
-    async (userMessage: string) => {
+    async (userMessage: string, session_id?: number,) => {
       const sent_at = new Date().toISOString(); // Generate current sent_at
       if (userMessage) {
         // optimistically add the user's message for a more responsive feel
@@ -45,7 +45,7 @@ const Chat = () => {
         addMessage(message);
       }
       try {
-        if (!userPreferences?.sessions.length) {
+        if (!session_id) {
           console.error("User has no sessions");
           addMessage(
             generateCompassMessage(
@@ -55,7 +55,7 @@ const Chat = () => {
           );
           return;
         }
-        const chatService = ChatService.getInstance(userPreferences.sessions[0]);
+        const chatService = ChatService.getInstance(session_id);
         if (!chatService) {
           console.error("Chat service is not initialized");
           addMessage(
@@ -85,7 +85,7 @@ const Chat = () => {
         setIsTyping(false);
       }
     },
-    [userPreferences?.sessions]
+    []
   );
 
   const handleLogout = useCallback(() => {
@@ -101,9 +101,11 @@ const Chat = () => {
     );
   }, [enqueueSnackbar, navigate, logout]);
 
-  const initializeChat = useCallback(async () => {
+  const initializeChat = useCallback(async (session_id?: number) => {
+    setMessages([])
+
     try {
-      if (!userPreferences?.sessions.length) {
+      if (!session_id) {
         addMessage(
           generateCompassMessage(
             "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
@@ -112,7 +114,7 @@ const Chat = () => {
         );
         return;
       }
-      const chatService = ChatService.getInstance(userPreferences.sessions[0]);
+      const chatService = ChatService.getInstance(session_id);
       if (!chatService) {
         console.error("Chat service is not initialized");
         addMessage(
@@ -137,7 +139,7 @@ const Chat = () => {
           }
         });
       } else {
-        await sendMessage("");
+        await sendMessage("", session_id);
       }
     } catch (e) {
       if (e instanceof ServiceError) {
@@ -150,30 +152,47 @@ const Chat = () => {
     } finally {
       setIsTyping(false);
     }
-  }, [enqueueSnackbar, sendMessage, userPreferences?.sessions]);
+  }, [enqueueSnackbar, sendMessage]);
 
   useEffect(() => {
     if (!initialized) {
-      initializeChat();
+      initializeChat(userPreferences?.sessions[0]);
       setInitialized(true);
     }
-  }, [initializeChat, initialized]);
+  }, [initializeChat, initialized, userPreferences?.sessions]);
 
   const handleSend = useCallback(async () => {
     if (currentMessage.trim()) {
       setCurrentMessage("");
-      await sendMessage(currentMessage);
+      await sendMessage(currentMessage, userPreferences?.sessions[0]);
     }
-  }, [currentMessage, sendMessage]);
+  }, [currentMessage, sendMessage, userPreferences?.sessions]);
 
-  console.log({
-    messages,
-    conversationCompleted
-  })
+  const startNewConversation = useCallback(async () => {
+    try {
+      const chatService = ChatService.getInstance(userPreferences?.sessions[0]!);
+
+      let session_id = await chatService.getNewSession();
+
+      updateUserPreferences({
+        ...userPreferences!,
+        sessions: [session_id, ...(userPreferences?.sessions || [])],
+      });
+
+      enqueueSnackbar("New conversation started", { variant: "success" });
+
+      await initializeChat(session_id);
+    } catch (e) {
+      console.error("Failed to start new conversation", e);
+    }
+  }, [initializeChat, updateUserPreferences, userPreferences, enqueueSnackbar])
 
   return (
     <Box width="100%" height="100%" display="flex" flexDirection="column" data-testid={DATA_TEST_ID.CHAT_CONTAINER}>
-      <ChatHeader notifyOnLogout={handleLogout} />
+      <ChatHeader
+          notifyOnLogout={handleLogout}
+          startNewConversation={startNewConversation}
+      />
       <Box sx={{ flex: 1, overflowY: "auto" }}>
         <ChatList messages={messages} isTyping={isTyping} />
       </Box>

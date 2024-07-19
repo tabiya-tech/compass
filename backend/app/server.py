@@ -1,5 +1,7 @@
 import logging
 import os
+import random
+
 from datetime import datetime
 from typing import List, Annotated
 
@@ -12,7 +14,7 @@ from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_types import AgentInput
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
-from app.constants.errors import HTTPErrorResponse
+from app.constants.errors import HTTPErrorResponse, ErrorService
 from app.users.auth import Authentication, UserInfo
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
@@ -21,13 +23,16 @@ from app.chat.chat_utils import filter_conversation_history, get_messages_from_c
 from app.server_dependecies.agent_director_dependencies import get_agent_director
 from app.server_dependecies.conversation_manager_dependencies import get_conversation_memory_manager
 from app.server_dependecies.db_dependecies import initialize_mongo_db
-from app.users.repositories import UserPreferenceRepository
 from app.version.version_routes import add_version_routes
 
 from contextlib import asynccontextmanager
 
 from app.users import add_users_routes
 from app.poc import add_poc_routes
+
+from app.types import NewSessionResponse
+from app.users.repositories import UserPreferenceRepository
+from app.users.types import UserPreferencesUpdateRequest
 
 logger = logging.getLogger(__name__)
 
@@ -233,6 +238,44 @@ async def get_conversation_history(
     except Exception as e:
         logger.exception(e)
         raise HTTPException(status_code=500, detail="Oops! something went wrong")
+
+
+@app.get(path="/conversation/new-session",
+         response_model=NewSessionResponse,
+         status_code=201,
+         responses={404: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
+         description="""Endpoint for starting a new conversation session.""",)
+async def get_new_convesation_session(user: UserInfo = Depends(auth.get_user_info())):
+    """
+    Endpoint for starting a new conversation session.
+    The function creates a new session id and adds it to the user sessions on the top of the list.
+
+    :param user: UserInfo - The logged-in user information
+    :return: NewSessionResponse - The response to the new session request
+    """
+    try:
+        new_session_id = random.randint(0, (1 << 48) - 1)  # nosec
+
+        user_repository = UserPreferenceRepository()
+
+        user_preferences = await user_repository.get_user_preference_by_user_id(user.user_id)
+
+        if user_preferences is None:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        new_sessions = [new_session_id, *user_preferences.sessions]
+
+        user_preferences = await user_repository.update_user_preference(
+            user_id=user.user_id,
+            update=UserPreferencesUpdateRequest(sessions=new_sessions)
+        )
+
+        return NewSessionResponse(
+            session_id=user_preferences.sessions[0]
+        )
+    except Exception as e:
+        ErrorService.handle(__name__, e)
+
 
 ############################################
 # Add routes relevant for the user management
