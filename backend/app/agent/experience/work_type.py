@@ -1,22 +1,6 @@
 from enum import Enum
 from textwrap import dedent
 
-WORK_TYPE_DEFINITIONS_FOR_PROMPT = dedent("""\
-None: When there is not information to classify the work type in any of the categories below.    
-FORMAL_SECTOR_WAGED_EMPLOYMENT: Waged work or paid work except SELF_EMPLOYMENT
-FORMAL_SECTOR_UNPAID_TRAINEE: Unpaid trainee work
-SELF_EMPLOYMENT: Self-employment, micro entrepreneurship, contract based work, freelance running a one person business, 
-                paid but not waged work.
-UNSEEN_UNPAID: Represents all unseen economy, 
-    including:
-    - Unpaid domestic services for household and family members
-    - Unpaid caregiving services for household and family members
-    - Unpaid direct volunteering for other households
-    - Unpaid community- and organization-based volunteering
-    excluding:
-    - Unpaid trainee work, which is classified as FORMAL_SECTOR_UNPAID_TRAINEE
-""")
-
 
 class WorkType(Enum):
     """
@@ -37,3 +21,20 @@ class WorkType(Enum):
     FORMAL_SECTOR_UNPAID_TRAINEE_WORK = "Formal sector/Unpaid trainee work"
     SELF_EMPLOYMENT = "Self-employment"
     UNSEEN_UNPAID = "Unpaid other"  # All unseen work is grouped under this category
+
+
+WORK_TYPE_DEFINITIONS_FOR_PROMPT = dedent(f"""\
+None: When there isn't adequate information to classify the work type in any of the categories below.    
+{WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name}: Waged work or paid work except {WorkType.SELF_EMPLOYMENT.name}
+{WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK.name}: Unpaid trainee work
+{WorkType.SELF_EMPLOYMENT.name}: Self-employment, micro entrepreneurship, contract based work, freelancing, running own business, 
+                paid but not {WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name}.
+{WorkType.UNSEEN_UNPAID.name}: Represents all unseen economy, 
+    including:
+    - Unpaid domestic services for household and family members
+    - Unpaid caregiving services for household and family members
+    - Unpaid direct volunteering for other households
+    - Unpaid community- and organization-based volunteering
+    excluding:
+    - Unpaid trainee work, which is classified as {WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK.name}
+""")
