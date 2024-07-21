@@ -40,6 +40,72 @@ class CollectExperiencesAgentTestCase(EvaluationTestCase):
 
 test_cases = [
     CollectExperiencesAgentTestCase(
+        name='university_of_oxford_manager',
+        simulated_user_prompt=dedent("""
+            You are a person without any personal background.
+            You have one experience
+            1. Worked as a project manager at the University of Oxford, from 2018 to 2020. It was a paid job and you worked remotely.
+            You have no other experiences
+            You reply in the most concise way possible.
+            When asked about your experiences, answer with all the information at the same time. Do not add additional information or invent information.
+            """) + sa_prompt,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
+        expected_experiences_count=1
+    ),
+    CollectExperiencesAgentTestCase(
+        name='no_experiences_at_all',
+        simulated_user_prompt=dedent("""
+            You are a person without any personal background.
+            You have no experiences at all.
+            You have never worked in your life and never helped your community or volunteered for anything.
+            You think you are worthless and helpless and desperately need a job.
+            Do not add additional information or invent information.
+            """) + sa_prompt,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
+        expected_experiences_count=0
+    ),
+    CollectExperiencesAgentTestCase(
+        name='experiences_of_all_kinds',
+        simulated_user_prompt=dedent("""
+            You are an accomplished professional.
+            You have all kind of experiences.
+            1. Worked as a project manager at the University of Oxford, from 2018 to 2020. It was a paid job and you worked remotely.
+            2. Worked as a software architect at ProUbis GmbH in berlin, from 2010 to 2018. It was a full-time job.
+            3. You owned a bar/restaurant called Dinner For Two in Berlin from 2010 until covid-19, then you sold it.
+            4. Co-founded Acme Inc. in 2022, a startup based in DC, USA. Earned money from it.  
+            5. In 1998 did an unpaid internship as a Software Developer for Ubis GmbH in Berlin. 
+            6. Volunteered between 2015-2017 and taught coding to kids in a community center in Berlin.
+            7. Helped your elderly neighbor with groceries and cleaning every week since 2019.
+            You have no other experiences than the above 7.
+            You reply in the most concise way possible.
+            When asked about your experiences, answer with all the information for each experience at the same time. 
+            Do not add additional information or invent information.
+            Make sure you mention all the experiences during the conversation.
+            """) + sa_prompt,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
+        expected_experiences_count=7
+    ),
+    CollectExperiencesAgentTestCase(
+        name='experiences_of_all_kinds_all_at_once',
+        simulated_user_prompt=dedent("""
+            You are an accomplished professional.
+            You have all kind of experiences.
+            1. Worked as a project manager at the University of Oxford, from 2018 to 2020. It was a paid job and you worked remotely.
+            2. Worked as a software architect at ProUbis GmbH in berlin, from 2010 to 2018. It was a full-time job.
+            3. You owned  a bar/restaurant called Dinner For Two in Berlin from 2010 until covid-19, then you sold it.
+            4. Co-founded Acme Inc. in 2022, a startup based in DC, USA. You owned this business.
+            5. In 1998 did an unpaid internship as a Software Developer for Ubis GmbH in Berlin. 
+            6. Volunteered between 2015-2017 and taught coding to kids in a community center in Berlin.
+            7. Helped your elderly neighbor with groceries and cleaning every week since 2019.
+            You have no other experiences
+            You reply in the most concise way possible.
+            When asked about your experiences, answer with all the information of every experience at the same time. 
+            Do not add additional information or invent information.
+            """) + sa_prompt,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
+        expected_experiences_count=7
+    ),
+    CollectExperiencesAgentTestCase(
         name='withholding_student_e2e',
         simulated_user_prompt=dedent("""
             You are a Gen Z student living with your mom and three brothers in Johannesburg. You have the following experiences:
@@ -48,7 +114,7 @@ test_cases = [
             3. Assist elderly people in nursing home without pay, every summer since 2020.
             You are resistant to getting help from the agent and withhold information when doing so.
             """) + sa_prompt,
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)],
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
         expected_experiences_count=3
     ),
     CollectExperiencesAgentTestCase(
@@ -58,7 +124,7 @@ test_cases = [
             You like to help your neighbours tend their garden. You have a passion for music and dance and would like to pursue it. You also drive
             and help your grandmother with transportation.
             """) + kenya_prompt,
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)],
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
         # The simulated user seems to report 3 experiences (help parent, drove grandma, helped neighbors)
         expected_experiences_count=3
     ),
@@ -67,10 +133,10 @@ test_cases = [
         simulated_user_prompt=dedent("""
             You are a young person from Paris, France looking for a job. You would like to work in retail and your previous experiences are as follows:
             1. Delivery job for Uber Eats in Paris, from Janary 2021 to March 2023. This was a paid job with a contract.
-            2. Selling old furniture at the Flea Market of rue Jean Henri Fabre, every Wednesday and Friday. You started in 2019 with your older brother and are still doing it today. This is unformal labor, as you only get 100 euros at the end of the day, without any formal contract.
+            2. Selling old furniture at the Flea Market of rue Jean Henri Fabre, every Wednesday and Friday. You started in 2019 with your older brother and are still doing it today. This is informal labor, as you only get 100 euros at the end of the day, without any formal contract.
             You write with typos.
             """) + france_prompt,
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)],
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
         expected_experiences_count=2
     ),
     CollectExperiencesAgentTestCase(
@@ -78,10 +144,10 @@ test_cases = [
         simulated_user_prompt=dedent("""
             You are a young person from Paris, France looking for a job. You would like to work in retail and your previous experiences are as follows:
             1. Delivery job for Uber Eats in Paris, from Janary 2021 to March 2023. This was a paid job with a contract.
-            2. Selling old furniture at the Flea Market of rue Jean Henri Fabre, every Wednesday and Friday. You started in 2019 with your older brother and are still doing it today. This is unformal labor, as you only get 100 euros at the end of the day, without any formal contract.
+            2. Selling old furniture at the Flea Market of rue Jean Henri Fabre, every Wednesday and Friday. You started in 2019 with your older brother and are still doing it today. This is informal labor, as you only get 100 euros at the end of the day, without any formal contract.
             When asked about your experiences, answer with all the information at the same time. Do not add additional information or invent information.
             """) + france_prompt,
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)],
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
         expected_experiences_count=2
 
     ),
@@ -92,7 +158,7 @@ test_cases = [
             Your only previous experience is only one in the Chandaria Center for Performing Art, where you have been working since 2018 with a full time contract.
             Do not add additional information or invent information. You have never done volunteering or helped your community.
             """) + kenya_prompt,
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)],
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
         expected_experiences_count=1
     ),
     CollectExperiencesAgentTestCase(
@@ -104,7 +170,7 @@ test_cases = [
             When first asked about your experience, you mistake the dates and say that you have been working there since 2009. Only when asked about more information,
             you correct your mistake.
             """) + france_prompt,
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)],
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
         expected_experiences_count=1
     ),
 ]
