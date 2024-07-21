@@ -111,13 +111,16 @@ class ExploreExperiencesAgentDirector(Agent):
             current_experience = s.experiences_state.get(s.current_experience_uuid, None)
 
         if not current_experience:
-            return AgentOutput(
-                message_for_user="I am a bit confused, it seems that there no experiences to process.",
-                finished=False,
+            message = AgentOutput(
+                message_for_user="It looks like, there are no experiences to discuss further.",
+                finished=True,
                 agent_type=self._agent_type,
                 agent_response_time_in_sec=0,
                 llm_stats=[]
             )
+            await self._conversation_manager.update_history(user_input, message)
+            return message
+
         # ensure that the current experience is set in the state
         s.current_experience_uuid = current_experience.experience.uuid
 
