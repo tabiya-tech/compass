@@ -17,7 +17,7 @@ STD_LANGUAGE_STYLE = dedent("""\
     Your language style should be:
     - Informal but professional and simple.
     - Concise and not too chatty. 
-     - Do not use any business jargon 
+    - Do not use any business jargon 
       Avoid: 
         freelance, project, employer, job title, career, position, role, self-employed, 
         self-employment, entrepreneur, formal sector, hustle, gig, manage 
