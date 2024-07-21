@@ -4,6 +4,8 @@ from textwrap import dedent
 
 from app.agent.agent_types import LLMStats
 from app.agent.experience.experience_entity import ExperienceEntity
+from app.agent.experience.work_type import WorkType
+from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.countries import Country, get_country_glossary
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LOW_TEMPERATURE_GENERATION_CONFIG, LLMConfig, JSON_GENERATION_CONFIG
@@ -24,7 +26,7 @@ def get_system_prompt_for_contextual_title(country_of_interest: Country):
     if glossary:
         glossary_str = glossary_template.format(glossary=glossary)
 
-    return dedent("""\
+    system_prompt_template = dedent("""\
         You are an expert who needs to classify jobs from {country_of_interest} to a European framework. 
         The jobs are described in the context of {country_of_interest} and use specific terminology from {country_of_interest}, 
         You should return a job description that does not include terminology from {country_of_interest}, 
@@ -35,20 +37,8 @@ def get_system_prompt_for_contextual_title(country_of_interest: Country):
         'Job Description': The job title in the context of {country_of_interest},
         'Employer Name' : The name of the employer,
         'Employment Type': The type of employment that has one of the following values 'None', 
-                'FORMAL_SECTOR_WAGED_EMPLOYMENT', 'FORMAL_SECTOR_UNPAID_TRAINEE', 'SELF_EMPLOYMENT' or 'UNSEEN_UNPAID'.
-                The values have the following meanings:   
-                    None: When there is not information to classify the work type in any of the categories below.    
-                    FORMAL_SECTOR_WAGED_EMPLOYMENT: Formal sector / Wage employment 
-                    FORMAL_SECTOR_UNPAID_TRAINEE: Formal sector / Unpaid trainee work
-                    SELF_EMPLOYMENT: Self-employment, micro entrepreneurship
-                    UNSEEN_UNPAID: Represents all unseen economy, 
-                        including:
-                        - Unpaid domestic services for household and family members
-                        - Unpaid caregiving services for household and family members
-                        - Unpaid direct volunteering for other households
-                        - Unpaid community- and organization-based volunteering
-                        excluding:
-                        - Unpaid trainee work, which is classified as FORMAL_SECTOR_UNPAID_TRAINEE  
+                {work_type_names}.
+                {work_type_definitions}  
         
         You should use the above information only to infer the context and you shouldn't return it as output. 
         
@@ -59,7 +49,12 @@ def get_system_prompt_for_contextual_title(country_of_interest: Country):
         Do not add any markup, or other special characters.
         Don't output anything else. 
         Do not include the employer information.
-        """).format(country_of_interest=country_of_interest.value, glossary=glossary_str)
+        """)
+    return replace_placeholders_with_indent(system_prompt_template,
+                                            country_of_interest=country_of_interest.value,
+                                            work_type_names=", ".join([work_type.name for work_type in WorkType]),
+                                            work_type_definitions=ExperienceEntity.WORK_TYPE_DEFINITIONS_FOR_PROMPT,
+                                            glossary=glossary_str)
 
 
 def get_request_prompt_for_contextual_title(experience_entity: ExperienceEntity):
