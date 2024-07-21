@@ -18,7 +18,7 @@ from app.constants.errors import HTTPErrorResponse, ErrorService
 from app.users.auth import Authentication, UserInfo
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
-from app.chat.chat_types import ConverstaionResponse
+from app.chat.chat_types import ConversationResponse
 from app.chat.chat_utils import filter_conversation_history, get_messages_from_conversation_manager
 from app.server_dependecies.agent_director_dependencies import get_agent_director
 from app.server_dependecies.conversation_manager_dependencies import get_conversation_memory_manager
@@ -128,7 +128,7 @@ application_state_manager = ApplicationStateManager(InMemoryApplicationStateStor
 
 
 @app.get(path="/conversation",
-         response_model=ConverstaionResponse,
+         response_model=ConversationResponse,
          responses={400: {"model": HTTPErrorResponse}, 403: {"model": HTTPErrorResponse}, 413: {"model": HTTPErrorResponse},
                     500: {"model": HTTPErrorResponse}},
          description="""The main conversation route used to interact with the agent.""")
@@ -187,7 +187,7 @@ async def conversation(request: Request, user_input: str, clear_memory: bool = F
         response = await get_messages_from_conversation_manager(context, from_index=current_index)
         # save the state, before responding to the user
         await application_state_manager.save_state(session_id, state)
-        return ConverstaionResponse(
+        return ConversationResponse(
             messages=response,
             conversation_completed=state.agent_director_state.current_phase == ConversationPhase.ENDED
         )
@@ -204,7 +204,7 @@ async def conversation(request: Request, user_input: str, clear_memory: bool = F
 
 
 @app.get(path="/conversation/history",
-         response_model=ConverstaionResponse,
+         response_model=ConversationResponse,
          responses={400: {"model": HTTPErrorResponse}, 403: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
          description="""Endpoint for retrieving the conversation history.""")
 async def get_conversation_history(
@@ -231,7 +231,7 @@ async def get_conversation_history(
         context = await conversation_memory_manager.get_conversation_context()
         messages = filter_conversation_history(context.all_history)
 
-        return ConverstaionResponse(
+        return ConversationResponse(
             messages=messages,
             conversation_completed=state.agent_director_state.current_phase == ConversationPhase.ENDED
         )

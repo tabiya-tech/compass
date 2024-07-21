@@ -25,7 +25,7 @@ class ConversationMessage(BaseModel):
         extra = "forbid"
 
 
-class ConverstaionResponse(BaseModel):
+class ConversationResponse(BaseModel):
     messages: list[ConversationMessage]
     """The messages in the conversation"""
     conversation_completed: bool = False
