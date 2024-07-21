@@ -11,6 +11,7 @@ from evaluation_tests.conversation_libs.search_service_fixtures import get_searc
 def pytest_addoption(parser):
     parser.addoption("--max_iterations", action="store", default="5")
     parser.addoption("--test_cases_to_run", action="store", default="")
+    parser.addoption("--test_cases_to_exclude", action="store", default="")
 
 
 def pytest_generate_tests(metafunc):
