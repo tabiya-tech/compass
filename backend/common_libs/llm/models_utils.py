@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 import vertexai
 
 from dotenv import load_dotenv
-from google.api_core.exceptions import ResourceExhausted
+from google.api_core.exceptions import ResourceExhausted, ServerError
 from pydantic import BaseModel
 from vertexai.generative_models import HarmCategory, HarmBlockThreshold, SafetySetting
 
@@ -73,7 +73,7 @@ class Retry(Generic[T]):
                 result: T = await callback()
                 logger.debug("Attempt %d to call %s succeeded", attempt + 1, callback.__name__)
                 return result
-            except ResourceExhausted as e:
+            except (ResourceExhausted, ServerError) as e:
                 logger.warning("Attempt %d to call %s failed, error: %s, retrying in %.2f seconds", attempt + 1,
                                callback.__name__, e, wait_time)
                 await asyncio.sleep(wait_time)
