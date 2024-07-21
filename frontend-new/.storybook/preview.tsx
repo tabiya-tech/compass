@@ -19,6 +19,9 @@ import "@fontsource/roboto/700.css";
 import type { Preview } from "@storybook/react";
 import { AuthProvider } from "../src/auth/Providers/AuthProvider/AuthProvider";
 import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
+import {
+  UserPreferencesContext,
+} from "../src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
 
 const preview: Preview = {
   parameters: {
@@ -49,26 +52,26 @@ const preview: Preview = {
 
 export default preview;
 
-// Define the sessionStorage decorator
-const withSessionStorage = (Story) => {
-  // Set the sessionStorage before rendering the stories (used for chat components)
-  sessionStorage.setItem('ChatSessionID', '1234');
-  return <Story />;
-};
+const userPreferencesValue = {
+  userPreferences: {
+    sessions: [1234]
+  }
+}
 
 export const decorators = [
-  withSessionStorage,
   (Story) => (
     <Router>
       <AuthProvider>
+        <UserPreferencesContext.Provider value={userPreferencesValue}>
         <CssBaseline />
-        <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
-          <SnackbarProvider>
-            <div style={{ height: "100vh" }}>
-              <Story />
-            </div>
-          </SnackbarProvider>
-        </ThemeProvider>
+          <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
+            <SnackbarProvider>
+              <div style={{ height: "100vh" }}>
+                <Story />
+              </div>
+            </SnackbarProvider>
+          </ThemeProvider>
+        </UserPreferencesContext.Provider>
       </AuthProvider>
     </Router>
   ),

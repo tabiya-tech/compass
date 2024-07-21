@@ -106,6 +106,7 @@ const Chat = () => {
 
     try {
       if (!session_id) {
+        console.error("User has no sessions")
         addMessage(
           generateCompassMessage(
             "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
