@@ -34,8 +34,10 @@ Optional useful parameters:
 
 - `-s` allows you to see the log output even for tests that pass
 - `--max_iterations <number>` allows you to set the number of messages the chatbot is allowed to make.
-- `--test_cases_to_run` allows you to set specific test cases to be run. This should mostly be used for local
-  development. Takes a comma separated list. The names of the test cases can be found in the conversation_test.py file.
+- `--test_cases_to_run` run only the specified test cases. This should mostly be used for local
+  development. Takes a comma separated list. The names of the test cases can be found there were they are defined. 
+- `--test_cases_to_exclude` exclude specific test cases from running. This should mostly be used for local
+  development. Takes a comma separated list. The names of the test cases can be found in the conversation_test.py file. If used together with `--test_cases_to_run`, the test cases to exclude will be excluded from the list of test cases to run.
 
 An example run, to run only the kenya_student_e2e test case with 15 max iterations and showing all outputs in command line:
 ```bash
