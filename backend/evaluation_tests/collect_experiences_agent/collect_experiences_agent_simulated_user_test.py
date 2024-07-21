@@ -12,13 +12,15 @@ from evaluation_tests.collect_experiences_agent.collect_experiences_executor imp
 from evaluation_tests.collect_experiences_agent.collect_experiences_test_cases import test_cases, \
     CollectExperiencesAgentTestCase
 from evaluation_tests.conversation_libs.conversation_test_function import LLMSimulatedUser, \
-    ConversationTestConfig, conversation_test_function
+    ConversationTestConfig, conversation_test_function, assert_expected_evaluation_results
+from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationEvaluationRecord
+from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 
 
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test
-@pytest.mark.parametrize('test_case', test_cases,
-                         ids=[case.name for case in test_cases])
+@pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases),
+                         ids=[case.name for case in get_test_cases_to_run(test_cases)])
 async def test_collect_experiences_agent_simulated_user(max_iterations: int, test_case: CollectExperiencesAgentTestCase,
                                                         caplog: LogCaptureFixture):
     """
@@ -44,7 +46,8 @@ async def test_collect_experiences_agent_simulated_user(max_iterations: int, tes
         execute_simulated_user=LLMSimulatedUser(system_instructions=test_case.simulated_user_prompt),
         is_finished=CollectExperienceAgentIsFinished(),
         get_conversation_context=CollectExperienceAgentGetConversationContextExecutor(
-            conversation_manager=conversation_manager)
+            conversation_manager=conversation_manager),
+        deferred_evaluation_assertions=True  # run the evaluation assertions at the end
     )
 
     # Set the capl-og at the level in question - 1 to ensure that the root logger is set to the correct level.
@@ -62,7 +65,7 @@ async def test_collect_experiences_agent_simulated_user(max_iterations: int, tes
         caplog.records.clear()
 
         # Run the main test
-        await conversation_test_function(
+        evaluation_result: ConversationEvaluationRecord = await conversation_test_function(
             config=config
         )
 
@@ -77,3 +80,7 @@ async def test_collect_experiences_agent_simulated_user(max_iterations: int, tes
         for record in caplog.records:
             assert record.levelname != 'ERROR'
             assert record.levelname != 'WARNING'
+
+        # We run the evaluation assertions at the end
+        # as it fails often due to the unpredictability of the LLM responses
+        assert_expected_evaluation_results(evaluation_result=evaluation_result, test_case=test_case)
