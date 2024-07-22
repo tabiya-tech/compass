@@ -1,8 +1,9 @@
 import React from "react";
-import { Box, Button, Container, Typography } from "@mui/material";
+import { Box, Container, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import AuthContextMenu from "src/auth/components/AuthContextMenu/AuthContextMenu";
+import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
 const uniqueId = "f1228c6a-e447-4946-b810-0c7ddc8ca833";
 
@@ -51,7 +52,7 @@ const DataProtectionAgreement: React.FC = () => {
           A verification email has been sent to your email address. To continue, please verify your email address first.
         </Typography>
 
-        <Button
+        <PrimaryButton
           fullWidth
           variant="contained"
           color="primary"
@@ -60,7 +61,7 @@ const DataProtectionAgreement: React.FC = () => {
           onClick={handleBackToLogin}
         >
           Back to Login
-        </Button>
+        </PrimaryButton>
       </Box>
     </Container>
   );

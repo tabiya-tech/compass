@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { Box, Button, Container, styled, Typography } from "@mui/material";
+import { Box, Container, styled, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -11,6 +11,7 @@ import { StatusCodes } from "http-status-codes";
 import AuthContextMenu from "src/auth/components/AuthContextMenu/AuthContextMenu";
 import { UserPreferencesContext } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
 import { writeServiceErrorToLog } from "src/error/logger";
+import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
@@ -143,17 +144,18 @@ const DataProtectionAgreement = () => {
           Are you ready to start?
         </Typography>
 
-        <Button
+        <PrimaryButton
           fullWidth
           variant="contained"
           color="primary"
           style={{ marginTop: 16 }}
           disabled={isAcceptingDPA}
+          disableWhenOffline={true}
           data-testid={DATA_TEST_ID.ACCEPT_DPA_BUTTON}
           onClick={handleAcceptedDPA}
         >
           Sure, I am ready.
-        </Button>
+        </PrimaryButton>
       </Box>
     </Container>
   );

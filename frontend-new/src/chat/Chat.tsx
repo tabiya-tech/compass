@@ -36,57 +36,51 @@ const Chat = () => {
     setMessages((prevMessages) => [...prevMessages, message]);
   };
 
-  const sendMessage = useCallback(
-    async (userMessage: string, session_id?: number,) => {
-      const sent_at = new Date().toISOString(); // Generate current sent_at
-      if (userMessage) {
-        // optimistically add the user's message for a more responsive feel
-        const message = generateUserMessage(userMessage, sent_at);
-        addMessage(message);
-      }
-      try {
-        if (!session_id) {
-          console.error("User has no sessions");
-          addMessage(
-            generateCompassMessage(
-              "I'm sorry, I'm having trouble connecting to the server. Please try again later.",
-              sent_at
-            )
-          );
-          return;
-        }
-        const chatService = ChatService.getInstance(session_id);
-        if (!chatService) {
-          console.error("Chat service is not initialized");
-          addMessage(
-            generateCompassMessage(
-              "I'm sorry, I'm having trouble connecting to the server. Please try again later.",
-              sent_at
-            )
-          );
-          return;
-        }
-        setIsTyping(true);
-        const response = await chatService.sendMessage(userMessage);
-        setConversationCompleted(response.conversation_completed)
-        const botMessages = response.messages.map((messageItem) =>
-          generateCompassMessage(messageItem.message, messageItem.sent_at)
-        );
-        botMessages.forEach((message) => addMessage(message));
-      } catch (error) {
-        console.error("Failed to send message:", error);
+  const sendMessage = useCallback(async (userMessage: string, session_id?: number) => {
+    const sent_at = new Date().toISOString(); // Generate current sent_at
+    if (userMessage) {
+      // optimistically add the user's message for a more responsive feel
+      const message = generateUserMessage(userMessage, sent_at);
+      addMessage(message);
+    }
+    try {
+      if (!session_id) {
+        console.error("User has no sessions");
         addMessage(
           generateCompassMessage(
-            "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
+            "I'm sorry, I'm having trouble connecting to the server. Please try again later.",
             sent_at
           )
         );
-      } finally {
-        setIsTyping(false);
+        return;
       }
-    },
-    []
-  );
+      const chatService = ChatService.getInstance(session_id);
+      if (!chatService) {
+        console.error("Chat service is not initialized");
+        addMessage(
+          generateCompassMessage(
+            "I'm sorry, I'm having trouble connecting to the server. Please try again later.",
+            sent_at
+          )
+        );
+        return;
+      }
+      setIsTyping(true);
+      const response = await chatService.sendMessage(userMessage);
+      setConversationCompleted(response.conversation_completed);
+      const botMessages = response.messages.map((messageItem) =>
+        generateCompassMessage(messageItem.message, messageItem.sent_at)
+      );
+      botMessages.forEach((message) => addMessage(message));
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      addMessage(
+        generateCompassMessage("I'm sorry, Something seems to have gone wrong on my end... Can you try again?", sent_at)
+      );
+    } finally {
+      setIsTyping(false);
+    }
+  }, []);
 
   const handleLogout = useCallback(() => {
     logout(
@@ -101,59 +95,61 @@ const Chat = () => {
     );
   }, [enqueueSnackbar, navigate, logout]);
 
-  const initializeChat = useCallback(async (session_id?: number) => {
-    setMessages([])
+  const initializeChat = useCallback(
+    async (session_id?: number) => {
+      setMessages([]);
 
-    try {
-      if (!session_id) {
-        console.error("User has no sessions")
-        addMessage(
-          generateCompassMessage(
-            "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
-            new Date().toISOString()
-          )
-        );
-        return;
-      }
-      const chatService = ChatService.getInstance(session_id);
-      if (!chatService) {
-        console.error("Chat service is not initialized");
-        addMessage(
-          generateCompassMessage(
-            "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
-            new Date().toISOString()
-          )
-        );
-        return;
-      }
-      setIsTyping(true);
+      try {
+        if (!session_id) {
+          console.error("User has no sessions");
+          addMessage(
+            generateCompassMessage(
+              "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
+              new Date().toISOString()
+            )
+          );
+          return;
+        }
+        const chatService = ChatService.getInstance(session_id);
+        if (!chatService) {
+          console.error("Chat service is not initialized");
+          addMessage(
+            generateCompassMessage(
+              "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
+              new Date().toISOString()
+            )
+          );
+          return;
+        }
+        setIsTyping(true);
 
-      const history = await chatService.getChatHistory();
-      if(history.conversation_completed)
-        setConversationCompleted(true);
-      if (history.messages.length) {
-        history.messages.forEach((message: ConversationMessage) => {
-          if (message.sender === ConversationMessageSender.USER && message.message !== "") {
-            addMessage(generateUserMessage(message.message, message.sent_at));
-          } else {
-            addMessage(generateCompassMessage(message.message, message.sent_at));
-          }
-        });
-      } else {
-        await sendMessage("", session_id);
+        const history = await chatService.getChatHistory();
+        if (history.conversation_completed) setConversationCompleted(true);
+        if (history.messages.length) {
+          history.messages.forEach((message: ConversationMessage) => {
+            if (message.sender === ConversationMessageSender.USER && message.message !== "") {
+              addMessage(generateUserMessage(message.message, message.sent_at));
+            } else {
+              addMessage(generateCompassMessage(message.message, message.sent_at));
+            }
+          });
+        } else {
+          await sendMessage("", session_id);
+        }
+      } catch (e) {
+        if (e instanceof ServiceError) {
+          writeServiceErrorToLog(e, console.error);
+        } else {
+          console.error("Failed to initialize chat", e);
+        }
+        const errorMessage = getUserFriendlyErrorMessage(e as Error);
+        enqueueSnackbar(errorMessage, { variant: "error" });
+      } finally {
+        setIsTyping(false);
       }
-    } catch (e) {
-      if (e instanceof ServiceError) {
-        writeServiceErrorToLog(e, console.error);
-      } else {
-        console.error("Failed to initialize chat", e);
-      }
-      const errorMessage = getUserFriendlyErrorMessage(e as Error);
-      enqueueSnackbar(errorMessage, { variant: "error" });
-    } finally {
-      setIsTyping(false);
-    }
-  }, [enqueueSnackbar, sendMessage]);
+    },
+    [enqueueSnackbar, sendMessage]
+  );
 
   useEffect(() => {
     if (!initialized) {
@@ -186,24 +182,21 @@ const Chat = () => {
     } catch (e) {
       console.error("Failed to start new conversation", e);
     }
-  }, [initializeChat, updateUserPreferences, userPreferences, enqueueSnackbar])
+  }, [initializeChat, updateUserPreferences, userPreferences, enqueueSnackbar]);
 
   return (
     <Box width="100%" height="100%" display="flex" flexDirection="column" data-testid={DATA_TEST_ID.CHAT_CONTAINER}>
-      <ChatHeader
-          notifyOnLogout={handleLogout}
-          startNewConversation={startNewConversation}
-      />
+      <ChatHeader notifyOnLogout={handleLogout} startNewConversation={startNewConversation} />
       <Box sx={{ flex: 1, overflowY: "auto" }}>
         <ChatList messages={messages} isTyping={isTyping} />
       </Box>
       <Box sx={{ flexShrink: 0 }}>
         <ChatMessageField
-            handleSend={handleSend}
-            aiIsTyping={isTyping}
-            isChatFinished={conversationCompleted}
-            message={currentMessage}
-            notifyChange={setCurrentMessage}
+          handleSend={handleSend}
+          aiIsTyping={isTyping}
+          isChatFinished={conversationCompleted}
+          message={currentMessage}
+          notifyChange={setCurrentMessage}
         />
       </Box>
     </Box>

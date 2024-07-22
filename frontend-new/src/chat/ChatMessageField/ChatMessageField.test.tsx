@@ -3,11 +3,20 @@ import "src/_test_utilities/consoleMock";
 
 import ChatMessageField, { DATA_TEST_ID, CHAT_MESSAGE_MAX_LENGTH, DISALLOWED_CHARACTERS } from "./ChatMessageField";
 import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
+import { mockBrowserIsOnLine } from "../../_test_utilities/mockBrowserIsOnline";
 
 describe("ChatMessageField", () => {
   test("should render ChatMessageField correctly", () => {
     // WHEN ChatMessageField is rendered
-    render(<ChatMessageField aiIsTyping={false} isChatFinished={false} handleSend={jest.fn()} message="foo" notifyChange={jest.fn()} />);
+    render(
+      <ChatMessageField
+        aiIsTyping={false}
+        isChatFinished={false}
+        handleSend={jest.fn()}
+        message="foo"
+        notifyChange={jest.fn()}
+      />
+    );
 
     //THEN expect no errors or warnings has occurred
     expect(console.error).not.toHaveBeenCalled();
@@ -31,7 +40,15 @@ describe("ChatMessageField", () => {
     const handleChange = jest.fn();
 
     // WHEN ChatMessageField is rendered
-    render(<ChatMessageField aiIsTyping={false} isChatFinished={false} handleSend={jest.fn()} message="" notifyChange={handleChange} />);
+    render(
+      <ChatMessageField
+        aiIsTyping={false}
+        isChatFinished={false}
+        handleSend={jest.fn()}
+        message=""
+        notifyChange={handleChange}
+      />
+    );
     // AND the input is changed
     const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
     fireEvent.change(ChatMessageFieldInput, { target: { value: message } });
@@ -50,7 +67,15 @@ describe("ChatMessageField", () => {
     const handleChange = jest.fn();
 
     // WHEN ChatMessageField is rendered
-    render(<ChatMessageField aiIsTyping={false} isChatFinished={false} handleSend={jest.fn()} message="" notifyChange={handleChange} />);
+    render(
+      <ChatMessageField
+        aiIsTyping={false}
+        isChatFinished={false}
+        handleSend={jest.fn()}
+        message=""
+        notifyChange={handleChange}
+      />
+    );
     // AND the input is changed
     const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
     fireEvent.change(ChatMessageFieldInput, { target: { value: invalidMessage } });
@@ -68,7 +93,15 @@ describe("ChatMessageField", () => {
     const handleChange = jest.fn();
 
     // WHEN ChatMessageField is rendered
-    render(<ChatMessageField aiIsTyping={false} isChatFinished={false} handleSend={jest.fn()} message="" notifyChange={handleChange} />);
+    render(
+      <ChatMessageField
+        aiIsTyping={false}
+        isChatFinished={false}
+        handleSend={jest.fn()}
+        message=""
+        notifyChange={handleChange}
+      />
+    );
     // AND the input is changed
     const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
     fireEvent.change(ChatMessageFieldInput, { target: { value: validMessage } });
@@ -89,7 +122,15 @@ describe("ChatMessageField", () => {
       const handleChange = jest.fn();
 
       // WHEN ChatMessageField is rendered
-      render(<ChatMessageField aiIsTyping={false} isChatFinished={false} handleSend={jest.fn()} message="" notifyChange={handleChange} />);
+      render(
+        <ChatMessageField
+          aiIsTyping={false}
+          isChatFinished={false}
+          handleSend={jest.fn()}
+          message=""
+          notifyChange={handleChange}
+        />
+      );
 
       // AND the input is changed
       const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
@@ -112,7 +153,15 @@ describe("ChatMessageField", () => {
       const handleChange = jest.fn();
 
       // WHEN ChatMessageField is rendered
-      render(<ChatMessageField aiIsTyping={false} isChatFinished={false} handleSend={jest.fn()} message="" notifyChange={handleChange} />);
+      render(
+        <ChatMessageField
+          aiIsTyping={false}
+          isChatFinished={false}
+          handleSend={jest.fn()}
+          message=""
+          notifyChange={handleChange}
+        />
+      );
 
       // AND the input is changed
       const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
@@ -130,7 +179,15 @@ describe("ChatMessageField", () => {
       const handleSend = jest.fn();
 
       // WHEN ChatMessageField is rendered
-      render(<ChatMessageField aiIsTyping={false} isChatFinished={false} handleSend={handleSend} message="foo" notifyChange={jest.fn()} />);
+      render(
+        <ChatMessageField
+          aiIsTyping={false}
+          isChatFinished={false}
+          handleSend={handleSend}
+          message="foo"
+          notifyChange={jest.fn()}
+        />
+      );
       // AND the button is clicked
       const ChatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
       fireEvent.change(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD), { target: { value: "foo" } });
@@ -145,7 +202,15 @@ describe("ChatMessageField", () => {
       const notifyChange = jest.fn();
 
       // WHEN ChatMessageField is rendered
-      render(<ChatMessageField aiIsTyping={false} isChatFinished={false} handleSend={jest.fn()} message="foo" notifyChange={notifyChange} />);
+      render(
+        <ChatMessageField
+          aiIsTyping={false}
+          isChatFinished={false}
+          handleSend={jest.fn()}
+          message="foo"
+          notifyChange={notifyChange}
+        />
+      );
       // AND the input is changed
       const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
       fireEvent.change(ChatMessageFieldInput, { target: { value: "bar" } });
@@ -156,53 +221,113 @@ describe("ChatMessageField", () => {
 
     test("should disable sending a message when the message is empty", () => {
       // GIVEN handleSend function
-        const handleSend = jest.fn();
-        // WHEN ChatMessageField is rendered
-        render(<ChatMessageField aiIsTyping={false} isChatFinished={false} handleSend={handleSend} message="" notifyChange={jest.fn()} />);
-        // AND the button is clicked
-        const ChatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
-        fireEvent.click(ChatMessageFieldButton);
+      const handleSend = jest.fn();
+      // WHEN ChatMessageField is rendered
+      render(
+        <ChatMessageField
+          aiIsTyping={false}
+          isChatFinished={false}
+          handleSend={handleSend}
+          message=""
+          notifyChange={jest.fn()}
+        />
+      );
+      // AND the button is clicked
+      const ChatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
+      fireEvent.click(ChatMessageFieldButton);
 
-        // THEN expect handleSend not to be called
-        expect(handleSend).not.toHaveBeenCalled();
-    })
+      // THEN expect handleSend not to be called
+      expect(handleSend).not.toHaveBeenCalled();
+    });
 
     it("should disable send button when AI is typing", () => {
-        // GIVEN handleSend function
-        const handleSend = jest.fn();
-        // WHEN ChatMessageField is rendered
-        render(<ChatMessageField  aiIsTyping={true} isChatFinished={false} handleSend={handleSend} message="foo" notifyChange={jest.fn()} />);
-        // AND the button is clicked
-        const ChatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
+      // GIVEN handleSend function
+      const handleSend = jest.fn();
+      // WHEN ChatMessageField is rendered
+      render(
+        <ChatMessageField
+          aiIsTyping={true}
+          isChatFinished={false}
+          handleSend={handleSend}
+          message="foo"
+          notifyChange={jest.fn()}
+        />
+      );
+      // AND the button is clicked
+      const ChatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
 
-        // THEN expect ChatMessageFieldButton to be disabled
-        expect(ChatMessageFieldButton).toBeDisabled();
-    })
+      // THEN expect ChatMessageFieldButton to be disabled
+      expect(ChatMessageFieldButton).toBeDisabled();
+    });
 
     it("should not call handleSend when AI is typing", () => {
-        // GIVEN handleSend function
-        const handleSend = jest.fn();
-        // WHEN ChatMessageField is rendered with some message
-        render(<ChatMessageField aiIsTyping={true} isChatFinished={false} handleSend={handleSend} message="foo" notifyChange={jest.fn()} />);
+      // GIVEN handleSend function
+      const handleSend = jest.fn();
+      // WHEN ChatMessageField is rendered with some message
+      render(
+        <ChatMessageField
+          aiIsTyping={true}
+          isChatFinished={false}
+          handleSend={handleSend}
+          message="foo"
+          notifyChange={jest.fn()}
+        />
+      );
 
-        // AND the button is clicked
-        const ChatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
-        fireEvent.click(ChatMessageFieldButton);
+      // AND the button is clicked
+      const ChatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
+      fireEvent.click(ChatMessageFieldButton);
 
-        // THEN expect handleSend not to be called
-        expect(handleSend).not.toHaveBeenCalled();
+      // THEN expect handleSend not to be called
+      expect(handleSend).not.toHaveBeenCalled();
     });
 
     it("should be disabled when chat is finished", () => {
-        // GIVEN handleSend function
-        const handleSend = jest.fn();
-        // WHEN ChatMessageField is rendered
-        render(<ChatMessageField aiIsTyping={false} isChatFinished={true} handleSend={handleSend} message="foo" notifyChange={jest.fn()} />);
-        // AND the button is clicked
-        const ChatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
+      // GIVEN handleSend function
+      const handleSend = jest.fn();
+      // WHEN ChatMessageField is rendered
+      render(
+        <ChatMessageField
+          aiIsTyping={false}
+          isChatFinished={true}
+          handleSend={handleSend}
+          message="foo"
+          notifyChange={jest.fn()}
+        />
+      );
+      // AND the button is clicked
+      const ChatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
 
-        // THEN expect ChatMessageFieldButton to be disabled
-        expect(ChatMessageFieldButton).toBeDisabled();
+      // THEN expect ChatMessageFieldButton to be disabled
+      expect(ChatMessageFieldButton).toBeDisabled();
+    });
+
+    test("should be disabled when browser is offline", () => {
+      // GIVEN the browser is offline
+      mockBrowserIsOnLine(false)
+      // AND handleSend function
+      const handleSend = jest.fn();
+      // WHEN ChatMessageField is rendered
+      render(
+        <ChatMessageField
+          aiIsTyping={false}
+          isChatFinished={false}
+          handleSend={handleSend}
+          message="foo"
+          notifyChange={jest.fn()}
+        />
+      );
+      // AND the button is clicked
+      const ChatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
+
+      // THEN expect ChatMessageFieldButton to be disabled
+      expect(ChatMessageFieldButton).toBeDisabled();
+
+      // AND the button is clicked
+      fireEvent.click(ChatMessageFieldButton);
+
+      // THEN expect handleSend not to be called
+      expect(handleSend).not.toHaveBeenCalled();
     })
 
     it("should focus on the input once ai is done typing", async () => {

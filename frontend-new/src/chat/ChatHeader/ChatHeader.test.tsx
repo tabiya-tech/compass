@@ -9,6 +9,7 @@ import { routerPaths } from "src/app/routerPaths";
 import { testNavigateToPath } from "src/_test_utilities/routeNavigation";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
+import { mockBrowserIsOnLine } from "../../_test_utilities/mockBrowserIsOnline";
 
 // mock the ContextMenu
 jest.mock("src/theme/ContextMenu/ContextMenu", () => {
@@ -76,7 +77,9 @@ describe("ChatHeader", () => {
   describe("chatHeader action tests", () => {
     const givenNotifyOnLogout = jest.fn();
     const givenStartNewConversation = jest.fn();
-    const givenChatHeader = <ChatHeader notifyOnLogout={givenNotifyOnLogout} startNewConversation={givenStartNewConversation} />;
+    const givenChatHeader = (
+      <ChatHeader notifyOnLogout={givenNotifyOnLogout} startNewConversation={givenStartNewConversation} />
+    );
     testNavigateToPath(givenChatHeader, "compass logo", DATA_TEST_ID.CHAT_HEADER_LOGO_LINK, routerPaths.ROOT);
 
     test("should open the context menu when the user icon is clicked", async () => {
@@ -151,38 +154,38 @@ describe("ChatHeader", () => {
 
     test("should call start new conversation when the start new conversation menu item is clicked", async () => {
       // GIVEN a ChatHeader component
-        const givenNotifyOnLogout = jest.fn();
-        const givenStartNewConversation = jest.fn();
-        const givenChatHeader = (
-          <HashRouter>
-            <ChatHeader notifyOnLogout={givenNotifyOnLogout} startNewConversation={givenStartNewConversation} />
-          </HashRouter>
+      const givenNotifyOnLogout = jest.fn();
+      const givenStartNewConversation = jest.fn();
+      const givenChatHeader = (
+        <HashRouter>
+          <ChatHeader notifyOnLogout={givenNotifyOnLogout} startNewConversation={givenStartNewConversation} />
+        </HashRouter>
+      );
+
+      // AND the chat header is rendered
+      render(givenChatHeader);
+
+      // AND the user button is clicked
+      const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
+      fireEvent.click(userButton);
+
+      // AND the context menu is opened
+      await waitFor(() => {
+        expect(ContextMenu).toHaveBeenCalledWith(
+          expect.objectContaining({
+            anchorEl: userButton,
+            open: true,
+          }),
+          {}
         );
+      });
 
-        // AND the chat header is rendered
-        render(givenChatHeader);
+      // WHEN the start new conversation menu item is clicked
+      const startNewConversationMenuItem = screen.getByTestId(MENU_ITEM_ID.START_NEW_CONVERSATION);
+      fireEvent.click(startNewConversationMenuItem);
 
-        // AND the user button is clicked
-        const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
-        fireEvent.click(userButton);
-
-        // AND the context menu is opened
-        await waitFor(() => {
-          expect(ContextMenu).toHaveBeenCalledWith(
-            expect.objectContaining({
-              anchorEl: userButton,
-              open: true,
-            }),
-            {}
-          );
-        });
-
-        // WHEN the start new conversation menu item is clicked
-        const startNewConversationMenuItem = screen.getByTestId(MENU_ITEM_ID.START_NEW_CONVERSATION);
-        fireEvent.click(startNewConversationMenuItem);
-
-        // THEN expect the start new conversation function to be called
-        expect(givenStartNewConversation).toHaveBeenCalled();
+      // THEN expect the start new conversation function to be called
+      expect(givenStartNewConversation).toHaveBeenCalled();
     });
 
     test("should close the context menu when notifyOnClose is called", async () => {
@@ -213,5 +216,63 @@ describe("ChatHeader", () => {
        **/
       expect(ContextMenu).toHaveBeenNthCalledWith(3, expect.objectContaining({ anchorEl: null, open: false }), {});
     });
+  });
+  describe("context menu item tests", () => {
+    test.each([
+      ["online", true],
+      ["offline", false],
+    ])(
+      "should render the context menu with the correct menu items when browser is %s",
+      async (_description, browserIsOnline) => {
+        mockBrowserIsOnLine(browserIsOnline);
+        // GIVEN a ChatHeader component
+        const givenNotifyOnLogout = jest.fn();
+        const givenStartNewConversation = jest.fn();
+        const givenChatHeader = (
+          <HashRouter>
+            <ChatHeader notifyOnLogout={givenNotifyOnLogout} startNewConversation={givenStartNewConversation} />
+          </HashRouter>
+        );
+        // AND the chat header is rendered
+        render(givenChatHeader);
+        // AND the user button is clicked
+        const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
+        fireEvent.click(userButton);
+
+        // THEN expect the context menu to be visible
+        await waitFor(() => {
+          expect(ContextMenu).toHaveBeenCalledWith(
+            expect.objectContaining({
+              anchorEl: userButton,
+              open: true,
+              items: expect.arrayContaining([
+                expect.objectContaining({
+                  id: MENU_ITEM_ID.START_NEW_CONVERSATION,
+                  text: "start new conversation",
+                  disabled: !browserIsOnline,
+                }),
+                expect.objectContaining({
+                  id: MENU_ITEM_ID.SETTINGS_SELECTOR,
+                  text: "settings",
+                  disabled: !browserIsOnline,
+                }),
+                expect.objectContaining({
+                  id: MENU_ITEM_ID.LOGOUT_BUTTON,
+                  text: "logout",
+                  disabled: !browserIsOnline,
+                }),
+              ]),
+            }),
+            {}
+          );
+        });
+        // AND the context menu to contain the correct menu items
+        const contextMenu = screen.getByTestId("mock-context-menu");
+        expect(contextMenu).toBeInTheDocument();
+        expect(screen.getByTestId(MENU_ITEM_ID.START_NEW_CONVERSATION)).toBeInTheDocument();
+        expect(screen.getByTestId(MENU_ITEM_ID.SETTINGS_SELECTOR)).toBeInTheDocument();
+        expect(screen.getByTestId(MENU_ITEM_ID.LOGOUT_BUTTON)).toBeInTheDocument();
+      }
+    );
   });
 });

@@ -40,7 +40,6 @@ export const Shown: Story = {
   },
 };
 
-
 export const AIIsTyping: Story = {
   render: (args) => <ChatMessageFieldWrapper {...args} />,
   args: {
@@ -51,10 +50,10 @@ export const AIIsTyping: Story = {
 };
 
 export const ChatIsClosed: Story = {
-    render: (args) => <ChatMessageFieldWrapper {...args} />,
-    args: {
-        message: "",
-        handleSend: action("Message sent"),
-        isChatFinished: true,
-    },
-}
+  render: (args) => <ChatMessageFieldWrapper {...args} />,
+  args: {
+    message: "",
+    handleSend: action("Message sent"),
+    isChatFinished: true,
+  },
+};

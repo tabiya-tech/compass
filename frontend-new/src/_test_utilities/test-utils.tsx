@@ -9,16 +9,19 @@ import { AuthProvider } from "src/auth/Providers/AuthProvider/AuthProvider";
 import "src/_test_utilities/firebaseMock";
 import SnackbarProvider from "src/theme/SnackbarProvider/SnackbarProvider";
 import { UserPreferencesProvider } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
+import { IsOnlineProvider } from "src/app/providers/IsOnlineProvider";
 
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return (
-    <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
-      <AuthProvider>
-        <UserPreferencesProvider>
-          <SnackbarProvider>{children}</SnackbarProvider>
-        </UserPreferencesProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <IsOnlineProvider>
+      <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
+        <AuthProvider>
+          <UserPreferencesProvider>
+            <SnackbarProvider>{children}</SnackbarProvider>
+          </UserPreferencesProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </IsOnlineProvider>
   );
 };
 

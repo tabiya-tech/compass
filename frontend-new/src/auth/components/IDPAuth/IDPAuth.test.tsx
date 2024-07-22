@@ -1,7 +1,7 @@
 import "src/_test_utilities/consoleMock";
 import React from "react";
-import { render, waitFor } from "src/_test_utilities/test-utils";
-import IDPAuth from "./IDPAuth";
+import { render, waitFor, screen } from "src/_test_utilities/test-utils";
+import IDPAuth, { DATA_TEST_ID } from "./IDPAuth";
 import * as firebaseui from "firebaseui";
 import { HashRouter, useNavigate } from "react-router-dom";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -9,6 +9,7 @@ import { routerPaths } from "src/app/routerPaths";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 import { Language } from "src/auth/services/UserPreferences/userPreferences.types";
 import { UserPreferencesContext } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
+import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -47,7 +48,10 @@ jest.mock("firebaseui", () => {
     auth: {
       AuthUI: jest.fn().mockImplementation(() => ({
         start: jest.fn(),
-        getInstance: jest.fn(),
+        getInstance: jest.fn().mockReturnValue({
+          reset: jest.fn(),
+        }),
+        reset: jest.fn(),
       })),
     },
   };
@@ -113,8 +117,13 @@ describe("IDPAuth tests", () => {
   });
 
   beforeAll(() => mockUseTokens());
+
   afterEach(() => {
     jest.clearAllMocks();
+  });
+
+  beforeEach(() => {
+    unmockBrowserIsOnLine();
   });
 
   test("should render the IDPAuth component", () => {
@@ -152,6 +161,7 @@ describe("IDPAuth tests", () => {
             },
           });
         },
+        reset: jest.fn(),
       }));
 
       // AND the user preferences provider will return the user preferences
@@ -200,6 +210,7 @@ describe("IDPAuth tests", () => {
           },
         });
       },
+      reset: jest.fn(),
     }));
     // AND the user preferences provider will throw an error
     const givenUserPreferencesError = new Error("User preferences error");
@@ -234,6 +245,7 @@ describe("IDPAuth tests", () => {
       start: (elementId: string, config: any) => {
         config.callbacks.signInFailure({ message: "Sign-in failed" });
       },
+      reset: jest.fn(),
     }));
 
     render(
@@ -249,4 +261,20 @@ describe("IDPAuth tests", () => {
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Login failed", { variant: "error" });
     });
   });
+
+  test("should show message if browser is not online", () => {
+    // GIVEN the browser is not online
+    mockBrowserIsOnLine(false);
+    // WHEN the component is rendered
+    render(
+      <HashRouter>
+        <UserPreferencesContext.Provider value={userPreferencesContextValue}>
+          <IDPAuth />
+        </UserPreferencesContext.Provider>
+      </HashRouter>
+    );
+
+    // THEN expect the message text to be in the document
+    expect(screen.getByTestId(DATA_TEST_ID.FIREBASE_FALLBACK_TEXT)).toBeInTheDocument();
+  })
 });
