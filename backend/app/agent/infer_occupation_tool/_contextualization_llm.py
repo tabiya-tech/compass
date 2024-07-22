@@ -4,11 +4,11 @@ from textwrap import dedent
 
 from app.agent.agent_types import LLMStats
 from app.agent.experience.experience_entity import ExperienceEntity
-from app.agent.experience.work_type import WorkType
+from app.agent.experience.work_type import WorkType, WORK_TYPE_DEFINITIONS_FOR_PROMPT
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.countries import Country, get_country_glossary
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import LOW_TEMPERATURE_GENERATION_CONFIG, LLMConfig, JSON_GENERATION_CONFIG
+from common_libs.llm.models_utils import LOW_TEMPERATURE_GENERATION_CONFIG, LLMConfig
 
 
 def get_system_prompt_for_contextual_title(country_of_interest: Country):
@@ -53,7 +53,7 @@ def get_system_prompt_for_contextual_title(country_of_interest: Country):
     return replace_placeholders_with_indent(system_prompt_template,
                                             country_of_interest=country_of_interest.value,
                                             work_type_names=", ".join([work_type.name for work_type in WorkType]),
-                                            work_type_definitions=ExperienceEntity.WORK_TYPE_DEFINITIONS_FOR_PROMPT,
+                                            work_type_definitions=WORK_TYPE_DEFINITIONS_FOR_PROMPT,
                                             glossary=glossary_str)
 
 
