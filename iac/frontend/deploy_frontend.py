@@ -96,17 +96,17 @@ def deploy_frontend(project: str, location: str, environment: str):
 
     bucket = _create_bucket(basic_config, "frontend", services)
 
-    frontend_out_dir = "../../frontend/out"
-    _upload_directory_to_bucket(basic_config, bucket.name, frontend_out_dir, "",
-                                ["index.html"], [bucket])
-
     new_ui_build_dir = "../../frontend-new/build"
-    _upload_directory_to_bucket(basic_config, bucket.name, new_ui_build_dir, "new-ui",
+    _upload_directory_to_bucket(basic_config, bucket.name, new_ui_build_dir, "",
                                 ["index.html", "data/version.json"], [bucket])
+
+    frontend_out_dir = "../../frontend/out"
+    _upload_directory_to_bucket(basic_config, bucket.name, frontend_out_dir, "poc-ui",
+                                ["index.html"], [bucket])
 
     _make_bucket_public(basic_config, bucket.name, [bucket])
 
     pulumi.export('bucket_name', bucket.name)
     pulumi.export('bucket_url', pulumi.Output.concat("http://", bucket.name, ".storage.googleapis.com/index.html"))
     pulumi.export('new_ui_url',
-                  pulumi.Output.concat("http://", bucket.name, ".storage.googleapis.com/new-ui"))
+                  pulumi.Output.concat("http://", bucket.name, ".storage.googleapis.com"))

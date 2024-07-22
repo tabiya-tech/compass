@@ -117,4 +117,4 @@ jobs:
     with:
       component: frontend-new
       expected-version-info: ${{ needs.build-frontend.outputs.version-info }}
-      component-url: ${{ needs.setup-env.outputs.frontend-url }}/new-ui
+      component-url: ${{ needs.setup-env.outputs.frontend-url }}
