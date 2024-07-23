@@ -204,5 +204,18 @@ describe("ChatMessageField", () => {
         // THEN expect ChatMessageFieldButton to be disabled
         expect(ChatMessageFieldButton).toBeDisabled();
     })
+
+    it("should focus on the input once ai is done typing", async () => {
+        // GIVEN handleSend function
+        const handleSend = jest.fn();
+
+        // WHEN ChatMessageField is rendered
+        render(<ChatMessageField aiIsTyping={false} isChatFinished={false} handleSend={handleSend} message="foo" notifyChange={jest.fn()} />);
+
+        const messageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
+
+        // THEN expect input should be focused
+        expect(messageField).toHaveFocus();
+    })
   });
 });
