@@ -41,13 +41,13 @@ exports[`Testing Data Protection Policy component with AuthProvider it should sh
       </button>
     </div>
     <h4
-      class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1str1nv-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-aw10sv-MuiTypography-root"
       data-testid="dpa-title-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
     >
       Thank you for using Tabiya Compass.
     </h4>
     <p
-      class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-19i920d-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-orhnoi-MuiTypography-root"
       data-testid="dpa-agreement-body-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
     >
       We created this AI tool for you with care to help you and other young people like you explore their skills and discover new opportunities.
@@ -72,7 +72,7 @@ exports[`Testing Data Protection Policy component with AuthProvider it should sh
       Are you ready to start?
     </p>
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-nz9hw9-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1veuayk-MuiButtonBase-root-MuiButton-root"
       data-testid="dpa-accept-button-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
       style="margin-top: 16px;"
       tabindex="0"

@@ -13,7 +13,7 @@ exports[`render tests should render the Chat message with sent_at when typing is
     Hello, I'm Compass
   </div>
   <span
-    class="MuiTypography-root MuiTypography-caption css-1q7uxfb-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-caption css-1t50og3-MuiTypography-root"
     data-testid="chat-message-sent_at-2fbaf2ef-9eab-485a-bd28-b4a164e18b06"
   >
     sent 

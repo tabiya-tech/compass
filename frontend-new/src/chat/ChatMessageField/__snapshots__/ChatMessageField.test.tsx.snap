@@ -12,7 +12,7 @@ exports[`ChatMessageField should render ChatMessageField correctly 1`] = `
       class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-oap3n8-MuiFormControl-root-MuiTextField-root"
     >
       <div
-        class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline MuiInputBase-adornedEnd css-1cn4aa9-MuiInputBase-root-MuiOutlinedInput-root"
+        class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline MuiInputBase-adornedEnd css-1wq9v0q-MuiInputBase-root-MuiOutlinedInput-root"
       >
         <textarea
           aria-invalid="false"

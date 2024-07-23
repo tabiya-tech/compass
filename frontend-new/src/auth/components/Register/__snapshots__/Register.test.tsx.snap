@@ -41,13 +41,13 @@ exports[`Testing Register component with AuthProvider it should show register fo
       </button>
     </div>
     <h4
-      class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1str1nv-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-aw10sv-MuiTypography-root"
       data-testid="register-title-ab02918f-d559-47ba-9662-ea6b3a3606d0"
     >
       Welcome to Compass!
     </h4>
     <p
-      class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-19i920d-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-orhnoi-MuiTypography-root"
       data-testid="register-subtitle-ab02918f-d559-47ba-9662-ea6b3a3606d0"
     >
       We need some information to get started
@@ -60,7 +60,7 @@ exports[`Testing Register component with AuthProvider it should show register fo
         class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth MuiTextField-root css-17vbkzs-MuiFormControl-root-MuiTextField-root"
       >
         <label
-          class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined css-xnb7rg-MuiFormLabel-root-MuiInputLabel-root"
+          class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined css-1yj6ed4-MuiFormLabel-root-MuiInputLabel-root"
           data-shrink="true"
           for=":r0:"
           id=":r0:-label"
@@ -75,7 +75,7 @@ exports[`Testing Register component with AuthProvider it should show register fo
           </span>
         </label>
         <div
-          class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-1ly4nm2-MuiInputBase-root-MuiOutlinedInput-root"
+          class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-1hkzykt-MuiInputBase-root-MuiOutlinedInput-root"
         >
           <input
             aria-invalid="false"
@@ -106,7 +106,7 @@ exports[`Testing Register component with AuthProvider it should show register fo
         class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth MuiTextField-root css-17vbkzs-MuiFormControl-root-MuiTextField-root"
       >
         <label
-          class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined css-xnb7rg-MuiFormLabel-root-MuiInputLabel-root"
+          class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined css-1yj6ed4-MuiFormLabel-root-MuiInputLabel-root"
           data-shrink="true"
           for=":r1:"
           id=":r1:-label"
@@ -121,7 +121,7 @@ exports[`Testing Register component with AuthProvider it should show register fo
           </span>
         </label>
         <div
-          class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-1ly4nm2-MuiInputBase-root-MuiOutlinedInput-root"
+          class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-1hkzykt-MuiInputBase-root-MuiOutlinedInput-root"
         >
           <input
             aria-invalid="false"
@@ -152,7 +152,7 @@ exports[`Testing Register component with AuthProvider it should show register fo
         class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth MuiTextField-root css-17vbkzs-MuiFormControl-root-MuiTextField-root"
       >
         <label
-          class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined css-xnb7rg-MuiFormLabel-root-MuiInputLabel-root"
+          class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined css-1yj6ed4-MuiFormLabel-root-MuiInputLabel-root"
           data-shrink="true"
           for=":r2:"
           id=":r2:-label"
@@ -167,7 +167,7 @@ exports[`Testing Register component with AuthProvider it should show register fo
           </span>
         </label>
         <div
-          class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-1ly4nm2-MuiInputBase-root-MuiOutlinedInput-root"
+          class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-1hkzykt-MuiInputBase-root-MuiOutlinedInput-root"
         >
           <input
             aria-invalid="false"
@@ -195,7 +195,7 @@ exports[`Testing Register component with AuthProvider it should show register fo
         </div>
       </div>
       <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-nz9hw9-MuiButtonBase-root-MuiButton-root"
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1veuayk-MuiButtonBase-root-MuiButton-root"
         data-testid="register-button-ab02918f-d559-47ba-9662-ea6b3a3606d0"
         style="margin-top: 16px;"
         tabindex="0"
@@ -212,7 +212,7 @@ exports[`Testing Register component with AuthProvider it should show register fo
       data-testid="firebase-auth-container-ab02918f-d559-47ba-9662-ea6b3a3606d0"
     >
       <p
-        class="MuiTypography-root MuiTypography-body2 css-odp70e-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body2 css-1hj66kc-MuiTypography-root"
         data-testid="register-using-ab02918f-d559-47ba-9662-ea6b3a3606d0"
       >
         Or continue with
@@ -224,7 +224,7 @@ exports[`Testing Register component with AuthProvider it should show register fo
       </div>
     </div>
     <p
-      class="MuiTypography-root MuiTypography-body2 css-odp70e-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-body2 css-1hj66kc-MuiTypography-root"
       data-testid="register-login-link-ab02918f-d559-47ba-9662-ea6b3a3606d0"
     >
       Already have an account?

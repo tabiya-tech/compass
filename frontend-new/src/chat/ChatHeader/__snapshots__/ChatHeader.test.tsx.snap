@@ -20,7 +20,7 @@ exports[`ChatHeader should render the Chat Header 1`] = `
     />
   </a>
   <h1
-    class="MuiTypography-root MuiTypography-h1 css-1ku1uae-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-h1 css-19n1cqi-MuiTypography-root"
   >
     compass
   </h1>
