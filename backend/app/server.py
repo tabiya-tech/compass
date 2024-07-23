@@ -1,6 +1,7 @@
 import logging
 import os
 import random
+import uuid
 
 from datetime import datetime
 from typing import List, Annotated
@@ -13,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_types import AgentInput
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
+from app.agent.experience.work_type import WorkType
 from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
 from app.constants.errors import HTTPErrorResponse, ErrorService
 from app.users.auth import Authentication, UserInfo
@@ -30,7 +32,7 @@ from contextlib import asynccontextmanager
 from app.users import add_users_routes
 from app.poc import add_poc_routes
 
-from app.types import NewSessionResponse
+from app.types import NewSessionResponse, Experience, Skill
 from app.users.repositories import UserPreferenceRepository
 from app.users.types import UserPreferencesUpdateRequest
 
@@ -240,12 +242,77 @@ async def get_conversation_history(
         raise HTTPException(status_code=500, detail="Oops! something went wrong")
 
 
+@app.get(path="/conversation/experiences",
+         response_model=List[Experience],
+         responses={400: {"model": HTTPErrorResponse}, 403: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
+         description="""Endpoint for retrieving the experiences of a user.""")
+async def get_experiences(session_id: int, user_info: UserInfo = Depends(auth.get_user_info())) -> List[Experience]:
+    """
+    Endpoint for retrieving the experiences of a user.
+    Currently, this is a mocked response with two experiences.
+    """
+    # Check that the user making the request has the session_id in their user preferences
+    user_preference_repository = UserPreferenceRepository()
+    current_user_preferences = await user_preference_repository.get_user_preference_by_user_id(user_info.user_id)
+
+    if current_user_preferences is None or session_id not in current_user_preferences.sessions:
+        raise HTTPException(status_code=403, detail="User does not have permission to access this session")
+
+    # Mocked data for the experiences
+    # A user that has two experiences
+    # As a barber and as a cook and seller of Kotas
+    # This should eventually be received from the application state manager
+    experiences = [
+        Experience(
+            experience_title="Barber",
+            company="at a local barber shop",
+            location="Cape Town, South Africa",
+            start_date="2019-01-01",
+            end_date="2021-01-01",
+            work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+            top_skills=[
+                Skill(
+                    preferredLabel="Hairdressing",
+                    description="Hairdressing",
+                    altLabels=[]
+                ),
+                Skill(
+                    preferredLabel="Customer service",
+                    description="Customer service",
+                    altLabels=[]
+                )
+            ]
+        ),
+        Experience(
+            experience_title="Cook and Seller of Kotas",
+            company="at a street food stall",
+            location="Johannesburg, South Africa",
+            start_date="2017-05-01",
+            end_date="2018-12-01",
+            work_type=WorkType.SELF_EMPLOYMENT,
+            top_skills=[
+                Skill(
+                    preferredLabel="Cooking",
+                    description="Preparing and cooking food",
+                    altLabels=[]
+                ),
+                Skill(
+                    preferredLabel="Sales",
+                    description="Selling food items",
+                    altLabels=[]
+                )
+            ]
+        )
+    ]
+    return experiences
+
+
 @app.get(path="/conversation/new-session",
          response_model=NewSessionResponse,
          status_code=201,
          responses={404: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
          description="""Endpoint for starting a new conversation session.""",)
-async def get_new_convesation_session(user: UserInfo = Depends(auth.get_user_info())):
+async def get_new_conversation_session(user: UserInfo = Depends(auth.get_user_info())):
     """
     Endpoint for starting a new conversation session.
     The function creates a new session id and adds it to the user sessions on the top of the list.
