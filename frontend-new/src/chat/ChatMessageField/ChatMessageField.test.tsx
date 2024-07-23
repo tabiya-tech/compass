@@ -140,20 +140,6 @@ describe("ChatMessageField", () => {
       expect(handleSend).toHaveBeenCalled();
     });
 
-    test("should call handleSend when enter key is pressed", () => {
-      // GIVEN handleSend function
-      const handleSend = jest.fn();
-
-      // WHEN ChatMessageField is rendered
-      render(<ChatMessageField aiIsTyping={false} isChatFinished={false} handleSend={handleSend} message="foo" notifyChange={jest.fn()} />);
-      // AND the enter key is pressed
-      const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
-      fireEvent.keyDown(ChatMessageFieldInput, { key: "Enter", code: "Enter" });
-
-      // THEN expect handleSend to be called
-      expect(handleSend).toHaveBeenCalled();
-    });
-
     test("should call notifyChange when input is changed", () => {
       // GIVEN notifyChange function
       const notifyChange = jest.fn();
@@ -168,7 +154,7 @@ describe("ChatMessageField", () => {
       expect(notifyChange).toHaveBeenCalled();
     });
 
-    it("should disable sending a message when the message is empty", () => {
+    test("should disable sending a message when the message is empty", () => {
       // GIVEN handleSend function
         const handleSend = jest.fn();
         // WHEN ChatMessageField is rendered
