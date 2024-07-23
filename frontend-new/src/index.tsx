@@ -9,6 +9,7 @@ import { AuthProvider } from "src/auth/Providers/AuthProvider/AuthProvider";
 import SnackbarProvider from "src/theme/SnackbarProvider/SnackbarProvider";
 import { UserPreferencesProvider } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
 import { IsOnlineProvider } from "src/app/providers/IsOnlineProvider";
+import ViewPortWrapper from "src/app/ViewPortWrapper";
 
 // Currently the fonts are downloaded from Google via the index.css
 // Fonts could be distributed with the app instead, by explicitly importing them here
@@ -25,7 +26,9 @@ root.render(
           <AuthProvider>
             <UserPreferencesProvider>
               <SnackbarProvider>
-                <App />
+                <ViewPortWrapper>
+                  <App />
+                </ViewPortWrapper>
               </SnackbarProvider>
             </UserPreferencesProvider>
           </AuthProvider>
