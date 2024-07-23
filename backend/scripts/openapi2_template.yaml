@@ -35,6 +35,15 @@ securityDefinitions:
     x-google-jwks_uri: "https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com"
     x-google-audiences: "{0}"
 paths:
+  /poc/conversation:
+    get:
+      summary: Chat Conversation
+      operationId: conversation
+      responses:
+        '200':
+          description: A successful response
+          schema:
+            type: string
   /docs:
     get:
       summary: Docs endpoint
