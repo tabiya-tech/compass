@@ -98,13 +98,6 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     setCharCount(0);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleButtonClick();
-    }
-  };
-
   // The character counter is only visible when the user types more than 75% of the character limit
   const showCharCounter = charCount > CHAT_MESSAGE_MAX_LENGTH * 0.75;
   // The character counter turns red when only 1% is left
@@ -152,7 +145,6 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
           value={props.message}
           disabled={isDisabled}
           onChange={handleChange}
-          onKeyDown={handleKeyDown}
           error={!!errorMessage}
           helperText={errorMessage}
           InputProps={{
