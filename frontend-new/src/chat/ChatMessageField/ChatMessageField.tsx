@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import { IconButton, InputAdornment, TextField, styled, useTheme, Typography, Box } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 
@@ -49,6 +49,8 @@ const StyledTextField = styled(TextField)(({ theme, disabled }) => ({
 }));
 
 const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
   const theme = useTheme();
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [charCount, setCharCount] = useState<number>(0);
@@ -116,6 +118,12 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
 
   const isDisabled = props.isChatFinished || props.aiIsTyping;
 
+  useEffect(() => {
+    if(inputRef.current && !props.aiIsTyping) {
+      inputRef.current.focus();
+    }
+  }, [props.aiIsTyping])
+
   return (
     <Box
       position="relative"
@@ -145,6 +153,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
           value={props.message}
           disabled={isDisabled}
           onChange={handleChange}
+          inputRef={inputRef}
           error={!!errorMessage}
           helperText={errorMessage}
           InputProps={{
