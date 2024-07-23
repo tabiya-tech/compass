@@ -22,13 +22,13 @@ function CSSClampFnCalculator(unit: "rem" | "px", minValue: number, maxValue: nu
     ((maxValue - minValue) / (screenSize.maxHeight - screenSize.minHeight + Number.EPSILON)) * 100
   );
   const heightOffset: number = round(minValue - (heightScaleFactor / 100) * screenSize.minHeight);
-  const heightPart: string = `${heightScaleFactor}vh + ${heightOffset}${unit}`;
+  const heightPart: string = `${heightScaleFactor}dvh + ${heightOffset}${unit}`;
   // width
   const widthScaleFactor: number = round(
     ((maxValue - minValue) / (screenSize.maxWidth - screenSize.minWidth + Number.EPSILON)) * 100
   );
   const widthOffset: number = round(minValue - (widthScaleFactor / 100) * screenSize.minWidth);
-  const widthPart: string = `${widthScaleFactor}vw + ${widthOffset}${unit}`;
+  const widthPart: string = `${widthScaleFactor}dvw + ${widthOffset}${unit}`;
 
   // consider both the height and width scale factors
   const clampFn: string = `clamp(${minValue}${unit}, (${heightPart} + ${widthPart})/2 , ${maxValue}${unit})`;

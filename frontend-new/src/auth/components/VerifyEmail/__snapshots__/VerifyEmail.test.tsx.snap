@@ -2,11 +2,11 @@
 
 exports[`Testing Verify Email component with AuthProvider it should show verification page 1`] = `
 <div
-  class="MuiContainer-root MuiContainer-maxWidthXs css-h7lrk5-MuiContainer-root"
+  class="MuiContainer-root MuiContainer-maxWidthXs css-xravbe-MuiContainer-root"
   data-testid="verification-container-f1228c6a-e447-4946-b810-0c7ddc8ca833"
 >
   <div
-    class="MuiBox-root css-1olm9cy"
+    class="MuiBox-root css-inbm3t"
   >
     <div
       class="MuiBox-root css-1vd84sn"
@@ -18,7 +18,7 @@ exports[`Testing Verify Email component with AuthProvider it should show verific
         style="max-width: 60%; margin: 10%;"
       />
       <button
-        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1xvhgyt-MuiButtonBase-root-MuiIconButton-root"
+        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-j7z1rr-MuiButtonBase-root-MuiIconButton-root"
         data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
         tabindex="0"
         title="Language Selector"
@@ -41,19 +41,19 @@ exports[`Testing Verify Email component with AuthProvider it should show verific
       </button>
     </div>
     <h4
-      class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-aw10sv-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-xvfkrl-MuiTypography-root"
       data-testid="verification-title-f1228c6a-e447-4946-b810-0c7ddc8ca833"
     >
       Thank you for registering to Tabiya Compass.
     </h4>
     <p
-      class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-orhnoi-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1ncy5w-MuiTypography-root"
       data-testid="verification-body-f1228c6a-e447-4946-b810-0c7ddc8ca833"
     >
       A verification email has been sent to your email address. To continue, please verify your email address first.
     </p>
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1veuayk-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-q25fil-MuiButtonBase-root-MuiButton-root"
       data-testid="verification-back-to-login-button-f1228c6a-e447-4946-b810-0c7ddc8ca833"
       style="margin-top: 16px;"
       tabindex="0"

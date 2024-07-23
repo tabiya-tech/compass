@@ -2,7 +2,7 @@
 
 exports[`Home should render the home page 1`] = `
 <div
-  class="MuiBox-root css-79col"
+  class="MuiBox-root css-u40fhb"
   data-testid="home-container-13cb726d-b36d-4ea6-a518-9bf8f1e7356f"
 >
   <div

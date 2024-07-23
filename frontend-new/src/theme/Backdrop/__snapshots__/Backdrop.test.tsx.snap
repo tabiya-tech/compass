@@ -15,13 +15,13 @@ exports[`Backdrop render tests should be shown 1`] = `
       class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 css-1t034p-MuiPaper-root"
     >
       <div
-        class="MuiGrid-root MuiGrid-container css-19ib6lz-MuiGrid-root"
+        class="MuiGrid-root MuiGrid-container css-15vmx7d-MuiGrid-root"
       >
         <div
           class="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
         >
           <h6
-            class="MuiTypography-root MuiTypography-h6 css-1fxo9xt-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h6 css-j3fu9i-MuiTypography-root"
             data-testid="message-91b57774-d50c-4350-882d-363f80ac10e8"
           >
             foo-message
@@ -55,7 +55,7 @@ exports[`Backdrop render tests should be shown 1`] = `
       </div>
     </div>
     <div
-      class="MuiContainer-root MuiContainer-maxWidthLg css-151kih5-MuiContainer-root"
+      class="MuiContainer-root MuiContainer-maxWidthLg css-t4utv2-MuiContainer-root"
     >
       <svg
         overflow="visible"
@@ -191,7 +191,7 @@ exports[`Backdrop render tests should rendered without message and not show any 
       class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 css-1t034p-MuiPaper-root"
     >
       <div
-        class="MuiGrid-root MuiGrid-container css-19ib6lz-MuiGrid-root"
+        class="MuiGrid-root MuiGrid-container css-15vmx7d-MuiGrid-root"
       >
         <div
           class="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
@@ -221,7 +221,7 @@ exports[`Backdrop render tests should rendered without message and not show any 
       </div>
     </div>
     <div
-      class="MuiContainer-root MuiContainer-maxWidthLg css-151kih5-MuiContainer-root"
+      class="MuiContainer-root MuiContainer-maxWidthLg css-t4utv2-MuiContainer-root"
     >
       <svg
         overflow="visible"

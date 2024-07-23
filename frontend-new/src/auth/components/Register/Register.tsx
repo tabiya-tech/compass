@@ -102,10 +102,10 @@ const Register: React.FC = () => {
           />
           <AuthContextMenu />
         </Box>
-        <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.TITLE}>
+        <Typography variant="h4" align={"center"} gutterBottom data-testid={DATA_TEST_ID.TITLE}>
           Welcome to Compass!
         </Typography>
-        <Typography variant="body2" gutterBottom data-testid={DATA_TEST_ID.SUBTITLE}>
+        <Typography variant="body2" align={"center"} gutterBottom data-testid={DATA_TEST_ID.SUBTITLE}>
           We need some information to get started
         </Typography>
         <Box component="form" mt={2} onSubmit={handleRegister} data-testid={DATA_TEST_ID.FORM}>
