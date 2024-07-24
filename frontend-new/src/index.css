@@ -9,11 +9,3 @@ html,
   margin: 0;
   padding: 0;
 }
-#body {
-  /**
-    To disable the "overscroll" or "rubber-banding" effect we must disable the scroll bar.
-    We should not disable it at the or body level because we want storybook to have scroll bars in most of the components displayed.
-    Instead we target per id the body of the index.html, which has the main entrypoint of the app.
-   */
-  overflow: clip;
-}

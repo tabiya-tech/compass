@@ -79,6 +79,15 @@ jest.mock("./auth/Providers/UserPreferencesProvider/UserPreferencesProvider", ()
   };
 });
 
+// mock the ViewPortWrapper
+jest.mock("src/app/ViewPortWrapper", () => {
+  const mViewPortWrapper = jest.fn().mockImplementation(({ children }) => children);
+  return {
+    __esModule: true,
+    default: mViewPortWrapper,
+  };
+});
+
 // mock the IsOnlineProvider
 jest.mock("src/app/providers/IsOnlineProvider", () => {
   const mIsOnlineProvider = jest.fn().mockImplementation(({ children }) => children);
