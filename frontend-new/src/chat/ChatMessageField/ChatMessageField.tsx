@@ -1,6 +1,7 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useContext, useMemo, useState } from "react";
 import { IconButton, InputAdornment, TextField, styled, useTheme, Typography, Box } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
+import { IsOnlineContext } from "src/app/providers/IsOnlineProvider";
 
 export interface ChatMessageFieldProps {
   message: string;
@@ -44,7 +45,7 @@ const StyledTextField = styled(TextField)(({ theme, disabled }) => ({
 
     "&.Mui-disabled": {
       WebkitTextFillColor: theme.palette.text.textBlack,
-    }
+    },
   },
 }));
 
@@ -54,6 +55,8 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
   const theme = useTheme();
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [charCount, setCharCount] = useState<number>(0);
+
+  const isOnline = useContext(IsOnlineContext);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
@@ -87,13 +90,13 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
 
   const handleButtonClick = () => {
     // Prevent sending a message when the AI is typing, or a message is still being sent.
-    if(props.aiIsTyping) return;
+    if (props.aiIsTyping) return;
 
     // Prevent sending a message when the chat is finished.
-    if(props?.isChatFinished) return;
+    if (props?.isChatFinished) return;
 
     // Prevent sending an empty message
-    if(!props.message.length) return;
+    if (!props.message.length) return;
 
     props.handleSend();
     setErrorMessage("");
@@ -113,8 +116,11 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     if (props.aiIsTyping) {
       return "AI is typing..., wait for it to finish.";
     }
+    if (!isOnline) {
+      return "You are offline. Please connect to the internet to send a message.";
+    }
     return "Type your message...";
-  }, [props.aiIsTyping, props.isChatFinished])
+  }, [props.aiIsTyping, props.isChatFinished, isOnline]);
 
   const isDisabled = props.isChatFinished || props.aiIsTyping;
 
@@ -162,16 +168,14 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
                 <IconButton
                   data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON}
                   onClick={handleButtonClick}
-                  disabled={isDisabled}
+                  disabled={isDisabled || !isOnline}
                   color={"error"}
                   title="send message"
                 >
                   <SendIcon
                     data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_ICON}
                     sx={{
-                      color: (isDisabled)
-                          ? theme.palette.grey[400]
-                          : theme.palette.primary.dark
+                      color: (isDisabled || !isOnline) ? theme.palette.grey[400] : theme.palette.primary.dark,
                     }}
                   />
                 </IconButton>

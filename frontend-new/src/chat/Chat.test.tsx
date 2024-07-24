@@ -115,13 +115,16 @@ describe("Chat", () => {
       expect(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER)).toMatchSnapshot();
 
       // AND the ChatMessageField component to be called with the initial props
-      expect(ChatMessageField).toHaveBeenCalledWith({
+      expect(ChatMessageField).toHaveBeenCalledWith(
+        {
           message: expect.any(String),
           notifyChange: expect.any(Function),
           handleSend: expect.any(Function),
           aiIsTyping: expect.any(Boolean),
           isChatFinished: expect.any(Boolean),
-      }, {})
+        },
+        {}
+      );
     });
   });
 
@@ -148,9 +151,9 @@ describe("Chat", () => {
             message: "Hello foo, would you like to begin your skill exploration session?",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
-          }
+          },
         ],
-        conversation_completed: false
+        conversation_completed: false,
       });
       // GIVEN a chat component
       // WHEN the chat is rendered with a router
@@ -243,7 +246,7 @@ describe("Chat", () => {
             sent_at: new Date().toISOString(),
           },
         ],
-        conversation_completed: false
+        conversation_completed: false,
       });
 
       // GIVEN a chat component

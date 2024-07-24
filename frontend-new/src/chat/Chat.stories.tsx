@@ -24,19 +24,20 @@ export const Shown: Story = {
         method: "GET",
         status: 200,
         response: {
-          messages:[
+          messages: [
             {
               message: "Hello! How can I help you today?",
               sender: "COMPASS",
               sent_at: "2021-10-01T12:00:01Z",
             },
-          {
-            message: "I need help with my CV",
-            sender: "USER",
-            sent_at: "2021-10-01T12:00:02Z",
-          }
-        ],
-        conversation_completed: false}
+            {
+              message: "I need help with my CV",
+              sender: "USER",
+              sent_at: "2021-10-01T12:00:02Z",
+            },
+          ],
+          conversation_completed: false,
+        },
       },
     ],
   },
@@ -147,10 +148,10 @@ const generateRealisticConversation = (finished: boolean) => {
           },
         ],
         conversation_completed: finished,
-      }
+      },
     },
   ];
-}
+};
 
 export const ShownWithUnfinishedConversation: Story = {
   args: {},
