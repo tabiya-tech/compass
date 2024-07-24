@@ -8,26 +8,32 @@ import applicationTheme, { ThemeMode } from "src/theme/applicationTheme/applicat
 import { AuthProvider } from "src/auth/Providers/AuthProvider/AuthProvider";
 import SnackbarProvider from "src/theme/SnackbarProvider/SnackbarProvider";
 import { UserPreferencesProvider } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
+import { IsOnlineProvider } from "src/app/providers/IsOnlineProvider";
 
 // Currently the fonts are downloaded from Google via the index.css
 // Fonts could be distributed with the app instead, by explicitly importing them here
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
-root.render(<React.StrictMode>
-  <>
-    <CssBaseline />
-    <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
-      <AuthProvider>
-        <UserPreferencesProvider>
-          <SnackbarProvider>
-            <App />
-          </SnackbarProvider>
-        </UserPreferencesProvider>
-      </AuthProvider>
-    </ThemeProvider>
-  </>
-</React.StrictMode>);
+root.render(
+  <React.StrictMode>
+    <>
+      <CssBaseline />
+
+      <IsOnlineProvider>
+        <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
+          <AuthProvider>
+            <UserPreferencesProvider>
+              <SnackbarProvider>
+                <App />
+              </SnackbarProvider>
+            </UserPreferencesProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </IsOnlineProvider>
+    </>
+  </React.StrictMode>
+);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

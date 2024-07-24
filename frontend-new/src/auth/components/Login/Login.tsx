@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Box, Button, CircularProgress, Container, styled, TextField, Typography, useTheme } from "@mui/material";
+import { Box, CircularProgress, Container, styled, TextField, Typography, useTheme } from "@mui/material";
 import { AuthContext } from "src/auth/Providers/AuthProvider/AuthProvider";
 import { NavLink as RouterNavLink, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -9,6 +9,7 @@ import AuthContextMenu from "src/auth/components/AuthContextMenu/AuthContextMenu
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/error";
 import { writeServiceErrorToLog } from "src/error/logger";
 import { UserPreferencesContext } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
+import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
 const uniqueId = "7ce9ba1f-bde0-48e2-88df-e4f697945cc4";
 
@@ -158,13 +159,14 @@ const Login: React.FC = () => {
             onChange={(e) => setPassword(e.target.value)}
             inputProps={{ "data-testid": DATA_TEST_ID.PASSWORD_INPUT }}
           />
-          <Button
+          <PrimaryButton
             fullWidth
             variant="contained"
             color="primary"
             style={{ marginTop: 16 }}
             type="submit"
             disabled={isLoggingIn || isCheckingPreferences}
+            disableWhenOffline={true}
             data-testid={DATA_TEST_ID.LOGIN_BUTTON}
           >
             {isLoggingIn || isCheckingPreferences ? (
@@ -178,7 +180,7 @@ const Login: React.FC = () => {
             ) : (
               "Login"
             )}
-          </Button>
+          </PrimaryButton>
         </Box>
         <Box
           display="flex"

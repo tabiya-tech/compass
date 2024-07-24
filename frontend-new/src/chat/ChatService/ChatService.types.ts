@@ -4,7 +4,6 @@ export enum ConversationMessageSender {
   COMPASS = "COMPASS",
 }
 
-
 // Type for individual conversation messages
 export interface ConversationMessage {
   message: string;
@@ -13,6 +12,6 @@ export interface ConversationMessage {
 }
 
 export interface ConverstaionResponse {
-  messages: ConversationMessage[]
+  messages: ConversationMessage[];
   conversation_completed: boolean;
 }

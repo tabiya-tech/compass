@@ -102,20 +102,20 @@ export default class ChatService {
 
     try {
       response = await fetchWithAuth(qualifiedURL, {
-          method: method,
-          headers: { "Content-Type": "application/json" },
-          expectedStatusCode: StatusCodes.CREATED,
-          serviceName,
-          serviceFunction,
-          failureMessage: `Failed to generate new session`,
-          expectedContentType: "application/json",
+        method: method,
+        headers: { "Content-Type": "application/json" },
+        expectedStatusCode: StatusCodes.CREATED,
+        serviceName,
+        serviceFunction,
+        failureMessage: `Failed to generate new session`,
+        expectedContentType: "application/json",
       });
 
       const { session_id } = JSON.parse(await response.text());
 
       return session_id;
     } catch (e) {
-      console.log(e)
+      console.log(e);
       const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, qualifiedURL);
 
       throw errorFactory(
@@ -148,7 +148,7 @@ export default class ChatService {
 
     const responseBody = await response.text();
 
-    let chatHistory: ConverstaionResponse
+    let chatHistory: ConverstaionResponse;
     try {
       chatHistory = JSON.parse(responseBody);
     } catch (e: any) {

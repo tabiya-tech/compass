@@ -79,6 +79,15 @@ jest.mock("./auth/Providers/UserPreferencesProvider/UserPreferencesProvider", ()
   };
 });
 
+// mock the IsOnlineProvider
+jest.mock("src/app/providers/IsOnlineProvider", () => {
+  const mIsOnlineProvider = jest.fn().mockImplementation(({ children }) => children);
+  return {
+    __esModule: true,
+    IsOnlineProvider: mIsOnlineProvider,
+  };
+});
+
 describe("test the application bootstrapping", () => {
   beforeEach(() => {
     (console.error as jest.Mock).mockClear();

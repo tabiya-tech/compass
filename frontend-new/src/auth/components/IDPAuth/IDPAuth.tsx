@@ -1,4 +1,4 @@
-import { SetStateAction, useCallback, useContext, useEffect, useState } from "react";
+import { SetStateAction, useCallback, useContext, useEffect, useRef, useState } from "react";
 import firebase from "firebase/compat/app";
 import * as firebaseui from "firebaseui";
 import "firebaseui/dist/firebaseui.css";
@@ -13,10 +13,12 @@ import { getUserFriendlyErrorMessage } from "src/error/error";
 import { writeServiceErrorToLog } from "src/error/logger";
 import { UserPreferencesContext } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
 import { AuthContext } from "src/auth/Providers/AuthProvider/AuthProvider";
+import { IsOnlineContext } from "src/app/providers/IsOnlineProvider";
 
 const uniqueId = "f0324e97-83fd-49e6-95c3-1043751fa1db";
 export const DATA_TEST_ID = {
   FIREBASE_AUTH: `firebase-auth-${uniqueId}`,
+  FIREBASE_FALLBACK_TEXT: `firebase-fallback-text-${uniqueId}`,
 };
 
 const IDPAuth = () => {
@@ -30,8 +32,12 @@ const IDPAuth = () => {
   const { user } = useContext(AuthContext);
   const { getUserPreferences, userPreferences } = useContext(UserPreferencesContext);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const firebaseUIElementRef = useRef(null);
+
+  const isOnline = useContext(IsOnlineContext);
 
   /**
    * Redirect the user to the login page
@@ -85,6 +91,7 @@ const IDPAuth = () => {
 
   useEffect(() => {
     setLoading(true);
+    const firebaseUiWidget = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
     const uiConfig = {
       signInFlow: "popup", // 'redirect', if you do not want to use popup
       signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
@@ -110,16 +117,22 @@ const IDPAuth = () => {
         },
       },
     };
-    const ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
-    ui.start("#firebaseui-auth-container", uiConfig);
+    if (uiConfig.signInFlow === "popup") firebaseUiWidget.reset();
+
+    // Render the firebaseUi Widget.
+    if (isOnline) firebaseUiWidget.start(firebaseUIElementRef.current!, uiConfig);
     setLoading(false);
-  }, [navigate, enqueueSnackbar, checkUserPreferences, tokens, updateUserByIDToken]);
+  }, [navigate, enqueueSnackbar, checkUserPreferences, tokens, updateUserByIDToken, loading, isOnline]);
 
   return (
     <div data-test_id={DATA_TEST_ID.FIREBASE_AUTH}>
       {(loading || isCheckingPreferences) && <p>Loading...</p>}
       {error && <p className="error">{error}</p>}
-      <div id="firebaseui-auth-container"></div>
+      {isOnline ? (
+        <div id="firebaseui-auth-container" ref={firebaseUIElementRef}></div>
+      ) : (
+        <p data-testid={DATA_TEST_ID.FIREBASE_FALLBACK_TEXT}>Google sign in is not available when offline.</p>
+      )}
     </div>
   );
 };

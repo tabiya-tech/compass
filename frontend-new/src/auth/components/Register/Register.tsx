@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Container, Box, TextField, Button, Typography, useTheme, styled, CircularProgress } from "@mui/material";
+import { Container, Box, TextField, Typography, useTheme, styled, CircularProgress } from "@mui/material";
 import { AuthContext } from "src/auth/Providers/AuthProvider/AuthProvider";
 import { NavLink as RouterNavLink, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -9,6 +9,7 @@ import AuthContextMenu from "src/auth/components/AuthContextMenu/AuthContextMenu
 import { validatePassword } from "src/auth/components/Register/utils/validatePassword";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/error";
 import { writeServiceErrorToLog } from "src/error/logger";
+import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -142,13 +143,14 @@ const Register: React.FC = () => {
             error={!!passwordError}
             helperText={passwordError}
           />
-          <Button
+          <PrimaryButton
             fullWidth
             variant="contained"
             color="primary"
             style={{ marginTop: 16 }}
             type="submit"
             disabled={isRegistering}
+            disableWhenOffline={true}
             data-testid={DATA_TEST_ID.REGISTER_BUTTON}
           >
             {isRegistering ? (
@@ -162,7 +164,7 @@ const Register: React.FC = () => {
             ) : (
               "Register"
             )}
-          </Button>
+          </PrimaryButton>
         </Box>
         <Box
           display="flex"

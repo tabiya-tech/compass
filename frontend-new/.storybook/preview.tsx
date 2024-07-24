@@ -22,6 +22,7 @@ import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
 import {
   UserPreferencesContext,
 } from "../src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
+import { IsOnlineContext, IsOnlineProvider } from "../src/app/providers/IsOnlineProvider";
 
 const preview: Preview = {
   parameters: {
@@ -48,31 +49,54 @@ const preview: Preview = {
       element: '#storybook-root:not([aria-hidden="true"]), body > div[role="presentation"]',
     },
   },
+  globalTypes: {
+    online: {
+      name: "Online",
+      description: "Is the user online",
+      toolbar: {
+        icon: "rss",
+        items: [
+          { value: true, title: "Online" },
+          { value: false, title: "Offline" },
+        ],
+        dynamicTitle: true,
+      },
+    },
+  },
+  args: {
+    online: true,
+  },
 };
 
 export default preview;
 
-const userPreferencesValue = {
-  userPreferences: {
-    sessions: [1234]
-  }
-}
-
 export const decorators = [
-  (Story) => (
+  (Story, context) => {
+  const isOnline = context.globals.online;
+
+  const userPreferencesValue = {
+    userPreferences: {
+      sessions: [1234]
+    }
+  }
+
+  return (
     <Router>
-      <AuthProvider>
-        <UserPreferencesContext.Provider value={userPreferencesValue}>
-        <CssBaseline />
-          <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
-            <SnackbarProvider>
-              <div style={{ height: "100vh" }}>
-                <Story />
-              </div>
-            </SnackbarProvider>
-          </ThemeProvider>
-        </UserPreferencesContext.Provider>
-      </AuthProvider>
+      <IsOnlineContext.Provider value={isOnline}>
+        <AuthProvider>
+          <UserPreferencesContext.Provider value={userPreferencesValue}>
+            <CssBaseline />
+            <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
+              <SnackbarProvider>
+                <div style={{ height: "100vh" }}>
+                  <Story />
+                </div>
+              </SnackbarProvider>
+            </ThemeProvider>
+          </UserPreferencesContext.Provider>
+        </AuthProvider>
+      </IsOnlineContext.Provider>
     </Router>
-  ),
+    );
+  }
 ];
