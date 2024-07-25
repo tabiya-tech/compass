@@ -21,9 +21,10 @@ loggers:
     level: DEBUG
     handlers: [ file ]
     propagate: yes
-  WelcomeAgent: *template_logger
-  SkillExplorerAgent: *template_logger
-  FarewellAgent: *template_logger
+  #CollectExperiencesAgent: *template_logger
+  #WelcomeAgent: *template_logger
+  #SkillExplorerAgent: *template_logger
+  #FarewellAgent: *template_logger
 root:
-  level: DEBUG
+  level: INFO
   handlers: [ console ]

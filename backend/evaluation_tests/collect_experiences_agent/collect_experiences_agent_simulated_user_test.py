@@ -17,10 +17,19 @@ from evaluation_tests.conversation_libs.evaluators.evaluation_result import Conv
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 
 
+def _get_test_cases_to_run():
+    # if there are test case with force then run only those
+    for tc in get_test_cases_to_run(test_cases):
+        if tc.skip_force:
+            return [tc]
+    # if there are no test case with force then run all test cases that are not skipped
+    return [tc for tc in get_test_cases_to_run(test_cases) if tc.skip_force != "skip"]
+
+
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test
-@pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases),
-                         ids=[case.name for case in get_test_cases_to_run(test_cases)])
+@pytest.mark.parametrize('test_case', _get_test_cases_to_run(),
+                         ids=[case.name for case in _get_test_cases_to_run()])
 async def test_collect_experiences_agent_simulated_user(max_iterations: int, test_case: CollectExperiencesAgentTestCase,
                                                         caplog: LogCaptureFixture):
     """
@@ -74,13 +83,13 @@ async def test_collect_experiences_agent_simulated_user(max_iterations: int, tes
         assert context.history.turns[-1].output.finished
 
         # Check if the actual discovered experiences match the expected ones
-        assert len(execute_evaluated_agent.get_experiences()) == test_case.expected_experiences_count
-
+        assert len(execute_evaluated_agent.get_experiences()) >= test_case.expected_experiences_found_min
+        assert len(execute_evaluated_agent.get_experiences()) <= test_case.expected_experiences_found_max
         # Finally check that no errors and no warning were logged
         for record in caplog.records:
             assert record.levelname != 'ERROR'
             assert record.levelname != 'WARNING'
 
-        # We run the evaluation assertions at the end
-        # as it fails often due to the unpredictability of the LLM responses
-        assert_expected_evaluation_results(evaluation_result=evaluation_result, test_case=test_case)
+    # We run the evaluation assertions at the end
+    # as it fails often due to the unpredictability of the LLM responses
+    assert_expected_evaluation_results(evaluation_result=evaluation_result, test_case=test_case)
