@@ -1,0 +1,36 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ExperiencesDrawerHeader should render ExperiencesDrawerHeader correctly 1`] = `
+<div
+  class="MuiBox-root css-1vdz656"
+  data-testid="experiences-drawer-header-container-4d3ec79b-1a39-4f4b-9c4a-354a5464a253"
+>
+  <h5
+    class="MuiTypography-root MuiTypography-h5 css-1khr3e0-MuiTypography-root"
+  >
+    Experiences and skills overview
+  </h5>
+  <button
+    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1ads42p-MuiButtonBase-root-MuiIconButton-root"
+    data-testid="experiences-drawer-header-button-4d3ec79b-1a39-4f4b-9c4a-354a5464a253"
+    tabindex="0"
+    title="Close experiences"
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+      data-testid="experiences-drawer-header-icon-4d3ec79b-1a39-4f4b-9c4a-354a5464a253"
+      focusable="false"
+      viewBox="0 0 24 24"
+    >
+      <path
+        d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+      />
+    </svg>
+    <span
+      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+    />
+  </button>
+</div>
+`;
