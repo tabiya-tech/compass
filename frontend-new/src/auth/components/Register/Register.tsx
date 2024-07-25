@@ -1,11 +1,11 @@
 import React, { useContext, useState } from "react";
 import { Container, Box, TextField, Typography, useTheme, styled, CircularProgress } from "@mui/material";
-import { AuthContext } from "src/auth/Providers/AuthProvider/AuthProvider";
-import { NavLink as RouterNavLink, useNavigate } from "react-router-dom";
+import { AuthContext, TabiyaUser } from "src/auth/AuthProvider/AuthProvider";
+import { NavLink as RouterNavLink } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import IDPAuth from "src/auth/components/IDPAuth/IDPAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import AuthContextMenu from "src/auth/components/AuthContextMenu/AuthContextMenu";
+import LanguageContextMenu from "src/i18n/languageContextMenu/LanguageContextMenu";
 import { validatePassword } from "src/auth/components/Register/utils/validatePassword";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/error";
 import { writeServiceErrorToLog } from "src/error/logger";
@@ -40,10 +40,18 @@ export const DATA_TEST_ID = {
   LANGUAGE_SELECTOR: `register-language-selector-${uniqueId}`,
 };
 
-const Register: React.FC = () => {
+export interface RegisterProps {
+  postRegisterHandler: () => void;
+  // we have to pass the notifyOnLogin function since the IDPAuth component is used in the Register component
+  // and the IDPAuth behaves like a login
+  postLoginHandler: (user: TabiyaUser) => void;
+  // describes the loading state of the post login handlers
+  isPostLoginLoading: boolean;
+}
+
+const Register: React.FC<Readonly<RegisterProps>> = ({ postRegisterHandler, postLoginHandler, isPostLoginLoading }) => {
   const theme = useTheme();
   const { register, isRegistering } = useContext(AuthContext);
-  const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
   const [name, setName] = useState("");
@@ -67,7 +75,7 @@ const Register: React.FC = () => {
         password,
         name,
         () => {
-          navigate(routerPaths.VERIFY_EMAIL, { replace: true });
+          postRegisterHandler();
           enqueueSnackbar("Verification Email Sent!", { variant: "success" });
         },
         (e) => {
@@ -100,7 +108,7 @@ const Register: React.FC = () => {
             style={{ maxWidth: "60%", margin: "10%" }}
             data-testid={DATA_TEST_ID.LOGO}
           />
-          <AuthContextMenu />
+          <LanguageContextMenu />
         </Box>
         <Typography variant="h4" align={"center"} gutterBottom data-testid={DATA_TEST_ID.TITLE}>
           Welcome to Compass!
@@ -114,7 +122,7 @@ const Register: React.FC = () => {
             label="Name"
             variant="outlined"
             margin="normal"
-            disabled={isRegistering}
+            disabled={isRegistering || isPostLoginLoading}
             required
             onChange={(e) => setName(e.target.value)}
             inputProps={{ "data-testid": DATA_TEST_ID.NAME_INPUT }}
@@ -123,7 +131,7 @@ const Register: React.FC = () => {
             fullWidth
             label="Email"
             type="email"
-            disabled={isRegistering}
+            disabled={isRegistering || isPostLoginLoading}
             variant="outlined"
             margin="normal"
             required
@@ -134,7 +142,7 @@ const Register: React.FC = () => {
             fullWidth
             label="Password"
             type="password"
-            disabled={isRegistering}
+            disabled={isRegistering || isPostLoginLoading}
             variant="outlined"
             margin="normal"
             required
@@ -149,11 +157,11 @@ const Register: React.FC = () => {
             color="primary"
             style={{ marginTop: 16 }}
             type="submit"
-            disabled={isRegistering}
+            disabled={isRegistering || isPostLoginLoading}
             disableWhenOffline={true}
             data-testid={DATA_TEST_ID.REGISTER_BUTTON}
           >
-            {isRegistering ? (
+            {isRegistering || isPostLoginLoading ? (
               <CircularProgress
                 color={"secondary"}
                 aria-label={"Registering"}
@@ -178,7 +186,7 @@ const Register: React.FC = () => {
             Or continue with
           </Typography>
           <Box mt={2} width="100%">
-            <IDPAuth />
+            <IDPAuth notifyOnLogin={postLoginHandler} isLoading={isPostLoginLoading} />
           </Box>
         </Box>
         <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.LOGIN_LINK}>

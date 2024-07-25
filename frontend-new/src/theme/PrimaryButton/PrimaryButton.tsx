@@ -1,6 +1,6 @@
 import { Button, ButtonProps } from "@mui/material";
 import React, { useContext } from "react";
-import { IsOnlineContext } from "src/app/providers/IsOnlineProvider";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 
 interface PrimaryButtonProps extends ButtonProps {
   // Add additional props specific to PrimaryButton Button here

@@ -3,8 +3,7 @@ import "src/_test_utilities/consoleMock";
 
 import App, { SNACKBAR_KEYS } from "./index";
 import { render, screen } from "src/_test_utilities/test-utils";
-import { Route } from "react-router-dom";
-import routerConfig from "./routerConfig";
+import { HashRouter } from "react-router-dom";
 import { unmockBrowserIsOnLine, mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { DEFAULT_SNACKBAR_AUTO_HIDE_DURATION, useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 
@@ -33,15 +32,33 @@ jest.mock("react-router-dom", () => {
   };
 });
 
+// mock the usePageHandlers hook
+jest.mock("src/app/hooks/useRouteHandlers", () => {
+  return {
+    __esModule: true,
+    useRouteHandlers: jest.fn().mockReturnValue({
+      handleLogin: jest.fn(),
+      handleRegister: jest.fn(),
+      handleAcceptDPA: jest.fn(),
+      handleVerifyEmail: jest.fn(),
+      isLoading: false,
+    }),
+  };
+});
+
 describe("main compass app test", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     unmockBrowserIsOnLine();
   });
-  
+
   test("should render app successfully", () => {
     // WHEN the app is rendered
-    render(<App />);
+    render(
+      <HashRouter>
+        <App />
+      </HashRouter>
+    );
 
     // THEN expect no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
@@ -49,13 +66,6 @@ describe("main compass app test", () => {
     // AND the HASH ROUTER to be in the document
     const router = screen.getByTestId("hash-router-id");
     expect(router).toBeInTheDocument();
-    // AND for each path to have a route configured
-    const allRoutes = screen.queryAllByTestId("route-id");
-    expect(allRoutes.length).toBe(routerConfig.length);
-    // AND The routes to be configured with the router config
-    routerConfig.forEach((cfg) => {
-      expect(Route).toHaveBeenCalledWith(cfg, {});
-    });
   });
 
   describe("when the app is offline/online", () => {
@@ -78,7 +88,11 @@ describe("main compass app test", () => {
     test("should show the online then offline notification when the browser switches from offline->online->offline", async () => {
       // GIVEN that the app is initially rendered while the browser is offline
       mockBrowserIsOnLine(false);
-      render(<App />);
+      render(
+        <HashRouter>
+          <App />
+        </HashRouter>
+      );
 
       // THEN expect the offline notification to be shown
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(expectedMessageOffline, expectedOfflineSnackBar);

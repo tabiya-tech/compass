@@ -1,6 +1,6 @@
 import { getServiceErrorFactory } from "src/error/error";
 import { StatusCodes } from "http-status-codes";
-import { fetchWithAuth } from "src/apiService/APIService";
+import { fetchWithAuth } from "src/utils/fetchWithAuth/fetchWithAuth";
 import ErrorConstants from "src/error/error.constants";
 import { getBackendUrl } from "src/envService";
 import { ConverstaionResponse } from "./ChatService.types";

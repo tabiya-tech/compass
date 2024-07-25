@@ -11,9 +11,7 @@ interface AppWrapperProps {
 }
 
 const ViewPortWrapper: React.FC<Readonly<AppWrapperProps>> = ({ children }: AppWrapperProps) => {
-  return (
-    <Box sx={{ height: "100%" }}>{children}</Box>
-  );
+  return <Box sx={{ height: "100%" }}>{children}</Box>;
 };
 
 export default ViewPortWrapper;

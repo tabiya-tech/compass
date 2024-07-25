@@ -1,5 +1,9 @@
 import { createTheme, PaletteOptions, ThemeOptions, SimplePaletteColorOptions } from "@mui/material/styles/";
-import { CSSClampFnCalculatorPx, CSSClampFnCalculatorRem, ScreenSize } from "src/utils/CSSClampFnCalculator";
+import {
+  CSSClampFnCalculatorPx,
+  CSSClampFnCalculatorRem,
+  ScreenSize,
+} from "src/utils/cssClampFnCalculator/CSSClampFnCalculator";
 
 export enum ThemeMode {
   LIGHT = "light",

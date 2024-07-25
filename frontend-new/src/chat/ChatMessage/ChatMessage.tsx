@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography, styled } from "@mui/material";
 import { IChatMessage } from "src/chat/Chat.types";
-import { getDurationFromNow } from "src/utils/getDurationFromNow";
+import { getDurationFromNow } from "src/utils/getDurationFromNow/getDurationFromNow";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 
 const uniqueId = "2fbaf2ef-9eab-485a-bd28-b4a164e18b06";

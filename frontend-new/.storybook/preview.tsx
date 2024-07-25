@@ -17,12 +17,12 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 */
 import type { Preview } from "@storybook/react";
-import { AuthProvider } from "../src/auth/Providers/AuthProvider/AuthProvider";
+import { AuthProvider } from "../src/auth/AuthProvider/AuthProvider";
 import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
 import {
   UserPreferencesContext,
-} from "../src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
-import { IsOnlineContext, IsOnlineProvider } from "../src/app/providers/IsOnlineProvider";
+} from "../src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
+import { IsOnlineContext } from "../src/app/isOnlineProvider/IsOnlineProvider";
 
 const preview: Preview = {
   parameters: {

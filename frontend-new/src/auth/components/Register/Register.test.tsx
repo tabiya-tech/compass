@@ -1,11 +1,10 @@
 import "src/_test_utilities/consoleMock";
 import React from "react";
 import { render, screen, waitFor, fireEvent } from "src/_test_utilities/test-utils";
-import { HashRouter, useNavigate } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
 import Register, { DATA_TEST_ID } from "./Register";
-import { AuthContext, TabiyaUser } from "src/auth/Providers/AuthProvider/AuthProvider";
+import { AuthContext, TabiyaUser } from "src/auth/AuthProvider/AuthProvider";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { routerPaths } from "src/app/routerPaths";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 import { validatePassword } from "src/auth/components/Register/utils/validatePassword";
 
@@ -57,6 +56,7 @@ describe("Testing Register component with AuthProvider", () => {
   const authContextValue = {
     register: registerMock,
     isLoggingIn: false,
+    isLoggingOut: false,
     isRegistering: false,
     user: null,
     login: jest.fn(),
@@ -78,11 +78,18 @@ describe("Testing Register component with AuthProvider", () => {
     const givenName = "Foo Bar";
     const givenEmail = "foo@bar.baz";
     const givenPassword = "password";
+    const givenNotifyOnRegister = jest.fn();
+    const givenNotifyOnLogin = jest.fn();
+    const givenIsLoading = false;
     // WHEN the component is rendered within the AuthContext and Router
     render(
       <HashRouter>
         <AuthContext.Provider value={authContextValue}>
-          <Register />
+          <Register
+            postRegisterHandler={givenNotifyOnRegister}
+            postLoginHandler={givenNotifyOnLogin}
+            isPostLoginLoading={givenIsLoading}
+          />
         </AuthContext.Provider>
       </HashRouter>
     );
@@ -129,6 +136,10 @@ describe("Testing Register component with AuthProvider", () => {
     const givenName = "Foo Bar";
     const givenEmail = "foo@bar.baz";
     const givenPassword = "password";
+    const givenNotifyOnRegister = jest.fn();
+    const givenNotifyOnLogin = jest.fn();
+    const givenIsLoading = false;
+
     registerMock.mockImplementation((email, password, name, onSuccess, onError) => {
       onSuccess({ id: "mock-id", email: givenEmail, name: givenName } as TabiyaUser);
     });
@@ -137,7 +148,11 @@ describe("Testing Register component with AuthProvider", () => {
     render(
       <HashRouter>
         <AuthContext.Provider value={authContextValue}>
-          <Register />
+          <Register
+            postRegisterHandler={givenNotifyOnRegister}
+            postLoginHandler={givenNotifyOnLogin}
+            isPostLoginLoading={givenIsLoading}
+          />
         </AuthContext.Provider>
       </HashRouter>
     );
@@ -165,7 +180,7 @@ describe("Testing Register component with AuthProvider", () => {
     expect(console.warn).not.toHaveBeenCalled();
 
     // AND the user should be redirected to the data protection Agreement page
-    expect(useNavigate()).toHaveBeenCalledWith(routerPaths.VERIFY_EMAIL, { replace: true });
+    expect(givenNotifyOnRegister).toHaveBeenCalled();
     // AND the success message should be displayed
     expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Verification Email Sent!", { variant: "success" });
   });
@@ -178,12 +193,19 @@ describe("Testing Register component with AuthProvider", () => {
     const givenName = "Foo Bar";
     const givenEmail = "foo@bar.baz";
     const givenPassword = "password";
+    const givenNotifyOnRegister = jest.fn();
+    const givenNotifyOnLogin = jest.fn();
+    const givenIsLoading = false;
 
     // WHEN the register form is submitted
     render(
       <HashRouter>
         <AuthContext.Provider value={authContextValue}>
-          <Register />
+          <Register
+            postRegisterHandler={givenNotifyOnRegister}
+            postLoginHandler={givenNotifyOnLogin}
+            isPostLoginLoading={givenIsLoading}
+          />
         </AuthContext.Provider>
       </HashRouter>
     );
@@ -216,6 +238,9 @@ describe("Testing Register component with AuthProvider", () => {
     const givenName = "Foo Bar";
     const givenEmail = "foo@bar.baz";
     const givenPassword = "password";
+    const givenNotifyOnRegister = jest.fn();
+    const givenNotifyOnLogin = jest.fn();
+    const givenIsLoading = false;
 
     // Mock the validation function to return no errors
     (validatePassword as jest.Mock).mockReturnValueOnce("");
@@ -224,7 +249,11 @@ describe("Testing Register component with AuthProvider", () => {
     render(
       <HashRouter>
         <AuthContext.Provider value={authContextValue}>
-          <Register />
+          <Register
+            postRegisterHandler={givenNotifyOnRegister}
+            postLoginHandler={givenNotifyOnLogin}
+            isPostLoginLoading={givenIsLoading}
+          />
         </AuthContext.Provider>
       </HashRouter>
     );
@@ -248,6 +277,9 @@ describe("Testing Register component with AuthProvider", () => {
     const givenName = "Foo Bar";
     const givenEmail = "foo@bar.baz";
     const givenPassword = "password";
+    const givenNotifyOnRegister = jest.fn();
+    const givenNotifyOnLogin = jest.fn();
+    const givenIsLoading = false;
 
     // Mock the validation function to return an error message
     (validatePassword as jest.Mock).mockReturnValue("Password must be at least 8 characters long");
@@ -256,7 +288,11 @@ describe("Testing Register component with AuthProvider", () => {
     render(
       <HashRouter>
         <AuthContext.Provider value={authContextValue}>
-          <Register />
+          <Register
+            postRegisterHandler={givenNotifyOnRegister}
+            postLoginHandler={givenNotifyOnLogin}
+            isPostLoginLoading={givenIsLoading}
+          />
         </AuthContext.Provider>
       </HashRouter>
     );
@@ -276,6 +312,9 @@ describe("Testing Register component with AuthProvider", () => {
 
   test("should disable everything if registering is still in progress", () => {
     // GIVEN the component is rendering
+    const givenNotifyOnRegister = jest.fn();
+    const givenNotifyOnLogin = jest.fn();
+    const givenIsLoading = false;
     render(
       <HashRouter>
         <AuthContext.Provider
@@ -284,7 +323,11 @@ describe("Testing Register component with AuthProvider", () => {
             isRegistering: true,
           }}
         >
-          <Register />
+          <Register
+            postRegisterHandler={givenNotifyOnRegister}
+            postLoginHandler={givenNotifyOnLogin}
+            isPostLoginLoading={givenIsLoading}
+          />
         </AuthContext.Provider>
       </HashRouter>
     );

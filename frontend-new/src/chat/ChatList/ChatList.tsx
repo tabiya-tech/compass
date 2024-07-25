@@ -66,9 +66,9 @@ const ChatList: React.FC<ChatListProps> = ({ messages, isTyping }) => {
   }
 
   useEffect(() => {
-    window.addEventListener("resize", resizeChatMessage)
-    return () => window.removeEventListener("resize", resizeChatMessage)
-  }, [])
+    window.addEventListener("resize", resizeChatMessage);
+    return () => window.removeEventListener("resize", resizeChatMessage);
+  }, []);
 
   return (
     <ChatListContainer data-testid={DATA_TEST_ID.CHAT_LIST_CONTAINER}>

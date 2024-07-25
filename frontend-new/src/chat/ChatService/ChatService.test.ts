@@ -8,9 +8,9 @@ import {
   generateTestChatResponses,
   generateTestHistory,
 } from "src/chat/ChatService/_test_utilities/generateTestChatResponses";
-import { UserPreference } from "src/auth/services/UserPreferences/userPreferences.types";
+import { UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 
-jest.mock("src/persistentStorageService/PersistentStorageService", () => {
+jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => {
   const mockUserPreference: UserPreference = {
     user_id: "1",
     language: "en",
@@ -85,7 +85,7 @@ describe("ChatService", () => {
       const givenMessage = "Hello";
       // GIVEN fetch rejects with some unknown error
       const givenFetchError = new Error("some error");
-      jest.spyOn(require("src/apiService/APIService"), "fetchWithAuth").mockImplementationOnce(() => {
+      jest.spyOn(require("src/utils/fetchWithAuth/fetchWithAuth"), "fetchWithAuth").mockImplementationOnce(() => {
         return new Promise(() => {
           throw givenFetchError;
         });
@@ -166,7 +166,7 @@ describe("ChatService", () => {
     test("on fail to fetch, should reject with the expected service error", async () => {
       // GIVEN fetch rejects with some unknown error
       const givenFetchError = new Error("some error");
-      jest.spyOn(require("src/apiService/APIService"), "fetchWithAuth").mockImplementationOnce(() => {
+      jest.spyOn(require("src/utils/fetchWithAuth/fetchWithAuth"), "fetchWithAuth").mockImplementationOnce(() => {
         return new Promise(() => {
           throw givenFetchError;
         });
@@ -247,7 +247,7 @@ describe("ChatService", () => {
     test("on fail to fetch, should reject with the expected service error", async () => {
       // GIVEN fetch rejects with some unknown error
       const givenFetchError = new Error("some error");
-      jest.spyOn(require("src/apiService/APIService"), "fetchWithAuth").mockImplementationOnce(() => {
+      jest.spyOn(require("src/utils/fetchWithAuth/fetchWithAuth"), "fetchWithAuth").mockImplementationOnce(() => {
         return new Promise(() => {
           throw givenFetchError;
         });

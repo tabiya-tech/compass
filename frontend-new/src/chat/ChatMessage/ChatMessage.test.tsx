@@ -3,8 +3,8 @@ import "src/_test_utilities/consoleMock";
 
 import ChatMessage, { DATA_TEST_ID } from "./ChatMessage";
 import { render, screen } from "src/_test_utilities/test-utils";
-import * as GetDurationFromNow from "src/utils/getDurationFromNow";
-import { ConversationMessageSender } from "../ChatService/ChatService.types";
+import * as GetDurationFromNow from "src/utils/getDurationFromNow/getDurationFromNow";
+import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 
 describe("render tests", () => {
   beforeAll(() => {
