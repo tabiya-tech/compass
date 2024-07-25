@@ -6,6 +6,8 @@ from typing import Callable, TextIO
 
 from pydantic import BaseModel, Field
 
+from app.conversation_memory.save_conversation_context import format_for_markdown, MD_NEW_LINE
+
 logger = logging.getLogger()
 
 
@@ -116,7 +118,7 @@ class EvaluationRecord(BaseModel):
         """
         evaluations_str = ""
         for evaluation in self.evaluations:
-            evaluations_str += f"**{evaluation.type}**: {evaluation.score}\\\n**Reasoning**:{evaluation.reasoning}\n\n"
+            evaluations_str += f"**{evaluation.type}**: {evaluation.score}  \n**Reasoning**:{evaluation.reasoning}\n\n"
         return evaluations_str
 
     def _get_formatted_conversation(self) -> str:
@@ -129,8 +131,8 @@ class EvaluationRecord(BaseModel):
             if i % 2 == 0:
                 suffix = "\n\n"
             else:
-                suffix = "\\\n"
-            formatted_conversation += f"**{record.actor.value}**: {record.message}{suffix}"
+                suffix = f"{MD_NEW_LINE}"
+            formatted_conversation += f"**{record.actor.value}**: {format_for_markdown(record.message)}{suffix}"
         return formatted_conversation
 
 

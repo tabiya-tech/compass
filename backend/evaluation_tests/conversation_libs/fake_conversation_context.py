@@ -1,71 +1,16 @@
 import os
-from typing import TextIO
 
-from app.agent.agent_types import AgentInput, AgentOutput, LLMStats
+from app.agent.agent_types import AgentInput, AgentOutput
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationTurn, ConversationHistory
+from app.conversation_memory.save_conversation_context import save_conversation_context_to_json, save_conversation_context_to_markdown
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationRecord, Actor
-
-
-def _write_stats(f: TextIO, stats: LLMStats, index: int):
-    f.write(f"***LLM call stats {index + 1}:***\n")
-    if stats.error != '':
-        f.write(f"* *Error*: {stats.error}\n")
-    f.write(f"* *Prompt Token Count*: {stats.prompt_token_count}\n")
-    f.write(f"* *Response Token Count*: {stats.response_token_count}\n")
-    f.write(f"* *Response Time (sec)*: {stats.response_time_in_sec}\n")
-    f.write("\n")
-
-
-def _write_turn(f: TextIO, turn: ConversationTurn):
-    f.write(f"### Turn {turn.index}\n\n")
-    f.write(f"**User**: {turn.input.message}\\\n")
-    f.write(f"**{turn.output.agent_type}**: {turn.output.message_for_user}\\\n")
-    f.write(f"**Finished**: {turn.output.finished}\\\n")
-    # Besides the standard fields, we also want to write any additional fields
-    # from subclasses of AgentOutput
-    for key, value in turn.output.dict().items():
-        if key not in ["message_for_user", "finished", "agent_response_time_in_sec", "llm_stats"]:
-            f.write(f"**{key}**: {value}\\\n")
-    f.write(f"**Agent Response Time (sec)**: {turn.output.agent_response_time_in_sec}\\\n")
-    for i, stats in enumerate(turn.output.llm_stats):
-        _write_stats(f, stats, i)
-    f.write("\n\n")
-
-
-def _save_conversation_context_to_json(context: ConversationContext, file_path: str) -> None:
-    """
-    Save the conversation context to a json file
-    :param file_path: The file path
-    """
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    with open(file_path, 'w', encoding='utf-8') as f:
-        f.write(context.model_dump_json(indent=4))
-
-
-def _save_conversation_context_to_markdown(context: ConversationContext, title: str, file_path: str) -> None:
-    """
-    Save the conversation context to a markdown file
-    :param title: A title for the markdown document
-    :param file_path: The file path
-    """
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    with open(file_path, 'w', encoding='utf-8') as f:
-        f.write(f"# {title}\n\n")
-        f.write("## Conversation Summary\n\n")
-        f.write(f"{context.summary}\n\n")
-        f.write("## Conversation Recent History\n\n")
-        for turn in context.history.turns:
-            _write_turn(f, turn)
-        f.write("## Conversation All History\n\n")
-        for turn in context.all_history.turns:
-            _write_turn(f, turn)
 
 
 def save_conversation(context: ConversationContext, title: str, folder_path: str):
     """ Saves the conversation context to a json and markdown file."""
-    _save_conversation_context_to_json(context, os.path.join(folder_path, "conversation_context.json"))
-    _save_conversation_context_to_markdown(context, title=title,
-                                           file_path=os.path.join(folder_path, "conversation_context.md"))
+    save_conversation_context_to_json(context=context, file_path=os.path.join(folder_path, "conversation_context.json"))
+    save_conversation_context_to_markdown(context=context, title=title,
+                                          file_path=os.path.join(folder_path, "conversation_context.md"))
 
 
 class FakeConversationContext(ConversationContext):
