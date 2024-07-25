@@ -1,5 +1,6 @@
 from enum import Enum
 from textwrap import dedent
+from typing import Optional
 
 
 class WorkType(Enum):
@@ -21,6 +22,12 @@ class WorkType(Enum):
     FORMAL_SECTOR_UNPAID_TRAINEE_WORK = "Formal sector/Unpaid trainee work"
     SELF_EMPLOYMENT = "Self-employment"
     UNSEEN_UNPAID = "Unpaid other"  # All unseen work is grouped under this category
+
+    @staticmethod
+    def from_string_key(key: Optional[str]) -> Optional['WorkType']:
+        if key in WorkType.__members__:
+            return WorkType[key]
+        return None
 
 
 WORK_TYPE_DEFINITIONS_FOR_PROMPT = dedent(f"""\

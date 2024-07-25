@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from app.agent.agent import Agent
 from app.agent.agent_types import AgentType
 from app.agent.agent_types import AgentInput, AgentOutput
-from app.agent.collect_experiences_agent._conversation_llm import _ConversationLLM
+from app.agent.collect_experiences_agent._conversation_llm import _ConversationLLM, ConversationLLMAgentOutput
 from app.agent.collect_experiences_agent._dataextraction_llm import _DataExtractionLLM
 from app.agent.collect_experiences_agent._types import CollectedData
 from app.agent.experience.experience_entity import ExperienceEntity
@@ -23,6 +23,17 @@ class CollectExperiencesAgentState(BaseModel):
     collected_data: list[CollectedData] = []
     """
     The data collected during the conversation.
+    """
+
+    unexplored_types: list[WorkType] = [WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT, WorkType.SELF_EMPLOYMENT, WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK,
+                                        WorkType.UNSEEN_UNPAID]
+    """
+    The types of work experiences that have not been explored yet.
+    """
+
+    explored_types: list[WorkType] = []
+    """
+    The questions asked by the conversational LLM.
     """
 
     class Config:
@@ -69,46 +80,30 @@ class CollectExperiencesAgent(Agent):
             user_input.message = "(silence)"
 
         collected_data = self._state.collected_data
-        json_data = json.dumps([_data.dict() for _data in collected_data], indent=2)
-
+        # The data extraction LLM is responsible for extracting the experience data from the conversation
         data_extraction_llm = _DataExtractionLLM(self.logger)
-
-        data_extraction_llm_output, data_extraction_llm_stats = \
-            await data_extraction_llm.execute(user_input=user_input,
-                                              context=context,
-                                              collected_experience_data=json_data)
-        self.logger.debug("Experience data from our conversation until now to be merged to the data response: %s",
-                          data_extraction_llm_output)
-
-        collected_data.clear()  # Overwrite the old with the new data, as it is difficult to merge them
-        if data_extraction_llm_output and data_extraction_llm_output.collected_experiences_data:
-            index = 0
-            for elem in data_extraction_llm_output.collected_experiences_data:
-                new_item = CollectedData(
-                    index=index,
-                    experience_title=elem.experience_title,
-                    company=elem.company,
-                    location=elem.location,
-                    start_date_calculated=elem.start_date_calculated,
-                    end_date_calculated=elem.end_date_calculated,
-                    work_type=elem.work_type
-                )
-                # Sometimes the LLM may add an empty experience, so we skip it
-                if _collect_experience_is_empty(new_item):
-                    self.logger.debug("Experience data is empty: %s", new_item)
-                    continue
-                # Sometimes the LLM may add duplicates, so we remove them
-                if any(_compare_collected_data(new_item, existing_item) for existing_item in collected_data):
-                    self.logger.warning("Duplicate experience data detected: %s", new_item)
-                    continue
-                collected_data.append(new_item)
-                index += 1
-
+        # TODO: the LLM can and will fail with an exception or even return None, we need to handle this
+        last_referenced_experience_index, data_extraction_llm_stats = await data_extraction_llm.execute(user_input=user_input,
+                                                                                                        context=context,
+                                                                                                        collected_experience_data_so_far=collected_data)
         conversion_llm = _ConversationLLM()
-        json_data = json.dumps([_data.dict() for _data in collected_data], indent=2)
-        conversation_llm_output = await conversion_llm.execute(user_input=user_input, context=context,
-                                                               collected_experience_data=json_data, logger=self.logger)
-        if conversation_llm_output.finished:
+        # TODO: Keep track of the last_referenced_experience_index and if it has changed it means that the user has
+        # provided a new experience, we need to handle this as
+        # a) if the user has not finished with the previous one we should ask them to complete it first
+        # b) the model may have made a mistake interpreting the user input as we need to clarify
+        conversation_llm_output: ConversationLLMAgentOutput
+        exploring_type = self._state.unexplored_types[0] if len(self._state.unexplored_types) > 0 else None
+        conversation_llm_output = await conversion_llm.execute(context=context,
+                                                               user_input=user_input,
+                                                               collected_data=collected_data,
+                                                               last_referenced_experience_index=last_referenced_experience_index,
+                                                               exploring_type=exploring_type,
+                                                               unexplored_types=self._state.unexplored_types,
+                                                               explored_types=self._state.explored_types,
+                                                               logger=self.logger)
+
+        if conversation_llm_output.finished and len(self._state.unexplored_types) == 0:
+            # The conversation is completed when the LLM has finished and all work types have been explored
             for elem in collected_data:
                 self.logger.debug("Experience data collected: %s", elem)
                 try:
@@ -116,12 +111,32 @@ class CollectExperiencesAgent(Agent):
                         experience_title=elem.experience_title,
                         company=elem.company,
                         location=elem.location,
-                        timeline=Timeline(start=elem.start_date_calculated, end=elem.end_date_calculated),
-                        work_type=CollectExperiencesAgent._get_work_type(elem.work_type)
+                        timeline=Timeline(start=elem.start_date, end=elem.end_date),
+                        work_type=WorkType.from_string_key(elem.work_type)
                     )
                     self._experiences.append(entity)
                 except Exception as e:  # pylint: disable=broad-except
                     self.logger.warning("Could not parse experience entity from: %s. Error: %s", elem, e)
+        elif conversation_llm_output.exploring_type_finished:
+            #  The specific work type has been explored, so we remove it from the list
+            #  and we set the conversation to continue
+            explored_type = self._state.unexplored_types.pop(0)
+            exploring_type = self._state.unexplored_types[0] if len(self._state.unexplored_types) > 0 else None
+            self._state.explored_types.append(explored_type)
+            self.logger.info("Explored work type: %s, remaining types: %s", explored_type, self._state.unexplored_types)
+            transition_message: str
+            if exploring_type is not None:
+                transition_message = f"Ask me about experiences that include: {exploring_type.value}"
+            else:
+                transition_message = "Let's recap, and give me a chance to correct any mistakes."
+            conversation_llm_output = await conversion_llm.execute(context=context,
+                                                                   user_input=AgentInput(message=transition_message, is_artificial=True),
+                                                                   collected_data=collected_data,
+                                                                   last_referenced_experience_index=last_referenced_experience_index,
+                                                                   exploring_type=exploring_type,
+                                                                   unexplored_types=self._state.unexplored_types,
+                                                                   explored_types=self._state.explored_types,
+                                                                   logger=self.logger)
 
         conversation_llm_output.llm_stats = data_extraction_llm_stats + conversation_llm_output.llm_stats
         return conversation_llm_output
@@ -134,28 +149,3 @@ class CollectExperiencesAgent(Agent):
         :return:
         """
         return self._experiences
-
-    @staticmethod
-    def _get_work_type(key: str | None) -> WorkType | None:
-        if key in WorkType.__members__:
-            return WorkType[key]
-
-        return None
-
-
-def _collect_experience_is_empty(experience: CollectedData):
-    return all([experience.experience_title == "" or experience.experience_title is None,
-                experience.start_date_calculated == "" or experience.start_date_calculated is None,
-                experience.end_date_calculated == "" or experience.end_date_calculated is None,
-                experience.company == "" or experience.company is None,
-                experience.location == "" or experience.location is None,
-                ])
-
-
-def _compare_collected_data(item1: CollectedData, item2: CollectedData):
-    return (item1.experience_title == item2.experience_title and
-            item1.work_type == item2.work_type and
-            item1.start_date_calculated == item2.start_date_calculated and
-            item1.end_date_calculated == item2.end_date_calculated and
-            item1.company == item2.company and
-            item1.location == item2.location)
