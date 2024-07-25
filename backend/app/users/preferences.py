@@ -1,11 +1,12 @@
 from fastapi import APIRouter, HTTPException, Depends
 
+from app.constants.errors import ErrorService, HTTPErrorResponse
 from app.users.auth import Authentication, UserInfo
 from app.users.repositories import UserPreferenceRepository
+from app.users.sessions import generate_new_session_id, SessionsService
 from app.users.types import UserPreferencesUpdateRequest, UserPreferences, UpdateUserLanguageRequest, \
     CreateUserPreferencesRequest
 
-import random
 import logging
 
 logger = logging.getLogger(__name__)
@@ -32,7 +33,7 @@ async def _update_user_language(
         if isinstance(e, HTTPException):
             raise e
 
-        raise HTTPException(status_code=500, detail="internal server error - "+e.__str__())
+        raise HTTPException(status_code=500, detail="internal server error - " + e.__str__())
 
 
 async def _get_user_preferences(
@@ -53,7 +54,7 @@ async def _get_user_preferences(
 
         # Check if the sessions field is missing or empty, and add a new session if needed
         if not user_preferences.sessions or len(user_preferences.sessions) == 0:
-            session_id = random.randint(0, (1 << 48) - 1)  # nosec
+            session_id = generate_new_session_id()  # nosec
             user_preferences = await repository.update_user_preference(user_id,
                                                                        UserPreferencesUpdateRequest(
                                                                            sessions=[session_id]))
@@ -82,7 +83,7 @@ async def _create_user_preferences(
                 detail="user already exists"
             )
         # Generating a 64-bit integer session ID
-        session_id = random.randint(0, (1 << 48) - 1)  # nosec
+        session_id = generate_new_session_id()  # nosec
 
         user.sessions = [session_id]
 
@@ -103,6 +104,24 @@ async def _create_user_preferences(
             "message": "failed to create user preferences",
             "cause": e
         })
+
+
+async def _get_new_session(user_repository: UserPreferenceRepository, user_id: str, authed_user: UserInfo) -> UserPreferences:
+    """
+    Get a new session for the user
+    :param user_id:  id of the user
+    :param authed_user: authenticated user
+    :return: UserPreferences - with the new session
+    """
+    try:
+        # Check if the user is the same as the authenticated user
+        if user_id != authed_user.user_id:
+            raise HTTPException(status_code=403, detail="forbidden")
+
+        session_service = SessionsService(user_repository)
+        return await session_service.new_session(user_id)
+    except Exception as e:
+        ErrorService.handle(__name__, e)
 
 
 def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
@@ -153,6 +172,24 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     async def _update_user_language_handler(user: UpdateUserLanguageRequest,
                                             user_info: UserInfo = Depends(auth.get_user_info())):
         return await _update_user_language(user_preference_repository, user, user_info)
+
+    #########################
+    # GET /new-session - Get a new session for the user
+    #########################
+    @router.get("/new-session",
+                response_model=UserPreferences,
+                status_code=201,
+                responses={403: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
+                description="""Endpoint for starting a new conversation session.""")
+    async def _get_new_session_handler(user_id: str, user_info: UserInfo = Depends(auth.get_user_info())):
+        """
+        Endpoint for starting a new conversation session.
+        The function creates a new session id and adds it to the user sessions on the top of the list.
+
+        :param user_info: UserInfo - The logged-in user information
+        :return: UserPreferences - The updated user preferences
+        """
+        return await _get_new_session(user_preference_repository, user_id, user_info)
 
     #########################
     # Add the router to the users router
