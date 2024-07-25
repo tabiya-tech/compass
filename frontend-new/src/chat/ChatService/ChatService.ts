@@ -37,7 +37,9 @@ export default class ChatService {
     const serviceName = "ChatService";
     const serviceFunction = "sendMessage";
     const method = "GET";
-    const constructedChatURL = `${this.chatEndpointUrl}?user_input=${message}&session_id=${this.getSessionId()}`;
+    const constructedChatURL = encodeURI(
+      `${this.chatEndpointUrl}?user_input=${message}&session_id=${this.getSessionId()}`
+    );
     const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, constructedChatURL);
 
     const response = await fetchWithAuth(constructedChatURL, {

@@ -52,7 +52,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage, isTyping }) => {
   }
   return (
     <MessageContainer origin={chatMessage.sender} data-testid={DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}>
-      <MessageBubble origin={chatMessage.sender}>{chatMessage.message}</MessageBubble>
+      <MessageBubble origin={chatMessage.sender}>
+        <Typography whiteSpace="pre-line">{chatMessage.message}</Typography>
+      </MessageBubble>
       {!isTyping && (
         <TimeStamp data-testid={DATA_TEST_ID.CHAT_MESSAGE_TIMESTAMP} variant="caption">
           sent {duration}
