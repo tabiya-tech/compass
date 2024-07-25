@@ -9,7 +9,7 @@ import { routerPaths } from "src/app/routerPaths";
 import { testNavigateToPath } from "src/_test_utilities/routeNavigation";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
-import { mockBrowserIsOnLine } from "../../_test_utilities/mockBrowserIsOnline";
+import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 
 // mock the ContextMenu
 jest.mock("src/theme/ContextMenu/ContextMenu", () => {
@@ -47,10 +47,14 @@ describe("ChatHeader", () => {
     // GIVEN a ChatHeader component
     const givenNotifyOnLogout = jest.fn();
     const givenStartNewConversation = jest.fn();
-
+    const givenNotifyOnExperiencesDrawerOpen = jest.fn();
     const givenChatHeader = (
       <HashRouter>
-        <ChatHeader notifyOnLogout={givenNotifyOnLogout} startNewConversation={givenStartNewConversation} />
+        <ChatHeader
+          notifyOnLogout={givenNotifyOnLogout}
+          startNewConversation={givenStartNewConversation}
+          notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+        />
       </HashRouter>
     );
 
@@ -77,8 +81,13 @@ describe("ChatHeader", () => {
   describe("chatHeader action tests", () => {
     const givenNotifyOnLogout = jest.fn();
     const givenStartNewConversation = jest.fn();
+    const givenNotifyOnExperiencesDrawerOpen = jest.fn();
     const givenChatHeader = (
-      <ChatHeader notifyOnLogout={givenNotifyOnLogout} startNewConversation={givenStartNewConversation} />
+      <ChatHeader
+        notifyOnLogout={givenNotifyOnLogout}
+        startNewConversation={givenStartNewConversation}
+        notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+      />
     );
     testNavigateToPath(givenChatHeader, "compass logo", DATA_TEST_ID.CHAT_HEADER_LOGO_LINK, routerPaths.ROOT);
 
@@ -87,7 +96,11 @@ describe("ChatHeader", () => {
       const givenNotifyOnLogout = jest.fn();
       const givenChatHeader = (
         <HashRouter>
-          <ChatHeader notifyOnLogout={givenNotifyOnLogout} startNewConversation={givenStartNewConversation} />
+          <ChatHeader
+            notifyOnLogout={givenNotifyOnLogout}
+            startNewConversation={givenStartNewConversation}
+            notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+          />
         </HashRouter>
       );
       // AND the chat header is rendered
@@ -114,7 +127,11 @@ describe("ChatHeader", () => {
       const givenNotifyOnLogout = jest.fn();
       const givenChatHeader = (
         <HashRouter>
-          <ChatHeader notifyOnLogout={givenNotifyOnLogout} startNewConversation={givenStartNewConversation} />
+          <ChatHeader
+            notifyOnLogout={givenNotifyOnLogout}
+            startNewConversation={givenStartNewConversation}
+            notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+          />
         </HashRouter>
       );
       // AND the chat header is rendered
@@ -158,7 +175,11 @@ describe("ChatHeader", () => {
       const givenStartNewConversation = jest.fn();
       const givenChatHeader = (
         <HashRouter>
-          <ChatHeader notifyOnLogout={givenNotifyOnLogout} startNewConversation={givenStartNewConversation} />
+          <ChatHeader
+            notifyOnLogout={givenNotifyOnLogout}
+            startNewConversation={givenStartNewConversation}
+            notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+          />
         </HashRouter>
       );
 
@@ -193,7 +214,11 @@ describe("ChatHeader", () => {
       const givenNotifyOnLogout = jest.fn();
       const givenChatHeader = (
         <HashRouter>
-          <ChatHeader notifyOnLogout={givenNotifyOnLogout} startNewConversation={givenStartNewConversation} />
+          <ChatHeader
+            notifyOnLogout={givenNotifyOnLogout}
+            startNewConversation={givenStartNewConversation}
+            notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+          />
         </HashRouter>
       );
       // AND the chat header is rendered
@@ -216,7 +241,34 @@ describe("ChatHeader", () => {
        **/
       expect(ContextMenu).toHaveBeenNthCalledWith(3, expect.objectContaining({ anchorEl: null, open: false }), {});
     });
+
+    test("should call notifyOnExperiencesDrawerOpen when the experiences menu item is clicked", async () => {
+      // GIVEN a ChatHeader component
+      const givenNotifyOnExperiencesDrawerOpen = jest.fn();
+      const givenChatHeader = (
+        <HashRouter>
+          <ChatHeader
+            notifyOnLogout={jest.fn()}
+            startNewConversation={jest.fn()}
+            notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+          />
+        </HashRouter>
+      );
+      // AND the chat header is rendered
+      render(givenChatHeader);
+      // AND the context menu is opened
+      const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
+      fireEvent.click(userButton);
+
+      // WHEN the experiences menu item is clicked
+      const experiencesMenuItem = screen.getByTestId(MENU_ITEM_ID.EXPERIENCES_BUTTON);
+      fireEvent.click(experiencesMenuItem);
+
+      // THEN expect notifyOnExperiencesDrawerOpen to be called
+      expect(givenNotifyOnExperiencesDrawerOpen).toHaveBeenCalled();
+    });
   });
+
   describe("context menu item tests", () => {
     test.each([
       ["online", true],
@@ -228,9 +280,14 @@ describe("ChatHeader", () => {
         // GIVEN a ChatHeader component
         const givenNotifyOnLogout = jest.fn();
         const givenStartNewConversation = jest.fn();
+        const givenNotifyOnExperiencesDrawerOpen = jest.fn();
         const givenChatHeader = (
           <HashRouter>
-            <ChatHeader notifyOnLogout={givenNotifyOnLogout} startNewConversation={givenStartNewConversation} />
+            <ChatHeader
+              notifyOnLogout={givenNotifyOnLogout}
+              startNewConversation={givenStartNewConversation}
+              notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+            />
           </HashRouter>
         );
         // AND the chat header is rendered

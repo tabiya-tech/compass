@@ -5,7 +5,10 @@ const meta: Meta<typeof ChatHeader> = {
   title: "Chat/ChatHeader",
   component: ChatHeader,
   tags: ["autodocs"],
-  argTypes: {},
+  argTypes: {
+    notifyOnLogout: { action: "notifyOnLogout" },
+    notifyOnExperiencesDrawerOpen: { action: "notifyOnExperiencesDrawerOpen" },
+  },
 };
 
 export default meta;

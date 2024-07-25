@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`] = `
+<div
+  class="MuiBox-root css-1ck9pm7"
+  data-testid="experiences-drawer-content-container-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+>
+  <p
+    class="MuiTypography-root MuiTypography-body1 css-1z050en-MuiTypography-root"
+    data-testid="experiences-drawer-content-occupation-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+  >
+    Project Manager
+  </p>
+  <p
+    class="MuiTypography-root MuiTypography-body1 css-3ahvbo-MuiTypography-root"
+    data-testid="experiences-drawer-content-skills-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+  >
+    <b>
+      Top Skills:
+    </b>
+     
+    Management, Communication
+  </p>
+  <p
+    class="MuiTypography-root MuiTypography-body2 css-1mdkfbx-MuiTypography-root"
+    data-testid="experiences-drawer-content-date-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+  >
+    2022 — Present
+  </p>
+</div>
+`;

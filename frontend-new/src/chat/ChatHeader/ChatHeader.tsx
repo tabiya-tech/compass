@@ -11,6 +11,7 @@ import { IsOnlineContext } from "src/app/providers/IsOnlineProvider";
 export type ChatHeaderProps = {
   notifyOnLogout: () => void;
   startNewConversation: () => void;
+  notifyOnExperiencesDrawerOpen: () => void;
 };
 
 const uniqueId = "7413b63a-887b-4f41-b930-89e9770db12b";
@@ -26,15 +27,21 @@ export const MENU_ITEM_ID = {
   SETTINGS_SELECTOR: `settings-selector-${uniqueId}`,
   LOGOUT_BUTTON: `logout-button-${uniqueId}`,
   START_NEW_CONVERSATION: `start-new-conversation-${uniqueId}`,
+  EXPERIENCES_BUTTON: `experiences-button-${uniqueId}`,
 };
 
 export const MENU_ITEM_TEXT = {
   SETTINGS: "settings",
   LOGOUT: "logout",
   START_NEW_CONVERSATION: "start new conversation",
+  EXPERIENCES: "view experiences",
 };
 
-const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({ notifyOnLogout, startNewConversation }) => {
+const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
+  notifyOnLogout,
+  startNewConversation,
+  notifyOnExperiencesDrawerOpen,
+}) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -46,6 +53,12 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({ notifyOnLogout, start
       text: MENU_ITEM_TEXT.START_NEW_CONVERSATION,
       disabled: !isOnline,
       action: startNewConversation,
+    },
+    {
+      id: MENU_ITEM_ID.EXPERIENCES_BUTTON,
+      text: MENU_ITEM_TEXT.EXPERIENCES,
+      disabled: false,
+      action: notifyOnExperiencesDrawerOpen,
     },
     {
       id: MENU_ITEM_ID.SETTINGS_SELECTOR,
