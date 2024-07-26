@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_types import AgentInput
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
+from app.agent.experience.experience_entity import ExperienceEntity
 from app.agent.experience.work_type import WorkType
 from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
 from app.constants.errors import HTTPErrorResponse, ErrorService
@@ -250,7 +251,6 @@ async def get_conversation_history(
 async def get_experiences(session_id: int, user_info: UserInfo = Depends(auth.get_user_info())) -> List[Experience]:
     """
     Endpoint for retrieving the experiences of a user.
-    Currently, this is a mocked response with two experiences.
     """
     # Check that the user making the request has the session_id in their user preferences
     user_preference_repository = UserPreferenceRepository()
@@ -259,54 +259,47 @@ async def get_experiences(session_id: int, user_info: UserInfo = Depends(auth.ge
     if current_user_preferences is None or session_id not in current_user_preferences.sessions:
         raise HTTPException(status_code=403, detail="User does not have permission to access this session")
 
-    # Mocked data for the experiences
-    # A user that has two experiences
-    # As a barber and as a cook and seller of Kotas
-    # This should eventually be received from the application state manager
-    experiences = [
-        Experience(
-            experience_title="Barber",
-            company="at a local barber shop",
-            location="Cape Town, South Africa",
-            start_date="2019-01-01",
-            end_date="2021-01-01",
-            work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
-            top_skills=[
-                Skill(
-                    preferredLabel="Hairdressing",
-                    description="Hairdressing",
-                    altLabels=[]
-                ),
-                Skill(
-                    preferredLabel="Customer service",
-                    description="Customer service",
-                    altLabels=[]
-                )
-            ]
-        ),
-        Experience(
-            experience_title="Cook and Seller of Kotas",
-            company="at a street food stall",
-            location="Johannesburg, South Africa",
-            start_date="2017-05-01",
-            end_date="2018-12-01",
-            work_type=WorkType.SELF_EMPLOYMENT,
-            top_skills=[
-                Skill(
-                    preferredLabel="Cooking",
-                    description="Preparing and cooking food",
-                    altLabels=[]
-                ),
-                Skill(
-                    preferredLabel="Sales",
-                    description="Selling food items",
-                    altLabels=[]
-                )
-            ]
-        )
-    ]
-    return experiences
+    # Get the experiences from the application state
+    state = await application_state_manager.get_state(session_id)
 
+    experiences: list[Experience] = []
+
+    for UUID in state.explore_experiences_director_state.experiences_state:
+        """
+        UUID is the key for the experiences_state dictionary in the explore_experiences_director_state.
+        """
+        experience_details: ExperienceEntity = state.explore_experiences_director_state.experiences_state[UUID].experience
+        """
+        experience_details is the value for the UUID key in the experiences_state dictionary.
+        """
+        top_skills = []
+        """
+        Top skills for the experience.
+        """
+
+        for skill in experience_details.top_skills:
+            """
+            Construct the Skill object for each skill in the top_skills list.
+            """
+            top_skills.append(Skill(
+                UUID=skill.UUID,
+                preferredLabel=skill.preferredLabel,
+                description=skill.description,
+                altLabels=skill.altLabels
+            ))
+
+        experiences.append(Experience(
+            UUID=experience_details.uuid,
+            experience_title=experience_details.experience_title,
+            company=experience_details.company,
+            location=experience_details.location,
+            start_date=experience_details.timeline.start,
+            end_date=experience_details.timeline.end,
+            work_type=experience_details.work_type,
+            top_skills=top_skills
+        ))
+
+    return experiences
 
 @app.get(path="/conversation/new-session",
          response_model=NewSessionResponse,
