@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Drawer, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Drawer, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import ExperiencesDrawerHeader from "src/Experiences/components/ExperiencesDrawerHeader/ExperiencesDrawerHeader";
 import ExperiencesDrawerContent from "src/Experiences/components/ExperiencesDrawerContent/ExperiencesDrawerContent";
@@ -49,6 +49,16 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({ isOpen, isLoading
     >
       <ExperiencesDrawerHeader notifyOnClose={handleClose} />
       <Box display="flex" flexDirection="column" gap={isSmallerScreen ? 10 : 6}>
+        {experiences.length === 0 && !isLoading && (
+          <Box sx={{ fontSize: theme.typography.body1.fontSize, fontWeight: "bold" }}>
+            <Typography variant="h1" textAlign={"center"}>
+              🤷‍♀️
+            </Typography>
+            <Typography>
+              We haven’t yet discovered any experiences so far, Let's continue chatting.
+            </Typography>
+          </Box>
+        )}
         {experiences.map((experience, index) => (
           <ExperiencesDrawerContent key={index} experience={experience} isLoading={isLoading} />
         ))}

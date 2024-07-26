@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Box, Grid, Skeleton, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Experience } from "src/Experiences/ExperienceService/Experiences.types";
 import { Theme } from "@mui/material/styles";
@@ -20,6 +20,12 @@ interface ExperienceProps {
 const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, isLoading }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
+
+  const formattedSkills = useMemo(() => {
+    if(experience.top_skills.length === 0) return "No skills yet"
+    return experience.top_skills.map((skill) => skill.preferredLabel).join(", ")
+  }, [experience.top_skills])
+
 
   if (isLoading) {
     return (
@@ -48,7 +54,7 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, isLoa
         {experience.experience_title}
       </Typography>
       <Typography variant="body1" data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_SKILLS}>
-        <b>Top Skills:</b> {experience.top_skills.map((skill) => skill.preferredLabel).join(", ")}
+        <b>Top Skills:</b> {formattedSkills}
       </Typography>
       <Typography variant="body2" data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_DATE}>
         {experience.end_date && experience.start_date
