@@ -2,7 +2,7 @@
 
 exports[`ChatHeader should render the Chat Header 1`] = `
 <div
-  class="MuiBox-root css-1ddfroy"
+  class="MuiBox-root css-12zc3r8"
   data-testid="chat-header-container-7413b63a-887b-4f41-b930-89e9770db12b"
 >
   <a
@@ -20,12 +20,12 @@ exports[`ChatHeader should render the Chat Header 1`] = `
     />
   </a>
   <h1
-    class="MuiTypography-root MuiTypography-h1 css-1ku1uae-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-h1 css-74y4cl-MuiTypography-root"
   >
     compass
   </h1>
   <button
-    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1v8l01o-MuiButtonBase-root-MuiIconButton-root"
+    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-r08as9-MuiButtonBase-root-MuiIconButton-root"
     data-testid="chat-header-button-user-7413b63a-887b-4f41-b930-89e9770db12b"
     tabindex="0"
     title="user info"

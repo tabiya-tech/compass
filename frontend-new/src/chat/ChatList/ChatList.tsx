@@ -55,6 +55,21 @@ const ChatList: React.FC<ChatListProps> = ({ messages, isTyping }) => {
     visible: { opacity: 1, y: 0 },
   };
 
+  /**
+   * Resize the chat message when the window is resized,
+   * Reason: on mobile devices when keyboard is opened the chat message is not resized, we should scroll to the bottom of the chat message
+   * @mdndocs dsad
+   */
+  function resizeChatMessage() {
+    // Scroll to the bottom of the chat message
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }
+
+  useEffect(() => {
+    window.addEventListener("resize", resizeChatMessage)
+    return () => window.removeEventListener("resize", resizeChatMessage)
+  }, [])
+
   return (
     <ChatListContainer data-testid={DATA_TEST_ID.CHAT_LIST_CONTAINER}>
       <MessagesContainer tabIndex={0}>
