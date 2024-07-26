@@ -10,7 +10,7 @@ exports[`SnackbarProvider render action tests should close the snackbar when the
 >
   <svg
     aria-hidden="true"
-    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-12bfw96-MuiSvgIcon-root"
+    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-7cto4p-MuiSvgIcon-root"
     data-testid="CloseIcon"
     focusable="false"
     viewBox="0 0 24 24"

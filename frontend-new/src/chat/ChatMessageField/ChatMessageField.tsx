@@ -1,4 +1,4 @@
-import React, {useEffect, useContext, useMemo, useState } from "react";
+import React, {useEffect, useContext, useMemo, useState, MouseEvent} from "react";
 import { IconButton, InputAdornment, TextField, styled, useTheme, Typography, Box } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import { IsOnlineContext } from "src/app/providers/IsOnlineProvider";
@@ -88,7 +88,9 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     }
   };
 
-  const handleButtonClick = () => {
+  const handleButtonClick = (e: MouseEvent) => {
+    e.stopPropagation();
+
     // Prevent sending a message when the AI is typing, or a message is still being sent.
     if (props.aiIsTyping) return;
 
@@ -129,6 +131,20 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       inputRef.current.focus();
     }
   }, [props.aiIsTyping])
+
+  // if the input is focused and the user scrolls, the input should be blurred
+  useEffect(() => {
+    const handleTouchEnd = () => {
+      // if the input is focused, blur it
+      if (document.activeElement === inputRef.current) {
+        inputRef.current?.blur()
+      }
+    }
+    window.addEventListener("touchend", handleTouchEnd);
+    return () => {
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, []);
 
   return (
     <Box

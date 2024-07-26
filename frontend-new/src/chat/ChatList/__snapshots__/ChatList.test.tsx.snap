@@ -6,7 +6,7 @@ exports[`ChatList should render the Chat List 1`] = `
   data-testid="chat-list-container-0397ee51-f637-4453-9e2f-5cc8900c9554"
 >
   <div
-    class="MuiBox-root css-1u7k2j3"
+    class="MuiBox-root css-hjxlfo"
     tabindex="0"
   >
     <ul

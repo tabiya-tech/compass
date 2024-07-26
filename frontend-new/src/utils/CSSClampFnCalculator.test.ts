@@ -18,7 +18,7 @@ describe("CSSClampFnCalculatorPx", () => {
     const actualCssClampFn = CSSClampFnCalculatorPx(givenMinValue, givenMaxValue, givenScreenPx);
 
     // THEN expect a string representing the CSS clamp function to be returned
-    expect(actualCssClampFn).toEqual("clamp(8px, (2.67vh + -5.35px + 2vw + -8px)/2 , 16px)");
+    expect(actualCssClampFn).toEqual("clamp(8px, (2.67dvh + -5.35px + 2dvw + -8px)/2 , 16px)");
   });
 });
 
@@ -40,6 +40,6 @@ describe("CSSClampFnCalculatorRem", () => {
     const actualCssClampFn = CSSClampFnCalculatorRem(givenMinValue, givenMaxValue, givenScreenPx);
 
     // THEN expect a string representing the CSS clamp function to be returned
-    expect(actualCssClampFn).toEqual("clamp(0.5rem, (5.33vh + -1.17rem + 4vw + -1.5rem)/2 , 1.5rem)");
+    expect(actualCssClampFn).toEqual("clamp(0.5rem, (5.33dvh + -1.17rem + 4dvw + -1.5rem)/2 , 1.5rem)");
   });
 });
