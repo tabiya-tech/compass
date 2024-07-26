@@ -11,10 +11,12 @@ export default class UserPreferencesService {
 
   readonly userPreferencesEndpointUrl: string;
   readonly apiServerUrl: string;
+  readonly generateNewSessionEndpointUrl: string;
 
   constructor() {
     this.apiServerUrl = getBackendUrl();
     this.userPreferencesEndpointUrl = `${this.apiServerUrl}/users/preferences`;
+    this.generateNewSessionEndpointUrl = `${this.apiServerUrl}/users/preferences/new-session`;
   }
 
   /**
@@ -185,5 +187,53 @@ export default class UserPreferencesService {
       ...userPreferencesResponse,
       accepted_tc: new Date(userPreferencesResponse.accepted_tc),
     };
+  }
+
+  /**
+   * Get a new session ID from the chat service.
+   */
+  async getNewSession(user_id: string): Promise<UserPreference> {
+    const serviceName = "UserPreferencesService";
+    const serviceFunction = "getNewSession";
+    const method = "GET";
+    const qualifiedURL = `${this.generateNewSessionEndpointUrl}`;
+
+    let response: Response | null = null;
+
+    try {
+      response = await fetchWithAuth(qualifiedURL+`?user_id=${user_id}`, {
+        method: method,
+        headers: { "Content-Type": "application/json" },
+        expectedStatusCode: StatusCodes.CREATED,
+        serviceName,
+        serviceFunction,
+        failureMessage: `Failed to generate new session`,
+        expectedContentType: "application/json",
+      });
+
+      let user_preference = JSON.parse(await response.text()) as UserPreference;
+
+      user_preference = {
+        ...user_preference,
+        accepted_tc: new Date(user_preference.accepted_tc),
+      };
+
+      PersistentStorageService.setUserPreferences(user_preference)
+
+      return user_preference;
+    } catch (e) {
+      console.log(e);
+      const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, qualifiedURL);
+
+      throw errorFactory(
+          response?.status!,
+          ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
+          "Failed to generate new session",
+          {
+            responseBody: response?.text(),
+            error: e,
+          }
+      );
+    }
   }
 }
