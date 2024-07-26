@@ -41,3 +41,19 @@ export const ShownWithMultipleExperiences = {
     experiences: generateRandomExperiences(5),
   },
 };
+
+export const ShownWithNoExperiences = {
+  args: {
+    isOpen: true,
+    experiences: [],
+  },
+}
+
+const ShownWithExperienceWithEmptySkills_experiences = generateRandomExperiences(1);
+ShownWithExperienceWithEmptySkills_experiences[0].top_skills = [];
+export const ShownWithExperienceWithEmptySkills =  {
+  args: {
+    isOpen: true,
+    experiences: ShownWithExperienceWithEmptySkills_experiences
+  }
+}

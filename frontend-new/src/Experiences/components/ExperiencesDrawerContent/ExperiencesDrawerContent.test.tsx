@@ -46,4 +46,17 @@ describe("ReportDrawerContent", () => {
     const skeletonElement = screen.getAllByTestId("skeleton-text");
     expect(skeletonElement).toHaveLength(3);
   });
+
+  test("it should show No skills yet when there are no skills", () => {
+    // GIVEN the ExperiencesDrawerContent component
+    const givenReportDrawerContent = (
+      <ExperiencesDrawerContent experience={{ ...mockExperiences[0], top_skills: [] }} isLoading={false} />
+    );
+
+    // WHEN the component is rendered
+    render(givenReportDrawerContent);
+
+    // THEN expect No skills yet to be in the document
+    expect(screen.getByText("No skills yet")).toBeInTheDocument();
+  })
 });
