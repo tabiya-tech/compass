@@ -36,18 +36,20 @@ export default class ChatService {
   public async sendMessage(message: string): Promise<ConverstaionResponse> {
     const serviceName = "ChatService";
     const serviceFunction = "sendMessage";
-    const method = "GET";
-    const constructedChatURL = encodeURI(
-      `${this.chatEndpointUrl}?user_input=${message}&session_id=${this.getSessionId()}`
-    );
-    const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, constructedChatURL);
+    const method = "POST";
+    const ChatURL = this.chatEndpointUrl;
+    const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, ChatURL);
 
-    const response = await fetchWithAuth(constructedChatURL, {
+    const response = await fetchWithAuth(ChatURL, {
       method: method,
       headers: {
         "Content-Type": "application/json",
       },
-      expectedStatusCode: StatusCodes.OK,
+      body: JSON.stringify({
+        session_id: this.getSessionId(),
+        user_input: message,
+      }),
+      expectedStatusCode: StatusCodes.CREATED,
       serviceName,
       serviceFunction,
       failureMessage: `Failed to send message with session id ${this.getSessionId()}`,
