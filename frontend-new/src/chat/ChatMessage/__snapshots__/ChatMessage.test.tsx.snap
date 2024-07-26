@@ -11,7 +11,7 @@ exports[`render tests should render the Chat message with sent_at when typing is
     origin="COMPASS"
   >
     <p
-      class="MuiTypography-root MuiTypography-body1 css-1mtamc1-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-body1 css-gxvxtl-MuiTypography-root"
     >
       Hello, I'm Compass
     </p>
