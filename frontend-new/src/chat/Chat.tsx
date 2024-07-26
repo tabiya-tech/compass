@@ -17,6 +17,7 @@ import { UserPreferencesContext } from "src/auth/Providers/UserPreferencesProvid
 import ExperiencesDrawer from "src/Experiences/ExperiencesDrawer";
 import { Experience } from "src/Experiences/ExperienceService/Experiences.types";
 import ExperienceService from "src/Experiences/ExperienceService/ExperienceService";
+import UserPreferencesService from "../auth/services/UserPreferences/userPreferences.service";
 
 const uniqueId = "b7ea1e82-0002-432d-a768-11bdcd186e1d";
 export const DATA_TEST_ID = {
@@ -31,10 +32,10 @@ const Chat = () => {
   const [initialized, setInitialized] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const { userPreferences, updateUserPreferences } = useContext(UserPreferencesContext);
-  const { logout } = useContext(AuthContext);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [experiences, setExperiences] = React.useState<Experience[]>([]);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const { logout, user } = useContext(AuthContext);
 
   const navigate = useNavigate();
 
@@ -173,22 +174,22 @@ const Chat = () => {
 
   const startNewConversation = useCallback(async () => {
     try {
-      const chatService = ChatService.getInstance(userPreferences?.sessions[0]!);
+      if(!user?.id) return;
 
-      let session_id = await chatService.getNewSession();
+      const preferencesService = new UserPreferencesService()
 
-      updateUserPreferences({
-        ...userPreferences!,
-        sessions: [session_id, ...(userPreferences?.sessions || [])],
-      });
+      let user_preferences = await preferencesService.getNewSession(user?.id!)
+
+      updateUserPreferences(user_preferences);
 
       enqueueSnackbar("New conversation started", { variant: "success" });
 
-      await initializeChat(session_id);
+      // Initialize the new conversation with the new session id usually at the top of the sessions array
+      await initializeChat(user_preferences.sessions[0]);
     } catch (e) {
       console.error("Failed to start new conversation", e);
     }
-  }, [initializeChat, updateUserPreferences, userPreferences, enqueueSnackbar]);
+  }, [initializeChat, updateUserPreferences, enqueueSnackbar, user]);
 
   const handleOpenExperiencesDrawer = async () => {
     setIsDrawerOpen(true);

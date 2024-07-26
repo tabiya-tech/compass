@@ -151,9 +151,6 @@ async def conversation(request: Request, body: ConversationInput, clear_memory: 
     if current_user_preferences is None or session_id not in current_user_preferences.sessions:
         raise HTTPException(status_code=403, detail="User does not have permission to access this session")
 
-    # check that the session is the most recent session
-    if session_id != current_user_preferences.sessions[0]:
-        raise HTTPException(status_code=400, detail="Session is not active. Please use the most recent session.")
     # Do not allow user input that is too long,
     # as a basic measure to prevent abuse.
     if len(user_input) > 1000:
@@ -224,10 +221,6 @@ async def get_conversation_history(
     current_user_preferences = await user_preference_repository.get_user_preference_by_user_id(user_info.user_id)
     if current_user_preferences is None or session_id not in current_user_preferences.sessions:
         raise HTTPException(status_code=403, detail="User does not have permission to access this session")
-
-    # check that the session is the most recent session
-    if session_id != current_user_preferences.sessions[0]:
-        raise HTTPException(status_code=400, detail="Session is not active. Please use the most recent session.")
 
     try:
         state = await application_state_manager.get_state(session_id)
@@ -300,43 +293,6 @@ async def get_experiences(session_id: int, user_info: UserInfo = Depends(auth.ge
         ))
 
     return experiences
-
-@app.get(path="/conversation/new-session",
-         response_model=NewSessionResponse,
-         status_code=201,
-         responses={404: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
-         description="""Endpoint for starting a new conversation session.""",)
-async def get_new_conversation_session(user: UserInfo = Depends(auth.get_user_info())):
-    """
-    Endpoint for starting a new conversation session.
-    The function creates a new session id and adds it to the user sessions on the top of the list.
-
-    :param user: UserInfo - The logged-in user information
-    :return: NewSessionResponse - The response to the new session request
-    """
-    try:
-        new_session_id = random.randint(0, (1 << 48) - 1)  # nosec
-
-        user_repository = UserPreferenceRepository()
-
-        user_preferences = await user_repository.get_user_preference_by_user_id(user.user_id)
-
-        if user_preferences is None:
-            raise HTTPException(status_code=404, detail="User not found")
-
-        new_sessions = [new_session_id, *user_preferences.sessions]
-
-        user_preferences = await user_repository.update_user_preference(
-            user_id=user.user_id,
-            update=UserPreferencesUpdateRequest(sessions=new_sessions)
-        )
-
-        return NewSessionResponse(
-            session_id=user_preferences.sessions[0]
-        )
-    except Exception as e:
-        ErrorService.handle(__name__, e)
-
 
 ############################################
 # Add routes relevant for the user management

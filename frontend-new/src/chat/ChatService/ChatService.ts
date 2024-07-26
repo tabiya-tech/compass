@@ -9,14 +9,12 @@ export default class ChatService {
   readonly chatEndpointUrl: string;
   readonly chatHistoryEndpointUrl: string;
   readonly apiServerUrl: string;
-  readonly generateNewSessionEndpointUrl: string;
   private readonly sessionId: number;
 
   constructor(sessionId: number) {
     this.apiServerUrl = getBackendUrl();
     this.chatEndpointUrl = `${this.apiServerUrl}/conversation`;
     this.chatHistoryEndpointUrl = `${this.apiServerUrl}/conversation/history`;
-    this.generateNewSessionEndpointUrl = `${this.apiServerUrl}/conversation/new-session`;
     this.sessionId = sessionId;
   }
 
@@ -91,47 +89,6 @@ export default class ChatService {
       failureMessage: `Failed to clear chat for session id ${this.getSessionId()}`,
       expectedContentType: "application/json",
     });
-  }
-
-  /**
-   * Get a new session ID from the chat service.
-   */
-  async getNewSession(): Promise<number> {
-    const serviceName = "ChatService";
-    const serviceFunction = "getNewSession";
-    const method = "GET";
-    const qualifiedURL = `${this.generateNewSessionEndpointUrl}`;
-
-    let response: Response | null = null;
-
-    try {
-      response = await fetchWithAuth(qualifiedURL, {
-        method: method,
-        headers: { "Content-Type": "application/json" },
-        expectedStatusCode: StatusCodes.CREATED,
-        serviceName,
-        serviceFunction,
-        failureMessage: `Failed to generate new session`,
-        expectedContentType: "application/json",
-      });
-
-      const { session_id } = JSON.parse(await response.text());
-
-      return session_id;
-    } catch (e) {
-      console.log(e);
-      const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, qualifiedURL);
-
-      throw errorFactory(
-        response?.status!,
-        ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
-        "Response did not contain valid JSON",
-        {
-          responseBody: response?.text(),
-          error: e,
-        }
-      );
-    }
   }
 
   public async getChatHistory(): Promise<ConverstaionResponse> {
