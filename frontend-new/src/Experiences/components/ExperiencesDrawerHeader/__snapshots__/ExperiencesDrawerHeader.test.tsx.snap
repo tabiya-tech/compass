@@ -2,16 +2,16 @@
 
 exports[`ExperiencesDrawerHeader should render ExperiencesDrawerHeader correctly 1`] = `
 <div
-  class="MuiBox-root css-1vdz656"
+  class="MuiBox-root css-jxaf0q"
   data-testid="experiences-drawer-header-container-4d3ec79b-1a39-4f4b-9c4a-354a5464a253"
 >
   <h5
-    class="MuiTypography-root MuiTypography-h5 css-1khr3e0-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-h5 css-1rn8ty8-MuiTypography-root"
   >
     Experiences and skills overview
   </h5>
   <button
-    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1ads42p-MuiButtonBase-root-MuiIconButton-root"
+    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-axrlfp-MuiButtonBase-root-MuiIconButton-root"
     data-testid="experiences-drawer-header-button-4d3ec79b-1a39-4f4b-9c4a-354a5464a253"
     tabindex="0"
     title="Close experiences"
