@@ -20,7 +20,7 @@ from app.constants.errors import HTTPErrorResponse, ErrorService
 from app.users.auth import Authentication, UserInfo
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
-from app.chat.chat_types import ConversationResponse
+from app.chat.chat_types import ConversationResponse, ConversationInput
 from app.chat.chat_utils import filter_conversation_history, get_messages_from_conversation_manager
 from app.server_dependecies.agent_director_dependencies import get_agent_director
 from app.server_dependecies.conversation_manager_dependencies import get_conversation_memory_manager
@@ -128,20 +128,21 @@ add_version_routes(app)
 # TODO: use the Fast api dependency injection pattern to inject them into the routes
 application_state_manager = ApplicationStateManager(InMemoryApplicationStateStore())
 
-
-@app.get(path="/conversation",
+@app.post(path="/conversation",
+         status_code=201,
          response_model=ConversationResponse,
          responses={400: {"model": HTTPErrorResponse}, 403: {"model": HTTPErrorResponse}, 413: {"model": HTTPErrorResponse},
                     500: {"model": HTTPErrorResponse}},
          description="""The main conversation route used to interact with the agent.""")
-async def conversation(request: Request, user_input: str, clear_memory: bool = False, filter_pii: bool = False,
-                       session_id: int = 1,
+async def conversation(request: Request, body: ConversationInput, clear_memory: bool = False, filter_pii: bool = False,
                        conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager),
                        agent_director: LLMAgentDirector = Depends(get_agent_director),
                        user_info: UserInfo = Depends(auth.get_user_info())):
     """
     Endpoint for conducting the conversation with the agent.
     """
+    session_id = body.session_id
+    user_input = body.user_input
 
     # check that the user making the request has the session_id in their user preferences
     user_preference_repository = UserPreferenceRepository()

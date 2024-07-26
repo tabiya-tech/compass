@@ -47,13 +47,13 @@ describe("ChatService", () => {
   });
 
   describe("sendMessage", () => {
-    test("should fetch the correct URL, with GET and the correct headers and payload successfully", async () => {
+    test("should fetch the correct URL, with POST and the correct headers and payload successfully", async () => {
       // GIVEN some message specification to send
       const givenMessage = "Hello";
       // AND the send message REST API will respond with OK and some message response
       const expectedRootMessageResponse = generateTestChatResponses();
       const fetchSpy = setupAPIServiceSpy(
-        StatusCodes.OK,
+        StatusCodes.CREATED,
         expectedRootMessageResponse,
         "application/json;charset=UTF-8"
       );
@@ -66,18 +66,16 @@ describe("ChatService", () => {
       // THEN expect it to make a GET request
       // AND the headers
       // AND the request payload to contain the given arguments
-      expect(fetchSpy).toHaveBeenCalledWith(
-        `${givenApiServerUrl}/conversation?user_input=${givenMessage}&session_id=${service.getSessionId()}`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          expectedStatusCode: StatusCodes.OK,
-          serviceName: "ChatService",
-          serviceFunction: "sendMessage",
-          failureMessage: `Failed to send message with session id ${service.getSessionId()}`,
-          expectedContentType: "application/json",
-        }
-      );
+      expect(fetchSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/conversation`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: givenSessionId, user_input: givenMessage }),
+        expectedStatusCode: StatusCodes.CREATED,
+        serviceName: "ChatService",
+        serviceFunction: "sendMessage",
+        failureMessage: `Failed to send message with session id ${service.getSessionId()}`,
+        expectedContentType: "application/json",
+      });
 
       // AND returns the message response
       expect(actualMessageResponse).toEqual(expectedRootMessageResponse);
@@ -105,12 +103,12 @@ describe("ChatService", () => {
       ["is a malformed json", "{"],
       ["is a string", "foo"],
     ])(
-      "on 200, should reject with an error ERROR_CODE.INVALID_RESPONSE_BODY if response %s",
+      "on 201, should reject with an error ERROR_CODE.INVALID_RESPONSE_BODY if response %s",
       async (description, givenResponse) => {
         // GIVEN some message specification to send
         const givenMessage = "Hello";
         // AND the send message REST API will respond with OK and some response that does conform to the messageResponseSchema even if it states that it is application/json
-        setupAPIServiceSpy(StatusCodes.OK, givenResponse, "application/json;charset=UTF-8");
+        setupAPIServiceSpy(StatusCodes.CREATED, givenResponse, "application/json;charset=UTF-8");
 
         // WHEN the sendMessage function is called with the given arguments
         const givenSessionId = 1234;
@@ -122,9 +120,9 @@ describe("ChatService", () => {
           ...new ServiceError(
             ChatService.name,
             "sendMessage",
-            "GET",
-            `${givenApiServerUrl}/conversation?user_input=${givenMessage}&session_id=${service.getSessionId()}`,
-            StatusCodes.OK,
+            "POST",
+            `${givenApiServerUrl}/conversation`,
+            StatusCodes.CREATED,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",
             ""

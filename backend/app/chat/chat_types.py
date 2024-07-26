@@ -32,3 +32,12 @@ class ConversationResponse(BaseModel):
 
     class Config:
         extra = "forbid"
+
+class ConversationInput(BaseModel):
+    session_id: int = 1
+    """The user session id"""
+    user_input: str
+    """The user input"""
+
+    class Config:
+        extra = "forbid"
