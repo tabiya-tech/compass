@@ -1,7 +1,7 @@
 import "src/_test_utilities/consoleMock";
 import { useTokens } from "src/auth/hooks/useTokens";
 import { renderHook, act, waitFor } from "@testing-library/react";
-import { PersistentStorageService } from "src/persistentStorageService/PersistentStorageService";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import firebase from "firebase/compat/app";
 
 import "src/_test_utilities/firebaseMock";
@@ -11,7 +11,7 @@ const TOKEN_VALUE = "foo";
 const updateUserByIDToken = jest.fn();
 const params = { updateUserByIDToken };
 
-jest.mock("src/persistentStorageService/PersistentStorageService", () => {
+jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => {
   return {
     __esModule: true,
     PersistentStorageService: {

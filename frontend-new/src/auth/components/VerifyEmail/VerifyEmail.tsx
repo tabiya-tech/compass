@@ -1,8 +1,6 @@
 import React from "react";
 import { Box, Container, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { routerPaths } from "src/app/routerPaths";
-import AuthContextMenu from "src/auth/components/AuthContextMenu/AuthContextMenu";
+import LanguageContextMenu from "src/i18n/languageContextMenu/LanguageContextMenu";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
 const uniqueId = "f1228c6a-e447-4946-b810-0c7ddc8ca833";
@@ -16,14 +14,16 @@ export const DATA_TEST_ID = {
   BACK_TO_LOGIN_BUTTON: `verification-back-to-login-button-${uniqueId}`,
 };
 
-const DataProtectionAgreement: React.FC = () => {
-  const navigate = useNavigate();
+export interface VerifyEmailProps {
+  notifyOnEmailVerified: () => void;
+}
 
+const VerifyEmail: React.FC<Readonly<VerifyEmailProps>> = ({ notifyOnEmailVerified }) => {
   /**
    * Handle when a user clicks back to login
    */
   const handleBackToLogin = async () => {
-    navigate(routerPaths.LOGIN, { replace: true });
+    notifyOnEmailVerified();
   };
 
   return (
@@ -43,7 +43,7 @@ const DataProtectionAgreement: React.FC = () => {
             style={{ maxWidth: "60%", margin: "10%" }}
             data-testid={DATA_TEST_ID.LOGO}
           />
-          <AuthContextMenu />
+          <LanguageContextMenu />
         </Box>
         <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.TITLE}>
           Thank you for registering to Tabiya Compass.
@@ -67,4 +67,4 @@ const DataProtectionAgreement: React.FC = () => {
   );
 };
 
-export default DataProtectionAgreement;
+export default VerifyEmail;

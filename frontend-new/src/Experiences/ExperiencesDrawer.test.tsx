@@ -57,12 +57,16 @@ describe("ExperiencesDrawer", () => {
 
   test("it should show the right text when there are no experiences", () => {
     // GIVEN the ExperiencesDrawer component
-    const givenExperiencesDrawer = <ExperiencesDrawer isOpen={true} isLoading={false} experiences={[]} notifyOnClose={jest.fn()} />;
+    const givenExperiencesDrawer = (
+      <ExperiencesDrawer isOpen={true} isLoading={false} experiences={[]} notifyOnClose={jest.fn()} />
+    );
     // AND the component is rendered
     render(givenExperiencesDrawer);
 
     // THEN expect the text to be in the document
-    const noExperiencesText = screen.getByText("We haven’t yet discovered any experiences so far, Let's continue chatting.");
+    const noExperiencesText = screen.getByText(
+      "We haven’t yet discovered any experiences so far, Let's continue chatting."
+    );
     expect(noExperiencesText).toBeInTheDocument();
-  })
+  });
 });

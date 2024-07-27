@@ -9,8 +9,8 @@ import { DATA_TEST_ID as EXPERIENCES_DRAWER_CONTAINER_TEST_ID } from "src/Experi
 import { HashRouter } from "react-router-dom";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { ConversationMessageSender } from "./ChatService/ChatService.types";
-import { Language } from "src/auth/services/UserPreferences/userPreferences.types";
-import { UserPreferencesContext } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
+import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 import ChatService from "./ChatService/ChatService";
 import ExperienceService from "src/Experiences/ExperienceService/ExperienceService";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";

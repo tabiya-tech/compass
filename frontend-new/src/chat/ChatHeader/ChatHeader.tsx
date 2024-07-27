@@ -6,7 +6,7 @@ import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
-import { IsOnlineContext } from "src/app/providers/IsOnlineProvider";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 
 export type ChatHeaderProps = {
   notifyOnLogout: () => void;

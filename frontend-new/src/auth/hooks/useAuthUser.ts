@@ -39,8 +39,8 @@ export function useAuthUser() {
    * @param user : TabiyaUser
    */
   const updateUser = useCallback(
-    (user: TabiyaUser | null) => {
-      setUser(user);
+    (_user: TabiyaUser | null) => {
+      setUser(_user);
     },
     [setUser]
   );

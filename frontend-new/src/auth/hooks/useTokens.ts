@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
-import { PersistentStorageService } from "src/persistentStorageService/PersistentStorageService";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
 type TUseTokensParams = {
   updateUserByIDToken: (idToken: string) => void;

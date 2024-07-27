@@ -58,5 +58,5 @@ describe("ReportDrawerContent", () => {
 
     // THEN expect No skills yet to be in the document
     expect(screen.getByText("No skills yet")).toBeInTheDocument();
-  })
+  });
 });

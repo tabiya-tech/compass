@@ -54,9 +54,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({ isOpen, isLoading
             <Typography variant="h1" textAlign={"center"}>
               🤷‍♀️
             </Typography>
-            <Typography>
-              We haven’t yet discovered any experiences so far, Let's continue chatting.
-            </Typography>
+            <Typography>We haven’t yet discovered any experiences so far, Let's continue chatting.</Typography>
           </Box>
         )}
         {experiences.map((experience, index) => (

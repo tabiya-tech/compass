@@ -1,14 +1,13 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import { Box, CircularProgress, Container, styled, TextField, Typography, useTheme } from "@mui/material";
-import { AuthContext } from "src/auth/Providers/AuthProvider/AuthProvider";
-import { NavLink as RouterNavLink, useNavigate } from "react-router-dom";
+import { AuthContext, TabiyaUser } from "src/auth/AuthProvider/AuthProvider";
+import { NavLink as RouterNavLink } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import IDPAuth from "src/auth/components/IDPAuth/IDPAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import AuthContextMenu from "src/auth/components/AuthContextMenu/AuthContextMenu";
+import LanguageContextMenu from "src/i18n/languageContextMenu/LanguageContextMenu";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/error";
 import { writeServiceErrorToLog } from "src/error/logger";
-import { UserPreferencesContext } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
 const uniqueId = "7ce9ba1f-bde0-48e2-88df-e4f697945cc4";
@@ -39,77 +38,51 @@ export const DATA_TEST_ID = {
   LANGUAGE_SELECTOR: `login-language-selector-${uniqueId}`,
 };
 
-const Login: React.FC = () => {
+export interface LoginProps {
+  postLoginHandler: (user: TabiyaUser) => void;
+  isLoading: boolean;
+}
+
+const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) => {
   const theme = useTheme();
-  const { login, isLoggingIn, user } = useContext(AuthContext);
-  const [isCheckingPreferences, setIsCheckingPreferences] = useState(false);
-  const navigate = useNavigate();
+  const { login, isLoggingIn } = useContext(AuthContext);
   const { enqueueSnackbar } = useSnackbar();
-  const { getUserPreferences, userPreferences } = useContext(UserPreferencesContext);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   /**
-   * Redirect the user to the login page
-   * if they are already logged in
-   */
-  useEffect(() => {
-    // If the user is already logged in, redirect to the home page
-    if (user && userPreferences?.accepted_tc) {
-      navigate(routerPaths.ROOT, { replace: true });
-    }
-  }, [navigate, user, userPreferences]);
-
-  /**
    * Handle the login form submission
    * @param event
    */
-  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    login(
-      email,
-      password,
-      async (user) => {
-        try {
-          setIsCheckingPreferences(true);
-          getUserPreferences(
-            user.id,
-            (prefs) => {
-              // If the accepted_tc is not set or is not a valid date, redirect to the DPA page
-              // this is to ensure that even if the accepted_tc is manipulated in the database, the user will be redirected to the DPA page
-              // and will have to accept the terms and conditions again
-              if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
-                navigate(routerPaths.DPA, { replace: true });
-              } else {
-                navigate(routerPaths.ROOT, { replace: true });
-                enqueueSnackbar("Welcome back!", { variant: "success" });
-              }
-            },
-            (error) => {
-              writeServiceErrorToLog(error, console.error);
-              throw error;
-            }
-          );
-        } catch (e) {
-          const errorMessage = getUserFriendlyErrorMessage(e as Error);
+  const handleLogin = useCallback(
+    async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      login(
+        email,
+        password,
+        async (user) => {
+          try {
+            postLoginHandler(user);
+          } catch (e) {
+            const errorMessage = getUserFriendlyErrorMessage(e as Error);
+            enqueueSnackbar(errorMessage, { variant: "error" });
+            console.error("Error during login process", e);
+          }
+        },
+        (e) => {
+          if (e instanceof ServiceError) {
+            writeServiceErrorToLog(e, console.error);
+          } else {
+            console.error(e);
+          }
+          const errorMessage = getUserFriendlyErrorMessage(e);
           enqueueSnackbar(errorMessage, { variant: "error" });
-          console.error("Error during login process", e);
-        } finally {
-          setIsCheckingPreferences(false);
         }
-      },
-      (e) => {
-        if (e instanceof ServiceError) {
-          writeServiceErrorToLog(e, console.error);
-        } else {
-          console.error(e);
-        }
-        const errorMessage = getUserFriendlyErrorMessage(e);
-        enqueueSnackbar(errorMessage, { variant: "error" });
-      }
-    );
-  };
+      );
+    },
+    [email, enqueueSnackbar, login, postLoginHandler, password]
+  );
 
   return (
     <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.LOGIN_CONTAINER}>
@@ -128,7 +101,7 @@ const Login: React.FC = () => {
             style={{ maxWidth: "60%", margin: "10%" }}
             data-testid={DATA_TEST_ID.LOGO}
           />
-          <AuthContextMenu />
+          <LanguageContextMenu />
         </Box>
         <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.TITLE}>
           Welcome to Compass!
@@ -143,7 +116,7 @@ const Login: React.FC = () => {
             type="email"
             variant="outlined"
             margin="normal"
-            disabled={isLoggingIn || isCheckingPreferences}
+            disabled={isLoggingIn || isLoading}
             required
             onChange={(e) => setEmail(e.target.value)}
             inputProps={{ "data-testid": DATA_TEST_ID.EMAIL_INPUT }}
@@ -153,7 +126,7 @@ const Login: React.FC = () => {
             label="Password"
             type="password"
             variant="outlined"
-            disabled={isLoggingIn || isCheckingPreferences}
+            disabled={isLoggingIn || isLoading}
             margin="normal"
             required
             onChange={(e) => setPassword(e.target.value)}
@@ -165,11 +138,11 @@ const Login: React.FC = () => {
             color="primary"
             style={{ marginTop: 16 }}
             type="submit"
-            disabled={isLoggingIn || isCheckingPreferences}
+            disabled={isLoggingIn || isLoading}
             disableWhenOffline={true}
             data-testid={DATA_TEST_ID.LOGIN_BUTTON}
           >
-            {isLoggingIn || isCheckingPreferences ? (
+            {isLoggingIn || isLoading ? (
               <CircularProgress
                 color={"secondary"}
                 data-testid={DATA_TEST_ID.LOGIN_BUTTON_CIRCULAR_PROGRESS}
@@ -194,7 +167,7 @@ const Login: React.FC = () => {
             Or continue with
           </Typography>
           <Box mt={2} width="100%">
-            <IDPAuth />
+            <IDPAuth notifyOnLogin={postLoginHandler} isLoading={isLoading} />
           </Box>
         </Box>
         <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.LOGIN_LINK}>

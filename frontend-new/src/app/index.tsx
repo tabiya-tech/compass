@@ -1,8 +1,14 @@
-import { HashRouter, Route, Routes } from "react-router-dom";
-import routerConfig from "./routerConfig";
-import { useRef, useEffect, useContext } from "react";
-import { IsOnlineContext } from "./providers/IsOnlineProvider";
-import { DEFAULT_SNACKBAR_AUTO_HIDE_DURATION, useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import { Route, Routes } from "react-router-dom";
+import { routerPaths } from "src/app/routerPaths";
+import Home from "src/homePage/Home";
+import Info from "src/info/Info";
+import Register from "src/auth/components/Register/Register";
+import Login from "src/auth/components/Login/Login";
+import DataProtectionAgreement from "src/dataProtectionAgreement/DataProtectionAgreement";
+import VerifyEmail from "src/auth/components/VerifyEmail/VerifyEmail";
+import NotFound from "src/errorPage/NotFound";
+import ProtectedRoute from "src/app/ProtectedRoute/ProtectedRoute";
+import { useRouteHandlers } from "src/app/hooks/useRouteHandlers";
 
 const uniqueId = "17ccbdb7-1855-44b2-bc68-ef066e5c4e6f";
 export const SNACKBAR_KEYS = {
@@ -11,49 +17,71 @@ export const SNACKBAR_KEYS = {
 };
 
 const App = () => {
-  const renderCount = useRef(0);
-  const isOnline = useContext(IsOnlineContext);
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-
-  useEffect(() => {
-    renderCount.current++;
-    // if currently online and initial render, then don't show notification
-    console.log(isOnline)
-    if (isOnline && renderCount.current === 1) {
-      return;
-    }
-
-    if (!isOnline) {
-      // offline
-      closeSnackbar(SNACKBAR_KEYS.ONLINE_SUCCESS);
-      enqueueSnackbar(`You are offline`, {
-        variant: "warning",
-        key: SNACKBAR_KEYS.OFFLINE_ERROR,
-        preventDuplicate: true,
-        persist: true,
-        action: [],
-      });
-    } else {
-      // online
-      closeSnackbar(SNACKBAR_KEYS.OFFLINE_ERROR);
-      enqueueSnackbar(`You are back online`, {
-        variant: "success",
-        key: SNACKBAR_KEYS.ONLINE_SUCCESS,
-        preventDuplicate: true,
-        autoHideDuration: DEFAULT_SNACKBAR_AUTO_HIDE_DURATION,
-      });
-    }
-  }, [isOnline, closeSnackbar, enqueueSnackbar]);
+  const { handleLogin, handleRegister, handleAcceptDPA, handleVerifyEmail, isPostLoginLoading } = useRouteHandlers();
 
   return (
-    <HashRouter>
-      <Routes>
-        {routerConfig.map((route) => (
-          <Route key={route.path} path={route.path} element={route.element} errorElement={route.errorElement} />
-        ))}
-      </Routes>
-    </HashRouter>
+    <Routes>
+      {/*------*/}
+      {/*The following routes require the user to be authenticated*/}
+      {/*------*/}
+      <Route
+        path={routerPaths.ROOT}
+        element={
+          <ProtectedRoute authenticationAndDPARequired={true}>
+            <Home />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={routerPaths.SETTINGS}
+        element={
+          <ProtectedRoute authenticationAndDPARequired={true}>
+            <Info />
+          </ProtectedRoute>
+        }
+      />
+      {/*------*/}
+      {/*The following routes do not require the user to be authenticated*/}
+      {/*------*/}
+      <Route
+        path={routerPaths.REGISTER}
+        element={
+          <ProtectedRoute authenticationAndDPARequired={false}>
+            <Register
+              postRegisterHandler={handleRegister}
+              postLoginHandler={handleLogin}
+              isPostLoginLoading={isPostLoginLoading}
+            />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={routerPaths.LOGIN}
+        element={
+          <ProtectedRoute authenticationAndDPARequired={false}>
+            <Login postLoginHandler={handleLogin} isLoading={isPostLoginLoading} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={routerPaths.VERIFY_EMAIL}
+        element={
+          <ProtectedRoute authenticationAndDPARequired={false}>
+            <VerifyEmail notifyOnEmailVerified={handleVerifyEmail} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={routerPaths.DPA}
+        element={
+          <ProtectedRoute authenticationAndDPARequired={false}>
+            <DataProtectionAgreement notifyOnAcceptDPA={handleAcceptDPA} isLoading={isPostLoginLoading} />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="*" element={<NotFound />} />
+      {/*-----*/}
+    </Routes>
   );
 };
-
 export default App;

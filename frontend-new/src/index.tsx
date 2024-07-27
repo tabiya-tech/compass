@@ -5,11 +5,12 @@ import App from "src/app";
 import reportWebVitals from "src/reportWebVitals";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import applicationTheme, { ThemeMode } from "src/theme/applicationTheme/applicationTheme";
-import { AuthProvider } from "src/auth/Providers/AuthProvider/AuthProvider";
+import { AuthProvider } from "src/auth/AuthProvider/AuthProvider";
 import SnackbarProvider from "src/theme/SnackbarProvider/SnackbarProvider";
-import { UserPreferencesProvider } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
-import { IsOnlineProvider } from "src/app/providers/IsOnlineProvider";
+import { UserPreferencesProvider } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
+import { IsOnlineProvider } from "src/app/isOnlineProvider/IsOnlineProvider";
 import ViewPortWrapper from "src/app/ViewPortWrapper";
+import { HashRouter } from "react-router-dom";
 
 // Currently the fonts are downloaded from Google via the index.css
 // Fonts could be distributed with the app instead, by explicitly importing them here
@@ -20,14 +21,15 @@ root.render(
   <React.StrictMode>
     <>
       <CssBaseline />
-
       <IsOnlineProvider>
         <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
           <AuthProvider>
             <UserPreferencesProvider>
               <SnackbarProvider>
                 <ViewPortWrapper>
-                  <App />
+                  <HashRouter>
+                    <App />
+                  </HashRouter>
                 </ViewPortWrapper>
               </SnackbarProvider>
             </UserPreferencesProvider>

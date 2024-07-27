@@ -11,13 +11,14 @@ import { getUserFriendlyErrorMessage, ServiceError } from "src/error/error";
 import { writeServiceErrorToLog } from "src/error/logger";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
-import { AuthContext } from "src/auth/Providers/AuthProvider/AuthProvider";
+import { AuthContext } from "src/auth/AuthProvider/AuthProvider";
 import { ConversationMessage, ConversationMessageSender } from "./ChatService/ChatService.types";
-import { UserPreferencesContext } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
+import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
+import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import ExperiencesDrawer from "src/Experiences/ExperiencesDrawer";
 import { Experience } from "src/Experiences/ExperienceService/Experiences.types";
 import ExperienceService from "src/Experiences/ExperienceService/ExperienceService";
-import UserPreferencesService from "../auth/services/UserPreferences/userPreferences.service";
+import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 
 const uniqueId = "b7ea1e82-0002-432d-a768-11bdcd186e1d";
 export const DATA_TEST_ID = {
@@ -32,10 +33,10 @@ const Chat = () => {
   const [initialized, setInitialized] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const { userPreferences, updateUserPreferences } = useContext(UserPreferencesContext);
+  const { logout, isLoggingOut, user } = useContext(AuthContext);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [experiences, setExperiences] = React.useState<Experience[]>([]);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const { logout, user } = useContext(AuthContext);
 
   const navigate = useNavigate();
 
@@ -92,6 +93,7 @@ const Chat = () => {
   const handleLogout = useCallback(() => {
     logout(
       () => {
+        updateUserPreferences(null);
         navigate(routerPaths.LOGIN, { replace: true });
         enqueueSnackbar("Successfully logged out.", { variant: "success" });
       },
@@ -100,7 +102,7 @@ const Chat = () => {
         enqueueSnackbar(errorMessage, { variant: "error" });
       }
     );
-  }, [enqueueSnackbar, navigate, logout]);
+  }, [enqueueSnackbar, navigate, logout, updateUserPreferences]);
 
   const initializeChat = useCallback(
     async (session_id?: number) => {
@@ -159,9 +161,8 @@ const Chat = () => {
   );
 
   useEffect(() => {
-    if (!initialized) {
-      initializeChat(userPreferences?.sessions[0]);
-      setInitialized(true);
+    if (!initialized && userPreferences?.sessions?.length) {
+      initializeChat(userPreferences?.sessions[0]).then((_prefs) => setInitialized(true));
     }
   }, [initializeChat, initialized, userPreferences?.sessions]);
 
@@ -174,11 +175,11 @@ const Chat = () => {
 
   const startNewConversation = useCallback(async () => {
     try {
-      if(!user?.id) return;
+      if (!user?.id) return;
 
-      const preferencesService = new UserPreferencesService()
+      const preferencesService = new UserPreferencesService();
 
-      let user_preferences = await preferencesService.getNewSession(user?.id!)
+      let user_preferences = await preferencesService.getNewSession(user?.id!);
 
       updateUserPreferences(user_preferences);
 
@@ -211,31 +212,43 @@ const Chat = () => {
 
   return (
     <>
-      <Box width="100%" height="100%" display="flex" flexDirection="column" data-testid={DATA_TEST_ID.CHAT_CONTAINER}>
-        <ChatHeader
-          notifyOnLogout={handleLogout}
-          startNewConversation={startNewConversation}
-          notifyOnExperiencesDrawerOpen={handleOpenExperiencesDrawer}
-        />
-        <Box sx={{ flex: 1, overflowY: "auto" }}>
-          <ChatList messages={messages} isTyping={isTyping} />
-        </Box>
-        <Box sx={{ flexShrink: 0 }}>
-          <ChatMessageField
-            handleSend={handleSend}
-            aiIsTyping={isTyping}
-            isChatFinished={conversationCompleted}
-            message={currentMessage}
-            notifyChange={setCurrentMessage}
+      {isLoggingOut ? (
+        <Backdrop isShown={isLoggingOut} message={"Logging you out, wait a moment..."} />
+      ) : (
+        <>
+          <Box
+            width="100%"
+            height="100%"
+            display="flex"
+            flexDirection="column"
+            data-testid={DATA_TEST_ID.CHAT_CONTAINER}
+          >
+            <ChatHeader
+              notifyOnLogout={handleLogout}
+              startNewConversation={startNewConversation}
+              notifyOnExperiencesDrawerOpen={handleOpenExperiencesDrawer}
+            />
+            <Box sx={{ flex: 1, overflowY: "auto" }}>
+              <ChatList messages={messages} isTyping={isTyping} />
+            </Box>
+            <Box sx={{ flexShrink: 0 }}>
+              <ChatMessageField
+                handleSend={handleSend}
+                aiIsTyping={isTyping}
+                isChatFinished={conversationCompleted}
+                message={currentMessage}
+                notifyChange={setCurrentMessage}
+              />
+            </Box>
+          </Box>
+          <ExperiencesDrawer
+            isOpen={isDrawerOpen}
+            notifyOnClose={handleDrawerClose}
+            isLoading={isLoading}
+            experiences={experiences}
           />
-        </Box>
-      </Box>
-      <ExperiencesDrawer
-        isOpen={isDrawerOpen}
-        notifyOnClose={handleDrawerClose}
-        isLoading={isLoading}
-        experiences={experiences}
-      />
+        </>
+      )}
     </>
   );
 };

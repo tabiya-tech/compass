@@ -3,17 +3,13 @@ import React from "react";
 import { render, screen, waitFor, fireEvent } from "src/_test_utilities/test-utils";
 import { HashRouter, useNavigate } from "react-router-dom";
 import Login, { DATA_TEST_ID } from "./Login";
-import { AuthContext, TabiyaUser } from "src/auth/Providers/AuthProvider/AuthProvider";
+import { AuthContext, TabiyaUser } from "src/auth/AuthProvider/AuthProvider";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { routerPaths } from "src/app/routerPaths";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 import { ServiceError } from "src/error/error";
 import ErrorConstants from "src/error/error.constants";
-import ErrorCodes = ErrorConstants.ErrorCodes;
 import { StatusCodes } from "http-status-codes";
-import { UserPreferencesContext } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
-import { Language } from "src/auth/services/UserPreferences/userPreferences.types";
-import * as Logger from "src/error/logger";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -66,26 +62,12 @@ describe("Testing Login component with AuthProvider", () => {
   const authContextValue = {
     login: loginMock,
     isLoggingIn: false,
+    isLoggingOut: false,
     isRegistering: false,
     user: null,
     register: jest.fn(),
     logout: jest.fn(),
     handlePageLoad: jest.fn(),
-  };
-
-  const getUserPreferencesMock = jest.fn();
-
-  const userPreferencesContextValue = {
-    getUserPreferences: getUserPreferencesMock,
-    createUserPreferences: jest.fn(),
-    userPreferences: {
-      accepted_tc: new Date(),
-      user_id: "0001",
-      language: Language.en,
-      sessions: [],
-    },
-    updateUserPreferences: jest.fn(),
-    isLoading: false,
   };
 
   beforeEach(() => {
@@ -102,9 +84,7 @@ describe("Testing Login component with AuthProvider", () => {
     render(
       <HashRouter>
         <AuthContext.Provider value={authContextValue}>
-          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Login />
-          </UserPreferencesContext.Provider>
+          <Login postLoginHandler={() => {}} isLoading={false} />
         </AuthContext.Provider>
       </HashRouter>
     );
@@ -157,21 +137,16 @@ describe("Testing Login component with AuthProvider", () => {
         email: "foo@bar.baz",
         name: "Foo Bar",
       };
+      const givenNotifyOnLogin = jest.fn();
+      const givenIsLoading = false;
       loginMock.mockImplementation((email, password, onSuccess, onError) => {
-        onSuccess({ id: "0001" });
-      });
-
-      // AND the user preferences provider will return the user preferences
-      getUserPreferencesMock.mockImplementation((userId, successCallback, failureCallback) => {
-        successCallback({ accepted_tc: tc });
+        onSuccess(givenUser);
       });
 
       render(
         <HashRouter>
           <AuthContext.Provider value={authContextValue}>
-            <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-              <Login />
-            </UserPreferencesContext.Provider>
+            <Login postLoginHandler={givenNotifyOnLogin} isLoading={givenIsLoading} />
           </AuthContext.Provider>
         </HashRouter>
       );
@@ -200,13 +175,9 @@ describe("Testing Login component with AuthProvider", () => {
         expect(loginMock).toHaveBeenCalledWith("foo@bar.baz", "password", expect.any(Function), expect.any(Function));
       });
 
-      // AND the user preferences service should have been called
+      // AND the notifyOnLogin function should have been called
       await waitFor(() => {
-        expect(getUserPreferencesMock).toHaveBeenCalledWith(givenUser.id, expect.any(Function), expect.any(Function));
-      });
-      // AND the user should be redirected to the expected path
-      await waitFor(() => {
-        expect(useNavigate()).toHaveBeenCalledWith(expectedPath, { replace: true });
+        expect(givenNotifyOnLogin).toHaveBeenCalledWith(givenUser);
       });
     }
   );
@@ -231,9 +202,7 @@ describe("Testing Login component with AuthProvider", () => {
     render(
       <HashRouter>
         <AuthContext.Provider value={authContextValue}>
-          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Login />
-          </UserPreferencesContext.Provider>
+          <Login postLoginHandler={() => {}} isLoading={false} />
         </AuthContext.Provider>
       </HashRouter>
     );
@@ -274,89 +243,6 @@ describe("Testing Login component with AuthProvider", () => {
     expect(useNavigate()).not.toHaveBeenCalled();
   });
 
-  test("it should show an error message if the user preferences cannot be fetched", async () => {
-    // GIVEN the login function will succeed
-    const givenUser: TabiyaUser = {
-      id: "0001",
-      email: "foo@bar.baz",
-      name: "Foo Bar",
-    };
-    loginMock.mockImplementation((email, password, onSuccess, onError) => {
-      onSuccess(givenUser);
-    });
-
-    // AND the user preferences service will fail
-    const givenUserPreferencesError = new ServiceError(
-      "ServiceName",
-      "ServiceFunction",
-      "GET",
-      "/api/path",
-      StatusCodes.NOT_FOUND,
-      ErrorCodes.API_ERROR,
-      "Failed to fetch user preferences"
-    );
-    getUserPreferencesMock.mockImplementation((userId, onSuccess, onError) => {
-      onError(givenUserPreferencesError);
-    });
-
-    // AND the Login component is rendered within the AuthContext and Router
-    jest.spyOn(Logger, "writeServiceErrorToLog");
-    render(
-      <HashRouter>
-        <AuthContext.Provider value={authContextValue}>
-          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Login />
-          </UserPreferencesContext.Provider>
-        </AuthContext.Provider>
-      </HashRouter>
-    );
-
-    // THEN expect no errors or warning to have occurred
-    expect(console.error).not.toHaveBeenCalled();
-    expect(console.warn).not.toHaveBeenCalled();
-
-    // AND the component should be rendered
-    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toBeDefined();
-
-    // AND the form inputs and button should be displayed
-    expect(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT)).toBeInTheDocument();
-    expect(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT)).toBeInTheDocument();
-    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_BUTTON)).toBeInTheDocument();
-
-    // Simulate form input and submission
-    fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: "foo@bar.baz" } });
-    fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: "password" } });
-
-    // Trigger form submission
-    fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
-
-    // THEN expect the login function to have been called
-    await waitFor(() => {
-      expect(loginMock).toHaveBeenCalledWith("foo@bar.baz", "password", expect.any(Function), expect.any(Function));
-    });
-
-    // AND the user preferences service should have been called
-    await waitFor(() => {
-      expect(getUserPreferencesMock).toHaveBeenCalledWith(givenUser.id, expect.any(Function), expect.any(Function));
-    });
-
-    // AND the error message should be displayed
-    await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        "The requested resource was not found. Please clear your browser's cache and refresh the page.",
-        {
-          variant: "error",
-        }
-      );
-    });
-
-    // AND the error should be logged
-    expect(Logger.writeServiceErrorToLog).toHaveBeenCalledWith(givenUserPreferencesError, console.error);
-
-    // AND the user should not be redirected
-    expect(useNavigate()).not.toHaveBeenCalled();
-  });
-
   test("it should show error message when login fails", async () => {
     // GIVEN the login function will fail
     loginMock.mockImplementation((email, password, onSuccess, onError) => {
@@ -367,7 +253,7 @@ describe("Testing Login component with AuthProvider", () => {
     render(
       <HashRouter>
         <AuthContext.Provider value={authContextValue}>
-          <Login />
+          <Login postLoginHandler={() => {}} isLoading={false} />
         </AuthContext.Provider>
       </HashRouter>
     );
@@ -416,7 +302,7 @@ describe("Testing Login component with AuthProvider", () => {
     render(
       <HashRouter>
         <AuthContext.Provider value={_authContextValue}>
-          <Login />
+          <Login postLoginHandler={() => {}} isLoading={false} />
         </AuthContext.Provider>
       </HashRouter>
     );

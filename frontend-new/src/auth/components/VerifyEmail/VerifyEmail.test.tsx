@@ -2,10 +2,9 @@ import "src/_test_utilities/consoleMock";
 import React from "react";
 import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
 import VerifyEmail, { DATA_TEST_ID } from "./VerifyEmail";
-import { HashRouter, useNavigate } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
 import { mockLoggedInUser } from "src/_test_utilities/mockLoggedInUser";
 import { waitFor } from "@testing-library/react";
-import { routerPaths } from "src/app/routerPaths";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 
 // mock the router
@@ -35,9 +34,10 @@ describe("Testing Verify Email component with AuthProvider", () => {
 
   test("it should show verification page", async () => {
     // WHEN the component is rendered
+    const givenNotifyOnEmailVerified = jest.fn();
     render(
       <HashRouter>
-        <VerifyEmail />
+        <VerifyEmail notifyOnEmailVerified={givenNotifyOnEmailVerified} />
       </HashRouter>
     );
 
@@ -60,9 +60,10 @@ describe("Testing Verify Email component with AuthProvider", () => {
 
   test("should successfully navigate back to login when the back to login button is pressed", async () => {
     // GIVEN the component is rendered
+    const givenNotifyOnEmailVerified = jest.fn();
     render(
       <HashRouter>
-        <VerifyEmail />
+        <VerifyEmail notifyOnEmailVerified={givenNotifyOnEmailVerified} />
       </HashRouter>
     );
 
@@ -79,7 +80,7 @@ describe("Testing Verify Email component with AuthProvider", () => {
 
     // THEN expect the user to be redirected to the root path
     await waitFor(() => {
-      expect(useNavigate()).toHaveBeenCalledWith(routerPaths.LOGIN, { replace: true });
+      expect(givenNotifyOnEmailVerified).toHaveBeenCalled();
     });
   });
 });

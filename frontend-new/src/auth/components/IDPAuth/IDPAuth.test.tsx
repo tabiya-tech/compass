@@ -3,12 +3,10 @@ import React from "react";
 import { render, waitFor, screen } from "src/_test_utilities/test-utils";
 import IDPAuth, { DATA_TEST_ID } from "./IDPAuth";
 import * as firebaseui from "firebaseui";
-import { HashRouter, useNavigate } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { routerPaths } from "src/app/routerPaths";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
-import { Language } from "src/auth/services/UserPreferences/userPreferences.types";
-import { UserPreferencesContext } from "src/auth/Providers/UserPreferencesProvider/UserPreferencesProvider";
 import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 
 // Mock the envService module
@@ -70,15 +68,6 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   };
 });
 
-// mock the UserPreferencesService
-jest.mock("src/auth/services/UserPreferences/userPreferences.service", () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      getUserPreferences: jest.fn(),
-    };
-  });
-});
-
 // mock the router
 jest.mock("react-router-dom", () => {
   const actual = jest.requireActual("react-router-dom");
@@ -93,21 +82,6 @@ jest.mock("react-router-dom", () => {
 });
 
 describe("IDPAuth tests", () => {
-  const getUserPreferencesMock = jest.fn();
-
-  const userPreferencesContextValue = {
-    getUserPreferences: getUserPreferencesMock,
-    createUserPreferences: jest.fn(),
-    userPreferences: {
-      accepted_tc: new Date(),
-      user_id: "0001",
-      language: Language.en,
-      sessions: [],
-    },
-    updateUserPreferences: jest.fn(),
-    isLoading: false,
-  };
-
   beforeEach(() => {
     (console.error as jest.Mock).mockClear();
     (console.warn as jest.Mock).mockClear();
@@ -128,12 +102,12 @@ describe("IDPAuth tests", () => {
 
   test("should render the IDPAuth component", () => {
     // GIVEN a IDPAuth component
+    const givenNotifyOnLogin = jest.fn();
+    const givenIsLoading = false;
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-          <IDPAuth />
-        </UserPreferencesContext.Provider>
+        <IDPAuth notifyOnLogin={givenNotifyOnLogin} isLoading={givenIsLoading} />
       </HashRouter>
     );
 
@@ -148,12 +122,21 @@ describe("IDPAuth tests", () => {
     "it should handle successful sign-in for a user who has %s terms and conditions",
     async (_description: string, tc: Date | undefined, expectedPath: string) => {
       // GIVEN a IDPAuth component
+      const givenNotifyOnLogin = jest.fn();
+      const givenIsLoading = false;
+      const givenUser = {
+        id: "mock-id",
+        name: "foo bar",
+        email: "foo@bar.baz",
+      };
       // AND the sign-in is successful
       (firebaseui.auth.AuthUI as unknown as jest.Mock).mockImplementation(() => ({
         start: (elementId: string, config: any) => {
           config.callbacks.signInSuccessWithAuthResult({
             user: {
-              id: "mock-id",
+              uid: givenUser.id,
+              displayName: givenUser.name,
+              email: givenUser.email,
               multiFactor: { user: { accessToken: "mock-access-token" } },
             },
             credential: {
@@ -164,28 +147,16 @@ describe("IDPAuth tests", () => {
         reset: jest.fn(),
       }));
 
-      // AND the user preferences provider will return the user preferences
-      getUserPreferencesMock.mockImplementation((userId, onSuccess) => {
-        onSuccess({
-          accepted_tc: tc,
-          user_id: "0001",
-          language: Language.en,
-          sessions: [],
-        });
-      });
-
       // WHEN the component is rendered
       render(
         <HashRouter>
-          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <IDPAuth />
-          </UserPreferencesContext.Provider>
+          <IDPAuth notifyOnLogin={givenNotifyOnLogin} isLoading={givenIsLoading} />
         </HashRouter>
       );
 
       // THEN expect the user to be redirected to the correct path
       await waitFor(() => {
-        expect(useNavigate()).toHaveBeenCalledWith(expectedPath, { replace: true });
+        expect(givenNotifyOnLogin).toHaveBeenCalledWith(givenUser);
       });
 
       // AND a success message to be shown
@@ -195,51 +166,10 @@ describe("IDPAuth tests", () => {
     }
   );
 
-  test("it should show an error message if the user preferences cannot be fetched", async () => {
-    // GIVEN a IDPAuth component
-    // AND the sign-in is successful
-    (firebaseui.auth.AuthUI as unknown as jest.Mock).mockImplementation(() => ({
-      start: (elementId: string, config: any) => {
-        config.callbacks.signInSuccessWithAuthResult({
-          user: {
-            id: "mock-id",
-            multiFactor: { user: { accessToken: "mock-access-token" } },
-          },
-          credential: {
-            idToken: "mock-id-token",
-          },
-        });
-      },
-      reset: jest.fn(),
-    }));
-    // AND the user preferences provider will throw an error
-    const givenUserPreferencesError = new Error("User preferences error");
-    getUserPreferencesMock.mockImplementation((userId, onSuccess, onError) => {
-      onError(givenUserPreferencesError);
-    });
-
-    // WHEN the component is rendered
-    render(
-      <HashRouter>
-        <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-          <IDPAuth />
-        </UserPreferencesContext.Provider>
-      </HashRouter>
-    );
-
-    // THEN expect an error message to be shown
-    await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        "An unexpected error occurred. Please try again later.",
-        {
-          variant: "error",
-        }
-      );
-    });
-  });
-
   test("should handle sign-in failure", async () => {
     // GIVEN a IDPAuth component
+    const givenNotifyOnLogin = jest.fn();
+    const givenIsLoading = false;
     // WHEN the sign-in fails
     (firebaseui.auth.AuthUI as unknown as jest.Mock).mockImplementation(() => ({
       start: (elementId: string, config: any) => {
@@ -250,9 +180,7 @@ describe("IDPAuth tests", () => {
 
     render(
       <HashRouter>
-        <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-          <IDPAuth />
-        </UserPreferencesContext.Provider>
+        <IDPAuth notifyOnLogin={givenNotifyOnLogin} isLoading={givenIsLoading} />
       </HashRouter>
     );
 
@@ -263,18 +191,19 @@ describe("IDPAuth tests", () => {
   });
 
   test("should show message if browser is not online", () => {
-    // GIVEN the browser is not online
+    // GIVEN a IDPAuth component
+    const givenNotifyOnLogin = jest.fn();
+    const givenIsLoading = false;
+    // AND the browser is not online
     mockBrowserIsOnLine(false);
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-          <IDPAuth />
-        </UserPreferencesContext.Provider>
+        <IDPAuth notifyOnLogin={givenNotifyOnLogin} isLoading={givenIsLoading} />
       </HashRouter>
     );
 
     // THEN expect the message text to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.FIREBASE_FALLBACK_TEXT)).toBeInTheDocument();
-  })
+  });
 });
