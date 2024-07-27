@@ -49,7 +49,7 @@ jest.mock("@mui/material", () => {
 });
 
 // mock AuthProvider
-jest.mock("./auth/Providers/AuthProvider/AuthProvider", () => {
+jest.mock("./auth/AuthProvider/AuthProvider", () => {
   const mAuthProvider = jest
     .fn()
     .mockImplementation(({ children }) => <div data-testid="auth-provider-id">{children}</div>);
@@ -71,7 +71,7 @@ jest.mock("./theme/SnackbarProvider/SnackbarProvider", () => {
 });
 
 // mock the UserPreferencesProvider
-jest.mock("./auth/Providers/UserPreferencesProvider/UserPreferencesProvider", () => {
+jest.mock("./userPreferences/UserPreferencesProvider/UserPreferencesProvider", () => {
   const mUserPreferencesProvider = jest.fn().mockImplementation(({ children }) => children);
   return {
     __esModule: true,
@@ -89,11 +89,20 @@ jest.mock("src/app/ViewPortWrapper", () => {
 });
 
 // mock the IsOnlineProvider
-jest.mock("src/app/providers/IsOnlineProvider", () => {
+jest.mock("src/app/isOnlineProvider/IsOnlineProvider", () => {
   const mIsOnlineProvider = jest.fn().mockImplementation(({ children }) => children);
   return {
     __esModule: true,
     IsOnlineProvider: mIsOnlineProvider,
+  };
+});
+
+// mock the hash router
+jest.mock("react-router-dom", () => {
+  const mHashRouter = jest.fn().mockImplementation(({ children }) => children);
+  return {
+    __esModule: true,
+    HashRouter: mHashRouter,
   };
 });
 

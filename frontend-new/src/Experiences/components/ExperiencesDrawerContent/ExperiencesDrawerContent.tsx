@@ -22,10 +22,9 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, isLoa
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
 
   const formattedSkills = useMemo(() => {
-    if(experience.top_skills.length === 0) return "No skills yet"
-    return experience.top_skills.map((skill) => skill.preferredLabel).join(", ")
-  }, [experience.top_skills])
-
+    if (experience.top_skills.length === 0) return "No skills yet";
+    return experience.top_skills.map((skill) => skill.preferredLabel).join(", ");
+  }, [experience.top_skills]);
 
   if (isLoading) {
     return (

@@ -3,7 +3,7 @@ import "src/_test_utilities/consoleMock";
 
 import ChatMessageField, { DATA_TEST_ID, CHAT_MESSAGE_MAX_LENGTH, DISALLOWED_CHARACTERS } from "./ChatMessageField";
 import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
-import { mockBrowserIsOnLine } from "../../_test_utilities/mockBrowserIsOnline";
+import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 
 describe("ChatMessageField", () => {
   test("should render ChatMessageField correctly", () => {
@@ -304,7 +304,7 @@ describe("ChatMessageField", () => {
 
     test("should be disabled when browser is offline", () => {
       // GIVEN the browser is offline
-      mockBrowserIsOnLine(false)
+      mockBrowserIsOnLine(false);
       // AND handleSend function
       const handleSend = jest.fn();
       // WHEN ChatMessageField is rendered
@@ -328,19 +328,27 @@ describe("ChatMessageField", () => {
 
       // THEN expect handleSend not to be called
       expect(handleSend).not.toHaveBeenCalled();
-    })
+    });
 
     it("should focus on the input once ai is done typing", async () => {
-        // GIVEN handleSend function
-        const handleSend = jest.fn();
+      // GIVEN handleSend function
+      const handleSend = jest.fn();
 
-        // WHEN ChatMessageField is rendered
-        render(<ChatMessageField aiIsTyping={false} isChatFinished={false} handleSend={handleSend} message="foo" notifyChange={jest.fn()} />);
+      // WHEN ChatMessageField is rendered
+      render(
+        <ChatMessageField
+          aiIsTyping={false}
+          isChatFinished={false}
+          handleSend={handleSend}
+          message="foo"
+          notifyChange={jest.fn()}
+        />
+      );
 
-        const messageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
+      const messageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
 
-        // THEN expect input should be focused
-        expect(messageField).toHaveFocus();
-    })
+      // THEN expect input should be focused
+      expect(messageField).toHaveFocus();
+    });
   });
 });

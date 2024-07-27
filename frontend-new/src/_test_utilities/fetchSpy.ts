@@ -24,5 +24,7 @@ export function setupAPIServiceSpy(
     status: expectedStatus,
     headers: { "Content-Type": contentType },
   });
-  return jest.spyOn(require("src/apiService/APIService"), "fetchWithAuth").mockResolvedValue(expectedResponse);
+  return jest
+    .spyOn(require("src/utils/fetchWithAuth/fetchWithAuth"), "fetchWithAuth")
+    .mockResolvedValue(expectedResponse);
 }

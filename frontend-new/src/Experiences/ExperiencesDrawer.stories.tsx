@@ -47,13 +47,13 @@ export const ShownWithNoExperiences = {
     isOpen: true,
     experiences: [],
   },
-}
+};
 
 const ShownWithExperienceWithEmptySkills_experiences = generateRandomExperiences(1);
 ShownWithExperienceWithEmptySkills_experiences[0].top_skills = [];
-export const ShownWithExperienceWithEmptySkills =  {
+export const ShownWithExperienceWithEmptySkills = {
   args: {
     isOpen: true,
-    experiences: ShownWithExperienceWithEmptySkills_experiences
-  }
-}
+    experiences: ShownWithExperienceWithEmptySkills_experiences,
+  },
+};

@@ -1,7 +1,7 @@
-import React, {useEffect, useContext, useMemo, useState, MouseEvent} from "react";
+import React, { useEffect, useContext, useMemo, useState, MouseEvent } from "react";
 import { IconButton, InputAdornment, TextField, styled, useTheme, Typography, Box } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import { IsOnlineContext } from "src/app/providers/IsOnlineProvider";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 
 export interface ChatMessageFieldProps {
   message: string;
@@ -127,19 +127,19 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
   const isDisabled = props.isChatFinished || props.aiIsTyping;
 
   useEffect(() => {
-    if(inputRef.current && !props.aiIsTyping) {
+    if (inputRef.current && !props.aiIsTyping) {
       inputRef.current.focus();
     }
-  }, [props.aiIsTyping])
+  }, [props.aiIsTyping]);
 
   // if the input is focused and the user scrolls, the input should be blurred
   useEffect(() => {
     const handleTouchEnd = () => {
       // if the input is focused, blur it
       if (document.activeElement === inputRef.current) {
-        inputRef.current?.blur()
+        inputRef.current?.blur();
       }
-    }
+    };
     window.addEventListener("touchend", handleTouchEnd);
     return () => {
       window.removeEventListener("touchend", handleTouchEnd);
@@ -191,7 +191,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
                   <SendIcon
                     data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_ICON}
                     sx={{
-                      color: (isDisabled || !isOnline) ? theme.palette.grey[400] : theme.palette.primary.dark,
+                      color: isDisabled || !isOnline ? theme.palette.grey[400] : theme.palette.primary.dark,
                     }}
                   />
                 </IconButton>
