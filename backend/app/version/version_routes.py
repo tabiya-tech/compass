@@ -1,8 +1,12 @@
 import json
 import os
+import logging
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from app.constants.errors import HTTPErrorResponse
 
+
+logger = logging.getLogger(__name__)
 
 def add_version_routes(app: FastAPI):
     """
@@ -19,8 +23,14 @@ def add_version_routes(app: FastAPI):
         version_info = json.load(fp)
 
     @app.get(path="/version",
+             status_code=200,
+             responses={500: {"model": HTTPErrorResponse}},
              description="""
              Returns the version of the application
              """, )
     async def _get_version():
-        return version_info
+        try:
+            return version_info
+        except Exception as e:
+            logger.exception(e)
+            raise HTTPException(status_code=500, detail="Failed to retrieve the version of the application.")
