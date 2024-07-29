@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useMemo, useState } from "react";
+import React, { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import { useTokens } from "src/auth/hooks/useTokens";
 import { useAuthUser } from "src/auth/hooks/useAuthUser";
 import { AuthService } from "src/auth/AuthService/AuthService";
@@ -170,6 +170,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     },
     [logout]
   );
+
+  // Load the user on page load
+  useEffect(() => {
+    handlePageLoad(
+      (user: TabiyaUser) => {
+        updateUser(user);
+      },
+      (error: any) => {
+        // do nothing
+      }
+    );
+  }, [handlePageLoad, updateUser]);
 
   // Memoize the context value to optimize performance
   const value = useMemo(
