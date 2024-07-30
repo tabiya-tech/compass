@@ -96,31 +96,37 @@ class Retry(Generic[T]):
 DEFAULT_GENERATION_CONFIG = {
     "temperature": 0.1,
     "candidate_count": 1,
+    "top_p": 0.95,
 }
 
 ZERO_TEMPERATURE_GENERATION_CONFIG = {
     "temperature": 0.0,
     "candidate_count": 1,
+    "top_p": 0.95,
 }
 
 LOW_TEMPERATURE_GENERATION_CONFIG = {
     "temperature": 0.1,
-    "candidate_count": 1
+    "candidate_count": 1,
+    "top_p": 0.95,
 }
 
 MEDIUM_TEMPERATURE_GENERATION_CONFIG = {
     "temperature": 0.5,
     "candidate_count": 1,
+    "top_p": 0.95,
 }
 
 HIGH_TEMPERATURE_GENERATION_CONFIG = {
     "temperature": 1.0,
     "candidate_count": 1,
+    "top_p": 0.95,
 }
 
 CRAZY_TEMPERATURE_GENERATION_CONFIG = {
     "temperature": 2.0,
     "candidate_count": 1,
+    "top_p": 0.95,
 }
 
 JSON_GENERATION_CONFIG = {
@@ -161,7 +167,7 @@ class LLMConfig(BaseModel):
     """
     # gemini-1.5-flash is an auto update version the points to the most recent stable version
     # see https://cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versioning#auto-updated-version
-    language_model_name: str = "gemini-1.5-flash"
+    language_model_name: str = "gemini-1.5-flash-001"
     location: str = DEFAULT_VERTEX_API_REGION
     generation_config: dict = DEFAULT_GENERATION_CONFIG
     safety_settings: frozenset[SafetySetting] = DEFAULT_SAFETY_SETTINGS
