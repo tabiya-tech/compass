@@ -1,5 +1,3 @@
-import json
-
 from pydantic import BaseModel
 
 from app.agent.agent import Agent
@@ -74,23 +72,25 @@ class CollectExperiencesAgent(Agent):
         if self._state is None:
             raise ValueError("CollectExperiencesAgent: execute() called before state was initialized")
 
+        collected_data = self._state.collected_data
+        last_referenced_experience_index = -1
+        data_extraction_llm_stats = []
         if user_input.message == "":
             # If the user input is empty, set it to "(silence)"
             # This is to avoid the agent failing to respond to an empty input
             user_input.message = "(silence)"
-
-        collected_data = self._state.collected_data
-        # The data extraction LLM is responsible for extracting the experience data from the conversation
-        data_extraction_llm = _DataExtractionLLM(self.logger)
-        # TODO: the LLM can and will fail with an exception or even return None, we need to handle this
-        last_referenced_experience_index, data_extraction_llm_stats = await data_extraction_llm.execute(user_input=user_input,
-                                                                                                        context=context,
-                                                                                                        collected_experience_data_so_far=collected_data)
+        else:
+            # The data extraction LLM is responsible for extracting the experience data from the conversation
+            data_extraction_llm = _DataExtractionLLM(self.logger)
+            # TODO: the LLM can and will fail with an exception or even return None, we need to handle this
+            last_referenced_experience_index, data_extraction_llm_stats = await data_extraction_llm.execute(user_input=user_input,
+                                                                                                            context=context,
+                                                                                                            collected_experience_data_so_far=collected_data)
         conversion_llm = _ConversationLLM()
         # TODO: Keep track of the last_referenced_experience_index and if it has changed it means that the user has
-        # provided a new experience, we need to handle this as
-        # a) if the user has not finished with the previous one we should ask them to complete it first
-        # b) the model may have made a mistake interpreting the user input as we need to clarify
+        #   provided a new experience, we need to handle this as
+        #   a) if the user has not finished with the previous one we should ask them to complete it first
+        #   b) the model may have made a mistake interpreting the user input as we need to clarify
         conversation_llm_output: ConversationLLMAgentOutput
         exploring_type = self._state.unexplored_types[0] if len(self._state.unexplored_types) > 0 else None
         conversation_llm_output = await conversion_llm.execute(context=context,
