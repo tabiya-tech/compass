@@ -1,7 +1,7 @@
 import sys
 from typing import TypeVar
 
-T = TypeVar('T')
+T = TypeVar('T', bound='CompassTestCase')
 
 
 def get_test_cases_to_run(all_test_cases: list[T]) -> list[T]:
@@ -19,4 +19,13 @@ def get_test_cases_to_run(all_test_cases: list[T]) -> list[T]:
         cases_to_exclude_str = sys.argv[sys.argv.index('--test_cases_to_exclude') + 1].split(',')
         cases_to_run = [case for case in cases_to_run if case.name not in cases_to_exclude_str]
 
-    return cases_to_run
+    _cases_to_run = []
+    for tc in cases_to_run:
+        if hasattr(tc, 'skip_force'):
+            if tc.skip_force == "force":
+                return [tc]  # if there is a test case with force then run only that test case
+            elif tc.skip_force != "skip":
+                _cases_to_run.append(tc)  # gather all test cases that are not skipped
+
+    # if there are no test case with force then run all test cases that are not skipped
+    return _cases_to_run

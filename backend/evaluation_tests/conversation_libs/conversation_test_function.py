@@ -11,6 +11,7 @@ from app.conversation_memory.save_conversation_context import save_conversation_
     save_conversation_context_to_markdown
 from common_libs.llm.chat_models import GeminiChatLLM
 from common_libs.llm.models_utils import LLMConfig, LLMInput, MEDIUM_TEMPERATURE_GENERATION_CONFIG
+from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.conversation_libs import conversation_generator
 from evaluation_tests.conversation_libs.agent_executors import ExecuteAgentCallable, CheckAgentFinishedCallable, \
     ExecuteSimulatedUserCallable, GetConversationContextCallable
@@ -28,13 +29,20 @@ class Evaluation(BaseModel):
     expected: int
 
 
-class EvaluationTestCase(BaseModel):
+class EvaluationTestCase(CompassTestCase):
     """
     The definition of the test cases to be run.
     """
-    name: str
+
     simulated_user_prompt: str
+    """
+    The prompt for the simulated user.
+    """
+
     evaluations: list[Evaluation]
+    """
+    The evaluations to be run.
+    """
 
 
 class ScriptedUserEvaluationTestCase(EvaluationTestCase):
