@@ -13,11 +13,15 @@ from app.agent.agent_types import AgentInput, LLMStats
 from app.agent.collect_experiences_agent._types import CollectedData
 from app.agent.experience.work_type import WORK_TYPE_DEFINITIONS_FOR_PROMPT
 from app.agent.llm_caller import LLMCaller
+from app.agent.prompt_template import sanitize_input
 from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE, STD_AGENT_CHARACTER
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, ZERO_TEMPERATURE_GENERATION_CONFIG
+
+# The tags are part of the prompt template and should not be used as input data
+_TAGS_TO_FILTER = ["system instructions", "previously extracted experience data", "user's last input", "conversation history"]
 
 
 class _DataOperation(Enum):
@@ -202,7 +206,7 @@ class _DataExtractionLLM:
             user: {user_message}
             </User's Last Input>
             """).format(conversation_history=format_history_for_prompt(collected_experience_data_so_far, context),
-                        user_message=sanitize_input(user_message.strip()))
+                        user_message=sanitize_input(user_message.strip(), _TAGS_TO_FILTER))
 
     @staticmethod
     def _create_extraction_system_instructions(previously_extracted_data: str = "") -> str:
@@ -405,15 +409,6 @@ class _DataExtractionLLM:
         )
 
 
-def sanitize_input(input_str: str) -> str:
-    # The tags are part of the prompt template and should not be used as input data
-    _TAGS_TO_FILTER = ["system instructions", "previously extracted experience data", "user's last input", "conversation history"]
-    for tag in _TAGS_TO_FILTER:
-        input_str = re.sub(re.escape(f"<{tag}>"), "", input_str, flags=re.IGNORECASE)
-        input_str = re.sub(re.escape(f"</{tag}>"), "", input_str, flags=re.IGNORECASE)
-    return input_str
-
-
 def find_duplicate(item: CollectedData, items: list[CollectedData]) -> int:
     """
     Check if the item is a duplicating any of the items in the list.
@@ -441,6 +436,6 @@ def format_history_for_prompt(collected_experience_data_so_far: list[CollectedDa
                 _experience_ref = f" (see <Previously Extracted Experience Data> index={_data.index})"
                 break
 
-        _output += (f"{ConversationHistoryFormatter.USER}: '{sanitize_input(turn.input.message)}{_experience_ref}'\n"
-                    f"{ConversationHistoryFormatter.MODEL}: '{sanitize_input(turn.output.message_for_user)}'\n")
+        _output += (f"{ConversationHistoryFormatter.USER}: '{sanitize_input(turn.input.message, _TAGS_TO_FILTER)}{_experience_ref}'\n"
+                    f"{ConversationHistoryFormatter.MODEL}: '{sanitize_input(turn.output.message_for_user, _TAGS_TO_FILTER)}'\n")
     return _output
