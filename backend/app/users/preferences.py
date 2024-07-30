@@ -65,6 +65,7 @@ async def _get_user_preferences(
 
         if isinstance(e, HTTPException):
             raise e
+        raise HTTPException(status_code=500, detail="Oops! something went wrong")
 
 
 async def _create_user_preferences(
@@ -122,7 +123,7 @@ async def _get_new_session(user_repository: UserPreferenceRepository, user_id: s
         return await session_service.new_session(user_id)
     except Exception as e:
         ErrorService.handle(__name__, e)
-
+        raise HTTPException(status_code=500, detail="Oops! something went wrong")
 
 def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     """
@@ -143,6 +144,8 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     #########################
     @router.get("",
                 response_model=UserPreferences,
+                status_code=200,
+                responses={403: {"model" : HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
                 name="get user preferences",
                 description="Get user preferences, (language and time when they accepted terms and conditions)")
     async def _get_user_preferences_handler(user_id: str, user_info: UserInfo = Depends(auth.get_user_info())):
@@ -154,6 +157,7 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     @router.post("",
                  response_model=UserPreferences,
                  status_code=201,
+                 responses={403: {"model" : HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
                  name="add user preferences",
                  description="Add user preferences, (language and time when they accepted terms and conditions)"
                  )
@@ -166,6 +170,8 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     #########################
     @router.put("/update-language",
                 response_model=UserPreferences,
+                status_code=200,
+                responses={403: {"model" : HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
                 name="update user preferences, specifically language",
                 description="Update user preferences - language"
                 )
