@@ -11,12 +11,12 @@ import { TestUser } from "src/_test_utilities/mockLoggedInUser";
 
 describe("ProtectedRoute test", () => {
   const authContextValue = {
-    login: jest.fn(),
+    loginWithEmail: jest.fn(),
     isLoggingIn: false,
     isLoggingOut: false,
     isRegistering: false,
     user: null,
-    register: jest.fn(),
+    registerWithEmail: jest.fn(),
     logout: jest.fn(),
     handlePageLoad: jest.fn(),
   };

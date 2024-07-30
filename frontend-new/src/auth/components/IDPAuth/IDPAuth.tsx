@@ -9,11 +9,14 @@ import { TabiyaUser } from "src/auth/auth.types";
 import { useTokens } from "src/auth/hooks/useTokens";
 import { useAuthUser } from "src/auth/hooks/useAuthUser";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
+import { Box, Typography } from "@mui/material";
 
 const uniqueId = "f0324e97-83fd-49e6-95c3-1043751fa1db";
 export const DATA_TEST_ID = {
   FIREBASE_AUTH: `firebase-auth-${uniqueId}`,
   FIREBASE_FALLBACK_TEXT: `firebase-fallback-text-${uniqueId}`,
+  FIREBASE_AUTH_CONTAINER: `firebase-auth-container-${uniqueId}`,
+  CONTINUE_WITH_GOOGLE: `continue-with-google-${uniqueId}`,
 };
 export interface IDPAuthProps {
   notifyOnLogin: (user: TabiyaUser) => void;
@@ -67,15 +70,29 @@ const IDPAuth: React.FC<Readonly<IDPAuthProps>> = ({ notifyOnLogin, isLoading })
   }, [navigate, enqueueSnackbar, tokens, updateUserByIDToken, loading, isOnline, notifyOnLogin]);
 
   return (
-    <div data-test_id={DATA_TEST_ID.FIREBASE_AUTH}>
-      {(loading || isLoading) && <p>Loading...</p>}
-      {error && <p className="error">{error}</p>}
-      {isOnline ? (
-        <div id="firebaseui-auth-container" ref={firebaseUIElementRef}></div>
-      ) : (
-        <p data-testid={DATA_TEST_ID.FIREBASE_FALLBACK_TEXT}>Google sign in is not available when offline.</p>
-      )}
-    </div>
+    <Box
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+      mt={(theme) => theme.tabiyaSpacing.lg}
+      data-testid={DATA_TEST_ID.FIREBASE_AUTH_CONTAINER}
+    >
+      <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.CONTINUE_WITH_GOOGLE}>
+        Or continue with
+      </Typography>
+      <Box mt={2} width="100%">
+        <div data-test_id={DATA_TEST_ID.FIREBASE_AUTH}>
+          {(loading || isLoading) && <p>Loading...</p>}
+          {error && <p className="error">{error}</p>}
+          {isOnline ? (
+            <div id="firebaseui-auth-container" ref={firebaseUIElementRef}></div>
+          ) : (
+            <p data-testid={DATA_TEST_ID.FIREBASE_FALLBACK_TEXT}>Google sign in is not available when offline.</p>
+          )}
+        </div>
+      </Box>
+    </Box>
   );
 };
 

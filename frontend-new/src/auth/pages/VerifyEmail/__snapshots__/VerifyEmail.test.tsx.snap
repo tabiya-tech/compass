@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Testing Verify Email component with AuthProvider it should show verification page 1`] = `
+<div
+  class="MuiContainer-root MuiContainer-maxWidthXs css-xravbe-MuiContainer-root"
+  data-testid="verification-container-f1228c6a-e447-4946-b810-0c7ddc8ca833"
+>
+  <div
+    class="MuiBox-root css-inbm3t"
+  >
+    <span
+      data-testid="auth-header-container-40374529-6e2c-49d8-81d7-93f01603a648"
+    />
+    <button
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-q25fil-MuiButtonBase-root-MuiButton-root"
+      data-testid="verification-back-to-login-button-f1228c6a-e447-4946-b810-0c7ddc8ca833"
+      style="margin-top: 16px;"
+      tabindex="0"
+      type="button"
+    >
+      Back to Login
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+  </div>
+</div>
+`;
