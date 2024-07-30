@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Testing Register With Email component with AuthProvider it should show register form successfully 1`] = `
+<div
+  class="MuiContainer-root MuiContainer-maxWidthXs css-xravbe-MuiContainer-root"
+  data-testid="register-container-ab02918f-d559-47ba-9662-ea6b3a3606d0"
+>
+  <div
+    class="MuiBox-root css-inbm3t"
+  >
+    <span
+      data-testid="auth-header-container-40374529-6e2c-49d8-81d7-93f01603a648"
+    />
+    <span
+      data-testid="register-form-6cf1a0fa-8d75-4342-bf6b-1203d5b114d7"
+    />
+    <span
+      data-testid="firebase-auth-container-f0324e97-83fd-49e6-95c3-1043751fa1db"
+    />
+    <p
+      class="MuiTypography-root MuiTypography-body2 css-1t5l3lb-MuiTypography-root"
+      data-testid="register-login-link-ab02918f-d559-47ba-9662-ea6b3a3606d0"
+    >
+      Already have an account?
+       
+    </p>
+  </div>
+</div>
+`;

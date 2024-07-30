@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import { useTokens } from "src/auth/hooks/useTokens";
 import { useAuthUser } from "src/auth/hooks/useAuthUser";
-import { AuthService } from "src/auth/AuthService/AuthService";
+import { authService } from "src/auth/AuthService/AuthService";
 import {
   AuthContextValue,
   AuthProviderProps,
@@ -19,9 +19,9 @@ export const authContextDefaultValue: AuthContextValue = {
   isLoggingIn: false,
   isLoggingOut: false,
   isRegistering: false,
-  login: () => {},
+  loginWithEmail: () => {},
+  registerWithEmail: () => {},
   logout: () => {},
-  register: () => {},
   handlePageLoad: () => {},
 };
 
@@ -69,19 +69,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 
   /**
+   * Logs out the user by clearing tokens and user data
+   */
+  const logout = useCallback(
+    (successCallback: () => void, errorCallback: (error: any) => void) => {
+      setIsLoggingOut(true);
+      // Clear the tokens and user data
+      PersistentStorageService.clear();
+      tokens.clearTokens();
+      updateUser(null);
+      authService.handleLogout(successCallback, errorCallback).then((r) => setIsLoggingOut(false));
+    },
+    [updateUser, tokens]
+  );
+
+  /**
    * Logs in the user with an email and password
    */
-  const login = useCallback(
+  const loginWithEmail = useCallback(
     (
       email: string,
       password: string,
       successCallback: (user: TabiyaUser) => void,
       errorCallback: (error: any) => void
     ) => {
-      const authService = AuthService.getInstance();
       setIsLoggingIn(true);
       authService
-        .handleLogin(
+        .handleLoginWithEmail(
           email,
           password,
           (response: TFirebaseTokenResponse) => {
@@ -119,25 +133,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 
   /**
-   * Logs out the user by clearing tokens and user data
-   */
-  const logout = useCallback(
-    (successCallback: () => void, errorCallback: (error: any) => void) => {
-      setIsLoggingOut(true);
-      const authService = AuthService.getInstance();
-      // Clear the tokens and user data
-      PersistentStorageService.clear();
-      tokens.clearTokens();
-      updateUser(null);
-      authService.handleLogout(successCallback, errorCallback).then((r) => setIsLoggingOut(false));
-    },
-    [updateUser, tokens]
-  );
-
-  /**
    * Registers the user with an email and password
    */
-  const register = useCallback(
+  const registerWithEmail = useCallback(
     (
       email: string,
       password: string,
@@ -145,10 +143,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       successCallback: () => void,
       errorCallback: (error: any) => void
     ) => {
-      const authService = AuthService.getInstance();
       setIsRegistering(true);
       authService
-        .handleRegister(
+        .handleRegisterWithEmail(
           email,
           password,
           name,
@@ -171,7 +168,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     [logout]
   );
 
-  // Load the user on page load
+  /**
+   * Load the user on page load
+   */
+
   useEffect(() => {
     handlePageLoad(
       (user: TabiyaUser) => {
@@ -187,15 +187,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const value = useMemo(
     () => ({
       user,
-      login,
+      loginWithEmail,
+      registerWithEmail,
       logout,
-      register,
       isLoggingIn,
       isLoggingOut,
       isRegistering,
       handlePageLoad,
     }),
-    [logout, isLoggingIn, isLoggingOut, isRegistering, user, login, register, handlePageLoad]
+    [logout, isLoggingIn, isLoggingOut, isRegistering, user, loginWithEmail, registerWithEmail, handlePageLoad]
   );
 
   return (

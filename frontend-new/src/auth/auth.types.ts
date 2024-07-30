@@ -34,20 +34,20 @@ export type AuthContextValue = {
   isLoggingIn: boolean;
   isLoggingOut: boolean;
   isRegistering: boolean;
-  login: (
+  loginWithEmail: (
     email: string,
     password: string,
     successCallback: (user: TabiyaUser) => void,
     errorCallback: (error: Error) => void
   ) => void;
-  logout: (successCallback: () => void, errorCallback: (error: any) => void) => void;
-  register: (
+  registerWithEmail: (
     email: string,
     password: string,
     name: string,
     successCallback: () => void,
     errorCallback: (error: Error) => void
   ) => void;
+  logout: (successCallback: () => void, errorCallback: (error: any) => void) => void;
   handlePageLoad: (successCallback: (user: TabiyaUser) => void, errorCallback: (error: Error) => void) => void;
 };
 

@@ -5,7 +5,7 @@ import Register from "./Register";
 import { AuthContext, authContextDefaultValue } from "src/auth/AuthProvider/AuthProvider";
 
 const meta: Meta<typeof Register> = {
-  title: "Auth/Register",
+  title: "Auth/EmailAuth/RegisterWithEmail",
   component: Register,
   tags: ["autodocs"],
   decorators: [

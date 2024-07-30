@@ -6,6 +6,7 @@ import { HashRouter } from "react-router-dom";
 import { mockLoggedInUser } from "src/_test_utilities/mockLoggedInUser";
 import { waitFor } from "@testing-library/react";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
+import { DATA_TEST_ID as AUTH_HEADER_DATA_TEST_ID } from "src/auth/components/AuthHeader/AuthHeader";
 
 // mock the router
 jest.mock("react-router-dom", () => {
@@ -16,6 +17,18 @@ jest.mock("react-router-dom", () => {
     useNavigate: jest.fn().mockReturnValue(jest.fn()),
     NavLink: jest.fn().mockImplementation(() => {
       return <></>;
+    }),
+  };
+});
+
+// mock the AuthHeader component
+jest.mock("src/auth/components/AuthHeader/AuthHeader", () => {
+  const actual = jest.requireActual("src/auth/components/AuthHeader/AuthHeader");
+  return {
+    ...actual,
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return <span data-testid={actual.DATA_TEST_ID.AUTH_HEADER_CONTAINER}></span>;
     }),
   };
 });
@@ -46,10 +59,10 @@ describe("Testing Verify Email component with AuthProvider", () => {
     expect(console.warn).not.toHaveBeenCalled();
 
     // AND the component should be rendered
-    expect(screen.getByTestId(DATA_TEST_ID.VERIFY_EMAIL_CONTAINER)).toBeDefined();
+    expect(screen.getByTestId(DATA_TEST_ID.VERIFY_EMAIL_CONTAINER)).toBeInTheDocument();
 
-    // AND the body text should be rendered
-    expect(screen.getByTestId(DATA_TEST_ID.VERIFICATION_BODY)).toBeInTheDocument();
+    // AND the header component should be rendered
+    expect(screen.getByTestId(AUTH_HEADER_DATA_TEST_ID.AUTH_HEADER_CONTAINER)).toBeInTheDocument();
 
     // AND the back to login button should be rendered
     expect(screen.getByTestId(DATA_TEST_ID.BACK_TO_LOGIN_BUTTON)).toBeInTheDocument();
