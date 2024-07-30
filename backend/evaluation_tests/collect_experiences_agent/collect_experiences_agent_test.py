@@ -12,7 +12,7 @@ from evaluation_tests.conversation_libs.conversation_test_function import conver
 from evaluation_tests.collect_experiences_agent.collect_experiences_test_cases import test_cases
 from evaluation_tests.collect_experiences_agent.collect_experiences_executor import CollectExperienceAgentGetConversationContextExecutor, \
     CollectExperienceAgentIsFinished, CollectExperiencesAgentExecutor
-from evaluation_tests.collect_experiences_agent.conversation_generator import generate
+from evaluation_tests.conversation_libs.conversation_generator import generate
 
 TEST_DICTIONARY = {
     test_case.name: test_case for test_case in test_cases
