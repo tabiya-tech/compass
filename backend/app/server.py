@@ -16,6 +16,7 @@ from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.agent.experience.experience_entity import ExperienceEntity
 from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
 from app.constants.errors import HTTPErrorResponse, ErrorService
+from app.invitations.routes import add_user_invitations_routes
 from app.users.auth import Authentication, UserInfo
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
@@ -296,6 +297,11 @@ async def get_experiences(session_id: int, user_info: UserInfo = Depends(auth.ge
 # Add routes relevant for the user management
 ############################################
 add_users_routes(app, auth)
+
+############################################
+# Add the user invitations routes
+############################################
+add_user_invitations_routes(app)
 
 ############################################
 # Add POC chat routes

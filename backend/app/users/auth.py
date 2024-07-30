@@ -2,6 +2,9 @@ import base64
 import logging
 import json
 import os
+from enum import Enum
+from typing import Optional
+
 import jwt
 
 from pydantic import BaseModel
@@ -9,6 +12,12 @@ from fastapi import Depends, Request, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 logger = logging.getLogger(__name__)
+
+
+class SignInProvider(Enum):
+    ANONYMOUS = "anonymous"
+    PASSWORD = "password"  # nosec
+    GOOGLE = "google.com"
 
 
 class UserInfo(BaseModel):
@@ -20,14 +29,20 @@ class UserInfo(BaseModel):
     The user id. This is the unique identifier for the user. We get it from idp (identity provider) like firebase.
     """
 
-    name: str
+    name: Optional[str] = None
     """
     name of the user.
+    It is optional because the user may not have a name. ie: Anonymous user.
     """
 
-    email: str
+    email: Optional[str] = None
 
     token: str
+
+    sign_in_provider: SignInProvider
+    """
+    Sign in Provider
+    """
 
     class Config:
         extra = "forbid"
@@ -113,9 +128,10 @@ class Authentication:
 
                 user_info = UserInfo(
                     user_id=token_info["sub"],
-                    name=token_info["name"],
-                    email=token_info["email"],
-                    token=credentials
+                    name=token_info["name"] if "name" in token_info else None,  # Anon user will not have a name
+                    email=token_info["email"] if "email" in token_info else None,  # Anon user will not have an email
+                    token=credentials,
+                    sign_in_provider=token_info["firebase"]["sign_in_provider"]
                 )
 
                 logger.info(f"authenticated user : {user_info.user_id}")

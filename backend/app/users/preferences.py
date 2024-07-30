@@ -1,7 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends
 
 from app.constants.errors import ErrorService, HTTPErrorResponse
-from app.users.auth import Authentication, UserInfo
+from app.invitations.service import UserInvitationService
+from app.invitations.types import InvitationCodeStatus, InvitationType
+from app.users.auth import Authentication, UserInfo, SignInProvider
 from app.users.repositories import UserPreferenceRepository
 from app.users.sessions import generate_new_session_id, SessionsService
 from app.users.types import UserPreferencesUpdateRequest, UserPreferences, UpdateUserLanguageRequest, \
@@ -69,12 +71,29 @@ async def _get_user_preferences(
 
 
 async def _create_user_preferences(
+        user_invitation_service: UserInvitationService,
         repository: UserPreferenceRepository,
         user: CreateUserPreferencesRequest,
         authed_user: UserInfo) -> UserPreferences:
     try:
         if user.user_id != authed_user.user_id:
             raise HTTPException(status_code=403, detail="forbidden")
+
+        # validation of invitation code.
+        invitation = await user_invitation_service.get_invitation_status(user.invitation_code)
+
+        if invitation.status == InvitationCodeStatus.INVALID:
+            raise HTTPException(status_code=400, detail="Invalid invitation code")
+
+        # an authenticated user can't use an auto-register invitation code
+        if (invitation.invitation_type == InvitationType.AUTO_REGISTER.value
+                and authed_user.sign_in_provider != SignInProvider.ANONYMOUS):
+            raise HTTPException(status_code=400, detail="Invalid invitation code")
+
+        # an anonymous user can't use a register invitation code because it requires user to register
+        if (invitation.invitation_type == InvitationType.REGISTER.value and
+                authed_user.sign_in_provider == SignInProvider.ANONYMOUS):
+            raise HTTPException(status_code=400, detail="Invalid invitation code")
 
         user_already_exists = await repository.get_user_preference_by_user_id(user.user_id)
 
@@ -83,11 +102,19 @@ async def _create_user_preferences(
                 status_code=409,
                 detail="user already exists"
             )
+
         # Generating a 64-bit integer session ID
         session_id = generate_new_session_id()  # nosec
 
+        # Reduce the invitation code capacity
+        is_reduced = await user_invitation_service.reduce_invitation_code_capacity(user.invitation_code)
+
+        if not is_reduced:
+            raise HTTPException(status_code=400, detail="Invalid invitation code")
+
         user.sessions = [session_id]
 
+        # Create the user preferences
         created = await repository.insert_user_preference(user.user_id, UserPreferences(
             language=user.language,
             accepted_tc=user.accepted_tc,
@@ -95,16 +122,14 @@ async def _create_user_preferences(
         ))
 
         return created
+
     except Exception as e:
         logger.exception(e)
 
         if isinstance(e, HTTPException):
             raise e
 
-        raise HTTPException(status_code=500, detail={
-            "message": "failed to create user preferences",
-            "cause": e
-        })
+        raise HTTPException(status_code=500, detail="failed to create user preferences")
 
 
 async def _get_new_session(user_repository: UserPreferenceRepository, user_id: str, authed_user: UserInfo) -> UserPreferences:
@@ -125,6 +150,7 @@ async def _get_new_session(user_repository: UserPreferenceRepository, user_id: s
         ErrorService.handle(__name__, e)
         raise HTTPException(status_code=500, detail="Oops! something went wrong")
 
+
 def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     """
     Add all routes related to user preferences to the users router.
@@ -138,6 +164,7 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     # Dependency Injection - User Preference Repository
     #########################
     user_preference_repository = UserPreferenceRepository()
+    user_invitation_service = UserInvitationService()
 
     #########################
     # GET /preferences - Get user preferences by user id
@@ -163,7 +190,7 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
                  )
     async def _create_handler(user_preferences: CreateUserPreferencesRequest,
                               user_info: UserInfo = Depends(auth.get_user_info())):
-        return await _create_user_preferences(user_preference_repository, user_preferences, user_info)
+        return await _create_user_preferences(user_invitation_service, user_preference_repository, user_preferences, user_info)
 
     #########################
     # PUT /update-language - Update user preferences - language
