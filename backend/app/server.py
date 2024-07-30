@@ -1,7 +1,6 @@
 import logging
 import os
 import random
-import uuid
 
 from datetime import datetime
 from typing import List, Annotated
@@ -15,7 +14,6 @@ from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_types import AgentInput
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.agent.experience.experience_entity import ExperienceEntity
-from app.agent.experience.work_type import WorkType
 from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
 from app.constants.errors import HTTPErrorResponse, ErrorService
 from app.users.auth import Authentication, UserInfo
