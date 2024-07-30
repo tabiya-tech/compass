@@ -1,7 +1,7 @@
 import React from "react";
-import { Box, Container, Typography } from "@mui/material";
-import LanguageContextMenu from "src/i18n/languageContextMenu/LanguageContextMenu";
+import { Box, Container } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
+import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
 
 const uniqueId = "f1228c6a-e447-4946-b810-0c7ddc8ca833";
 
@@ -36,22 +36,12 @@ const VerifyEmail: React.FC<Readonly<VerifyEmailProps>> = ({ notifyOnEmailVerifi
         m={4}
         height={"80%"}
       >
-        <Box display="flex" flexDirection="row" justifyContent="center" alignItems="center">
-          <img
-            src={`${process.env.PUBLIC_URL}/logo.svg`}
-            alt="Logo"
-            style={{ maxWidth: "60%", margin: "10%" }}
-            data-testid={DATA_TEST_ID.LOGO}
-          />
-          <LanguageContextMenu />
-        </Box>
-        <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.TITLE}>
-          Thank you for registering to Tabiya Compass.
-        </Typography>
-        <Typography variant="body2" gutterBottom data-testid={DATA_TEST_ID.VERIFICATION_BODY}>
-          A verification email has been sent to your email address. To continue, please verify your email address first.
-        </Typography>
-
+        <AuthHeader
+          title={"Thank you for registering to Tabiya Compass."}
+          subtitle={
+            "A verification email has been sent to your email address. To continue, please verify your email address first."
+          }
+        />
         <PrimaryButton
           fullWidth
           variant="contained"

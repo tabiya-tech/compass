@@ -21,6 +21,31 @@ export class AuthService {
   }
 
   /**
+   * Handle user logout.
+   * @param {() => void} successCallback - Callback to execute on successful logout.
+   * @param {(error: any) => void} errorCallback - Callback to execute on logout error.
+   */
+  async handleLogout(successCallback: () => void, errorCallback: (error: any) => void): Promise<void> {
+    const errorFactory = getServiceErrorFactory("AuthService", "handleLogout", "POST", "signOut");
+    try {
+      await auth.signOut();
+      successCallback();
+    } catch (error) {
+      const firebaseError = (error as any).code;
+      //@ts-ignore
+      const errorMessage = FIREBASE_ERROR_MESSAGES[firebaseError] || (error as Error).message;
+      errorCallback(
+        errorFactory(
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          firebaseError || ErrorConstants.ErrorCodes.FAILED_TO_FETCH,
+          errorMessage,
+          {}
+        )
+      );
+    }
+  }
+
+  /**
    * Handle user login with email and password.
    * @param {string} email - The user's email address.
    * @param {string} password - The user's password.
@@ -28,7 +53,7 @@ export class AuthService {
    * @param {(error: any) => void} errorCallback - Callback to execute on login error.
    * @returns {Promise<TFirebaseTokenResponse | undefined>} The login response, or undefined if there was an error.
    */
-  async handleLogin(
+  async handleLoginWithEmail(
     email: string,
     password: string,
     successCallback: (data: TFirebaseTokenResponse) => void,
@@ -82,31 +107,6 @@ export class AuthService {
   }
 
   /**
-   * Handle user logout.
-   * @param {() => void} successCallback - Callback to execute on successful logout.
-   * @param {(error: any) => void} errorCallback - Callback to execute on logout error.
-   */
-  async handleLogout(successCallback: () => void, errorCallback: (error: any) => void): Promise<void> {
-    const errorFactory = getServiceErrorFactory("AuthService", "handleLogout", "POST", "signOut");
-    try {
-      await auth.signOut();
-      successCallback();
-    } catch (error) {
-      const firebaseError = (error as any).code;
-      //@ts-ignore
-      const errorMessage = FIREBASE_ERROR_MESSAGES[firebaseError] || (error as Error).message;
-      errorCallback(
-        errorFactory(
-          StatusCodes.INTERNAL_SERVER_ERROR,
-          firebaseError || ErrorConstants.ErrorCodes.FAILED_TO_FETCH,
-          errorMessage,
-          {}
-        )
-      );
-    }
-  }
-
-  /**
    * Handle user registration with email, password, and name.
    * @param {string} email - The user's email address.
    * @param {string} password - The user's password.
@@ -115,7 +115,7 @@ export class AuthService {
    * @param {(error: any) => void} errorCallback - Callback to execute on registration error.
    * @returns {Promise<TFirebaseTokenResponse | undefined>} The registration response, or undefined if there was an error.
    */
-  async handleRegister(
+  async handleRegisterWithEmail(
     email: string,
     password: string,
     name: string,

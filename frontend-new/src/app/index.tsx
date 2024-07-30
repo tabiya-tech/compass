@@ -2,10 +2,10 @@ import { Route, Routes } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import Home from "src/homePage/Home";
 import Info from "src/info/Info";
-import Register from "src/auth/components/Register/Register";
-import Login from "src/auth/components/Login/Login";
+import RegisterWithEmail from "src/auth/pages/Register/Register";
+import LoginWithEmail from "src/auth/pages/Login/Login";
 import DataProtectionAgreement from "src/dataProtectionAgreement/DataProtectionAgreement";
-import VerifyEmail from "src/auth/components/VerifyEmail/VerifyEmail";
+import VerifyEmail from "src/auth/pages/VerifyEmail/VerifyEmail";
 import NotFound from "src/errorPage/NotFound";
 import ProtectedRoute from "src/app/ProtectedRoute/ProtectedRoute";
 import { useRouteHandlers } from "src/app/hooks/useRouteHandlers";
@@ -47,7 +47,7 @@ const App = () => {
         path={routerPaths.REGISTER}
         element={
           <ProtectedRoute authenticationAndDPARequired={false}>
-            <Register
+            <RegisterWithEmail
               postRegisterHandler={handleRegister}
               postLoginHandler={handleLogin}
               isPostLoginLoading={isPostLoginLoading}
@@ -59,7 +59,7 @@ const App = () => {
         path={routerPaths.LOGIN}
         element={
           <ProtectedRoute authenticationAndDPARequired={false}>
-            <Login postLoginHandler={handleLogin} isLoading={isPostLoginLoading} />
+            <LoginWithEmail postLoginHandler={handleLogin} isLoading={isPostLoginLoading} />
           </ProtectedRoute>
         }
       />

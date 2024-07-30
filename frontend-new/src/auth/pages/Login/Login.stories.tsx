@@ -5,7 +5,7 @@ import Login from "./Login";
 import { AuthContext, authContextDefaultValue } from "src/auth/AuthProvider/AuthProvider";
 
 const meta: Meta<typeof Login> = {
-  title: "Auth/Login",
+  title: "Auth/EmailAuth/LoginWithEmail",
   tags: ["autodocs"],
   component: Login,
   decorators: [

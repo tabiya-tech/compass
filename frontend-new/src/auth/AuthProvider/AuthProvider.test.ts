@@ -51,13 +51,13 @@ describe("AuthProvider module", () => {
       const givenEmail = "foo@bar.baz";
       const givenPassword = "password";
 
-      const loginSpy = jest.spyOn(authService, "handleLogin");
+      const loginSpy = jest.spyOn(authService, "handleLoginWithEmail");
 
       //initially isLogging in should be false.
       expect(result.current.isLoggingIn).toBe(false);
 
       act(() => {
-        result.current?.login(givenEmail, givenPassword, givenSuccessCallback, givenErrorCallback);
+        result.current?.loginWithEmail(givenEmail, givenPassword, givenSuccessCallback, givenErrorCallback);
       });
 
       // THEN the auth service handleLogin function should be called with the correct parameters
@@ -79,7 +79,7 @@ describe("AuthProvider module", () => {
       const givenEmail = "foo@bar.baz";
       const givenPassword = "password";
 
-      const loginSpy = jest.spyOn(authService, "handleLogin");
+      const loginSpy = jest.spyOn(authService, "handleLoginWithEmail");
       const loginError = new Error("Login failed");
       //@ts-ignore
       loginSpy.mockImplementationOnce((_email, _password, _successCallback, errorCallback) => {
@@ -90,7 +90,7 @@ describe("AuthProvider module", () => {
       expect(result.current.isLoggingIn).toBe(false);
 
       act(() => {
-        result.current?.login(givenEmail, givenPassword, givenSuccessCallback, givenErrorCallback);
+        result.current?.loginWithEmail(givenEmail, givenPassword, givenSuccessCallback, givenErrorCallback);
       });
 
       // THEN the auth service handleLogin function should be called with the correct parameters
@@ -153,13 +153,19 @@ describe("AuthProvider module", () => {
       const givenSuccessCallback = jest.fn();
       const givenErrorCallback = jest.fn();
 
-      const registerSpy = jest.spyOn(authService, "handleRegister");
+      const registerSpy = jest.spyOn(authService, "handleRegisterWithEmail");
 
       // Initially isRegistering should be false.
       expect(result.current.isRegistering).toBe(false);
 
       act(() => {
-        result.current?.register(givenEmail, givenPassword, givenName, givenSuccessCallback, givenErrorCallback);
+        result.current?.registerWithEmail(
+          givenEmail,
+          givenPassword,
+          givenName,
+          givenSuccessCallback,
+          givenErrorCallback
+        );
       });
 
       // THEN the auth service handleRegister function should be called with the correct parameters
@@ -189,7 +195,7 @@ describe("AuthProvider module", () => {
       const givenSuccessCallback = jest.fn();
       const givenErrorCallback = jest.fn();
 
-      const registerSpy = jest.spyOn(authService, "handleRegister");
+      const registerSpy = jest.spyOn(authService, "handleRegisterWithEmail");
       const registerError = new Error("Register failed");
       //@ts-ignore
       registerSpy.mockImplementationOnce((_email, _password, _name, _successCallback, errorCallback) => {
@@ -200,7 +206,13 @@ describe("AuthProvider module", () => {
       expect(result.current.isRegistering).toBe(false);
 
       act(() => {
-        result.current?.register(givenEmail, givenPassword, givenName, givenSuccessCallback, givenErrorCallback);
+        result.current?.registerWithEmail(
+          givenEmail,
+          givenPassword,
+          givenName,
+          givenSuccessCallback,
+          givenErrorCallback
+        );
       });
 
       // THEN the auth service handleRegister function should be called with the correct parameters

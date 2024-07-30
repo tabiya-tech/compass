@@ -1,6 +1,6 @@
 import "src/_test_utilities/consoleMock";
 import React from "react";
-import { render, screen, waitFor, fireEvent } from "src/_test_utilities/test-utils";
+import { render, screen, waitFor } from "src/_test_utilities/test-utils";
 import { HashRouter, useNavigate } from "react-router-dom";
 import Login, { DATA_TEST_ID } from "./Login";
 import { AuthContext, TabiyaUser } from "src/auth/AuthProvider/AuthProvider";
@@ -10,6 +10,8 @@ import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 import { ServiceError } from "src/error/error";
 import ErrorConstants from "src/error/error.constants";
 import { StatusCodes } from "http-status-codes";
+import LoginWithEmailForm from "src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm";
+import { DATA_TEST_ID as AUTH_HEADER_DATA_TEST_ID } from "src/auth/components/AuthHeader/AuthHeader";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -56,16 +58,28 @@ jest.mock("react-router-dom", () => {
   };
 });
 
-describe("Testing Login component with AuthProvider", () => {
-  const loginMock = jest.fn();
+// mock the login form with email component
+jest.mock("src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm", () => {
+  const actual = jest.requireActual("src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm");
+  return {
+    ...actual,
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return <span data-testid={actual.DATA_TEST_ID.FORM}></span>;
+    }),
+  };
+});
+
+describe("Testing Login With Email component with AuthProvider", () => {
+  const loginWithEmailMock = jest.fn();
 
   const authContextValue = {
-    login: loginMock,
+    loginWithEmail: loginWithEmailMock,
     isLoggingIn: false,
     isLoggingOut: false,
     isRegistering: false,
     user: null,
-    register: jest.fn(),
+    registerWithEmail: jest.fn(),
     logout: jest.fn(),
     handlePageLoad: jest.fn(),
   };
@@ -94,31 +108,20 @@ describe("Testing Login component with AuthProvider", () => {
     expect(console.warn).not.toHaveBeenCalled();
 
     // AND the component should be rendered
-    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toBeDefined();
+    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toBeInTheDocument();
+
+    // AND the header component should be rendered
+    expect(screen.getByTestId(AUTH_HEADER_DATA_TEST_ID.AUTH_HEADER_CONTAINER)).toBeInTheDocument();
 
     // AND the form inputs and button should be displayed
-    expect(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT)).toBeInTheDocument();
-    expect(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT)).toBeInTheDocument();
-    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_BUTTON)).toBeInTheDocument();
+    expect(LoginWithEmailForm).toHaveBeenCalled();
 
-    // AND the login button should not be disabled
-    expect(screen.queryByTestId(DATA_TEST_ID.LOGIN_BUTTON_CIRCULAR_PROGRESS)).not.toBeInTheDocument();
+    // AND when the login form calls the notifyOnLogin function when the form is submitted
+    (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnLogin(new Event("submit"));
 
-    // Simulate form input and submission
-    fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: "john.doe@example.com" } });
-    fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: "password" } });
-
-    // Trigger form submission
-    fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
-
-    // Expect the login function to have been called
+    // THEN expect the login function to have been called
     await waitFor(() => {
-      expect(loginMock).toHaveBeenCalledWith(
-        "john.doe@example.com",
-        "password",
-        expect.any(Function),
-        expect.any(Function)
-      );
+      expect(loginWithEmailMock).toHaveBeenCalled();
     });
 
     // AND the component should match the snapshot
@@ -139,7 +142,7 @@ describe("Testing Login component with AuthProvider", () => {
       };
       const givenNotifyOnLogin = jest.fn();
       const givenIsLoading = false;
-      loginMock.mockImplementation((email, password, onSuccess, onError) => {
+      loginWithEmailMock.mockImplementation((email, password, onSuccess, onError) => {
         onSuccess(givenUser);
       });
 
@@ -156,23 +159,17 @@ describe("Testing Login component with AuthProvider", () => {
       expect(console.warn).not.toHaveBeenCalled();
 
       // AND the component should be rendered
-      expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toBeDefined();
+      expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toBeInTheDocument();
 
       // AND the form inputs and button should be displayed
-      expect(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT)).toBeInTheDocument();
-      expect(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT)).toBeInTheDocument();
-      expect(screen.getByTestId(DATA_TEST_ID.LOGIN_BUTTON)).toBeInTheDocument();
+      expect(LoginWithEmailForm).toHaveBeenCalled();
 
-      // Simulate form input and submission
-      fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: "foo@bar.baz" } });
-      fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: "password" } });
-
-      // Trigger form submission
-      fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
+      // AND when the login form calls the notifyOnLogin function when the form is submitted
+      (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnLogin(new Event("submit"));
 
       // THEN expect the login function to have been called
       await waitFor(() => {
-        expect(loginMock).toHaveBeenCalledWith("foo@bar.baz", "password", expect.any(Function), expect.any(Function));
+        expect(loginWithEmailMock).toHaveBeenCalled();
       });
 
       // AND the notifyOnLogin function should have been called
@@ -184,7 +181,7 @@ describe("Testing Login component with AuthProvider", () => {
 
   test("it should show an error message if the user's email is not verified", async () => {
     // GIVEN the login function will fail with an error message
-    loginMock.mockImplementation((email, password, onSuccess, onError) => {
+    loginWithEmailMock.mockImplementation((email, password, onSuccess, onError) => {
       const mockServiceError = new ServiceError(
         "AuthService",
         "handleLogin",
@@ -212,23 +209,17 @@ describe("Testing Login component with AuthProvider", () => {
     expect(console.warn).not.toHaveBeenCalled();
 
     // AND the component should be rendered
-    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toBeDefined();
+    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toBeInTheDocument();
 
     // AND the form inputs and button should be displayed
-    expect(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT)).toBeInTheDocument();
-    expect(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT)).toBeInTheDocument();
-    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_BUTTON)).toBeInTheDocument();
+    expect(LoginWithEmailForm).toHaveBeenCalled();
 
-    // Simulate form input and submission
-    fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: "foo@bar.baz" } });
-    fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: "password" } });
-
-    // Trigger form submission
-    fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
+    // AND when the login form calls the notifyOnLogin function when the form is submitted
+    (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnLogin(new Event("submit"));
 
     // THEN expect the login function to have been called
     await waitFor(() => {
-      expect(loginMock).toHaveBeenCalledWith("foo@bar.baz", "password", expect.any(Function), expect.any(Function));
+      expect(loginWithEmailMock).toHaveBeenCalled();
     });
 
     // AND the error message should be displayed
@@ -245,7 +236,7 @@ describe("Testing Login component with AuthProvider", () => {
 
   test("it should show error message when login fails", async () => {
     // GIVEN the login function will fail
-    loginMock.mockImplementation((email, password, onSuccess, onError) => {
+    loginWithEmailMock.mockImplementation((email, password, onSuccess, onError) => {
       onError(new Error("Login failed"));
     });
 
@@ -263,23 +254,17 @@ describe("Testing Login component with AuthProvider", () => {
     expect(console.warn).not.toHaveBeenCalled();
 
     // AND the component should be rendered
-    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toBeDefined();
+    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toBeInTheDocument();
 
     // AND the form inputs and button should be displayed
-    expect(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT)).toBeInTheDocument();
-    expect(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT)).toBeInTheDocument();
-    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_BUTTON)).toBeInTheDocument();
+    expect(LoginWithEmailForm).toHaveBeenCalled();
 
-    // Simulate form input and submission
-    fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: "foo@bar.baz" } });
-    fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: "password" } });
-
-    // Trigger form submission
-    fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
+    // AND when the login form calls the notifyOnLogin function when the form is submitted
+    (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnLogin(new Event("submit"));
 
     // THEN expect the login function to have been called
     await waitFor(() => {
-      expect(loginMock).toHaveBeenCalledWith("foo@bar.baz", "password", expect.any(Function), expect.any(Function));
+      expect(loginWithEmailMock).toHaveBeenCalled();
     });
 
     // AND the error message should be displayed
@@ -289,32 +274,5 @@ describe("Testing Login component with AuthProvider", () => {
         { variant: "error" }
       );
     });
-  });
-
-  it("should disable everything when logging in", () => {
-    // GIVEN the isLoggingIn flag is set to true
-    const _authContextValue = {
-      ...authContextValue,
-      isLoggingIn: true,
-    };
-
-    // WHEN the Login component is rendered within the AuthContext and Router
-    render(
-      <HashRouter>
-        <AuthContext.Provider value={_authContextValue}>
-          <Login postLoginHandler={() => {}} isLoading={false} />
-        </AuthContext.Provider>
-      </HashRouter>
-    );
-
-    // THEN expect the login button to be disabled
-    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_BUTTON)).toBeDisabled();
-    // AND the email input to be disabled
-    expect(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT)).toBeDisabled();
-    // AND the password input to be disabled
-    expect(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT)).toBeDisabled();
-
-    // AND login button circular progress to be displayed
-    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_BUTTON_CIRCULAR_PROGRESS)).toBeInTheDocument();
   });
 });

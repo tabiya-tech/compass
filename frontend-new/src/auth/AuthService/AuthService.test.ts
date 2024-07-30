@@ -56,7 +56,7 @@ describe("AuthService class tests", () => {
       (jwtDecode as jest.Mock).mockReturnValueOnce(givenUser);
 
       // WHEN the login is attempted
-      await authService.handleLogin(givenEmail, givenPassword, successCallback, errorCallback);
+      await authService.handleLoginWithEmail(givenEmail, givenPassword, successCallback, errorCallback);
 
       // THEN test should call the firebase login function with the given email and password
       expect(firebase.auth().signInWithEmailAndPassword).toHaveBeenCalledWith(givenEmail, givenPassword);
@@ -73,7 +73,7 @@ describe("AuthService class tests", () => {
       const errorCallback = jest.fn();
 
       // WHEN the login is attempted
-      await authService.handleLogin(givenEmail, givenPassword, successCallback, errorCallback);
+      await authService.handleLoginWithEmail(givenEmail, givenPassword, successCallback, errorCallback);
 
       // THEN test should call the firebase login function with the given email and password
       expect(firebase.auth().signInWithEmailAndPassword).toHaveBeenCalledWith(givenEmail, givenPassword);
@@ -97,7 +97,7 @@ describe("AuthService class tests", () => {
       const errorCallback = jest.fn();
 
       // WHEN the login is attempted
-      await authService.handleLogin(givenEmail, givenPassword, successCallback, errorCallback);
+      await authService.handleLoginWithEmail(givenEmail, givenPassword, successCallback, errorCallback);
 
       // THEN the error callback should be called with Email not verified
       await expect(errorCallback).toHaveBeenCalledWith(
@@ -120,7 +120,7 @@ describe("AuthService class tests", () => {
       const errorCallback = jest.fn();
 
       // WHEN the login is attempted
-      await authService.handleLogin(givenEmail, givenPassword, successCallback, errorCallback);
+      await authService.handleLoginWithEmail(givenEmail, givenPassword, successCallback, errorCallback);
       // THEN the error callback should be called with Failed to Fetch
       await expect(errorCallback).toHaveBeenCalledWith(
         new Error("There is no user record corresponding to this email.")
@@ -194,7 +194,7 @@ describe("AuthService class tests", () => {
       (jwtDecode as jest.Mock).mockReturnValueOnce(givenUser);
 
       // WHEN the registration is attempted
-      await authService.handleRegister(givenEmail, givenPassword, givenName, successCallback, errorCallback);
+      await authService.handleRegisterWithEmail(givenEmail, givenPassword, givenName, successCallback, errorCallback);
 
       // THEN test should call the firebase registration function with the given email and password
       expect(firebase.auth().createUserWithEmailAndPassword).toHaveBeenCalledWith(givenEmail, givenPassword);
@@ -211,7 +211,7 @@ describe("AuthService class tests", () => {
       const errorCallback = jest.fn();
 
       // WHEN the registration is attempted
-      await authService.handleRegister(givenEmail, givenPassword, givenName, successCallback, errorCallback);
+      await authService.handleRegisterWithEmail(givenEmail, givenPassword, givenName, successCallback, errorCallback);
 
       // THEN test should call the firebase registration function with the given email and password
       expect(firebase.auth().createUserWithEmailAndPassword).toHaveBeenCalledWith(givenEmail, givenPassword);
@@ -231,7 +231,7 @@ describe("AuthService class tests", () => {
       const errorCallback = jest.fn();
 
       // WHEN the registration is attempted
-      await authService.handleRegister(givenEmail, givenPassword, givenName, successCallback, errorCallback);
+      await authService.handleRegisterWithEmail(givenEmail, givenPassword, givenName, successCallback, errorCallback);
       // THEN the error callback should be called with Failed to Fetch
       expect(errorCallback).toHaveBeenCalledWith(new Error("There is no user record corresponding to this email."));
     });
