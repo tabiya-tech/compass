@@ -4,11 +4,11 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from app.agent.skill_explorer_agent import SkillsExplorerAgent
 from app.countries import Country
 from app.agent.collect_experiences_agent import CollectExperiencesAgent
 from app.agent.experience.experience_entity import ExperienceEntity
 from app.agent.infer_occupation_tool.infer_occupation_tool import InferOccupationTool
-from app.agent.skill_explorer_agent import SkillExplorerAgent
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 
 from app.agent.agent import Agent
@@ -101,14 +101,15 @@ class ExploreExperiencesAgentDirector(Agent):
     """
 
     async def _dive_into_experiences(self, user_input: AgentInput, context: ConversationContext,
-                                     s: ExploreExperiencesAgentDirectorState) -> AgentOutput:
+                                     state: ExploreExperiencesAgentDirectorState) -> AgentOutput:
 
         current_experience: ExperienceState
-        if s.current_experience_uuid is None:
+        if state.current_experience_uuid is None:
             # Pick the next experience to process
-            current_experience = _pick_next_experience_to_process(s.experiences_state)
+            current_experience = _pick_next_experience_to_process(state.experiences_state)
         else:
-            current_experience = s.experiences_state.get(s.current_experience_uuid, None)
+            # Get the current experience from the state
+            current_experience = state.experiences_state.get(state.current_experience_uuid, None)
 
         if not current_experience:
             message = AgentOutput(
@@ -122,7 +123,7 @@ class ExploreExperiencesAgentDirector(Agent):
             return message
 
         # ensure that the current experience is set in the state
-        s.current_experience_uuid = current_experience.experience.uuid
+        state.current_experience_uuid = current_experience.experience.uuid
 
         if current_experience.dive_in_phase == DiveInPhase.NOT_STARTED:
             # Start the first sub-phase
@@ -169,11 +170,11 @@ class ExploreExperiencesAgentDirector(Agent):
                 return agent_output
 
             current_experience.dive_in_phase = DiveInPhase.PROCESSED
-            s.current_experience_uuid = None
+            state.current_experience_uuid = None
 
             # If the agent has finished exploring the skills, then if there are no more experiences to process,
             # then we are done
-            _next_experience = _pick_next_experience_to_process(s.experiences_state)
+            _next_experience = _pick_next_experience_to_process(state.experiences_state)
             if not _next_experience:
                 # No more experiences to process, we are done
                 return AgentOutput(
@@ -185,19 +186,19 @@ class ExploreExperiencesAgentDirector(Agent):
                 )
 
             # Otherwise, we have more experiences to process
-            return await self._dive_into_experiences(user_input, context, s)
+            return await self._dive_into_experiences(user_input, context, state)
 
     async def execute(self, user_input: AgentInput, context: ConversationContext) -> AgentOutput:
         if self._state is None:
             raise ValueError("ExperiencesExplorerAgentDirector: execute() called before state was initialized")
 
-        s = self._state
+        state = self._state
 
         # Flag to indicate if we transitioned between conversation phases
         transitioned_between_states = False
 
         # First collect all the experiences from the user
-        if s.conversation_phase == ConversationPhase.COLLECT_EXPERIENCES:
+        if state.conversation_phase == ConversationPhase.COLLECT_EXPERIENCES:
             agent_output = await self._collect_experiences_agent.execute(user_input, context)
             await self._conversation_manager.update_history(user_input, agent_output)
 
@@ -205,20 +206,20 @@ class ExploreExperiencesAgentDirector(Agent):
             # present them to the user even if data collection has not finished.
             # The experiences will be overwritten every time
             experiences = self._collect_experiences_agent.get_experiences()
-            s.experiences_state.clear()
+            state.experiences_state.clear()
             for exp in experiences:
-                s.experiences_state[exp.uuid] = ExperienceState(experience=exp)
+                state.experiences_state[exp.uuid] = ExperienceState(experience=exp)
 
             # If collecting is not finished then return the output to the user to continue collecting
             if not agent_output.finished:
                 return agent_output
 
             # and transition to the next phase
-            s.conversation_phase = ConversationPhase.DIVE_IN
+            state.conversation_phase = ConversationPhase.DIVE_IN
             transitioned_between_states = True
 
         # Then dive into each of the experiences collected
-        if s.conversation_phase == ConversationPhase.DIVE_IN:
+        if state.conversation_phase == ConversationPhase.DIVE_IN:
 
             if transitioned_between_states:
                 user_input = AgentInput(
@@ -227,7 +228,7 @@ class ExploreExperiencesAgentDirector(Agent):
 
             # The conversation history is handled in dive_into_experiences method,
             # as there is another transition between sub-phases happening there
-            agent_output = await self._dive_into_experiences(user_input, context, s)
+            agent_output = await self._dive_into_experiences(user_input, context, state)
             return agent_output
 
         # Should never happen
@@ -251,7 +252,7 @@ class ExploreExperiencesAgentDirector(Agent):
         self._state: ExploreExperiencesAgentDirectorState | None = None
         self._collect_experiences_agent = CollectExperiencesAgent()
         self._infer_occupations_tool = InferOccupationTool(search_services.occupation_skill_search_service)
-        self._exploring_skills_agent = SkillExplorerAgent()
+        self._exploring_skills_agent = SkillsExplorerAgent()
 
     def get_collect_experiences_agent(self) -> CollectExperiencesAgent:
         return self._collect_experiences_agent

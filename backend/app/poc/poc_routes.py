@@ -17,7 +17,7 @@ from app.server_dependecies.agent_director_dependencies import get_agent_directo
 from app.server_dependecies.conversation_manager_dependencies import get_conversation_memory_manager
 from app.users import Authentication
 from app.vector_search.similarity_search_service import SimilaritySearchService
-from app.vector_search.vector_search_dependencies import get_occupation_skill_search_service
+from app.vector_search.vector_search_dependencies import get_occupation_skill_search_service, get_all_search_services, SearchServices
 from app.vector_search.occupation_search_routes import add_occupation_search_routes
 from app.vector_search.skill_search_routes import add_skill_search_routes
 
@@ -104,7 +104,7 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
     sensitive_filter.add_filter_routes(router)
 
     @router.get(path="/conversation",
-             description="""The main conversation route used to interact with the agent.""", )
+                description="""The main conversation route used to interact with the agent.""", )
     async def conversation(request: Request, user_input: str, clear_memory: bool = False, filter_pii: bool = False,
                            session_id: int = 1,
                            conversation_memory_manager: ConversationMemoryManager = Depends(
@@ -156,8 +156,8 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
             )
             raise HTTPException(status_code=500, detail="Oops! something went wrong")
 
-    @router.get(path="/conversation_sandbox",
-             description="""Temporary route used to interact with the conversation agent.""", )
+    @router.get(path="/conversation_sandbox/collect_experiences",
+                description="""Temporary route used to interact with the conversation agent.""", )
     async def _test_conversation(request: Request, user_input: str, clear_memory: bool = False, filter_pii: bool = False,
                                  session_id: int = 1, only_reply: bool = False,
                                  similarity_search: SimilaritySearchService = Depends(get_occupation_skill_search_service),
@@ -223,6 +223,91 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
             )
             raise HTTPException(status_code=500, detail="Oops! something went wrong")
 
+    @router.get(path="/conversation_sandbox/skills_explorer",
+                description="""Temporary route used to interact with the conversation agent.""", )
+    async def _test_conversation(request: Request, user_input: str, clear_memory: bool = False, filter_pii: bool = False,
+                                 session_id: int = 1, only_reply: bool = False,
+                                 conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager)):
+        """
+        As a developer, you can use this endpoint to test the conversation agent with any user input.
+        You can adjust the front-end to use this endpoint for testing locally an agent in a configurable way.
+        """
+        # Do not allow user input that is too long,
+        # as a basic measure to prevent abuse.
+        if len(user_input) > 1000:
+            raise HTTPException(status_code=413, detail="To long user input")
+
+        try:
+            if clear_memory:
+                await application_state_manager.delete_state(session_id)
+            if filter_pii:
+                user_input = await sensitive_filter.obfuscate(user_input)
+
+            # set the state of the conversation memory manager
+            state = await application_state_manager.get_state(session_id)
+            conversation_memory_manager.set_state(state.conversation_memory_manager_state)
+
+            # handle the user input
+            context = await conversation_memory_manager.get_conversation_context()
+            # get the current index in the conversation history, so that we can return only the new messages
+            current_index = len(context.all_history.turns)
+
+            # ##################### ADD YOUR AGENT HERE ######################
+            # Initialize the agent you want to use for the evaluation
+
+            from app.agent.skill_explorer_agent import SkillsExplorerAgent
+            agent = SkillsExplorerAgent()
+            # Define a dummy experience entity if it is not set in the application state is not set
+            from app.agent.experience.experience_entity import ExperienceEntity
+            from app.agent.experience.work_type import WorkType
+            if len(state.explore_experiences_director_state.experiences_state) == 0:
+                experience_entity = ExperienceEntity(experience_title="Baker",
+                                                     company="Baker's and Sons",
+                                                     work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT)
+                from app.agent.explore_experiences_agent_director import ExperienceState
+                from app.agent.explore_experiences_agent_director import DiveInPhase
+                state.explore_experiences_director_state.current_experience_uuid = experience_entity.uuid
+                state.explore_experiences_director_state.experiences_state[experience_entity.uuid] = ExperienceState(
+                    dive_in_phase=DiveInPhase.EXPLORING_SKILLS,
+                    experience=experience_entity)
+
+            experience_state = state.explore_experiences_director_state.experiences_state.get(state.explore_experiences_director_state.current_experience_uuid)
+            agent.set_experience(experience_state.experience)
+
+            # ################################################################
+            logger.debug("%s initialized for sandbox testing", agent.agent_type.value)
+
+            agent_output = await agent.execute(user_input=AgentInput(message=user_input), context=context)
+            if not agent.is_responsible_for_conversation_history():
+                await conversation_memory_manager.update_history(AgentInput(message=user_input), agent_output)
+
+            if agent_output.finished:
+                await conversation_memory_manager.update_history(AgentInput(message="", is_artificial=True), AgentOutput(
+                    finished=True,
+                    agent_response_time_in_sec=0,
+                    llm_stats=[],
+                    message_for_user=f"Found these skills: {experience_state.experience.responsibilities}"))
+
+            # get the context again after updating the history
+            context = await conversation_memory_manager.get_conversation_context()
+            response = await ConversationResponse.from_conversation_manager(context, from_index=current_index)
+            if only_reply:
+                response = response.last.message_for_user
+
+            # save the state, before responding to the user
+            await application_state_manager.save_state(session_id, state)
+            return response
+        except Exception as e:  # pylint: disable=broad-except
+            logger.exception(
+                "Error for request: %s %s?%s with session id: %s : %s",
+                request.method,
+                request.url.path,
+                request.query_params,
+                session_id,
+                e
+            )
+            raise HTTPException(status_code=500, detail="Oops! something went wrong")
+
     @router.get(path="/conversation_context",
                 description="""Temporary route used to get the conversation context of a user.""", )
     async def get_conversation_context(
@@ -246,7 +331,7 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
     # from the request. This is for testing purposes until the UI supports auth
     # and must be removed later.
     @router.get(path="/authinfo",
-             description="Returns the authentication info (JWT token claims)")
+                description="Returns the authentication info (JWT token claims)")
     async def _get_auth_info(request: Request,
                              credentials=Depends(auth.provider)):
         auth_info_b64 = request.headers.get('x-apigateway-api-userinfo')
