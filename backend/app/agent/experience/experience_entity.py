@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Any
 import uuid
 
 from pydantic.main import BaseModel
@@ -6,6 +6,44 @@ from pydantic.main import BaseModel
 from app.agent.experience.timeline import Timeline
 from app.agent.experience.work_type import WorkType
 from app.vector_search.esco_entities import SkillEntity, OccupationSkillEntity
+
+
+class ResponsibilitiesData(BaseModel):
+    """
+    A model for the collected data of the Skill Explorer Agent.
+    The data are collected during the conversation and stored in the agent's state.
+    They represent the following type of entities:
+        - responsibilities:
+        - skills
+        - duties
+        - tasks
+        - actions
+        - behaviour
+        - activities
+        - competencies
+        - knowledge
+    """
+
+    responsibilities: list[str] = []
+    """
+    Everything the user considers as part of what they do for a given job.
+    """
+
+    non_responsibilities: list[str] = []
+    """
+    Everything the user considers as not part of what they do for a given job.
+    """
+
+    other_peoples_responsibilities: list[str] = []
+    """
+    Everything the user considers as part of what other people do for a given job.
+    """
+
+    class Config:
+        """
+        Disallow extra fields in the model
+        """
+        extra = "forbid"
 
 
 class ExperienceEntity(BaseModel):
@@ -50,9 +88,9 @@ class ExperienceEntity(BaseModel):
     Type of work (e.g. "waged-employee")
     """
 
-    mentioned_tasks_and_skills: List[str] = []
+    responsibilities: ResponsibilitiesData = ResponsibilitiesData()
     """
-    List of tasks and skills mentioned by the user while describing the experience
+    List of responsibilities mentioned by the user while describing the experience
     It may contain duplicate entries as the user may mention the same task or skill multiple times
     """
 
@@ -73,9 +111,11 @@ class ExperienceEntity(BaseModel):
                  company: Optional[str] = None,
                  location: Optional[str] = None,
                  timeline: Optional[Timeline] = None,
-                 work_type: Optional[WorkType] = None):
+                 work_type: Optional[WorkType] = None,
+                 **data: Any):
         super().__init__(
             uuid=str(uuid.uuid4()),  # Generate a unique UUID for each instance
             experience_title=experience_title, company=company, location=location, timeline=timeline,
-            work_type=work_type
+            work_type=work_type,
+            **data
         )
