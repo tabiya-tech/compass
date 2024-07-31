@@ -35,7 +35,4 @@ class ErrorService:
             raise e
 
         # Raise HTTPException with status code 500 if the exception is not an instance of HTTPException
-        raise HTTPException(status_code=500, detail={
-            "message": "Opps! Something went wrong.",
-            "cause": e
-        })
+        raise HTTPException(status_code=500, detail="Opps! Something went wrong.")

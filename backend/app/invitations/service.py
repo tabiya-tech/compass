@@ -1,0 +1,50 @@
+from app.constants.errors import ErrorService
+from app.invitations.repository import UserInvitationRepository
+from app.invitations.types import GetInvitationCodeStatusResponse, InvitationCodeStatus
+
+
+class UserInvitationService:
+    """
+    The UserInvitationService class is responsible for handling all the business logic related to user invitations.
+    """
+
+    def __init__(self):
+        """
+        Initialize the UserInvitationService and inject the user_invitation_repository
+        """
+        self._repository: UserInvitationRepository = UserInvitationRepository()
+
+    async def get_invitation_status(self, code: str) -> GetInvitationCodeStatusResponse:
+        """
+        Get the status of a user invitation
+        :param code: str: The code of the user invitation
+        :return: dict: The status of the user invitation
+        """
+        try:
+            invitation = await self._repository.get_valid_invitation_by_code(code)
+
+            if not invitation:
+                return GetInvitationCodeStatusResponse(
+                    code=code,
+                    status=InvitationCodeStatus.INVALID
+                )
+
+            return GetInvitationCodeStatusResponse(
+                code=code,
+                status=InvitationCodeStatus.VALID,
+                # Return the invitation type if the status is valid
+                invitation_type=invitation.invitation_type
+            )
+        except Exception as e:
+            ErrorService.handle(__name__, e)
+
+    async def reduce_invitation_code_capacity(self, code: str) -> bool:
+        """
+        Reduce the remaining usage of the invitation code
+        :param code: str: The code of the invitation
+        :return:  Bool, whether the capacity was reduced or not
+        """
+        try:
+            return await self._repository.reduce_capacity(code)
+        except Exception as e:
+            ErrorService.handle(__name__, e)

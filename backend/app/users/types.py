@@ -1,3 +1,6 @@
+from enum import Enum
+from typing import Mapping, Optional
+
 from pydantic import BaseModel
 from datetime import datetime
 
@@ -29,10 +32,27 @@ class UserPreferences(BaseModel):
 
 
 class CreateUserPreferencesRequest(BaseModel):
+    invitation_code: str
+    """
+    Invitation code
+    """
+
     user_id: str
+    """
+    User ID
+    """
     language: str
+    """
+    The language of the user
+    """
     accepted_tc: datetime
+    """
+    The date and time the terms and conditions were accepted
+    """
     sessions: list[int] = []
+    """
+    List of session ids
+    """
 
     class Config:
         extra = "forbid"
