@@ -20,7 +20,8 @@ def add_user_invitations_routes(app: FastAPI):
     invitations_service = UserInvitationService()
 
     @router.get(
-        path="/{code}/status",
+        path="/check-status",
+        description="""Get the status of the invitation code""",
         response_model=GetInvitationCodeStatusResponse,
         responses={500: {"model": HTTPErrorResponse}},
         name="get user invitation status"
