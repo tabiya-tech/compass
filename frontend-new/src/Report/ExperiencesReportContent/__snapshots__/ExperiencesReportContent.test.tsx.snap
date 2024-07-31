@@ -1,0 +1,44 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ExperiencesReportContent should render ExperiencesReportContent correctly 1`] = `
+<view
+  data-testid="experiences-content-report-container-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+  style="display: flex; flex-direction: row; align-items: flex-start; padding-bottom: 16px;"
+>
+  <text
+    data-testid="experiences-content-report-date-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+    style="font-size: 12px; flex-basis: 200px; font-weight: bold; font-family: Inter;"
+  >
+    2022 — Present
+  </text>
+  <view
+    style="display: flex; flex-direction: column; flex: 1; margin-bottom: 8px; margin-right: 26px;"
+  >
+    <view>
+      <text
+        data-testid="experiences-content-report-experience-title-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+        style="font-family: Inter; font-weight: bold; font-size: 12px; padding-bottom: 16px;"
+      >
+        Project Manager
+      </text>
+    </view>
+    <view>
+      <text
+        data-testid="experiences-content-report-skills-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+        style="display: flex; flex-direction: row; gap: 2px;"
+      >
+        <text
+          style="font-size: 13px; color: rgb(13, 13, 15);"
+        >
+          Top Skills: 
+        </text>
+        <text
+          style="font-family: Inter; font-size: 12px; font-weight: normal; padding-bottom: 8px;"
+        >
+          Management, Communication
+        </text>
+      </text>
+    </view>
+  </view>
+</view>
+`;

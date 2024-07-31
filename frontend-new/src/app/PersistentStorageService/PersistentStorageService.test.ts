@@ -188,6 +188,45 @@ describe("AuthPersistentStorage class tests", () => {
     });
   });
 
+  describe("getItem tests", () => {
+    test("should return correct item from localStorage", () => {
+      // GIVEN an item is stored in localStorage
+      const key = "testKey";
+      const value = "testValue";
+      localStorage.setItem(key, value);
+
+      const retrievedValue = PersistentStorageService.getItem(localStorage, key);
+
+      // THEN the correct value should be returned
+      expect(retrievedValue).toEqual(value);
+    });
+
+    test("should set item in localStorage", () => {
+      // GIVEN a key and value
+      const key = "testKey";
+      const value = "testValue";
+
+      // WHEN the item is set using setItem
+      PersistentStorageService.setItem(localStorage, key, value);
+
+      // THEN the item should be stored in localStorage
+      expect(localStorage.getItem(key)).toEqual(value);
+    });
+
+    test("should remove item from localStorage", () => {
+      // GIVEN an item is stored in localStorage
+      const key = "testKey";
+      const value = "testValue";
+      localStorage.setItem(key, value);
+
+      // WHEN the item is removed using removeItem
+      PersistentStorageService.removeItem(localStorage, key);
+
+      // THEN the item should be removed from localStorage
+      expect(localStorage.getItem(key)).toBeNull();
+    });
+  });
+
   test("clear all tokens", () => {
     // GIVEN The token is stored in the session storage
     const givenID = "foo";

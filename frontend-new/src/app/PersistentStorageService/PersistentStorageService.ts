@@ -12,6 +12,7 @@ export const INVITATION_KEY = "invitation";
  */
 export class PersistentStorageService {
   static readonly storage = sessionStorage;
+  static readonly local = localStorage;
 
   /**
    * Returns the token from the storage
@@ -88,6 +89,34 @@ export class PersistentStorageService {
    */
   static clearInvitation(): void {
     this.storage.removeItem(INVITATION_KEY);
+  }
+
+  /**
+   * Returns the item from the storage
+   * @returns string | null - The item from the storage
+   *
+   */
+  static getItem(storage: Storage, key: string): string | null {
+    return storage.getItem(key);
+  }
+
+  /**
+   * Sets an item in the specified storage.
+   * @param {Storage} storage - The storage object (localStorage or sessionStorage).
+   * @param {string} key - The key of the item to remove.
+   * @param {string} value - The value of the item to set.
+   */
+  static setItem(storage: Storage, key: string, value: string): void {
+    storage.setItem(key, value);
+  }
+
+  /**
+   * Removes an item from the specified storage.
+   * @param {Storage} storage - The storage object (localStorage or sessionStorage).
+   * @param {string} key - The key of the item to remove.
+   */
+  static removeItem(storage: Storage, key: string): void {
+    storage.removeItem(key);
   }
 
   /**
