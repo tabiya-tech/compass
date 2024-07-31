@@ -31,6 +31,7 @@ export const USER_FRIENDLY_ERROR_MESSAGES = {
   EMAIL_NOT_VERIFIED:
     "The email you are using is registered, but you have not yet verified it. Please verify your email to continue.",
   USER_NOT_FOUND: "The user you are trying to use does not exist. Please try again with different credentials",
+  UNABLE_TO_PROCESS_REQUEST: "Apologies. Something went wrong while processing your request.",
 };
 
 /**
@@ -254,6 +255,11 @@ export const getUserFriendlyErrorMessage = (error: ServiceError | Error): string
       // - refresh the page to get the latest version of the app
       // - clear the browser cache to get the latest version of the app
       return USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_RESPONSE;
+    case ErrorConstants.ErrorCodes.FORBIDDEN:
+      if (error.statusCode === 422) {
+        // we use a forbidden with an unprocessable entity when the invite code is
+        return USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_REQUEST;
+      }
   }
   // If we get here, then
   // - we messed and don't know what the error is, or

@@ -37,7 +37,7 @@ export const Registering: StoryObj<typeof Register> = {
       <AuthContext.Provider
         value={{
           ...authContextDefaultValue,
-          isRegistering: true,
+          isRegisteringWithEmail: true,
         }}
       >
         <Register {...props} />

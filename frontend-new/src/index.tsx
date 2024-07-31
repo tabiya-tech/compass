@@ -11,6 +11,7 @@ import { UserPreferencesProvider } from "src/userPreferences/UserPreferencesProv
 import { IsOnlineProvider } from "src/app/isOnlineProvider/IsOnlineProvider";
 import ViewPortWrapper from "src/app/ViewPortWrapper";
 import { HashRouter } from "react-router-dom";
+import { InvitationsProvider } from "./invitations/InvitationsProvider/InvitationsProvider";
 
 // Currently the fonts are downloaded from Google via the index.css
 // Fonts could be distributed with the app instead, by explicitly importing them here
@@ -18,13 +19,14 @@ import { HashRouter } from "react-router-dom";
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
 root.render(
-  <React.StrictMode>
-    <>
-      <CssBaseline />
-      <IsOnlineProvider>
-        <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
-          <AuthProvider>
-            <UserPreferencesProvider>
+  // <React.StrictMode>
+  <>
+    <CssBaseline />
+    <IsOnlineProvider>
+      <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
+        <AuthProvider>
+          <UserPreferencesProvider>
+            <InvitationsProvider>
               <SnackbarProvider>
                 <ViewPortWrapper>
                   <HashRouter>
@@ -32,12 +34,13 @@ root.render(
                   </HashRouter>
                 </ViewPortWrapper>
               </SnackbarProvider>
-            </UserPreferencesProvider>
-          </AuthProvider>
-        </ThemeProvider>
-      </IsOnlineProvider>
-    </>
-  </React.StrictMode>
+            </InvitationsProvider>
+          </UserPreferencesProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </IsOnlineProvider>
+  </>
+  // </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

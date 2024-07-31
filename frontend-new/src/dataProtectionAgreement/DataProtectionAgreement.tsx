@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useState } from "react";
 import { Box, Container, styled, Typography } from "@mui/material";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { AuthContext } from "src/auth/AuthProvider/AuthProvider";
-import { Language, UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { Language, UserPreferencesSpec } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { ServiceError } from "src/error/error";
 import ErrorConstants from "src/error/error.constants";
 import { StatusCodes } from "http-status-codes";
@@ -10,6 +10,7 @@ import LanguageContextMenu from "src/i18n/languageContextMenu/LanguageContextMen
 import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 import { writeServiceErrorToLog } from "src/error/logger";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
+import { InvitationsContext } from "src/invitations/InvitationsProvider/InvitationsProvider";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
@@ -41,7 +42,7 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
   const { createUserPreferences } = useContext(UserPreferencesContext);
   const { user } = useContext(AuthContext);
   const { enqueueSnackbar } = useSnackbar();
-
+  const { invitation } = useContext(InvitationsContext);
   /**
    * Persist the user's chosen preferences to the backend
    */
@@ -59,12 +60,14 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
           ""
         );
       }
-      const newUserPreferenceSpecs: UserPreference = {
+      const newUserPreferenceSpecs: UserPreferencesSpec = {
         user_id: user.id,
         language: Language.en,
         accepted_tc: new Date(),
         sessions: [],
+        code: invitation?.code,
       };
+      console.log("in dpa", { invitation }, { newUserPreferenceSpecs });
       setIsAcceptingDPA(true);
       createUserPreferences(
         newUserPreferenceSpecs,
@@ -84,7 +87,7 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
     } finally {
       setIsAcceptingDPA(false);
     }
-  }, [user, enqueueSnackbar, createUserPreferences, notifyOnAcceptDPA]);
+  }, [user, enqueueSnackbar, createUserPreferences, notifyOnAcceptDPA, invitation]);
 
   /**
    * Handle when a user accepts the data protection agreement

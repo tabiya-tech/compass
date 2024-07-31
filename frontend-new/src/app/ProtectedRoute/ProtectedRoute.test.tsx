@@ -12,13 +12,15 @@ import { TestUser } from "src/_test_utilities/mockLoggedInUser";
 describe("ProtectedRoute test", () => {
   const authContextValue = {
     loginWithEmail: jest.fn(),
-    isLoggingIn: false,
+    isLoggingInWithEmail: false,
+    isRegisteringWithEmail: false,
+    isLoggingInAnonymously: false,
     isLoggingOut: false,
-    isRegistering: false,
     user: null,
     registerWithEmail: jest.fn(),
     logout: jest.fn(),
     handlePageLoad: jest.fn(),
+    loginAnonymously: jest.fn(),
   };
 
   test("should redirect to the login page if the user is not logged in and authentication is required", () => {

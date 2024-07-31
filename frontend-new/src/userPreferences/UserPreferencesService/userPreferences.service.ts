@@ -1,5 +1,5 @@
 import { getServiceErrorFactory } from "src/error/error";
-import { UserPreference } from "./userPreferences.types";
+import { UserPreference, UserPreferencesSpec } from "./userPreferences.types";
 import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/error.constants";
 import { getBackendUrl } from "src/envService";
@@ -35,13 +35,14 @@ export default class UserPreferencesService {
    * Creates an entry for the user preferences of a user with an ID
    *
    */
-  async createUserPreferences(newUserPreferencesSpec: UserPreference): Promise<UserPreference> {
+  async createUserPreferences(newUserPreferencesSpec: UserPreferencesSpec): Promise<UserPreference> {
     const serviceName = "UserPreferencesService";
     const serviceFunction = "createUserPreferences";
     const method = "POST";
     const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, this.userPreferencesEndpointUrl);
     let response;
     let responseBody: string;
+    console.log(newUserPreferencesSpec, "----------------");
     const requestBody = JSON.stringify(newUserPreferencesSpec);
     response = await fetchWithAuth(this.userPreferencesEndpointUrl, {
       method: method,
@@ -123,8 +124,8 @@ export default class UserPreferencesService {
       method,
       `${this.userPreferencesEndpointUrl}?user_id=${userId}`
     );
-    let response;
-    response = await fetchWithAuth(`${this.userPreferencesEndpointUrl}?user_id=${userId}`, {
+
+    const response = await fetchWithAuth(`${this.userPreferencesEndpointUrl}?user_id=${userId}`, {
       method: method,
       headers: {
         "Content-Type": "application/json",
@@ -135,35 +136,15 @@ export default class UserPreferencesService {
       failureMessage: `Failed to get user preferences for user with id ${userId}`,
     });
 
-    // check if the server responded with the expected status code
+    // Server responded with a status code that indicates that the resource was not the expected one
+    // The responseBody should be an ErrorResponse but that is not guaranteed e.g. if a gateway in the middle returns a 502,
+    // or if the server is not conforming to the error response schema
+    // we don't want to throw an error however, since the user might not have any preferences yet
+    // in that case we return an empty object
+    if (response.status === StatusCodes.NOT_FOUND) {
+      return {} as UserPreference;
+    }
     const responseBody = await response.text();
-    if (response.status !== StatusCodes.OK) {
-      // Server responded with a status code that indicates that the resource was not the expected one
-      // The responseBody should be an ErrorResponse but that is not guaranteed e.g. if a gateway in the middle returns a 502,
-      // or if the server is not conforming to the error response schema
-      // we dont want to throw an error however, since the user might not have any preferences yet
-      // in that case we return an empty object
-      if (response.status === StatusCodes.NOT_FOUND) {
-        return {} as UserPreference;
-      } else {
-        throw errorFactory(
-          response.status,
-          ErrorConstants.ErrorCodes.API_ERROR,
-          `Failed to get user preferences for user with id ${userId}`,
-          responseBody
-        );
-      }
-    }
-    // check if the response is in the expected format
-    const responseContentType = response.headers.get("Content-Type");
-    if (!responseContentType?.includes("application/json")) {
-      throw errorFactory(
-        response.status,
-        ErrorConstants.ErrorCodes.INVALID_RESPONSE_HEADER,
-        "Response Content-Type should be 'application/json'",
-        `Content-Type header was ${responseContentType}`
-      );
-    }
 
     let userPreferencesResponse: UserPreference;
     try {
@@ -242,3 +223,5 @@ export default class UserPreferencesService {
     }
   }
 }
+
+export const userPreferencesService = UserPreferencesService.getInstance();

@@ -1,7 +1,7 @@
-import React, { useCallback, useContext } from "react";
+import React, { useCallback, useContext, useEffect, useRef } from "react";
 import { Box, Container, styled, Typography, useTheme } from "@mui/material";
 import { AuthContext, TabiyaUser } from "src/auth/AuthProvider/AuthProvider";
-import { NavLink as RouterNavLink } from "react-router-dom";
+import { NavLink as RouterNavLink, useLocation } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import IDPAuth from "src/auth/components/IDPAuth/IDPAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -9,6 +9,9 @@ import { getUserFriendlyErrorMessage, ServiceError } from "src/error/error";
 import { writeServiceErrorToLog } from "src/error/logger";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
 import LoginWithEmailForm from "src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm";
+import { InvitationsContext } from "src/invitations/InvitationsProvider/InvitationsProvider";
+
+export const INVITATIONS_PARAM_NAME = "invite-code";
 
 const uniqueId = "7ce9ba1f-bde0-48e2-88df-e4f697945cc4";
 
@@ -43,15 +46,22 @@ export interface LoginProps {
 
 const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) => {
   const theme = useTheme();
-  const { loginWithEmail, isLoggingIn } = useContext(AuthContext);
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const inviteCode = params.get(INVITATIONS_PARAM_NAME);
+
+  const renderCount = useRef(0);
+
+  const { loginWithEmail, isLoggingInWithEmail, isLoggingInAnonymously } = useContext(AuthContext);
+  const { checkInvitationStatus, isInvitationCheckLoading } = useContext(InvitationsContext);
   const { enqueueSnackbar } = useSnackbar();
 
   /**
    * Handle the login form submission
    * @param event
    */
-  const handleLogin = useCallback(
-    async (email: string, password: string) => {
+  const handleLoginWithEmail = useCallback(
+    (email: string, password: string) => {
       loginWithEmail(
         email,
         password,
@@ -78,6 +88,47 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
     [enqueueSnackbar, loginWithEmail, postLoginHandler]
   );
 
+  /**
+   * Check if the user was invited
+   * @param code
+   */
+  const handleCheckIfInvited = useCallback(
+    (code: string) => {
+      checkInvitationStatus(
+        code,
+        (user) => {
+          console.log("Invitation check successful", user);
+          enqueueSnackbar("Invitation code is valid", { variant: "success" });
+          postLoginHandler(user);
+        },
+        (e) => {
+          console.log(e);
+          if (e instanceof ServiceError) {
+            writeServiceErrorToLog(e, console.error);
+          } else {
+            console.error(e);
+          }
+          const errorMessage = getUserFriendlyErrorMessage(e);
+          enqueueSnackbar(errorMessage, { variant: "error" });
+        }
+      );
+    },
+    [checkInvitationStatus, enqueueSnackbar, postLoginHandler]
+  );
+
+  // Check if the user was invited
+  useEffect(() => {
+    renderCount.current++;
+    if (!inviteCode && renderCount.current === 1) {
+      return;
+    }
+
+    if (inviteCode) {
+      handleCheckIfInvited(inviteCode);
+    }
+  }, [handleCheckIfInvited, inviteCode]);
+  const isLoginLoading = isLoggingInWithEmail || isLoggingInAnonymously || isInvitationCheckLoading;
+
   return (
     <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.LOGIN_CONTAINER}>
       <Box
@@ -89,7 +140,7 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
         height={"80%"}
       >
         <AuthHeader title={"Welcome to Compass!"} subtitle={"Login to your account to continue"} />
-        <LoginWithEmailForm notifyOnLogin={handleLogin} isLoggingIn={isLoggingIn || isLoading} />
+        <LoginWithEmailForm notifyOnLogin={handleLoginWithEmail} isLoggingIn={isLoginLoading} />
         <IDPAuth notifyOnLogin={postLoginHandler} isLoading={isLoading} />
         <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.LOGIN_LINK}>
           Don't have an account?{" "}

@@ -75,11 +75,13 @@ describe("Testing Login With Email component with AuthProvider", () => {
 
   const authContextValue = {
     loginWithEmail: loginWithEmailMock,
-    isLoggingIn: false,
+    isLoggingInWithEmail: false,
+    isRegisteringWithEmail: false,
+    isLoggingInAnonymously: false,
     isLoggingOut: false,
-    isRegistering: false,
     user: null,
     registerWithEmail: jest.fn(),
+    loginAnonymously: jest.fn(),
     logout: jest.fn(),
     handlePageLoad: jest.fn(),
   };

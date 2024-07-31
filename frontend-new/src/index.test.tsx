@@ -79,6 +79,15 @@ jest.mock("./userPreferences/UserPreferencesProvider/UserPreferencesProvider", (
   };
 });
 
+// mock the invitationsProvider
+jest.mock("./invitations/InvitationsProvider/InvitationsProvider", () => {
+  const mInvitationsProvider = jest.fn().mockImplementation(({ children }) => children);
+  return {
+    __esModule: true,
+    InvitationsProvider: mInvitationsProvider,
+  };
+});
+
 // mock the ViewPortWrapper
 jest.mock("src/app/ViewPortWrapper", () => {
   const mViewPortWrapper = jest.fn().mockImplementation(({ children }) => children);

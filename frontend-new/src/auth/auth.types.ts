@@ -31,9 +31,10 @@ export type AuthProviderProps = {
 
 export type AuthContextValue = {
   user: TabiyaUser | null;
-  isLoggingIn: boolean;
+  isLoggingInWithEmail: boolean;
+  isRegisteringWithEmail: boolean;
+  isLoggingInAnonymously: boolean;
   isLoggingOut: boolean;
-  isRegistering: boolean;
   loginWithEmail: (
     email: string,
     password: string,
@@ -47,6 +48,7 @@ export type AuthContextValue = {
     successCallback: () => void,
     errorCallback: (error: Error) => void
   ) => void;
+  loginAnonymously: (successCallback: (user: TabiyaUser) => void, errorCallback: (error: Error) => void) => void;
   logout: (successCallback: () => void, errorCallback: (error: any) => void) => void;
   handlePageLoad: (successCallback: (user: TabiyaUser) => void, errorCallback: (error: Error) => void) => void;
 };

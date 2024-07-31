@@ -77,12 +77,14 @@ describe("Testing Register With Email component with AuthProvider", () => {
   const authContextValue = {
     registerWithEmail: registerWithEmailMock,
     loginWithEmail: jest.fn(),
-    isLoggingIn: false,
+    isLoggingInWithEmail: false,
+    isRegisteringWithEmail: false,
+    isLoggingInAnonymously: false,
     isLoggingOut: false,
-    isRegistering: false,
     user: null,
     logout: jest.fn(),
     handlePageLoad: jest.fn(),
+    loginAnonymously: jest.fn(),
   };
 
   beforeEach(() => {

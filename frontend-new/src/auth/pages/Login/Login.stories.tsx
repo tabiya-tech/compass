@@ -37,7 +37,7 @@ export const LoggingIn: StoryObj<typeof Login> = {
       <AuthContext.Provider
         value={{
           ...authContextDefaultValue,
-          isLoggingIn: true,
+          isLoggingInWithEmail: true,
         }}
       >
         <Login {...props} />

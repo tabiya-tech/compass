@@ -80,7 +80,7 @@ async def _create_user_preferences(
             raise HTTPException(status_code=403, detail="forbidden")
 
         # validation of invitation code.
-        invitation = await user_invitation_service.get_invitation_status(user.invitation_code)
+        invitation = await user_invitation_service.get_invitation_status(user.code)
 
         if invitation.status == InvitationCodeStatus.INVALID:
             raise HTTPException(status_code=400, detail="Invalid invitation code")
@@ -107,7 +107,7 @@ async def _create_user_preferences(
         session_id = generate_new_session_id()  # nosec
 
         # Reduce the invitation code capacity
-        is_reduced = await user_invitation_service.reduce_invitation_code_capacity(user.invitation_code)
+        is_reduced = await user_invitation_service.reduce_invitation_code_capacity(user.code)
 
         if not is_reduced:
             raise HTTPException(status_code=400, detail="Invalid invitation code")

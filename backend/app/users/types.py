@@ -32,7 +32,7 @@ class UserPreferences(BaseModel):
 
 
 class CreateUserPreferencesRequest(BaseModel):
-    invitation_code: str
+    code: str
     """
     Invitation code
     """

@@ -16,11 +16,13 @@ import { jwtDecode } from "jwt-decode";
 // Default values for AuthContext
 export const authContextDefaultValue: AuthContextValue = {
   user: null,
-  isLoggingIn: false,
+  isLoggingInWithEmail: false,
+  isRegisteringWithEmail: false,
+  isLoggingInAnonymously: false,
   isLoggingOut: false,
-  isRegistering: false,
   loginWithEmail: () => {},
   registerWithEmail: () => {},
+  loginAnonymously: () => {},
   logout: () => {},
   handlePageLoad: () => {},
 };
@@ -40,9 +42,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const tokens = useTokens({ updateUserByIDToken });
 
   // State to track if the user is logging in/registering
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isLoggingInWithEmail, setIsLoggingInWithEmail] = useState(false);
+  const [isLoggingInAnonymously, setIsLoggingInAnonymously] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [isRegistering, setIsRegistering] = useState(false);
+  const [isRegisteringWithEmail, setIsRegisteringWithEmail] = useState(false);
 
   /**
    * Handles page load to check and set the user if an access token exists
@@ -93,7 +96,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       successCallback: (user: TabiyaUser) => void,
       errorCallback: (error: any) => void
     ) => {
-      setIsLoggingIn(true);
+      setIsLoggingInWithEmail(true);
       authService
         .handleLoginWithEmail(
           email,
@@ -115,7 +118,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           },
           (error) => {
             console.error(error);
-            setIsLoggingIn(false);
+            setIsLoggingInWithEmail(false);
             errorCallback(error);
           }
         )
@@ -126,7 +129,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         })
         .finally(() => {
           // Once the login is complete, set the isLoggingIn state to false
-          setIsLoggingIn(false);
+          setIsLoggingInWithEmail(false);
         });
     },
     [updateUserByIDToken, tokens]
@@ -143,7 +146,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       successCallback: () => void,
       errorCallback: (error: any) => void
     ) => {
-      setIsRegistering(true);
+      setIsRegisteringWithEmail(true);
       authService
         .handleRegisterWithEmail(
           email,
@@ -162,10 +165,54 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         )
         .finally(() => {
           // we don't need to update the user state or tokens
-          setIsRegistering(false);
+          setIsRegisteringWithEmail(false);
         });
     },
     [logout]
+  );
+
+  /**
+   * Logs in the user anonymously
+   */
+  const loginAnonymously = useCallback(
+    (successCallback: (user: TabiyaUser) => void, errorCallback: (error: any) => void) => {
+      setIsLoggingInAnonymously(true);
+      authService
+        .handleAnonymousLogin(
+          (response: TFirebaseTokenResponse) => {
+            updateUserByIDToken(response.access_token);
+            console.log("Access token", response.access_token);
+            console.log({ response });
+            PersistentStorageService.setAccessToken(response.access_token);
+            // Update the user state
+            updateUserByIDToken(response.access_token);
+
+            const decodedUser: FirebaseIDToken = jwtDecode(response.access_token);
+            const newUser: TabiyaUser = {
+              id: decodedUser.user_id,
+              name: decodedUser.name,
+              email: decodedUser.email,
+            };
+            // Call the success callback with the new user
+            successCallback(newUser);
+          },
+          (error) => {
+            console.error(error);
+            setIsLoggingInAnonymously(false);
+            errorCallback(error);
+          }
+        )
+        .then((data: TFirebaseTokenResponse | undefined) => {
+          if (!data) return;
+          // Set the access token in the tokens context once the login is complete
+          tokens.setAccessToken(data.access_token);
+        })
+        .finally(() => {
+          // Once the login is complete, set the isLoggingIn state to false
+          setIsLoggingInAnonymously(false);
+        });
+    },
+    [updateUserByIDToken, tokens]
   );
 
   /**
@@ -189,13 +236,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       user,
       loginWithEmail,
       registerWithEmail,
+      loginAnonymously,
       logout,
-      isLoggingIn,
+      isLoggingInWithEmail,
       isLoggingOut,
-      isRegistering,
+      isRegisteringWithEmail,
+      isLoggingInAnonymously,
       handlePageLoad,
     }),
-    [logout, isLoggingIn, isLoggingOut, isRegistering, user, loginWithEmail, registerWithEmail, handlePageLoad]
+    [
+      logout,
+      isLoggingInWithEmail,
+      isLoggingOut,
+      isRegisteringWithEmail,
+      isLoggingInAnonymously,
+      user,
+      loginWithEmail,
+      registerWithEmail,
+      loginAnonymously,
+      handlePageLoad,
+    ]
   );
 
   return (

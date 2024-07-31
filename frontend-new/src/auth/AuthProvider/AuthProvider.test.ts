@@ -54,7 +54,7 @@ describe("AuthProvider module", () => {
       const loginSpy = jest.spyOn(authService, "handleLoginWithEmail");
 
       //initially isLogging in should be false.
-      expect(result.current.isLoggingIn).toBe(false);
+      expect(result.current.isLoggingInWithEmail).toBe(false);
 
       act(() => {
         result.current?.loginWithEmail(givenEmail, givenPassword, givenSuccessCallback, givenErrorCallback);
@@ -64,7 +64,7 @@ describe("AuthProvider module", () => {
       expect(loginSpy).toHaveBeenCalledWith(givenEmail, givenPassword, expect.any(Function), expect.any(Function));
 
       // AND isLogging in should be false.
-      expect(result.current.isLoggingIn).toBe(false);
+      expect(result.current.isLoggingInWithEmail).toBe(false);
     });
 
     test("should call the failure callback when the service login fails", async () => {
@@ -87,7 +87,7 @@ describe("AuthProvider module", () => {
       });
 
       //initially isLogging in should be false.
-      expect(result.current.isLoggingIn).toBe(false);
+      expect(result.current.isLoggingInWithEmail).toBe(false);
 
       act(() => {
         result.current?.loginWithEmail(givenEmail, givenPassword, givenSuccessCallback, givenErrorCallback);
@@ -98,7 +98,7 @@ describe("AuthProvider module", () => {
 
       // AND isLogging in should be false.
       await waitFor(() => {
-        expect(result.current.isLoggingIn).toBe(false);
+        expect(result.current.isLoggingInWithEmail).toBe(false);
       });
 
       // AND the error callback should be called
@@ -156,7 +156,7 @@ describe("AuthProvider module", () => {
       const registerSpy = jest.spyOn(authService, "handleRegisterWithEmail");
 
       // Initially isRegistering should be false.
-      expect(result.current.isRegistering).toBe(false);
+      expect(result.current.isRegisteringWithEmail).toBe(false);
 
       act(() => {
         result.current?.registerWithEmail(
@@ -179,7 +179,7 @@ describe("AuthProvider module", () => {
 
       // AND isRegistering in should be false.
       await waitFor(() => {
-        expect(result.current.isRegistering).toBe(false);
+        expect(result.current.isRegisteringWithEmail).toBe(false);
       });
     });
 
@@ -203,7 +203,7 @@ describe("AuthProvider module", () => {
       });
 
       // Initially isRegistering should be false.
-      expect(result.current.isRegistering).toBe(false);
+      expect(result.current.isRegisteringWithEmail).toBe(false);
 
       act(() => {
         result.current?.registerWithEmail(
@@ -226,11 +226,74 @@ describe("AuthProvider module", () => {
 
       // AND isRegistering in should be false.
       await waitFor(() => {
-        expect(result.current.isRegistering).toBe(false);
+        expect(result.current.isRegisteringWithEmail).toBe(false);
       });
 
       // AND the error callback should be called
       expect(givenErrorCallback).toHaveBeenCalledWith(registerError);
+    });
+  });
+
+  describe("Anonymously login functionality", () => {
+    test("should call the login anonymously function", async () => {
+      // GIVEN the Auth Provider is rendered and auth context is accessed
+      const { result } = renderAuthContext();
+
+      // AND some callback functions
+      const givenSuccessCallback = jest.fn();
+      const givenErrorCallback = jest.fn();
+
+      // WHEN the login anonymously function is called
+      const loginSpy = jest.spyOn(authService, "handleAnonymousLogin");
+
+      //initially isLogging in should be false.
+      expect(result.current.isLoggingInAnonymously).toBe(false);
+
+      act(() => {
+        result.current?.loginAnonymously(givenSuccessCallback, givenErrorCallback);
+      });
+
+      // THEN the auth service handleLogin function should be called with the correct parameters
+      expect(loginSpy).toHaveBeenCalledWith(expect.any(Function), expect.any(Function));
+
+      // AND isLogging in should be false.
+      expect(result.current.isLoggingInAnonymously).toBe(false);
+    });
+
+    test("should call the failure callback when the service login anonymously fails", async () => {
+      // GIVEN the Auth Provider is rendered and auth context is accessed
+      const { result } = renderAuthContext();
+
+      // AND some callback functions
+      const givenSuccessCallback = jest.fn();
+      const givenErrorCallback = jest.fn();
+
+      // WHEN the login anonymously function is called
+
+      const loginSpy = jest.spyOn(authService, "handleAnonymousLogin");
+      const loginError = new Error("Login anonymously failed");
+      //@ts-ignore
+      loginSpy.mockImplementationOnce((_successCallback, errorCallback) => {
+        return Promise.resolve().then(() => errorCallback(loginError));
+      });
+
+      //initially isLogging in should be false.
+      expect(result.current.isLoggingInAnonymously).toBe(false);
+
+      act(() => {
+        result.current?.loginAnonymously(givenSuccessCallback, givenErrorCallback);
+      });
+
+      // THEN the auth service handleLogin function should be called with the correct parameters
+      expect(loginSpy).toHaveBeenCalledWith(expect.any(Function), expect.any(Function));
+
+      // AND isLogging in should be false.
+      await waitFor(() => {
+        expect(result.current.isLoggingInAnonymously).toBe(false);
+      });
+
+      // AND the error callback should be called
+      expect(givenErrorCallback).toHaveBeenCalledWith(loginError);
     });
   });
 

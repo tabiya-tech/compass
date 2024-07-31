@@ -10,6 +10,7 @@ import "src/_test_utilities/firebaseMock";
 import SnackbarProvider from "src/theme/SnackbarProvider/SnackbarProvider";
 import { UserPreferencesProvider } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 import { IsOnlineProvider } from "src/app/isOnlineProvider/IsOnlineProvider";
+import { InvitationsProvider } from "src/invitations/InvitationsProvider/InvitationsProvider";
 
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -17,7 +18,9 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
       <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
         <AuthProvider>
           <UserPreferencesProvider>
-            <SnackbarProvider>{children}</SnackbarProvider>
+            <InvitationsProvider>
+              <SnackbarProvider>{children}</SnackbarProvider>
+            </InvitationsProvider>
           </UserPreferencesProvider>
         </AuthProvider>
       </ThemeProvider>
