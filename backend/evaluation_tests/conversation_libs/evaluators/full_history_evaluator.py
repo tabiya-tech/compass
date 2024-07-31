@@ -7,7 +7,7 @@ from common_libs.text_formatters import extract_json
 from evaluation_tests.conversation_libs.evaluators.evaluator import Evaluator, EvaluationResult
 from evaluation_tests.conversation_libs.utils import _add_turn_to_context, _unwrap_all_history
 
-class CollectExperiencesEvaluator(Evaluator):
+class FullHistoryEvaluator(Evaluator):
     def __init__(self, evaluation_prompt):
         self.evaluation_prompt = evaluation_prompt
         self.llm = GeminiGenerativeLLM(config=LLMConfig(model_name="gemini-1.5-pro-preview-0409", response_mime_type="application/json"))
