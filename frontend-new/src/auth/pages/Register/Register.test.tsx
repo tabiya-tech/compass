@@ -3,7 +3,7 @@ import React from "react";
 import { render, screen, waitFor } from "src/_test_utilities/test-utils";
 import { HashRouter } from "react-router-dom";
 import Register, { DATA_TEST_ID } from "./Register";
-import { AuthContext, TabiyaUser } from "src/auth/AuthProvider/AuthProvider";
+import { EmailAuthContext, TabiyaUser } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 import RegisterWithEmailForm from "src/auth/pages/Register/components/RegisterWithEmailForm/RegisterWithEmailForm";
@@ -71,7 +71,7 @@ jest.mock("src/auth/components/AuthHeader/AuthHeader", () => {
   };
 });
 
-describe("Testing Register With Email component with AuthProvider", () => {
+describe("Testing Register component", () => {
   const registerWithEmailMock = jest.fn();
 
   const authContextValue = {
@@ -107,13 +107,13 @@ describe("Testing Register With Email component with AuthProvider", () => {
     // WHEN the component is rendered within the AuthContext and Router
     render(
       <HashRouter>
-        <AuthContext.Provider value={authContextValue}>
+        <EmailAuthContext.Provider value={authContextValue}>
           <Register
             postRegisterHandler={givenNotifyOnRegister}
             postLoginHandler={givenNotifyOnLogin}
             isPostLoginLoading={givenIsLoading}
           />
-        </AuthContext.Provider>
+        </EmailAuthContext.Provider>
       </HashRouter>
     );
 
@@ -164,13 +164,13 @@ describe("Testing Register With Email component with AuthProvider", () => {
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <AuthContext.Provider value={authContextValue}>
+        <EmailAuthContext.Provider value={authContextValue}>
           <Register
             postRegisterHandler={givenNotifyOnRegister}
             postLoginHandler={givenNotifyOnLogin}
             isPostLoginLoading={givenIsLoading}
           />
-        </AuthContext.Provider>
+        </EmailAuthContext.Provider>
       </HashRouter>
     );
 
@@ -213,13 +213,13 @@ describe("Testing Register With Email component with AuthProvider", () => {
     // WHEN the register form is submitted
     render(
       <HashRouter>
-        <AuthContext.Provider value={authContextValue}>
+        <EmailAuthContext.Provider value={authContextValue}>
           <Register
             postRegisterHandler={givenNotifyOnRegister}
             postLoginHandler={givenNotifyOnLogin}
             isPostLoginLoading={givenIsLoading}
           />
-        </AuthContext.Provider>
+        </EmailAuthContext.Provider>
       </HashRouter>
     );
 

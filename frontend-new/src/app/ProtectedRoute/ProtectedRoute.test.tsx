@@ -5,7 +5,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
-import { AuthContext } from "src/auth/AuthProvider/AuthProvider";
+import { EmailAuthContext } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 import { routerPaths } from "src/app/routerPaths";
 import { TestUser } from "src/_test_utilities/mockLoggedInUser";
 
@@ -38,9 +38,9 @@ describe("ProtectedRoute test", () => {
 
     // WHEN the user navigates to the page
     render(
-      <AuthContext.Provider value={authContextValue}>
+      <EmailAuthContext.Provider value={authContextValue}>
         <RouterProvider router={router} />
-      </AuthContext.Provider>
+      </EmailAuthContext.Provider>
     );
 
     // THEN expect the user to be redirected to the login page
@@ -63,9 +63,9 @@ describe("ProtectedRoute test", () => {
 
     // WHEN the user navigates to the page
     render(
-      <AuthContext.Provider value={{ ...authContextValue, user: TestUser }}>
+      <EmailAuthContext.Provider value={{ ...authContextValue, user: TestUser }}>
         <RouterProvider router={router} />
-      </AuthContext.Provider>
+      </EmailAuthContext.Provider>
     );
 
     // THEN expect the user to be redirected to the root page

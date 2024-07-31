@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Container, Box, Typography, useTheme, styled } from "@mui/material";
-import { AuthContext, TabiyaUser } from "src/auth/AuthProvider/AuthProvider";
+import { EmailAuthContext, TabiyaUser } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 import { NavLink as RouterNavLink } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import IDPAuth from "src/auth/components/IDPAuth/IDPAuth";
@@ -50,7 +50,7 @@ export interface RegisterProps {
 
 const Register: React.FC<Readonly<RegisterProps>> = ({ postRegisterHandler, postLoginHandler, isPostLoginLoading }) => {
   const theme = useTheme();
-  const { registerWithEmail, isRegisteringWithEmail } = useContext(AuthContext);
+  const { registerWithEmail, isRegisteringWithEmail } = useContext(EmailAuthContext);
   const { enqueueSnackbar } = useSnackbar();
 
   /**

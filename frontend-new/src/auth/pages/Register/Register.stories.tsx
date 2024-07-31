@@ -2,23 +2,23 @@ import React from "react";
 import { Meta, StoryObj } from "@storybook/react";
 import { action } from "@storybook/addon-actions";
 import Register from "./Register";
-import { AuthContext, authContextDefaultValue } from "src/auth/AuthProvider/AuthProvider";
+import { EmailAuthContext, emailAuthContextDefaultValue } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 
 const meta: Meta<typeof Register> = {
-  title: "Auth/EmailAuth/RegisterWithEmail",
+  title: "Auth/Register",
   component: Register,
   tags: ["autodocs"],
   decorators: [
     (Story) => {
       const mockAuthContextValue = {
-        ...authContextDefaultValue,
+        ...emailAuthContextDefaultValue,
         register: action("register"),
       };
 
       return (
-        <AuthContext.Provider value={mockAuthContextValue}>
+        <EmailAuthContext.Provider value={mockAuthContextValue}>
           <Story />
-        </AuthContext.Provider>
+        </EmailAuthContext.Provider>
       );
     },
   ],
@@ -34,14 +34,14 @@ export const Registering: StoryObj<typeof Register> = {
   args: {},
   render: (props) => {
     return (
-      <AuthContext.Provider
+      <EmailAuthContext.Provider
         value={{
-          ...authContextDefaultValue,
+          ...emailAuthContextDefaultValue,
           isRegisteringWithEmail: true,
         }}
       >
         <Register {...props} />
-      </AuthContext.Provider>
+      </EmailAuthContext.Provider>
     );
   },
 };

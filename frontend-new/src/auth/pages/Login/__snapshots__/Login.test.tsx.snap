@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Testing Login With Email component with AuthProvider it should show login form successfully 1`] = `
+exports[`Testing Login component it should show login form successfully 1`] = `
 <div
   class="MuiContainer-root MuiContainer-maxWidthXs css-xravbe-MuiContainer-root"
   data-testid="login-container-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"

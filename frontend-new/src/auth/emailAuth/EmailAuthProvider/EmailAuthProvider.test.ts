@@ -2,13 +2,13 @@
 import "src/_test_utilities/consoleMock";
 
 import { useContext } from "react";
-import { AuthContext, authContextDefaultValue } from "src/auth/AuthProvider/AuthProvider";
+import { EmailAuthContext, emailAuthContextDefaultValue } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 import { renderHook, act, waitFor } from "src/_test_utilities/test-utils";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import * as useTokensHook from "src/auth/hooks/useTokens";
 import { mockLoggedInUser } from "src/_test_utilities/mockLoggedInUser";
 import { defaultUseTokensResponse } from "src/auth/hooks/useTokens";
-import { AuthService } from "src/auth/AuthService/AuthService";
+import { EmailAuthService } from "src/auth/emailAuth/EmailAuthService/EmailAuth.service";
 
 jest.mock("src/auth/hooks/useAuthUser");
 jest.mock("src/auth/hooks/useTokens");
@@ -21,13 +21,13 @@ function defaultSetup() {
   (useTokensHook.useTokens as jest.Mock).mockReturnValue(defaultUseTokensResponse);
 }
 
-const renderAuthContext = () => renderHook(() => useContext(AuthContext));
+const renderAuthContext = () => renderHook(() => useContext(EmailAuthContext));
 
-describe("AuthProvider module", () => {
-  let authService: AuthService;
+describe("EmailAuthProvider module", () => {
+  let authService: EmailAuthService;
 
   beforeEach(() => {
-    authService = AuthService.getInstance();
+    authService = EmailAuthService.getInstance();
     jest.useFakeTimers(); // Use Jest's fake timers
   });
 
@@ -234,73 +234,10 @@ describe("AuthProvider module", () => {
     });
   });
 
-  describe("Anonymously login functionality", () => {
-    test("should call the login anonymously function", async () => {
-      // GIVEN the Auth Provider is rendered and auth context is accessed
-      const { result } = renderAuthContext();
-
-      // AND some callback functions
-      const givenSuccessCallback = jest.fn();
-      const givenErrorCallback = jest.fn();
-
-      // WHEN the login anonymously function is called
-      const loginSpy = jest.spyOn(authService, "handleAnonymousLogin");
-
-      //initially isLogging in should be false.
-      expect(result.current.isLoggingInAnonymously).toBe(false);
-
-      act(() => {
-        result.current?.loginAnonymously(givenSuccessCallback, givenErrorCallback);
-      });
-
-      // THEN the auth service handleLogin function should be called with the correct parameters
-      expect(loginSpy).toHaveBeenCalledWith(expect.any(Function), expect.any(Function));
-
-      // AND isLogging in should be false.
-      expect(result.current.isLoggingInAnonymously).toBe(false);
-    });
-
-    test("should call the failure callback when the service login anonymously fails", async () => {
-      // GIVEN the Auth Provider is rendered and auth context is accessed
-      const { result } = renderAuthContext();
-
-      // AND some callback functions
-      const givenSuccessCallback = jest.fn();
-      const givenErrorCallback = jest.fn();
-
-      // WHEN the login anonymously function is called
-
-      const loginSpy = jest.spyOn(authService, "handleAnonymousLogin");
-      const loginError = new Error("Login anonymously failed");
-      //@ts-ignore
-      loginSpy.mockImplementationOnce((_successCallback, errorCallback) => {
-        return Promise.resolve().then(() => errorCallback(loginError));
-      });
-
-      //initially isLogging in should be false.
-      expect(result.current.isLoggingInAnonymously).toBe(false);
-
-      act(() => {
-        result.current?.loginAnonymously(givenSuccessCallback, givenErrorCallback);
-      });
-
-      // THEN the auth service handleLogin function should be called with the correct parameters
-      expect(loginSpy).toHaveBeenCalledWith(expect.any(Function), expect.any(Function));
-
-      // AND isLogging in should be false.
-      await waitFor(() => {
-        expect(result.current.isLoggingInAnonymously).toBe(false);
-      });
-
-      // AND the error callback should be called
-      expect(givenErrorCallback).toHaveBeenCalledWith(loginError);
-    });
-  });
-
   describe("authContextDefaultValue", () => {
     test("should return the default values", () => {
       // GIVEN: Default values for the AuthContext
-      const givenAuthContextDefaultValue = authContextDefaultValue;
+      const givenAuthContextDefaultValue = emailAuthContextDefaultValue;
 
       // THEN: The default values should be as expected
       expect(givenAuthContextDefaultValue.user).toBeNull();

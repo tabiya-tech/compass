@@ -3,7 +3,7 @@ import { invitationsService } from "src/invitations/InvitationsService/invitatio
 import { Invitation, InvitationType } from "src/invitations/InvitationsService/invitations.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import isEmptyObject from "src/utils/isEmptyObject/isEmptyObject";
-import { AuthContext, TabiyaUser } from "src/auth/AuthProvider/AuthProvider";
+import { AnonymousAuthContext, TabiyaUser } from "../../auth/anonymousAuth/AnonymousAuthProvider/AnonymousAuthProvider";
 
 export type InvitationsProviderProps = {
   children: ReactNode;
@@ -31,7 +31,7 @@ export const InvitationsProvider: React.FC<InvitationsProviderProps> = ({ childr
   const [invitation, setInvitation] = useState<Invitation | null>(null);
   const [isInvitationCheckLoading, setIsInvitationCheckLoading] = useState<boolean>(false);
 
-  const { loginAnonymously } = useContext(AuthContext);
+  const { loginAnonymously } = useContext(AnonymousAuthContext);
 
   useEffect(() => {
     const storedInvitation = PersistentStorageService.getInvitation();
@@ -49,20 +49,18 @@ export const InvitationsProvider: React.FC<InvitationsProviderProps> = ({ childr
   }, [invitation]);
 
   /**
-   * Check invitation status
+   * Check invitation status and sign in anonymously
    */
-  const checkInvitationStatus = useCallback(
+  const checkInvitationStatusAndSignInAnonymously = useCallback(
     async (code: string, successCallback: (user: TabiyaUser) => void, errorCallback: (error: any) => void) => {
       try {
         setIsInvitationCheckLoading(true);
         const newInvitation = await invitationsService.checkInvitationCodeStatus(code);
-        console.log("Invitation check successful", newInvitation);
         setInvitation(newInvitation);
         if (newInvitation.invitation_type === InvitationType.AUTO_REGISTER) {
           // Log the user in anonymously if the invitation is for auto-register
           loginAnonymously(
             (user) => {
-              console.log("Anonymous login successful", user);
               successCallback(user);
             },
             (error) => {
@@ -70,6 +68,8 @@ export const InvitationsProvider: React.FC<InvitationsProviderProps> = ({ childr
               errorCallback(error);
             }
           );
+        } else {
+          throw new Error("Invitation type is not AUTO_REGISTER");
         }
         setIsInvitationCheckLoading(false);
       } catch (error) {
@@ -85,9 +85,9 @@ export const InvitationsProvider: React.FC<InvitationsProviderProps> = ({ childr
     () => ({
       invitation,
       isInvitationCheckLoading,
-      checkInvitationStatus,
+      checkInvitationStatus: checkInvitationStatusAndSignInAnonymously,
     }),
-    [invitation, isInvitationCheckLoading, checkInvitationStatus]
+    [invitation, isInvitationCheckLoading, checkInvitationStatusAndSignInAnonymously]
   );
 
   return <InvitationsContext.Provider value={value}>{children}</InvitationsContext.Provider>;

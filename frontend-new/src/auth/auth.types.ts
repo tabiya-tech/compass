@@ -1,5 +1,3 @@
-import React from "react";
-
 export type TabiyaUser = {
   id: string;
   name: string;
@@ -25,15 +23,13 @@ export type FirebaseIDToken = {
   };
 };
 
-export type AuthProviderProps = {
-  children: React.ReactNode;
-};
-
-export type AuthContextValue = {
+/**
+ * The context value for the email authentication context
+ */
+export type EmailAuthContextValue = {
   user: TabiyaUser | null;
   isLoggingInWithEmail: boolean;
   isRegisteringWithEmail: boolean;
-  isLoggingInAnonymously: boolean;
   isLoggingOut: boolean;
   loginWithEmail: (
     email: string,
@@ -48,6 +44,17 @@ export type AuthContextValue = {
     successCallback: () => void,
     errorCallback: (error: Error) => void
   ) => void;
+  logout: (successCallback: () => void, errorCallback: (error: any) => void) => void;
+  handlePageLoad: (successCallback: (user: TabiyaUser) => void, errorCallback: (error: Error) => void) => void;
+};
+
+/**
+ * The context value for the anonymous authentication context
+ */
+export type AnonymousAuthContextValue = {
+  user: TabiyaUser | null;
+  isLoggingInAnonymously: boolean;
+  isLoggingOut: boolean;
   loginAnonymously: (successCallback: (user: TabiyaUser) => void, errorCallback: (error: Error) => void) => void;
   logout: (successCallback: () => void, errorCallback: (error: any) => void) => void;
   handlePageLoad: (successCallback: (user: TabiyaUser) => void, errorCallback: (error: Error) => void) => void;

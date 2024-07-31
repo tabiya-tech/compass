@@ -53,7 +53,7 @@ jest.mock("react-router-dom", () => {
   };
 });
 
-describe("Testing Data Protection Policy component with AuthProvider", () => {
+describe("Testing Data Protection Policy component", () => {
   const createUserPreferencesMock = jest.fn();
 
   const userPreferencesContextValue = {

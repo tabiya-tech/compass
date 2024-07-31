@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useRef } from "react";
 import { Box, Container, styled, Typography, useTheme } from "@mui/material";
-import { AuthContext, TabiyaUser } from "src/auth/AuthProvider/AuthProvider";
+import { EmailAuthContext, TabiyaUser } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 import { NavLink as RouterNavLink, useLocation } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import IDPAuth from "src/auth/components/IDPAuth/IDPAuth";
@@ -10,6 +10,7 @@ import { writeServiceErrorToLog } from "src/error/logger";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
 import LoginWithEmailForm from "src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm";
 import { InvitationsContext } from "src/invitations/InvitationsProvider/InvitationsProvider";
+import { AnonymousAuthContext } from "../../anonymousAuth/AnonymousAuthProvider/AnonymousAuthProvider";
 
 export const INVITATIONS_PARAM_NAME = "invite-code";
 
@@ -52,7 +53,8 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
 
   const renderCount = useRef(0);
 
-  const { loginWithEmail, isLoggingInWithEmail, isLoggingInAnonymously } = useContext(AuthContext);
+  const { loginWithEmail, isLoggingInWithEmail } = useContext(EmailAuthContext);
+  const { isLoggingInAnonymously } = useContext(AnonymousAuthContext);
   const { checkInvitationStatus, isInvitationCheckLoading } = useContext(InvitationsContext);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -97,12 +99,10 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
       checkInvitationStatus(
         code,
         (user) => {
-          console.log("Invitation check successful", user);
           enqueueSnackbar("Invitation code is valid", { variant: "success" });
           postLoginHandler(user);
         },
         (e) => {
-          console.log(e);
           if (e instanceof ServiceError) {
             writeServiceErrorToLog(e, console.error);
           } else {

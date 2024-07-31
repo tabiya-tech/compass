@@ -4,20 +4,20 @@ import { getServiceErrorFactory, FIREBASE_ERROR_MESSAGES } from "src/error/error
 import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/error.constants";
 
-export class AuthService {
-  private static instance: AuthService;
+export class EmailAuthService {
+  private static instance: EmailAuthService;
 
   private constructor() {}
 
   /**
-   * Get the singleton instance of the AuthService.
-   * @returns {AuthService} The singleton instance of the AuthService.
+   * Get the singleton instance of the EmailAuthService.
+   * @returns {EmailAuthService} The singleton instance of the EmailAuthService.
    */
-  static getInstance(): AuthService {
-    if (!AuthService.instance) {
-      AuthService.instance = new AuthService();
+  static getInstance(): EmailAuthService {
+    if (!EmailAuthService.instance) {
+      EmailAuthService.instance = new EmailAuthService();
     }
-    return AuthService.instance;
+    return EmailAuthService.instance;
   }
 
   /**
@@ -26,7 +26,7 @@ export class AuthService {
    * @param {(error: any) => void} errorCallback - Callback to execute on logout error.
    */
   async handleLogout(successCallback: () => void, errorCallback: (error: any) => void): Promise<void> {
-    const errorFactory = getServiceErrorFactory("AuthService", "handleLogout", "POST", "signOut");
+    const errorFactory = getServiceErrorFactory("EmailAuthService", "handleLogout", "POST", "signOut");
     try {
       await auth.signOut();
       successCallback();
@@ -59,7 +59,12 @@ export class AuthService {
     successCallback: (data: TFirebaseTokenResponse) => void,
     errorCallback: (error: any) => void
   ): Promise<TFirebaseTokenResponse | undefined> {
-    const errorFactory = getServiceErrorFactory("AuthService", "handleLogin", "POST", "signInWithEmailAndPassword");
+    const errorFactory = getServiceErrorFactory(
+      "EmailAuthService",
+      "handleLogin",
+      "POST",
+      "signInWithEmailAndPassword"
+    );
     try {
       const userCredential = await auth.signInWithEmailAndPassword(email, password);
       if (!userCredential.user) {
@@ -123,7 +128,7 @@ export class AuthService {
     errorCallback: (error: any) => void
   ): Promise<TFirebaseTokenResponse | undefined> {
     const errorFactory = getServiceErrorFactory(
-      "AuthService",
+      "EmailAuthService",
       "handleRegister",
       "POST",
       "createUserWithEmailAndPassword"
@@ -166,52 +171,6 @@ export class AuthService {
       );
     }
   }
-
-  /**
-   * handle anonymous login
-   * @param {(data: TFirebaseTokenResponse) => void} successCallback - Callback to execute on successful login.
-   * @param {(error: any) => void} errorCallback - Callback to execute on login error.
-   * @returns {Promise<TFirebaseTokenResponse | undefined>} The login response, or undefined if there was an error.
-   */
-  async handleAnonymousLogin(
-    successCallback: (data: TFirebaseTokenResponse) => void,
-    errorCallback: (error: any) => void
-  ): Promise<TFirebaseTokenResponse | undefined> {
-    const errorFactory = getServiceErrorFactory("AuthService", "handleAnonymousLogin", "POST", "signInAnonymously");
-    try {
-      const userCredential = await auth.signInAnonymously();
-      if (!userCredential.user) {
-        errorCallback(
-          errorFactory(
-            StatusCodes.NOT_FOUND,
-            ErrorConstants.FirebaseErrorCodes.USER_NOT_FOUND,
-            FIREBASE_ERROR_MESSAGES[ErrorConstants.FirebaseErrorCodes.USER_NOT_FOUND],
-            {}
-          )
-        );
-        return;
-      }
-      const data = {
-        access_token: await userCredential.user.getIdToken(),
-        expires_in: 3600,
-      };
-      console.log("Anonymous login successful", data);
-      successCallback(data);
-      return data;
-    } catch (error) {
-      const firebaseError = (error as any).code;
-      //@ts-ignore
-      const errorMessage = FIREBASE_ERROR_MESSAGES[firebaseError] || (error as Error).message;
-      errorCallback(
-        errorFactory(
-          StatusCodes.INTERNAL_SERVER_ERROR,
-          firebaseError || ErrorConstants.ErrorCodes.FAILED_TO_FETCH,
-          errorMessage,
-          {}
-        )
-      );
-    }
-  }
 }
 
-export const authService = AuthService.getInstance();
+export const emailAuthService = EmailAuthService.getInstance();

@@ -1,28 +1,24 @@
 import React, { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import { useTokens } from "src/auth/hooks/useTokens";
 import { useAuthUser } from "src/auth/hooks/useAuthUser";
-import { authService } from "src/auth/AuthService/AuthService";
-import {
-  AuthContextValue,
-  AuthProviderProps,
-  FirebaseIDToken,
-  TabiyaUser,
-  TFirebaseTokenResponse,
-} from "src/auth/auth.types";
+import { emailAuthService } from "src/auth/emailAuth/EmailAuthService/EmailAuth.service";
+import { EmailAuthContextValue, FirebaseIDToken, TabiyaUser, TFirebaseTokenResponse } from "src/auth/auth.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import { jwtDecode } from "jwt-decode";
 
+export type EmailAuthProviderProps = {
+  children: React.ReactNode;
+};
+
 // Default values for AuthContext
-export const authContextDefaultValue: AuthContextValue = {
+export const emailAuthContextDefaultValue: EmailAuthContextValue = {
   user: null,
   isLoggingInWithEmail: false,
   isRegisteringWithEmail: false,
-  isLoggingInAnonymously: false,
   isLoggingOut: false,
   loginWithEmail: () => {},
   registerWithEmail: () => {},
-  loginAnonymously: () => {},
   logout: () => {},
   handlePageLoad: () => {},
 };
@@ -30,20 +26,19 @@ export const authContextDefaultValue: AuthContextValue = {
 /**
  * AuthContext that provides the user, login, logout, and hasRole functions
  */
-export const AuthContext = createContext<AuthContextValue>(authContextDefaultValue);
+export const EmailAuthContext = createContext<EmailAuthContextValue>(emailAuthContextDefaultValue);
 
 /**
- * AuthProvider component that provides the AuthContext to the application
+ * EmailAuthProvider component that provides the EmailAuthContext to the application
  * @param children - the child components that will have access to AuthContext
  * @constructor
  */
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const EmailAuthProvider: React.FC<EmailAuthProviderProps> = ({ children }) => {
   const { user, updateUser, updateUserByIDToken } = useAuthUser();
   const tokens = useTokens({ updateUserByIDToken });
 
   // State to track if the user is logging in/registering
   const [isLoggingInWithEmail, setIsLoggingInWithEmail] = useState(false);
-  const [isLoggingInAnonymously, setIsLoggingInAnonymously] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isRegisteringWithEmail, setIsRegisteringWithEmail] = useState(false);
 
@@ -81,7 +76,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       PersistentStorageService.clear();
       tokens.clearTokens();
       updateUser(null);
-      authService.handleLogout(successCallback, errorCallback).then((r) => setIsLoggingOut(false));
+      emailAuthService.handleLogout(successCallback, errorCallback).then((r) => setIsLoggingOut(false));
     },
     [updateUser, tokens]
   );
@@ -97,7 +92,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       errorCallback: (error: any) => void
     ) => {
       setIsLoggingInWithEmail(true);
-      authService
+      emailAuthService
         .handleLoginWithEmail(
           email,
           password,
@@ -147,7 +142,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       errorCallback: (error: any) => void
     ) => {
       setIsRegisteringWithEmail(true);
-      authService
+      emailAuthService
         .handleRegisterWithEmail(
           email,
           password,
@@ -172,50 +167,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 
   /**
-   * Logs in the user anonymously
-   */
-  const loginAnonymously = useCallback(
-    (successCallback: (user: TabiyaUser) => void, errorCallback: (error: any) => void) => {
-      setIsLoggingInAnonymously(true);
-      authService
-        .handleAnonymousLogin(
-          (response: TFirebaseTokenResponse) => {
-            updateUserByIDToken(response.access_token);
-            console.log("Access token", response.access_token);
-            console.log({ response });
-            PersistentStorageService.setAccessToken(response.access_token);
-            // Update the user state
-            updateUserByIDToken(response.access_token);
-
-            const decodedUser: FirebaseIDToken = jwtDecode(response.access_token);
-            const newUser: TabiyaUser = {
-              id: decodedUser.user_id,
-              name: decodedUser.name,
-              email: decodedUser.email,
-            };
-            // Call the success callback with the new user
-            successCallback(newUser);
-          },
-          (error) => {
-            console.error(error);
-            setIsLoggingInAnonymously(false);
-            errorCallback(error);
-          }
-        )
-        .then((data: TFirebaseTokenResponse | undefined) => {
-          if (!data) return;
-          // Set the access token in the tokens context once the login is complete
-          tokens.setAccessToken(data.access_token);
-        })
-        .finally(() => {
-          // Once the login is complete, set the isLoggingIn state to false
-          setIsLoggingInAnonymously(false);
-        });
-    },
-    [updateUserByIDToken, tokens]
-  );
-
-  /**
    * Load the user on page load
    */
 
@@ -236,12 +187,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       user,
       loginWithEmail,
       registerWithEmail,
-      loginAnonymously,
       logout,
       isLoggingInWithEmail,
       isLoggingOut,
       isRegisteringWithEmail,
-      isLoggingInAnonymously,
       handlePageLoad,
     }),
     [
@@ -249,23 +198,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       isLoggingInWithEmail,
       isLoggingOut,
       isRegisteringWithEmail,
-      isLoggingInAnonymously,
       user,
       loginWithEmail,
       registerWithEmail,
-      loginAnonymously,
       handlePageLoad,
     ]
   );
 
   return (
-    <AuthContext.Provider value={value}>
+    <EmailAuthContext.Provider value={value}>
       {tokens.isAuthenticating ? (
         <Backdrop isShown={tokens.isAuthenticating} message={"Authenticating, wait a moment..."} />
       ) : (
         children
       )}
-    </AuthContext.Provider>
+    </EmailAuthContext.Provider>
   );
 };
 

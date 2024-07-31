@@ -54,7 +54,6 @@ export const UserPreferencesProvider: React.FC<UserPreferencesProviderProps> = (
     ) => {
       setIsLoading(true);
       try {
-        console.log("Creating user preferences -------- ", preferences);
         const newPreferences = await userPreferencesService.createUserPreferences(preferences);
         setUserPreferences(newPreferences);
         successCallback(newPreferences);

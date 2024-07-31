@@ -11,7 +11,7 @@ import { getUserFriendlyErrorMessage, ServiceError } from "src/error/error";
 import { writeServiceErrorToLog } from "src/error/logger";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
-import { AuthContext } from "src/auth/AuthProvider/AuthProvider";
+import { EmailAuthContext } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 import { ConversationMessage, ConversationMessageSender } from "./ChatService/ChatService.types";
 import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
@@ -33,7 +33,7 @@ const Chat = () => {
   const [initialized, setInitialized] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const { userPreferences, updateUserPreferences } = useContext(UserPreferencesContext);
-  const { logout, isLoggingOut, user } = useContext(AuthContext);
+  const { logout, isLoggingOut, user } = useContext(EmailAuthContext);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [experiences, setExperiences] = React.useState<Experience[]>([]);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
@@ -179,7 +179,7 @@ const Chat = () => {
 
       const preferencesService = new UserPreferencesService();
 
-      let user_preferences = await preferencesService.getNewSession(user?.id!);
+      let user_preferences = await preferencesService.getNewSession(user?.id);
 
       updateUserPreferences(user_preferences);
 

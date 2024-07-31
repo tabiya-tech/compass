@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useState } from "react";
 import { Box, Container, styled, Typography } from "@mui/material";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { AuthContext } from "src/auth/AuthProvider/AuthProvider";
+import { EmailAuthContext } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 import { Language, UserPreferencesSpec } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { ServiceError } from "src/error/error";
 import ErrorConstants from "src/error/error.constants";
@@ -40,7 +40,7 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
 }) => {
   const [isAcceptingDPA, setIsAcceptingDPA] = useState(false);
   const { createUserPreferences } = useContext(UserPreferencesContext);
-  const { user } = useContext(AuthContext);
+  const { user } = useContext(EmailAuthContext);
   const { enqueueSnackbar } = useSnackbar();
   const { invitation } = useContext(InvitationsContext);
   /**
@@ -67,7 +67,6 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
         sessions: [],
         code: invitation?.code,
       };
-      console.log("in dpa", { invitation }, { newUserPreferenceSpecs });
       setIsAcceptingDPA(true);
       createUserPreferences(
         newUserPreferenceSpecs,

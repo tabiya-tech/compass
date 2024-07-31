@@ -9,11 +9,11 @@ import { renderHook } from "src/_test_utilities/test-utils";
 import { act } from "@testing-library/react";
 import InvitationsService from "src/invitations/InvitationsService/invitations.service";
 import { Invitation, InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
-import { AuthContext } from "src/auth/AuthProvider/AuthProvider";
 import { TestUser } from "src/_test_utilities/mockLoggedInUser";
+import { AnonymousAuthContext } from "../../auth/anonymousAuth/AnonymousAuthProvider/AnonymousAuthProvider";
 
 const renderInvitationsContext = () => renderHook(() => useContext(InvitationsContext));
-const renderAuthContext = () => renderHook(() => useContext(AuthContext));
+const renderAnonymousAuthContext = () => renderHook(() => useContext(AnonymousAuthContext));
 
 describe("InvitationsProvider module", () => {
   let invitationsService: InvitationsService;
@@ -36,9 +36,9 @@ describe("InvitationsProvider module", () => {
   describe("Check invitation status functionality", () => {
     test("should call the checkInvitationCodeStatus service with the correct parameters when the InvitationType is AUTO_REGISTER", async () => {
       // GIVEN the anonymous login will happen successfully
-      const { result: authContextResult } = renderAuthContext();
+      const { result: anonymousAuthContextResult } = renderAnonymousAuthContext();
       jest
-        .spyOn(authContextResult.current, "loginAnonymously")
+        .spyOn(anonymousAuthContextResult.current, "loginAnonymously")
         .mockImplementationOnce((successCallback, _errorCallback) => {
           successCallback(TestUser);
         });

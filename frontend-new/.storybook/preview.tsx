@@ -17,7 +17,7 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 */
 import type { Preview } from "@storybook/react";
-import { AuthProvider } from "../src/auth/AuthProvider/AuthProvider";
+import { EmailAuthProvider } from "../src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
 import {
   UserPreferencesContext,
@@ -83,7 +83,7 @@ export const decorators = [
   return (
     <Router>
       <IsOnlineContext.Provider value={isOnline}>
-        <AuthProvider>
+        <EmailAuthProvider>
           <UserPreferencesContext.Provider value={userPreferencesValue}>
             <CssBaseline />
             <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
@@ -94,7 +94,7 @@ export const decorators = [
               </SnackbarProvider>
             </ThemeProvider>
           </UserPreferencesContext.Provider>
-        </AuthProvider>
+        </EmailAuthProvider>
       </IsOnlineContext.Provider>
     </Router>
     );
