@@ -16,11 +16,10 @@ class CollectExperiencesEvaluator(Evaluator):
     async def evaluate(self, user_input: str, context: ConversationContext, agent_output: str) -> EvaluationResult:
             _add_turn_to_context(user_input, agent_output.message_for_user, context)
             history_to_string = _unwrap_all_history(context)
-            focus_evaluation_prompt =  self.evaluation_prompt+textwrap.dedent(f""" 
-                Conversation Data:
-                [BEGIN DATA]
-                [Conversation]: {history_to_string}
-                [END DATA] 
+            focus_evaluation_prompt = textwrap.dedent(f"""{self.evaluation_prompt}
+                <Conversation Data>:
+                {history_to_string}
+                </Conversation Data>
             """)
 
             result = await self.llm.generate_content(focus_evaluation_prompt)

@@ -32,11 +32,6 @@ EVALUATION_OUTRO_PROMPT = textwrap.dedent("""
             """)
 
 class TestCaseCollectExperiencesAgent(CompassTestCase):
-    name: str
-    """
-    The name of the test case.
-    """
-
     # The GIVEN
     turns: list[tuple[str, str]]
     """
@@ -96,6 +91,7 @@ test_cases_collect_experiences = [
     ),
     TestCaseCollectExperiencesAgent(
         name="supportive",
+        # skip_force="skip",
         summary="",
         turns=FIXED_TURNS,
         user_input="Fluffy Flour. I hated working there. I think I will never be good at anything.",
@@ -212,9 +208,9 @@ async def test_collect_experiences(test_case):
     agent_output = await collect_experience_agent.execute(
             AgentInput(message=test_case.user_input),
             context=context)
-    logging.info(agent_output.message_for_user)
+    logging.info(f"Agent output: {agent_output.message_for_user}")
     evaluator = CollectExperiencesEvaluator(evaluation_prompt=test_case.evaluator_prompt)
     evaluation_output = await evaluator.evaluate(test_case.user_input, context, agent_output)
-    logging.info(evaluation_output.reason)
+    logging.info(f"Evaluation reasoning: {evaluation_output.reason}")
     actual = evaluation_output.score
     assert actual >= test_case.expected_min_score
