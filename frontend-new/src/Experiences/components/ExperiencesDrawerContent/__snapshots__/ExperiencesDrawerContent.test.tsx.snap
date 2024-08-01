@@ -29,3 +29,38 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
   </p>
 </div>
 `;
+
+exports[`ReportDrawerContent should render ExperiencesDrawerContent skeleton correctly 1`] = `
+<div
+  class="MuiGrid-root MuiGrid-container css-1w7ivyd-MuiGrid-root"
+  data-testid="experiences-drawer-content-container-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+>
+  <div
+    class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-8 css-vok43g-MuiGrid-root"
+  >
+    <div
+      class="MuiBox-root css-yj95vr"
+    >
+      <span
+        class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-qn5ikh-MuiSkeleton-root"
+        data-testid="skeleton-text"
+        style="width: 60%;"
+      />
+      <span
+        class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-qn5ikh-MuiSkeleton-root"
+        data-testid="skeleton-text"
+        style="width: 90%;"
+      />
+    </div>
+    <div
+      class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-4 css-gj1fbr-MuiGrid-root"
+    >
+      <span
+        class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-qn5ikh-MuiSkeleton-root"
+        data-testid="skeleton-text"
+        style="width: 80%;"
+      />
+    </div>
+  </div>
+</div>
+`;

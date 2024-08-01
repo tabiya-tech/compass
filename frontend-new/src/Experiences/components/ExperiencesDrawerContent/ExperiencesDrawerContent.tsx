@@ -6,6 +6,7 @@ import { Theme } from "@mui/material/styles";
 const uniqueId = "34a59a9e-e7f6-4a10-8b72-0fd401c727de";
 
 export const DATA_TEST_ID = {
+  LOADING_EXPERIENCES_DRAWER_CONTENT_CONTAINER: `experiences-drawer-content-container-${uniqueId}`,
   EXPERIENCES_DRAWER_CONTENT_CONTAINER: `experiences-drawer-content-container-${uniqueId}`,
   EXPERIENCES_DRAWER_CONTENT_DATE: `experiences-drawer-content-date-${uniqueId}`,
   EXPERIENCES_DRAWER_CONTENT_OCCUPATION: `experiences-drawer-content-occupation-${uniqueId}`,
@@ -14,10 +15,9 @@ export const DATA_TEST_ID = {
 
 interface ExperienceProps {
   experience: Experience;
-  isLoading: boolean;
 }
 
-const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, isLoading }) => {
+const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
 
@@ -25,22 +25,6 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, isLoa
     if (experience.top_skills.length === 0) return "No skills yet";
     return experience.top_skills.map((skill) => skill.preferredLabel).join(", ");
   }, [experience.top_skills]);
-
-  if (isLoading) {
-    return (
-      <Grid container alignItems="top" data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_CONTAINER}>
-        <Grid item xs={8}>
-          <Box display="flex" flexDirection="column" gap={theme.tabiyaSpacing.md}>
-            <Skeleton variant="text" width="60%" data-testid="skeleton-text" />
-            <Skeleton variant="text" width="90%" data-testid="skeleton-text" />
-          </Box>
-          <Grid item xs={4}>
-            <Skeleton variant="text" width="80%" data-testid="skeleton-text" />
-          </Grid>
-        </Grid>
-      </Grid>
-    );
-  }
 
   return (
     <Box
@@ -61,6 +45,24 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, isLoa
           : experience.start_date || experience.end_date}
       </Typography>
     </Box>
+  );
+};
+
+export const LoadingExperienceDrawerContent = () => {
+  const theme = useTheme();
+
+  return (
+    <Grid container alignItems="top" data-testid={DATA_TEST_ID.LOADING_EXPERIENCES_DRAWER_CONTENT_CONTAINER}>
+      <Grid item xs={8}>
+        <Box display="flex" flexDirection="column" gap={theme.tabiyaSpacing.md}>
+          <Skeleton variant="text" width="60%" data-testid="skeleton-text" />
+          <Skeleton variant="text" width="90%" data-testid="skeleton-text" />
+        </Box>
+        <Grid item xs={4}>
+          <Skeleton variant="text" width="80%" data-testid="skeleton-text" />
+        </Grid>
+      </Grid>
+    </Grid>
   );
 };
 
