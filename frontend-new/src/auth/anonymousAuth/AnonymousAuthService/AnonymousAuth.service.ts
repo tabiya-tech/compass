@@ -78,7 +78,6 @@ export class AnonymousAuthService {
         access_token: await userCredential.user.getIdToken(),
         expires_in: 3600,
       };
-      console.log("Anonymous login successful", data);
       successCallback(data);
       return data;
     } catch (error) {

@@ -42,7 +42,6 @@ export default class UserPreferencesService {
     const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, this.userPreferencesEndpointUrl);
     let response;
     let responseBody: string;
-    console.log(newUserPreferencesSpec, "----------------");
     const requestBody = JSON.stringify(newUserPreferencesSpec);
     response = await fetchWithAuth(this.userPreferencesEndpointUrl, {
       method: method,

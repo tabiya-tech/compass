@@ -328,7 +328,7 @@ export const applicationTheme = (theme: ThemeMode) => {
         styleOverrides: {
           root: {
             fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem), // Adjust text size
-            padding: '0',
+            padding: "0",
           },
         },
       },
@@ -336,11 +336,11 @@ export const applicationTheme = (theme: ThemeMode) => {
         styleOverrides: {
           root: {
             fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem), // Adjust text size
-            padding: '0',
+            padding: "0",
           },
           input: {
             fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem), // Adjust input text size
-            padding: '0',
+            padding: "0",
           },
         },
       },
@@ -348,7 +348,7 @@ export const applicationTheme = (theme: ThemeMode) => {
         styleOverrides: {
           root: {
             fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem), // Adjust label text size
-            padding: '0',
+            padding: "0",
           },
         },
       },

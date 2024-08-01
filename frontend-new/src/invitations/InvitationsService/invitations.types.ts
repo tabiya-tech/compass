@@ -1,5 +1,5 @@
 export interface Invitation {
-  code: string;
+  invitation_code: string;
   status: InvitationStatus;
   invitation_type: InvitationType;
 }

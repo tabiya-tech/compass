@@ -24,7 +24,7 @@ describe("InvitationsProvider module", () => {
   });
 
   const givenInvitation: Invitation = {
-    code: "123",
+    invitation_code: "123",
     status: InvitationStatus.VALID,
     invitation_type: InvitationType.REGISTER,
   };
@@ -44,7 +44,7 @@ describe("InvitationsProvider module", () => {
         });
       // AND the InvitationsProvider is rendered and invitations context is accessed
       const givenInvitation: Invitation = {
-        code: "123",
+        invitation_code: "123",
         status: InvitationStatus.VALID,
         invitation_type: InvitationType.AUTO_REGISTER,
       };
@@ -63,14 +63,14 @@ describe("InvitationsProvider module", () => {
 
       await act(async () => {
         await invitationContextResult.current.checkInvitationStatus(
-          givenInvitation.code,
+          givenInvitation.invitation_code,
           givenSuccessCallback,
           givenErrorCallback
         );
       });
 
       // THEN the invitations service checkInvitationCodeStatus function should be called with the correct parameters
-      expect(checkInvitationCodeStatusSpy).toHaveBeenCalledWith(givenInvitation.code);
+      expect(checkInvitationCodeStatusSpy).toHaveBeenCalledWith(givenInvitation.invitation_code);
 
       // AND isLoading should be false
       expect(invitationContextResult.current.isInvitationCheckLoading).toBe(false);
@@ -90,11 +90,15 @@ describe("InvitationsProvider module", () => {
       const checkInvitationCodeStatusSpy = jest.spyOn(invitationsService, "checkInvitationCodeStatus");
 
       await act(async () => {
-        await result.current.checkInvitationStatus(givenInvitation.code, givenSuccessCallback, givenErrorCallback);
+        await result.current.checkInvitationStatus(
+          givenInvitation.invitation_code,
+          givenSuccessCallback,
+          givenErrorCallback
+        );
       });
 
       // THEN the invitations service checkInvitationCodeStatus function should be called with the correct parameters
-      expect(checkInvitationCodeStatusSpy).toHaveBeenCalledWith(givenInvitation.code);
+      expect(checkInvitationCodeStatusSpy).toHaveBeenCalledWith(givenInvitation.invitation_code);
 
       // AND the error callback should be called
       expect(givenErrorCallback).toHaveBeenCalled();

@@ -80,9 +80,11 @@ async def _create_user_preferences(
             raise HTTPException(status_code=403, detail="forbidden")
 
         # If an invitation code is provided, perform the validation
-        if preferences.code:
+        # TODO: The invitation code is optional since register with invitation code is not yet implemented
+        # make invitation code required when the feature is implemented
+        if preferences.invitation_code:
             # validation of invitation code.
-            invitation = await user_invitation_service.get_invitation_status(preferences.code)
+            invitation = await user_invitation_service.get_invitation_status(preferences.invitation_code)
 
             if invitation.status == InvitationCodeStatus.INVALID:
                 raise HTTPException(status_code=400, detail="Invalid invitation code")
@@ -98,7 +100,7 @@ async def _create_user_preferences(
                 raise HTTPException(status_code=400, detail="Invalid invitation code")
 
             # Reduce the invitation code capacity
-            is_reduced = await user_invitation_service.reduce_invitation_code_capacity(preferences.code)
+            is_reduced = await user_invitation_service.reduce_invitation_code_capacity(preferences.invitation_code)
 
             if not is_reduced:
                 raise HTTPException(status_code=400, detail="Invalid invitation code")

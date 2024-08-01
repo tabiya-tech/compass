@@ -71,7 +71,7 @@ def _get_all_metrics(predictions: List[List[str]], true_values: List[List[str]],
 def _get_evaluated_field(entity: Any, evaluated_type: Type) -> str:
     """Get the field to evaluate based on the entity type."""
     if evaluated_type == Type.OCCUPATION:
-        return entity.code
+        return entity.invitation_code
     elif evaluated_type == Type.SKILL:
         return entity.preferredLabel
     else:

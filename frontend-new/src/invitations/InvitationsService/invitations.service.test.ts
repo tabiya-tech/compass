@@ -35,7 +35,7 @@ describe("InvitationsService", () => {
       // GIVEN the GET invitations REST API will respond with OK and a valid status
       const givenCode = "test-code";
       const givenResponseBody: Invitation = {
-        code: givenCode,
+        invitation_code: givenCode,
         status: InvitationStatus.VALID,
         invitation_type: InvitationType.REGISTER,
       };
@@ -47,7 +47,7 @@ describe("InvitationsService", () => {
       const actualStatus = await service.checkInvitationCodeStatus("test-code");
 
       // THEN expect it to make a GET request with correct headers and payload
-      expect(fetchSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/user-invitations/check-status?code=test-code`, {
+      expect(fetchSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/user-invitations/check-status?invitation_code=test-code`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -100,7 +100,7 @@ describe("InvitationsService", () => {
             InvitationsService.name,
             "checkInvitationCodeStatus",
             "GET",
-            `${givenApiServerUrl}/user-invitations/check-status?code=test-code`,
+            `${givenApiServerUrl}/user-invitations/check-status?invitation_code=test-code`,
             StatusCodes.OK,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",

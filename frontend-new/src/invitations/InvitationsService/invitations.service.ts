@@ -36,7 +36,7 @@ export default class InvitationsService {
     const serviceName = "InvitationsService";
     const serviceFunction = "checkInvitationCodeStatus";
     const method = "GET";
-    const endpointUrl = `${this.invitationStatusEndpointUrl}/check-status?code=${code}`;
+    const endpointUrl = `${this.invitationStatusEndpointUrl}/check-status?invitation_code=${code}`;
     const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, endpointUrl);
 
     const response = await fetchWithAuth(endpointUrl, {

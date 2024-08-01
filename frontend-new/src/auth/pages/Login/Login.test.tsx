@@ -104,7 +104,7 @@ describe("Testing Login component", () => {
     checkInvitationStatus: checkInvitationStatusMock,
     isInvitationCheckLoading: false,
     invitation: {
-      code: "INVITE-CODE-123",
+      invitation_code: "INVITE-CODE-123",
       status: InvitationStatus.VALID,
       invitation_type: InvitationType.AUTO_REGISTER,
     },

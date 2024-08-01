@@ -32,7 +32,7 @@ class UserPreferences(BaseModel):
 
 
 class CreateUserPreferencesRequest(BaseModel):
-    code: Optional[str] = None
+    invitation_code: Optional[str] = None
     """
     Invitation code
     Optional since in the case of a normal email/password registration, the code is not required

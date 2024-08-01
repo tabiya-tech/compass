@@ -11,6 +11,8 @@ import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvi
 import { writeServiceErrorToLog } from "src/error/logger";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { InvitationsContext } from "src/invitations/InvitationsProvider/InvitationsProvider";
+import { useNavigate } from "react-router-dom";
+import { routerPaths } from "../app/routerPaths";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
@@ -38,6 +40,7 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
   notifyOnAcceptDPA,
   isLoading,
 }) => {
+  const navigate = useNavigate();
   const [isAcceptingDPA, setIsAcceptingDPA] = useState(false);
   const { createUserPreferences } = useContext(UserPreferencesContext);
   const { user } = useContext(EmailAuthContext);
@@ -65,7 +68,7 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
         language: Language.en,
         accepted_tc: new Date(),
         sessions: [],
-        code: invitation?.code,
+        invitation_code: invitation?.invitation_code,
       };
       setIsAcceptingDPA(true);
       createUserPreferences(
@@ -76,6 +79,7 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
         },
         (error) => {
           writeServiceErrorToLog(error, console.error);
+          navigate(routerPaths.LOGIN, { replace: true });
           enqueueSnackbar("Failed to create user preferences", { variant: "error" });
         }
       );
@@ -86,7 +90,7 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
     } finally {
       setIsAcceptingDPA(false);
     }
-  }, [user, enqueueSnackbar, createUserPreferences, notifyOnAcceptDPA, invitation]);
+  }, [user, enqueueSnackbar, createUserPreferences, notifyOnAcceptDPA, invitation, navigate]);
 
   /**
    * Handle when a user accepts the data protection agreement

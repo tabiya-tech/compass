@@ -10,7 +10,7 @@ export type UserPreference = UserLanguage & {
 
 export type UserPreferencesSpec = UserPreference & {
   // TODO: optional for now, until we implement the invitation code for email registration
-  code?: string;
+  invitation_code?: string;
 };
 
 export enum Language {
