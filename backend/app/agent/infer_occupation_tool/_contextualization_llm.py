@@ -39,7 +39,7 @@ def get_system_prompt_for_contextual_title(country_of_interest: Country):
         'Employment Type': The type of employment that has one of the following values 'None', 
                 {work_type_names}.
                 {work_type_definitions}  
-        
+        'Responsibilities': A list of responsibilities/activities/skills/behaviour that we know about the job.
         You should use the above information only to infer the context and you shouldn't return it as output. 
         
         {glossary}
@@ -63,12 +63,15 @@ def get_request_prompt_for_contextual_title(experience_entity: ExperienceEntity)
         'Job Description': {experience_title}
         'Employer Name': {company}
         'Employment Type': {work_type}
+        'Responsibilities': {responsibilities}
         #Output
         'Contextualized Job Title':
         """).format(
         experience_title=experience_entity.experience_title,
         company=experience_entity.company if experience_entity.company else "Undefined",
-        work_type=experience_entity.work_type)
+        work_type=experience_entity.work_type,
+        responsibilities=",".join(experience_entity.responsibilities.responsibilities)
+    )
 
 
 class _ContextualizationLLM:

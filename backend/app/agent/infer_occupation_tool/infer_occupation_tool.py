@@ -36,9 +36,16 @@ class InferOccupationTool:
     async def execute(self,
                       country_of_interest: Country,
                       experience: ExperienceEntity,
-                      top_k: int = 10) -> InferredOccupationResult:
+                      top_k: int = 5) -> InferredOccupationResult:
         """
-        TODO: Add description
+        Infers most likely matching occupations based on the experience and the country of interest.
+        It uses the experience title to search for the top_k matching occupations.
+        Additionally, it infers a contextualized title based on the country of interest and information from the experience
+        and searches for the top_k matching occupations based on the contextualized title.
+        The final list of occupations is a list of unique occupations from the two searches, so it may contain from top_k to 2*top_k occupations.
+        It returns the contextualized title, the list of mathing occupations and the stats of the LLM
+
+        The experience is not changed by this method.
         """
 
         contextualization_llm = _ContextualizationLLM(country_of_interest, self._logger)
