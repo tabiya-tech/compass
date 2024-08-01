@@ -8,12 +8,12 @@ from app.vector_search.esco_entities import OccupationEntity
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from app.vector_search.vector_search_dependencies import get_occupation_search_service
 
-
 logger = logging.getLogger(__name__)
 
 
 def add_occupation_search_routes(app: APIRouter) -> None:
     """ Add the occupation search routes to the FastAPI app."""
+
     class OccupationsResponse(BaseModel):
         """
         The response model for the occupations search endpoint.
@@ -32,7 +32,7 @@ def add_occupation_search_routes(app: APIRouter) -> None:
             top_k: Annotated[int, Query(ge=1, le=100, description="The number of occupations to return")] = 5,
             occupation_service: SimilaritySearchService[OccupationEntity] = Depends(get_occupation_search_service)):
         try:
-            occupations = await occupation_service.search(query, k=top_k)
+            occupations = await occupation_service.search(query=query, k=top_k)
             return OccupationsResponse(occupations=occupations)
         except Exception as e:
             logger.exception(e)
