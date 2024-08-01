@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any, Mapping
 
 from app.server_dependecies.db_dependecies import get_mongo_db
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
@@ -13,7 +13,7 @@ from common_libs.environment_settings.constants import EmbeddingConfig
 class FakeOccupationSimilaritySearchService(SimilaritySearchService[OccupationEntity]):
     """ A fake similarity search service that returns a single occupation entity for any query."""
 
-    async def search(self, query: str, k: int = 5) -> List[OccupationEntity]:
+    async def search(self, *, query: str, filter_spec: Mapping[str, Any] = None, k: int = 5) -> List[OccupationEntity]:
         return [OccupationEntity(id='1', UUID='1', preferredLabel='Baker', code='123', description='Bakes bread',
                                  altLabels=['Baker'])]
 

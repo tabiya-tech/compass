@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Literal
 
 from pydantic.main import BaseModel
 
@@ -13,6 +13,7 @@ class OccupationEntity(BaseModel):
     code: str
     description: str
     altLabels: List[str]
+    score: float
 
 
 class SkillEntity(BaseModel):
@@ -24,8 +25,18 @@ class SkillEntity(BaseModel):
     preferredLabel: str
     description: str
     altLabels: List[str]
-    skillType: str
-    relationType: str
+    skillType: Literal['skill/competence', 'knowledge', 'language', 'attitude']
+    score: float
+
+    def __str__(self):
+        return self.preferredLabel
+
+
+class AssociatedSkillEntity(SkillEntity):
+    """
+    Represents a skill entity associated with an occupation.
+    """
+    relationType: Literal['essential', 'optional']
 
     def __str__(self):
         return self.preferredLabel
@@ -36,4 +47,4 @@ class OccupationSkillEntity(BaseModel):
     Represents an occupation and its associated skills.
     """
     occupation: OccupationEntity
-    skills: List[SkillEntity]
+    associated_skills: List[AssociatedSkillEntity]

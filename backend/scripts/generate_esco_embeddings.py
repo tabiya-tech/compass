@@ -14,6 +14,7 @@ from bson.objectid import ObjectId
 from dotenv import load_dotenv
 from google.api_core.exceptions import ResourceExhausted
 from motor.motor_asyncio import AsyncIOMotorCollection, AsyncIOMotorClient
+from pymongo.operations import SearchIndexModel
 from tqdm import tqdm
 
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
@@ -153,21 +154,30 @@ async def generate_embeddings(
 async def upsert_indexes(collection_name: str):
     """Creates the search index for the embeddings."""
     collection = COMPASS_DB[collection_name]
-    definition = {'mappings': {
-        'dynamic': True,
-        'fields': {
-            EMBEDDING_SETTINGS.embedding_key: {
-                'dimensions': 768,
-                'similarity': 'cosine',
-                'type': 'knnVector'
+    vector_index_definition = {
+        "fields": [
+            {
+                "numDimensions": 768,
+                "path": EMBEDDING_SETTINGS.embedding_key,
+                "similarity": "cosine",
+                "type": "vector"
+            },
+            {
+                "path": "UUID",
+                "type": "filter"
             }
-        }
-    }}
-    if 'embedding_index' in [index['name'] for index in await collection.list_search_indexes().to_list(length=None)]:
-        await collection.update_search_index(EMBEDDING_SETTINGS.embedding_index, definition)
+        ]
+    }
+
+    if EMBEDDING_SETTINGS.embedding_index in [index['name'] for index in await collection.list_search_indexes().to_list(length=None)]:
+        await collection.update_search_index(EMBEDDING_SETTINGS.embedding_index, vector_index_definition)
     else:
-        await collection.create_search_index(
-            {'name': EMBEDDING_SETTINGS.embedding_index, 'definition': definition})
+        search_index_model = SearchIndexModel(
+            definition=vector_index_definition,
+            name=EMBEDDING_SETTINGS.embedding_index,
+            type="vectorSearch",
+        )
+        await collection.create_search_index(model=search_index_model)
 
 
 async def create_collection(type: Type, drop=True):

@@ -43,9 +43,9 @@ class InferOccupationTool:
 
         contextualization_llm = _ContextualizationLLM(country_of_interest, self._logger)
         contextualized_title, llm_stats = await contextualization_llm.execute(experience)
-        tasks = [self._occupation_skill_search_service.search(contextualized_title, top_k)]
-        if contextualized_title != experience.experience_title:
-            tasks.append(self._occupation_skill_search_service.search(experience.experience_title, top_k))
+        tasks = [self._occupation_skill_search_service.search(query=contextualized_title, k=top_k)]
+        if contextualized_title.lower() != experience.experience_title.lower():
+            tasks.append(self._occupation_skill_search_service.search(query=experience.experience_title, k=top_k))
 
         list_of_occupation_list = await asyncio.gather(*tasks)
         occupations_skills = flattern(list_of_occupation_list)
