@@ -29,7 +29,7 @@ const AuthHeader: React.FC<Readonly<AuthHeaderProps>> = ({ title, subtitle }) =>
         <img
           src={`${process.env.PUBLIC_URL}/logo.svg`}
           alt="Logo"
-          style={{ maxWidth: "60%", margin: "10%" }}
+          style={{ maxWidth: "60%", margin: "5% 10%" }}
           data-testid={DATA_TEST_ID.AUTH_HEADER_LOGO}
         />
         <LanguageContextMenu />

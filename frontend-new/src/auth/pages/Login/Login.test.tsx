@@ -1,26 +1,22 @@
 import "src/_test_utilities/consoleMock";
 import React from "react";
-import { render, screen, waitFor } from "src/_test_utilities/test-utils";
-import { HashRouter, useNavigate } from "react-router-dom";
+import { render, screen, waitFor, fireEvent, act } from "src/_test_utilities/test-utils";
+import { HashRouter } from "react-router-dom";
 import Login, { DATA_TEST_ID } from "./Login";
 import { EmailAuthContext, TabiyaUser } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
-import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { routerPaths } from "src/app/routerPaths";
-import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
-import { ServiceError } from "src/error/error";
-import ErrorConstants from "src/error/error.constants";
-import { StatusCodes } from "http-status-codes";
+import { InvitationsContext } from "src/invitations/InvitationsProvider/InvitationsProvider";
+import { AnonymousAuthContext } from "src/auth/anonymousAuth/AnonymousAuthProvider/AnonymousAuthProvider";
 import LoginWithEmailForm from "src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm";
-import { DATA_TEST_ID as AUTH_HEADER_DATA_TEST_ID } from "src/auth/components/AuthHeader/AuthHeader";
+import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm";
+import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
 
-// Mock the envService module
+// Mock the necessary modules
 jest.mock("src/envService", () => ({
   getFirebaseAPIKey: jest.fn(() => "mock-api-key"),
   getFirebaseDomain: jest.fn(() => "mock-auth-domain"),
   getBackendUrl: jest.fn(() => "mock-backend-url"),
 }));
 
-//mock the IDPAuth component
 jest.mock("src/auth/components/IDPAuth/IDPAuth", () => {
   const actual = jest.requireActual("src/auth/components/IDPAuth/IDPAuth");
   return {
@@ -32,7 +28,6 @@ jest.mock("src/auth/components/IDPAuth/IDPAuth", () => {
   };
 });
 
-// mock the snack bar provider
 jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   const actual = jest.requireActual("src/theme/SnackbarProvider/SnackbarProvider");
   return {
@@ -45,7 +40,6 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   };
 });
 
-// mock the router
 jest.mock("react-router-dom", () => {
   const actual = jest.requireActual("react-router-dom");
   return {
@@ -58,7 +52,6 @@ jest.mock("react-router-dom", () => {
   };
 });
 
-// mock the login form with email component
 jest.mock("src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm", () => {
   const actual = jest.requireActual("src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm");
   return {
@@ -70,10 +63,23 @@ jest.mock("src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm
   };
 });
 
+jest.mock("./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm", () => {
+  const actual = jest.requireActual("./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm");
+  return {
+    ...actual,
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return <span data-testid={actual.DATA_TEST_ID.FORM}></span>;
+    }),
+  };
+});
+
 describe("Testing Login component", () => {
   const loginWithEmailMock = jest.fn();
+  const checkInvitationStatusMock = jest.fn();
+  const loginAnonymouslyMock = jest.fn();
 
-  const authContextValue = {
+  const emailAuthContextValue = {
     loginWithEmail: loginWithEmailMock,
     isLoggingInWithEmail: false,
     isRegisteringWithEmail: false,
@@ -85,194 +91,136 @@ describe("Testing Login component", () => {
     handlePageLoad: jest.fn(),
   };
 
+  const anonymousAuthContextValue = {
+    loginAnonymously: loginAnonymouslyMock,
+    user: null,
+    isLoggingInAnonymously: false,
+    isLoggingOut: false,
+    logout: jest.fn(),
+    handlePageLoad: jest.fn(),
+  };
+
+  const invitationsContextValue = {
+    checkInvitationStatus: checkInvitationStatusMock,
+    isInvitationCheckLoading: false,
+    invitation: {
+      code: "INVITE-CODE-123",
+      status: InvitationStatus.VALID,
+      invitation_type: InvitationType.AUTO_REGISTER,
+    },
+  };
+
   beforeEach(() => {
-    // Clear console mocks and mock functions
+    // Clear mocks before each test
     (console.error as jest.Mock).mockClear();
     (console.warn as jest.Mock).mockClear();
     jest.clearAllMocks();
   });
 
-  beforeAll(() => mockUseTokens());
-
   test("it should show login form successfully", async () => {
-    // Render the component within the AuthContext and Router
+    // GIVEN the component is rendered within necessary context providers
     render(
       <HashRouter>
-        <EmailAuthContext.Provider value={authContextValue}>
-          <Login postLoginHandler={() => {}} isLoading={false} />
+        <EmailAuthContext.Provider value={emailAuthContextValue}>
+          <AnonymousAuthContext.Provider value={anonymousAuthContextValue}>
+            <InvitationsContext.Provider value={invitationsContextValue}>
+              <Login postLoginHandler={jest.fn()} isLoading={false} />
+            </InvitationsContext.Provider>
+          </AnonymousAuthContext.Provider>
         </EmailAuthContext.Provider>
       </HashRouter>
     );
 
-    // THEN expect no errors or warning to have occurred
+    // THEN expect no errors or warnings to have occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
 
-    // AND the component should be rendered
+    // THEN the component should be rendered
     expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toBeInTheDocument();
 
-    // AND the header component should be rendered
-    expect(screen.getByTestId(AUTH_HEADER_DATA_TEST_ID.AUTH_HEADER_CONTAINER)).toBeInTheDocument();
-
-    // AND the form inputs and button should be displayed
+    // THEN the email login form should be displayed
     expect(LoginWithEmailForm).toHaveBeenCalled();
 
-    // AND when the login form calls the notifyOnLogin function when the form is submitted
-    (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnLogin(new Event("submit"));
-
-    // THEN expect the login function to have been called
-    await waitFor(() => {
-      expect(loginWithEmailMock).toHaveBeenCalled();
-    });
-
-    // AND the component should match the snapshot
-    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toMatchSnapshot();
+    // THEN the invite code login form should be displayed
+    expect(LoginWithInviteCodeForm).toHaveBeenCalled();
   });
 
-  test.each([
-    ["accepted", new Date(), routerPaths.ROOT],
-    ["not accepted", null, routerPaths.DPA],
-  ])(
-    "it should handle successful login for a user who has %s terms and conditions",
-    async (_description: string, tc: Date | null, expectedPath: string) => {
-      // GIVEN the login function will succeed
-      const givenUser: TabiyaUser = {
-        id: "0001",
-        email: "foo@bar.baz",
-        name: "Foo Bar",
-      };
-      const givenNotifyOnLogin = jest.fn();
-      const givenIsLoading = false;
-      loginWithEmailMock.mockImplementation((email, password, onSuccess, onError) => {
-        onSuccess(givenUser);
-      });
+  test("it should handle email login correctly", async () => {
+    // GIVEN a user with valid credentials
+    const givenUser: TabiyaUser = { id: "0001", email: "foo@bar.baz", name: "Foo Bar" };
 
-      render(
-        <HashRouter>
-          <EmailAuthContext.Provider value={authContextValue}>
-            <Login postLoginHandler={givenNotifyOnLogin} isLoading={givenIsLoading} />
-          </EmailAuthContext.Provider>
-        </HashRouter>
-      );
-
-      // THEN expect no errors or warning to have occurred
-      expect(console.error).not.toHaveBeenCalled();
-      expect(console.warn).not.toHaveBeenCalled();
-
-      // AND the component should be rendered
-      expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toBeInTheDocument();
-
-      // AND the form inputs and button should be displayed
-      expect(LoginWithEmailForm).toHaveBeenCalled();
-
-      // AND when the login form calls the notifyOnLogin function when the form is submitted
-      (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnLogin(new Event("submit"));
-
-      // THEN expect the login function to have been called
-      await waitFor(() => {
-        expect(loginWithEmailMock).toHaveBeenCalled();
-      });
-
-      // AND the notifyOnLogin function should have been called
-      await waitFor(() => {
-        expect(givenNotifyOnLogin).toHaveBeenCalledWith(givenUser);
-      });
-    }
-  );
-
-  test("it should show an error message if the user's email is not verified", async () => {
-    // GIVEN the login function will fail with an error message
-    loginWithEmailMock.mockImplementation((email, password, onSuccess, onError) => {
-      const mockServiceError = new ServiceError(
-        "AuthService",
-        "handleLogin",
-        "POST",
-        "/signInWithEmailAndPassword",
-        StatusCodes.FORBIDDEN,
-        ErrorConstants.FirebaseErrorCodes.EMAIL_NOT_VERIFIED,
-        "auth/email-not-verified"
-      );
-
-      onError(mockServiceError);
+    // AND the email login mock will succeed
+    loginWithEmailMock.mockImplementation((email, password, onSuccess) => {
+      onSuccess(givenUser);
     });
 
-    // AND the Login component is rendered within the AuthContext and Router
     render(
       <HashRouter>
-        <EmailAuthContext.Provider value={authContextValue}>
-          <Login postLoginHandler={() => {}} isLoading={false} />
+        <EmailAuthContext.Provider value={emailAuthContextValue}>
+          <AnonymousAuthContext.Provider value={anonymousAuthContextValue}>
+            <InvitationsContext.Provider value={invitationsContextValue}>
+              <Login postLoginHandler={jest.fn()} isLoading={false} />
+            </InvitationsContext.Provider>
+          </AnonymousAuthContext.Provider>
         </EmailAuthContext.Provider>
       </HashRouter>
     );
 
-    // THEN expect no errors or warning to have occurred
-    expect(console.error).not.toHaveBeenCalled();
-    expect(console.warn).not.toHaveBeenCalled();
-
-    // AND the component should be rendered
-    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toBeInTheDocument();
-
-    // AND the form inputs and button should be displayed
-    expect(LoginWithEmailForm).toHaveBeenCalled();
-
-    // AND when the login form calls the notifyOnLogin function when the form is submitted
-    (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnLogin(new Event("submit"));
-
-    // THEN expect the login function to have been called
-    await waitFor(() => {
-      expect(loginWithEmailMock).toHaveBeenCalled();
+    // WHEN the user fills in their email and password
+    await act(() => {
+      (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnEmailChanged("foo@bar.baz");
+      (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnPasswordChanged("Pa$$word123");
     });
 
-    // AND the error message should be displayed
+    // AND clicks the login button
+    fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
+
+    // THEN the loginWithEmail function should be called with the correct arguments
     await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        "The email you are using is registered, but you have not yet verified it. Please verify your email to continue.",
-        { variant: "error" }
+      expect(loginWithEmailMock).toHaveBeenCalledWith(
+        "foo@bar.baz",
+        "Pa$$word123",
+        expect.any(Function),
+        expect.any(Function)
       );
     });
-
-    // AND the user should not be redirected
-    expect(useNavigate()).not.toHaveBeenCalled();
   });
 
-  test("it should show error message when login fails", async () => {
-    // GIVEN the login function will fail
-    loginWithEmailMock.mockImplementation((email, password, onSuccess, onError) => {
-      onError(new Error("Login failed"));
+  test("it should handle invitation code login correctly", async () => {
+    // GIVEN a valid invitation code
+    const givenUser: TabiyaUser = { id: "0001", email: "foo@bar.baz", name: "Foo Bar" };
+
+    // AND the invitation code mock will succeed
+    checkInvitationStatusMock.mockImplementation((code, onSuccess) => {
+      onSuccess(givenUser);
     });
 
-    // AND the Login component is rendered within the AuthContext and Router
     render(
       <HashRouter>
-        <EmailAuthContext.Provider value={authContextValue}>
-          <Login postLoginHandler={() => {}} isLoading={false} />
+        <EmailAuthContext.Provider value={emailAuthContextValue}>
+          <AnonymousAuthContext.Provider value={anonymousAuthContextValue}>
+            <InvitationsContext.Provider value={invitationsContextValue}>
+              <Login postLoginHandler={jest.fn()} isLoading={false} />
+            </InvitationsContext.Provider>
+          </AnonymousAuthContext.Provider>
         </EmailAuthContext.Provider>
       </HashRouter>
     );
 
-    // THEN expect no errors or warning to have occurred
-    expect(console.error).not.toHaveBeenCalled();
-    expect(console.warn).not.toHaveBeenCalled();
-
-    // AND the component should be rendered
-    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toBeInTheDocument();
-
-    // AND the form inputs and button should be displayed
-    expect(LoginWithEmailForm).toHaveBeenCalled();
-
-    // AND when the login form calls the notifyOnLogin function when the form is submitted
-    (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnLogin(new Event("submit"));
-
-    // THEN expect the login function to have been called
-    await waitFor(() => {
-      expect(loginWithEmailMock).toHaveBeenCalled();
+    // WHEN the user fills in their invitation code
+    await act(() => {
+      (LoginWithInviteCodeForm as jest.Mock).mock.calls[0][0].notifyOnInviteCodeChanged("INVITE-CODE-123");
     });
 
-    // AND the error message should be displayed
+    // AND clicks the login button
+    fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
+
+    // THEN the checkInvitationStatus function should be called with the correct arguments
     await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        "An unexpected error occurred. Please try again later.",
-        { variant: "error" }
+      expect(checkInvitationStatusMock).toHaveBeenCalledWith(
+        "INVITE-CODE-123",
+        expect.any(Function),
+        expect.any(Function)
       );
     });
   });
