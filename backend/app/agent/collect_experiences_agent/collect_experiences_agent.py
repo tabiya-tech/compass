@@ -102,22 +102,7 @@ class CollectExperiencesAgent(Agent):
                                                                explored_types=self._state.explored_types,
                                                                logger=self.logger)
 
-        if conversation_llm_output.finished and len(self._state.unexplored_types) == 0:
-            # The conversation is completed when the LLM has finished and all work types have been explored
-            for elem in collected_data:
-                self.logger.debug("Experience data collected: %s", elem)
-                try:
-                    entity = ExperienceEntity(
-                        experience_title=elem.experience_title,
-                        company=elem.company,
-                        location=elem.location,
-                        timeline=Timeline(start=elem.start_date, end=elem.end_date),
-                        work_type=WorkType.from_string_key(elem.work_type)
-                    )
-                    self._experiences.append(entity)
-                except Exception as e:  # pylint: disable=broad-except
-                    self.logger.warning("Could not parse experience entity from: %s. Error: %s", elem, e)
-        elif conversation_llm_output.exploring_type_finished:
+        if conversation_llm_output.exploring_type_finished:
             #  The specific work type has been explored, so we remove it from the list
             #  and we set the conversation to continue
             explored_type = self._state.unexplored_types.pop(0)
@@ -144,8 +129,23 @@ class CollectExperiencesAgent(Agent):
     def get_experiences(self) -> list[ExperienceEntity]:
         """
         Get the experiences extracted by the agent.
-        This method should be called after the agent has finished its task, otherwise,
-        the list will be empty or incomplete.
+        If this method is called before the agent has finished its task, the list will be empty or incomplete.
         :return:
         """
-        return self._experiences
+        experiences = []
+        # The conversation is completed when the LLM has finished and all work types have been explored
+        for elem in self._state.collected_data:
+            self.logger.debug("Experience data collected: %s", elem)
+            try:
+                entity = ExperienceEntity(
+                    experience_title=elem.experience_title,
+                    company=elem.company,
+                    location=elem.location,
+                    timeline=Timeline(start=elem.start_date, end=elem.end_date),
+                    work_type=WorkType.from_string_key(elem.work_type)
+                )
+                experiences.append(entity)
+            except Exception as e:  # pylint: disable=broad-except
+                self.logger.warning("Could not parse experience entity from: %s. Error: %s", elem, e)
+
+        return experiences
