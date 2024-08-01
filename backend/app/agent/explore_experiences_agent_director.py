@@ -201,14 +201,17 @@ class ExploreExperiencesAgentDirector(Agent):
             agent_output = await self._collect_experiences_agent.execute(user_input, context)
             await self._conversation_manager.update_history(user_input, agent_output)
 
+            # The experiences are still being collected, but we can already store them so that we can
+            # present them to the user even if data collection has not finished.
+            # The experiences will be overwritten every time
+            experiences = self._collect_experiences_agent.get_experiences()
+            s.experiences_state.clear()
+            for exp in experiences:
+                s.experiences_state[exp.uuid] = ExperienceState(experience=exp)
+
             # If collecting is not finished then return the output to the user to continue collecting
             if not agent_output.finished:
                 return agent_output
-
-            # Collecting has finished, update the state with the experiences
-            experiences = self._collect_experiences_agent.get_experiences()
-            for exp in experiences:
-                s.experiences_state[exp.uuid] = ExperienceState(experience=exp)
 
             # and transition to the next phase
             s.conversation_phase = ConversationPhase.DIVE_IN
