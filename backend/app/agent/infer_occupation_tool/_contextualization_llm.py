@@ -24,7 +24,7 @@ def get_system_prompt_for_contextual_title(country_of_interest: Country):
     glossary = get_country_glossary(country_of_interest)
     glossary_str = ""
     if glossary:
-        glossary_str = glossary_template.format(glossary=glossary)
+        glossary_str = replace_placeholders_with_indent(glossary_template, glossary=glossary)
 
     system_prompt_template = dedent("""\
         You are an expert who needs to classify jobs from {country_of_interest} to a European framework. 
