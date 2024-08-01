@@ -2,7 +2,7 @@ import { fetchWithAuth } from "./fetchWithAuth";
 import { setupFetchSpy } from "src/_test_utilities/fetchSpy";
 import { ServiceError } from "src/error/error";
 import ErrorConstants from "src/error/error.constants";
-import * as getActiveAccessTokenModule from "src/utils/getActiveAccessToken/getActiveAccessToken";
+import * as getActiveTokenModule from "src/utils/getActiveToken/getActiveToken";
 
 describe("Api Service tests", () => {
   beforeEach(() => {
@@ -14,7 +14,7 @@ describe("Api Service tests", () => {
     const givenApiUrl = "https://api.example.com/data";
     const givenToken = "someAuthToken";
 
-    jest.spyOn(getActiveAccessTokenModule, "getActiveAccessToken").mockResolvedValueOnce(givenToken);
+    jest.spyOn(getActiveTokenModule, "getActiveToken").mockResolvedValueOnce(givenToken);
 
     // AND the server responds with a 200 status code
     setupFetchSpy(200, "fetch response", "application/json;charset=UTF-8");
@@ -42,7 +42,7 @@ describe("Api Service tests", () => {
   test("fetchWithAuth should work without authToken", async () => {
     // GIVEN an API URL and no auth token in sessionStorage
     const givenApiUrl = "https://api.example.com/data";
-    jest.spyOn(getActiveAccessTokenModule, "getActiveAccessToken").mockResolvedValueOnce("");
+    jest.spyOn(getActiveTokenModule, "getActiveToken").mockResolvedValueOnce("");
 
     // AND the server responds with a 200 status code
     setupFetchSpy(200, "fetch response without token", "application/json;charset=UTF-8");

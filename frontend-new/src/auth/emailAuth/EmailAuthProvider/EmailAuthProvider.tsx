@@ -2,7 +2,12 @@ import React, { createContext, useCallback, useEffect, useMemo, useState } from 
 import { useTokens } from "src/auth/hooks/useTokens";
 import { useAuthUser } from "src/auth/hooks/useAuthUser";
 import { emailAuthService } from "src/auth/emailAuth/EmailAuthService/EmailAuth.service";
-import { EmailAuthContextValue, FirebaseIDToken, TabiyaUser, TFirebaseTokenResponse } from "src/auth/auth.types";
+import {
+  EmailAuthContextValue,
+  FirebaseToken,
+  TabiyaUser,
+  TFirebaseTokenResponse,
+} from "src/auth/auth.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import { jwtDecode } from "jwt-decode";
@@ -34,8 +39,8 @@ export const EmailAuthContext = createContext<EmailAuthContextValue>(emailAuthCo
  * @constructor
  */
 export const EmailAuthProvider: React.FC<EmailAuthProviderProps> = ({ children }) => {
-  const { user, updateUser, updateUserByIDToken } = useAuthUser();
-  const tokens = useTokens({ updateUserByIDToken });
+  const { user, updateUser, updateUserByToken } = useAuthUser();
+  const tokens = useTokens({ updateUserByToken });
 
   // State to track if the user is logging in/registering
   const [isLoggingInWithEmail, setIsLoggingInWithEmail] = useState(false);
@@ -43,15 +48,15 @@ export const EmailAuthProvider: React.FC<EmailAuthProviderProps> = ({ children }
   const [isRegisteringWithEmail, setIsRegisteringWithEmail] = useState(false);
 
   /**
-   * Handles page load to check and set the user if an access token exists
+   * Handles page load to check and set the user if an token exists
    */
   const handlePageLoad = useCallback(
     (successCallback: (user: TabiyaUser) => void, errorCallback: (error: any) => void) => {
-      const accessToken = PersistentStorageService.getAccessToken();
-      if (accessToken) {
-        // If an access token exists, update the user state
-        updateUserByIDToken(accessToken);
-        const decodedUser: FirebaseIDToken = jwtDecode(accessToken);
+      const token = PersistentStorageService.getToken();
+      if (token) {
+        // If token exists, update the user state
+        updateUserByToken(token);
+        const decodedUser: FirebaseToken = jwtDecode(token);
         const newUser: TabiyaUser = {
           id: decodedUser.user_id,
           name: decodedUser.name,
@@ -60,10 +65,10 @@ export const EmailAuthProvider: React.FC<EmailAuthProviderProps> = ({ children }
         // Call the success callback with the new user
         successCallback(newUser);
       } else {
-        errorCallback("No access token");
+        errorCallback("No token");
       }
     },
-    [updateUserByIDToken]
+    [updateUserByToken]
   );
 
   /**
@@ -97,12 +102,12 @@ export const EmailAuthProvider: React.FC<EmailAuthProviderProps> = ({ children }
           email,
           password,
           (response: TFirebaseTokenResponse) => {
-            updateUserByIDToken(response.access_token);
-            PersistentStorageService.setAccessToken(response.access_token);
+            updateUserByToken(response.access_token);
+            PersistentStorageService.setToken(response.access_token);
             // Update the user state
-            updateUserByIDToken(response.access_token);
+            updateUserByToken(response.access_token);
 
-            const decodedUser: FirebaseIDToken = jwtDecode(response.access_token);
+            const decodedUser: FirebaseToken = jwtDecode(response.access_token);
             const newUser: TabiyaUser = {
               id: decodedUser.user_id,
               name: decodedUser.name,
@@ -119,15 +124,15 @@ export const EmailAuthProvider: React.FC<EmailAuthProviderProps> = ({ children }
         )
         .then((data: TFirebaseTokenResponse | undefined) => {
           if (!data) return;
-          // Set the access token in the tokens context once the login is complete
-          tokens.setAccessToken(data.access_token);
+          // Set the token in the tokens context once the login is complete
+          tokens.setToken(data.access_token);
         })
         .finally(() => {
           // Once the login is complete, set the isLoggingIn state to false
           setIsLoggingInWithEmail(false);
         });
     },
-    [updateUserByIDToken, tokens]
+    [updateUserByToken, tokens]
   );
 
   /**

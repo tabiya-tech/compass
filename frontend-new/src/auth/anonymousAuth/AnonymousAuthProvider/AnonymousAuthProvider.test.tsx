@@ -54,14 +54,14 @@ describe("AnonymousAuthProvider module", () => {
       const givenErrorCallback = jest.fn();
 
       // AND the access token is set
-      PersistentStorageService.setAccessToken("foo");
+      PersistentStorageService.setToken("foo");
       const logoutSpy = jest.spyOn(authService, "handleLogout");
 
       // WHEN the logout function is called
       act(() => result.current?.logout(givenSuccessCallback, givenErrorCallback));
 
       // THEN the access token should be cleared
-      expect(PersistentStorageService.getAccessToken()).toBeNull();
+      expect(PersistentStorageService.getToken()).toBeNull();
       // AND the session ids should be cleared
       expect(PersistentStorageService.getUserPreferences()).toBeNull();
 

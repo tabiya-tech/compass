@@ -3,7 +3,7 @@ import { AuthProviderIds } from "src/auth/auth.types";
 const auth = {
   currentUser: {
     getIdToken: jest.fn(),
-    getIdTokenResult: jest.fn(),
+    getTokenResult: jest.fn(),
   },
   onAuthStateChanged: jest.fn().mockReturnValue(jest.fn()),
   signInWithPopup: jest.fn(),

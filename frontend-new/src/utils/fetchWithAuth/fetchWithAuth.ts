@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import { getServiceErrorFactory } from "src/error/error";
 import ErrorConstants from "src/error/error.constants";
-import { getActiveAccessToken } from "src/utils/getActiveAccessToken/getActiveAccessToken";
+import { getActiveToken } from "src/utils/getActiveToken/getActiveToken";
 
 // This function is used to make authenticated fetch requests
 // It adds the Authorization header with the Token from the session storage
@@ -35,7 +35,7 @@ export const fetchWithAuth = async (
   const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, init.method ?? "Unknown method", apiUrl);
   let response: Response;
   try {
-    const token = await getActiveAccessToken();
+    const token = await getActiveToken();
 
     const headers = new Headers(init.headers || {});
     headers.append("Authorization", `Bearer ${token ?? "ANONYMOUS"}`);

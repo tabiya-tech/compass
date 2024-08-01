@@ -1,4 +1,4 @@
-import { getActiveAccessToken } from "./getActiveAccessToken";
+import { getActiveToken } from "./getActiveToken";
 import { jwtDecode } from "jwt-decode";
 import { auth } from "src/auth/firebaseConfig";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
@@ -7,7 +7,7 @@ jest.mock("jwt-decode");
 jest.mock("src/auth/firebaseConfig");
 jest.mock("src/app/PersistentStorageService/PersistentStorageService");
 
-describe("getActiveAccessToken", () => {
+describe("getActiveToken", () => {
   const mockGetToken = PersistentStorageService.getToken as jest.Mock;
   const mockSetToken = PersistentStorageService.setToken as jest.Mock;
   const mockJwtDecode = jwtDecode as jest.Mock;
@@ -29,7 +29,7 @@ describe("getActiveAccessToken", () => {
     mockAuth.mockResolvedValue(givenMockedToken);
 
     // WHEN we call the function.
-    const actualToken = await getActiveAccessToken();
+    const actualToken = await getActiveToken();
 
     // THEN we should get the mocked token.
     expect(actualToken).toBe(givenMockedToken);
@@ -49,7 +49,7 @@ describe("getActiveAccessToken", () => {
     mockJwtDecode.mockReturnValue(mockDecodedToken);
 
     // WHEN we call the function.
-    const token = await getActiveAccessToken();
+    const token = await getActiveToken();
 
     // THEN we should get the mocked token.
     expect(token).toBe(givenMockedToken);
@@ -66,7 +66,7 @@ describe("getActiveAccessToken", () => {
     mockAuth.mockResolvedValue(givenMockedToken);
 
     // WHEN we call the function.
-    const token = await getActiveAccessToken();
+    const token = await getActiveToken();
 
     // THEN we should get the mocked token.
     expect(token).toBe(givenMockedToken);
@@ -83,7 +83,7 @@ describe("getActiveAccessToken", () => {
     mockAuth.mockResolvedValue(givenMockedToken);
 
     // WHEN we call the function.
-    const token = await getActiveAccessToken();
+    const token = await getActiveToken();
 
     // THEN we should get the mocked token.
     expect(token).toBe(givenMockedToken);

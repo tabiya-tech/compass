@@ -4,7 +4,7 @@ export type TabiyaUser = {
   email: string;
 };
 
-export type FirebaseIDToken = {
+export type FirebaseToken = {
   name: string;
   iss: string;
   aud: string;

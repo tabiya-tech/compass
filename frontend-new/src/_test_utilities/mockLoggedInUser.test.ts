@@ -4,7 +4,7 @@ import { useContext } from "react";
 import { EmailAuthContext, TabiyaUser } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 
 describe("Mock Logged In User", () => {
-  test("it should return the access token when set", () => {
+  test("it should return the token when set", () => {
     // GIVEN: The user is set
     const givenUser: TabiyaUser = { id: "0001", name: "foo-1", email: "foo@bar.baz" };
     mockLoggedInUser({ user: givenUser });

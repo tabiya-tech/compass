@@ -29,7 +29,7 @@ const EXPIRATION_TOLERANCE = 300; // 5 minutes, 300 seconds
  * If the token has expired, refresh it
  * @returns {string} The active access token
  */
-export async function getActiveAccessToken(): Promise<string> {
+export async function getActiveToken(): Promise<string> {
   let token = PersistentStorageService.getToken();
 
   // if no token avaialble, get a refreshed one

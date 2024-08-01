@@ -10,7 +10,7 @@ export function mockLoggedInUser(mockedValues: Partial<EmailAuthContextValue>) {
     ...emailAuthContextDefaultValue,
     user: user,
     updateUser: (user: TabiyaUser) => null,
-    updateUserByAccessToken: () => {},
+    updateUserByToken: () => {},
     ...mockedValues,
   });
 }

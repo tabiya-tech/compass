@@ -1,7 +1,7 @@
 import { UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { Invitation } from "src/invitations/InvitationsService/invitations.types";
 
-export const ACCESS_TOKEN_KEY = "access_token";
+export const TOKEN_KEY = "token";
 export const USER_PREFERENCES_KEY = "user_preferences";
 
 export const INVITATION_KEY = "invitation";
@@ -14,26 +14,26 @@ export class PersistentStorageService {
   static readonly storage = sessionStorage;
 
   /**
-   * Returns the access token from the storage
-   * @returns string | null - The access token
+   * Returns the token from the storage
+   * @returns string | null - The token
    */
-  static getAccessToken(): string | null {
-    return this.storage.getItem(ACCESS_TOKEN_KEY);
+  static getToken(): string | null {
+    return this.storage.getItem(TOKEN_KEY);
   }
 
   /**
-   * Clears the Access token from the storage
+   * Clears the token from the storage
    */
-  static clearAccessToken(): void {
-    this.storage.removeItem(ACCESS_TOKEN_KEY);
+  static clearToken(): void {
+    this.storage.removeItem(TOKEN_KEY);
   }
 
   /**
-   * Sets the Access token in the storage
-   * @param accessToken
+   * Sets the token in the storage
+   * @param token
    */
-  static setAccessToken(accessToken: string): void {
-    this.storage.setItem(ACCESS_TOKEN_KEY, accessToken);
+  static setToken(token: string): void {
+    this.storage.setItem(TOKEN_KEY, token);
   }
 
   /**
@@ -60,7 +60,6 @@ export class PersistentStorageService {
 
   /**
    * Clears the user preferences from the storage
-   * @param preferences
    * @returns void
    */
   static clearUserPreferences(): void {
