@@ -19,6 +19,7 @@ class ScriptSettings(BaseSettings):
     tabiya_mongodb_uri: str
     """ The URI to connect to the Tabiya Platform MongoDB database."""
 
+
 class Type(Enum):
     """
     An enumeration class to define the type of the entity.

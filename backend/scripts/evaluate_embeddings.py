@@ -84,7 +84,7 @@ async def _get_predictions(search_service: SimilaritySearchService, queries: Lis
     # API. We are running it sequentially to avoid hitting the limit.
     predictions = []
     for query in tqdm(queries):
-        result = await search_service.search(query, k=k)
+        result = await search_service.search(query=query, k=k)
         predictions.append([_get_evaluated_field(e, evaluated_type) for e in result])
     return predictions
 

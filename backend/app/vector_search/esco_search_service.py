@@ -1,12 +1,12 @@
 from abc import abstractmethod
-from typing import TypeVar, List
+from typing import TypeVar, List, Mapping, Any
 
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pydantic import BaseModel
 
 from app.vector_search.embeddings_model import EmbeddingService
-from app.vector_search.esco_entities import OccupationEntity, OccupationSkillEntity
+from app.vector_search.esco_entities import OccupationEntity, OccupationSkillEntity, AssociatedSkillEntity
 from app.vector_search.esco_entities import SkillEntity
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from common_libs.environment_settings.constants import EmbeddingConfig
@@ -74,12 +74,13 @@ class AbstractEscoSearchService(SimilaritySearchService[T]):
         """
         raise NotImplementedError
 
-    async def search(self, query: str, k: int = 5) -> List[T]:
+    async def search(self, *, query: str | list[float], filter_spec: Mapping[str, Any] = None, k: int = 5) -> List[T]:
         """
         Perform a similarity search on the vector store. It uses the default similarity search set during vector
         generation.
 
-        :param query: The query to search for.
+        :param query: The text query, or it's vector representation to search for.
+        :param filter_spec: A filter to apply to the search. See https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-stage/#fields
         :param k: The number of results to return.
         :return: A list of T objects.
         """
@@ -87,7 +88,11 @@ class AbstractEscoSearchService(SimilaritySearchService[T]):
         # preferredLabel, one for the description and one for the altLabels. The search is performed on all three
         # fields, so we need to multiply the number of results by 3 to account for the possible duplication. Those
         # are then grouped by the UUID and the best score is selected. The final number of results is limited to k.
-        embedding = await self.embedding_service.embed(query)
+        embedding: list[float]
+        if isinstance(query, str):
+            embedding = await self.embedding_service.embed(query)
+        else:
+            embedding = query
         params = {
             "queryVector": embedding,
             "path": self.config.embedding_key,
@@ -95,6 +100,8 @@ class AbstractEscoSearchService(SimilaritySearchService[T]):
             "limit": k * 3,
             "index": self.config.index_name,
         }
+        if filter_spec:
+            params["filter"] = filter_spec
         fields = self._group_fields().copy()
         fields.update({"score": {"$max": "$score"}})
         pipeline = [
@@ -121,6 +128,7 @@ class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
                 "description": {"$first": "$description"},
                 "altLabels": {"$first": "$altLabels"},
                 "code": {"$first": "$code"},
+                "score": {"$max": "$score"}
                 }
 
     def _to_entity(self, doc: dict) -> OccupationEntity:
@@ -135,10 +143,21 @@ class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
             preferredLabel=doc.get("preferredLabel", ""),
             description=doc.get("description", ""),
             altLabels=doc.get("altLabels", []),
+            score=doc.get("score", 0.0),
         )
 
+    async def get_by_esco_code(self, *, code: str) -> OccupationEntity:
+        """
+        Get an occupation by its ESCO code.
+        :param code: The ESCO code of the occupation.
+        :return: The OccupationEntity object.
+        """
+        # use $eq to match the exact code
+        query = {"code": {"$eq": code}}
+        doc = await self.collection.find_one(query)
+        return self._to_entity(doc)
 
-# TODO: Merge this with the OccupationSkillSearch to avoid duplication.
+
 class SkillSearchService(AbstractEscoSearchService[SkillEntity]):
     """
     A service class to perform similarity searches on the skills' collection.
@@ -156,7 +175,7 @@ class SkillSearchService(AbstractEscoSearchService[SkillEntity]):
             description=doc.get("description", ""),
             altLabels=doc.get("altLabels", []),
             skillType=doc.get("skillType", ""),
-            relationType="",
+            score=doc.get("score", 0.0),
         )
 
     def _group_fields(self) -> dict:
@@ -166,6 +185,7 @@ class SkillSearchService(AbstractEscoSearchService[SkillEntity]):
                 "description": {"$first": "$description"},
                 "altLabels": {"$first": "$altLabels"},
                 "skillType": {"$first": "$skillType"},
+                "score": {"$max": "$score"}
                 }
 
 
@@ -215,7 +235,7 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
                         }}
         ]).to_list(length=None)
         # TODO: Also use embeddings for the skills.
-        return [SkillEntity(
+        return [AssociatedSkillEntity(
             id=str(skill.get("skillId", "")),
             UUID=skill.get("UUID", ""),
             preferredLabel=skill.get("preferredLabel", ""),
@@ -223,9 +243,23 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
             altLabels=skill.get("altLabels", []),
             skillType=skill.get("skillType", ""),
             relationType=skill.get("relationType", ""),
+            score=0.0
         ) for skill in skills]
 
-    async def search(self, query: str, k: int = 5) -> list[OccupationSkillEntity]:
-        occupations = await self.occupation_search_service.search(query, k)
-        return [OccupationSkillEntity(occupation=occupation, skills=await self._find_skills_from_occupation(occupation))
-                for occupation in occupations]
+    async def search(self, *, query: str, filter_spec: Mapping[str, Any] = None, k: int = 5) -> list[OccupationSkillEntity]:
+        occupation_skills: List[OccupationSkillEntity] = []
+        occupations: list[OccupationEntity] = await self.occupation_search_service.search(query=query, filter_spec=filter_spec, k=k)
+        for occupation in occupations:
+            associated_skills = await self._find_skills_from_occupation(occupation)
+            occupation_skills.append(OccupationSkillEntity(occupation=occupation, associated_skills=associated_skills))
+        return occupation_skills
+
+    async def get_by_esco_code(self, *, code: str) -> OccupationSkillEntity:
+        """
+        Get an occupation by its ESCO code.
+        :param code: The ESCO code of the occupation.
+        :return: The OccupationSkillEntity object.
+        """
+        occupation = await self.occupation_search_service.get_by_esco_code(code=code)
+        associated_skills = await self._find_skills_from_occupation(occupation)
+        return OccupationSkillEntity(occupation=occupation, associated_skills=associated_skills)
