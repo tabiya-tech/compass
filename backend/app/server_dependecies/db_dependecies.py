@@ -31,7 +31,7 @@ async def initialize_mongo_db():
 
         # create the user invitations indexes
         await _mongo_db.get_collection(Collections.USER_INVITATIONS).create_index([
-            ("code", 1)
+            ("invitation_code", 1)
         ], unique=True)
 
     INITIALIZED_MONGO_DB = True
