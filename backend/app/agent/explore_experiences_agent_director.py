@@ -1,4 +1,3 @@
-import logging
 import time
 from enum import Enum
 from typing import Optional
@@ -19,8 +18,6 @@ from app.agent.agent_types import AgentType
 from app.conversation_memory.conversation_memory_types import \
     ConversationContext
 from app.vector_search.vector_search_dependencies import SearchServices
-
-logger = logging.getLogger(__name__)
 
 
 class ConversationPhase(Enum):
@@ -253,20 +250,22 @@ class ExploreExperiencesAgentDirector(Agent):
 
     async def _link_and_rank(self, current_experience: ExperienceEntity) -> AgentOutput:
         start = time.time()
-        inferred_occupations = await self._infer_occupations_tool.execute(
+        inferred_occupations_response = await self._infer_occupations_tool.execute(
             country_of_interest=Country.SOUTH_AFRICA,
             experience=current_experience
         )
-        current_experience.contextual_title = inferred_occupations.contextualized_title
-        current_experience.esco_occupations = inferred_occupations.esco_occupations
+        current_experience.contextual_title = inferred_occupations_response.contextualized_title
+        current_experience.esco_occupations = inferred_occupations_response.esco_occupations
         # Link the skills and rank them
-        top_skills = await self._skills_linking_tool.link_and_rank_skills(
-            esco_occupations=inferred_occupations.esco_occupations,
+        top_skills_response = await self._skills_linking_tool.link_and_rank_skills(
+            experience_title=current_experience.experience_title,
+            contextual_title=current_experience.contextual_title,
+            esco_occupations=inferred_occupations_response.esco_occupations,
             responsibilities_data=current_experience.responsibilities)
-        current_experience.top_skills = top_skills
+        current_experience.top_skills = top_skills_response.top_skills
         # construct a summary of the skills
         skills_summary = "\n"
-        for skill in top_skills:
+        for skill in top_skills_response.top_skills:
             skills_summary += f"• {skill.preferredLabel}\n"
 
         end = time.time()
@@ -277,6 +276,6 @@ class ExploreExperiencesAgentDirector(Agent):
             finished=False,
             agent_type=self._agent_type,
             agent_response_time_in_sec=round(end - start, 2),
-            llm_stats=[inferred_occupations.stats]
+            llm_stats=[inferred_occupations_response.stats] + top_skills_response.llm_stats
         )
         return agent_output
