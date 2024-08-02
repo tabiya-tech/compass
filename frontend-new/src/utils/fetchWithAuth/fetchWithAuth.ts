@@ -1,10 +1,10 @@
 import { StatusCodes } from "http-status-codes";
 import { getServiceErrorFactory } from "src/error/error";
 import ErrorConstants from "src/error/error.constants";
-import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import { getActiveAccessToken } from "src/utils/getActiveAccessToken/getActiveAccessToken";
 
 // This function is used to make authenticated fetch requests
-// It adds the Authorization header with the IDToken from the session storage
+// It adds the Authorization header with the Token from the session storage
 // It also checks if the response is in the expected format
 // It throws an error if the response is not in the expected format
 // It throws an error if the server responds with a status code that is not among the expected one.
@@ -35,7 +35,7 @@ export const fetchWithAuth = async (
   const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, init.method ?? "Unknown method", apiUrl);
   let response: Response;
   try {
-    const token = PersistentStorageService.getAccessToken();
+    const token = await getActiveAccessToken();
 
     const headers = new Headers(init.headers || {});
     headers.append("Authorization", `Bearer ${token ?? "ANONYMOUS"}`);
