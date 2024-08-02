@@ -16,14 +16,14 @@ export function useAuthUser() {
   const [user, setUser] = useState<TabiyaUser | null>(null);
 
   /**
-   * Updates the user by the access token
+   * Updates the user by the token
    * @returns void
-   * @param accessToken
+   * @param token : string - The token
    */
-  const updateUserByIDToken = useCallback(
-    (idToken: string): void => {
+  const updateUserByToken = useCallback(
+    (token: string): void => {
       try {
-        const decodedToken = jwtDecode<any>(idToken);
+        const decodedToken = jwtDecode<any>(token);
         const user = getUserFromToken(decodedToken);
         setUser(user);
       } catch (error) {
@@ -85,6 +85,6 @@ export function useAuthUser() {
   return {
     user,
     updateUser,
-    updateUserByIDToken,
+    updateUserByToken,
   };
 }

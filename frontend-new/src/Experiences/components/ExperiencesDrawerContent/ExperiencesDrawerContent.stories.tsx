@@ -1,5 +1,7 @@
 import { Meta } from "@storybook/react";
-import ExperiencesDrawerContent from "src/Experiences/components/ExperiencesDrawerContent/ExperiencesDrawerContent";
+import ExperiencesDrawerContent, {
+  LoadingExperienceDrawerContent,
+} from "src/Experiences/components/ExperiencesDrawerContent/ExperiencesDrawerContent";
 import { generateRandomExperiences } from "src/Experiences/ExperienceService/_test_utilities/mockExperiencesResponses";
 
 const meta: Meta<typeof ExperiencesDrawerContent> = {
@@ -14,4 +16,8 @@ export const Shown = {
   args: {
     experience: generateRandomExperiences(1)[0],
   },
+};
+
+export const Loading = {
+  render: () => <LoadingExperienceDrawerContent />,
 };

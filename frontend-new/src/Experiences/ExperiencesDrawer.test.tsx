@@ -69,4 +69,17 @@ describe("ExperiencesDrawer", () => {
     );
     expect(noExperiencesText).toBeInTheDocument();
   });
+
+  test("it should show loading state when isLoading is true", () => {
+    // GIVEN the ExperiencesDrawer component
+    const givenExperiencesDrawer = (
+      <ExperiencesDrawer isOpen={true} isLoading={true} experiences={[]} notifyOnClose={jest.fn()} />
+    );
+    // AND the component is rendered
+    render(givenExperiencesDrawer);
+
+    // THEN expect the loading state to be in the document
+    const loadingContainer = screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_LOADER);
+    expect(loadingContainer).toBeInTheDocument();
+  });
 });
