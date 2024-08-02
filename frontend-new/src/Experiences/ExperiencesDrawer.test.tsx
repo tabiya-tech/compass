@@ -8,6 +8,29 @@ import { mockExperiences } from "./ExperienceService/_test_utilities/mockExperie
 import { DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID } from "src/Experiences/components/ExperiencesDrawerHeader/ExperiencesDrawerHeader";
 import { DATA_TEST_ID as EXPERIENCES_DRAWER_CONTENT_TEST_ID } from "src/Experiences/components/ExperiencesDrawerContent/ExperiencesDrawerContent";
 
+// mock PDFDownloadLink
+jest.mock("@react-pdf/renderer", () => {
+  return {
+    PDFDownloadLink: jest.fn(() => {
+      return <div data-testid={"mock-PDFDownloadLink"} />;
+    }),
+  };
+});
+
+// mock SkillReport
+jest.mock("src/Report/Report", () => {
+  return jest.fn(() => {
+    return <div data-testid={"mock-SkillReport"} />;
+  });
+});
+
+// mock custom text field
+jest.mock("src/theme/CustomTextField/CustomTextField", () => {
+  return jest.fn(({ label, ...props }) => {
+    return <input aria-label={label} {...props} data-testid={"mock-CustomTextField"} />;
+  });
+});
+
 describe("ExperiencesDrawer", () => {
   test("should render ExperiencesDrawer correctly", () => {
     // GIVEN the ExperiencesDrawer component
@@ -29,6 +52,8 @@ describe("ExperiencesDrawer", () => {
       EXPERIENCES_DRAWER_HEADER_TEST_ID.EXPERIENCES_DRAWER_HEADER_CONTAINER
     );
     expect(experiencesDrawerHeaderContainer).toBeInTheDocument();
+    // AND the divider to be in the document
+    expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DIVIDER)).toBeInTheDocument();
     // AND the experiences drawer content to be in the document
     const experiencesDrawerContentContainer = screen.getAllByTestId(
       EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_CONTENT_CONTAINER
@@ -81,5 +106,38 @@ describe("ExperiencesDrawer", () => {
     // THEN expect the loading state to be in the document
     const loadingContainer = screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_LOADER);
     expect(loadingContainer).toBeInTheDocument();
+  });
+
+  test("should handle onChange correctly when the text field changes", () => {
+    // GIVEN the ExperiencesDrawer component
+    const givenExperiencesDrawer = (
+      <ExperiencesDrawer isOpen={true} isLoading={false} experiences={mockExperiences} notifyOnClose={jest.fn()} />
+    );
+    // AND the component is rendered
+    render(givenExperiencesDrawer);
+
+    // WHEN the name field is changed
+    const nameField = screen.getByLabelText("Name:");
+    fireEvent.change(nameField, { target: { value: "John Doe" } });
+    // THEN expect the name field to have the correct value
+    expect(nameField).toHaveValue("John Doe");
+
+    // WHEN the email field is changed
+    const emailField = screen.getByLabelText("Email:");
+    fireEvent.change(emailField, { target: { value: "john.doe@example.com" } });
+    // THEN expect the email field to have the correct value
+    expect(emailField).toHaveValue("john.doe@example.com");
+
+    // WHEN the phone field is changed
+    const phoneField = screen.getByLabelText("Phone:");
+    // THEN expect the phone field to have the correct value
+    fireEvent.change(phoneField, { target: { value: "1234567890" } });
+    expect(phoneField).toHaveValue("1234567890");
+
+    // WHEN the address field is changed
+    const addressField = screen.getByLabelText("Address:");
+    fireEvent.change(addressField, { target: { value: "123 Main St" } });
+    // THEN expect the address field to have the correct value
+    expect(addressField).toHaveValue("123 Main St");
   });
 });

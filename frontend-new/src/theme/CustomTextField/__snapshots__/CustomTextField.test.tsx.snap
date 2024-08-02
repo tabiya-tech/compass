@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Custom text field should render CustomTextField correctly 1`] = `
+<div
+  class="MuiBox-root css-101s3jr"
+  data-testid="custom-text-field-container-f4b3b3b3-4b3b-4b3b-4b3b-4b3b4b3b4b3b"
+>
+  <p
+    class="MuiTypography-root MuiTypography-body1 css-1wdfbkk-MuiTypography-root"
+    data-testid="custom-text-field-label-f4b3b3b3-4b3b-4b3b-4b3b-4b3b4b3b4b3b"
+  >
+    label
+  </p>
+  <div
+    class="MuiFormControl-root MuiTextField-root css-15owxvq-MuiFormControl-root-MuiTextField-root"
+    data-testid="custom-text-field-input-f4b3b3b3-4b3b-4b3b-4b3b-4b3b4b3b4b3b"
+  >
+    <div
+      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
+    >
+      <input
+        aria-invalid="false"
+        class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
+        id=":r0:"
+        placeholder="Enter text here"
+        type="text"
+        value="Some text"
+      />
+      <fieldset
+        aria-hidden="true"
+        class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+      >
+        <legend
+          class="css-ihdtdm"
+        >
+          <span
+            class="notranslate"
+          >
+            ​
+          </span>
+        </legend>
+      </fieldset>
+    </div>
+  </div>
+</div>
+`;

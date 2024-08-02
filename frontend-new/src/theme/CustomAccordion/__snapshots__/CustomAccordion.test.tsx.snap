@@ -1,0 +1,76 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CustomAccordion should render CustomAccordion correctly 1`] = `
+<div
+  class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiAccordion-root MuiAccordion-rounded MuiAccordion-gutters css-1lu2ztt-MuiPaper-root-MuiAccordion-root"
+  data-testid="custom-accordion-container-34d24bf6-1b9b-40f1-93b3-baf68ab03da4"
+>
+  <div
+    class="MuiBox-root css-70qvj9"
+  >
+    <div
+      aria-controls="panel-content"
+      aria-expanded="false"
+      class="MuiButtonBase-root MuiAccordionSummary-root MuiAccordionSummary-gutters css-16newb5-MuiButtonBase-root-MuiAccordionSummary-root"
+      data-testid="custom-accordion-summary-34d24bf6-1b9b-40f1-93b3-baf68ab03da4"
+      id="panel-header"
+      role="button"
+      tabindex="0"
+    >
+      <div
+        class="MuiAccordionSummary-content MuiAccordionSummary-contentGutters css-eqpfi5-MuiAccordionSummary-content"
+      >
+        <p
+          class="MuiTypography-root MuiTypography-body1 css-1wdfbkk-MuiTypography-root"
+        >
+          foo
+        </p>
+      </div>
+      <div
+        class="MuiAccordionSummary-expandIconWrapper css-yw020d-MuiAccordionSummary-expandIconWrapper"
+      >
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+          data-testid="ExpandMoreIcon"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
+          />
+        </svg>
+      </div>
+    </div>
+    <div
+      data-testid="custom-accordion-help-tip-34d24bf6-1b9b-40f1-93b3-baf68ab03da4"
+    />
+  </div>
+  <div
+    class="MuiCollapse-root MuiCollapse-vertical MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+    style="min-height: 0px;"
+  >
+    <div
+      class="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+    >
+      <div
+        class="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+      >
+        <div
+          class="MuiAccordion-region"
+          role="region"
+        >
+          <div
+            class="MuiAccordionDetails-root css-1w3q3li-MuiAccordionDetails-root"
+            data-testid="custom-accordion-details-34d24bf6-1b9b-40f1-93b3-baf68ab03da4"
+          >
+            <div>
+              Some content
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

@@ -1,0 +1,144 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Report should render Report correctly 1`] = `
+<document
+  data-testid="skill-report-container-5a296552-f91f-4c38-b88f-542cacaced8e"
+>
+  <page
+    style="display: flex; flex-direction: column; padding: 26px; color: rgb(64, 62, 57);"
+  >
+    <text
+      data-testid="skill-report-title-5a296552-f91f-4c38-b88f-542cacaced8e"
+      style="font-size: 24px; font-weight: bold; padding-bottom: 36px;"
+    >
+      Skill Report
+    </text>
+    <view
+      data-testid="skill-report-body-5a296552-f91f-4c38-b88f-542cacaced8e"
+      style="display: flex; flex-direction: column;"
+    >
+      <view
+        style="display: flex; flex-direction: row; justify-content: space-between; padding-bottom: 36px;"
+      >
+        <view
+          style="display: flex; flex-direction: column; justify-content: flex-start;"
+        >
+          <text
+            data-testid="skill-report-name-5a296552-f91f-4c38-b88f-542cacaced8e"
+            style="font-size: 16px; font-family: Inter; font-weight: bold; padding-bottom: 8px;"
+          >
+            John Doe
+          </text>
+          <view
+            data-testid="skill-report-email-5a296552-f91f-4c38-b88f-542cacaced8e"
+            style="display: flex; flex-direction: row; gap: 2px;"
+          >
+            <text
+              style="font-family: Inter; font-weight: bold; font-size: 12px;"
+            >
+              Email: 
+            </text>
+            <text
+              style="font-family: Inter; font-size: 12px; font-weight: normal; padding-bottom: 8px;"
+            >
+               
+              johndoe@example.com
+            </text>
+          </view>
+        </view>
+        <view
+          style="display: flex; flex-direction: column; justify-content: flex-start;"
+        >
+          <view
+            data-testid="skill-report-phone-5a296552-f91f-4c38-b88f-542cacaced8e"
+            style="display: flex; flex-direction: row; gap: 2px;"
+          >
+            <text
+              style="font-family: Inter; font-weight: bold; font-size: 12px;"
+            >
+              Phone: 
+            </text>
+            <text
+              style="font-family: Inter; font-size: 12px; font-weight: normal; padding-bottom: 8px;"
+            >
+              1234567890
+            </text>
+          </view>
+          <view
+            data-testid="skill-report-address-5a296552-f91f-4c38-b88f-542cacaced8e"
+            style="display: flex; flex-direction: row; gap: 2px;"
+          >
+            <text
+              style="font-family: Inter; font-weight: bold; font-size: 12px;"
+            >
+              Address: 
+            </text>
+            <text
+              style="font-family: Inter; font-size: 12px; font-weight: normal; padding-bottom: 8px;"
+            >
+              1234 Main St
+            </text>
+          </view>
+        </view>
+      </view>
+      <text
+        data-testid="skill-report-body-text-5a296552-f91f-4c38-b88f-542cacaced8e"
+        style="font-size: 12px; padding-bottom: 36px; font-family: Inter; font-weight: normal;"
+      >
+        This report provides insights gathered by Compass Tabiya's AI chatbot, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam nec pretium turpis. Nulla porttitor faucibus massa, in convallis urna commodo sed. Nullam ut convallis augue, nec aliquam justo. Praesent imperdiet facilisis dui sed sagittis. Ut in gravida purus. Sed ornare pharetra purus, mattis feugiat quam. Aliquam ac vulputate lectus. Aenean ornare eros a tellus convallis, et convallis lacus luctus. Ut at dapibus dui, quis convallis nulla. Quisque eget velit molestie, placerat justo in, dignissim dolor.
+      </text>
+      <text
+        data-testid="skill-report-experiences-title-5a296552-f91f-4c38-b88f-542cacaced8e"
+        style="font-family: Inter; font-size: 16px; font-weight: bold; padding-bottom: 36px;"
+      >
+        EXPERIENCES
+      </text>
+      <view
+        data-testid="skill-report-experiences-container-5a296552-f91f-4c38-b88f-542cacaced8e"
+        style="display: flex; flex-direction: column;"
+      >
+        <view
+          data-testid="experiences-content-report-container-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+          style="display: flex; flex-direction: row; align-items: flex-start; padding-bottom: 16px;"
+        >
+          <text
+            data-testid="experiences-content-report-date-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+            style="font-size: 12px; flex-basis: 200px; font-weight: bold; font-family: Inter;"
+          >
+            2022 — Present
+          </text>
+          <view
+            style="display: flex; flex-direction: column; flex: 1; margin-bottom: 8px; margin-right: 26px;"
+          >
+            <view>
+              <text
+                data-testid="experiences-content-report-experience-title-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+                style="font-family: Inter; font-weight: bold; font-size: 12px; padding-bottom: 16px;"
+              >
+                Project Manager
+              </text>
+            </view>
+            <view>
+              <text
+                data-testid="experiences-content-report-skills-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+                style="display: flex; flex-direction: row; gap: 2px;"
+              >
+                <text
+                  style="font-size: 13px; color: rgb(13, 13, 15);"
+                >
+                  Top Skills: 
+                </text>
+                <text
+                  style="font-family: Inter; font-size: 12px; font-weight: normal; padding-bottom: 8px;"
+                >
+                  Management, Communication
+                </text>
+              </text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </page>
+</document>
+`;

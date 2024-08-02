@@ -19,7 +19,7 @@ interface ExperienceProps {
 
 const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience }) => {
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
+  const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
 
   const formattedSkills = useMemo(() => {
     if (experience.top_skills.length === 0) return "No skills yet";
@@ -30,13 +30,17 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience }) => 
     <Box
       display="flex"
       flexDirection="column"
-      gap={isSmallScreen ? 4 : theme.tabiyaSpacing.md}
+      gap={isSmallMobile ? 4 : theme.tabiyaSpacing.md}
       data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_CONTAINER}
     >
       <Typography variant="body1" fontWeight="bold" data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_OCCUPATION}>
         {experience.experience_title}
       </Typography>
-      <Typography variant="body1" data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_SKILLS}>
+      <Typography
+        variant="body1"
+        sx={{ wordBreak: "break-all" }}
+        data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_SKILLS}
+      >
         <b>Top Skills:</b> {formattedSkills}
       </Typography>
       <Typography variant="body2" data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_DATE}>
