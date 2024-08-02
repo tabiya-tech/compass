@@ -8,7 +8,7 @@ from app.agent.experience.work_type import WorkType, WORK_TYPE_DEFINITIONS_FOR_P
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.countries import Country, get_country_glossary
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import LOW_TEMPERATURE_GENERATION_CONFIG, LLMConfig
+from common_libs.llm.models_utils import LOW_TEMPERATURE_GENERATION_CONFIG, LLMConfig, ZERO_TEMPERATURE_GENERATION_CONFIG
 
 
 def get_system_prompt_for_contextual_title(country_of_interest: Country):
@@ -28,7 +28,8 @@ def get_system_prompt_for_contextual_title(country_of_interest: Country):
 
     system_prompt_template = dedent("""\
         You are an expert who needs to classify jobs from {country_of_interest} to a European framework. 
-        The jobs are described in the context of {country_of_interest} and use specific terminology from {country_of_interest}, 
+        The jobs are described in the context of {country_of_interest} and use specific terminology from {country_of_interest}. 
+        You should also consider the employment type of the job and the responsibilities that are provided to determine the context.
         You should return a job description that does not include terminology from {country_of_interest}, 
         but rather European standards.
 
@@ -85,7 +86,7 @@ class _ContextualizationLLM:
 
         self._llm = GeminiGenerativeLLM(
             system_instructions=get_system_prompt_for_contextual_title(country_of_interest),
-            config=LLMConfig(generation_config=LOW_TEMPERATURE_GENERATION_CONFIG)
+            config=LLMConfig(generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG)
         )
         self._logger = logger
 

@@ -1,10 +1,12 @@
 import logging
+import time
 from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel
 
 from app.agent.skill_explorer_agent import SkillsExplorerAgent
+from app.agent.skill_linking_ranking import SkillsLinkingTool
 from app.countries import Country
 from app.agent.collect_experiences_agent import CollectExperiencesAgent
 from app.agent.experience.experience_entity import ExperienceEntity
@@ -36,8 +38,8 @@ class DiveInPhase(Enum):
     The DIVE_IN sub-phases
     """
     NOT_STARTED = 0
-    INFERRING_OCCUPATIONS = 1
-    EXPLORING_SKILLS = 2
+    EXPLORING_SKILLS = 1
+    LINKING_RANKING = 2
     PROCESSED = 3
 
 
@@ -124,42 +126,21 @@ class ExploreExperiencesAgentDirector(Agent):
 
         # ensure that the current experience is set in the state
         state.current_experience_uuid = current_experience.experience.uuid
+        picked_new_experience = False
 
         if current_experience.dive_in_phase == DiveInPhase.NOT_STARTED:
             # Start the first sub-phase
-            current_experience.dive_in_phase = DiveInPhase.INFERRING_OCCUPATIONS
-
-        transitioned_between_states = False
-        if current_experience.dive_in_phase == DiveInPhase.INFERRING_OCCUPATIONS:
-            # The agent will infer the occupations for the experience and update the experience entity
-
-            inferred_occupations = await self._infer_occupations_tool.execute(
-                country_of_interest=Country.SOUTH_AFRICA,
-                experience=current_experience.experience
-            )
-            current_experience.experience.contextual_title = inferred_occupations.contextualized_title
-            current_experience.experience.esco_occupations = inferred_occupations.esco_occupations
-            agent_output: AgentOutput = AgentOutput(
-                message_for_user=f"I have inferred the occupations for the experience: "
-                                 f"{current_experience.experience.contextual_title}",
-                finished=True,
-                agent_type=self._agent_type,
-                agent_response_time_in_sec=inferred_occupations.stats.response_time_in_sec,
-                llm_stats=[inferred_occupations.stats]
-            )
-            await self._conversation_manager.update_history(user_input, agent_output)
-
-            if not agent_output.finished:
-                return agent_output
-
-            # advance to the next sub-phase
             current_experience.dive_in_phase = DiveInPhase.EXPLORING_SKILLS
-            transitioned_between_states = True
+            picked_new_experience = True
 
         # Sub-phase 2
         if current_experience.dive_in_phase == DiveInPhase.EXPLORING_SKILLS:
 
-            if transitioned_between_states:
+            if picked_new_experience:
+                # TODO: when transitioning between states set this message to ""
+                # and handle it in the execute method of the agent
+                # alternatively, set the message in the execute method
+
                 user_input = AgentInput(message="Hi, I am ready to explore my skills", is_artificial=True)
             # The agent will explore the skills for the experience and update the experience entity
             self._exploring_skills_agent.set_experience(current_experience.experience)
@@ -169,6 +150,18 @@ class ExploreExperiencesAgentDirector(Agent):
             if not agent_output.finished:
                 return agent_output
 
+            # advance to the next sub-phase
+            current_experience.dive_in_phase = DiveInPhase.LINKING_RANKING
+
+        if current_experience.dive_in_phase == DiveInPhase.LINKING_RANKING:
+            # Infer the occupations for the experience and update the experience entity
+            # , then link the skills and rank them
+            agent_output = await self._link_and_rank(current_experience.experience)
+            await self._conversation_manager.update_history(AgentInput(
+                message="(silence)",
+                is_artificial=True
+            ), agent_output)
+            # completed processing this experience
             current_experience.dive_in_phase = DiveInPhase.PROCESSED
             state.current_experience_uuid = None
 
@@ -253,6 +246,37 @@ class ExploreExperiencesAgentDirector(Agent):
         self._collect_experiences_agent = CollectExperiencesAgent()
         self._infer_occupations_tool = InferOccupationTool(search_services.occupation_skill_search_service)
         self._exploring_skills_agent = SkillsExplorerAgent()
+        self._skills_linking_tool = SkillsLinkingTool(search_services.skill_search_service)
 
     def get_collect_experiences_agent(self) -> CollectExperiencesAgent:
         return self._collect_experiences_agent
+
+    async def _link_and_rank(self, current_experience: ExperienceEntity) -> AgentOutput:
+        start = time.time()
+        inferred_occupations = await self._infer_occupations_tool.execute(
+            country_of_interest=Country.SOUTH_AFRICA,
+            experience=current_experience
+        )
+        current_experience.contextual_title = inferred_occupations.contextualized_title
+        current_experience.esco_occupations = inferred_occupations.esco_occupations
+        # Link the skills and rank them
+        top_skills = await self._skills_linking_tool.link_and_rank_skills(
+            esco_occupations=inferred_occupations.esco_occupations,
+            responsibilities_data=current_experience.responsibilities)
+        current_experience.top_skills = top_skills
+        # construct a summary of the skills
+        skills_summary = "\n"
+        for skill in top_skills:
+            skills_summary += f"• {skill.preferredLabel}\n"
+
+        end = time.time()
+        agent_output: AgentOutput = AgentOutput(
+            message_for_user=f"After examining the information you provided, "
+                             f"I identified the following skills:"
+                             f"{skills_summary}",
+            finished=False,
+            agent_type=self._agent_type,
+            agent_response_time_in_sec=round(end - start, 2),
+            llm_stats=[inferred_occupations.stats]
+        )
+        return agent_output
