@@ -17,3 +17,9 @@ class CompassTestCase(BaseModel):
     If set to 'skip', the test case will be skipped.
     If set to 'force', only this test case will be run.
     """
+
+    class Config:
+        """
+        Disallow extra fields in the model
+        """
+        extra = "forbid"
