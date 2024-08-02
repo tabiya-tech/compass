@@ -9,14 +9,14 @@ exports[`ChatMessageField should render ChatMessageField correctly 1`] = `
     class="MuiBox-root css-zeiu9o"
   >
     <div
-      class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-9x4qc3-MuiFormControl-root-MuiTextField-root"
+      class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-19cagv7-MuiFormControl-root-MuiTextField-root"
     >
       <div
-        class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline MuiInputBase-adornedEnd css-1vqckl-MuiInputBase-root-MuiOutlinedInput-root"
+        class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline MuiInputBase-adornedEnd css-8z051r-MuiInputBase-root-MuiOutlinedInput-root"
       >
         <textarea
           aria-invalid="false"
-          class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiInputBase-inputAdornedEnd css-191tptq-MuiInputBase-input-MuiOutlinedInput-input"
+          class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiInputBase-inputAdornedEnd css-f55ppk-MuiInputBase-input-MuiOutlinedInput-input"
           data-testid="chat-message-field-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
           id=":r0:"
           maxlength="1000"
@@ -27,7 +27,7 @@ exports[`ChatMessageField should render ChatMessageField correctly 1`] = `
         </textarea>
         <textarea
           aria-hidden="true"
-          class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiInputBase-inputAdornedEnd css-191tptq-MuiInputBase-input-MuiOutlinedInput-input"
+          class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiInputBase-inputAdornedEnd css-f55ppk-MuiInputBase-input-MuiOutlinedInput-input"
           readonly=""
           style="visibility: hidden; position: absolute; overflow: hidden; height: 0px; top: 0px; left: 0px; transform: translateZ(0); padding-top: 0px; padding-bottom: 0px; width: 100%;"
           tabindex="-1"

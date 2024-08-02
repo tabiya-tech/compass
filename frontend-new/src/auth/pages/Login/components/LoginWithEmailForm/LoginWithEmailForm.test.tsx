@@ -14,11 +14,24 @@ describe("Testing LoginWithEmailForm component", () => {
 
   test("it should show login form", async () => {
     // WHEN the component is rendered
-    const givenNotifyOnLogin = jest.fn();
-    const givenIsLoggingIn = false;
+    const givenNotifyOnEmailChange = jest.fn();
+    const givenNotifyOnPasswordChange = jest.fn();
+    const givenNotifyOnFocused = jest.fn();
+    const givenEmailValue = "email";
+    const givenPasswordValue = "password";
+    const givenIsDisabled = false;
+    const givenPasswordError = "";
     render(
       <HashRouter>
-        <LoginWithEmailForm notifyOnLogin={givenNotifyOnLogin} isLoggingIn={givenIsLoggingIn} />
+        <LoginWithEmailForm
+          email={givenEmailValue}
+          password={givenPasswordValue}
+          notifyOnEmailChanged={givenNotifyOnEmailChange}
+          notifyOnPasswordChanged={givenNotifyOnPasswordChange}
+          notifyOnFocused={givenNotifyOnFocused}
+          isDisabled={givenIsDisabled}
+          passwordError={givenPasswordError}
+        />
       </HashRouter>
     );
 
@@ -26,68 +39,79 @@ describe("Testing LoginWithEmailForm component", () => {
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
 
-    // AND the component should be rendered
-    expect(screen.getByTestId(DATA_TEST_ID.FORM)).toBeDefined();
-
     // AND the email input should be rendered
-    expect(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT)).toBeInTheDocument();
+    expect(screen.getByTestId(DATA_TEST_ID.EMAIL_LOGIN_FORM_EMAIL_INPUT)).toBeInTheDocument();
 
     // AND the password input should be rendered
-    expect(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT)).toBeInTheDocument();
-
-    // AND the login button should be rendered
-    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_BUTTON)).toBeInTheDocument();
-
-    // AND the login button should not be disabled
-    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_BUTTON)).not.toBeDisabled();
+    expect(screen.getByTestId(DATA_TEST_ID.EMAIL_LOGIN_FORM_PASSWORD_INPUT)).toBeInTheDocument();
 
     // AND the component should match the snapshot
-    expect(screen.getByTestId(DATA_TEST_ID.FORM)).toMatchSnapshot();
+    expect(screen.getByTestId(DATA_TEST_ID.EMAIL_LOGIN_FORM_CONTAINER)).toMatchSnapshot();
   });
 
   describe("action tests", () => {
-    test("should call notifyOnLogin on form submit", async () => {
+    test("should call notigyOnEmailChanged when the email field changes", async () => {
       // WHEN the component is rendered
-      const givenNotifyOnLogin = jest.fn();
-      const givenIsLoggingIn = false;
+      const givenNotifyOnEmailChange = jest.fn();
+      const givenNotifyOnPasswordChange = jest.fn();
+      const givenNotifyOnFocused = jest.fn();
+      const givenEmailValue = "email";
+      const givenPasswordValue = "password";
+      const givenIsDisabled = false;
+      const givenPasswordError = "";
       render(
         <HashRouter>
-          <LoginWithEmailForm notifyOnLogin={givenNotifyOnLogin} isLoggingIn={givenIsLoggingIn} />
+          <LoginWithEmailForm
+            email={givenEmailValue}
+            password={givenPasswordValue}
+            notifyOnEmailChanged={givenNotifyOnEmailChange}
+            notifyOnPasswordChanged={givenNotifyOnPasswordChange}
+            notifyOnFocused={givenNotifyOnFocused}
+            isDisabled={givenIsDisabled}
+            passwordError={givenPasswordError}
+          />
         </HashRouter>
       );
 
       // Simulate form input and submission
-      fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: "john.doe@example.com" } });
-      fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: "password" } });
+      fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_LOGIN_FORM_EMAIL_INPUT), {
+        target: { value: "foo@bar.baz" },
+      });
 
-      // AND the form is submitted
-      fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
-
-      // THEN expect notifyOnLogin to have been called
-      expect(givenNotifyOnLogin).toHaveBeenCalled();
+      // THEN expect the notifyOnEmailChanged function to have been called
+      expect(givenNotifyOnEmailChange).toHaveBeenCalledWith("foo@bar.baz");
     });
 
-    test("should disable everything when logging in", () => {
-      // GIVEN the isLoggingIn flag is set to true
-      const givenNotifyOnLogin = jest.fn();
-      const givenIsLoggingIn = true;
-
-      // WHEN the Login component is rendered within the AuthContext and Router
+    test("should call notifyOnPasswordChanged when the password field changes", async () => {
+      // WHEN the component is rendered
+      const givenNotifyOnEmailChange = jest.fn();
+      const givenNotifyOnPasswordChange = jest.fn();
+      const givenNotifyOnFocused = jest.fn();
+      const givenEmailValue = "email";
+      const givenPasswordValue = "password";
+      const givenIsDisabled = false;
+      const givenPasswordError = "";
       render(
         <HashRouter>
-          <LoginWithEmailForm notifyOnLogin={givenNotifyOnLogin} isLoggingIn={givenIsLoggingIn} />
+          <LoginWithEmailForm
+            email={givenEmailValue}
+            password={givenPasswordValue}
+            notifyOnEmailChanged={givenNotifyOnEmailChange}
+            notifyOnPasswordChanged={givenNotifyOnPasswordChange}
+            notifyOnFocused={givenNotifyOnFocused}
+            isDisabled={givenIsDisabled}
+            passwordError={givenPasswordError}
+          />
         </HashRouter>
       );
 
-      // THEN expect the login button to be disabled
-      expect(screen.getByTestId(DATA_TEST_ID.LOGIN_BUTTON)).toBeDisabled();
-      // AND the email input to be disabled
-      expect(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT)).toBeDisabled();
-      // AND the password input to be disabled
-      expect(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT)).toBeDisabled();
+      // Simulate form input and submission
+      fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_LOGIN_FORM_PASSWORD_INPUT), {
+        target: { value: "Pa$$word123" },
+      });
 
-      // AND login button circular progress to be displayed
-      expect(screen.getByTestId(DATA_TEST_ID.LOGIN_BUTTON_CIRCULAR_PROGRESS)).toBeInTheDocument();
+      // THEN expect the notifyOnPasswordChanged function to have been called
+      expect(givenNotifyOnPasswordChange).toHaveBeenCalledWith("Pa$$word123");
     });
   });
 });

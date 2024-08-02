@@ -1,7 +1,7 @@
 import { mockLoggedInUser } from "src/_test_utilities/mockLoggedInUser";
 import { renderHook } from "src/_test_utilities/test-utils";
 import { useContext } from "react";
-import { AuthContext, TabiyaUser } from "src/auth/AuthProvider/AuthProvider";
+import { EmailAuthContext, TabiyaUser } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 
 describe("Mock Logged In User", () => {
   test("it should return the access token when set", () => {
@@ -10,7 +10,7 @@ describe("Mock Logged In User", () => {
     mockLoggedInUser({ user: givenUser });
 
     // WHEN: The hook is used in a component
-    const { result } = renderHook(() => useContext(AuthContext));
+    const { result } = renderHook(() => useContext(EmailAuthContext));
 
     // THEN: The user should be set
     expect(result.current.user).toEqual(givenUser);

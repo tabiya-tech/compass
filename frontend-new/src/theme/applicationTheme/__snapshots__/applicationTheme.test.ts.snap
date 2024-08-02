@@ -90,6 +90,26 @@ Object {
         },
       },
     },
+    "MuiInputBase": Object {
+      "styleOverrides": Object {
+        "input": Object {
+          "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+          "padding": "0",
+        },
+        "root": Object {
+          "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+          "padding": "0",
+        },
+      },
+    },
+    "MuiInputLabel": Object {
+      "styleOverrides": Object {
+        "root": Object {
+          "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+          "padding": "0",
+        },
+      },
+    },
     "MuiSvgIcon": Object {
       "styleOverrides": Object {
         "fontSizeLarge": Object {
@@ -110,6 +130,14 @@ Object {
       "defaultProps": Object {
         "style": Object {
           "background": "#F3F1EE",
+        },
+      },
+    },
+    "MuiTextField": Object {
+      "styleOverrides": Object {
+        "root": Object {
+          "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+          "padding": "0",
         },
       },
     },
@@ -790,6 +818,26 @@ Object {
         },
       },
     },
+    "MuiInputBase": Object {
+      "styleOverrides": Object {
+        "input": Object {
+          "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+          "padding": "0",
+        },
+        "root": Object {
+          "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+          "padding": "0",
+        },
+      },
+    },
+    "MuiInputLabel": Object {
+      "styleOverrides": Object {
+        "root": Object {
+          "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+          "padding": "0",
+        },
+      },
+    },
     "MuiSvgIcon": Object {
       "styleOverrides": Object {
         "fontSizeLarge": Object {
@@ -810,6 +858,14 @@ Object {
       "defaultProps": Object {
         "style": Object {
           "background": "#F3F1EE",
+        },
+      },
+    },
+    "MuiTextField": Object {
+      "styleOverrides": Object {
+        "root": Object {
+          "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+          "padding": "0",
         },
       },
     },

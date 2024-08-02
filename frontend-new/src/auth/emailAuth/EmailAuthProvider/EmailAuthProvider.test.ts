@@ -2,13 +2,13 @@
 import "src/_test_utilities/consoleMock";
 
 import { useContext } from "react";
-import { AuthContext, authContextDefaultValue } from "src/auth/AuthProvider/AuthProvider";
+import { EmailAuthContext, emailAuthContextDefaultValue } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 import { renderHook, act, waitFor } from "src/_test_utilities/test-utils";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import * as useTokensHook from "src/auth/hooks/useTokens";
 import { mockLoggedInUser } from "src/_test_utilities/mockLoggedInUser";
 import { defaultUseTokensResponse } from "src/auth/hooks/useTokens";
-import { AuthService } from "src/auth/AuthService/AuthService";
+import { EmailAuthService } from "src/auth/emailAuth/EmailAuthService/EmailAuth.service";
 
 jest.mock("src/auth/hooks/useAuthUser");
 jest.mock("src/auth/hooks/useTokens");
@@ -21,13 +21,13 @@ function defaultSetup() {
   (useTokensHook.useTokens as jest.Mock).mockReturnValue(defaultUseTokensResponse);
 }
 
-const renderAuthContext = () => renderHook(() => useContext(AuthContext));
+const renderAuthContext = () => renderHook(() => useContext(EmailAuthContext));
 
-describe("AuthProvider module", () => {
-  let authService: AuthService;
+describe("EmailAuthProvider module", () => {
+  let authService: EmailAuthService;
 
   beforeEach(() => {
-    authService = AuthService.getInstance();
+    authService = EmailAuthService.getInstance();
     jest.useFakeTimers(); // Use Jest's fake timers
   });
 
@@ -54,7 +54,7 @@ describe("AuthProvider module", () => {
       const loginSpy = jest.spyOn(authService, "handleLoginWithEmail");
 
       //initially isLogging in should be false.
-      expect(result.current.isLoggingIn).toBe(false);
+      expect(result.current.isLoggingInWithEmail).toBe(false);
 
       act(() => {
         result.current?.loginWithEmail(givenEmail, givenPassword, givenSuccessCallback, givenErrorCallback);
@@ -64,7 +64,7 @@ describe("AuthProvider module", () => {
       expect(loginSpy).toHaveBeenCalledWith(givenEmail, givenPassword, expect.any(Function), expect.any(Function));
 
       // AND isLogging in should be false.
-      expect(result.current.isLoggingIn).toBe(false);
+      expect(result.current.isLoggingInWithEmail).toBe(false);
     });
 
     test("should call the failure callback when the service login fails", async () => {
@@ -87,7 +87,7 @@ describe("AuthProvider module", () => {
       });
 
       //initially isLogging in should be false.
-      expect(result.current.isLoggingIn).toBe(false);
+      expect(result.current.isLoggingInWithEmail).toBe(false);
 
       act(() => {
         result.current?.loginWithEmail(givenEmail, givenPassword, givenSuccessCallback, givenErrorCallback);
@@ -98,7 +98,7 @@ describe("AuthProvider module", () => {
 
       // AND isLogging in should be false.
       await waitFor(() => {
-        expect(result.current.isLoggingIn).toBe(false);
+        expect(result.current.isLoggingInWithEmail).toBe(false);
       });
 
       // AND the error callback should be called
@@ -156,7 +156,7 @@ describe("AuthProvider module", () => {
       const registerSpy = jest.spyOn(authService, "handleRegisterWithEmail");
 
       // Initially isRegistering should be false.
-      expect(result.current.isRegistering).toBe(false);
+      expect(result.current.isRegisteringWithEmail).toBe(false);
 
       act(() => {
         result.current?.registerWithEmail(
@@ -179,7 +179,7 @@ describe("AuthProvider module", () => {
 
       // AND isRegistering in should be false.
       await waitFor(() => {
-        expect(result.current.isRegistering).toBe(false);
+        expect(result.current.isRegisteringWithEmail).toBe(false);
       });
     });
 
@@ -203,7 +203,7 @@ describe("AuthProvider module", () => {
       });
 
       // Initially isRegistering should be false.
-      expect(result.current.isRegistering).toBe(false);
+      expect(result.current.isRegisteringWithEmail).toBe(false);
 
       act(() => {
         result.current?.registerWithEmail(
@@ -226,7 +226,7 @@ describe("AuthProvider module", () => {
 
       // AND isRegistering in should be false.
       await waitFor(() => {
-        expect(result.current.isRegistering).toBe(false);
+        expect(result.current.isRegisteringWithEmail).toBe(false);
       });
 
       // AND the error callback should be called
@@ -237,7 +237,7 @@ describe("AuthProvider module", () => {
   describe("authContextDefaultValue", () => {
     test("should return the default values", () => {
       // GIVEN: Default values for the AuthContext
-      const givenAuthContextDefaultValue = authContextDefaultValue;
+      const givenAuthContextDefaultValue = emailAuthContextDefaultValue;
 
       // THEN: The default values should be as expected
       expect(givenAuthContextDefaultValue.user).toBeNull();

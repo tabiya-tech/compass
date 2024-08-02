@@ -1,12 +1,13 @@
 import React, { createContext, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
-import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import {
   UserPreference,
   UserPreferencesContextValue,
+  UserPreferencesSpec,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
-import isEmptyObject from "../../utils/isEmptyObject/isEmptyObject";
+import isEmptyObject from "src/utils/isEmptyObject/isEmptyObject";
 
 export type UserPreferencesProviderProps = {
   children: ReactNode;
@@ -47,11 +48,10 @@ export const UserPreferencesProvider: React.FC<UserPreferencesProviderProps> = (
    */
   const createUserPreferences = useCallback(
     async (
-      preferences: UserPreference,
+      preferences: UserPreferencesSpec,
       successCallback: (prefs: UserPreference) => void,
       errorCallback: (error: any) => void
     ) => {
-      const userPreferencesService = UserPreferencesService.getInstance();
       setIsLoading(true);
       try {
         const newPreferences = await userPreferencesService.createUserPreferences(preferences);
@@ -72,7 +72,6 @@ export const UserPreferencesProvider: React.FC<UserPreferencesProviderProps> = (
    */
   const getUserPreferences = useCallback(
     async (userId: string, successCallback: (prefs: UserPreference) => void, errorCallback: (error: any) => void) => {
-      const userPreferencesService = UserPreferencesService.getInstance();
       setIsLoading(true);
       try {
         const preferences = await userPreferencesService.getUserPreferences(userId);

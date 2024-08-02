@@ -3,23 +3,29 @@ import React, { ReactElement, ReactNode } from "react";
 import { render, renderHook, RenderHookOptions, RenderOptions } from "@testing-library/react";
 import { ThemeProvider } from "@mui/material";
 import applicationTheme, { ThemeMode } from "src/theme/applicationTheme/applicationTheme";
-import { AuthProvider } from "src/auth/AuthProvider/AuthProvider";
+import { EmailAuthProvider } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
+import { AnonymousAuthProvider } from "src/auth/anonymousAuth/AnonymousAuthProvider/AnonymousAuthProvider";
 
 // Import the Firebase mock utilities
 import "src/_test_utilities/firebaseMock";
 import SnackbarProvider from "src/theme/SnackbarProvider/SnackbarProvider";
 import { UserPreferencesProvider } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 import { IsOnlineProvider } from "src/app/isOnlineProvider/IsOnlineProvider";
+import { InvitationsProvider } from "src/invitations/InvitationsProvider/InvitationsProvider";
 
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <IsOnlineProvider>
       <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
-        <AuthProvider>
-          <UserPreferencesProvider>
-            <SnackbarProvider>{children}</SnackbarProvider>
-          </UserPreferencesProvider>
-        </AuthProvider>
+        <AnonymousAuthProvider>
+          <EmailAuthProvider>
+            <UserPreferencesProvider>
+              <InvitationsProvider>
+                <SnackbarProvider>{children}</SnackbarProvider>
+              </InvitationsProvider>
+            </UserPreferencesProvider>
+          </EmailAuthProvider>
+        </AnonymousAuthProvider>
       </ThemeProvider>
     </IsOnlineProvider>
   );

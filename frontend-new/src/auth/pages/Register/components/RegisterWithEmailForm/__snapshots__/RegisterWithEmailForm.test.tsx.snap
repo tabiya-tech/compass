@@ -6,10 +6,10 @@ exports[`Testing Register Email Form component it should show register form 1`] 
   data-testid="register-form-6cf1a0fa-8d75-4342-bf6b-1203d5b114d7"
 >
   <div
-    class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth MuiTextField-root css-17vbkzs-MuiFormControl-root-MuiTextField-root"
+    class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth MuiTextField-root css-1spxxly-MuiFormControl-root-MuiTextField-root"
   >
     <label
-      class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-17xyxvf-MuiFormLabel-root-MuiInputLabel-root"
+      class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-a4npng-MuiFormLabel-root-MuiInputLabel-root"
       data-shrink="false"
       for=":r0:"
       id=":r0:-label"
@@ -24,11 +24,11 @@ exports[`Testing Register Email Form component it should show register form 1`] 
       </span>
     </label>
     <div
-      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-no50bp-MuiInputBase-root-MuiOutlinedInput-root"
+      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-1vdto9g-MuiInputBase-root-MuiOutlinedInput-root"
     >
       <input
         aria-invalid="false"
-        class="MuiInputBase-input MuiOutlinedInput-input css-1apxpsd-MuiInputBase-input-MuiOutlinedInput-input"
+        class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
         data-testid="register-name-input-6cf1a0fa-8d75-4342-bf6b-1203d5b114d7"
         id=":r0:"
         required=""
@@ -52,10 +52,10 @@ exports[`Testing Register Email Form component it should show register form 1`] 
     </div>
   </div>
   <div
-    class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth MuiTextField-root css-17vbkzs-MuiFormControl-root-MuiTextField-root"
+    class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth MuiTextField-root css-1spxxly-MuiFormControl-root-MuiTextField-root"
   >
     <label
-      class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-17xyxvf-MuiFormLabel-root-MuiInputLabel-root"
+      class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-a4npng-MuiFormLabel-root-MuiInputLabel-root"
       data-shrink="false"
       for=":r1:"
       id=":r1:-label"
@@ -70,11 +70,11 @@ exports[`Testing Register Email Form component it should show register form 1`] 
       </span>
     </label>
     <div
-      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-no50bp-MuiInputBase-root-MuiOutlinedInput-root"
+      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-1vdto9g-MuiInputBase-root-MuiOutlinedInput-root"
     >
       <input
         aria-invalid="false"
-        class="MuiInputBase-input MuiOutlinedInput-input css-1apxpsd-MuiInputBase-input-MuiOutlinedInput-input"
+        class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
         data-testid="register-email-input-6cf1a0fa-8d75-4342-bf6b-1203d5b114d7"
         id=":r1:"
         required=""
@@ -98,10 +98,10 @@ exports[`Testing Register Email Form component it should show register form 1`] 
     </div>
   </div>
   <div
-    class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth MuiTextField-root css-17vbkzs-MuiFormControl-root-MuiTextField-root"
+    class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth MuiTextField-root css-1spxxly-MuiFormControl-root-MuiTextField-root"
   >
     <label
-      class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-17xyxvf-MuiFormLabel-root-MuiInputLabel-root"
+      class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-a4npng-MuiFormLabel-root-MuiInputLabel-root"
       data-shrink="false"
       for=":r2:"
       id=":r2:-label"
@@ -116,11 +116,11 @@ exports[`Testing Register Email Form component it should show register form 1`] 
       </span>
     </label>
     <div
-      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-no50bp-MuiInputBase-root-MuiOutlinedInput-root"
+      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-1vdto9g-MuiInputBase-root-MuiOutlinedInput-root"
     >
       <input
         aria-invalid="false"
-        class="MuiInputBase-input MuiOutlinedInput-input css-1apxpsd-MuiInputBase-input-MuiOutlinedInput-input"
+        class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
         data-testid="register-password-input-6cf1a0fa-8d75-4342-bf6b-1203d5b114d7"
         id=":r2:"
         required=""

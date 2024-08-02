@@ -38,7 +38,7 @@ class UserInvitation(BaseModel):
     Invitation Object Id
     """
 
-    code: str
+    invitation_code: str
     """
     Unique code for the invitation
     """
@@ -77,7 +77,7 @@ class UserInvitation(BaseModel):
         """
         return UserInvitation(
             id=str(_dict.get("_id")),
-            code=_dict.get("code"),
+            invitation_code=_dict.get("invitation_code"),
             remaining_usage=_dict.get("remaining_usage"),
             allowed_usage=_dict.get("allowed_usage"),
             valid_from=_dict.get("valid_from"),
@@ -91,7 +91,7 @@ class UserInvitation(BaseModel):
 
 
 class GetInvitationCodeStatusResponse(BaseModel):
-    code: str
+    invitation_code: str
     """
     The code of the invitation
     """

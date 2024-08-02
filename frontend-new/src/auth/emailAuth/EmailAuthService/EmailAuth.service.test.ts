@@ -1,6 +1,6 @@
 // mute chatty console
 import "src/_test_utilities/consoleMock";
-import { AuthService } from "src/auth/AuthService/AuthService";
+import { EmailAuthService } from "src/auth/emailAuth/EmailAuthService/EmailAuth.service";
 import { jwtDecode } from "jwt-decode";
 import firebase from "firebase/compat/app";
 
@@ -13,6 +13,7 @@ jest.mock("firebase/compat/app", () => {
       signInWithCustomToken: jest.fn(),
       signInWithEmailAndPassword: jest.fn(),
       createUserWithEmailAndPassword: jest.fn(),
+      signInAnonymously: jest.fn(),
       signOut: jest.fn(),
     }),
   };
@@ -21,17 +22,56 @@ jest.mock("firebase/compat/app", () => {
 jest.useFakeTimers();
 
 describe("AuthService class tests", () => {
-  let authService: AuthService;
+  let authService: EmailAuthService;
 
   beforeAll(() => {
-    authService = AuthService.getInstance();
+    authService = EmailAuthService.getInstance();
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  describe("handleLogin", () => {
+  describe("handleLogout", () => {
+    test("should call successCallback on successful logout", async () => {
+      // GIVEN the user is logged in
+      const mockSignOut = jest.fn();
+      jest.spyOn(firebase.auth(), "signOut").mockImplementation(mockSignOut);
+
+      const successCallback = jest.fn();
+      const errorCallback = jest.fn();
+
+      // WHEN the logout is attempted
+      await authService.handleLogout(successCallback, errorCallback);
+
+      // THEN test should call the firebase signOut function
+      expect(firebase.auth().signOut).toHaveBeenCalled();
+      // AND test should call the success callback
+      expect(successCallback).toHaveBeenCalled();
+      // AND test should not call the error callback
+      expect(errorCallback).not.toHaveBeenCalled();
+    });
+
+    test("should call errorCallback on logout failure", async () => {
+      // GIVEN the user is logged in
+      jest.spyOn(firebase.auth(), "signOut").mockRejectedValueOnce(new Error("Logout failed"));
+
+      const successCallback = jest.fn();
+      const errorCallback = jest.fn();
+
+      // WHEN the logout is attempted
+      await authService.handleLogout(successCallback, errorCallback);
+
+      // THEN test should call the firebase signOut function
+      expect(firebase.auth().signOut).toHaveBeenCalled();
+      // AND test should not call the success callback
+      expect(successCallback).not.toHaveBeenCalled();
+      // AND test should call the error callback
+      expect(errorCallback).toHaveBeenCalledWith(expect.any(Error));
+    });
+  });
+
+  describe("handleLoginWithEmail", () => {
     const givenEmail = "foo@bar.baz";
     const givenPassword = "password";
     const givenUser = { email: givenEmail, userId: "123" };
@@ -128,46 +168,7 @@ describe("AuthService class tests", () => {
     });
   });
 
-  describe("handleLogout", () => {
-    test("should call successCallback on successful logout", async () => {
-      // GIVEN the user is logged in
-      const mockSignOut = jest.fn();
-      jest.spyOn(firebase.auth(), "signOut").mockImplementation(mockSignOut);
-
-      const successCallback = jest.fn();
-      const errorCallback = jest.fn();
-
-      // WHEN the logout is attempted
-      await authService.handleLogout(successCallback, errorCallback);
-
-      // THEN test should call the firebase signOut function
-      expect(firebase.auth().signOut).toHaveBeenCalled();
-      // AND test should call the success callback
-      expect(successCallback).toHaveBeenCalled();
-      // AND test should not call the error callback
-      expect(errorCallback).not.toHaveBeenCalled();
-    });
-
-    test("should call errorCallback on logout failure", async () => {
-      // GIVEN the user is logged in
-      jest.spyOn(firebase.auth(), "signOut").mockRejectedValueOnce(new Error("Logout failed"));
-
-      const successCallback = jest.fn();
-      const errorCallback = jest.fn();
-
-      // WHEN the logout is attempted
-      await authService.handleLogout(successCallback, errorCallback);
-
-      // THEN test should call the firebase signOut function
-      expect(firebase.auth().signOut).toHaveBeenCalled();
-      // AND test should not call the success callback
-      expect(successCallback).not.toHaveBeenCalled();
-      // AND test should call the error callback
-      expect(errorCallback).toHaveBeenCalledWith(expect.any(Error));
-    });
-  });
-
-  describe("handleRegister", () => {
+  describe("handleRegisterWithEmail", () => {
     const givenEmail = "foo@bar.baz";
     const givenPassword = "password";
     const givenName = "foo";

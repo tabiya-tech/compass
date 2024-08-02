@@ -1,82 +1,67 @@
-import { Box, CircularProgress, TextField, useTheme } from "@mui/material";
-import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
-import React, { useState } from "react";
+import { Box, TextField } from "@mui/material";
+import React from "react";
 
 const uniqueId = "8ab76120-a0d3-47b1-aac0-42d0169e0a58";
 
 export const DATA_TEST_ID = {
-  FORM: `login-form-${uniqueId}`,
-  EMAIL_INPUT: `login-email-input-${uniqueId}`,
-  PASSWORD_INPUT: `login-password-input-${uniqueId}`,
-  LOGIN_BUTTON: `login-button-${uniqueId}`,
-  LOGIN_BUTTON_CIRCULAR_PROGRESS: `login-button-circular-progress-${uniqueId}`,
+  EMAIL_LOGIN_FORM_CONTAINER: `login-form-${uniqueId}`,
+  EMAIL_LOGIN_FORM_EMAIL_INPUT: `login-email-input-${uniqueId}`,
+  EMAIL_LOGIN_FORM_PASSWORD_INPUT: `login-password-input-${uniqueId}`,
 };
 
 export interface LoginFormProps {
-  notifyOnLogin: (email: string, password: string) => void;
-  isLoggingIn: boolean;
+  email: string;
+  password: string;
+  passwordError: string;
+  notifyOnEmailChanged: (email: string) => void;
+  notifyOnPasswordChanged: (password: string) => void;
+  notifyOnFocused: () => void;
+  isDisabled: boolean;
 }
-const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({ notifyOnLogin, isLoggingIn }) => {
-  const theme = useTheme();
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({
+  email,
+  password,
+  passwordError,
+  notifyOnEmailChanged,
+  notifyOnPasswordChanged,
+  isDisabled,
+  notifyOnFocused,
+}) => {
   const handleEmailChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    setEmail(event.target.value);
+    event.preventDefault();
+    notifyOnEmailChanged(event.target.value);
   };
   const handlePasswordChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    setPassword(event.target.value);
-  };
-  const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    notifyOnLogin(email, password);
+    notifyOnPasswordChanged(event.target.value);
   };
+
   return (
-    <Box component="form" mt={2} onSubmit={handleLogin} data-testid={DATA_TEST_ID.FORM}>
+    <Box data-testid={DATA_TEST_ID.EMAIL_LOGIN_FORM_CONTAINER}>
       <TextField
         fullWidth
         label="Email"
         type="email"
         variant="outlined"
         margin="normal"
-        disabled={isLoggingIn}
-        required
+        disabled={isDisabled}
+        value={email}
         onChange={(e) => handleEmailChange(e)}
-        inputProps={{ "data-testid": DATA_TEST_ID.EMAIL_INPUT }}
+        inputProps={{ "data-testid": DATA_TEST_ID.EMAIL_LOGIN_FORM_EMAIL_INPUT }}
       />
       <TextField
         fullWidth
         label="Password"
         type="password"
         variant="outlined"
-        disabled={isLoggingIn}
+        disabled={isDisabled}
+        value={password}
         margin="normal"
-        required
         onChange={(e) => handlePasswordChange(e)}
-        inputProps={{ "data-testid": DATA_TEST_ID.PASSWORD_INPUT }}
+        inputProps={{ "data-testid": DATA_TEST_ID.EMAIL_LOGIN_FORM_PASSWORD_INPUT }}
+        error={!!passwordError}
+        helperText={passwordError}
       />
-      <PrimaryButton
-        fullWidth
-        variant="contained"
-        color="primary"
-        style={{ marginTop: 16 }}
-        type="submit"
-        disabled={isLoggingIn}
-        disableWhenOffline={true}
-        data-testid={DATA_TEST_ID.LOGIN_BUTTON}
-      >
-        {isLoggingIn ? (
-          <CircularProgress
-            color={"secondary"}
-            data-testid={DATA_TEST_ID.LOGIN_BUTTON_CIRCULAR_PROGRESS}
-            aria-label={"Logging in"}
-            size={16}
-            sx={{ marginTop: theme.tabiyaSpacing.sm, marginBottom: theme.tabiyaSpacing.sm }}
-          />
-        ) : (
-          "Login"
-        )}
-      </PrimaryButton>
     </Box>
   );
 };

@@ -1,9 +1,8 @@
-import React, { SetStateAction, useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import firebase from "firebase/compat/app";
 import * as firebaseui from "firebaseui";
 import "firebaseui/dist/firebaseui.css";
 import { auth } from "src/auth/firebaseConfig";
-import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { TabiyaUser } from "src/auth/auth.types";
 import { useTokens } from "src/auth/hooks/useTokens";
@@ -18,16 +17,16 @@ export const DATA_TEST_ID = {
   FIREBASE_AUTH_CONTAINER: `firebase-auth-container-${uniqueId}`,
   CONTINUE_WITH_GOOGLE: `continue-with-google-${uniqueId}`,
 };
+
 export interface IDPAuthProps {
   notifyOnLogin: (user: TabiyaUser) => void;
   isLoading: boolean;
 }
-const IDPAuth: React.FC<Readonly<IDPAuthProps>> = ({ notifyOnLogin, isLoading }) => {
-  const navigate = useNavigate();
-  const { enqueueSnackbar } = useSnackbar();
 
+const IDPAuth: React.FC<Readonly<IDPAuthProps>> = ({ notifyOnLogin, isLoading }) => {
+  const { enqueueSnackbar } = useSnackbar();
   const { updateUserByIDToken } = useAuthUser();
-  const tokens = useTokens({ updateUserByIDToken: updateUserByIDToken });
+  const tokens = useTokens({ updateUserByIDToken });
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -36,10 +35,11 @@ const IDPAuth: React.FC<Readonly<IDPAuthProps>> = ({ notifyOnLogin, isLoading })
 
   const isOnline = useContext(IsOnlineContext);
 
-  useEffect(() => {
-    setLoading(true);
-    const firebaseUiWidget = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
-    const uiConfig = {
+  // Memoize firebaseUiWidget and uiConfig to avoid re-initializing on each render
+  const firebaseUiWidget = useMemo(() => firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth), []);
+
+  const uiConfig = useMemo(
+    () => ({
       signInFlow: "popup", // 'redirect', if you do not want to use popup
       signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
       callbacks: {
@@ -55,19 +55,28 @@ const IDPAuth: React.FC<Readonly<IDPAuthProps>> = ({ notifyOnLogin, isLoading })
           notifyOnLogin(newUser);
           return false;
         },
-        signInFailure: (error: { message: SetStateAction<string> }) => {
+        signInFailure: (error: { message: string }) => {
           enqueueSnackbar("Login failed", { variant: "error" });
           setError(error.message);
           setLoading(false);
         },
       },
-    };
+    }),
+    [enqueueSnackbar, tokens, updateUserByIDToken, notifyOnLogin]
+  );
+
+  useEffect(() => {
+    setLoading(true);
     if (uiConfig.signInFlow === "popup") firebaseUiWidget.reset();
 
     // Render the firebaseUi Widget.
     if (isOnline) firebaseUiWidget.start(firebaseUIElementRef.current!, uiConfig);
     setLoading(false);
-  }, [navigate, enqueueSnackbar, tokens, updateUserByIDToken, loading, isOnline, notifyOnLogin]);
+
+    return () => {
+      firebaseUiWidget.reset();
+    };
+  }, [firebaseUiWidget, uiConfig, isOnline]);
 
   return (
     <Box
@@ -78,7 +87,7 @@ const IDPAuth: React.FC<Readonly<IDPAuthProps>> = ({ notifyOnLogin, isLoading })
       mt={(theme) => theme.tabiyaSpacing.lg}
       data-testid={DATA_TEST_ID.FIREBASE_AUTH_CONTAINER}
     >
-      <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.CONTINUE_WITH_GOOGLE}>
+      <Typography variant="caption" mt={2} data-testid={DATA_TEST_ID.CONTINUE_WITH_GOOGLE}>
         Or continue with
       </Typography>
       <Box mt={2} width="100%">
@@ -96,4 +105,4 @@ const IDPAuth: React.FC<Readonly<IDPAuthProps>> = ({ notifyOnLogin, isLoading })
   );
 };
 
-export default IDPAuth;
+export default React.memo(IDPAuth);

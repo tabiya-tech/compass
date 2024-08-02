@@ -10,8 +10,6 @@ import { renderHook } from "src/_test_utilities/test-utils";
 import { act } from "@testing-library/react";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
-import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
-import { StatusCodes } from "http-status-codes";
 
 const renderUserPreferencesContext = () => renderHook(() => useContext(UserPreferencesContext));
 
@@ -31,12 +29,10 @@ describe("UserPreferencesProvider module", () => {
   });
 
   describe("Create user preferences functionality", () => {
-    beforeEach(() => {
-      setupAPIServiceSpy(StatusCodes.CREATED, JSON.stringify(givenUserPreferences), "application/json;charset=UTF-8");
-    });
     test("should call the createUserPreferences service with the correct parameters", async () => {
       // GIVEN: The UserPreferencesProvider is rendered and user preferences context is accessed
       const { result } = renderUserPreferencesContext();
+      userPreferencesService.createUserPreferences = jest.fn().mockResolvedValue(givenUserPreferences);
 
       // AND some callback functions
       const givenSuccessCallback = jest.fn();
@@ -64,11 +60,7 @@ describe("UserPreferencesProvider module", () => {
     });
     test("should call the error callback on failure", async () => {
       // Simulate failure response
-      setupAPIServiceSpy(
-        StatusCodes.INTERNAL_SERVER_ERROR,
-        JSON.stringify({ error: "Internal Server Error" }),
-        "application/json;charset=UTF-8"
-      );
+      userPreferencesService.createUserPreferences = jest.fn().mockRejectedValue(new Error("Internal Server Error"));
 
       // GIVEN: The UserPreferencesProvider is rendered and user preferences context is accessed
       const { result } = renderUserPreferencesContext();
@@ -95,12 +87,10 @@ describe("UserPreferencesProvider module", () => {
   });
 
   describe("Get user preferences functionality", () => {
-    beforeEach(() => {
-      setupAPIServiceSpy(StatusCodes.OK, JSON.stringify(givenUserPreferences), "application/json;charset=UTF-8");
-    });
     test("should call the getUserPreferences service with the correct parameters", async () => {
       // GIVEN: The UserPreferencesProvider is rendered and user preferences context is accessed
       const { result } = renderUserPreferencesContext();
+      userPreferencesService.getUserPreferences = jest.fn().mockResolvedValue(givenUserPreferences);
 
       // AND some callback functions
       const givenSuccessCallback = jest.fn().mockImplementation(() => {
@@ -131,11 +121,7 @@ describe("UserPreferencesProvider module", () => {
     });
     test("should call the error callback on failure", async () => {
       // Simulate failure response
-      setupAPIServiceSpy(
-        StatusCodes.INTERNAL_SERVER_ERROR,
-        JSON.stringify({ error: "Internal Server Error" }),
-        "application/json;charset=UTF-8"
-      );
+      userPreferencesService.getUserPreferences = jest.fn().mockRejectedValue(new Error("Internal Server Error"));
 
       // GIVEN: The UserPreferencesProvider is rendered and user preferences context is accessed
       const { result } = renderUserPreferencesContext();

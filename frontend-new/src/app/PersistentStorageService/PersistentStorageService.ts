@@ -1,7 +1,10 @@
 import { UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { Invitation } from "src/invitations/InvitationsService/invitations.types";
 
 export const ACCESS_TOKEN_KEY = "access_token";
 export const USER_PREFERENCES_KEY = "user_preferences";
+
+export const INVITATION_KEY = "invitation";
 
 /**
  * This class is used to store the tokens in the session storage.
@@ -62,6 +65,30 @@ export class PersistentStorageService {
    */
   static clearUserPreferences(): void {
     this.storage.removeItem(USER_PREFERENCES_KEY);
+  }
+
+  /**
+   * Returns the user's invitation details from the storage
+   * @returns Invitation | null - The user's invitation details
+   */
+  static getInvitation(): Invitation | null {
+    const item = this.storage.getItem(INVITATION_KEY);
+    return item ? JSON.parse(item) : null;
+  }
+
+  /**
+   * Sets the user's invitation details in the storage
+   * @param invitation
+   */
+  static setInvitation(invitation: Invitation): void {
+    this.storage.setItem(INVITATION_KEY, JSON.stringify(invitation));
+  }
+
+  /**
+   * Clears the user's invitation details from the storage
+   */
+  static clearInvitation(): void {
+    this.storage.removeItem(INVITATION_KEY);
   }
 
   /**

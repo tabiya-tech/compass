@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Container, Box, Typography, useTheme, styled } from "@mui/material";
-import { AuthContext, TabiyaUser } from "src/auth/AuthProvider/AuthProvider";
+import { EmailAuthContext, TabiyaUser } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 import { NavLink as RouterNavLink } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import IDPAuth from "src/auth/components/IDPAuth/IDPAuth";
@@ -50,7 +50,7 @@ export interface RegisterProps {
 
 const Register: React.FC<Readonly<RegisterProps>> = ({ postRegisterHandler, postLoginHandler, isPostLoginLoading }) => {
   const theme = useTheme();
-  const { registerWithEmail, isRegistering } = useContext(AuthContext);
+  const { registerWithEmail, isRegisteringWithEmail } = useContext(EmailAuthContext);
   const { enqueueSnackbar } = useSnackbar();
 
   /**
@@ -91,7 +91,10 @@ const Register: React.FC<Readonly<RegisterProps>> = ({ postRegisterHandler, post
         height={"80%"}
       >
         <AuthHeader title={"Welcome to Compass!"} subtitle={"We need some information to get started"} />
-        <RegisterWithEmailForm notifyOnRegister={handleRegister} isRegistering={isRegistering || isPostLoginLoading} />
+        <RegisterWithEmailForm
+          notifyOnRegister={handleRegister}
+          isRegistering={isRegisteringWithEmail || isPostLoginLoading}
+        />
         <IDPAuth notifyOnLogin={postLoginHandler} isLoading={isPostLoginLoading} />
         <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.LOGIN_LINK}>
           Already have an account?{" "}

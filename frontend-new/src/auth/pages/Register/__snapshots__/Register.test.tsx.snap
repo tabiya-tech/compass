@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Testing Register With Email component with AuthProvider it should show register form successfully 1`] = `
+exports[`Testing Register component it should show register form successfully 1`] = `
 <div
   class="MuiContainer-root MuiContainer-maxWidthXs css-xravbe-MuiContainer-root"
   data-testid="register-container-ab02918f-d559-47ba-9662-ea6b3a3606d0"

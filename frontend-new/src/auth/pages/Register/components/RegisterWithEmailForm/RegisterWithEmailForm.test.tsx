@@ -1,14 +1,13 @@
 // silence chatty console
 import "src/_test_utilities/consoleMock";
-import { DATA_TEST_ID } from "./RegisterWithEmailForm";
+import RegisterWithEmailForm, { DATA_TEST_ID } from "./RegisterWithEmailForm";
 import React from "react";
 import { HashRouter } from "react-router-dom";
 import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
-import RegisterWithEmailForm from "./RegisterWithEmailForm";
-import { validatePassword } from "src/auth/pages/Register/utils/validatePassword";
+import { validatePassword } from "src/auth/utils/validatePassword";
 
 // mock the password validator
-jest.mock("src/auth/pages/Register/utils/validatePassword", () => {
+jest.mock("src/auth/utils/validatePassword", () => {
   return {
     __esModule: true,
     validatePassword: jest.fn().mockReturnValue(""),

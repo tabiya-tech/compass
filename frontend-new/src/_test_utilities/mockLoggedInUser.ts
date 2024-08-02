@@ -1,9 +1,13 @@
-import { AuthContextValue, TabiyaUser, authContextDefaultValue } from "src/auth/AuthProvider/AuthProvider";
+import {
+  EmailAuthContextValue,
+  TabiyaUser,
+  emailAuthContextDefaultValue,
+} from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 
-export function mockLoggedInUser(mockedValues: Partial<AuthContextValue>) {
+export function mockLoggedInUser(mockedValues: Partial<EmailAuthContextValue>) {
   let user: TabiyaUser = mockedValues.user || TestUser;
   jest.spyOn(require("src/auth/hooks/useAuthUser"), "useAuthUser").mockReturnValue({
-    ...authContextDefaultValue,
+    ...emailAuthContextDefaultValue,
     user: user,
     updateUser: (user: TabiyaUser) => null,
     updateUserByAccessToken: () => {},

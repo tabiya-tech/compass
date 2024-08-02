@@ -2,23 +2,23 @@ import React from "react";
 import { Meta, StoryObj } from "@storybook/react";
 import { action } from "@storybook/addon-actions";
 import Login from "./Login";
-import { AuthContext, authContextDefaultValue } from "src/auth/AuthProvider/AuthProvider";
+import { EmailAuthContext, emailAuthContextDefaultValue } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 
 const meta: Meta<typeof Login> = {
-  title: "Auth/EmailAuth/LoginWithEmail",
+  title: "Auth/Login",
   tags: ["autodocs"],
   component: Login,
   decorators: [
     (Story) => {
       const mockAuthContextValue = {
-        ...authContextDefaultValue,
+        ...emailAuthContextDefaultValue,
         login: action("login"),
       };
 
       return (
-        <AuthContext.Provider value={mockAuthContextValue}>
+        <EmailAuthContext.Provider value={mockAuthContextValue}>
           <Story />
-        </AuthContext.Provider>
+        </EmailAuthContext.Provider>
       );
     },
   ],
@@ -34,14 +34,14 @@ export const LoggingIn: StoryObj<typeof Login> = {
   args: {},
   render: (props) => {
     return (
-      <AuthContext.Provider
+      <EmailAuthContext.Provider
         value={{
-          ...authContextDefaultValue,
-          isLoggingIn: true,
+          ...emailAuthContextDefaultValue,
+          isLoggingInWithEmail: true,
         }}
       >
         <Login {...props} />
-      </AuthContext.Provider>
+      </EmailAuthContext.Provider>
     );
   },
 };

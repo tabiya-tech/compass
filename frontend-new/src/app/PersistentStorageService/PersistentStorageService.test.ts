@@ -1,5 +1,6 @@
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { Language, UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { Invitation, InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
 
 describe("AuthPersistentStorage class tests", () => {
   beforeEach(() => {
@@ -122,6 +123,68 @@ describe("AuthPersistentStorage class tests", () => {
       // THEN The user preferences should be stored
       const userPreferences = PersistentStorageService.getUserPreferences();
       expect(userPreferences).toEqual(givenUserPreferences);
+    });
+  });
+
+  describe("invitation tests", () => {
+    test("return correct previously set invitation", () => {
+      // GIVEN The invitation is stored in the session storage
+      const givenInvitation: Invitation = {
+        invitation_code: "foo",
+        invitation_type: InvitationType.REGISTER,
+        status: InvitationStatus.VALID,
+      };
+      PersistentStorageService.setInvitation(givenInvitation);
+
+      // WHEN The invitation is retrieved
+      const invitation = PersistentStorageService.getInvitation();
+
+      // THEN The invitation should be returned
+      expect(invitation).toEqual(givenInvitation);
+    });
+
+    test("return null if invitation is not set", () => {
+      // GIVEN The invitation is not stored in the session storage
+      // Nothing set
+
+      // WHEN The invitation is retrieved
+      const invitation = PersistentStorageService.getInvitation();
+
+      // THEN null should be returned
+      expect(invitation).toBeNull();
+    });
+
+    test("clear invitation", () => {
+      // GIVEN The invitation is stored in the session storage
+      const givenInvitation: Invitation = {
+        invitation_code: "foo",
+        invitation_type: InvitationType.REGISTER,
+        status: InvitationStatus.VALID,
+      };
+      PersistentStorageService.setInvitation(givenInvitation);
+
+      // WHEN The invitation is cleared
+      PersistentStorageService.clearInvitation();
+
+      // THEN The invitation should be cleared (null)
+      const invitation = PersistentStorageService.getInvitation();
+      expect(invitation).toBeNull();
+    });
+
+    test("set invitation", () => {
+      // GIVEN The invitation is not stored in the session storage
+      const givenInvitation: Invitation = {
+        invitation_code: "foo",
+        invitation_type: InvitationType.REGISTER,
+        status: InvitationStatus.VALID,
+      };
+
+      // WHEN The invitation is set
+      PersistentStorageService.setInvitation(givenInvitation);
+
+      // THEN The invitation should be stored
+      const invitation = PersistentStorageService.getInvitation();
+      expect(invitation).toEqual(givenInvitation);
     });
   });
 
