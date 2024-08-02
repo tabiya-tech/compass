@@ -87,7 +87,7 @@ describe("useAuthUser hook tests", () => {
     expect(result.current.user).toEqual({ id: "0001", name: "bar", email: "bar@foo.baz" });
   });
 
-  describe("updateUserByIDToken", () => {
+  describe("updateUserByToken", () => {
     test("successful case for Google OAuth token", () => {
       jwtDecodeFn.mockReturnValue(googleToken);
 
@@ -97,8 +97,8 @@ describe("useAuthUser hook tests", () => {
       // AND No user is set
       expect(result.current.user).toBeNull();
 
-      // WHEN the user is updated by an access token
-      act(() => result.current.updateUserByIDToken("foo"));
+      // WHEN the user is updated by an token
+      act(() => result.current.updateUserByToken("foo"));
 
       // THEN the user should be updated
       expect(result.current.user).toEqual({
@@ -117,8 +117,8 @@ describe("useAuthUser hook tests", () => {
       // AND No user is set
       expect(result.current.user).toBeNull();
 
-      // WHEN the user is updated by an access token
-      act(() => result.current.updateUserByIDToken("foo"));
+      // WHEN the user is updated by an token
+      act(() => result.current.updateUserByToken("foo"));
 
       // THEN the user should be updated
       expect(result.current.user).toEqual({
@@ -139,8 +139,8 @@ describe("useAuthUser hook tests", () => {
       // AND No user is set
       expect(result.current.user).toBeNull();
 
-      // WHEN the user is updated by an access token
-      act(() => result.current.updateUserByIDToken("foo"));
+      // WHEN the user is updated by an token
+      act(() => result.current.updateUserByToken("foo"));
 
       // THEN the user should be null
       expect(result.current.user).toBeNull();

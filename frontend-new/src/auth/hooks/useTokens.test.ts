@@ -8,16 +8,16 @@ import "src/_test_utilities/firebaseMock";
 
 const TOKEN_VALUE = "foo";
 
-const updateUserByIDToken = jest.fn();
-const params = { updateUserByIDToken };
+const updateUserByToken = jest.fn();
+const params = { updateUserByToken };
 
 jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => {
   return {
     __esModule: true,
     PersistentStorageService: {
-      getAccessToken: jest.fn(),
-      clearAccessToken: jest.fn(),
-      setAccessToken: jest.fn(),
+      getToken: jest.fn(),
+      clearToken: jest.fn(),
+      setToken: jest.fn(),
       clear: jest.fn(),
     },
   };
@@ -28,7 +28,7 @@ describe("useTokens hook tests", () => {
     // Mock Firebase's currentUser.getIdToken
     (firebase.auth().currentUser?.getIdToken as jest.Mock).mockResolvedValueOnce(TOKEN_VALUE);
 
-    // Mock Firebase's onIdTokenChanged
+    // Mock Firebase's onTokenChanged
     (firebase.auth().onAuthStateChanged as jest.Mock).mockImplementation((callback) => {
       callback({
         getIdToken: jest.fn().mockResolvedValueOnce(TOKEN_VALUE),
@@ -60,14 +60,14 @@ describe("useTokens hook tests", () => {
       jest.clearAllMocks();
     });
 
-    test("It should call getIdToken on the current user and set the new Id token", async () => {
+    test("It should call getIdToken on the current user and set the new token", async () => {
       // GIVEN the useTokens hook is used in a component
       const { result } = renderHook(() => useTokens(params));
 
       // Mock Firebase's currentUser.getIdToken
       (firebase.auth().currentUser?.getIdToken as jest.Mock).mockResolvedValueOnce(TOKEN_VALUE);
 
-      // Mock Firebase's onIdTokenChanged
+      // Mock Firebase's onTokenChanged
       (firebase.auth().onAuthStateChanged as jest.Mock).mockImplementation((callback) => {
         callback({
           getIdToken: jest.fn().mockResolvedValueOnce(TOKEN_VALUE),
@@ -78,8 +78,8 @@ describe("useTokens hook tests", () => {
       // THEN the token should be fetched and set
       await waitFor(() => expect(result.current.isAuthenticated).toBe(true));
 
-      // THE updated user by ID token should be called
-      expect(updateUserByIDToken).toHaveBeenCalledWith(TOKEN_VALUE);
+      // THE updated user by token should be called
+      expect(updateUserByToken).toHaveBeenCalledWith(TOKEN_VALUE);
 
       // AND the refreshing should stop
       expect(result.current.isAuthenticating).toBe(false);
@@ -103,7 +103,7 @@ describe("useTokens hook tests", () => {
       // GIVEN the useTokens hook is used in a component
       const { result } = renderHook(() => useTokens(params));
 
-      // Mock Firebase's onIdTokenChanged
+      // Mock Firebase's onTokenChanged
       const idTokenChangedCallback = (callback: (user: any) => void) => {
         callback({
           getIdToken: jest.fn().mockResolvedValueOnce(TOKEN_VALUE),
@@ -115,8 +115,8 @@ describe("useTokens hook tests", () => {
       // THEN the token should be fetched and set
       await waitFor(() => expect(result.current.isAuthenticated).toBe(true));
 
-      // THE updated user by ID token should be called
-      expect(updateUserByIDToken).toHaveBeenCalledWith(TOKEN_VALUE);
+      // THE updated user by token should be called
+      expect(updateUserByToken).toHaveBeenCalledWith(TOKEN_VALUE);
 
       // AND the refreshing should stop
       expect(result.current.isAuthenticating).toBe(false);
@@ -140,8 +140,8 @@ describe("useTokens hook tests", () => {
     expect(firebase.auth().currentUser?.getIdToken).not.toHaveBeenCalled();
   });
 
-  test("onIdTokenChanged should clear storage and set isAuthenticated to false when there is no user", async () => {
-    // Mock Firebase's onIdTokenChanged to call the callback with no user
+  test("onTokenChanged should clear storage and set isAuthenticated to false when there is no user", async () => {
+    // Mock Firebase's onTokenChanged to call the callback with no user
     (firebase.auth().onAuthStateChanged as jest.Mock).mockImplementation((callback) => {
       callback(null); // No user
       return jest.fn(); // Return a function to simulate the unsubscribe function
@@ -150,7 +150,7 @@ describe("useTokens hook tests", () => {
     // GIVEN the useTokens hook is used in a component
     const { result } = renderHook(() => useTokens(params));
 
-    // WHEN the onIdTokenChanged is triggered
+    // WHEN the onTokenChanged is triggered
     await waitFor(() => {
       expect(result.current.isAuthenticated).toBe(false);
     });

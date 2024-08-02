@@ -4,7 +4,7 @@ export function mockUseTokens(overrides = {}) {
       isAuthenticating: false,
       isAuthenticated: true,
       setIsAuthenticated: jest.fn(),
-      setAccessToken: jest.fn(),
+      setToken: jest.fn(),
       clearTokens: jest.fn(),
       ...overrides,
     };

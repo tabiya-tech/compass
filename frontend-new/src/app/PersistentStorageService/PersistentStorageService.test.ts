@@ -11,53 +11,53 @@ describe("AuthPersistentStorage class tests", () => {
     PersistentStorageService.clear();
   });
 
-  describe("Access token tests", () => {
-    test("return correct previously set Access token", () => {
-      // GIVEN The Access token is stored in the session storage
-      const givenIDToken = "foo";
-      PersistentStorageService.setAccessToken(givenIDToken);
+  describe("token tests", () => {
+    test("return correct previously set token", () => {
+      // GIVEN The token is stored in the session storage
+      const givenToken = "foo";
+      PersistentStorageService.setToken(givenToken);
 
-      // WHEN The Access token is retrieved
-      const IDToken = PersistentStorageService.getAccessToken();
+      // WHEN The token is retrieved
+      const Token = PersistentStorageService.getToken();
 
-      // THEN The Access token should be returned
-      expect(IDToken).toEqual(givenIDToken);
+      // THEN The token should be returned
+      expect(Token).toEqual(givenToken);
     });
 
-    test("return null if Access token is not set", () => {
-      // GIVEN The Access token is not stored in the session storage
+    test("return null if token is not set", () => {
+      // GIVEN The token is not stored in the session storage
       // Nothing set
 
-      // WHEN The Access token is retrieved
-      const IDToken = PersistentStorageService.getAccessToken();
+      // WHEN The token is retrieved
+      const Token = PersistentStorageService.getToken();
 
       // THEN null should be returned
-      expect(IDToken).toBeNull();
+      expect(Token).toBeNull();
     });
 
-    test("clear Access token", () => {
-      // GIVEN The Access token is stored in the session storage
-      const givenIDToken = "foo";
-      PersistentStorageService.setAccessToken(givenIDToken);
+    test("clear token", () => {
+      // GIVEN The token is stored in the session storage
+      const givenToken = "foo";
+      PersistentStorageService.setToken(givenToken);
 
-      // WHEN The Access token is cleared
-      PersistentStorageService.clearAccessToken();
+      // WHEN The token is cleared
+      PersistentStorageService.clearToken();
 
-      // THEN The Access token should be cleared (null)
-      const IDToken = PersistentStorageService.getAccessToken();
-      expect(IDToken).toBeNull();
+      // THEN The token should be cleared (null)
+      const Token = PersistentStorageService.getToken();
+      expect(Token).toBeNull();
     });
 
-    test("set Access token", () => {
-      // GIVEN The Access token is not stored in the session storage
-      const givenIDToken = "foo";
+    test("set token", () => {
+      // GIVEN The token is not stored in the session storage
+      const givenToken = "foo";
 
-      // WHEN The Access token is set
-      PersistentStorageService.setAccessToken(givenIDToken);
+      // WHEN The token is set
+      PersistentStorageService.setToken(givenToken);
 
-      // THEN The Access token should be stored
-      const IDToken = PersistentStorageService.getAccessToken();
-      expect(IDToken).toEqual(givenIDToken);
+      // THEN The token should be stored
+      const Token = PersistentStorageService.getToken();
+      expect(Token).toEqual(givenToken);
     });
   });
 
@@ -189,16 +189,16 @@ describe("AuthPersistentStorage class tests", () => {
   });
 
   test("clear all tokens", () => {
-    // GIVEN The Access token is stored in the session storage
+    // GIVEN The token is stored in the session storage
     const givenID = "foo";
-    PersistentStorageService.setAccessToken(givenID);
+    PersistentStorageService.setToken(givenID);
 
-    // WHEN The Access token is cleared
+    // WHEN The token is cleared
     PersistentStorageService.clear();
 
-    // THEN The Access token should be cleared (null)
-    const IDToken = PersistentStorageService.getAccessToken();
-    expect(IDToken).toBeNull();
+    // THEN The token should be cleared (null)
+    const Token = PersistentStorageService.getToken();
+    expect(Token).toBeNull();
 
     // AND The user preferences should be cleared (null)
     const userPreferences = PersistentStorageService.getUserPreferences();

@@ -137,10 +137,10 @@ describe("IDPAuth tests", () => {
               uid: givenUser.id,
               displayName: givenUser.name,
               email: givenUser.email,
-              multiFactor: { user: { accessToken: "mock-access-token" } },
+              multiFactor: { user: { token: "mock-access-token" } },
             },
             credential: {
-              idToken: "mock-id-token",
+              token: "mock-id-token",
             },
           });
         },

@@ -3,6 +3,7 @@ import "src/_test_utilities/consoleMock";
 
 import ExperiencesDrawerContent, {
   DATA_TEST_ID,
+  LoadingExperienceDrawerContent,
 } from "src/Experiences/components/ExperiencesDrawerContent/ExperiencesDrawerContent";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { mockExperiences } from "src/Experiences/ExperienceService/_test_utilities/mockExperiencesResponses";
@@ -10,9 +11,7 @@ import { mockExperiences } from "src/Experiences/ExperienceService/_test_utiliti
 describe("ReportDrawerContent", () => {
   test("should render ExperiencesDrawerContent correctly", () => {
     // GIVEN the ExperiencesDrawerContent component
-    const givenReportDrawerContent = (
-      <ExperiencesDrawerContent experience={{ ...mockExperiences[0] }} isLoading={false} />
-    );
+    const givenReportDrawerContent = <ExperiencesDrawerContent experience={{ ...mockExperiences[0] }} />;
 
     // WHEN the component is rendered
     render(givenReportDrawerContent);
@@ -35,22 +34,27 @@ describe("ReportDrawerContent", () => {
 
   test("should render ExperiencesDrawerContent skeleton correctly", () => {
     // GIVEN the ExperiencesDrawerContent component
-    const givenReportDrawerContent = (
-      <ExperiencesDrawerContent experience={{ ...mockExperiences[0] }} isLoading={true} />
-    );
+    const givenReportDrawerContent = <LoadingExperienceDrawerContent />;
 
     // WHEN the component is rendered
     render(givenReportDrawerContent);
 
-    // THEN expect skeleton elements to be in the document
+    // THEN expect no errors or warning to have occurred
+    const loadingContainer = screen.getByTestId(DATA_TEST_ID.LOADING_EXPERIENCES_DRAWER_CONTENT_CONTAINER);
+    expect(loadingContainer).toBeInTheDocument();
+
+    // AND expect skeleton elements to be in the document
     const skeletonElement = screen.getAllByTestId("skeleton-text");
     expect(skeletonElement).toHaveLength(3);
+
+    // AND to match the snapshot
+    expect(loadingContainer).toMatchSnapshot();
   });
 
   test("it should show No skills yet when there are no skills", () => {
     // GIVEN the ExperiencesDrawerContent component
     const givenReportDrawerContent = (
-      <ExperiencesDrawerContent experience={{ ...mockExperiences[0], top_skills: [] }} isLoading={false} />
+      <ExperiencesDrawerContent experience={{ ...mockExperiences[0], top_skills: [] }} />
     );
 
     // WHEN the component is rendered

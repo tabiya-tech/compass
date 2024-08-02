@@ -25,8 +25,8 @@ export interface IDPAuthProps {
 
 const IDPAuth: React.FC<Readonly<IDPAuthProps>> = ({ notifyOnLogin, isLoading }) => {
   const { enqueueSnackbar } = useSnackbar();
-  const { updateUserByIDToken } = useAuthUser();
-  const tokens = useTokens({ updateUserByIDToken });
+  const { updateUserByToken } = useAuthUser();
+  const tokens = useTokens({ updateUserByToken });
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -50,8 +50,8 @@ const IDPAuth: React.FC<Readonly<IDPAuthProps>> = ({ notifyOnLogin, isLoading })
             name: data.user.displayName,
             email: data.user.email,
           };
-          tokens.setAccessToken(data?.user?.multiFactor?.user?.accessToken as string);
-          updateUserByIDToken(data?.user?.multiFactor?.user?.accessToken as string);
+          tokens.setToken(data?.user?.multiFactor?.user?.accessToken as string);
+          updateUserByToken(data?.user?.multiFactor?.user?.accessToken as string);
           notifyOnLogin(newUser);
           return false;
         },
@@ -62,7 +62,7 @@ const IDPAuth: React.FC<Readonly<IDPAuthProps>> = ({ notifyOnLogin, isLoading })
         },
       },
     }),
-    [enqueueSnackbar, tokens, updateUserByIDToken, notifyOnLogin]
+    [enqueueSnackbar, tokens, updateUserByToken, notifyOnLogin]
   );
 
   useEffect(() => {
@@ -72,11 +72,7 @@ const IDPAuth: React.FC<Readonly<IDPAuthProps>> = ({ notifyOnLogin, isLoading })
     // Render the firebaseUi Widget.
     if (isOnline) firebaseUiWidget.start(firebaseUIElementRef.current!, uiConfig);
     setLoading(false);
-
-    return () => {
-      firebaseUiWidget.reset();
-    };
-  }, [firebaseUiWidget, uiConfig, isOnline]);
+  }, [enqueueSnackbar, firebaseUiWidget, uiConfig, tokens, updateUserByToken, loading, isOnline, notifyOnLogin]);
 
   return (
     <Box

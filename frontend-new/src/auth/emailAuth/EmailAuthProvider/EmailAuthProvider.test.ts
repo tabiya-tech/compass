@@ -107,7 +107,7 @@ describe("EmailAuthProvider module", () => {
   });
 
   describe("Logout functionality", () => {
-    test("it should clear the access token, session ids and call the success callback when the logout function is called", async () => {
+    test("it should clear the token, session ids and call the success callback when the logout function is called", async () => {
       const clearTokens = jest.fn();
 
       (useTokensHook.useTokens as jest.Mock).mockReturnValue({ clearTokens });
@@ -118,15 +118,15 @@ describe("EmailAuthProvider module", () => {
       const givenSuccessCallback = jest.fn();
       const givenErrorCallback = jest.fn();
 
-      // AND the access token is set
-      PersistentStorageService.setAccessToken("foo");
+      // AND the token is set
+      PersistentStorageService.setToken("foo");
       const logoutSpy = jest.spyOn(authService, "handleLogout");
 
       // WHEN the logout function is called
       act(() => result.current?.logout(givenSuccessCallback, givenErrorCallback));
 
-      // THEN the access token should be cleared
-      expect(PersistentStorageService.getAccessToken()).toBeNull();
+      // THEN the token should be cleared
+      expect(PersistentStorageService.getToken()).toBeNull();
       // AND the session ids should be cleared
       expect(PersistentStorageService.getUserPreferences()).toBeNull();
 

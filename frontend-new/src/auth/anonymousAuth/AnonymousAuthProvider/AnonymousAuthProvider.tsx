@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import { useTokens } from "src/auth/hooks/useTokens";
 import { useAuthUser } from "src/auth/hooks/useAuthUser";
-import { FirebaseIDToken, TabiyaUser, TFirebaseTokenResponse, AnonymousAuthContextValue } from "src/auth/auth.types";
+import { FirebaseToken, TabiyaUser, TFirebaseTokenResponse, AnonymousAuthContextValue } from "src/auth/auth.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import { jwtDecode } from "jwt-decode";
@@ -34,8 +34,8 @@ export type AuthProviderProps = {
  * @constructor
  */
 export const AnonymousAuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const { user, updateUser, updateUserByIDToken } = useAuthUser();
-  const tokens = useTokens({ updateUserByIDToken });
+  const { user, updateUser, updateUserByToken } = useAuthUser();
+  const tokens = useTokens({ updateUserByToken });
 
   // State to track if the user is logging in/registering
   const [isLoggingInAnonymously, setIsLoggingInAnonymously] = useState(false);
@@ -46,11 +46,11 @@ export const AnonymousAuthProvider: React.FC<AuthProviderProps> = ({ children })
    */
   const handlePageLoad = useCallback(
     (successCallback: (user: TabiyaUser) => void, errorCallback: (error: any) => void) => {
-      const accessToken = PersistentStorageService.getAccessToken();
-      if (accessToken) {
+      const token = PersistentStorageService.getToken();
+      if (token) {
         // If an access token exists, update the user state
-        updateUserByIDToken(accessToken);
-        const decodedUser: FirebaseIDToken = jwtDecode(accessToken);
+        updateUserByToken(token);
+        const decodedUser: FirebaseToken = jwtDecode(token);
         const newUser: TabiyaUser = {
           id: decodedUser.user_id,
           name: decodedUser.name,
@@ -62,7 +62,7 @@ export const AnonymousAuthProvider: React.FC<AuthProviderProps> = ({ children })
         errorCallback("No access token");
       }
     },
-    [updateUserByIDToken]
+    [updateUserByToken]
   );
 
   /**
@@ -89,12 +89,12 @@ export const AnonymousAuthProvider: React.FC<AuthProviderProps> = ({ children })
       anonymousAuthService
         .handleAnonymousLogin(
           (response: TFirebaseTokenResponse) => {
-            updateUserByIDToken(response.access_token);
-            PersistentStorageService.setAccessToken(response.access_token);
+            updateUserByToken(response.access_token);
+            PersistentStorageService.setToken(response.access_token);
             // Update the user state
-            updateUserByIDToken(response.access_token);
+            updateUserByToken(response.access_token);
 
-            const decodedUser: FirebaseIDToken = jwtDecode(response.access_token);
+            const decodedUser: FirebaseToken = jwtDecode(response.access_token);
             const newUser: TabiyaUser = {
               id: decodedUser.user_id,
               name: decodedUser.name,
@@ -112,14 +112,14 @@ export const AnonymousAuthProvider: React.FC<AuthProviderProps> = ({ children })
         .then((data: TFirebaseTokenResponse | undefined) => {
           if (!data) return;
           // Set the access token in the tokens context once the login is complete
-          tokens.setAccessToken(data.access_token);
+          tokens.setToken(data.access_token);
         })
         .finally(() => {
           // Once the login is complete, set the isLoggingIn state to false
           setIsLoggingInAnonymously(false);
         });
     },
-    [updateUserByIDToken, tokens]
+    [updateUserByToken, tokens]
   );
 
   /**

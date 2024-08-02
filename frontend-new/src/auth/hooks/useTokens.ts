@@ -4,7 +4,7 @@ import "firebase/compat/auth";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
 type TUseTokensParams = {
-  updateUserByIDToken: (idToken: string) => void;
+  updateUserByToken: (token: string) => void;
 };
 
 /**
@@ -12,23 +12,23 @@ type TUseTokensParams = {
  *  > this hook was added to fulfill Single Responsibility Principle, for now it is only used in authProvider
  * @returns tokens - The tokens
  */
-export function useTokens({ updateUserByIDToken }: TUseTokensParams) {
+export function useTokens({ updateUserByToken }: TUseTokensParams) {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const _setAccessToken = useCallback(
+  const _setToken = useCallback(
     (token: string) => {
-      updateUserByIDToken(token);
-      PersistentStorageService.setAccessToken(token);
+      updateUserByToken(token);
+      PersistentStorageService.setToken(token);
     },
-    [updateUserByIDToken]
+    [updateUserByToken]
   );
 
   useEffect(() => {
     const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
       if (user) {
-        const idToken = await user.getIdToken(true);
-        _setAccessToken(idToken);
+        const token = await user.getIdToken(true);
+        _setToken(token);
         setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
@@ -38,7 +38,7 @@ export function useTokens({ updateUserByIDToken }: TUseTokensParams) {
     });
 
     return () => unsubscribe();
-  }, [_setAccessToken]);
+  }, [_setToken]);
 
   const clearTokens = () => {
     PersistentStorageService.clear();
@@ -49,7 +49,7 @@ export function useTokens({ updateUserByIDToken }: TUseTokensParams) {
     isAuthenticating,
     isAuthenticated,
     setIsAuthenticated,
-    setAccessToken: _setAccessToken,
+    setToken: _setToken,
     clearTokens,
   };
 }
@@ -58,6 +58,6 @@ export const defaultUseTokensResponse: ReturnType<typeof useTokens> = {
   isAuthenticating: false,
   isAuthenticated: false,
   setIsAuthenticated: () => {},
-  setAccessToken: () => {},
+  setToken: () => {},
   clearTokens: () => {},
 };
