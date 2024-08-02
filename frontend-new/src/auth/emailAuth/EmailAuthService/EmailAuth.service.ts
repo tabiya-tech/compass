@@ -4,20 +4,20 @@ import { getServiceErrorFactory, FIREBASE_ERROR_MESSAGES } from "src/error/error
 import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/error.constants";
 
-export class AuthService {
-  private static instance: AuthService;
+export class EmailAuthService {
+  private static instance: EmailAuthService;
 
   private constructor() {}
 
   /**
-   * Get the singleton instance of the AuthService.
-   * @returns {AuthService} The singleton instance of the AuthService.
+   * Get the singleton instance of the EmailAuthService.
+   * @returns {EmailAuthService} The singleton instance of the EmailAuthService.
    */
-  static getInstance(): AuthService {
-    if (!AuthService.instance) {
-      AuthService.instance = new AuthService();
+  static getInstance(): EmailAuthService {
+    if (!EmailAuthService.instance) {
+      EmailAuthService.instance = new EmailAuthService();
     }
-    return AuthService.instance;
+    return EmailAuthService.instance;
   }
 
   /**
@@ -26,7 +26,7 @@ export class AuthService {
    * @param {(error: any) => void} errorCallback - Callback to execute on logout error.
    */
   async handleLogout(successCallback: () => void, errorCallback: (error: any) => void): Promise<void> {
-    const errorFactory = getServiceErrorFactory("AuthService", "handleLogout", "POST", "signOut");
+    const errorFactory = getServiceErrorFactory("EmailAuthService", "handleLogout", "POST", "signOut");
     try {
       await auth.signOut();
       successCallback();
@@ -59,7 +59,12 @@ export class AuthService {
     successCallback: (data: TFirebaseTokenResponse) => void,
     errorCallback: (error: any) => void
   ): Promise<TFirebaseTokenResponse | undefined> {
-    const errorFactory = getServiceErrorFactory("AuthService", "handleLogin", "POST", "signInWithEmailAndPassword");
+    const errorFactory = getServiceErrorFactory(
+      "EmailAuthService",
+      "handleLogin",
+      "POST",
+      "signInWithEmailAndPassword"
+    );
     try {
       const userCredential = await auth.signInWithEmailAndPassword(email, password);
       if (!userCredential.user) {
@@ -123,7 +128,7 @@ export class AuthService {
     errorCallback: (error: any) => void
   ): Promise<TFirebaseTokenResponse | undefined> {
     const errorFactory = getServiceErrorFactory(
-      "AuthService",
+      "EmailAuthService",
       "handleRegister",
       "POST",
       "createUserWithEmailAndPassword"
@@ -168,4 +173,4 @@ export class AuthService {
   }
 }
 
-export const authService = AuthService.getInstance();
+export const emailAuthService = EmailAuthService.getInstance();

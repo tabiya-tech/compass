@@ -12,15 +12,18 @@ export default meta;
 
 export const Shown: StoryObj<typeof LoginWithEmailForm> = {
   args: {
-    notifyOnLogin: () => {
-      action("login")();
-    },
-    isLoggingIn: false,
+    notifyOnEmailChanged: action("notifyOnEmailChanged"),
+    notifyOnPasswordChanged: action("notifyOnPasswordChanged"),
+    notifyOnFocused: action("notifyOnFocused"),
+    isDisabled: false,
   },
 };
 
 export const LoggingIn: StoryObj<typeof LoginWithEmailForm> = {
   args: {
-    isLoggingIn: true,
+    notifyOnEmailChanged: action("notifyOnEmailChanged"),
+    notifyOnPasswordChanged: action("notifyOnPasswordChanged"),
+    notifyOnFocused: action("notifyOnFocused"),
+    isDisabled: true,
   },
 };

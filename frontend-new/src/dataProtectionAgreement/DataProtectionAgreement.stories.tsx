@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from "@storybook/react";
 import DataProtectionAgreement from "./DataProtectionAgreement";
-import { AuthContext, authContextDefaultValue } from "src/auth/AuthProvider/AuthProvider";
+import { EmailAuthContext, emailAuthContextDefaultValue } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 
 const meta: Meta<typeof DataProtectionAgreement> = {
   title: "Auth/DataProtectionAgreement",
@@ -9,7 +9,7 @@ const meta: Meta<typeof DataProtectionAgreement> = {
   decorators: [
     (Story) => {
       const mockAuthContextValue = {
-        ...authContextDefaultValue,
+        ...emailAuthContextDefaultValue,
         user: {
           id: "123",
           name: "John Doe",
@@ -18,9 +18,9 @@ const meta: Meta<typeof DataProtectionAgreement> = {
       };
 
       return (
-        <AuthContext.Provider value={mockAuthContextValue}>
+        <EmailAuthContext.Provider value={mockAuthContextValue}>
           <Story />
-        </AuthContext.Provider>
+        </EmailAuthContext.Provider>
       );
     },
   ],

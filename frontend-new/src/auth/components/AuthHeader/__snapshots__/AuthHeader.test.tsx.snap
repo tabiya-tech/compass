@@ -12,7 +12,7 @@ exports[`AuthHeader tests should render the AuthHeader 1`] = `
       alt="Logo"
       data-testid="auth-header-logo-40374529-6e2c-49d8-81d7-93f01603a648"
       src="/logo.svg"
-      style="max-width: 60%; margin: 10%;"
+      style="max-width: 60%; margin: 5% 10%;"
     />
     <button
       class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-j7z1rr-MuiButtonBase-root-MuiIconButton-root"

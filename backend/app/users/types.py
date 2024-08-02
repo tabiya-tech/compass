@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Mapping, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 from datetime import datetime
@@ -32,9 +32,10 @@ class UserPreferences(BaseModel):
 
 
 class CreateUserPreferencesRequest(BaseModel):
-    invitation_code: str
+    invitation_code: Optional[str] = None
     """
     Invitation code
+    Optional since in the case of a normal email/password registration, the code is not required
     """
 
     user_id: str

@@ -14,23 +14,23 @@ class UserInvitationService:
         """
         self._repository: UserInvitationRepository = UserInvitationRepository()
 
-    async def get_invitation_status(self, code: str) -> GetInvitationCodeStatusResponse:
+    async def get_invitation_status(self, invitation_code: str) -> GetInvitationCodeStatusResponse:
         """
         Get the status of a user invitation
-        :param code: str: The code of the user invitation
+        :param invitation_code: str: The code of the user invitation
         :return: dict: The status of the user invitation
         """
         try:
-            invitation = await self._repository.get_valid_invitation_by_code(code)
+            invitation = await self._repository.get_valid_invitation_by_code(invitation_code)
 
             if not invitation:
                 return GetInvitationCodeStatusResponse(
-                    code=code,
+                    invitation_code=invitation_code,
                     status=InvitationCodeStatus.INVALID
                 )
 
             return GetInvitationCodeStatusResponse(
-                code=code,
+                invitation_code=invitation_code,
                 status=InvitationCodeStatus.VALID,
                 # Return the invitation type if the status is valid
                 invitation_type=invitation.invitation_type
@@ -38,13 +38,13 @@ class UserInvitationService:
         except Exception as e:
             ErrorService.handle(__name__, e)
 
-    async def reduce_invitation_code_capacity(self, code: str) -> bool:
+    async def reduce_invitation_code_capacity(self, invitation_code: str) -> bool:
         """
         Reduce the remaining usage of the invitation code
-        :param code: str: The code of the invitation
+        :param invitation_code: str: The code of the invitation
         :return:  Bool, whether the capacity was reduced or not
         """
         try:
-            return await self._repository.reduce_capacity(code)
+            return await self._repository.reduce_capacity(invitation_code)
         except Exception as e:
             ErrorService.handle(__name__, e)

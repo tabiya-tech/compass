@@ -5,12 +5,14 @@ import App from "src/app";
 import reportWebVitals from "src/reportWebVitals";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import applicationTheme, { ThemeMode } from "src/theme/applicationTheme/applicationTheme";
-import { AuthProvider } from "src/auth/AuthProvider/AuthProvider";
+import { EmailAuthProvider } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 import SnackbarProvider from "src/theme/SnackbarProvider/SnackbarProvider";
 import { UserPreferencesProvider } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 import { IsOnlineProvider } from "src/app/isOnlineProvider/IsOnlineProvider";
 import ViewPortWrapper from "src/app/ViewPortWrapper";
 import { HashRouter } from "react-router-dom";
+import { InvitationsProvider } from "./invitations/InvitationsProvider/InvitationsProvider";
+import { AnonymousAuthProvider } from "./auth/anonymousAuth/AnonymousAuthProvider/AnonymousAuthProvider";
 
 // Currently the fonts are downloaded from Google via the index.css
 // Fonts could be distributed with the app instead, by explicitly importing them here
@@ -18,26 +20,30 @@ import { HashRouter } from "react-router-dom";
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
 root.render(
-  <React.StrictMode>
-    <>
-      <CssBaseline />
-      <IsOnlineProvider>
-        <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
-          <AuthProvider>
+  // <React.StrictMode>
+  <>
+    <CssBaseline />
+    <IsOnlineProvider>
+      <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
+        <AnonymousAuthProvider>
+          <EmailAuthProvider>
             <UserPreferencesProvider>
-              <SnackbarProvider>
-                <ViewPortWrapper>
-                  <HashRouter>
-                    <App />
-                  </HashRouter>
-                </ViewPortWrapper>
-              </SnackbarProvider>
+              <InvitationsProvider>
+                <SnackbarProvider>
+                  <ViewPortWrapper>
+                    <HashRouter>
+                      <App />
+                    </HashRouter>
+                  </ViewPortWrapper>
+                </SnackbarProvider>
+              </InvitationsProvider>
             </UserPreferencesProvider>
-          </AuthProvider>
-        </ThemeProvider>
-      </IsOnlineProvider>
-    </>
-  </React.StrictMode>
+          </EmailAuthProvider>
+        </AnonymousAuthProvider>
+      </ThemeProvider>
+    </IsOnlineProvider>
+  </>
+  // </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

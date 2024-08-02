@@ -73,29 +73,40 @@ async def _get_user_preferences(
 async def _create_user_preferences(
         user_invitation_service: UserInvitationService,
         repository: UserPreferenceRepository,
-        user: CreateUserPreferencesRequest,
+        preferences: CreateUserPreferencesRequest,
         authed_user: UserInfo) -> UserPreferences:
     try:
-        if user.user_id != authed_user.user_id:
+        if preferences.user_id != authed_user.user_id:
             raise HTTPException(status_code=403, detail="forbidden")
 
-        # validation of invitation code.
-        invitation = await user_invitation_service.get_invitation_status(user.invitation_code)
+        # If an invitation code is provided, perform the validation
+        # TODO: The invitation code is optional since register with invitation code is not yet implemented
+        # make invitation code required when the feature is implemented
+        if preferences.invitation_code:
+            # validation of invitation code.
+            invitation = await user_invitation_service.get_invitation_status(preferences.invitation_code)
 
-        if invitation.status == InvitationCodeStatus.INVALID:
-            raise HTTPException(status_code=400, detail="Invalid invitation code")
+            if invitation.status == InvitationCodeStatus.INVALID:
+                raise HTTPException(status_code=400, detail="Invalid invitation code")
 
-        # an authenticated user can't use an auto-register invitation code
-        if (invitation.invitation_type == InvitationType.AUTO_REGISTER.value
-                and authed_user.sign_in_provider != SignInProvider.ANONYMOUS):
-            raise HTTPException(status_code=400, detail="Invalid invitation code")
+            # an authenticated user can't use an auto-register invitation code
+            if (invitation.invitation_type == InvitationType.AUTO_REGISTER.value
+                    and authed_user.sign_in_provider != SignInProvider.ANONYMOUS):
+                raise HTTPException(status_code=400, detail="Invalid invitation code")
 
-        # an anonymous user can't use a register invitation code because it requires user to register
-        if (invitation.invitation_type == InvitationType.REGISTER.value and
-                authed_user.sign_in_provider == SignInProvider.ANONYMOUS):
-            raise HTTPException(status_code=400, detail="Invalid invitation code")
+            # an anonymous user can't use a register invitation code because it requires user to register
+            if (invitation.invitation_type == InvitationType.REGISTER.value and
+                    authed_user.sign_in_provider == SignInProvider.ANONYMOUS):
+                raise HTTPException(status_code=400, detail="Invalid invitation code")
 
-        user_already_exists = await repository.get_user_preference_by_user_id(user.user_id)
+            # Reduce the invitation code capacity
+            is_reduced = await user_invitation_service.reduce_invitation_code_capacity(preferences.invitation_code)
+
+            if not is_reduced:
+                raise HTTPException(status_code=400, detail="Invalid invitation code")
+
+        # Check if user preferences already exist
+        user_already_exists = await repository.get_user_preference_by_user_id(preferences.user_id)
 
         if user_already_exists:
             raise HTTPException(
@@ -105,20 +116,13 @@ async def _create_user_preferences(
 
         # Generating a 64-bit integer session ID
         session_id = generate_new_session_id()  # nosec
-
-        # Reduce the invitation code capacity
-        is_reduced = await user_invitation_service.reduce_invitation_code_capacity(user.invitation_code)
-
-        if not is_reduced:
-            raise HTTPException(status_code=400, detail="Invalid invitation code")
-
-        user.sessions = [session_id]
+        preferences.sessions = [session_id]
 
         # Create the user preferences
-        created = await repository.insert_user_preference(user.user_id, UserPreferences(
-            language=user.language,
-            accepted_tc=user.accepted_tc,
-            sessions=user.sessions
+        created = await repository.insert_user_preference(preferences.user_id, UserPreferences(
+            language=preferences.language,
+            accepted_tc=preferences.accepted_tc,
+            sessions=preferences.sessions
         ))
 
         return created

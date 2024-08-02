@@ -33,7 +33,7 @@ jest.mock("src/auth/components/AuthHeader/AuthHeader", () => {
   };
 });
 
-describe("Testing Verify Email component with AuthProvider", () => {
+describe("Testing Verify Email component", () => {
   beforeEach(() => {
     // Clear console mocks and mock functions
     (console.error as jest.Mock).mockClear();

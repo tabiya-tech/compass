@@ -48,14 +48,25 @@ jest.mock("@mui/material", () => {
   };
 });
 
-// mock AuthProvider
-jest.mock("./auth/AuthProvider/AuthProvider", () => {
-  const mAuthProvider = jest
+// mock EmailAuthProvider
+jest.mock("./auth/emailAuth/EmailAuthProvider/EmailAuthProvider", () => {
+  const mEmailAuthProvider = jest
     .fn()
-    .mockImplementation(({ children }) => <div data-testid="auth-provider-id">{children}</div>);
+    .mockImplementation(({ children }) => <div data-testid="email-auth-provider-id">{children}</div>);
   return {
     __esModule: true,
-    AuthProvider: mAuthProvider,
+    EmailAuthProvider: mEmailAuthProvider,
+  };
+});
+
+// mock AnonymousAuthProvider
+jest.mock("./auth/anonymousAuth/AnonymousAuthProvider/AnonymousAuthProvider", () => {
+  const mAnonymousAuthProvider = jest
+    .fn()
+    .mockImplementation(({ children }) => <div data-testid="anonymous-auth-provider-id">{children}</div>);
+  return {
+    __esModule: true,
+    AnonymousAuthProvider: mAnonymousAuthProvider,
   };
 });
 
@@ -72,10 +83,23 @@ jest.mock("./theme/SnackbarProvider/SnackbarProvider", () => {
 
 // mock the UserPreferencesProvider
 jest.mock("./userPreferences/UserPreferencesProvider/UserPreferencesProvider", () => {
-  const mUserPreferencesProvider = jest.fn().mockImplementation(({ children }) => children);
+  const mUserPreferencesProvider = jest
+    .fn()
+    .mockImplementation(({ children }) => <div data-testid="user-preferences-provider-id">{children}</div>);
   return {
     __esModule: true,
     UserPreferencesProvider: mUserPreferencesProvider,
+  };
+});
+
+// mock the invitationsProvider
+jest.mock("./invitations/InvitationsProvider/InvitationsProvider", () => {
+  const mInvitationsProvider = jest
+    .fn()
+    .mockImplementation(({ children }) => <div data-testid="invitations-provider-id">{children}</div>);
+  return {
+    __esModule: true,
+    InvitationsProvider: mInvitationsProvider,
   };
 });
 
@@ -129,9 +153,21 @@ describe("test the application bootstrapping", () => {
       const cssBaselineElement = screen.getByTestId("css-baseline-id");
       expect(cssBaselineElement).toBeInTheDocument();
 
-      // AND expect the auth provider to be in the DOM and to be a child of the theme provider
-      const authProviderElement = within(themeProviderElement).getByTestId("auth-provider-id");
+      // AND expect the email auth provider to be in the DOM and to be a child of the theme provider
+      const authProviderElement = within(themeProviderElement).getByTestId("email-auth-provider-id");
       expect(authProviderElement).toBeInTheDocument();
+
+      // AND expect the anonymous auth provider to be in the DOM and to be a child of the theme provider
+      const anonymousAuthProviderElement = within(themeProviderElement).getByTestId("anonymous-auth-provider-id");
+      expect(anonymousAuthProviderElement).toBeInTheDocument();
+
+      // AND expect the user preferences provider to be in the DOM and to be a child of the theme provider
+      const userPreferencesProviderElement = within(themeProviderElement).getByTestId("user-preferences-provider-id");
+      expect(userPreferencesProviderElement).toBeInTheDocument();
+
+      // AND expect the invitations provider to be in the DOM and to be a child of the theme provider
+      const invitationsProviderElement = within(themeProviderElement).getByTestId("invitations-provider-id");
+      expect(invitationsProviderElement).toBeInTheDocument();
 
       // AND expect the snackbar provider to be in the DOM and to be a child of the theme provider
       const snackbarProviderElement = within(themeProviderElement).getByTestId("snackbar-provider-id");

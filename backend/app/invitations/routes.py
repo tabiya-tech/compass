@@ -26,8 +26,8 @@ def add_user_invitations_routes(app: FastAPI):
         responses={500: {"model": HTTPErrorResponse}},
         name="get user invitation status"
     )
-    async def _get_invitation_status(code: str) -> GetInvitationCodeStatusResponse:
-        return await invitations_service.get_invitation_status(code)
+    async def _get_invitation_status(invitation_code: str) -> GetInvitationCodeStatusResponse:
+        return await invitations_service.get_invitation_status(invitation_code)
 
     ######################
     # Add the user invitations router to the app

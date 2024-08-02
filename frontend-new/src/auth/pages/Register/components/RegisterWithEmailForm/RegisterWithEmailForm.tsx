@@ -1,7 +1,7 @@
 import { Box, CircularProgress, TextField, useTheme } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import React, { useState } from "react";
-import { validatePassword } from "src/auth/pages/Register/utils/validatePassword";
+import { validatePassword } from "src/auth/utils/validatePassword";
 
 const uniqueId = "6cf1a0fa-8d75-4342-bf6b-1203d5b114d7";
 

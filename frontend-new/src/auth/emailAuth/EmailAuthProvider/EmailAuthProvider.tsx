@@ -1,24 +1,22 @@
 import React, { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import { useTokens } from "src/auth/hooks/useTokens";
 import { useAuthUser } from "src/auth/hooks/useAuthUser";
-import { authService } from "src/auth/AuthService/AuthService";
-import {
-  AuthContextValue,
-  AuthProviderProps,
-  FirebaseIDToken,
-  TabiyaUser,
-  TFirebaseTokenResponse,
-} from "src/auth/auth.types";
+import { emailAuthService } from "src/auth/emailAuth/EmailAuthService/EmailAuth.service";
+import { EmailAuthContextValue, FirebaseIDToken, TabiyaUser, TFirebaseTokenResponse } from "src/auth/auth.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import { jwtDecode } from "jwt-decode";
 
+export type EmailAuthProviderProps = {
+  children: React.ReactNode;
+};
+
 // Default values for AuthContext
-export const authContextDefaultValue: AuthContextValue = {
+export const emailAuthContextDefaultValue: EmailAuthContextValue = {
   user: null,
-  isLoggingIn: false,
+  isLoggingInWithEmail: false,
+  isRegisteringWithEmail: false,
   isLoggingOut: false,
-  isRegistering: false,
   loginWithEmail: () => {},
   registerWithEmail: () => {},
   logout: () => {},
@@ -28,21 +26,21 @@ export const authContextDefaultValue: AuthContextValue = {
 /**
  * AuthContext that provides the user, login, logout, and hasRole functions
  */
-export const AuthContext = createContext<AuthContextValue>(authContextDefaultValue);
+export const EmailAuthContext = createContext<EmailAuthContextValue>(emailAuthContextDefaultValue);
 
 /**
- * AuthProvider component that provides the AuthContext to the application
+ * EmailAuthProvider component that provides the EmailAuthContext to the application
  * @param children - the child components that will have access to AuthContext
  * @constructor
  */
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const EmailAuthProvider: React.FC<EmailAuthProviderProps> = ({ children }) => {
   const { user, updateUser, updateUserByIDToken } = useAuthUser();
   const tokens = useTokens({ updateUserByIDToken });
 
   // State to track if the user is logging in/registering
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isLoggingInWithEmail, setIsLoggingInWithEmail] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [isRegistering, setIsRegistering] = useState(false);
+  const [isRegisteringWithEmail, setIsRegisteringWithEmail] = useState(false);
 
   /**
    * Handles page load to check and set the user if an access token exists
@@ -78,7 +76,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       PersistentStorageService.clear();
       tokens.clearTokens();
       updateUser(null);
-      authService.handleLogout(successCallback, errorCallback).then((r) => setIsLoggingOut(false));
+      emailAuthService.handleLogout(successCallback, errorCallback).then((r) => setIsLoggingOut(false));
     },
     [updateUser, tokens]
   );
@@ -93,8 +91,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       successCallback: (user: TabiyaUser) => void,
       errorCallback: (error: any) => void
     ) => {
-      setIsLoggingIn(true);
-      authService
+      setIsLoggingInWithEmail(true);
+      emailAuthService
         .handleLoginWithEmail(
           email,
           password,
@@ -115,7 +113,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           },
           (error) => {
             console.error(error);
-            setIsLoggingIn(false);
+            setIsLoggingInWithEmail(false);
             errorCallback(error);
           }
         )
@@ -126,7 +124,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         })
         .finally(() => {
           // Once the login is complete, set the isLoggingIn state to false
-          setIsLoggingIn(false);
+          setIsLoggingInWithEmail(false);
         });
     },
     [updateUserByIDToken, tokens]
@@ -143,8 +141,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       successCallback: () => void,
       errorCallback: (error: any) => void
     ) => {
-      setIsRegistering(true);
-      authService
+      setIsRegisteringWithEmail(true);
+      emailAuthService
         .handleRegisterWithEmail(
           email,
           password,
@@ -162,7 +160,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         )
         .finally(() => {
           // we don't need to update the user state or tokens
-          setIsRegistering(false);
+          setIsRegisteringWithEmail(false);
         });
     },
     [logout]
@@ -190,22 +188,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       loginWithEmail,
       registerWithEmail,
       logout,
-      isLoggingIn,
+      isLoggingInWithEmail,
       isLoggingOut,
-      isRegistering,
+      isRegisteringWithEmail,
       handlePageLoad,
     }),
-    [logout, isLoggingIn, isLoggingOut, isRegistering, user, loginWithEmail, registerWithEmail, handlePageLoad]
+    [
+      logout,
+      isLoggingInWithEmail,
+      isLoggingOut,
+      isRegisteringWithEmail,
+      user,
+      loginWithEmail,
+      registerWithEmail,
+      handlePageLoad,
+    ]
   );
 
   return (
-    <AuthContext.Provider value={value}>
+    <EmailAuthContext.Provider value={value}>
       {tokens.isAuthenticating ? (
         <Backdrop isShown={tokens.isAuthenticating} message={"Authenticating, wait a moment..."} />
       ) : (
         children
       )}
-    </AuthContext.Provider>
+    </EmailAuthContext.Provider>
   );
 };
 
