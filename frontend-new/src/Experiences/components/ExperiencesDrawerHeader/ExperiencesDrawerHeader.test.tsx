@@ -21,7 +21,7 @@ describe("ExperiencesDrawerHeader", () => {
     const experiencesDrawerHeaderContainer = screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_HEADER_CONTAINER);
     expect(experiencesDrawerHeaderContainer).toBeInTheDocument();
     // AND the experiences drawer header text to be in the document
-    expect(screen.getByText("Experiences and skills overview")).toBeInTheDocument();
+    expect(screen.getByText("Experiences and skills")).toBeInTheDocument();
     // AND the experiences drawer header button to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_HEADER_BUTTON)).toBeInTheDocument();
     // AND the experiences drawer header icon to be in the document

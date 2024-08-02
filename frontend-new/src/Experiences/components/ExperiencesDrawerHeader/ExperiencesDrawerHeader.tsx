@@ -26,7 +26,7 @@ const ExperiencesDrawerHeader: React.FC<ExperiencesDrawerHeaderProps> = (props) 
       gap={theme.tabiyaSpacing.lg}
       data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_HEADER_CONTAINER}
     >
-      <Typography variant="h5">Experiences and skills overview</Typography>
+      <Typography variant="h5">Experiences and skills</Typography>
       <PrimaryIconButton
         sx={{
           color: theme.palette.common.black,
