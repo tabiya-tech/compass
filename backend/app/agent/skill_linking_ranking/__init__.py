@@ -1,1 +1,1 @@
-from .skills_linking_tool import SkillsLinkingTool, SkillStat
+from .skills_linking_tool import SkillsLinkingTool

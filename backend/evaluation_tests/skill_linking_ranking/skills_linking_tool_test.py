@@ -59,12 +59,11 @@ test_cases = [
     SkillLinkingToolTestCase(
         skip_force="force",
         name="Baker by title",
-        given_occupation_title="baker",
-        given_responsibilities=["I bake bread", "I clean my work place", "I order supplies", "I sell bread"],
+        given_occupation_title="Baker",
+        given_responsibilities=["I bake bread", "I clean my work place", "I order supplies", "I sell bread", "I talk to customers"],
         expected_skills=["bake goods", "ensure sanitation", "order supplies", "sell products"]
     ),
     SkillLinkingToolTestCase(
-        skip_force="force",
         name="GDE Brigade member by title",
         given_occupation_title="GDE Brigade member",
         given_responsibilities=["I make sure everyone follows the Covid-19 rules.",
@@ -72,7 +71,11 @@ test_cases = [
                                 "I check and record temperatures and other health signs.",
                                 "I clean and disinfect students, teachers, and visitors.",
                                 "I put together weekly and monthly reports."],
-        expected_skills=[]
+        expected_skills=['follow health and safety precautions in social care practices',
+                         "guarantee students' safety",
+                         'perform security checks',
+                         'maintain incident reporting records',
+                         'present reports']
     ),
 ]
 
@@ -82,6 +85,7 @@ test_cases = [
 @pytest.mark.parametrize("test_case", get_test_cases_to_run(test_cases), ids=[test_case.name for test_case in get_test_cases_to_run(test_cases)])
 async def test_skill_linking_tool(test_case: SkillLinkingToolTestCase, get_search_services):
     # Given the occupation with it's associated skills
+    given_contextual_title: str = ""
     given_occupations_with_skills: list[OccupationSkillEntity] = []
     if test_case.given_occupation_code:
         given_occupation_skills: OccupationSkillEntity = await get_search_services.occupation_skill_search_service.get_by_esco_code(
@@ -100,16 +104,20 @@ async def test_skill_linking_tool(test_case: SkillLinkingToolTestCase, get_searc
         )
         result = await tool.execute(experience=experience, country_of_interest=Country.SOUTH_AFRICA, top_k=5)
         given_occupations_with_skills.extend(result.esco_occupations)
+        given_contextual_title = result.contextualized_title
 
     # When the skill linking tool is called with the given occupation and responsibilities
     skill_linking_tool = SkillsLinkingTool(get_search_services.skill_search_service)
-    actual_skills = await skill_linking_tool.link_and_rank_skills(esco_occupations=given_occupations_with_skills,
-                                                                  responsibilities_data=ResponsibilitiesData(responsibilities=test_case.given_responsibilities),
-                                                                  top_k=5,
-                                                                  top_p=10)
+    response = await skill_linking_tool.link_and_rank_skills(
+        experience_title=test_case.given_occupation_title,
+        contextual_title=given_contextual_title,
+        esco_occupations=given_occupations_with_skills,
+        responsibilities_data=ResponsibilitiesData(responsibilities=test_case.given_responsibilities),
+        top_k=5,
+        top_p=10)
     # Then the expected skills are returned
     # get the preferred labels fo the found skills
-    actual_skills_labels = [skill.preferredLabel.lower() for skill in actual_skills]
+    actual_skills_labels = [skill.preferredLabel.lower() for skill in response.top_skills]
     # assert the expected skills are in the actual skills
     # Find missing skills
     missing_skills = [skill for skill in test_case.expected_skills if skill not in actual_skills_labels]
