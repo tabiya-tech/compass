@@ -57,6 +57,7 @@
     "@mui/material": "^5.15.12",
     "@mui/system": "^5.15.15",
     "@react-pdf/renderer": "^3.4.4",
+    "@types/dom-speech-recognition": "^0.0.4",
     "firebase": "^10.12.2",
     "firebaseui": "^6.1.0",
     "framer-motion": "^11.2.11",

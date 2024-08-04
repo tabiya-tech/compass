@@ -2,6 +2,7 @@ import React, { useEffect, useContext, useMemo, useState, MouseEvent } from "rea
 import { IconButton, InputAdornment, TextField, styled, useTheme, Typography, Box } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
+import RecordButton from "src/chat/ChatRecordButton/RecordButton";
 
 export interface ChatMessageFieldProps {
   message: string;
@@ -181,6 +182,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
+                <RecordButton notifyChange={props.notifyChange} isDisabled={isDisabled} />
                 <IconButton
                   data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON}
                   onClick={handleButtonClick}
