@@ -5,8 +5,6 @@ from vertexai.language_models import TextGenerationModel
 
 from common_libs.llm.models_utils import LLMConfig, LLMInput, LLMResponse, BasicLLM
 
-logger = logging.getLogger(__name__)
-
 
 class GeminiGenerativeLLM(BasicLLM):
     """
