@@ -57,3 +57,11 @@ export const ShownWithExperienceWithEmptySkills = {
     experiences: ShownWithExperienceWithEmptySkills_experiences,
   },
 };
+
+export const ShownWhenConversationCompleted = {
+  args: {
+    isOpen: true,
+    experiences: generateRandomExperiences(3),
+    conversationCompleted: true,
+  },
+};

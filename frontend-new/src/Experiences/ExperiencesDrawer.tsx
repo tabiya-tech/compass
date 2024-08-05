@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Divider, Drawer, IconButton, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Divider, Drawer, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import ExperiencesDrawerHeader from "src/Experiences/components/ExperiencesDrawerHeader/ExperiencesDrawerHeader";
 import ExperiencesDrawerContent, {
@@ -9,15 +9,16 @@ import { Experience } from "src/Experiences/ExperienceService/Experiences.types"
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import SkillReport from "src/Report/Report";
 import CustomTextField from "src/theme/CustomTextField/CustomTextField";
-import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import CustomAccordion from "src/theme/CustomAccordion/CustomAccordion";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import DownloadReportButton from "src/Experiences/components/DownloadReportButton/DownloadReportButton";
 
 export interface ExperiencesDrawerProps {
   isOpen: boolean;
   notifyOnClose: (event: CloseEvent) => void;
   experiences: Experience[];
   isLoading: boolean;
+  conversationCompleted: boolean;
 }
 
 export enum CloseEventName {
@@ -60,7 +61,13 @@ const useLocalStorage = (key: string, initialValue: string) => {
   return [value, setValue] as const;
 };
 
-const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({ isOpen, isLoading, experiences, notifyOnClose }) => {
+const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
+  isOpen,
+  isLoading,
+  experiences,
+  notifyOnClose,
+  conversationCompleted,
+}) => {
   const theme = useTheme();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
@@ -91,7 +98,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({ isOpen, isLoading
       <ExperiencesDrawerHeader notifyOnClose={handleClose} />
       <Box display="flex" flexDirection="column" gap={2}>
         <Box display="flex" flexDirection="column" gap={1} alignItems="end" justifyContent="flex-end">
-          {experiences.length > 0 && !isLoading && (
+          {conversationCompleted ? (
             <PDFDownloadLink
               document={
                 <SkillReport
@@ -105,25 +112,10 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({ isOpen, isLoading
               fileName="SkillReport.pdf"
               style={{ color: theme.palette.tabiyaBlue.main, fontWeight: "bold" }}
             >
-              <IconButton
-                sx={{
-                  margin: 0,
-                  color: theme.palette.tabiyaBlue.main,
-                  borderRadius: (theme) => theme.tabiyaRounding.sm,
-                }}
-                title="Download Report"
-              >
-                <FileDownloadIcon sx={{ lineHeight: 0 }} />
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: theme.palette.tabiyaBlue.main,
-                  }}
-                >
-                  Download
-                </Typography>
-              </IconButton>
+              <DownloadReportButton />
             </PDFDownloadLink>
+          ) : (
+            <DownloadReportButton disabled />
           )}
         </Box>
         <CustomAccordion title="Personal Information" tooltipText={tooltipText}>

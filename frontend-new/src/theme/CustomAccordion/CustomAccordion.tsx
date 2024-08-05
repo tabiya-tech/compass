@@ -3,6 +3,7 @@ import { Accordion, AccordionDetails, AccordionSummary, Box, Typography } from "
 import { styled } from "@mui/system";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import HelpTip from "src/theme/HelpTip/HelpTip";
+import PrivacyTipIcon from "@mui/icons-material/PrivacyTip";
 
 const StyledAccordion = styled(Accordion)({
   "&.MuiAccordion-root": {
@@ -70,7 +71,9 @@ const CustomAccordion: React.FC<CustomAccordionProps> = ({ title, tooltipText, c
             {title}
           </Typography>
         </AccordionSummary>
-        <HelpTip data-testid={DATA_TEST_ID.CUSTOM_ACCORDION_HELP_TIP}>{tooltipText}</HelpTip>
+        <HelpTip icon={<PrivacyTipIcon />} data-testid={DATA_TEST_ID.CUSTOM_ACCORDION_HELP_TIP}>
+          {tooltipText}
+        </HelpTip>
       </Box>
       <AccordionDetails data-testid={DATA_TEST_ID.CUSTOM_ACCORDION_DETAILS}>{children}</AccordionDetails>
     </StyledAccordion>
