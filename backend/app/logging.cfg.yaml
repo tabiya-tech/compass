@@ -9,6 +9,13 @@ handlers:
     level: DEBUG
     formatter: standard
     stream: ext://sys.stdout
+loggers:
+  _template: &template_logger  # Define an anchor
+    level: DEBUG
+    propagate: yes
+  common_libs.llm.models_utils: *template_logger
+  CollectExperiencesAgent: *template_logger
+  SkillsExplorerAgent: *template_logger
 root:
   level: INFO
   handlers: [ console ]
