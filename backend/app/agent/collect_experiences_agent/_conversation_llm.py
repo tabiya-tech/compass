@@ -200,7 +200,7 @@ class _ConversationLLM:
                     - end_date is after the start_date
                     If they are inconsistent point it out and ask me for clarifications.
                 ##'company' instructions
-                    The type of company and its name.
+                    What the company does and its name.
                     If I have not provided the company name or type, ask me for it. 
                 ##'location' instructions
                     The location (e.g City, Region, District) the location of the company or organization. 
@@ -477,7 +477,7 @@ def _get_explore_experiences_instructions(*,
         Be precise and pay close attention, as we may have discussed experiences that are not included in {experiences_in_type}.
         
         Do not assume whether or not I have these kind of experiences.
-        Do not ask me about experiences that are not include in (a)
+        Do not ask me about experiences that are not included in (a)
         
         Gather as many of experiences as possible that include {experiences_in_type}
         , or until I explicitly state that I have no more to share.
@@ -523,11 +523,11 @@ def _get_experience_count(work_types: list[WorkType], collected_data: list[Colle
 
 
 def _get_summary_of_experiences(collected_data: list[CollectedData]) -> str:
-    summary = "\n"
+    summary = ""
     if len(collected_data) == 0:
         return "• No experiences identified so far"
     for experience in collected_data:
-        date_part = ""
+        date_part: str
         if experience.start_date is not None and experience.start_date != "":
             date_part = f", {experience.start_date}" + f" - {experience.end_date}" if experience.end_date is not None and experience.end_date != "" else ""
         else:

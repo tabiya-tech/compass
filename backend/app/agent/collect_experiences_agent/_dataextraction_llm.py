@@ -15,6 +15,7 @@ from app.agent.experience.work_type import WORK_TYPE_DEFINITIONS_FOR_PROMPT
 from app.agent.llm_caller import LLMCaller
 from app.agent.prompt_template import sanitize_input
 from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE, STD_AGENT_CHARACTER
+from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
@@ -302,7 +303,7 @@ class _DataExtractionLLM:
                             Empty string if the user was asked and explicitly chose to not provide this information. 
                             For reference, my current date is {current_date}    
                     ##'company' instructions
-                        The type or name of the company depending on the context.
+                        What the company does or name of the company depending on the context.
                         For unpaid work, use the receiver of the work (e.g. "Family", "Community", "Self" etc).
                         String value containing the type or name of the company.
                         `null` It was not provided by the user and the user was not explicitly asked for this information yet.
@@ -400,13 +401,13 @@ class _DataExtractionLLM:
                 </Previously Extracted Experience Data>   
                 """)
 
-        return system_instructions_template.format(
-            current_date=datetime.now().strftime("%Y/%m"),
-            agent_character=STD_AGENT_CHARACTER,
-            language_style=STD_LANGUAGE_STYLE,
-            previously_extracted_data=previously_extracted_data,
-            work_type_definitions=WORK_TYPE_DEFINITIONS_FOR_PROMPT
-        )
+        return replace_placeholders_with_indent(system_instructions_template,
+                                                current_date=datetime.now().strftime("%Y/%m"),
+                                                agent_character=STD_AGENT_CHARACTER,
+                                                language_style=STD_LANGUAGE_STYLE,
+                                                previously_extracted_data=previously_extracted_data,
+                                                work_type_definitions=WORK_TYPE_DEFINITIONS_FOR_PROMPT
+                                                )
 
 
 def find_duplicate(item: CollectedData, items: list[CollectedData]) -> int:
@@ -425,17 +426,17 @@ def format_history_for_prompt(collected_experience_data_so_far: list[CollectedDa
     if context.summary != "":
         _output += f"{ConversationHistoryFormatter.USER}: '{ConversationHistoryFormatter.SUMMARY_TITLE}\n{context.summary}'"
 
-    for turn in context.history.turns:
-        # if there is a collected experience data that was defined at that turn,
-        # then add a reference to help the model associate the experience data with that turn.
-        # This help the model to connect the dots between the user's last input --> conversation history --> experience data
-        # And follow the associations that it inferred in previous turns.
-        _experience_ref = ""
-        for _data in collected_experience_data_so_far:
-            if _data.defined_at_turn_number == turn.index:
-                _experience_ref = f" (see <Previously Extracted Experience Data> index={_data.index})"
-                break
+        for turn in context.history.turns:
+            # if there is a collected experience data that was defined at that turn,
+            # then add a reference to help the model associate the experience data with that turn.
+            # This help the model to connect the dots between the user's last input --> conversation history --> experience data
+            # And follow the associations that it inferred in previous turns.
+            _experience_ref = ""
+            for _data in collected_experience_data_so_far:
+                if _data.defined_at_turn_number == turn.index:
+                    _experience_ref = f" (see <Previously Extracted Experience Data> index={_data.index})"
+                    break
 
-        _output += (f"{ConversationHistoryFormatter.USER}: '{sanitize_input(turn.input.message, _TAGS_TO_FILTER)}{_experience_ref}'\n"
-                    f"{ConversationHistoryFormatter.MODEL}: '{sanitize_input(turn.output.message_for_user, _TAGS_TO_FILTER)}'\n")
-    return _output
+            _output += (f"{ConversationHistoryFormatter.USER}: '{sanitize_input(turn.input.message, _TAGS_TO_FILTER)}{_experience_ref}'\n"
+                        f"{ConversationHistoryFormatter.MODEL}: '{sanitize_input(turn.output.message_for_user, _TAGS_TO_FILTER)}'\n")
+        return _output
