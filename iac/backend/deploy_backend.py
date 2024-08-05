@@ -350,6 +350,10 @@ def _deploy_cloud_run_service(
         location=basic_config.location,
         ingress="INGRESS_TRAFFIC_ALL",
         template=gcp.cloudrunv2.ServiceTemplateArgs(
+            scaling=gcp.cloudrunv2.ServiceTemplateScalingArgs(
+                min_instance_count=1,
+                max_instance_count=1,
+            ),
             containers=[
                 gcp.cloudrunv2.ServiceTemplateContainerArgs(
                     image=fully_qualified_image_name,
