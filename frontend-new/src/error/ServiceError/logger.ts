@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // @ts-nocheck
-import { ServiceError } from "./error";
+import { ServiceError } from "./ServiceError";
 
 export function writeServiceErrorToLog(err: ServiceError, logFunction: (msg: any) => void): void {
   const logMessage = `ServiceError: ${err.serviceName} ${err.serviceFunction} ${err.errorCode} ${err.method} ${err.path} ${err.statusCode}`;

@@ -53,7 +53,10 @@ describe("AuthService class tests", () => {
 
     test("should call errorCallback on logout failure", async () => {
       // GIVEN the user is logged in
-      jest.spyOn(firebase.auth(), "signOut").mockRejectedValueOnce(new Error("Logout failed"));
+      jest.spyOn(firebase.auth(), "signOut").mockRejectedValueOnce({
+        code: "auth/internal-error",
+        message: "Internal error",
+      });
 
       const successCallback = jest.fn();
       const errorCallback = jest.fn();
@@ -93,7 +96,10 @@ describe("AuthService class tests", () => {
 
     test("should call errorCallback on anonymous login failure", async () => {
       // GIVEN the user is not able to log in anonymously
-      jest.spyOn(firebase.auth(), "signInAnonymously").mockRejectedValue(new Error("Anonymous login failed"));
+      jest.spyOn(firebase.auth(), "signInAnonymously").mockRejectedValue({
+        code: "auth/internal-error",
+        message: "Internal error",
+      });
 
       const successCallback = jest.fn();
       const errorCallback = jest.fn();
@@ -121,7 +127,7 @@ describe("AuthService class tests", () => {
       // WHEN the anonymous login is attempted
       await authService.handleAnonymousLogin(successCallback, errorCallback);
       // THEN the error callback should be called with Failed to Fetch
-      expect(errorCallback).toHaveBeenCalledWith(new Error("There is no user record corresponding to this email."));
+      expect(errorCallback).toHaveBeenCalledWith(new Error("User not found"));
     });
   });
 });

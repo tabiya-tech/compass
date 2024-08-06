@@ -5,15 +5,17 @@ import { NavLink as RouterNavLink, useLocation } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import IDPAuth from "src/auth/components/IDPAuth/IDPAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { getUserFriendlyErrorMessage, ServiceError } from "src/error/error";
-import { writeServiceErrorToLog } from "src/error/logger";
+import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
+import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
 import LoginWithEmailForm from "src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm";
 import { InvitationsContext } from "src/invitations/InvitationsProvider/InvitationsProvider";
-import { AnonymousAuthContext } from "../../anonymousAuth/AnonymousAuthProvider/AnonymousAuthProvider";
-import PrimaryButton from "../../../theme/PrimaryButton/PrimaryButton";
+import { AnonymousAuthContext } from "src/auth/anonymousAuth/AnonymousAuthProvider/AnonymousAuthProvider";
+import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm";
-import { validatePassword } from "../../utils/validatePassword";
+import { validatePassword } from "src/auth/utils/validatePassword";
+import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
+import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
 
 export const INVITATIONS_PARAM_NAME = "invite-code";
 
@@ -91,18 +93,26 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
             try {
               postLoginHandler(user);
             } catch (e) {
-              const errorMessage = getUserFriendlyErrorMessage(e as Error);
+              let errorMessage;
+              if (e instanceof FirebaseError) {
+                errorMessage = getUserFriendlyFirebaseErrorMessage(e);
+                writeFirebaseErrorToLog(e, console.error);
+              } else {
+                console.error(e);
+                errorMessage = (e as Error).message;
+              }
               enqueueSnackbar(errorMessage, { variant: "error" });
-              console.error("Error during login process", e);
             }
           },
           (e) => {
-            if (e instanceof ServiceError) {
-              writeServiceErrorToLog(e, console.error);
+            let errorMessage;
+            if (e instanceof FirebaseError) {
+              errorMessage = getUserFriendlyFirebaseErrorMessage(e);
+              writeFirebaseErrorToLog(e, console.error);
             } else {
               console.error(e);
+              errorMessage = (e as Error).message;
             }
-            const errorMessage = getUserFriendlyErrorMessage(e);
             enqueueSnackbar(errorMessage, { variant: "error" });
           }
         );

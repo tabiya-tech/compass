@@ -1,6 +1,6 @@
-import { getServiceErrorFactory } from "src/error/error";
+import { getServiceErrorFactory } from "src/error/ServiceError/ServiceError";
 import { StatusCodes } from "http-status-codes";
-import ErrorConstants from "src/error/error.constants";
+import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import { getBackendUrl } from "src/envService";
 import { fetchWithAuth } from "src/utils/fetchWithAuth/fetchWithAuth";
 import { Invitation, InvitationStatus } from "./invitations.types";
@@ -70,12 +70,13 @@ export default class InvitationsService {
     if (data.status !== InvitationStatus.VALID) {
       throw errorFactory(
         StatusCodes.UNPROCESSABLE_ENTITY,
-        ErrorConstants.ErrorCodes.FORBIDDEN,
+        ErrorConstants.ErrorCodes.VALIDATION_ERROR,
         "Invitation code is not valid",
-        {}
+        {
+          errorCode: ErrorConstants.ErrorCodes.FORBIDDEN,
+        }
       );
     }
-    // TODO: Here we also need to check if the invitation is expired
     return data;
   }
 }
