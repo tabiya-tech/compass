@@ -111,6 +111,12 @@ LOW_TEMPERATURE_GENERATION_CONFIG = {
     "top_p": 0.95,
 }
 
+MODERATE_TEMPERATURE_GENERATION_CONFIG = {
+    "temperature": 0.25,
+    "candidate_count": 1,
+    "top_p": 0.95,
+}
+
 MEDIUM_TEMPERATURE_GENERATION_CONFIG = {
     "temperature": 0.5,
     "candidate_count": 1,
