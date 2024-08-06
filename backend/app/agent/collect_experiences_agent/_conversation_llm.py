@@ -11,7 +11,7 @@ from app.agent.prompt_template.format_prompt import replace_placeholders_with_in
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import MEDIUM_TEMPERATURE_GENERATION_CONFIG, LLMConfig
+from common_libs.llm.models_utils import MODERATE_TEMPERATURE_GENERATION_CONFIG, LLMConfig
 
 _NO_EXPERIENCE_COLLECTED = "No experience data has been collected yet"
 _FINAL_MESSAGE = "Thank you for sharing your experiences. Let's move on to the next step."
@@ -53,7 +53,7 @@ class _ConversationLLM:
                                                                           last_referenced_experience_index=last_referenced_experience_index,
                                                                           ),
             config=LLMConfig(
-                generation_config=MEDIUM_TEMPERATURE_GENERATION_CONFIG
+                generation_config=MODERATE_TEMPERATURE_GENERATION_CONFIG
             ))
         if user_input.message == "":
             # If the user input is empty, set it to "(silence)"
@@ -186,22 +186,30 @@ class _ConversationLLM:
                 ##'work_type' instructions
                     It can have one of the following values:
                         {work_type_definitions}
-                    If work_type is 'None' ask explicitly questions to verify the 'work_type' field.
-                    These questions should be in plain English. 
+                    Explicitly ask questions to verify the 'work_type' field.
+                    Here are some examples of questions you can ask depending on the work type you want to verify:
+                        - FORMAL_SECTOR_WAGED_EMPLOYMENT: "Did you work as a paid employee?"
+                        - FORMAL_SECTOR_UNPAID_TRAINEE_WORK: "Did you work as an unpaid trainee?"
+                        - SELF_EMPLOYMENT: "Was it your own business?"
+                                           "Was is it a freelance or contract work?"
+                        - UNSEEN_UNPAID:   "Was it unpaid volunteer work?"
+                                           "Was it unpaid work for the community?"
+                        
+                    These questions should be in plain English.     
                     Do not ask about full-time, part-time.    
                 ##Timeline instructions
                     I may provide the beginning and end of an experience at any order, 
                     in a single input or in separate inputs, as a period or as a single date in relative or absolute terms
                     e.g., "March 2021" or "last month", "since n months", "the last M years" etc or whatever 
-                ###Date Consistency instructions
-                    Check the start_date and end_date dates and ensure they are not inconsistent:
-                    - they do not refer to the future
-                    - refer to dates that cannot be represented in the Gregorian calendar
-                    - end_date is after the start_date
-                    If they are inconsistent point it out and ask me for clarifications.
+                    ###Date Consistency instructions
+                        Check the start_date and end_date dates and ensure they are not inconsistent:
+                        - they do not refer to the future
+                        - refer to dates that cannot be represented in the Gregorian calendar
+                        - end_date is after the start_date
+                        If they are inconsistent point it out and ask me for clarifications.
                 ##'company' instructions
                     What the company does and its name.
-                    If I have not provided the company name or type, ask me for it. 
+                    If I have not provided the company name or what it does, ask me for it. 
                 ##'location' instructions
                     The location (e.g City, Region, District) the location of the company or organization. 
                     If I have not provided the location, ask me for it.
@@ -268,7 +276,7 @@ def _transition_instructions(*,
     # elif len(unexplored_types) > 0:  # need to collect more experiences
     if len(unexplored_types) > 0:  # need to collect more experiences
         return dedent(f"""\
-        Evaluate the following instruction only after we have explored all experiences that "{_get_experience_type(exploring_type)}".
+        Evaluate the following instruction only after we have explored all experiences of that include "{_get_experience_type(exploring_type)}".
         Review our conversation carefully and if I have explicitly stated that I have no more experiences to share that include "{_get_experience_type(exploring_type)}", 
         you will respond by saying <END_OF_WORKTYPE> and end the conversation. You will not add anything before or after the <END_OF_WORKTYPE> message.
         
@@ -458,14 +466,14 @@ def _get_explore_experiences_instructions(*,
         instructions_template = dedent("""\
         Follow the instructions is this section carefully!
         Now, we are focusing on exploring experiences that include only: 
-        (a) {experiences_in_type}.
+            (a) {experiences_in_type}.
         
         {questions_to_ask}
         
         {focus_unseen_instructions}
        
         We are not exploring experiences that include:
-        (b) {excluding_experiences}
+            (b) {excluding_experiences}
         
         We have already explored experiences that include:
             {already_explored_types}
@@ -473,39 +481,38 @@ def _get_explore_experiences_instructions(*,
         We have not finished exploring experiences that include:
             {not_explored_types}   
         
-        Inspect our conversation carefully to see if you explicitly asked about {experiences_in_type}
+        Inspect our conversation carefully to see if you explicitly asked about {experiences_in_type}.
         Be precise and pay close attention, as we may have discussed experiences that are not included in {experiences_in_type}.
         
         Do not assume whether or not I have these kind of experiences.
-        Do not ask me about experiences that are not included in (a)
+        Do not ask me about experiences that are not included in (a).
         
-        Gather as many of experiences as possible that include {experiences_in_type}
-        , or until I explicitly state that I have no more to share.
+        Gather as many of experiences as possible that include {experiences_in_type}, or until I explicitly state that I have no more to share.
         
         If I provide you with multiple experiences in a single input, you should ask me politely to slow down and 
         tell me to provide one experience at a time.
         
         If I provide you with the same experience multiple times, you should tell me that you already have this information.
         Here are the experiences that I have shared with you so far:
-        {experiences_summary}
+            {experiences_summary}
         
         For each experience, ask me questions to gather information following the '#Gather Details' instructions.
         
         After you have collected all experiences that include {experiences_in_type}, 
         you will evaluate the '#Transition' instructions to know how to transition to the next phase.
-        """).format(questions_to_ask=questions_to_ask,
-                    focus_unseen_instructions=focus_unseen_instructions,
-                    experiences_in_type=experiences_in_type,
-                    excluding_experiences=excluding_experiences,
-                    already_explored_types=already_explored_types,
-                    not_explored_types=not_explored_types,
-                    experiences_summary="{experiences_summary}")
+        """)
         return replace_placeholders_with_indent(instructions_template,
+                                                questions_to_ask=questions_to_ask,
+                                                focus_unseen_instructions=focus_unseen_instructions,
+                                                experiences_in_type=experiences_in_type,
+                                                excluding_experiences=excluding_experiences,
+                                                already_explored_types=already_explored_types,
+                                                not_explored_types=not_explored_types,
                                                 experiences_summary=experiences_summary)
 
     else:
         return replace_placeholders_with_indent(dedent("""\
-            We has finished exploring all type of experiences.
+            We have finished exploring all types of experiences.
             
             We have explored experiences that include:
                 {explored_types}  
@@ -517,7 +524,7 @@ def _get_explore_experiences_instructions(*,
 def _get_experience_count(work_types: list[WorkType], collected_data: list[CollectedData]) -> int:
     count = 0
     for data in collected_data:
-        if data.work_type in work_types:
+        if WorkType.from_string_key(data.work_type) in work_types:
             count += 1
     return count
 
@@ -534,5 +541,20 @@ def _get_summary_of_experiences(collected_data: list[CollectedData]) -> str:
             date_part = f", until {experience.end_date}" if experience.end_date is not None and experience.end_date != "" else ""
         company_part = f", {experience.company}" if experience.company is not None and experience.company != "" else ""
         location_part = f", {experience.location}" if experience.location is not None and experience.location != "" else ""
-        summary += "• " + experience.experience_title + date_part + company_part + location_part + "\n"
+        work_type_part = f" {_work_type_short(experience.work_type)}" if experience.work_type is not None and experience.work_type != "" else ""
+        summary += "• " + experience.experience_title + work_type_part + date_part + company_part + location_part + "\n"
     return summary
+
+
+def _work_type_short(work_type: str) -> str:
+    wt = WorkType.from_string_key(work_type)
+    if wt == WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
+        return "(Waged Employment)"
+    elif wt == WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK:
+        return "(Trainee)"
+    elif wt == WorkType.SELF_EMPLOYMENT:
+        return "(Self-Employed)"
+    elif wt == WorkType.UNSEEN_UNPAID:
+        return "(Volunteer/Unpaid)"
+    else:
+        return ""
