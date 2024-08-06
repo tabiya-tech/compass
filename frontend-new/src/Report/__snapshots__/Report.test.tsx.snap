@@ -9,7 +9,7 @@ exports[`Report should render Report correctly 1`] = `
   >
     <text
       data-testid="skill-report-title-5a296552-f91f-4c38-b88f-542cacaced8e"
-      style="font-size: 24px; font-weight: bold; padding-bottom: 36px;"
+      style="font-size: 24px; font-family: Inter; font-weight: bold; padding-bottom: 36px;"
     >
       Skill Report
     </text>
@@ -18,7 +18,7 @@ exports[`Report should render Report correctly 1`] = `
       style="display: flex; flex-direction: column;"
     >
       <view
-        style="display: flex; flex-direction: row; justify-content: space-between; padding-bottom: 36px;"
+        style="display: flex; flex-direction: row; justify-content: space-between; padding-bottom: 28px;"
       >
         <view
           style="display: flex; flex-direction: column; justify-content: flex-start;"
@@ -39,7 +39,7 @@ exports[`Report should render Report correctly 1`] = `
               Email: 
             </text>
             <text
-              style="font-family: Inter; font-size: 12px; font-weight: normal; padding-bottom: 8px;"
+              style="font-family: Inter; font-size: 12px; font-weight: normal; padding-bottom: 8px; word-break: break-word;"
             >
                
               johndoe@example.com
@@ -59,7 +59,7 @@ exports[`Report should render Report correctly 1`] = `
               Phone: 
             </text>
             <text
-              style="font-family: Inter; font-size: 12px; font-weight: normal; padding-bottom: 8px;"
+              style="font-family: Inter; font-size: 12px; font-weight: normal; padding-bottom: 8px; word-break: break-word;"
             >
               1234567890
             </text>
@@ -74,7 +74,7 @@ exports[`Report should render Report correctly 1`] = `
               Address: 
             </text>
             <text
-              style="font-family: Inter; font-size: 12px; font-weight: normal; padding-bottom: 8px;"
+              style="font-family: Inter; font-size: 12px; font-weight: normal; padding-bottom: 8px; word-break: break-word;"
             >
               1234 Main St
             </text>
@@ -83,7 +83,7 @@ exports[`Report should render Report correctly 1`] = `
       </view>
       <text
         data-testid="skill-report-body-text-5a296552-f91f-4c38-b88f-542cacaced8e"
-        style="font-size: 12px; padding-bottom: 36px; font-family: Inter; font-weight: normal;"
+        style="font-size: 12px; padding-bottom: 36px; font-family: Inter; font-weight: normal; word-break: break-word;"
       >
         This report provides insights gathered by Compass Tabiya's AI chatbot, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam nec pretium turpis. Nulla porttitor faucibus massa, in convallis urna commodo sed. Nullam ut convallis augue, nec aliquam justo. Praesent imperdiet facilisis dui sed sagittis. Ut in gravida purus. Sed ornare pharetra purus, mattis feugiat quam. Aliquam ac vulputate lectus. Aenean ornare eros a tellus convallis, et convallis lacus luctus. Ut at dapibus dui, quis convallis nulla. Quisque eget velit molestie, placerat justo in, dignissim dolor.
       </text>
@@ -108,7 +108,7 @@ exports[`Report should render Report correctly 1`] = `
             2022 — Present
           </text>
           <view
-            style="display: flex; flex-direction: column; flex: 1; margin-bottom: 8px; margin-right: 26px;"
+            style="display: flex; flex-direction: column; flex: 1; margin-bottom: 8px;"
           >
             <view>
               <text
@@ -129,7 +129,7 @@ exports[`Report should render Report correctly 1`] = `
                   Top Skills: 
                 </text>
                 <text
-                  style="font-family: Inter; font-size: 12px; font-weight: normal; padding-bottom: 8px;"
+                  style="font-family: Inter; font-size: 12px; font-weight: normal; padding-bottom: 8px; word-break: break-word;"
                 >
                   Management, Communication
                 </text>
@@ -138,6 +138,22 @@ exports[`Report should render Report correctly 1`] = `
           </view>
         </view>
       </view>
+    </view>
+    <view
+      style="display: flex; flex-direction: row; position: absolute; align-items: center; right: 26px; bottom: 16px; gap: 2px;"
+    >
+      <image
+        src="/future-development.png"
+        style="height: 26px; margin-top: 56px;"
+      />
+      <image
+        src="/oxford.jpg"
+        style="height: 26px; margin-top: 56px;"
+      />
+      <image
+        src="/logo.jpg"
+        style="height: 30px; margin-top: 56px;"
+      />
     </view>
   </page>
 </document>

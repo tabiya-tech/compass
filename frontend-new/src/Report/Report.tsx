@@ -1,5 +1,5 @@
 import React from "react";
-import { Document, Text, Page, View } from "@react-pdf/renderer";
+import { Document, Text, Page, View, Image } from "@react-pdf/renderer";
 import { Experience } from "src/Experiences/ExperienceService/Experiences.types";
 import ExperiencesReportContent from "src/Report/ExperiencesReportContent/ExperiencesReportContent";
 import styles from "src/Report/styles";
@@ -80,6 +80,18 @@ const SkillReport: React.FC<SkillReportProps> = ({ name, email, phone, address, 
               <ExperiencesReportContent key={index} experience={experience} />
             ))}
           </View>
+        </View>
+        {experiences.length > 5 && (
+          <Text
+            style={styles.pageNumber}
+            render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`}
+            fixed
+          />
+        )}
+        <View fixed style={styles.imageContainer}>
+          <Image src={`${process.env.PUBLIC_URL}/future-development.png`} style={styles.image} />
+          <Image src={`${process.env.PUBLIC_URL}/oxford.jpg`} style={styles.image} />
+          <Image src={`${process.env.PUBLIC_URL}/logo.jpg`} style={styles.compassImage} />
         </View>
       </Page>
     </Document>

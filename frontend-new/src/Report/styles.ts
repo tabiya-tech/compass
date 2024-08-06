@@ -14,6 +14,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
+    fontFamily: "Inter",
     fontWeight: "bold",
     paddingBottom: 36,
   },
@@ -28,6 +29,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "normal",
     paddingBottom: 8,
+    wordBreak: "break-word",
   },
   boldText: {
     fontFamily: "Inter",
@@ -52,7 +54,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingBottom: 36,
+    paddingBottom: 28,
   },
   rowView: {
     display: "flex",
@@ -69,6 +71,7 @@ const styles = StyleSheet.create({
     paddingBottom: 36,
     fontFamily: "Inter",
     fontWeight: "normal",
+    wordBreak: "break-word",
   },
   experiencesContainer: {
     display: "flex",
@@ -97,7 +100,31 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     flex: 1,
     marginBottom: 8,
-    marginRight: 26,
+  },
+  imageContainer: {
+    display: "flex",
+    flexDirection: "row",
+    position: "absolute",
+    alignItems: "center",
+    right: 26,
+    bottom: 16,
+    gap: 2,
+  },
+  image: {
+    height: 26,
+    marginTop: 56,
+  },
+  compassImage: {
+    height: 30,
+    marginTop: 56,
+  },
+  pageNumber: {
+    position: "absolute",
+    fontSize: 12,
+    bottom: 16,
+    left: 26,
+    textAlign: "center",
+    color: "#403E39",
   },
 });
 
