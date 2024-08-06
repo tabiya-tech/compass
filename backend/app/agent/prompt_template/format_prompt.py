@@ -1,3 +1,6 @@
+import re
+
+
 def replace_placeholders_with_indent(template_string: str, **replacements: str):
     """
     Replace multiple placeholders in the template string with their corresponding replacements,
@@ -8,38 +11,44 @@ def replace_placeholders_with_indent(template_string: str, **replacements: str):
     :return: The modified string with the placeholders replaced
     """
 
+    # Split the template string into lines
     lines = template_string.splitlines()
+    new_lines = []
 
-    for key, replacement in replacements.items():
-        replacement_lines = replacement.splitlines()
-        new_lines = []
+    # Pattern to find markers
+    pattern = re.compile(r'{(.*?)}')
+    while len(lines):
+        current_line = lines.pop(0)
+        start_pos = 0
+        match = pattern.search(current_line, pos=start_pos)
+        if not match:
+            # No more markers in the line
+            new_lines.append(current_line)
+            continue
 
-        for line in lines:
-            while f'{{{key}}}' in line:
-                marker_index = line.index(f'{{{key}}}')
-                indent = line[:marker_index]
-                parts = line.split(f'{{{key}}}', 1)
+        start, end = match.span()  # Found a marker
+        marker = match.group(1)
 
-                if len(replacement_lines) > 1:
-                    if not parts[0].strip():
-                        for i, repl_line in enumerate(replacement_lines):
-                            new_lines.append(indent + repl_line if i == 0 else ' ' * len(indent) + repl_line)
-                        if len(parts) > 1 and parts[1].strip():
-                            new_lines[-1] += parts[1]
-                    else:
-                        new_line = parts[0] + replacement_lines[0]
-                        new_lines.append(new_line)
-                        for repl_line in replacement_lines[1:]:
-                            new_lines.append(' ' * marker_index + repl_line)
-                        if len(parts) > 1 and parts[1].strip():
-                            new_lines[-1] += parts[1]
-                    line = ""
-                else:
-                    line = parts[0] + replacement + parts[1]
+        if marker in replacements:
+            replacement = replacements[marker]
+            if replacement is None or replacement == "":
+                # If the replacement is None or empty, replace the marker with an empty string
+                replacement_lines = [""]
+            else:
+                replacement_lines = replacement.splitlines()
+            # Add the part before the marker and the first line of the replacement
+            modified_line = current_line[:start] + replacement_lines[0]
 
-            if line:
-                new_lines.append(line)
+            # Add remaining lines of the replacement with indentation
+            indent = " " * start
+            for repl_line in replacement_lines[1:]:
+                modified_line += "\n" + indent + repl_line
 
-        lines = new_lines
+            # Continue processing the rest of the current line after the placeholder
+            rest_of_line = modified_line + current_line[end:]
+            lines = rest_of_line.splitlines() + lines
+        else:
+            # unknown marker, keep the line as is
+            new_lines.append(current_line)
 
-    return "\n".join(lines)
+    return "\n".join(new_lines)
