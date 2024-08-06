@@ -1,6 +1,5 @@
 import json
 import logging
-import re
 
 from datetime import datetime
 from enum import Enum
@@ -279,7 +278,8 @@ class _DataExtractionLLM:
                         Empty string if the user was asked and explicitly chose to not provide this information. 
                     ##'work_type' instructions
                         Classify the type of work the experience refers to.
-                        Use one of the following values and criteria:
+                        Use the '<User's Last Input>' related it to the'<Conversation History>' to determine the type of work.
+                        Choose one of the following values and apply the criteria:
                             {work_type_definitions}   
                     ##Timeline instructions
                         The user may provide the beginning and end of an experience at any order, 
