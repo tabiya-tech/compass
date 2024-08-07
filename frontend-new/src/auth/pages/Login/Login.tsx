@@ -1,21 +1,22 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Box, CircularProgress, Container, styled, Typography, useTheme } from "@mui/material";
-import { EmailAuthContext, TabiyaUser } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 import { NavLink as RouterNavLink, useLocation } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
-import IDPAuth from "src/auth/components/IDPAuth/IDPAuth";
+import SocialAuth from "src/auth/components/SocialAuth/SocialAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
 import LoginWithEmailForm from "src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm";
 import { InvitationsContext } from "src/invitations/InvitationsProvider/InvitationsProvider";
-import { AnonymousAuthContext } from "src/auth/anonymousAuth/AnonymousAuthProvider/AnonymousAuthProvider";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm";
 import { validatePassword } from "src/auth/utils/validatePassword";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
+import { AuthContext, TabiyaUser } from "src/auth/AuthProvider";
+import { emailAuthService } from "src/auth/services/emailAuth/EmailAuth.service";
+import { anonymousAuthService } from "src/auth/services/anonymousAuth/AnonymousAuth.service";
 
 export const INVITATIONS_PARAM_NAME = "invite-code";
 
@@ -71,81 +72,12 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
 
   const [activeLoginForm, setActiveLoginForm] = useState(ActiveForm.NONE);
 
-  const { loginWithEmail, isLoggingInWithEmail } = useContext(EmailAuthContext);
-  const { isLoggingInAnonymously } = useContext(AnonymousAuthContext);
+  const [isLoggingInWithEmail, setIsLoggingInWithEmail] = useState(false);
+  const [isLoggingInAnonymously, setIsLoggingInAnonymously] = useState(false);
+
+  const { isAuthenticationInProgress, updateUserByToken } = useContext(AuthContext);
   const { checkInvitationStatus, isInvitationCheckLoading } = useContext(InvitationsContext);
   const { enqueueSnackbar } = useSnackbar();
-
-  /**
-   * Handle the login form submission
-   * @param event
-   */
-  const handleLoginWithEmail = useCallback(
-    (email: string, password: string) => {
-      const passwordValidationResult = validatePassword(password);
-      setPasswordError(passwordValidationResult);
-
-      if (passwordValidationResult === "" && email && password) {
-        loginWithEmail(
-          email,
-          password,
-          async (user) => {
-            try {
-              postLoginHandler(user);
-            } catch (e) {
-              let errorMessage;
-              if (e instanceof FirebaseError) {
-                errorMessage = getUserFriendlyFirebaseErrorMessage(e);
-                writeFirebaseErrorToLog(e, console.error);
-              } else {
-                console.error(e);
-                errorMessage = (e as Error).message;
-              }
-              enqueueSnackbar(errorMessage, { variant: "error" });
-            }
-          },
-          (e) => {
-            let errorMessage;
-            if (e instanceof FirebaseError) {
-              errorMessage = getUserFriendlyFirebaseErrorMessage(e);
-              writeFirebaseErrorToLog(e, console.error);
-            } else {
-              console.error(e);
-              errorMessage = (e as Error).message;
-            }
-            enqueueSnackbar(errorMessage, { variant: "error" });
-          }
-        );
-      }
-    },
-    [enqueueSnackbar, loginWithEmail, postLoginHandler]
-  );
-
-  /**
-   * Check if the user was invited
-   * @param code
-   */
-  const handleCheckIfInvited = useCallback(
-    (code: string) => {
-      checkInvitationStatus(
-        code,
-        (user) => {
-          enqueueSnackbar("Invitation code is valid", { variant: "success" });
-          postLoginHandler(user);
-        },
-        (e) => {
-          if (e instanceof ServiceError) {
-            writeServiceErrorToLog(e, console.error);
-          } else {
-            console.error(e);
-          }
-          const errorMessage = getUserFriendlyErrorMessage(e);
-          enqueueSnackbar(errorMessage, { variant: "error" });
-        }
-      );
-    },
-    [checkInvitationStatus, enqueueSnackbar, postLoginHandler]
-  );
 
   // callbacks to pass on to child components
   const handleEmailChanged = (email: string) => {
@@ -161,6 +93,105 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
     setInviteCode(code);
   };
 
+  /**
+   * Handle the login form submission
+   * @param event
+   */
+  const handleLoginWithEmail = useCallback(
+    (email: string, password: string) => {
+      const passwordValidationResult = validatePassword(password);
+      setPasswordError(passwordValidationResult);
+
+      if (passwordValidationResult === "" && email && password) {
+        setIsLoggingInWithEmail(true);
+        emailAuthService.handleLoginWithEmail(
+          email,
+          password,
+          async (token) => {
+            setIsLoggingInWithEmail(false);
+            try {
+              const _user = updateUserByToken(token);
+              if (_user) {
+                postLoginHandler(_user);
+              }
+            } catch (e) {
+              let errorMessage;
+              if (e instanceof FirebaseError) {
+                errorMessage = getUserFriendlyFirebaseErrorMessage(e);
+                writeFirebaseErrorToLog(e, console.error);
+              } else {
+                console.error(e);
+                errorMessage = (e as Error).message;
+              }
+              enqueueSnackbar(errorMessage, { variant: "error" });
+            }
+          },
+          (error) => {
+            setIsLoggingInWithEmail(false);
+            const shownError = getUserFriendlyFirebaseErrorMessage(error);
+            writeFirebaseErrorToLog(error, console.error);
+            enqueueSnackbar(shownError, { variant: "error" });
+          }
+        );
+      }
+    },
+    [enqueueSnackbar, updateUserByToken, postLoginHandler]
+  );
+
+  /**
+   * Check if the user was invited
+   * @param code
+   */
+  const handleLoginWithInvitationCode = useCallback(
+    (code: string) => {
+      setIsLoggingInAnonymously(true);
+      checkInvitationStatus(
+        code,
+        (invitation) => {
+          enqueueSnackbar("Invitation code is valid", { variant: "success" });
+          anonymousAuthService.handleAnonymousLogin(
+            (token) => {
+              setIsLoggingInAnonymously(false);
+              const _user = updateUserByToken(token);
+              if (_user) {
+                postLoginHandler(_user);
+              }
+            },
+            (error) => {
+              setIsLoggingInAnonymously(false);
+              const shownError = getUserFriendlyFirebaseErrorMessage(error);
+              writeFirebaseErrorToLog(error, console.error);
+              enqueueSnackbar(shownError, { variant: "error" });
+            }
+          );
+        },
+        (e) => {
+          if (e instanceof ServiceError) {
+            writeServiceErrorToLog(e, console.error);
+          } else {
+            console.error(e);
+          }
+          const errorMessage = getUserFriendlyErrorMessage(e);
+          enqueueSnackbar(errorMessage, { variant: "error" });
+        }
+      );
+    },
+    [checkInvitationStatus, enqueueSnackbar, updateUserByToken, postLoginHandler]
+  );
+
+  // depending on which form is active, handle submit button
+  const handleLoginSubmit = useCallback(
+    (event: React.FormEvent) => {
+      event.preventDefault();
+      if (activeLoginForm === ActiveForm.INVITE_CODE) {
+        handleLoginWithInvitationCode(inviteCode);
+      } else {
+        handleLoginWithEmail(email, password);
+      }
+    },
+    [email, handleLoginWithInvitationCode, handleLoginWithEmail, activeLoginForm, inviteCode, password]
+  );
+
   // clear whichever form is not active
   useEffect(() => {
     if (activeLoginForm === ActiveForm.EMAIL) {
@@ -172,19 +203,6 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
     }
   }, [activeLoginForm]);
 
-  // depending on which form is active, handle submit button
-  const handleLoginSubmit = useCallback(
-    (event: React.FormEvent) => {
-      event.preventDefault();
-      if (activeLoginForm === ActiveForm.INVITE_CODE) {
-        handleCheckIfInvited(inviteCode);
-      } else {
-        handleLoginWithEmail(email, password);
-      }
-    },
-    [email, handleCheckIfInvited, handleLoginWithEmail, activeLoginForm, inviteCode, password]
-  );
-
   // Check if the user was invited by checking the invite code in the URL
   useEffect(() => {
     renderCount.current++;
@@ -193,12 +211,13 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
     }
 
     if (inviteCodeParam) {
-      handleCheckIfInvited(inviteCodeParam);
+      handleLoginWithInvitationCode(inviteCodeParam);
     }
-  }, [handleCheckIfInvited, inviteCodeParam]);
+  }, [handleLoginWithInvitationCode, inviteCodeParam]);
 
   // login is loading when any of the login methods return a loading state
-  const isLoginLoading = isLoggingInWithEmail || isLoggingInAnonymously || isInvitationCheckLoading;
+  const isLoginLoading =
+    isAuthenticationInProgress || isLoggingInWithEmail || isLoggingInAnonymously || isInvitationCheckLoading;
   // login button is disabled when login is loading, or when there is no active Form, or the fields for the active form are not filled in
   const isLoginButtonDisabled =
     isLoginLoading || activeLoginForm === ActiveForm.NONE || ((!email || !password) && !inviteCode);
@@ -268,7 +287,7 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
             )}
           </PrimaryButton>
         </Box>
-        <IDPAuth notifyOnLogin={postLoginHandler} isLoading={isLoading} />
+        <SocialAuth postLoginHandler={postLoginHandler} isLoading={isLoading} />
         <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.LOGIN_LINK}>
           Don't have an account?{" "}
           <StyledNavLink

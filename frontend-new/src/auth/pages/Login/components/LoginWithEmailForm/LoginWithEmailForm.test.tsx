@@ -4,6 +4,7 @@ import LoginWithEmailForm, { DATA_TEST_ID } from "./LoginWithEmailForm";
 import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
 import { HashRouter } from "react-router-dom";
 import React from "react";
+
 describe("Testing LoginWithEmailForm component", () => {
   beforeEach(() => {
     // Clear console mocks and mock functions

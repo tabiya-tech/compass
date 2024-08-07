@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import { Navigate } from "react-router-dom";
-import { EmailAuthContext } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 import { routerPaths } from "src/app/routerPaths";
 import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
+import { AuthContext } from "src/auth/AuthProvider";
 
 interface ProtectedRouteProps {
   authenticationAndDPARequired: boolean;
@@ -10,7 +10,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ authenticationAndDPARequired, children }) => {
-  const { user } = useContext(EmailAuthContext);
+  const { user } = useContext(AuthContext);
   const { userPreferences } = useContext(UserPreferencesContext);
 
   if (authenticationAndDPARequired && (!user || !userPreferences?.accepted_tc)) {

@@ -6,6 +6,8 @@ export const USER_PREFERENCES_KEY = "user_preferences";
 
 export const INVITATION_KEY = "invitation";
 
+export const LOGIN_METHOD_KEY = "login_method";
+
 /**
  * This class is used to store the tokens in the session storage.
  *   eg: refresh token
@@ -88,6 +90,28 @@ export class PersistentStorageService {
    */
   static clearInvitation(): void {
     this.storage.removeItem(INVITATION_KEY);
+  }
+
+  /**
+   * Sets the user's login method in the storage
+   */
+  static setLoginMethod(method: string): void {
+    this.storage.setItem(LOGIN_METHOD_KEY, method);
+  }
+
+  /**
+   * Returns the user's login method from the storage
+   * @returns string | null - The user's login method
+   */
+  static getLoginMethod(): string | null {
+    return this.storage.getItem(LOGIN_METHOD_KEY);
+  }
+
+  /**
+   * Clears the user's login method from the storage
+   */
+  static clearLoginMethod(): void {
+    this.storage.removeItem(LOGIN_METHOD_KEY);
   }
 
   /**

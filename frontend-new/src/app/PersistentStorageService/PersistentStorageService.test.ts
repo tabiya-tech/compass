@@ -188,6 +188,56 @@ describe("AuthPersistentStorage class tests", () => {
     });
   });
 
+  describe("login method tests", () => {
+    test("return correct previously set login method", () => {
+      // GIVEN The login method is stored in the session storage
+      const givenLoginMethod = "foo";
+      PersistentStorageService.setLoginMethod(givenLoginMethod);
+
+      // WHEN The login method is retrieved
+      const loginMethod = PersistentStorageService.getLoginMethod();
+
+      // THEN The login method should be returned
+      expect(loginMethod).toEqual(givenLoginMethod);
+    });
+
+    test("return null if login method is not set", () => {
+      // GIVEN The login method is not stored in the session storage
+      // Nothing set
+
+      // WHEN The login method is retrieved
+      const loginMethod = PersistentStorageService.getLoginMethod();
+
+      // THEN null should be returned
+      expect(loginMethod).toBeNull();
+    });
+
+    test("clear login method", () => {
+      // GIVEN The login method is stored in the session storage
+      const givenLoginMethod = "foo";
+      PersistentStorageService.setLoginMethod(givenLoginMethod);
+
+      // WHEN The login method is cleared
+      PersistentStorageService.clearLoginMethod();
+
+      // THEN The login method should be cleared (null)
+      const loginMethod = PersistentStorageService.getLoginMethod();
+      expect(loginMethod).toBeNull();
+    });
+
+    test("set login method", () => {
+      // GIVEN The login method is not stored in the session storage
+      const givenLoginMethod = "foo";
+
+      // WHEN The login method is set
+      PersistentStorageService.setLoginMethod(givenLoginMethod);
+
+      // THEN The login method should be stored
+      const loginMethod = PersistentStorageService.getLoginMethod();
+      expect(loginMethod).toEqual(givenLoginMethod);
+    });
+  });
+
   describe("getItem tests", () => {
     test("should return correct item from localStorage", () => {
       // GIVEN an item is stored in localStorage

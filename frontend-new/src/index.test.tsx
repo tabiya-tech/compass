@@ -49,24 +49,13 @@ jest.mock("@mui/material", () => {
 });
 
 // mock EmailAuthProvider
-jest.mock("./auth/emailAuth/EmailAuthProvider/EmailAuthProvider", () => {
-  const mEmailAuthProvider = jest
+jest.mock("./auth/AuthProvider", () => {
+  const mAuthProvider = jest
     .fn()
-    .mockImplementation(({ children }) => <div data-testid="email-auth-provider-id">{children}</div>);
+    .mockImplementation(({ children }) => <div data-testid="auth-provider-id">{children}</div>);
   return {
     __esModule: true,
-    EmailAuthProvider: mEmailAuthProvider,
-  };
-});
-
-// mock AnonymousAuthProvider
-jest.mock("./auth/anonymousAuth/AnonymousAuthProvider/AnonymousAuthProvider", () => {
-  const mAnonymousAuthProvider = jest
-    .fn()
-    .mockImplementation(({ children }) => <div data-testid="anonymous-auth-provider-id">{children}</div>);
-  return {
-    __esModule: true,
-    AnonymousAuthProvider: mAnonymousAuthProvider,
+    AuthProvider: mAuthProvider,
   };
 });
 
@@ -154,12 +143,8 @@ describe("test the application bootstrapping", () => {
       expect(cssBaselineElement).toBeInTheDocument();
 
       // AND expect the email auth provider to be in the DOM and to be a child of the theme provider
-      const authProviderElement = within(themeProviderElement).getByTestId("email-auth-provider-id");
+      const authProviderElement = within(themeProviderElement).getByTestId("auth-provider-id");
       expect(authProviderElement).toBeInTheDocument();
-
-      // AND expect the anonymous auth provider to be in the DOM and to be a child of the theme provider
-      const anonymousAuthProviderElement = within(themeProviderElement).getByTestId("anonymous-auth-provider-id");
-      expect(anonymousAuthProviderElement).toBeInTheDocument();
 
       // AND expect the user preferences provider to be in the DOM and to be a child of the theme provider
       const userPreferencesProviderElement = within(themeProviderElement).getByTestId("user-preferences-provider-id");

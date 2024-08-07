@@ -11,7 +11,6 @@ import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceErro
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
-import { EmailAuthContext } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 import { ConversationMessage, ConversationMessageSender } from "./ChatService/ChatService.types";
 import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
@@ -19,6 +18,9 @@ import ExperiencesDrawer from "src/Experiences/ExperiencesDrawer";
 import { Experience } from "src/Experiences/ExperienceService/Experiences.types";
 import ExperienceService from "src/Experiences/ExperienceService/ExperienceService";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import { AuthContext } from "src/auth/AuthProvider";
+import { FirebaseError } from "src/error/FirebaseError/firebaseError";
+import { logoutService } from "src/auth/services/logout/logout.service";
 
 const uniqueId = "b7ea1e82-0002-432d-a768-11bdcd186e1d";
 export const DATA_TEST_ID = {
@@ -33,10 +35,11 @@ const Chat = () => {
   const [initialized, setInitialized] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const { userPreferences, updateUserPreferences } = useContext(UserPreferencesContext);
-  const { logout, isLoggingOut, user } = useContext(EmailAuthContext);
+  const { user, clearUser } = useContext(AuthContext);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [experiences, setExperiences] = React.useState<Experience[]>([]);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [isLoggingOut, setIsLoggingOut] = React.useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -90,19 +93,30 @@ const Chat = () => {
     }
   }, []);
 
-  const handleLogout = useCallback(() => {
-    logout(
-      () => {
-        updateUserPreferences(null);
-        navigate(routerPaths.LOGIN, { replace: true });
-        enqueueSnackbar("Successfully logged out.", { variant: "success" });
-      },
-      (error) => {
-        const errorMessage = getUserFriendlyErrorMessage(error);
-        enqueueSnackbar(errorMessage, { variant: "error" });
-      }
-    );
-  }, [enqueueSnackbar, navigate, logout, updateUserPreferences]);
+  const handleLogout = useCallback(async () => {
+    const successCallback = () => {
+      setIsLoggingOut(false);
+      clearUser();
+      navigate(routerPaths.LOGIN, { replace: true });
+      enqueueSnackbar("Successfully logged out.", { variant: "success" });
+    };
+    const failureCallback = (error: FirebaseError) => {
+      setIsLoggingOut(false);
+      const errorMessage = getUserFriendlyErrorMessage(error);
+      enqueueSnackbar(errorMessage, { variant: "error" });
+    };
+    setIsLoggingOut(true);
+    try {
+      // Call the logout service to handle the logout based on the current login method
+      logoutService.handleLogout(successCallback, failureCallback);
+      // clear the user from the context, and the persistent storage
+      clearUser();
+    } catch (error) {
+      setIsLoggingOut(false);
+      console.error("Failed to logout", error);
+      enqueueSnackbar("Failed to logout", { variant: "error" });
+    }
+  }, [enqueueSnackbar, navigate, clearUser]);
 
   const initializeChat = useCallback(
     async (session_id?: number) => {

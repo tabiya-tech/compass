@@ -1,9 +1,8 @@
-import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
 import { Invitation, InvitationType } from "src/invitations/InvitationsService/invitations.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import isEmptyObject from "src/utils/isEmptyObject/isEmptyObject";
-import { AnonymousAuthContext, TabiyaUser } from "src/auth/anonymousAuth/AnonymousAuthProvider/AnonymousAuthProvider";
 
 export type InvitationsProviderProps = {
   children: ReactNode;
@@ -14,7 +13,7 @@ export interface InvitationsContextValue {
   isInvitationCheckLoading: boolean;
   checkInvitationStatus: (
     code: string,
-    successCallback: (user: TabiyaUser) => void,
+    successCallback: (invitation: Invitation) => void,
     errorCallback: (error: any) => void
   ) => void;
 }
@@ -30,8 +29,6 @@ export const InvitationsContext = createContext<InvitationsContextValue>(invitat
 export const InvitationsProvider: React.FC<InvitationsProviderProps> = ({ children }) => {
   const [invitation, setInvitation] = useState<Invitation | null>(null);
   const [isInvitationCheckLoading, setIsInvitationCheckLoading] = useState<boolean>(false);
-
-  const { loginAnonymously } = useContext(AnonymousAuthContext);
 
   useEffect(() => {
     const storedInvitation = PersistentStorageService.getInvitation();
@@ -51,23 +48,15 @@ export const InvitationsProvider: React.FC<InvitationsProviderProps> = ({ childr
   /**
    * Check invitation status and sign in anonymously
    */
-  const checkInvitationStatusAndSignInAnonymously = useCallback(
-    async (code: string, successCallback: (user: TabiyaUser) => void, errorCallback: (error: any) => void) => {
+  const checkInvitationStatus = useCallback(
+    async (code: string, successCallback: (invitation: Invitation) => void, errorCallback: (error: any) => void) => {
       try {
         setIsInvitationCheckLoading(true);
         const newInvitation = await invitationsService.checkInvitationCodeStatus(code);
         setInvitation(newInvitation);
         if (newInvitation.invitation_type === InvitationType.AUTO_REGISTER) {
-          // Log the user in anonymously if the invitation is for auto-register
-          loginAnonymously(
-            (user) => {
-              successCallback(user);
-            },
-            (error) => {
-              console.error("Error during anonymous login", error);
-              errorCallback(error);
-            }
-          );
+          // checks that the invitation type is AUTO_REGISTER and calls the successCallback
+          successCallback(newInvitation);
         } else {
           throw new Error("Invitation type is not AUTO_REGISTER");
         }
@@ -78,16 +67,16 @@ export const InvitationsProvider: React.FC<InvitationsProviderProps> = ({ childr
         setIsInvitationCheckLoading(false);
       }
     },
-    [setInvitation, loginAnonymously]
+    [setInvitation]
   );
 
   const value = useMemo(
     () => ({
       invitation,
       isInvitationCheckLoading,
-      checkInvitationStatus: checkInvitationStatusAndSignInAnonymously,
+      checkInvitationStatus,
     }),
-    [invitation, isInvitationCheckLoading, checkInvitationStatusAndSignInAnonymously]
+    [invitation, isInvitationCheckLoading, checkInvitationStatus]
   );
 
   return <InvitationsContext.Provider value={value}>{children}</InvitationsContext.Provider>;

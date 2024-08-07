@@ -3,8 +3,6 @@ import React, { ReactElement, ReactNode } from "react";
 import { render, renderHook, RenderHookOptions, RenderOptions } from "@testing-library/react";
 import { ThemeProvider } from "@mui/material";
 import applicationTheme, { ThemeMode } from "src/theme/applicationTheme/applicationTheme";
-import { EmailAuthProvider } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
-import { AnonymousAuthProvider } from "src/auth/anonymousAuth/AnonymousAuthProvider/AnonymousAuthProvider";
 
 // Import the Firebase mock utilities
 import "src/_test_utilities/firebaseMock";
@@ -12,20 +10,48 @@ import SnackbarProvider from "src/theme/SnackbarProvider/SnackbarProvider";
 import { UserPreferencesProvider } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 import { IsOnlineProvider } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { InvitationsProvider } from "src/invitations/InvitationsProvider/InvitationsProvider";
+import { AuthProvider } from "src/auth/AuthProvider";
+jest.mock("firebase/compat/app", () => {
+  return {
+    initializeApp: jest.fn(),
+    auth: jest.fn().mockReturnValue({
+      signOut: jest.fn(),
+      currentUser: {
+        getIdToken: jest.fn(),
+        getTokenResult: jest.fn(),
+      },
+      onAuthStateChanged: jest.fn().mockReturnValue(jest.fn()),
+      signInWithPopup: jest.fn(),
+      GoogleAuthProvider: { PROVIDER_ID: "google.com" },
+    }),
+  };
+});
 
+jest.mock("firebaseui", () => {
+  return {
+    auth: {
+      AuthUI: {
+        start: jest.fn(),
+        getInstance: jest.fn().mockReturnValue({
+          start: jest.fn(),
+          reset: jest.fn(),
+        }),
+        reset: jest.fn(),
+      },
+    },
+  };
+});
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <IsOnlineProvider>
       <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
-        <AnonymousAuthProvider>
-          <EmailAuthProvider>
-            <UserPreferencesProvider>
-              <InvitationsProvider>
-                <SnackbarProvider>{children}</SnackbarProvider>
-              </InvitationsProvider>
-            </UserPreferencesProvider>
-          </EmailAuthProvider>
-        </AnonymousAuthProvider>
+        <AuthProvider>
+          <UserPreferencesProvider>
+            <InvitationsProvider>
+              <SnackbarProvider>{children}</SnackbarProvider>
+            </InvitationsProvider>
+          </UserPreferencesProvider>
+        </AuthProvider>
       </ThemeProvider>
     </IsOnlineProvider>
   );

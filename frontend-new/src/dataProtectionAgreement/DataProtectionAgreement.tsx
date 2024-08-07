@@ -1,7 +1,6 @@
 import React, { useCallback, useContext, useState } from "react";
 import { Box, Container, styled, Typography } from "@mui/material";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { EmailAuthContext } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 import { Language, UserPreferencesSpec } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { ServiceError } from "src/error/ServiceError/ServiceError";
 import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
@@ -13,6 +12,7 @@ import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { InvitationsContext } from "src/invitations/InvitationsProvider/InvitationsProvider";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
+import { AuthContext } from "src/auth/AuthProvider";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
@@ -43,7 +43,7 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
   const navigate = useNavigate();
   const [isAcceptingDPA, setIsAcceptingDPA] = useState(false);
   const { createUserPreferences } = useContext(UserPreferencesContext);
-  const { user } = useContext(EmailAuthContext);
+  const { user } = useContext(AuthContext);
   const { enqueueSnackbar } = useSnackbar();
   const { invitation } = useContext(InvitationsContext);
   /**
