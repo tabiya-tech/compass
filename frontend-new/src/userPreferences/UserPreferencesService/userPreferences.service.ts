@@ -1,5 +1,8 @@
 import { getServiceErrorFactory } from "src/error/ServiceError/ServiceError";
-import { UserPreference, UserPreferencesSpec } from "./userPreferences.types";
+import {
+  CreateUserPreferencesSpec, UpdateUserPreferencesSpec,
+  UserPreference
+} from "./userPreferences.types";
 import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import { getBackendUrl } from "src/envService";
@@ -10,14 +13,34 @@ import isEmptyObject from "src/utils/isEmptyObject/isEmptyObject";
 export default class UserPreferencesService {
   private static instance: UserPreferencesService;
 
-  readonly userPreferencesEndpointUrl: string;
+  readonly updateUserPreferencesEndpointUrl: string;
+  readonly getUserPreferencesEndpointUrl: string;
   readonly apiServerUrl: string;
   readonly generateNewSessionEndpointUrl: string;
+  readonly createUserPreferencesEndpointURL: string;
 
   constructor() {
     this.apiServerUrl = getBackendUrl();
-    this.userPreferencesEndpointUrl = `${this.apiServerUrl}/users/preferences`;
+    this.getUserPreferencesEndpointUrl = `${this.apiServerUrl}/users/preferences`;
+    this.updateUserPreferencesEndpointUrl = `${this.apiServerUrl}/users/preferences`;
+    this.createUserPreferencesEndpointURL = `${this.apiServerUrl}/users/preferences`;
     this.generateNewSessionEndpointUrl = `${this.apiServerUrl}/users/preferences/new-session`;
+  }
+
+  /**
+   * Format the accepted_tc field of the user preferences to a Date object.
+   * @param accepted_tc - The accepted_tc field of the user preferences.
+   * @returns {Date | null}
+   * @private
+   */
+  private formatAcceptedTC(accepted_tc: string | Date | null | undefined): Date | undefined {
+    if (!accepted_tc) {
+      return undefined;
+    }
+    if (typeof accepted_tc === "string") {
+      return new Date(accepted_tc);
+    }
+    return accepted_tc;
   }
 
   /**
@@ -32,23 +55,102 @@ export default class UserPreferencesService {
   }
 
   /**
-   * Creates an entry for the user preferences of a user with an ID
-   *
+   * Creates an entry for the user preferences of a user with an ID.
+   * This is used to create a user profile for the first time.
+   * you provide user_id and invitation_code
    */
-  async createUserPreferences(newUserPreferencesSpec: UserPreferencesSpec): Promise<UserPreference> {
+  async createUserPreferences(user_preferences: CreateUserPreferencesSpec): Promise<Partial<UserPreference>> {
     const serviceName = "UserPreferencesService";
     const serviceFunction = "createUserPreferences";
     const method = "POST";
-    const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, this.userPreferencesEndpointUrl);
+    const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, this.createUserPreferencesEndpointURL);
     let response;
     let responseBody: string;
-    const requestBody = JSON.stringify(newUserPreferencesSpec);
-    response = await fetchWithAuth(this.userPreferencesEndpointUrl, {
+    const requestBody = JSON.stringify(user_preferences);
+    response = await fetchWithAuth(this.createUserPreferencesEndpointURL, {
       method: method,
       headers: {
         "Content-Type": "application/json",
       },
       expectedStatusCode: [StatusCodes.CREATED, StatusCodes.NOT_FOUND],
+      serviceName: serviceName,
+      serviceFunction: serviceFunction,
+      failureMessage: `Failed to create new user preferences for user with id ${user_preferences.user_id}`,
+      body: requestBody,
+    });
+    responseBody = await response.text();
+
+    // check if the server responded with the expected status code
+    if (response.status !== StatusCodes.CREATED) {
+      // Server responded with a status code that indicates that the resource was not the expected one
+      // The responseBody should be an ErrorResponse but that is not guaranteed e.g. if a gateway in the middle returns a 502,
+      // or if the server is not conforming to the error response schema
+      throw errorFactory(
+        response.status,
+        ErrorConstants.ErrorCodes.API_ERROR,
+        `Failed to create new user preferences for user with id ${user_preferences.user_id}`,
+        responseBody
+      );
+    }
+
+    // check if the response is in the expected format
+    const responseContentType = response.headers.get("Content-Type");
+    if (!responseContentType?.includes("application/json")) {
+      throw errorFactory(
+        response.status,
+        ErrorConstants.ErrorCodes.INVALID_RESPONSE_HEADER,
+        "Response Content-Type should be 'application/json'",
+        `Content-Type header was ${responseContentType}`
+      );
+    }
+
+    let userPreferencesResponse: UserPreference;
+    try {
+      userPreferencesResponse = {
+        ...JSON.parse(responseBody),
+        accepted_tc: this.formatAcceptedTC(JSON.parse(responseBody).accepted_tc),
+      };
+    } catch (e: any) {
+      throw errorFactory(
+        response.status,
+        ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
+        "Response did not contain valid JSON",
+        {
+          responseBody,
+          error: e,
+        }
+      );
+    }
+
+    // store the user preferences in the local storage
+    if (userPreferencesResponse && !isEmptyObject(userPreferencesResponse)) {
+      PersistentStorageService.setUserPreferences(userPreferencesResponse);
+    }
+
+    return {
+      ...userPreferencesResponse,
+      accepted_tc: this.formatAcceptedTC(userPreferencesResponse.accepted_tc),
+    };
+  }
+
+  /**
+   * Updates the user preferences of a user with an ID
+   * it sets new language and accepted_tc
+   */
+  async updateUserPreferences(newUserPreferencesSpec: UpdateUserPreferencesSpec): Promise<UserPreference> {
+    const serviceName = "UserPreferencesService";
+    const serviceFunction = "updateUserPreferences";
+    const method = "PATCH";
+    const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, this.updateUserPreferencesEndpointUrl);
+    let response;
+    let responseBody: string;
+    const requestBody = JSON.stringify(newUserPreferencesSpec);
+    response = await fetchWithAuth(this.updateUserPreferencesEndpointUrl, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      expectedStatusCode: StatusCodes.OK,
       serviceName: serviceName,
       serviceFunction: serviceFunction,
       failureMessage: `Failed to create new user preferences for user with id ${newUserPreferencesSpec.user_id}`,
@@ -57,7 +159,7 @@ export default class UserPreferencesService {
     responseBody = await response.text();
 
     // check if the server responded with the expected status code
-    if (response.status !== StatusCodes.CREATED) {
+    if (response.status !== StatusCodes.OK) {
       // Server responded with a status code that indicates that the resource was not the expected one
       // The responseBody should be an ErrorResponse but that is not guaranteed e.g. if a gateway in the middle returns a 502,
       // or if the server is not conforming to the error response schema
@@ -84,7 +186,7 @@ export default class UserPreferencesService {
     try {
       userPreferencesResponse = {
         ...JSON.parse(responseBody),
-        accepted_tc: new Date(JSON.parse(responseBody).accepted_tc),
+        accepted_tc: this.formatAcceptedTC(JSON.parse(responseBody).accepted_tc),
       };
     } catch (e: any) {
       throw errorFactory(
@@ -105,7 +207,7 @@ export default class UserPreferencesService {
 
     return {
       ...userPreferencesResponse,
-      accepted_tc: new Date(userPreferencesResponse.accepted_tc),
+      accepted_tc: this.formatAcceptedTC(userPreferencesResponse.accepted_tc),
     };
   }
 
@@ -121,10 +223,10 @@ export default class UserPreferencesService {
       serviceName,
       serviceFunction,
       method,
-      `${this.userPreferencesEndpointUrl}?user_id=${userId}`
+      `${this.getUserPreferencesEndpointUrl}?user_id=${userId}`
     );
 
-    const response = await fetchWithAuth(`${this.userPreferencesEndpointUrl}?user_id=${userId}`, {
+    const response = await fetchWithAuth(`${this.getUserPreferencesEndpointUrl}?user_id=${userId}`, {
       method: method,
       headers: {
         "Content-Type": "application/json",
@@ -149,7 +251,7 @@ export default class UserPreferencesService {
     try {
       userPreferencesResponse = {
         ...JSON.parse(responseBody),
-        accepted_tc: new Date(JSON.parse(responseBody).accepted_tc),
+        accepted_tc: this.formatAcceptedTC(JSON.parse(responseBody).accepted_tc),
       };
     } catch (e: any) {
       throw errorFactory(
@@ -170,7 +272,7 @@ export default class UserPreferencesService {
 
     return {
       ...userPreferencesResponse,
-      accepted_tc: new Date(userPreferencesResponse.accepted_tc),
+      accepted_tc: this.formatAcceptedTC(userPreferencesResponse.accepted_tc),
     };
   }
 
@@ -200,7 +302,7 @@ export default class UserPreferencesService {
 
       user_preference = {
         ...user_preference,
-        accepted_tc: new Date(user_preference.accepted_tc),
+        accepted_tc: this.formatAcceptedTC(user_preference.accepted_tc),
       };
 
       PersistentStorageService.setUserPreferences(user_preference);

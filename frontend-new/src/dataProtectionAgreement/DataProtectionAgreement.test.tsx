@@ -10,6 +10,8 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { TabiyaUser } from "src/auth/auth.types";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
+import { InvitationsContext } from "src/invitations/InvitationsProvider/InvitationsProvider";
+import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -55,17 +57,19 @@ jest.mock("react-router-dom", () => {
 
 describe("Testing Data Protection Policy component", () => {
   const createUserPreferencesMock = jest.fn();
+  const updateUserPreferencesMock = jest.fn();
 
   const userPreferencesContextValue = {
     getUserPreferences: jest.fn(),
     createUserPreferences: createUserPreferencesMock,
+    setUserPreferences: jest.fn(),
     userPreferences: {
       accepted_tc: new Date(),
       user_id: "0001",
       language: Language.en,
       sessions: [],
     },
-    updateUserPreferences: jest.fn(),
+    updateUserPreferences: updateUserPreferencesMock,
     isLoading: false,
   };
   const givenNotifyOnAcceptDPA = jest.fn();
@@ -128,17 +132,25 @@ describe("Testing Data Protection Policy component", () => {
       sessions: [],
     };
 
+    const invitation = {
+      invitation_code: "0001",
+      invitation_type: InvitationType.REGISTER,
+      status: InvitationStatus.VALID
+    }
+
     // AND the user preferences provider will create the user preferences
-    createUserPreferencesMock.mockImplementation((newUserPrefs, onSuccess, onError) => {
+    updateUserPreferencesMock.mockImplementation((newUserPrefs, onSuccess, onError) => {
       onSuccess(newUserPreferences);
     });
 
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-          <DataProtectionAgreement notifyOnAcceptDPA={givenNotifyOnAcceptDPA} isLoading={givenIsLoading} />
-        </UserPreferencesContext.Provider>
+        <InvitationsContext.Provider value={{ invitation, isInvitationCheckLoading: false, checkInvitationStatus: jest.fn(), setInvitation: jest.fn() }}>
+          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
+            <DataProtectionAgreement notifyOnAcceptDPA={givenNotifyOnAcceptDPA} isLoading={givenIsLoading} />
+          </UserPreferencesContext.Provider>
+        </InvitationsContext.Provider>
       </HashRouter>
     );
 
@@ -153,10 +165,6 @@ describe("Testing Data Protection Policy component", () => {
     // AND WHEN the accept button is clicked
     fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_BUTTON));
 
-    await waitFor(() => {
-      expect(givenNotifyOnAcceptDPA).toHaveBeenCalled();
-    });
-
     // AND the user should be redirected to the root path
     await waitFor(() => {
       expect(givenNotifyOnAcceptDPA).toHaveBeenCalled();
@@ -170,6 +178,48 @@ describe("Testing Data Protection Policy component", () => {
     });
   });
 
+  test("should not call accepting DPA service method if no invitation is in state", async () => {
+    // GIVEN a user is logged in
+    const givenUser: TabiyaUser = {
+      id: "0001",
+      email: "foo@bar.baz",
+      name: "Foo Bar",
+    };
+    mockLoggedInUser({ user: givenUser });
+    const newUserPreferences: UserPreference = {
+      user_id: givenUser.id,
+      language: Language.en,
+      accepted_tc: new Date(),
+      sessions: [],
+    };
+
+    // AND the user preferences provider will create the user preferences
+    createUserPreferencesMock.mockImplementation((newUserPrefs, onSuccess, onError) => {
+      onSuccess(newUserPreferences);
+    });
+
+    // WHEN the component is rendered
+    render(
+      <HashRouter>
+        <InvitationsContext.Provider value={{ invitation: null, isInvitationCheckLoading: false, checkInvitationStatus: jest.fn(), setInvitation: jest.fn() }}>
+          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
+            <DataProtectionAgreement notifyOnAcceptDPA={givenNotifyOnAcceptDPA} isLoading={givenIsLoading} />
+          </UserPreferencesContext.Provider>
+        </InvitationsContext.Provider>
+      </HashRouter>
+    );
+
+    // AND the givenNotifyOnAcceptDPA should not have been called
+    await waitFor(() => {
+      expect(givenNotifyOnAcceptDPA).not.toHaveBeenCalled();
+    });
+
+    // AND the success message should not be displayed
+    await waitFor(() => {
+      expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalled()
+    });
+  });
+
   test("should fail to accept the data protection policy gracefully", async () => {
     // GIVEN a user is logged in
     const givenUser: TabiyaUser = {
@@ -180,8 +230,8 @@ describe("Testing Data Protection Policy component", () => {
 
     mockLoggedInUser({ user: givenUser });
 
-    // AND the user preferences provider will fail to create the user preferences
-    createUserPreferencesMock.mockImplementation((newUserPrefs, onSuccess, onError) => {
+    // AND the user preferences provider will fail to update the user preferences
+    updateUserPreferencesMock.mockImplementation((newUserPrefs, onSuccess, onError) => {
       onError(new Error("Failed to create user preferences"));
     });
 

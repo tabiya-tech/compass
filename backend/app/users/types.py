@@ -13,18 +13,55 @@ class UpdateUserLanguageRequest(BaseModel):
         extra = "forbid"
 
 
-class UserPreferencesUpdateRequest(BaseModel):
-    language: str = None
-    accepted_tc: datetime = None
+class UserPreferencesRepositoryUpdateRequest(BaseModel):
+    language: Optional[str] = None
+    """
+    Language - The language of the user
+    """
+
+    accepted_tc: Optional[datetime] = None
+    """
+    time - The time the user accepted the terms and conditions
+    """
+
     sessions: list[int] = None  # not required
+    """
+    sessions - The sessions of the user
+    """
+
+    invitation_code: Optional[str] = None
+    """
+    invitation_code - The invitation code of the user
+    """
+
+    class Config:
+        extra = "forbid"
+
+
+class UserPreferencesUpdateRequest(BaseModel):
+    user_id: str
+    """
+    User ID - The user ID to update
+    """
+
+    language: str = None
+    """
+    Language - The language of the user
+    """
+
+    accepted_tc: datetime = None
+    """
+    time - The time the user accepted the terms and conditions
+    """
 
     class Config:
         extra = "forbid"
 
 
 class UserPreferences(BaseModel):
-    language: str
-    accepted_tc: datetime
+    language: Optional[str] = None
+    invitation_code: Optional[str] = None
+    accepted_tc: Optional[datetime] = None
     sessions: list[int] = []  # not required
 
     class Config:
@@ -32,12 +69,6 @@ class UserPreferences(BaseModel):
 
 
 class CreateUserPreferencesRequest(BaseModel):
-    invitation_code: Optional[str] = None
-    """
-    Invitation code
-    Optional since in the case of a normal email/password registration, the code is not required
-    """
-
     user_id: str
     """
     User ID
@@ -46,13 +77,9 @@ class CreateUserPreferencesRequest(BaseModel):
     """
     The language of the user
     """
-    accepted_tc: datetime
+    invitation_code: str
     """
-    The date and time the terms and conditions were accepted
-    """
-    sessions: list[int] = []
-    """
-    List of session ids
+    Invitation code
     """
 
     class Config:
@@ -62,6 +89,26 @@ class CreateUserPreferencesRequest(BaseModel):
 class CreateUserPreferenceResponse(BaseModel):
     user_preference_id: str
     user_preferences: UserPreferences
+
+    class Config:
+        extra = "forbid"
+
+
+class UpdateUserPreferencesRequest(BaseModel):
+    user_id: str
+    """
+    User ID
+    """
+
+    language: Optional[str] = None
+    """
+    The language of the user
+    """
+
+    accepted_tc: Optional[datetime] = None
+    """
+    Accepted terms and conditions date
+    """
 
     class Config:
         extra = "forbid"

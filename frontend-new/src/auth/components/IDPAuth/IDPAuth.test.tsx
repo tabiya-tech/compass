@@ -1,13 +1,15 @@
 import "src/_test_utilities/consoleMock";
 import React from "react";
-import { render, waitFor, screen } from "src/_test_utilities/test-utils";
+import { render, waitFor, screen, fireEvent } from "src/_test_utilities/test-utils";
 import IDPAuth, { DATA_TEST_ID } from "./IDPAuth";
-import * as firebaseui from "firebaseui";
 import { HashRouter } from "react-router-dom";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { routerPaths } from "src/app/routerPaths";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
+import * as authModule from "src/auth/firebaseConfig"
 import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
+import firebase from "firebase/compat";
+import UserCredential = firebase.auth.UserCredential;
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -18,15 +20,16 @@ jest.mock("src/envService", () => ({
 
 // mock the firebaseConfig module
 jest.mock("src/auth/firebaseConfig", () => {
-  const auth = jest.fn(() => ({
+  const auth = () => ({
     signInWithCustomToken: jest.fn(),
     signInWithEmailAndPassword: jest.fn(),
     createUserWithEmailAndPassword: jest.fn(),
     signOut: jest.fn(),
-    GoogleAuthProvider: { PROVIDER_ID: "google.com" },
-  }));
+    signInWithPopup: jest.fn(),
+  });
+
   return {
-    auth,
+    auth: auth(),
   };
 });
 
@@ -35,7 +38,11 @@ jest.mock("firebase/compat/app", () => {
   return {
     initializeApp: jest.fn(),
     auth: {
-      GoogleAuthProvider: { PROVIDER_ID: "google.com" },
+      GoogleAuthProvider: class {},
+      Auth: jest.fn().mockImplementation(() => ({
+        signInWithPopup: jest.fn(),
+        signOut: jest.fn(),
+      })),
     },
   };
 });
@@ -86,8 +93,6 @@ describe("IDPAuth tests", () => {
     (console.error as jest.Mock).mockClear();
     (console.warn as jest.Mock).mockClear();
     jest.clearAllMocks();
-
-    firebaseui.auth.AuthUI.getInstance = jest.fn();
   });
 
   beforeAll(() => mockUseTokens());
@@ -121,6 +126,20 @@ describe("IDPAuth tests", () => {
   ])(
     "it should handle successful sign-in for a user who has %s terms and conditions",
     async (_description: string, tc: Date | undefined, expectedPath: string) => {
+
+      jest.spyOn(authModule.auth, "signInWithPopup").mockResolvedValue({
+        user: {
+          uid: "mock-id",
+          displayName: "foo bar",
+          email: "foo@bar.baz",
+          multiFactor: {
+            user: {
+              accessToken: "mock-token",
+            }
+          }
+        }
+      } as unknown as UserCredential)
+
       // GIVEN a IDPAuth component
       const givenNotifyOnLogin = jest.fn();
       const givenIsLoading = false;
@@ -129,30 +148,20 @@ describe("IDPAuth tests", () => {
         name: "foo bar",
         email: "foo@bar.baz",
       };
-      // AND the sign-in is successful
-      (firebaseui.auth.AuthUI as unknown as jest.Mock).mockImplementation(() => ({
-        start: (elementId: string, config: any) => {
-          config.callbacks.signInSuccessWithAuthResult({
-            user: {
-              uid: givenUser.id,
-              displayName: givenUser.name,
-              email: givenUser.email,
-              multiFactor: { user: { token: "mock-access-token" } },
-            },
-            credential: {
-              token: "mock-id-token",
-            },
-          });
-        },
-        reset: jest.fn(),
-      }));
 
       // WHEN the component is rendered
       render(
         <HashRouter>
-          <IDPAuth notifyOnLogin={givenNotifyOnLogin} isLoading={givenIsLoading} />
+          <IDPAuth
+            preLoginCheck={() => true}
+            notifyOnLogin={givenNotifyOnLogin}
+            isLoading={givenIsLoading}
+          />
         </HashRouter>
       );
+
+      // WHEN the button is clicked
+      fireEvent.click(screen.getByTestId(DATA_TEST_ID.CONTINUE_WITH_GOOGLE_BUTTON));
 
       // THEN expect the user to be redirected to the correct path
       await waitFor(() => {
@@ -170,19 +179,22 @@ describe("IDPAuth tests", () => {
     // GIVEN a IDPAuth component
     const givenNotifyOnLogin = jest.fn();
     const givenIsLoading = false;
+
     // WHEN the sign-in fails
-    (firebaseui.auth.AuthUI as unknown as jest.Mock).mockImplementation(() => ({
-      start: (elementId: string, config: any) => {
-        config.callbacks.signInFailure({ message: "Sign-in failed" });
-      },
-      reset: jest.fn(),
-    }));
+    jest.spyOn(authModule.auth, "signInWithPopup").mockRejectedValue(new Error("mock-error"));
 
     render(
       <HashRouter>
-        <IDPAuth notifyOnLogin={givenNotifyOnLogin} isLoading={givenIsLoading} />
+        <IDPAuth
+          preLoginCheck={() => true}
+          notifyOnLogin={givenNotifyOnLogin}
+          isLoading={givenIsLoading}
+        />
       </HashRouter>
     );
+
+    // WHEN the button is clicked
+    fireEvent.click(screen.getByTestId(DATA_TEST_ID.CONTINUE_WITH_GOOGLE_BUTTON));
 
     // THEN expect error message to be in the document
     await waitFor(() => {

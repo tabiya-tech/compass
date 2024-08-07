@@ -21,36 +21,36 @@ describe("UserPreferencesProvider module", () => {
     jest.useFakeTimers();
   });
 
-  const givenUserPreferences = { user_id: "123", accepted_tc: new Date(), language: Language.en, sessions: [] };
+  const givenUserPreferences = { user_id: "123", accepted_tc: new Date(), language: Language.en };
 
   afterEach(() => {
     jest.clearAllMocks();
     jest.useRealTimers();
   });
 
-  describe("Create user preferences functionality", () => {
-    test("should call the createUserPreferences service with the correct parameters", async () => {
+  describe("update user preferences functionality", () => {
+    test("should call the updateUserPreferences service with the correct parameters", async () => {
       // GIVEN: The UserPreferencesProvider is rendered and user preferences context is accessed
       const { result } = renderUserPreferencesContext();
-      userPreferencesService.createUserPreferences = jest.fn().mockResolvedValue(givenUserPreferences);
+      userPreferencesService.updateUserPreferences = jest.fn().mockResolvedValue(givenUserPreferences);
 
       // AND some callback functions
       const givenSuccessCallback = jest.fn();
       const givenErrorCallback = jest.fn();
 
-      // WHEN the createUserPreferences function is called
+      // WHEN the updateUserPreferences function is called
 
-      const createUserPreferencesSpy = jest.spyOn(userPreferencesService, "createUserPreferences");
+      const updateUserPreferences = jest.spyOn(userPreferencesService, "updateUserPreferences");
 
       // initially isLoading should be false
       expect(result.current.isLoading).toBe(false);
 
       await act(async () => {
-        await result.current.createUserPreferences(givenUserPreferences, givenSuccessCallback, givenErrorCallback);
+        await result.current.updateUserPreferences(givenUserPreferences, givenSuccessCallback, givenErrorCallback);
       });
 
-      // THEN the user preferences service createUserPreferences function should be called with the correct parameters
-      expect(createUserPreferencesSpy).toHaveBeenCalledWith(givenUserPreferences);
+      // THEN the user preferences service updateUserPreferences function should be called with the correct parameters
+      expect(updateUserPreferences).toHaveBeenCalledWith(givenUserPreferences);
 
       // AND isLoading should be false
       expect(result.current.isLoading).toBe(false);
@@ -60,24 +60,26 @@ describe("UserPreferencesProvider module", () => {
     });
     test("should call the error callback on failure", async () => {
       // Simulate failure response
-      userPreferencesService.createUserPreferences = jest.fn().mockRejectedValue(new Error("Internal Server Error"));
+      userPreferencesService.updateUserPreferences = jest.fn().mockRejectedValue(new Error("Internal Server Error"));
 
       // GIVEN: The UserPreferencesProvider is rendered and user preferences context is accessed
       const { result } = renderUserPreferencesContext();
+
+      console.log(result.current)
 
       // AND some callback functions
       const givenSuccessCallback = jest.fn();
       const givenErrorCallback = jest.fn();
 
-      // WHEN the createUserPreferences function is called
-      const createUserPreferencesSpy = jest.spyOn(userPreferencesService, "createUserPreferences");
+      // WHEN the updateUserPreferences function is called
+      const updateUserPreferencesSpy = jest.spyOn(userPreferencesService, "updateUserPreferences");
 
       await act(async () => {
-        await result.current.createUserPreferences(givenUserPreferences, givenSuccessCallback, givenErrorCallback);
+        await result.current.updateUserPreferences(givenUserPreferences, givenSuccessCallback, givenErrorCallback);
       });
 
-      // THEN the user preferences service createUserPreferences function should be called with the correct parameters
-      expect(createUserPreferencesSpy).toHaveBeenCalledWith(givenUserPreferences);
+      // THEN the user preferences service updateUserPreferences function should be called with the correct parameters
+      expect(updateUserPreferencesSpy).toHaveBeenCalledWith(givenUserPreferences);
 
       // AND the error callback should be called
       expect(givenErrorCallback).toHaveBeenCalled();

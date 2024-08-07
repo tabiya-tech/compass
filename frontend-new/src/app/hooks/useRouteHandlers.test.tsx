@@ -47,8 +47,8 @@ const userPreferencesValue = {
   getUserPreferences: mockGetUserPreferences,
   userPreferences: null,
   isLoading: false,
-  createUserPreferences: jest.fn(),
   updateUserPreferences: jest.fn(),
+  setUserPreferences: jest.fn(),
 } as UserPreferencesContextValue;
 
 const UserPreferencesWrapper = ({ children }: { children: React.ReactNode }) => (

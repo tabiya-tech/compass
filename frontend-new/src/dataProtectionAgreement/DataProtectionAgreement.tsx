@@ -2,15 +2,14 @@ import React, { useCallback, useContext, useState } from "react";
 import { Box, Container, styled, Typography } from "@mui/material";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { EmailAuthContext } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
-import { Language, UserPreferencesSpec } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import { ServiceError } from "src/error/ServiceError/ServiceError";
 import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
+import { Language, UpdateUserPreferencesSpec } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { ServiceError, USER_FRIENDLY_ERROR_MESSAGES } from "src/error/ServiceError/ServiceError";
 import { StatusCodes } from "http-status-codes";
 import LanguageContextMenu from "src/i18n/languageContextMenu/LanguageContextMenu";
 import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
-import { InvitationsContext } from "src/invitations/InvitationsProvider/InvitationsProvider";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 
@@ -42,10 +41,9 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
 }) => {
   const navigate = useNavigate();
   const [isAcceptingDPA, setIsAcceptingDPA] = useState(false);
-  const { createUserPreferences } = useContext(UserPreferencesContext);
+  const { updateUserPreferences } = useContext(UserPreferencesContext);
   const { user } = useContext(EmailAuthContext);
   const { enqueueSnackbar } = useSnackbar();
-  const { invitation } = useContext(InvitationsContext);
   /**
    * Persist the user's chosen preferences to the backend
    */
@@ -63,15 +61,13 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
           ""
         );
       }
-      const newUserPreferenceSpecs: UserPreferencesSpec = {
+      const newUserPreferenceSpecs: UpdateUserPreferencesSpec = {
         user_id: user.id,
         language: Language.en,
         accepted_tc: new Date(),
-        sessions: [],
-        invitation_code: invitation?.invitation_code,
       };
       setIsAcceptingDPA(true);
-      createUserPreferences(
+      updateUserPreferences(
         newUserPreferenceSpecs,
         (_prefs) => {
           notifyOnAcceptDPA();
@@ -79,8 +75,15 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
         },
         (error) => {
           writeServiceErrorToLog(error, console.error);
-          navigate(routerPaths.LOGIN, { replace: true });
-          enqueueSnackbar("Failed to create user preferences", { variant: "error" });
+
+          // if the invitation code is invalid, show a user-friendly message
+          // otherwise, navigate to the login page and show a generic error message
+          if(error.details.detail === USER_FRIENDLY_ERROR_MESSAGES.INVALID_INVITATION_CODE) {
+            enqueueSnackbar(USER_FRIENDLY_ERROR_MESSAGES.INVALID_INVITATION_CODE, { variant: "error" });
+          } else {
+            navigate(routerPaths.LOGIN, { replace: true });
+            enqueueSnackbar("Failed to create user preferences", { variant: "error" });
+          }
         }
       );
     } catch (e) {
@@ -90,7 +93,7 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
     } finally {
       setIsAcceptingDPA(false);
     }
-  }, [user, enqueueSnackbar, createUserPreferences, notifyOnAcceptDPA, invitation, navigate]);
+  }, [user, enqueueSnackbar, updateUserPreferences, notifyOnAcceptDPA, navigate]);
 
   /**
    * Handle when a user accepts the data protection agreement

@@ -77,6 +77,7 @@ jest.mock("./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm", () => 
 describe("Testing Login component", () => {
   const loginWithEmailMock = jest.fn();
   const checkInvitationStatusMock = jest.fn();
+  const givenSetInvitation = jest.fn();
   const loginAnonymouslyMock = jest.fn();
 
   const emailAuthContextValue = {
@@ -102,6 +103,7 @@ describe("Testing Login component", () => {
 
   const invitationsContextValue = {
     checkInvitationStatus: checkInvitationStatusMock,
+    setInvitation: givenSetInvitation,
     isInvitationCheckLoading: false,
     invitation: {
       invitation_code: "INVITE-CODE-123",

@@ -3,7 +3,7 @@ import logging
 from app.server_dependecies.db_dependecies import get_mongo_db
 from app.constants.database import Collections
 
-from app.users.types import UserPreferences, UserPreferencesUpdateRequest
+from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest
 
 
 logger = logging.getLogger(__name__)
@@ -31,6 +31,7 @@ class UserPreferenceRepository:
             return UserPreferences(
                 language=_doc.get("language"),
                 accepted_tc=_doc.get("accepted_tc"),
+                invitation_code=_doc.get("invitation_code"),
                 sessions=_doc.get("sessions"),
             )
 
@@ -56,7 +57,7 @@ class UserPreferenceRepository:
             logger.exception(e)
             raise e
 
-    async def update_user_preference(self, user_id: str, update: UserPreferencesUpdateRequest) -> UserPreferences:
+    async def update_user_preference(self, user_id: str, update: UserPreferencesRepositoryUpdateRequest) -> UserPreferences:
         """
         Update the user preferences by user_id
         :param user_id: str - The user_id to update
@@ -67,6 +68,9 @@ class UserPreferenceRepository:
         """
         try:
             payload = update.dict(exclude_none=True)
+
+            print(payload)
+
             _doc = await self.collection.update_one({"user_id": {"$eq": user_id}}, {"$set": payload})
 
             return await self.get_user_preference_by_user_id(user_id=user_id)

@@ -32,7 +32,7 @@ const Chat = () => {
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const [initialized, setInitialized] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
-  const { userPreferences, updateUserPreferences } = useContext(UserPreferencesContext);
+  const { userPreferences,     setUserPreferences } = useContext(UserPreferencesContext);
   const { logout, isLoggingOut, user } = useContext(EmailAuthContext);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [experiences, setExperiences] = React.useState<Experience[]>([]);
@@ -93,7 +93,7 @@ const Chat = () => {
   const handleLogout = useCallback(() => {
     logout(
       () => {
-        updateUserPreferences(null);
+        setUserPreferences(null);
         navigate(routerPaths.LOGIN, { replace: true });
         enqueueSnackbar("Successfully logged out.", { variant: "success" });
       },
@@ -102,7 +102,7 @@ const Chat = () => {
         enqueueSnackbar(errorMessage, { variant: "error" });
       }
     );
-  }, [enqueueSnackbar, navigate, logout, updateUserPreferences]);
+  }, [enqueueSnackbar, navigate, logout, setUserPreferences]);
 
   const initializeChat = useCallback(
     async (session_id?: number) => {
@@ -181,7 +181,7 @@ const Chat = () => {
 
       let user_preferences = await preferencesService.getNewSession(user?.id);
 
-      updateUserPreferences(user_preferences);
+      setUserPreferences(user_preferences);
 
       enqueueSnackbar("New conversation started", { variant: "success" });
 
@@ -190,7 +190,7 @@ const Chat = () => {
     } catch (e) {
       console.error("Failed to start new conversation", e);
     }
-  }, [initializeChat, updateUserPreferences, enqueueSnackbar, user]);
+  }, [initializeChat, setUserPreferences, enqueueSnackbar, user]);
 
   const handleOpenExperiencesDrawer = async () => {
     setIsDrawerOpen(true);
