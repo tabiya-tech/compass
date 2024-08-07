@@ -6,6 +6,18 @@ import { HashRouter } from "react-router-dom";
 import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
 import { validatePassword } from "src/auth/utils/validatePassword";
 
+// mock the SocialAuthService
+jest.mock("src/auth/services/socialAuth/SocialAuth.service", () => {
+  return {
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return {
+        logout: jest.fn(),
+      };
+    }),
+  };
+});
+
 // mock the password validator
 jest.mock("src/auth/utils/validatePassword", () => {
   return {

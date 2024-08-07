@@ -34,7 +34,7 @@ exports[`RegistrationCodeFormModal renders correctly when modal is shown 1`] = `
       Enter your registration code
     </p>
     <div
-      class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth MuiTextField-root css-1spxxly-MuiFormControl-root-MuiTextField-root"
+      class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth MuiTextField-root css-1lbn22w-MuiFormControl-root-MuiTextField-root"
     >
       <label
         class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-a4npng-MuiFormLabel-root-MuiInputLabel-root"

@@ -6,18 +6,18 @@ exports[`Testing Register component it should show register form successfully 1`
   data-testid="register-container-ab02918f-d559-47ba-9662-ea6b3a3606d0"
 >
   <div
-    class="MuiBox-root css-inbm3t"
+    class="MuiBox-root css-i9eu8x"
   >
     <span
       data-testid="auth-header-container-40374529-6e2c-49d8-81d7-93f01603a648"
     />
-    <p
-      class="MuiTypography-root MuiTypography-body1 css-1cgg3hu-MuiTypography-root"
+    <h6
+      class="MuiTypography-root MuiTypography-subtitle2 css-ohbpz3-MuiTypography-root"
     >
       Enter your registration code to sign up
-    </p>
+    </h6>
     <div
-      class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth MuiTextField-root css-1spxxly-MuiFormControl-root-MuiTextField-root"
+      class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1pcwqdd-MuiFormControl-root-MuiTextField-root"
     >
       <label
         class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined css-1d7vtq4-MuiFormLabel-root-MuiInputLabel-root"
@@ -70,7 +70,11 @@ exports[`Testing Register component it should show register form successfully 1`
       <span
         class="MuiDivider-wrapper css-8j2o7p-MuiDivider-wrapper"
       >
-        And continue with
+        <h6
+          class="MuiTypography-root MuiTypography-subtitle2 css-zq12aa-MuiTypography-root"
+        >
+          and then continue with
+        </h6>
       </span>
     </div>
     <span
@@ -80,7 +84,7 @@ exports[`Testing Register component it should show register form successfully 1`
       data-testid="firebase-auth-container-f0324e97-83fd-49e6-95c3-1043751fa1db"
     />
     <p
-      class="MuiTypography-root MuiTypography-body2 css-1t5l3lb-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-body2 css-bbtak5-MuiTypography-root"
       data-testid="register-login-link-ab02918f-d559-47ba-9662-ea6b3a3606d0"
     >
       Already have an account?

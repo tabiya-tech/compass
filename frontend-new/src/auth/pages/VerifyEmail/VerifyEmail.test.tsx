@@ -3,7 +3,6 @@ import React from "react";
 import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
 import VerifyEmail, { DATA_TEST_ID } from "./VerifyEmail";
 import { HashRouter } from "react-router-dom";
-import { mockLoggedInUser } from "src/_test_utilities/mockLoggedInUser";
 import { waitFor } from "@testing-library/react";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 import { DATA_TEST_ID as AUTH_HEADER_DATA_TEST_ID } from "src/auth/components/AuthHeader/AuthHeader";
@@ -40,8 +39,6 @@ describe("Testing Verify Email component", () => {
     (console.warn as jest.Mock).mockClear();
     jest.clearAllMocks();
   });
-
-  beforeAll(() => mockLoggedInUser({}));
 
   beforeAll(() => mockUseTokens());
 

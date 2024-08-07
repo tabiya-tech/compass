@@ -1,5 +1,5 @@
-import { Meta, type StoryObj } from '@storybook/react';
-import RegistrationCodeFormModal from 'src/invitations/components/RegistrationCodeFormModal/RegistrationCodeFormModal';
+import { Meta, type StoryObj } from "@storybook/react";
+import RegistrationCodeFormModal from "src/invitations/components/RegistrationCodeFormModal/RegistrationCodeFormModal";
 
 const meta: Meta<typeof RegistrationCodeFormModal> = {
   title: "Invitations/RegistrationCodeFormModal",
@@ -24,4 +24,4 @@ export const Hidden: Story = {
     show: false,
     onClose: () => {},
   },
-}
+};

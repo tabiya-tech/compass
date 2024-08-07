@@ -33,7 +33,7 @@ export const USER_FRIENDLY_ERROR_MESSAGES = {
   USER_NOT_FOUND: "The user you are trying to use does not exist. Please try again with different credentials",
   UNABLE_TO_PROCESS_REQUEST: "Apologies. Something went wrong while processing your request.",
   INVITATION_CODE_INVALID: "The invitation code you entered is invalid. Please check the code and try again.",
-  INVALID_INVITATION_CODE: "Invalid invitation code"
+  INVALID_INVITATION_CODE: "Invalid invitation code",
 };
 
 /**

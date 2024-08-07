@@ -1,8 +1,5 @@
-import { getServiceErrorFactory } from "src/error/ServiceError/ServiceError";
-import {
-  CreateUserPreferencesSpec, UpdateUserPreferencesSpec,
-  UserPreference
-} from "./userPreferences.types";
+import { getServiceErrorFactory, ServiceError } from "src/error/ServiceError/ServiceError";
+import { CreateUserPreferencesSpec, UpdateUserPreferencesSpec, UserPreference } from "./userPreferences.types";
 import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import { getBackendUrl } from "src/envService";
@@ -59,163 +56,193 @@ export default class UserPreferencesService {
    * This is used to create a user profile for the first time.
    * you provide user_id and invitation_code
    */
-  async createUserPreferences(user_preferences: CreateUserPreferencesSpec): Promise<Partial<UserPreference>> {
+  async createUserPreferences(
+    user_preferences: CreateUserPreferencesSpec,
+    successCallback: (prefs: UserPreference) => void,
+    failureCallback: (error: ServiceError) => void
+  ): Promise<void> {
     const serviceName = "UserPreferencesService";
-    const serviceFunction = "createUserPreferencesProfile";
+    const serviceFunction = "createUserPreferences";
     const method = "POST";
-    const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, this.createUserPreferencesEndpointURL);
+    const errorFactory = getServiceErrorFactory(
+      serviceName,
+      serviceFunction,
+      method,
+      this.createUserPreferencesEndpointURL
+    );
     let response;
     let responseBody: string;
-    const requestBody = JSON.stringify(user_preferences);
-    response = await fetchWithAuth(this.createUserPreferencesEndpointURL, {
-      method: method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      expectedStatusCode: [StatusCodes.CREATED, StatusCodes.NOT_FOUND],
-      serviceName: serviceName,
-      serviceFunction: serviceFunction,
-      failureMessage: `Failed to create new user preferences for user with id ${user_preferences.user_id}`,
-      body: requestBody,
-    });
-    responseBody = await response.text();
-
-    // check if the server responded with the expected status code
-    if (response.status !== StatusCodes.CREATED) {
-      // Server responded with a status code that indicates that the resource was not the expected one
-      // The responseBody should be an ErrorResponse but that is not guaranteed e.g. if a gateway in the middle returns a 502,
-      // or if the server is not conforming to the error response schema
-      throw errorFactory(
-        response.status,
-        ErrorConstants.ErrorCodes.API_ERROR,
-        `Failed to create new user preferences for user with id ${user_preferences.user_id}`,
-        responseBody
-      );
-    }
-
-    // check if the response is in the expected format
-    const responseContentType = response.headers.get("Content-Type");
-    if (!responseContentType?.includes("application/json")) {
-      throw errorFactory(
-        response.status,
-        ErrorConstants.ErrorCodes.INVALID_RESPONSE_HEADER,
-        "Response Content-Type should be 'application/json'",
-        `Content-Type header was ${responseContentType}`
-      );
-    }
-
-    let userPreferencesResponse: UserPreference;
     try {
+      const requestBody = JSON.stringify(user_preferences);
+      response = await fetchWithAuth(this.createUserPreferencesEndpointURL, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        expectedStatusCode: [StatusCodes.CREATED, StatusCodes.NOT_FOUND],
+        serviceName: serviceName,
+        serviceFunction: serviceFunction,
+        failureMessage: `Failed to create new user preferences for user with id ${user_preferences.user_id}`,
+        body: requestBody,
+      });
+      responseBody = await response.text();
+
+      // check if the server responded with the expected status code
+      if (response.status !== StatusCodes.CREATED) {
+        // Server responded with a status code that indicates that the resource was not the expected one
+        // The responseBody should be an ErrorResponse but that is not guaranteed e.g. if a gateway in the middle returns a 502,
+        // or if the server is not conforming to the error response schema
+        failureCallback(
+          errorFactory(
+            response.status,
+            ErrorConstants.ErrorCodes.API_ERROR,
+            `Failed to create new user preferences for user with id ${user_preferences.user_id}`,
+            responseBody
+          )
+        );
+      }
+
+      // check if the response is in the expected format
+      const responseContentType = response.headers.get("Content-Type");
+      if (!responseContentType?.includes("application/json")) {
+        failureCallback(
+          errorFactory(
+            response.status,
+            ErrorConstants.ErrorCodes.INVALID_RESPONSE_HEADER,
+            "Response Content-Type should be 'application/json'",
+            `Content-Type header was ${responseContentType}`
+          )
+        );
+      }
+
+      let userPreferencesResponse: UserPreference;
+
       userPreferencesResponse = {
         ...JSON.parse(responseBody),
         accepted_tc: this.formatAcceptedTC(JSON.parse(responseBody).accepted_tc),
       };
+
+      // store the user preferences in the local storage
+      if (userPreferencesResponse && !isEmptyObject(userPreferencesResponse)) {
+        PersistentStorageService.setUserPreferences(userPreferencesResponse);
+      }
+
+      successCallback({
+        ...userPreferencesResponse,
+        accepted_tc: this.formatAcceptedTC(userPreferencesResponse.accepted_tc),
+      });
     } catch (e: any) {
-      throw errorFactory(
-        response.status,
-        ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
-        "Response did not contain valid JSON",
-        {
-          responseBody,
-          error: e,
-        }
+      failureCallback(
+        errorFactory(
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          ErrorConstants.ErrorCodes.API_ERROR,
+          `Failed to create new user preferences for user with id ${user_preferences.user_id}`,
+          e as Error
+        )
       );
     }
-
-    // store the user preferences in the local storage
-    if (userPreferencesResponse && !isEmptyObject(userPreferencesResponse)) {
-      PersistentStorageService.setUserPreferences(userPreferencesResponse);
-    }
-
-    return {
-      ...userPreferencesResponse,
-      accepted_tc: this.formatAcceptedTC(userPreferencesResponse.accepted_tc),
-    };
   }
 
   /**
    * Creates an entry for the user preferences of a user with an ID
    *
    */
-  async updateUserPreferences(newUserPreferencesSpec: UpdateUserPreferencesSpec): Promise<UserPreference> {
+  async updateUserPreferences(
+    newUserPreferencesSpec: UpdateUserPreferencesSpec,
+    successCallback: (prefs: UserPreference) => void,
+    failureCallback: (error: ServiceError) => void
+  ): Promise<void> {
     const serviceName = "UserPreferencesService";
     const serviceFunction = "createUserPreferences";
     const method = "PATCH";
-    const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, this.updateUserPreferencesEndpointUrl);
+    const errorFactory = getServiceErrorFactory(
+      serviceName,
+      serviceFunction,
+      method,
+      this.updateUserPreferencesEndpointUrl
+    );
     let response;
     let responseBody: string;
     const requestBody = JSON.stringify(newUserPreferencesSpec);
-    response = await fetchWithAuth(this.updateUserPreferencesEndpointUrl, {
-      method: method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      expectedStatusCode: StatusCodes.OK,
-      serviceName: serviceName,
-      serviceFunction: serviceFunction,
-      failureMessage: `Failed to create new user preferences for user with id ${newUserPreferencesSpec.user_id}`,
-      body: requestBody,
-    });
-    responseBody = await response.text();
 
-    // check if the server responded with the expected status code
-    if (response.status !== StatusCodes.OK) {
-      // Server responded with a status code that indicates that the resource was not the expected one
-      // The responseBody should be an ErrorResponse but that is not guaranteed e.g. if a gateway in the middle returns a 502,
-      // or if the server is not conforming to the error response schema
-      throw errorFactory(
-        response.status,
-        ErrorConstants.ErrorCodes.API_ERROR,
-        `Failed to create new user preferences for user with id ${newUserPreferencesSpec.user_id}`,
-        responseBody
-      );
-    }
-
-    // check if the response is in the expected format
-    const responseContentType = response.headers.get("Content-Type");
-    if (!responseContentType?.includes("application/json")) {
-      throw errorFactory(
-        response.status,
-        ErrorConstants.ErrorCodes.INVALID_RESPONSE_HEADER,
-        "Response Content-Type should be 'application/json'",
-        `Content-Type header was ${responseContentType}`
-      );
-    }
-
-    let userPreferencesResponse: UserPreference;
     try {
+      response = await fetchWithAuth(this.updateUserPreferencesEndpointUrl, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        expectedStatusCode: StatusCodes.OK,
+        serviceName: serviceName,
+        serviceFunction: serviceFunction,
+        failureMessage: `Failed to update user preferences for user with id ${newUserPreferencesSpec.user_id}`,
+        body: requestBody,
+      });
+      responseBody = await response.text();
+
+      // check if the server responded with the expected status code
+      if (response.status !== StatusCodes.OK) {
+        // Server responded with a status code that indicates that the resource was not the expected one
+        // The responseBody should be an ErrorResponse but that is not guaranteed e.g. if a gateway in the middle returns a 502,
+        // or if the server is not conforming to the error response schema
+        failureCallback(
+          errorFactory(
+            response.status,
+            ErrorConstants.ErrorCodes.API_ERROR,
+            `Failed to update user preferences for user with id ${newUserPreferencesSpec.user_id}`,
+            responseBody
+          )
+        );
+      }
+
+      // check if the response is in the expected format
+      const responseContentType = response.headers.get("Content-Type");
+      if (!responseContentType?.includes("application/json")) {
+        failureCallback(
+          errorFactory(
+            response.status,
+            ErrorConstants.ErrorCodes.INVALID_RESPONSE_HEADER,
+            "Response Content-Type should be 'application/json'",
+            `Content-Type header was ${responseContentType}`
+          )
+        );
+      }
+
+      let userPreferencesResponse: UserPreference;
       userPreferencesResponse = {
         ...JSON.parse(responseBody),
         accepted_tc: this.formatAcceptedTC(JSON.parse(responseBody).accepted_tc),
       };
+
+      // store the user preferences in the local storage
+      if (userPreferencesResponse && !isEmptyObject(userPreferencesResponse)) {
+        PersistentStorageService.setUserPreferences(userPreferencesResponse);
+      }
+
+      successCallback({
+        ...userPreferencesResponse,
+        accepted_tc: this.formatAcceptedTC(userPreferencesResponse.accepted_tc),
+      });
     } catch (e: any) {
-      throw errorFactory(
-        response.status,
-        ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
-        "Response did not contain valid JSON",
-        {
-          responseBody,
-          error: e,
-        }
+      failureCallback(
+        errorFactory(
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          ErrorConstants.ErrorCodes.API_ERROR,
+          `Failed to update user preferences for user with id ${newUserPreferencesSpec.user_id}`,
+          e as Error
+        )
       );
     }
-
-    // store the user preferences in the local storage
-    if (userPreferencesResponse && !isEmptyObject(userPreferencesResponse)) {
-      PersistentStorageService.setUserPreferences(userPreferencesResponse);
-    }
-
-    return {
-      ...userPreferencesResponse,
-      accepted_tc: this.formatAcceptedTC(userPreferencesResponse.accepted_tc),
-    };
   }
 
   /**
    * Gets the user preferences of a user with an ID
    *
    */
-  async getUserPreferences(userId: string): Promise<UserPreference> {
+  async getUserPreferences(
+    userId: string,
+    successCallback: (prefs: UserPreference) => void,
+    failureCallback: (error: ServiceError) => void
+  ): Promise<void> {
     const serviceName = "UserPreferencesService";
     const serviceFunction = "getUserPreferences";
     const method = "GET";
@@ -225,55 +252,61 @@ export default class UserPreferencesService {
       method,
       `${this.getUserPreferencesEndpointUrl}?user_id=${userId}`
     );
-
-    const response = await fetchWithAuth(`${this.getUserPreferencesEndpointUrl}?user_id=${userId}`, {
-      method: method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      expectedStatusCode: [StatusCodes.OK, StatusCodes.NOT_FOUND],
-      serviceName: serviceName,
-      serviceFunction: serviceFunction,
-      failureMessage: `Failed to get user preferences for user with id ${userId}`,
-    });
-
-    // Server responded with a status code that indicates that the resource was not the expected one
-    // The responseBody should be an ErrorResponse but that is not guaranteed e.g. if a gateway in the middle returns a 502,
-    // or if the server is not conforming to the error response schema
-    // we don't want to throw an error however, since the user might not have any preferences yet
-    // in that case we return an empty object
-    if (response.status === StatusCodes.NOT_FOUND) {
-      return {} as UserPreference;
-    }
-    const responseBody = await response.text();
-
-    let userPreferencesResponse: UserPreference;
     try {
+      const response = await fetchWithAuth(`${this.getUserPreferencesEndpointUrl}?user_id=${userId}`, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        expectedStatusCode: [StatusCodes.OK, StatusCodes.NOT_FOUND],
+        serviceName: serviceName,
+        serviceFunction: serviceFunction,
+        failureMessage: `Failed to get user preferences for user with id ${userId}`,
+      });
+
+      // Server responded with a status code that indicates that the resource was not the expected one
+      // The responseBody should be an ErrorResponse but that is not guaranteed e.g. if a gateway in the middle returns a 502,
+      // or if the server is not conforming to the error response schema
+      // we don't want to throw an error however, since the user might not have any preferences yet
+      // in that case we return an empty object
+      if (response.status === StatusCodes.NOT_FOUND) {
+        failureCallback(
+          errorFactory(
+            response.status,
+            ErrorConstants.ErrorCodes.NOT_FOUND,
+            `Failed to get user preferences for user with id ${userId}`,
+            {}
+          )
+        );
+      }
+      const responseBody = await response.text();
+
+      let userPreferencesResponse: UserPreference;
+
       userPreferencesResponse = {
         ...JSON.parse(responseBody),
         accepted_tc: this.formatAcceptedTC(JSON.parse(responseBody).accepted_tc),
       };
-    } catch (e: any) {
-      throw errorFactory(
-        response.status,
-        ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
-        "Response did not contain valid JSON",
-        {
-          responseBody,
-          error: e,
-        }
+
+      // store the user preferences in the local storage
+      if (userPreferencesResponse && !isEmptyObject(userPreferencesResponse)) {
+        PersistentStorageService.setUserPreferences(userPreferencesResponse);
+      }
+
+      successCallback({
+        ...userPreferencesResponse,
+        accepted_tc: this.formatAcceptedTC(userPreferencesResponse.accepted_tc),
+      });
+    } catch (e) {
+      failureCallback(
+        errorFactory(
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          ErrorConstants.ErrorCodes.API_ERROR,
+          `Failed to get user preferences for user with id ${userId}`,
+          e as Error
+        )
       );
     }
-
-    // store the user preferences in the local storage
-    if (userPreferencesResponse && !isEmptyObject(userPreferencesResponse)) {
-      PersistentStorageService.setUserPreferences(userPreferencesResponse);
-    }
-
-    return {
-      ...userPreferencesResponse,
-      accepted_tc: this.formatAcceptedTC(userPreferencesResponse.accepted_tc),
-    };
   }
 
   /**

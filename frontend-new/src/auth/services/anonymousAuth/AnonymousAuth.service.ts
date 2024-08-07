@@ -1,11 +1,12 @@
 import { auth } from "src/auth/firebaseConfig";
-import { TFirebaseTokenResponse } from "src/auth/auth.types";
+import { AuthService, AuthServices } from "src/auth/auth.types";
 import { getServiceErrorFactory } from "src/error/ServiceError/ServiceError";
 import { StatusCodes } from "http-status-codes";
-import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
+import { FirebaseError, getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
-export class AnonymousAuthService {
+export class AnonymousAuthService implements AuthService {
   private static instance: AnonymousAuthService;
 
   private constructor() {}
@@ -24,16 +25,16 @@ export class AnonymousAuthService {
   /**
    * Handle user logout.
    * @param {() => void} successCallback - Callback to execute on successful logout.
-   * @param {(error: any) => void} errorCallback - Callback to execute on logout error.
+   * @param {(error: any) => void} failureCallback - Callback to execute on logout error.
    */
-  async handleLogout(successCallback: () => void, errorCallback: (error: any) => void): Promise<void> {
+  async handleLogout(successCallback: () => void, failureCallback: (error: any) => void): Promise<void> {
     const errorFactory = getServiceErrorFactory("AnonymousAuthService", "handleLogout", "POST", "signOut");
     try {
       await auth.signOut();
       successCallback();
     } catch (error) {
       const firebaseError = (error as any).code;
-      errorCallback(
+      failureCallback(
         errorFactory(
           firebaseError.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
           firebaseError || FirebaseErrorCodes.INTERNAL_ERROR,
@@ -46,14 +47,14 @@ export class AnonymousAuthService {
 
   /**
    * handle anonymous login
-   * @param {(data: TFirebaseTokenResponse) => void} successCallback - Callback to execute on successful login.
-   * @param {(error: any) => void} errorCallback - Callback to execute on login error.
-   * @returns {Promise<TFirebaseTokenResponse | undefined>} The login response, or undefined if there was an error.
+   * @param {(data: TFirebaseAccessToken) => void} successCallback - Callback to execute on successful login.
+   * @param {(error: any) => void} failureCallback - Callback to execute on login error.
+   * @returns {Promise<string | undefined>} The login response, or undefined if there was an error.
    */
   async handleAnonymousLogin(
-    successCallback: (data: TFirebaseTokenResponse) => void,
-    errorCallback: (error: any) => void
-  ): Promise<TFirebaseTokenResponse | undefined> {
+    successCallback: (data: string) => void,
+    failureCallback: (error: FirebaseError) => void
+  ): Promise<void> {
     const errorFactory = getFirebaseErrorFactory(
       "AnonymousAuthService",
       "handleAnonymousLogin",
@@ -63,19 +64,19 @@ export class AnonymousAuthService {
     try {
       const userCredential = await auth.signInAnonymously();
       if (!userCredential.user) {
-        errorCallback(errorFactory(StatusCodes.NOT_FOUND, FirebaseErrorCodes.USER_NOT_FOUND, "User not found", {}));
+        failureCallback(errorFactory(StatusCodes.NOT_FOUND, FirebaseErrorCodes.USER_NOT_FOUND, "User not found", {}));
         return;
       }
-      const data = {
-        user_id: userCredential.user.uid,
-        access_token: await userCredential.user.getIdToken(),
-        expires_in: 3600,
-      };
-      successCallback(data);
-      return data;
+      // in the case of anonymous login, firebase doesnt give us a way to access the access token directly
+      // but we can use the getIdToken method to get the id token, which will be identical to the access token
+      const token = await userCredential.user.getIdToken();
+      // set the login method to anonymous for future reference
+      // we'll want to know how the user logged in, when we want to log them out for example
+      PersistentStorageService.setLoginMethod(AuthServices.ANONYMOUS);
+      successCallback(token);
     } catch (error) {
       const firebaseError = (error as any).code;
-      errorCallback(
+      failureCallback(
         errorFactory(
           firebaseError.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
           firebaseError || FirebaseErrorCodes.INTERNAL_ERROR,

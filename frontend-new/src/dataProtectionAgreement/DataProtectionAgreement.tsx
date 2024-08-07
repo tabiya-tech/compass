@@ -1,10 +1,9 @@
 import React, { useCallback, useContext, useState } from "react";
 import { Box, Container, styled, Typography } from "@mui/material";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { EmailAuthContext } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
-import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import { Language, UpdateUserPreferencesSpec } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import { ServiceError, USER_FRIENDLY_ERROR_MESSAGES } from "src/error/ServiceError/ServiceError";
+import { ServiceError, ServiceErrorObject, USER_FRIENDLY_ERROR_MESSAGES } from "src/error/ServiceError/ServiceError";
+import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import { StatusCodes } from "http-status-codes";
 import LanguageContextMenu from "src/i18n/languageContextMenu/LanguageContextMenu";
 import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
@@ -12,6 +11,8 @@ import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
+import { AuthContext } from "src/auth/AuthProvider";
+import { userPreferencesService } from "../userPreferences/UserPreferencesService/userPreferences.service";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
@@ -42,7 +43,7 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
   const navigate = useNavigate();
   const [isAcceptingDPA, setIsAcceptingDPA] = useState(false);
   const { updateUserPreferences } = useContext(UserPreferencesContext);
-  const { user } = useContext(EmailAuthContext);
+  const { user } = useContext(AuthContext);
   const { enqueueSnackbar } = useSnackbar();
   /**
    * Persist the user's chosen preferences to the backend
@@ -67,9 +68,10 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
         accepted_tc: new Date(),
       };
       setIsAcceptingDPA(true);
-      updateUserPreferences(
+      userPreferencesService.updateUserPreferences(
         newUserPreferenceSpecs,
         (_prefs) => {
+          updateUserPreferences(_prefs);
           notifyOnAcceptDPA();
           enqueueSnackbar("Data Protection Agreement Accepted", { variant: "success" });
         },
@@ -78,18 +80,20 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
 
           // if the invitation code is invalid, show a user-friendly message
           // otherwise, navigate to the login page and show a generic error message
-          if(error.details.detail === USER_FRIENDLY_ERROR_MESSAGES.INVALID_INVITATION_CODE) {
+          if (
+            (error?.details as ServiceErrorObject)?.details === USER_FRIENDLY_ERROR_MESSAGES.INVALID_INVITATION_CODE
+          ) {
             enqueueSnackbar(USER_FRIENDLY_ERROR_MESSAGES.INVALID_INVITATION_CODE, { variant: "error" });
           } else {
             navigate(routerPaths.LOGIN, { replace: true });
-            enqueueSnackbar("Failed to create user preferences", { variant: "error" });
+            enqueueSnackbar("Failed to update user preferences", { variant: "error" });
           }
         }
       );
     } catch (e) {
       console.error(e);
-      enqueueSnackbar("Failed to create user preferences", { variant: "error" });
-      console.error("Failed to create user preferences", e);
+      enqueueSnackbar("Failed to update user preferences", { variant: "error" });
+      console.error("Failed to update user preferences", e);
     } finally {
       setIsAcceptingDPA(false);
     }

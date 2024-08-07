@@ -8,6 +8,7 @@ import { routerPaths } from "src/app/routerPaths";
 import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 import { UserPreferencesContextValue } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import React from "react";
+import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 
 // mock the router
 jest.mock("react-router-dom", () => {
@@ -35,8 +36,6 @@ const mockCloseSnackbar = jest.fn();
   closeSnackbar: mockCloseSnackbar,
 });
 
-const mockGetUserPreferences = jest.fn();
-
 const givenUser: TabiyaUser = {
   id: "0001",
   name: "Test User",
@@ -44,16 +43,10 @@ const givenUser: TabiyaUser = {
 };
 
 const userPreferencesValue = {
-  getUserPreferences: mockGetUserPreferences,
   userPreferences: null,
   isLoading: false,
   updateUserPreferences: jest.fn(),
-  updateUserPreferencesOnClient: jest.fn(),
 } as UserPreferencesContextValue;
-
-const UserPreferencesWrapper = ({ children }: { children: React.ReactNode }) => (
-  <UserPreferencesContext.Provider value={userPreferencesValue}>{children}</UserPreferencesContext.Provider>
-);
 
 describe("useRouteHandlers hook tests", () => {
   beforeEach(() => {
@@ -62,16 +55,23 @@ describe("useRouteHandlers hook tests", () => {
 
   test("handleLogin successfully navigates to ROOT if preferences are valid", async () => {
     // GIVEN: The hook is used in a component
-    mockGetUserPreferences.mockImplementation((userId, successCallback) => {
-      successCallback({ accepted_tc: new Date() });
-    });
+    const givenUpdateUserPreferencesMock = jest.fn().mockImplementation();
+    jest.spyOn(userPreferencesService, "getUserPreferences").mockImplementation(
+      //@ts-ignore
+      (userId, successCallback) => {
+        //@ts-ignore
+        successCallback({ accepted_tc: new Date() });
+      }
+    );
 
     const { result } = renderHook(() => useRouteHandlers(), {
       // @ts-ignore
       wrapper: ({ children }) => (
-        <UserPreferencesWrapper>
+        <UserPreferencesContext.Provider
+          value={{ ...userPreferencesValue, updateUserPreferences: givenUpdateUserPreferencesMock }}
+        >
           <MemoryRouter>{children}</MemoryRouter>
-        </UserPreferencesWrapper>
+        </UserPreferencesContext.Provider>
       ),
     });
 
@@ -87,16 +87,20 @@ describe("useRouteHandlers hook tests", () => {
 
   test("handleLogin navigates to DPA if preferences are invalid", async () => {
     // GIVEN: The hook is used in a component
-    mockGetUserPreferences.mockImplementation((userId, successCallback) => {
-      successCallback({ accepted_tc: null });
-    });
+    jest.spyOn(userPreferencesService, "getUserPreferences").mockImplementation(
+      //@ts-ignore
+      (userId, successCallback) => {
+        //@ts-ignore
+        successCallback({ accepted_tc: undefined });
+      }
+    );
 
     const { result } = renderHook(() => useRouteHandlers(), {
       // @ts-ignore
       wrapper: ({ children }) => (
-        <UserPreferencesWrapper>
+        <UserPreferencesContext.Provider value={userPreferencesValue}>
           <MemoryRouter>{children}</MemoryRouter>
-        </UserPreferencesWrapper>
+        </UserPreferencesContext.Provider>
       ),
     });
 
@@ -111,16 +115,20 @@ describe("useRouteHandlers hook tests", () => {
 
   test("handleLogin shows an error snackbar on failure", async () => {
     // GIVEN: The hook is used in a component
-    mockGetUserPreferences.mockImplementation((userId, successCallback, errorCallback) => {
-      errorCallback(new Error("Test error"));
-    });
+    jest.spyOn(userPreferencesService, "getUserPreferences").mockImplementation(
+      //@ts-ignore
+      (userId, successCallback, errorCallback) => {
+        //@ts-ignore
+        errorCallback(new Error("Test error"));
+      }
+    );
 
     const { result } = renderHook(() => useRouteHandlers(), {
       // @ts-ignore
       wrapper: ({ children }) => (
-        <UserPreferencesWrapper>
+        <UserPreferencesContext.Provider value={userPreferencesValue}>
           <MemoryRouter>{children}</MemoryRouter>
-        </UserPreferencesWrapper>
+        </UserPreferencesContext.Provider>
       ),
     });
 
@@ -140,9 +148,9 @@ describe("useRouteHandlers hook tests", () => {
     const { result } = renderHook(() => useRouteHandlers(), {
       // @ts-ignore
       wrapper: ({ children }) => (
-        <UserPreferencesWrapper>
+        <UserPreferencesContext.Provider value={userPreferencesValue}>
           <MemoryRouter>{children}</MemoryRouter>
-        </UserPreferencesWrapper>
+        </UserPreferencesContext.Provider>
       ),
     });
 
@@ -160,9 +168,9 @@ describe("useRouteHandlers hook tests", () => {
     const { result } = renderHook(() => useRouteHandlers(), {
       // @ts-ignore
       wrapper: ({ children }) => (
-        <UserPreferencesWrapper>
+        <UserPreferencesContext.Provider value={userPreferencesValue}>
           <MemoryRouter>{children}</MemoryRouter>
-        </UserPreferencesWrapper>
+        </UserPreferencesContext.Provider>
       ),
     });
 
@@ -180,9 +188,9 @@ describe("useRouteHandlers hook tests", () => {
     const { result } = renderHook(() => useRouteHandlers(), {
       // @ts-ignore
       wrapper: ({ children }) => (
-        <UserPreferencesWrapper>
+        <UserPreferencesContext.Provider value={userPreferencesValue}>
           <MemoryRouter>{children}</MemoryRouter>
-        </UserPreferencesWrapper>
+        </UserPreferencesContext.Provider>
       ),
     });
 
@@ -197,16 +205,20 @@ describe("useRouteHandlers hook tests", () => {
 
   test("isLoading state is managed correctly during handleLogin", async () => {
     // GIVEN: The hook is used in a component
-    mockGetUserPreferences.mockImplementation((userId, successCallback) => {
-      successCallback({ accepted_tc: new Date() });
-    });
+    jest.spyOn(userPreferencesService, "getUserPreferences").mockImplementation(
+      //@ts-ignore
+      (userId, successCallback) => {
+        //@ts-ignore
+        successCallback({ accepted_tc: new Date() });
+      }
+    );
 
     const { result } = renderHook(() => useRouteHandlers(), {
       // @ts-ignore
       wrapper: ({ children }) => (
-        <UserPreferencesWrapper>
+        <UserPreferencesContext.Provider value={userPreferencesValue}>
           <MemoryRouter>{children}</MemoryRouter>
-        </UserPreferencesWrapper>
+        </UserPreferencesContext.Provider>
       ),
     });
 

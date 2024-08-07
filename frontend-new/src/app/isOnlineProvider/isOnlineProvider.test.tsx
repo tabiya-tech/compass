@@ -3,7 +3,17 @@ import { screen, render, waitFor } from "@testing-library/react";
 import { useContext } from "react";
 import * as React from "react";
 import { unmockBrowserIsOnLine, mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
-
+// mock the SocialAuthService
+jest.mock("src/auth/services/socialAuth/SocialAuth.service", () => {
+  return {
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return {
+        logout: jest.fn(),
+      };
+    }),
+  };
+});
 describe("isOnlineProvider", () => {
   beforeEach(() => {
     unmockBrowserIsOnLine();

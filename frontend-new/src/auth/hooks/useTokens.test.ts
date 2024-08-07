@@ -1,163 +1,141 @@
-import "src/_test_utilities/consoleMock";
+import { renderHook, act } from "src/_test_utilities/test-utils";
 import { useTokens } from "src/auth/hooks/useTokens";
-import { renderHook, act, waitFor } from "@testing-library/react";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import firebase from "firebase/compat/app";
+import { jwtDecode } from "jwt-decode";
 
-import "src/_test_utilities/firebaseMock";
-
-const TOKEN_VALUE = "foo";
-
-const updateUserByToken = jest.fn();
-const params = { updateUserByToken };
-
-jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => {
-  return {
-    __esModule: true,
-    PersistentStorageService: {
-      getToken: jest.fn(),
-      clearToken: jest.fn(),
-      setToken: jest.fn(),
-      clear: jest.fn(),
-    },
-  };
-});
+jest.mock("src/app/PersistentStorageService/PersistentStorageService");
+jest.mock("jwt-decode");
 
 describe("useTokens hook tests", () => {
-  beforeEach(() => {
-    // Mock Firebase's currentUser.getIdToken
-    (firebase.auth().currentUser?.getIdToken as jest.Mock).mockResolvedValueOnce(TOKEN_VALUE);
-
-    // Mock Firebase's onTokenChanged
-    (firebase.auth().onAuthStateChanged as jest.Mock).mockImplementation((callback) => {
-      callback({
-        getIdToken: jest.fn().mockResolvedValueOnce(TOKEN_VALUE),
-      });
-      return jest.fn(); // Return a function to simulate the unsubscribe function
-    });
-  });
-
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  test("It should call the AuthPersistentStorage.clear", () => {
-    // GIVEN: The hook is used in a component
-    const { result } = renderHook(() => useTokens(params));
+  describe("getToken", () => {
+    test("should return token from persistent storage", () => {
+      // GIVEN a token in persistent storage
+      const token = "mock-token";
+      (PersistentStorageService.getToken as jest.Mock).mockReturnValue(token);
 
-    // WHEN clear all tokens is called
-    act(() => {
-      result.current.clearTokens();
+      // WHEN the hook is used
+      const { result } = renderHook(() => useTokens());
+
+      // THEN the token should be returned
+      expect(result.current.getToken()).toBe(token);
     });
-
-    // THEN the storage should be cleared
-    expect(PersistentStorageService.clear).toHaveBeenCalled();
   });
 
-  describe("Refreshing of tokens", () => {
-    beforeEach(() => {
-      PersistentStorageService.clear();
-      jest.clearAllMocks();
-    });
+  describe("setToken", () => {
+    test("should set token in persistent storage", () => {
+      // GIVEN a token to set
+      const token = "mock-token";
 
-    test("It should call getIdToken on the current user and set the new token", async () => {
-      // GIVEN the useTokens hook is used in a component
-      const { result } = renderHook(() => useTokens(params));
+      // WHEN the hook is used
+      const { result } = renderHook(() => useTokens());
 
-      // Mock Firebase's currentUser.getIdToken
-      (firebase.auth().currentUser?.getIdToken as jest.Mock).mockResolvedValueOnce(TOKEN_VALUE);
-
-      // Mock Firebase's onTokenChanged
-      (firebase.auth().onAuthStateChanged as jest.Mock).mockImplementation((callback) => {
-        callback({
-          getIdToken: jest.fn().mockResolvedValueOnce(TOKEN_VALUE),
-        });
-        return jest.fn(); // Return a function to simulate the unsubscribe function
+      // AND the token is set
+      act(() => {
+        result.current.setToken(token);
       });
 
-      // THEN the token should be fetched and set
-      await waitFor(() => expect(result.current.isAuthenticated).toBe(true));
-
-      // THE updated user by token should be called
-      expect(updateUserByToken).toHaveBeenCalledWith(TOKEN_VALUE);
-
-      // AND the refreshing should stop
-      expect(result.current.isAuthenticating).toBe(false);
+      // THEN the token should be set in persistent storage
+      expect(PersistentStorageService.setToken).toHaveBeenCalledWith(token);
     });
+  });
 
-    test("It should call the unsubscribe callback when component is unmounted", async () => {
-      // GIVEN the hook is used in a component
-      const unsubscribe = jest.fn();
-      (firebase.auth().onAuthStateChanged as jest.Mock).mockReturnValue(unsubscribe);
+  describe("clearToken", () => {
+    test("should clear token from persistent storage", () => {
+      // GIVEN the hook is used
+      const { result } = renderHook(() => useTokens());
 
-      const { unmount } = renderHook(() => useTokens(params));
+      // WHEN the token is cleared
+      act(() => {
+        result.current.clearToken();
+      });
 
-      // WHEN the component is unmounted
-      unmount();
-
-      // THEN the unsubscribe function should be called
-      expect(unsubscribe).toHaveBeenCalled();
+      // THEN the token should be cleared from persistent storage
+      expect(PersistentStorageService.clear).toHaveBeenCalled();
     });
+  });
 
-    test("It should handle token change correctly", async () => {
-      // GIVEN the useTokens hook is used in a component
-      const { result } = renderHook(() => useTokens(params));
-
-      // Mock Firebase's onTokenChanged
-      const idTokenChangedCallback = (callback: (user: any) => void) => {
-        callback({
-          getIdToken: jest.fn().mockResolvedValueOnce(TOKEN_VALUE),
-        });
-        return jest.fn();
+  describe("getUserFromToken", () => {
+    test("should return user from Google OAuth token", () => {
+      // GIVEN a Google OAuth token
+      const token = "mock-google-token";
+      const decodedToken = {
+        iss: "accounts.google.com",
+        sub: "0000",
+        email: "foo@bar.baz",
+        email_verified: true,
       };
-      (firebase.auth().onAuthStateChanged as jest.Mock).mockImplementation(idTokenChangedCallback);
+      (jwtDecode as jest.Mock).mockReturnValue(decodedToken);
 
-      // THEN the token should be fetched and set
-      await waitFor(() => expect(result.current.isAuthenticated).toBe(true));
+      // WHEN the hook is used
+      const { result } = renderHook(() => useTokens());
 
-      // THE updated user by token should be called
-      expect(updateUserByToken).toHaveBeenCalledWith(TOKEN_VALUE);
+      // AND the user is extracted from the token
+      const user = result.current.getUserFromToken(token);
 
-      // AND the refreshing should stop
-      expect(result.current.isAuthenticating).toBe(false);
-    });
-  });
-
-  test("It should not refresh the token if already authenticated", async () => {
-    // GIVEN the useTokens hook is used in a component and is already authenticated
-    const { result } = renderHook(() => useTokens(params));
-
-    // Set the authenticated state to true
-    result.current.setIsAuthenticated(true);
-
-    // Reset the call count for getIdToken mock
-    (firebase.auth().currentUser?.getIdToken as jest.Mock).mockClear();
-
-    // WHEN the tokens refreshing process is triggered
-    await waitFor(() => expect(result.current.isAuthenticated).toBe(true));
-
-    // THEN the token should not be refreshed
-    expect(firebase.auth().currentUser?.getIdToken).not.toHaveBeenCalled();
-  });
-
-  test("onTokenChanged should clear storage and set isAuthenticated to false when there is no user", async () => {
-    // Mock Firebase's onTokenChanged to call the callback with no user
-    (firebase.auth().onAuthStateChanged as jest.Mock).mockImplementation((callback) => {
-      callback(null); // No user
-      return jest.fn(); // Return a function to simulate the unsubscribe function
+      // THEN the user should be returned
+      expect(user).toEqual({
+        id: decodedToken.sub,
+        name: decodedToken.email,
+        email: decodedToken.email,
+      });
     });
 
-    // GIVEN the useTokens hook is used in a component
-    const { result } = renderHook(() => useTokens(params));
+    test("should return user from Firebase Password token", () => {
+      // GIVEN a Firebase Password token
+      const token = "mock-firebase-token";
+      const decodedToken = {
+        name: "Foo Bar",
+        iss: "https://foo.bar/baz",
+        aud: "foo.bar.baz",
+        auth_time: 1718826735,
+        user_id: "0001",
+        sub: "0002",
+        iat: 1718826735,
+        exp: 1718830335,
+        email: "foo@bar.baz",
+        email_verified: true,
+        firebase: {
+          identities: {
+            email: ["foo@bar.baz"],
+          },
+          sign_in_provider: "password",
+        },
+      };
+      (jwtDecode as jest.Mock).mockReturnValue(decodedToken);
 
-    // WHEN the onTokenChanged is triggered
-    await waitFor(() => {
-      expect(result.current.isAuthenticated).toBe(false);
+      // WHEN the hook is used
+      const { result } = renderHook(() => useTokens());
+
+      // AND the user is extracted from the token
+      const user = result.current.getUserFromToken(token);
+
+      // THEN the user should be returned
+      expect(user).toEqual({
+        id: decodedToken.user_id,
+        name: decodedToken.name,
+        email: decodedToken.email,
+      });
     });
 
-    // THEN the storage should be cleared
-    expect(PersistentStorageService.clear).toHaveBeenCalled();
-    // AND the user should not be authenticated
-    expect(result.current.isAuthenticated).toBe(false);
+    test("should return null for invalid token", () => {
+      // GIVEN an invalid token
+      const token = "invalid-token";
+      (jwtDecode as jest.Mock).mockImplementation(() => {
+        throw new Error("Invalid token");
+      });
+
+      // WHEN the hook is used
+      const { result } = renderHook(() => useTokens());
+
+      // AND the user is extracted from the token
+      const user = result.current.getUserFromToken(token);
+
+      // THEN null should be returned
+      expect(user).toBeNull();
+    });
   });
 });

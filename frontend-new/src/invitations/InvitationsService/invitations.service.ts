@@ -1,4 +1,4 @@
-import { getServiceErrorFactory } from "src/error/ServiceError/ServiceError";
+import { getServiceErrorFactory, ServiceError } from "src/error/ServiceError/ServiceError";
 import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import { getBackendUrl } from "src/envService";
@@ -30,54 +30,65 @@ export default class InvitationsService {
   /**
    * Checks the status of an invitation code.
    * @param {string} code - The invitation code to check.
-   * @returns {Promise<Invitation>} - A promise that resolves to an invitation object.
+   * @param {Function} succesCallback - Callback to execute on successful invitation code status check.
+   * @param {Function} failureCallback - Callback to execute on invitation code status check error.
+   * @returns {Promise<void>}
    */
-  async checkInvitationCodeStatus(code: string): Promise<Invitation> {
+  async checkInvitationCodeStatus(
+    code: string,
+    succesCallback: (invitation: Invitation) => void,
+    failureCallback: (error: ServiceError) => void
+  ): Promise<void> {
     const serviceName = "InvitationsService";
     const serviceFunction = "checkInvitationCodeStatus";
     const method = "GET";
     const endpointUrl = `${this.invitationStatusEndpointUrl}/check-status?invitation_code=${code}`;
     const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, endpointUrl);
-
-    const response = await fetchWithAuth(endpointUrl, {
-      method: method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      expectedStatusCode: [StatusCodes.OK],
-      serviceName: serviceName,
-      serviceFunction: serviceFunction,
-      failureMessage: `Failed to check status for invitation code ${code}`,
-    });
-
-    const responseBody = await response.text();
-    let data: Invitation;
-
     try {
-      data = JSON.parse(responseBody);
-    } catch (e: any) {
-      throw errorFactory(
-        response.status,
-        ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
-        "Response did not contain valid JSON",
-        {
-          responseBody,
-          error: e,
-        }
-      );
-    }
+      const response = await fetchWithAuth(endpointUrl, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        expectedStatusCode: [StatusCodes.OK],
+        serviceName: serviceName,
+        serviceFunction: serviceFunction,
+        failureMessage: `Failed to check status for invitation code ${code}`,
+      });
 
-    if (data.status !== InvitationStatus.VALID) {
-      throw errorFactory(
-        StatusCodes.UNPROCESSABLE_ENTITY,
-        ErrorConstants.ErrorCodes.VALIDATION_ERROR,
-        "Invitation code is not valid",
-        {
-          errorCode: ErrorConstants.ErrorCodes.FORBIDDEN,
-        }
+      const responseBody = await response.text();
+      let data: Invitation;
+
+      data = JSON.parse(responseBody);
+
+      if (data.status !== InvitationStatus.VALID) {
+        failureCallback(
+          errorFactory(
+            StatusCodes.UNPROCESSABLE_ENTITY,
+            ErrorConstants.ErrorCodes.VALIDATION_ERROR,
+            "Invitation code is not valid",
+            {
+              errorCode: ErrorConstants.ErrorCodes.FORBIDDEN,
+            }
+          )
+        );
+        return;
+      }
+
+      succesCallback(data);
+    } catch (e: any) {
+      failureCallback(
+        errorFactory(
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          ErrorConstants.ErrorCodes.INTERNAL_SERVER_ERROR,
+          "Failed to check status for invitation code",
+          {
+            error: e,
+          }
+        )
       );
+      return;
     }
-    return data;
   }
 }
 
