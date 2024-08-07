@@ -38,7 +38,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const [initialized, setInitialized] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
-  const { userPreferences,     setUserPreferences } = useContext(UserPreferencesContext);
+  const { userPreferences, updateUserPreferencesOnClient } = useContext(UserPreferencesContext);
   const { logout, isLoggingOut, user } = useContext(EmailAuthContext);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [experiences, setExperiences] = React.useState<Experience[]>([]);
@@ -101,7 +101,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const handleLogout = useCallback(() => {
     logout(
       () => {
-        setUserPreferences(null);
+        updateUserPreferencesOnClient(null);
         navigate(routerPaths.LOGIN, { replace: true });
         enqueueSnackbar("Successfully logged out.", { variant: "success" });
       },
@@ -110,7 +110,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         enqueueSnackbar(errorMessage, { variant: "error" });
       }
     );
-  }, [enqueueSnackbar, navigate, logout, setUserPreferences]);
+  }, [enqueueSnackbar, navigate, logout, updateUserPreferencesOnClient]);
 
   const initializeChat = useCallback(
     async (session_id?: number) => {
@@ -189,7 +189,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
       let user_preferences = await preferencesService.getNewSession(user?.id);
 
-      setUserPreferences(user_preferences);
+      updateUserPreferencesOnClient(user_preferences);
 
       enqueueSnackbar("New conversation started", { variant: "success" });
 
@@ -198,7 +198,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     } catch (e) {
       console.error("Failed to start new conversation", e);
     }
-  }, [initializeChat, setUserPreferences, enqueueSnackbar, user]);
+  }, [initializeChat, updateUserPreferencesOnClient, enqueueSnackbar, user]);
 
   const handleOpenExperiencesDrawer = async () => {
     setIsDrawerOpen(true);

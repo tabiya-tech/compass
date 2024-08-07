@@ -48,7 +48,7 @@ const userPreferencesValue = {
   userPreferences: null,
   isLoading: false,
   updateUserPreferences: jest.fn(),
-  setUserPreferences: jest.fn(),
+  updateUserPreferencesOnClient: jest.fn(),
 } as UserPreferencesContextValue;
 
 const UserPreferencesWrapper = ({ children }: { children: React.ReactNode }) => (

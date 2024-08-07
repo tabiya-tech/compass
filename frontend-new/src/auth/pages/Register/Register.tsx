@@ -142,13 +142,7 @@ const Register: React.FC<Readonly<RegisterProps>> = ({ postRegisterHandler, post
       })
 
       postLoginHandler(user);
-    } catch (e: any) {
-      // if the user already exists, we should just log them in
-      if(e.statusCode === 409) {
-        postLoginHandler(user);
-        return;
-      }
-
+    } catch (e) {
       if (e instanceof ServiceError) {
         writeServiceErrorToLog(e, console.error);
       } else {

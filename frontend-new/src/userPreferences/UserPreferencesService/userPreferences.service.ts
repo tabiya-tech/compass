@@ -61,7 +61,7 @@ export default class UserPreferencesService {
    */
   async createUserPreferences(user_preferences: CreateUserPreferencesSpec): Promise<Partial<UserPreference>> {
     const serviceName = "UserPreferencesService";
-    const serviceFunction = "createUserPreferences";
+    const serviceFunction = "createUserPreferencesProfile";
     const method = "POST";
     const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, this.createUserPreferencesEndpointURL);
     let response;
@@ -134,12 +134,12 @@ export default class UserPreferencesService {
   }
 
   /**
-   * Updates the user preferences of a user with an ID
-   * it sets new language and accepted_tc
+   * Creates an entry for the user preferences of a user with an ID
+   *
    */
   async updateUserPreferences(newUserPreferencesSpec: UpdateUserPreferencesSpec): Promise<UserPreference> {
     const serviceName = "UserPreferencesService";
-    const serviceFunction = "updateUserPreferences";
+    const serviceFunction = "createUserPreferences";
     const method = "PATCH";
     const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, this.updateUserPreferencesEndpointUrl);
     let response;

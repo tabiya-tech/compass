@@ -103,7 +103,7 @@ describe("Chat", () => {
 
   const userPreferencesContextValue = {
     getUserPreferences: getUserPreferencesMock,
-    setUserPreferences: jest.fn(),
+    updateUserPreferencesOnClient: jest.fn(),
     createUserPreferences: jest.fn(),
     userPreferences: {
       accepted_tc: new Date(),

@@ -33,7 +33,7 @@ export enum Language {
 export type UserPreferencesContextValue = {
   userPreferences: UserPreference | null;
   isLoading: boolean;
-  setUserPreferences: (userPreferences: UserPreference | null) => void;
+  updateUserPreferencesOnClient: (userPreferences: UserPreference | null) => void;
   updateUserPreferences: (
     preferences: UpdateUserPreferencesSpec,
     successCallback: (prefs: UserPreference) => void,

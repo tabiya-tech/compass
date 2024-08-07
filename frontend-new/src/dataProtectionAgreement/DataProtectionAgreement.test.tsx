@@ -62,7 +62,7 @@ describe("Testing Data Protection Policy component", () => {
   const userPreferencesContextValue = {
     getUserPreferences: jest.fn(),
     createUserPreferences: createUserPreferencesMock,
-    setUserPreferences: jest.fn(),
+    updateUserPreferencesOnClient: jest.fn(),
     userPreferences: {
       accepted_tc: new Date(),
       user_id: "0001",

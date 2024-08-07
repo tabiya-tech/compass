@@ -17,7 +17,7 @@ import { validatePassword } from "src/auth/utils/validatePassword";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
-import RegistrationCodeFormModal from "src/invitations/components/RegistrationCodeFormModal/RegistrationCodeFormModal";
+import InvitationCodeFormModal from "src/invitations/components/InvitationCodeFormModal/InvitationCodeFormModal";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 
 export const INVITATIONS_PARAM_NAME = "invite-code";
@@ -337,7 +337,7 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
           </StyledNavLink>
         </Typography>
       </Box>
-      <RegistrationCodeFormModal
+      <InvitationCodeFormModal
          show={showInviteCodeForm}
          onSuccess={createUser}
          onClose={() => setShowInviteCodeForm(false)}

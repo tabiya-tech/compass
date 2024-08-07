@@ -17,7 +17,7 @@ export const userPreferencesContextDefaultValue: UserPreferencesContextValue = {
   userPreferences: null,
   isLoading: false,
   updateUserPreferences: () => {},
-  setUserPreferences: (userPreferences: UserPreference | null) => {},
+  updateUserPreferencesOnClient: (userPreferences: UserPreference | null) => {},
   getUserPreferences: () => {},
 };
 
@@ -87,7 +87,7 @@ export const UserPreferencesProvider: React.FC<UserPreferencesProviderProps> = (
     []
   );
 
-  const _setUserPreferences = useCallback(
+  const updateUserPreferencesOnClient = useCallback(
     async (preferences: UserPreference | null) => {
       setIsLoading(true);
       setUserPreferences(preferences);
@@ -100,11 +100,11 @@ export const UserPreferencesProvider: React.FC<UserPreferencesProviderProps> = (
     () => ({
       userPreferences,
       isLoading,
-      setUserPreferences: _setUserPreferences,
+      updateUserPreferencesOnClient,
       updateUserPreferences,
       getUserPreferences,
     }),
-    [userPreferences, isLoading, _setUserPreferences, getUserPreferences, updateUserPreferences]
+    [userPreferences, isLoading, updateUserPreferencesOnClient, getUserPreferences, updateUserPreferences]
   );
 
   return (
