@@ -33,6 +33,25 @@ export const USER_FRIENDLY_ERROR_MESSAGES = {
   USER_NOT_FOUND: "The user you are trying to use does not exist. Please try again with different credentials",
   UNABLE_TO_PROCESS_REQUEST: "Apologies. Something went wrong while processing your request.",
   INVITATION_CODE_INVALID: "The invitation code you entered is invalid. Please check the code and try again.",
+  INVALID_INVITATION_CODE: "Invalid invitation code"
+};
+
+/**
+ * a map of error codes and more user-friendly error messages that can be shown to the user
+ * in case of Firebase authentication errors.
+ **/
+export const FIREBASE_ERROR_MESSAGES = {
+  "auth/email-already-in-use": "The email address is already in use by another account.",
+  "auth/email-not-verified":
+    "The email you are using is registered, but you have not yet verified it. Please verify your email to continue.",
+  "auth/invalid-credential": "The email/password provided is invalid.",
+  "auth/invalid-email": "The email address is not valid.",
+  "auth/operation-not-allowed": "Email/password accounts are not enabled.",
+  "auth/weak-password": "The password is too weak.",
+  "auth/user-disabled": "The user account has been disabled.",
+  "auth/user-not-found": "There is no user record corresponding to this email.",
+  "auth/wrong-password": "The password is invalid.",
+  "auth/too-many-requests": "We have blocked all requests from this device due to unusual activity. Try again later.",
 };
 
 export class ServiceError extends Error {

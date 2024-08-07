@@ -67,6 +67,7 @@ export class AnonymousAuthService {
         return;
       }
       const data = {
+        user_id: userCredential.user.uid,
         access_token: await userCredential.user.getIdToken(),
         expires_in: 3600,
       };

@@ -16,6 +16,9 @@ import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginW
 import { validatePassword } from "src/auth/utils/validatePassword";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
+import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import RegistrationCodeFormModal from "src/invitations/components/RegistrationCodeFormModal/RegistrationCodeFormModal";
+import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 
 export const INVITATIONS_PARAM_NAME = "invite-code";
 
@@ -64,6 +67,9 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
 
   const renderCount = useRef(0);
 
+  const [tempUser, setTempUser] = useState<TabiyaUser | null>(null);
+  const [showInviteCodeForm, setShowInviteCodeForm] = useState(false);
+
   const [inviteCode, setInviteCode] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -91,6 +97,10 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
           password,
           async (user) => {
             try {
+
+              // check user preference status.
+
+
               postLoginHandler(user);
             } catch (e) {
               let errorMessage;
@@ -202,6 +212,46 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
   // login button is disabled when login is loading, or when there is no active Form, or the fields for the active form are not filled in
   const isLoginButtonDisabled =
     isLoginLoading || activeLoginForm === ActiveForm.NONE || ((!email || !password) && !inviteCode);
+
+  const socialLoginHandler = async (user: TabiyaUser) => {
+    try {
+      const userPreferences = await userPreferencesService.getUserPreferences(user.id);
+
+      if(!userPreferences.accepted_tc) {
+        // user is not created show the invitation code modal
+        setTempUser(user);
+        setShowInviteCodeForm(true);
+        return;
+      }
+
+      postLoginHandler(user);
+    } catch (e) {
+      console.log(e)
+
+      const errorMessage = getUserFriendlyErrorMessage(e as Error);
+      enqueueSnackbar(errorMessage, { variant: "error" });
+      console.error("Error during login process", e);
+    }
+  }
+
+  const createUser = async (invitationCode: string) => {
+    try {
+      await userPreferencesService.createUserPreferences({
+        user_id: tempUser?.id!,
+        language: Language.en,
+        invitation_code: invitationCode,
+      });
+
+      postLoginHandler(tempUser!);
+    } catch (e) {
+      console.log(e)
+
+      const errorMessage = getUserFriendlyErrorMessage(e as Error);
+      enqueueSnackbar(errorMessage, { variant: "error" });
+      console.error("Error during login")
+    }
+  }
+
   return (
     <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.LOGIN_CONTAINER}>
       <Box
@@ -268,7 +318,12 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
             )}
           </PrimaryButton>
         </Box>
-        <IDPAuth notifyOnLogin={postLoginHandler} isLoading={isLoading} />
+        <IDPAuth
+          disabled={false}
+          preLoginCheck={() => true}
+          notifyOnLogin={socialLoginHandler}
+          isLoading={isLoading}
+        />
         <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.LOGIN_LINK}>
           Don't have an account?{" "}
           <StyledNavLink
@@ -282,6 +337,11 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
           </StyledNavLink>
         </Typography>
       </Box>
+      <RegistrationCodeFormModal
+         show={showInviteCodeForm}
+         onSuccess={createUser}
+         onClose={() => setShowInviteCodeForm(false)}
+      />
     </Container>
   );
 };

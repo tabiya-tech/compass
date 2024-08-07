@@ -79,11 +79,55 @@ describe("EmailAuthProvider module", () => {
   });
 
   describe("Register functionality", () => {
+    test("should call the register function with the correct parameters", async () => {
+      // GIVEN the Auth Provider is rendered and auth context is accessed
+      const { result } = renderAuthContext();
+
+      // WHEN the register function is called
+      const givenInvitationCode = "foo_bar"
+      const givenEmail = "foo@bar.baz";
+      const givenPassword = "password";
+      const givenName = "foo";
+      const givenSuccessCallback = jest.fn();
+      const givenErrorCallback = jest.fn();
+
+      const registerSpy = jest.spyOn(authService, "handleRegisterWithEmail");
+
+      // Initially isRegistering should be false.
+      expect(result.current.isRegisteringWithEmail).toBe(false);
+
+      act(() => {
+        result.current?.registerWithEmail(
+          givenInvitationCode,
+          givenEmail,
+          givenPassword,
+          givenName,
+          givenSuccessCallback,
+          givenErrorCallback
+        );
+      });
+
+      // THEN the auth service handleRegister function should be called with the correct parameters
+      expect(registerSpy).toHaveBeenCalledWith(
+        givenEmail,
+        givenPassword,
+        givenName,
+        expect.any(Function),
+        expect.any(Function)
+      );
+
+      // AND isRegistering in should be false.
+      await waitFor(() => {
+        expect(result.current.isRegisteringWithEmail).toBe(false);
+      });
+    });
+
     test("should call the failure callback when the service register fails", async () => {
       // GIVEN the Auth Provider is rendered and auth context is accessed
       const { result } = renderAuthContext();
 
       // WHEN the register function is called
+      const givenInvitationCode = "foo_bar"
       const givenEmail = "foo@bar.baz";
       const givenPassword = "password";
 
@@ -106,6 +150,7 @@ describe("EmailAuthProvider module", () => {
 
       act(() => {
         result.current?.registerWithEmail(
+          givenInvitationCode,
           givenEmail,
           givenPassword,
           givenName,

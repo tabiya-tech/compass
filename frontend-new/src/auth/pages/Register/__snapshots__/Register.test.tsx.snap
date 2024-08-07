@@ -11,6 +11,68 @@ exports[`Testing Register component it should show register form successfully 1`
     <span
       data-testid="auth-header-container-40374529-6e2c-49d8-81d7-93f01603a648"
     />
+    <p
+      class="MuiTypography-root MuiTypography-body1 css-1cgg3hu-MuiTypography-root"
+    >
+      Enter your registration code to sign up
+    </p>
+    <div
+      class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth MuiTextField-root css-1spxxly-MuiFormControl-root-MuiTextField-root"
+    >
+      <label
+        class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined css-1d7vtq4-MuiFormLabel-root-MuiInputLabel-root"
+        data-shrink="true"
+        for=":r0:"
+        id=":r0:-label"
+      >
+        Registration code
+        <span
+          aria-hidden="true"
+          class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-1th3aq5-MuiFormLabel-asterisk"
+        >
+           
+          *
+        </span>
+      </label>
+      <div
+        class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-1vdto9g-MuiInputBase-root-MuiOutlinedInput-root"
+      >
+        <input
+          aria-invalid="false"
+          class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
+          data-testid="register-registration-code-input-ab02918f-d559-47ba-9662-ea6b3a3606d0"
+          id=":r0:"
+          required=""
+          type="text"
+          value="foo-bar"
+        />
+        <fieldset
+          aria-hidden="true"
+          class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+        >
+          <legend
+            class="css-14lo706"
+          >
+            <span>
+              Registration code
+               
+              *
+            </span>
+          </legend>
+        </fieldset>
+      </div>
+    </div>
+    <div
+      class="MuiDivider-root MuiDivider-fullWidth MuiDivider-withChildren css-1puturl-MuiDivider-root"
+      role="separator"
+      style="width: 100%;"
+    >
+      <span
+        class="MuiDivider-wrapper css-8j2o7p-MuiDivider-wrapper"
+      >
+        And continue with
+      </span>
+    </div>
     <span
       data-testid="register-form-6cf1a0fa-8d75-4342-bf6b-1203d5b114d7"
     />

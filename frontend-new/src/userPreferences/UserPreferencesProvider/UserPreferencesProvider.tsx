@@ -1,9 +1,9 @@
 import React, { createContext, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import {
+  UpdateUserPreferencesSpec,
   UserPreference,
   UserPreferencesContextValue,
-  UserPreferencesSpec,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
@@ -16,9 +16,9 @@ export type UserPreferencesProviderProps = {
 export const userPreferencesContextDefaultValue: UserPreferencesContextValue = {
   userPreferences: null,
   isLoading: false,
-  createUserPreferences: () => {},
-  getUserPreferences: () => {},
   updateUserPreferences: () => {},
+  setUserPreferences: (userPreferences: UserPreference | null) => {},
+  getUserPreferences: () => {},
 };
 
 export const UserPreferencesContext = createContext<UserPreferencesContextValue>(userPreferencesContextDefaultValue);
@@ -46,15 +46,15 @@ export const UserPreferencesProvider: React.FC<UserPreferencesProviderProps> = (
   /**
    * Create user preferences
    */
-  const createUserPreferences = useCallback(
+  const updateUserPreferences = useCallback(
     async (
-      preferences: UserPreferencesSpec,
+      preferences: UpdateUserPreferencesSpec,
       successCallback: (prefs: UserPreference) => void,
       errorCallback: (error: any) => void
     ) => {
       setIsLoading(true);
       try {
-        const newPreferences = await userPreferencesService.createUserPreferences(preferences);
+        const newPreferences = await userPreferencesService.updateUserPreferences(preferences);
         setUserPreferences(newPreferences);
         successCallback(newPreferences);
       } catch (error) {
@@ -87,7 +87,7 @@ export const UserPreferencesProvider: React.FC<UserPreferencesProviderProps> = (
     []
   );
 
-  const updateUserPreferences = useCallback(
+  const _setUserPreferences = useCallback(
     async (preferences: UserPreference | null) => {
       setIsLoading(true);
       setUserPreferences(preferences);
@@ -99,12 +99,12 @@ export const UserPreferencesProvider: React.FC<UserPreferencesProviderProps> = (
   const value = useMemo(
     () => ({
       userPreferences,
-      updateUserPreferences,
       isLoading,
-      createUserPreferences,
+      setUserPreferences: _setUserPreferences,
+      updateUserPreferences,
       getUserPreferences,
     }),
-    [userPreferences, isLoading, createUserPreferences, getUserPreferences, updateUserPreferences]
+    [userPreferences, isLoading, _setUserPreferences, getUserPreferences, updateUserPreferences]
   );
 
   return (

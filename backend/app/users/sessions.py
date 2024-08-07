@@ -4,7 +4,7 @@ from fastapi import HTTPException
 
 from app.constants.errors import ErrorService
 from app.users.repositories import UserPreferenceRepository
-from app.users.types import UserPreferencesUpdateRequest, UserPreferences
+from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest
 
 
 def generate_new_session_id():
@@ -46,7 +46,7 @@ class SessionsService:
 
             return await self.user_repository.update_user_preference(
                 user_id=user_id,
-                update=UserPreferencesUpdateRequest(sessions=new_sessions)
+                update=UserPreferencesRepositoryUpdateRequest(sessions=new_sessions)
             )
 
         except Exception as e:

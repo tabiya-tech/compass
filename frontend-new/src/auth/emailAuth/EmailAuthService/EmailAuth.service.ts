@@ -77,6 +77,7 @@ export class EmailAuthService {
       }
 
       const data = {
+        user_id: userCredential.user.uid,
         access_token: await userCredential.user.getIdToken(),
         expires_in: 3600,
       };
@@ -130,6 +131,7 @@ export class EmailAuthService {
       await userCredential.user.sendEmailVerification();
       await auth.signOut();
       const data = {
+        user_id: userCredential.user.uid,
         access_token: await userCredential.user.getIdToken(),
         expires_in: 3600,
       };
@@ -139,9 +141,9 @@ export class EmailAuthService {
       const firebaseError = (error as any).code;
       errorCallback(
         errorFactory(
-          firebaseError.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
+          firebaseError?.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
           firebaseError || FirebaseErrorCodes.INTERNAL_ERROR,
-          firebaseError.message || FirebaseErrorCodes.INTERNAL_ERROR,
+          firebaseError?.message || FirebaseErrorCodes.INTERNAL_ERROR,
           {}
         )
       );

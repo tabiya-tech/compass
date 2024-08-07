@@ -38,6 +38,7 @@ export type EmailAuthContextValue = {
     errorCallback: (error: Error) => void
   ) => void;
   registerWithEmail: (
+    invitation_code: string,
     email: string,
     password: string,
     name: string,
@@ -64,6 +65,7 @@ export type AnonymousAuthContextValue = {
  * The response from the firebase when refreshing the tokens
  */
 export type TFirebaseTokenResponse = {
+  user_id: string;
   expires_in: number;
   access_token: string;
 };

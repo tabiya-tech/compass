@@ -6,7 +6,12 @@ import { StatusCodes } from "http-status-codes";
 import { ServiceError } from "src/error/ServiceError/ServiceError";
 import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
-import { Language, UserPreference } from "./userPreferences.types";
+import {
+  CreateUserPreferencesSpec,
+  Language,
+  UpdateUserPreferencesSpec,
+  UserPreference
+} from "./userPreferences.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
 const setupFetchSpy = setupAPIServiceSpy;
@@ -39,7 +44,7 @@ describe("UserPreferencesService", () => {
     expect(service).toBeDefined();
 
     // AND the service should have the correct endpoint url
-    expect(service.userPreferencesEndpointUrl).toEqual(`${givenApiServerUrl}/users/preferences`);
+    expect(service.getUserPreferencesEndpointUrl).toEqual(`${givenApiServerUrl}/users/preferences`);
   });
 
   describe("getUserPreferences", () => {
@@ -149,15 +154,112 @@ describe("UserPreferencesService", () => {
     );
   });
 
-  describe("createUserPreferences", () => {
-    test("should fetch the correct URL, with POST and the correct headers and payload successfully", async () => {
+  describe("updateUserPreferences", () => {
+    test("should fetch the correct URL, with PATCH and the correct headers and payload successfully", async () => {
       // GIVEN some user preference specification to create
-      const givenUserPreferencesSpec: UserPreference = {
+      const givenUserPreferencesSpec: UpdateUserPreferencesSpec = {
         user_id: "foo",
         language: Language.en,
         accepted_tc: new Date(),
-        sessions: [],
       };
+      // AND the create model REST API will respond with OK and some newly create model
+      const expectedUserPreferenceResponse = {
+        ...givenUserPreferencesSpec,
+        sessions: [1234],
+      } as unknown as UserPreference;
+      const fetchSpy = setupFetchSpy(
+        StatusCodes.OK,
+        expectedUserPreferenceResponse,
+        "application/json;charset=UTF-8"
+      );
+
+      // WHEN the createUserPreferences function is called with the given arguments
+      const service = new UserPreferencesService();
+
+      const actualCreatedModel = await service.updateUserPreferences(givenUserPreferencesSpec);
+      // THEN expect it to make a POST request
+      // AND the headers
+      // AND the request payload to contain the given arguments (name, description, ...)
+      expect(fetchSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/users/preferences`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(givenUserPreferencesSpec),
+        expectedStatusCode: 200,
+        failureMessage: `Failed to create new user preferences for user with id ${givenUserPreferencesSpec.user_id}`,
+        serviceName: "UserPreferencesService",
+        serviceFunction: "updateUserPreferences",
+      });
+
+      // AND returns the newly created user preferences
+      expect(actualCreatedModel).toEqual(expectedUserPreferenceResponse);
+
+      // AND expect the service to have set the user preferences in the persistent storage
+      expect(PersistentStorageService.setUserPreferences).toHaveBeenCalledWith(expectedUserPreferenceResponse);
+    });
+
+    test("on fail to fetch, it should reject with the expected service error", async () => {
+      const givenUserPreferencesSpec: UpdateUserPreferencesSpec = {
+        user_id: "1",
+        language: Language.en,
+        accepted_tc: new Date(),
+      };
+      // GIVEN fetch rejects with some unknown error
+      const givenFetchError = new Error();
+      jest.spyOn(require("src/utils/fetchWithAuth/fetchWithAuth"), "fetchWithAuth").mockRejectedValue(givenFetchError);
+      // WHEN calling create model function
+      const service = new UserPreferencesService();
+
+      // THEN expected it to reject with the same error thrown by fetchWithAuth
+      await expect(service.updateUserPreferences(givenUserPreferencesSpec)).rejects.toMatchObject(givenFetchError);
+    });
+
+    test.each([
+      ["is a malformed json", "{"],
+      ["is a string", "foo"],
+    ])(
+      "on 200, should reject with an error ERROR_CODE.INVALID_RESPONSE_BODY if response %s",
+      async (description, givenResponse) => {
+        // GIVEN some user preference specification to create
+        const givenUserPreferencesSpec: UpdateUserPreferencesSpec = {
+          user_id: "1",
+          language: Language.en,
+          accepted_tc: new Date(),
+        };
+        // AND the create model REST API will respond with OK and some response that does conform to the userPreferencesResponseSchema even if it states that it is application/json
+        setupFetchSpy(StatusCodes.OK, givenResponse, "application/json;charset=UTF-8");
+
+        // WHEN the createModel function is called with the given arguments (name, description, ...)
+        const service = new UserPreferencesService();
+        const createModelPromise = service.updateUserPreferences(givenUserPreferencesSpec);
+
+        // THEN expected it to reject with the error response
+        const expectedError = {
+          ...new ServiceError(
+            UserPreferencesService.name,
+            "updateUserPreferences",
+            "PATCH",
+            `${givenApiServerUrl}/users/preferences`,
+            StatusCodes.OK,
+            ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
+            "",
+            ""
+          ),
+          details: expect.anything(),
+        };
+        await expect(createModelPromise).rejects.toMatchObject(expectedError);
+      }
+    );
+  });
+
+  describe("createUserPreferences", () => {
+    test("should fetch the correct URL, with POST and the correct headers and payload successfully", async () => {
+      // GIVEN some user preference specification to create
+      const givenUserPreferencesSpec: CreateUserPreferencesSpec = {
+        user_id: "foo",
+        invitation_code: "bar",
+        language: Language.en,
+      };
+
       // AND the create model REST API will respond with OK and some newly create model
       const expectedUserPreferenceResponse = {
         ...givenUserPreferencesSpec,
@@ -194,11 +296,10 @@ describe("UserPreferencesService", () => {
     });
 
     test("on fail to fetch, it should reject with the expected service error", async () => {
-      const givenUserPreferencesSpec: UserPreference = {
+      const givenUserPreferencesSpec: CreateUserPreferencesSpec = {
         user_id: "1",
         language: Language.en,
-        accepted_tc: new Date(),
-        sessions: [],
+        invitation_code: "bar"
       };
       // GIVEN fetch rejects with some unknown error
       const givenFetchError = new Error();
@@ -214,30 +315,29 @@ describe("UserPreferencesService", () => {
       ["is a malformed json", "{"],
       ["is a string", "foo"],
     ])(
-      "on 201, should reject with an error ERROR_CODE.INVALID_RESPONSE_BODY if response %s",
+      "on 200, should reject with an error ERROR_CODE.INVALID_RESPONSE_BODY if response %s",
       async (description, givenResponse) => {
         // GIVEN some user preference specification to create
-        const givenUserPreferencesSpec: UserPreference = {
+        const givenUserPreferencesSpec: UpdateUserPreferencesSpec = {
           user_id: "1",
           language: Language.en,
           accepted_tc: new Date(),
-          sessions: [],
         };
         // AND the create model REST API will respond with OK and some response that does conform to the userPreferencesResponseSchema even if it states that it is application/json
-        setupFetchSpy(StatusCodes.CREATED, givenResponse, "application/json;charset=UTF-8");
+        setupFetchSpy(StatusCodes.OK, givenResponse, "application/json;charset=UTF-8");
 
         // WHEN the createModel function is called with the given arguments (name, description, ...)
         const service = new UserPreferencesService();
-        const createModelPromise = service.createUserPreferences(givenUserPreferencesSpec);
+        const createModelPromise = service.updateUserPreferences(givenUserPreferencesSpec);
 
         // THEN expected it to reject with the error response
         const expectedError = {
           ...new ServiceError(
             UserPreferencesService.name,
-            "createUserPreferences",
-            "POST",
+            "updateUserPreferences",
+            "PATCH",
             `${givenApiServerUrl}/users/preferences`,
-            StatusCodes.CREATED,
+            StatusCodes.OK,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",
             ""

@@ -1,14 +1,14 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
-import firebase from "firebase/compat/app";
-import * as firebaseui from "firebaseui";
-import "firebaseui/dist/firebaseui.css";
+import React, { useContext, useState } from "react";
 import { auth } from "src/auth/firebaseConfig";
+import firebase from "firebase/compat/app";
+import "firebaseui/dist/firebaseui.css";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { TabiyaUser } from "src/auth/auth.types";
 import { useTokens } from "src/auth/hooks/useTokens";
 import { useAuthUser } from "src/auth/hooks/useAuthUser";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
+import { GoogleIcon } from "src/theme/Icons/GoogleIcon";
 
 const uniqueId = "f0324e97-83fd-49e6-95c3-1043751fa1db";
 export const DATA_TEST_ID = {
@@ -16,63 +16,62 @@ export const DATA_TEST_ID = {
   FIREBASE_FALLBACK_TEXT: `firebase-fallback-text-${uniqueId}`,
   FIREBASE_AUTH_CONTAINER: `firebase-auth-container-${uniqueId}`,
   CONTINUE_WITH_GOOGLE: `continue-with-google-${uniqueId}`,
+  CONTINUE_WITH_GOOGLE_BUTTON: `continue-with-google-button-${uniqueId}`,
 };
 
 export interface IDPAuthProps {
+  preLoginCheck?: () => Promise<boolean> | boolean,
+  disabled?: boolean;
+  label?: string;
   notifyOnLogin: (user: TabiyaUser) => void;
   isLoading: boolean;
 }
 
-const IDPAuth: React.FC<Readonly<IDPAuthProps>> = ({ notifyOnLogin, isLoading }) => {
-  const { enqueueSnackbar } = useSnackbar();
-  const { updateUserByToken } = useAuthUser();
-  const tokens = useTokens({ updateUserByToken });
+const IDPAuth: React.FC<Readonly<IDPAuthProps>> = ({ preLoginCheck, disabled = false,  label, notifyOnLogin, isLoading }) => {
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  const [loading, setLoading] = useState(true);
+  const {enqueueSnackbar} = useSnackbar();
+  const {updateUserByToken} = useAuthUser();
+  const tokens = useTokens({updateUserByToken});
+
   const [error, setError] = useState("");
-
-  const firebaseUIElementRef = useRef(null);
 
   const isOnline = useContext(IsOnlineContext);
 
   // Memoize firebaseUiWidget and uiConfig to avoid re-initializing on each render
-  const firebaseUiWidget = useMemo(() => firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth), []);
+  const loginWithPopup = async () => {
+    try {
+      setIsLoggingIn(true);
+      const passed = await preLoginCheck?.();
 
-  const uiConfig = useMemo(
-    () => ({
-      signInFlow: "popup", // 'redirect', if you do not want to use popup
-      signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
-      callbacks: {
-        signInSuccessWithAuthResult: (data: any) => {
-          enqueueSnackbar("Login successful", { variant: "success" });
-          const newUser: TabiyaUser = {
-            id: data.user.uid,
-            name: data.user.displayName,
-            email: data.user.email,
-          };
-          tokens.setToken(data?.user?.multiFactor?.user?.accessToken as string);
-          updateUserByToken(data?.user?.multiFactor?.user?.accessToken as string);
-          notifyOnLogin(newUser);
-          return false;
-        },
-        signInFailure: (error: { message: string }) => {
-          enqueueSnackbar("Login failed", { variant: "error" });
-          setError(error.message);
-          setLoading(false);
-        },
-      },
-    }),
-    [enqueueSnackbar, tokens, updateUserByToken, notifyOnLogin]
-  );
+      if (!passed) {
+        return
+      }
 
-  useEffect(() => {
-    setLoading(true);
-    if (uiConfig.signInFlow === "popup") firebaseUiWidget.reset();
+      const data = await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+      enqueueSnackbar("Login successful", {variant: "success"});
 
-    // Render the firebaseUi Widget.
-    if (isOnline) firebaseUiWidget.start(firebaseUIElementRef.current!, uiConfig);
-    setLoading(false);
-  }, [enqueueSnackbar, firebaseUiWidget, uiConfig, tokens, updateUserByToken, loading, isOnline, notifyOnLogin]);
+      const newUser: TabiyaUser = {
+        id: data?.user?.uid!,
+        name: data?.user?.displayName!,
+        email: data?.user?.email!,
+      };
+
+      // @ts-ignore
+      const token = data?.user?.multiFactor?.user?.accessToken as string;
+
+      tokens.setToken(token);
+      updateUserByToken(token);
+      notifyOnLogin(newUser);
+      return false;
+    } catch (error: any) {
+      console.log(error)
+      enqueueSnackbar("Login failed", { variant: "error" });
+      setError(error.message);
+    } finally {
+      setIsLoggingIn(false);
+    }
+  }
 
   return (
     <Box
@@ -88,14 +87,37 @@ const IDPAuth: React.FC<Readonly<IDPAuthProps>> = ({ notifyOnLogin, isLoading })
       </Typography>
       <Box mt={2} width="100%">
         <div data-test_id={DATA_TEST_ID.FIREBASE_AUTH}>
-          {(loading || isLoading) && <p>Loading...</p>}
           {error && <p className="error">{error}</p>}
           {isOnline ? (
-            <div id="firebaseui-auth-container" ref={firebaseUIElementRef}></div>
+            <Button
+              variant="text"
+              size={"medium"}
+              disabled={disabled || isLoading || isLoggingIn}
+              fullWidth
+              id={"firebaseui-auth-container"}
+              data-testid={DATA_TEST_ID.CONTINUE_WITH_GOOGLE_BUTTON}
+              onClick={loginWithPopup}
+              sx={{
+                paddingX: 4,
+                display: "flex",
+                justifyItems: "center",
+                alignContent: "center",
+                gap: 2,
+                color: theme => theme.palette.tabiyaBlue.light,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center"}}>
+                <GoogleIcon />
+              </div>
+              <div>
+                {label || "Sign in with Google"}
+              </div>
+            </Button>
           ) : (
             <p data-testid={DATA_TEST_ID.FIREBASE_FALLBACK_TEXT}>Google sign in is not available when offline.</p>
           )}
         </div>
+
       </Box>
     </Box>
   );

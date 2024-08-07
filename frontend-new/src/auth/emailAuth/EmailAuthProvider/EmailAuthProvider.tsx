@@ -6,6 +6,8 @@ import { EmailAuthContextValue, FirebaseToken, TabiyaUser, TFirebaseTokenRespons
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import { jwtDecode } from "jwt-decode";
+import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 
 export type EmailAuthProviderProps = {
   children: React.ReactNode;
@@ -135,6 +137,7 @@ export const EmailAuthProvider: React.FC<EmailAuthProviderProps> = ({ children }
    */
   const registerWithEmail = useCallback(
     (
+      invitation_code: string,
       email: string,
       password: string,
       name: string,
@@ -147,9 +150,17 @@ export const EmailAuthProvider: React.FC<EmailAuthProviderProps> = ({ children }
           email,
           password,
           name,
-          () => {
+          async (data) => {
             // since the registration will log the user out and prompt them to verify their email,
             // we don't need to update the user state
+            PersistentStorageService.setToken(data.access_token);
+
+            await userPreferencesService.createUserPreferences({
+              user_id: data.user_id,
+              invitation_code,
+              language: Language.en,
+            })
+
             logout(() => {}, errorCallback);
             successCallback();
           },
