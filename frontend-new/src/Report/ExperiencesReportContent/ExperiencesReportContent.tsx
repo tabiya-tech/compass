@@ -20,7 +20,7 @@ const ExperiencesReportContent: React.FC<ExperienceProps> = ({ experience }) => 
   const formattedSkills = experience.top_skills.map((skill) => skill.preferredLabel).join(", ");
 
   return (
-    <View style={styles.container} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_CONTAINER}>
+    <View wrap={false} style={styles.container} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_CONTAINER}>
       <Text style={styles.firstColumn} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_DATE}>
         {experience.end_date && experience.start_date
           ? `${experience.start_date} — ${experience.end_date}`

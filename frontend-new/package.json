@@ -74,7 +74,7 @@
     "compile": "tsc --noEmit",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --coverage --watchAll=false -u",
+    "test": "react-scripts test --coverage --watchAll=false",
     "eject": "react-scripts eject",
     "test:smoke": "jest --config jest.smoke.config.js --runInBand test/smoke/*.test.ts",
     "storybook": "storybook dev -p 6006",

@@ -12,7 +12,7 @@ exports[`ExperiencesReportContent should render ExperiencesReportContent correct
     2022 — Present
   </text>
   <view
-    style="display: flex; flex-direction: column; flex: 1; margin-bottom: 8px; margin-right: 26px;"
+    style="display: flex; flex-direction: column; flex: 1; margin-bottom: 8px;"
   >
     <view>
       <text
@@ -33,7 +33,7 @@ exports[`ExperiencesReportContent should render ExperiencesReportContent correct
           Top Skills: 
         </text>
         <text
-          style="font-family: Inter; font-size: 12px; font-weight: normal; padding-bottom: 8px;"
+          style="font-family: Inter; font-size: 12px; font-weight: normal; padding-bottom: 8px; word-break: break-word;"
         >
           Management, Communication
         </text>
