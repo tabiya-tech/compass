@@ -19,11 +19,21 @@ class ResponsibilitiesExtractionResponse(ResponsibilitiesData):
     """
     The reasoning behind the data extraction.
     """
+
     extracted_entities: list[str] = []
     """
     The extracted entities from the user's input.
     """
+
     classification_reasoning: Optional[str] = None
+    """
+    The reasoning behind the classification.
+    """
+
+    irrelevant_entities: Optional[list[str]] = []
+    """
+    The irrelevant entities from the user's input.
+    """
 
 
 class _ResponsibilitiesExtractionLLM:
@@ -99,6 +109,7 @@ class _ResponsibilitiesExtractionLLM:
                 - other_peoples_responsibilities: What other people are responsible for.
                 - non_responsibilities: What the user is not responsible for.
                 - responsibilities: What the user is responsible for.
+                - irrelevant_entities: When the named entity is irrelevant to the user's experience or it refers to something that is not part of the user's experience.
             
             There are two criteria that either one can be met for a named entity to be in non_responsibilities:
                 1. The named entity must be something that the user is not responsible for,
@@ -126,7 +137,7 @@ class _ResponsibilitiesExtractionLLM:
             - other_peoples_responsibilities: list of JSON strings, can be empty
             - non_responsibilities: list of JSON strings, can be empty
             - responsibilities: list of JSON strings, can be empty
-            
+            - irrelevant_entities: list of JSON strings, can be empty
             
             Your response must always be a JSON object with the schema above
         </System Instructions>
