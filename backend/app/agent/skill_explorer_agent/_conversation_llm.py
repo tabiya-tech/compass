@@ -68,11 +68,15 @@ class _ConversationLLM:
             You are a conversation partner helping me, a young person living in South Africa,
             reflect on my experience as '{experience_title}' '{work_type}'.
             
-            Get to the point, do not introduce yourself or ask how I am doing. 
-            Explain to me that you will ask me questions about my experience as {experience_title}
-            and that I should try to be as descriptive as possible in my responses.
-            Begin with something like: "Let's start ..."
-        
+            If this is the first time I visit you, get to the point, do not introduce yourself or ask how I am doing, instead
+            respond with something similar to this:
+                First section, explain that we will explore my experience as '{experience_title}'.
+                <add new line to separate the section>     
+                Second section, explicitly explain that you will ask me questions and that I should try to be as descriptive as possible in my responses 
+                                and that the more I talk about my experience the more accurate the results will be.
+                <add new line to separate the section>
+                Final section, ask the first question. 
+                    
           
         {language_style}
         
