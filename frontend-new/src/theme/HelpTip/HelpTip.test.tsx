@@ -12,11 +12,13 @@ describe("HelpTip component render tests", () => {
   test("renders correctly with children content", () => {
     // GIVEN the HelpTip component is rendered with specific children content
     const givenChild = <div>"This is a helpful tip"</div>;
+    // AND a specific icon
+    const givenIcon = <div>Mock icon</div>;
 
     // WHEN the component mounts
     // @ts-ignore
     const renderSpy: jest.Mock = jest.spyOn(Tooltip, "render");
-    render(<HelpTip>{givenChild}</HelpTip>);
+    render(<HelpTip icon={givenIcon}>{givenChild}</HelpTip>);
 
     // THEN it should display the help IconButton
     const helpIconButton = screen.getByTestId(DATA_TEST_ID.HELP_ICON);
@@ -52,7 +54,8 @@ describe("HelpTip component interaction tests", () => {
   test("should display the tooltip when the user hovers over the icon", async () => {
     // GIVEN the HelpTip component is rendered with specific children content
     const childrenContent = "This is a helpful tip";
-    render(<HelpTip>{childrenContent}</HelpTip>);
+    const givenIcon = <div>Mock icon</div>;
+    render(<HelpTip icon={givenIcon}>{childrenContent}</HelpTip>);
     const helpIconButton = screen.getByRole("button");
 
     // WHEN the user moves the cursor over the HelpTip icon
@@ -71,7 +74,8 @@ describe("HelpTip component interaction tests", () => {
   test("should hide the tooltip when the user does not hover over the icon", async () => {
     // GIVEN the HelpTip component is rendered with specific children content
     const childrenContent = "This is a helpful tip";
-    render(<HelpTip>{childrenContent}</HelpTip>);
+    const givenIcon = <div>Mock icon</div>;
+    render(<HelpTip icon={givenIcon}>{childrenContent}</HelpTip>);
     const helpIconButton = screen.getByRole("button");
     // AND the tooltip is currently displayed because the user moved the cursor over the HelpTip icon
     fireEvent.mouseEnter(helpIconButton);
@@ -95,7 +99,8 @@ describe("HelpTip component interaction tests", () => {
   test("should display the tooltip when the icon is clicked", async () => {
     // GIVEN the HelpTip component is rendered with specific children content
     const childrenContent = "This is a helpful tip";
-    render(<HelpTip>{childrenContent}</HelpTip>);
+    const givenIcon = <div>Mock icon</div>;
+    render(<HelpTip icon={givenIcon}>{childrenContent}</HelpTip>);
     const helpIconButton = screen.getByRole("button");
 
     // WHEN the user clicks on the HelpTip icon
@@ -114,7 +119,12 @@ describe("HelpTip component interaction tests", () => {
   test("should hide the tooltip when the user clicks outside of it", async () => {
     // GIVEN the HelpTip component is rendered with specific children content
     const childrenContent = "This is a helpful tip";
-    render(<HelpTip data-testid="tooltip-component">{childrenContent}</HelpTip>);
+    const givenIcon = <div>Mock icon</div>;
+    render(
+      <HelpTip icon={givenIcon} data-testid="tooltip-component">
+        {childrenContent}
+      </HelpTip>
+    );
     const helpIconButton = screen.getByRole("button");
     // AND the tooltip is currently displayed because the user clicked on the HelpTip icon
     await userEvent.click(helpIconButton);

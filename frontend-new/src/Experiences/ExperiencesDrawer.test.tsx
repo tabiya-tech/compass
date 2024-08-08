@@ -35,7 +35,13 @@ describe("ExperiencesDrawer", () => {
   test("should render ExperiencesDrawer correctly", () => {
     // GIVEN the ExperiencesDrawer component
     const givenExperiencesDrawer = (
-      <ExperiencesDrawer isOpen={true} isLoading={false} experiences={mockExperiences} notifyOnClose={jest.fn()} />
+      <ExperiencesDrawer
+        isOpen={true}
+        isLoading={false}
+        experiences={mockExperiences}
+        notifyOnClose={jest.fn()}
+        conversationCompleted={true}
+      />
     );
 
     // WHEN the component is rendered
@@ -67,7 +73,13 @@ describe("ExperiencesDrawer", () => {
     // GIVEN the ExperiencesDrawer component
     const notifyOnClose = jest.fn();
     const givenExperiencesDrawer = (
-      <ExperiencesDrawer isOpen={true} isLoading={false} experiences={mockExperiences} notifyOnClose={notifyOnClose} />
+      <ExperiencesDrawer
+        isOpen={true}
+        isLoading={false}
+        experiences={mockExperiences}
+        notifyOnClose={notifyOnClose}
+        conversationCompleted={true}
+      />
     );
     // AND the component is rendered
     render(givenExperiencesDrawer);
@@ -83,7 +95,13 @@ describe("ExperiencesDrawer", () => {
   test("it should show the right text when there are no experiences", () => {
     // GIVEN the ExperiencesDrawer component
     const givenExperiencesDrawer = (
-      <ExperiencesDrawer isOpen={true} isLoading={false} experiences={[]} notifyOnClose={jest.fn()} />
+      <ExperiencesDrawer
+        isOpen={true}
+        isLoading={false}
+        experiences={[]}
+        notifyOnClose={jest.fn()}
+        conversationCompleted={true}
+      />
     );
     // AND the component is rendered
     render(givenExperiencesDrawer);
@@ -98,7 +116,13 @@ describe("ExperiencesDrawer", () => {
   test("it should show loading state when isLoading is true", () => {
     // GIVEN the ExperiencesDrawer component
     const givenExperiencesDrawer = (
-      <ExperiencesDrawer isOpen={true} isLoading={true} experiences={[]} notifyOnClose={jest.fn()} />
+      <ExperiencesDrawer
+        isOpen={true}
+        isLoading={true}
+        experiences={[]}
+        notifyOnClose={jest.fn()}
+        conversationCompleted={true}
+      />
     );
     // AND the component is rendered
     render(givenExperiencesDrawer);
@@ -111,7 +135,13 @@ describe("ExperiencesDrawer", () => {
   test("should handle onChange correctly when the text field changes", () => {
     // GIVEN the ExperiencesDrawer component
     const givenExperiencesDrawer = (
-      <ExperiencesDrawer isOpen={true} isLoading={false} experiences={mockExperiences} notifyOnClose={jest.fn()} />
+      <ExperiencesDrawer
+        isOpen={true}
+        isLoading={false}
+        experiences={mockExperiences}
+        notifyOnClose={jest.fn()}
+        conversationCompleted={true}
+      />
     );
     // AND the component is rendered
     render(givenExperiencesDrawer);
