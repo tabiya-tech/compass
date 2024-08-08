@@ -12,7 +12,7 @@ export function Chat({ isMobile, sessionId }: Readonly<ChatProps>) {
   const [messagesState, setMessagesState] = useState<Message[]>([]);
   const [initialized, setInitialized] = useState<boolean>(false);
 
-  const START_PROMPT = "~~~START_CONVERSATION~~~";
+  const START_PROMPT = "";
 
   // Helper function to add a new message
   const addMessage = (message: Message) => {
@@ -66,13 +66,10 @@ export function Chat({ isMobile, sessionId }: Readonly<ChatProps>) {
         console.log({ data: response.data });
         response.data.conversation_context.history.turns.forEach((historyItem: any) => {
           console.log(
-            START_PROMPT,
             historyItem.input.message,
             historyItem.output.message_for_user,
-            historyItem.input.message === START_PROMPT
           );
-          const userMessage =
-            historyItem.input.message !== START_PROMPT && generateUserMessageFromResponse(historyItem.input.message);
+          const userMessage = generateUserMessageFromResponse(historyItem.input.message);
           const tabiyaMessage = generateTabiyaMessageFromResponse(historyItem.output.message_for_user);
           if (userMessage) addMessage(userMessage);
           addMessage(tabiyaMessage);
