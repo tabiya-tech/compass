@@ -41,13 +41,19 @@ class SimpleLLMAgent(Agent):
         msg = user_input.message.strip()  # Remove leading and trailing whitespaces
         model_response: ModelResponse | None
         llm_stats_list: list[LLMStats]
-        model_response, llm_stats_list = await self._llm_caller.call_llm(
-            llm=self._llm,
-            llm_input=ConversationHistoryFormatter.format_for_agent_generative_prompt(
-                model_response_instructions=get_json_response_instructions(),
-                context=context, user_input=msg),
-            logger=self.logger
-        )
+
+        try:
+            model_response, llm_stats_list = await self._llm_caller.call_llm(
+                llm=self._llm,
+                llm_input=ConversationHistoryFormatter.format_for_agent_generative_prompt(
+                    model_response_instructions=get_json_response_instructions(),
+                    context=context, user_input=msg),
+                logger=self.logger
+            )
+        except Exception as e:
+            self.logger.exception("An error occurred while calling the LLM.", e)
+            model_response = None
+            llm_stats_list = []
 
         # If it was not possible to get a model response, set the response to a default message
         if model_response is None:
