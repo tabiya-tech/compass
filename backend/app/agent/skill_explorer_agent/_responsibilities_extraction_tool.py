@@ -26,6 +26,14 @@ class _ResponsibilitiesExtractionTool:
         sentence_decomposition_output, sentence_decomposition_stats = await self._sentence_decomposition_llm.execute(
             last_user_input=last_user_input, context=context)
         self.logger.debug("Sentence decomposition output: %s", sentence_decomposition_output.dict())
+        if len(sentence_decomposition_output.resolved_pronouns) == 0:
+            self.logger.debug("No resolved pronouns found in the user's input. Skipping responsibilities extraction.")
+            return ResponsibilitiesData(
+                responsibilities=[],
+                non_responsibilities=[],
+                other_peoples_responsibilities=[]
+            ), sentence_decomposition_stats
+
         resolved_pronouns = "\n".join(sentence_decomposition_output.resolved_pronouns)
         responsibilities_extraction_output, responsibilities_extraction_stats = \
             await self._responsibilities_extraction_llm.execute(
