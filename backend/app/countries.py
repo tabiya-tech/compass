@@ -23,7 +23,7 @@ def get_country_glossary(country: Country) -> str | None:
 _GLOSSARY = {
     Country.SOUTH_AFRICA:
         dedent("""\
-        GDE Brigade member - A member of the Gauteng Department of Education's (GDE) Brigade program.
+        GDE Brigade - Gauteng Department of Education (GDE) Brigade was a short-term programme for contract workers in the education sector.
         Kotas - A South African street food. 
         Bunny chow - Indian South African fast food dish.
         Crew Member - A member of a team but not necessarily in the aviation industry.
