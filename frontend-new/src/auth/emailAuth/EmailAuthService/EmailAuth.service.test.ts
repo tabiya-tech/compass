@@ -54,7 +54,10 @@ describe("AuthService class tests", () => {
 
     test("should call errorCallback on logout failure", async () => {
       // GIVEN the user is logged in
-      jest.spyOn(firebase.auth(), "signOut").mockRejectedValueOnce(new Error("Logout failed"));
+      jest.spyOn(firebase.auth(), "signOut").mockRejectedValueOnce({
+        code: "auth/internal-error",
+        message: "Internal error",
+      });
 
       const successCallback = jest.fn();
       const errorCallback = jest.fn();
@@ -108,7 +111,10 @@ describe("AuthService class tests", () => {
 
     test("should call errorCallback on login failure", async () => {
       // GIVEN the login credentials are incorrect
-      jest.spyOn(firebase.auth(), "signInWithEmailAndPassword").mockRejectedValue(new Error("Login failed"));
+      jest.spyOn(firebase.auth(), "signInWithEmailAndPassword").mockRejectedValue({
+        code: "auth/internal-error",
+        message: "Internal error",
+      });
       const successCallback = jest.fn();
       const errorCallback = jest.fn();
 
@@ -140,11 +146,7 @@ describe("AuthService class tests", () => {
       await authService.handleLoginWithEmail(givenEmail, givenPassword, successCallback, errorCallback);
 
       // THEN the error callback should be called with Email not verified
-      await expect(errorCallback).toHaveBeenCalledWith(
-        new Error(
-          "The email you are using is registered, but you have not yet verified it. Please verify your email to continue."
-        )
-      );
+      await expect(errorCallback).toHaveBeenCalledWith(new Error("Email not verified"));
 
       // AND the success callback should not be called
       await expect(successCallback).not.toHaveBeenCalled();
@@ -162,9 +164,7 @@ describe("AuthService class tests", () => {
       // WHEN the login is attempted
       await authService.handleLoginWithEmail(givenEmail, givenPassword, successCallback, errorCallback);
       // THEN the error callback should be called with Failed to Fetch
-      await expect(errorCallback).toHaveBeenCalledWith(
-        new Error("There is no user record corresponding to this email.")
-      );
+      await expect(errorCallback).toHaveBeenCalledWith(new Error("User not found"));
     });
   });
 
@@ -207,7 +207,10 @@ describe("AuthService class tests", () => {
 
     test("should call errorCallback on registration failure", async () => {
       // GIVEN the registration credentials are incorrect
-      jest.spyOn(firebase.auth(), "createUserWithEmailAndPassword").mockRejectedValue(new Error("Registration failed"));
+      jest.spyOn(firebase.auth(), "createUserWithEmailAndPassword").mockRejectedValue({
+        code: "auth/internal-error",
+        message: "Internal error",
+      });
       const successCallback = jest.fn();
       const errorCallback = jest.fn();
 
@@ -234,7 +237,7 @@ describe("AuthService class tests", () => {
       // WHEN the registration is attempted
       await authService.handleRegisterWithEmail(givenEmail, givenPassword, givenName, successCallback, errorCallback);
       // THEN the error callback should be called with Failed to Fetch
-      expect(errorCallback).toHaveBeenCalledWith(new Error("There is no user record corresponding to this email."));
+      expect(errorCallback).toHaveBeenCalledWith(new Error("User not found"));
     });
   });
 });

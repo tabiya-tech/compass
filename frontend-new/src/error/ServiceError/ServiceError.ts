@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes/";
-import ErrorConstants from "src/error/error.constants";
-import FirebaseErrorCodes = ErrorConstants.FirebaseErrorCodes;
+import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
+import ErrorCodes = ErrorConstants.ErrorCodes;
 
 export type ServiceErrorObject = {
   errorCode: ErrorConstants.ErrorCodes;
@@ -32,24 +32,7 @@ export const USER_FRIENDLY_ERROR_MESSAGES = {
     "The email you are using is registered, but you have not yet verified it. Please verify your email to continue.",
   USER_NOT_FOUND: "The user you are trying to use does not exist. Please try again with different credentials",
   UNABLE_TO_PROCESS_REQUEST: "Apologies. Something went wrong while processing your request.",
-};
-
-/**
- * a map of error codes and more user-friendly error messages that can be shown to the user
- * in case of Firebase authentication errors.
- **/
-export const FIREBASE_ERROR_MESSAGES = {
-  "auth/email-already-in-use": "The email address is already in use by another account.",
-  "auth/email-not-verified":
-    "The email you are using is registered, but you have not yet verified it. Please verify your email to continue.",
-  "auth/invalid-credential": "The email/password provided is invalid.",
-  "auth/invalid-email": "The email address is not valid.",
-  "auth/operation-not-allowed": "Email/password accounts are not enabled.",
-  "auth/weak-password": "The password is too weak.",
-  "auth/user-disabled": "The user account has been disabled.",
-  "auth/user-not-found": "There is no user record corresponding to this email.",
-  "auth/wrong-password": "The password is invalid.",
-  "auth/too-many-requests": "We have blocked all requests from this device due to unusual activity. Try again later.",
+  INVITATION_CODE_INVALID: "The invitation code you entered is invalid. Please check the code and try again.",
 };
 
 export class ServiceError extends Error {
@@ -97,7 +80,7 @@ export class ServiceError extends Error {
 //factory function
 export type ServiceErrorFactory = (
   statusCode: number,
-  errorCode: ErrorConstants.ErrorCodes | ErrorConstants.FirebaseErrorCodes | string,
+  errorCode: ErrorConstants.ErrorCodes | string,
   message: string,
   details?: ServiceErrorDetails
 ) => ServiceError;
@@ -110,7 +93,7 @@ export function getServiceErrorFactory(
 ): ServiceErrorFactory {
   return (
     statusCode: number,
-    errorCode: ErrorConstants.ErrorCodes | ErrorConstants.FirebaseErrorCodes | string,
+    errorCode: ErrorConstants.ErrorCodes | string,
     message: string,
     details?: ServiceErrorDetails
   ): ServiceError => {
@@ -127,12 +110,6 @@ export const getUserFriendlyErrorMessage = (error: ServiceError | Error): string
   if (!(error instanceof ServiceError)) {
     // in case the error is not a ServiceError, then it is an unexpected error
     return USER_FRIENDLY_ERROR_MESSAGES.UNEXPECTED_ERROR;
-  }
-
-  if (error.errorCode in FIREBASE_ERROR_MESSAGES) {
-    // if the error code is in the FIREBASE_ERROR_MESSAGES, then return the user-friendly message for that error code
-    //@ts-ignore
-    return FIREBASE_ERROR_MESSAGES[error.errorCode];
   }
   // All the errors can happen due to a bug in the frontend or backend code.
   // In that case, the users can do little about it, but there might be some cases where a workaround is possible.
@@ -259,6 +236,14 @@ export const getUserFriendlyErrorMessage = (error: ServiceError | Error): string
       if (error.statusCode === 422) {
         // we use a forbidden with an unprocessable entity when the invite code is
         return USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_REQUEST;
+      }
+      break;
+    case ErrorConstants.ErrorCodes.VALIDATION_ERROR:
+      // The client could not validate something about the data received from the server.
+      // This can happen when:
+      // - there is a specific validation error that the client can handle (eg. invalid invite code)
+      if ((error.details as ServiceErrorObject).errorCode === ErrorCodes.FORBIDDEN) {
+        return USER_FRIENDLY_ERROR_MESSAGES.INVITATION_CODE_INVALID;
       }
   }
   // If we get here, then

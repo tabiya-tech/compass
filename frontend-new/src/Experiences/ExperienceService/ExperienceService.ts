@@ -1,8 +1,8 @@
 import { getBackendUrl } from "src/envService";
-import { getServiceErrorFactory } from "src/error/error";
+import { getServiceErrorFactory } from "src/error/ServiceError/ServiceError";
 import { fetchWithAuth } from "src/utils/fetchWithAuth/fetchWithAuth";
 import { StatusCodes } from "http-status-codes";
-import ErrorConstants from "src/error/error.constants";
+import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import { Experience } from "src/Experiences/ExperienceService/Experiences.types";
 
 export default class ExperienceService {

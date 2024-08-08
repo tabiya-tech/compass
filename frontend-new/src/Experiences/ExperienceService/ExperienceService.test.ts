@@ -1,8 +1,8 @@
 import ExperienceService from "src/Experiences/ExperienceService/ExperienceService";
-import ErrorConstants from "src/error/error.constants";
+import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 import { StatusCodes } from "http-status-codes";
-import { ServiceError } from "src/error/error";
+import { ServiceError } from "src/error/ServiceError/ServiceError";
 import { mockExperiences } from "src/Experiences/ExperienceService/_test_utilities/mockExperiencesResponses";
 
 describe("ExperienceService", () => {

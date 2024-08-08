@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
-import { getServiceErrorFactory } from "src/error/error";
-import ErrorConstants from "src/error/error.constants";
+import { getServiceErrorFactory } from "src/error/ServiceError/ServiceError";
+import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import { getActiveToken } from "src/utils/getActiveToken/getActiveToken";
 
 // This function is used to make authenticated fetch requests

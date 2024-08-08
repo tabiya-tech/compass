@@ -1,6 +1,6 @@
-import { ServiceError } from "./error";
+import { ServiceError } from "./ServiceError";
 import { writeServiceErrorToLog } from "./logger";
-import ErrorConstants from "src/error/error.constants";
+import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 
 describe("Test writeServiceErrorToLog", () => {
   test("should write to log", () => {

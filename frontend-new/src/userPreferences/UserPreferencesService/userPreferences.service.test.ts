@@ -3,9 +3,9 @@ import "src/_test_utilities/consoleMock";
 
 import UserPreferencesService from "./userPreferences.service";
 import { StatusCodes } from "http-status-codes";
-import { ServiceError } from "src/error/error";
+import { ServiceError } from "src/error/ServiceError/ServiceError";
 import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
-import ErrorConstants from "src/error/error.constants";
+import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import { Language, UserPreference } from "./userPreferences.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 

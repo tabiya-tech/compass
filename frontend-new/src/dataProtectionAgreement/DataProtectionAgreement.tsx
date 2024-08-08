@@ -3,16 +3,16 @@ import { Box, Container, styled, Typography } from "@mui/material";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { EmailAuthContext } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 import { Language, UserPreferencesSpec } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import { ServiceError } from "src/error/error";
-import ErrorConstants from "src/error/error.constants";
+import { ServiceError } from "src/error/ServiceError/ServiceError";
+import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import { StatusCodes } from "http-status-codes";
 import LanguageContextMenu from "src/i18n/languageContextMenu/LanguageContextMenu";
 import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
-import { writeServiceErrorToLog } from "src/error/logger";
+import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { InvitationsContext } from "src/invitations/InvitationsProvider/InvitationsProvider";
 import { useNavigate } from "react-router-dom";
-import { routerPaths } from "../app/routerPaths";
+import { routerPaths } from "src/app/routerPaths";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 

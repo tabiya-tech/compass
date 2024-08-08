@@ -20,30 +20,30 @@ import { AnonymousAuthProvider } from "./auth/anonymousAuth/AnonymousAuthProvide
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
 root.render(
-  // <React.StrictMode>
-  <>
-    <CssBaseline />
-    <IsOnlineProvider>
-      <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
-        <AnonymousAuthProvider>
-          <EmailAuthProvider>
-            <UserPreferencesProvider>
-              <InvitationsProvider>
-                <SnackbarProvider>
-                  <ViewPortWrapper>
-                    <HashRouter>
-                      <App />
-                    </HashRouter>
-                  </ViewPortWrapper>
-                </SnackbarProvider>
-              </InvitationsProvider>
-            </UserPreferencesProvider>
-          </EmailAuthProvider>
-        </AnonymousAuthProvider>
-      </ThemeProvider>
-    </IsOnlineProvider>
-  </>
-  // </React.StrictMode>
+  <React.StrictMode>
+    <>
+      <CssBaseline />
+      <IsOnlineProvider>
+        <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
+          <SnackbarProvider>
+            <AnonymousAuthProvider>
+              <EmailAuthProvider>
+                <UserPreferencesProvider>
+                  <InvitationsProvider>
+                    <ViewPortWrapper>
+                      <HashRouter>
+                        <App />
+                      </HashRouter>
+                    </ViewPortWrapper>
+                  </InvitationsProvider>
+                </UserPreferencesProvider>
+              </EmailAuthProvider>
+            </AnonymousAuthProvider>
+          </SnackbarProvider>
+        </ThemeProvider>
+      </IsOnlineProvider>
+    </>
+  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

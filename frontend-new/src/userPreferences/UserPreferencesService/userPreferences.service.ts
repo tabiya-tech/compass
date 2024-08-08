@@ -1,7 +1,7 @@
-import { getServiceErrorFactory } from "src/error/error";
+import { getServiceErrorFactory } from "src/error/ServiceError/ServiceError";
 import { UserPreference, UserPreferencesSpec } from "./userPreferences.types";
 import { StatusCodes } from "http-status-codes";
-import ErrorConstants from "src/error/error.constants";
+import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import { getBackendUrl } from "src/envService";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { fetchWithAuth } from "src/utils/fetchWithAuth/fetchWithAuth";

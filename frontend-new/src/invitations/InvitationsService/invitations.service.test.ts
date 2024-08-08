@@ -2,9 +2,9 @@ import "src/_test_utilities/consoleMock";
 
 import InvitationsService from "./invitations.service";
 import { StatusCodes } from "http-status-codes";
-import { ServiceError } from "src/error/error";
+import { ServiceError } from "src/error/ServiceError/ServiceError";
 import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
-import ErrorConstants from "src/error/error.constants";
+import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import { Invitation, InvitationStatus, InvitationType } from "./invitations.types";
 
 const setupFetchSpy = setupAPIServiceSpy;
@@ -47,16 +47,19 @@ describe("InvitationsService", () => {
       const actualStatus = await service.checkInvitationCodeStatus("test-code");
 
       // THEN expect it to make a GET request with correct headers and payload
-      expect(fetchSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/user-invitations/check-status?invitation_code=test-code`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        expectedStatusCode: [200],
-        failureMessage: `Failed to check status for invitation code test-code`,
-        serviceFunction: "checkInvitationCodeStatus",
-        serviceName: "InvitationsService",
-      });
+      expect(fetchSpy).toHaveBeenCalledWith(
+        `${givenApiServerUrl}/user-invitations/check-status?invitation_code=test-code`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          expectedStatusCode: [200],
+          failureMessage: `Failed to check status for invitation code test-code`,
+          serviceFunction: "checkInvitationCodeStatus",
+          serviceName: "InvitationsService",
+        }
+      );
 
       // AND expect it to return the valid invitation object
       expect(actualStatus).toEqual(givenResponseBody);

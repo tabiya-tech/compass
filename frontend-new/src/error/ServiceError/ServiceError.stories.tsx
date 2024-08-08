@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import SnackbarProvider, { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { FormLabel, MenuItem, Select, Stack } from "@mui/material";
-import { USER_FRIENDLY_ERROR_MESSAGES } from "./error";
+import { USER_FRIENDLY_ERROR_MESSAGES } from "./ServiceError";
 import React from "react";
 
 const meta: Meta<typeof SnackbarProvider> = {

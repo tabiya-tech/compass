@@ -1,6 +1,6 @@
 import ExperiencesContent from "./ExperiencesReportContent";
 import { Meta, StoryObj } from "@storybook/react";
-import { generateRandomExperiences } from "../../Experiences/ExperienceService/_test_utilities/mockExperiencesResponses";
+import { generateRandomExperiences } from "src/Experiences/ExperienceService/_test_utilities/mockExperiencesResponses";
 
 const meta: Meta<typeof ExperiencesContent> = {
   title: "Report/ExperiencesContent",

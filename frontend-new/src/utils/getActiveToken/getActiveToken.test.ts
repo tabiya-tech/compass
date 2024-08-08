@@ -13,7 +13,6 @@ describe("getActiveToken", () => {
   const mockJwtDecode = jwtDecode as jest.Mock;
   const mockAuth = auth.currentUser?.getIdToken as jest.Mock;
 
-
   const mockDecodedToken = { exp: Date.now() / 1000 + 4000 };
 
   beforeEach(() => {

@@ -2,12 +2,7 @@ import React, { createContext, useCallback, useEffect, useMemo, useState } from 
 import { useTokens } from "src/auth/hooks/useTokens";
 import { useAuthUser } from "src/auth/hooks/useAuthUser";
 import { emailAuthService } from "src/auth/emailAuth/EmailAuthService/EmailAuth.service";
-import {
-  EmailAuthContextValue,
-  FirebaseToken,
-  TabiyaUser,
-  TFirebaseTokenResponse,
-} from "src/auth/auth.types";
+import { EmailAuthContextValue, FirebaseToken, TabiyaUser, TFirebaseTokenResponse } from "src/auth/auth.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import { jwtDecode } from "jwt-decode";
