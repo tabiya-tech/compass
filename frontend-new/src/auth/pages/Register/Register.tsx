@@ -5,10 +5,10 @@ import { NavLink as RouterNavLink } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import IDPAuth from "src/auth/components/IDPAuth/IDPAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { getUserFriendlyErrorMessage, ServiceError } from "src/error/error";
-import { writeServiceErrorToLog } from "src/error/logger";
 import RegisterWithEmailForm from "src/auth/pages/Register/components/RegisterWithEmailForm/RegisterWithEmailForm";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
+import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
+import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -69,12 +69,14 @@ const Register: React.FC<Readonly<RegisterProps>> = ({ postRegisterHandler, post
         enqueueSnackbar("Verification Email Sent!", { variant: "success" });
       },
       (e) => {
-        if (e instanceof ServiceError) {
-          writeServiceErrorToLog(e, console.error);
+        let errorMessage;
+        if (e instanceof FirebaseError) {
+          errorMessage = getUserFriendlyFirebaseErrorMessage(e);
+          writeFirebaseErrorToLog(e, console.error);
         } else {
           console.error(e);
+          errorMessage = (e as Error).message;
         }
-        const errorMessage = getUserFriendlyErrorMessage(e);
         enqueueSnackbar(errorMessage, { variant: "error" });
       }
     );

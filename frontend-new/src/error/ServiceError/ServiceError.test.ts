@@ -1,10 +1,10 @@
-import ErrorConstants from "src/error/error.constants";
+import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import {
   getServiceErrorFactory,
   ServiceError,
   getUserFriendlyErrorMessage,
   USER_FRIENDLY_ERROR_MESSAGES,
-} from "./error";
+} from "./ServiceError";
 import { StatusCodes } from "http-status-codes/";
 
 describe("Test the ServiceError class", () => {

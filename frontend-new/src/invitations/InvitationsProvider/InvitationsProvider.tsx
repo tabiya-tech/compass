@@ -3,7 +3,7 @@ import { invitationsService } from "src/invitations/InvitationsService/invitatio
 import { Invitation, InvitationType } from "src/invitations/InvitationsService/invitations.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import isEmptyObject from "src/utils/isEmptyObject/isEmptyObject";
-import { AnonymousAuthContext, TabiyaUser } from "../../auth/anonymousAuth/AnonymousAuthProvider/AnonymousAuthProvider";
+import { AnonymousAuthContext, TabiyaUser } from "src/auth/anonymousAuth/AnonymousAuthProvider/AnonymousAuthProvider";
 
 export type InvitationsProviderProps = {
   children: ReactNode;

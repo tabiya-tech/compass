@@ -1,7 +1,7 @@
 import { fetchWithAuth } from "./fetchWithAuth";
 import { setupFetchSpy } from "src/_test_utilities/fetchSpy";
-import { ServiceError } from "src/error/error";
-import ErrorConstants from "src/error/error.constants";
+import { ServiceError } from "src/error/ServiceError/ServiceError";
+import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import * as getActiveTokenModule from "src/utils/getActiveToken/getActiveToken";
 
 describe("Api Service tests", () => {

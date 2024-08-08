@@ -4,20 +4,19 @@ import { PersistentStorageService } from "src/app/PersistentStorageService/Persi
 
 type DecodedToken = {
   exp: number;
-}
+};
 
 /**
  * Get a refreshed token from the firebase auth service
  * @returns {string} The refreshed token
  */
 const getRefreshedToken = async (): Promise<string> => {
-  let refreshed_token = await auth.currentUser?.getIdToken(true)
+  let refreshed_token = await auth.currentUser?.getIdToken(true);
 
-  if(refreshed_token)
-    PersistentStorageService.setToken(refreshed_token);
+  if (refreshed_token) PersistentStorageService.setToken(refreshed_token);
 
   return refreshed_token!;
-}
+};
 
 /**
  * The number of seconds before the token expiration time that the token should be refreshed
@@ -33,7 +32,7 @@ export async function getActiveToken(): Promise<string> {
   let token = PersistentStorageService.getToken();
 
   // if no token avaialble, get a refreshed one
-  if(!token) {
+  if (!token) {
     return getRefreshedToken();
   }
 
@@ -41,10 +40,9 @@ export async function getActiveToken(): Promise<string> {
 
   // Check if the token has expired
   // if the token has expired, return a refreshed one
-  if((decodedToken.exp-EXPIRATION_TOLERANCE) < Date.now() / 1000) {
+  if (decodedToken.exp - EXPIRATION_TOLERANCE < Date.now() / 1000) {
     return getRefreshedToken();
   }
 
   return token;
 }
-

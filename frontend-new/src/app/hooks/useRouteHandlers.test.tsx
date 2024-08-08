@@ -24,7 +24,7 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => ({
   useSnackbar: jest.fn(),
 }));
 
-jest.mock("src/error/logger", () => ({
+jest.mock("src/error/ServiceError/logger", () => ({
   writeServiceErrorToLog: jest.fn(),
 }));
 

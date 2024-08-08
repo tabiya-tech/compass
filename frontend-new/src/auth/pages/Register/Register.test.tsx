@@ -201,7 +201,10 @@ describe("Testing Register component", () => {
   test("it should show error message on failed registration", async () => {
     // GIVEN a failed registration
     registerWithEmailMock.mockImplementation((email, password, name, onSuccess, onError) => {
-      onError();
+      onError(new Error("An unexpected error occurred. Please try again later."), {
+        code: "auth/internal-error",
+        message: "Internal error",
+      });
     });
     const givenName = "Foo Bar";
     const givenEmail = "foo@bar.baz";

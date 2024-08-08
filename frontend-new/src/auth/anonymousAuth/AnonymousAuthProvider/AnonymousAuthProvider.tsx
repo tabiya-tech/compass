@@ -5,7 +5,7 @@ import { FirebaseToken, TabiyaUser, TFirebaseTokenResponse, AnonymousAuthContext
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import { jwtDecode } from "jwt-decode";
-import { anonymousAuthService } from "../AnonymousAuthService/AnonymousAuth.service";
+import { anonymousAuthService } from "src/auth/anonymousAuth/AnonymousAuthService/AnonymousAuth.service";
 
 // Default values for AuthContext
 export const anonymousAuthContextDefaultValue: AnonymousAuthContextValue = {

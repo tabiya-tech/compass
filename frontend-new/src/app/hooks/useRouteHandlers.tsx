@@ -4,7 +4,7 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { useNavigate } from "react-router-dom";
 import { TabiyaUser } from "src/auth/auth.types";
 import { routerPaths } from "src/app/routerPaths";
-import { writeServiceErrorToLog } from "src/error/logger";
+import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 
 export const useRouteHandlers = () => {
   const { getUserPreferences } = useContext(UserPreferencesContext);
