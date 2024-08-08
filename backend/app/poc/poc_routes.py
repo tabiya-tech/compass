@@ -198,10 +198,10 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
 
             # ################################################################
             logger.debug("%s initialized for sandbox testing", agent.agent_type.value)
-
-            agent_output = await agent.execute(user_input=AgentInput(message=user_input), context=context)
+            agent_input = AgentInput(message=user_input)
+            agent_output = await agent.execute(user_input=agent_input, context=context)
             if not agent.is_responsible_for_conversation_history():
-                await conversation_memory_manager.update_history(AgentInput(message=user_input), agent_output)
+                await conversation_memory_manager.update_history(agent_input, agent_output)
 
             # get the context again after updating the history
             context = await conversation_memory_manager.get_conversation_context()
@@ -276,10 +276,10 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
 
             # ################################################################
             logger.debug("%s initialized for sandbox testing", agent.agent_type.value)
-
-            agent_output = await agent.execute(user_input=AgentInput(message=user_input), context=context)
+            agent_input = AgentInput(message=user_input)
+            agent_output = await agent.execute(user_input=agent_input, context=context)
             if not agent.is_responsible_for_conversation_history():
-                await conversation_memory_manager.update_history(AgentInput(message=user_input), agent_output)
+                await conversation_memory_manager.update_history(agent_input, agent_output)
 
             if agent_output.finished:
                 await conversation_memory_manager.update_history(AgentInput(message="", is_artificial=True), AgentOutput(
