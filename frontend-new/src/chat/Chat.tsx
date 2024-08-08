@@ -19,13 +19,19 @@ import ExperiencesDrawer from "src/Experiences/ExperiencesDrawer";
 import { Experience } from "src/Experiences/ExperienceService/Experiences.types";
 import ExperienceService from "src/Experiences/ExperienceService/ExperienceService";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import InactiveBackdrop from "src/theme/Backdrop/InactiveBackdrop";
 
 const uniqueId = "b7ea1e82-0002-432d-a768-11bdcd186e1d";
 export const DATA_TEST_ID = {
   CHAT_CONTAINER: `chat-container-${uniqueId}`,
 };
 
-const Chat = () => {
+interface ChatProps {
+  showInactiveSessionAlert?: boolean;
+  disableInactivityCheck?: boolean;
+}
+
+const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableInactivityCheck = false }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [messages, setMessages] = useState<IChatMessage[]>([]);
   const [conversationCompleted, setConversationCompleted] = useState<boolean>(false);
@@ -37,6 +43,8 @@ const Chat = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [experiences, setExperiences] = React.useState<Experience[]>([]);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [showBackdrop, setShowBackdrop] = useState(showInactiveSessionAlert);
+  const [lastActivityTime, setLastActivityTime] = React.useState<number>(Date.now());
 
   const navigate = useNavigate();
 
@@ -210,6 +218,43 @@ const Chat = () => {
     setIsDrawerOpen(false);
   };
 
+  // show the user backdrop when the user is inactive for 2 minutes
+  useEffect(() => {
+    if (disableInactivityCheck) return;
+
+    const checkInactivity = () => {
+      if (Date.now() - lastActivityTime > 2 * 60 * 1000) {
+        setShowBackdrop(true);
+      }
+    };
+
+    // Set the interval to check every 1 minute
+    const interval = setInterval(checkInactivity, 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [lastActivityTime, disableInactivityCheck]);
+
+  // Close backdrop when user interacts with the page
+  useEffect(() => {
+    if (disableInactivityCheck) return;
+
+    // Reset the timer when the user interacts with the page
+    const resetTimer = () => {
+      setLastActivityTime(Date.now());
+      if (showBackdrop) {
+        setShowBackdrop(false);
+      }
+    };
+
+    const handleUserActivity = () => resetTimer();
+
+    document.addEventListener("click", handleUserActivity);
+
+    return () => {
+      document.removeEventListener("click", handleUserActivity);
+    };
+  }, [showBackdrop, disableInactivityCheck]);
+
   return (
     <>
       {isLoggingOut ? (
@@ -231,6 +276,7 @@ const Chat = () => {
             <Box sx={{ flex: 1, overflowY: "auto" }}>
               <ChatList messages={messages} isTyping={isTyping} />
             </Box>
+            {showBackdrop && <InactiveBackdrop isShown={showBackdrop} />}
             <Box sx={{ flexShrink: 0 }}>
               <ChatMessageField
                 handleSend={handleSend}

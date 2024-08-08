@@ -27,7 +27,7 @@ type Story = StoryObj<typeof Chat>;
 const CONVERSATION_HISTORY_URL = getBackendUrl() + "/conversation/history?session_id=1234";
 
 export const Shown: Story = {
-  args: {},
+  args: { showInactiveSessionAlert: false, disableInactivityCheck: true },
   parameters: {
     mockData: [
       ...meta.parameters!.mockData,
@@ -172,7 +172,7 @@ const generateRealisticConversation = (finished: boolean, includeExperiences: bo
 };
 
 export const ShownWithUnfinishedConversation: Story = {
-  args: {},
+  args: { showInactiveSessionAlert: false, disableInactivityCheck: true },
   parameters: {
     mockData: generateRealisticConversation(false, false),
     isLoading: true,
@@ -180,8 +180,18 @@ export const ShownWithUnfinishedConversation: Story = {
 };
 
 export const ShownWithFinishedConversation: Story = {
-  args: {},
+  args: { showInactiveSessionAlert: false, disableInactivityCheck: true },
   parameters: {
     mockData: generateRealisticConversation(true, true),
+  },
+};
+
+export const ShownWhenUserIsInactive: Story = {
+  args: {
+    showInactiveSessionAlert: true,
+    disableInactivityCheck: true,
+  },
+  parameters: {
+    mockData: generateRealisticConversation(false, true),
   },
 };
