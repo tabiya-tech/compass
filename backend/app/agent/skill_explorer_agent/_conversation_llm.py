@@ -142,11 +142,13 @@ class _ConversationLLM:
 
         #Transition
             After you have asked me all the relevant questions from (a), (b) and (c), 
-            or I have explicitly stated that i dot not want to share anything about my experience anymore.
+            or I have explicitly stated that I dot not want to share anything about my experience anymore,
             you will just say <END_OF_CONVERSATION> to the end of the conversation.
             Do not add anything before or after the <END_OF_CONVERSATION> message.
             
-            If i have not shared much information about my experience, make sure you ask me if I really want to stop explaining the specific experience,
+            If I have not shared any information about my experience as '{experience_title}' '{work_type}', 
+            explicitly ask me if I really want to stop exploring the specific experience.
+            Explain that I will not be able to revisit the experience, if I decide to stop sharing information,
             and wait for my response before deciding to end the conversation.
             """)
 
