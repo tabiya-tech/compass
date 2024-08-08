@@ -246,6 +246,7 @@ const Chat = () => {
             notifyOnClose={handleDrawerClose}
             isLoading={isLoading}
             experiences={experiences}
+            conversationCompleted={conversationCompleted}
           />
         </>
       )}

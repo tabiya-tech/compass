@@ -1,11 +1,11 @@
 import React from "react";
 
 import { Box, IconButton, Tooltip, useTheme } from "@mui/material";
-import PrivacyTipIcon from "@mui/icons-material/PrivacyTip";
 
 export interface HelpTipProps {
   children?: React.ReactNode;
   "data-testid"?: string;
+  icon: React.ReactNode;
 }
 
 const uniqueId = "4b757f12-fb67-4a59-94b1-b8a2498a7a49";
@@ -49,7 +49,7 @@ const HelpTip: React.FC<HelpTipProps> = (props: Readonly<HelpTipProps>) => {
           marginRight: 0.5,
         }}
       >
-        <PrivacyTipIcon />
+        {props.icon}
       </IconButton>
     </Tooltip>
   );

@@ -1,0 +1,72 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DownloadReportButton should render DownloadReportButton correctly when disabled is false 1`] = `
+<div
+  class="MuiBox-root css-0"
+  data-testid="download-report-button-container-f5553dac-adb7-440f-9549-c3567b22dc76"
+>
+  <button
+    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-aysw4f-MuiButtonBase-root-MuiIconButton-root"
+    data-testid="download-report-button-f5553dac-adb7-440f-9549-c3567b22dc76"
+    tabindex="0"
+    title="Download Report"
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-dy5dri-MuiSvgIcon-root"
+      data-testid="download-report-icon-f5553dac-adb7-440f-9549-c3567b22dc76"
+      focusable="false"
+      viewBox="0 0 24 24"
+    >
+      <path
+        d="M19 9h-4V3H9v6H5l7 7zM5 18v2h14v-2z"
+      />
+    </svg>
+    <span
+      class="MuiTypography-root MuiTypography-caption css-ijdyd0-MuiTypography-root"
+    >
+      Download
+    </span>
+    <span
+      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+    />
+  </button>
+</div>
+`;
+
+exports[`DownloadReportButton should render DownloadReportButton correctly when disabled is true 1`] = `
+<div
+  class="MuiBox-root css-0"
+  data-testid="download-report-button-container-f5553dac-adb7-440f-9549-c3567b22dc76"
+>
+  <button
+    class="MuiButtonBase-root Mui-disabled MuiIconButton-root Mui-disabled MuiIconButton-sizeMedium css-aysw4f-MuiButtonBase-root-MuiIconButton-root"
+    data-testid="download-report-button-f5553dac-adb7-440f-9549-c3567b22dc76"
+    disabled=""
+    tabindex="-1"
+    title="Download Report"
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-dy5dri-MuiSvgIcon-root"
+      data-testid="download-report-icon-f5553dac-adb7-440f-9549-c3567b22dc76"
+      focusable="false"
+      viewBox="0 0 24 24"
+    >
+      <path
+        d="M19 9h-4V3H9v6H5l7 7zM5 18v2h14v-2z"
+      />
+    </svg>
+    <span
+      class="MuiTypography-root MuiTypography-caption css-1jmum30-MuiTypography-root"
+    >
+      Download
+    </span>
+  </button>
+  <div
+    data-testid="download-report-help-tip-f5553dac-adb7-440f-9549-c3567b22dc76"
+  />
+</div>
+`;
