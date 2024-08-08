@@ -231,5 +231,89 @@ test_cases = [
         expected_same_title=False,
         expected_occupations_found=["power production plant operator"],
     ),
+    InferOccupationToolTestCase(
+        name="generic title",
+        given_experience=ExperienceEntity(
+            experience_title="Service Provider",
+            work_type=WorkType.SELF_EMPLOYMENT,
+            company="Mobile carwash",
+            location="Joburg",
+            responsibilities=ResponsibilitiesData(
+                responsibilities=[
+                    "I move my activity",
+                    "I wash cars"
+                ]),
+        ),
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        expected_same_title=False,
+        expected_occupations_found=["vehicle cleaner"],
+    ),
+    InferOccupationToolTestCase(
+        name="generic object",
+        given_experience=ExperienceEntity(
+            experience_title="Goods seller",
+            work_type=WorkType.SELF_EMPLOYMENT,
+            company="",
+            location="Joburg",
+            responsibilities=ResponsibilitiesData(
+                responsibilities=[
+                    "I sell goods",
+                ]),
+        ),
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        expected_same_title=False,
+        expected_occupations_found=["sales workers not elsewhere classified"],
+    ),
+    InferOccupationToolTestCase(
+        name="new occupation",
+        given_experience=ExperienceEntity(
+            experience_title="Influencer",
+            work_type=WorkType.SELF_EMPLOYMENT,
+            company="",
+            location="online",
+            responsibilities=ResponsibilitiesData(
+                responsibilities=[
+                    "I create content for social media",
+                    "I work with brands for social media campaigns"
+                ]),
+        ),
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        expected_same_title=False,
+        expected_occupations_found=["digital marketing manager", "promoter"],
+    ),
+    InferOccupationToolTestCase(
+        name="role is not stable",
+        given_experience=ExperienceEntity(
+            experience_title="Casual",
+            work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+            company="Spar",
+            location="Joburg",
+            responsibilities=ResponsibilitiesData(
+                responsibilities=[
+                    "Unload goods",
+                    "stock shelves"
+                ]),
+        ),
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        expected_same_title=False,
+        expected_occupations_found=["shelf filler", "sales assistant"],
+    ),
+    InferOccupationToolTestCase(
+        name="rare role",
+        given_experience=ExperienceEntity(
+            experience_title="Voice over artist",
+            work_type=WorkType.SELF_EMPLOYMENT,
+            company="",
+            location="Joburg",
+            responsibilities=ResponsibilitiesData(
+                responsibilities=[
+                    "I do audiobook narrations",
+                    "I inform and educate communities"
+                ]),
+        ),
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        expected_same_title=False,
+        expected_occupations_found=["voice-over artist"],
+    ),
     # Add more test cases as needed
 ]
