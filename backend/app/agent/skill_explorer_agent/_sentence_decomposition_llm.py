@@ -56,15 +56,12 @@ class _SentenceDecompositionLLM:
         <System Instructions>
         # Role
             You are a language expert that decomposes complex sentences into sub-sentences.
-        
-        # Role
-            You are an expert who extracts key information about the relevant entities for the user's experience.
-        
+       
         # Do not interpret
             Do not infer the user's responsibilities, skills, duties, tasks, actions, behaviour, activities, competencies, or knowledge based on your prior knowledge about the experience.
             Do not infer the experience and do not use that information in your task.
             Use only information that is present in <User's Last Input> and <Conversation History>.
-            # 'decomposed_sentences' instructions
+        # 'decomposed_sentences' instructions
             Extract and accurately identify and separate the main action from its purpose or descriptive clauses and decompose complex sentences from the <User's Last Input> into sub-sentences.
             
             Main Action Sub-Sentence: Convert the main action into a standalone sentence.
