@@ -74,7 +74,7 @@ async def test_main_app_chat(max_iterations: int, test_case: EvaluationTestCase,
                                                      test_case=test_case.name)
     try:
         evaluation_result.add_conversation_records(
-            await conversation_generator.generate(max_iterations=max_iterations,
+            await conversation_generator.generate(max_iterations=test_case.conversation_rounds if test_case.conversation_rounds else max_iterations,
                                                   execute_simulated_user=LLMSimulatedUser(
                                                       system_instructions=test_case.simulated_user_prompt),
                                                   execute_evaluated_agent=_AppChatExecutor(session_id=session_id),
@@ -87,7 +87,7 @@ async def test_main_app_chat(max_iterations: int, test_case: EvaluationTestCase,
             assert output.score >= evaluation.expected, f"{evaluation.type.name} expected " \
                                                         f"{evaluation.expected} actual {output.score}"
     except Exception as e:
-        logger.error(f"Error in test case {test_case.name}: {e}")
+        logger.exception(f"Error in test case {test_case.name}: {e}", exc_info=True)
     finally:
         output_folder = common_folder_path + 'e2e_test_' + test_case.name
         evaluation_result.save_data(folder=output_folder, base_file_name='evaluation_record')
