@@ -4,12 +4,11 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from app.agent.linking_and_ranking_pipeline.experience_pipeline import ExperiencePipeline
 from app.agent.skill_explorer_agent import SkillsExplorerAgent
-from app.agent.skill_linking_ranking import SkillsLinkingTool
 from app.countries import Country
 from app.agent.collect_experiences_agent import CollectExperiencesAgent
 from app.agent.experience.experience_entity import ExperienceEntity
-from app.agent.infer_occupation_tool.infer_occupation_tool import InferOccupationTool
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 
 from app.agent.agent import Agent
@@ -150,16 +149,39 @@ class ExploreExperiencesAgentDirector(Agent):
             current_experience.dive_in_phase = DiveInPhase.LINKING_RANKING
 
         if current_experience.dive_in_phase == DiveInPhase.LINKING_RANKING:
-            # Infer the occupations for the experience and update the experience entity
-            # , then link the skills and rank them
-            agent_output = await self._link_and_rank(current_experience.experience)
-            await self._conversation_manager.update_history(AgentInput(
-                message="(silence)",
-                is_artificial=True
-            ), agent_output)
-            # completed processing this experience
-            current_experience.dive_in_phase = DiveInPhase.PROCESSED
-            state.current_experience_uuid = None
+
+            if current_experience.experience.responsibilities.responsibilities:
+                # Infer the occupations for the experience and update the experience entity
+                # , then link the skills and rank them
+                agent_output = await self._link_and_rank(current_experience.experience)
+                await self._conversation_manager.update_history(AgentInput(
+                    message="(silence)",
+                    is_artificial=True
+                ), agent_output)
+                # get the context again after updating the history
+                context = await self._conversation_manager.get_conversation_context()
+                # completed processing this experience
+                current_experience.dive_in_phase = DiveInPhase.PROCESSED
+                state.current_experience_uuid = None
+            else:
+                # if the current experience does not have any responsibilities, then we should skip this experience
+                # as there is no information to link and ran, and we should move to the next experience
+                current_experience.dive_in_phase = DiveInPhase.PROCESSED
+                state.current_experience_uuid = None
+                agent_output = AgentOutput(
+                    message_for_user=f'I have skipped your experience as "{current_experience.experience.experience_title}" '
+                                     f'because you did not share enough details',
+                    finished=False,
+                    agent_type=self._agent_type,
+                    agent_response_time_in_sec=0,
+                    llm_stats=[]
+                )
+                await self._conversation_manager.update_history(AgentInput(
+                    message="(silence)",
+                    is_artificial=True
+                ), agent_output)
+                # get the context again after updating the history
+                context = await self._conversation_manager.get_conversation_context()
 
             # If the agent has finished exploring the skills, then if there are no more experiences to process,
             # then we are done
@@ -212,7 +234,7 @@ class ExploreExperiencesAgentDirector(Agent):
         # Then dive into each of the experiences collected
         if state.conversation_phase == ConversationPhase.DIVE_IN:
 
-            if transitioned_between_states:
+            if transitioned_between_states:  # TODO this is not needed anymore
                 user_input = AgentInput(
                     message="I am ready to dive into my experiences, don't greet me, let's get into it immediately",
                     is_artificial=True)
@@ -242,9 +264,7 @@ class ExploreExperiencesAgentDirector(Agent):
         self._conversation_manager = conversation_manager
         self._state: ExploreExperiencesAgentDirectorState | None = None
         self._collect_experiences_agent = CollectExperiencesAgent()
-        self._infer_occupations_tool = InferOccupationTool(search_services.occupation_skill_search_service)
         self._exploring_skills_agent = SkillsExplorerAgent()
-        self._skills_linking_tool = SkillsLinkingTool(search_services.skill_search_service)
 
     def get_collect_experiences_agent(self) -> CollectExperiencesAgent:
         return self._collect_experiences_agent
@@ -254,22 +274,19 @@ class ExploreExperiencesAgentDirector(Agent):
 
     async def _link_and_rank(self, current_experience: ExperienceEntity) -> AgentOutput:
         start = time.time()
-        inferred_occupations_response = await self._infer_occupations_tool.execute(
-            country_of_interest=Country.SOUTH_AFRICA,
-            experience=current_experience
-        )
-        current_experience.contextual_title = inferred_occupations_response.contextualized_title
-        current_experience.esco_occupations = inferred_occupations_response.esco_occupations
-        # Link the skills and rank them
-        top_skills_response = await self._skills_linking_tool.link_and_rank_skills(
+        pipeline = ExperiencePipeline(self._search_services)
+        pipline_result = await pipeline.execute(
             experience_title=current_experience.experience_title,
-            contextual_title=current_experience.contextual_title,
-            esco_occupations=inferred_occupations_response.esco_occupations,
-            responsibilities_data=current_experience.responsibilities)
-        current_experience.top_skills = top_skills_response.top_skills
+            company_name=current_experience.company,
+            work_type=current_experience.work_type,
+            country_of_interest=Country.SOUTH_AFRICA,  # TODO: get the country from the state
+            responsibilities=current_experience.responsibilities.responsibilities
+        )
+        current_experience.top_skills = pipline_result.top_skills
+
         # construct a summary of the skills
         skills_summary = "\n"
-        for skill in top_skills_response.top_skills:
+        for skill in current_experience.top_skills:
             skills_summary += f"• {skill.preferredLabel}\n"
 
         end = time.time()
@@ -280,6 +297,6 @@ class ExploreExperiencesAgentDirector(Agent):
             finished=False,
             agent_type=self._agent_type,
             agent_response_time_in_sec=round(end - start, 2),
-            llm_stats=[inferred_occupations_response.stats] + top_skills_response.llm_stats
+            llm_stats=pipline_result.llm_stats
         )
         return agent_output
