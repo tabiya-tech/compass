@@ -3,9 +3,8 @@ from typing import List
 
 from pydantic import BaseModel
 
+from ._relevance_classifier_llm import _RelevanceClassifierLLM
 from app.agent.agent_types import LLMStats
-from app.agent.experience.experience_entity import ResponsibilitiesData
-from app.agent.skill_linking_ranking._relevance_classifier_llm import _RelevanceClassifierLLM, RelevanceClassifierResponse
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
 from app.vector_search.esco_entities import OccupationSkillEntity, SkillEntity
 from app.vector_search.esco_search_service import SkillSearchService
@@ -28,21 +27,21 @@ class _SkillStat(BaseModel):
     score_sum: float = 0.0
 
 
-class SkillsLinkingTool:
+class SkillLinkingTool:
 
     def __init__(self, skill_search_service: SkillSearchService):
         self._skill_search_service = skill_search_service
         self._relevance_tool = _RelevanceClassifierLLM()
         self._logger = logging.getLogger(__class__.__name__)
 
-    async def link_and_rank_skills(self, *,
-                                   experience_title: str,
-                                   contextual_title: str,
-                                   esco_occupations: List[OccupationSkillEntity],
-                                   responsibilities_data: ResponsibilitiesData,
-                                   only_essential: bool = True,
-                                   top_k: int = 5,
-                                   top_p: int = 10) -> SkillsLinkingToolResponse:
+    async def execute(self, *,
+                      experience_title: str,
+                      contextual_title: str,
+                      esco_occupations: List[OccupationSkillEntity],
+                      responsibilities: list[str],
+                      only_essential: bool = True,
+                      top_k: int = 5,
+                      top_p: int = 10) -> SkillsLinkingToolResponse:
         """
         Return the top_k that are linked to the responsibilities.
 
@@ -83,10 +82,10 @@ class SkillsLinkingTool:
 
         # 1. Generate the embeddings for the responsibilities (responsibilities_data.responsibilities)
         embeddings_service = GoogleGeckoEmbeddingService()
-        responsibilities_embeddings = await embeddings_service.embed_batch(responsibilities_data.responsibilities)
+        responsibilities_embeddings = await embeddings_service.embed_batch(responsibilities)
         # 2. For each responsibility (embedding),
         all_llm_stats: list[LLMStats] = []
-        for responsibility_text, responsibility_embedding in zip(responsibilities_data.responsibilities, responsibilities_embeddings):
+        for responsibility_text, responsibility_embedding in zip(responsibilities, responsibilities_embeddings):
             # 2.1 Find the top_p most similar skills that are within the list of skills of the esco_occupations
             filter_spec = {"UUID": {"$in": esco_skills_uuids}} if len(esco_skills_uuids) > 0 else None
             similar_skills = await self._skill_search_service.search(query=responsibility_embedding, filter_spec=filter_spec, k=top_p)

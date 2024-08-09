@@ -4,7 +4,7 @@ import uuid
 import pytest
 from _pytest.logging import LogCaptureFixture
 
-from app.agent.skill_linking_ranking._relevance_classifier_llm import _RelevanceClassifierLLM
+from app.agent.linking_and_ranking_pipeline.skill_linking_tool._relevance_classifier_llm import _RelevanceClassifierLLM
 from app.vector_search.esco_entities import SkillEntity
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
@@ -34,6 +34,30 @@ class RelevanceClassifierLLMTestCase(CompassTestCase):
 
 test_cases = [
     RelevanceClassifierLLMTestCase(
+        skip_force="force",
+        name="Special characters",
+        given_experience_title="Baker",
+        given_contextual_title="Baker",
+        given_responsibility="'I clean my work place'",
+        given_skills=[
+            _get_skill_entity(preferred_label="perform one's cleaning duties", score=0.9),
+            _get_skill_entity(preferred_label="ensure \"sanitation\"", score=0.8),
+            _get_skill_entity(preferred_label="clean animals", score=0.8),
+            _get_skill_entity(preferred_label="let's not think about it", score=0.7),
+            _get_skill_entity(preferred_label="*_@§\"$%\"':", score=0.6),
+        ],
+        given_top_k=2,
+        expected_relevant_skills=["perform one's cleaning duties",
+                                  "ensure \"sanitation\"",
+                                  ],
+        expected_remaining_skills=[
+            "clean animals",
+            "let's not think about it",
+            "*_@§\"$%\"':",
+        ]
+    ),
+
+    RelevanceClassifierLLMTestCase(
         name="Baker",
         given_experience_title="Baker",
         given_contextual_title="Baker",
@@ -55,12 +79,12 @@ test_cases = [
                                   "ensure sanitation",
                                   "follow hygienic procedures during food processing",
                                   "ensure cleanliness of food preparation area",
-                                  "clean food and beverage machinery",
+                                  "handover the food preparation area",
                                   "maintain a safe, hygienic and secure working environment",
                                   ],
         expected_remaining_skills=[
+            "clean food and beverage machinery",
             "monitor operations of cleaning machines",
-            "handover the food preparation area",
             "operate grain cleaning machine",
             "carry out checks of production plant equipment",
         ]
