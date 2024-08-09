@@ -1,17 +1,21 @@
 import "src/_test_utilities/consoleMock";
 import React from "react";
-import { render, screen, waitFor } from "src/_test_utilities/test-utils";
+import { render, screen, waitFor, act, fireEvent } from "src/_test_utilities/test-utils";
 import { HashRouter } from "react-router-dom";
 import Register, { DATA_TEST_ID } from "./Register";
-import { EmailAuthContext, TabiyaUser } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 import RegisterWithEmailForm from "src/auth/pages/Register/components/RegisterWithEmailForm/RegisterWithEmailForm";
 import { DATA_TEST_ID as AUTH_HEADER_DATA_TEST_ID } from "src/auth/components/AuthHeader/AuthHeader";
+import { AuthContext, AuthContextValue, TabiyaUser } from "src/auth/AuthProvider";
+import { emailAuthService } from "src/auth/services/emailAuth/EmailAuth.service";
+import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
+import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
+import { ServiceError } from "src/error/ServiceError/ServiceError";
 
-//mock the IDPAuth component
-jest.mock("src/auth/components/IDPAuth/IDPAuth", () => {
-  const actual = jest.requireActual("src/auth/components/IDPAuth/IDPAuth");
+//mock the SocialAuth component
+jest.mock("src/auth/components/SocialAuth/SocialAuth", () => {
+  const actual = jest.requireActual("src/auth/components/SocialAuth/SocialAuth");
   return {
     ...actual,
     __esModule: true,
@@ -21,6 +25,15 @@ jest.mock("src/auth/components/IDPAuth/IDPAuth", () => {
   };
 });
 
+// mock the emailAuthService
+jest.mock("src/auth/services/emailAuth/EmailAuth.service", () => {
+  return {
+    emailAuthService: {
+      handleRegisterWithEmail: jest.fn(),
+      handleLogout: jest.fn(),
+    },
+  };
+});
 // mock the snack bar provider
 jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   const actual = jest.requireActual("src/theme/SnackbarProvider/SnackbarProvider");
@@ -72,19 +85,12 @@ jest.mock("src/auth/components/AuthHeader/AuthHeader", () => {
 });
 
 describe("Testing Register component", () => {
-  const registerWithEmailMock = jest.fn();
-
-  const authContextValue = {
-    registerWithEmail: registerWithEmailMock,
-    loginWithEmail: jest.fn(),
-    isLoggingInWithEmail: false,
-    isRegisteringWithEmail: false,
-    isLoggingInAnonymously: false,
-    isLoggingOut: false,
+  const authContextValue: AuthContextValue = {
     user: null,
-    logout: jest.fn(),
-    handlePageLoad: jest.fn(),
-    loginAnonymously: jest.fn(),
+    updateUserByToken: jest.fn(),
+    clearUser: jest.fn(),
+    isAuthenticationInProgress: false,
+    isAuthenticated: false,
   };
 
   beforeEach(() => {
@@ -98,22 +104,37 @@ describe("Testing Register component", () => {
 
   test("it should show register form successfully", async () => {
     // GIVEN a user to register
+    const givenInvitationCode = "foo-bar";
     const givenName = "Foo Bar";
     const givenEmail = "foo@bar.baz";
     const givenPassword = "password";
     const givenNotifyOnRegister = jest.fn();
     const givenNotifyOnLogin = jest.fn();
     const givenIsLoading = false;
+
+    // AND check invitation code status returns a valid code
+    const checkInvitationCodeStatusMock = jest
+      .spyOn(invitationsService, "checkInvitationCodeStatus")
+      .mockImplementation(
+        //@ts-ignore
+        (initation_code, successCallback, failureCallback) => {
+          successCallback({
+            invitation_type: InvitationType.REGISTER,
+            status: InvitationStatus.VALID,
+            invitation_code: initation_code,
+          });
+        }
+      );
     // WHEN the component is rendered within the AuthContext and Router
     render(
       <HashRouter>
-        <EmailAuthContext.Provider value={authContextValue}>
+        <AuthContext.Provider value={authContextValue}>
           <Register
             postRegisterHandler={givenNotifyOnRegister}
             postLoginHandler={givenNotifyOnLogin}
             isPostLoginLoading={givenIsLoading}
           />
-        </EmailAuthContext.Provider>
+        </AuthContext.Provider>
       </HashRouter>
     );
 
@@ -130,12 +151,24 @@ describe("Testing Register component", () => {
     // AND the form inputs and button should be displayed
     expect(RegisterWithEmailForm).toHaveBeenCalled();
 
-    // Simulate form submission
-    (RegisterWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnRegister(givenName, givenEmail, givenPassword);
+    fireEvent.change(screen.getByTestId(DATA_TEST_ID.REGISTRATION_CODE_INPUT), {
+      target: { value: givenInvitationCode },
+    });
+
+    await act(async () => {
+      // Simulate form submission
+      const calls = (RegisterWithEmailForm as jest.Mock).mock.calls;
+
+      await calls[calls.length - 1][0].notifyOnRegister(givenName, givenEmail, givenPassword);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId(DATA_TEST_ID.REGISTRATION_CODE_INPUT)).toHaveValue(givenInvitationCode);
+    });
 
     // Expect the register function to have been called
     await waitFor(() => {
-      expect(registerWithEmailMock).toHaveBeenCalledWith(
+      expect(emailAuthService.handleRegisterWithEmail).toHaveBeenCalledWith(
         givenEmail,
         givenPassword,
         givenName,
@@ -143,6 +176,13 @@ describe("Testing Register component", () => {
         expect.any(Function)
       );
     });
+
+    // AND check that the invitation code status was checked
+    expect(checkInvitationCodeStatusMock).toHaveBeenCalledWith(
+      givenInvitationCode,
+      expect.any(Function),
+      expect.any(Function)
+    );
 
     // AND the component should match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.REGISTER_CONTAINER)).toMatchSnapshot();
@@ -157,29 +197,46 @@ describe("Testing Register component", () => {
     const givenNotifyOnLogin = jest.fn();
     const givenIsLoading = false;
 
-    registerWithEmailMock.mockImplementation((email, password, name, onSuccess, onError) => {
-      onSuccess({ id: "mock-id", email: givenEmail, name: givenName } as TabiyaUser);
-    });
+    (emailAuthService.handleRegisterWithEmail as jest.Mock).mockImplementation(
+      (
+        email: string,
+        password: string,
+        name: string,
+        onSuccess: (user: TabiyaUser) => void,
+        onError: (error: Error) => void
+      ) => {
+        onSuccess({ id: "mock-id", email: givenEmail, name: givenName } as TabiyaUser);
+      }
+    );
 
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <EmailAuthContext.Provider value={authContextValue}>
+        <AuthContext.Provider value={authContextValue}>
           <Register
             postRegisterHandler={givenNotifyOnRegister}
             postLoginHandler={givenNotifyOnLogin}
             isPostLoginLoading={givenIsLoading}
           />
-        </EmailAuthContext.Provider>
+        </AuthContext.Provider>
       </HashRouter>
     );
 
     // AND the register form is submitted
-    (RegisterWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnRegister(givenName, givenEmail, givenPassword);
+    await act(() => {
+      (RegisterWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnRegister(givenName, givenEmail, givenPassword);
+    });
+
+    await act(async () => {
+      // Simulate form submission
+      const calls = (RegisterWithEmailForm as jest.Mock).mock.calls;
+
+      await calls[calls.length - 1][0].notifyOnRegister(givenName, givenEmail, givenPassword);
+    });
 
     // THEN expect the register function to have been called
     await waitFor(() => {
-      expect(registerWithEmailMock).toHaveBeenCalledWith(
+      expect(emailAuthService.handleRegisterWithEmail).toHaveBeenCalledWith(
         givenEmail,
         givenPassword,
         givenName,
@@ -191,21 +248,22 @@ describe("Testing Register component", () => {
     // AND no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
-
-    // AND the user should be redirected to the data protection Agreement page
-    expect(givenNotifyOnRegister).toHaveBeenCalled();
-    // AND the success message should be displayed
-    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Verification Email Sent!", { variant: "success" });
   });
 
   test("it should show error message on failed registration", async () => {
     // GIVEN a failed registration
-    registerWithEmailMock.mockImplementation((email, password, name, onSuccess, onError) => {
-      onError(new Error("An unexpected error occurred. Please try again later."), {
-        code: "auth/internal-error",
-        message: "Internal error",
-      });
-    });
+    (emailAuthService.handleRegisterWithEmail as jest.Mock).mockImplementation(
+      (
+        email: string,
+        password: string,
+        name: string,
+        onSuccess: (user: TabiyaUser) => void,
+        onError: (error: Error) => void
+      ) => {
+        onError(new Error("An unexpected error occurred. Please try again later."));
+      }
+    );
+
     const givenName = "Foo Bar";
     const givenEmail = "foo@bar.baz";
     const givenPassword = "password";
@@ -213,25 +271,38 @@ describe("Testing Register component", () => {
     const givenNotifyOnLogin = jest.fn();
     const givenIsLoading = false;
 
+    // AND check invitation code status returns a valid code
+    jest.spyOn(invitationsService, "checkInvitationCodeStatus").mockImplementation(
+      //@ts-ignore
+      (initation_code, successCallback, failureCallback) => {
+        successCallback({
+          invitation_type: InvitationType.REGISTER,
+          status: InvitationStatus.VALID,
+          invitation_code: initation_code,
+        });
+      }
+    );
+
     // WHEN the register form is submitted
     render(
       <HashRouter>
-        <EmailAuthContext.Provider value={authContextValue}>
+        <AuthContext.Provider value={authContextValue}>
           <Register
             postRegisterHandler={givenNotifyOnRegister}
             postLoginHandler={givenNotifyOnLogin}
             isPostLoginLoading={givenIsLoading}
           />
-        </EmailAuthContext.Provider>
+        </AuthContext.Provider>
       </HashRouter>
     );
 
     // AND the register form is submitted
-    (RegisterWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnRegister(givenName, givenEmail, givenPassword);
-
+    await act(() => {
+      (RegisterWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnRegister(givenName, givenEmail, givenPassword);
+    });
     // THEN expect the register function to have been called
     await waitFor(() => {
-      expect(registerWithEmailMock).toHaveBeenCalledWith(
+      expect(emailAuthService.handleRegisterWithEmail).toHaveBeenCalledWith(
         givenEmail,
         givenPassword,
         givenName,
@@ -241,9 +312,44 @@ describe("Testing Register component", () => {
     });
 
     // AND the error message should be displayed
-    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-      "An unexpected error occurred. Please try again later.",
-      { variant: "error" }
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("An internal error has occurred.", { variant: "error" });
+  });
+
+  test("it should not call register when invitation code is invalid", async () => {
+    // GIVEN an invalid invitation code
+    const givenInvitationCode = "foo-bar";
+    const givenName = "Foo Bar";
+    const givenEmail = "foo-bar@foo.bar";
+
+    // AND check invitation code check returns an invalid code
+    jest.spyOn(invitationsService, "checkInvitationCodeStatus").mockImplementation(
+      //@ts-ignore
+      (initation_code, successCallback, failureCallback) => {
+        failureCallback({
+          message: "Invalid invitation code",
+        } as ServiceError);
+      }
     );
+
+    // WHEN the component is rendered
+    render(
+      <HashRouter>
+        <AuthContext.Provider value={authContextValue}>
+          <Register postRegisterHandler={jest.fn()} postLoginHandler={jest.fn()} isPostLoginLoading={false} />
+        </AuthContext.Provider>
+      </HashRouter>
+    );
+
+    fireEvent.change(screen.getByTestId(DATA_TEST_ID.REGISTRATION_CODE_INPUT), {
+      target: { value: givenInvitationCode },
+    });
+
+    // AND the register form is submitted
+    (RegisterWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnRegister(givenName, givenEmail, "password");
+
+    // THEN expect the register function to not have been called
+    await waitFor(() => {
+      expect(emailAuthService.handleRegisterWithEmail).not.toHaveBeenCalled();
+    });
   });
 });

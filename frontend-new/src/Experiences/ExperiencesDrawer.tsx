@@ -44,7 +44,7 @@ const useLocalStorage = (key: string, initialValue: string) => {
   // Retrieve value from localStorage or fallback to initialValue
   const [value, setValue] = useState<string>(() => {
     const savedValue = PersistentStorageService.getItem(PersistentStorageService.storage, key);
-    const trimmedValueSaved = trimAndValidate(savedValue || "");
+    const trimmedValueSaved = trimAndValidate(savedValue ?? "");
     return trimmedValueSaved !== "" ? trimmedValueSaved : initialValue;
   });
 

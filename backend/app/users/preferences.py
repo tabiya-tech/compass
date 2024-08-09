@@ -7,35 +7,11 @@ from app.users.auth import Authentication, UserInfo, SignInProvider
 from app.users.repositories import UserPreferenceRepository
 from app.users.sessions import generate_new_session_id, SessionsService
 from app.users.types import UserPreferencesUpdateRequest, UserPreferences, UpdateUserLanguageRequest, \
-    CreateUserPreferencesRequest
+    CreateUserPreferencesRequest, UserPreferencesRepositoryUpdateRequest
 
 import logging
 
 logger = logging.getLogger(__name__)
-
-
-async def _update_user_language(
-        repository: UserPreferenceRepository,
-        user_preferences: UpdateUserLanguageRequest,
-        authed_user: UserInfo) -> UserPreferences:
-    try:
-        if authed_user.user_id != user_preferences.user_id:
-            raise HTTPException(status_code=403, detail="forbidden")
-
-        user_language = await repository.get_user_preference_by_user_id(user_preferences.user_id)
-
-        if user_language is None:
-            raise HTTPException(status_code=404, detail="user not found")
-
-        return await repository.update_user_preference(user_preferences.user_id,
-                                                       UserPreferencesUpdateRequest(language=user_preferences.language))
-    except Exception as e:
-        logger.exception(e)
-
-        if isinstance(e, HTTPException):
-            raise e
-
-        raise HTTPException(status_code=500, detail="internal server error - " + e.__str__())
 
 
 async def _get_user_preferences(
@@ -57,9 +33,12 @@ async def _get_user_preferences(
         # Check if the sessions field is missing or empty, and add a new session if needed
         if not user_preferences.sessions or len(user_preferences.sessions) == 0:
             session_id = generate_new_session_id()  # nosec
-            user_preferences = await repository.update_user_preference(user_id,
-                                                                       UserPreferencesUpdateRequest(
-                                                                           sessions=[session_id]))
+            user_preferences = await repository.update_user_preference(
+                user_id,
+                UserPreferencesRepositoryUpdateRequest(
+                    sessions=[session_id]
+                )
+            )
 
         return user_preferences
     except Exception as e:
@@ -79,31 +58,21 @@ async def _create_user_preferences(
         if preferences.user_id != authed_user.user_id:
             raise HTTPException(status_code=403, detail="forbidden")
 
-        # If an invitation code is provided, perform the validation
-        # TODO: The invitation code is optional since register with invitation code is not yet implemented
-        # make invitation code required when the feature is implemented
-        if preferences.invitation_code:
-            # validation of invitation code.
-            invitation = await user_invitation_service.get_invitation_status(preferences.invitation_code)
+        # validation of invitation code.
+        invitation = await user_invitation_service.get_invitation_status(preferences.invitation_code)
 
-            if invitation.status == InvitationCodeStatus.INVALID:
-                raise HTTPException(status_code=400, detail="Invalid invitation code")
+        if invitation.status == InvitationCodeStatus.INVALID:
+            raise HTTPException(status_code=400, detail="Invalid invitation code")
 
-            # an authenticated user can't use an auto-register invitation code
-            if (invitation.invitation_type == InvitationType.AUTO_REGISTER.value
-                    and authed_user.sign_in_provider != SignInProvider.ANONYMOUS):
-                raise HTTPException(status_code=400, detail="Invalid invitation code")
+        # an authenticated user can't use an auto-register invitation code
+        if (invitation.invitation_type == InvitationType.AUTO_REGISTER.value
+                and authed_user.sign_in_provider != SignInProvider.ANONYMOUS):
+            raise HTTPException(status_code=400, detail="Invalid invitation code")
 
-            # an anonymous user can't use a register invitation code because it requires user to register
-            if (invitation.invitation_type == InvitationType.REGISTER.value and
-                    authed_user.sign_in_provider == SignInProvider.ANONYMOUS):
-                raise HTTPException(status_code=400, detail="Invalid invitation code")
-
-            # Reduce the invitation code capacity
-            is_reduced = await user_invitation_service.reduce_invitation_code_capacity(preferences.invitation_code)
-
-            if not is_reduced:
-                raise HTTPException(status_code=400, detail="Invalid invitation code")
+        # an anonymous user can't use a register invitation code because it requires user to register
+        if (invitation.invitation_type == InvitationType.REGISTER.value and
+                authed_user.sign_in_provider == SignInProvider.ANONYMOUS):
+            raise HTTPException(status_code=400, detail="Invalid invitation code")
 
         # Check if user preferences already exist
         user_already_exists = await repository.get_user_preference_by_user_id(preferences.user_id)
@@ -114,15 +83,21 @@ async def _create_user_preferences(
                 detail="user already exists"
             )
 
+        # Reduce the invitation code capacity
+        is_reduced = await user_invitation_service.reduce_invitation_code_capacity(preferences.invitation_code)
+
+        if not is_reduced:
+            raise HTTPException(status_code=400, detail="Invalid invitation code")
+
         # Generating a 64-bit integer session ID
         session_id = generate_new_session_id()  # nosec
-        preferences.sessions = [session_id]
+        sessions = [session_id]
 
         # Create the user preferences
         created = await repository.insert_user_preference(preferences.user_id, UserPreferences(
             language=preferences.language,
-            accepted_tc=preferences.accepted_tc,
-            sessions=preferences.sessions
+            invitation_code=preferences.invitation_code,
+            sessions=sessions
         ))
 
         return created
@@ -136,7 +111,8 @@ async def _create_user_preferences(
         raise HTTPException(status_code=500, detail="failed to create user preferences")
 
 
-async def _get_new_session(user_repository: UserPreferenceRepository, user_id: str, authed_user: UserInfo) -> UserPreferences:
+async def _get_new_session(user_repository: UserPreferenceRepository, user_id: str,
+                           authed_user: UserInfo) -> UserPreferences:
     """
     Get a new session for the user
     :param user_id:  id of the user
@@ -153,6 +129,48 @@ async def _get_new_session(user_repository: UserPreferenceRepository, user_id: s
     except Exception as e:
         ErrorService.handle(__name__, e)
         raise HTTPException(status_code=500, detail="Oops! something went wrong")
+
+
+async def _update_user_preferences(
+        repository: UserPreferenceRepository,
+        preferences: UserPreferencesUpdateRequest,
+        authed_user: UserInfo) -> UserPreferences:
+    """
+    Update user preferences
+    :param repository: UserPreferenceRepository - The user preference repository
+    :param preferences: CreateUserPreferencesRequest - The user preferences to update
+    :param authed_user: UserInfo - The authenticated user
+    :return:
+    """
+    try:
+        if preferences.user_id != authed_user.user_id:
+            raise HTTPException(status_code=403, detail="forbidden")
+
+        # Check if user preferences already exist
+        user_already_exists = await repository.get_user_preference_by_user_id(preferences.user_id)
+
+        if not user_already_exists:
+            raise HTTPException(
+                status_code=404,
+                detail="user does not exist exists"
+            )
+
+        # you can't update the accepted terms and conditions when it's already accepted
+        if preferences.accepted_tc and user_already_exists.accepted_tc:
+            raise HTTPException(
+                status_code=400,
+                detail="accepted terms and conditions can't be updated once accepted"
+            )
+
+        # Update the user preferences
+        created = await repository.update_user_preference(preferences.user_id, UserPreferencesRepositoryUpdateRequest(
+            language=preferences.language,
+            accepted_tc=preferences.accepted_tc,
+        ))
+
+        return created
+    except Exception as e:
+        ErrorService.handle(__name__, e)
 
 
 def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
@@ -176,7 +194,7 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     @router.get("",
                 response_model=UserPreferences,
                 status_code=200,
-                responses={403: {"model" : HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
+                responses={403: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
                 name="get user preferences",
                 description="Get user preferences, (language and time when they accepted terms and conditions)")
     async def _get_user_preferences_handler(user_id: str, user_info: UserInfo = Depends(auth.get_user_info())):
@@ -188,27 +206,33 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     @router.post("",
                  response_model=UserPreferences,
                  status_code=201,
-                 responses={403: {"model" : HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
+                 responses={403: {"model": HTTPErrorResponse}, 409: {"model": HTTPErrorResponse} , 500: {"model": HTTPErrorResponse}},
                  name="add user preferences",
                  description="Add user preferences, (language and time when they accepted terms and conditions)"
                  )
-    async def _create_handler(user_preferences: CreateUserPreferencesRequest,
+    async def _create_handler(body: CreateUserPreferencesRequest,
                               user_info: UserInfo = Depends(auth.get_user_info())):
-        return await _create_user_preferences(user_invitation_service, user_preference_repository, user_preferences, user_info)
+        return await _create_user_preferences(user_invitation_service, user_preference_repository, body, user_info)
 
     #########################
-    # PUT /update-language - Update user preferences - language
+    # POS /users/preferences - Create a user profile
     #########################
-    @router.put("/update-language",
-                response_model=UserPreferences,
-                status_code=200,
-                responses={403: {"model" : HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
-                name="update user preferences, specifically language",
-                description="Update user preferences - language"
-                )
-    async def _update_user_language_handler(user: UpdateUserLanguageRequest,
-                                            user_info: UserInfo = Depends(auth.get_user_info())):
-        return await _update_user_language(user_preference_repository, user, user_info)
+    @router.patch(
+        path="",
+        status_code=200,
+        response_model=UserPreferences,
+        responses={404: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
+        description="Update user preferences",
+    )
+    async def _update_user_preferences_handler(
+            request: UserPreferencesUpdateRequest,
+            user_info: UserInfo = Depends(auth.get_user_info())
+    ) -> UserPreferences:
+        return await _update_user_preferences(
+            user_preference_repository,
+            request,
+            user_info
+        )
 
     #########################
     # GET /new-session - Get a new session for the user

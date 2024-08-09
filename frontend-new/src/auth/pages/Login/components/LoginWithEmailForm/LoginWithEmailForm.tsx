@@ -1,4 +1,4 @@
-import { Box, TextField } from "@mui/material";
+import { Box, TextField, useTheme } from "@mui/material";
 import React from "react";
 
 const uniqueId = "8ab76120-a0d3-47b1-aac0-42d0169e0a58";
@@ -25,8 +25,8 @@ const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({
   notifyOnEmailChanged,
   notifyOnPasswordChanged,
   isDisabled,
-  notifyOnFocused,
 }) => {
+  const theme = useTheme();
   const handleEmailChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     event.preventDefault();
     notifyOnEmailChanged(event.target.value);
@@ -37,13 +37,19 @@ const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({
   };
 
   return (
-    <Box data-testid={DATA_TEST_ID.EMAIL_LOGIN_FORM_CONTAINER}>
+    <Box
+      display="flex"
+      flexDirection="column"
+      width={"100%"}
+      justifyContent={"space-evenly"}
+      gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
+      data-testid={DATA_TEST_ID.EMAIL_LOGIN_FORM_CONTAINER}
+    >
       <TextField
         fullWidth
         label="Email"
         type="email"
         variant="outlined"
-        margin="normal"
         disabled={isDisabled}
         value={email}
         onChange={(e) => handleEmailChange(e)}
@@ -56,7 +62,6 @@ const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({
         variant="outlined"
         disabled={isDisabled}
         value={password}
-        margin="normal"
         onChange={(e) => handlePasswordChange(e)}
         inputProps={{ "data-testid": DATA_TEST_ID.EMAIL_LOGIN_FORM_PASSWORD_INPUT }}
         error={!!passwordError}

@@ -76,7 +76,12 @@ describe("AuthPersistentStorage class tests", () => {
       const userPreferences = PersistentStorageService.getUserPreferences();
 
       // THEN The user preferences should be returned
-      expect(userPreferences).toEqual(givenUserPreferences);
+      expect(userPreferences).toEqual({
+        user_id: "foo",
+        language: Language.en,
+        accepted_tc: expect.any(String),
+        sessions: [1, 2, 3],
+      });
     });
 
     test("return null if user preferences are not set", () => {
@@ -122,7 +127,12 @@ describe("AuthPersistentStorage class tests", () => {
 
       // THEN The user preferences should be stored
       const userPreferences = PersistentStorageService.getUserPreferences();
-      expect(userPreferences).toEqual(givenUserPreferences);
+      expect(userPreferences).toEqual({
+        user_id: "foo",
+        language: Language.en,
+        accepted_tc: expect.any(String),
+        sessions: [1, 2, 3],
+      });
     });
   });
 
@@ -185,6 +195,56 @@ describe("AuthPersistentStorage class tests", () => {
       // THEN The invitation should be stored
       const invitation = PersistentStorageService.getInvitation();
       expect(invitation).toEqual(givenInvitation);
+    });
+  });
+
+  describe("login method tests", () => {
+    test("return correct previously set login method", () => {
+      // GIVEN The login method is stored in the session storage
+      const givenLoginMethod = "foo";
+      PersistentStorageService.setLoginMethod(givenLoginMethod);
+
+      // WHEN The login method is retrieved
+      const loginMethod = PersistentStorageService.getLoginMethod();
+
+      // THEN The login method should be returned
+      expect(loginMethod).toEqual(givenLoginMethod);
+    });
+
+    test("return null if login method is not set", () => {
+      // GIVEN The login method is not stored in the session storage
+      // Nothing set
+
+      // WHEN The login method is retrieved
+      const loginMethod = PersistentStorageService.getLoginMethod();
+
+      // THEN null should be returned
+      expect(loginMethod).toBeNull();
+    });
+
+    test("clear login method", () => {
+      // GIVEN The login method is stored in the session storage
+      const givenLoginMethod = "foo";
+      PersistentStorageService.setLoginMethod(givenLoginMethod);
+
+      // WHEN The login method is cleared
+      PersistentStorageService.clearLoginMethod();
+
+      // THEN The login method should be cleared (null)
+      const loginMethod = PersistentStorageService.getLoginMethod();
+      expect(loginMethod).toBeNull();
+    });
+
+    test("set login method", () => {
+      // GIVEN The login method is not stored in the session storage
+      const givenLoginMethod = "foo";
+
+      // WHEN The login method is set
+      PersistentStorageService.setLoginMethod(givenLoginMethod);
+
+      // THEN The login method should be stored
+      const loginMethod = PersistentStorageService.getLoginMethod();
+      expect(loginMethod).toEqual(givenLoginMethod);
     });
   });
 

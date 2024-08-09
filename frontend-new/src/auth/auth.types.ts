@@ -24,49 +24,26 @@ export type FirebaseToken = {
 };
 
 /**
- * The context value for the email authentication context
+ * The context value for the authentication context
  */
-export type EmailAuthContextValue = {
+export type AuthContextValue = {
   user: TabiyaUser | null;
-  isLoggingInWithEmail: boolean;
-  isRegisteringWithEmail: boolean;
-  isLoggingOut: boolean;
-  loginWithEmail: (
-    email: string,
-    password: string,
-    successCallback: (user: TabiyaUser) => void,
-    errorCallback: (error: Error) => void
-  ) => void;
-  registerWithEmail: (
-    email: string,
-    password: string,
-    name: string,
-    successCallback: () => void,
-    errorCallback: (error: Error) => void
-  ) => void;
-  logout: (successCallback: () => void, errorCallback: (error: any) => void) => void;
-  handlePageLoad: (successCallback: (user: TabiyaUser) => void, errorCallback: (error: Error) => void) => void;
+  updateUserByToken: (token: string) => TabiyaUser | null;
+  clearUser: () => void;
+  isAuthenticationInProgress: boolean;
+  isAuthenticated: boolean;
 };
 
-/**
- * The context value for the anonymous authentication context
- */
-export type AnonymousAuthContextValue = {
-  user: TabiyaUser | null;
-  isLoggingInAnonymously: boolean;
-  isLoggingOut: boolean;
-  loginAnonymously: (successCallback: (user: TabiyaUser) => void, errorCallback: (error: Error) => void) => void;
-  logout: (successCallback: () => void, errorCallback: (error: any) => void) => void;
-  handlePageLoad: (successCallback: (user: TabiyaUser) => void, errorCallback: (error: Error) => void) => void;
-};
+export enum AuthServices {
+  EMAIL = "EMAIL",
+  SOCIAL = "SOCIAL",
+  ANONYMOUS = "ANONYMOUS",
+}
 
-/**
- * The response from the firebase when refreshing the tokens
- */
-export type TFirebaseTokenResponse = {
-  expires_in: number;
-  access_token: string;
-};
+export enum AuthMethods {
+  GOOGLE = "google",
+  PASSWORD = "password",
+}
 
 /**
  * Provider Ids for the different authentication providers
@@ -75,4 +52,18 @@ export type TFirebaseTokenResponse = {
 export enum AuthProviderIds {
   GOOGLE = "google.com",
   PASSWORD = "password",
+}
+
+/**
+ * An interface for all authentication services.
+ * When adding a new authentication service, implement this interface.
+ */
+export interface AuthService {
+  /**
+   * Handle Logout: Method to handle user logout.
+   * @param {() => void} successCallback - Callback to execute on successful logout.
+   * @param {(error: any) => void} failureCallback - Callback to execute on logout error.
+   * @returns {Promise<void>}
+   */
+  handleLogout(successCallback: () => void, failureCallback: (error: any) => void): Promise<void>;
 }

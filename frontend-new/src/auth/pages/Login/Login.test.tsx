@@ -3,22 +3,22 @@ import React from "react";
 import { render, screen, waitFor, fireEvent, act } from "src/_test_utilities/test-utils";
 import { HashRouter } from "react-router-dom";
 import Login, { DATA_TEST_ID } from "./Login";
-import { EmailAuthContext, TabiyaUser } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
-import { InvitationsContext } from "src/invitations/InvitationsProvider/InvitationsProvider";
-import { AnonymousAuthContext } from "src/auth/anonymousAuth/AnonymousAuthProvider/AnonymousAuthProvider";
 import LoginWithEmailForm from "src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm";
 import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm";
 import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
+import { AuthContext, AuthContextValue } from "src/auth/AuthProvider";
+import { EmailAuthService } from "src/auth/services/emailAuth/EmailAuth.service";
+import { AnonymousAuthService } from "src/auth/services/anonymousAuth/AnonymousAuth.service";
+import InvitationsService from "src/invitations/InvitationsService/invitations.service";
 
-// Mock the necessary modules
 jest.mock("src/envService", () => ({
   getFirebaseAPIKey: jest.fn(() => "mock-api-key"),
   getFirebaseDomain: jest.fn(() => "mock-auth-domain"),
   getBackendUrl: jest.fn(() => "mock-backend-url"),
 }));
 
-jest.mock("src/auth/components/IDPAuth/IDPAuth", () => {
-  const actual = jest.requireActual("src/auth/components/IDPAuth/IDPAuth");
+jest.mock("src/auth/components/SocialAuth/SocialAuth", () => {
+  const actual = jest.requireActual("src/auth/components/SocialAuth/SocialAuth");
   return {
     ...actual,
     __esModule: true,
@@ -75,59 +75,33 @@ jest.mock("./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm", () => 
 });
 
 describe("Testing Login component", () => {
-  const loginWithEmailMock = jest.fn();
-  const checkInvitationStatusMock = jest.fn();
-  const loginAnonymouslyMock = jest.fn();
-
-  const emailAuthContextValue = {
-    loginWithEmail: loginWithEmailMock,
-    isLoggingInWithEmail: false,
-    isRegisteringWithEmail: false,
-    isLoggingOut: false,
-    user: null,
-    registerWithEmail: jest.fn(),
-    loginAnonymously: jest.fn(),
-    logout: jest.fn(),
-    handlePageLoad: jest.fn(),
-  };
-
-  const anonymousAuthContextValue = {
-    loginAnonymously: loginAnonymouslyMock,
-    user: null,
-    isLoggingInAnonymously: false,
-    isLoggingOut: false,
-    logout: jest.fn(),
-    handlePageLoad: jest.fn(),
-  };
-
-  const invitationsContextValue = {
-    checkInvitationStatus: checkInvitationStatusMock,
-    isInvitationCheckLoading: false,
-    invitation: {
-      invitation_code: "INVITE-CODE-123",
-      status: InvitationStatus.VALID,
-      invitation_type: InvitationType.AUTO_REGISTER,
-    },
-  };
+  let emailAuthService: EmailAuthService;
+  let anonymousAuthService: AnonymousAuthService;
+  let invitationsService: InvitationsService;
 
   beforeEach(() => {
-    // Clear mocks before each test
-    (console.error as jest.Mock).mockClear();
-    (console.warn as jest.Mock).mockClear();
+    emailAuthService = EmailAuthService.getInstance();
+    anonymousAuthService = AnonymousAuthService.getInstance();
+    invitationsService = InvitationsService.getInstance();
+    jest.useFakeTimers(); // Use Jest's fake timers
     jest.clearAllMocks();
   });
+
+  const authContextValue: AuthContextValue = {
+    user: null,
+    updateUserByToken: jest.fn(),
+    clearUser: jest.fn(),
+    isAuthenticationInProgress: false,
+    isAuthenticated: false,
+  };
 
   test("it should show login form successfully", async () => {
     // GIVEN the component is rendered within necessary context providers
     render(
       <HashRouter>
-        <EmailAuthContext.Provider value={emailAuthContextValue}>
-          <AnonymousAuthContext.Provider value={anonymousAuthContextValue}>
-            <InvitationsContext.Provider value={invitationsContextValue}>
-              <Login postLoginHandler={jest.fn()} isLoading={false} />
-            </InvitationsContext.Provider>
-          </AnonymousAuthContext.Provider>
-        </EmailAuthContext.Provider>
+        <AuthContext.Provider value={authContextValue}>
+          <Login postLoginHandler={jest.fn()} isLoading={false} />
+        </AuthContext.Provider>
       </HashRouter>
     );
 
@@ -146,30 +120,31 @@ describe("Testing Login component", () => {
   });
 
   test("it should handle email login correctly", async () => {
-    // GIVEN a user with valid credentials
-    const givenUser: TabiyaUser = { id: "0001", email: "foo@bar.baz", name: "Foo Bar" };
+    // GIVEN an email and password
+    const givenEmail = "foo@bar.baz";
+    const givenPassword = "Pa$$word123";
 
     // AND the email login mock will succeed
-    loginWithEmailMock.mockImplementation((email, password, onSuccess) => {
-      onSuccess(givenUser);
-    });
+    const handleLoginWithEmailSpy = jest
+      .spyOn(emailAuthService, "handleLoginWithEmail")
+      // @ts-ignore
+      .mockImplementation((email, password, onSuccess, onError) => {
+        // @ts-ignore
+        onSuccess();
+      });
 
     render(
       <HashRouter>
-        <EmailAuthContext.Provider value={emailAuthContextValue}>
-          <AnonymousAuthContext.Provider value={anonymousAuthContextValue}>
-            <InvitationsContext.Provider value={invitationsContextValue}>
-              <Login postLoginHandler={jest.fn()} isLoading={false} />
-            </InvitationsContext.Provider>
-          </AnonymousAuthContext.Provider>
-        </EmailAuthContext.Provider>
+        <AuthContext.Provider value={authContextValue}>
+          <Login postLoginHandler={jest.fn()} isLoading={false} />
+        </AuthContext.Provider>
       </HashRouter>
     );
 
     // WHEN the user fills in their email and password
     await act(() => {
-      (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnEmailChanged("foo@bar.baz");
-      (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnPasswordChanged("Pa$$word123");
+      (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnEmailChanged(givenEmail);
+      (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnPasswordChanged(givenPassword);
     });
 
     // AND clicks the login button
@@ -177,9 +152,9 @@ describe("Testing Login component", () => {
 
     // THEN the loginWithEmail function should be called with the correct arguments
     await waitFor(() => {
-      expect(loginWithEmailMock).toHaveBeenCalledWith(
-        "foo@bar.baz",
-        "Pa$$word123",
+      expect(handleLoginWithEmailSpy).toHaveBeenCalledWith(
+        givenEmail,
+        givenPassword,
         expect.any(Function),
         expect.any(Function)
       );
@@ -187,23 +162,35 @@ describe("Testing Login component", () => {
   });
 
   test("it should handle invitation code login correctly", async () => {
-    // GIVEN a valid invitation code
-    const givenUser: TabiyaUser = { id: "0001", email: "foo@bar.baz", name: "Foo Bar" };
-
     // AND the invitation code mock will succeed
-    checkInvitationStatusMock.mockImplementation((code, onSuccess) => {
-      onSuccess(givenUser);
-    });
+    const handleCheckInvitationStatusSpy = jest
+      .spyOn(invitationsService, "checkInvitationCodeStatus")
+      .mockImplementation(
+        // @ts-ignore
+        (invitationCode, onSuccess, onError) => {
+          return new Promise<void>((resolve) => {
+            onSuccess({
+              invitation_code: "INVITE-CODE-123",
+              status: InvitationStatus.VALID,
+              invitation_type: InvitationType.AUTO_REGISTER,
+            });
+            resolve();
+          });
+        }
+      );
+    // AND the anonymous auth mock will succeed
+    const handleAnonymousLoginSpy = jest
+      .spyOn(anonymousAuthService, "handleAnonymousLogin")
+      // @ts-ignore
+      .mockImplementation((user, onSuccess, onError) => {
+        onSuccess(user);
+      });
 
     render(
       <HashRouter>
-        <EmailAuthContext.Provider value={emailAuthContextValue}>
-          <AnonymousAuthContext.Provider value={anonymousAuthContextValue}>
-            <InvitationsContext.Provider value={invitationsContextValue}>
-              <Login postLoginHandler={jest.fn()} isLoading={false} />
-            </InvitationsContext.Provider>
-          </AnonymousAuthContext.Provider>
-        </EmailAuthContext.Provider>
+        <AuthContext.Provider value={authContextValue}>
+          <Login postLoginHandler={jest.fn()} isLoading={false} />
+        </AuthContext.Provider>
       </HashRouter>
     );
 
@@ -217,11 +204,16 @@ describe("Testing Login component", () => {
 
     // THEN the checkInvitationStatus function should be called with the correct arguments
     await waitFor(() => {
-      expect(checkInvitationStatusMock).toHaveBeenCalledWith(
+      expect(handleCheckInvitationStatusSpy).toHaveBeenCalledWith(
         "INVITE-CODE-123",
         expect.any(Function),
         expect.any(Function)
       );
+    });
+
+    // AND the anonymousAuthService should be called with the correct arguments
+    await waitFor(() => {
+      expect(handleAnonymousLoginSpy).toHaveBeenCalledWith(expect.any(Function), expect.any(Function));
     });
   });
 });

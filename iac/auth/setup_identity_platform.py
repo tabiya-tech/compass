@@ -65,6 +65,9 @@ def _setup_identity_platform(*, basic_config: ProjectBaseConfig, frontend_domain
         ),
         sign_in=gcp.identityplatform.ConfigSignInArgs(
             allow_duplicate_emails=False,
+            anonymous=gcp.identityplatform.ConfigSignInAnonymousArgs(
+                enabled=True,
+            ),
             email=gcp.identityplatform.ConfigSignInEmailArgs(
                 enabled=True,
                 password_required=True

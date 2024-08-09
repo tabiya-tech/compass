@@ -5,22 +5,28 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
-import { EmailAuthContext } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
 import { routerPaths } from "src/app/routerPaths";
-import { TestUser } from "src/_test_utilities/mockLoggedInUser";
+import { AuthContext, AuthContextValue } from "src/auth/AuthProvider";
+
+// mock the SocialAuthService
+jest.mock("src/auth/services/socialAuth/SocialAuth.service", () => {
+  return {
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return {
+        logout: jest.fn(),
+      };
+    }),
+  };
+});
 
 describe("ProtectedRoute test", () => {
-  const authContextValue = {
-    loginWithEmail: jest.fn(),
-    isLoggingInWithEmail: false,
-    isRegisteringWithEmail: false,
-    isLoggingInAnonymously: false,
-    isLoggingOut: false,
+  const authContextValue: AuthContextValue = {
     user: null,
-    registerWithEmail: jest.fn(),
-    logout: jest.fn(),
-    handlePageLoad: jest.fn(),
-    loginAnonymously: jest.fn(),
+    updateUserByToken: jest.fn(),
+    clearUser: jest.fn(),
+    isAuthenticationInProgress: false,
+    isAuthenticated: false,
   };
 
   test("should redirect to the login page if the user is not logged in and authentication is required", () => {
@@ -38,9 +44,9 @@ describe("ProtectedRoute test", () => {
 
     // WHEN the user navigates to the page
     render(
-      <EmailAuthContext.Provider value={authContextValue}>
+      <AuthContext.Provider value={authContextValue}>
         <RouterProvider router={router} />
-      </EmailAuthContext.Provider>
+      </AuthContext.Provider>
     );
 
     // THEN expect the user to be redirected to the login page
@@ -63,9 +69,18 @@ describe("ProtectedRoute test", () => {
 
     // WHEN the user navigates to the page
     render(
-      <EmailAuthContext.Provider value={{ ...authContextValue, user: TestUser }}>
+      <AuthContext.Provider
+        value={{
+          ...authContextValue,
+          user: {
+            id: "0001",
+            name: "Test User",
+            email: "test@email.com",
+          },
+        }}
+      >
         <RouterProvider router={router} />
-      </EmailAuthContext.Provider>
+      </AuthContext.Provider>
     );
 
     // THEN expect the user to be redirected to the root page

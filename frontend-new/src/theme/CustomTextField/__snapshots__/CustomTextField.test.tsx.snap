@@ -12,7 +12,7 @@ exports[`Custom text field should render CustomTextField correctly 1`] = `
     label
   </p>
   <div
-    class="MuiFormControl-root MuiTextField-root css-15owxvq-MuiFormControl-root-MuiTextField-root"
+    class="MuiFormControl-root MuiTextField-root css-1njg1ad-MuiFormControl-root-MuiTextField-root"
     data-testid="custom-text-field-input-f4b3b3b3-4b3b-4b3b-4b3b-4b3b4b3b4b3b"
   >
     <div

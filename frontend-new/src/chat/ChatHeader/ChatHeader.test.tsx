@@ -38,6 +38,18 @@ jest.mock("react-router-dom", () => {
   };
 });
 
+// mock the SocialAuthServices
+jest.mock("src/auth/services/socialAuth/SocialAuth.service", () => {
+  return {
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return {
+        logout: jest.fn(),
+      };
+    }),
+  };
+});
+
 describe("ChatHeader", () => {
   beforeEach(() => {
     (ContextMenu as jest.Mock).mockClear();
