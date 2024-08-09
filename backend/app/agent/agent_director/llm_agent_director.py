@@ -337,7 +337,7 @@ class LLMAgentDirector(AbstractAgentDirector):
         except Exception as e:  # pylint: disable=broad-except
             self._logger.error("Error while executing the agent director: %s", e, exc_info=True)
             return AgentOutput(
-                message_for_user="Conversation forcefully ended",
+                message_for_user="I am facing some difficulties right now, could you please repeat what you said?",
                 finished=True,
                 agent_type=None,
                 agent_response_time_in_sec=0,  # TODO(Apostolos): for now an artificial value. TBC if it should be 0
