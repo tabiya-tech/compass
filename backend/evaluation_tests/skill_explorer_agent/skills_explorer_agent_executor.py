@@ -1,6 +1,6 @@
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.experience.experience_entity import ExperienceEntity
-from app.agent.skill_explorer_agent import SkillsExplorerAgent
+from app.agent.skill_explorer_agent import SkillsExplorerAgent, SkillsExplorerAgentState
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationContext
 
@@ -10,8 +10,9 @@ class SkillsExplorerAgentExecutor:
     Executes the Skills Explorer Agent
     """
 
-    def __init__(self, conversation_manager: ConversationMemoryManager, experience: ExperienceEntity):
+    def __init__(self, conversation_manager: ConversationMemoryManager, state: SkillsExplorerAgentState, experience: ExperienceEntity):
         self._agent = SkillsExplorerAgent()
+        self._agent.set_state(state)
         self._agent.set_experience(experience)
         self._conversation_manager = conversation_manager
 
