@@ -132,6 +132,7 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
             agent_director.get_explore_experiences_agent().set_state(state.explore_experiences_director_state)
             agent_director.get_explore_experiences_agent().get_collect_experiences_agent().set_state(
                 state.collect_experience_state)
+            agent_director.get_explore_experiences_agent().get_exploring_skills_agent().set_state(state.skills_explorer_agent_state)
             conversation_memory_manager.set_state(state.conversation_memory_manager_state)
 
             # Handle the user input
@@ -272,6 +273,7 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
                     experience=experience_entity)
 
             experience_state = state.explore_experiences_director_state.experiences_state.get(state.explore_experiences_director_state.current_experience_uuid)
+            agent.set_state(state.skills_explorer_agent_state)
             agent.set_experience(experience_state.experience)
 
             # ################################################################

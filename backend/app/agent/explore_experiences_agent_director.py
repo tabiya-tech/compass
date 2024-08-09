@@ -249,6 +249,9 @@ class ExploreExperiencesAgentDirector(Agent):
     def get_collect_experiences_agent(self) -> CollectExperiencesAgent:
         return self._collect_experiences_agent
 
+    def get_exploring_skills_agent(self) -> SkillsExplorerAgent:
+        return self._exploring_skills_agent
+
     async def _link_and_rank(self, current_experience: ExperienceEntity) -> AgentOutput:
         start = time.time()
         inferred_occupations_response = await self._infer_occupations_tool.execute(
