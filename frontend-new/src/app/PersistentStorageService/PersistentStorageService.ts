@@ -11,8 +11,7 @@ export const INVITATION_KEY = "invitation";
  *   eg: refresh token
  */
 export class PersistentStorageService {
-  static readonly storage = sessionStorage;
-  static readonly local = localStorage;
+  static readonly storage = localStorage;
 
   /**
    * Returns the token from the storage
