@@ -62,7 +62,7 @@ class ExperienceEntity(BaseModel):
     Title of the experience as the user refers to it (e.g. "Crew Member")
     """
 
-    contextual_title: Optional[str] = None
+    contextual_title: Optional[str] = None  # TODO: replace with the cluster_results from the ExperiencePipelineResponse
     """
     Title of the experience that is based on the experience title 
     and the additional context the user provided (e.g. "Fast Food Restaurant Staff")
@@ -94,7 +94,7 @@ class ExperienceEntity(BaseModel):
     It may contain duplicate entries as the user may mention the same task or skill multiple times
     """
 
-    esco_occupations: List[OccupationSkillEntity] = []
+    esco_occupations: List[OccupationSkillEntity] = []  # TODO: replace with the cluster_results from the ExperiencePipelineResponse
     """
     List of esco occupations and their skills (from the esco model) that match the experience.
     It should not contain duplicates.
@@ -119,3 +119,20 @@ class ExperienceEntity(BaseModel):
             work_type=work_type,
             **data
         )
+
+    @staticmethod
+    def get_text_summary(*, experience_title: str,
+                         location: Optional[str] = None,
+                         work_type: Optional[str] = None,
+                         start_date: Optional[str] = None,
+                         end_date: Optional[str] = None,
+                         company: Optional[str] = None) -> str:
+        date_part: str
+        if start_date is not None and start_date != "":
+            date_part = f", {start_date}" + f" - {end_date}" if end_date is not None and end_date != "" else ""
+        else:
+            date_part = f", until {end_date}" if end_date is not None and end_date != "" else ""
+        company_part = f", {company}" if company is not None and company != "" else ""
+        location_part = f", {location}" if location is not None and location != "" else ""
+        work_type_part = f" ({WorkType.work_type_short(WorkType.from_string_key(work_type))})" if work_type is not None and work_type != "" else ""
+        return experience_title + work_type_part + date_part + company_part + location_part + "\n"
