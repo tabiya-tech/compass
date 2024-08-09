@@ -44,7 +44,16 @@ describe("InvitationsService", () => {
 
       // WHEN the checkInvitationCodeStatus function is called with the given code
       const service = new InvitationsService();
-      const actualStatus = await service.checkInvitationCodeStatus("test-code");
+      let actualStatus;
+      await service.checkInvitationCodeStatus(
+        "test-code",
+        (data) => {
+          actualStatus = data;
+        },
+        (error) => {
+          throw error;
+        }
+      );
 
       // THEN expect it to make a GET request with correct headers and payload
       expect(fetchSpy).toHaveBeenCalledWith(
@@ -76,20 +85,26 @@ describe("InvitationsService", () => {
       // THEN expected it to reject with the error response
       let error;
       try {
-        await service.checkInvitationCodeStatus("test-code");
+        await service.checkInvitationCodeStatus(
+          "test-code",
+          () => {},
+          (err) => {
+            throw err;
+          }
+        );
       } catch (err) {
         error = err;
       }
 
       // AND expect the service to throw the error that the fetchWithAuth function throws
-      expect(error).toMatchObject(givenFetchError);
+      expect(error).toEqual(new Error("Failed to check status for invitation code"));
     });
 
     test.each([
       ["is a malformed json", "{"],
       ["is a string", "foo"],
     ])(
-      "on 200, should reject with an error ERROR_CODE.INVALID_RESPONSE_BODY if response %s",
+      "on 200, should reject with an error ERROR_CODE.INTERNAL_SERVER_ERROR if response %s",
       async (description, givenResponse) => {
         // GIVEN the GET invitations REST API will respond with OK and some invalid response
         setupFetchSpy(StatusCodes.OK, givenResponse, "application/json;charset=UTF-8");
@@ -104,8 +119,8 @@ describe("InvitationsService", () => {
             "checkInvitationCodeStatus",
             "GET",
             `${givenApiServerUrl}/user-invitations/check-status?invitation_code=test-code`,
-            StatusCodes.OK,
-            ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
+            StatusCodes.INTERNAL_SERVER_ERROR,
+            ErrorConstants.ErrorCodes.INTERNAL_SERVER_ERROR,
             "",
             ""
           ),
@@ -113,7 +128,13 @@ describe("InvitationsService", () => {
         };
         let error;
         try {
-          await service.checkInvitationCodeStatus("test-code");
+          await service.checkInvitationCodeStatus(
+            "test-code",
+            () => {},
+            (err) => {
+              throw err;
+            }
+          );
         } catch (err) {
           error = err;
         }

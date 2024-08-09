@@ -4,13 +4,20 @@ export type UserLanguage = {
 };
 
 export type UserPreference = UserLanguage & {
-  accepted_tc: Date;
+  accepted_tc?: Date;
   sessions: number[];
 };
 
-export type UserPreferencesSpec = UserPreference & {
-  // TODO: optional for now, until we implement the invitation code for email registration
-  invitation_code?: string;
+export type CreateUserPreferencesSpec = {
+  user_id: string;
+  invitation_code: string;
+  language: Language;
+};
+
+export type UpdateUserPreferencesSpec = {
+  user_id: string;
+  language: Language;
+  accepted_tc: Date;
 };
 
 export enum Language {
@@ -21,15 +28,5 @@ export enum Language {
 export type UserPreferencesContextValue = {
   userPreferences: UserPreference | null;
   isLoading: boolean;
-  createUserPreferences: (
-    preferences: UserPreferencesSpec,
-    successCallback: (prefs: UserPreference) => void,
-    errorCallback: (error: any) => void
-  ) => void;
-  getUserPreferences: (
-    userId: string,
-    successCallback: (prefs: UserPreference) => void,
-    errorCallback: (error: any) => void
-  ) => void;
-  updateUserPreferences: (preferences: UserPreference | null) => void;
+  updateUserPreferences: (userPreferences: UserPreference | null) => void;
 };

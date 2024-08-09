@@ -4,9 +4,20 @@ import "src/_test_utilities/consoleMock";
 import Home, { DATA_TEST_ID } from "./Home";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { HashRouter } from "react-router-dom";
-import { mockLoggedInUser } from "src/_test_utilities/mockLoggedInUser";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 import { DATA_TEST_ID as CHAT_DATA_TEST_ID } from "src/chat/Chat";
+
+// mock the SocialAuthService
+jest.mock("src/auth/services/socialAuth/SocialAuth.service", () => {
+  return {
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return {
+        logout: jest.fn(),
+      };
+    }),
+  };
+});
 
 // mock the router
 jest.mock("react-router-dom", () => {
@@ -32,7 +43,6 @@ jest.mock("src/chat/Chat", () => {
 });
 
 describe("Home", () => {
-  beforeAll(() => mockLoggedInUser({}));
   beforeAll(() => mockUseTokens());
   test("should render the home page", () => {
     // WHEN the home page is rendered

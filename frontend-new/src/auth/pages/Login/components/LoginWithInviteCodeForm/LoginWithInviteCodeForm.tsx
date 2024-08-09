@@ -20,7 +20,6 @@ const LoginWithInviteCodeForm: React.FC<Readonly<LoginFormProps>> = ({
   inviteCode,
   notifyOnInviteCodeChanged,
   isDisabled,
-  notifyOnFocused,
 }) => {
   const handleInviteCodeChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     event.preventDefault();
@@ -32,7 +31,6 @@ const LoginWithInviteCodeForm: React.FC<Readonly<LoginFormProps>> = ({
       fullWidth
       label="Invite Code"
       variant="outlined"
-      margin="normal"
       value={inviteCode}
       disabled={isDisabled}
       onChange={(e) => handleInviteCodeChange(e)}

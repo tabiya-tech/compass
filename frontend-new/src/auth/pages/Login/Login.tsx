@@ -1,21 +1,26 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { Box, CircularProgress, Container, styled, Typography, useTheme } from "@mui/material";
-import { EmailAuthContext, TabiyaUser } from "src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
+import { Box, CircularProgress, Container, Divider, styled, Typography, useTheme } from "@mui/material";
 import { NavLink as RouterNavLink, useLocation } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
-import IDPAuth from "src/auth/components/IDPAuth/IDPAuth";
+import SocialAuth from "src/auth/components/SocialAuth/SocialAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
 import LoginWithEmailForm from "src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm";
-import { InvitationsContext } from "src/invitations/InvitationsProvider/InvitationsProvider";
-import { AnonymousAuthContext } from "src/auth/anonymousAuth/AnonymousAuthProvider/AnonymousAuthProvider";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm";
 import { validatePassword } from "src/auth/utils/validatePassword";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
+import { AuthContext, TabiyaUser } from "src/auth/AuthProvider";
+import { emailAuthService } from "src/auth/services/emailAuth/EmailAuth.service";
+import { anonymousAuthService } from "src/auth/services/anonymousAuth/AnonymousAuth.service";
+import RegistrationCodeFormModal from "src/invitations/components/RegistrationCodeFormModal/RegistrationCodeFormModal";
+import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
+import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 
 export const INVITATIONS_PARAM_NAME = "invite-code";
 
@@ -64,6 +69,9 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
 
   const renderCount = useRef(0);
 
+  const [tempUser, setTempUser] = useState<TabiyaUser | null>(null);
+  const [showInviteCodeForm, setShowInviteCodeForm] = useState(false);
+
   const [inviteCode, setInviteCode] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -71,81 +79,12 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
 
   const [activeLoginForm, setActiveLoginForm] = useState(ActiveForm.NONE);
 
-  const { loginWithEmail, isLoggingInWithEmail } = useContext(EmailAuthContext);
-  const { isLoggingInAnonymously } = useContext(AnonymousAuthContext);
-  const { checkInvitationStatus, isInvitationCheckLoading } = useContext(InvitationsContext);
+  const [isLoggingInWithEmail, setIsLoggingInWithEmail] = useState(false);
+  const [isLoggingInAnonymously, setIsLoggingInAnonymously] = useState(false);
+
+  const { isAuthenticationInProgress, updateUserByToken } = useContext(AuthContext);
+  const { updateUserPreferences } = useContext(UserPreferencesContext);
   const { enqueueSnackbar } = useSnackbar();
-
-  /**
-   * Handle the login form submission
-   * @param event
-   */
-  const handleLoginWithEmail = useCallback(
-    (email: string, password: string) => {
-      const passwordValidationResult = validatePassword(password);
-      setPasswordError(passwordValidationResult);
-
-      if (passwordValidationResult === "" && email && password) {
-        loginWithEmail(
-          email,
-          password,
-          async (user) => {
-            try {
-              postLoginHandler(user);
-            } catch (e) {
-              let errorMessage;
-              if (e instanceof FirebaseError) {
-                errorMessage = getUserFriendlyFirebaseErrorMessage(e);
-                writeFirebaseErrorToLog(e, console.error);
-              } else {
-                console.error(e);
-                errorMessage = (e as Error).message;
-              }
-              enqueueSnackbar(errorMessage, { variant: "error" });
-            }
-          },
-          (e) => {
-            let errorMessage;
-            if (e instanceof FirebaseError) {
-              errorMessage = getUserFriendlyFirebaseErrorMessage(e);
-              writeFirebaseErrorToLog(e, console.error);
-            } else {
-              console.error(e);
-              errorMessage = (e as Error).message;
-            }
-            enqueueSnackbar(errorMessage, { variant: "error" });
-          }
-        );
-      }
-    },
-    [enqueueSnackbar, loginWithEmail, postLoginHandler]
-  );
-
-  /**
-   * Check if the user was invited
-   * @param code
-   */
-  const handleCheckIfInvited = useCallback(
-    (code: string) => {
-      checkInvitationStatus(
-        code,
-        (user) => {
-          enqueueSnackbar("Invitation code is valid", { variant: "success" });
-          postLoginHandler(user);
-        },
-        (e) => {
-          if (e instanceof ServiceError) {
-            writeServiceErrorToLog(e, console.error);
-          } else {
-            console.error(e);
-          }
-          const errorMessage = getUserFriendlyErrorMessage(e);
-          enqueueSnackbar(errorMessage, { variant: "error" });
-        }
-      );
-    },
-    [checkInvitationStatus, enqueueSnackbar, postLoginHandler]
-  );
 
   // callbacks to pass on to child components
   const handleEmailChanged = (email: string) => {
@@ -161,6 +100,162 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
     setInviteCode(code);
   };
 
+  /**
+   * Handle the login form submission
+   * @param event
+   */
+  const handleLoginWithEmail = useCallback(
+    (email: string, password: string) => {
+      const passwordValidationResult = validatePassword(password);
+      setPasswordError(passwordValidationResult);
+
+      if (passwordValidationResult === "" && email && password) {
+        setIsLoggingInWithEmail(true);
+        emailAuthService.handleLoginWithEmail(
+          email,
+          password,
+          async (token) => {
+            setIsLoggingInWithEmail(false);
+            try {
+              const _user = updateUserByToken(token);
+              if (_user) {
+                postLoginHandler(_user);
+              }
+            } catch (e) {
+              let errorMessage;
+              if (e instanceof FirebaseError) {
+                errorMessage = getUserFriendlyFirebaseErrorMessage(e);
+                writeFirebaseErrorToLog(e, console.error);
+              } else {
+                console.error(e);
+                errorMessage = (e as Error).message;
+              }
+              enqueueSnackbar(errorMessage, { variant: "error" });
+            }
+          },
+          (error) => {
+            setIsLoggingInWithEmail(false);
+            const shownError = getUserFriendlyFirebaseErrorMessage(error);
+            writeFirebaseErrorToLog(error, console.error);
+            enqueueSnackbar(shownError, { variant: "error" });
+          }
+        );
+      }
+    },
+    [enqueueSnackbar, updateUserByToken, postLoginHandler]
+  );
+
+  /**
+   * Check if the user was invited
+   * @param code
+   */
+  const handleLoginWithInvitationCode = useCallback(
+    (code: string) => {
+      setIsLoggingInAnonymously(true);
+      invitationsService
+        .checkInvitationCodeStatus(
+          code,
+          (invitation) => {
+            enqueueSnackbar("Invitation code is valid", { variant: "success" });
+            anonymousAuthService.handleAnonymousLogin(
+              async (token) => {
+                const _user = updateUserByToken(token);
+                if (_user) {
+                  try {
+                    // create user preferences for the first time.
+                    // in order to do this, there needs to be a logged in user in the persistent storage
+                    await userPreferencesService.createUserPreferences(
+                      {
+                        user_id: _user.id,
+                        invitation_code: invitation.invitation_code,
+                        language: Language.en,
+                      },
+                      (_prefs) => {
+                        updateUserPreferences(_prefs);
+                        postLoginHandler(_user);
+                      },
+                      (error) => {
+                        writeServiceErrorToLog(error, console.error);
+                        const errorMessage = getUserFriendlyErrorMessage(error as Error);
+                        enqueueSnackbar(errorMessage, { variant: "error" });
+                      }
+                    );
+                  } catch (error) {
+                    if (error instanceof ServiceError) {
+                      writeServiceErrorToLog(error, console.error);
+                    } else {
+                      console.error(error);
+                    }
+                    const errorMessage = getUserFriendlyErrorMessage(error as Error);
+                    enqueueSnackbar(errorMessage, { variant: "error" });
+                  }
+                }
+              },
+              (error) => {
+                const shownError = getUserFriendlyFirebaseErrorMessage(error);
+                writeFirebaseErrorToLog(error, console.error);
+                enqueueSnackbar(shownError, { variant: "error" });
+              }
+            );
+          },
+          (e) => {
+            writeServiceErrorToLog(e, console.error);
+            const errorMessage = getUserFriendlyErrorMessage(e);
+            enqueueSnackbar(errorMessage, { variant: "error" });
+          }
+        )
+        .finally(() => {
+          setIsLoggingInAnonymously(false);
+        });
+    },
+    [enqueueSnackbar, updateUserByToken, postLoginHandler, updateUserPreferences]
+  );
+
+  /**
+   * Handle logging in with social media idps
+   * @param user
+   */
+  const socialLoginHandler = async (user: TabiyaUser) => {
+    try {
+      await userPreferencesService.getUserPreferences(
+        user.id,
+        (prefs) => {
+          updateUserPreferences(prefs);
+          if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
+            setTempUser(user);
+            setShowInviteCodeForm(true);
+            return;
+          }
+          postLoginHandler(user);
+        },
+        (error) => {
+          setTempUser(user);
+          setShowInviteCodeForm(true);
+          writeServiceErrorToLog(error, console.error);
+        }
+      );
+    } catch (e) {
+      console.log(e);
+
+      const errorMessage = getUserFriendlyErrorMessage(e as Error);
+      enqueueSnackbar(errorMessage, { variant: "error" });
+      console.error("Error during login process", e);
+    }
+  };
+
+  // depending on which form is active, handle submit button
+  const handleLoginSubmit = useCallback(
+    (event: React.FormEvent) => {
+      event.preventDefault();
+      if (activeLoginForm === ActiveForm.INVITE_CODE) {
+        handleLoginWithInvitationCode(inviteCode);
+      } else {
+        handleLoginWithEmail(email, password);
+      }
+    },
+    [email, handleLoginWithInvitationCode, handleLoginWithEmail, activeLoginForm, inviteCode, password]
+  );
+
   // clear whichever form is not active
   useEffect(() => {
     if (activeLoginForm === ActiveForm.EMAIL) {
@@ -172,19 +267,6 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
     }
   }, [activeLoginForm]);
 
-  // depending on which form is active, handle submit button
-  const handleLoginSubmit = useCallback(
-    (event: React.FormEvent) => {
-      event.preventDefault();
-      if (activeLoginForm === ActiveForm.INVITE_CODE) {
-        handleCheckIfInvited(inviteCode);
-      } else {
-        handleLoginWithEmail(email, password);
-      }
-    },
-    [email, handleCheckIfInvited, handleLoginWithEmail, activeLoginForm, inviteCode, password]
-  );
-
   // Check if the user was invited by checking the invite code in the URL
   useEffect(() => {
     renderCount.current++;
@@ -193,38 +275,59 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
     }
 
     if (inviteCodeParam) {
-      handleCheckIfInvited(inviteCodeParam);
+      handleLoginWithInvitationCode(inviteCodeParam);
     }
-  }, [handleCheckIfInvited, inviteCodeParam]);
+  }, [handleLoginWithInvitationCode, inviteCodeParam]);
 
   // login is loading when any of the login methods return a loading state
-  const isLoginLoading = isLoggingInWithEmail || isLoggingInAnonymously || isInvitationCheckLoading;
+  const isLoginLoading = isAuthenticationInProgress || isLoggingInWithEmail || isLoggingInAnonymously;
   // login button is disabled when login is loading, or when there is no active Form, or the fields for the active form are not filled in
   const isLoginButtonDisabled =
     isLoginLoading || activeLoginForm === ActiveForm.NONE || ((!email || !password) && !inviteCode);
+
+  const createUser = async (invitationCode: string) => {
+    try {
+      await userPreferencesService.createUserPreferences(
+        {
+          user_id: tempUser?.id!,
+          language: Language.en,
+          invitation_code: invitationCode,
+        },
+        (_prefs) => {
+          updateUserPreferences(_prefs);
+          postLoginHandler(tempUser!);
+        },
+        (error) => {
+          writeServiceErrorToLog(error, console.error);
+          const errorMessage = getUserFriendlyErrorMessage(error as Error);
+          enqueueSnackbar(errorMessage, { variant: "error" });
+        }
+      );
+    } catch (e) {
+      console.log(e);
+
+      const errorMessage = getUserFriendlyErrorMessage(e as Error);
+      enqueueSnackbar(errorMessage, { variant: "error" });
+      console.error("Error during login");
+    }
+  };
+
   return (
     <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.LOGIN_CONTAINER}>
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent={"space-evenly"}
-        m={4}
-        height={"80%"}
-      >
+      <Box display="flex" flexDirection="column" alignItems="center" justifyContent={"space-evenly"} height={"80%"}>
         <AuthHeader title={"Welcome to Compass!"} subtitle={"Login to your account to continue"} />
         <Box
           component="form"
-          mt={2}
           onSubmit={handleLoginSubmit}
           data-testid={DATA_TEST_ID.FORM}
           display={"flex"}
           flexDirection={"column"}
-          gap={theme.tabiyaSpacing.xs}
           padding={theme.tabiyaSpacing.xs}
           textAlign={"center"}
+          width={"100%"}
+          gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
         >
-          <Typography variant="caption" data-testid={DATA_TEST_ID.SUBTITLE}>
+          <Typography variant="subtitle2" data-testid={DATA_TEST_ID.SUBTITLE}>
             Login using
           </Typography>
           <LoginWithInviteCodeForm
@@ -233,9 +336,16 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
             isDisabled={isLoginLoading}
             notifyOnFocused={() => {}}
           />
-          <Typography variant="caption" data-testid={DATA_TEST_ID.SUBTITLE}>
-            Or
-          </Typography>
+          <Divider textAlign="center" style={{ width: "100%" }}>
+            <Typography
+              variant="subtitle2"
+              padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
+              data-testid={DATA_TEST_ID.SUBTITLE}
+            >
+              Or
+            </Typography>
+          </Divider>
+
           <LoginWithEmailForm
             email={email}
             password={password}
@@ -268,7 +378,12 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
             )}
           </PrimaryButton>
         </Box>
-        <IDPAuth notifyOnLogin={postLoginHandler} isLoading={isLoading} />
+        <SocialAuth
+          disabled={false}
+          preLoginCheck={() => true}
+          postLoginHandler={socialLoginHandler}
+          isLoading={isLoading}
+        />
         <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.LOGIN_LINK}>
           Don't have an account?{" "}
           <StyledNavLink
@@ -282,6 +397,11 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
           </StyledNavLink>
         </Typography>
       </Box>
+      <RegistrationCodeFormModal
+        show={showInviteCodeForm}
+        onSuccess={createUser}
+        onClose={() => setShowInviteCodeForm(false)}
+      />
     </Container>
   );
 };

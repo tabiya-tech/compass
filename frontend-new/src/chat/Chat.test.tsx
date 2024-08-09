@@ -18,6 +18,17 @@ import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 // Mock the ChatService module
 jest.mock("src/chat/ChatService/ChatService");
 
+jest.mock("src/auth/services/socialAuth/SocialAuth.service", () => {
+  return {
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return {
+        logout: jest.fn(),
+      };
+    }),
+  };
+});
+
 // mock the ExperienceService module
 jest.mock("src/Experiences/ExperienceService/ExperienceService", () => {
   return {
@@ -103,6 +114,7 @@ describe("Chat", () => {
 
   const userPreferencesContextValue = {
     getUserPreferences: getUserPreferencesMock,
+    updateUserPreferencesOnClient: jest.fn(),
     createUserPreferences: jest.fn(),
     userPreferences: {
       accepted_tc: new Date(),

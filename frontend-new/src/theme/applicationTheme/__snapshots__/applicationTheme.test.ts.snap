@@ -136,6 +136,9 @@ Object {
     "MuiTextField": Object {
       "styleOverrides": Object {
         "root": Object {
+          "& .Mui-disabled": Object {
+            "opacity": 0.5,
+          },
           "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
           "padding": "0",
         },
@@ -864,6 +867,9 @@ Object {
     "MuiTextField": Object {
       "styleOverrides": Object {
         "root": Object {
+          "& .Mui-disabled": Object {
+            "opacity": 0.5,
+          },
           "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
           "padding": "0",
         },

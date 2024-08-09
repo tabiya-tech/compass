@@ -329,6 +329,10 @@ export const applicationTheme = (theme: ThemeMode) => {
           root: {
             fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem), // Adjust text size
             padding: "0",
+
+            "& .Mui-disabled": {
+              opacity: .5,
+            }
           },
         },
       },

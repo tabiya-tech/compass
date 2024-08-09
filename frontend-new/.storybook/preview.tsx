@@ -17,13 +17,12 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 */
 import type { Preview } from "@storybook/react";
-import { EmailAuthProvider } from "../src/auth/emailAuth/EmailAuthProvider/EmailAuthProvider";
-import { AnonymousAuthProvider } from "../src/auth/anonymousAuth/AnonymousAuthProvider/AnonymousAuthProvider";
 import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
 import {
   UserPreferencesContext,
 } from "../src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 import { IsOnlineContext } from "../src/app/isOnlineProvider/IsOnlineProvider";
+import { AuthProvider } from "../src/auth/AuthProvider";
 
 const preview: Preview = {
   parameters: {
@@ -84,8 +83,7 @@ export const decorators = [
   return (
     <Router>
       <IsOnlineContext.Provider value={isOnline}>
-        <EmailAuthProvider>
-          <AnonymousAuthProvider>
+        <AuthProvider>
             <UserPreferencesContext.Provider value={userPreferencesValue}>
               <CssBaseline />
               <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
@@ -96,8 +94,7 @@ export const decorators = [
                 </SnackbarProvider>
               </ThemeProvider>
             </UserPreferencesContext.Provider>
-          </AnonymousAuthProvider>
-        </EmailAuthProvider>
+          </AuthProvider>
       </IsOnlineContext.Provider>
     </Router>
     );

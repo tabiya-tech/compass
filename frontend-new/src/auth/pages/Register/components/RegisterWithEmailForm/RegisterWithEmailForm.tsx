@@ -7,6 +7,7 @@ const uniqueId = "6cf1a0fa-8d75-4342-bf6b-1203d5b114d7";
 
 export const DATA_TEST_ID = {
   FORM: `register-form-${uniqueId}`,
+  REGISTRATION_CODE_INPUT: `register-registration-code-input-${uniqueId}`,
   NAME_INPUT: `register-name-input-${uniqueId}`,
   EMAIL_INPUT: `register-email-input-${uniqueId}`,
   PASSWORD_INPUT: `register-password-input-${uniqueId}`,
@@ -15,11 +16,16 @@ export const DATA_TEST_ID = {
 };
 
 export interface RegisterFormProps {
+  disabled?: boolean;
   notifyOnRegister: (name: string, email: string, password: string) => void;
   isRegistering: boolean;
 }
 
-const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({ notifyOnRegister, isRegistering }) => {
+const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
+  disabled = false,
+  notifyOnRegister,
+  isRegistering,
+}) => {
   const theme = useTheme();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -47,13 +53,21 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({ notifyOn
     }
   };
   return (
-    <Box component="form" mt={2} onSubmit={handleRegister} data-testid={DATA_TEST_ID.FORM}>
+    <Box
+      display="flex"
+      flexDirection="column"
+      width={"100%"}
+      justifyContent={"space-evenly"}
+      gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
+      component="form"
+      onSubmit={handleRegister}
+      data-testid={DATA_TEST_ID.FORM}
+    >
       <TextField
         fullWidth
         label="Name"
         variant="outlined"
-        margin="normal"
-        disabled={isRegistering}
+        disabled={isRegistering || disabled}
         required
         onChange={(e) => handleNameChange(e)}
         inputProps={{ "data-testid": DATA_TEST_ID.NAME_INPUT }}
@@ -62,9 +76,8 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({ notifyOn
         fullWidth
         label="Email"
         type="email"
-        disabled={isRegistering}
+        disabled={isRegistering || disabled}
         variant="outlined"
-        margin="normal"
         required
         onChange={(e) => handleEmailChange(e)}
         inputProps={{ "data-testid": DATA_TEST_ID.EMAIL_INPUT }}
@@ -73,9 +86,8 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({ notifyOn
         fullWidth
         label="Password"
         type="password"
-        disabled={isRegistering}
+        disabled={isRegistering || disabled}
         variant="outlined"
-        margin="normal"
         required
         onChange={(e) => handlePasswordChange(e)}
         inputProps={{ "data-testid": DATA_TEST_ID.PASSWORD_INPUT }}
@@ -88,7 +100,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({ notifyOn
         color="primary"
         style={{ marginTop: 16 }}
         type="submit"
-        disabled={isRegistering}
+        disabled={isRegistering || disabled}
         disableWhenOffline={true}
         data-testid={DATA_TEST_ID.REGISTER_BUTTON}
       >

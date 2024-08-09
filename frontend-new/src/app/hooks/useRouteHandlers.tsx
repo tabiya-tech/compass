@@ -5,11 +5,12 @@ import { useNavigate } from "react-router-dom";
 import { TabiyaUser } from "src/auth/auth.types";
 import { routerPaths } from "src/app/routerPaths";
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
+import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 
 export const useRouteHandlers = () => {
-  const { getUserPreferences } = useContext(UserPreferencesContext);
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
+  const { updateUserPreferences } = useContext(UserPreferencesContext);
 
   const [isPostLoginLoading, setIsPostLoginLoading] = useState(false);
 
@@ -20,10 +21,11 @@ export const useRouteHandlers = () => {
   const handlePostLogin = useCallback(
     (user: TabiyaUser) => {
       setIsPostLoginLoading(true);
-      getUserPreferences(
+      userPreferencesService.getUserPreferences(
         user.id,
         (prefs) => {
           setIsPostLoginLoading(false);
+          updateUserPreferences(prefs);
           if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
             navigate(routerPaths.DPA, { replace: true });
           } else {
@@ -38,7 +40,7 @@ export const useRouteHandlers = () => {
         }
       );
     },
-    [getUserPreferences, navigate, enqueueSnackbar]
+    [navigate, enqueueSnackbar, updateUserPreferences]
   );
   /**
    * Handles what happens after the user registers

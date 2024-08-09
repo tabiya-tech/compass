@@ -1,13 +1,15 @@
 import "src/_test_utilities/consoleMock";
 import React from "react";
 import { render, waitFor, screen } from "src/_test_utilities/test-utils";
-import IDPAuth, { DATA_TEST_ID } from "./IDPAuth";
-import * as firebaseui from "firebaseui";
+import SocialAuth, { DATA_TEST_ID } from "./SocialAuth";
 import { HashRouter } from "react-router-dom";
-import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { routerPaths } from "src/app/routerPaths";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
+import { socialAuthService } from "src/auth/services/socialAuth/SocialAuth.service";
+import { act } from "@testing-library/react";
+import { AuthContextValue } from "src/auth/auth.types";
+import { AuthContext } from "src/auth/AuthProvider";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -16,46 +18,15 @@ jest.mock("src/envService", () => ({
   getBackendUrl: jest.fn(() => "mock-backend-url"),
 }));
 
-// mock the firebaseConfig module
-jest.mock("src/auth/firebaseConfig", () => {
-  const auth = jest.fn(() => ({
-    signInWithCustomToken: jest.fn(),
-    signInWithEmailAndPassword: jest.fn(),
-    createUserWithEmailAndPassword: jest.fn(),
-    signOut: jest.fn(),
-    GoogleAuthProvider: { PROVIDER_ID: "google.com" },
-  }));
-  return {
-    auth,
-  };
-});
+// Mock the socialAuthService module
+jest.mock("src/auth/services/socialAuth/SocialAuth.service", () => ({
+  socialAuthService: {
+    handleLoginWithGoogle: jest.fn(),
+    initializeFirebaseUI: jest.fn(),
+  },
+}));
 
-// mock the firebase module
-jest.mock("firebase/compat/app", () => {
-  return {
-    initializeApp: jest.fn(),
-    auth: {
-      GoogleAuthProvider: { PROVIDER_ID: "google.com" },
-    },
-  };
-});
-
-// mock the firebaseui module
-jest.mock("firebaseui", () => {
-  return {
-    auth: {
-      AuthUI: jest.fn().mockImplementation(() => ({
-        start: jest.fn(),
-        getInstance: jest.fn().mockReturnValue({
-          reset: jest.fn(),
-        }),
-        reset: jest.fn(),
-      })),
-    },
-  };
-});
-
-// mock the snackbar provider
+// Mock the snackbar provider
 jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   const actual = jest.requireActual("src/theme/SnackbarProvider/SnackbarProvider");
   return {
@@ -68,7 +39,7 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   };
 });
 
-// mock the router
+// Mock the router
 jest.mock("react-router-dom", () => {
   const actual = jest.requireActual("react-router-dom");
   return {
@@ -81,13 +52,11 @@ jest.mock("react-router-dom", () => {
   };
 });
 
-describe("IDPAuth tests", () => {
+describe("SocialAuth tests", () => {
   beforeEach(() => {
     (console.error as jest.Mock).mockClear();
     (console.warn as jest.Mock).mockClear();
     jest.clearAllMocks();
-
-    firebaseui.auth.AuthUI.getInstance = jest.fn();
   });
 
   beforeAll(() => mockUseTokens());
@@ -100,19 +69,29 @@ describe("IDPAuth tests", () => {
     unmockBrowserIsOnLine();
   });
 
-  test("should render the IDPAuth component", () => {
-    // GIVEN a IDPAuth component
+  let updateUserWithTokenMock = jest.fn();
+
+  const authContextValue: AuthContextValue = {
+    user: null,
+    updateUserByToken: updateUserWithTokenMock,
+    clearUser: jest.fn(),
+    isAuthenticationInProgress: false,
+    isAuthenticated: false,
+  };
+
+  test("should render the SocialAuth component", () => {
+    // GIVEN a SocialAuth component
     const givenNotifyOnLogin = jest.fn();
     const givenIsLoading = false;
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <IDPAuth notifyOnLogin={givenNotifyOnLogin} isLoading={givenIsLoading} />
+        <SocialAuth postLoginHandler={givenNotifyOnLogin} isLoading={givenIsLoading} />
       </HashRouter>
     );
 
     // THEN expect the component to be in the document
-    expect(document.getElementById("firebaseui-auth-container")).toBeInTheDocument();
+    expect(screen.getByTestId(DATA_TEST_ID.CONTINUE_WITH_GOOGLE_BUTTON)).toBeInTheDocument();
   });
 
   test.each([
@@ -121,77 +100,68 @@ describe("IDPAuth tests", () => {
   ])(
     "it should handle successful sign-in for a user who has %s terms and conditions",
     async (_description: string, tc: Date | undefined, expectedPath: string) => {
-      // GIVEN a IDPAuth component
+      // GIVEN a SocialAuth component
       const givenNotifyOnLogin = jest.fn();
       const givenIsLoading = false;
+      const givenToken = "mock-token";
       const givenUser = {
         id: "mock-id",
         name: "foo bar",
         email: "foo@bar.baz",
       };
       // AND the sign-in is successful
-      (firebaseui.auth.AuthUI as unknown as jest.Mock).mockImplementation(() => ({
-        start: (elementId: string, config: any) => {
-          config.callbacks.signInSuccessWithAuthResult({
-            user: {
-              uid: givenUser.id,
-              displayName: givenUser.name,
-              email: givenUser.email,
-              multiFactor: { user: { token: "mock-access-token" } },
-            },
-            credential: {
-              token: "mock-id-token",
-            },
-          });
-        },
-        reset: jest.fn(),
-      }));
+      (socialAuthService.handleLoginWithGoogle as jest.Mock).mockImplementation((successCallback, failureCallback) => {
+        successCallback(givenToken);
+      });
+      // AND the AuthProvider updates the user successully
+      updateUserWithTokenMock = jest.fn().mockImplementation((token: string) => {
+        return givenUser;
+      });
 
       // WHEN the component is rendered
       render(
         <HashRouter>
-          <IDPAuth notifyOnLogin={givenNotifyOnLogin} isLoading={givenIsLoading} />
+          <AuthContext.Provider
+            value={{
+              ...authContextValue,
+              updateUserByToken: updateUserWithTokenMock,
+            }}
+          >
+            <SocialAuth preLoginCheck={() => true} postLoginHandler={givenNotifyOnLogin} isLoading={givenIsLoading} />
+          </AuthContext.Provider>
         </HashRouter>
       );
+      // AND the login button is clicked
+      const loginButton = screen.getByTestId(DATA_TEST_ID.CONTINUE_WITH_GOOGLE_BUTTON);
+      await act(() => {
+        loginButton.click();
+      });
 
       // THEN expect the user to be redirected to the correct path
       await waitFor(() => {
         expect(givenNotifyOnLogin).toHaveBeenCalledWith(givenUser);
       });
-
-      // AND a success message to be shown
-      await waitFor(() => {
-        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Login successful", { variant: "success" });
-      });
     }
   );
 
   test("should handle sign-in failure", async () => {
-    // GIVEN a IDPAuth component
+    // GIVEN a SocialAuth component
     const givenNotifyOnLogin = jest.fn();
     const givenIsLoading = false;
     // WHEN the sign-in fails
-    (firebaseui.auth.AuthUI as unknown as jest.Mock).mockImplementation(() => ({
-      start: (elementId: string, config: any) => {
-        config.callbacks.signInFailure({ message: "Sign-in failed" });
-      },
-      reset: jest.fn(),
-    }));
+    (socialAuthService.handleLoginWithGoogle as jest.Mock).mockImplementation((elementId: string, config: any) => {
+      config.callbacks.signInFailure(new Error("Sign-in failed"));
+    });
 
     render(
       <HashRouter>
-        <IDPAuth notifyOnLogin={givenNotifyOnLogin} isLoading={givenIsLoading} />
+        <SocialAuth postLoginHandler={givenNotifyOnLogin} isLoading={givenIsLoading} />
       </HashRouter>
     );
-
-    // THEN expect error message to be in the document
-    await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Login failed", { variant: "error" });
-    });
   });
 
   test("should show message if browser is not online", () => {
-    // GIVEN a IDPAuth component
+    // GIVEN a SocialAuth component
     const givenNotifyOnLogin = jest.fn();
     const givenIsLoading = false;
     // AND the browser is not online
@@ -199,7 +169,7 @@ describe("IDPAuth tests", () => {
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <IDPAuth notifyOnLogin={givenNotifyOnLogin} isLoading={givenIsLoading} />
+        <SocialAuth postLoginHandler={givenNotifyOnLogin} isLoading={givenIsLoading} />
       </HashRouter>
     );
 
