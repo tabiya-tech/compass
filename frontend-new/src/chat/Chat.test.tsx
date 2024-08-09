@@ -89,6 +89,14 @@ jest.mock("src/theme/ContextMenu/ContextMenu", () => {
   };
 });
 
+// mock the InactiveBackdrop
+jest.mock("src/theme/Backdrop/InactiveBackdrop", () => {
+  return {
+    __esModule: true,
+    default: jest.fn(() => <div data-testid="inactive-backdrop"></div>),
+  };
+});
+
 describe("Chat", () => {
   const getUserPreferencesMock = jest.fn();
   const givenSessionId = 123;
@@ -158,6 +166,62 @@ describe("Chat", () => {
         },
         {}
       );
+    });
+
+    test("should show the backdrop when the user is inactive", async () => {
+      jest.useFakeTimers();
+
+      // GIVEN a chat component
+      render(
+        <HashRouter>
+          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
+            <Chat />
+          </UserPreferencesContext.Provider>
+        </HashRouter>
+      );
+
+      // WHEN the user is inactive
+      const input = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD);
+      fireEvent.change(input, { target: { value: "" } });
+      jest.advanceTimersByTime(3 * 60 * 1000);
+
+      // THEN expect the backdrop to be shown
+      await waitFor(() => {
+        expect(screen.getByTestId("inactive-backdrop")).toBeInTheDocument();
+      });
+
+      jest.useRealTimers();
+    });
+
+    test("should hide the backdrop when the user interacts with the page", async () => {
+      jest.useFakeTimers();
+
+      // GIVEN a chat component
+      render(
+        <HashRouter>
+          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
+            <Chat />
+          </UserPreferencesContext.Provider>
+        </HashRouter>
+      );
+
+      // WHEN the user is inactive
+      jest.advanceTimersByTime(3 * 60 * 1000);
+
+      // THEN expect the backdrop to be shown
+      await waitFor(() => {
+        expect(screen.getByTestId("inactive-backdrop")).toBeInTheDocument();
+      });
+
+      // WHEN the user interacts with the page
+      fireEvent.click(document);
+
+      // THEN expect the backdrop to be hidden
+      await waitFor(() => {
+        expect(screen.queryByTestId("inactive-backdrop")).not.toBeInTheDocument();
+      });
+
+      jest.useRealTimers();
     });
   });
 
