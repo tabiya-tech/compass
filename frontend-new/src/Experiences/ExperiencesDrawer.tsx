@@ -43,7 +43,7 @@ const trimAndValidate = (value: string) => {
 const useLocalStorage = (key: string, initialValue: string) => {
   // Retrieve value from localStorage or fallback to initialValue
   const [value, setValue] = useState<string>(() => {
-    const savedValue = PersistentStorageService.getItem(PersistentStorageService.local, key);
+    const savedValue = PersistentStorageService.getItem(PersistentStorageService.storage, key);
     const trimmedValueSaved = trimAndValidate(savedValue || "");
     return trimmedValueSaved !== "" ? trimmedValueSaved : initialValue;
   });
@@ -52,9 +52,9 @@ const useLocalStorage = (key: string, initialValue: string) => {
   useEffect(() => {
     const trimmedValue = trimAndValidate(value);
     if (trimmedValue !== "") {
-      PersistentStorageService.setItem(PersistentStorageService.local, key, trimmedValue);
+      PersistentStorageService.setItem(PersistentStorageService.storage, key, trimmedValue);
     } else {
-      PersistentStorageService.removeItem(PersistentStorageService.local, key);
+      PersistentStorageService.removeItem(PersistentStorageService.storage, key);
     }
   }, [key, value]);
 
