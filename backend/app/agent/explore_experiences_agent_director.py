@@ -134,16 +134,15 @@ class ExploreExperiencesAgentDirector(Agent):
         if current_experience.dive_in_phase == DiveInPhase.EXPLORING_SKILLS:
 
             if picked_new_experience:
-                # TODO: when transitioning between states set this message to ""
-                # and handle it in the execute method of the agent
-                # alternatively, set the message in the execute method
-
-                user_input = AgentInput(message="Hi, I am ready to explore my skills", is_artificial=True)
+                # When transitioning between states set this message to "" and handle it in the execute method of the agent
+                user_input = AgentInput(message="", is_artificial=True)
             # The agent will explore the skills for the experience and update the experience entity
             self._exploring_skills_agent.set_experience(current_experience.experience)
             agent_output: AgentOutput = await self._exploring_skills_agent.execute(user_input, context)
             # Update the conversation history
             await self._conversation_manager.update_history(user_input, agent_output)
+            # get the context again after updating the history
+            context = await self._conversation_manager.get_conversation_context()
             if not agent_output.finished:
                 return agent_output
 
@@ -191,6 +190,8 @@ class ExploreExperiencesAgentDirector(Agent):
         if state.conversation_phase == ConversationPhase.COLLECT_EXPERIENCES:
             agent_output = await self._collect_experiences_agent.execute(user_input, context)
             await self._conversation_manager.update_history(user_input, agent_output)
+            # get the context again after updating the history
+            context = await self._conversation_manager.get_conversation_context()
 
             # The experiences are still being collected, but we can already store them so that we can
             # present them to the user even if data collection has not finished.
