@@ -5,6 +5,7 @@ from textwrap import dedent
 
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType, LLMStats
 from app.agent.collect_experiences_agent._types import CollectedData
+from app.agent.experience import ExperienceEntity
 from app.agent.experience.work_type import WORK_TYPE_DEFINITIONS_FOR_PROMPT, WorkType
 from app.agent.prompt_template.agent_prompt_template import STD_AGENT_CHARACTER, STD_LANGUAGE_STYLE
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
@@ -534,27 +535,11 @@ def _get_summary_of_experiences(collected_data: list[CollectedData]) -> str:
     if len(collected_data) == 0:
         return "• No experiences identified so far"
     for experience in collected_data:
-        date_part: str
-        if experience.start_date is not None and experience.start_date != "":
-            date_part = f", {experience.start_date}" + f" - {experience.end_date}" if experience.end_date is not None and experience.end_date != "" else ""
-        else:
-            date_part = f", until {experience.end_date}" if experience.end_date is not None and experience.end_date != "" else ""
-        company_part = f", {experience.company}" if experience.company is not None and experience.company != "" else ""
-        location_part = f", {experience.location}" if experience.location is not None and experience.location != "" else ""
-        work_type_part = f" {_work_type_short(experience.work_type)}" if experience.work_type is not None and experience.work_type != "" else ""
-        summary += "• " + experience.experience_title + work_type_part + date_part + company_part + location_part + "\n"
+        summary += "• " + ExperienceEntity.get_text_summary(
+            experience_title=experience.experience_title,
+            location=experience.location,
+            work_type=experience.work_type,
+            start_date=experience.start_date,
+            end_date=experience.end_date,
+            company=experience.company) + "\n"
     return summary
-
-
-def _work_type_short(work_type: str) -> str:
-    wt = WorkType.from_string_key(work_type)
-    if wt == WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
-        return "(Waged Employment)"
-    elif wt == WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK:
-        return "(Trainee)"
-    elif wt == WorkType.SELF_EMPLOYMENT:
-        return "(Self-Employed)"
-    elif wt == WorkType.UNSEEN_UNPAID:
-        return "(Volunteer/Unpaid)"
-    else:
-        return ""

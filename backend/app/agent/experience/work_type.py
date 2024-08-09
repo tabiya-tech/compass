@@ -1,3 +1,4 @@
+from __future__ import annotations
 from enum import Enum
 from textwrap import dedent
 from typing import Optional
@@ -24,11 +25,23 @@ class WorkType(Enum):
     UNSEEN_UNPAID = "Unpaid other"  # All unseen work is grouped under this category
 
     @staticmethod
-    def from_string_key(key: Optional[str]) -> Optional['WorkType']:
+    def from_string_key(key: Optional[str]) -> Optional[WorkType]:
         if key in WorkType.__members__:
             return WorkType[key]
         return None
 
+    @staticmethod
+    def work_type_short(work_type: WorkType) -> str:
+        if work_type == WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
+            return "Waged Employment"
+        elif work_type == WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK:
+            return "Trainee"
+        elif work_type == WorkType.SELF_EMPLOYMENT:
+            return "Self-Employed"
+        elif work_type == WorkType.UNSEEN_UNPAID:
+            return "Volunteer/Unpaid"
+        else:
+            return ""
 
 WORK_TYPE_DEFINITIONS_FOR_PROMPT = dedent(f"""\
 None: When there isn't adequate information to classify the work type in any of the categories below.    
