@@ -23,9 +23,9 @@ root.render(
   <React.StrictMode>
     <>
       <CssBaseline />
-      <IsOnlineProvider>
-        <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
-          <SnackbarProvider>
+      <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
+        <SnackbarProvider>
+          <IsOnlineProvider>
             <AnonymousAuthProvider>
               <EmailAuthProvider>
                 <UserPreferencesProvider>
@@ -39,9 +39,9 @@ root.render(
                 </UserPreferencesProvider>
               </EmailAuthProvider>
             </AnonymousAuthProvider>
-          </SnackbarProvider>
-        </ThemeProvider>
-      </IsOnlineProvider>
+          </IsOnlineProvider>
+        </SnackbarProvider>
+      </ThemeProvider>
     </>
   </React.StrictMode>
 );
