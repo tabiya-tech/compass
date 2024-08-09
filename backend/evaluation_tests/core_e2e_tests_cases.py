@@ -30,6 +30,7 @@ france_prompt = system_instruction_prompt + dedent("""
 
 test_cases = [
     EvaluationTestCase(
+        conversation_rounds=100,
         name='genZ_student_e2e',
         simulated_user_prompt=dedent("""
             Let's put you in the shoes of Shiela! You're a Gen Z student living with your mom and three 
@@ -40,6 +41,7 @@ test_cases = [
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
     ),
     EvaluationTestCase(
+        conversation_rounds=100,
         name='mechanical_engineer_e2e',
         simulated_user_prompt=dedent("""
             You are a 29 year old man named Tumelo Jacobs from Cape Town. You live with your mom and sister, 
@@ -50,6 +52,7 @@ test_cases = [
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
     ),
     EvaluationTestCase(
+        conversation_rounds=100,
         name='minimum_wage_worker_e2e',
         simulated_user_prompt=dedent("""
             You are a 23 year old woman from rural South Africa who has moved to Pretoria for work after being unable 
@@ -61,6 +64,7 @@ test_cases = [
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
     ),
     EvaluationTestCase(
+        conversation_rounds=100,
         name='dancer_e2e',
         simulated_user_prompt=dedent("""
             You are a 24 year old woman named Aisha Nouma from Rural Mombasa.
@@ -72,6 +76,7 @@ test_cases = [
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
     ),
     EvaluationTestCase(
+        conversation_rounds=100,
         name='creative_writer_e2e',
         simulated_user_prompt=dedent("""
             Let's put you in the shoes of Mark. A 24-year-old writer from Mombasa... always looking for that creative 
@@ -82,6 +87,7 @@ test_cases = [
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
     ),
     EvaluationTestCase(
+        conversation_rounds=100,
         name='management_dropout_e2e',
         simulated_user_prompt=dedent("""
             You are Sarah, a 21 year old woman from Drancy, Ile de France. You grew up in, and live in a QPV. You 
@@ -91,6 +97,7 @@ test_cases = [
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
     ),
     EvaluationTestCase(
+        conversation_rounds=100,
         name='garden_worker_e2e',
         simulated_user_prompt=dedent("""
             Your name is Warren, an 18 year old man from Valance, Drôme. You grew up and live in a QPV. You dropped 

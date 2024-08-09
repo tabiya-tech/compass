@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 from datetime import datetime, timezone
+from typing import Optional
 
 import pytest
 from pydantic.main import BaseModel
@@ -37,6 +38,12 @@ class EvaluationTestCase(CompassTestCase):
     simulated_user_prompt: str
     """
     The prompt for the simulated user.
+    """
+
+    conversation_rounds: Optional[int] = None
+    """
+    The number of conversation rounds to be run.
+    If provided, it will override the max_iterations from the configuration.
     """
 
     evaluations: list[Evaluation]
