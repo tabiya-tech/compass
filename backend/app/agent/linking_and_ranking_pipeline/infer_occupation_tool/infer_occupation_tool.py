@@ -1,12 +1,13 @@
 import asyncio
 import logging
+from typing import Optional
 
 from pydantic import BaseModel
 
+from app.agent.experience.work_type import WorkType
 from app.countries import Country
 from app.agent.agent_types import LLMStats
-from app.agent.experience.experience_entity import ExperienceEntity
-from app.agent.infer_occupation_tool._contextualization_llm import _ContextualizationLLM
+from ._contextualization_llm import _ContextualizationLLM
 
 from app.vector_search.esco_entities import OccupationSkillEntity
 from app.vector_search.esco_search_service import OccupationSkillSearchService
@@ -15,10 +16,11 @@ from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
 MONGO_SETTINGS = MongoDbSettings()
 
 
-class InferredOccupationResult(BaseModel):
-    contextualized_title: str
+class InferOccupationResult(BaseModel):
+    contextual_title: str
     esco_occupations: list[OccupationSkillEntity]
-    stats: LLMStats
+    responsibilities: list[str]
+    llm_stats: list[LLMStats]
 
     class Config:
         extra = "forbid"
@@ -33,33 +35,43 @@ class InferOccupationTool:
         self._logger = logging.getLogger(self.__class__.__name__)
         self._occupation_skill_search_service = occupation_skill_search_service
 
-    async def execute(self,
+    async def execute(self, *,
+                      experience_title: str,
+                      company: Optional[str] = None,
+                      work_type: Optional[WorkType] = None,
+                      responsibilities: list[str],
                       country_of_interest: Country,
-                      experience: ExperienceEntity,
-                      top_k: int = 5) -> InferredOccupationResult:
+                      top_k: int = 5) -> InferOccupationResult:
         """
         Infers most likely matching occupations based on the experience and the country of interest.
         It uses the experience title to search for the top_k matching occupations.
-        Additionally, it infers a contextualized title based on the country of interest and information from the experience
-        and searches for the top_k matching occupations based on the contextualized title.
+        Additionally, it infers a contextual title based on the country of interest and information from the experience
+        and searches for the top_k matching occupations based on the contextual title.
         The final list of occupations is a list of unique occupations from the two searches, so it may contain from top_k to 2*top_k occupations.
-        It returns the contextualized title, the list of mathing occupations and the stats of the LLM
+        It returns the contextual title, the list of mathing occupations and the stats of the LLM
 
         The experience is not changed by this method.
         """
 
         contextualization_llm = _ContextualizationLLM(country_of_interest, self._logger)
-        contextualized_title, llm_stats = await contextualization_llm.execute(experience)
-        tasks = [self._occupation_skill_search_service.search(query=contextualized_title, k=top_k)]
-        if contextualized_title.lower() != experience.experience_title.lower():
-            tasks.append(self._occupation_skill_search_service.search(query=experience.experience_title, k=top_k))
+        contextualization_response = await contextualization_llm.execute(
+            experience_title=experience_title,
+            company=company,
+            work_type=work_type,
+            responsibilities=responsibilities
+        )
+        #  create a set to remove duplicates and convert to lowercase
+        titles: set[str] = {contextualization_response.contextual_title.lower(), experience_title.lower()}
+        # create a task for each title
+        tasks = [self._occupation_skill_search_service.search(query=title, k=top_k) for title in titles]
 
         list_of_occupation_list = await asyncio.gather(*tasks)
         occupations_skills = flattern(list_of_occupation_list)
-        return InferredOccupationResult(contextualized_title=contextualized_title,
-                                        esco_occupations=occupations_skills,
-                                        stats=llm_stats
-                                        )
+        return InferOccupationResult(contextual_title=contextualization_response.contextual_title,
+                                     esco_occupations=occupations_skills,
+                                     responsibilities=responsibilities,
+                                     llm_stats=contextualization_response.llm_stats
+                                     )
 
 
 def flattern(list_of_occupation_list: list[list[OccupationSkillEntity]]) -> list[OccupationSkillEntity]:

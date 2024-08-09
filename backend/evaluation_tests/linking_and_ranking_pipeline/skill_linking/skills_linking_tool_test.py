@@ -3,9 +3,9 @@ from typing import Optional
 
 import pytest
 
-from app.agent.experience.experience_entity import ResponsibilitiesData, ExperienceEntity
-from app.agent.infer_occupation_tool.infer_occupation_tool import InferOccupationTool
-from app.agent.skill_linking_ranking.skills_linking_tool import SkillsLinkingTool
+from app.agent.experience.work_type import WorkType
+from app.agent.linking_and_ranking_pipeline.infer_occupation_tool import InferOccupationTool
+from app.agent.linking_and_ranking_pipeline.skill_linking_tool import SkillLinkingTool
 from app.countries import Country
 from app.server_dependecies.db_dependecies import get_mongo_db
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
@@ -46,6 +46,7 @@ class SkillLinkingToolTestCase(CompassTestCase):
     given_occupation_code: Optional[str] = None
     given_occupation_title: Optional[str] = None
     given_responsibilities: list[str]
+    given_work_type: WorkType
     expected_skills: list[str]
 
 
@@ -53,19 +54,21 @@ test_cases = [
     SkillLinkingToolTestCase(
         name="Baker by code",
         given_occupation_code="7512.1",
+        given_work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
         given_responsibilities=["I bake bread", "I clean my work place", "I order supplies"],
         expected_skills=["bake goods", "ensure sanitation", "order supplies"]
     ),
     SkillLinkingToolTestCase(
-        skip_force="force",
         name="Baker by title",
         given_occupation_title="Baker",
+        given_work_type=WorkType.SELF_EMPLOYMENT,
         given_responsibilities=["I bake bread", "I clean my work place", "I order supplies", "I sell bread", "I talk to customers"],
         expected_skills=["bake goods", "ensure sanitation", "order supplies", "sell products"]
     ),
     SkillLinkingToolTestCase(
         name="GDE Brigade member by title",
         given_occupation_title="GDE Brigade member",
+        given_work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
         given_responsibilities=["I make sure everyone follows the Covid-19 rules.",
                                 "I keep an eye on the kids to make sure they stay apart from each other.",
                                 "I check and record temperatures and other health signs.",
@@ -95,24 +98,25 @@ async def test_skill_linking_tool(test_case: SkillLinkingToolTestCase, get_searc
 
     if test_case.given_occupation_title:
         tool = InferOccupationTool(get_search_services.occupation_skill_search_service)
-        experience = ExperienceEntity(
+        result = await tool.execute(
             experience_title=test_case.given_occupation_title,
-            work_type=None,
+            work_type=test_case.given_work_type,
             company=None,
-            location=None,
-            responsibilities=ResponsibilitiesData(responsibilities=test_case.given_responsibilities)
-        )
-        result = await tool.execute(experience=experience, country_of_interest=Country.SOUTH_AFRICA, top_k=5)
+            responsibilities=test_case.given_responsibilities,
+            country_of_interest=Country.SOUTH_AFRICA,
+            top_k=5)
+        logging.getLogger().info(f"Contextual title: {result.contextual_title}")
+        logging.getLogger().info(f"ESCO occupations: {[esco_occupation.occupation.preferredLabel for esco_occupation in result.esco_occupations]}")
         given_occupations_with_skills.extend(result.esco_occupations)
-        given_contextual_title = result.contextualized_title
+        given_contextual_title = result.contextual_title
 
     # When the skill linking tool is called with the given occupation and responsibilities
-    skill_linking_tool = SkillsLinkingTool(get_search_services.skill_search_service)
-    response = await skill_linking_tool.link_and_rank_skills(
+    skill_linking_tool = SkillLinkingTool(get_search_services.skill_search_service)
+    response = await skill_linking_tool.execute(
         experience_title=test_case.given_occupation_title,
         contextual_title=given_contextual_title,
         esco_occupations=given_occupations_with_skills,
-        responsibilities_data=ResponsibilitiesData(responsibilities=test_case.given_responsibilities),
+        responsibilities=test_case.given_responsibilities,
         top_k=5,
         top_p=10)
     # Then the expected skills are returned
