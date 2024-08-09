@@ -175,6 +175,7 @@ async def conversation(request: Request, body: ConversationInput, clear_memory: 
         agent_director.get_explore_experiences_agent().set_state(state.explore_experiences_director_state)
         agent_director.get_explore_experiences_agent().get_collect_experiences_agent().set_state(
             state.collect_experience_state)
+        agent_director.get_explore_experiences_agent().get_exploring_skills_agent().set_state(state.skills_explorer_agent_state)
         conversation_memory_manager.set_state(state.conversation_memory_manager_state)
 
         # Handle the user input

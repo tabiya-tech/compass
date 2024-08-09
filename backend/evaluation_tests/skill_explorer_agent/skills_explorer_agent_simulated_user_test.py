@@ -4,6 +4,7 @@ import os
 import pytest
 from _pytest.logging import LogCaptureFixture
 
+from app.agent.skill_explorer_agent import SkillsExplorerAgentState
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
@@ -34,6 +35,7 @@ async def test_skills_explorer_agent_simulated_user(max_iterations: int, test_ca
     conversation_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
     conversation_manager.set_state(state=ConversationMemoryManagerState(session_id))
     execute_evaluated_agent = SkillsExplorerAgentExecutor(conversation_manager=conversation_manager,
+                                                          state=SkillsExplorerAgentState(session_id=session_id),
                                                           experience=test_case.given_experience)
 
     # Run the conversation test

@@ -7,6 +7,7 @@ from app.agent.agent_director.abstract_agent_director import AgentDirectorState
 from app.agent.collect_experiences_agent import CollectExperiencesAgentState
 from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
+from app.agent.skill_explorer_agent import SkillsExplorerAgentState
 
 
 class ApplicationState(BaseModel):
@@ -20,13 +21,15 @@ class ApplicationState(BaseModel):
     explore_experiences_director_state: ExploreExperiencesAgentDirectorState
     conversation_memory_manager_state: ConversationMemoryManagerState
     collect_experience_state: CollectExperiencesAgentState
+    skills_explorer_agent_state: SkillsExplorerAgentState
 
     def __init__(self, session_id):
         super().__init__(session_id=session_id,
                          agent_director_state=AgentDirectorState(session_id),
                          explore_experiences_director_state=ExploreExperiencesAgentDirectorState(session_id),
                          conversation_memory_manager_state=ConversationMemoryManagerState(session_id),
-                         collect_experience_state=CollectExperiencesAgentState(session_id)
+                         collect_experience_state=CollectExperiencesAgentState(session_id),
+                         skills_explorer_agent_state=SkillsExplorerAgentState(session_id)
                          )
 
 
