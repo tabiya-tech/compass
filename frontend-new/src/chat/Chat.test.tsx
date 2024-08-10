@@ -1,19 +1,20 @@
 import "src/_test_utilities/consoleMock";
-import Chat, { DATA_TEST_ID } from "./Chat";
-import { fireEvent, render, screen, waitFor } from "src/_test_utilities/test-utils";
-import { DATA_TEST_ID as CHAT_HEADER_TEST_ID, MENU_ITEM_ID } from "./ChatHeader/ChatHeader";
-import ChatList, { DATA_TEST_ID as CHAT_LIST_TEST_ID } from "./ChatList/ChatList";
-import ChatMessageField, { DATA_TEST_ID as CHAT_MESSAGE_FIELD_TEST_ID } from "./ChatMessageField/ChatMessageField";
-import { DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID } from "src/Experiences/components/ExperiencesDrawerHeader/ExperiencesDrawerHeader";
-import { DATA_TEST_ID as EXPERIENCES_DRAWER_CONTAINER_TEST_ID } from "src/Experiences/ExperiencesDrawer";
-import { HashRouter } from "react-router-dom";
-import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { ConversationMessageSender } from "./ChatService/ChatService.types";
-import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
+import Chat, {CHECK_INACTIVITY_INTERVAL, DATA_TEST_ID} from "./Chat";
+import {fireEvent, render, screen, waitFor} from "src/_test_utilities/test-utils";
+import {DATA_TEST_ID as CHAT_HEADER_TEST_ID, MENU_ITEM_ID} from "./ChatHeader/ChatHeader";
+import ChatList, {DATA_TEST_ID as CHAT_LIST_TEST_ID} from "./ChatList/ChatList";
+import ChatMessageField, {DATA_TEST_ID as CHAT_MESSAGE_FIELD_TEST_ID} from "./ChatMessageField/ChatMessageField";
+import {DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID} from "src/Experiences/components/ExperiencesDrawerHeader/ExperiencesDrawerHeader";
+import {DATA_TEST_ID as EXPERIENCES_DRAWER_CONTAINER_TEST_ID} from "src/Experiences/ExperiencesDrawer";
+import {HashRouter} from "react-router-dom";
+import {useSnackbar} from "src/theme/SnackbarProvider/SnackbarProvider";
+import {ConversationMessageSender} from "./ChatService/ChatService.types";
+import {Language} from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import {UserPreferencesContext} from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 import ChatService from "./ChatService/ChatService";
 import ExperienceService from "src/Experiences/ExperienceService/ExperienceService";
-import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
+import {MenuItemConfig} from "src/theme/ContextMenu/menuItemConfig.types";
+import {act} from "@testing-library/react";
 
 // Mock the ChatService module
 jest.mock("src/chat/ChatService/ChatService");
@@ -55,7 +56,7 @@ jest.mock("src/chat/ChatMessageField/ChatMessageField", () => {
   return {
     __esModule: true,
     ...actualModule,
-    default: jest.fn(({ handleSend, message, notifyChange }) => (
+    default: jest.fn(({handleSend, message, notifyChange}) => (
       <div data-testid={actualModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER}>
         <input
           data-testid={actualModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD}
@@ -87,7 +88,7 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
 jest.mock("src/theme/ContextMenu/ContextMenu", () => {
   return {
     __esModule: true,
-    default: jest.fn(({ items }: { items: MenuItemConfig[] }) => (
+    default: jest.fn(({items}: { items: MenuItemConfig[] }) => (
       <div data-testid="mock-context-menu">
         {items.map((item) => (
           <div key={item.id} data-testid={item.id} onClick={item.action}>
@@ -148,7 +149,7 @@ describe("Chat", () => {
       render(
         <HashRouter>
           <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat />
+            <Chat/>
           </UserPreferencesContext.Provider>
         </HashRouter>
       );
@@ -187,15 +188,15 @@ describe("Chat", () => {
       render(
         <HashRouter>
           <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat />
+            <Chat/>
           </UserPreferencesContext.Provider>
         </HashRouter>
       );
 
       // WHEN the user is inactive
       const input = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD);
-      fireEvent.change(input, { target: { value: "" } });
-      jest.advanceTimersByTime(3 * 60 * 1000);
+      fireEvent.change(input, {target: {value: ""}});
+      jest.advanceTimersByTime(CHECK_INACTIVITY_INTERVAL);
 
       // THEN expect the backdrop to be shown
       await waitFor(() => {
@@ -205,33 +206,39 @@ describe("Chat", () => {
       jest.useRealTimers();
     });
 
-    test("should hide the backdrop when the user interacts with the page", async () => {
+    test.each(
+      [
+        ["mouseDown", () => fireEvent.mouseDown(document)],
+        ["keyDown", () => fireEvent.keyDown(document, {key: "Enter"})],
+      ]
+    )("should hide the backdrop when the user %s", async (description, event_callback: () => void) => {
       jest.useFakeTimers();
 
       // GIVEN a chat component
       render(
         <HashRouter>
           <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat />
+            <Chat/>
           </UserPreferencesContext.Provider>
         </HashRouter>
       );
 
       // WHEN the user is inactive
-      jest.advanceTimersByTime(3 * 60 * 1000);
-
+      jest.advanceTimersByTime(CHECK_INACTIVITY_INTERVAL);
       // THEN expect the backdrop to be shown
       await waitFor(() => {
         expect(screen.getByTestId("inactive-backdrop")).toBeInTheDocument();
       });
 
-      // WHEN the user interacts with the page
-      fireEvent.click(document);
+      // AND WHEN the user interacts with the page
+      act(() => {
+        event_callback();
+      });
 
       // THEN expect the backdrop to be hidden
-      await waitFor(() => {
-        expect(screen.queryByTestId("inactive-backdrop")).not.toBeInTheDocument();
-      });
+      //await waitFor(() => {
+      expect(screen.queryByTestId("inactive-backdrop")).not.toBeInTheDocument();
+      //});
 
       jest.useRealTimers();
     });
@@ -269,7 +276,7 @@ describe("Chat", () => {
       render(
         <HashRouter>
           <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat />
+            <Chat/>
           </UserPreferencesContext.Provider>
         </HashRouter>
       );
@@ -329,7 +336,7 @@ describe("Chat", () => {
       render(
         <HashRouter>
           <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat />
+            <Chat/>
           </UserPreferencesContext.Provider>
         </HashRouter>
       );
@@ -338,7 +345,7 @@ describe("Chat", () => {
       await waitFor(() => {
         expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
           "An unexpected error occurred. Please try again later.",
-          { variant: "error" }
+          {variant: "error"}
         );
       });
     });
@@ -363,7 +370,7 @@ describe("Chat", () => {
       render(
         <HashRouter>
           <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat />
+            <Chat/>
           </UserPreferencesContext.Provider>
         </HashRouter>
       );
@@ -371,7 +378,7 @@ describe("Chat", () => {
       const input = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD);
       const sendButton = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
 
-      fireEvent.change(input, { target: { value: "Test message" } });
+      fireEvent.change(input, {target: {value: "Test message"}});
       fireEvent.click(sendButton);
 
       // THEN expect the message to be sent and the response to be received
@@ -410,7 +417,7 @@ describe("Chat", () => {
       render(
         <HashRouter>
           <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat />
+            <Chat/>
           </UserPreferencesContext.Provider>
         </HashRouter>
       );
@@ -426,7 +433,7 @@ describe("Chat", () => {
       const input = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD);
       const sendButton = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
 
-      fireEvent.change(input, { target: { value: "Test message" } });
+      fireEvent.change(input, {target: {value: "Test message"}});
       fireEvent.click(sendButton);
 
       // THEN expect an error message to be shown in the chat
@@ -459,7 +466,7 @@ describe("Chat", () => {
     const chatComponent = (
       <HashRouter>
         <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-          <Chat />
+          <Chat/>
         </UserPreferencesContext.Provider>
       </HashRouter>
     );
