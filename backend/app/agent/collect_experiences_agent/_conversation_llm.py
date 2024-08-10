@@ -12,7 +12,7 @@ from app.agent.prompt_template.format_prompt import replace_placeholders_with_in
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import MODERATE_TEMPERATURE_GENERATION_CONFIG, LLMConfig
+from common_libs.llm.models_utils import MODERATE_TEMPERATURE_GENERATION_CONFIG, LLMConfig, LLMResponse
 
 _NO_EXPERIENCE_COLLECTED = "No experience data has been collected yet"
 _FINAL_MESSAGE = "Thank you for sharing your experiences. Let's move on to the next step."
@@ -25,6 +25,7 @@ class ConversationLLMAgentOutput(AgentOutput):
 class _ConversationLLM:
     @staticmethod
     async def execute(*,
+                      first_time_visit: bool,
                       user_input: AgentInput,
                       context: ConversationContext,
                       collected_data: list[CollectedData],
@@ -35,27 +36,19 @@ class _ConversationLLM:
                       logger: logging.Logger) -> ConversationLLMAgentOutput:
         """
         Converses with the user and asks probing questions to collect experiences.
-        :param all_fields_collected: The fields from the experience data have been filled
-        :param question_asked: All important questions asked so far
-        :param logger: A logger instance to log the execution
-        :param data_collected_in_previous_round: The data extracted from the previous round
-        :param user_input: The last user input
-        :param context: The conversation context including the conversation history
-        :param collected_experience_data: The collected experience data so far
+        :param first_time_visit: If this is the first time the user visits the agent during the conversation
+        :param collected_data:
+        :param user_input: The user input.
+        :param context: The conversation context.
+        :param exploring_type: The type of work experience the agent is exploring.
+        :param unexplored_types: The types of work experiences that have not been explored yet.
+        :param explored_types: The types of work experiences that have been explored.
+        :param last_referenced_experience_index: The index of the last referenced experience in the collected data.
+        :param logger: The logger.
         :return: The agent output with the next message for the user and finished flag
                  set to True if the conversation is
         finished.
         """
-        llm = GeminiGenerativeLLM(
-            system_instructions=_ConversationLLM._get_system_instructions(collected_data=collected_data,
-                                                                          exploring_type=exploring_type,
-                                                                          unexplored_types=unexplored_types,
-                                                                          explored_types=explored_types,
-                                                                          last_referenced_experience_index=last_referenced_experience_index,
-                                                                          ),
-            config=LLMConfig(
-                generation_config=MODERATE_TEMPERATURE_GENERATION_CONFIG
-            ))
         if user_input.message == "":
             # If the user input is empty, set it to "(silence)"
             # This is to avoid the agent failing to respond to an empty input
@@ -63,35 +56,62 @@ class _ConversationLLM:
             user_input.is_artificial = True
         msg = user_input.message.strip()  # Remove leading and trailing whitespaces
         llm_start_time = time.time()
-        llm_response = await llm.generate_content(
-            llm_input=ConversationHistoryFormatter.format_for_agent_generative_prompt(
-                model_response_instructions=None,
-                context=context, user_input=msg),
-        )
+
+        exploring_type_finished = False
+        finished = False
+        llm_response: LLMResponse
+        if first_time_visit:
+            # If this is the first time the user visits the agent, the agent should get to the point
+            # and not introduce itself or ask how the user is doing.
+
+            llm = GeminiGenerativeLLM(
+                system_instructions=None,
+                config=LLMConfig(
+                    generation_config=MODERATE_TEMPERATURE_GENERATION_CONFIG
+                ))
+            llm_response = await llm.generate_content(
+                llm_input=_ConversationLLM._get_first_time_generative_prompt(exploring_type=exploring_type),
+            )
+        else:
+            llm = GeminiGenerativeLLM(
+                system_instructions=_ConversationLLM._get_system_instructions(collected_data=collected_data,
+                                                                              exploring_type=exploring_type,
+                                                                              unexplored_types=unexplored_types,
+                                                                              explored_types=explored_types,
+                                                                              last_referenced_experience_index=last_referenced_experience_index,
+                                                                              ),
+                config=LLMConfig(
+                    generation_config=MODERATE_TEMPERATURE_GENERATION_CONFIG
+                ))
+
+            llm_response = await llm.generate_content(
+                llm_input=ConversationHistoryFormatter.format_for_agent_generative_prompt(
+                    model_response_instructions=None,
+                    context=context, user_input=msg),
+            )
+
+            llm_response.text = llm_response.text.strip()
+
+            # Test if the response is the same as the previous two
+            if llm_response.text.find("<END_OF_WORKTYPE>") != -1:
+                # We finished a work type (and it is not the last one) we need to move to the next one
+                if llm_response.text != "<END_OF_WORKTYPE>":
+                    logger.warning("The response contains '<END_OF_WORKTYPE>' and additional text: %s", llm_response.text)
+                exploring_type_finished = True
+                finished = False
+                llm_response.text = "Let's move on to other work experiences."
+
+            if llm_response.text.find("<END_OF_CONVERSATION>") != -1:
+                if llm_response.text != "<END_OF_CONVERSATION>":
+                    logger.warning("The response contains '<END_OF_CONVERSATION>' and additional text: %s", llm_response.text)
+                llm_response.text = _FINAL_MESSAGE
+                exploring_type_finished = False
+                finished = True
+
         llm_end_time = time.time()
         llm_stats = LLMStats(prompt_token_count=llm_response.prompt_token_count,
                              response_token_count=llm_response.response_token_count,
                              response_time_in_sec=round(llm_end_time - llm_start_time, 2))
-        exploring_type_finished = False
-        finished = False
-        llm_response.text = llm_response.text.strip()
-
-        # Test if the response is the same as the previous two
-        if llm_response.text.find("<END_OF_WORKTYPE>") != -1:
-            # We finished a work type (and it is not the last one) we need to move to the next one
-            if llm_response.text != "<END_OF_WORKTYPE>":
-                logger.warning("The response contains '<END_OF_WORKTYPE>' and additional text: %s", llm_response.text)
-            exploring_type_finished = True
-            finished = False
-            llm_response.text = "Let's move on to other work experiences."
-
-        if llm_response.text.find("<END_OF_CONVERSATION>") != -1:
-            if llm_response.text != "<END_OF_CONVERSATION>":
-                logger.warning("The response contains '<END_OF_CONVERSATION>' and additional text: %s", llm_response.text)
-            llm_response.text = _FINAL_MESSAGE
-            exploring_type_finished = False
-            finished = True
-
         return ConversationLLMAgentOutput(
             message_for_user=llm_response.text,
             exploring_type_finished=exploring_type_finished,
@@ -115,11 +135,7 @@ class _ConversationLLM:
                 
             {language_style}
             
-            {agent_character}
-         
-            #Introduction
-                if this is the first time I visit you, get to the point do not introduce yourself or ask how I am doing.
-                Say something like: "Let's start ..."    
+            {agent_character} 
                         
             #Stay Focused
                 Keep the conversation focused on the task at hand. If I ask you questions that are irrelevant to our subject
@@ -261,6 +277,23 @@ class _ConversationLLM:
                                                 ),
                                                 last_referenced_experience=_get_last_referenced_experience(collected_data, last_referenced_experience_index)
                                                 )
+
+    @staticmethod
+    def _get_first_time_generative_prompt(exploring_type: WorkType):
+        first_time_generative_prompt = dedent("""\
+                #Role
+                    You are a counselor working for an employment agency helping me, a young person living in South Africa, 
+                    outline my work experiences.
+                    
+                {language_style}
+                
+                Respond with something similar to this:
+                    Explain that during this step you will only gather basic information about all my experiences, 
+                    later we will move to the next step and explore each experience separately in detail.
+                    <add new line to separate the section>
+                    {question_to_ask}.  
+                """)
+        return replace_placeholders_with_indent(first_time_generative_prompt, question_to_ask=_ask_experience_type_question(exploring_type))
 
 
 def _transition_instructions(*,
@@ -423,6 +456,21 @@ def _get_excluding_experiences(work_type: WorkType) -> str:
         raise ValueError("The work type is not supported")
 
 
+def _ask_experience_type_question(work_type: WorkType) -> str:
+    question_to_ask: str
+    if work_type == WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
+        question_to_ask = "Ask me if I have worked for a company or a someone else's business for money."
+    elif work_type == WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK:
+        question_to_ask = "Ask me if I have experiences for a company or organization as an unpaid trainee"
+    elif work_type == WorkType.SELF_EMPLOYMENT:
+        question_to_ask = "Ask me if I run my own business, did freelance or contract work."
+    elif work_type == WorkType.UNSEEN_UNPAID:
+        question_to_ask = "Ask me if I have done unpaid community volunteering work, caregiving for family, helping in the household, or helping out friends."
+    else:
+        raise ValueError("The exploring type is not supported")
+    return question_to_ask
+
+
 def _get_explore_experiences_instructions(*,
                                           collected_data: list[CollectedData],
                                           exploring_type: WorkType,
@@ -431,17 +479,7 @@ def _get_explore_experiences_instructions(*,
                                           formal_experiences_found: int,
                                           ) -> str:
     if exploring_type is not None:
-        questions_to_ask: str
-        if exploring_type == WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
-            questions_to_ask = "Ask me if I have worked for a company or a someone else's business for money."
-        elif exploring_type == WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK:
-            questions_to_ask = "Ask me if I have experiences for a company or organization as an unpaid trainee"
-        elif exploring_type == WorkType.SELF_EMPLOYMENT:
-            questions_to_ask = "Ask me if I run my own business, did freelance or contract work."
-        elif exploring_type == WorkType.UNSEEN_UNPAID:
-            questions_to_ask = "Ask me if I have done unpaid community volunteering work, caregiving for family, helping in the household, or helping out friends."
-        else:
-            raise ValueError("The exploring type is not supported")
+        questions_to_ask: str = _ask_experience_type_question(exploring_type)
 
         focus_unseen_instructions = ""
         if formal_experiences_found == 0 and exploring_type == WorkType.UNSEEN_UNPAID:
