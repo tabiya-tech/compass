@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 from app.agent.agent import Agent
@@ -34,6 +36,11 @@ class CollectExperiencesAgentState(BaseModel):
     The questions asked by the conversational LLM.
     """
 
+    first_time_visit: bool = True
+    """
+    Whether this is the first time the agent is visited during the conversation.
+    """
+
     class Config:
         """
         Disallow extra fields in the model
@@ -57,7 +64,7 @@ class CollectExperiencesAgent(Agent):
         super().__init__(agent_type=AgentType.COLLECT_EXPERIENCES_AGENT,
                          is_responsible_for_conversation_history=False)
         self._experiences: list[ExperienceEntity] = []
-        self._state: CollectExperiencesAgentState | None = None
+        self._state: Optional[CollectExperiencesAgentState] = None
 
     def set_state(self, state: CollectExperiencesAgentState):
         """
@@ -93,7 +100,8 @@ class CollectExperiencesAgent(Agent):
         #   b) the model may have made a mistake interpreting the user input as we need to clarify
         conversation_llm_output: ConversationLLMAgentOutput
         exploring_type = self._state.unexplored_types[0] if len(self._state.unexplored_types) > 0 else None
-        conversation_llm_output = await conversion_llm.execute(context=context,
+        conversation_llm_output = await conversion_llm.execute(first_time_visit=self._state.first_time_visit,
+                                                               context=context,
                                                                user_input=user_input,
                                                                collected_data=collected_data,
                                                                last_referenced_experience_index=last_referenced_experience_index,
@@ -101,7 +109,7 @@ class CollectExperiencesAgent(Agent):
                                                                unexplored_types=self._state.unexplored_types,
                                                                explored_types=self._state.explored_types,
                                                                logger=self.logger)
-
+        self._state.first_time_visit = False  # The first time visit is over
         if conversation_llm_output.exploring_type_finished:
             #  The specific work type has been explored, so we remove it from the list
             #  and we set the conversation to continue
@@ -114,7 +122,8 @@ class CollectExperiencesAgent(Agent):
                 transition_message = f"Ask me about experiences that include: {exploring_type.value}"
             else:
                 transition_message = "Let's recap, and give me a chance to correct any mistakes."
-            conversation_llm_output = await conversion_llm.execute(context=context,
+            conversation_llm_output = await conversion_llm.execute(first_time_visit=self._state.first_time_visit,
+                                                                   context=context,
                                                                    user_input=AgentInput(message=transition_message, is_artificial=True),
                                                                    collected_data=collected_data,
                                                                    last_referenced_experience_index=last_referenced_experience_index,
