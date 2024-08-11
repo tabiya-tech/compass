@@ -150,10 +150,10 @@ class _ConversationLLM:
                 
             #Do not repeat information unnecessarily
                 Review your previous questions and my answers and do not repeat the same question twice in a row, especially if I give you the same answer.
-                Do not repeat the information you have collected so far, in every question you ask.
+                Do not repeat the information you collected, in every question you ask.
                 Do not repeat what I said in the questions you ask me.
                 Maintain a natural flow in the conversation and only refer to the information you have collected recently only when you summarize an experience.
-                After you collect a new piece of information  ask questions that incorporate an inviting phrase that makes the question sound less formal. 
+                After you collect a new piece of information ask questions that incorporate an inviting phrase that makes the question sound less formal. 
                 Examples:
                     - ask the next question directly without any additional comments on the previous round.
                     - "Got it, ...?"
@@ -166,7 +166,7 @@ class _ConversationLLM:
                     - "...?"
                     
             #Gather Details
-                For each experience, you will ask me questions to gather the following information unless I have already provided it:
+                For each experience, you will ask me questions to gather the following information, unless I have already provided it:
                 - 'experience_title': see #experience_title instructions 
                 - 'paid_work': see #paid_work instructions
                 - 'work_type': see #work_type instructions
@@ -329,7 +329,7 @@ def _transition_instructions(*,
                 "Let's recap the information we have collected so far:
                 {summary_of_experiences}
                 Is there anything you would like to add or change?"
-            Also with the above question inform me that if one of the experiences seems to be duplicated, I can ask you to delete it.
+            Also with the above question inform me that if one of the experiences seems to be duplicated, I can ask you to remove it.
              
             You must wait for me to respond to your question and explicitly confirm that I have nothing to add or change 
             to the information presented in the summary. 
