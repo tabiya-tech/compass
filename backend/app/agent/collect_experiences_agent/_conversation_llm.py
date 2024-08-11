@@ -180,6 +180,8 @@ class _ConversationLLM:
                 and decide which question to ask next. 
                 
                 Do not ask me about specific responsibilities, tasks, skills or competencies of the experience.
+                If I provide this information then remind me that we will explore this experience separately in detail later 
+                and that for now we are only collecting basic information.
                 
                 Do not ask me questions that are not related to the experience data fields listed above.
                 
