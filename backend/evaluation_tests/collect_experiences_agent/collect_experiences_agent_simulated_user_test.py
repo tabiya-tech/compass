@@ -21,7 +21,7 @@ from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 @pytest.mark.evaluation_test
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases),
                          ids=[case.name for case in get_test_cases_to_run(test_cases)])
-async def test_collect_experiences_agent_simulated_user(max_iterations: int, test_case: CollectExperiencesAgentTestCase,
+async def test_collect_experiences_agent_simulated_user(test_case: CollectExperiencesAgentTestCase,
                                                         caplog: LogCaptureFixture):
     """
     Tests the welcome agent with a simulated user.
@@ -36,7 +36,7 @@ async def test_collect_experiences_agent_simulated_user(max_iterations: int, tes
     conversation_manager.set_state(state=ConversationMemoryManagerState(session_id))
     execute_evaluated_agent = CollectExperiencesAgentExecutor(conversation_manager=conversation_manager,
                                                               session_id=session_id)
-
+    max_iterations = 50
     # Run the conversation test
     config = ConversationTestConfig(
         max_iterations=max_iterations,
