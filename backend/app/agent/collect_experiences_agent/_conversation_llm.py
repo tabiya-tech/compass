@@ -188,11 +188,12 @@ class _ConversationLLM:
                 Avoid asking multiple questions at once to collect multiple pieces of information, try to collect one-two pieces of information at a time. 
                 If you do ask for multiple pieces of information 
                 at once and I provide only one piece, ask for the missing information in a follow-up question.
-                 
-                Once you have collected all the information for an experience, you will summarize in prose plain English (no markdown or json or other formats)
-                all the information you have collected for that experience and explicitly ask me if I would like to add or change anything.
-                before exploring additional experiences as instructed in the '#Experiences To Explore' section.                
-                This is to ensure that the information is accurate and complete before moving to the next experience.
+                
+                Once you have gathered all the information for an experience, you will respond by summarizing it in plain text (no markdown, JSON, or other formats) 
+                and explicitly asking me if I would like to add or change anything before moving on to another experience.
+                Make sure to include in the summary the titel, company, location and timeline information you have gathered.
+                You will wait for my response before moving on to the next experience as outlined in the '#Experiences To Explore' section.
+                This approach ensures that the information is accurate and complete before proceeding to the next experience.
                 
                 ##'experience_title' instructions
                     The title of the experience
