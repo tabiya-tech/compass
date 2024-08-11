@@ -220,7 +220,8 @@ class _ConversationLLM:
                 ##Timeline instructions
                     I may provide the beginning and end of an experience at any order, 
                     in a single input or in separate inputs, as a period or as a single date in relative or absolute terms
-                    e.g., "March 2021" or "last month", "since n months", "the last M years" etc or whatever 
+                    e.g., "March 2021" or "last month", "since n months", "the last M years" etc or whatever the user may provide.
+                    An exact date is not required, year or year and month is sufficient. 
                     ###Date Consistency instructions
                         Check the start_date and end_date dates and ensure they are not inconsistent:
                         - they do not refer to the future
@@ -231,7 +232,8 @@ class _ConversationLLM:
                     What the company does and its name.
                     If I have not provided the company name or what it does, ask me for it. 
                 ##'location' instructions
-                    The location (e.g City, Region, District) the location of the company or organization. 
+                    The location (e.g City, Region, District) of the company or organization. 
+                    An exact address is not required.
                     If I have not provided the location, ask me for it.
             
             #Security Instructions
