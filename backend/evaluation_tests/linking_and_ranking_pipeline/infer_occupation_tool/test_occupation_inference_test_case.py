@@ -12,6 +12,7 @@ class InferOccupationToolTestCase(CompassTestCase):
     given_responsibilities: list[str]
     given_country_of_interest: Country
     given_top_k: int = 5
+    given_top_p: int = 10
     expected_same_title: bool
     expected_occupations_found: list[str]
 
@@ -25,7 +26,7 @@ test_cases = [
         given_responsibilities=["I bake bread", "I clean my work place", "I order supplies", "I sell bread"],
         given_country_of_interest=Country.SOUTH_AFRICA,
         expected_same_title=False,
-        expected_occupations_found=["baker", "bakery shop manager", "bakery specialised seller"])
+        expected_occupations_found=["baker", "bakery shop manager", "pastry maker"])
     ,
     InferOccupationToolTestCase(
         name="Title is not useful, infer from responsibilities",
@@ -51,7 +52,6 @@ test_cases = [
         expected_occupations_found=["import export specialist"],
     ),
     InferOccupationToolTestCase(
-        skip_force="force",
         name="Infer from responsibilities",
         given_experience_title="GDE Brigade member",
         given_work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
@@ -116,7 +116,7 @@ test_cases = [
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
         expected_same_title=False,
-        expected_occupations_found=["home care aide", "social care worker"],
+        expected_occupations_found=["home care aide", "care at home worker"],
     ),
     InferOccupationToolTestCase(
         name="Infer from glossary (emtpy responsibilities)",

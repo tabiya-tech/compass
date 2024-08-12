@@ -14,9 +14,10 @@ from app.vector_search.vector_search_dependencies import SearchServices
 from ...countries import Country
 
 _NUMBER_OF_CLUSTERS: int = 5
-_NUMBER_OF_OCCUPATIONS_PER_CLUSTER: int = 20
+_NUMBER_OF_OCCUPATIONS_PER_CLUSTER: int = 20  # reduce to 10 or 15 when the alternative titles will be considered and the non contextualized title dropped
+_NUMBER_OF_OCCUPATIONS_CANDIDATES_PER_CLUSTER: int = 2 * _NUMBER_OF_OCCUPATIONS_PER_CLUSTER
 _NUMBER_OF_SKILLS_PER_CLUSTER: int = 5
-_NUMBER_OF_SKILL_CANDIDATES_PER_RESPONSIBILITY: int = 15
+_NUMBER_OF_SKILL_CANDIDATES_PER_RESPONSIBILITY: int = 3 * _NUMBER_OF_SKILLS_PER_CLUSTER
 
 
 class ClusterPipelineResult(BaseModel):
@@ -62,7 +63,8 @@ class ExperiencePipeline:
         2. For each cluster
         2.1 Infer the occupations and associated skills
         2.2 Link responsibilities to the associated skills
-        2.3 Rank the skills to get the top skill of the cluster
+        # 2.3 Rank the skills to get the top skills of the cluster
+        3. Return the top skills of each cluster
         """
         llm_stats = []
         if len(responsibilities) == 0:
@@ -78,7 +80,9 @@ class ExperiencePipeline:
                                                                                   number_of_clusters=_NUMBER_OF_CLUSTERS)
         llm_stats.extend(cluster_tool_response.llm_stats)
         # 2. For each cluster
-
+        # 2.1 Infer the occupations and associated skills
+        # 2.2 Link responsibilities to the associated skills
+        # 2.3 Rank the skills to get the top skills of the cluster
         tasks = []
         for cluster in cluster_tool_response.clusters_of_responsibilities:
             tasks.append(self.handle_cluster(responsibilities=cluster,
@@ -88,6 +92,7 @@ class ExperiencePipeline:
                                              work_type=work_type))
 
         cluster_results: list[ClusterPipelineResult] = await asyncio.gather(*tasks)
+        # 3. Return the top skill of each cluster
         top_skills = []
         for cluster_result in cluster_results:
             # get the top skill of the cluster
@@ -127,7 +132,9 @@ class ExperiencePipeline:
                                                                                    work_type=work_type,
                                                                                    responsibilities=responsibilities,
                                                                                    country_of_interest=country_of_interest,
-                                                                                   top_k=_NUMBER_OF_OCCUPATIONS_PER_CLUSTER)
+                                                                                   top_k=_NUMBER_OF_OCCUPATIONS_PER_CLUSTER,
+                                                                                   top_p=_NUMBER_OF_OCCUPATIONS_CANDIDATES_PER_CLUSTER
+                                                                                   )
         llm_stats.extend(inferred_occupations_response.llm_stats)
         occupation_labels = [esco_occupation.occupation.preferredLabel for esco_occupation in inferred_occupations_response.esco_occupations]
         # 2.2 Link responsibilities to the associated skills
