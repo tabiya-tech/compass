@@ -167,7 +167,7 @@ test_cases = [
                     "I buy and sell",
                 ],
         given_country_of_interest=Country.SOUTH_AFRICA,
-        expected_same_title=False,
+        expected_same_title=True,
         expected_occupations_found=["wholesale merchant in live animals"],
     ),
     InferOccupationToolTestCase(
