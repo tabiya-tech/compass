@@ -8,6 +8,8 @@ export const INVITATION_KEY = "invitation";
 
 export const LOGIN_METHOD_KEY = "login_method";
 
+export const LOG_OUT_FLAG_KEY = "logged_out";
+
 /**
  * This class is used to store the tokens in the session storage.
  *   eg: refresh token
@@ -113,6 +115,28 @@ export class PersistentStorageService {
    */
   static clearLoginMethod(): void {
     this.storage.removeItem(LOGIN_METHOD_KEY);
+  }
+
+  /**
+   * Sets the loggged out flag in the storage
+   */
+  static setLoggedOutFlag(loggedOut: boolean): void {
+    this.storage.setItem(LOG_OUT_FLAG_KEY, loggedOut.toString());
+  }
+
+  /**
+   * Returns the logged out flag from the storage
+   * @returns string | null - The logged out flag
+   */
+  static getLoggedOutFlag(): boolean | null {
+    return this.storage.getItem(LOG_OUT_FLAG_KEY) === "true";
+  }
+
+  /**
+   * Clears the logged out flag from the storage
+   */
+  static clearLoggedOutFlag(): void {
+    this.storage.removeItem(LOG_OUT_FLAG_KEY);
   }
 
   /**

@@ -26,6 +26,14 @@ export class LogoutService {
    * @param {(error: any) => void} failureCallback - Callback to execute on logout error.
    */
   async handleLogout(successCallback: () => void, failureCallback: (error: any) => void): Promise<void> {
+    const onFailure = (error: any) => {
+      // if an error occurs, persist a flag in the storage to indicate that the user is logged out
+      // this will tell the application to log the user out on the next possible opportunity
+      console.log("Error logging out", error);
+      PersistentStorageService.setLoggedOutFlag(true);
+      // call the failure callback
+      failureCallback(error);
+    }
     // set the login method to email for future reference
     // we'll want to know how the user logged in, when we want to log them out for example
     try {
@@ -46,9 +54,9 @@ export class LogoutService {
           failureCallback("Invalid login method");
           return;
       }
-      authService.handleLogout(successCallback, failureCallback);
+      authService.handleLogout(successCallback, onFailure);
     } catch (error) {
-      failureCallback(error);
+      onFailure(error)
     }
   }
 }

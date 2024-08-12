@@ -17,7 +17,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ authenticationAndDPAReq
   const isAcceptedTCValid = userPreferences?.accepted_tc && isValid(new Date(userPreferences.accepted_tc));
 
   if (authenticationAndDPARequired && (!user || !isAcceptedTCValid)) {
-    console.log({ userPreferences }, "userPreferences ---");
     // if the user is not found or the terms and conditions aren't accepted
     // log the user out fully to preserve the state of the application
     // and then redirect to login page
@@ -27,7 +26,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ authenticationAndDPAReq
   if (!authenticationAndDPARequired && user && isAcceptedTCValid) {
     // if there is a user and they have accepted the terms and conditions
     // redirect to the root page
-    console.log({ userPreferences }, "userPreferences ***");
     return <Navigate to={routerPaths.ROOT} replace />;
   }
 
