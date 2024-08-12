@@ -12,7 +12,7 @@ from app.agent.llm_caller import LLMCaller
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.countries import Country, get_country_glossary
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import LLMConfig, ZERO_TEMPERATURE_GENERATION_CONFIG
+from common_libs.llm.models_utils import LLMConfig, ZERO_TEMPERATURE_GENERATION_CONFIG, JSON_GENERATION_CONFIG
 
 
 class ContextualizationLLMResponse(BaseModel):
@@ -42,13 +42,16 @@ def get_system_prompt_for_contextual_title(country_of_interest: Country):
 
     system_prompt_template = dedent("""\
         <System Instructions>
-        You are an expert who needs to classify jobs from {country_of_interest} to a European framework. 
-        The jobs are described in the context of {country_of_interest} and use specific terminology from {country_of_interest}. 
-        You should also consider the employment type of the job and the responsibilities that are provided to determine the context.
-        You should return a job description that does not include terminology from {country_of_interest}, but rather European standards.
+        You are an expert in mapping job titles from {country_of_interest} to European standards. 
+        You are given a job title described within the context of {country_of_interest} and  it includes specific terminology from that country. 
+        Additionally, you are given the employer name, employment type and the responsibilities associated with the job title. 
+        Your task is to return a job title that reflects the employment type and the given responsibilities, aligns with European standards,
+        and does not use any terminology specific to {country_of_interest}. The title should be formulated in such a way that the input components 
+        are reflected in the title and can be inferred from it. 
+        
         #Input Structure
             The input structure is composed of: 
-            'Job Description': The job title in the context of {country_of_interest},
+            'Job Title': The job title in the context of {country_of_interest},
             'Employer Name' : The name of the employer,
             'Employment Type': The type of employment that has one of the following values 'None', 
                     {work_type_names}.
@@ -59,8 +62,8 @@ def get_system_prompt_for_contextual_title(country_of_interest: Country):
         #JSON Output instructions
             Your response must always be a JSON object with the following schema:
             {
-                "reasoning": Why you chose the specific contextual titles
-                "contextual_title": The contextual job title as a json string
+                "reasoning": Why you chose to return the specific title and how it aligns with the input
+                "contextual_title": The returned job title as a json string
             }
         </System Instructions>
         """)
@@ -79,7 +82,7 @@ def get_request_prompt_for_contextual_title(*,
                                             ):
     return dedent(""" \
         <Input>
-            'Job Description': {experience_title}
+            'Job Title': {experience_title}
             'Employer Name': {company}
             'Employment Type': {work_type}
             'Responsibilities': {responsibilities}
@@ -99,7 +102,7 @@ class _ContextualizationLLM:
 
         self._llm = GeminiGenerativeLLM(
             system_instructions=get_system_prompt_for_contextual_title(country_of_interest),
-            config=LLMConfig(generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG)
+            config=LLMConfig(generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG)
         )
         self._llm_caller: LLMCaller[_ContextualizationLLMOutput] = LLMCaller[_ContextualizationLLMOutput](
             model_response_type=_ContextualizationLLMOutput)
@@ -134,8 +137,14 @@ class _ContextualizationLLM:
         if not contextual_title:
             self._logger.warning("Failed to generate a contextual title. Using the original title instead.")
             contextual_title = experience_title
+
         contextual_title = contextual_title.strip()
 
+
+        if self._logger.isEnabledFor(logging.INFO):
+            self._logger.info("ContextualizationLLM inferred contextual title: '%s' reasoning: '%s' "
+                              "for the input: experience_title: '%s', company: '%s', work_type: '%s', responsibilities: %s",
+                              llm_response.contextual_title, llm_response.reasoning, experience_title, company, work_type, json.dumps(responsibilities))
         return ContextualizationLLMResponse(
             contextual_title=contextual_title,
             llm_stats=llm_stats
