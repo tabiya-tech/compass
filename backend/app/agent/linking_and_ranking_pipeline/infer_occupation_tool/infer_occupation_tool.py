@@ -12,11 +12,12 @@ from ._contextualization_llm import _ContextualizationLLM
 from app.vector_search.esco_entities import OccupationSkillEntity
 from app.vector_search.esco_search_service import OccupationSkillSearchService
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
+from ._relevant_occupations_classifier_llm import _RelevantOccupationsClassifierLLM
 
 MONGO_SETTINGS = MongoDbSettings()
 
 
-class InferOccupationResult(BaseModel):
+class InferOccupationToolOutput(BaseModel):
     contextual_title: str
     esco_occupations: list[OccupationSkillEntity]
     responsibilities: list[str]
@@ -41,18 +42,21 @@ class InferOccupationTool:
                       work_type: Optional[WorkType] = None,
                       responsibilities: list[str],
                       country_of_interest: Country,
-                      top_k: int = 5) -> InferOccupationResult:
+                      top_k: int,
+                      top_p: int
+                      ) -> InferOccupationToolOutput:
         """
-        Infers most likely matching occupations based on the experience and the country of interest.
-        It uses the experience title to search for the top_k matching occupations.
-        Additionally, it infers a contextual title based on the country of interest and information from the experience
-        and searches for the top_k matching occupations based on the contextual title.
-        The final list of occupations is a list of unique occupations from the two searches, so it may contain from top_k to 2*top_k occupations.
-        It returns the contextual title, the list of mathing occupations and the stats of the LLM
-
-        The experience is not changed by this method.
+        Finds the top_k matching occupations to the experience title, company, work type and responsibilities and country of interest.
+        1. Contextualize the experience title based on the country of interest, company, work type and responsibilities
+          and infer the contextual title.
+        2. Search for the top_p occupations matching the title
+        2.1 Search for the top_p occupations matching the experience title
+        2.2 Search for the top_p occupations matching the contextual title
+        3. Filter out the irrelevant occupations based on the responsibilities and keep the top_k most relevant ones
         """
 
+        # 1. Contextualize the experience title based on the country of interest, company, work type and responsibilities
+        #    and infer the contextual title.
         contextualization_llm = _ContextualizationLLM(country_of_interest, self._logger)
         contextualization_response = await contextualization_llm.execute(
             experience_title=experience_title,
@@ -60,18 +64,34 @@ class InferOccupationTool:
             work_type=work_type,
             responsibilities=responsibilities
         )
+        # 2. Search for the top_p occupations matching the title
         #  create a set to remove duplicates and convert to lowercase
         titles: set[str] = {contextualization_response.contextual_title.lower(), experience_title.lower()}
         # create a task for each title
-        tasks = [self._occupation_skill_search_service.search(query=title, k=top_k) for title in titles]
+        # search for the 2 * top_k matching occupations for each title initially, and later filter out the irrelevant ones
+        tasks = [self._occupation_skill_search_service.search(query=title, k=top_p) for title in titles]
 
         list_of_occupation_list = await asyncio.gather(*tasks)
         occupations_skills = flattern(list_of_occupation_list)
-        return InferOccupationResult(contextual_title=contextualization_response.contextual_title,
-                                     esco_occupations=occupations_skills,
-                                     responsibilities=responsibilities,
-                                     llm_stats=contextualization_response.llm_stats
-                                     )
+
+        # 3. Filter out the irrelevant occupations based on the responsibilities and keep the top_k most relevant ones
+        relevant_occupations_tool = _RelevantOccupationsClassifierLLM()
+        relevant_occupations_output = await relevant_occupations_tool.execute(
+            experience_title=experience_title,
+            contextual_title=contextualization_response.contextual_title,
+            occupations=[occupation_skill.occupation for occupation_skill in occupations_skills],
+            responsibilities=responsibilities,
+            top_k=top_k
+        )
+        relevant_occupations_uuids = {occupation.UUID for occupation in relevant_occupations_output.most_relevant}
+        relevant_occupations_skills = [occupation_skill for occupation_skill in occupations_skills if
+                                       occupation_skill.occupation.UUID in relevant_occupations_uuids]
+
+        return InferOccupationToolOutput(contextual_title=contextualization_response.contextual_title,
+                                         esco_occupations=relevant_occupations_skills,
+                                         responsibilities=responsibilities,
+                                         llm_stats=contextualization_response.llm_stats + relevant_occupations_output.llm_stats
+                                         )
 
 
 def flattern(list_of_occupation_list: list[list[OccupationSkillEntity]]) -> list[OccupationSkillEntity]:
