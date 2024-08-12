@@ -95,6 +95,7 @@ async def test_skill_linking_tool(test_case: SkillLinkingToolTestCase, get_searc
             code=test_case.given_occupation_code,
         )
         given_occupations_with_skills.append(given_occupation_skills)
+        given_contextual_title = given_occupation_skills.occupation.preferredLabel
 
     if test_case.given_occupation_title:
         tool = InferOccupationTool(get_search_services.occupation_skill_search_service)
@@ -104,7 +105,9 @@ async def test_skill_linking_tool(test_case: SkillLinkingToolTestCase, get_searc
             company=None,
             responsibilities=test_case.given_responsibilities,
             country_of_interest=Country.SOUTH_AFRICA,
-            top_k=5)
+            top_k=5,
+            top_p=10
+        )
         logging.getLogger().info(f"Contextual title: {result.contextual_title}")
         logging.getLogger().info(f"ESCO occupations: {[esco_occupation.occupation.preferredLabel for esco_occupation in result.esco_occupations]}")
         given_occupations_with_skills.extend(result.esco_occupations)
