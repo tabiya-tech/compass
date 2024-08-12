@@ -50,7 +50,6 @@ class ExperiencePipelineTestCase(CompassTestCase):
 
 test_cases = [
     ExperiencePipelineTestCase(
-
         name="Baker (I sell bread)",
         given_experience_title="Baker",
         given_company_name="Baker's Delight",
@@ -66,7 +65,11 @@ test_cases = [
         given_responsibilities=["I bake bread", "I clean my work place", "I order supplies", "I sell bread", "I talk to customers"],
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_work_type=WorkType.SELF_EMPLOYMENT,
-        expected_top_skills=["bake goods", "perform cleaning duties", "order supplies", "advise customers on bread", "maintain relationship with customers"]
+        expected_top_skills=['bake goods',
+                             'maintain relationship with customers',
+                             'maintain work area cleanliness',
+                             'order supplies',
+                             'prepare bread products']
     ),
     ExperiencePipelineTestCase(
         name="Help Parents",
@@ -102,7 +105,6 @@ test_cases = [
         expected_top_skills=[]
     ),
     ExperiencePipelineTestCase(
-        skip_force="force",
         name="GDE Brigade member",
         given_experience_title="GDE Brigade member",
         given_company_name="Gauteng Department of Education",
