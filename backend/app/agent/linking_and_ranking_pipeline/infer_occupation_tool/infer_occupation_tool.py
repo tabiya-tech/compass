@@ -65,8 +65,9 @@ class InferOccupationTool:
             responsibilities=responsibilities
         )
         # 2. Search for the top_p occupations matching the title
-        #  create a set to remove duplicates and convert to lowercase
-        titles: set[str] = {contextualization_response.contextual_title.lower(), experience_title.lower()}
+        #  create a set to remove duplicates and convert to lowercase as the esco titles in the db are lowercase and
+        #  using a different case yields imprecise results
+        titles: set[str] = {contextualization_response.contextual_title.strip().lower(), experience_title.strip().lower()}
         # create a task for each title
         # search for the 2 * top_k matching occupations for each title initially, and later filter out the irrelevant ones
         tasks = [self._occupation_skill_search_service.search(query=title, k=top_p) for title in titles]
