@@ -1,4 +1,6 @@
+import json
 import logging
+import random
 
 import pytest
 
@@ -28,6 +30,8 @@ def setup_agent_tool():
 async def test_occupation_inference_tool(test_case: InferOccupationToolTestCase, setup_agent_tool):
     tool = setup_agent_tool
     # GIVEN an experience and a country of interest
+    # shuffle the responsibilities to ensure the test is not dependent on the order of the responsibilities
+    random.shuffle(test_case.given_responsibilities)
     # WHEN the tool is executed with the given experience and country
 
     result = await tool.execute(
@@ -36,7 +40,8 @@ async def test_occupation_inference_tool(test_case: InferOccupationToolTestCase,
         work_type=test_case.given_work_type,
         responsibilities=test_case.given_responsibilities,
         country_of_interest=test_case.given_country_of_interest,
-        top_k=test_case.given_top_k
+        top_k=test_case.given_top_k,
+        top_p=test_case.given_top_p
     )
     logging.log(logging.INFO, "Given Title '%s' -> Contextual Title '%s'", test_case.given_experience_title,
                 result.contextual_title)
@@ -56,6 +61,9 @@ async def test_occupation_inference_tool(test_case: InferOccupationToolTestCase,
         assert len(result.esco_occupations) >= test_case.given_top_k
         assert len(result.esco_occupations) <= (2 + 3) * test_case.given_top_k
 
+    occupations = [{"title": skill_occupation.occupation.preferredLabel, "description": skill_occupation.occupation.description} for skill_occupation in
+                   result.esco_occupations]
+    logging.log(logging.INFO, "Found ESCO Occupations(preferredLabel,code): \n -%s", json.dumps(occupations))
     # expected_occupations_found should be a subset of the preferred labels of the occupations
     labels = [skill_occupation.occupation.preferredLabel for skill_occupation in result.esco_occupations]
     logging.log(logging.INFO, "Found ESCO Occupations: \n -%s", "\n -".join(labels))

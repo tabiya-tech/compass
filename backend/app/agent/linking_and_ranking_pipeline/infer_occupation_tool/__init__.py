@@ -1,1 +1,1 @@
-from .infer_occupation_tool import InferOccupationTool
+from .infer_occupation_tool import InferOccupationTool, InferOccupationToolOutput
