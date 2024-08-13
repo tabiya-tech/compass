@@ -9,16 +9,14 @@ class _RelevantSkillsClassifierLLM(RelevantEntitiesClassifierLLM[SkillEntity]):
     async def execute(
             self,
             *,
-            experience_title: str,
-            contextual_title: str,
+            job_titles: list[str],
             responsibilities: list[str],
             skills: list[SkillEntity],
             top_k: int = 5
     ) -> RelevantEntityClassifierOutput[SkillEntity]:
         """
         Given
-        - an experience_title,
-        - a contextual_title,
+        - a list of job titles,
         - a list of responsibilities,
         - and a list of skills
         classify the skills in:
@@ -26,8 +24,7 @@ class _RelevantSkillsClassifierLLM(RelevantEntitiesClassifierLLM[SkillEntity]):
         - remaining skills
         """
         return await super().execute(
-            experience_title=experience_title,
-            contextual_title=contextual_title,
+            job_titles=job_titles,
             responsibilities=responsibilities,
             entities_to_classify=skills,
             top_k=top_k

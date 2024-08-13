@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 from typing import Optional
 
@@ -14,7 +15,8 @@ from app.vector_search.vector_search_dependencies import SearchServices
 from ...countries import Country
 
 _NUMBER_OF_CLUSTERS: int = 5
-_NUMBER_OF_OCCUPATIONS_PER_CLUSTER: int = 20  # reduce to 10 or 15 when the alternative titles will be considered and the non contextualized title dropped
+_NUMBER_OF_OCCUPATION_ALT_TITLES: int = 5
+_NUMBER_OF_OCCUPATIONS_PER_CLUSTER: int = 15
 _NUMBER_OF_OCCUPATIONS_CANDIDATES_PER_CLUSTER: int = 2 * _NUMBER_OF_OCCUPATIONS_PER_CLUSTER
 _NUMBER_OF_SKILLS_PER_CLUSTER: int = 5
 _NUMBER_OF_SKILL_CANDIDATES_PER_RESPONSIBILITY: int = 3 * _NUMBER_OF_SKILLS_PER_CLUSTER
@@ -22,7 +24,7 @@ _NUMBER_OF_SKILL_CANDIDATES_PER_RESPONSIBILITY: int = 3 * _NUMBER_OF_SKILLS_PER_
 
 class ClusterPipelineResult(BaseModel):
     responsibilities: list[str]
-    contextual_title: str
+    contextual_titles: list[str]
     esco_occupations: list[OccupationSkillEntity]
     unranked_skills: list[SkillEntity]
     ranked_skills: list[SkillEntity]
@@ -132,6 +134,7 @@ class ExperiencePipeline:
                                                                                    work_type=work_type,
                                                                                    responsibilities=responsibilities,
                                                                                    country_of_interest=country_of_interest,
+                                                                                   number_of_titles=_NUMBER_OF_OCCUPATION_ALT_TITLES,
                                                                                    top_k=_NUMBER_OF_OCCUPATIONS_PER_CLUSTER,
                                                                                    top_p=_NUMBER_OF_OCCUPATIONS_CANDIDATES_PER_CLUSTER
                                                                                    )
@@ -139,8 +142,7 @@ class ExperiencePipeline:
         occupation_labels = [esco_occupation.occupation.preferredLabel for esco_occupation in inferred_occupations_response.esco_occupations]
         # 2.2 Link responsibilities to the associated skills
         top_skills_response = await self._skills_linking_tool.execute(
-            experience_title=experience_title,
-            contextual_title=inferred_occupations_response.contextual_title,
+            job_titles=inferred_occupations_response.contextual_titles,
             esco_occupations=inferred_occupations_response.esco_occupations,
             responsibilities=responsibilities,
             only_essential=True,
@@ -150,15 +152,18 @@ class ExperiencePipeline:
         top_skills = top_skills_response.top_skills
         llm_stats.extend(top_skills_response.llm_stats)
         top_skills_labels = [skill.preferredLabel for skill in top_skills]
-        self._logger.info("Top skills: %s based on Inferred title: '%s' , linked occupations: %s for responsibilities : %s", top_skills_labels,
-                          inferred_occupations_response.contextual_title,
-                          occupation_labels, responsibilities)
+        if self._logger.isEnabledFor(logging.INFO):
+            self._logger.info("Top skills: %s based on inferred job titles: %s, linked occupations: %s for responsibilities : %s",
+                              top_skills_labels,
+                              json.dumps(inferred_occupations_response.contextual_titles),
+                              json.dumps(occupation_labels),
+                              json.dumps(responsibilities))
         # 2.3 Rank the skills to get the top skill of the cluster
         # TODO: Use RCA to rank the skills
         # For now, just return the unranked skills
         return ClusterPipelineResult(
             responsibilities=responsibilities,
-            contextual_title=inferred_occupations_response.contextual_title,
+            contextual_titles=inferred_occupations_response.contextual_titles,
             esco_occupations=inferred_occupations_response.esco_occupations,
             unranked_skills=top_skills.copy(),
             ranked_skills=top_skills.copy(),

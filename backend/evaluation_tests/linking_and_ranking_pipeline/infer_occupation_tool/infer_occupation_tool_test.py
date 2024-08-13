@@ -41,25 +41,17 @@ async def test_occupation_inference_tool(test_case: InferOccupationToolTestCase,
         responsibilities=test_case.given_responsibilities,
         country_of_interest=test_case.given_country_of_interest,
         top_k=test_case.given_top_k,
-        top_p=test_case.given_top_p
+        top_p=test_case.given_top_p,
+        number_of_titles=test_case.number_of_titles
     )
-    logging.log(logging.INFO, "Given Title '%s' -> Contextual Title '%s'", test_case.given_experience_title,
-                result.contextual_title)
-    # THEN the result should contain a contextual title
-    assert len(result.contextual_title) > 0
+    logging.log(logging.INFO, "Given Title '%s' -> Contextual Titles: %s", test_case.given_experience_title,
+                json.dumps(result.contextual_titles))
 
-    if test_case.expected_same_title:
-        # AMD the contextual title should be the same as the given experience title
-        assert result.contextual_title == test_case.given_experience_title
-        # AND a list of ESCO occupations is equal to the top_k value
-        assert len(result.esco_occupations) == test_case.given_top_k
-    else:
-        # AMD the contextual title should be different from the given experience title
-        assert result.contextual_title != test_case.given_experience_title
-        # AND a list of ESCO occupations is between given_top_k and 2*given_top_k
-        # depending on the search results for each title
-        assert len(result.esco_occupations) >= test_case.given_top_k
-        assert len(result.esco_occupations) <= (2 + 3) * test_case.given_top_k
+    # THEN the result should contain expected number of titles
+    assert len(result.contextual_titles) == test_case.number_of_titles
+
+    # AND a list of ESCO occupations is given_top_k
+    assert len(result.esco_occupations) == test_case.given_top_k
 
     occupations = [{"title": skill_occupation.occupation.preferredLabel, "description": skill_occupation.occupation.description} for skill_occupation in
                    result.esco_occupations]
