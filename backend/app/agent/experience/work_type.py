@@ -43,18 +43,34 @@ class WorkType(Enum):
         else:
             return ""
 
+    @staticmethod
+    def work_type_long(work_type: WorkType | None) -> str:
+        if work_type == WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
+            return "Waged work or paid work as an employee."
+        elif work_type == WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK:
+            return "Unpaid Trainee Work."
+        elif work_type == WorkType.SELF_EMPLOYMENT:
+            return "Self-employment, micro entrepreneurship, contract based work, freelancing, running own business, paid work but not work as an employee."
+        elif work_type == WorkType.UNSEEN_UNPAID:
+            return dedent("""\
+            Represents all unseen economy, including:
+            - Unpaid domestic services for household and family members.
+            - Unpaid caregiving services for household and family members.
+            - Unpaid direct volunteering for other households.
+            - Unpaid community- and organization-based volunteering.
+            excluding:
+            - Unpaid trainee work.
+            """)
+        elif work_type is None:
+            return "When there isn't adequate information to classify the work type in any of the categories below."
+        else:
+            return ""
+
+
 WORK_TYPE_DEFINITIONS_FOR_PROMPT = dedent(f"""\
-None: When there isn't adequate information to classify the work type in any of the categories below.    
-{WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name}: Waged work or paid work except {WorkType.SELF_EMPLOYMENT.name}
-{WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK.name}: Unpaid trainee work
-{WorkType.SELF_EMPLOYMENT.name}: Self-employment, micro entrepreneurship, contract based work, freelancing, running own business, 
-                paid but not {WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name}.
-{WorkType.UNSEEN_UNPAID.name}: Represents all unseen economy, 
-    including:
-    - Unpaid domestic services for household and family members
-    - Unpaid caregiving services for household and family members
-    - Unpaid direct volunteering for other households
-    - Unpaid community- and organization-based volunteering
-    excluding:
-    - Unpaid trainee work, which is classified as {WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK.name}
+None: {WorkType.work_type_long(None)}   
+{WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name}:{WorkType.work_type_long(WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT)}
+{WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK.name}: {WorkType.work_type_long(WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK)}
+{WorkType.SELF_EMPLOYMENT.name}: {WorkType.work_type_long(WorkType.SELF_EMPLOYMENT)}
+{WorkType.UNSEEN_UNPAID.name}: {WorkType.work_type_long(WorkType.UNSEEN_UNPAID)}
 """)

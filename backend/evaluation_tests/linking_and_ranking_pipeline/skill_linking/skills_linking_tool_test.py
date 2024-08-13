@@ -56,14 +56,14 @@ test_cases = [
         given_occupation_code="7512.1",
         given_work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
         given_responsibilities=["I bake bread", "I clean my work place", "I order supplies"],
-        expected_skills=["bake goods", "ensure sanitation", "order supplies"]
+        expected_skills=['bake goods', 'ensure sanitation']
     ),
     SkillLinkingToolTestCase(
         name="Baker by title",
         given_occupation_title="Baker",
         given_work_type=WorkType.SELF_EMPLOYMENT,
         given_responsibilities=["I bake bread", "I clean my work place", "I order supplies", "I sell bread", "I talk to customers"],
-        expected_skills=["bake goods", "ensure sanitation", "order supplies", "sell products"]
+        expected_skills=['bake goods', 'prepare bakery products', 'order supplies', 'ensure sanitation', 'maintain relationship with customers']
     ),
     SkillLinkingToolTestCase(
         name="GDE Brigade member by title",
@@ -74,11 +74,7 @@ test_cases = [
                                 "I check and record temperatures and other health signs.",
                                 "I clean and disinfect students, teachers, and visitors.",
                                 "I put together weekly and monthly reports."],
-        expected_skills=['follow health and safety precautions in social care practices',
-                         "guarantee students' safety",
-                         'perform security checks',
-                         'maintain incident reporting records',
-                         'present reports']
+        expected_skills=['manage health and safety standards', 'health and safety regulations', 'undertake inspections', 'write work-related reports', 'communicate health and safety measures']
     ),
 ]
 
@@ -88,14 +84,14 @@ test_cases = [
 @pytest.mark.parametrize("test_case", get_test_cases_to_run(test_cases), ids=[test_case.name for test_case in get_test_cases_to_run(test_cases)])
 async def test_skill_linking_tool(test_case: SkillLinkingToolTestCase, get_search_services):
     # Given the occupation with it's associated skills
-    given_contextual_title: str = ""
+    given_job_titles: list[str] = []
     given_occupations_with_skills: list[OccupationSkillEntity] = []
     if test_case.given_occupation_code:
         given_occupation_skills: OccupationSkillEntity = await get_search_services.occupation_skill_search_service.get_by_esco_code(
             code=test_case.given_occupation_code,
         )
         given_occupations_with_skills.append(given_occupation_skills)
-        given_contextual_title = given_occupation_skills.occupation.preferredLabel
+        given_job_titles.append(given_occupation_skills.occupation.preferredLabel)
 
     if test_case.given_occupation_title:
         tool = InferOccupationTool(get_search_services.occupation_skill_search_service)
@@ -105,19 +101,19 @@ async def test_skill_linking_tool(test_case: SkillLinkingToolTestCase, get_searc
             company=None,
             responsibilities=test_case.given_responsibilities,
             country_of_interest=Country.SOUTH_AFRICA,
+            number_of_titles=5,
             top_k=5,
             top_p=10
         )
-        logging.getLogger().info(f"Contextual title: {result.contextual_title}")
+        logging.getLogger().info(f"Contextual titles: {result.contextual_titles}")
         logging.getLogger().info(f"ESCO occupations: {[esco_occupation.occupation.preferredLabel for esco_occupation in result.esco_occupations]}")
         given_occupations_with_skills.extend(result.esco_occupations)
-        given_contextual_title = result.contextual_title
+        given_job_titles.extend(result.contextual_titles)
 
     # When the skill linking tool is called with the given occupation and responsibilities
     skill_linking_tool = SkillLinkingTool(get_search_services.skill_search_service)
     response = await skill_linking_tool.execute(
-        experience_title=test_case.given_occupation_title,
-        contextual_title=given_contextual_title,
+        job_titles=given_job_titles,
         esco_occupations=given_occupations_with_skills,
         responsibilities=test_case.given_responsibilities,
         top_k=5,

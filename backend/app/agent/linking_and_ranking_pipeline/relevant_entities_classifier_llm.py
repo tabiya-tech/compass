@@ -27,11 +27,6 @@ class RelevantEntityClassifierOutput(BaseModel, Generic[T]):
     llm_stats: list[LLMStats]
 
 
-def _get_job_title(experience_title: str, contextual_title: str):
-    _aka_title = f"{(' aka ' + experience_title if experience_title and experience_title != contextual_title else '')}"
-    return f"{contextual_title}{_aka_title}"
-
-
 class RelevantEntitiesClassifierLLM(Generic[T]):
     def __init__(self, entity_type: Literal['skill', 'occupation']):
         self._entity_type_singular: Literal['skill', 'occupation'] = entity_type
@@ -48,24 +43,19 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
     async def execute(
             self,
             *,
-            experience_title: str,
-            contextual_title: str,
+            job_titles: list[str],
             responsibilities: list[str],
             entities_to_classify: list[T],
             top_k: int = 5
     ) -> RelevantEntityClassifierOutput:
         """
         Given
-        - an experience_title,
-        - a contextual_title,
+        - a list of job titles,
         - and list of responsibilities
         classify a list of entities in:
         - top_k most relevant entities
         - remaining entities
-
-        If the experience title is different from the contextual title,
-        then job title is the contextual title followed by "aka" and the experience title.
-        """
+         """
         # create a dict with the entity text as key and the entity as value
         _entities_dict: dict[str, T] = {}
         for entity in entities_to_classify:
@@ -73,8 +63,7 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
 
         prompt = RelevantEntitiesClassifierLLM._get_prompt(
             entity_type_singular=self._entity_type_singular,
-            experience_title=experience_title,
-            contextual_title=contextual_title,
+            job_titles=job_titles,
             responsibilities=responsibilities,
             entities_to_classify=entities_to_classify,
             top_k=top_k)
@@ -108,10 +97,17 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
         # Create the most relevant entities list by removing the remaining entities from the original list of entities
         # use the UUID to compare if the entities are the same
         most_relevant_entities = [entity for entity in entities_to_classify if entity.UUID not in remaining_entities_uuids]
+        # Get the top_k most relevant entities
+        if len(most_relevant_entities) != top_k:
+            self._logger.warning("The LLM returned %d most relevant {self._entity_types_plural} instead of the requested %d.", len(most_relevant_entities),
+                                 top_k)
 
-        self._logger.info(f"For title: '%s'  and responsibilities: '%s'  relevant {self._entity_types_plural} response is: %s",
-                          _get_job_title(experience_title, contextual_title),
-                          json.dumps(responsibilities), llm_output)
+        most_relevant_entities = most_relevant_entities[:top_k] # Get the top_k most relevant entities
+        if self._logger.isEnabledFor(logging.INFO):
+            self._logger.info(f"For job titles: '%s'  and responsibilities: '%s'  relevant {self._entity_types_plural} response is: %s",
+                              json.dumps(job_titles),
+                              json.dumps(responsibilities),
+                              llm_output)
         return RelevantEntityClassifierOutput(
             most_relevant=most_relevant_entities,
             remaining=remaining_entities,
@@ -125,25 +121,26 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
             <System Instructions>
             You are an expert in the labour market.
             
-            You will be given a job title, a list of responsibilities/activities/skills/behaviours, a list of {entity_types_plural}, 
+            You will be given a list of job titles, a list of responsibilities/activities/skills/behaviours, a list of {entity_types_plural}, 
             and the number of the most relevant {entity_types_plural} to return.
             
             You will inspect '{entity_type_singular} title' and the '{entity_type_singular} description' of each {entity_type_singular} in '{entity_types_plural_capitalized}'
-            to determine the most relevant {entity_types_plural} for the given 'Job Title' and 'Responsibilities'.
+            to determine the most relevant {entity_types_plural} for any of the given 'Job Titles' and all of the given 'Responsibilities'. 
             
             You should return the titles of the most relevant {entity_types_plural} as a list of json strings and return the remaining {entity_type_singular} titles in an another list of json strings.
             Each {entity_type_singular} title from the input list must be present in one of the two lists.
+            The titles in each list should be returned in the order of relevance with the most relevant {entity_types_plural} first.
             
             #Input Structure
                 The input structure is composed of: 
-                'Job Title': The job title 
+                'Job Titles': A list of job titles 
                 'Responsibilities' : The list of responsibilities/activities/skills/behaviours
                 '{entity_types_plural_capitalized}': The list of {entity_types_plural} title with their descriptions to be classified
                 'Number of {entity_types_plural} to return': The number of the most relevant {entity_types_plural} to return
             #JSON Output instructions
                 Your response must always be a JSON object with the following schema:
                 {
-                    "reasoning": Why the {entity_types_plural} where selected as most relevant or not
+        "reasoning": Why the {entity_types_plural} where selected as most relevant based onj the 'Job Titles' and 'Responsibilities',
                     "most_relevant": The most relevant {entity_type_singular} titles, an array of a json strings 
                     "remaining": The remaining {entity_types_plural}, an array of a json strings
                 }
@@ -158,8 +155,7 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
     @staticmethod
     def _get_prompt(*,
                     entity_type_singular: Literal['skill', 'occupation'],
-                    experience_title: str,
-                    contextual_title: str,
+                    job_titles: list[str],
                     responsibilities: list[str],
                     entities_to_classify: list[T],
                     top_k: int = 5):
@@ -168,20 +164,19 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
         entity_types_plural_capitalized = entity_types_plural.capitalize()
         prompt_template = dedent("""\
                                 <Input>
-                                'Job Title': {job_title}
+                                'Job Titles': {job_titles}
                                 'Responsibilities': {responsibilities}
                                 '{entity_types_plural_capitalized}': {entities_to_classify}
                                 'Number of {entity_types_plural} to return': {top_k}
                                 </Input>
                                 """)
 
-        job_title = _get_job_title(experience_title, contextual_title)
         _entities_to_classify = [{f'{entity_type_singular} title': entity.preferredLabel, f'{entity_type_singular} description': entity.description} for entity
                                  in entities_to_classify]
         return replace_placeholders_with_indent(prompt_template,
                                                 entity_types_plural=entity_types_plural,
                                                 entity_types_plural_capitalized=entity_types_plural_capitalized,
-                                                job_title=job_title,
+                                                job_titles=json.dumps(job_titles),
                                                 responsibilities=json.dumps(responsibilities),
                                                 entities_to_classify=json.dumps(_entities_to_classify, indent=4),
                                                 top_k=f"{top_k}")

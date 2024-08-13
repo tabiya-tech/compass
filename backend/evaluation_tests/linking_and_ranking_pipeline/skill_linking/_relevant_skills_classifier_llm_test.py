@@ -24,8 +24,7 @@ def _get_skill_entity(*, preferred_label: str, description: Optional[str] = "", 
 
 
 class RelevantSkillsClassifierLLMTestCase(CompassTestCase):
-    given_experience_title: str
-    given_contextual_title: str
+    given_job_titles: list[str]
     given_responsibility: str
     given_skills: list[SkillEntity]
     given_top_k: int = 5
@@ -36,8 +35,7 @@ class RelevantSkillsClassifierLLMTestCase(CompassTestCase):
 test_cases = [
     RelevantSkillsClassifierLLMTestCase(
         name="Special characters",
-        given_experience_title="Baker",
-        given_contextual_title="Baker",
+        given_job_titles=["Baker"],
         given_responsibility="I clean my work place",
         given_skills=[
             _get_skill_entity(preferred_label="perform one's cleaning duties", score=0.9),
@@ -59,8 +57,7 @@ test_cases = [
 
     RelevantSkillsClassifierLLMTestCase(
         name="Baker",
-        given_experience_title="Baker",
-        given_contextual_title="Baker",
+        given_job_titles=["Baker"],
         given_responsibility="I clean my work place",
         given_skills=[
             _get_skill_entity(preferred_label="perform cleaning duties", score=0.9),
@@ -91,8 +88,7 @@ test_cases = [
     ),
     RelevantSkillsClassifierLLMTestCase(
         name="GDE Brigade member",
-        given_experience_title="GDE Brigade member",
-        given_contextual_title="School Safety Officer",
+        given_job_titles=["GDE Brigade member", "School Safety Officer"],
         given_responsibility="I check and record temperatures and other health signs.",
         given_skills=[
             _get_skill_entity(preferred_label="ensure compliance with policies",
@@ -173,8 +169,7 @@ async def test_relevance_classifier_llm(test_case: RelevantSkillsClassifierLLMTe
 
         # WHEN the skill linking tool is called with the given title and responsibilities and skills
         actual_result = await relevant_skills_classifier.execute(
-            experience_title=test_case.given_experience_title,
-            contextual_title=test_case.given_contextual_title,
+            job_titles=test_case.given_job_titles,
             responsibilities=[test_case.given_responsibility],
             skills=test_case.given_skills,
             top_k=test_case.given_top_k

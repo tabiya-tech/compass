@@ -9,16 +9,14 @@ class _RelevantOccupationsClassifierLLM(RelevantEntitiesClassifierLLM[Occupation
     async def execute(
             self,
             *,
-            experience_title: str,
-            contextual_title: str,
+            job_titles: list[str],
             responsibilities: list[str],
             occupations: list[OccupationEntity],
             top_k: int = 5
     ) -> RelevantEntityClassifierOutput[OccupationEntity]:
         """
         Given
-        - an experience_title,
-        - a contextual_title,
+        - a list of job titles,
         - a list of responsibilities,
         - and a list of occupations
         classify the occupations in:
@@ -26,8 +24,7 @@ class _RelevantOccupationsClassifierLLM(RelevantEntitiesClassifierLLM[Occupation
         - remaining occupations
         """
         return await super().execute(
-            experience_title=experience_title,
-            contextual_title=contextual_title,
+            job_titles=job_titles,
             responsibilities=responsibilities,
             entities_to_classify=occupations,
             top_k=top_k

@@ -11,9 +11,9 @@ class InferOccupationToolTestCase(CompassTestCase):
     given_work_type: WorkType
     given_responsibilities: list[str]
     given_country_of_interest: Country
-    given_top_k: int = 5
-    given_top_p: int = 10
-    expected_same_title: bool
+    given_top_k: int = 10
+    given_top_p: int = 20
+    number_of_titles: int = 5
     expected_occupations_found: list[str]
 
 
@@ -25,7 +25,6 @@ test_cases = [
         given_company="",
         given_responsibilities=["I bake bread", "I clean my work place", "I order supplies", "I sell bread"],
         given_country_of_interest=Country.SOUTH_AFRICA,
-        expected_same_title=False,
         expected_occupations_found=["baker", "bakery shop manager", "pastry maker"])
     ,
     InferOccupationToolTestCase(
@@ -35,7 +34,6 @@ test_cases = [
         given_company="",
         given_responsibilities=["I cook street food", "I sell food to the local community"],
         given_country_of_interest=Country.SOUTH_AFRICA,
-        expected_same_title=False,
         expected_occupations_found=["street food vendor"],
     ),
     InferOccupationToolTestCase(
@@ -48,7 +46,6 @@ test_cases = [
                                 "I talk with the minister of foreign affairs"],
 
         given_country_of_interest=Country.SOUTH_AFRICA,
-        expected_same_title=False,
         expected_occupations_found=["import export specialist"],
     ),
     InferOccupationToolTestCase(
@@ -65,7 +62,6 @@ test_cases = [
             "I put together weekly and monthly reports."
         ],
         given_country_of_interest=Country.SOUTH_AFRICA,
-        expected_same_title=False,
         expected_occupations_found=["health and safety officer"],
     ),
     InferOccupationToolTestCase(
@@ -75,7 +71,6 @@ test_cases = [
         given_company="Google",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
-        expected_same_title=True,
         expected_occupations_found=["software developer"],
     ),
     InferOccupationToolTestCase(
@@ -85,7 +80,6 @@ test_cases = [
         given_company="",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
-        expected_same_title=False,
         expected_occupations_found=["street food vendor"],
     ),
     InferOccupationToolTestCase(
@@ -95,7 +89,6 @@ test_cases = [
         given_company="Hungry Lion",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
-        expected_same_title=False,
         expected_occupations_found=["cook"],
     ),
     InferOccupationToolTestCase(
@@ -105,7 +98,6 @@ test_cases = [
         given_company="Hungry Tiger",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
-        expected_same_title=False,
         expected_occupations_found=["street food vendor"],
     ),
     InferOccupationToolTestCase(
@@ -115,7 +107,6 @@ test_cases = [
         given_company="",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
-        expected_same_title=False,
         expected_occupations_found=["home care aide", "care at home worker"],
     ),
     InferOccupationToolTestCase(
@@ -125,7 +116,6 @@ test_cases = [
         given_company="home",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
-        expected_same_title=False,
         expected_occupations_found=["hairdresser"],
     ),
     # Add more test cases as needed
