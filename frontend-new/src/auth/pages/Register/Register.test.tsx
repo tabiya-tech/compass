@@ -12,6 +12,7 @@ import { emailAuthService } from "src/auth/services/emailAuth/EmailAuth.service"
 import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
 import { ServiceError } from "src/error/ServiceError/ServiceError";
+import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 
 //mock the SocialAuth component
 jest.mock("src/auth/components/SocialAuth/SocialAuth", () => {
@@ -315,21 +316,25 @@ describe("Testing Register component", () => {
     expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("An internal error has occurred.", { variant: "error" });
   });
 
-  test("it should not call register when invitation code is invalid", async () => {
+  test("it should not call register when registration code is invalid", async () => {
     // GIVEN an invalid invitation code
     const givenInvitationCode = "foo-bar";
     const givenName = "Foo Bar";
     const givenEmail = "foo-bar@foo.bar";
 
+    const givenError = {
+      message: "Invalid invitation code",
+    }
+
     // AND check invitation code check returns an invalid code
     jest.spyOn(invitationsService, "checkInvitationCodeStatus").mockImplementation(
       //@ts-ignore
       (initation_code, successCallback, failureCallback) => {
-        failureCallback({
-          message: "Invalid invitation code",
-        } as ServiceError);
+        failureCallback(givenError as ServiceError);
       }
     );
+
+    const getUserFriendlyErrorMessage = jest.spyOn(require("src/error/ServiceError/ServiceError"), "getUserFriendlyErrorMessage")
 
     // WHEN the component is rendered
     render(
@@ -345,11 +350,22 @@ describe("Testing Register component", () => {
     });
 
     // AND the register form is submitted
-    (RegisterWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnRegister(givenName, givenEmail, "password");
+    await act(async () => {
+      (RegisterWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnRegister(givenName, givenEmail, "password");
+    })
 
     // THEN expect the register function to not have been called
     await waitFor(() => {
       expect(emailAuthService.handleRegisterWithEmail).not.toHaveBeenCalled();
+    });
+
+
+    // AND CALL THE INVITATION CODE CHECK
+    expect(getUserFriendlyErrorMessage).toHaveBeenCalledWith({
+      ...givenError,
+      details: {
+        errorCode: ErrorConstants.ErrorCodes.INVALID_REGISTRATION_CODE
+      }
     });
   });
 });

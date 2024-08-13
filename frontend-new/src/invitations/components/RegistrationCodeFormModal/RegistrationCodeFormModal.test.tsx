@@ -88,7 +88,7 @@ describe("RegistrationCodeFormModal", () => {
     fireEvent.change(input, { target: { value: "valid-code" } });
     fireEvent.click(button);
 
-    // THEN the invitation code should be validated
+    // THEN the registration code should be validated
     await waitFor(() => {
       expect(checkInvitationCodeStatus).toHaveBeenCalledWith("valid-code", expect.any(Function), expect.any(Function));
     });
