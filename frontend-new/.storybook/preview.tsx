@@ -22,7 +22,7 @@ import {
   UserPreferencesContext,
 } from "../src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 import { IsOnlineContext } from "../src/app/isOnlineProvider/IsOnlineProvider";
-import { AuthProvider } from "../src/auth/AuthProvider";
+import { AuthContext } from "../src/auth/AuthProvider";
 
 const preview: Preview = {
   parameters: {
@@ -80,10 +80,18 @@ export const decorators = [
     }
   }
 
+  const authContextDefaultValue = {
+    user: null,
+    updateUserByToken: () => null,
+    clearUser: () => {},
+    isAuthenticationInProgress: false,
+    isAuthenticated: false,
+  }
+
   return (
     <Router>
       <IsOnlineContext.Provider value={isOnline}>
-        <AuthProvider>
+        <AuthContext.Provider value={authContextDefaultValue}>
             <UserPreferencesContext.Provider value={userPreferencesValue}>
               <CssBaseline />
               <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
@@ -94,7 +102,7 @@ export const decorators = [
                 </SnackbarProvider>
               </ThemeProvider>
             </UserPreferencesContext.Provider>
-          </AuthProvider>
+          </AuthContext.Provider>
       </IsOnlineContext.Provider>
     </Router>
     );
