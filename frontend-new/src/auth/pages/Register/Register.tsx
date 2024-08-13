@@ -16,8 +16,9 @@ import { userPreferencesService } from "src/userPreferences/UserPreferencesServi
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
-import { logoutService } from "../../services/logout/logout.service";
-import { UserPreferencesContext } from "../../../userPreferences/UserPreferencesProvider/UserPreferencesProvider";
+import { logoutService } from "src/auth/services/logout/logout.service";
+import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
+import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -79,13 +80,18 @@ const Register: React.FC<Readonly<RegisterProps>> = ({ postRegisterHandler, post
               invitation.status === InvitationStatus.INVALID ||
               invitation.invitation_type !== InvitationType.REGISTER
             ) {
-              enqueueSnackbar("Invalid invitation code", { variant: "error" });
+              enqueueSnackbar("Invalid registration code", { variant: "error" });
               resolve(false);
             } else {
               resolve(true);
             }
           },
           (error) => {
+            // If the error is a service error, log it
+            error.details = {
+              errorCode: ErrorConstants.ErrorCodes.INVALID_REGISTRATION_CODE
+            }
+
             const errorMessage = getUserFriendlyErrorMessage(error);
             enqueueSnackbar(errorMessage, { variant: "error" });
             resolve(false);
