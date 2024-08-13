@@ -1,164 +1,194 @@
-"""
-Functions to embed an entire collection
-of a database in MongoDB and save the embeddings.
-"""
-import argparse
 import asyncio
 import logging
+import os
 from datetime import datetime
-from random import randint
-from typing import List
+from enum import Enum
+from typing import Literal
 
 import vertexai
-from bson.objectid import ObjectId
-from dotenv import load_dotenv
-from google.api_core.exceptions import ResourceExhausted
-from motor.motor_asyncio import AsyncIOMotorCollection, AsyncIOMotorClient
+from pydantic import BaseModel
 from pymongo.operations import SearchIndexModel
 from tqdm import tqdm
+from dotenv import load_dotenv
+from bson.objectid import ObjectId
+from motor.motor_asyncio import AsyncIOMotorClient
 
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
-from common_libs.environment_settings.constants import EmbeddingConfig
-from scripts.base_data_settings import ScriptSettings, Type, TabiyaDatabaseConfig
+from scripts.base_data_settings import ScriptSettings, TabiyaDatabaseConfig
 
 load_dotenv()
 vertexai.init()
+logger = logging.getLogger(__name__)
 
-PARALLEL_TASK_SIZE = 5
-MAX_RETRIES = 3
-MONGO_SETTINGS = MongoDbSettings()
-EMBEDDING_SETTINGS = EmbeddingConfig()
-SCRIPT_SETTINGS = ScriptSettings()
+##########################
+# Load the settings
+##########################
+
+MONGO_SETTINGS = MongoDbSettings(
+    mongodb_uri=os.getenv("MONGODB_URI"),
+    database_name=os.getenv("DATABASE_NAME")
+)
+
+SCRIPT_SETTINGS = ScriptSettings(
+    hf_access_token=os.getenv("HF_ACCESS_TOKEN"),
+    tabiya_mongodb_uri=os.getenv("TABIYA_MONGODB_URI")
+)
+
 TABIYA_CONFIG = TabiyaDatabaseConfig()
-TABIYA_DB = AsyncIOMotorClient(SCRIPT_SETTINGS.tabiya_mongodb_uri).get_database(
-    TABIYA_CONFIG.db_name)
-COMPASS_DB = AsyncIOMotorClient(MONGO_SETTINGS.mongodb_uri).get_database(MONGO_SETTINGS.database_name)
+MODEL_ID = "66845ccb635d10616a2895aa"
 GECKO_EMBEDDING_SERVICE = GoogleGeckoEmbeddingService()
 
-# The model ID to use for the embeddings. We dont' want to copy more than one model for now.
-# TODO: COM-328 Support multiple models (e.g. French ESCO).
-RELEVANT_MODEL_ID = ObjectId("6613c0a34436e3a6dbb41b66")
-
-PER_TYPE_SETTINGS = {
-    Type.OCCUPATION: {
-        'clean_data_collection_name': TABIYA_CONFIG.occupation_collection_name,
-        'collection_name': EMBEDDING_SETTINGS.occupation_collection_name,
-        'fields': ['preferredLabel', 'altLabels', 'description', 'UUID', 'code'],
-        'id_field_name': 'occupationId'
-    },
-    Type.SKILL: {
-        'clean_data_collection_name': TABIYA_CONFIG.skill_collection_name,
-        'collection_name': EMBEDDING_SETTINGS.skill_collection_name,
-        'fields': ['preferredLabel', 'altLabels', 'description', 'UUID', 'skillType'],
-        'id_field_name': 'skillId'
-    }
-}
-
-logger = logging.getLogger(__name__)
-parser = argparse.ArgumentParser(
-    prog='ESCO Embeddings Generator',
-    description='Generates embeddings for the ESCO database in MongoDB')
-parser.add_argument('--drop_collection', type=bool, action=argparse.BooleanOptionalAction,
-                    help='Indicates whether to delete the current embedding collection',
-                    default=False)
-parser.add_argument('--uuids', type=str, nargs="*",
-                    help='List of UUIDs to embed. If None, all the documents will be embedded',
-                    default=None)
+##########################
+# Connect to the databases
+##########################
+PLATFORM_DB = AsyncIOMotorClient(
+    SCRIPT_SETTINGS.tabiya_mongodb_uri, tlsAllowInvalidCertificates=True).get_database(TABIYA_CONFIG.db_name)
 
 
-def _field_to_string(field, document):
-    if field == "altLabels":
-        return "\n".join(document[field])
-    return document[field]
+class PlatformCollections(Enum):
+    SKILLS = "skillmodels"
+    RELATIONS = "occupationtoskillrelationmodels"
+    OCCUPATIONS = "occupationmodels"
 
 
-async def _embed_document(collection: AsyncIOMotorCollection,
-                          type: Type,
-                          field: str,
-                          document,
-                          errors: List[str] = None,
-                          retry_count: int = 0):
-    if errors is None:
-        errors = []
-    try:
-        embedded_text = _field_to_string(field, document)
-        if embedded_text == "":
-            logging.debug(f"Document UUID:{document['UUID']} has no text in field {field}. Skipping.")
-            return
-        embedding = await GECKO_EMBEDDING_SERVICE.embed(embedded_text)
-        document_to_save = {k: v for k, v in document.items() if k in PER_TYPE_SETTINGS[type]['fields']}
-        document_to_save[EMBEDDING_SETTINGS.embedding_key] = embedding
-        document_to_save['embedded_field'] = field
-        document_to_save['embedded_text'] = embedded_text
-        document_to_save['updatedAt'] = datetime.utcnow()
-        document_to_save[PER_TYPE_SETTINGS[type]['id_field_name']] = document['_id']
-        await collection.replace_one(
-            {'$and': [  # Make sure we only have one embedding per field per occupation.
-                {'UUID': document['UUID']},
-                {'embedded_field': field}]},
-            document_to_save,
-            upsert=True)
-    except Exception as e:
-        if isinstance(e, ResourceExhausted) and retry_count < MAX_RETRIES:
-            logging.debug(f"Retriable resource exhausted for document {document['UUID']}: {e}.")
-            await asyncio.sleep(randint(5, 10) * (retry_count + 1))  # nosec
-            await _embed_document(collection, type, field, document, errors,
-                                  retry_count + 1)
-        else:
-            logging.error(f"Error embedding document UUID:{document['UUID']}, label: {document['preferredLabel']}: {e}")
-            errors.append(document['UUID'])
+COMPASS_DB = AsyncIOMotorClient(
+    MONGO_SETTINGS.mongodb_uri, tlsAllowInvalidCertificates=True).get_database(MONGO_SETTINGS.database_name)
 
 
-async def generate_embeddings(
-        type: Type,
-        uuids: List[str] = None
-) -> None:
-    """Embeds the entire collection in a MongoDB database.
+class CompassCollections(Enum):
+    SKILLS = "skillsmodelsembeddings"
+    RELATIONS = "occupationtoskillrelationmodels"
+    OCCUPATIONS = "occupationmodelsembeddings"
 
-    Saving the embeddings in the collection in the 'embedding' field. Each field to embed creates its own copy of the
-    record. The record includes all the fields of the original document, plus the embedding, the name of the embedded
-    field, the text embedded, and the date of the embedding. The combination of the UUID and the embedded field is
-    unique, if it already exists, it will be updated, if not it will be created.
 
-    Args:
-        :param type: The type of the entity to embed.
-        :param uuids: A list of UUIDs to embed. If None, all the documents in the collection will be embedded.
+##########################
+# Types
+##########################
+class EmbeddingContext(BaseModel):
+    schema: Literal["occupation", "skill"]
     """
-    # This could be a collection from the Platform taxonomy database.
-    clean_data_collection = TABIYA_DB[PER_TYPE_SETTINGS[type]['clean_data_collection_name']]
-    embeddings_collection = COMPASS_DB[PER_TYPE_SETTINGS[type]['collection_name']]
-    search_filter: dict = {'UUID': {'$in': uuids}} if uuids else {}
-    search_filter.update({"modelId": RELEVANT_MODEL_ID})
-    pbar = tqdm(desc=f'Embedding progress for {type.name}',
-                total=await clean_data_collection.count_documents(search_filter))
+    schema is the name of the schema
+    """
+    source_collection: str
+    destination_collection: str
+    id_field_name: str
+    extra_fields: list[str] = []
+
+
+async def generate_and_save_embeddings(documents: list[dict[str, any]], ctx: EmbeddingContext):
+    """
+    Generate the embeddings for the given documents
+    :param documents:
+    :param ctx:
+    :return:
+    """
+    texts = []
+
+    for document in documents:
+        texts.append(document["description"])
+        texts.append(document["preferredLabel"])
+        texts.append("\n".join(document["altLabels"]))
+
+    # Remove the empty strings
+    # Later when iterating over the documents we need to make that we check
+    # for empty strings to ensure that we keep the same order
+    texts = [text for text in texts if text]
+
+    embeddings = await GECKO_EMBEDDING_SERVICE.embed_batch(texts)
+
+    insertable_documents = []
+
     i = 0
-    tasks = []
-    errors = []
-    async for document in clean_data_collection.find(search_filter):
-        tasks += [
-            _embed_document(embeddings_collection, type, field, document,
-                            errors) for field in
-            ['preferredLabel', 'altLabels', 'description']]
-        i += 1
-        pbar.update()
-        if len(tasks) > PARALLEL_TASK_SIZE:
-            await asyncio.gather(*tasks)
-            tasks = []
-    await asyncio.gather(*tasks)
-    pbar.close()
-    if len(errors) > 0:
-        logging.error(f"Errors embedding documents in collection {type.name}: {' '.join(errors)}")
+    for document in documents:
+        new_document = {
+            "UUID": document["UUID"],
+            "modelId": document["modelId"],
+            "preferredLabel": document["preferredLabel"],
+            "altLabels": document["altLabels"],
+            "description": document["description"],
+            "updatedAt": datetime.now(),
+            ctx.id_field_name: document["_id"]
+        }
+
+        for extra_field in ctx.extra_fields:
+            new_document[extra_field] = document[extra_field]
+
+        if document["description"]:
+            insertable_documents.append({
+                **new_document,
+                "embedding": embeddings[i],
+                "embedded_field": "description",
+                "embedded_text": document["description"]
+            })
+            i += 1
+
+        if document["preferredLabel"]:
+            insertable_documents.append({
+                **new_document,
+                "embedding": embeddings[i],
+                "embedded_field": "preferredLabel",
+                "embedded_text": document["preferredLabel"]
+            })
+            i += 1
+
+        alt_labels = "\n".join(document["altLabels"])
+        if alt_labels:
+            insertable_documents.append({
+                **new_document,
+                "embedding": embeddings[i],
+                "embedded_field": "altLabels",
+                "embedded_text": alt_labels
+            })
+            i += 1
+
+    if len(texts) != i:
+        raise ValueError("The number of embeddings generated is different from the number of texts")
+
+    await COMPASS_DB[ctx.destination_collection].insert_many(insertable_documents)
 
 
-async def upsert_indexes(collection_name: str):
-    """Creates the search index for the embeddings."""
-    collection = COMPASS_DB[collection_name]
+async def create_indexes(ctx: EmbeddingContext):
+    """
+    Create the indexes for the destination collection
+    :param ctx: EmbeddingContext - the context
+    """
+
+    # create index for model_id and _id,
+    # this is used to search for the document by the model_id and the original document id.
+    # to ensure that the combination of model_id and id_field_name is reserved on every import.
+    await COMPASS_DB[ctx.destination_collection].create_index(
+        {"modelId": 1, ctx.id_field_name: 1},
+        name=f"model_id_and_{ctx.id_field_name}_index",
+    )
+
+    # unique index for modelId, ctx.id_field_name, embedded_field
+    # we have to ensure that the combination of modelId, ctx.id_field_name, embedded_field is unique
+    await COMPASS_DB[ctx.destination_collection].create_index(
+        {
+            'modelId': 1,
+            ctx.id_field_name: 1,
+            'embedded_field': 1
+        },
+        unique=True,
+        name='UUID_embedded_field_index'
+    )
+
+    await COMPASS_DB[ctx.destination_collection].create_index(
+        {'UUID': 1},
+        name='UUID_index'
+    )
+
+    await COMPASS_DB[ctx.destination_collection].create_index(
+        {ctx.id_field_name: 1},
+        name=ctx.id_field_name + '_index'
+    )
+
     vector_index_definition = {
         "fields": [
             {
                 "numDimensions": 768,
-                "path": EMBEDDING_SETTINGS.embedding_key,
+                "path": "embedding",
                 "similarity": "cosine",
                 "type": "vector"
             },
@@ -169,66 +199,197 @@ async def upsert_indexes(collection_name: str):
         ]
     }
 
-    if EMBEDDING_SETTINGS.embedding_index in [index['name'] for index in await collection.list_search_indexes().to_list(length=None)]:
-        await collection.update_search_index(EMBEDDING_SETTINGS.embedding_index, vector_index_definition)
+    search_index_model = SearchIndexModel(
+        definition=vector_index_definition,
+        name="embedding_index",
+        type="vectorSearch",
+    )
+
+    # if search index exists, update it.
+    existing_indexes = []
+    async for index in COMPASS_DB[ctx.destination_collection].list_search_indexes():
+        existing_indexes.append(index["name"])
+
+    if "embedding_index" in existing_indexes:
+        # if it exists, update it
+        await COMPASS_DB[ctx.destination_collection].update_search_index("embedding_index", vector_index_definition)
     else:
-        search_index_model = SearchIndexModel(
-            definition=vector_index_definition,
-            name=EMBEDDING_SETTINGS.embedding_index,
-            type="vectorSearch",
-        )
-        await collection.create_search_index(model=search_index_model)
+        # if it does not exist, create it
+        await COMPASS_DB[ctx.destination_collection].create_search_index(model=search_index_model)
+
+    # Create the indexes for the relations collection
+    # this index is used for the search of already generated embeddings
+    await COMPASS_DB[ctx.destination_collection].create_index(
+        {"modelId": 1, "source_id": 1},
+        name="model_id_index",
+    )
 
 
-async def create_collection(type: Type, drop=True):
-    """Creates the collection to store the embeddings. If it already exists and drop = True, it will be dropped and
-    recreated."""
-    embedding_collection_name = PER_TYPE_SETTINGS[type]["collection_name"]
-    collist = await COMPASS_DB.list_collection_names()
-    if embedding_collection_name in collist and drop:
-        await COMPASS_DB.drop_collection(embedding_collection_name)
-    else:
-        return
-    await COMPASS_DB.create_collection(embedding_collection_name)
-    await COMPASS_DB[embedding_collection_name].create_index({'UUID': 1, 'embedded_field': 1},
-                                                             name='UUID_embedded_field_index')
-    await COMPASS_DB[embedding_collection_name].create_index({'UUID': 1}, name='UUID_index')
-    id_field_name = PER_TYPE_SETTINGS[type]['id_field_name']
-    await COMPASS_DB[embedding_collection_name].create_index({id_field_name: 1}, name=id_field_name + '_index')
-    await asyncio.sleep(3)  # Wait for the indexes to be created.
+async def process_schema(ctx: EmbeddingContext):
+    """
+    Process the documents collection
+    :return:
+    """
+    logger.info(f"Processing documents: {ctx.schema}")
+
+    # Define the context
+    # it is used to define the source and destination collections
+    # and the field name that will be used as the id field
+
+    from_collection = PLATFORM_DB[ctx.source_collection]
+    to_collection = COMPASS_DB[ctx.destination_collection]
+
+    logger.info(f"[1/2] copying the {ctx.schema}s documents from {from_collection.name} to {to_collection.name}")
+
+    # Define the search filter
+    # check all ids in the to_collection where the embeddings are already generated
+    done_ids = await to_collection.distinct(ctx.id_field_name, {"modelId": ObjectId(MODEL_ID)})
+    search_filter = {
+        "modelId": ObjectId(MODEL_ID),
+        "_id": {
+            "$nin": done_ids
+        }
+    }
+    # Set the batch size
+    # The batch size is the number of documents to insert in one batch
+    batch_size = 1000
+    cursor = from_collection.find(search_filter).batch_size(batch_size)
+    documents = []
+    progress = tqdm(
+        desc=f'generating embeddings for {ctx.schema}',
+        total=await from_collection.count_documents(search_filter),
+    )
+
+    async for document in cursor:
+        documents.append(document)
+
+        # batch is full, start generating embeddings
+        if len(documents) == batch_size:
+            progress.update(batch_size)
+            await generate_and_save_embeddings(documents, ctx)
+            documents = []
+
+    if len(documents) > 0:
+        # sometimes the last batch is not full
+        # if it is empty then we don't need to generate embeddings
+        # but if it is not empty then we need to generate embeddings
+        progress.update(len(documents))
+        await generate_and_save_embeddings(documents, ctx)
+
+    # Close the progress bar
+    progress.close()
+
+    # Create the indexes
+    logger.info("[2/2] creating indexes for embeddings-collection")
+    await create_indexes(ctx)
 
 
-async def generate_embeddings_for_collection(
-        type: Type,
-        arguments: argparse.Namespace,
-) -> None:
-    """Embeds the entire collection in a MongoDB database. """
-    await create_collection(type, drop=arguments.drop_collection)
-    await generate_embeddings(type, arguments.uuids)
-    await upsert_indexes(PER_TYPE_SETTINGS[type]["collection_name"])
+async def copy_relations_collection():
+    """
+    Copy the relations collection from the platform database to the compass database
+    :return:
+    """
 
+    from_collection = PLATFORM_DB[PlatformCollections.RELATIONS.value]
+    to_collection = COMPASS_DB[CompassCollections.RELATIONS.value]
 
-async def copy_relationship_model(drop=False):
-    """Copies the occupation to skill relationship model from the Tabiya database to the Compass database."""
-    relation_collection_name = TABIYA_CONFIG.relation_collection_name
-    collist = await COMPASS_DB.list_collection_names()
-    if relation_collection_name in collist and drop:
-        await COMPASS_DB.drop_collection(relation_collection_name)
-    if relation_collection_name not in collist:
-        await COMPASS_DB.create_collection(relation_collection_name)
-        await COMPASS_DB[relation_collection_name].create_index({'requiredSkillId': 1}, name='requiredSkillId_index')
-        await COMPASS_DB[relation_collection_name].create_index({'requiredOccupationId': 1},
-                                                                name='requiredOccupationId_index')
-    await asyncio.gather(*[COMPASS_DB[relation_collection_name].insert_one(document) async for document in
-                           TABIYA_DB[relation_collection_name].find({"modelId": RELEVANT_MODEL_ID})])
+    logger.info(f"[1/2] Copying the relations documents from {from_collection.name} to {to_collection.name}")
+
+    # FInd all the document that were not copied in a previous run
+    # completed ids are the ids of the documents that were already copied
+    # the source_id is used to keep track of the original document id
+    # it is found in the source_id field, its insertion happens in the next step
+    completed_ids = await to_collection.distinct("source_id", {"modelId": ObjectId(MODEL_ID)})
+    search_filter = {
+        "modelId": ObjectId(MODEL_ID),
+        "_id": {
+            "$nin": completed_ids
+        }
+    }
+
+    progress = tqdm(
+        desc=f'copying progress for ',
+        total=await from_collection.count_documents(search_filter),
+    )
+
+    # Set the batch size
+    # The batch size is the number of documents to insert in one batch
+    batch_size = 5000
+    documents = []
+    cursor = from_collection.find(search_filter).batch_size(batch_size)
+    async for relation in cursor:
+        # copy the document
+        # remove the _id field so that we can insert it in the new collection and let mongo generate a new _id
+        # and add the source_id field
+        # we need a source_id field to keep track of the original document id
+        # this is the new format of the saved document
+        new_document = relation.copy()
+        del new_document["_id"]
+        new_document["source_id"] = relation["_id"]
+
+        documents.append(new_document)
+
+        if len(documents) == batch_size:
+            progress.update(batch_size)
+            await to_collection.insert_many(documents)
+            documents = []
+
+    if len(documents) > 0:
+        progress.update(len(documents))
+        await to_collection.insert_many(documents)
+
+    progress.close()
+
+    logger.info("[2/2] creating indexes")
+    await to_collection.create_index(
+        {"requiringOccupationId": 1},
+        name="requiring_occupation_id_index",
+    )
+
+    await to_collection.create_index(
+        {"requiredSkillId": 1},
+        name="required_skill_id_index",
+    )
+
+    await to_collection.create_index(
+        {"modelId": 1, "source_id": 1},
+        name="model_id_and_source_id_index",
+    )
 
 
 async def main():
-    args = parser.parse_args()
+    """
+    Main function:
+    Entry point of the script
+    :return:
+    """
+    logger.info("Starting the main function")
 
-    await generate_embeddings_for_collection(Type.OCCUPATION, args)
-    await generate_embeddings_for_collection(Type.SKILL, args)
-    await copy_relationship_model(drop=args.drop_collection)
+    # run the three tasks in parallel
+    await asyncio.gather(
+        # [1/3] Copy the relations collection
+        copy_relations_collection(),
+
+        # [2/3] Process the occupations
+        process_schema(EmbeddingContext(
+            schema="occupation",
+            source_collection=PlatformCollections.OCCUPATIONS.value,
+            destination_collection=CompassCollections.OCCUPATIONS.value,
+            id_field_name="occupationId",
+            extra_fields=["code"]
+        )),
+
+        # [3/3] Process the skills
+        process_schema(EmbeddingContext(
+            schema="skill",
+            source_collection=PlatformCollections.SKILLS.value,
+            destination_collection=CompassCollections.SKILLS.value,
+            id_field_name="skillId",
+            extra_fields=["skillType"]
+        )),
+    )
+
+    logger.info("Script execution completed")
 
 
 if __name__ == "__main__":
