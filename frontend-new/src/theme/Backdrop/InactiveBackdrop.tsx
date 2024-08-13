@@ -51,6 +51,8 @@ const InactiveBackdrop: React.FC<InactivityBackdropProps> = ({ isShown }) => {
           ...zzZZzzZZ
           <br />
           Are you still here?
+          <br />
+          Tap anywhere to continue...
         </Typography>
       </Paper>
     </Backdrop>
