@@ -24,6 +24,7 @@ export const UserPreferencesProvider: React.FC<UserPreferencesProviderProps> = (
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    setIsLoading(true)
     const storedPreferences = PersistentStorageService.getUserPreferences();
     if (storedPreferences) {
       setUserPreferences(storedPreferences);

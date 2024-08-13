@@ -55,6 +55,7 @@ jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => {
     __esModule: true,
     PersistentStorageService: {
       getLoginMethod: jest.fn(),
+      setLoggedOutFlag: jest.fn(),
     },
   };
 });

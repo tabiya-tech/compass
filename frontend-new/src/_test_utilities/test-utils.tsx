@@ -9,7 +9,7 @@ import "src/_test_utilities/firebaseMock";
 import SnackbarProvider from "src/theme/SnackbarProvider/SnackbarProvider";
 import { UserPreferencesProvider } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 import { IsOnlineProvider } from "src/app/isOnlineProvider/IsOnlineProvider";
-import { AuthProvider } from "src/auth/AuthProvider";
+import { AuthContext } from "src/auth/AuthProvider";
 jest.mock("firebase/compat/app", () => {
   return {
     initializeApp: jest.fn(),
@@ -41,14 +41,21 @@ jest.mock("firebaseui", () => {
   };
 });
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
+  const defaultAuthContextValue = {
+    user: null,
+    updateUserByToken: () => null,
+    clearUser: () => {},
+    isAuthenticationInProgress: false,
+    isAuthenticated: false,
+  }
   return (
     <IsOnlineProvider>
       <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
-        <AuthProvider>
+        <AuthContext.Provider value={defaultAuthContextValue}>
           <UserPreferencesProvider>
             <SnackbarProvider>{children}</SnackbarProvider>
           </UserPreferencesProvider>
-        </AuthProvider>
+        </AuthContext.Provider>
       </ThemeProvider>
     </IsOnlineProvider>
   );
