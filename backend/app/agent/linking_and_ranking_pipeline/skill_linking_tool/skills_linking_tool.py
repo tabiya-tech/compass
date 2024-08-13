@@ -37,8 +37,7 @@ class SkillLinkingTool:
         self._logger = logging.getLogger(__class__.__name__)
 
     async def execute(self, *,
-                      experience_title: str,
-                      contextual_title: str,
+                      job_titles: list[str],
                       esco_occupations: List[OccupationSkillEntity],
                       responsibilities: list[str],
                       only_essential: bool = True,
@@ -78,14 +77,14 @@ class SkillLinkingTool:
         responsibilities_embeddings = await embeddings_service.embed_batch(responsibilities)
         # 2. For each responsibility (embedding),
         all_llm_stats: list[LLMStats] = []
+        # TODO: Parallelize the following loop
         for responsibility_text, responsibility_embedding in zip(responsibilities, responsibilities_embeddings):
             # 2.1 Find the top_p most similar skills that are within the list of skills of the esco_occupations
             filter_spec = {"UUID": {"$in": esco_skills_uuids}} if len(esco_skills_uuids) > 0 else None
             similar_skills = await self._skill_search_service.search(query=responsibility_embedding, filter_spec=filter_spec, k=top_p)
             # 2.2  Discard the skills that are not relevant by using the relevance classifier
             relevant_skills_output = await self._relevant_skills_tool.execute(
-                experience_title=experience_title,
-                contextual_title=contextual_title,
+                job_titles=job_titles,
                 responsibilities=[responsibility_text],
                 skills=similar_skills,
                 top_k=top_k
@@ -108,8 +107,7 @@ class SkillLinkingTool:
         if len(skill_stats) >= top_k:
             # Return the top_k most relevant skills
             top_k_relevant_skills_output = await self._relevant_skills_tool.execute(
-                experience_title=experience_title,
-                contextual_title=contextual_title,
+                job_titles=job_titles,
                 responsibilities=responsibilities,
                 skills=top_skills,
                 top_k=top_k

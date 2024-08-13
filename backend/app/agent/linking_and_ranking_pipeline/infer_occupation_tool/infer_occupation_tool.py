@@ -18,7 +18,7 @@ MONGO_SETTINGS = MongoDbSettings()
 
 
 class InferOccupationToolOutput(BaseModel):
-    contextual_title: str
+    contextual_titles: list[str]
     esco_occupations: list[OccupationSkillEntity]
     responsibilities: list[str]
     llm_stats: list[LLMStats]
@@ -42,6 +42,7 @@ class InferOccupationTool:
                       work_type: Optional[WorkType] = None,
                       responsibilities: list[str],
                       country_of_interest: Country,
+                      number_of_titles: int,
                       top_k: int,
                       top_p: int
                       ) -> InferOccupationToolOutput:
@@ -57,17 +58,22 @@ class InferOccupationTool:
 
         # 1. Contextualize the experience title based on the country of interest, company, work type and responsibilities
         #    and infer the contextual title.
-        contextualization_llm = _ContextualizationLLM(country_of_interest, self._logger)
+        contextualization_llm = _ContextualizationLLM(
+            country_of_interest=country_of_interest,
+            number_of_titles=number_of_titles,
+            logger=self._logger)
         contextualization_response = await contextualization_llm.execute(
             experience_title=experience_title,
             company=company,
             work_type=work_type,
-            responsibilities=responsibilities
+            responsibilities=responsibilities,
+            number_of_titles=number_of_titles
         )
         # 2. Search for the top_p occupations matching the title
         #  create a set to remove duplicates and convert to lowercase as the esco titles in the db are lowercase and
         #  using a different case yields imprecise results
-        titles: set[str] = {contextualization_response.contextual_title.strip().lower(), experience_title.strip().lower()}
+        titles: set[str] = {experience_title.strip().lower()}.union(
+            {title.strip().lower() for title in contextualization_response.contextual_titles})
         # create a task for each title
         # search for the 2 * top_k matching occupations for each title initially, and later filter out the irrelevant ones
         tasks = [self._occupation_skill_search_service.search(query=title, k=top_p) for title in titles]
@@ -78,8 +84,7 @@ class InferOccupationTool:
         # 3. Filter out the irrelevant occupations based on the responsibilities and keep the top_k most relevant ones
         relevant_occupations_tool = _RelevantOccupationsClassifierLLM()
         relevant_occupations_output = await relevant_occupations_tool.execute(
-            experience_title=experience_title,
-            contextual_title=contextualization_response.contextual_title,
+            job_titles=list(titles),
             occupations=[occupation_skill.occupation for occupation_skill in occupations_skills],
             responsibilities=responsibilities,
             top_k=top_k
@@ -88,7 +93,7 @@ class InferOccupationTool:
         relevant_occupations_skills = [occupation_skill for occupation_skill in occupations_skills if
                                        occupation_skill.occupation.UUID in relevant_occupations_uuids]
 
-        return InferOccupationToolOutput(contextual_title=contextualization_response.contextual_title,
+        return InferOccupationToolOutput(contextual_titles=contextualization_response.contextual_titles,
                                          esco_occupations=relevant_occupations_skills,
                                          responsibilities=responsibilities,
                                          llm_stats=contextualization_response.llm_stats + relevant_occupations_output.llm_stats

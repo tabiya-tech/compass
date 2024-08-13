@@ -25,8 +25,7 @@ def _get_occupation_entity(*, preferred_label: str, description: Optional[str] =
 
 
 class RelevantOccupationClassifierLLMTestCase(CompassTestCase):
-    given_experience_title: str
-    given_contextual_title: str
+    given_job_titles: list[str]
     given_responsibilities: list[str]
     given_occupations: list[OccupationEntity]
     given_top_k: int = 5
@@ -37,8 +36,7 @@ class RelevantOccupationClassifierLLMTestCase(CompassTestCase):
 test_cases = [
     RelevantOccupationClassifierLLMTestCase(
         name="Self-employed Baker",
-        given_experience_title="Baker",
-        given_contextual_title="Self-employed Baker",
+        given_job_titles=["Baker", "Self-employed Baker"],
         given_responsibilities=["I bake bread", "I clean my work place", "I order supplies", "I sell bread"],
         given_occupations=[_get_occupation_entity(preferred_label="baker",
                                                   description="Bakers make a wide range of breads, pastries, and other baked goods. "
@@ -138,8 +136,7 @@ test_cases = [
     ),
     RelevantOccupationClassifierLLMTestCase(
         name="Special characters",
-        given_experience_title="Baker",
-        given_contextual_title="Self-employed Baker",
+        given_job_titles=["Baker", "Self-employed Baker"],
         given_responsibilities=["I clean my work place"],
         given_occupations=[
             _get_occupation_entity(preferred_label="Baker", score=0.9),
@@ -187,8 +184,7 @@ async def test_relevant_occupations_classifier_llm(test_case: RelevantOccupation
         random.shuffle(test_case.given_occupations)  # shuffle the responsibilities to be certain that the order does not matter
         # WHEN the relevance classifier is called with the given title and responsibilities and occupations
         actual_result = await relevant_occupations_classifier.execute(
-            experience_title=test_case.given_experience_title,
-            contextual_title=test_case.given_contextual_title,
+            job_titles=test_case.given_job_titles,
             responsibilities=test_case.given_responsibilities,
             occupations=test_case.given_occupations,
             top_k=test_case.given_top_k

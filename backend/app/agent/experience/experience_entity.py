@@ -62,11 +62,11 @@ class ExperienceEntity(BaseModel):
     Title of the experience as the user refers to it (e.g. "Crew Member")
     """
 
-    contextual_title: Optional[str] = None  # TODO: replace with the cluster_results from the ExperiencePipelineResponse
-    """
-    Title of the experience that is based on the experience title 
-    and the additional context the user provided (e.g. "Fast Food Restaurant Staff")
-    """
+    # contextual_title: Optional[str] = None  # TODO: replace with the cluster_results from the ExperiencePipelineResponse
+    # """
+    # Title of the experience that is based on the experience title
+    # and the additional context the user provided (e.g. "Fast Food Restaurant Staff")
+    # """
 
     company: Optional[str] = None
     """
