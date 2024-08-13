@@ -27,12 +27,12 @@ async def initialize_mongo_db():
         # Create the user preferences indexes
         await _mongo_db.get_collection(Collections.USER_PREFERENCES).create_index([
             ("user_id", 1)
-        ], unique=True)
+        ], unique=True, name="user_id_index")
 
         # create the user invitations indexes
         await _mongo_db.get_collection(Collections.USER_INVITATIONS).create_index([
             ("invitation_code", 1)
-        ], unique=True)
+        ], unique=True, name="invitation_code_index")
 
     INITIALIZED_MONGO_DB = True
 
