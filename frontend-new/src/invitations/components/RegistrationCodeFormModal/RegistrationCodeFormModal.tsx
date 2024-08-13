@@ -30,14 +30,14 @@ export interface InvitationCodeFormModalProps {
   onClose: () => void;
 
   /**
-   * Function to call when the invitation code is validated
+   * Function to call when the registration code is validated
    * @param invitationCode
    */
   onSuccess: (invitationCode: string) => void;
 }
 
 /**
- * Modal to enter the invitation code
+ * Modal to enter the registration code
  */
 const style = {
   position: "absolute",
@@ -61,8 +61,8 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ sho
 
   const closeModal = useCallback(() => {
     /**
-     * If the invitation code is not validated, do not close the modal
-     * This is to prevent the user from closing the modal without validating the invitation code
+     * If the registration code is not validated, do not close the modal
+     * This is to prevent the user from closing the modal without validating the registration code
      */
     if (!invitationCode || !isValidated) return;
     else onClose();
@@ -76,7 +76,7 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ sho
       await service.checkInvitationCodeStatus(
         invitationCode,
         (invitation) => {
-          enqueueSnackbar("Invitation code is valid!", { variant: "success" });
+          enqueueSnackbar("Registration code is valid!", { variant: "success" });
           setIsValidated(true);
           onSuccess(invitation.invitation_code);
         },
