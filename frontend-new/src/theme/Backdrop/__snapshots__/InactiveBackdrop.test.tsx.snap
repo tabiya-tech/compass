@@ -17,6 +17,8 @@ exports[`InactiveBackdrop render tests should show InactiveBackdrop when isShown
       ...zzZZzzZZ
       <br />
       Are you still here?
+      <br />
+      Tap anywhere to continue...
     </p>
   </div>
 </div>
