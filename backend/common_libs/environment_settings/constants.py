@@ -1,10 +1,6 @@
 from pydantic import BaseModel
 
 
-class Collections:
-    USER_PREFERENCES: str = "user_preferences"
-
-
 class EmbeddingConfig(BaseModel):
     """ Settings for the embedding models. """
     skill_collection_name: str = "skillsmodelsembeddings"

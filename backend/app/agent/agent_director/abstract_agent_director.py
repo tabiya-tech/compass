@@ -1,8 +1,9 @@
 import logging
 from abc import ABC, abstractmethod
 from enum import Enum
+from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_serializer, Field
 
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.conversation_memory.conversation_memory_manager import \
@@ -24,11 +25,19 @@ class AgentDirectorState(BaseModel):
     The state of the agent director
     """
     session_id: int
-    current_phase: ConversationPhase
+    current_phase: ConversationPhase = Field(default=ConversationPhase.INTRO)
 
-    def __init__(self, session_id):
-        super().__init__(session_id=session_id,
-                         current_phase=ConversationPhase.INTRO)
+    class Config:
+        extra = "forbid"
+
+    # override the dict method to return the enum value instead of the enum object
+    def dict(self, *args, **kwargs):
+        return super().dict(exclude={"current_phase"}) | {
+            "current_phase": self.current_phase.value
+        }
+
+    def __init__(self, session_id: int, **data: Any):
+        super().__init__(session_id=session_id, **data)
 
 
 class AbstractAgentDirector(ABC):

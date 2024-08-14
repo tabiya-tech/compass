@@ -1,6 +1,5 @@
 import logging
 import os
-import random
 
 from datetime import datetime
 from typing import List, Annotated
@@ -14,9 +13,10 @@ from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_types import AgentInput
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.agent.experience.experience_entity import ExperienceEntity
-from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
-from app.constants.errors import HTTPErrorResponse, ErrorService
+from app.application_state import ApplicationStateManager
+from app.constants.errors import HTTPErrorResponse
 from app.invitations.routes import add_user_invitations_routes
+from app.server_dependecies.application_state_dependencies import get_application_state_manager
 from app.users.auth import Authentication, UserInfo
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
@@ -32,9 +32,8 @@ from contextlib import asynccontextmanager
 from app.users import add_users_routes
 from app.poc import add_poc_routes
 
-from app.types import NewSessionResponse, Experience, Skill
+from app.types import Experience, Skill
 from app.users.repositories import UserPreferenceRepository
-from app.users.types import UserPreferencesUpdateRequest
 
 logger = logging.getLogger(__name__)
 
@@ -122,12 +121,6 @@ add_version_routes(app)
 # Add routes relevant for the conversation agent
 ############################################
 
-# Initialize the application state manager, conversation memory manager and the agent director
-# Currently, using an in-memory store for the application state,
-# but this can be replaced with a persistent store based on environment variables
-# TODO: use the Fast api dependency injection pattern to inject them into the routes
-application_state_manager = ApplicationStateManager(InMemoryApplicationStateStore())
-
 @app.post(path="/conversation",
          status_code=201,
          response_model=ConversationResponse,
@@ -137,7 +130,8 @@ application_state_manager = ApplicationStateManager(InMemoryApplicationStateStor
 async def conversation(request: Request, body: ConversationInput, clear_memory: bool = False, filter_pii: bool = False,
                        conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager),
                        agent_director: LLMAgentDirector = Depends(get_agent_director),
-                       user_info: UserInfo = Depends(auth.get_user_info())):
+                       user_info: UserInfo = Depends(auth.get_user_info()),
+                       application_state_manager: ApplicationStateManager = Depends(get_application_state_manager)):
     """
     Endpoint for conducting the conversation with the agent.
     """
@@ -211,7 +205,8 @@ async def conversation(request: Request, body: ConversationInput, clear_memory: 
 async def get_conversation_history(
     session_id: Annotated[int, Query(description="The session id for the conversation history.")],
     conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager),
-    user_info: UserInfo = Depends(auth.get_user_info())
+    user_info: UserInfo = Depends(auth.get_user_info()),
+    application_state_manager: ApplicationStateManager = Depends(get_application_state_manager)
 ):
     """
     Endpoint for retrieving the conversation history.
@@ -241,7 +236,8 @@ async def get_conversation_history(
          response_model=List[Experience],
          responses={400: {"model": HTTPErrorResponse}, 403: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
          description="""Endpoint for retrieving the experiences of a user.""")
-async def get_experiences(session_id: int, user_info: UserInfo = Depends(auth.get_user_info())) -> List[Experience]:
+async def get_experiences(session_id: int, user_info: UserInfo = Depends(auth.get_user_info()),
+                          application_state_manager: ApplicationStateManager = Depends(get_application_state_manager)) -> List[Experience]:
     """
     Endpoint for retrieving the experiences of a user.
     """
