@@ -1,5 +1,31 @@
-tes# Infrastructure as Code
+# Infrastructure as Code
 The infrastructure for Compass is managed using [Pulumi](https://www.pulumi.com/). The infrastructure is defined in code and can be deployed to Google Cloud Platform (GCP) using Pulumi. 
+
+The Pulumi codebase has been divided into multipe Pulumi `micro-stacks`
+* `organization`: Sets up the organizational base. This is needs to be done only once.
+* `environment`: Creates a new `project/environment` and enables the required base APIs. This needs to be done once per new environment.
+* `auth`: Sets up GCP Identity Platform to the target `project/environment`. 
+* `backend`: Sets up the required infrastructure, APIs and services for the Compass backend.
+* `frontend`: Sets up the required infrastructure, APIs, and services for the Compass frontend.
+* `common`: Sets up the required common infrastructure, APIs, and services (DNS, load balancers, etc) for the Tabiya Compass (both backend and frontend).
+* `aws-ns`: Updates Tabiya's main nameservers hosted in AWS.
+* `lib`: libs, utils, helpers, etc. Not deployable.
+
+The following provides examples of the usage
+```
+// THIS IS ONLY REQUIRED ONCE
+pulumi up -C organization -s base
+
+// Create new environment - this must be done once per environment
+pulumi up -C environment -s dev
+
+// To deploy all required services to the new dev environment
+pulumi up -C auth -s dev
+pulumi up -C backend -s dev
+pulumi up -C frontend -s dev   // the frontend must be build first using "yarn build" 
+pulumi up -C commong -s dev
+pulumi up -C aws-ns -s dev
+```
 
 ## Prerequisites
 ### General

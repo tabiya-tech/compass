@@ -1,6 +1,5 @@
 import os
 import sys
-from urllib.parse import urlparse
 
 # Determine the absolute path to the 'iac' directory
 libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -8,6 +7,7 @@ libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # so that we can import the iac/lib module when we run pulumi from withing the iac/common directory
 sys.path.insert(0, libs_dir)
 
+from urllib.parse import urlparse
 import pulumi
 from deploy_common import deploy_common
 from dotenv import load_dotenv
@@ -19,14 +19,16 @@ load_dotenv()
 def main():
     # Get the config values
     config = pulumi.Config("gcp")
-    project = config.require("project")
-    pulumi.info(f'Using project:{project}')
     location = config.require("region")
     pulumi.info(f'Using location:{location}')
     environment = pulumi.get_stack()
     pulumi.info(f"Using Environment: {environment}")
     domain_name = os.getenv("DOMAIN_NAME")
     pulumi.info(f"Using Domain: {domain_name}")
+
+    env_reference = pulumi.StackReference(f"tabiya-tech/compass-environment/{environment}")
+    project = env_reference.get_output("project_id")
+
     if not domain_name:
         pulumi.error("environment variable DOMAIN_NAME is not set")
         sys.exit(1)

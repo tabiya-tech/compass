@@ -1,3 +1,2 @@
 config:
-  gcp:project: "compass-dev-425015"
   gcp:region: "us-central1"
