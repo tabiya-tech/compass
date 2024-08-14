@@ -121,7 +121,7 @@ class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
     """
 
     def _group_fields(self) -> dict:
-        return {"_id": "$UUID",
+        return {"_id": "$occupationId",
                 "occupationId": {"$first": "$occupationId"},
                 "UUID": {"$first": "$UUID"},
                 "preferredLabel": {"$first": "$preferredLabel"},
@@ -169,7 +169,7 @@ class SkillSearchService(AbstractEscoSearchService[SkillEntity]):
         """
 
         return SkillEntity(
-            id=str(doc.get("_id", "")),
+            id=str(doc.get("$skillId", "")),
             UUID=doc.get("UUID", ""),
             preferredLabel=doc.get("preferredLabel", ""),
             description=doc.get("description", ""),
@@ -179,7 +179,7 @@ class SkillSearchService(AbstractEscoSearchService[SkillEntity]):
         )
 
     def _group_fields(self) -> dict:
-        return {"_id": "$UUID",
+        return {"_id": "$skillId",
                 "UUID": {"$first": "$UUID"},
                 "preferredLabel": {"$first": "$preferredLabel"},
                 "description": {"$first": "$description"},
@@ -212,11 +212,9 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
         :param occupation: The occupation entity.
         :return: A list of SkillEntity objects.
         """
-        query = {"requiringOccupationId": ObjectId(occupation.id)}
-
         skills = await self.database.get_collection(
             self.embedding_config.occupation_to_skill_collection_name).aggregate([
-            {"$match": query},
+            {"$match": {"requiringOccupationId": ObjectId(occupation.id)}},
             {"$lookup": {
                 "from": self.embedding_config.skill_collection_name,
                 "localField": "requiredSkillId",
@@ -224,7 +222,7 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
                 "as": "skills"
             }},
             {"$unwind": "$skills"},
-            {"$group": {"_id": "$skills.UUID",
+            {"$group": {"_id": "$skills.skillId",
                         "skillId": {"$first": "$skills.skillId"},
                         "UUID": {"$first": "$skills.UUID"},
                         "preferredLabel": {"$first": "$skills.preferredLabel"},
