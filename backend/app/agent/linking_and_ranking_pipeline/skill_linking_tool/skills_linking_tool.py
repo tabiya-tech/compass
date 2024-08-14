@@ -1,5 +1,6 @@
+import asyncio
 import logging
-from typing import List
+from typing import List, Coroutine, Any
 
 from pydantic import BaseModel
 
@@ -76,23 +77,27 @@ class SkillLinkingTool:
         embeddings_service = GoogleGeckoEmbeddingService()
         responsibilities_embeddings = await embeddings_service.embed_batch(responsibilities)
         # 2. For each responsibility (embedding),
-        all_llm_stats: list[LLMStats] = []
-        # TODO: Parallelize the following loop
+        # Find the top_p most similar skills that are within the list of skills of the esco_occupations and get the top_k most relevant skills
+        # Parallelize the process to speed up the execution
+        tasks: list[Coroutine[Any, Any, tuple[list[SkillEntity], list[LLMStats]]]] = []
         for responsibility_text, responsibility_embedding in zip(responsibilities, responsibilities_embeddings):
-            # 2.1 Find the top_p most similar skills that are within the list of skills of the esco_occupations
-            filter_spec = {"UUID": {"$in": esco_skills_uuids}} if len(esco_skills_uuids) > 0 else None
-            similar_skills = await self._skill_search_service.search(query=responsibility_embedding, filter_spec=filter_spec, k=top_p)
-            # 2.2  Discard the skills that are not relevant by using the relevance classifier
-            relevant_skills_output = await self._relevant_skills_tool.execute(
+            tasks.append(self._responsibility_to_skills(
+                responsibility_text=responsibility_text,
+                responsibility_embedding=responsibility_embedding,
+                esco_skills_uuids=esco_skills_uuids,
                 job_titles=job_titles,
-                responsibilities=[responsibility_text],
-                skills=similar_skills,
-                top_k=top_k
-            )
-            all_llm_stats.extend(relevant_skills_output.llm_stats)
+                top_k=top_k,
+                top_p=top_p
+            ))
+        self._logger.debug(f"Executing {len(tasks)} tasks in parallel to find the most relevant skills for the responsibilities.")
+        most_relevant_skills_of_each_responsibility: list[tuple[list[SkillEntity], list[LLMStats]]] = await asyncio.gather(*tasks)
+        # get the llm_stats and the scores of the skills from the executed tasks
+        all_llm_stats = []
+        for most_relevant_skills, llm_stats in most_relevant_skills_of_each_responsibility:
+            all_llm_stats.extend(llm_stats)
 
             # 2.3 Count the number of occurrences of each skill and update the ranking
-            for skill in relevant_skills_output.most_relevant:
+            for skill in most_relevant_skills:
                 if skill.UUID in skill_stats:
                     skill_stats[skill.UUID].count += 1
                     skill_stats[skill.UUID].score_sum += skill.score
@@ -118,3 +123,17 @@ class SkillLinkingTool:
         return SkillsLinkingToolOutput(
             top_skills=[skill_stat for skill_stat in sorted_skills_score[:top_k]],
             llm_stats=all_llm_stats)
+
+    async def _responsibility_to_skills(self, *, responsibility_text: str, responsibility_embedding: list[float], esco_skills_uuids: list[str],
+                                        job_titles: list[str], top_k: int, top_p: int) -> tuple[list[SkillEntity], list[LLMStats]]:
+        # 2.1 Find the top_p most similar skills that are within the list of skills of the esco_occupations
+        filter_spec = {"UUID": {"$in": esco_skills_uuids}} if len(esco_skills_uuids) > 0 else None
+        similar_skills = await self._skill_search_service.search(query=responsibility_embedding, filter_spec=filter_spec, k=top_p)
+        # 2.2  Discard the skills that are not relevant by using the relevance classifier and return the top_k most relevant skills for the responsibility
+        relevant_skills_output = await self._relevant_skills_tool.execute(
+            job_titles=job_titles,
+            responsibilities=[responsibility_text],
+            skills=similar_skills,
+            top_k=top_k
+        )
+        return relevant_skills_output.most_relevant, relevant_skills_output.llm_stats
