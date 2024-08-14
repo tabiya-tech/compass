@@ -5,91 +5,97 @@ exports[`Report should render Report correctly 1`] = `
   data-testid="skill-report-container-5a296552-f91f-4c38-b88f-542cacaced8e"
 >
   <page
-    style="display: flex; flex-direction: column; padding: 26px; color: rgb(64, 62, 57);"
+    style="display: flex; height: 100vh; flex-direction: column;"
   >
-    <text
-      data-testid="skill-report-title-5a296552-f91f-4c38-b88f-542cacaced8e"
-      style="font-size: 24px; font-family: Inter; font-weight: bold; padding-bottom: 36px;"
-    >
-      Skill Report
-    </text>
     <view
       data-testid="skill-report-body-5a296552-f91f-4c38-b88f-542cacaced8e"
-      style="display: flex; flex-direction: column;"
+      style="display: flex; flex-direction: column; flex: 1; padding-bottom: 36px;"
     >
       <view
-        style="display: flex; flex-direction: row; justify-content: space-between; padding-bottom: 28px;"
+        style="display: flex; flex-direction: row; align-items: center; padding-bottom: 20px; padding-top: 40px; gap: 4px;"
       >
-        <view
-          style="display: flex; flex-direction: column; justify-content: flex-start;"
+        <image
+          src="/logo.jpg"
+          style="height: 62px;"
+        />
+        <image
+          src="/oxford-logo.jpg"
+          style="height: 42px;"
+        />
+      </view>
+      <text
+        data-testid="skill-report-title-5a296552-f91f-4c38-b88f-542cacaced8e"
+        style="font-size: 16px; font-family: Inter; font-weight: bold; padding-bottom: 18px; color: rgb(8, 55, 99);"
+      >
+        Skills Report
+      </text>
+      <view
+        style="display: flex; flex-direction: column; justify-content: flex-start; gap: 8px;"
+      >
+        <text
+          data-testid="skill-report-name-5a296552-f91f-4c38-b88f-542cacaced8e"
+          style="font-size: 14px; font-family: Inter; font-weight: bold;"
         >
+          John Doe
+        </text>
+        <view
+          data-testid="skill-report-address-5a296552-f91f-4c38-b88f-542cacaced8e"
+          style="display: flex; flex-direction: row; align-items: center; gap: 2px;"
+        >
+          <image
+            src="/location.png"
+            style="height: 12px;"
+          />
           <text
-            data-testid="skill-report-name-5a296552-f91f-4c38-b88f-542cacaced8e"
-            style="font-size: 16px; font-family: Inter; font-weight: bold; padding-bottom: 8px;"
+            style="font-family: Inter; font-size: 12px; font-weight: normal; word-break: break-word;"
           >
-            John Doe
+             
+            1234 Main St
           </text>
-          <view
-            data-testid="skill-report-email-5a296552-f91f-4c38-b88f-542cacaced8e"
-            style="display: flex; flex-direction: row; gap: 2px;"
-          >
-            <text
-              style="font-family: Inter; font-weight: bold; font-size: 12px;"
-            >
-              Email: 
-            </text>
-            <text
-              style="font-family: Inter; font-size: 12px; font-weight: normal; padding-bottom: 8px; word-break: break-word;"
-            >
-               
-              johndoe@example.com
-            </text>
-          </view>
         </view>
         <view
-          style="display: flex; flex-direction: column; justify-content: flex-start;"
+          data-testid="skill-report-phone-5a296552-f91f-4c38-b88f-542cacaced8e"
+          style="display: flex; flex-direction: row; align-items: center; gap: 2px;"
         >
-          <view
-            data-testid="skill-report-phone-5a296552-f91f-4c38-b88f-542cacaced8e"
-            style="display: flex; flex-direction: row; gap: 2px;"
+          <image
+            src="/phone-call.png"
+            style="height: 12px;"
+          />
+          <text
+            style="font-family: Inter; font-size: 12px; font-weight: normal; word-break: break-word;"
           >
-            <text
-              style="font-family: Inter; font-weight: bold; font-size: 12px;"
-            >
-              Phone: 
-            </text>
-            <text
-              style="font-family: Inter; font-size: 12px; font-weight: normal; padding-bottom: 8px; word-break: break-word;"
-            >
-              1234567890
-            </text>
-          </view>
-          <view
-            data-testid="skill-report-address-5a296552-f91f-4c38-b88f-542cacaced8e"
-            style="display: flex; flex-direction: row; gap: 2px;"
+             
+            1234567890
+          </text>
+        </view>
+        <view
+          data-testid="skill-report-email-5a296552-f91f-4c38-b88f-542cacaced8e"
+          style="display: flex; flex-direction: row; align-items: center; gap: 2px;"
+        >
+          <image
+            src="/email.png"
+            style="height: 12px;"
+          />
+          <text
+            style="font-family: Inter; font-size: 12px; font-weight: normal; word-break: break-word;"
           >
-            <text
-              style="font-family: Inter; font-weight: bold; font-size: 12px;"
-            >
-              Address: 
-            </text>
-            <text
-              style="font-family: Inter; font-size: 12px; font-weight: normal; padding-bottom: 8px; word-break: break-word;"
-            >
-              1234 Main St
-            </text>
-          </view>
+             
+            johndoe@example.com
+          </text>
         </view>
       </view>
       <text
         data-testid="skill-report-body-text-5a296552-f91f-4c38-b88f-542cacaced8e"
-        style="font-size: 12px; padding-bottom: 36px; font-family: Inter; font-weight: normal; word-break: break-word;"
+        style="font-size: 11px; padding-top: 18px; font-family: Inter; font-weight: normal; word-break: break-word; color: rgb(67, 71, 78);"
       >
-        This report provides insights gathered by Compass Tabiya's AI chatbot, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam nec pretium turpis. Nulla porttitor faucibus massa, in convallis urna commodo sed. Nullam ut convallis augue, nec aliquam justo. Praesent imperdiet facilisis dui sed sagittis. Ut in gravida purus. Sed ornare pharetra purus, mattis feugiat quam. Aliquam ac vulputate lectus. Aenean ornare eros a tellus convallis, et convallis lacus luctus. Ut at dapibus dui, quis convallis nulla. Quisque eget velit molestie, placerat justo in, dignissim dolor.
+        This report summarizes the key information gathered during a conversation with Compass on [insert date]. Compass by Tabiya is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report presents the candidate’s work experience and the skills identified from each experience. This information can be used to guide job search and highlight their skills when applying for jobs, especially during interviews with potential employers. It can be a good starting point for creating a complete CV.
       </text>
+      <view
+        style="border: 1px; color: rgb(67, 71, 78); margin-top: 28px; margin-bottom: 16px;"
+      />
       <text
         data-testid="skill-report-experiences-title-5a296552-f91f-4c38-b88f-542cacaced8e"
-        style="font-family: Inter; font-size: 16px; font-weight: bold; padding-bottom: 36px;"
+        style="font-family: Inter; font-size: 13px; font-weight: bold; margin-bottom: 16px;"
       >
         EXPERIENCES
       </text>
@@ -99,61 +105,71 @@ exports[`Report should render Report correctly 1`] = `
       >
         <view
           data-testid="experiences-content-report-container-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-          style="display: flex; flex-direction: row; align-items: flex-start; padding-bottom: 16px;"
+          style="display: flex; flex-direction: row; align-items: flex-start; padding-bottom: 10px;"
         >
-          <text
-            data-testid="experiences-content-report-date-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-            style="font-size: 12px; flex-basis: 200px; font-weight: bold; font-family: Inter;"
-          >
-            2022 — Present
-          </text>
           <view
             style="display: flex; flex-direction: column; flex: 1; margin-bottom: 8px;"
           >
-            <view>
-              <text
-                data-testid="experiences-content-report-experience-title-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-                style="font-family: Inter; font-weight: bold; font-size: 12px; padding-bottom: 16px;"
-              >
-                Project Manager
-              </text>
-            </view>
-            <view>
-              <text
-                data-testid="experiences-content-report-skills-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-                style="display: flex; flex-direction: row; gap: 2px;"
+            <text
+              data-testid="experiences-content-report-experience-title-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+              style="font-family: Inter; font-weight: bold; font-size: 12px; padding-bottom: 4px;"
+            >
+              Project Manager
+            </text>
+            <text
+              data-testid="experiences-content-report-date-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+              style="font-size: 10px; font-weight: normal; font-family: Inter; padding-bottom: 8px;"
+            >
+              2022 — Present
+            </text>
+            <view
+              data-testid="experiences-content-report-skills-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+              style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 4px;"
+            >
+              <view
+                style="flex-direction: row; align-items: center; background-color: rgb(187, 185, 181); border-radius: 16px;"
               >
                 <text
-                  style="font-size: 13px; color: rgb(13, 13, 15);"
+                  style="font-size: 11px; color: rgb(33, 31, 29); font-family: Inter;"
                 >
-                  Top Skills: 
+                  Management
                 </text>
+              </view>
+              <view
+                style="flex-direction: row; align-items: center; background-color: rgb(187, 185, 181); border-radius: 16px;"
+              >
                 <text
-                  style="font-family: Inter; font-size: 12px; font-weight: normal; padding-bottom: 8px; word-break: break-word;"
+                  style="font-size: 11px; color: rgb(33, 31, 29); font-family: Inter;"
                 >
-                  Management, Communication
+                  Communication
                 </text>
-              </text>
+              </view>
             </view>
           </view>
         </view>
       </view>
     </view>
     <view
-      style="display: flex; flex-direction: row; position: absolute; align-items: center; right: 26px; bottom: 16px; gap: 2px;"
+      style="display: flex; flex-direction: row; margin-top: 32px; margin-bottom: 56px; gap: 2px; padding: 8px; border: 1px; border-color: #666666;"
     >
       <image
-        src="/future-development.png"
-        style="height: 26px; margin-top: 56px;"
+        src="/danger.png"
+        style="width: 12px; height: 12px;"
       />
-      <image
-        src="/oxford.jpg"
-        style="height: 26px; margin-top: 56px;"
-      />
-      <image
-        src="/logo.jpg"
-        style="height: 30px; margin-top: 56px;"
-      />
+      <text
+        style="display: flex; flex: 1; flex-wrap: wrap; font-family: Inter; font-weight: normal; font-size: 9px; color: rgb(102, 102, 102);"
+      >
+         
+        Disclaimer:
+         
+        <text
+          style="font-size: 9px; color: rgb(0, 0, 0);"
+        >
+          Listed skills are based on a conversation with the candidate, are not verified or validated by Tabiya, and may be inaccurate.
+           
+        </text>
+        Information should be checked before use for job search, job interviews, or for creating a CV. To revise this information, speak with Compass again or create a complete CV based on this report.
+      </text>
     </view>
   </page>
 </document>

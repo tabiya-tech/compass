@@ -31,47 +31,47 @@ const SkillReport: React.FC<SkillReportProps> = ({ name, email, phone, address, 
   return (
     <Document data-testid={DATA_TEST_ID.SKILL_REPORT_CONTAINER}>
       <Page size="A4" style={styles.page}>
-        <Text style={styles.title} data-testid={DATA_TEST_ID.SKILL_REPORT_TITLE}>
-          Skill Report
-        </Text>
         <View style={styles.body} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY}>
-          <View style={styles.row}>
-            <View style={styles.column}>
-              {name && (
-                <Text style={styles.subtitle} data-testid={DATA_TEST_ID.SKILL_REPORT_NAME}>
-                  {name}
-                </Text>
-              )}
-              {email && (
-                <View style={styles.rowView} data-testid={DATA_TEST_ID.SKILL_REPORT_EMAIL}>
-                  <Text style={styles.boldText}>Email: </Text>
-                  <Text style={styles.text}> {email}</Text>
-                </View>
-              )}
-            </View>
-            <View style={styles.column}>
-              {phone && (
-                <View style={styles.rowView} data-testid={DATA_TEST_ID.SKILL_REPORT_PHONE}>
-                  <Text style={styles.boldText}>Phone: </Text>
-                  <Text style={styles.text}>{phone}</Text>
-                </View>
-              )}
-              {address && (
-                <View style={styles.rowView} data-testid={DATA_TEST_ID.SKILL_REPORT_ADDRESS}>
-                  <Text style={styles.boldText}>Address: </Text>
-                  <Text style={styles.text}>{address}</Text>
-                </View>
-              )}
-            </View>
+          <View fixed style={styles.logoContainer}>
+            <Image src={`${process.env.PUBLIC_URL}/logo.jpg`} style={styles.compassImage} />
+            <Image src={`${process.env.PUBLIC_URL}/oxford-logo.jpg`} style={styles.image} />
+          </View>
+          <Text style={styles.title} data-testid={DATA_TEST_ID.SKILL_REPORT_TITLE}>
+            Skills Report
+          </Text>
+          <View style={styles.column}>
+            {name && (
+              <Text style={styles.subtitle} data-testid={DATA_TEST_ID.SKILL_REPORT_NAME}>
+                {name}
+              </Text>
+            )}
+            {address && (
+              <View style={styles.rowView} data-testid={DATA_TEST_ID.SKILL_REPORT_ADDRESS}>
+                <Image src={`${process.env.PUBLIC_URL}/location.png`} style={styles.infoIcon} />
+                <Text style={styles.text}> {address}</Text>
+              </View>
+            )}
+            {phone && (
+              <View style={styles.rowView} data-testid={DATA_TEST_ID.SKILL_REPORT_PHONE}>
+                <Image src={`${process.env.PUBLIC_URL}/phone-call.png`} style={styles.infoIcon} />
+                <Text style={styles.text}> {phone}</Text>
+              </View>
+            )}
+            {email && (
+              <View style={styles.rowView} data-testid={DATA_TEST_ID.SKILL_REPORT_EMAIL}>
+                <Image src={`${process.env.PUBLIC_URL}/email.png`} style={styles.infoIcon} />
+                <Text style={styles.text}> {email}</Text>
+              </View>
+            )}
           </View>
           <Text style={styles.bodyText} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY_TEXT}>
-            This report provides insights gathered by Compass Tabiya's AI chatbot, Lorem ipsum dolor sit amet,
-            consectetur adipiscing elit. Nam nec pretium turpis. Nulla porttitor faucibus massa, in convallis urna
-            commodo sed. Nullam ut convallis augue, nec aliquam justo. Praesent imperdiet facilisis dui sed sagittis. Ut
-            in gravida purus. Sed ornare pharetra purus, mattis feugiat quam. Aliquam ac vulputate lectus. Aenean ornare
-            eros a tellus convallis, et convallis lacus luctus. Ut at dapibus dui, quis convallis nulla. Quisque eget
-            velit molestie, placerat justo in, dignissim dolor.
+            This report summarizes the key information gathered during a conversation with Compass on [insert date].
+            Compass by Tabiya is an AI chatbot that assists job-seekers in exploring their skills and experiences. This
+            report presents the candidate’s work experience and the skills identified from each experience. This
+            information can be used to guide job search and highlight their skills when applying for jobs, especially
+            during interviews with potential employers. It can be a good starting point for creating a complete CV.
           </Text>
+          <View style={styles.divider} />
           <Text style={styles.experiencesTitle} data-testid={DATA_TEST_ID.SKILL_REPORT_EXPERIENCES_TITLE}>
             EXPERIENCES
           </Text>
@@ -81,6 +81,19 @@ const SkillReport: React.FC<SkillReportProps> = ({ name, email, phone, address, 
             ))}
           </View>
         </View>
+        <View fixed style={styles.disclaimerContainer}>
+          <Image src={`${process.env.PUBLIC_URL}/danger.png`} style={styles.disclaimerIcon} />
+          <Text style={styles.disclaimerText}>
+            {" "}
+            Disclaimer:{" "}
+            <Text style={styles.disclaimerTextBold}>
+              Listed skills are based on a conversation with the candidate, are not verified or validated by Tabiya, and
+              may be inaccurate.{" "}
+            </Text>
+            Information should be checked before use for job search, job interviews, or for creating a CV. To revise
+            this information, speak with Compass again or create a complete CV based on this report.
+          </Text>
+        </View>
         {experiences.length > 5 && (
           <Text
             style={styles.pageNumber}
@@ -88,11 +101,6 @@ const SkillReport: React.FC<SkillReportProps> = ({ name, email, phone, address, 
             fixed
           />
         )}
-        <View fixed style={styles.imageContainer}>
-          <Image src={`${process.env.PUBLIC_URL}/future-development.png`} style={styles.image} />
-          <Image src={`${process.env.PUBLIC_URL}/oxford.jpg`} style={styles.image} />
-          <Image src={`${process.env.PUBLIC_URL}/logo.jpg`} style={styles.compassImage} />
-        </View>
       </Page>
     </Document>
   );

@@ -17,26 +17,23 @@ export const DATA_TEST_ID = {
 };
 
 const ExperiencesReportContent: React.FC<ExperienceProps> = ({ experience }) => {
-  const formattedSkills = experience.top_skills.map((skill) => skill.preferredLabel).join(", ");
-
   return (
     <View wrap={false} style={styles.container} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_CONTAINER}>
-      <Text style={styles.firstColumn} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_DATE}>
-        {experience.end_date && experience.start_date
-          ? `${experience.start_date} — ${experience.end_date}`
-          : experience.start_date || experience.end_date}
-      </Text>
       <View style={styles.secondColumn}>
-        <View>
-          <Text style={styles.experienceTitle} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_EXPERIENCE_TITLE}>
-            {experience.experience_title}
-          </Text>
-        </View>
-        <View>
-          <Text style={styles.rowView} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_SKILLS}>
-            <Text style={styles.darkText}>Top Skills: </Text>
-            <Text style={styles.text}>{formattedSkills}</Text>
-          </Text>
+        <Text style={styles.experienceTitle} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_EXPERIENCE_TITLE}>
+          {experience.experience_title}
+        </Text>
+        <Text style={styles.date} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_DATE}>
+          {experience.end_date && experience.start_date
+            ? `${experience.start_date} — ${experience.end_date}`
+            : experience.start_date || experience.end_date}
+        </Text>
+        <View style={styles.chipContainer} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_SKILLS}>
+          {experience.top_skills.map((skill) => (
+            <View key={skill.UUID} style={styles.chip}>
+              <Text style={styles.chipText}>{skill.preferredLabel}</Text>
+            </View>
+          ))}
         </View>
       </View>
     </View>
