@@ -17,9 +17,13 @@ export const DATA_TEST_ID = {
 };
 
 const ExperiencesReportContent: React.FC<ExperienceProps> = ({ experience }) => {
+  const capitalizeFirstLetter = (string: string): string => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
   return (
     <View wrap={false} style={styles.container} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_CONTAINER}>
-      <View style={styles.secondColumn}>
+      <View style={styles.contentColumn}>
         <Text style={styles.experienceTitle} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_EXPERIENCE_TITLE}>
           {experience.experience_title}
         </Text>
@@ -28,12 +32,15 @@ const ExperiencesReportContent: React.FC<ExperienceProps> = ({ experience }) => 
             ? `${experience.start_date} — ${experience.end_date}`
             : experience.start_date || experience.end_date}
         </Text>
-        <View style={styles.chipContainer} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_SKILLS}>
-          {experience.top_skills.map((skill) => (
-            <View key={skill.UUID} style={styles.chip}>
-              <Text style={styles.chipText}>{skill.preferredLabel}</Text>
-            </View>
-          ))}
+        <View>
+          <Text style={styles.skillsTitle}>Top skills:</Text>
+          <View style={styles.chipContainer} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_SKILLS}>
+            {experience.top_skills.map((skill) => (
+              <View key={skill.UUID} style={styles.chip}>
+                <Text style={styles.chipText}>{capitalizeFirstLetter(skill.preferredLabel)}</Text>
+              </View>
+            ))}
+          </View>
         </View>
       </View>
     </View>

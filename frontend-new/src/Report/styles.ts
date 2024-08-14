@@ -39,14 +39,14 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     fontSize: 13,
     fontWeight: "bold",
-    marginBottom: 16,
+    // marginBottom: 16,
     paddingHorizontal: 48,
+    color: "#083763",
   },
   body: {
     display: "flex",
     flexDirection: "column",
     flex: 1,
-    paddingBottom: 36,
   },
   row: {
     display: "flex",
@@ -80,12 +80,34 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     paddingHorizontal: 48,
+    paddingVertical: 16,
+  },
+  categoryContainer: {
+    display: "flex",
+    flexDirection: "column",
+    marginBottom: 18,
+  },
+  categoryTitleContainer: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  categoryIcon: {
+    width: 16,
+    height: 16,
+    marginBottom: 2,
+    marginRight: 8,
+  },
+  categoryTitle: {
+    fontFamily: "Inter",
+    fontWeight: "bold",
+    fontSize: 13,
   },
   container: {
     display: "flex",
     flexDirection: "row",
     alignItems: "flex-start",
-    paddingBottom: 10,
   },
   experienceTitle: {
     fontFamily: "Inter",
@@ -99,11 +121,10 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     paddingBottom: 8,
   },
-  secondColumn: {
+  contentColumn: {
     display: "flex",
     flexDirection: "column",
-    flex: 1,
-    marginBottom: 8,
+    paddingBottom: 12,
   },
   divider: {
     marginHorizontal: 48,
@@ -131,13 +152,21 @@ const styles = StyleSheet.create({
   infoIcon: {
     height: 12,
   },
+  skillsTitle: {
+    fontFamily: "Inter",
+    fontWeight: "bold",
+    fontSize: 12,
+  },
   chip: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#BBB9B5",
+    backgroundColor: "#D9D9D9",
     borderRadius: 16,
     paddingVertical: 2,
     paddingHorizontal: 8,
+    marginRight: 4,
+    marginBottom: 8,
   },
   chipText: {
     fontSize: 11,
@@ -148,7 +177,10 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
+    alignItems: "center",
     gap: 4,
+    marginTop: 4,
+    marginBottom: 18,
   },
   disclaimerContainer: {
     display: "flex",

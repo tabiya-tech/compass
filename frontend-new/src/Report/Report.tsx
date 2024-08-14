@@ -1,6 +1,6 @@
 import React from "react";
 import { Document, Text, Page, View, Image } from "@react-pdf/renderer";
-import { Experience } from "src/Experiences/ExperienceService/Experiences.types";
+import { Experience, WorkType } from "src/Experiences/ExperienceService/Experiences.types";
 import ExperiencesReportContent from "src/Report/ExperiencesReportContent/ExperiencesReportContent";
 import styles from "src/Report/styles";
 
@@ -28,6 +28,18 @@ export const DATA_TEST_ID = {
 };
 
 const SkillReport: React.FC<SkillReportProps> = ({ name, email, phone, address, experiences }) => {
+  const selfEmploymentExperiences = experiences.filter(
+    (experience) => experience.work_type === WorkType.SELF_EMPLOYMENT
+  );
+  const salaryWorkExperiences = experiences.filter(
+    (experience) => experience.work_type === WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT
+  );
+  const unpaidWorkExperiences = experiences.filter(
+    (experience) =>
+      experience.work_type === WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK ||
+      experience.work_type === WorkType.UNSEEN_UNPAID
+  );
+
   return (
     <Document data-testid={DATA_TEST_ID.SKILL_REPORT_CONTAINER}>
       <Page size="A4" style={styles.page}>
@@ -75,10 +87,55 @@ const SkillReport: React.FC<SkillReportProps> = ({ name, email, phone, address, 
           <Text style={styles.experiencesTitle} data-testid={DATA_TEST_ID.SKILL_REPORT_EXPERIENCES_TITLE}>
             EXPERIENCES
           </Text>
-          <View style={styles.experiencesContainer} data-testId={DATA_TEST_ID.SKILL_REPORT_EXPERIENCES_CONTAINER}>
-            {experiences.map((experience, index) => (
-              <ExperiencesReportContent key={index} experience={experience} />
-            ))}
+          <View style={styles.experiencesContainer} data-testid={DATA_TEST_ID.SKILL_REPORT_EXPERIENCES_CONTAINER}>
+            {selfEmploymentExperiences.length > 0 && (
+              <View style={styles.categoryContainer}>
+                <View wrap={false}>
+                  <View style={styles.categoryTitleContainer}>
+                    <Image src={`${process.env.PUBLIC_URL}/briefcase.png`} style={styles.categoryIcon} />
+                    <Text style={styles.categoryTitle}>Self-Employment</Text>
+                  </View>
+                  {selfEmploymentExperiences.slice(0, 1).map((experience, index) => (
+                    <ExperiencesReportContent key={index} experience={experience} />
+                  ))}
+                </View>
+                {selfEmploymentExperiences.slice(1).map((experience, index) => (
+                  <ExperiencesReportContent key={index} experience={experience} />
+                ))}
+              </View>
+            )}
+            {salaryWorkExperiences.length > 0 && (
+              <View style={styles.categoryContainer}>
+                <View wrap={false}>
+                  <View style={styles.categoryTitleContainer}>
+                    <Image src={`${process.env.PUBLIC_URL}/dollar-bag.png`} style={styles.categoryIcon} />
+                    <Text style={styles.categoryTitle}>Salary Work</Text>
+                  </View>
+                  {salaryWorkExperiences.slice(0, 1).map((experience, index) => (
+                    <ExperiencesReportContent key={index} experience={experience} />
+                  ))}
+                </View>
+                {salaryWorkExperiences.slice(1).map((experience, index) => (
+                  <ExperiencesReportContent key={index} experience={experience} />
+                ))}
+              </View>
+            )}
+            {unpaidWorkExperiences.length > 0 && (
+              <View style={styles.categoryContainer}>
+                <View wrap={false}>
+                  <View style={styles.categoryTitleContainer}>
+                    <Image src={`${process.env.PUBLIC_URL}/friendly.png`} style={styles.categoryIcon} />
+                    <Text style={styles.categoryTitle}>Unpaid Work</Text>
+                  </View>
+                  {unpaidWorkExperiences.slice(0, 1).map((experience, index) => (
+                    <ExperiencesReportContent key={index} experience={experience} />
+                  ))}
+                </View>
+                {unpaidWorkExperiences.slice(1).map((experience, index) => (
+                  <ExperiencesReportContent key={index} experience={experience} />
+                ))}
+              </View>
+            )}
           </View>
         </View>
         <View fixed style={styles.disclaimerContainer}>
