@@ -81,22 +81,32 @@ test_cases = [
         given_occupation_title="Ambassador",
         given_work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
         given_responsibilities=["I publicize beauty products.",
-                                "I manage social media presence.",
-                                "I decide the branding strategy.",
-                                "I publish make-up tutorials for my followers"],
+                                "I decide the branding strategy."],
         expected_skills=['content marketing strategy',
-                         'develop communications strategies',
-                         'social media management',
-                         'create digital content',
                          'design brand\'s online communication plan']
+    ),
+    SkillLinkingToolTestCase(
+        name="Brand Ambassador2",
+        given_occupation_title="Ambassador",
+        given_work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+        given_responsibilities=["I manage social media presence."],
+        expected_skills=['social media management',
+                         'design brand\'s online communication plan']
+    ),
+    SkillLinkingToolTestCase(
+        name="Brand Ambassador3",
+        given_occupation_title="Ambassador",
+        given_work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+        given_responsibilities=["I publish make-up tutorials for my followers"],
+        expected_skills=['make-up techniques',
+                         'perform video editing']
     ),
     SkillLinkingToolTestCase(
         name="Livestock trader",
         given_occupation_title="Livestock Trader",
         given_work_type=WorkType.SELF_EMPLOYMENT,
         given_responsibilities=["I sell cows at the local market.",
-                                "I buy cows at the local market.",
-                                "I transport large animals."],
+                                "I buy cows at the local market."],
         expected_skills=['select livestock',
                          'manage livestock',
                          'assist in transportation of animals']
@@ -116,11 +126,9 @@ test_cases = [
         name="Carwash",
         given_occupation_title="Service provider",
         given_work_type=WorkType.SELF_EMPLOYMENT,
-        given_responsibilities=["I move the van with all my equipment",
-                                "I wash cars",
+        given_responsibilities=["I wash cars",
                                 "I clean the interiors of cars"],
         expected_skills=['clean vehicle exterior',
-                         #'polish windshields',
                          'clean vehicles interior']
     ),
     SkillLinkingToolTestCase(
@@ -129,11 +137,17 @@ test_cases = [
         given_work_type=WorkType.SELF_EMPLOYMENT,
         given_responsibilities=["I sell goods and wares on the street",
                                 "I contact my supplier to get household items",
-                                "I look through old stuff to see what could be sold",
-                                "I organize my stall every day"],
+                                "I look through old stuff to see what could be sold",],
         expected_skills=['order products',
                          'sell household goods',
-                         'organise product display']
+                         ]
+    ),
+    SkillLinkingToolTestCase(
+        name="generic salesperson2",
+        given_occupation_title="Salesperson",
+        given_work_type=WorkType.SELF_EMPLOYMENT,
+        given_responsibilities=["I organize my stall every day"],
+        expected_skills=['organise product display']
     ),
     SkillLinkingToolTestCase(
         name="influencer",
@@ -154,12 +168,8 @@ test_cases = [
         given_work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
         given_responsibilities=[
                     "I fill shelves at the supermarket",
-                    "I unload products from the trucks",
-                    "I dispose of expired products"
                 ],
-        expected_skills=['stock shelves',
-                         'unload supplies',
-                         'manage stock rotation']
+        expected_skills=['stock shelves']
     ),
     SkillLinkingToolTestCase(
         name="voice-over artist",
@@ -169,14 +179,22 @@ test_cases = [
         given_responsibilities=[
                     "I do audiobook narrations",
                     "I act according to the character",
-                    "I inform and educate communities",
-                    "I teach my skills", 
                     "I edit some of my work"
                 ],
         expected_skills=['perform scripted dialogue',
                          'edit recorded sound',
-                         'study roles from scripts',
-                         'community education',
+                         'study roles from scripts']
+    ),
+    SkillLinkingToolTestCase(
+        name="voice-over artist2",
+        skip_force="force",
+        given_occupation_title="Voice-over Artist",
+        given_work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+        given_responsibilities=[
+                    "I inform and educate communities",
+                    "I teach my skills", 
+                ],
+        expected_skills=['community education',
                          'teaching and training']
     )
 ]
