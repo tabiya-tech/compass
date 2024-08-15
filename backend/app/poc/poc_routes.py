@@ -10,10 +10,11 @@ from fastapi import APIRouter, Request, HTTPException, Depends
 from fastapi.security import HTTPBearer
 from fastapi.responses import JSONResponse
 
-from app.application_state import ApplicationStateManager, InMemoryApplicationStateStore
+from app.application_state import ApplicationStateManager
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
 from app.server_dependecies.agent_director_dependencies import get_agent_director
+from app.server_dependecies.application_state_dependencies import get_application_state_manager
 from app.server_dependecies.conversation_manager_dependencies import get_conversation_memory_manager
 from app.users import Authentication
 from app.vector_search.similarity_search_service import SimilaritySearchService
@@ -83,9 +84,6 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
 
     router = APIRouter()
 
-    # Initialize the application state manager
-    application_state_manager = ApplicationStateManager(InMemoryApplicationStateStore())
-
     HTTPBearer(auto_error=False, scheme_name="JWT_auth")
     HTTPBearer(scheme_name="firebase")
     HTTPBearer(scheme_name="google")
@@ -109,7 +107,8 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
                            session_id: int = 1,
                            conversation_memory_manager: ConversationMemoryManager = Depends(
                                get_conversation_memory_manager),
-                           agent_director: LLMAgentDirector = Depends(get_agent_director)):
+                           agent_director: LLMAgentDirector = Depends(get_agent_director),
+                           application_state_manager: ApplicationStateManager = Depends(get_application_state_manager)):
         """
         Endpoint for conducting the conversation with the agent.
         """
@@ -162,7 +161,8 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
     async def _test_conversation(request: Request, user_input: str, clear_memory: bool = False, filter_pii: bool = False,
                                  session_id: int = 1, only_reply: bool = False,
                                  similarity_search: SimilaritySearchService = Depends(get_occupation_skill_search_service),
-                                 conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager)):
+                                 conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager),
+                                 application_state_manager: ApplicationStateManager = Depends(get_application_state_manager)):
         """
         As a developer, you can use this endpoint to test the conversation agent with any user input.
         You can adjust the front-end to use this endpoint for testing locally an agent in a configurable way.
@@ -228,7 +228,8 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
                 description="""Temporary route used to interact with the conversation agent.""", )
     async def _test_conversation(request: Request, user_input: str, clear_memory: bool = False, filter_pii: bool = False,
                                  session_id: int = 1, only_reply: bool = False,
-                                 conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager)):
+                                 conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager),
+                                 application_state_manager: ApplicationStateManager = Depends(get_application_state_manager)):
         """
         As a developer, you can use this endpoint to test the conversation agent with any user input.
         You can adjust the front-end to use this endpoint for testing locally an agent in a configurable way.
@@ -315,7 +316,8 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
     async def get_conversation_context(
             session_id: int,
             conversation_memory_manager: ConversationMemoryManager = Depends(
-                get_conversation_memory_manager)):
+                get_conversation_memory_manager),
+                application_state_manager: ApplicationStateManager = Depends(get_application_state_manager)):
         """
         Get the conversation context of a user.
         """

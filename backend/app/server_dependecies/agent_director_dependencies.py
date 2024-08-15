@@ -21,7 +21,7 @@ def get_agent_director(conversation_manager: ConversationMemoryManager = Depends
     Get the agent director instance.
     """
     global _llm_agent_director_singleton
-    if _llm_agent_director_singleton is None:  # initial check
+    if _llm_agent_director_singleton is None:  # initial check to avoid the lock if the singleton instance is already created (lock is expensive)
         with _lock:  # before modifying the singleton instance, acquire the lock
             if _llm_agent_director_singleton is None:  # double check after acquiring the lock
                 _llm_agent_director_singleton = LLMAgentDirector(conversation_manager, search_services)
