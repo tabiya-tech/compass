@@ -42,6 +42,7 @@ class SkillLinkingTool:
                       esco_occupations: List[OccupationSkillEntity],
                       responsibilities: list[str],
                       only_essential: bool = True,
+                      ignore_occupations: bool = False,
                       top_k: int,
                       top_p: int) -> SkillsLinkingToolOutput:
         """
@@ -49,9 +50,9 @@ class SkillLinkingTool:
         # 1. Generate the embeddings for the responsibilities (responsibilities_data.responsibilities)
         # 2. For each responsibility (embedding),
         # 2.1 Find the top_p most similar skills that are
-            if esco_occupations is empty
+            if esco_occupations is empty or ignore_occupations is True
                 within all the skills in the database
-            if esco_occupations is not empty
+            elseif esco_occupations is not empty
                 within the list of skills of the esco_occupations
         # 2.2 Discard the skills that are not relevant by using the relevance classifier
         # 2.3 Count the number of occurrences of each skill and update the ranking
@@ -62,16 +63,20 @@ class SkillLinkingTool:
 
         # Get the uuids of the skills of the esco_occupations
         esco_skills_uuids = []
-        for occupation in esco_occupations:
-            # Add the uuids of the skills of the occupation
-            # if only_essential is True, only add the essential skills
-            for associated_skill in occupation.associated_skills:
-                if not only_essential or (associated_skill.relationType == "essential"):
-                    esco_skills_uuids.append(associated_skill.UUID)
-        # remove duplicates
-        esco_skills_uuids = list(set(esco_skills_uuids))
-        if len(esco_skills_uuids) == 0:
-            self._logger.debug("No skills found in the esco_occupations. The search will consider all the skills in the ESCO database.")
+        if not ignore_occupations:
+            for occupation in esco_occupations:
+                # Add the uuids of the skills of the occupation
+                # if only_essential is True, only add the essential skills
+                for associated_skill in occupation.associated_skills:
+                    if not only_essential or (associated_skill.relationType == "essential"):
+                        esco_skills_uuids.append(associated_skill.UUID)
+            # remove duplicates
+            esco_skills_uuids = list(set(esco_skills_uuids))
+            if len(esco_skills_uuids) == 0:
+                self._logger.info("No skills found in the esco_occupations. The skills search will consider all the skills in the ESCO database.")
+        else:
+            self._logger.info("Ignoring the occupations. The skills search will consider all the skills in the ESCO database "
+                              "and will not be limited to the skills associated with the occupations provided.")
 
         # 1. Generate the embeddings for the responsibilities (responsibilities_data.responsibilities)
         embeddings_service = GoogleGeckoEmbeddingService()
