@@ -49,14 +49,14 @@ def setup_agent_director(setup_search_services) -> tuple[
     session_id = session_id = random.randint(10 ** 9, 10 ** 10 - 1)  # nosec B311 # random number for a test session
     # The conversation manager for this test
     conversation_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
-    conversation_manager.set_state(state=ConversationMemoryManagerState(session_id))
+    conversation_manager.set_state(state=ConversationMemoryManagerState(session_id=session_id))
     # The Search Services for this test
     search_services = setup_search_services
     agent_director = LLMAgentDirector(conversation_manager, search_services)
-    agent_director.set_state(AgentDirectorState(session_id))
+    agent_director.set_state(AgentDirectorState(session_id=session_id))
     explore_experiences_agent = agent_director.get_explore_experiences_agent()
-    explore_experiences_agent.set_state(ExploreExperiencesAgentDirectorState(session_id))
-    explore_experiences_agent.get_collect_experiences_agent().set_state(CollectExperiencesAgentState(session_id))
+    explore_experiences_agent.set_state(ExploreExperiencesAgentDirectorState(session_id=session_id))
+    explore_experiences_agent.get_collect_experiences_agent().set_state(CollectExperiencesAgentState(session_id=session_id))
 
     async def agent_director_exec(caplog, test_case):
         print(f"Running test case {test_case.name}")

@@ -1,7 +1,7 @@
 from typing import List, Optional, Any
-import uuid
+import uuid as uuidObj
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_serializer, field_validator
 
 from app.agent.experience.timeline import Timeline
 from app.agent.experience.work_type import WorkType
@@ -106,18 +106,39 @@ class ExperienceEntity(BaseModel):
     It should not contain duplicates.
     """
 
+    class Config:
+        extra = "forbid"
+
+    # use a field serializer to serialize the work_type
+    # we use the name of the Enum instead of the value because that makes the code less brittle
+    @field_serializer("work_type")
+    def serialize_work_type(self, work_type: WorkType, _info):
+        return work_type.name
+
+    # Deserialize the work_type from the enum name
+    @field_validator("work_type", mode='before')
+    def deserialize_work_type(cls, value: Any) -> WorkType:
+        if isinstance(value, str):
+            return WorkType[value]
+        return value
+
     def __init__(self, *,
                  experience_title: str,
                  company: Optional[str] = None,
                  location: Optional[str] = None,
                  timeline: Optional[Timeline] = None,
                  work_type: Optional[WorkType] = None,
+                 uuid: Optional[str] = None, #TODO check this
                  responsibilities: Optional[ResponsibilitiesData] = None,
                  esco_occupations: Optional[List[OccupationSkillEntity]] = None,
-                 top_skills: Optional[List[SkillEntity]] = None):
+                 top_skills: Optional[List[SkillEntity]] = None
+                 ):
         super().__init__(
-            uuid=str(uuid.uuid4()),  # Generate a unique UUID for each instance
-            experience_title=experience_title, company=company, location=location, timeline=timeline,
+            uuid=uuid if uuid is not None else str(uuidObj.uuid4()),  # Generate a unique UUID for each instance
+            experience_title=experience_title,
+            company=company,
+            location=location,
+            timeline=timeline,
             work_type=work_type,
             responsibilities=responsibilities if responsibilities is not None else ResponsibilitiesData(),
             esco_occupations=esco_occupations if esco_occupations is not None else [],

@@ -1,10 +1,11 @@
 import logging
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Any, Optional
-from datetime import datetime
+from typing import Any, Optional, Mapping
+from datetime import datetime, timezone
 
 from pydantic import BaseModel, Field, field_serializer, field_validator
+
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.conversation_memory.conversation_memory_manager import \
     ConversationMemoryManager
@@ -30,31 +31,56 @@ class AgentDirectorState(BaseModel):
 
     class Config:
         extra = "forbid"
+        json_encoders = {
+            # ensure datetime values are serialized as a ISODate object
+            datetime: lambda dt: dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt.astimezone(timezone.utc)
+        }
 
-    # Serialize the conversation_completed_at datetime to ensure it's stored as UTC
-    @field_serializer("conversation_completed_at")
-    def serialize_conversation_completed_at(self, conversation_completed_at: Optional[datetime]) -> Optional[str]:
-        return conversation_completed_at.isoformat() if conversation_completed_at else None
+    def __setattr__(self, key, value):
+        if key == "conversation_completed_at":
+            value = _parse_data(value)
+        super().__setattr__(key, value)
+
+    # use a field serializer to serialize the current_phase
+    # we use the name of the Enum instead of the value because that makes the code less brittle
+    @field_serializer("current_phase")
+    def serialize_current_phase(self, current_phase: ConversationPhase, _info):
+        return current_phase.name
+
+    # Deserialize the current_phase from the enum name
+    @field_validator("current_phase", mode='before')
+    def deserialize_current_phase(cls, value: str | ConversationPhase) -> ConversationPhase:
+        if isinstance(value, str):
+            return ConversationPhase[value]
+        return value
 
     # Deserialize the conversation_completed_at datetime and ensure it's interpreted as UTC
     @field_validator("conversation_completed_at", mode='before')
-    def deserialize_conversation_completed_at(cls, value: Optional[str | datetime]) -> Optional[datetime]:
-        if value is None:
-            return None
-        if isinstance(value, str):
-            dt = datetime.fromisoformat(value)
-        else:
-            dt = value
-        return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+    def deserialize_conversation_completed_at(cls, value: Optional[datetime]) -> Optional[datetime]:
+        return _parse_data(value)
 
-    # override the dict method to return the enum value instead of the enum object
-    def dict(self, *args, **kwargs):
-        return super().dict(exclude={"current_phase"}) | {
-            "current_phase": self.current_phase.value
-        }
+    @staticmethod
+    def from_document(_doc: Mapping[str, Any]) -> "AgentDirectorState":
+        return AgentDirectorState(session_id=_doc["session_id"],
+                                  current_phase=_doc["current_phase"],
+                                  conversation_completed_at=_doc["conversation_completed_at"])
 
-    def __init__(self, session_id: int, **data: Any):
-        super().__init__(session_id=session_id, **data)
+
+def _parse_data(value: Optional[datetime | str]) -> Optional[datetime]:
+    if value is None:
+        return None
+    if isinstance(value, str):
+        try:
+            # Convert string to datetime
+            value = datetime.fromisoformat(value)
+        except ValueError:
+            raise ValueError(f"Invalid datetime string: {value}")
+
+    # Always assume UTC timezone even for naive datetimes. This is important because MongoDB stores implicitly datetimes as UTC
+    # but returns them as naive datetimes.
+    # Convert to UTC and truncate microseconds to milliseconds as MongoDB does not support microseconds
+
+    return value.replace(tzinfo=timezone.utc).replace(microsecond=(value.microsecond // 1000 * 1000))
 
 
 class AbstractAgentDirector(ABC):

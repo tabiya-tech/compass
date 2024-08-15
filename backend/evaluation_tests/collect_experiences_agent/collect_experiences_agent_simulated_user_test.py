@@ -33,7 +33,7 @@ async def test_collect_experiences_agent_simulated_user(test_case: CollectExperi
 
     # The conversation manager for this test
     conversation_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
-    conversation_manager.set_state(state=ConversationMemoryManagerState(session_id))
+    conversation_manager.set_state(state=ConversationMemoryManagerState(session_id=session_id))
     execute_evaluated_agent = CollectExperiencesAgentExecutor(conversation_manager=conversation_manager,
                                                               session_id=session_id)
     max_iterations = 50
