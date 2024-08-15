@@ -97,7 +97,7 @@ class PickOneSkillTool:
             self._logger.info(
                 "Picked skill: '%s' from skills: %s for job titles: '%s' and responsibilities group: '%s' and responsibilities: %s. The llm output was '%s'",
                 picked_skill.preferredLabel if picked_skill else None,
-                json.dumps([entity.preferredLabel for entity in remaining_skills]),
+                json.dumps([entity.preferredLabel for entity in skills]),
                 json.dumps(job_titles),
                 responsibilities_group_name,
                 json.dumps(responsibilities),
