@@ -67,6 +67,13 @@ class ExperiencePipelineConfig(BaseModel):
     If True, only the essential skills will be considered when linking the responsibilities to the skills.
     """
 
+    ignore_occupations: bool = False
+    """
+    Default is False
+    If True, the skills search will consider all the skills in the ESCO database and will not be limited 
+    to the skills associated with the occupations found."
+    """
+
     class Config:
         extra = "forbid"
 
@@ -225,6 +232,7 @@ class ExperiencePipeline:
             esco_occupations=inferred_occupations_response.esco_occupations,
             responsibilities=responsibilities,
             only_essential=config.only_essential_skills,
+            ignore_occupations=config.ignore_occupations,
             top_k=config.number_of_skills_per_cluster,
             top_p=config.number_of_skill_candidates_per_responsibility
         )
