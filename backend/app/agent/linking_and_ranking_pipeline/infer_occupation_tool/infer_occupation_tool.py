@@ -75,7 +75,7 @@ class InferOccupationTool:
         titles: set[str] = {experience_title.strip().lower()}.union(
             {title.strip().lower() for title in contextualization_response.contextual_titles})
         # create a task for each title
-        # search for the 2 * top_k matching occupations for each title initially, and later filter out the irrelevant ones
+        # search for the top_p matching occupations for each title initially, and later filter out the irrelevant ones
         tasks = [self._occupation_skill_search_service.search(query=title, k=top_p) for title in titles]
 
         list_of_occupation_list = await asyncio.gather(*tasks)
