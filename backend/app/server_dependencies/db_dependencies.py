@@ -60,6 +60,22 @@ class CompassDBProvider:
             ("session_id", 1)
         ], unique=True)
 
+        await application_db.get_collection(Collections.EXPLORE_EXPERIENCES_DIRECTOR_STATE).create_index([
+            ("session_id", 1)
+        ], unique=True)
+
+        await application_db.get_collection(Collections.CONVERSATION_MEMORY_MANAGER_STATE).create_index([
+            ("session_id", 1)
+        ], unique=True)
+
+        await application_db.get_collection(Collections.COLLECT_EXPERIENCE_STATE).create_index([
+            ("session_id", 1)
+        ], unique=True)
+
+        await application_db.get_collection(Collections.SKILLS_EXPLORER_AGENT_STATE).create_index([
+            ("session_id", 1)
+        ], unique=True)
+
     @classmethod
     async def get_application_db(cls) -> AsyncIOMotorDatabase:
         if cls._application_mongo_db is None:  # Check if the database instance has been created

@@ -33,7 +33,7 @@ async def test_skills_explorer_agent_simulated_user(max_iterations: int, test_ca
 
     # The conversation manager for this test
     conversation_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
-    conversation_manager.set_state(state=ConversationMemoryManagerState(session_id))
+    conversation_manager.set_state(state=ConversationMemoryManagerState(session_id=session_id))
     execute_evaluated_agent = SkillsExplorerAgentExecutor(conversation_manager=conversation_manager,
                                                           state=SkillsExplorerAgentState(session_id=session_id),
                                                           experience=test_case.given_experience)

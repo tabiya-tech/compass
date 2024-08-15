@@ -1,4 +1,6 @@
-from pydantic import BaseModel
+from typing import Optional, Mapping, Any
+
+from pydantic import BaseModel, Field
 
 from app.agent.agent import Agent
 from app.agent.agent_types import AgentType
@@ -15,23 +17,25 @@ class SkillsExplorerAgentState(BaseModel):
     """
     session_id: int
 
-    first_time_for_experience: dict[str, bool]
+    first_time_for_experience: dict[str, bool] = Field(default_factory=dict)
     """
     The key is the experience uuid and the value is a boolean that indicates 
     whether the user is entering the skills explorer for the first time for that experience.
     """
 
-    experiences_explored: list[str]
+    experiences_explored: list[str] = Field(default_factory=list)
     """
     The list of experiences already explored with the user.
     """
 
-    def __init__(self, session_id):
-        super().__init__(
-            session_id=session_id,
-            first_time_for_experience={},
-            experiences_explored=[]
-        )
+    class Config:
+        extra = "forbid"
+
+    @staticmethod
+    def from_document(_doc: Mapping[str, Any]) -> "SkillsExplorerAgentState":
+        return SkillsExplorerAgentState(session_id=_doc["session_id"],
+                                        first_time_for_experience=_doc["first_time_for_experience"],
+                                        experiences_explored=_doc["experiences_explored"]                                        )
 
 
 class SkillsExplorerAgent(Agent):
