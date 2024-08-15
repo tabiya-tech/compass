@@ -2,7 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 from pydantic import BaseModel, Field, field_serializer, field_validator
 from app.agent.agent_types import AgentInput, AgentOutput
@@ -30,6 +30,19 @@ class AgentDirectorState(BaseModel):
 
     class Config:
         extra = "forbid"
+
+    # use a field serializer to serialize the current_phase
+    # we use the name of the Enum instead of the value because that makes the code less brittle
+    @field_serializer("current_phase")
+    def serialize_current_phase(self, current_phase: ConversationPhase, _info):
+        return current_phase.name
+
+    # Deserialize the current_phase from the enum name
+    @field_validator("current_phase", mode='before')
+    def deserialize_current_phase(cls, value: Any) -> ConversationPhase:
+        if isinstance(value, str):
+            return ConversationPhase[value]
+        return value
 
     # Serialize the conversation_completed_at datetime to ensure it's stored as UTC
     @field_serializer("conversation_completed_at")
