@@ -1,6 +1,6 @@
-from typing import Optional
+from typing import Optional, Mapping, Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel,  Field, field_serializer, field_validator
 
 from app.agent.agent import Agent
 from app.agent.agent_types import AgentType
@@ -20,22 +20,25 @@ class CollectExperiencesAgentState(BaseModel):
     """
     session_id: int
 
-    collected_data: list[CollectedData]
+    collected_data: list[CollectedData] = Field(default_factory=list)
     """
     The data collected during the conversation.
     """
 
-    unexplored_types: list[WorkType]
+    unexplored_types: list[WorkType] = Field(default_factory=lambda: [WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+                                                                      WorkType.SELF_EMPLOYMENT,
+                                                                      WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK,
+                                                                      WorkType.UNSEEN_UNPAID])
     """
     The types of work experiences that have not been explored yet.
     """
 
-    explored_types: list[WorkType]
+    explored_types: list[WorkType] = Field(default_factory=list)
     """
     The questions asked by the conversational LLM.
     """
 
-    first_time_visit: bool
+    first_time_visit: bool = True
     """
     Whether this is the first time the agent is visited during the conversation.
     """
@@ -46,17 +49,45 @@ class CollectExperiencesAgentState(BaseModel):
         """
         extra = "forbid"
 
-    def __init__(self, session_id):
-        super().__init__(
-            session_id=session_id,
-            collected_data=[],
-            unexplored_types=[WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
-                               WorkType.SELF_EMPLOYMENT,
-                               WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK,
-                               WorkType.UNSEEN_UNPAID],
-            explored_types=[],
-            first_time_visit=True
-        )
+    # use a field serializer to serialize the explored_types
+    # we use the name of the Enum instead of the value because that makes the code less brittle
+    @field_serializer("explored_types")
+    def serialize_explored_types(self, explored_types: list[WorkType], _info):
+        # We serialize the explored_types to a list of strings (the names of the Enum)
+        return [x.name for x in explored_types]
+
+    # Deserialize the explored_types from the enum name
+    @field_validator("explored_types", mode='before')
+    def deserialize_explored_types(cls, value: list[str] | list[WorkType]) -> list[WorkType]:
+        if isinstance(value, list):
+            # If the value is a list, and the items in the list are strings, we convert the strings to the Enum
+            # Otherwise, we return the value as is
+            return [WorkType[x] if isinstance(x, str) else x for x in value]
+        return value
+
+    # use a field serializer to serialize the unexplored_types
+    # we use the name of the Enum instead of the value because that makes the code less brittle
+    @field_serializer("unexplored_types")
+    def serialize_unexplored_types(self, unexplored_types: list[WorkType], _info):
+        # We serialize the unexplored_types to a list of strings (the names of the Enum)
+        return [x.name for x in unexplored_types]
+
+    # Deserialize the unexplored_types from the enum name
+    @field_validator("unexplored_types", mode='before')
+    def deserialize_unexplored_types(cls, value: list[str] | list[WorkType]) -> list[WorkType]:
+        if isinstance(value, list):
+            # If the value is a list, and the items in the list are strings, we convert the strings to the Enum
+            # Otherwise, we return the value as is
+            return [WorkType[x] if isinstance(x, str) else x for x in value]
+        return value
+
+    @staticmethod
+    def from_document(_doc: Mapping[str, Any]) -> "CollectExperiencesAgentState":
+        return CollectExperiencesAgentState(session_id=_doc["session_id"],
+                                            collected_data=_doc["collected_data"],
+                                            unexplored_types=_doc["unexplored_types"],
+                                            explored_types=_doc["explored_types"],
+                                            first_time_visit=_doc["first_time_visit"])
 
 
 class CollectExperiencesAgent(Agent):

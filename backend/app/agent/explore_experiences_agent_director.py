@@ -1,8 +1,8 @@
 import time
 from enum import Enum
-from typing import Optional
+from typing import Optional, Mapping, Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer, field_validator, Field
 
 from app.agent.linking_and_ranking_pipeline import ExperiencePipeline, ExperiencePipelineConfig
 from app.agent.skill_explorer_agent import SkillsExplorerAgent
@@ -53,6 +53,22 @@ class ExperienceState(BaseModel):
     The experience entity that is being explored.
     """
 
+    class Config:
+        extra = "forbid"
+
+    # use a field serializer to serialize the dive_in_phase
+    # we use the name of the Enum instead of the value because that makes the code less brittle
+    @field_serializer("dive_in_phase")
+    def serialize_dive_in_phase(self, dive_in_phase: DiveInPhase, _info):
+        return dive_in_phase.name
+
+    # Deserialize the dive_in_phase from the enum name
+    @field_validator("dive_in_phase", mode='before')
+    def deserialize_dive_in_phase(cls, value: DiveInPhase | str) -> DiveInPhase:
+        if isinstance(value, str):
+            return DiveInPhase[value]
+        return value
+
 
 class ExploreExperiencesAgentDirectorState(BaseModel):
     """
@@ -60,7 +76,7 @@ class ExploreExperiencesAgentDirectorState(BaseModel):
     """
     session_id: int
 
-    experiences_state: dict[str, ExperienceState]
+    experiences_state: dict[str, ExperienceState] = Field(default_factory=dict)
     """
     The state of the experiences of the user that are being explored, keyed by experience.uuid
     """
@@ -79,9 +95,26 @@ class ExploreExperiencesAgentDirectorState(BaseModel):
     class Config:
         extra = "forbid"
 
-    def __init__(self, session_id):
-        super().__init__(session_id=session_id,
-                         experiences_state={})
+    # use a field serializer to serialize the conversation_phase
+    # we use the name of the Enum instead of the value because that makes the code less brittle
+    @field_serializer("conversation_phase")
+    def serialize_conversation_phase(self, conversation_phase: ConversationPhase, _info):
+        return conversation_phase.name
+
+    # Deserialize the conversation_phase from the enum name
+    @field_validator("conversation_phase", mode='before')
+    def deserialize_conversation_phase(cls, value: ConversationPhase | str) -> ConversationPhase:
+        if isinstance(value, str):
+            return ConversationPhase[value]
+        return value
+
+    @staticmethod
+    def from_document(_doc: Mapping[str, Any]) -> "ExploreExperiencesAgentDirectorState":
+        return ExploreExperiencesAgentDirectorState(
+            session_id=_doc["session_id"],
+            experiences_state=_doc["experiences_state"],
+            current_experience_uuid=_doc["current_experience_uuid"],
+            conversation_phase=_doc["conversation_phase"])
 
 
 def _pick_next_experience_to_process(experiences: dict[str, ExperienceState]) -> ExperienceState | None:
