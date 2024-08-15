@@ -86,8 +86,8 @@ class ExperiencePipeline:
         # 2.2 Link responsibilities to the associated skills
         # 2.3 Rank the skills to get the top skills of the cluster
         tasks = []
-        for cluster in cluster_tool_response.clusters_of_responsibilities:
-            tasks.append(self.handle_cluster(responsibilities=cluster,
+        for cluster in cluster_tool_response.clusters:
+            tasks.append(self.handle_cluster(responsibilities=cluster.responsibilities,
                                              experience_title=experience_title,
                                              company_name=company_name,
                                              country_of_interest=country_of_interest,

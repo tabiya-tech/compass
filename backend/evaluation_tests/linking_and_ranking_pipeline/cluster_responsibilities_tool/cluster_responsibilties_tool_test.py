@@ -4,7 +4,7 @@ import logging
 import pytest
 from _pytest.logging import LogCaptureFixture
 
-from app.agent.linking_and_ranking_pipeline.cluster_responsibilities_tool.cluster_responsibilties_tool import ClusterResponsibilitiesTool
+from app.agent.linking_and_ranking_pipeline.cluster_responsibilities_tool.cluster_responsibilties_tool import ClusterResponsibilitiesTool, Cluster
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 
@@ -12,17 +12,20 @@ from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 class ClusterResponsibilitiesToolTestCase(CompassTestCase):
     given_responsibilities: list[str]
     given_number_of_clusters: int = 5
-    expected_clusters: list[list[str]]
+    expected_clusters: list[Cluster]
 
 
 test_cases = [
     ClusterResponsibilitiesToolTestCase(
-        skip_force="force",
         name="responsibilities with single ' quote",
         given_responsibilities=["i'm working", "i'm eating", "i'm sleeping"],
         given_number_of_clusters=5,
         expected_clusters=[
-            ["i'm working"], ["i'm eating"], ["i'm sleeping"], ["i'm eating", "i'm sleeping"], ["i'm working"]
+            Cluster(cluster_name="Cluster 0", responsibilities=["i'm working"]),
+            Cluster(cluster_name="Cluster 1", responsibilities=["i'm eating"]),
+            Cluster(cluster_name="Cluster 2", responsibilities=["i'm sleeping"]),
+            Cluster(cluster_name="Cluster 3", responsibilities=["i'm eating", "i'm sleeping"]),
+            Cluster(cluster_name="Cluster 4", responsibilities=["i'm working"])
         ]
     ),
     ClusterResponsibilitiesToolTestCase(
@@ -30,7 +33,11 @@ test_cases = [
         given_responsibilities=["i work", "i eat", "i sleep"],
         given_number_of_clusters=5,
         expected_clusters=[
-            ["i work"], ["i eat"], ["i sleep"], ["i eat", "i sleep"], ["i work"]
+            Cluster(cluster_name="Cluster 0", responsibilities=["i work"]),
+            Cluster(cluster_name="Cluster 1", responsibilities=["i eat"]),
+            Cluster(cluster_name="Cluster 2", responsibilities=["i sleep"]),
+            Cluster(cluster_name="Cluster 3", responsibilities=["i eat", "i sleep"]),
+            Cluster(cluster_name="Cluster 4", responsibilities=["i work"])
         ]
     ),
     ClusterResponsibilitiesToolTestCase(
@@ -38,7 +45,11 @@ test_cases = [
         given_responsibilities=["i drink", "i eat", "i sleep"],
         given_number_of_clusters=5,
         expected_clusters=[
-            ["i drink"], ["i eat"], ["i sleep"], ["i eat", "i drink"], ["i sleep"]
+            Cluster(cluster_name="Cluster 0", responsibilities=["i drink"]),
+            Cluster(cluster_name="Cluster 1", responsibilities=["i eat"]),
+            Cluster(cluster_name="Cluster 2", responsibilities=["i sleep"]),
+            Cluster(cluster_name="Cluster 3", responsibilities=["i eat", "i drink"]),
+            Cluster(cluster_name="Cluster 4", responsibilities=["i sleep"])
         ]
     ),
     ClusterResponsibilitiesToolTestCase(
@@ -46,7 +57,11 @@ test_cases = [
         given_responsibilities=["i work", "i eat"],
         given_number_of_clusters=5,
         expected_clusters=[
-            ["i work"], ["i eat"], ["i work"], ["i eat"], ["i work", "i eat"]
+            Cluster(cluster_name="Cluster 0", responsibilities=["i work"]),
+            Cluster(cluster_name="Cluster 1", responsibilities=["i eat"]),
+            Cluster(cluster_name="Cluster 2", responsibilities=["i work"]),
+            Cluster(cluster_name="Cluster 3", responsibilities=["i eat"]),
+            Cluster(cluster_name="Cluster 4", responsibilities=["i work", "i eat"])
         ]
     ),
 
@@ -55,14 +70,18 @@ test_cases = [
         given_responsibilities=["i work"],
         given_number_of_clusters=5,
         expected_clusters=[
-            ["i work"], ["i work"], ["i work"], ["i work"], ["i work"]
+            Cluster(cluster_name="Cluster 0", responsibilities=["i work"]),
+            Cluster(cluster_name="Cluster 1", responsibilities=["i work"]),
+            Cluster(cluster_name="Cluster 2", responsibilities=["i work"]),
+            Cluster(cluster_name="Cluster 3", responsibilities=["i work"]),
+            Cluster(cluster_name="Cluster 4", responsibilities=["i work"])
         ]
     ),
     ClusterResponsibilitiesToolTestCase(
         name="no responsibilities",
         given_responsibilities=[],
         given_number_of_clusters=5,
-        expected_clusters=[[], [], [], [], []]
+        expected_clusters=[Cluster(cluster_name="Empty", responsibilities=[]) for _ in range(5)]
     ),
 
     ClusterResponsibilitiesToolTestCase(
@@ -72,24 +91,15 @@ test_cases = [
                                 "I buy supplies", "I order ingredients"],
         given_number_of_clusters=5,
         expected_clusters=[
-            [
-                "i bake", "I fire up the oven", "I mix ingredients"
-            ],
-            [
-                "I clean"
-            ],
-            [
-                "I am on time"
-            ],
-            [
-                "i advise customers", "I sell the bread"
-            ],
-            [
-                "I buy supplies", "I order ingredients"
-            ]
+            Cluster(cluster_name="Cluster 0", responsibilities=["i bake", "I fire up the oven", "I mix ingredients"]),
+            Cluster(cluster_name="Cluster 1", responsibilities=["I clean"]),
+            Cluster(cluster_name="Cluster 2", responsibilities=["I am on time"]),
+            Cluster(cluster_name="Cluster 3", responsibilities=["i advise customers", "I sell the bread"]),
+            Cluster(cluster_name="Cluster 4", responsibilities=["I buy supplies", "I order ingredients"])
         ]
     ),
     ClusterResponsibilitiesToolTestCase(
+        skip_force="force",
         name="GDE Brigade member responsibilities",
         given_responsibilities=["I make sure everyone follows the Covid-19 rules.",
                                 "I keep an eye on the kids to make sure they stay apart from each other.",
@@ -104,27 +114,17 @@ test_cases = [
                                 ],
         given_number_of_clusters=5,
         expected_clusters=[
-            [
-                "I make sure everyone follows the Covid-19 rules.",
-                "I keep an eye on the kids to make sure they stay apart from each other.",
-                "I check and record temperatures ",
-                "I record health symptoms",
-                "I make sure everyone is safe"
-            ],
-            [
-                "I clean teachers, and students.",
-                "I disinfect visitors"
-            ],
-            [
-                "I put together weekly and monthly reports."
-            ],
-            [
-                "I do night patrols",
-                "I secure the building"
-            ],
-            [
-                "I check the id of visitors",
-            ]
+            Cluster(cluster_name="Cluster 0", responsibilities=["I make sure everyone follows the Covid-19 rules.",
+                                                                "I keep an eye on the kids to make sure they stay apart from each other.",
+                                                                "I check and record temperatures ",
+                                                                "I record health symptoms",
+                                                                "I make sure everyone is safe"]),
+            Cluster(cluster_name="Cluster 1", responsibilities=["I clean teachers, and students.",
+                                                                "I disinfect visitors"]),
+            Cluster(cluster_name="Cluster 2", responsibilities=["I put together weekly and monthly reports."]),
+            Cluster(cluster_name="Cluster 3", responsibilities=["I do night patrols",
+                                                                "I secure the building"]),
+            Cluster(cluster_name="Cluster 4", responsibilities=["I check the id of visitors"])
         ])
 ]
 
@@ -158,7 +158,14 @@ async def test_cluster_responsibilities_tool(test_case: ClusterResponsibilitiesT
             number_of_clusters=test_case.given_number_of_clusters
         )
         # THEN the result should contain the expected clusters
-        assert lists_to_json(actual_result.clusters_of_responsibilities) == lists_to_json(test_case.expected_clusters)
+        # Check that the actual clusters are the same as the expected clusters
+        # The order of the clusters and the order of the responsibilities in the clusters does not matter
+        # Build a list of lists of responsibilities for each cluster
+        actual_lists_of_responsibilities = [[responsibility for responsibility in cluster.responsibilities] for cluster in
+                                            actual_result.clusters]
+        expected_lists_of_responsibilities = [[responsibility for responsibility in cluster.responsibilities] for cluster in test_case.expected_clusters]
+
+        assert lists_to_json(actual_lists_of_responsibilities) == lists_to_json(expected_lists_of_responsibilities)
 
         # Check that no errors and no warning were logged
         for record in caplog.records:
