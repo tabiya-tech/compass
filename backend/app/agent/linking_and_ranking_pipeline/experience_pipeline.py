@@ -15,12 +15,60 @@ from app.vector_search.esco_entities import SkillEntity, OccupationSkillEntity
 from app.vector_search.vector_search_dependencies import SearchServices
 from ...countries import Country
 
-_NUMBER_OF_CLUSTERS: int = 5
-_NUMBER_OF_OCCUPATION_ALT_TITLES: int = 5
-_NUMBER_OF_OCCUPATIONS_PER_CLUSTER: int = 15
-_NUMBER_OF_OCCUPATIONS_CANDIDATES_PER_CLUSTER: int = 2 * _NUMBER_OF_OCCUPATIONS_PER_CLUSTER
-_NUMBER_OF_SKILLS_PER_CLUSTER: int = 5
-_NUMBER_OF_SKILL_CANDIDATES_PER_RESPONSIBILITY: int = 3 * _NUMBER_OF_SKILLS_PER_CLUSTER
+
+class ExperiencePipelineConfig(BaseModel):
+    number_of_clusters: int = 5
+    """
+    Default is 5
+    
+    The number of clusters to group the responsibilities. 
+    Each cluster of responsibilities will contribute to one top skill.
+
+    """
+
+    number_of_occupation_alt_titles: int = 5
+    """
+    Default is 5 
+    The number of alternative titles to infer from the experience title, company, work type and responsibilities and country of interest
+    Each alternative title will be linked to a set of occupations.
+    """
+
+    number_of_occupations_per_cluster: int = 15
+    """
+    Default is 15
+    The number of The number of most relevant occupations chosen from all the occupation candidates that where linked to each alternative title.
+    This is the number of occupations that will be used by the skill linking tool to find the top skills for each cluster. 
+    """
+
+    number_of_occupations_candidates_per_title: int = 30
+    """
+    Default is 30
+    The number of occupation candidates to consider for each alternative title. 
+    This refers to the number of occupations retrieved from the search service for each alternative title.
+    """
+
+    number_of_skills_per_cluster: int = 5
+    """
+    Default is 5
+    The number of top skills to return for each cluster.
+    It also corresponds to the number of skills selected from each responsibility among the skill candidates returned by the search service.
+    """
+
+    number_of_skill_candidates_per_responsibility: int = 15
+    """
+    Default is 15
+    The number of skill candidates to consider for each responsibility.
+    These are the number of skills that are retrieved from the search service for each responsibility.
+    """
+
+    only_essential_skills: bool = True
+    """
+    Default is True
+    If True, only the essential skills will be considered when linking the responsibilities to the skills.
+    """
+
+    class Config:
+        extra = "forbid"
 
 
 class ClusterPipelineResult(BaseModel):
@@ -45,13 +93,16 @@ class ExperiencePipelineResponse(BaseModel):
 
 
 class ExperiencePipeline:
-    def __init__(self, search_services: SearchServices):
+    def __init__(self, *, config: ExperiencePipelineConfig, search_services: SearchServices):
+        self._config = config
         self._search_services = search_services
         self._cluster_responsibilities_tool = ClusterResponsibilitiesTool()
         self._infer_occupations_tool = InferOccupationTool(search_services.occupation_skill_search_service)
         self._skills_linking_tool = SkillLinkingTool(search_services.skill_search_service)
         self._top_skills_picker = PickOneSkillTool()
         self._logger = logging.getLogger(__class__.__name__)
+        if self._logger.isEnabledFor(logging.INFO):
+            self._logger.info("ExperiencePipeline initialized with config: %s", config.model_dump_json())
 
     async def execute(self, *,
                       experience_title: str,
@@ -81,7 +132,7 @@ class ExperiencePipeline:
 
             # 1 Cluster the responsibilities into N clusters
         cluster_tool_response = await self._cluster_responsibilities_tool.execute(responsibilities=responsibilities,
-                                                                                  number_of_clusters=_NUMBER_OF_CLUSTERS)
+                                                                                  number_of_clusters=self._config.number_of_clusters)
         llm_stats.extend(cluster_tool_response.llm_stats)
         # 2. For each cluster
         # 2.1 Infer the occupations and associated skills
@@ -90,6 +141,7 @@ class ExperiencePipeline:
         tasks = []
         for cluster in cluster_tool_response.clusters:
             tasks.append(self.handle_cluster(
+                config=self._config,
                 responsibilities_cluster_name=cluster.cluster_name,
                 responsibilities=cluster.responsibilities,
                 experience_title=experience_title,
@@ -146,7 +198,8 @@ class ExperiencePipeline:
                 return s
         return None
 
-    async def handle_cluster(self,
+    async def handle_cluster(self, *,
+                             config: ExperiencePipelineConfig,
                              responsibilities_cluster_name: str,
                              responsibilities: list[str],
                              experience_title: str,
@@ -161,10 +214,9 @@ class ExperiencePipeline:
                                                                                    work_type=work_type,
                                                                                    responsibilities=responsibilities,
                                                                                    country_of_interest=country_of_interest,
-                                                                                   number_of_titles=_NUMBER_OF_OCCUPATION_ALT_TITLES,
-                                                                                   top_k=_NUMBER_OF_OCCUPATIONS_PER_CLUSTER,
-                                                                                   top_p=_NUMBER_OF_OCCUPATIONS_CANDIDATES_PER_CLUSTER
-                                                                                   )
+                                                                                   number_of_titles=config.number_of_occupation_alt_titles,
+                                                                                   top_k=config.number_of_occupations_per_cluster,
+                                                                                   top_p=config.number_of_occupations_candidates_per_title)
         llm_stats.extend(inferred_occupations_response.llm_stats)
         occupation_labels = [esco_occupation.occupation.preferredLabel for esco_occupation in inferred_occupations_response.esco_occupations]
         # 2.2 Link responsibilities to the associated skills
@@ -172,9 +224,9 @@ class ExperiencePipeline:
             job_titles=inferred_occupations_response.contextual_titles,
             esco_occupations=inferred_occupations_response.esco_occupations,
             responsibilities=responsibilities,
-            only_essential=True,
-            top_k=_NUMBER_OF_SKILLS_PER_CLUSTER,
-            top_p=_NUMBER_OF_SKILL_CANDIDATES_PER_RESPONSIBILITY
+            only_essential=config.only_essential_skills,
+            top_k=config.number_of_skills_per_cluster,
+            top_p=config.number_of_skill_candidates_per_responsibility
         )
         top_skills = top_skills_response.top_skills
         llm_stats.extend(top_skills_response.llm_stats)

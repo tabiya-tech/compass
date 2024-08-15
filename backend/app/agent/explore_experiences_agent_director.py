@@ -4,7 +4,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from app.agent.linking_and_ranking_pipeline.experience_pipeline import ExperiencePipeline
+from app.agent.linking_and_ranking_pipeline import ExperiencePipeline, ExperiencePipelineConfig
 from app.agent.skill_explorer_agent import SkillsExplorerAgent
 from app.countries import Country
 from app.agent.collect_experiences_agent import CollectExperiencesAgent
@@ -274,7 +274,10 @@ class ExploreExperiencesAgentDirector(Agent):
 
     async def _link_and_rank(self, current_experience: ExperienceEntity) -> AgentOutput:
         start = time.time()
-        pipeline = ExperiencePipeline(self._search_services)
+        pipeline = ExperiencePipeline(
+            config=ExperiencePipelineConfig(),
+            search_services=self._search_services
+        )
         pipline_result = await pipeline.execute(
             experience_title=current_experience.experience_title,
             company_name=current_experience.company,

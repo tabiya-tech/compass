@@ -3,7 +3,7 @@ from typing import Optional
 import pytest
 
 from app.agent.experience.work_type import WorkType
-from app.agent.linking_and_ranking_pipeline.experience_pipeline import ExperiencePipeline
+from app.agent.linking_and_ranking_pipeline import ExperiencePipeline, ExperiencePipelineConfig
 from app.countries import Country
 from app.server_dependecies.db_dependecies import get_mongo_db
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
@@ -129,7 +129,10 @@ test_cases = [
 @pytest.mark.parametrize("test_case", get_test_cases_to_run(test_cases), ids=[test_case.name for test_case in get_test_cases_to_run(test_cases)])
 async def test_experience_pipeline(test_case: ExperiencePipelineTestCase, get_search_services):
     # When the skill linking tool is called with the given occupation and responsibilities
-    experience_pipeline = ExperiencePipeline(get_search_services)
+    experience_pipeline = ExperiencePipeline(
+        config=ExperiencePipelineConfig(),
+        search_services=get_search_services
+    )
     response = await experience_pipeline.execute(
         experience_title=test_case.given_experience_title,
         responsibilities=test_case.given_responsibilities,
