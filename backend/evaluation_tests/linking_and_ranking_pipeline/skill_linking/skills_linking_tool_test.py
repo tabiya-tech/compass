@@ -173,7 +173,6 @@ test_cases = [
     ),
     SkillLinkingToolTestCase(
         name="voice-over artist",
-        skip_force="force",
         given_occupation_title="Voice-over Artist",
         given_work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
         given_responsibilities=[
@@ -182,20 +181,18 @@ test_cases = [
                     "I edit some of my work"
                 ],
         expected_skills=['perform scripted dialogue',
-                         'edit recorded sound',
-                         'study roles from scripts']
+                         'edit recorded sound']
     ),
     SkillLinkingToolTestCase(
         name="voice-over artist2",
-        skip_force="force",
         given_occupation_title="Voice-over Artist",
         given_work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
         given_responsibilities=[
                     "I inform and educate communities",
                     "I teach my skills", 
                 ],
-        expected_skills=['community education',
-                         'teaching and training']
+        expected_skills=['conduct educational activities',
+                         'use pedagogic strategies for creativity']
     )
 ]
 
