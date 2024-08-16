@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from pydantic import BaseModel, field_serializer
 from enum import Enum
+from typing import Optional
 
 
 class ConversationMessageSender(Enum):
@@ -29,6 +30,12 @@ class ConversationResponse(BaseModel):
     """The messages in the conversation"""
     conversation_completed: bool = False
     """Whether the conversation is finished"""
+    conversation_completed_at: Optional[datetime] = None
+    """The time the conversation was completed"""
+
+    @field_serializer('conversation_completed_at')
+    def serialize_conversation_completed_at(self, value: Optional[datetime]) -> Optional[str]:
+        return value.astimezone(timezone.utc).isoformat() if value else None
 
     class Config:
         extra = "forbid"

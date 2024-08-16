@@ -14,4 +14,5 @@ export interface ConversationMessage {
 export interface ConverstaionResponse {
   messages: ConversationMessage[];
   conversation_completed: boolean;
+  conversation_completed_at: string | null; // ISO formatted datetime string
 }
