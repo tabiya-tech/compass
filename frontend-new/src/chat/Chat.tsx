@@ -1,27 +1,27 @@
-import React, {useCallback, useContext, useEffect, useState} from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import ChatService from "src/chat/ChatService/ChatService";
 import ChatList from "src/chat/ChatList/ChatList";
-import {IChatMessage} from "./Chat.types";
-import {generateCompassMessage, generateUserMessage} from "./util";
-import {useSnackbar} from "src/theme/SnackbarProvider/SnackbarProvider";
-import {Box} from "@mui/material";
+import { IChatMessage } from "./Chat.types";
+import { generateCompassMessage, generateUserMessage } from "./util";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import { Box } from "@mui/material";
 import ChatHeader from "./ChatHeader/ChatHeader";
 import ChatMessageField from "./ChatMessageField/ChatMessageField";
-import {getUserFriendlyErrorMessage, ServiceError} from "src/error/ServiceError/ServiceError";
-import {writeServiceErrorToLog} from "src/error/ServiceError/logger";
-import {useNavigate} from "react-router-dom";
-import {routerPaths} from "src/app/routerPaths";
-import {ConversationMessage, ConversationMessageSender} from "./ChatService/ChatService.types";
-import {UserPreferencesContext} from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
-import {Backdrop} from "src/theme/Backdrop/Backdrop";
+import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
+import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
+import { useNavigate } from "react-router-dom";
+import { routerPaths } from "src/app/routerPaths";
+import { ConversationMessage, ConversationMessageSender } from "./ChatService/ChatService.types";
+import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
+import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import ExperiencesDrawer from "src/Experiences/ExperiencesDrawer";
-import {Experience} from "src/Experiences/ExperienceService/Experiences.types";
+import { Experience } from "src/Experiences/ExperienceService/Experiences.types";
 import ExperienceService from "src/Experiences/ExperienceService/ExperienceService";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import InactiveBackdrop from "src/theme/Backdrop/InactiveBackdrop";
-import {AuthContext} from "src/auth/AuthProvider";
-import {FirebaseError} from "src/error/FirebaseError/firebaseError";
-import {logoutService} from "src/auth/services/logout/logout.service";
+import { AuthContext } from "src/auth/AuthProvider";
+import { FirebaseError } from "src/error/FirebaseError/firebaseError";
+import { logoutService } from "src/auth/services/logout/logout.service";
 
 const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -37,15 +37,15 @@ interface ChatProps {
   disableInactivityCheck?: boolean;
 }
 
-const Chat: React.FC<ChatProps> = ({showInactiveSessionAlert = false, disableInactivityCheck = false}) => {
-  const {enqueueSnackbar} = useSnackbar();
+const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableInactivityCheck = false }) => {
+  const { enqueueSnackbar } = useSnackbar();
   const [messages, setMessages] = useState<IChatMessage[]>([]);
   const [conversationCompleted, setConversationCompleted] = useState<boolean>(false);
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const [initialized, setInitialized] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
-  const {userPreferences, updateUserPreferences} = useContext(UserPreferencesContext);
-  const {user, clearUser} = useContext(AuthContext);
+  const { userPreferences, updateUserPreferences } = useContext(UserPreferencesContext);
+  const { user, clearUser } = useContext(AuthContext);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [experiences, setExperiences] = React.useState<Experience[]>([]);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
@@ -112,13 +112,13 @@ const Chat: React.FC<ChatProps> = ({showInactiveSessionAlert = false, disableIna
       clearUser();
       // clear the userPreferences from the context and persistent storage as well
       updateUserPreferences(null);
-      navigate(routerPaths.LOGIN, {replace: true});
-      enqueueSnackbar("Successfully logged out.", {variant: "success"});
+      navigate(routerPaths.LOGIN, { replace: true });
+      enqueueSnackbar("Successfully logged out.", { variant: "success" });
     };
     const failureCallback = (error: FirebaseError) => {
       setIsLoggingOut(false);
       const errorMessage = getUserFriendlyErrorMessage(error);
-      enqueueSnackbar(errorMessage, {variant: "error"});
+      enqueueSnackbar(errorMessage, { variant: "error" });
     };
     setIsLoggingOut(true);
     try {
@@ -127,7 +127,7 @@ const Chat: React.FC<ChatProps> = ({showInactiveSessionAlert = false, disableIna
     } catch (error) {
       setIsLoggingOut(false);
       console.error("Failed to logout", error);
-      enqueueSnackbar("Failed to logout", {variant: "error"});
+      enqueueSnackbar("Failed to logout", { variant: "error" });
     }
   }, [enqueueSnackbar, navigate, clearUser, updateUserPreferences]);
 
@@ -179,7 +179,7 @@ const Chat: React.FC<ChatProps> = ({showInactiveSessionAlert = false, disableIna
           console.error("Failed to initialize chat", e);
         }
         const errorMessage = getUserFriendlyErrorMessage(e as Error);
-        enqueueSnackbar(errorMessage, {variant: "error"});
+        enqueueSnackbar(errorMessage, { variant: "error" });
       } finally {
         setIsTyping(false);
       }
@@ -210,7 +210,7 @@ const Chat: React.FC<ChatProps> = ({showInactiveSessionAlert = false, disableIna
 
       updateUserPreferences(user_preferences);
 
-      enqueueSnackbar("New conversation started", {variant: "success"});
+      enqueueSnackbar("New conversation started", { variant: "success" });
 
       // Initialize the new conversation with the new session id usually at the top of the sessions array
       await initializeChat(user_preferences.sessions[0]);
@@ -228,7 +228,7 @@ const Chat: React.FC<ChatProps> = ({showInactiveSessionAlert = false, disableIna
       setExperiences(data);
       setIsLoading(false);
     } catch (error) {
-      enqueueSnackbar("Failed to retrieve experiences", {variant: "error"});
+      enqueueSnackbar("Failed to retrieve experiences", { variant: "error" });
       console.error("Failed to retrieve experiences", error);
     }
   };
@@ -240,7 +240,6 @@ const Chat: React.FC<ChatProps> = ({showInactiveSessionAlert = false, disableIna
   // show the user backdrop when the user is inactive for 2 minutes
   useEffect(() => {
     if (disableInactivityCheck || conversationCompleted) return;
-
 
     const checkInactivity = () => {
       if (Date.now() - lastActivityTime > INACTIVITY_TIMEOUT) {
@@ -273,14 +272,13 @@ const Chat: React.FC<ChatProps> = ({showInactiveSessionAlert = false, disableIna
     return () => {
       document.removeEventListener("mousedown", handleUserActivity);
       document.removeEventListener("keydown", handleUserActivity);
-
     };
   }, [showBackdrop, disableInactivityCheck]);
 
   return (
     <>
       {isLoggingOut ? (
-        <Backdrop isShown={isLoggingOut} message={"Logging you out, wait a moment..."}/>
+        <Backdrop isShown={isLoggingOut} message={"Logging you out, wait a moment..."} />
       ) : (
         <>
           <Box
@@ -295,11 +293,11 @@ const Chat: React.FC<ChatProps> = ({showInactiveSessionAlert = false, disableIna
               startNewConversation={startNewConversation}
               notifyOnExperiencesDrawerOpen={handleOpenExperiencesDrawer}
             />
-            <Box sx={{flex: 1, overflowY: "auto"}}>
-              <ChatList messages={messages} isTyping={isTyping}/>
+            <Box sx={{ flex: 1, overflowY: "auto" }}>
+              <ChatList messages={messages} isTyping={isTyping} />
             </Box>
-            {showBackdrop && <InactiveBackdrop isShown={showBackdrop}/>}
-            <Box sx={{flexShrink: 0}}>
+            {showBackdrop && <InactiveBackdrop isShown={showBackdrop} />}
+            <Box sx={{ flexShrink: 0 }}>
               <ChatMessageField
                 handleSend={handleSend}
                 aiIsTyping={isTyping}
