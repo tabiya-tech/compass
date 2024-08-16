@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Optional
 from datetime import datetime, timezone
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator, field_serializer
 
 
 class AgentType(Enum):
@@ -36,6 +36,17 @@ class AgentInput(BaseModel):
 
     class Config:
         extra = "forbid"
+
+    # Serialize the sent_at datetime to ensure it's stored as UTC
+    @field_serializer("sent_at")
+    def serialize_sent_at(self, sent_at: datetime) -> str:
+        return sent_at.isoformat()
+
+    # Deserialize the sent_at datetime and ensure it's interpreted as UTC
+    @field_validator("sent_at", mode='before')
+    def deserialize_sent_at(cls, value: str) -> datetime:
+        dt = datetime.fromisoformat(value)
+        return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
 
 
 class LLMStats(BaseModel):
@@ -82,6 +93,32 @@ class AgentOutput(BaseModel):
 
     class Config:
         extra = "forbid"
+
+
+    # use a field serializer to serialize the agent_type
+    # we use the name of the Enum instead of the value because that makes the code less brittle
+    @field_serializer("agent_type")
+    def serialize_agent_type(self, agent_type: AgentType, _info):
+        if agent_type is not None:
+            return agent_type.name
+
+    # Deserialize the agent_type from the enum name
+    @field_validator("agent_type", mode='before')
+    def deserialize_agent_type(cls, value: AgentType | str) -> AgentType:
+        if isinstance(value, str):
+            return AgentType[value]
+        return value
+
+    # Serialize the sent_at datetime to ensure it's stored as UTC
+    @field_serializer("sent_at")
+    def serialize_sent_at(self, sent_at: datetime) -> str:
+        return sent_at.isoformat()
+
+    # Deserialize the sent_at datetime and ensure it's interpreted as UTC
+    @field_validator("sent_at", mode='before')
+    def deserialize_sent_at(cls, value: str) -> datetime:
+        dt = datetime.fromisoformat(value)
+        return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
 
 
 class AgentOutputWithReasoning(AgentOutput):

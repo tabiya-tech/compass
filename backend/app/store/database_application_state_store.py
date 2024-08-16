@@ -5,6 +5,7 @@ from app.agent.agent_director.abstract_agent_director import AgentDirectorState
 from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState
 from app.application_state import ApplicationStateStore, ApplicationState
 from app.constants.database import Collections
+from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
 from app.server_dependecies.db_dependecies import get_mongo_db
 
 
@@ -16,6 +17,7 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
         db = get_mongo_db()
         self._agent_director_collection = db.get_collection(Collections.AGENT_DIRECTOR_STATE)
         self._explore_experiences_director_state_collection = db.get_collection(Collections.EXPLORE_EXPERIENCES_DIRECTOR_STATE)
+        self.conversation_memory_manager_state_collection = db.get_collection(Collections.CONVERSATION_MEMORY_MANAGER_STATE)
         self._logger = logging.getLogger(self.__class__.__name__)
 
         # _store will hold the state for components that are not yet implemented
@@ -28,7 +30,7 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
         #   The collections will be named as follows:
         #   - agent_director_state [DONE]
         #   - explore_experiences_state [DONE]
-        #   - conversation_memory_state [UNIMPLEMENTED]
+        #   - conversation_memory_state [DONE]
         #   - collect_experience_state [UNIMPLEMENTED]
         #   - skills_explorer_state [UNIMPLEMENTED]
         #   The components that remain unimplemented will be stored in memory until they are implemented.
@@ -51,7 +53,8 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
             # Get the states of the different components from the database
             results = await asyncio.gather(
                 self._agent_director_collection.find_one({"session_id": session_id}, {'_id': False}),
-                self._explore_experiences_director_state_collection.find_one({"session_id": session_id}, {'_id': False})
+                self._explore_experiences_director_state_collection.find_one({"session_id": session_id}, {'_id': False}),
+                self.conversation_memory_manager_state_collection.find_one({"session_id": session_id}, {'_id': False})
                 # other collections will be added here
             )
 
@@ -59,13 +62,14 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
                 self._logger.info("Application state not found in the database for session ID %s", session_id)
                 return None
 
-            agent_director_state, explore_experiences_director_state = results
+            agent_director_state, explore_experiences_director_state, conversation_memory_state = results
 
             # Overwrite the state object with the data from the database
             # This will also go away once all components are stored in the database
             #  -------------------------------
             state.agent_director_state = AgentDirectorState(**agent_director_state)
             state.explore_experiences_director_state = ExploreExperiencesAgentDirectorState(**explore_experiences_director_state)
+            state.conversation_memory_manager_state = ConversationMemoryManagerState(**conversation_memory_state)
             #  -------------------------------
 
             return state
@@ -81,7 +85,8 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
             # Write the component states to the database
             await asyncio.gather(
                 self._agent_director_collection.update_one({"session_id": session_id}, {"$set": state.agent_director_state.dict()}, upsert=True),
-                self._explore_experiences_director_state_collection.update_one({"session_id": session_id}, {"$set": state.explore_experiences_director_state.dict()}, upsert=True)
+                self._explore_experiences_director_state_collection.update_one({"session_id": session_id}, {"$set": state.explore_experiences_director_state.dict()}, upsert=True),
+                self.conversation_memory_manager_state_collection.update_one({"session_id": session_id}, {"$set": state.conversation_memory_manager_state.dict()}, upsert=True)
                 # other collections will be added here
             )
 
@@ -100,7 +105,8 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
             # Delete the states from the database
             await asyncio.gather(
                 self._agent_director_collection.delete_one({"session_id": session_id}),
-                self._explore_experiences_director_state_collection.delete_one({"session_id": session_id})
+                self._explore_experiences_director_state_collection.delete_one({"session_id": session_id}),
+                self.conversation_memory_manager_state_collection.delete_one({"session_id": session_id})
                 # other collections will be added here
             )
 

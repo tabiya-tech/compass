@@ -156,7 +156,7 @@ async def conversation(request: Request, body: ConversationInput, clear_memory: 
             user_input = await sensitive_filter.obfuscate(user_input)
 
         # set the sent_at for the user input
-        user_input = AgentInput(message=user_input, sent_at=datetime.now())
+        user_input = AgentInput(message=user_input)
 
         # set the state of the agent director, the conversation memory manager and all the agents
         state = await application_state_manager.get_state(session_id)

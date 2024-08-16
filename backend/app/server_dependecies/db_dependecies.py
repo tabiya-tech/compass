@@ -43,6 +43,10 @@ async def initialize_mongo_db():
             ("session_id", 1)
         ], unique=True)
 
+        await _mongo_db.get_collection(Collections.CONVERSATION_MEMORY_MANAGER_STATE).create_index([
+            ("session_id", 1)
+        ], unique=True)
+
     INITIALIZED_MONGO_DB = True
 
 
