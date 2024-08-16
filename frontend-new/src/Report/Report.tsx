@@ -10,6 +10,7 @@ interface SkillReportProps {
   phone: string;
   address: string;
   experiences: Experience[];
+  conversationCompletedAt: string | null;
 }
 
 const uniqueId = "5a296552-f91f-4c38-b88f-542cacaced8e";
@@ -27,7 +28,22 @@ export const DATA_TEST_ID = {
   SKILL_REPORT_EXPERIENCES_CONTAINER: `skill-report-experiences-container-${uniqueId}`,
 };
 
-const SkillReport: React.FC<SkillReportProps> = ({ name, email, phone, address, experiences }) => {
+export function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${month}/${day}/${year}`;
+}
+
+const SkillReport: React.FC<SkillReportProps> = ({
+  name,
+  email,
+  phone,
+  address,
+  experiences,
+  conversationCompletedAt,
+}) => {
   const selfEmploymentExperiences = experiences.filter(
     (experience) => experience.work_type === WorkType.SELF_EMPLOYMENT
   );
@@ -77,11 +93,12 @@ const SkillReport: React.FC<SkillReportProps> = ({ name, email, phone, address, 
             )}
           </View>
           <Text style={styles.bodyText} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY_TEXT}>
-            This report summarizes the key information gathered during a conversation with Compass on [insert date].
-            Compass by Tabiya is an AI chatbot that assists job-seekers in exploring their skills and experiences. This
-            report presents the candidate’s work experience and the skills identified from each experience. This
-            information can be used to guide job search and highlight their skills when applying for jobs, especially
-            during interviews with potential employers. It can be a good starting point for creating a complete CV.
+            This report summarizes the key information gathered during a conversation with Compass on
+            {formatDate(conversationCompletedAt!)}. Compass by Tabiya is an AI chatbot that assists job-seekers in
+            exploring their skills and experiences. This report presents the candidate’s work experience and the skills
+            identified from each experience. This information can be used to guide job search and highlight their skills
+            when applying for jobs, especially during interviews with potential employers. It can be a good starting
+            point for creating a complete CV.
           </Text>
           <View style={styles.divider} />
           <Text style={styles.experiencesTitle} data-testid={DATA_TEST_ID.SKILL_REPORT_EXPERIENCES_TITLE}>

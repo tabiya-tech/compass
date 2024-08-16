@@ -88,7 +88,9 @@ exports[`Report should render Report correctly 1`] = `
         data-testid="skill-report-body-text-5a296552-f91f-4c38-b88f-542cacaced8e"
         style="font-size: 11px; padding-top: 18px; font-family: Inter; font-weight: normal; word-break: break-word; color: rgb(67, 71, 78);"
       >
-        This report summarizes the key information gathered during a conversation with Compass on [insert date]. Compass by Tabiya is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report presents the candidate’s work experience and the skills identified from each experience. This information can be used to guide job search and highlight their skills when applying for jobs, especially during interviews with potential employers. It can be a good starting point for creating a complete CV.
+        This report summarizes the key information gathered during a conversation with Compass on 
+        06/01/2021
+        . Compass by Tabiya is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report presents the candidate’s work experience and the skills identified from each experience. This information can be used to guide job search and highlight their skills when applying for jobs, especially during interviews with potential employers. It can be a good starting point for creating a complete CV.
       </text>
       <view
         style="border: 1px; color: rgb(67, 71, 78); margin-top: 28px; margin-bottom: 16px;"
