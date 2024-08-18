@@ -22,13 +22,16 @@ class ApplicationState(BaseModel):
     collect_experience_state: CollectExperiencesAgentState
     skills_explorer_agent_state: SkillsExplorerAgentState
 
-    def __init__(self, session_id):
+    def __init__(self, session_id, **data: dict):
+        # Initialize the states of the different components
+        # with the given data, and if the data is not provided, initialize it with the session ID
+        # The keys in the data dictionary are the names of the component states, and should match the names of the component states accross the application
         super().__init__(session_id=session_id,
-                         agent_director_state=AgentDirectorState(session_id),
-                         explore_experiences_director_state=ExploreExperiencesAgentDirectorState(session_id),
-                         conversation_memory_manager_state=ConversationMemoryManagerState(session_id),
-                         collect_experience_state=CollectExperiencesAgentState(session_id),
-                         skills_explorer_agent_state=SkillsExplorerAgentState(session_id)
+                         agent_director_state=AgentDirectorState(**data.get("agent_director_state", {"session_id": session_id })),
+                         explore_experiences_director_state=ExploreExperiencesAgentDirectorState(**data.get("explore_experiences_director_state", {"session_id": session_id})),
+                         conversation_memory_manager_state=ConversationMemoryManagerState(**data.get("conversation_memory_manager_state", {"session_id": session_id})),
+                         collect_experience_state=CollectExperiencesAgentState(**data.get("collect_experience_state", {"session_id": session_id})),
+                         skills_explorer_agent_state=SkillsExplorerAgentState(**data.get("skills_explorer_agent_state", {"session_id": session_id})),
                          )
 
 

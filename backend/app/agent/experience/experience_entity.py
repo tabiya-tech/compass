@@ -109,7 +109,7 @@ class ExperienceEntity(BaseModel):
     class Config:
         extra = "forbid"
 
-    # use a field serializer to serialize the dive_in_phase
+    # use a field serializer to serialize the work_type
     # we use the name of the Enum instead of the value because that makes the code less brittle
     @field_serializer("work_type")
     def serialize_work_type(self, work_type: WorkType, _info):

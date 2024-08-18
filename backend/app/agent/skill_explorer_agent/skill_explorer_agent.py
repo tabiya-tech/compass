@@ -1,3 +1,5 @@
+from typing import Any
+
 from pydantic import BaseModel
 
 from app.agent.agent import Agent
@@ -15,22 +17,21 @@ class SkillsExplorerAgentState(BaseModel):
     """
     session_id: int
 
-    first_time_for_experience: dict[str, bool]
+    first_time_for_experience: dict[str, bool] = {}
     """
     The key is the experience uuid and the value is a boolean that indicates 
     whether the user is entering the skills explorer for the first time for that experience.
     """
 
-    experiences_explored: list[str]
+    experiences_explored: list[str] = []
     """
     The list of experiences already explored with the user.
     """
 
-    def __init__(self, session_id):
+    def __init__(self, session_id, **data: Any):
         super().__init__(
             session_id=session_id,
-            first_time_for_experience={},
-            experiences_explored=[]
+            **data
         )
 
 

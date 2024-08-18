@@ -1,6 +1,6 @@
-from typing import Optional
+from typing import Optional, Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer, field_validator
 
 from app.agent.agent import Agent
 from app.agent.agent_types import AgentType
@@ -46,16 +46,53 @@ class CollectExperiencesAgentState(BaseModel):
         """
         extra = "forbid"
 
-    def __init__(self, session_id):
+    # use a field serializer to serialize the explored_types
+    # we use the name of the Enum instead of the value because that makes the code less brittle
+    @field_serializer("explored_types")
+    def serialize_explored_types(self, explored_types: list[WorkType], _info):
+        # We serialize the explored_types to a list of strings (the names of the Enum)
+        return [x.name for x in explored_types]
+
+    # Deserialize the explored_types from the enum name
+    @field_validator("explored_types", mode='before')
+    def deserialize_explored_types(cls, value: Any) -> list[WorkType]:
+        if isinstance(value, list):
+            # If the value is a list, and the items in the list are strings, we convert the strings to the Enum
+            # Otherwise, we return the value as is
+            return [WorkType[x] if isinstance(x, str) else x for x in value]
+        return value
+
+    # use a field serializer to serialize the unexplored_types
+    # we use the name of the Enum instead of the value because that makes the code less brittle
+    @field_serializer("unexplored_types")
+    def serialize_unexplored_types(self, unexplored_types: list[WorkType], _info):
+        # We serialize the unexplored_types to a list of strings (the names of the Enum)
+        return [x.name for x in unexplored_types]
+
+    # Deserialize the unexplored_types from the enum name
+    @field_validator("unexplored_types", mode='before')
+    def deserialize_unexplored_types(cls, value: Any) -> list[WorkType]:
+        if isinstance(value, list):
+            # If the value is a list, and the items in the list are strings, we convert the strings to the Enum
+            # Otherwise, we return the value as is
+            return [WorkType[x] if isinstance(x, str) else x for x in value]
+        return value
+
+    def __init__(self, session_id,
+                 collected_data: Optional[list[CollectedData]] = None,
+                 unexplored_types: Optional[list[WorkType]] = None,
+                 explored_types: list[WorkType] = None,
+                 first_time_visit: bool = True
+                 ):
         super().__init__(
             session_id=session_id,
-            collected_data=[],
-            unexplored_types=[WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+            collected_data=collected_data if collected_data is not None else [],
+            unexplored_types=unexplored_types if unexplored_types is not None else [WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
                                WorkType.SELF_EMPLOYMENT,
                                WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK,
                                WorkType.UNSEEN_UNPAID],
-            explored_types=[],
-            first_time_visit=True
+            explored_types=explored_types if explored_types is not None else [],
+            first_time_visit=first_time_visit
         )
 
 
