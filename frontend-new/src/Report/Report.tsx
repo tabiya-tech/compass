@@ -91,7 +91,7 @@ const SkillReport: React.FC<SkillReportProps> = ({
             )}
           </View>
           <Text style={styles.bodyText} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY_TEXT}>
-            This report summarizes the key information gathered during a conversation with Compass on
+            This report summarizes the key information gathered during a conversation with Compass on{" "}
             {formatDate(conversationCompletedAt!)}. Compass by Tabiya is an AI chatbot that assists job-seekers in
             exploring their skills and experiences. This report presents the candidate’s work experience and the skills
             identified from each experience. This information can be used to guide job search and highlight their skills
@@ -153,26 +153,24 @@ const SkillReport: React.FC<SkillReportProps> = ({
             )}
           </View>
         </View>
-        <View fixed style={styles.disclaimerContainer}>
-          <Image src={`${process.env.PUBLIC_URL}/danger.png`} style={styles.disclaimerIcon} />
-          <Text style={styles.disclaimerText}>
-            {" "}
-            Disclaimer:{" "}
-            <Text style={styles.disclaimerTextBold}>
-              Listed skills are based on a conversation with the candidate, are not verified or validated by Tabiya, and
-              may be inaccurate.{" "}
+        <View fixed style={styles.footer}>
+          <View style={styles.disclaimerContainer}>
+            <Image src={`${process.env.PUBLIC_URL}/danger.png`} style={styles.disclaimerIcon} />
+            <Text style={styles.disclaimerText}>
+              {" "}
+              Disclaimer:{" "}
+              <Text style={styles.disclaimerTextBold}>
+                Listed skills are based on a conversation with the candidate, are not verified or validated by Tabiya,
+                and may be inaccurate.{" "}
+              </Text>
+              Information should be checked before use for job search, job interviews, or for creating a CV. To revise
+              this information, speak with Compass again or create a complete CV based on this report.
             </Text>
-            Information should be checked before use for job search, job interviews, or for creating a CV. To revise
-            this information, speak with Compass again or create a complete CV based on this report.
-          </Text>
+          </View>
+          {experiences.length > 2 && (
+            <Text style={styles.pageNumber} render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
+          )}
         </View>
-        {experiences.length > 5 && (
-          <Text
-            style={styles.pageNumber}
-            render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`}
-            fixed
-          />
-        )}
       </Page>
     </Document>
   );

@@ -34,11 +34,11 @@ const ExperiencesReportContent: React.FC<ExperienceProps> = ({ experience }) => 
         </Text>
         <View>
           <Text style={styles.skillsTitle}>Top skills:</Text>
-          <View style={styles.chipContainer} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_SKILLS}>
+          <View style={styles.skillsContainer} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_SKILLS}>
             {experience.top_skills.map((skill) => (
-              <View key={skill.UUID} style={styles.chip}>
-                <Text style={styles.chipText}>{capitalizeFirstLetter(skill.preferredLabel)}</Text>
-              </View>
+              <Text key={skill.UUID} style={styles.skillText}>
+                • {capitalizeFirstLetter(skill.preferredLabel)}
+              </Text>
             ))}
           </View>
         </View>

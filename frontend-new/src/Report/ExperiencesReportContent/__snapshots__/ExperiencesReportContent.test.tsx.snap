@@ -3,51 +3,45 @@
 exports[`ExperiencesReportContent should render ExperiencesReportContent correctly 1`] = `
 <view
   data-testid="experiences-content-report-container-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-  style="display: flex; flex-direction: row; align-items: flex-start;"
+  style="display: flex; flex-direction: row; align-items: flex-start; margin-bottom: 14px;"
 >
   <view
-    style="display: flex; flex-direction: column; padding-bottom: 12px;"
+    style="display: flex; flex-direction: column;"
   >
     <text
       data-testid="experiences-content-report-experience-title-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-      style="font-family: Inter; font-weight: bold; font-size: 12px; padding-bottom: 4px;"
+      style="font-family: Inter; font-weight: bold; font-size: 12px;"
     >
       Project Manager
     </text>
     <text
       data-testid="experiences-content-report-date-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-      style="font-size: 10px; font-weight: normal; font-family: Inter; padding-bottom: 8px;"
+      style="font-size: 10px; font-weight: normal; font-family: Inter;"
     >
       2022 — Present
     </text>
     <view>
       <text
-        style="font-family: Inter; font-weight: bold; font-size: 12px;"
+        style="font-family: Inter; font-weight: bold; font-size: 12px; padding-bottom: 4px;"
       >
         Top skills:
       </text>
       <view
         data-testid="experiences-content-report-skills-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-        style="display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 4px; margin-bottom: 18px;"
+        style="display: flex; flex-direction: column; flex-wrap: wrap; align-items: flex-start; gap: 4px;"
       >
-        <view
-          style="display: flex; flex-direction: row; align-items: center; background-color: rgb(217, 217, 217); border-radius: 16px; margin-right: 4px; margin-bottom: 8px;"
+        <text
+          style="font-size: 11px; color: rgb(33, 31, 29); font-family: Inter;"
         >
-          <text
-            style="font-size: 11px; color: rgb(33, 31, 29); font-family: Inter;"
-          >
-            Management
-          </text>
-        </view>
-        <view
-          style="display: flex; flex-direction: row; align-items: center; background-color: rgb(217, 217, 217); border-radius: 16px; margin-right: 4px; margin-bottom: 8px;"
+          • 
+          Management
+        </text>
+        <text
+          style="font-size: 11px; color: rgb(33, 31, 29); font-family: Inter;"
         >
-          <text
-            style="font-size: 11px; color: rgb(33, 31, 29); font-family: Inter;"
-          >
-            Communication
-          </text>
-        </view>
+          • 
+          Communication
+        </text>
       </view>
     </view>
   </view>
