@@ -6,9 +6,7 @@ import { HashRouter, useNavigate } from "react-router-dom";
 import { waitFor } from "@testing-library/react";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { TabiyaUser } from "src/auth/auth.types";
-import {
-  userPreferencesStateService,
-} from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
+import { userPreferencesStateService } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import authStateService from "src/auth/AuthStateService";
 
@@ -46,7 +44,6 @@ jest.mock("react-router-dom", () => {
 });
 
 describe("Testing Data Protection Policy component", () => {
-
   beforeEach(() => {
     // Clear console mocks and mock functions
     (console.error as jest.Mock).mockClear();
@@ -63,7 +60,7 @@ describe("Testing Data Protection Policy component", () => {
     // WHEN the component is rendered
     render(
       <HashRouter>
-          <DataProtectionAgreement />
+        <DataProtectionAgreement />
       </HashRouter>
     );
 
@@ -80,14 +77,19 @@ describe("Testing Data Protection Policy component", () => {
     // AND the accept button should be rendered
     expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_BUTTON)).toBeInTheDocument();
 
+    // AND the accept checkbox should be rendered
+    expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_CHECKBOX)).toBeInTheDocument();
+
+    // AND the terms and conditions should be rendered
+    expect(screen.getByTestId(DATA_TEST_ID.TERMS_AND_CONDITIONS)).toBeInTheDocument();
+
     // AND the component should match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.DPA_CONTAINER)).toMatchSnapshot();
   });
 
   test("should successfully accept the data protection policy", async () => {
     // GIVEN the user preferences state service is mocked to set the user preferences
-    jest.spyOn(userPreferencesStateService, 'setUserPreferences')
-      .mockImplementation(() => {});
+    jest.spyOn(userPreferencesStateService, "setUserPreferences").mockImplementation(() => {});
 
     // WHEN the component is rendered
     render(
@@ -117,12 +119,12 @@ describe("Testing Data Protection Policy component", () => {
     };
 
     // AND the user preferences service is mocked to throw an error
-    jest.spyOn(userPreferencesService, 'updateUserPreferences')
+    jest
+      .spyOn(userPreferencesService, "updateUserPreferences")
       .mockRejectedValue(new Error("Failed to update user preferences"));
 
     // AND the authStateService is mocked to return the given user
-    jest.spyOn(authStateService, 'getUser')
-      .mockImplementation(() => givenUser);
+    jest.spyOn(authStateService, "getUser").mockImplementation(() => givenUser);
 
     // WHEN the component is rendered
     render(
@@ -135,8 +137,20 @@ describe("Testing Data Protection Policy component", () => {
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
 
-    // AND the accept button should be rendered
-    expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_BUTTON)).toBeInTheDocument();
+    // AND the user accepts the terms and conditions
+    const checkBoxWrapper = screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_CHECKBOX);
+    expect(checkBoxWrapper).toBeInTheDocument();
+
+    // WHEN the user clicks the checkbox
+    const checkBoxInput = screen.getByRole("checkbox") as HTMLInputElement;
+    fireEvent.click(checkBoxInput);
+
+    // THEN expect the checkbox to be checked
+    expect(checkBoxInput.checked).toBe(true);
+
+    // AND the accept button should be enabled
+    const acceptButton = screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_BUTTON);
+    expect(acceptButton).toBeEnabled();
 
     // WHEN the user clicks the accept button
     fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_BUTTON));
@@ -147,9 +161,12 @@ describe("Testing Data Protection Policy component", () => {
 
     // AND the error message should be displayed
     await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to update user preferences: Failed to update user preferences", {
-        variant: "error",
-      });
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+        "Failed to update user preferences: Failed to update user preferences",
+        {
+          variant: "error",
+        }
+      );
     });
 
     // AND the error should be logged

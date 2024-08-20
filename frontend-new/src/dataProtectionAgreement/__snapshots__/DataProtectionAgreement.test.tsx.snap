@@ -6,7 +6,7 @@ exports[`Testing Data Protection Policy component it should show data protection
   data-testid="dpa-container-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
 >
   <div
-    class="MuiBox-root css-inbm3t"
+    class="MuiBox-root css-1y62btt"
   >
     <div
       class="MuiBox-root css-1vd84sn"
@@ -69,19 +69,66 @@ exports[`Testing Data Protection Policy component it should show data protection
       Help us keep all AI interactions safe and positive! 😊
       <br />
       <br />
+    </p>
+    <div
+      class="MuiBox-root css-zdjc7m"
+    >
+      <span
+        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-doowm0-MuiButtonBase-root-MuiCheckbox-root"
+        data-testid="dpa-accept-checkbox-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
+      >
+        <input
+          aria-label="I have read and agree to Compass's "
+          class="PrivateSwitchBase-input css-1m9pwf3"
+          data-indeterminate="false"
+          type="checkbox"
+        />
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+          data-testid="CheckBoxOutlineBlankIcon"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
+          />
+        </svg>
+        <span
+          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+        />
+      </span>
+      <p
+        class="MuiTypography-root MuiTypography-body2 css-bbtak5-MuiTypography-root"
+        data-testid="dpa-terms-and-conditions-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
+      >
+        I have read and agree to Compass's 
+        <a
+          class="css-8nw4ws"
+          href="https://compass.tabiya.org/dpa.html"
+          rel="noreferrer"
+          target="_blank"
+        >
+          Terms and Conditions
+        </a>
+        .
+      </p>
+    </div>
+    <p
+      class="MuiTypography-root MuiTypography-body1 css-7xnq80-MuiTypography-root"
+    >
       Are you ready to start?
+      <br />
     </p>
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-q25fil-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-q25fil-MuiButtonBase-root-MuiButton-root"
       data-testid="dpa-accept-button-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
+      disabled=""
       style="margin-top: 16px;"
-      tabindex="0"
+      tabindex="-1"
       type="button"
     >
       Sure, I am ready.
-      <span
-        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-      />
     </button>
   </div>
 </div>
