@@ -162,6 +162,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         const history = await chatService.getChatHistory();
         if (history.conversation_completed) setConversationCompleted(true);
         if (history.messages.length) {
+          setMessages([]) // Clear the messages before adding the new ones
           history.messages.forEach((message: ConversationMessage) => {
             if (message.sender === ConversationMessageSender.USER && message.message !== "") {
               addMessage(generateUserMessage(message.message, message.sent_at));
