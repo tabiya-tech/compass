@@ -23,6 +23,7 @@ import { userPreferencesStateService } from "src/userPreferences/UserPreferences
 import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
 import authStateService from "src/auth/AuthStateService";
 import { TabiyaUser } from "src/auth/auth.types";
+import { Backdrop } from "src/theme/Backdrop/Backdrop";
 
 export const INVITATIONS_PARAM_NAME = "invite-code";
 
@@ -302,6 +303,14 @@ const Login: React.FC = () => {
   );
 
   /**
+   * callback functions for the social auth component to set the loading state
+   */
+  const notifyOnSocialLoading = useCallback((socialAuthLoading: boolean) => {
+    setIsLoading(socialAuthLoading);
+  }, []);
+
+  // depending on which form is active, handle submit button
+  /**
    * The submit button could be used to login with email/password or with an invitation code
    * This function handles the submission of the form, and decides which method to use based on the active form
    * @param event
@@ -372,103 +381,105 @@ const Login: React.FC = () => {
   /* ------------------
    * aggregated states for loading and disabling ui
    */
-  // login is loading when the authentication provider or any of the login methods return a loading state
-  const isLoginLoading = isLoading;
   // login button is disabled when login is loading, or when there is no active Form, or the fields for the active form are not filled in
   const isLoginButtonDisabled =
-    isLoginLoading || activeLoginForm === ActiveForm.NONE || ((!email || !password) && !inviteCode);
+    isLoading || activeLoginForm === ActiveForm.NONE || ((!email || !password) && !inviteCode);
 
   return (
-    <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.LOGIN_CONTAINER}>
-      <Box display="flex" flexDirection="column" alignItems="center" justifyContent={"space-evenly"} height={"80%"}>
-        <AuthHeader title={"Welcome to Compass!"} subtitle={"Login to your account to continue"} />
-        <Box
-          component="form"
-          onSubmit={handleLoginSubmit}
-          data-testid={DATA_TEST_ID.FORM}
-          display={"flex"}
-          flexDirection={"column"}
-          padding={theme.tabiyaSpacing.xs}
-          textAlign={"center"}
-          width={"100%"}
-          gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
-        >
-          <Typography variant="subtitle2" data-testid={DATA_TEST_ID.SUBTITLE}>
-            Login using
-          </Typography>
-          <LoginWithInviteCodeForm
-            inviteCode={inviteCode}
-            notifyOnInviteCodeChanged={handleInviteCodeChanged}
-            isDisabled={isLoginLoading}
-            notifyOnFocused={() => {}} //TODO: remove this
-          />
-          <Divider textAlign="center" style={{ width: "100%" }}>
-            <Typography
-              variant="subtitle2"
-              padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
-              data-testid={DATA_TEST_ID.SUBTITLE}
-            >
-              Or
+    <>
+      <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.LOGIN_CONTAINER}>
+        <Box display="flex" flexDirection="column" alignItems="center" justifyContent={"space-evenly"} height={"80%"}>
+          <AuthHeader title={"Welcome to Compass!"} subtitle={"Login to your account to continue"} />
+          <Box
+            component="form"
+            onSubmit={handleLoginSubmit}
+            data-testid={DATA_TEST_ID.FORM}
+            display={"flex"}
+            flexDirection={"column"}
+            padding={theme.tabiyaSpacing.xs}
+            textAlign={"center"}
+            width={"100%"}
+            gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
+          >
+            <Typography variant="subtitle2" data-testid={DATA_TEST_ID.SUBTITLE}>
+              Login using
             </Typography>
-          </Divider>
+            <LoginWithInviteCodeForm
+              inviteCode={inviteCode}
+              notifyOnInviteCodeChanged={handleInviteCodeChanged}
+              isDisabled={isLoading}
+              notifyOnFocused={() => {}} //TODO: remove this
+            />
+            <Divider textAlign="center" style={{ width: "100%" }}>
+              <Typography
+                variant="subtitle2"
+                padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
+                data-testid={DATA_TEST_ID.SUBTITLE}
+              >
+                Or
+              </Typography>
+            </Divider>
 
-          <LoginWithEmailForm
-            email={email}
-            password={password}
-            passwordError={passwordError}
-            notifyOnEmailChanged={handleEmailChanged}
-            notifyOnPasswordChanged={handlePasswordChanged}
-            isDisabled={isLoginLoading}
-            notifyOnFocused={() => {}}
+            <LoginWithEmailForm
+              email={email}
+              password={password}
+              passwordError={passwordError}
+              notifyOnEmailChanged={handleEmailChanged}
+              notifyOnPasswordChanged={handlePasswordChanged}
+              isDisabled={isLoading}
+              notifyOnFocused={() => {}}
+            />
+            <PrimaryButton
+              fullWidth
+              variant="contained"
+              color="primary"
+              style={{ marginTop: 8 }}
+              type="submit"
+              disabled={isLoginButtonDisabled}
+              disableWhenOffline={true}
+              data-testid={DATA_TEST_ID.LOGIN_BUTTON}
+            >
+              {isLoading ? (
+                <CircularProgress
+                  color={"secondary"}
+                  data-testid={DATA_TEST_ID.LOGIN_BUTTON_CIRCULAR_PROGRESS}
+                  aria-label={"Logging in"}
+                  size={16}
+                  sx={{ marginTop: theme.tabiyaSpacing.sm, marginBottom: theme.tabiyaSpacing.sm }}
+                />
+              ) : (
+                "Login"
+              )}
+            </PrimaryButton>
+          </Box>
+          <SocialAuth
+            disabled={false}
+            preLoginCheck={() => true} // no checks need to happen before logging in with social providers
+            postLoginHandler={successfulSocialLoginCallback}
+            isLoading={isLoading}
+            notifyOnLoading={notifyOnSocialLoading}
           />
-          <PrimaryButton
-            fullWidth
-            variant="contained"
-            color="primary"
-            style={{ marginTop: 8 }}
-            type="submit"
-            disabled={isLoginButtonDisabled}
-            disableWhenOffline={true}
-            data-testid={DATA_TEST_ID.LOGIN_BUTTON}
-          >
-            {isLoginLoading ? (
-              <CircularProgress
-                color={"secondary"}
-                data-testid={DATA_TEST_ID.LOGIN_BUTTON_CIRCULAR_PROGRESS}
-                aria-label={"Logging in"}
-                size={16}
-                sx={{ marginTop: theme.tabiyaSpacing.sm, marginBottom: theme.tabiyaSpacing.sm }}
-              />
-            ) : (
-              "Login"
-            )}
-          </PrimaryButton>
+          <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.LOGIN_LINK}>
+            Don't have an account?{" "}
+            <StyledNavLink
+              to={routerPaths.REGISTER}
+              style={{
+                color: theme.palette.text.textAccent,
+                fontStyle: "italic",
+              }}
+            >
+              Register
+            </StyledNavLink>
+          </Typography>
         </Box>
-        <SocialAuth
-          disabled={false}
-          preLoginCheck={() => true} // no checks need to happen before logging in with social providers
-          postLoginHandler={successfulSocialLoginCallback}
-          isLoading={isLoading}
+        <RegistrationCodeFormModal
+          show={showRegistrationCodeForm}
+          onSuccess={createUserPreferencesCallback}
+          onClose={() => setShowRegistrationCodeForm(false)}
         />
-        <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.LOGIN_LINK}>
-          Don't have an account?{" "}
-          <StyledNavLink
-            to={routerPaths.REGISTER}
-            style={{
-              color: theme.palette.text.textAccent,
-              fontStyle: "italic",
-            }}
-          >
-            Register
-          </StyledNavLink>
-        </Typography>
-      </Box>
-      <RegistrationCodeFormModal
-        show={showRegistrationCodeForm}
-        onSuccess={createUserPreferencesCallback}
-        onClose={() => setShowRegistrationCodeForm(false)}
-      />
-    </Container>
+      </Container>
+      <Backdrop isShown={isLoading} message={"Logging you in..."} />
+    </>
   );
 };
 
