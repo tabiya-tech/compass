@@ -61,8 +61,7 @@ class CollectExperiencesAgentState(BaseModel):
 
 class CollectExperiencesAgent(Agent):
     """
-    This agent drives the conversation to build up the initial picture of the previous work experiences of the user.
-    This agent is stateless, and it does not link to ESCO.
+    This agent converses with user and collects basic information about their work experiences.
     """
 
     def __init__(self):
