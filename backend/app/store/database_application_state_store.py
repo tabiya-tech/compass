@@ -58,11 +58,11 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
         try:
             # Write the component states to the database
             await asyncio.gather(
-                self._agent_director_collection.update_one({"session_id": session_id}, {"$set": state.agent_director_state.dict()}, upsert=True),
-                self._explore_experiences_director_state_collection.update_one({"session_id": session_id}, {"$set": state.explore_experiences_director_state.dict()}, upsert=True),
-                self._conversation_memory_manager_state_collection.update_one({"session_id": session_id}, {"$set": state.conversation_memory_manager_state.dict()}, upsert=True),
-                self._collect_experience_state_collection.update_one({"session_id": session_id}, {"$set": state.collect_experience_state.dict()}, upsert=True),
-                self._skills_explorer_agent_state_collection.update_one({"session_id": session_id}, {"$set": state.skills_explorer_agent_state.dict()}, upsert=True)
+                self._agent_director_collection.update_one({"session_id": session_id}, {"$set": state.agent_director_state.model_dump()}, upsert=True),
+                self._explore_experiences_director_state_collection.update_one({"session_id": session_id}, {"$set": state.explore_experiences_director_state.model_dump()}, upsert=True),
+                self._conversation_memory_manager_state_collection.update_one({"session_id": session_id}, {"$set": state.conversation_memory_manager_state.model_dump()}, upsert=True),
+                self._collect_experience_state_collection.update_one({"session_id": session_id}, {"$set": state.collect_experience_state.model_dump()}, upsert=True),
+                self._skills_explorer_agent_state_collection.update_one({"session_id": session_id}, {"$set": state.skills_explorer_agent_state.model_dump()}, upsert=True)
             )
         except Exception as e:
             # Log the error and raise an exception, so that the caller can handle it
