@@ -1,5 +1,5 @@
 from typing import List, Optional, Any
-import uuid
+import uuid as uuidObj
 
 from pydantic import BaseModel, Field, field_serializer, field_validator
 
@@ -131,9 +131,10 @@ class ExperienceEntity(BaseModel):
                  uuid: Optional[str] = None, #TODO check this
                  responsibilities: Optional[ResponsibilitiesData] = None,
                  esco_occupations: Optional[List[OccupationSkillEntity]] = None,
-                 top_skills: Optional[List[SkillEntity]] = None):
+                 top_skills: Optional[List[SkillEntity]] = None
+                 ):
         super().__init__(
-            uuid=uuid if uuid is not None else str(uuid.uuid4()),  # Generate a unique UUID for each instance
+            uuid=uuid if uuid is not None else str(uuidObj.uuid4()),  # Generate a unique UUID for each instance
             experience_title=experience_title,
             company=company,
             location=location,

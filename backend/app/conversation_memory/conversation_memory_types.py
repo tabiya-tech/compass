@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, Field
 
 from app.agent.agent_types import AgentInput, AgentOutput
@@ -49,11 +51,23 @@ class ConversationMemoryManagerState(BaseModel):
     all_history: ConversationHistory
     unsummarized_history: ConversationHistory
     to_be_summarized_history: ConversationHistory
-    summary: str
+    summary: str = ""
 
-    def __init__(self, session_id):
+    @staticmethod
+    def from_document(self: dict):
+        return ConversationMemoryManagerState(session_id=self["session_id"],
+                                              all_history=self["all_history"],
+                                              unsummarized_history=self["unsummarized_history"],
+                                              to_be_summarized_history=self["to_be_summarized_history"],
+                                              summary=self["summary"])
+
+    def __init__(self, *, session_id,
+                 all_history: Optional[ConversationHistory] = None,
+                 unsummarized_history: Optional[ConversationHistory] = None,
+                 to_be_summarized_history: Optional[ConversationHistory] = None,
+                 summary: str = ""):
         super().__init__(session_id=session_id,
-                         all_history=ConversationHistory(),
-                         unsummarized_history=ConversationHistory(),
-                         to_be_summarized_history=ConversationHistory(),
-                         summary="")
+                         all_history=all_history if all_history is not None else ConversationHistory(),
+                         unsummarized_history=unsummarized_history if unsummarized_history is not None else ConversationHistory(),
+                         to_be_summarized_history=to_be_summarized_history if to_be_summarized_history is not None else ConversationHistory(),
+                         summary=summary)

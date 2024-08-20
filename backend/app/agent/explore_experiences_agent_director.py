@@ -81,13 +81,13 @@ class ExploreExperiencesAgentDirectorState(BaseModel):
     The state of the experiences of the user that are being explored, keyed by experience.uuid
     """
 
-    current_experience_uuid: Optional[str] = None
+    current_experience_uuid: Optional[str]
     """
     The key in the experiences dict of the current experience under discussion
     If None, then no experience is currently being processed
     """
 
-    conversation_phase: ConversationPhase = ConversationPhase.COLLECT_EXPERIENCES
+    conversation_phase: ConversationPhase
     """
     The current conversation phase   
     """
@@ -108,8 +108,23 @@ class ExploreExperiencesAgentDirectorState(BaseModel):
             return ConversationPhase[value]
         return value
 
-    def __init__(self, session_id: int):
-        super().__init__(session_id=session_id, experiences_state={})
+    @staticmethod
+    def from_document(self: dict):
+        return ExploreExperiencesAgentDirectorState(
+            session_id=self["session_id"],
+            experiences_state=self["experiences_state"],
+            current_experience_uuid=self["current_experience_uuid"],
+            conversation_phase=self["conversation_phase"]
+        )
+
+    def __init__(self, *, session_id: int,
+                 experiences_state: Optional[dict[str, ExperienceState]] = None,
+                 current_experience_uuid: Optional[str] = None,
+                 conversation_phase: Optional[ConversationPhase] = ConversationPhase.COLLECT_EXPERIENCES):
+        super().__init__(session_id=session_id,
+                         experiences_state=experiences_state if experiences_state is not None else {},
+                         current_experience_uuid=current_experience_uuid,
+                         conversation_phase=conversation_phase)
 
 
 def _pick_next_experience_to_process(experiences: dict[str, ExperienceState]) -> ExperienceState | None:

@@ -5,6 +5,7 @@ from typing import Any, Optional
 from datetime import datetime, timezone
 
 from pydantic import BaseModel, Field, field_serializer, field_validator
+
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.conversation_memory.conversation_memory_manager import \
     ConversationMemoryManager
@@ -39,7 +40,7 @@ class AgentDirectorState(BaseModel):
 
     # Deserialize the current_phase from the enum name
     @field_validator("current_phase", mode='before')
-    def deserialize_current_phase(cls, value: Any) -> ConversationPhase:
+    def deserialize_current_phase(cls, value: str | ConversationPhase ) -> ConversationPhase:
         if isinstance(value, str):
             return ConversationPhase[value]
         return value
@@ -60,14 +61,13 @@ class AgentDirectorState(BaseModel):
             dt = value
         return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
 
-    # override the dict method to return the enum value instead of the enum object
-    def dict(self, *args, **kwargs):
-        return super().dict(exclude={"current_phase"}) | {
-            "current_phase": self.current_phase.value
-        }
+    @staticmethod
+    def from_document(self: dict):
+        return AgentDirectorState(session_id=self["session_id"],
+                                  current_phase=self["current_phase"])
 
-    def __init__(self, session_id: int, **data: Any):
-        super().__init__(session_id=session_id, **data)
+    def __init__(self, *, session_id: int, current_phase: Optional[ConversationPhase] = ConversationPhase.INTRO):
+        super().__init__(session_id=session_id, current_phase=current_phase)
 
 
 class AbstractAgentDirector(ABC):

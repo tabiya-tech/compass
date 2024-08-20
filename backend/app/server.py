@@ -156,7 +156,7 @@ async def conversation(request: Request, body: ConversationInput, clear_memory: 
             user_input = await sensitive_filter.obfuscate(user_input)
 
         # set the sent_at for the user input
-        user_input = AgentInput(message=user_input)
+        user_input = AgentInput(message=user_input, sent_at=datetime.now(timezone.utc))
 
         # set the state of the agent director, the conversation memory manager and all the agents
         state = await application_state_manager.get_state(session_id)
@@ -184,7 +184,7 @@ async def conversation(request: Request, body: ConversationInput, clear_memory: 
         if state.agent_director_state.current_phase == ConversationPhase.ENDED:
             state.agent_director_state.conversation_completed_at = datetime.now(timezone.utc)
         # save the state, before responding to the user
-        await application_state_manager.save_state(session_id, state)
+        await application_state_manager.save_state(state)
         return ConversationResponse(
             messages=response,
             conversation_completed=state.agent_director_state.current_phase == ConversationPhase.ENDED,

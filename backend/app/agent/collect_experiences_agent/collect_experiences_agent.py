@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import Optional
 
 from pydantic import BaseModel, field_serializer, field_validator
 
@@ -55,7 +55,7 @@ class CollectExperiencesAgentState(BaseModel):
 
     # Deserialize the explored_types from the enum name
     @field_validator("explored_types", mode='before')
-    def deserialize_explored_types(cls, value: Any) -> list[WorkType]:
+    def deserialize_explored_types(cls, value: list[str] | list[WorkType]) -> list[WorkType]:
         if isinstance(value, list):
             # If the value is a list, and the items in the list are strings, we convert the strings to the Enum
             # Otherwise, we return the value as is
@@ -71,26 +71,33 @@ class CollectExperiencesAgentState(BaseModel):
 
     # Deserialize the unexplored_types from the enum name
     @field_validator("unexplored_types", mode='before')
-    def deserialize_unexplored_types(cls, value: Any) -> list[WorkType]:
+    def deserialize_unexplored_types(cls, value: list[str] | list[WorkType]) -> list[WorkType]:
         if isinstance(value, list):
             # If the value is a list, and the items in the list are strings, we convert the strings to the Enum
             # Otherwise, we return the value as is
             return [WorkType[x] if isinstance(x, str) else x for x in value]
         return value
 
-    def __init__(self, session_id,
+    @staticmethod
+    def from_document(self: dict):
+        return CollectExperiencesAgentState(session_id=self["session_id"],
+                                            collected_data=self["collected_data"],
+                                            unexplored_types=self["unexplored_types"],
+                                            explored_types=self["explored_types"],
+                                            first_time_visit=self["first_time_visit"])
+
+    def __init__(self, *, session_id,
                  collected_data: Optional[list[CollectedData]] = None,
                  unexplored_types: Optional[list[WorkType]] = None,
-                 explored_types: list[WorkType] = None,
-                 first_time_visit: bool = True
-                 ):
+                 explored_types: Optional[list[WorkType]] = None,
+                 first_time_visit: bool = True):
         super().__init__(
             session_id=session_id,
             collected_data=collected_data if collected_data is not None else [],
             unexplored_types=unexplored_types if unexplored_types is not None else [WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
-                               WorkType.SELF_EMPLOYMENT,
-                               WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK,
-                               WorkType.UNSEEN_UNPAID],
+                                                                                    WorkType.SELF_EMPLOYMENT,
+                                                                                    WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK,
+                                                                                    WorkType.UNSEEN_UNPAID],
             explored_types=explored_types if explored_types is not None else [],
             first_time_visit=first_time_visit
         )

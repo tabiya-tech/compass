@@ -143,7 +143,7 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
             context = await conversation_memory_manager.get_conversation_context()
             response = await ConversationResponse.from_conversation_manager(context, from_index=current_index)
             # save the state, before responding to the user
-            await application_state_manager.save_state(session_id, state)
+            await application_state_manager.save_state(state)
             return response
         except Exception as e:  # pylint: disable=broad-except
             logger.exception(
@@ -211,7 +211,7 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
                 response = response.last.message_for_user
 
             # save the state, before responding to the user
-            await application_state_manager.save_state(session_id, state)
+            await application_state_manager.save_state(state)
             return response
         except Exception as e:  # pylint: disable=broad-except
             logger.exception(
@@ -298,7 +298,7 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
                 response = response.last.message_for_user
 
             # save the state, before responding to the user
-            await application_state_manager.save_state(session_id, state)
+            await application_state_manager.save_state(state)
             return response
         except Exception as e:  # pylint: disable=broad-except
             logger.exception(

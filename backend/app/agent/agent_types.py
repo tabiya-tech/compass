@@ -44,8 +44,11 @@ class AgentInput(BaseModel):
 
     # Deserialize the sent_at datetime and ensure it's interpreted as UTC
     @field_validator("sent_at", mode='before')
-    def deserialize_sent_at(cls, value: str) -> datetime:
-        dt = datetime.fromisoformat(value)
+    def deserialize_sent_at(cls, value: str | datetime) -> datetime:
+        if isinstance(value, str):
+            dt = datetime.fromisoformat(value)
+        else:
+            dt = value
         return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
 
 
@@ -116,8 +119,11 @@ class AgentOutput(BaseModel):
 
     # Deserialize the sent_at datetime and ensure it's interpreted as UTC
     @field_validator("sent_at", mode='before')
-    def deserialize_sent_at(cls, value: str) -> datetime:
-        dt = datetime.fromisoformat(value)
+    def deserialize_sent_at(cls, value: str | datetime) -> datetime:
+        if isinstance(value, str):
+            dt = datetime.fromisoformat(value)
+        else:
+            dt = value
         return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
 
 

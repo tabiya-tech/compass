@@ -41,18 +41,18 @@ logger = logging.getLogger()
 
 TEST_DB_NAME = '__test_db__'
 MONGO_URI = MongoDbSettings().mongodb_uri
-# MONGO_URI = "mongodb://localhost:27017" # to run the test on local db
+# MONGO_URI = "mongodb://localhost:27017"  # to run the test on local db
 
 
-async def save_application_state_and_assert_match(given_state_store: DatabaseApplicationStateStore, given_session_id:int, given_state: ApplicationState):
+async def save_application_state_and_assert_match(given_state_store: DatabaseApplicationStateStore, given_state: ApplicationState):
     """
     Save the state to the state store and assert that the state is saved successfully and matches the given state
     """
     # WHEN the given state is stored under the given_session_id
     # THEN the state is saved successfully
-    await given_state_store.save_state(given_session_id, given_state)
+    await given_state_store.save_state(given_state)
     # AND WHEN the state is fetched back from the state store by the given_session_id
-    fetched_state = await given_state_store.get_state(given_session_id)
+    fetched_state = await given_state_store.get_state(given_state.agent_director_state.session_id)
     # THEN the fetched state should match the given state
     assert fetched_state is not None
     assert fetched_state.model_dump() == given_state.model_dump()
@@ -64,8 +64,18 @@ async def save_application_state_and_assert_match(given_state_store: DatabaseApp
     assert fetched_state.skills_explorer_agent_state.model_dump() == given_state.skills_explorer_agent_state.model_dump()
 
 
-def update_agent_director_state(session_id: int):
-    application_state = ApplicationState(session_id=session_id)
+def generate_default_application_state(session_id: int) -> ApplicationState:
+    return ApplicationState(
+        session_id=session_id,
+        agent_director_state=AgentDirectorState(session_id=session_id),
+        explore_experiences_director_state=ExploreExperiencesAgentDirectorState(session_id=session_id),
+        conversation_memory_manager_state=ConversationMemoryManagerState(session_id=session_id),
+        collect_experience_state=CollectExperiencesAgentState(session_id=session_id),
+        skills_explorer_agent_state=SkillsExplorerAgentState(session_id=session_id)
+    )
+
+
+def update_agent_director_state(session_id: int, application_state: ApplicationState):
     # Set the agent director state to a new state with a different phase
     application_state.agent_director_state = AgentDirectorState(
         session_id=session_id,
@@ -103,8 +113,7 @@ def generate_experience_state(experience_entity: ExperienceEntity) -> Experience
     )
 
 
-def update_explore_experiences_director_state(session_id: int):
-    application_state = ApplicationState(session_id=session_id)
+def update_explore_experiences_director_state(session_id: int, application_state: ApplicationState):
     # Generate a dictionary of 5 experiences with their UUID as the key
     generated_experiences = {
         experience_entity.uuid: generate_experience_state(experience_entity)
@@ -138,8 +147,7 @@ def generate_history(index) -> ConversationHistory:
     ])
 
 
-def update_conversation_memory_manager_state(session_id: int):
-    application_state = ApplicationState(session_id=session_id)
+def update_conversation_memory_manager_state(session_id: int, application_state: ApplicationState):
     # Set the conversation memory manager state to a new state with a different conversation history
     given_all_history = generate_history(5)
     given_summarized_history = generate_history(3)
@@ -148,7 +156,7 @@ def update_conversation_memory_manager_state(session_id: int):
     application_state.conversation_memory_manager_state = ConversationMemoryManagerState(
         session_id=session_id,
         all_history=given_all_history,
-        summarized=given_summarized_history,
+        unsummarized_history=given_summarized_history,
         to_be_summarized_history=given_to_be_summarized_history,
         summary=given_summary
     )
@@ -168,8 +176,7 @@ def generate_collected_data(index) -> CollectedData:
     )
 
 
-def update_collect_experience_state(session_id: int):
-    application_state = ApplicationState(session_id=session_id)
+def update_collect_experience_state(session_id: int, application_state: ApplicationState):
     # Set the collect experience state to a new state with a different conversation history
     given_collected_data = generate_collected_data(1)
     given_unexplored_types = [WorkType.SELF_EMPLOYMENT, WorkType.UNSEEN_UNPAID]
@@ -185,8 +192,7 @@ def update_collect_experience_state(session_id: int):
     return application_state
 
 
-def update_skills_explorer_agent_state(session_id: int):
-    application_state = ApplicationState(session_id=session_id)
+def update_skills_explorer_agent_state(session_id: int, application_state: ApplicationState):
     # Set the skills explorer agent state to a new state with a different conversation history
     given_first_time_for_experience = {str(uuid4()): True}
     given_experiences_explored = [str(uuid4())]
@@ -200,7 +206,7 @@ def update_skills_explorer_agent_state(session_id: int):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize('given_state_callback', [
-    lambda session_id: ApplicationState(session_id=session_id),
+    lambda session_id, application_state: generate_default_application_state(session_id),
     update_agent_director_state,
     update_explore_experiences_director_state,
     update_conversation_memory_manager_state,
@@ -225,13 +231,14 @@ async def test_database_application_state_store(given_state_callback):
         state_store = DatabaseApplicationStateStore()
 
         try:
-            # GIVEN an application state
+            # GIVEN an application state initialized with the given session_id
             given_session_id = 123
-            given_application_state = given_state_callback(session_id=given_session_id)
+            given_initial_application_state = generate_default_application_state(given_session_id)
+            given_application_state = given_state_callback(session_id=given_session_id, application_state=given_initial_application_state)
             # WHEN the application state is saved to the state store
             # THEN the application state is saved successfully
             # AND the saved state matches the given state
-            await save_application_state_and_assert_match(state_store, given_session_id, given_application_state)
+            await save_application_state_and_assert_match(state_store, given_application_state)
             # AND WHEN the state is deleted from the state store
             # THEN the state is deleted successfully
             await state_store.delete_state(given_session_id)
