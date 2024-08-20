@@ -41,6 +41,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // a state to track if the checks for the user on page load have been completed
   const [pageLoadComplete, setPageLoadComplete] = useState(false);
 
+  const FIREBASE_DB_NAME = "firebaseLocalStorageDb";
+
   /**
    * Sets and unsets the token from persistent storage based on the state of the application
    */
@@ -69,6 +71,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     [setUser, setToken, getUserFromToken]
   );
 
+  const deleteFirebaseDB = useCallback(async () => {
+    try {
+      indexedDB.deleteDatabase(FIREBASE_DB_NAME)
+    } catch (error) {
+      console.error("Failed to delete user from Firebase DB", error);
+    }
+  }, []);
+
   /**
    * Clears the user from the state and the persistent storage
    * @returns void
@@ -77,8 +87,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsAuthenticationInProgress(true);
     clearToken();
     setUser(null);
+    deleteFirebaseDB();
     setIsAuthenticationInProgress(false);
-  }, [clearToken]);
+  }, [clearToken, deleteFirebaseDB]);
 
   /**
    * Handles page load to check and set the user if an token exists in the persistent storage
@@ -101,6 +112,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setPageLoadComplete(true);
     } else {
       setIsAuthenticationInProgress(false);
+      clearUser();
       setPageLoadComplete(true);
     }
   }, [updateUserByToken, getToken, clearUser]);
@@ -126,7 +138,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           } catch (error) {
             console.error("Failed to refresh token:", error);
             // If the token refresh fails, log the user out
-            await logoutService.handleLogout(clearUser, console.error);
+            try {
+              await logoutService.handleLogout(clearUser, console.error);
+            } finally {
+              clearUser();
+            }
           }
         }, timeToExpiration - timeToExpiration * REFRESH_TOKEN_EXPIRATION_PERCENTAGE);
       });
