@@ -1,19 +1,17 @@
 import React, { useCallback, useState } from "react";
-import { Box, Container, styled, Typography } from "@mui/material";
+import { Box, Checkbox, Container, styled, Typography, useMediaQuery } from "@mui/material";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Language, UpdateUserPreferencesSpec } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import {
-  getUserFriendlyErrorMessage,
-  ServiceError
-} from "src/error/ServiceError/ServiceError";
+import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
 import LanguageContextMenu from "src/i18n/languageContextMenu/LanguageContextMenu";
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { useNavigate } from "react-router-dom";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { routerPaths } from "src/app/routerPaths";
-import { userPreferencesStateService } from "../userPreferences/UserPreferencesProvider/UserPreferencesStateService";
-import authStateService from "../auth/AuthStateService";
+import { userPreferencesStateService } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
+import authStateService from "src/auth/AuthStateService";
+import { Theme } from "@mui/material/styles";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
@@ -30,13 +28,26 @@ export const DATA_TEST_ID = {
   LANGUAGE_SELECTOR: `dpa-language-selector-${uniqueId}`,
   ACCEPT_DPA_BUTTON: `dpa-accept-button-${uniqueId}`,
   CIRCULAR_PROGRESS: `dpa-circular-progress-${uniqueId}`,
+  ACCEPT_DPA_CHECKBOX: `dpa-accept-checkbox-${uniqueId}`,
+  TERMS_AND_CONDITIONS: `dpa-terms-and-conditions-${uniqueId}`,
 };
 
+const StyledAnchor = styled("a")(({ theme }) => ({
+  color: theme.palette.tabiyaBlue.main,
+  textDecoration: "underline",
+  fontWeight: "bold",
+  "&:hover": {
+    color: theme.palette.tabiyaBlue.light,
+  },
+}));
 
 const DataProtectionAgreement: React.FC = () => {
   const navigate = useNavigate();
   const [isAcceptingDPA, setIsAcceptingDPA] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
+  const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
+
   /**
    * Persist the user's chosen preferences to the backend
    */
@@ -45,7 +56,7 @@ const DataProtectionAgreement: React.FC = () => {
       const user = authStateService.getUser();
       if (!user) {
         enqueueSnackbar("User not found", { variant: "error" });
-        navigate(routerPaths.LOGIN)
+        navigate(routerPaths.LOGIN);
         return;
       }
 
@@ -55,14 +66,12 @@ const DataProtectionAgreement: React.FC = () => {
         accepted_tc: new Date(),
       };
       setIsAcceptingDPA(true);
-      const prefs = await userPreferencesService.updateUserPreferences(
-        newUserPreferenceSpecs
-      );
+      const prefs = await userPreferencesService.updateUserPreferences(newUserPreferenceSpecs);
       userPreferencesStateService.setUserPreferences(prefs);
       navigate(routerPaths.ROOT, { replace: true });
       enqueueSnackbar("Data Protection Agreement Accepted", { variant: "success" });
     } catch (e) {
-      if(e instanceof ServiceError) {
+      if (e instanceof ServiceError) {
         writeServiceErrorToLog(e, console.error);
         enqueueSnackbar(getUserFriendlyErrorMessage(e), { variant: "error" });
       } else {
@@ -81,12 +90,21 @@ const DataProtectionAgreement: React.FC = () => {
     await persistUserPreferences();
   };
 
+  /**
+   * Handle when a user checks the checkbox
+   */
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsChecked(event.target.checked);
+  };
+
+  const label = "I have read and agree to Compass's ";
+
   return (
     <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.DPA_CONTAINER}>
       <Box
         display="flex"
         flexDirection="column"
-        alignItems="center"
+        alignItems="start"
         justifyContent={"space-evenly"}
         m={4}
         height={"80%"}
@@ -120,15 +138,33 @@ const DataProtectionAgreement: React.FC = () => {
           Help us keep all AI interactions safe and positive! 😊
           <br />
           <br />
-          Are you ready to start?
         </Typography>
-
+        <Box display="flex" alignItems="start" paddingBottom={3} gap={isSmallMobile ? 3 : 1.5}>
+          <Checkbox
+            checked={isChecked}
+            onChange={handleCheckboxChange}
+            sx={{ padding: 0, marginTop: 0.5, transform: "scale(1.3)" }}
+            inputProps={{ "aria-label": label }}
+            data-testid={DATA_TEST_ID.ACCEPT_DPA_CHECKBOX}
+          />
+          <Typography variant="body2" data-testid={DATA_TEST_ID.TERMS_AND_CONDITIONS}>
+            {label}
+            <StyledAnchor href="https://compass.tabiya.org/dpa.html" target="_blank" rel="noreferrer">
+              Terms and Conditions
+            </StyledAnchor>
+            .
+          </Typography>
+        </Box>
+        <Typography>
+          Are you ready to start?
+          <br />
+        </Typography>
         <PrimaryButton
           fullWidth
           variant="contained"
           color="primary"
           style={{ marginTop: 16 }}
-          disabled={isAcceptingDPA}
+          disabled={isAcceptingDPA || !isChecked}
           disableWhenOffline={true}
           data-testid={DATA_TEST_ID.ACCEPT_DPA_BUTTON}
           onClick={handleAcceptedDPA}
