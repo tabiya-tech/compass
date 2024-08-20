@@ -5,7 +5,7 @@ exports[`Report should render Report correctly 1`] = `
   data-testid="skill-report-container-5a296552-f91f-4c38-b88f-542cacaced8e"
 >
   <page
-    style="display: flex; flex-direction: column; padding-bottom: 95px;"
+    style="display: flex; flex-direction: column; padding-bottom: 100px;"
   >
     <view
       data-testid="skill-report-body-5a296552-f91f-4c38-b88f-542cacaced8e"
@@ -169,6 +169,52 @@ exports[`Report should render Report correctly 1`] = `
               </view>
             </view>
           </view>
+        </view>
+      </view>
+      <view
+        style="display: flex; flex-direction: column;"
+      >
+        <text
+          style="font-size: 16px; font-family: Inter; font-weight: bold; padding-bottom: 18px; color: rgb(8, 55, 99);"
+        >
+          Skills Description
+        </text>
+        <text
+          data-testid="skill-report-body-text-5a296552-f91f-4c38-b88f-542cacaced8e"
+          style="font-size: 11px; font-family: Inter; font-weight: normal; word-break: break-word; color: rgb(67, 71, 78);"
+        >
+          Below, you will find a list of the skills discovered during your conversation with Compass, along with their descriptions.
+        </text>
+        <view
+          style="border: 1px; color: rgb(67, 71, 78); margin-top: 12px; margin-bottom: 20px;"
+        />
+        <view
+          style="display: flex; flex-direction: column; gap: 4px;"
+        >
+          <text
+            style="font-family: Inter; font-weight: bold; font-size: 12px; color: rgb(67, 71, 78);"
+          >
+            Communication
+          </text>
+          <text
+            style="font-family: Inter; font-weight: normal; font-size: 10px; color: rgb(67, 71, 78); padding-bottom: 12px;"
+          >
+            The imparting or exchanging of information or news
+          </text>
+        </view>
+        <view
+          style="display: flex; flex-direction: column; gap: 4px;"
+        >
+          <text
+            style="font-family: Inter; font-weight: bold; font-size: 12px; color: rgb(67, 71, 78);"
+          >
+            Management
+          </text>
+          <text
+            style="font-family: Inter; font-weight: normal; font-size: 10px; color: rgb(67, 71, 78); padding-bottom: 12px;"
+          >
+            The process of dealing with or controlling things or people
+          </text>
         </view>
       </view>
     </view>

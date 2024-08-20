@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Document, Text, Page, View, Image } from "@react-pdf/renderer";
-import { Experience, WorkType } from "src/Experiences/ExperienceService/Experiences.types";
-import ExperiencesReportContent from "src/Report/ExperiencesReportContent/ExperiencesReportContent";
+import { Experience, Skill, WorkType } from "src/Experiences/ExperienceService/Experiences.types";
+import ExperiencesReportContent, {
+  capitalizeFirstLetter,
+} from "src/Report/ExperiencesReportContent/ExperiencesReportContent";
 import styles from "src/Report/styles";
 
 interface SkillReportProps {
@@ -53,6 +55,20 @@ const SkillReport: React.FC<SkillReportProps> = ({
       experience.work_type === WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK ||
       experience.work_type === WorkType.UNSEEN_UNPAID
   );
+
+  // Get a list of all unique skills in alphabetical order
+  const skillsList = useMemo(() => {
+    const skillOnly: Skill[] = [];
+    experiences.forEach((experience) => {
+      experience.top_skills.forEach((skill) => {
+        if (!skillOnly.find((sk) => sk.preferredLabel === skill.preferredLabel)) {
+          skillOnly.push(skill);
+        }
+        return;
+      });
+    });
+    return skillOnly.sort((a, b) => a.preferredLabel.localeCompare(b.preferredLabel));
+  }, [experiences]);
 
   return (
     <Document data-testid={DATA_TEST_ID.SKILL_REPORT_CONTAINER}>
@@ -151,6 +167,22 @@ const SkillReport: React.FC<SkillReportProps> = ({
                 ))}
               </View>
             )}
+          </View>
+          <View style={styles.skillDescriptionContainer}>
+            <Text style={styles.skillDescriptionTitle} break>
+              Skills Description
+            </Text>
+            <Text style={styles.info} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY_TEXT}>
+              Below, you will find a list of the skills discovered during your conversation with Compass, along with
+              their descriptions.
+            </Text>
+            <View style={styles.skillDivider} />
+            {skillsList.map((skill) => (
+              <View wrap={false} key={skill.UUID} style={styles.skillContainer}>
+                <Text style={styles.label}>{capitalizeFirstLetter(skill.preferredLabel)}</Text>
+                <Text style={styles.description}>{skill.description}</Text>
+              </View>
+            ))}
           </View>
         </View>
         <View fixed style={styles.footer}>

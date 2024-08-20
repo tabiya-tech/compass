@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
   page: {
     display: "flex",
     flexDirection: "column",
-    paddingBottom: 95,
+    paddingBottom: 100,
   },
   title: {
     fontSize: 16,
@@ -160,6 +160,50 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     alignItems: "flex-start",
     gap: 4,
+  },
+  skillDescriptionContainer: {
+    display: "flex",
+    flexDirection: "column",
+    paddingHorizontal: 48,
+  },
+  skillDescriptionTitle: {
+    fontSize: 16,
+    fontFamily: "Inter",
+    fontWeight: "bold",
+    paddingBottom: 18,
+    color: "#083763",
+  },
+  info: {
+    fontSize: 11,
+    fontFamily: "Inter",
+    fontWeight: "normal",
+    wordBreak: "break-word",
+    color: "#43474E",
+  },
+  skillDivider: {
+    borderBottomWidth: 1,
+    border: 1,
+    color: "#43474E",
+    marginTop: 12,
+    marginBottom: 20,
+  },
+  skillContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 4,
+  },
+  label: {
+    fontFamily: "Inter",
+    fontWeight: "bold",
+    fontSize: 12,
+    color: "#43474E",
+  },
+  description: {
+    fontFamily: "Inter",
+    fontWeight: "normal",
+    fontSize: 10,
+    color: "#43474E",
+    paddingBottom: 12,
   },
   footer: {
     width: "100%",

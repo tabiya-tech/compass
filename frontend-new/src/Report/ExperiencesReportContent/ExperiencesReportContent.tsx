@@ -16,11 +16,11 @@ export const DATA_TEST_ID = {
   EXPERIENCES_CONTENT_REPORT_SKILLS: `experiences-content-report-skills-${uniqueId}`,
 };
 
-const ExperiencesReportContent: React.FC<ExperienceProps> = ({ experience }) => {
-  const capitalizeFirstLetter = (string: string): string => {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  };
+export const capitalizeFirstLetter = (string: string): string => {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
 
+const ExperiencesReportContent: React.FC<ExperienceProps> = ({ experience }) => {
   return (
     <View wrap={false} style={styles.container} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_CONTAINER}>
       <View style={styles.contentColumn}>
