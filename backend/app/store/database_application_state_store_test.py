@@ -1,5 +1,7 @@
 import logging.config
+import os
 import random
+import re
 from unittest.mock import patch
 from uuid import uuid4
 
@@ -39,9 +41,15 @@ LOGGING_CONFIG = {
 logging.config.dictConfig(LOGGING_CONFIG)
 logger = logging.getLogger()
 
-TEST_DB_NAME = '__test_db__'
+# Get the branch name from the environment
+branch_name = os.getenv('BRANCH_NAME', '')
+
+# Replace any forbidden characters with an underscore '_'
+sanitized_branch_name = re.sub(r'[ .$/\\\x00"]', '_', branch_name)
+
+# Construct the test database name
+TEST_DB_NAME = '__test_db__' + sanitized_branch_name
 MONGO_URI = MongoDbSettings().mongodb_uri
-# MONGO_URI = "mongodb://localhost:27017"  # to run the test on local db
 
 
 async def save_application_state_and_assert_match(given_state_store: DatabaseApplicationStateStore, given_state: ApplicationState):
@@ -249,5 +257,5 @@ async def test_database_application_state_store(given_state_callback):
         finally:
             # Ensure cleanup of the test database regardless of the test outcome
             # To run the test locally, ensure that you have the permission to drop the database
-            await client.drop_database(TEST_DB_NAME)
+            # await client.drop_database(TEST_DB_NAME) # TODO: Uncomment this line to drop the test database
             client.close()

@@ -73,3 +73,4 @@ jobs:
           VERTEX_API_REGION: ${{ inputs.vertex-api-region }}
           BACKEND_URL: ${{ inputs.backend-url }}
           FRONTEND_URL: ${{ inputs.frontend-url }}
+          BRANCH_NAME: ${{ github.ref_name }}
