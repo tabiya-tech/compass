@@ -5,7 +5,7 @@ import random
 import pytest
 
 from app.agent.linking_and_ranking_pipeline.infer_occupation_tool import InferOccupationTool
-from app.server_dependecies.db_dependecies import get_mongo_db
+from app.server_dependecies.db_dependecies import CompassDBProvider
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
 from app.vector_search.esco_search_service import OccupationSkillSearchService
 from .test_occupation_inference_test_case import test_cases
@@ -14,8 +14,8 @@ from evaluation_tests.linking_and_ranking_pipeline.infer_occupation_tool.test_oc
 
 
 @pytest.fixture(scope="function")
-def setup_agent_tool():
-    db = get_mongo_db()
+async def setup_agent_tool():
+    db = await CompassDBProvider.get_taxonomy_db()
     embedding_service = GoogleGeckoEmbeddingService()
     search_service = OccupationSkillSearchService(db, embedding_service)
     tool = InferOccupationTool(search_service)

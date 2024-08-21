@@ -1,18 +1,19 @@
 import asyncio
 import logging
 
+from motor.motor_asyncio import AsyncIOMotorDatabase
+
 from app.agent.agent_director.abstract_agent_director import AgentDirectorState
 from app.application_state import ApplicationStateStore, ApplicationState
-from app.constants.database import Collections
-from app.server_dependecies.db_dependecies import get_mongo_db
+from app.server_dependecies.database_collections import Collections
 
 
 class DatabaseApplicationStateStore(ApplicationStateStore):
     """
     A MongoDB store for application state.
     """
-    def __init__(self):
-        db = get_mongo_db()
+
+    def __init__(self, db: AsyncIOMotorDatabase):
         self._agent_director_collection = db.get_collection(Collections.AGENT_DIRECTOR_STATE)
         self._logger = logging.getLogger(self.__class__.__name__)
 

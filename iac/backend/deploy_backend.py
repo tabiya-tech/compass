@@ -1,5 +1,7 @@
 import base64
 import os
+from wsgiref.util import application_uri
+
 import pulumi
 import pulumi_docker as docker
 import pulumi_gcp as gcp
@@ -307,7 +309,8 @@ class BackendEnvVarsConfig:
     See the backend service for more information on the environment variables
     """
     MONGODB_URI: str
-    DATABASE_NAME: str
+    TAXONOMY_DATABASE_NAME: str
+    APPLICATION_DATABASE_NAME: str
     VERTEX_API_REGION: str
     TARGET_ENVIRONMENT: str
     BACKEND_URL: str
@@ -360,8 +363,10 @@ def _deploy_cloud_run_service(
                     envs=[
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="MONGODB_URI",
                                                                        value=backend_env_vars_cfg.MONGODB_URI),
-                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="DATABASE_NAME",
-                                                                       value=backend_env_vars_cfg.DATABASE_NAME),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="TAXONOMY_DATABASE_NAME",
+                                                                       value=backend_env_vars_cfg.TAXONOMY_DATABASE_NAME),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="APPLICATION_DATABASE_NAME",
+                                                                       value=backend_env_vars_cfg.APPLICATION_DATABASE_NAME),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="VERTEX_API_REGION",
                                                                        value=backend_env_vars_cfg.VERTEX_API_REGION),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="TARGET_ENVIRONMENT",
@@ -388,9 +393,13 @@ def _get_backend_env_vars(environment: str):
     if not mongodb_uri:
         raise ValueError("MONGODB_URI environment variable is not set")
 
-    database_name = os.getenv("DATABASE_NAME")
-    if not database_name:
-        raise ValueError("DATABASE_NAME environment variable is not set")
+    taxonomy_database_name = os.getenv("TAXONOMY_DATABASE_NAME")
+    if not taxonomy_database_name:
+        raise ValueError("TAXONOMY_DATABASE_NAME environment variable is not set")
+
+    application_database_name = os.getenv("APPLICATION_DATABASE_NAME")
+    if not application_database_name:
+        raise ValueError("APPLICATION_DATABASE_NAME environment variable is not set")
 
     vertex_api_region = os.getenv("VERTEX_API_REGION")
     if not vertex_api_region:
@@ -406,7 +415,8 @@ def _get_backend_env_vars(environment: str):
 
     return BackendEnvVarsConfig(
         MONGODB_URI=mongodb_uri,
-        DATABASE_NAME=database_name,
+        TAXONOMY_DATABASE_NAME=taxonomy_database_name,
+        APPLICATION_DATABASE_NAME=application_database_name,
         VERTEX_API_REGION=vertex_api_region,
         TARGET_ENVIRONMENT=environment,
         BACKEND_URL=backend_url,
