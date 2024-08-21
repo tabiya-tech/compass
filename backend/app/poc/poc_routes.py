@@ -1,5 +1,5 @@
 import base64
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.agent.agent_types import AgentOutput, AgentInput
@@ -33,7 +33,7 @@ class ConversationResponse(BaseModel):
     """
     The last message from the agent in the conversation.
     """
-    messages_for_user: list[str] = []
+    messages_for_user: list[str] = Field(default_factory=list)
     """
     The messages for the user.
     """

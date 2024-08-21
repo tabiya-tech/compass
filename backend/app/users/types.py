@@ -1,7 +1,6 @@
-from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
 
 
@@ -62,7 +61,7 @@ class UserPreferences(BaseModel):
     language: Optional[str] = None
     invitation_code: Optional[str] = None
     accepted_tc: Optional[datetime] = None
-    sessions: list[int] = []  # not required
+    sessions: list[int] = Field(default_factory=list)  # not required
 
     class Config:
         extra = "forbid"
