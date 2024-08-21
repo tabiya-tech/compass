@@ -1,17 +1,17 @@
 import logging
 
-from app.server_dependecies.db_dependecies import get_mongo_db
-from app.constants.database import Collections
+from motor.motor_asyncio import AsyncIOMotorDatabase
+
+from app.server_dependecies.database_collections import Collections
 
 from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest
-
 
 logger = logging.getLogger(__name__)
 
 
 class UserPreferenceRepository:
-    def __init__(self):
-        self.collection = get_mongo_db().get_collection(Collections.USER_PREFERENCES)
+    def __init__(self, db: AsyncIOMotorDatabase):
+        self.collection = db.get_collection(Collections.USER_PREFERENCES)
 
     async def get_user_preference_by_user_id(self, user_id) -> UserPreferences | None:
         """

@@ -1,8 +1,15 @@
 from fastapi import FastAPI, APIRouter
+from fastapi.params import Depends
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.constants.errors import HTTPErrorResponse
 from app.invitations.service import UserInvitationService
 from app.invitations.types import GetInvitationCodeStatusResponse
+from app.server_dependecies.db_dependecies import CompassDBProvider
+
+
+async def get_user_invitations_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)):
+    return UserInvitationService(db)
 
 
 def add_user_invitations_routes(app: FastAPI):
@@ -17,8 +24,6 @@ def add_user_invitations_routes(app: FastAPI):
     User Invitations Routes
     """
 
-    invitations_service = UserInvitationService()
-
     @router.get(
         path="/check-status",
         description="""Get the status of the invitation code""",
@@ -26,7 +31,8 @@ def add_user_invitations_routes(app: FastAPI):
         responses={500: {"model": HTTPErrorResponse}},
         name="get user invitation status"
     )
-    async def _get_invitation_status(invitation_code: str) -> GetInvitationCodeStatusResponse:
+    async def _get_invitation_status(invitation_code: str,
+                                     invitations_service: UserInvitationService = Depends(get_user_invitations_service)) -> GetInvitationCodeStatusResponse:
         return await invitations_service.get_invitation_status(invitation_code)
 
     ######################

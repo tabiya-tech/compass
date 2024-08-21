@@ -2,11 +2,11 @@ import logging
 from datetime import datetime, timezone
 from typing import Optional
 
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo import ReturnDocument
 
-from app.constants.database import Collections
+from app.server_dependecies.database_collections import Collections
 from app.invitations.types import UserInvitation
-from app.server_dependecies.db_dependecies import get_mongo_db
 
 logger = logging.getLogger(__name__)
 
@@ -15,8 +15,9 @@ class UserInvitationRepository:
     """
     UserInvitationRepository class is responsible for managing the user invitations in the database.
     """
-    def __init__(self):
-        self._collection = get_mongo_db().get_collection(Collections.USER_INVITATIONS)
+
+    def __init__(self, db: AsyncIOMotorDatabase):
+        self._collection = db.get_collection(Collections.USER_INVITATIONS)
 
     async def get_valid_invitation_by_code(self, invitation_code: str) -> Optional[UserInvitation]:
         """
@@ -38,6 +39,7 @@ class UserInvitationRepository:
             })
 
             if not _doc:
+                logger.warning(f"Invitation with code '{invitation_code}' not found or invalid")
                 return None
 
             return UserInvitation.from_dict(_doc)

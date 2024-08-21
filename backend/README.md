@@ -145,8 +145,9 @@ docker run -v ~/.config/gcloud/:/root/.config/gcloud/ -e GCLOUD_PROJECT="$(gclou
 The backend uses the following environment variables:
 
 - `GOOGLE_APPLICATION_CREDENTIALS`: The path to the service account key file.
-- `MONGODB_URI`: The URI of the MongoDB Atlas instance to use where the ESCO data is stored.
-- `DATABASE_NAME`: The name of mongo db database
+- `MONGODB_URI`: The URI of the MongoDB Atlas instance.
+- `TAXONOMY_DATABASE_NAME`: The name of mongo db database where the ESCO taxonomy data with the embeddings is stored.
+- `APPLICATION_DATABASE_NAME`: The name of mongo db database used by the application to store data.
 - `VERTEX_API_REGION`: (optional) The region of the Vertex API to use. If not set defaults to `us-central1`.
 - `LOG_CONFIG_FILE`: (Optional) See the [Logging](#logging) section for more information. If not set defaults to `logging.cfg.yaml`.
 - `BACKEND_URL`: The URL of the backend. It is used to correctly configure Swagger UI and the CORS policy. 
@@ -162,6 +163,8 @@ directory of the backend project and set the environment variables as follows:
 # .env file
 GOOGLE_APPLICATION_CREDENTIALS=<PATH_TO_KEY_FILE>
 MONGODB_URI=<URI_TO_MONGODB>
+TAXONOMY_DATABASE_NAME=<TAXONOMY_DATABASE_NAME>
+APPLICATION_DATABASE_NAME=<APPLICATION_DATABASE_NAME>
 VERTEX_API_REGION=<REGION>
 LOG_CONFIG_FILE=<YAML_FILE>
 BACKEND_URL=<URL>
@@ -221,7 +224,9 @@ Assuming the `.env` file is in the root directory of the project and the service
 named `credentials.json` is in a folder named `keys` in the root directory:
 
 ```dotenv
-MONGODB_URI=<URI_TO_MONGODB>
+MONGODB_URI=mongodb+srv://<USERNAME>:<PASSORD>@<CLUSTER>/?retryWrites=true&w=majority&appName=Compass-Dev
+TAXONOMY_DATABASE_NAME=compass-dev
+APPLICATION_DATABASE_NAME=compass-dev
 GOOGLE_APPLICATION_CREDENTIALS=keys/credentials.json
 VERTEX_API_REGION=<REGION>
 LOG_CONFIG_FILE=logging.cfg.dev.yaml

@@ -1,6 +1,6 @@
 from typing import List, Any, Mapping
 
-from app.server_dependecies.db_dependecies import get_mongo_db
+from app.server_dependecies.db_dependecies import CompassDBProvider
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
 from app.vector_search.esco_entities import OccupationEntity
 from app.vector_search.esco_search_service import OccupationSkillSearchService, OccupationSearchService, \
@@ -18,8 +18,8 @@ class FakeOccupationSimilaritySearchService(SimilaritySearchService[OccupationEn
                                  altLabels=['Baker'])]
 
 
-def get_search_services():
-    db = get_mongo_db()
+async def get_search_services():
+    db = await CompassDBProvider.get_taxonomy_db()
     embedding_service = GoogleGeckoEmbeddingService()
     occupation_skill_search_service = OccupationSkillSearchService(db, embedding_service)
     embedding_config = EmbeddingConfig()

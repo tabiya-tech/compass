@@ -1,12 +1,14 @@
 from fastapi import APIRouter, HTTPException, Depends
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.constants.errors import ErrorService, HTTPErrorResponse
 from app.invitations.service import UserInvitationService
 from app.invitations.types import InvitationCodeStatus, InvitationType
+from app.server_dependecies.db_dependecies import CompassDBProvider
 from app.users.auth import Authentication, UserInfo, SignInProvider
 from app.users.repositories import UserPreferenceRepository
 from app.users.sessions import generate_new_session_id, SessionsService
-from app.users.types import UserPreferencesUpdateRequest, UserPreferences, UpdateUserLanguageRequest, \
+from app.users.types import UserPreferencesUpdateRequest, UserPreferences, \
     CreateUserPreferencesRequest, UserPreferencesRepositoryUpdateRequest
 
 import logging
@@ -49,6 +51,9 @@ async def _get_user_preferences(
         raise HTTPException(status_code=500, detail="Oops! something went wrong")
 
 
+INVALID_INVITATION_CODE_MESSAGE = "Invalid invitation code"
+
+
 async def _create_user_preferences(
         user_invitation_service: UserInvitationService,
         repository: UserPreferenceRepository,
@@ -62,17 +67,17 @@ async def _create_user_preferences(
         invitation = await user_invitation_service.get_invitation_status(preferences.invitation_code)
 
         if invitation.status == InvitationCodeStatus.INVALID:
-            raise HTTPException(status_code=400, detail="Invalid invitation code")
+            raise HTTPException(status_code=400, detail=INVALID_INVITATION_CODE_MESSAGE)
 
         # an authenticated user can't use an auto-register invitation code
         if (invitation.invitation_type == InvitationType.AUTO_REGISTER.value
                 and authed_user.sign_in_provider != SignInProvider.ANONYMOUS):
-            raise HTTPException(status_code=400, detail="Invalid invitation code")
+            raise HTTPException(status_code=400, detail=INVALID_INVITATION_CODE_MESSAGE)
 
         # an anonymous user can't use a register invitation code because it requires user to register
         if (invitation.invitation_type == InvitationType.REGISTER.value and
                 authed_user.sign_in_provider == SignInProvider.ANONYMOUS):
-            raise HTTPException(status_code=400, detail="Invalid invitation code")
+            raise HTTPException(status_code=400, detail=INVALID_INVITATION_CODE_MESSAGE)
 
         # Check if user preferences already exist
         user_already_exists = await repository.get_user_preference_by_user_id(preferences.user_id)
@@ -87,7 +92,7 @@ async def _create_user_preferences(
         is_reduced = await user_invitation_service.reduce_invitation_code_capacity(preferences.invitation_code)
 
         if not is_reduced:
-            raise HTTPException(status_code=400, detail="Invalid invitation code")
+            raise HTTPException(status_code=400, detail=INVALID_INVITATION_CODE_MESSAGE)
 
         # Generating a 64-bit integer session ID
         session_id = generate_new_session_id()  # nosec
@@ -173,6 +178,14 @@ async def _update_user_preferences(
         ErrorService.handle(__name__, e)
 
 
+async def _get_user_preferences_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)):
+    return UserPreferenceRepository(db)
+
+
+async def _get_user_invitations_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)):
+    return UserInvitationService(db)
+
+
 def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     """
     Add all routes related to user preferences to the users router.
@@ -185,8 +198,6 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     #########################
     # Dependency Injection - User Preference Repository
     #########################
-    user_preference_repository = UserPreferenceRepository()
-    user_invitation_service = UserInvitationService()
 
     #########################
     # GET /preferences - Get user preferences by user id
@@ -197,7 +208,8 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
                 responses={403: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
                 name="get user preferences",
                 description="Get user preferences, (language and time when they accepted terms and conditions)")
-    async def _get_user_preferences_handler(user_id: str, user_info: UserInfo = Depends(auth.get_user_info())):
+    async def _get_user_preferences_handler(user_id: str, user_info: UserInfo = Depends(auth.get_user_info()),
+                                            user_preference_repository: UserPreferenceRepository = Depends(_get_user_preferences_service)):
         return await _get_user_preferences(user_preference_repository, user_id, user_info)
 
     #########################
@@ -206,12 +218,15 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     @router.post("",
                  response_model=UserPreferences,
                  status_code=201,
-                 responses={403: {"model": HTTPErrorResponse}, 409: {"model": HTTPErrorResponse} , 500: {"model": HTTPErrorResponse}},
+                 responses={403: {"model": HTTPErrorResponse}, 409: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
                  name="add user preferences",
                  description="Add user preferences, (language and time when they accepted terms and conditions)"
                  )
     async def _create_handler(body: CreateUserPreferencesRequest,
-                              user_info: UserInfo = Depends(auth.get_user_info())):
+                              user_info: UserInfo = Depends(auth.get_user_info()),
+                              user_invitation_service: UserInvitationService = Depends(_get_user_invitations_service),
+                              user_preference_repository: UserPreferenceRepository = Depends(_get_user_preferences_service)
+                              ):
         return await _create_user_preferences(user_invitation_service, user_preference_repository, body, user_info)
 
     #########################
@@ -226,7 +241,8 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     )
     async def _update_user_preferences_handler(
             request: UserPreferencesUpdateRequest,
-            user_info: UserInfo = Depends(auth.get_user_info())
+            user_info: UserInfo = Depends(auth.get_user_info()),
+            user_preference_repository: UserPreferenceRepository = Depends(_get_user_preferences_service)
     ) -> UserPreferences:
         return await _update_user_preferences(
             user_preference_repository,
@@ -242,7 +258,9 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
                 status_code=201,
                 responses={403: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
                 description="""Endpoint for starting a new conversation session.""")
-    async def _get_new_session_handler(user_id: str, user_info: UserInfo = Depends(auth.get_user_info())):
+    async def _get_new_session_handler(user_id: str, user_info: UserInfo = Depends(auth.get_user_info()),
+                                       user_preference_repository: UserPreferenceRepository = Depends(_get_user_preferences_service)
+                                       ):
         """
         Endpoint for starting a new conversation session.
         The function creates a new session id and adds it to the user sessions on the top of the list.
