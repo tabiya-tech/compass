@@ -60,7 +60,7 @@ class ExploreExperiencesAgentDirectorState(BaseModel):
     """
     session_id: int
 
-    experiences_state: dict[str, ExperienceState] = {}
+    experiences_state: dict[str, ExperienceState]
     """
     The state of the experiences of the user that are being explored, keyed by experience.uuid
     """
@@ -76,8 +76,12 @@ class ExploreExperiencesAgentDirectorState(BaseModel):
     The current conversation phase   
     """
 
+    class Config:
+        extra = "forbid"
+
     def __init__(self, session_id):
-        super().__init__(session_id=session_id)
+        super().__init__(session_id=session_id,
+                         experiences_state={})
 
 
 def _pick_next_experience_to_process(experiences: dict[str, ExperienceState]) -> ExperienceState | None:

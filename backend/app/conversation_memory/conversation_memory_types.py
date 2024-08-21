@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.agent.agent_types import AgentInput, AgentOutput
 
@@ -19,19 +19,26 @@ class ConversationHistory(BaseModel):
     """
       A model for a conversation history
     """
-    turns: list[ConversationTurn] = []
+    turns: list[ConversationTurn] = Field(default_factory=list)
 
 
 class ConversationContext(BaseModel):
     """
       A model for a conversation context, constructed from the conversation history and summary
     """
-    all_history: ConversationHistory = ConversationHistory()
+    all_history: ConversationHistory
     """The full conversation history"""
-    history: ConversationHistory = ConversationHistory()
+    history: ConversationHistory
     """The most recent conversation history that has not be summarized"""
     summary: str = ""
     """The summary of the conversation"""
+
+    def __init__(self, *, all_history: ConversationHistory = None, history: ConversationHistory = None, summary: str = ""):
+        super().__init__(
+            all_history=all_history if all_history is not None else ConversationHistory(),
+            history=history if history is not None else ConversationHistory(),
+            summary=summary
+        )
 
 
 class ConversationMemoryManagerState(BaseModel):

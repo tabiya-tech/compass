@@ -1,7 +1,7 @@
 import logging
 from textwrap import dedent
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.agent.agent_types import LLMStats
 from app.agent.llm_caller import LLMCaller
@@ -13,12 +13,12 @@ from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, ZERO
 
 
 class _SentenceDecompositionResponse(BaseModel):
-    decomposed_sentences: list[str] = []
+    decomposed_sentences: list[str] = Field(default_factory=list)
     """
     The decomposed sentences from the user's input.
     """
 
-    resolved_pronouns: list[str] = []
+    resolved_pronouns: list[str] = Field(default_factory=list)
     """
     The resolved pronouns from the user's input.
     """

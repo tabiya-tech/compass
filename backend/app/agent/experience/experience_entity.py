@@ -1,7 +1,7 @@
 from typing import List, Optional, Any
 import uuid
 
-from pydantic.main import BaseModel
+from pydantic import BaseModel, Field
 
 from app.agent.experience.timeline import Timeline
 from app.agent.experience.work_type import WorkType
@@ -24,17 +24,17 @@ class ResponsibilitiesData(BaseModel):
         - knowledge
     """
 
-    responsibilities: list[str] = []
+    responsibilities: list[str] = Field(default_factory=list)
     """
     Everything the user considers as part of what they do for a given job.
     """
 
-    non_responsibilities: list[str] = []
+    non_responsibilities: list[str] = Field(default_factory=list)
     """
     Everything the user considers as not part of what they do for a given job.
     """
 
-    other_peoples_responsibilities: list[str] = []
+    other_peoples_responsibilities: list[str] = Field(default_factory=list)
     """
     Everything the user considers as part of what other people do for a given job.
     """
@@ -88,19 +88,19 @@ class ExperienceEntity(BaseModel):
     Type of work (e.g. "waged-employee")
     """
 
-    responsibilities: ResponsibilitiesData = ResponsibilitiesData()
+    responsibilities: ResponsibilitiesData
     """
     List of responsibilities mentioned by the user while describing the experience
     It may contain duplicate entries as the user may mention the same task or skill multiple times
     """
 
-    esco_occupations: List[OccupationSkillEntity] = []  # TODO: replace with the cluster_results from the ExperiencePipelineResponse
+    esco_occupations: List[OccupationSkillEntity]  # TODO: replace with the cluster_results from the ExperiencePipelineResponse
     """
     List of esco occupations and their skills (from the esco model) that match the experience.
     It should not contain duplicates.
     """
 
-    top_skills: List[SkillEntity] = []
+    top_skills: List[SkillEntity]
     """
     List of skills identified as relevant to the experience.
     It should not contain duplicates.
@@ -112,12 +112,16 @@ class ExperienceEntity(BaseModel):
                  location: Optional[str] = None,
                  timeline: Optional[Timeline] = None,
                  work_type: Optional[WorkType] = None,
-                 **data: Any):
+                 responsibilities: Optional[ResponsibilitiesData] = None,
+                 esco_occupations: Optional[List[OccupationSkillEntity]] = None,
+                 top_skills: Optional[List[SkillEntity]] = None):
         super().__init__(
             uuid=str(uuid.uuid4()),  # Generate a unique UUID for each instance
             experience_title=experience_title, company=company, location=location, timeline=timeline,
             work_type=work_type,
-            **data
+            responsibilities=responsibilities if responsibilities is not None else ResponsibilitiesData(),
+            esco_occupations=esco_occupations if esco_occupations is not None else [],
+            top_skills=top_skills if top_skills is not None else []
         )
 
     @staticmethod
