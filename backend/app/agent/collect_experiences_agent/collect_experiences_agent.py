@@ -20,23 +20,22 @@ class CollectExperiencesAgentState(BaseModel):
     """
     session_id: int
 
-    collected_data: list[CollectedData] = []
+    collected_data: list[CollectedData]
     """
     The data collected during the conversation.
     """
 
-    unexplored_types: list[WorkType] = [WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT, WorkType.SELF_EMPLOYMENT, WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK,
-                                        WorkType.UNSEEN_UNPAID]
+    unexplored_types: list[WorkType]
     """
     The types of work experiences that have not been explored yet.
     """
 
-    explored_types: list[WorkType] = []
+    explored_types: list[WorkType]
     """
     The questions asked by the conversational LLM.
     """
 
-    first_time_visit: bool = True
+    first_time_visit: bool
     """
     Whether this is the first time the agent is visited during the conversation.
     """
@@ -50,7 +49,13 @@ class CollectExperiencesAgentState(BaseModel):
     def __init__(self, session_id):
         super().__init__(
             session_id=session_id,
-            collected_data=[]
+            collected_data=[],
+            unexplored_types=[WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+                               WorkType.SELF_EMPLOYMENT,
+                               WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK,
+                               WorkType.UNSEEN_UNPAID],
+            explored_types=[],
+            first_time_visit=True
         )
 
 

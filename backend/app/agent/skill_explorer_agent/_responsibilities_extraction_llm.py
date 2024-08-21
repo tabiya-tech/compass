@@ -3,6 +3,8 @@ import logging
 from textwrap import dedent
 from typing import Optional
 
+from pydantic import Field
+
 from app.agent.agent_types import LLMStats
 from app.agent.experience.experience_entity import ResponsibilitiesData
 from app.agent.llm_caller import LLMCaller
@@ -20,7 +22,7 @@ class ResponsibilitiesExtractionResponse(ResponsibilitiesData):
     The reasoning behind the data extraction.
     """
 
-    extracted_entities: list[str] = []
+    extracted_entities: list[str] = Field(default_factory=list)
     """
     The extracted entities from the user's input.
     """
@@ -30,7 +32,7 @@ class ResponsibilitiesExtractionResponse(ResponsibilitiesData):
     The reasoning behind the classification.
     """
 
-    irrelevant_entities: Optional[list[str]] = []
+    irrelevant_entities: Optional[list[str]] = Field(default_factory=list)
     """
     The irrelevant entities from the user's input.
     """

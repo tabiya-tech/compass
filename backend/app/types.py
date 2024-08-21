@@ -57,7 +57,7 @@ class Experience(BaseModel):
     work_type: Optional[WorkType] = None
     """The work type of the experience"""
 
-    top_skills: List[Skill] = []
+    top_skills: List[Skill] = Field(default_factory=list)
     """The top skills of the experience"""
 
     @field_serializer("work_type")

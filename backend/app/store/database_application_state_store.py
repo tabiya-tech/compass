@@ -33,7 +33,7 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
 
     async def get_state(self, session_id: int) -> ApplicationState | None:
         """
-        Get the application state for a session from the database and memory.
+        Get the application state for a session from the databaseProtected Attributes and memory.
         """
         try:
             # Get the application state from memory

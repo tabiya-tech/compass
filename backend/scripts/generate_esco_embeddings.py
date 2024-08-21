@@ -6,7 +6,7 @@ from enum import Enum
 from typing import Literal
 
 import vertexai
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from pymongo.operations import SearchIndexModel
 from tqdm import tqdm
 from dotenv import load_dotenv
@@ -73,7 +73,7 @@ class EmbeddingContext(BaseModel):
     source_collection: str
     destination_collection: str
     id_field_name: str
-    extra_fields: list[str] = []
+    extra_fields: list[str] = Field(default_factory=list)
 
 
 async def generate_and_save_embeddings(documents: list[dict[str, any]], ctx: EmbeddingContext):
