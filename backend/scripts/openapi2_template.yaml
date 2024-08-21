@@ -25,7 +25,7 @@ x-google-management:
           STANDARD: 20 # requests per minute
 x-google-backend:
   address: "{1}"
-  deadline: 30.0 # 30 seconds as the cloud run container may take a while to start
+  deadline: 90.0 # 90 seconds as the cloud run container may take a while to start, and some requests may take a while to process
 securityDefinitions:
   firebase:
     authorizationUrl: ""
