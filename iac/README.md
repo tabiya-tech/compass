@@ -144,8 +144,9 @@ The deployment requires the following environment variables to be set:
 - `FRONTEND_URL`: The URL of the frontend application, typically it is `https://<ENVIRONMENT>.compass.tabiya.tech`
 - `BACKEND_DOMAIN` : The domain of the backend api, typically it is `<ENVIRONMENT>.compass.tabiya.tech`, for now should be equal to `FRONTEND_DOMAIN`
 - `BACKEND_URL`: The URL of the backend api, typically it is `https://<ENVIRONMENT>.compass.tabiya.tech/api`. Should be different than `FRONTEND_URL`
-- `MONGODB_URI`: The URI of the MongoDB instance to use where the ESCO data is stored.
-- `DATABASE_NAME`: The name of the database the backend will use.
+- `MONGODB_URI`: The URI of the MongoDB Atlas instance
+- `TAXONOMY_DATABASE_NAME`: The name of mongo db database where the ESCO taxonomy data with the embeddings is stored.
+- `APPLICATION_DATABASE_NAME`: The name of mongo db database used by the application to store data.
 - `VERTEX_API_REGION`: The region of the Vertex API that will be used by the backend.
 
 It is recommended to use a `.env` file to set the environment variables. Create a `.env` file in the root directory of the project and add the following content:
@@ -161,7 +162,8 @@ FRONTEND_URL="<FRONTEND_URL>"
 BACKEND_DOMAIN="<BACKEND_DOMAIN>"
 BACKEND_URL="<BACKEND_URL>"
 MONGODB_URI="<URI_TO_MONGODB>"
-DATABASE_NAME="<DATABASE_NAME>"
+TAXONOMY_DATABASE_NAME="<DATABASE_NAME>"
+APPLICATION_DATABASE_NAME="<DATABASE_NAME>"
 VERTEX_API_REGION="<REGION>"
 ```
 Refer to the backend and frontend projects for information on the environment variables.

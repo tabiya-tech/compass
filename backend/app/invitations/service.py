@@ -1,3 +1,5 @@
+from motor.motor_asyncio import AsyncIOMotorDatabase
+
 from app.constants.errors import ErrorService
 from app.invitations.repository import UserInvitationRepository
 from app.invitations.types import GetInvitationCodeStatusResponse, InvitationCodeStatus
@@ -8,11 +10,11 @@ class UserInvitationService:
     The UserInvitationService class is responsible for handling all the business logic related to user invitations.
     """
 
-    def __init__(self):
+    def __init__(self, db: AsyncIOMotorDatabase):
         """
         Initialize the UserInvitationService and inject the user_invitation_repository
         """
-        self._repository: UserInvitationRepository = UserInvitationRepository()
+        self._repository: UserInvitationRepository = UserInvitationRepository(db)
 
     async def get_invitation_status(self, invitation_code: str) -> GetInvitationCodeStatusResponse:
         """

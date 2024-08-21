@@ -25,15 +25,9 @@ logger = logging.getLogger(__name__)
 # Load the settings
 ##########################
 
-MONGO_SETTINGS = MongoDbSettings(
-    mongodb_uri=os.getenv("MONGODB_URI"),
-    database_name=os.getenv("DATABASE_NAME")
-)
+MONGO_SETTINGS = MongoDbSettings()
 
-SCRIPT_SETTINGS = ScriptSettings(
-    hf_access_token=os.getenv("HF_ACCESS_TOKEN"),
-    tabiya_mongodb_uri=os.getenv("TABIYA_MONGODB_URI")
-)
+SCRIPT_SETTINGS = ScriptSettings()
 
 TABIYA_CONFIG = TabiyaDatabaseConfig()
 MODEL_ID = "66845ccb635d10616a2895aa"
@@ -53,7 +47,7 @@ class PlatformCollections(Enum):
 
 
 COMPASS_DB = AsyncIOMotorClient(
-    MONGO_SETTINGS.mongodb_uri, tlsAllowInvalidCertificates=True).get_database(MONGO_SETTINGS.database_name)
+    MONGO_SETTINGS.taxonomy_mongodb_uri, tlsAllowInvalidCertificates=True).get_database(MONGO_SETTINGS.taxonomy_database_name)
 
 
 class CompassCollections(Enum):

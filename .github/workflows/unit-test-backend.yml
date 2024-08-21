@@ -5,7 +5,10 @@ on:
       target-environment:
         required: true
         type: string
-      database-name:
+      application-database-name:
+        required: true
+        type: string
+      taxonomy-database-name:
         required: true
         type: string
       backend-url:
@@ -68,7 +71,8 @@ jobs:
         working-directory: backend
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
-          DATABASE_NAME: ${{ inputs.database-name }}
+          TAXONOMY_DATABASE_NAME: ${{ inputs.taxonomy-database-name }}
+          APPLICATION_DATABASE_NAME: ${{ inputs.application-database-name }}
           TARGET_ENVIRONMENT: ${{ inputs.target-environment }}
           VERTEX_API_REGION: ${{ inputs.vertex-api-region }}
           BACKEND_URL: ${{ inputs.backend-url }}

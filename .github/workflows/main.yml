@@ -27,7 +27,8 @@ jobs:
       target-environment: dev
       backend-url: ${{ needs.setup-env.outputs.backend-url }}
       frontend-url: ${{ needs.setup-env.outputs.frontend-url }}
-      database-name: ${{ needs.setup-env.outputs.database-name }}
+      taxonomy-database-name: ${{ needs.setup-env.outputs.taxonomy-database-name }}
+      application-database-name: ${{ needs.setup-env.outputs.application-database-name }}
       vertex-api-region: ${{ needs.setup-env.outputs.vertex-api-region }}
   build-frontend:
     uses: ./.github/workflows/build-frontend.yml
@@ -53,7 +54,8 @@ jobs:
       target-environment: dev
       backend-url: ${{ needs.setup-env.outputs.backend-url }}
       frontend-url: ${{ needs.setup-env.outputs.frontend-url }}
-      database-name: ${{ needs.setup-env.outputs.database-name }}
+      taxonomy-database-name: ${{ needs.setup-env.outputs.taxonomy-database-name }}
+      application-database-name: ${{ needs.setup-env.outputs.application-database-name }}
       vertex-api-region: ${{ needs.setup-env.outputs.vertex-api-region }}
   smoke-test-backend-apigateway:
     needs: [ deploy-backend ]

@@ -11,10 +11,7 @@ from ._contextualization_llm import _ContextualizationLLM
 
 from app.vector_search.esco_entities import OccupationSkillEntity
 from app.vector_search.esco_search_service import OccupationSkillSearchService
-from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
 from ._relevant_occupations_classifier_llm import _RelevantOccupationsClassifierLLM
-
-MONGO_SETTINGS = MongoDbSettings()
 
 
 class InferOccupationToolOutput(BaseModel):

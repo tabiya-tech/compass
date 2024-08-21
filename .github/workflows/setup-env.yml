@@ -22,9 +22,12 @@ on:
       backend-domain:
         description: "The backend domain in the target environment"
         value: ${{ jobs.setup-env.outputs.backend-domain }}
-      database-name:
-        description: "The database name in the target environment"
-        value: ${{ jobs.setup-env.outputs.database-name }}
+      taxonomy-database-name:
+        description: "The taxonomy database name of the in the target environment"
+        value: ${{ jobs.setup-env.outputs.taxonomy-database-name }}
+      application-database-name:
+        description: "The application database name in the target environment"
+        value: ${{ jobs.setup-env.outputs.application-database-name }}
       vertex-api-region:
         description: "The vertex api region in the target environment"
         value: ${{ jobs.setup-env.outputs.vertex-api-region }}
@@ -39,7 +42,8 @@ jobs:
       backend-url: ${{ steps.setup.outputs.backend_url }}
       frontend-domain: ${{ steps.setup.outputs.frontend_domain }}
       backend-domain: ${{ steps.setup.outputs.backend_domain }}
-      database-name: ${{ vars.DATABASE_NAME }}
+      taxonomy-database-name: ${{ vars.TAXONOMY_DATABASE_NAME }}
+      application-database-name: ${{ vars.APPLICATION_DATABASE_NAME }}
       vertex-api-region: ${{ vars.VERTEX_API_REGION }}
     steps:
       - name: Checkout code
@@ -58,3 +62,6 @@ jobs:
           echo "backend-url: ${{ steps.setup.outputs.backend_url }}"
           echo "frontend-domain: ${{ steps.setup.outputs.frontend_domain }}"
           echo "backend-domain: ${{ steps.setup.outputs.backend_domain }}"
+          echo "taxonomy-database-name: ${{ steps.setup.outputs.taxonomy-database-name }}"
+          echo "application-database-name: ${{ steps.setup.outputs.application-database-name }}"
+          echo "vertex-api-region: ${{ steps.setup.outputs.vertex-api-region }}"

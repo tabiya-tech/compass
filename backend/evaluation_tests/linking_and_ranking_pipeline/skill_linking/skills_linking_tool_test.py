@@ -7,7 +7,7 @@ from app.agent.experience.work_type import WorkType
 from app.agent.linking_and_ranking_pipeline.infer_occupation_tool import InferOccupationTool
 from app.agent.linking_and_ranking_pipeline.skill_linking_tool import SkillLinkingTool
 from app.countries import Country
-from app.server_dependecies.db_dependecies import get_mongo_db
+from app.server_dependecies.db_dependecies import CompassDBProvider
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
 from app.vector_search.esco_entities import OccupationSkillEntity
 from app.vector_search.esco_search_service import OccupationSearchService, OccupationSkillSearchService, VectorSearchConfig, SkillSearchService
@@ -18,8 +18,8 @@ from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 
 
 @pytest.fixture(scope='function')
-def get_search_services():
-    db = get_mongo_db()
+async def get_search_services():
+    db = await CompassDBProvider.get_taxonomy_db()
     embedding_service = GoogleGeckoEmbeddingService()
     occupation_skill_search_service = OccupationSkillSearchService(db, embedding_service)
     embedding_config = EmbeddingConfig()

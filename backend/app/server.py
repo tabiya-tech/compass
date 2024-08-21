@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 
 from fastapi import FastAPI, Request, HTTPException, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_types import AgentInput
@@ -17,6 +18,7 @@ from app.application_state import ApplicationStateManager
 from app.constants.errors import HTTPErrorResponse
 from app.invitations.routes import add_user_invitations_routes
 from app.server_dependecies.application_state_dependencies import get_application_state_manager
+from app.server_dependecies.db_dependecies import CompassDBProvider
 from app.users.auth import Authentication, UserInfo
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
@@ -24,7 +26,6 @@ from app.chat.chat_types import ConversationResponse, ConversationInput
 from app.chat.chat_utils import filter_conversation_history, get_messages_from_conversation_manager
 from app.server_dependecies.agent_director_dependencies import get_agent_director
 from app.server_dependecies.conversation_manager_dependencies import get_conversation_memory_manager
-from app.server_dependecies.db_dependecies import initialize_mongo_db
 from app.version.version_routes import add_version_routes
 
 from contextlib import asynccontextmanager
@@ -45,7 +46,8 @@ load_dotenv()
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     # Startup logic
-    await initialize_mongo_db()
+    db = await CompassDBProvider.get_application_db()
+    await CompassDBProvider.initialize_application_mongo_db(db, logger)
     yield
     # Shutdown logic
     logger.info("Shutting down...")
@@ -104,8 +106,10 @@ app.add_middleware(
 # Check mandatory environment variables and raise an early exception if they are not set
 if not os.getenv('MONGODB_URI'):
     raise ValueError("Mandatory MONGODB_URI env variable is not set!")
-if not os.getenv("DATABASE_NAME"):
-    raise ValueError("Mandatory DATABASE_NAME environment variable is not set")
+if not os.getenv("TAXONOMY_DATABASE_NAME"):
+    raise ValueError("Mandatory TAXONOMY_DATABASE_NAME environment variable is not set")
+if not os.getenv("APPLICATION_DATABASE_NAME"):
+    raise ValueError("Mandatory APPLICATION_DATABASE_NAME environment variable is not set")
 
 ############################################
 # Initiate the Authentication Module for the FastAPI app
@@ -121,17 +125,22 @@ add_version_routes(app)
 # Add routes relevant for the conversation agent
 ############################################
 
+NO_PERMISSION_FOR_SESSION = "User does not have permission to access this session"
+
+
 @app.post(path="/conversation",
-         status_code=201,
-         response_model=ConversationResponse,
-         responses={400: {"model": HTTPErrorResponse}, 403: {"model": HTTPErrorResponse}, 413: {"model": HTTPErrorResponse},
-                    500: {"model": HTTPErrorResponse}},
-         description="""The main conversation route used to interact with the agent.""")
+          status_code=201,
+          response_model=ConversationResponse,
+          responses={400: {"model": HTTPErrorResponse}, 403: {"model": HTTPErrorResponse}, 413: {"model": HTTPErrorResponse},
+                     500: {"model": HTTPErrorResponse}},
+          description="""The main conversation route used to interact with the agent.""")
 async def conversation(request: Request, body: ConversationInput, clear_memory: bool = False, filter_pii: bool = False,
                        conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager),
                        agent_director: LLMAgentDirector = Depends(get_agent_director),
                        user_info: UserInfo = Depends(auth.get_user_info()),
-                       application_state_manager: ApplicationStateManager = Depends(get_application_state_manager)):
+                       application_state_manager: ApplicationStateManager = Depends(get_application_state_manager),
+                       application_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)
+                       ):
     """
     Endpoint for conducting the conversation with the agent.
     """
@@ -139,10 +148,10 @@ async def conversation(request: Request, body: ConversationInput, clear_memory: 
     user_input = body.user_input
 
     # check that the user making the request has the session_id in their user preferences
-    user_preference_repository = UserPreferenceRepository()
+    user_preference_repository = UserPreferenceRepository(application_db)
     current_user_preferences = await user_preference_repository.get_user_preference_by_user_id(user_info.user_id)
     if current_user_preferences is None or session_id not in current_user_preferences.sessions:
-        raise HTTPException(status_code=403, detail="User does not have permission to access this session")
+        raise HTTPException(status_code=403, detail=NO_PERMISSION_FOR_SESSION)
 
     # Do not allow user input that is too long,
     # as a basic measure to prevent abuse.
@@ -207,19 +216,20 @@ async def conversation(request: Request, body: ConversationInput, clear_memory: 
          responses={400: {"model": HTTPErrorResponse}, 403: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
          description="""Endpoint for retrieving the conversation history.""")
 async def get_conversation_history(
-    session_id: Annotated[int, Query(description="The session id for the conversation history.")],
-    conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager),
-    user_info: UserInfo = Depends(auth.get_user_info()),
-    application_state_manager: ApplicationStateManager = Depends(get_application_state_manager)
+        session_id: Annotated[int, Query(description="The session id for the conversation history.")],
+        conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager),
+        user_info: UserInfo = Depends(auth.get_user_info()),
+        application_state_manager: ApplicationStateManager = Depends(get_application_state_manager),
+        application_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)
 ):
     """
     Endpoint for retrieving the conversation history.
     """
     # check that the user making the request has the session_id in their user preferences
-    user_preference_repository = UserPreferenceRepository()
+    user_preference_repository = UserPreferenceRepository(application_db)
     current_user_preferences = await user_preference_repository.get_user_preference_by_user_id(user_info.user_id)
     if current_user_preferences is None or session_id not in current_user_preferences.sessions:
-        raise HTTPException(status_code=403, detail="User does not have permission to access this session")
+        raise HTTPException(status_code=403, detail=NO_PERMISSION_FOR_SESSION)
 
     try:
         state = await application_state_manager.get_state(session_id)
@@ -242,27 +252,29 @@ async def get_conversation_history(
          responses={400: {"model": HTTPErrorResponse}, 403: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
          description="""Endpoint for retrieving the experiences of a user.""")
 async def get_experiences(session_id: int, user_info: UserInfo = Depends(auth.get_user_info()),
-                          application_state_manager: ApplicationStateManager = Depends(get_application_state_manager)) -> List[Experience]:
+                          application_state_manager: ApplicationStateManager = Depends(get_application_state_manager),
+                          application_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)
+                          ) -> List[Experience]:
     """
     Endpoint for retrieving the experiences of a user.
     """
     # Check that the user making the request has the session_id in their user preferences
-    user_preference_repository = UserPreferenceRepository()
+    user_preference_repository = UserPreferenceRepository(application_db)
     current_user_preferences = await user_preference_repository.get_user_preference_by_user_id(user_info.user_id)
 
     if current_user_preferences is None or session_id not in current_user_preferences.sessions:
-        raise HTTPException(status_code=403, detail="User does not have permission to access this session")
+        raise HTTPException(status_code=403, detail=NO_PERMISSION_FOR_SESSION)
 
     # Get the experiences from the application state
     state = await application_state_manager.get_state(session_id)
 
     experiences: list[Experience] = []
 
-    for UUID in state.explore_experiences_director_state.experiences_state:
+    for uuid in state.explore_experiences_director_state.experiences_state:
         """
         UUID is the key for the experiences_state dictionary in the explore_experiences_director_state.
         """
-        experience_details: ExperienceEntity = state.explore_experiences_director_state.experiences_state[UUID].experience
+        experience_details: ExperienceEntity = state.explore_experiences_director_state.experiences_state[uuid].experience
         """
         experience_details is the value for the UUID key in the experiences_state dictionary.
         """
@@ -294,6 +306,7 @@ async def get_experiences(session_id: int, user_info: UserInfo = Depends(auth.ge
         ))
 
     return experiences
+
 
 ############################################
 # Add routes relevant for the user management
