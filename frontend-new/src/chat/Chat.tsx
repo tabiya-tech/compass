@@ -22,6 +22,7 @@ import InactiveBackdrop from "src/theme/Backdrop/InactiveBackdrop";
 import { AuthContext } from "src/auth/AuthProvider";
 import { FirebaseError } from "src/error/FirebaseError/firebaseError";
 import { logoutService } from "src/auth/services/logout/logout.service";
+import ApproveModal from "src/theme/ApproveModal/ApproveModal";
 
 const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -53,6 +54,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const [isLoggingOut, setIsLoggingOut] = React.useState<boolean>(false);
   const [showBackdrop, setShowBackdrop] = useState(showInactiveSessionAlert);
   const [lastActivityTime, setLastActivityTime] = React.useState<number>(Date.now());
+  const [newConversationDialog, setNewConversationDialog] = React.useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -165,7 +167,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         if (history.conversation_completed) setConversationCompleted(true);
         if (history.conversation_completed_at) setConversationCompletedAt(history.conversation_completed_at);
         if (history.messages.length) {
-          setMessages([]) // Clear the messages before adding the new ones
+          setMessages([]); // Clear the messages before adding the new ones
           history.messages.forEach((message: ConversationMessage) => {
             if (message.sender === ConversationMessageSender.USER && message.message !== "") {
               addMessage(generateUserMessage(message.message, message.sent_at));
@@ -279,6 +281,19 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     };
   }, [showBackdrop, disableInactivityCheck]);
 
+  const handleOpenNewConversationDialog = () => {
+    setNewConversationDialog(true);
+  };
+
+  const handleCloseNewConversationDialog = () => {
+    setNewConversationDialog(false);
+  };
+
+  const handleConfirmNewConversation = async () => {
+    setNewConversationDialog(false);
+    await startNewConversation();
+  };
+
   return (
     <>
       {isLoggingOut ? (
@@ -294,7 +309,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           >
             <ChatHeader
               notifyOnLogout={handleLogout}
-              startNewConversation={startNewConversation}
+              startNewConversation={handleOpenNewConversationDialog}
               notifyOnExperiencesDrawerOpen={handleOpenExperiencesDrawer}
             />
             <Box sx={{ flex: 1, overflowY: "auto" }}>
@@ -319,6 +334,24 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
             conversationCompleted={conversationCompleted}
             conversationCompletedAt={conversationCompletedAt}
           />
+          {newConversationDialog && (
+            <ApproveModal
+              isOpen={newConversationDialog}
+              title="Start New Conversation?"
+              content={
+                <>
+                  Once you start a new conversation, all messages from the current conversation will be lost forever.
+                  <br />
+                  <br />
+                  Are you sure you want to start a new conversation?
+                </>
+              }
+              onCancel={handleCloseNewConversationDialog}
+              onApprove={handleConfirmNewConversation}
+              cancelButtonText="Cancel"
+              approveButtonText="Yes, I'm sure"
+            />
+          )}
         </>
       )}
     </>
