@@ -46,7 +46,7 @@ const skillsLabels = [
   "helping Brother with Car",
   "community Volunteering",
   "ensured the project was completed on time",
-  "took care of the garden"
+  "took care of the garden",
 ];
 
 const generateRandomSkill = (usedLabels: string[]): Skill => {

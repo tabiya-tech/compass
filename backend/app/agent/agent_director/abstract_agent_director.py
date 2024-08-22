@@ -1,10 +1,10 @@
 import logging
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Any
+from typing import Any, Optional
+from datetime import datetime
 
-from pydantic import BaseModel, model_serializer, Field
-
+from pydantic import BaseModel, Field, field_serializer, field_validator
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.conversation_memory.conversation_memory_manager import \
     ConversationMemoryManager
@@ -26,9 +26,26 @@ class AgentDirectorState(BaseModel):
     """
     session_id: int
     current_phase: ConversationPhase = Field(default=ConversationPhase.INTRO)
+    conversation_completed_at: Optional[datetime] = None
 
     class Config:
         extra = "forbid"
+
+    # Serialize the conversation_completed_at datetime to ensure it's stored as UTC
+    @field_serializer("conversation_completed_at")
+    def serialize_conversation_completed_at(self, conversation_completed_at: Optional[datetime]) -> Optional[str]:
+        return conversation_completed_at.isoformat() if conversation_completed_at else None
+
+    # Deserialize the conversation_completed_at datetime and ensure it's interpreted as UTC
+    @field_validator("conversation_completed_at", mode='before')
+    def deserialize_conversation_completed_at(cls, value: Optional[str | datetime]) -> Optional[datetime]:
+        if value is None:
+            return None
+        if isinstance(value, str):
+            dt = datetime.fromisoformat(value)
+        else:
+            dt = value
+        return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
 
     # override the dict method to return the enum value instead of the enum object
     def dict(self, *args, **kwargs):

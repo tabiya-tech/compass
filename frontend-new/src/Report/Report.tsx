@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Document, Text, Page, View, Image } from "@react-pdf/renderer";
-import { Experience, WorkType } from "src/Experiences/ExperienceService/Experiences.types";
-import ExperiencesReportContent from "src/Report/ExperiencesReportContent/ExperiencesReportContent";
+import { Experience, Skill, WorkType } from "src/Experiences/ExperienceService/Experiences.types";
+import ExperiencesReportContent, {
+  capitalizeFirstLetter,
+} from "src/Report/ExperiencesReportContent/ExperiencesReportContent";
 import styles from "src/Report/styles";
 
 interface SkillReportProps {
@@ -10,6 +12,7 @@ interface SkillReportProps {
   phone: string;
   address: string;
   experiences: Experience[];
+  conversationCompletedAt: string | null;
 }
 
 const uniqueId = "5a296552-f91f-4c38-b88f-542cacaced8e";
@@ -27,7 +30,20 @@ export const DATA_TEST_ID = {
   SKILL_REPORT_EXPERIENCES_CONTAINER: `skill-report-experiences-container-${uniqueId}`,
 };
 
-const SkillReport: React.FC<SkillReportProps> = ({ name, email, phone, address, experiences }) => {
+function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  const options: Intl.DateTimeFormatOptions = { month: "long", day: "2-digit", year: "numeric" };
+  return date.toLocaleDateString("en-US", options);
+}
+
+const SkillReport: React.FC<SkillReportProps> = ({
+  name,
+  email,
+  phone,
+  address,
+  experiences,
+  conversationCompletedAt,
+}) => {
   const selfEmploymentExperiences = experiences.filter(
     (experience) => experience.work_type === WorkType.SELF_EMPLOYMENT
   );
@@ -39,6 +55,20 @@ const SkillReport: React.FC<SkillReportProps> = ({ name, email, phone, address, 
       experience.work_type === WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK ||
       experience.work_type === WorkType.UNSEEN_UNPAID
   );
+
+  // Get a list of all unique skills in alphabetical order
+  const skillsList = useMemo(() => {
+    const skillOnly: Skill[] = [];
+    experiences.forEach((experience) => {
+      experience.top_skills.forEach((skill) => {
+        if (!skillOnly.find((sk) => sk.preferredLabel === skill.preferredLabel)) {
+          skillOnly.push(skill);
+        }
+        return;
+      });
+    });
+    return skillOnly.sort((a, b) => a.preferredLabel.localeCompare(b.preferredLabel));
+  }, [experiences]);
 
   return (
     <Document data-testid={DATA_TEST_ID.SKILL_REPORT_CONTAINER}>
@@ -77,11 +107,12 @@ const SkillReport: React.FC<SkillReportProps> = ({ name, email, phone, address, 
             )}
           </View>
           <Text style={styles.bodyText} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY_TEXT}>
-            This report summarizes the key information gathered during a conversation with Compass on [insert date].
-            Compass by Tabiya is an AI chatbot that assists job-seekers in exploring their skills and experiences. This
-            report presents the candidate’s work experience and the skills identified from each experience. This
-            information can be used to guide job search and highlight their skills when applying for jobs, especially
-            during interviews with potential employers. It can be a good starting point for creating a complete CV.
+            This report summarizes the key information gathered during a conversation with Compass on{" "}
+            {formatDate(conversationCompletedAt!)}. Compass by Tabiya is an AI chatbot that assists job-seekers in
+            exploring their skills and experiences. This report presents the candidate’s work experience and the skills
+            identified from each experience. This information can be used to guide job search and highlight their skills
+            when applying for jobs, especially during interviews with potential employers. It can be a good starting
+            point for creating a complete CV.
           </Text>
           <View style={styles.divider} />
           <Text style={styles.experiencesTitle} data-testid={DATA_TEST_ID.SKILL_REPORT_EXPERIENCES_TITLE}>
@@ -137,27 +168,41 @@ const SkillReport: React.FC<SkillReportProps> = ({ name, email, phone, address, 
               </View>
             )}
           </View>
-        </View>
-        <View fixed style={styles.disclaimerContainer}>
-          <Image src={`${process.env.PUBLIC_URL}/danger.png`} style={styles.disclaimerIcon} />
-          <Text style={styles.disclaimerText}>
-            {" "}
-            Disclaimer:{" "}
-            <Text style={styles.disclaimerTextBold}>
-              Listed skills are based on a conversation with the candidate, are not verified or validated by Tabiya, and
-              may be inaccurate.{" "}
+          <View style={styles.skillDescriptionContainer}>
+            <Text style={styles.skillDescriptionTitle} break>
+              Skills Description
             </Text>
-            Information should be checked before use for job search, job interviews, or for creating a CV. To revise
-            this information, speak with Compass again or create a complete CV based on this report.
-          </Text>
+            <Text style={styles.info} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY_TEXT}>
+              Below, you will find a list of the skills discovered during your conversation with Compass, along with
+              their descriptions.
+            </Text>
+            <View style={styles.skillDivider} />
+            {skillsList.map((skill) => (
+              <View wrap={false} key={skill.UUID} style={styles.skillContainer}>
+                <Text style={styles.label}>{capitalizeFirstLetter(skill.preferredLabel)}</Text>
+                <Text style={styles.description}>{skill.description}</Text>
+              </View>
+            ))}
+          </View>
         </View>
-        {experiences.length > 5 && (
-          <Text
-            style={styles.pageNumber}
-            render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`}
-            fixed
-          />
-        )}
+        <View fixed style={styles.footer}>
+          <View style={styles.disclaimerContainer}>
+            <Image src={`${process.env.PUBLIC_URL}/danger.png`} style={styles.disclaimerIcon} />
+            <Text style={styles.disclaimerText}>
+              {" "}
+              Disclaimer:{" "}
+              <Text style={styles.disclaimerTextBold}>
+                Listed skills are based on a conversation with the candidate, are not verified or validated by Tabiya,
+                and may be inaccurate.{" "}
+              </Text>
+              Information should be checked before use for job search, job interviews, or for creating a CV. To revise
+              this information, speak with Compass again or create a complete CV based on this report.
+            </Text>
+          </View>
+          {experiences.length > 2 && (
+            <Text style={styles.pageNumber} render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
+          )}
+        </View>
       </Page>
     </Document>
   );

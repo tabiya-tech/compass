@@ -16,6 +16,7 @@ describe("Report", () => {
         phone="1234567890"
         address="1234 Main St"
         experiences={experiences}
+        conversationCompletedAt="2021-06-01T00:00:00Z"
       />
     );
 

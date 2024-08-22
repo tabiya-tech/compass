@@ -1,7 +1,7 @@
 import logging
 import os
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Annotated
 
 from dotenv import load_dotenv
@@ -180,11 +180,15 @@ async def conversation(request: Request, body: ConversationInput, clear_memory: 
         # get the context again after updating the history
         context = await conversation_memory_manager.get_conversation_context()
         response = await get_messages_from_conversation_manager(context, from_index=current_index)
+        # get the date when the conversation is completed
+        if state.agent_director_state.current_phase == ConversationPhase.ENDED:
+            state.agent_director_state.conversation_completed_at = datetime.now(timezone.utc)
         # save the state, before responding to the user
         await application_state_manager.save_state(session_id, state)
         return ConversationResponse(
             messages=response,
-            conversation_completed=state.agent_director_state.current_phase == ConversationPhase.ENDED
+            conversation_completed=state.agent_director_state.current_phase == ConversationPhase.ENDED,
+            conversation_completed_at=state.agent_director_state.conversation_completed_at
         )
     except Exception as e:  # pylint: disable=broad-except
         logger.exception(
@@ -225,7 +229,8 @@ async def get_conversation_history(
 
         return ConversationResponse(
             messages=messages,
-            conversation_completed=state.agent_director_state.current_phase == ConversationPhase.ENDED
+            conversation_completed=state.agent_director_state.current_phase == ConversationPhase.ENDED,
+            conversation_completed_at=state.agent_director_state.conversation_completed_at
         )
     except Exception as e:
         logger.exception(e)
