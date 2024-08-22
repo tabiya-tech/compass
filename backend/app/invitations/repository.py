@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from pymongo import ReturnDocument
@@ -27,7 +27,7 @@ class UserInvitationRepository:
         :param invitation_code: str the invitation code
         :return: Optional[UserInvitation] the user invitation object
         """
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
 
         try:
             _doc = await self._collection.find_one({
@@ -51,7 +51,7 @@ class UserInvitationRepository:
         :param invitation_code: str
         :return: bool: True if the capacity was reduced, else False
         """
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
 
         try:
             query = {
