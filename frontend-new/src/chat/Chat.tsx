@@ -41,6 +41,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const { enqueueSnackbar } = useSnackbar();
   const [messages, setMessages] = useState<IChatMessage[]>([]);
   const [conversationCompleted, setConversationCompleted] = useState<boolean>(false);
+  const [conversationCompletedAt, setConversationCompletedAt] = useState<string | null>(null);
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const [initialized, setInitialized] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
@@ -91,6 +92,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       setIsTyping(true);
       const response = await chatService.sendMessage(userMessage);
       setConversationCompleted(response.conversation_completed);
+      setConversationCompletedAt(response.conversation_completed_at);
       const botMessages = response.messages.map((messageItem) =>
         generateCompassMessage(messageItem.message, messageItem.sent_at)
       );
@@ -161,6 +163,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
         const history = await chatService.getChatHistory();
         if (history.conversation_completed) setConversationCompleted(true);
+        if (history.conversation_completed_at) setConversationCompletedAt(history.conversation_completed_at);
         if (history.messages.length) {
           setMessages([]) // Clear the messages before adding the new ones
           history.messages.forEach((message: ConversationMessage) => {
@@ -314,6 +317,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
             isLoading={isLoading}
             experiences={experiences}
             conversationCompleted={conversationCompleted}
+            conversationCompletedAt={conversationCompletedAt}
           />
         </>
       )}

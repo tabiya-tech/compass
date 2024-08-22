@@ -41,6 +41,7 @@ describe("ExperiencesDrawer", () => {
         experiences={mockExperiences}
         notifyOnClose={jest.fn()}
         conversationCompleted={true}
+        conversationCompletedAt="2021-06-01T00:00:00Z"
       />
     );
 
@@ -79,6 +80,7 @@ describe("ExperiencesDrawer", () => {
         experiences={mockExperiences}
         notifyOnClose={notifyOnClose}
         conversationCompleted={true}
+        conversationCompletedAt="2021-06-01T00:00:00Z"
       />
     );
     // AND the component is rendered
@@ -101,6 +103,7 @@ describe("ExperiencesDrawer", () => {
         experiences={[]}
         notifyOnClose={jest.fn()}
         conversationCompleted={true}
+        conversationCompletedAt="2021-06-01T00:00:00Z"
       />
     );
     // AND the component is rendered
@@ -122,6 +125,7 @@ describe("ExperiencesDrawer", () => {
         experiences={[]}
         notifyOnClose={jest.fn()}
         conversationCompleted={true}
+        conversationCompletedAt="2021-06-01T00:00:00Z"
       />
     );
     // AND the component is rendered
@@ -141,6 +145,7 @@ describe("ExperiencesDrawer", () => {
         experiences={mockExperiences}
         notifyOnClose={jest.fn()}
         conversationCompleted={true}
+        conversationCompletedAt="2021-06-01T00:00:00Z"
       />
     );
     // AND the component is rendered
