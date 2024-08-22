@@ -293,8 +293,11 @@ class ExploreExperiencesAgentDirector(Agent):
 
         # construct a summary of the skills
         skills_summary = "\n"
-        for skill in current_experience.top_skills:
-            skills_summary += f"• {skill.preferredLabel}\n"
+        if len(current_experience.top_skills) == 0:
+            skills_summary += "• No skills identified\n"
+        else:
+            for skill in current_experience.top_skills:
+                skills_summary += f"• {skill.preferredLabel}\n"
 
         end = time.time()
         agent_output: AgentOutput = AgentOutput(

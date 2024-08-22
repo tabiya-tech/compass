@@ -140,6 +140,13 @@ class ExperiencePipeline:
             # 1 Cluster the responsibilities into N clusters
         cluster_tool_response = await self._cluster_responsibilities_tool.execute(responsibilities=responsibilities,
                                                                                   number_of_clusters=self._config.number_of_clusters)
+        if len(cluster_tool_response.clusters) == 0:
+            self._logger.warning("No clusters found for experience title: '%s' and company: '%s'", experience_title, company_name)
+            return ExperiencePipelineResponse(
+                top_skills=[],
+                llm_stats=llm_stats,
+                cluster_results=[]
+            )
         llm_stats.extend(cluster_tool_response.llm_stats)
         # 2. For each cluster
         # 2.1 Infer the occupations and associated skills

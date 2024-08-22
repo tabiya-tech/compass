@@ -41,6 +41,15 @@ test_cases = [
         ]
     ),
     ClusterResponsibilitiesToolTestCase(
+        name="num of clusters equal to resp. count",
+        given_responsibilities=["i work", "i eat"],
+        given_number_of_clusters=2,
+        expected_clusters=[
+            Cluster(cluster_name="Cluster 0", responsibilities=["i work"]),
+            Cluster(cluster_name="Cluster 1", responsibilities=["i eat"])
+        ]
+    ),
+    ClusterResponsibilitiesToolTestCase(
         name="less that five responsibilities (drink, eat, sleep)",
         given_responsibilities=["i drink", "i eat", "i sleep"],
         given_number_of_clusters=5,
@@ -53,17 +62,19 @@ test_cases = [
         ]
     ),
     ClusterResponsibilitiesToolTestCase(
-        name="num of clusters multiple of resp. count",
+        name="num of clusters is multiple of resp. count",
         given_responsibilities=["i work", "i eat"],
-        given_number_of_clusters=5,
+        given_number_of_clusters=6,
         expected_clusters=[
             Cluster(cluster_name="Cluster 0", responsibilities=["i work"]),
             Cluster(cluster_name="Cluster 1", responsibilities=["i eat"]),
             Cluster(cluster_name="Cluster 2", responsibilities=["i work"]),
             Cluster(cluster_name="Cluster 3", responsibilities=["i eat"]),
-            Cluster(cluster_name="Cluster 4", responsibilities=["i work", "i eat"])
+            Cluster(cluster_name="Cluster 2", responsibilities=["i work"]),
+            Cluster(cluster_name="Cluster 3", responsibilities=["i eat"])
         ]
     ),
+
 
     ClusterResponsibilitiesToolTestCase(
         name="one responsibility (work work work ...)",
@@ -78,10 +89,20 @@ test_cases = [
         ]
     ),
     ClusterResponsibilitiesToolTestCase(
+        name="empty responsibilities",
+        given_responsibilities=["i work", "i eat", ""],
+        given_number_of_clusters=2,
+        expected_clusters=[
+            Cluster(cluster_name="Cluster 0", responsibilities=["i work"]),
+            Cluster(cluster_name="Cluster 1", responsibilities=["i eat"]),
+        ]
+    ),
+
+    ClusterResponsibilitiesToolTestCase(
         name="no responsibilities",
         given_responsibilities=[],
         given_number_of_clusters=5,
-        expected_clusters=[Cluster(cluster_name="Empty", responsibilities=[]) for _ in range(5)]
+        expected_clusters=[]
     ),
 
     ClusterResponsibilitiesToolTestCase(
@@ -99,7 +120,6 @@ test_cases = [
         ]
     ),
     ClusterResponsibilitiesToolTestCase(
-        skip_force="force",
         name="GDE Brigade member responsibilities",
         given_responsibilities=["I make sure everyone follows the Covid-19 rules.",
                                 "I keep an eye on the kids to make sure they stay apart from each other.",

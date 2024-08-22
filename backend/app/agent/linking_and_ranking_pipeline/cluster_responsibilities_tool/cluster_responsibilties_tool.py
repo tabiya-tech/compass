@@ -100,21 +100,28 @@ class ClusterResponsibilitiesTool:
         then the clusters will be prefilled with one responsibility each, and the remaining clusters are filled with the result of the clustering algorithm
         that will be called with the number of clusters remaining
         """
-        _responsibilities = [responsibility.lower() for responsibility in responsibilities]
+        # filter the empty responsibilities and log warnings if there are any empty responsibilities
+        _responsibilities = []
+        for responsibility in responsibilities:
+            _responsibility_stripped = responsibility.strip().lower()
+            if _responsibility_stripped:
+                _responsibilities.append(_responsibility_stripped)
+            else:
+                logging.getLogger().warning("Empty responsibility detected")
+
         _number_of_clusters = number_of_clusters
         _prefilled_clusters: list[Cluster] = []
 
         if len(responsibilities) == 0:
-            self._logger.debug("The list of responsibilities is empty.")
+            self._logger.warning("The list of responsibilities is empty.")
             # construct n empty clusters
-            for _ in range(number_of_clusters):
-                _prefilled_clusters.append(Cluster(cluster_name="Empty", responsibilities=[]))
-            return ClusterResponsibilitiesResponse(clusters=_prefilled_clusters, llm_stats=[])
+            return ClusterResponsibilitiesResponse(clusters=[], llm_stats=[])
 
         # Handle the case where the number of responsibilities is less than the requested number of clusters
-        if len(_responsibilities) < number_of_clusters:
-            self._logger.debug("The number of responsibilities is less than the requested number of clusters. Requested: %d, Number of responsibilities: %d",
-                               number_of_clusters, len(_responsibilities))
+        if len(_responsibilities) <= number_of_clusters:
+            self._logger.debug(
+                "The number of responsibilities is less or equal to the requested number of clusters. Requested: %d, Number of responsibilities: %d",
+                number_of_clusters, len(_responsibilities))
 
             # while the number of responsibilities is less than the requested number of clusters
             # prefill the clusters with one responsibility each
@@ -146,12 +153,8 @@ class ClusterResponsibilitiesTool:
                     "The number of clusters returned by the LLM is different from the requested number of clusters. Requested: %d, Returned: %d",
                     _number_of_clusters, len(llm_response.clusters))
 
-            llm_clusters = llm_response.clusters
+            llm_clusters, clustered_responsibilities = _filter_empty_clusters_and_responsibilities(llm_response.clusters)
             # log a warning if all the responsibilities are not clustered
-            clustered_responsibilities = []
-            for cluster in llm_response.clusters:
-                for responsibility in cluster.responsibilities:
-                    clustered_responsibilities.append(responsibility.lower())
             counter_responsibilities = Counter(_responsibilities)
             counter_clustered_responsibilities = Counter(clustered_responsibilities)
             only_in_responsibilities = counter_responsibilities - counter_clustered_responsibilities
@@ -163,6 +166,7 @@ class ClusterResponsibilitiesTool:
                 if cnt[1] > 1:
                     self._logger.warning("Responsibility '%s' is clustered more than once", cnt[0])
 
+        _prefilled_clusters, _ = _filter_empty_clusters_and_responsibilities(_prefilled_clusters)
         clusters = _prefilled_clusters + llm_clusters
         if self._logger.isEnabledFor(logging.INFO):
             self._logger.info("Clustered responsibilities into the following clusters: %s", clusters)
@@ -171,3 +175,26 @@ class ClusterResponsibilitiesTool:
             clusters=clusters,
             llm_stats=llm_stats
         )
+
+
+def _filter_empty_clusters_and_responsibilities(clusters: list[Cluster]) -> tuple[list[Cluster], list[str]]:
+    """
+    Filter out the empty clusters and  empty responsibilities and log warnings if there are any empty clusters or responsibilities
+    Return the filtered clusters and all the responsibilities that were added to the clusters
+    """
+    _filtered_clusters = []
+    _all_responsibilities = []
+    for cluster in clusters:
+        _filtered_responsibilities = []
+        for responsibility in cluster.responsibilities:
+            _responsibility_stripped = responsibility.strip()
+            if _responsibility_stripped:
+                _all_responsibilities.append(_responsibility_stripped)
+                _filtered_responsibilities.append(_responsibility_stripped)
+            else:
+                logging.getLogger().warning("Empty responsibility in cluster '%s'", cluster.cluster_name)
+        if len(_filtered_responsibilities) > 0:
+            _filtered_clusters.append(Cluster(cluster_name=cluster.cluster_name, responsibilities=_filtered_responsibilities))
+        else:
+            logging.getLogger().warning("Empty cluster '%s'", cluster.cluster_name)
+    return _filtered_clusters, _all_responsibilities
