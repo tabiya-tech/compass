@@ -92,7 +92,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
           data-testid={DATA_TEST_ID.CHAT_HEADER_LOGO}
         />
       </NavLink>
-      <Typography variant="h1">compass</Typography>
+      <Typography variant="h1">Compass</Typography>
       <PrimaryIconButton
         sx={{
           color: theme.palette.common.black,
