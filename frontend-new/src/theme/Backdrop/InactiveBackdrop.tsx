@@ -1,7 +1,7 @@
 import React from "react";
 import Paper from "@mui/material/Paper";
 import { Theme } from "@mui/material/styles";
-import { Backdrop, keyframes, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Backdrop, Typography, useMediaQuery, useTheme } from "@mui/material";
 
 interface InactivityBackdropProps {
   isShown: boolean;
@@ -13,15 +13,6 @@ export const DATA_TEST_ID = {
   INACTIVE_BACKDROP_CONTAINER: `inactive-backdrop-container-${uniqueId}`,
   INACTIVE_BACKDROP_MESSAGE: `inactive-backdrop-message-${uniqueId}`,
 };
-
-const moveX = keyframes`
-    0% {
-        transform: translateX(-100%);
-    }
-    100% {
-        transform: translateX(100%);
-    }
-`;
 
 const InactiveBackdrop: React.FC<InactivityBackdropProps> = ({ isShown }) => {
   const theme = useTheme();
@@ -36,20 +27,16 @@ const InactiveBackdrop: React.FC<InactivityBackdropProps> = ({ isShown }) => {
         elevation={24}
         sx={{
           backgroundColor: "containerBackground.main",
-          padding: isSmallMobile ? 4 : 2,
+          padding: isSmallMobile ? 6 : 4,
           position: "relative",
-          animation: `${moveX} 20s linear infinite alternate`,
         }}
       >
         <Typography
           variant="body1"
           color="info.contrastText"
-          fontWeight="bold"
           textAlign="center"
           data-testid={DATA_TEST_ID.INACTIVE_BACKDROP_MESSAGE}
         >
-          ...zzZZzzZZ
-          <br />
           Are you still here?
           <br />
           Tap anywhere to continue...
