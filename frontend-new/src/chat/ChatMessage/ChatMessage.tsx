@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, styled } from "@mui/material";
+import { Box, Typography, styled, alpha } from "@mui/material";
 import { IChatMessage } from "src/chat/Chat.types";
 import { getDurationFromNow } from "src/utils/getDurationFromNow/getDurationFromNow";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
@@ -25,8 +25,10 @@ const MessageBubble = styled(Box)<{ origin: ConversationMessageSender }>(({ them
   variants: "outlined",
   wordWrap: "break-word",
   padding: theme.fixedSpacing(theme.tabiyaSpacing.sm),
-  borderRadius: theme.rounding(theme.tabiyaRounding.xs),
-  backgroundColor: origin === ConversationMessageSender.USER ? theme.palette.primary.light : theme.palette.grey[200],
+  border: origin === ConversationMessageSender.USER ? `2px solid ${theme.palette.primary.light}` : "none",
+  borderRadius: origin === ConversationMessageSender.USER ? "12px 0px 12px 12px" : "12px 12px 12px 0px",
+  backgroundColor:
+    origin === ConversationMessageSender.USER ? alpha(theme.palette.primary.light, 0.16) : theme.palette.grey[200],
   color: origin === ConversationMessageSender.USER ? theme.palette.primary.contrastText : theme.palette.text.primary,
   position: "relative",
   alignSelf: origin === ConversationMessageSender.USER ? "flex-end" : "flex-start",
