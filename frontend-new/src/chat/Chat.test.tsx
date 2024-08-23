@@ -1,20 +1,21 @@
 import "src/_test_utilities/consoleMock";
-import Chat, {CHECK_INACTIVITY_INTERVAL, DATA_TEST_ID} from "./Chat";
-import {fireEvent, render, screen, waitFor} from "src/_test_utilities/test-utils";
-import {DATA_TEST_ID as CHAT_HEADER_TEST_ID, MENU_ITEM_ID} from "./ChatHeader/ChatHeader";
-import ChatList, {DATA_TEST_ID as CHAT_LIST_TEST_ID} from "./ChatList/ChatList";
-import ChatMessageField, {DATA_TEST_ID as CHAT_MESSAGE_FIELD_TEST_ID} from "./ChatMessageField/ChatMessageField";
-import {DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID} from "src/Experiences/components/ExperiencesDrawerHeader/ExperiencesDrawerHeader";
-import {DATA_TEST_ID as EXPERIENCES_DRAWER_CONTAINER_TEST_ID} from "src/Experiences/ExperiencesDrawer";
-import {HashRouter} from "react-router-dom";
-import {useSnackbar} from "src/theme/SnackbarProvider/SnackbarProvider";
-import {ConversationMessageSender} from "./ChatService/ChatService.types";
-import {Language} from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import {UserPreferencesContext} from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
+import Chat, { CHECK_INACTIVITY_INTERVAL, DATA_TEST_ID } from "./Chat";
+import { fireEvent, render, screen, waitFor } from "src/_test_utilities/test-utils";
+import { DATA_TEST_ID as CHAT_HEADER_TEST_ID, MENU_ITEM_ID } from "./ChatHeader/ChatHeader";
+import ChatList, { DATA_TEST_ID as CHAT_LIST_TEST_ID } from "./ChatList/ChatList";
+import ChatMessageField, { DATA_TEST_ID as CHAT_MESSAGE_FIELD_TEST_ID } from "./ChatMessageField/ChatMessageField";
+import { DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID } from "src/Experiences/components/ExperiencesDrawerHeader/ExperiencesDrawerHeader";
+import { DATA_TEST_ID as EXPERIENCES_DRAWER_CONTAINER_TEST_ID } from "src/Experiences/ExperiencesDrawer";
+import { DATA_TEST_ID as APPROVE_MODEL_TEST_ID } from "src/theme/ApproveModal/ApproveModal";
+import { HashRouter } from "react-router-dom";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import { ConversationMessageSender } from "./ChatService/ChatService.types";
+import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 import ChatService from "./ChatService/ChatService";
 import ExperienceService from "src/Experiences/ExperienceService/ExperienceService";
-import {MenuItemConfig} from "src/theme/ContextMenu/menuItemConfig.types";
-import {act} from "@testing-library/react";
+import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
+import { act } from "@testing-library/react";
 
 // Mock the ChatService module
 jest.mock("src/chat/ChatService/ChatService");
@@ -56,7 +57,7 @@ jest.mock("src/chat/ChatMessageField/ChatMessageField", () => {
   return {
     __esModule: true,
     ...actualModule,
-    default: jest.fn(({handleSend, message, notifyChange}) => (
+    default: jest.fn(({ handleSend, message, notifyChange }) => (
       <div data-testid={actualModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER}>
         <input
           data-testid={actualModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD}
@@ -88,7 +89,7 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
 jest.mock("src/theme/ContextMenu/ContextMenu", () => {
   return {
     __esModule: true,
-    default: jest.fn(({items}: { items: MenuItemConfig[] }) => (
+    default: jest.fn(({ items }: { items: MenuItemConfig[] }) => (
       <div data-testid="mock-context-menu">
         {items.map((item) => (
           <div key={item.id} data-testid={item.id} onClick={item.action}>
@@ -149,7 +150,7 @@ describe("Chat", () => {
       render(
         <HashRouter>
           <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat/>
+            <Chat />
           </UserPreferencesContext.Provider>
         </HashRouter>
       );
@@ -188,14 +189,14 @@ describe("Chat", () => {
       render(
         <HashRouter>
           <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat/>
+            <Chat />
           </UserPreferencesContext.Provider>
         </HashRouter>
       );
 
       // WHEN the user is inactive
       const input = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD);
-      fireEvent.change(input, {target: {value: ""}});
+      fireEvent.change(input, { target: { value: "" } });
       jest.advanceTimersByTime(CHECK_INACTIVITY_INTERVAL);
 
       // THEN expect the backdrop to be shown
@@ -206,19 +207,17 @@ describe("Chat", () => {
       jest.useRealTimers();
     });
 
-    test.each(
-      [
-        ["mouseDown", () => fireEvent.mouseDown(document)],
-        ["keyDown", () => fireEvent.keyDown(document, {key: "Enter"})],
-      ]
-    )("should hide the backdrop when the user %s", async (description, event_callback: () => void) => {
+    test.each([
+      ["mouseDown", () => fireEvent.mouseDown(document)],
+      ["keyDown", () => fireEvent.keyDown(document, { key: "Enter" })],
+    ])("should hide the backdrop when the user %s", async (description, event_callback: () => void) => {
       jest.useFakeTimers();
 
       // GIVEN a chat component
       render(
         <HashRouter>
           <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat/>
+            <Chat />
           </UserPreferencesContext.Provider>
         </HashRouter>
       );
@@ -276,7 +275,7 @@ describe("Chat", () => {
       render(
         <HashRouter>
           <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat/>
+            <Chat />
           </UserPreferencesContext.Provider>
         </HashRouter>
       );
@@ -336,7 +335,7 @@ describe("Chat", () => {
       render(
         <HashRouter>
           <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat/>
+            <Chat />
           </UserPreferencesContext.Provider>
         </HashRouter>
       );
@@ -345,7 +344,7 @@ describe("Chat", () => {
       await waitFor(() => {
         expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
           "An unexpected error occurred. Please try again later.",
-          {variant: "error"}
+          { variant: "error" }
         );
       });
     });
@@ -370,7 +369,7 @@ describe("Chat", () => {
       render(
         <HashRouter>
           <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat/>
+            <Chat />
           </UserPreferencesContext.Provider>
         </HashRouter>
       );
@@ -378,7 +377,7 @@ describe("Chat", () => {
       const input = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD);
       const sendButton = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
 
-      fireEvent.change(input, {target: {value: "Test message"}});
+      fireEvent.change(input, { target: { value: "Test message" } });
       fireEvent.click(sendButton);
 
       // THEN expect the message to be sent and the response to be received
@@ -417,7 +416,7 @@ describe("Chat", () => {
       render(
         <HashRouter>
           <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat/>
+            <Chat />
           </UserPreferencesContext.Provider>
         </HashRouter>
       );
@@ -433,7 +432,7 @@ describe("Chat", () => {
       const input = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD);
       const sendButton = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
 
-      fireEvent.change(input, {target: {value: "Test message"}});
+      fireEvent.change(input, { target: { value: "Test message" } });
       fireEvent.click(sendButton);
 
       // THEN expect an error message to be shown in the chat
@@ -466,7 +465,7 @@ describe("Chat", () => {
     const chatComponent = (
       <HashRouter>
         <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-          <Chat/>
+          <Chat />
         </UserPreferencesContext.Provider>
       </HashRouter>
     );
@@ -532,6 +531,68 @@ describe("Chat", () => {
           screen.queryByTestId(EXPERIENCES_DRAWER_CONTAINER_TEST_ID.EXPERIENCES_DRAWER_CONTAINER)
         ).not.toBeInTheDocument();
       });
+    });
+  });
+
+  describe("test new conversation dialog", () => {
+    test("should show new conversation dialog when the user clicks on the new conversation button", async () => {
+      // GIVEN a chat component
+      render(
+        <HashRouter>
+          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
+            <Chat />
+          </UserPreferencesContext.Provider>
+        </HashRouter>
+      );
+
+      // WHEN the new conversation button is clicked
+      const newConversationButton = screen.getByTestId(MENU_ITEM_ID.START_NEW_CONVERSATION);
+      fireEvent.click(newConversationButton);
+
+      // THEN expect the new conversation dialog to be shown
+      expect(screen.getByTestId(APPROVE_MODEL_TEST_ID.APPROVE_MODEL)).toBeInTheDocument();
+    });
+
+    test("should close the new conversation dialog when the user clicks on the cancel button", async () => {
+      // GIVEN the chat component is rendered
+      render(
+        <HashRouter>
+          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
+            <Chat />
+          </UserPreferencesContext.Provider>
+        </HashRouter>
+      );
+      // AND the new conversation dialog is open
+      const newConversationButton = screen.getByTestId(MENU_ITEM_ID.START_NEW_CONVERSATION);
+      fireEvent.click(newConversationButton);
+
+      // WHEN the cancel button is clicked
+      const cancelButton = screen.getByTestId(APPROVE_MODEL_TEST_ID.APPROVE_MODEL_CANCEL);
+      fireEvent.click(cancelButton);
+
+      // THEN expect the new conversation dialog to be closed
+      expect(screen.queryByTestId(APPROVE_MODEL_TEST_ID.APPROVE_MODEL)).not.toBeInTheDocument();
+    });
+
+    test("should start new conversation when the user clicks on the confirm button", async () => {
+      // GIVEN the chat component is rendered
+      render(
+        <HashRouter>
+          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
+            <Chat />
+          </UserPreferencesContext.Provider>
+        </HashRouter>
+      );
+      // AND the new conversation dialog is open
+      const newConversationButton = screen.getByTestId(MENU_ITEM_ID.START_NEW_CONVERSATION);
+      fireEvent.click(newConversationButton);
+
+      // WHEN the confirm button is clicked
+      const confirmButton = screen.getByTestId(APPROVE_MODEL_TEST_ID.APPROVE_MODEL_CONFIRM);
+      fireEvent.click(confirmButton);
+
+      // THEN expect the new conversation dialog to be closed
+      expect(screen.queryByTestId(APPROVE_MODEL_TEST_ID.APPROVE_MODEL)).not.toBeInTheDocument();
     });
   });
 });
