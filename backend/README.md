@@ -297,14 +297,23 @@ poetry run pytest --log-cli-level=DEBUG -v -m "not (smoke_test or evaluation_tes
 
 > Note: See [here](https://docs.pytest.org/en/latest/how-to/logging.html) for more information on logging in pytest.
 
-# One-Off Scripts
-
 ## ESCO Embedding Generation
 
 The script `generate_esco_embeddings.py` is used to generate the embeddings for the ESCO occupations. The script reads
-the ESCO occupations from a collection in the MongoDB database and generates the embeddings for the occupations. The
-embeddings are stored in a different collection in the MongoDB database. The names of the collections and database are
-specified in the `generate_esco_embeddings.py` file.
+the ESCO occupations and skills from the Platform Taxonomy MongoDB database and generates the embeddings for the Compass Taxonomy database. 
+
+For the target database the script uses the environment variables for the mondgo db server and  database to connect to, and the vertex API credentials and region
+(see [Environment Variables & Configuration](#environment-variables--configuration)).
+
+For the source database the script uses the following environment variables:
+```dotenv
+# The URI of the MongoDB instance where the ESCO data is stored
+TABIYA_MONGODB_URI=<MONGODB_URI>
+# The name of the database in the Tabiya MongoDB instance where the ESCO data is stored
+TABIYA_DB_NAME=<ESCO_DATABASE_NAME>
+# The model ID of the ESCO model in the Tabiya database
+TABIYA_MODEL_ID=<ESCO_MODEL_ID>
+```
 
 To run the script use the following command:
 
@@ -312,15 +321,6 @@ To run the script use the following command:
  python3 scripts/generate_esco_embeddings.py
 ```
 
-Make sure to run it from the `/backend` directory. as it contains the necessary environment variables (specifically
-MongoDB access keys and Google Cloud access keys). Due to quota limitations the script will take a while to run. If any
-of the records fail to be parsed the script will print out the UUIDs of the records that failed. You can then fix the
-problem and re-run only those using the `--uuids` argument.
+Make sure to run it from the `/backend` directory as it contains the necessary environment variables mentioned above.
 
-You can optionally use the `--uuids` argument to specify the UUIDs of the ESCO occupations for which the embeddings
-should be generated. And the `--drop_collection` argument to delete and re-create the embeddings' collection. For
-example:
-
-```shell
- python3 scripts/generate_esco_embeddings.py --uuids uuid1 uuid2 --drop_collection
-```
+The script handles retrying, rate limiting, and processes the data in batches. Additionally, if the generation process is interrupted, the script can be re-run, and it will continue processing the remaining data from where it left off.
