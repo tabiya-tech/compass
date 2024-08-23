@@ -30,14 +30,13 @@ MONGO_SETTINGS = MongoDbSettings()
 SCRIPT_SETTINGS = ScriptSettings()
 
 TABIYA_CONFIG = TabiyaDatabaseConfig()
-MODEL_ID = "66845ccb635d10616a2895aa"
 GECKO_EMBEDDING_SERVICE = GoogleGeckoEmbeddingService()
 
 ##########################
 # Connect to the databases
 ##########################
 PLATFORM_DB = AsyncIOMotorClient(
-    SCRIPT_SETTINGS.tabiya_mongodb_uri, tlsAllowInvalidCertificates=True).get_database(TABIYA_CONFIG.db_name)
+    SCRIPT_SETTINGS.tabiya_mongodb_uri, tlsAllowInvalidCertificates=True).get_database(SCRIPT_SETTINGS.tabiya_db_name)
 
 
 class PlatformCollections(Enum):
@@ -47,7 +46,7 @@ class PlatformCollections(Enum):
 
 
 COMPASS_DB = AsyncIOMotorClient(
-    MONGO_SETTINGS.taxonomy_mongodb_uri, tlsAllowInvalidCertificates=True).get_database(MONGO_SETTINGS.taxonomy_database_name)
+    MONGO_SETTINGS.mongodb_uri, tlsAllowInvalidCertificates=True).get_database(MONGO_SETTINGS.taxonomy_database_name)
 
 
 class CompassCollections(Enum):
@@ -60,7 +59,7 @@ class CompassCollections(Enum):
 # Types
 ##########################
 class EmbeddingContext(BaseModel):
-    schema: Literal["occupation", "skill"]
+    collection_schema: Literal["occupation", "skill"]
     """
     schema is the name of the schema
     """
@@ -224,7 +223,7 @@ async def process_schema(ctx: EmbeddingContext):
     Process the documents collection
     :return:
     """
-    logger.info(f"Processing documents: {ctx.schema}")
+    logger.info(f"Processing documents: {ctx.collection_schema}")
 
     # Define the context
     # it is used to define the source and destination collections
@@ -233,13 +232,13 @@ async def process_schema(ctx: EmbeddingContext):
     from_collection = PLATFORM_DB[ctx.source_collection]
     to_collection = COMPASS_DB[ctx.destination_collection]
 
-    logger.info(f"[1/2] copying the {ctx.schema}s documents from {from_collection.name} to {to_collection.name}")
+    logger.info(f"[1/2] copying the {ctx.collection_schema}s documents from {from_collection.name} to {to_collection.name}")
 
     # Define the search filter
     # check all ids in the to_collection where the embeddings are already generated
-    done_ids = await to_collection.distinct(ctx.id_field_name, {"modelId": ObjectId(MODEL_ID)})
+    done_ids = await to_collection.distinct(ctx.id_field_name, {"modelId": ObjectId(SCRIPT_SETTINGS.tabiya_model_id)})
     search_filter = {
-        "modelId": ObjectId(MODEL_ID),
+        "modelId": ObjectId(SCRIPT_SETTINGS.tabiya_model_id),
         "_id": {
             "$nin": done_ids
         }
@@ -250,7 +249,7 @@ async def process_schema(ctx: EmbeddingContext):
     cursor = from_collection.find(search_filter).batch_size(batch_size)
     documents = []
     progress = tqdm(
-        desc=f'generating embeddings for {ctx.schema}',
+        desc=f'generating embeddings for {ctx.collection_schema}',
         total=await from_collection.count_documents(search_filter),
     )
 
@@ -293,9 +292,9 @@ async def copy_relations_collection():
     # completed ids are the ids of the documents that were already copied
     # the source_id is used to keep track of the original document id
     # it is found in the source_id field, its insertion happens in the next step
-    completed_ids = await to_collection.distinct("source_id", {"modelId": ObjectId(MODEL_ID)})
+    completed_ids = await to_collection.distinct("source_id", {"modelId": ObjectId(SCRIPT_SETTINGS.tabiya_model_id)})
     search_filter = {
-        "modelId": ObjectId(MODEL_ID),
+        "modelId": ObjectId(SCRIPT_SETTINGS.tabiya_model_id),
         "_id": {
             "$nin": completed_ids
         }
@@ -366,7 +365,7 @@ async def main():
 
         # [2/3] Process the occupations
         process_schema(EmbeddingContext(
-            schema="occupation",
+            collection_schema="occupation",
             source_collection=PlatformCollections.OCCUPATIONS.value,
             destination_collection=CompassCollections.OCCUPATIONS.value,
             id_field_name="occupationId",
@@ -375,7 +374,7 @@ async def main():
 
         # [3/3] Process the skills
         process_schema(EmbeddingContext(
-            schema="skill",
+            collection_schema="skill",
             source_collection=PlatformCollections.SKILLS.value,
             destination_collection=CompassCollections.SKILLS.value,
             id_field_name="skillId",

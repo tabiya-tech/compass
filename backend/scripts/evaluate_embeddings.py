@@ -12,7 +12,7 @@ from app.vector_search.esco_search_service import VectorSearchConfig, Occupation
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
 from common_libs.environment_settings.constants import EmbeddingConfig
-from scripts.base_data_settings import ScriptSettings, Type
+from scripts.base_data_settings import Type, EvaluateScriptSettings
 
 OCCUPATION_REPO_ID = "tabiya/hahu_test"
 OCCUPATION_FILENAME = "redacted_hahu_test_with_id.csv"
@@ -21,7 +21,7 @@ SKILL_FILENAME = "data/processed_skill_test_set_with_id.parquet"
 
 load_dotenv()
 MONGO_SETTINGS = MongoDbSettings()
-SCRIPT_SETTINGS = ScriptSettings()
+SCRIPT_SETTINGS = EvaluateScriptSettings()
 EMBEDDING_SETTINGS = EmbeddingConfig()
 
 
