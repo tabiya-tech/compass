@@ -99,7 +99,7 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
         most_relevant_entities = [entity for entity in entities_to_classify if entity.UUID not in remaining_entities_uuids]
         # Get the top_k most relevant entities
         if len(most_relevant_entities) != top_k:
-            self._logger.warning("The LLM returned %d most relevant {self._entity_types_plural} instead of the requested %d.", len(most_relevant_entities),
+            self._logger.warning(f"The LLM returned %d most relevant {self._entity_types_plural} instead of the requested %d.", len(most_relevant_entities),
                                  top_k)
 
         most_relevant_entities = most_relevant_entities[:top_k] # Get the top_k most relevant entities
