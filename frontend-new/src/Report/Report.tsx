@@ -108,11 +108,11 @@ const SkillReport: React.FC<SkillReportProps> = ({
           </View>
           <Text style={styles.bodyText} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY_TEXT}>
             This report summarizes the key information gathered during a conversation with Compass on{" "}
-            {formatDate(conversationCompletedAt!)}. Compass by Tabiya is an AI chatbot that assists job-seekers in
-            exploring their skills and experiences. This report presents the candidate’s work experience and the skills
-            identified from each experience. This information can be used to guide job search and highlight their skills
-            when applying for jobs, especially during interviews with potential employers. It can be a good starting
-            point for creating a complete CV.
+            {formatDate(conversationCompletedAt!)}. Compass is an AI chatbot that assists job-seekers in exploring their
+            skills and experiences. This report presents the candidate’s work experience and the skills identified from
+            each experience. This information can be used to guide job search and highlight their skills when applying
+            for jobs, especially during interviews with potential employers. It can be a good starting point for
+            creating a complete CV.
           </Text>
           <View style={styles.divider} />
           <Text style={styles.experiencesTitle} data-testid={DATA_TEST_ID.SKILL_REPORT_EXPERIENCES_TITLE}>

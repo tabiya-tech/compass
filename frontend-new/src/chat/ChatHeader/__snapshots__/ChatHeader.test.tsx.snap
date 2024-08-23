@@ -22,7 +22,7 @@ exports[`ChatHeader should render the Chat Header 1`] = `
   <h1
     class="MuiTypography-root MuiTypography-h1 css-74y4cl-MuiTypography-root"
   >
-    compass
+    Compass
   </h1>
   <button
     class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-r08as9-MuiButtonBase-root-MuiIconButton-root"
