@@ -126,7 +126,7 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
           <LanguageContextMenu />
         </Box>
         <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.TITLE}>
-          Thank you for using Tabiya Compass.
+          Thank you for using Compass.
         </Typography>
         <Typography variant="body2" gutterBottom data-testid={DATA_TEST_ID.AGREEMENT_BODY}>
           We created this AI tool for you with care to help you and other young people like you explore their skills and
