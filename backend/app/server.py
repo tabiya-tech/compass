@@ -17,15 +17,15 @@ from app.agent.experience.experience_entity import ExperienceEntity
 from app.application_state import ApplicationStateManager
 from app.constants.errors import HTTPErrorResponse
 from app.invitations.routes import add_user_invitations_routes
-from app.server_dependecies.application_state_dependencies import get_application_state_manager
-from app.server_dependecies.db_dependecies import CompassDBProvider
+from app.server_dependencies.application_state_dependencies import get_application_state_manager
+from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, UserInfo
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
 from app.chat.chat_types import ConversationResponse, ConversationInput
 from app.chat.chat_utils import filter_conversation_history, get_messages_from_conversation_manager
-from app.server_dependecies.agent_director_dependencies import get_agent_director
-from app.server_dependecies.conversation_manager_dependencies import get_conversation_memory_manager
+from app.server_dependencies.agent_director_dependencies import get_agent_director
+from app.server_dependencies.conversation_manager_dependencies import get_conversation_memory_manager
 from app.version.version_routes import add_version_routes
 
 from contextlib import asynccontextmanager

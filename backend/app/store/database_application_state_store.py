@@ -5,7 +5,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.agent.agent_director.abstract_agent_director import AgentDirectorState
 from app.application_state import ApplicationStateStore, ApplicationState
-from app.server_dependecies.database_collections import Collections
+from app.server_dependencies.database_collections import Collections
 
 
 class DatabaseApplicationStateStore(ApplicationStateStore):

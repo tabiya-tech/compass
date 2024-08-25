@@ -2,7 +2,7 @@ import logging
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from app.server_dependecies.database_collections import Collections
+from app.server_dependencies.database_collections import Collections
 
 from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest
 

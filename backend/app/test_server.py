@@ -19,7 +19,7 @@ def test_version(in_memory_mongo_server):
         tlsAllowInvalidCertificates=True
     ).get_database(random_db_name())
 
-    with patch('app.server_dependecies.db_dependecies._get_application_db') as mock_get_application_db:
+    with patch('app.server_dependencies.db_dependencies._get_application_db') as mock_get_application_db:
         mock_get_application_db.return_value = _in_mem_application_db
 
         from fastapi.testclient import TestClient

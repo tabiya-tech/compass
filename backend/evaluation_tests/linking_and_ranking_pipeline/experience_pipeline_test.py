@@ -5,7 +5,7 @@ import pytest
 from app.agent.experience.work_type import WorkType
 from app.agent.linking_and_ranking_pipeline import ExperiencePipeline, ExperiencePipelineConfig
 from app.countries import Country
-from app.server_dependecies.db_dependecies import CompassDBProvider
+from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
 from app.vector_search.esco_search_service import OccupationSearchService, OccupationSkillSearchService, VectorSearchConfig, SkillSearchService
 from app.vector_search.vector_search_dependencies import SearchServices

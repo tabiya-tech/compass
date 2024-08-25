@@ -1,6 +1,6 @@
 from typing import List, Any, Mapping
 
-from app.server_dependecies.db_dependecies import CompassDBProvider
+from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
 from app.vector_search.esco_entities import OccupationEntity
 from app.vector_search.esco_search_service import OccupationSkillSearchService, OccupationSearchService, \

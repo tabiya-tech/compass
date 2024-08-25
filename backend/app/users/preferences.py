@@ -4,7 +4,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.constants.errors import ErrorService, HTTPErrorResponse
 from app.invitations.service import UserInvitationService
 from app.invitations.types import InvitationCodeStatus, InvitationType
-from app.server_dependecies.db_dependecies import CompassDBProvider
+from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, UserInfo, SignInProvider
 from app.users.repositories import UserPreferenceRepository
 from app.users.sessions import generate_new_session_id, SessionsService
