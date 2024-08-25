@@ -2483,6 +2483,20 @@ test = ["pytest (>=7)"]
 zstd = ["zstandard"]
 
 [[package]]
+name = "pymongo-inmemory"
+version = "0.4.2"
+description = "A mongo mocking library with an ephemeral MongoDB running in memory."
+optional = false
+python-versions = "<4.0,>=3.9"
+files = [
+    {file = "pymongo_inmemory-0.4.2-py3-none-any.whl", hash = "sha256:dc5dc7f63ef065ecf94e08d229b151ea980082a214614cd6d95a669a6011ac34"},
+    {file = "pymongo_inmemory-0.4.2.tar.gz", hash = "sha256:3c61f7db3b36d9247fdded790b3de4e9c4fc00e0b72a676b04b8761d80cd3a28"},
+]
+
+[package.dependencies]
+pymongo = "*"
+
+[[package]]
 name = "pyparsing"
 version = "3.1.2"
 description = "pyparsing module - Classes and methods to define and execute parsing grammars"
@@ -3545,4 +3559,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "3435335b669df4955f6a2be7b0a815f08e2f97e9b145738cdda033106483ca4e"
+content-hash = "4065bec5c1b2b399b5796cebc72b04a2b012c8333929a74a5ad39745d96cab76"

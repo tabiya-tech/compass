@@ -5,8 +5,8 @@ import logging
 from fastapi import FastAPI, HTTPException
 from app.constants.errors import HTTPErrorResponse
 
-
 logger = logging.getLogger(__name__)
+
 
 def add_version_routes(app: FastAPI):
     """
