@@ -69,7 +69,7 @@ class UserInvitation(BaseModel):
     """
 
     @staticmethod
-    def from_dict(_dict: Mapping[str, any]):
+    def from_dict(_dict: Mapping[str, any]) -> "UserInvitation":
         """
         Create a new UserInvitation object from a dictionary
         :param _dict: Mapping[str, any]: The dictionary to create the UserInvitation object from

@@ -16,7 +16,7 @@ from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.agent.experience.experience_entity import ExperienceEntity
 from app.application_state import ApplicationStateManager
 from app.constants.errors import HTTPErrorResponse
-from app.invitations.routes import add_user_invitations_routes
+from app.invitations import add_user_invitations_routes
 from app.server_dependencies.application_state_dependencies import get_application_state_manager
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, UserInfo
