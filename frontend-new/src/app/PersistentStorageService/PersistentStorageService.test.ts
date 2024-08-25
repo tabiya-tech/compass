@@ -1,5 +1,4 @@
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import { Language, UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { Invitation, InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
 
 describe("AuthPersistentStorage class tests", () => {
@@ -58,81 +57,6 @@ describe("AuthPersistentStorage class tests", () => {
       // THEN The token should be stored
       const Token = PersistentStorageService.getToken();
       expect(Token).toEqual(givenToken);
-    });
-  });
-
-  describe("user preferences tests", () => {
-    test("return correct previously set user preferences", () => {
-      // GIVEN The user preferences are stored in the session storage
-      const givenUserPreferences: UserPreference = {
-        user_id: "foo",
-        language: Language.en,
-        accepted_tc: new Date(),
-        sessions: [1, 2, 3],
-      };
-      PersistentStorageService.setUserPreferences(givenUserPreferences);
-
-      // WHEN The user preferences are retrieved
-      const userPreferences = PersistentStorageService.getUserPreferences();
-
-      // THEN The user preferences should be returned
-      expect(userPreferences).toEqual({
-        user_id: "foo",
-        language: Language.en,
-        accepted_tc: expect.any(String),
-        sessions: [1, 2, 3],
-      });
-    });
-
-    test("return null if user preferences are not set", () => {
-      // GIVEN The user preferences are not stored in the session storage
-      // Nothing set
-
-      // WHEN The user preferences are retrieved
-      const userPreferences = PersistentStorageService.getUserPreferences();
-
-      // THEN null should be returned
-      expect(userPreferences).toBeNull();
-    });
-
-    test("clear user preferences", () => {
-      // GIVEN The user preferences are stored in the session storage
-      const givenUserPreferences: UserPreference = {
-        user_id: "foo",
-        language: Language.en,
-        accepted_tc: new Date(),
-        sessions: [1, 2, 3],
-      };
-      PersistentStorageService.setUserPreferences(givenUserPreferences);
-
-      // WHEN The user preferences are cleared
-      PersistentStorageService.clearUserPreferences();
-
-      // THEN The user preferences should be cleared (null)
-      const userPreferences = PersistentStorageService.getUserPreferences();
-      expect(userPreferences).toBeNull();
-    });
-
-    test("set user preferences", () => {
-      // GIVEN The user preferences are not stored in the session storage
-      const givenUserPreferences: UserPreference = {
-        user_id: "foo",
-        language: Language.en,
-        accepted_tc: new Date(),
-        sessions: [1, 2, 3],
-      };
-
-      // WHEN The user preferences are set
-      PersistentStorageService.setUserPreferences(givenUserPreferences);
-
-      // THEN The user preferences should be stored
-      const userPreferences = PersistentStorageService.getUserPreferences();
-      expect(userPreferences).toEqual({
-        user_id: "foo",
-        language: Language.en,
-        accepted_tc: expect.any(String),
-        sessions: [1, 2, 3],
-      });
     });
   });
 
@@ -359,9 +283,5 @@ describe("AuthPersistentStorage class tests", () => {
     // THEN The token should be cleared (null)
     const Token = PersistentStorageService.getToken();
     expect(Token).toBeNull();
-
-    // AND The user preferences should be cleared (null)
-    const userPreferences = PersistentStorageService.getUserPreferences();
-    expect(userPreferences).toBeNull();
   });
 });

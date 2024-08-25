@@ -11,7 +11,9 @@ import { HashRouter } from "react-router-dom";
 import { DEFAULT_SNACKBAR_AUTO_HIDE_DURATION, useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { ConversationMessageSender } from "./ChatService/ChatService.types";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
+import {
+  userPreferencesStateService,
+} from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
 import ChatService from "./ChatService/ChatService";
 import ExperienceService from "src/Experiences/ExperienceService/ExperienceService";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
@@ -111,22 +113,7 @@ jest.mock("src/theme/Backdrop/InactiveBackdrop", () => {
 });
 
 describe("Chat", () => {
-  const getUserPreferencesMock = jest.fn();
   const givenSessionId = 123;
-
-  const userPreferencesContextValue = {
-    getUserPreferences: getUserPreferencesMock,
-    updateUserPreferencesOnClient: jest.fn(),
-    createUserPreferences: jest.fn(),
-    userPreferences: {
-      accepted_tc: new Date(),
-      user_id: "0001",
-      language: Language.en,
-      sessions: [givenSessionId],
-    },
-    updateUserPreferences: jest.fn(),
-    isLoading: false,
-  };
 
   const mockSendMessage = jest.fn();
   const mockGetChatHistory = jest.fn();
@@ -149,9 +136,7 @@ describe("Chat", () => {
       // WHEN the chat header is rendered with a router
       render(
         <HashRouter>
-          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat />
-          </UserPreferencesContext.Provider>
+          <Chat />
         </HashRouter>
       );
 
@@ -188,9 +173,7 @@ describe("Chat", () => {
       // GIVEN a chat component
       render(
         <HashRouter>
-          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat />
-          </UserPreferencesContext.Provider>
+          <Chat />
         </HashRouter>
       );
 
@@ -216,9 +199,7 @@ describe("Chat", () => {
       // GIVEN a chat component
       render(
         <HashRouter>
-          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat />
-          </UserPreferencesContext.Provider>
+          <Chat />
         </HashRouter>
       );
 
@@ -270,13 +251,19 @@ describe("Chat", () => {
         ],
         conversation_completed: false,
       });
+
+      jest.spyOn(userPreferencesStateService, "getUserPreferences").mockReturnValue({
+        accepted_tc: new Date(),
+        user_id: "0001",
+        language: Language.en,
+        sessions: [givenSessionId],
+      });
+
       // GIVEN a chat component
       // WHEN the chat is rendered with a router
       render(
         <HashRouter>
-          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat />
-          </UserPreferencesContext.Provider>
+          <Chat />
         </HashRouter>
       );
 
@@ -297,7 +284,7 @@ describe("Chat", () => {
             messages: [
               {
                 id: expect.any(Number),
-                sender: ConversationMessageSender.COMPASS,
+                sender: ConversationMessageSender.USER,
                 message: "",
                 sent_at: expect.any(String),
               },
@@ -334,9 +321,7 @@ describe("Chat", () => {
       // WHEN the chat is rendered with a router and snackbar provider
       render(
         <HashRouter>
-          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat />
-          </UserPreferencesContext.Provider>
+          <Chat />
         </HashRouter>
       );
 
@@ -368,9 +353,7 @@ describe("Chat", () => {
       // WHEN a user sends a message with a router
       render(
         <HashRouter>
-          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat />
-          </UserPreferencesContext.Provider>
+          <Chat />
         </HashRouter>
       );
 
@@ -415,9 +398,7 @@ describe("Chat", () => {
       // WHEN a user sends a message with a router and snackbar provider
       render(
         <HashRouter>
-          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
             <Chat />
-          </UserPreferencesContext.Provider>
         </HashRouter>
       );
 
@@ -450,7 +431,7 @@ describe("Chat", () => {
               {
                 id: expect.any(Number),
                 sender: ConversationMessageSender.COMPASS,
-                message: "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
+                message: "I'm sorry, Something seems to have gone wrong on my end... Can you repeat that?",
                 sent_at: expect.any(String),
               },
             ]),
@@ -476,9 +457,7 @@ describe("Chat", () => {
       // WHEN: the chat is rendered
       render(
         <HashRouter>
-          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat />
-          </UserPreferencesContext.Provider>
+          <Chat />
         </HashRouter>
       );
 
@@ -503,9 +482,7 @@ describe("Chat", () => {
   describe("test user experience drawer", () => {
     const chatComponent = (
       <HashRouter>
-        <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-          <Chat />
-        </UserPreferencesContext.Provider>
+        <Chat />
       </HashRouter>
     );
 
@@ -578,9 +555,7 @@ describe("Chat", () => {
       // GIVEN a chat component
       render(
         <HashRouter>
-          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat />
-          </UserPreferencesContext.Provider>
+          <Chat />
         </HashRouter>
       );
 
@@ -596,9 +571,7 @@ describe("Chat", () => {
       // GIVEN the chat component is rendered
       render(
         <HashRouter>
-          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat />
-          </UserPreferencesContext.Provider>
+          <Chat />
         </HashRouter>
       );
       // AND the new conversation dialog is open
@@ -617,9 +590,7 @@ describe("Chat", () => {
       // GIVEN the chat component is rendered
       render(
         <HashRouter>
-          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <Chat />
-          </UserPreferencesContext.Provider>
+          <Chat />
         </HashRouter>
       );
       // AND the new conversation dialog is open

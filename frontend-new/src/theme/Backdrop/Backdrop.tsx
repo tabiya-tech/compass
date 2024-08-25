@@ -7,6 +7,7 @@ import { Sloth } from "src/theme/Sloth/Sloth";
 interface IBackdropProps {
   isShown: boolean;
   message?: string;
+  transparent?: boolean;
 }
 
 const uniqueId = "91b57774-d50c-4350-882d-363f80ac10e8";
@@ -20,15 +21,21 @@ export const Backdrop = (props: Readonly<IBackdropProps>) => {
   const theme = useTheme();
   return (
     <OriginalBackdrop
-      sx={{ zIndex: theme.zIndex.drawer + 1 }}
+      sx={{
+        backgroundColor: props.transparent ? "transparent" : undefined,
+        zIndex: theme.zIndex.drawer + 1,
+        color: theme.palette.info.contrastText,
+      }}
       data-testid={DATA_TEST_ID.BACKDROP_CONTAINER}
       open={props.isShown}
     >
       <Sloth width={"64px"}>
         <Paper
-          elevation={24}
+          elevation={props.transparent ? 0: 24}
           sx={{
             backgroundColor: "containerBackground.main",
+            border: props.transparent ? theme.tabiyaSpacing.md : 0,
+            borderColor: "info.contrastText",
           }}
         >
           <Grid
