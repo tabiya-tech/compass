@@ -28,12 +28,7 @@ class UserPreferenceRepository:
             if not _doc:
                 return None
 
-            return UserPreferences(
-                language=_doc.get("language"),
-                accepted_tc=_doc.get("accepted_tc"),
-                invitation_code=_doc.get("invitation_code"),
-                sessions=_doc.get("sessions"),
-            )
+            return UserPreferences.from_document(_doc)
 
         except Exception as e:
             logger.exception(e)
@@ -48,7 +43,7 @@ class UserPreferenceRepository:
             The inserted user preferences
         """
         try:
-            payload = user_preference.dict()
+            payload = user_preference.model_dump()
             payload["user_id"] = user_id
 
             _doc = await self.collection.insert_one(payload)
@@ -67,7 +62,7 @@ class UserPreferenceRepository:
         :raises ValueError: if the user is not found - update failed
         """
         try:
-            payload = update.dict(exclude_none=True)
+            payload = update.model_dump(exclude_none=True)
 
             print(payload)
 
