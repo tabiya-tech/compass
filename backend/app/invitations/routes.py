@@ -5,7 +5,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.constants.errors import HTTPErrorResponse
 from app.invitations.service import UserInvitationService
 from app.invitations.types import GetInvitationCodeStatusResponse
-from app.server_dependecies.db_dependecies import CompassDBProvider
+from app.server_dependencies.db_dependencies import CompassDBProvider
 
 
 async def get_user_invitations_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)):

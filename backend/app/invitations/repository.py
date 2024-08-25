@@ -5,7 +5,7 @@ from typing import Optional
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo import ReturnDocument
 
-from app.server_dependecies.database_collections import Collections
+from app.server_dependencies.database_collections import Collections
 from app.invitations.types import UserInvitation
 
 logger = logging.getLogger(__name__)

@@ -6,8 +6,8 @@ from motor.motor_asyncio import AsyncIOMotorCollection
 import firebase_admin
 from firebase_admin import credentials, auth
 from datetime import datetime, timedelta
-from app.server_dependecies.db_dependecies import CompassDBProvider
-from app.server_dependecies.database_collections import Collections
+from app.server_dependencies.db_dependencies import CompassDBProvider
+from app.server_dependencies.database_collections import Collections
 
 
 @dataclass
