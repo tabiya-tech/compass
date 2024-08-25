@@ -5,7 +5,7 @@ from threading import Lock
 from fastapi import Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from app.server_dependecies.db_dependecies import CompassDBProvider
+from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService, \
     EmbeddingService
 from app.vector_search.esco_entities import OccupationEntity, OccupationSkillEntity, SkillEntity

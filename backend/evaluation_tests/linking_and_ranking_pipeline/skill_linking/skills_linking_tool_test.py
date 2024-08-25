@@ -7,7 +7,7 @@ from app.agent.experience.work_type import WorkType
 from app.agent.linking_and_ranking_pipeline.infer_occupation_tool import InferOccupationTool
 from app.agent.linking_and_ranking_pipeline.skill_linking_tool import SkillLinkingTool
 from app.countries import Country
-from app.server_dependecies.db_dependecies import CompassDBProvider
+from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
 from app.vector_search.esco_entities import OccupationSkillEntity
 from app.vector_search.esco_search_service import OccupationSearchService, OccupationSkillSearchService, VectorSearchConfig, SkillSearchService
