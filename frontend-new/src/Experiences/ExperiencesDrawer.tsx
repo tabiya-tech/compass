@@ -6,8 +6,6 @@ import ExperiencesDrawerContent, {
   LoadingExperienceDrawerContent,
 } from "src/Experiences/components/ExperiencesDrawerContent/ExperiencesDrawerContent";
 import { Experience } from "src/Experiences/ExperienceService/Experiences.types";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import SkillReport from "src/Report/Report";
 import CustomTextField from "src/theme/CustomTextField/CustomTextField";
 import CustomAccordion from "src/theme/CustomAccordion/CustomAccordion";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
@@ -41,22 +39,22 @@ const trimAndValidate = (value: string) => {
   return trimmedValue === "" ? "" : trimmedValue;
 };
 
-const useLocalStorage = (key: string, initialValue: string) => {
+const useLocalStorage = (key: string, initialValue: Record<string, string>) => {
   // Retrieve value from localStorage or fallback to initialValue
-  const [value, setValue] = useState<string>(() => {
+  const [value, setValue] = useState<Record<string, string>>(() => {
     const savedValue = PersistentStorageService.getItem(PersistentStorageService.storage, key);
-    const trimmedValueSaved = trimAndValidate(savedValue ?? "");
-    return trimmedValueSaved !== "" ? trimmedValueSaved : initialValue;
+    const parsedValue = savedValue ? JSON.parse(savedValue) : initialValue;
+    return Object.fromEntries(
+      Object.entries(parsedValue).map(([fieldName, fieldValue]) => [fieldName, trimAndValidate(fieldValue as string)])
+    );
   });
 
-  // Update localStorage whenever value changes
   useEffect(() => {
-    const trimmedValue = trimAndValidate(value);
-    if (trimmedValue !== "") {
-      PersistentStorageService.setItem(PersistentStorageService.storage, key, trimmedValue);
-    } else {
-      PersistentStorageService.removeItem(PersistentStorageService.storage, key);
-    }
+    const validatedValue = Object.fromEntries(
+      Object.entries(value).map(([fieldName, fieldValue]) => [fieldName, trimAndValidate(fieldValue)])
+    );
+
+    PersistentStorageService.setItem(PersistentStorageService.storage, key, JSON.stringify(validatedValue));
   }, [key, value]);
 
   return [value, setValue] as const;
@@ -73,10 +71,20 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   const theme = useTheme();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
-  const [name, setName] = useLocalStorage("name", "");
-  const [phone, setPhone] = useLocalStorage("phone", "");
-  const [email, setEmail] = useLocalStorage("email", "");
-  const [address, setAddress] = useLocalStorage("address", "");
+  const [personalInfo, setPersonalInfo] = useLocalStorage("personalInfo", {
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
+  });
+
+  const validatedPersonalInfo = Object.fromEntries(
+    Object.entries(personalInfo).map(([fieldName, fieldValue]) => [fieldName, trimAndValidate(fieldValue)])
+  );
+
+  const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPersonalInfo({ ...personalInfo, [field]: e.target.value });
+  };
 
   const handleClose = () => {
     notifyOnClose({ name: CloseEventName.DISMISS });
@@ -100,51 +108,40 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
       <ExperiencesDrawerHeader notifyOnClose={handleClose} />
       <Box display="flex" flexDirection="column" gap={2}>
         <Box display="flex" flexDirection="column" gap={1} alignItems="end" justifyContent="flex-end">
-          {conversationCompleted ? (
-            <PDFDownloadLink
-              document={
-                <SkillReport
-                  name={trimAndValidate(name)}
-                  email={trimAndValidate(email)}
-                  phone={trimAndValidate(phone)}
-                  address={trimAndValidate(address)}
-                  experiences={experiences}
-                  conversationCompletedAt={conversationCompletedAt!}
-                />
-              }
-              fileName="SkillReport.pdf"
-              style={{ color: theme.palette.tabiyaBlue.main, fontWeight: "bold" }}
-            >
-              <DownloadReportButton />
-            </PDFDownloadLink>
-          ) : (
-            <DownloadReportButton disabled />
-          )}
+          <DownloadReportButton
+            name={validatedPersonalInfo.name}
+            email={validatedPersonalInfo.email}
+            phone={validatedPersonalInfo.phone}
+            address={validatedPersonalInfo.address}
+            experiences={experiences}
+            conversationCompletedAt={conversationCompletedAt!}
+            disabled={!conversationCompleted}
+          />
         </Box>
         <CustomAccordion title="Personal Information" tooltipText={tooltipText}>
           <CustomTextField
             label="Name:"
             placeholder="Enter your name here"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={personalInfo.name}
+            onChange={handleInputChange("name")}
           />
           <CustomTextField
             label="Email:"
             placeholder="Enter your email here"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={personalInfo.email}
+            onChange={handleInputChange("email")}
           />
           <CustomTextField
             label="Phone:"
             placeholder="Enter your phone number here"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            value={personalInfo.phone}
+            onChange={handleInputChange("phone")}
           />
           <CustomTextField
             label="Address:"
             placeholder="Enter your address here"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
+            value={personalInfo.address}
+            onChange={handleInputChange("address")}
           />
         </CustomAccordion>
         <Divider

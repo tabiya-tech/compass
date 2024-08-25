@@ -11,18 +11,24 @@ exports[`ExperiencesReportContent should render ExperiencesReportContent correct
     <text
       data-testid="experiences-content-report-experience-title-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
       style="font-family: Inter; font-weight: bold; font-size: 12px;"
+      x="0"
+      y="0"
     >
       Project Manager
     </text>
     <text
       data-testid="experiences-content-report-date-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
       style="font-size: 10px; font-weight: normal; font-family: Inter;"
+      x="0"
+      y="0"
     >
       2022 — Present
     </text>
     <view>
       <text
         style="font-family: Inter; font-weight: bold; font-size: 12px; padding-bottom: 4px;"
+        x="0"
+        y="0"
       >
         Top skills:
       </text>
@@ -32,12 +38,16 @@ exports[`ExperiencesReportContent should render ExperiencesReportContent correct
       >
         <text
           style="font-size: 11px; color: rgb(33, 31, 29); font-family: Inter;"
+          x="0"
+          y="0"
         >
           • 
           Management
         </text>
         <text
           style="font-size: 11px; color: rgb(33, 31, 29); font-family: Inter;"
+          x="0"
+          y="0"
         >
           • 
           Communication
