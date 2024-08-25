@@ -78,35 +78,41 @@ const SkillReport: React.FC<SkillReportProps> = ({
             <Image src={`${process.env.PUBLIC_URL}/logo.jpg`} style={styles.compassImage} />
             <Image src={`${process.env.PUBLIC_URL}/oxford-logo.jpg`} style={styles.image} />
           </View>
-          <Text style={styles.title} data-testid={DATA_TEST_ID.SKILL_REPORT_TITLE}>
+          <Text x={0} y={0} style={styles.title} data-testid={DATA_TEST_ID.SKILL_REPORT_TITLE}>
             Skills Report
           </Text>
           <View style={styles.column}>
             {name && (
-              <Text style={styles.subtitle} data-testid={DATA_TEST_ID.SKILL_REPORT_NAME}>
+              <Text x={0} y={0} style={styles.subtitle} data-testid={DATA_TEST_ID.SKILL_REPORT_NAME}>
                 {name}
               </Text>
             )}
             {address && (
               <View style={styles.rowView} data-testid={DATA_TEST_ID.SKILL_REPORT_ADDRESS}>
                 <Image src={`${process.env.PUBLIC_URL}/location.png`} style={styles.infoIcon} />
-                <Text style={styles.text}> {address}</Text>
+                <Text x={0} y={0} style={styles.text}>
+                  {address}
+                </Text>
               </View>
             )}
             {phone && (
               <View style={styles.rowView} data-testid={DATA_TEST_ID.SKILL_REPORT_PHONE}>
                 <Image src={`${process.env.PUBLIC_URL}/phone-call.png`} style={styles.infoIcon} />
-                <Text style={styles.text}> {phone}</Text>
+                <Text x={0} y={0} style={styles.text}>
+                  {phone}
+                </Text>
               </View>
             )}
             {email && (
               <View style={styles.rowView} data-testid={DATA_TEST_ID.SKILL_REPORT_EMAIL}>
                 <Image src={`${process.env.PUBLIC_URL}/email.png`} style={styles.infoIcon} />
-                <Text style={styles.text}> {email}</Text>
+                <Text x={0} y={0} style={styles.text}>
+                  {email}
+                </Text>
               </View>
             )}
           </View>
-          <Text style={styles.bodyText} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY_TEXT}>
+          <Text x={0} y={0} style={styles.bodyText} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY_TEXT}>
             This report summarizes the key information gathered during a conversation with Compass on{" "}
             {formatDate(conversationCompletedAt!)}. Compass is an AI chatbot that assists job-seekers in exploring their
             skills and experiences. This report presents the candidate’s work experience and the skills identified from
@@ -115,7 +121,7 @@ const SkillReport: React.FC<SkillReportProps> = ({
             creating a complete CV.
           </Text>
           <View style={styles.divider} />
-          <Text style={styles.experiencesTitle} data-testid={DATA_TEST_ID.SKILL_REPORT_EXPERIENCES_TITLE}>
+          <Text x={0} y={0} style={styles.experiencesTitle} data-testid={DATA_TEST_ID.SKILL_REPORT_EXPERIENCES_TITLE}>
             EXPERIENCES
           </Text>
           <View style={styles.experiencesContainer} data-testid={DATA_TEST_ID.SKILL_REPORT_EXPERIENCES_CONTAINER}>
@@ -124,7 +130,9 @@ const SkillReport: React.FC<SkillReportProps> = ({
                 <View wrap={false}>
                   <View style={styles.categoryTitleContainer}>
                     <Image src={`${process.env.PUBLIC_URL}/briefcase.png`} style={styles.categoryIcon} />
-                    <Text style={styles.categoryTitle}>Self-Employment</Text>
+                    <Text x={0} y={0} style={styles.categoryTitle}>
+                      Self-Employment
+                    </Text>
                   </View>
                   {selfEmploymentExperiences.slice(0, 1).map((experience, index) => (
                     <ExperiencesReportContent key={index} experience={experience} />
@@ -140,7 +148,9 @@ const SkillReport: React.FC<SkillReportProps> = ({
                 <View wrap={false}>
                   <View style={styles.categoryTitleContainer}>
                     <Image src={`${process.env.PUBLIC_URL}/dollar-bag.png`} style={styles.categoryIcon} />
-                    <Text style={styles.categoryTitle}>Salary Work</Text>
+                    <Text x={0} y={0} style={styles.categoryTitle}>
+                      Salary Work
+                    </Text>
                   </View>
                   {salaryWorkExperiences.slice(0, 1).map((experience, index) => (
                     <ExperiencesReportContent key={index} experience={experience} />
@@ -156,7 +166,9 @@ const SkillReport: React.FC<SkillReportProps> = ({
                 <View wrap={false}>
                   <View style={styles.categoryTitleContainer}>
                     <Image src={`${process.env.PUBLIC_URL}/friendly.png`} style={styles.categoryIcon} />
-                    <Text style={styles.categoryTitle}>Unpaid Work</Text>
+                    <Text x={0} y={0} style={styles.categoryTitle}>
+                      Unpaid Work
+                    </Text>
                   </View>
                   {unpaidWorkExperiences.slice(0, 1).map((experience, index) => (
                     <ExperiencesReportContent key={index} experience={experience} />
@@ -169,18 +181,22 @@ const SkillReport: React.FC<SkillReportProps> = ({
             )}
           </View>
           <View style={styles.skillDescriptionContainer}>
-            <Text style={styles.skillDescriptionTitle} break>
+            <Text x={0} y={0} style={styles.skillDescriptionTitle} break>
               Skills Description
             </Text>
-            <Text style={styles.info} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY_TEXT}>
+            <Text x={0} y={0} style={styles.info} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY_TEXT}>
               Below, you will find a list of the skills discovered during your conversation with Compass, along with
               their descriptions.
             </Text>
             <View style={styles.skillDivider} />
             {skillsList.map((skill) => (
               <View wrap={false} key={skill.UUID} style={styles.skillContainer}>
-                <Text style={styles.label}>{capitalizeFirstLetter(skill.preferredLabel)}</Text>
-                <Text style={styles.description}>{skill.description}</Text>
+                <Text x={0} y={0} style={styles.label}>
+                  {capitalizeFirstLetter(skill.preferredLabel)}
+                </Text>
+                <Text x={0} y={0} style={styles.description}>
+                  {skill.description}
+                </Text>
               </View>
             ))}
           </View>
@@ -188,10 +204,10 @@ const SkillReport: React.FC<SkillReportProps> = ({
         <View fixed style={styles.footer}>
           <View style={styles.disclaimerContainer}>
             <Image src={`${process.env.PUBLIC_URL}/danger.png`} style={styles.disclaimerIcon} />
-            <Text style={styles.disclaimerText}>
+            <Text x={0} y={0} style={styles.disclaimerText}>
               {" "}
               Disclaimer:{" "}
-              <Text style={styles.disclaimerTextBold}>
+              <Text x={0} y={0} style={styles.disclaimerTextBold}>
                 Listed skills are based on a conversation with the candidate, are not verified or validated by Tabiya,
                 and may be inaccurate.{" "}
               </Text>
@@ -200,7 +216,12 @@ const SkillReport: React.FC<SkillReportProps> = ({
             </Text>
           </View>
           {experiences.length > 2 && (
-            <Text style={styles.pageNumber} render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
+            <Text
+              x={0}
+              y={0}
+              style={styles.pageNumber}
+              render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`}
+            />
           )}
         </View>
       </Page>

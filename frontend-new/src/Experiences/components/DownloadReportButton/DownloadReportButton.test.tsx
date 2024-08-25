@@ -17,7 +17,17 @@ jest.mock("src/theme/HelpTip/HelpTip", () => {
 describe("DownloadReportButton", () => {
   test("should render DownloadReportButton correctly when disabled is false", () => {
     // GIVEN the component
-    const givenComponent = <DownloadReportButton disabled={false} />;
+    const givenComponent = (
+      <DownloadReportButton
+        name={"foo"}
+        email={"foobar@example.com"}
+        phone={"12345"}
+        address={"1234 Main St"}
+        experiences={[]}
+        conversationCompletedAt={null}
+        disabled={false}
+      />
+    );
 
     // WHEN the component is rendered and the disabled is false
     render(givenComponent);
@@ -45,7 +55,17 @@ describe("DownloadReportButton", () => {
 
   test("should render DownloadReportButton correctly when disabled is true", () => {
     // GIVEN the component
-    const givenComponent = <DownloadReportButton disabled={true} />;
+    const givenComponent = (
+      <DownloadReportButton
+        name={"foo"}
+        email={"foobar@example.com"}
+        phone={"12345"}
+        address={"1234 Main St"}
+        experiences={[]}
+        conversationCompletedAt={null}
+        disabled={true}
+      />
+    );
 
     // WHEN the component is rendered and the disabled is true
     render(givenComponent);
