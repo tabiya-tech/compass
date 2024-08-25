@@ -145,8 +145,9 @@ docker run -v ~/.config/gcloud/:/root/.config/gcloud/ -e GCLOUD_PROJECT="$(gclou
 The backend uses the following environment variables:
 
 - `GOOGLE_APPLICATION_CREDENTIALS`: The path to the service account key file.
-- `MONGODB_URI`: The URI of the MongoDB Atlas instance.
+- `TAXONOMY_MONGODB_URI`: The URI of the MongoDB Atlas instance where the ESCO taxonomy data is stored.
 - `TAXONOMY_DATABASE_NAME`: The name of mongo db database where the ESCO taxonomy data with the embeddings is stored.
+- `APPLICATION_MONGODB_URI`: The URI of the MongoDB Atlas instance for the application database.
 - `APPLICATION_DATABASE_NAME`: The name of mongo db database used by the application to store data.
 - `VERTEX_API_REGION`: (optional) The region of the Vertex API to use. If not set defaults to `us-central1`.
 - `LOG_CONFIG_FILE`: (Optional) See the [Logging](#logging) section for more information. If not set defaults to `logging.cfg.yaml`.
@@ -162,8 +163,9 @@ directory of the backend project and set the environment variables as follows:
 ```dotenv
 # .env file
 GOOGLE_APPLICATION_CREDENTIALS=<PATH_TO_KEY_FILE>
-MONGODB_URI=<URI_TO_MONGODB>
+TAXONOMY_MONGODB_URI=<URI_TO_MONGODB>
 TAXONOMY_DATABASE_NAME=<TAXONOMY_DATABASE_NAME>
+APPLICATION_MONGODB_URI=<URI_TO_MONGODB>
 APPLICATION_DATABASE_NAME=<APPLICATION_DATABASE_NAME>
 VERTEX_API_REGION=<REGION>
 LOG_CONFIG_FILE=<YAML_FILE>

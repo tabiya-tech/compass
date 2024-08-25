@@ -88,8 +88,9 @@ jobs:
           poetry run convert_openapi
           cp openapi2.yaml ../../iac/backend/config/gcp_api_gateway_config.yaml
         env:
-          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          TAXONOMY_MONGODB_URI: ${{ secrets.TAXONOMY_MONGODB_URI }}
           TAXONOMY_DATABASE_NAME: ${{ inputs.taxonomy-database-name }}
+          APPLICATION_MONGODB_URI: ${{ secrets.APPLICATION_MONGODB_URI }}
           APPLICATION_DATABASE_NAME: ${{ inputs.application-database-name }}
           TARGET_ENVIRONMENT: ${{ inputs.target-environment }}
           VERTEX_API_REGION: ${{ inputs.vertex-api-region }}
@@ -108,8 +109,9 @@ jobs:
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
           GCP_OAUTH_CLIENT_ID: ${{ secrets.GCP_OAUTH_CLIENT_ID }}
-          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          TAXONOMY_MONGODB_URI: ${{ secrets.TAXONOMY_MONGODB_URI }}
           TAXONOMY_DATABASE_NAME: ${{ inputs.taxonomy-database-name }}
+          APPLICATION_MONGODB_URI: ${{ secrets.APPLICATION_MONGODB_URI }}
           APPLICATION_DATABASE_NAME: ${{ inputs.application-database-name }}
           TARGET_ENVIRONMENT: ${{ inputs.target-environment }}
           VERTEX_API_REGION: ${{ inputs.vertex-api-region }}

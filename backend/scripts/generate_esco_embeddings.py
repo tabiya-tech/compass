@@ -46,7 +46,7 @@ class PlatformCollections(Enum):
 
 
 COMPASS_DB = AsyncIOMotorClient(
-    MONGO_SETTINGS.mongodb_uri, tlsAllowInvalidCertificates=True).get_database(MONGO_SETTINGS.taxonomy_database_name)
+    MONGO_SETTINGS.taxonomy_mongodb_uri, tlsAllowInvalidCertificates=True).get_database(MONGO_SETTINGS.taxonomy_database_name)
 
 
 class CompassCollections(Enum):
@@ -301,7 +301,7 @@ async def copy_relations_collection():
     }
 
     progress = tqdm(
-        desc=f'copying progress for ',
+        desc='copying progress for relations',
         total=await from_collection.count_documents(search_filter),
     )
 

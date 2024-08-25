@@ -116,7 +116,7 @@ def _get_vector_search_config(evaluated_type: Type) -> VectorSearchConfig:
 
 if __name__ == "__main__":
     vertexai.init()
-    compass_db = AsyncIOMotorClient(MONGO_SETTINGS.mongodb_uri).get_database(MONGO_SETTINGS.taxonomy_database_name)
+    compass_db = AsyncIOMotorClient(MONGO_SETTINGS.taxonomy_mongodb_uri).get_database(MONGO_SETTINGS.taxonomy_database_name)
     gecko_embedding_service = GoogleGeckoEmbeddingService()
     _occupation_search_service = OccupationSearchService(compass_db, gecko_embedding_service,
                                                          _get_vector_search_config(Type.OCCUPATION))

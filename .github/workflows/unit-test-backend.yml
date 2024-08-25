@@ -70,8 +70,9 @@ jobs:
         run: poetry run pytest -m 'not (evaluation_test or smoke_test)'
         working-directory: backend
         env:
-          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          TAXONOMY_MONGODB_URI: ${{ secrets.TAXONOMY_MONGODB_URI }}
           TAXONOMY_DATABASE_NAME: ${{ inputs.taxonomy-database-name }}
+          APPLICATION_MONGODB_URI: ${{ secrets.APPLICATION_MONGODB_URI }}
           APPLICATION_DATABASE_NAME: ${{ inputs.application-database-name }}
           TARGET_ENVIRONMENT: ${{ inputs.target-environment }}
           VERTEX_API_REGION: ${{ inputs.vertex-api-region }}
