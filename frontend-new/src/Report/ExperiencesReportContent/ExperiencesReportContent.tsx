@@ -24,19 +24,26 @@ const ExperiencesReportContent: React.FC<ExperienceProps> = ({ experience }) => 
   return (
     <View wrap={false} style={styles.container} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_CONTAINER}>
       <View style={styles.contentColumn}>
-        <Text style={styles.experienceTitle} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_EXPERIENCE_TITLE}>
+        <Text
+          x={0}
+          y={0}
+          style={styles.experienceTitle}
+          data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_EXPERIENCE_TITLE}
+        >
           {experience.experience_title}
         </Text>
-        <Text style={styles.date} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_DATE}>
+        <Text x={0} y={0} style={styles.date} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_DATE}>
           {experience.end_date && experience.start_date
             ? `${experience.start_date} — ${experience.end_date}`
             : experience.start_date || experience.end_date}
         </Text>
         <View>
-          <Text style={styles.skillsTitle}>Top skills:</Text>
+          <Text x={0} y={0} style={styles.skillsTitle}>
+            Top skills:
+          </Text>
           <View style={styles.skillsContainer} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_SKILLS}>
             {experience.top_skills.map((skill) => (
-              <Text key={skill.UUID} style={styles.skillText}>
+              <Text x={0} y={0} key={skill.UUID} style={styles.skillText}>
                 • {capitalizeFirstLetter(skill.preferredLabel)}
               </Text>
             ))}
