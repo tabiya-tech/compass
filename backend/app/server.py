@@ -46,6 +46,7 @@ load_dotenv()
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     # Startup logic
+    logger.info("Starting up...")
     db = await CompassDBProvider.get_application_db()
     await CompassDBProvider.initialize_application_mongo_db(db, logger)
     yield

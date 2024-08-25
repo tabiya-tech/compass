@@ -5,8 +5,8 @@
 - A recent version of [git](https://git-scm.com/) (e.g. ^2.37 )
 - [Python 3.11 or higher](https://www.python.org/downloads/)
 - [Poerty 1.8 or higher](https://python-poetry.org/)
-  > Note: to install Poetry consult the [Poetry documentation](https://python-poetry.org/docs/#installing-with-the-official-installer) 
-  > 
+  > Note: to install Poetry consult the [Poetry documentation](https://python-poetry.org/docs/#installing-with-the-official-installer)
+  >
   > Note: When you install Poetry, you may encounter an `SSL: CERTIFICATE_VERIFY_FAILED`.
   See [here](https://github.com/python-poetry/install.python-poetry.org/issues/112#issuecomment-1555925766) on how to
   resolve the issue.
@@ -17,6 +17,7 @@
 ## Installation
 
 #### Set up virtualenv
+
 In the **root directory** of the backend project (so, the same directory as this README file), run the following commands:
 
 ```shell
@@ -71,9 +72,11 @@ The principal used to run the backend should have the following roles:
 
 There are [multiple ways you can authenticate with Google Cloud](https://cloud.google.com/sdk/gcloud/reference/auth).
 
-Using the [service account credentials, authenticate with Google Cloud](https://cloud.google.com/sdk/gcloud/reference/auth/activate-service-account) is the way preferred when running in a CI/CD environment and the most convenient method for running pulumi locally. 
+Using the [service account credentials, authenticate with Google Cloud](https://cloud.google.com/sdk/gcloud/reference/auth/activate-service-account) is the way
+preferred when running in a CI/CD environment and the most convenient method for running pulumi locally.
 
-The best practice is to use [service account impersonation](#option-2-service-account-impersonation) when running the code locally, it can be more complex to operate as it requires a more complex setup  and additionally the user is required to refresh the authentication token occasionally.
+The best practice is to use [service account impersonation](#option-2-service-account-impersonation) when running the code locally, it can be more complex to
+operate as it requires a more complex setup and additionally the user is required to refresh the authentication token occasionally.
 
 Bellow you can find the steps to authenticate.
 
@@ -151,11 +154,12 @@ The backend uses the following environment variables:
 - `APPLICATION_DATABASE_NAME`: The name of mongo db database used by the application to store data.
 - `VERTEX_API_REGION`: (optional) The region of the Vertex API to use. If not set defaults to `us-central1`.
 - `LOG_CONFIG_FILE`: (Optional) See the [Logging](#logging) section for more information. If not set defaults to `logging.cfg.yaml`.
-- `BACKEND_URL`: The URL of the backend. It is used to correctly configure Swagger UI and the CORS policy. 
-- `FRONTEND_URL`: The URL of the frontend. It is used to set the CORS policy.  
-- `TARGET_ENVIRONMENT`: (optional) The target environment where the backend is running. When set to `dev` or `local`, CORS will be set to allow all origins. 
+- `BACKEND_URL`: The URL of the backend. It is used to correctly configure Swagger UI and the CORS policy.
+- `FRONTEND_URL`: The URL of the frontend. It is used to set the CORS policy.
+- `TARGET_ENVIRONMENT`: (optional) The target environment where the backend is running. When set to `dev` or `local`, CORS will be set to allow all origins.
   > Note: The `FRONTEND_URL` should be set irrespective of the `TARGET_ENVIRONMENT` value.
-  >
+
+>
 
 The backend supports the use of a `.env` file to set the environment variables. Create a `.env` file in the root
 directory of the backend project and set the environment variables as follows:
@@ -192,6 +196,7 @@ For example for the local development environment, you can set the `LOG_CONFIG_F
 # .env file
 LOG_CONFIG_FILE=logging.cfg.dev.yaml
 ```
+
 ### Running the backend
 
 To run the backend, use the following command from the root directory of the backend project:
@@ -200,7 +205,15 @@ To run the backend, use the following command from the root directory of the bac
 python server.py
 ```
 
+> NOTE: when running the backend locally, make sure to set the environment variables as described in
+> the [Environment Variables & Configuration](#environment-variables--configuration) section.
+> You should set the `TABIYA_MONGODB_URI` and `TABIYA_DB_NAME` environment variables to point to the mongodb cloud instance where the ESCO embeddings are
+> stored.
+> For the application database, set the `APPLICATION_MONGODB_URI` and `APPLICATION_DATABASE_NAME` environment variables to point a local running mongodb
+> instance.
+
 ### Running the backend with Docker
+
 #### Building the Image locally
 
 To build the image:
@@ -223,18 +236,22 @@ If you have set up the `.env` file, you can run the image using the `--env-file`
 For example:
 
 Assuming the `.env` file is in the root directory of the project and the service account key file
-named `credentials.json` is in a folder named `keys` in the root directory:
+named `credentials.json` is in a folder named `keys` in the root directory and a mongodb instance is running locally (`mongodb://localhost:27017`).
 
 ```dotenv
-MONGODB_URI=mongodb+srv://<USERNAME>:<PASSORD>@<CLUSTER>/?retryWrites=true&w=majority&appName=Compass-Dev
-TAXONOMY_DATABASE_NAME=compass-dev
-APPLICATION_DATABASE_NAME=compass-dev
+TAXONOMY_MONGODB_URI=mongodb+srv://<USERNAME>:<PASSORD>@<CLUSTER>/?retryWrites=true&w=majority&appName=Compass-Dev
+TAXONOMY_DATABASE_NAME=compass-taxonomy-dev
+APPLICATION_MONGODB_URI=mongodb://localhost:27017
+APPLICATION_DATABASE_NAME=_compass-application-local
 GOOGLE_APPLICATION_CREDENTIALS=keys/credentials.json
 VERTEX_API_REGION=<REGION>
 LOG_CONFIG_FILE=logging.cfg.dev.yaml
-BACKEND_URL=* # allow all origins
-FRONTEND_URL=* # allow all origins
-TARGET_ENVIRONMENT=local # will add CORS policy to allow all origins
+# allow all origins
+BACKEND_URL=*
+# allow all origins
+FRONTEND_URL=*
+# will add CORS policy to allow all origins
+TARGET_ENVIRONMENT=local
 ```
 
 Run the image using the following command:
@@ -243,9 +260,8 @@ Run the image using the following command:
  docker run -v "$(pwd)/keys/credentials.json:/code/keys/credentials.json" -v "$(pwd)/logs/:/code/logs/" --env-file .env -p 8080:8080 compass-backend
 ```
 
-> Note: The `-v "$(pwd)/logs/:/code/logs/"` option is used to mount a volume to store the logs  specified in `logging.cfg.dev.yaml`
+> Note: The `-v "$(pwd)/logs/:/code/logs/"` option is used to mount a volume to store the logs specified in `logging.cfg.dev.yaml`
 >
-
 
 ## Testing Locally
 
@@ -302,12 +318,13 @@ poetry run pytest --log-cli-level=DEBUG -v -m "not (smoke_test or evaluation_tes
 ## ESCO Embedding Generation
 
 The script `generate_esco_embeddings.py` is used to generate the embeddings for the ESCO occupations. The script reads
-the ESCO occupations and skills from the Platform Taxonomy MongoDB database and generates the embeddings for the Compass Taxonomy database. 
+the ESCO occupations and skills from the Platform Taxonomy MongoDB database and generates the embeddings for the Compass Taxonomy database.
 
-For the target database the script uses the environment variables for the mondgo db server and  database to connect to, and the vertex API credentials and region
+For the target database the script uses the environment variables for the mondgo db server and database to connect to, and the vertex API credentials and region
 (see [Environment Variables & Configuration](#environment-variables--configuration)).
 
 For the source database the script uses the following environment variables:
+
 ```dotenv
 # The URI of the MongoDB instance where the ESCO data is stored
 TABIYA_MONGODB_URI=<MONGODB_URI>
@@ -325,4 +342,5 @@ To run the script use the following command:
 
 Make sure to run it from the `/backend` directory as it contains the necessary environment variables mentioned above.
 
-The script handles retrying, rate limiting, and processes the data in batches. Additionally, if the generation process is interrupted, the script can be re-run, and it will continue processing the remaining data from where it left off.
+The script handles retrying, rate limiting, and processes the data in batches. Additionally, if the generation process is interrupted, the script can be re-run,
+and it will continue processing the remaining data from where it left off.
