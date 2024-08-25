@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Mapping
 
 from pydantic import BaseModel, Field
 from datetime import datetime
@@ -23,7 +23,7 @@ class UserPreferencesRepositoryUpdateRequest(BaseModel):
     time - The time the user accepted the terms and conditions
     """
 
-    sessions: list[int] = None  # not required
+    sessions: Optional[list[int]] = None  # not required
     """
     sessions - The sessions of the user
     """
@@ -43,12 +43,12 @@ class UserPreferencesUpdateRequest(BaseModel):
     User ID - The user ID to update
     """
 
-    language: str = None
+    language: Optional[str] = None
     """
     Language - The language of the user
     """
 
-    accepted_tc: datetime = None
+    accepted_tc: Optional[datetime] = None
     """
     time - The time the user accepted the terms and conditions
     """
@@ -62,6 +62,15 @@ class UserPreferences(BaseModel):
     invitation_code: Optional[str] = None
     accepted_tc: Optional[datetime] = None
     sessions: list[int] = Field(default_factory=list)  # not required
+
+    @staticmethod
+    def from_document(doc: Mapping[str, any]) -> "UserPreferences":
+        return UserPreferences(
+            language=doc.get("language"),
+            accepted_tc=doc.get("accepted_tc"),
+            invitation_code=doc.get("invitation_code"),
+            sessions=doc.get("sessions"),
+        )
 
     class Config:
         extra = "forbid"
