@@ -104,10 +104,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 # Check mandatory environment variables and raise an early exception if they are not set
-if not os.getenv('MONGODB_URI'):
-    raise ValueError("Mandatory MONGODB_URI env variable is not set!")
+if not os.getenv('TAXONOMY_MONGODB_URI'):
+    raise ValueError("Mandatory TAXONOMY_MONGODB_URI env variable is not set!")
 if not os.getenv("TAXONOMY_DATABASE_NAME"):
     raise ValueError("Mandatory TAXONOMY_DATABASE_NAME environment variable is not set")
+if not os.getenv('APPLICATION_MONGODB_URI'):
+    raise ValueError("Mandatory APPLICATION_MONGODB_URI env variable is not set!")
 if not os.getenv("APPLICATION_DATABASE_NAME"):
     raise ValueError("Mandatory APPLICATION_DATABASE_NAME environment variable is not set")
 

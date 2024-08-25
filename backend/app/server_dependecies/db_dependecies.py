@@ -10,7 +10,7 @@ import logging
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
 
 
-def get_db(mongodb_uri: str, db_name: str) -> AsyncIOMotorDatabase:
+def _get_application_db(mongodb_uri: str, db_name: str) -> AsyncIOMotorDatabase:
     """
     Decouples the database creation from the database provider.
     This allows to mock the database creation in tests, instead of mocking the database provider.
@@ -20,6 +20,15 @@ def get_db(mongodb_uri: str, db_name: str) -> AsyncIOMotorDatabase:
         tlsAllowInvalidCertificates=True
     ).get_database(db_name)
 
+def _get_taxonomy_db(mongodb_uri: str, db_name: str) -> AsyncIOMotorDatabase:
+    """
+    Decouples the database creation from the database provider.
+    This allows to mock the database creation in tests, instead of mocking the database provider.
+    """
+    return AsyncIOMotorClient(
+        mongodb_uri,
+        tlsAllowInvalidCertificates=True
+    ).get_database(db_name)
 
 class CompassDBProvider:
     """
@@ -58,7 +67,7 @@ class CompassDBProvider:
                 if cls._application_mongo_db is None:  # Double-check after acquiring the lock
                     cls._logger.info("Initializing Application MongoDB")
                     # Create the database instance
-                    cls._application_mongo_db = get_db(cls._settings.mongodb_uri, cls._settings.application_database_name)
+                    cls._application_mongo_db = _get_application_db(cls._settings.application_mongodb_uri, cls._settings.application_database_name)
         return cls._application_mongo_db
 
     @classmethod
@@ -68,5 +77,5 @@ class CompassDBProvider:
                 if cls._taxonomy_mongo_db is None:  # Double-check after acquiring the lock
                     cls._logger.info("Initializing Taxonomy MongoDB")
                     # Create the database instance
-                    cls._taxonomy_mongo_db = get_db(cls._settings.mongodb_uri, cls._settings.taxonomy_database_name)
+                    cls._taxonomy_mongo_db = _get_taxonomy_db(cls._settings.taxonomy_mongodb_uri, cls._settings.taxonomy_database_name)
         return cls._taxonomy_mongo_db

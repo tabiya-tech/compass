@@ -16,7 +16,7 @@ OUTPUT_FILENAME = "path/to/your/output.csv"
 OUTPUT_FIELD = 'PredictionsJobTitle'
 
 # MongoDB constants - do not change
-DATABASE_NAME = 'compass-test'
+DATABASE_NAME = os.getenv('TAXONOMY_DATABASE_NAME')
 EMBEDDINGS_COLLECTION = 'occupationmodelsembeddings'
 
 # The row to start processing from in the input file
@@ -106,7 +106,7 @@ async def process_batch(batch_df, gecko_embedding_service, file_name, mode='w'):
 
 if __name__ == "__main__":
     vertexai.init()
-    compass_db = AsyncIOMotorClient(os.getenv('MONGODB_URI')).get_database(DATABASE_NAME)
+    compass_db = AsyncIOMotorClient(os.getenv('TAXONOMY_MONGODB_URI')).get_database(DATABASE_NAME)
     collection = compass_db[EMBEDDINGS_COLLECTION]
     gecko_embedding_service = GoogleGeckoEmbeddingService()
 
