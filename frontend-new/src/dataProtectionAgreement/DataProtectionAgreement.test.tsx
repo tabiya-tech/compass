@@ -10,6 +10,8 @@ import { TabiyaUser } from "src/auth/auth.types";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 import { AuthContext, authContextDefaultValue } from "src/auth/AuthProvider";
+import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
+
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -31,15 +33,6 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   };
 });
 
-// mock the UserPreferencesService
-jest.mock("src/userPreferences/UserPreferencesService/userPreferences.service", () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      getUserPreferences: jest.fn(),
-    };
-  });
-});
-
 // mock the router
 jest.mock("react-router-dom", () => {
   const actual = jest.requireActual("react-router-dom");
@@ -54,12 +47,11 @@ jest.mock("react-router-dom", () => {
 });
 
 describe("Testing Data Protection Policy component", () => {
-  const createUserPreferencesMock = jest.fn();
   const updateUserPreferencesMock = jest.fn();
 
   const userPreferencesContextValue = {
     getUserPreferences: jest.fn(),
-    createUserPreferences: createUserPreferencesMock,
+    createUserPreferences: jest.fn(),
     updateUserPreferencesOnClient: jest.fn(),
     userPreferences: {
       accepted_tc: new Date(),
@@ -170,10 +162,9 @@ describe("Testing Data Protection Policy component", () => {
       sessions: [],
     };
 
-    // AND the user preferences provider will create the user preferences
-    createUserPreferencesMock.mockImplementation((newUserPrefs, onSuccess, onError) => {
-      onSuccess(newUserPreferences);
-    });
+    // AND the user preferences service is mocked to return the user preferences
+    jest.spyOn(userPreferencesService, 'updateUserPreferences')
+      .mockResolvedValue(newUserPreferences);
 
     // WHEN the component is rendered
     render(
@@ -203,10 +194,9 @@ describe("Testing Data Protection Policy component", () => {
       name: "Foo Bar",
     };
 
-    // AND the user preferences provider will fail to create the user preferences
-    createUserPreferencesMock.mockImplementation((newUserPrefs, onSuccess, onError) => {
-      onError(new Error("Failed to create user preferences"));
-    });
+    // AND the user preferences service is mocked to throw an error
+    jest.spyOn(userPreferencesService, 'updateUserPreferences')
+      .mockRejectedValue(new Error("Failed to update user preferences"));
 
     // WHEN the component is rendered
     render(
@@ -235,7 +225,7 @@ describe("Testing Data Protection Policy component", () => {
 
     // AND the error message should be displayed
     await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to update user preferences", {
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to update user preferences: Failed to update user preferences", {
         variant: "error",
       });
     });

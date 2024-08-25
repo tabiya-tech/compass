@@ -19,6 +19,7 @@ import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import { logoutService } from "src/auth/services/logout/logout.service";
 import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
+import { StatusCodes } from "http-status-codes";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -69,6 +70,17 @@ const Register: React.FC<Readonly<RegisterProps>> = ({ postRegisterHandler, post
   const [isRegisteringWithEmail, setIsRegisteringWithEmail] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
+  /* -----------
+  * callbacks to pass to the child components
+  */
+  const handleRegistrationCodeChanged = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    setRegistrationCode(event.target.value);
+  };
+
+  /**
+   * Check if the invitation code is valid
+   * @returns {Promise<boolean>} - true if the invitation code is valid, false otherwise
+   */
   const isInvitationCodeValid = useCallback(async (): Promise<boolean> => {
     try {
       return await new Promise<boolean>((resolve) => {
@@ -110,6 +122,9 @@ const Register: React.FC<Readonly<RegisterProps>> = ({ postRegisterHandler, post
     }
   }, [enqueueSnackbar, registrationCode]);
 
+  /* ------------
+  * Actual registration handlers
+  */
   /**
    * Handle the register form submission
    * @param name
@@ -119,13 +134,14 @@ const Register: React.FC<Readonly<RegisterProps>> = ({ postRegisterHandler, post
   const handleRegister = useCallback(
     async (name: string, email: string, password: string) => {
       setIsRegisteringWithEmail(true);
+      // check if the invitation code is valid before proceeding with the registration
       const pass = await isInvitationCodeValid();
 
       if (!pass) {
         setIsRegisteringWithEmail(false);
         return;
       }
-      emailAuthService.handleRegisterWithEmail(
+      await emailAuthService.handleRegisterWithEmail(
         email,
         password,
         name,
@@ -135,24 +151,16 @@ const Register: React.FC<Readonly<RegisterProps>> = ({ postRegisterHandler, post
             try {
               // create user preferences for the first time.
               // in order to do this, there needs to be a logged in user in the persistent storage
-              await userPreferencesService.createUserPreferences(
+              const prefs = await userPreferencesService.createUserPreferences(
                 {
                   user_id: _user.id,
                   invitation_code: registrationCode,
                   language: Language.en,
-                },
-                (prefs) => {
-                  updateUserPreferences(prefs);
-                  setIsRegisteringWithEmail(false);
-                  enqueueSnackbar("Verification Email Sent!", { variant: "success" });
-                  postRegisterHandler();
-                },
-                (error) => {
-                  setIsRegisteringWithEmail(false);
-                  writeServiceErrorToLog(error, console.error);
-                  enqueueSnackbar("Failed to create user preferences", { variant: "error" });
                 }
               );
+              updateUserPreferences(prefs);
+              enqueueSnackbar("Verification Email Sent!", { variant: "success" });
+              postRegisterHandler();
               // IMPORTANT NOTE: after the preferences are added, or fail to be added, we should log the user out immediately,
               // since if we don't do that, the user may be able to access the application without verifying their email
               // or accepting the dpa.
@@ -171,7 +179,9 @@ const Register: React.FC<Readonly<RegisterProps>> = ({ postRegisterHandler, post
                 console.error(e);
               }
               const errorMessage = getUserFriendlyErrorMessage(e as Error);
-              enqueueSnackbar(errorMessage, { variant: "error" });
+              enqueueSnackbar(`Failed to create preferences: ${errorMessage}`, { variant: "error" });
+            } finally {
+              setIsRegisteringWithEmail(false);
             }
           }
         },
@@ -195,49 +205,47 @@ const Register: React.FC<Readonly<RegisterProps>> = ({ postRegisterHandler, post
     ]
   );
 
-  const postIDPRegisterHandler = async (user: TabiyaUser) => {
+  /**
+   * A callback to handle what to do after a social registration
+   * we pass this to the SocialAuth component which will call it after a successful social registration
+   * */
+  const successfulSocialRegistrationCallback = async (user: TabiyaUser) => {
     try {
-      await userPreferencesService.createUserPreferences(
+      // create user preferences for the first time.
+      const prefs = await userPreferencesService.createUserPreferences(
         {
           user_id: user.id,
           invitation_code: registrationCode,
           language: Language.en,
-        },
-        (prefs) => {
-          updateUserPreferences(prefs);
-          postLoginHandler(user);
-        },
-        (error) => {
-          // @ts-ignore
-          if(error?.details?.statusCode === 409) {
-            postLoginHandler(user);
-            return;
-          }
-
-          writeServiceErrorToLog(error, console.error);
-          enqueueSnackbar("Failed to create user preferences", { variant: "error" });
         }
       );
-    } catch (e: any) {
-      if(e.statusCode === 409) {
-        postLoginHandler(user);
-        return;
-      }
-
+      updateUserPreferences(prefs);
+      // We use postLoginHandler because a social registration is parallel to a login
+      // and the postLoginHandler is used to handle the post login actions
+      postLoginHandler(user);
+    } catch (e: unknown) {
+      let errorMessage;
       if (e instanceof ServiceError) {
+        // if the user preferences already exist, we should just log the user in
+        if((e).statusCode === StatusCodes.CONFLICT) {
+          postLoginHandler(user);
+          return;
+        }
+        errorMessage = getUserFriendlyErrorMessage(e as Error);
         writeServiceErrorToLog(e, console.error);
       } else {
         console.error(e);
+        errorMessage = (e as Error).message
       }
-      const errorMessage = getUserFriendlyErrorMessage(e as Error);
-      enqueueSnackbar(errorMessage, { variant: "error" });
+      enqueueSnackbar(`Failed to create preferences: ${errorMessage}`, { variant: "error" });
+    } finally {
+      setIsRegisteringWithEmail(false);
     }
   };
 
-  const registrationCodeChangeHandler = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    setRegistrationCode(event.target.value);
-  };
-
+  /* ------------------
+  * aggregated states for loading and disabling ui
+  */
   // register form is in the loading state if the auth context is loading, or if the user is registering with email or the post login handler is loading
   const isRegisterLoading = isAuthenticationInProgress || isRegisteringWithEmail || isPostLoginLoading;
 
@@ -260,7 +268,7 @@ const Register: React.FC<Readonly<RegisterProps>> = ({ postRegisterHandler, post
           variant="outlined"
           required
           value={registrationCode}
-          onChange={(e) => registrationCodeChangeHandler(e)}
+          onChange={(e) => handleRegistrationCodeChanged(e)}
           inputProps={{ "data-testid": DATA_TEST_ID.REGISTRATION_CODE_INPUT }}
         />
         <Divider textAlign="center" style={{ width: "100%" }}>
@@ -275,7 +283,7 @@ const Register: React.FC<Readonly<RegisterProps>> = ({ postRegisterHandler, post
         />
         <SocialAuth
           preLoginCheck={isInvitationCodeValid}
-          postLoginHandler={postIDPRegisterHandler}
+          postLoginHandler={successfulSocialRegistrationCallback}
           isLoading={isPostLoginLoading}
           disabled={!registrationCode}
           label={"Sign up with Google"}

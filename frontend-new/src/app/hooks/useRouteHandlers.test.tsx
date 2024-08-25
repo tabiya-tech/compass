@@ -6,7 +6,10 @@ import { MemoryRouter, useNavigate } from "react-router-dom";
 import { TabiyaUser } from "src/auth/auth.types";
 import { routerPaths } from "src/app/routerPaths";
 import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
-import { UserPreferencesContextValue } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import {
+  UserPreference,
+  UserPreferencesContextValue,
+} from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import React from "react";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 
@@ -56,13 +59,7 @@ describe("useRouteHandlers hook tests", () => {
   test("handleLogin successfully navigates to ROOT if preferences are valid", async () => {
     // GIVEN: The hook is used in a component
     const givenUpdateUserPreferencesMock = jest.fn().mockImplementation();
-    jest.spyOn(userPreferencesService, "getUserPreferences").mockImplementation(
-      //@ts-ignore
-      (userId, successCallback) => {
-        //@ts-ignore
-        successCallback({ accepted_tc: new Date() });
-      }
-    );
+    jest.spyOn(userPreferencesService, "getUserPreferences").mockResolvedValue({accepted_tc: new Date()} as UserPreference)
 
     const { result } = renderHook(() => useRouteHandlers(), {
       // @ts-ignore
@@ -87,13 +84,7 @@ describe("useRouteHandlers hook tests", () => {
 
   test("handleLogin navigates to DPA if preferences are invalid", async () => {
     // GIVEN: The hook is used in a component
-    jest.spyOn(userPreferencesService, "getUserPreferences").mockImplementation(
-      //@ts-ignore
-      (userId, successCallback) => {
-        //@ts-ignore
-        successCallback({ accepted_tc: undefined });
-      }
-    );
+    jest.spyOn(userPreferencesService, "getUserPreferences").mockResolvedValue({ accepted_tc: null } as unknown as UserPreference)
 
     const { result } = renderHook(() => useRouteHandlers(), {
       // @ts-ignore
@@ -115,13 +106,7 @@ describe("useRouteHandlers hook tests", () => {
 
   test("handleLogin shows an error snackbar on failure", async () => {
     // GIVEN: The hook is used in a component
-    jest.spyOn(userPreferencesService, "getUserPreferences").mockImplementation(
-      //@ts-ignore
-      (userId, successCallback, errorCallback) => {
-        //@ts-ignore
-        errorCallback(new Error("Test error"));
-      }
-    );
+    jest.spyOn(userPreferencesService, "getUserPreferences").mockRejectedValue(new Error("Failed to get user preferences"));
 
     const { result } = renderHook(() => useRouteHandlers(), {
       // @ts-ignore
@@ -138,7 +123,7 @@ describe("useRouteHandlers hook tests", () => {
     });
 
     // THEN: An error snackbar should be shown
-    expect(mockEnqueueSnackbar).toHaveBeenCalledWith("An error occurred while trying to get your preferences", {
+    expect(mockEnqueueSnackbar).toHaveBeenCalledWith("An error occurred while trying to get your preferences: Failed to get user preferences", {
       variant: "error",
     });
   });

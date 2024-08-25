@@ -70,7 +70,7 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
   const renderCount = useRef(0);
 
   const [tempUser, setTempUser] = useState<TabiyaUser | null>(null);
-  const [showInviteCodeForm, setShowInviteCodeForm] = useState(false);
+  const [showRegistrationCodeForm, setShowRegistrationCodeForm] = useState(false);
 
   const [inviteCode, setInviteCode] = useState("");
   const [email, setEmail] = useState("");
@@ -86,7 +86,9 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
   const { updateUserPreferences } = useContext(UserPreferencesContext);
   const { enqueueSnackbar } = useSnackbar();
 
-  // callbacks to pass on to child components
+  /* ------------------
+   * Callbacks to handle changes in the form fields
+   */
   const handleEmailChanged = (email: string) => {
     setActiveLoginForm(ActiveForm.EMAIL);
     setEmail(email);
@@ -100,9 +102,79 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
     setInviteCode(code);
   };
 
+  /* ------------------
+  * Callbacks to handle successful logins
+  */
+
+  /**
+   * A callback to handle what happens after the user has logged in with a social provider
+   * This function is passed to the SocialAuth component, which calls it after a successful login
+   * @param user
+   */
+  const successfulSocialLoginCallback = useCallback(async (user: TabiyaUser) => {
+    //TODO: have a state here that tracks the loading state of the social login [COM-408]
+    try {
+      const prefs = await userPreferencesService.getUserPreferences(
+        user.id,
+      );
+      // if the user is not found, it means that the user is new and needs to create user preferences
+      // but first, we need to ask the user for a registration code
+      if (prefs === null) {
+        setTempUser(user);
+        setShowRegistrationCodeForm(true);
+        return;
+      }
+      updateUserPreferences(prefs);
+      postLoginHandler(user);
+    } catch (error) {
+      let errorMessage;
+      if (error instanceof ServiceError) {
+        errorMessage = getUserFriendlyErrorMessage(error as Error);
+      } else {
+        console.error(error);
+        errorMessage = (error as Error).message;
+      }
+      enqueueSnackbar(errorMessage, { variant: "error" });
+    }
+  }, [enqueueSnackbar, postLoginHandler, updateUserPreferences]);
+
+  /**
+   * A callback to create user preferences for a user, after they have entered a registration code
+   * We pass this to the RegistrationCodeFormModal component to use after the user has entered a registration code
+   * @param invitationCode
+   */
+  const createUserPreferencesCallback = useCallback(async (invitationCode: string) => {
+    try {
+      const prefs = await userPreferencesService.createUserPreferences(
+        {
+          user_id: tempUser?.id!,
+          language: Language.en,
+          invitation_code: invitationCode,
+        }
+      );
+      updateUserPreferences(prefs);
+      postLoginHandler(tempUser!);
+    } catch (error) {
+      let errorMessage;
+      if (error instanceof ServiceError) {
+        errorMessage = getUserFriendlyErrorMessage(error as Error);
+        writeServiceErrorToLog(error, console.error);
+      } else {
+        console.error(error);
+        errorMessage = (error as Error).message;
+      }
+      enqueueSnackbar(errorMessage, { variant: "error" });
+      console.error("Error during login");
+    }
+  }, [enqueueSnackbar, postLoginHandler, tempUser, updateUserPreferences]);
+
+  /* ------------------
+  * Actual login handlers
+  */
   /**
    * Handle the login form submission
-   * @param event
+   * @param email
+   * @param password
    */
   const handleLoginWithEmail = useCallback(
     (email: string, password: string) => {
@@ -164,30 +236,25 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
                   try {
                     // create user preferences for the first time.
                     // in order to do this, there needs to be a logged in user in the persistent storage
-                    await userPreferencesService.createUserPreferences(
+                    const prefs = await userPreferencesService.createUserPreferences(
                       {
                         user_id: _user.id,
                         invitation_code: invitation.invitation_code,
                         language: Language.en,
-                      },
-                      (_prefs) => {
-                        updateUserPreferences(_prefs);
-                        postLoginHandler(_user);
-                      },
-                      (error) => {
-                        writeServiceErrorToLog(error, console.error);
-                        const errorMessage = getUserFriendlyErrorMessage(error as Error);
-                        enqueueSnackbar(errorMessage, { variant: "error" });
                       }
                     );
+                    updateUserPreferences(prefs);
+                    postLoginHandler(_user);
                   } catch (error) {
+                    let errorMessage;
                     if (error instanceof ServiceError) {
                       writeServiceErrorToLog(error, console.error);
+                      errorMessage = getUserFriendlyErrorMessage(error as Error);
                     } else {
                       console.error(error);
+                      errorMessage = (error as Error).message;
                     }
-                    const errorMessage = getUserFriendlyErrorMessage(error as Error);
-                    enqueueSnackbar(errorMessage, { variant: "error" });
+                    enqueueSnackbar(`Failed to create preferences: ${errorMessage}`, { variant: "error" });
                   }
                 }
               },
@@ -212,38 +279,10 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
   );
 
   /**
-   * Handle logging in with social media idps
-   * @param user
+   * The submit button could be used to login with email/password or with an invitation code
+   * This function handles the submission of the form, and decides which method to use based on the active form
+   * @param event
    */
-  const socialLoginHandler = async (user: TabiyaUser) => {
-    try {
-      await userPreferencesService.getUserPreferences(
-        user.id,
-        (prefs) => {
-          updateUserPreferences(prefs);
-          if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
-            setTempUser(user);
-            setShowInviteCodeForm(true);
-            return;
-          }
-          postLoginHandler(user);
-        },
-        (error) => {
-          setTempUser(user);
-          setShowInviteCodeForm(true);
-          writeServiceErrorToLog(error, console.error);
-        }
-      );
-    } catch (e) {
-      console.log(e);
-
-      const errorMessage = getUserFriendlyErrorMessage(e as Error);
-      enqueueSnackbar(errorMessage, { variant: "error" });
-      console.error("Error during login process", e);
-    }
-  };
-
-  // depending on which form is active, handle submit button
   const handleLoginSubmit = useCallback(
     (event: React.FormEvent) => {
       event.preventDefault();
@@ -256,7 +295,13 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
     [email, handleLoginWithInvitationCode, handleLoginWithEmail, activeLoginForm, inviteCode, password]
   );
 
-  // clear whichever form is not active
+  /* ------------------
+  * side effects, like checking the invite code in the URL
+  */
+
+  /**
+   * Reset the form fields when the active form changes
+   */
   useEffect(() => {
     if (activeLoginForm === ActiveForm.EMAIL) {
       setInviteCode("");
@@ -267,7 +312,9 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
     }
   }, [activeLoginForm]);
 
-  // Check if the user was invited by checking the invite code in the URL
+  /**
+   * Check if there is an invite code in the URL when the component mounts
+   */
   useEffect(() => {
     renderCount.current++;
     if (!inviteCodeParam && renderCount.current === 1) {
@@ -279,38 +326,13 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
     }
   }, [handleLoginWithInvitationCode, inviteCodeParam]);
 
+  /* ------------------
+  * aggregated states for loading and disabling ui
+  */
   // login is loading when any of the login methods return a loading state
   const isLoginLoading = isAuthenticationInProgress || isLoggingInWithEmail || isLoggingInAnonymously;
   // login button is disabled when login is loading, or when there is no active Form, or the fields for the active form are not filled in
-  const isLoginButtonDisabled =
-    isLoginLoading || activeLoginForm === ActiveForm.NONE || ((!email || !password) && !inviteCode);
-
-  const createUser = async (invitationCode: string) => {
-    try {
-      await userPreferencesService.createUserPreferences(
-        {
-          user_id: tempUser?.id!,
-          language: Language.en,
-          invitation_code: invitationCode,
-        },
-        (_prefs) => {
-          updateUserPreferences(_prefs);
-          postLoginHandler(tempUser!);
-        },
-        (error) => {
-          writeServiceErrorToLog(error, console.error);
-          const errorMessage = getUserFriendlyErrorMessage(error as Error);
-          enqueueSnackbar(errorMessage, { variant: "error" });
-        }
-      );
-    } catch (e) {
-      console.log(e);
-
-      const errorMessage = getUserFriendlyErrorMessage(e as Error);
-      enqueueSnackbar(errorMessage, { variant: "error" });
-      console.error("Error during login");
-    }
-  };
+  const isLoginButtonDisabled = isLoginLoading || activeLoginForm === ActiveForm.NONE || ((!email || !password) && !inviteCode);
 
   return (
     <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.LOGIN_CONTAINER}>
@@ -334,7 +356,7 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
             inviteCode={inviteCode}
             notifyOnInviteCodeChanged={handleInviteCodeChanged}
             isDisabled={isLoginLoading}
-            notifyOnFocused={() => {}}
+            notifyOnFocused={() => {}} //TODO: remove this
           />
           <Divider textAlign="center" style={{ width: "100%" }}>
             <Typography
@@ -380,8 +402,8 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
         </Box>
         <SocialAuth
           disabled={false}
-          preLoginCheck={() => true}
-          postLoginHandler={socialLoginHandler}
+          preLoginCheck={() => true} // no checks need to happen before logging in with social providers
+          postLoginHandler={successfulSocialLoginCallback}
           isLoading={isLoading}
         />
         <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.LOGIN_LINK}>
@@ -398,9 +420,9 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
         </Typography>
       </Box>
       <RegistrationCodeFormModal
-        show={showInviteCodeForm}
-        onSuccess={createUser}
-        onClose={() => setShowInviteCodeForm(false)}
+        show={showRegistrationCodeForm}
+        onSuccess={createUserPreferencesCallback}
+        onClose={() => setShowRegistrationCodeForm(false)}
       />
     </Container>
   );

@@ -1,9 +1,6 @@
-export type UserLanguage = {
+export type UserPreference = {
   user_id: string;
   language: Language;
-};
-
-export type UserPreference = UserLanguage & {
   accepted_tc?: Date;
   sessions: number[];
 };

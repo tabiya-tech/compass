@@ -69,7 +69,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
           setError(shownError);
         }
       );
-      return false;
+      return false;  //TODO: why is this here?
     } catch (error: any) {
       console.log(error);
       enqueueSnackbar("Login failed", { variant: "error" });

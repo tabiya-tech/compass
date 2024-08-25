@@ -2,17 +2,18 @@ import React, { useCallback, useContext, useState } from "react";
 import { Box, Container, styled, Typography } from "@mui/material";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Language, UpdateUserPreferencesSpec } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import { ServiceError, ServiceErrorObject, USER_FRIENDLY_ERROR_MESSAGES } from "src/error/ServiceError/ServiceError";
-import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
-import { StatusCodes } from "http-status-codes";
+import {
+  getUserFriendlyErrorMessage,
+  ServiceError
+} from "src/error/ServiceError/ServiceError";
 import LanguageContextMenu from "src/i18n/languageContextMenu/LanguageContextMenu";
 import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { useNavigate } from "react-router-dom";
-import { routerPaths } from "src/app/routerPaths";
 import { AuthContext } from "src/auth/AuthProvider";
-import { userPreferencesService } from "../userPreferences/UserPreferencesService/userPreferences.service";
+import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import { routerPaths } from "src/app/routerPaths";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
@@ -51,49 +52,31 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
   const persistUserPreferences = useCallback(async () => {
     try {
       if (!user) {
-        throw new ServiceError(
-          "UserPreferenceService",
-          "createUserPreferences",
-          "POST",
-          "users/preferences",
-          StatusCodes.NOT_FOUND,
-          ErrorConstants.ErrorCodes.NOT_FOUND,
-          "User not found",
-          ""
-        );
+        enqueueSnackbar("User not found", { variant: "error" });
+        navigate(routerPaths.LOGIN)
+        return;
       }
+
       const newUserPreferenceSpecs: UpdateUserPreferencesSpec = {
         user_id: user.id,
         language: Language.en,
         accepted_tc: new Date(),
       };
       setIsAcceptingDPA(true);
-      userPreferencesService.updateUserPreferences(
-        newUserPreferenceSpecs,
-        (_prefs) => {
-          updateUserPreferences(_prefs);
-          notifyOnAcceptDPA();
-          enqueueSnackbar("Data Protection Agreement Accepted", { variant: "success" });
-        },
-        (error) => {
-          writeServiceErrorToLog(error, console.error);
-
-          // if the invitation code is invalid, show a user-friendly message
-          // otherwise, navigate to the login page and show a generic error message
-          if (
-            (error?.details as ServiceErrorObject)?.details === USER_FRIENDLY_ERROR_MESSAGES.INVALID_INVITATION_CODE
-          ) {
-            enqueueSnackbar(USER_FRIENDLY_ERROR_MESSAGES.INVALID_INVITATION_CODE, { variant: "error" });
-          } else {
-            navigate(routerPaths.LOGIN, { replace: true });
-            enqueueSnackbar("Failed to update user preferences", { variant: "error" });
-          }
-        }
+      const prefs = await userPreferencesService.updateUserPreferences(
+        newUserPreferenceSpecs
       );
+      updateUserPreferences(prefs);
+      notifyOnAcceptDPA();
+      enqueueSnackbar("Data Protection Agreement Accepted", { variant: "success" });
     } catch (e) {
-      console.error(e);
-      enqueueSnackbar("Failed to update user preferences", { variant: "error" });
-      console.error("Failed to update user preferences", e);
+      if(e instanceof ServiceError) {
+        writeServiceErrorToLog(e, console.error);
+        enqueueSnackbar(getUserFriendlyErrorMessage(e), { variant: "error" });
+      } else {
+        enqueueSnackbar(`Failed to update user preferences: ${(e as Error).message}`, { variant: "error" });
+        console.error("Failed to update user preferences", e);
+      }
     } finally {
       setIsAcceptingDPA(false);
     }
