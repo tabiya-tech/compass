@@ -234,46 +234,33 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
           throw new Error("Invalid invitation code");
         }
         enqueueSnackbar("Invitation code is valid", { variant: "success" });
-        await anonymousAuthService.handleAnonymousLogin(
-          async (token) => {
-            const _user = updateUserByToken(token);
-            if (_user) {
-              try {
-                // create user preferences for the first time.
-                // in order to do this, there needs to be a logged in user in the persistent storage
-                const prefs = await userPreferencesService.createUserPreferences(
-                  {
-                    user_id: _user.id,
-                    invitation_code: invitation.invitation_code,
-                    language: Language.en,
-                  }
-                );
-                updateUserPreferences(prefs);
-                postLoginHandler(_user);
-              } catch (error) {
-                let errorMessage;
-                if (error instanceof ServiceError) {
-                  writeServiceErrorToLog(error, console.error);
-                  errorMessage = getUserFriendlyErrorMessage(error as Error);
-                } else {
-                  console.error(error);
-                  errorMessage = (error as Error).message;
-                }
-                enqueueSnackbar(`Failed to create preferences: ${errorMessage}`, { variant: "error" });
-              }
-            }
-          },
-          (error) => {
-            const shownError = getUserFriendlyFirebaseErrorMessage(error);
-            writeFirebaseErrorToLog(error, console.error);
-            enqueueSnackbar(shownError, { variant: "error" });
-          }
+        const token = await anonymousAuthService.handleAnonymousLogin(
         );
+        const _user = updateUserByToken(token);
+        if (_user) {
+            // create user preferences for the first time.
+            // in order to do this, there needs to be a logged in user in the persistent storage
+            const prefs = await userPreferencesService.createUserPreferences(
+              {
+                user_id: _user.id,
+                invitation_code: invitation.invitation_code,
+                language: Language.en,
+              }
+            );
+            updateUserPreferences(prefs);
+            postLoginHandler(_user);
+        } else {
+          // if a user cannot be gotten from the token, we have to throw an error
+          throw new Error("User not found");
+        }
       } catch (error) {
         let errorMessage;
         if (error instanceof ServiceError) {
           writeServiceErrorToLog(error, console.error);
           errorMessage = getUserFriendlyErrorMessage(error as Error);
+        } else if (error instanceof FirebaseError) {
+          writeFirebaseErrorToLog(error, console.error);
+          errorMessage = getUserFriendlyFirebaseErrorMessage(error);
         } else {
           console.error(error);
           errorMessage = (error as Error).message;

@@ -172,10 +172,7 @@ describe("Testing Login component", () => {
     // AND the anonymous auth mock will succeed
     const handleAnonymousLoginSpy = jest
       .spyOn(anonymousAuthService, "handleAnonymousLogin")
-      // @ts-ignore
-      .mockImplementation((user, onSuccess, onError) => {
-        onSuccess(user);
-      });
+      .mockResolvedValue("mock-token");
 
     render(
       <HashRouter>
@@ -202,7 +199,7 @@ describe("Testing Login component", () => {
 
     // AND the anonymousAuthService should be called with the correct arguments
     await waitFor(() => {
-      expect(handleAnonymousLoginSpy).toHaveBeenCalledWith(expect.any(Function), expect.any(Function));
+      expect(handleAnonymousLoginSpy).toHaveBeenCalledWith();
     });
   });
 });

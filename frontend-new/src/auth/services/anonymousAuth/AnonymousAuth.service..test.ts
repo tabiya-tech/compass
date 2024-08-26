@@ -32,7 +32,7 @@ describe("AuthService class tests", () => {
   });
 
   describe("handleLogout", () => {
-    test("should call successCallback on successful logout", async () => {
+    test("should call firebase signOut on successful logout", async () => {
       // GIVEN the user is logged in
       const mockSignOut = jest.fn();
       jest.spyOn(firebase.auth(), "signOut").mockImplementation(mockSignOut);
@@ -46,7 +46,7 @@ describe("AuthService class tests", () => {
       expect(firebase.auth().signOut).toHaveBeenCalled();
     });
 
-    test("should call failureCallback on logout failure", async () => {
+    test("should throw on logout failure", async () => {
       // GIVEN the user is logged in
       jest.spyOn(firebase.auth(), "signOut").mockRejectedValueOnce({
         code: "auth/internal-error",
@@ -66,24 +66,20 @@ describe("AuthService class tests", () => {
   });
 
   describe("handleAnonymousLogin", () => {
-    test("should call successCallback with user data on successful anonymous login", async () => {
+    test("should return token on successful anonymous login", async () => {
       // GIVEN the user is logged in anonymously
       jest.spyOn(firebase.auth(), "signInAnonymously").mockResolvedValue({
         user: { getIdToken: jest.fn().mockResolvedValue("foo") },
       } as unknown as firebase.auth.UserCredential);
 
-      const successCallback = jest.fn();
-      const failureCallback = jest.fn();
-
       // WHEN the anonymous login is attempted
-      await authService.handleAnonymousLogin(successCallback, failureCallback);
+      const anonymousLoginCallback = async () => await authService.handleAnonymousLogin();
+
+      // THEN test should return the token
+      await expect(anonymousLoginCallback()).resolves.toBe("foo");
 
       // THEN test should call the firebase signInAnonymously function
       expect(firebase.auth().signInAnonymously).toHaveBeenCalled();
-      // AND test should call the success callback with the user data
-      expect(successCallback).toHaveBeenCalledWith("foo");
-      // AND test should not call the error callback
-      expect(failureCallback).not.toHaveBeenCalled();
     });
 
     test("should call failureCallback on anonymous login failure", async () => {
@@ -93,33 +89,27 @@ describe("AuthService class tests", () => {
         message: "Internal error",
       });
 
-      const successCallback = jest.fn();
-      const failureCallback = jest.fn();
-
       // WHEN the anonymous login is attempted
-      await authService.handleAnonymousLogin(successCallback, failureCallback);
+      const anonymousLoginCallback = async () => await authService.handleAnonymousLogin();
+
+      // THEN the login should throw an error
+      await expect(anonymousLoginCallback()).rejects.toThrow("Internal error");
 
       // THEN test should call the firebase signInAnonymously function
       expect(firebase.auth().signInAnonymously).toHaveBeenCalled();
-      // AND test should not call the success callback
-      expect(successCallback).not.toHaveBeenCalled();
-      // AND test should call the error callback
-      expect(failureCallback).toHaveBeenCalledWith(expect.any(Error));
     });
 
-    test("should throw a Failed to Fetch error when the firebase signInAnonymously method fails to return a user", async () => {
+    test("should throw an error when the firebase signInAnonymously method fails to return a user", async () => {
       // GIVEN the user is not able to log in anonymously
       jest.spyOn(firebase.auth(), "signInAnonymously").mockResolvedValue({
         user: null,
       } as unknown as firebase.auth.UserCredential);
 
-      const successCallback = jest.fn();
-      const failureCallback = jest.fn();
-
       // WHEN the anonymous login is attempted
-      await authService.handleAnonymousLogin(successCallback, failureCallback);
+      const anonymousLoginCallback = async () => await authService.handleAnonymousLogin();
+
       // THEN the error callback should be called with Failed to Fetch
-      expect(failureCallback).toHaveBeenCalledWith(new Error("User not found"));
+      await expect(anonymousLoginCallback()).rejects.toThrow("User not found");
     });
   });
 });
