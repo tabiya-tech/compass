@@ -4,3 +4,4 @@ venv-backend
 keys
 test_output/
 .idea/
+logs/

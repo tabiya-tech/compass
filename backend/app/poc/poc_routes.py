@@ -3,6 +3,7 @@ from pydantic import BaseModel, Field
 
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.agent.agent_types import AgentOutput, AgentInput
+from app.context_vars import session_id_ctx_var
 from app.conversation_memory.conversation_memory_types import ConversationContext
 import logging
 
@@ -112,6 +113,11 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
         """
         Endpoint for conducting the conversation with the agent.
         """
+        # set the session_id in the context variable
+        # so that it can be accessed by the logger
+        # and downstream functions
+        session_id_ctx_var.set(session_id)
+
         # Do not allow user input that is too long,
         # as a basic measure to prevent abuse.
         if len(user_input) > 1000:
@@ -167,6 +173,11 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
         As a developer, you can use this endpoint to test the conversation agent with any user input.
         You can adjust the front-end to use this endpoint for testing locally an agent in a configurable way.
         """
+        # set the session_id in the context variable
+        # so that it can be accessed by the logger
+        # and downstream functions
+        session_id_ctx_var.set(session_id)
+
         # Do not allow user input that is too long,
         # as a basic measure to prevent abuse.
         if len(user_input) > 1000:
@@ -234,6 +245,11 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
         As a developer, you can use this endpoint to test the conversation agent with any user input.
         You can adjust the front-end to use this endpoint for testing locally an agent in a configurable way.
         """
+        # set the session_id in the context variable
+        # so that it can be accessed by the logger
+        # and downstream functions
+        session_id_ctx_var.set(session_id)
+
         # Do not allow user input that is too long,
         # as a basic measure to prevent abuse.
         if len(user_input) > 1000:
@@ -322,6 +338,11 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
         Get the conversation context of a user.
         """
         try:
+            # set the session_id in the context variable
+            # so that it can be accessed by the logger
+            # and downstream functions
+            session_id_ctx_var.set(session_id)
+
             state = await application_state_manager.get_state(session_id)
             conversation_memory_manager.set_state(state.conversation_memory_manager_state)
             context = await conversation_memory_manager.get_conversation_context()

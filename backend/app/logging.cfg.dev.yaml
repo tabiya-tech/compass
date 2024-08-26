@@ -2,13 +2,14 @@ version: 1
 disable_existing_loggers: False
 formatters:
   standard:
-    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format: '%(asctime)s - %(name)s - %(levelname)s - session:%(session_id)s %(message)s'
 handlers:
   console:
     class: logging.StreamHandler
     level: DEBUG
     formatter: standard
     stream: ext://sys.stdout
+    filters: [session_filter]
   file:
     class: logging.handlers.RotatingFileHandler
     level: DEBUG
@@ -19,12 +20,16 @@ handlers:
 loggers:
   _template: &template_logger  # Define an anchor
     level: DEBUG
-    handlers: [ file ]
+    handlers: [ console ]
     propagate: yes
   #CollectExperiencesAgent: *template_logger
   #WelcomeAgent: *template_logger
   #SkillExplorerAgent: *template_logger
   #FarewellAgent: *template_logger
+filters:
+  session_filter:
+    (): app.context_vars.SessionIdLogFilter
+
 root:
   level: INFO
   handlers: [ console ]
