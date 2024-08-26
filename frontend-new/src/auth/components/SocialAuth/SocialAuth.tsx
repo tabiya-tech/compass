@@ -6,9 +6,11 @@ import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { Box, Button, Typography } from "@mui/material";
 import { socialAuthService } from "src/auth/services/socialAuth/SocialAuth.service";
 import { AuthContext } from "src/auth/AuthProvider";
-import { getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
+import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
 import { GoogleIcon } from "src/theme/Icons/GoogleIcon";
+import { getUserFriendlyErrorMessage, ServiceError } from "../../../error/ServiceError/ServiceError";
+import { writeServiceErrorToLog } from "../../../error/ServiceError/logger";
 
 const uniqueId = "f0324e97-83fd-49e6-95c3-1043751fa1db";
 export const DATA_TEST_ID = {
@@ -55,25 +57,28 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
         return;
       }
 
-      await socialAuthService.handleLoginWithGoogle(
-        (token) => {
-          const _user = updateUserByToken(token);
-          if (_user) {
-            postLoginHandler(_user);
-          }
-        },
-        (error) => {
-          const shownError = getUserFriendlyFirebaseErrorMessage(error);
-          writeFirebaseErrorToLog(error, console.error);
-          enqueueSnackbar(shownError, { variant: "error" });
-          setError(shownError);
-        }
-      );
-      return false;  //TODO: why is this here?
+      const token = await socialAuthService.handleLoginWithGoogle();
+      const _user = updateUserByToken(token);
+      if (_user) {
+        postLoginHandler(_user);
+      } else {
+        // if the user cannot be gotten from the token, throw an error
+        throw new Error("Something went wrong while logging in. Please try again.");
+      }
     } catch (error: any) {
-      console.log(error);
-      enqueueSnackbar("Login failed", { variant: "error" });
-      setError(error.message);
+      let errorMessage;
+      if(error instanceof ServiceError) {
+        errorMessage = getUserFriendlyErrorMessage(error);
+        writeServiceErrorToLog(error, console.error);
+      } else if (error instanceof FirebaseError) {
+        errorMessage = getUserFriendlyFirebaseErrorMessage(error);
+        writeFirebaseErrorToLog(error, console.error);
+      } else {
+        errorMessage = (error as Error).message;
+        console.error(error);
+      }
+      setError(errorMessage);
+      enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
     } finally {
       setLoginInProgress(false);
     }

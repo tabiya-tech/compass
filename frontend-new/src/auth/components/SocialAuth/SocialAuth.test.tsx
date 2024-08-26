@@ -110,9 +110,7 @@ describe("SocialAuth tests", () => {
         email: "foo@bar.baz",
       };
       // AND the sign-in is successful
-      (socialAuthService.handleLoginWithGoogle as jest.Mock).mockImplementation((successCallback, failureCallback) => {
-        successCallback(givenToken);
-      });
+      (socialAuthService.handleLoginWithGoogle as jest.Mock).mockResolvedValue(givenToken);
       // AND the AuthProvider updates the user successully
       updateUserWithTokenMock = jest.fn().mockImplementation((token: string) => {
         return givenUser;
