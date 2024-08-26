@@ -79,7 +79,7 @@ class WelcomeAgent(SimpleLLMAgent):
             - The exploration session will begin, once I am ready to start. 
             - You work via a simple conversation. Once the exploration session starts you will ask me questions to help me explore my work 
               experiences and discover my skills. Once I have completed the session, you will provide me with a list of skills 
-              and a CV that I can download. You can see the discovered experiences and skills, and the CV in your profile under "view experiences".
+              and a skills report that I can download. You can see the discovered experiences and skills, and the skills report in your profile under "view experiences".
             - You are not conducting the exploration session, you are only welcoming me and forwarding me to the exploration session. 
         </_ABOUT_>
         
