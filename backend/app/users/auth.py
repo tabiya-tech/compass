@@ -134,8 +134,6 @@ class Authentication:
                     sign_in_provider=token_info["firebase"]["sign_in_provider"]
                 )
 
-                logger.info(f"authenticated user : {user_info.user_id}")
-
                 return user_info
 
             except Exception as e:
