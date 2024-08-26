@@ -44,20 +44,6 @@ jest.mock("react-router-dom", () => {
   };
 });
 
-// mock the usePageHandlers hook
-jest.mock("src/app/hooks/useRouteHandlers", () => {
-  return {
-    __esModule: true,
-    useRouteHandlers: jest.fn().mockReturnValue({
-      handleLogin: jest.fn(),
-      handleRegister: jest.fn(),
-      handleAcceptDPA: jest.fn(),
-      handleVerifyEmail: jest.fn(),
-      isLoading: false,
-    }),
-  };
-});
-
 describe("main compass app test", () => {
   beforeEach(() => {
     jest.clearAllMocks();

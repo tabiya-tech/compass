@@ -9,8 +9,8 @@ import { AuthContext } from "src/auth/AuthProvider";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
 import { GoogleIcon } from "src/theme/Icons/GoogleIcon";
-import { getUserFriendlyErrorMessage, ServiceError } from "../../../error/ServiceError/ServiceError";
-import { writeServiceErrorToLog } from "../../../error/ServiceError/logger";
+import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
+import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 
 const uniqueId = "f0324e97-83fd-49e6-95c3-1043751fa1db";
 export const DATA_TEST_ID = {

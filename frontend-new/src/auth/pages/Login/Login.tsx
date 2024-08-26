@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Box, CircularProgress, Container, Divider, styled, Typography, useTheme } from "@mui/material";
-import { NavLink as RouterNavLink, useLocation } from "react-router-dom";
+import { NavLink as RouterNavLink, useLocation, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import SocialAuth from "src/auth/components/SocialAuth/SocialAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -21,7 +21,7 @@ import { Language } from "src/userPreferences/UserPreferencesService/userPrefere
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
 import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
-import { InvitationStatus, InvitationType } from "../../../invitations/InvitationsService/invitations.types";
+import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
 
 export const INVITATIONS_PARAM_NAME = "invite-code";
 
@@ -51,18 +51,13 @@ export const DATA_TEST_ID = {
   LANGUAGE_SELECTOR: `login-language-selector-${uniqueId}`,
 };
 
-export interface LoginProps {
-  postLoginHandler: (user: TabiyaUser) => void;
-  isLoading: boolean;
-}
-
 enum ActiveForm {
   NONE = "NONE",
   EMAIL = "EMAIL",
   INVITE_CODE = "INVITE_CODE",
 }
 
-const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) => {
+const Login: React.FC = () => {
   const theme = useTheme();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -80,12 +75,13 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
 
   const [activeLoginForm, setActiveLoginForm] = useState(ActiveForm.NONE);
 
-  const [isLoggingInWithEmail, setIsLoggingInWithEmail] = useState(false);
-  const [isLoggingInAnonymously, setIsLoggingInAnonymously] = useState(false);
+  // a state to keep track of whether the login process is loading
+  const [isLoading, setIsLoading] = useState(false);
 
   const { isAuthenticationInProgress, updateUserByToken } = useContext(AuthContext);
   const { updateUserPreferences } = useContext(UserPreferencesContext);
   const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
 
   /* ------------------
    * Callbacks to handle changes in the form fields
@@ -106,6 +102,36 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
   /* ------------------
   * Callbacks to handle successful logins
   */
+  const handlePostLogin = useCallback(
+    async (user: TabiyaUser) => {
+      try {
+        const prefs = await userPreferencesService.getUserPreferences(
+          user.id
+        );
+        if(prefs === null){
+          throw new Error("User preferences not found");
+        }
+        updateUserPreferences(prefs);
+        if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
+          navigate(routerPaths.DPA, { replace: true });
+        } else {
+          navigate(routerPaths.ROOT, { replace: true });
+          enqueueSnackbar("Welcome back!", { variant: "success" });
+        }
+      } catch (error) {
+        let errorMessage;
+        if(error instanceof ServiceError) {
+          writeServiceErrorToLog(error, console.error);
+          errorMessage = getUserFriendlyErrorMessage(error);
+        } else {
+          errorMessage = (error as Error).message;
+          console.error("An error occurred while trying to get your preferences", error)
+        }
+        enqueueSnackbar(`An error occurred while trying to get your preferences: ${errorMessage}`, { variant: "error" });
+      }
+    },
+    [navigate, enqueueSnackbar, updateUserPreferences]
+  );
 
   /**
    * A callback to handle what happens after the user has logged in with a social provider
@@ -113,7 +139,7 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
    * @param user
    */
   const successfulSocialLoginCallback = useCallback(async (user: TabiyaUser) => {
-    //TODO: have a state here that tracks the loading state of the social login [COM-408]
+    setIsLoading(true);
     try {
       const prefs = await userPreferencesService.getUserPreferences(
         user.id,
@@ -126,7 +152,7 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
         return;
       }
       updateUserPreferences(prefs);
-      postLoginHandler(user);
+      await handlePostLogin(user);
     } catch (error) {
       let errorMessage;
       if (error instanceof ServiceError) {
@@ -136,8 +162,10 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
         errorMessage = (error as Error).message;
       }
       enqueueSnackbar(errorMessage, { variant: "error" });
+    } finally {
+      setIsLoading(false);
     }
-  }, [enqueueSnackbar, postLoginHandler, updateUserPreferences]);
+  }, [enqueueSnackbar, updateUserPreferences, handlePostLogin]);
 
   /**
    * A callback to create user preferences for a user, after they have entered a registration code
@@ -145,6 +173,7 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
    * @param invitationCode
    */
   const createUserPreferencesCallback = useCallback(async (invitationCode: string) => {
+    setIsLoading(true)
     try {
       const prefs = await userPreferencesService.createUserPreferences(
         {
@@ -154,7 +183,7 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
         }
       );
       updateUserPreferences(prefs);
-      postLoginHandler(tempUser!);
+      await handlePostLogin(tempUser!);
     } catch (error) {
       let errorMessage;
       if (error instanceof ServiceError) {
@@ -165,8 +194,10 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
         errorMessage = (error as Error).message;
       }
       enqueueSnackbar(errorMessage, { variant: "error" });
+    } finally {
+      setIsLoading(false);
     }
-  }, [enqueueSnackbar, postLoginHandler, tempUser, updateUserPreferences]);
+  }, [enqueueSnackbar, handlePostLogin, tempUser, updateUserPreferences]);
 
   /* ------------------
   * Actual login handlers
@@ -182,19 +213,21 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
         const passwordValidationResult = validatePassword(password);
         setPasswordError(passwordValidationResult);
 
-        if (passwordValidationResult === "" && email && password) {
-          setIsLoggingInWithEmail(true);
-          const token = await emailAuthService.handleLoginWithEmail(
-            email,
-            password,
-          );
-          const _user = updateUserByToken(token);
-          if (_user) {
-            postLoginHandler(_user);
-          } else {
-            // if a user cannot be gotten from the token, we have to throw an error
-            throw new Error("Something went wrong while logging in. Please try again.");
-          }
+        if (passwordValidationResult !== "") {
+          return;
+        }
+
+        setIsLoading(true);
+        const token = await emailAuthService.handleLoginWithEmail(
+          email,
+          password,
+        );
+        const _user = updateUserByToken(token);
+        if (_user) {
+          await handlePostLogin(_user);
+        } else {
+          // if a user cannot be gotten from the token, we have to throw an error
+          throw new Error("Something went wrong while logging in. Please try again.");
         }
       } catch (error) {
         let errorMessage;
@@ -210,10 +243,10 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
         }
         enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
       } finally {
-        setIsLoggingInWithEmail(false);
+        setIsLoading(false);
       }
     },
-    [enqueueSnackbar, updateUserByToken, postLoginHandler]
+    [enqueueSnackbar, updateUserByToken, handlePostLogin]
   );
 
   /**
@@ -223,7 +256,7 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
   const handleLoginWithInvitationCode = useCallback(
     async (code: string) => {
       try {
-        setIsLoggingInAnonymously(true);
+        setIsLoading(true)
         const invitation = await invitationsService
           .checkInvitationCodeStatus(
             code
@@ -246,7 +279,7 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
               }
             );
             updateUserPreferences(prefs);
-            postLoginHandler(_user);
+            await handlePostLogin(_user);
         } else {
           // if a user cannot be gotten from the token, we have to throw an error
           throw new Error("User not found");
@@ -265,10 +298,10 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
         }
         enqueueSnackbar(errorMessage, { variant: "error" });
       } finally {
-        setIsLoggingInAnonymously(false);
+        setIsLoading(false);
       }
     },
-    [enqueueSnackbar, updateUserByToken, postLoginHandler, updateUserPreferences]
+    [enqueueSnackbar, updateUserByToken, handlePostLogin, updateUserPreferences]
   );
 
   /**
@@ -281,11 +314,13 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
       event.preventDefault();
       if (activeLoginForm === ActiveForm.INVITE_CODE) {
         await handleLoginWithInvitationCode(inviteCode);
+      } else if (activeLoginForm === ActiveForm.EMAIL && email && password){
+        await handleLoginWithEmail(email, password);
       } else {
-        handleLoginWithEmail(email, password);
+        enqueueSnackbar("Please fill in the email and password fields", { variant: "error" });
       }
     },
-    [email, handleLoginWithInvitationCode, handleLoginWithEmail, activeLoginForm, inviteCode, password]
+    [email, handleLoginWithInvitationCode, handleLoginWithEmail, activeLoginForm, inviteCode, password, enqueueSnackbar]
   );
 
   /* ------------------
@@ -313,7 +348,6 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
     if (!inviteCodeParam && renderCount.current === 1) {
       return;
     }
-
     if (inviteCodeParam) {
       handleLoginWithInvitationCode(inviteCodeParam);
     }
@@ -322,8 +356,8 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
   /* ------------------
   * aggregated states for loading and disabling ui
   */
-  // login is loading when any of the login methods return a loading state
-  const isLoginLoading = isAuthenticationInProgress || isLoggingInWithEmail || isLoggingInAnonymously;
+  // login is loading when the authentication provider or any of the login methods return a loading state
+  const isLoginLoading = isAuthenticationInProgress || isLoading;
   // login button is disabled when login is loading, or when there is no active Form, or the fields for the active form are not filled in
   const isLoginButtonDisabled = isLoginLoading || activeLoginForm === ActiveForm.NONE || ((!email || !password) && !inviteCode);
 

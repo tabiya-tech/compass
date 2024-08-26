@@ -100,7 +100,7 @@ describe("Testing Login component", () => {
     render(
       <HashRouter>
         <AuthContext.Provider value={authContextValue}>
-          <Login postLoginHandler={jest.fn()} isLoading={false} />
+          <Login />
         </AuthContext.Provider>
       </HashRouter>
     );
@@ -136,7 +136,7 @@ describe("Testing Login component", () => {
     render(
       <HashRouter>
         <AuthContext.Provider value={authContextValue}>
-          <Login postLoginHandler={jest.fn()} isLoading={false} />
+          <Login />
         </AuthContext.Provider>
       </HashRouter>
     );
@@ -175,7 +175,7 @@ describe("Testing Login component", () => {
     render(
       <HashRouter>
         <AuthContext.Provider value={authContextValue}>
-          <Login postLoginHandler={jest.fn()} isLoading={false} />
+          <Login />
         </AuthContext.Provider>
       </HashRouter>
     );

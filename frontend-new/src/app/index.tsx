@@ -8,17 +8,13 @@ import DataProtectionAgreement from "src/dataProtectionAgreement/DataProtectionA
 import VerifyEmail from "src/auth/pages/VerifyEmail/VerifyEmail";
 import NotFound from "src/errorPage/NotFound";
 import ProtectedRoute from "src/app/ProtectedRoute/ProtectedRoute";
-import { useRouteHandlers } from "src/app/hooks/useRouteHandlers";
 
 const uniqueId = "17ccbdb7-1855-44b2-bc68-ef066e5c4e6f";
 export const SNACKBAR_KEYS = {
   OFFLINE_ERROR: `offline-error-${uniqueId}`,
   ONLINE_SUCCESS: `online-success-${uniqueId}`,
 };
-
 const App = () => {
-  const { handleLogin, handleRegister, handleAcceptDPA, handleVerifyEmail, isPostLoginLoading } = useRouteHandlers();
-
   return (
     <Routes>
       {/*------*/}
@@ -47,11 +43,7 @@ const App = () => {
         path={routerPaths.REGISTER}
         element={
           <ProtectedRoute authenticationAndDPARequired={false}>
-            <RegisterWithEmail
-              postRegisterHandler={handleRegister}
-              postLoginHandler={handleLogin}
-              isPostLoginLoading={isPostLoginLoading}
-            />
+            <RegisterWithEmail />
           </ProtectedRoute>
         }
       />
@@ -59,7 +51,7 @@ const App = () => {
         path={routerPaths.LOGIN}
         element={
           <ProtectedRoute authenticationAndDPARequired={false}>
-            <LoginWithEmail postLoginHandler={handleLogin} isLoading={isPostLoginLoading} />
+            <LoginWithEmail />
           </ProtectedRoute>
         }
       />
@@ -67,7 +59,7 @@ const App = () => {
         path={routerPaths.VERIFY_EMAIL}
         element={
           <ProtectedRoute authenticationAndDPARequired={false}>
-            <VerifyEmail notifyOnEmailVerified={handleVerifyEmail} />
+            <VerifyEmail />
           </ProtectedRoute>
         }
       />
@@ -75,7 +67,7 @@ const App = () => {
         path={routerPaths.DPA}
         element={
           <ProtectedRoute authenticationAndDPARequired={false}>
-            <DataProtectionAgreement notifyOnAcceptDPA={handleAcceptDPA} isLoading={isPostLoginLoading} />
+            <DataProtectionAgreement />
           </ProtectedRoute>
         }
       />

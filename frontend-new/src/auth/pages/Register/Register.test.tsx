@@ -111,9 +111,6 @@ describe("Testing Register component", () => {
     const givenName = "Foo Bar";
     const givenEmail = "foo@bar.baz";
     const givenPassword = "password";
-    const givenNotifyOnRegister = jest.fn();
-    const givenNotifyOnLogin = jest.fn();
-    const givenIsLoading = false;
 
     // AND check invitation code status returns a valid code
     const checkInvitationCodeStatusMock = jest
@@ -127,11 +124,7 @@ describe("Testing Register component", () => {
     render(
       <HashRouter>
         <AuthContext.Provider value={authContextValue}>
-          <Register
-            postRegisterHandler={givenNotifyOnRegister}
-            postLoginHandler={givenNotifyOnLogin}
-            isPostLoginLoading={givenIsLoading}
-          />
+          <Register />
         </AuthContext.Provider>
       </HashRouter>
     );
@@ -187,9 +180,6 @@ describe("Testing Register component", () => {
     const givenName = "Foo Bar";
     const givenEmail = "foo@bar.baz";
     const givenPassword = "password";
-    const givenNotifyOnRegister = jest.fn();
-    const givenNotifyOnLogin = jest.fn();
-    const givenIsLoading = false;
 
     (emailAuthService.handleRegisterWithEmail as jest.Mock).mockResolvedValue(
       "foo-bar-token"
@@ -212,11 +202,7 @@ describe("Testing Register component", () => {
     render(
       <HashRouter>
         <AuthContext.Provider value={authContextValue}>
-          <Register
-            postRegisterHandler={givenNotifyOnRegister}
-            postLoginHandler={givenNotifyOnLogin}
-            isPostLoginLoading={givenIsLoading}
-          />
+          <Register />
         </AuthContext.Provider>
       </HashRouter>
     );
@@ -256,9 +242,6 @@ describe("Testing Register component", () => {
     const givenName = "Foo Bar";
     const givenEmail = "foo@bar.baz";
     const givenPassword = "password";
-    const givenNotifyOnRegister = jest.fn();
-    const givenNotifyOnLogin = jest.fn();
-    const givenIsLoading = false;
 
     // AND check invitation code status returns a valid code
     jest.spyOn(invitationsService, "checkInvitationCodeStatus").mockResolvedValue({
@@ -271,11 +254,7 @@ describe("Testing Register component", () => {
     render(
       <HashRouter>
         <AuthContext.Provider value={authContextValue}>
-          <Register
-            postRegisterHandler={givenNotifyOnRegister}
-            postLoginHandler={givenNotifyOnLogin}
-            isPostLoginLoading={givenIsLoading}
-          />
+          <Register />
         </AuthContext.Provider>
       </HashRouter>
     );
@@ -315,7 +294,7 @@ describe("Testing Register component", () => {
     render(
       <HashRouter>
         <AuthContext.Provider value={authContextValue}>
-          <Register postRegisterHandler={jest.fn()} postLoginHandler={jest.fn()} isPostLoginLoading={false} />
+          <Register />
         </AuthContext.Provider>
       </HashRouter>
     );

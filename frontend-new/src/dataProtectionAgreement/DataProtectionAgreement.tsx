@@ -32,15 +32,8 @@ export const DATA_TEST_ID = {
   CIRCULAR_PROGRESS: `dpa-circular-progress-${uniqueId}`,
 };
 
-export interface DataProtectionAgreementProps {
-  notifyOnAcceptDPA: () => void;
-  isLoading: boolean;
-}
 
-const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> = ({
-  notifyOnAcceptDPA,
-  isLoading,
-}) => {
+const DataProtectionAgreement: React.FC = () => {
   const navigate = useNavigate();
   const [isAcceptingDPA, setIsAcceptingDPA] = useState(false);
   const { updateUserPreferences } = useContext(UserPreferencesContext);
@@ -67,7 +60,7 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
         newUserPreferenceSpecs
       );
       updateUserPreferences(prefs);
-      notifyOnAcceptDPA();
+      navigate(routerPaths.ROOT, { replace: true });
       enqueueSnackbar("Data Protection Agreement Accepted", { variant: "success" });
     } catch (e) {
       if(e instanceof ServiceError) {
@@ -80,7 +73,7 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
     } finally {
       setIsAcceptingDPA(false);
     }
-  }, [user, enqueueSnackbar, updateUserPreferences, notifyOnAcceptDPA, navigate]);
+  }, [user, enqueueSnackbar, updateUserPreferences, navigate]);
 
   /**
    * Handle when a user accepts the data protection agreement
@@ -136,7 +129,7 @@ const DataProtectionAgreement: React.FC<Readonly<DataProtectionAgreementProps>> 
           variant="contained"
           color="primary"
           style={{ marginTop: 16 }}
-          disabled={isAcceptingDPA || isLoading}
+          disabled={isAcceptingDPA}
           disableWhenOffline={true}
           data-testid={DATA_TEST_ID.ACCEPT_DPA_BUTTON}
           onClick={handleAcceptedDPA}

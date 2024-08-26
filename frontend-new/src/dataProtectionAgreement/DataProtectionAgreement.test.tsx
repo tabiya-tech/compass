@@ -2,7 +2,7 @@ import "src/_test_utilities/consoleMock";
 import React from "react";
 import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
 import DataProtectionAgreement, { DATA_TEST_ID } from "./DataProtectionAgreement";
-import { HashRouter } from "react-router-dom";
+import { HashRouter, useNavigate } from "react-router-dom";
 import { waitFor } from "@testing-library/react";
 import { Language, UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -62,8 +62,6 @@ describe("Testing Data Protection Policy component", () => {
     updateUserPreferences: updateUserPreferencesMock,
     isLoading: false,
   };
-  const givenNotifyOnAcceptDPA = jest.fn();
-  const givenIsLoading = false;
 
   beforeEach(() => {
     // Clear console mocks and mock functions
@@ -84,7 +82,7 @@ describe("Testing Data Protection Policy component", () => {
     render(
       <HashRouter>
         <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-          <DataProtectionAgreement notifyOnAcceptDPA={givenNotifyOnAcceptDPA} isLoading={givenIsLoading} />
+          <DataProtectionAgreement />
         </UserPreferencesContext.Provider>
       </HashRouter>
     );
@@ -130,7 +128,7 @@ describe("Testing Data Protection Policy component", () => {
       <HashRouter>
         <AuthContext.Provider value={authContextDefaultValue}>
           <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <DataProtectionAgreement notifyOnAcceptDPA={givenNotifyOnAcceptDPA} isLoading={givenIsLoading} />
+            <DataProtectionAgreement />
           </UserPreferencesContext.Provider>
         </AuthContext.Provider>
       </HashRouter>
@@ -146,44 +144,6 @@ describe("Testing Data Protection Policy component", () => {
     // WHEN the user clicks the accept button
     // AND WHEN the accept button is clicked
     fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_BUTTON));
-  });
-
-  test("should not call accepting DPA service method if no invitation is in state", async () => {
-    // GIVEN a user is logged in
-    const givenUser: TabiyaUser = {
-      id: "0001",
-      email: "foo@bar.baz",
-      name: "Foo Bar",
-    };
-    const newUserPreferences: UserPreference = {
-      user_id: givenUser.id,
-      language: Language.en,
-      accepted_tc: new Date(),
-      sessions: [],
-    };
-
-    // AND the user preferences service is mocked to return the user preferences
-    jest.spyOn(userPreferencesService, 'updateUserPreferences')
-      .mockResolvedValue(newUserPreferences);
-
-    // WHEN the component is rendered
-    render(
-      <HashRouter>
-        <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-          <DataProtectionAgreement notifyOnAcceptDPA={givenNotifyOnAcceptDPA} isLoading={givenIsLoading} />
-        </UserPreferencesContext.Provider>
-      </HashRouter>
-    );
-
-    // AND the givenNotifyOnAcceptDPA should not have been called
-    await waitFor(() => {
-      expect(givenNotifyOnAcceptDPA).not.toHaveBeenCalled();
-    });
-
-    // AND the success message should not be displayed
-    await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalled();
-    });
   });
 
   test("should fail to accept the data protection policy gracefully", async () => {
@@ -203,7 +163,7 @@ describe("Testing Data Protection Policy component", () => {
       <HashRouter>
         <AuthContext.Provider value={{ ...authContextDefaultValue, user: givenUser }}>
           <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <DataProtectionAgreement notifyOnAcceptDPA={givenNotifyOnAcceptDPA} isLoading={givenIsLoading} />
+            <DataProtectionAgreement />
           </UserPreferencesContext.Provider>
         </AuthContext.Provider>
       </HashRouter>
@@ -220,7 +180,7 @@ describe("Testing Data Protection Policy component", () => {
     fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_BUTTON));
 
     await waitFor(() => {
-      expect(givenNotifyOnAcceptDPA).not.toHaveBeenCalled();
+      expect(useNavigate()).not.toHaveBeenCalled();
     });
 
     // AND the error message should be displayed
