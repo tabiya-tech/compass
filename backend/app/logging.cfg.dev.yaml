@@ -2,7 +2,7 @@ version: 1
 disable_existing_loggers: False
 formatters:
   standard:
-    format: '%(asctime)s - %(name)s - %(levelname)s - session:%(session_id)s %(message)s'
+    format: '%(asctime)s - %(name)s - %(levelname)s - session:%(session_id)s - user:%(user_id)s - %(message)s'
 handlers:
   console:
     class: logging.StreamHandler
@@ -28,7 +28,7 @@ loggers:
   #FarewellAgent: *template_logger
 filters:
   session_filter:
-    (): app.context_vars.SessionIdLogFilter
+    (): app.logger.SessionIdLogFilter
 
 root:
   level: INFO

@@ -1,13 +1,14 @@
 version: 1
 disable_existing_loggers: False
 formatters:
-  standard:
+  json_formatter:
     format: '%(asctime)s - %(name)s - %(levelname)s - session:%(session_id)s %(message)s'
+    (): app.logger.JsonLogFormatter
 handlers:
   console:
     class: logging.StreamHandler
     level: DEBUG
-    formatter: standard
+    formatter: json_formatter
     stream: ext://sys.stdout
     filters: [session_filter]
 loggers:
@@ -19,7 +20,7 @@ loggers:
   SkillsExplorerAgent: *template_logger
 filters:
   session_filter:
-    (): app.context_vars.SessionIdLogFilter
+    (): app.logger.SessionIdLogFilter
 root:
   level: INFO
   handlers: [ console ]

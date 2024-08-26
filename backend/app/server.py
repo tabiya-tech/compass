@@ -37,7 +37,8 @@ from app.types import Experience, Skill
 from app.users.repositories import UserPreferenceRepository
 
 # ContextVar to hold the session ID
-from app.context_vars import session_id_ctx_var
+from app.context_vars import session_id_ctx_var, user_id_ctx_var
+
 logger = logging.getLogger(__name__)
 
 load_dotenv()
@@ -153,10 +154,11 @@ async def conversation(request: Request, body: ConversationInput, clear_memory: 
     session_id = body.session_id
     user_input = body.user_input
 
-    # set the session_id in the context variable
+    # set the session_id, user_id in the context variable
     # so that it can be accessed by the logger
     # and downstream functions
     session_id_ctx_var.set(body.session_id)
+    user_id_ctx_var.set(user_info.user_id)
 
     # check that the user making the request has the session_id in their user preferences
     user_preference_repository = UserPreferenceRepository(application_db)
@@ -237,10 +239,11 @@ async def get_conversation_history(
     Endpoint for retrieving the conversation history.
     """
 
-    # set the session_id in the context variable
+    # set the session_id, user_id in the context variable
     # so that it can be accessed by the logger
     # and downstream functions
     session_id_ctx_var.set(session_id)
+    user_id_ctx_var.set(user_info.user_id)
 
     # check that the user making the request has the session_id in their user preferences
     user_preference_repository = UserPreferenceRepository(application_db)
@@ -282,10 +285,11 @@ async def get_experiences(session_id: int, user_info: UserInfo = Depends(auth.ge
     if current_user_preferences is None or session_id not in current_user_preferences.sessions:
         raise HTTPException(status_code=403, detail=NO_PERMISSION_FOR_SESSION)
 
-    # set the session_id in the context variable
+    # set the session_id, user_id in the context variable
     # so that it can be accessed by the logger
     # and downstream functions
     session_id_ctx_var.set(session_id)
+    user_id_ctx_var.set(user_info.user_id)
 
     # Get the experiences from the application state
     state = await application_state_manager.get_state(session_id)
