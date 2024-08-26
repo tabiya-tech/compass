@@ -2,13 +2,14 @@ version: 1
 disable_existing_loggers: False
 formatters:
   standard:
-    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format: '%(asctime)s - %(name)s - %(levelname)s - session:%(session_id)s %(message)s'
 handlers:
   console:
     class: logging.StreamHandler
     level: DEBUG
     formatter: standard
     stream: ext://sys.stdout
+    filters: [session_filter]
 loggers:
   _template: &template_logger  # Define an anchor
     level: DEBUG
@@ -16,6 +17,9 @@ loggers:
   common_libs.llm.models_utils: *template_logger
   CollectExperiencesAgent: *template_logger
   SkillsExplorerAgent: *template_logger
+filters:
+  session_filter:
+    (): app.context_vars.SessionIdLogFilter
 root:
   level: INFO
   handlers: [ console ]
