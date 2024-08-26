@@ -8,9 +8,10 @@ class SessionIdLogFilter(logging.Filter):
     """
     A custom log filter that adds the session_id to the log record
     """
+
     def filter(self, record: logging.LogRecord) -> bool:
-        # Get the session_id from the context variable
-        # and add it to the log record
+        # Get the session_id and user_id from the context variable
+        # and add them to the log record
         # This will allow us to correlate log messages
         record.session_id = session_id_ctx_var.get()
         record.user_id = user_id_ctx_var.get()
@@ -36,11 +37,10 @@ class JsonLogFormatter(logging.Formatter):
         # Get the formatted message from the parent class
         formatted_message = super().format(record)
 
-        # Get the session_id from the context variable
+        # Get the session_id and the user_id from the context variable
         session_id = session_id_ctx_var.get()
         user_id = user_id_ctx_var.get()
 
-        # Add the session_id to the log message
         # We are using JSON format for the log message
         # Because google cloud logging expects JSON format
         # https://cloud.google.com/python/docs/reference/logging/latest/std-lib-integration#logging-json-payloads
@@ -50,6 +50,6 @@ class JsonLogFormatter(logging.Formatter):
             "logger_message": record.getMessage(),
             "user_id": user_id,
             "logger_name": record.name,
-            "session_id": session_id,
+            "session_id": str(session_id),
             "timestamp": record.asctime
         })
