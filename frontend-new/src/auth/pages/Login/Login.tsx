@@ -20,7 +20,9 @@ import RegistrationCodeFormModal from "src/invitations/components/RegistrationCo
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
-import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
+import {
+  userPreferencesStateService,
+} from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
 import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
 
 export const INVITATIONS_PARAM_NAME = "invite-code";
@@ -79,7 +81,6 @@ const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { isAuthenticationInProgress, updateUserByToken } = useContext(AuthContext);
-  const { updateUserPreferences } = useContext(UserPreferencesContext);
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
@@ -111,7 +112,8 @@ const Login: React.FC = () => {
         if(prefs === null){
           throw new Error("User preferences not found");
         }
-        updateUserPreferences(prefs);
+        // set the local preferences "state" ( for lack of a better word )
+        userPreferencesStateService.setUserPreferences(prefs);
         if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
           navigate(routerPaths.DPA, { replace: true });
         } else {
@@ -130,7 +132,7 @@ const Login: React.FC = () => {
         enqueueSnackbar(`An error occurred while trying to get your preferences: ${errorMessage}`, { variant: "error" });
       }
     },
-    [navigate, enqueueSnackbar, updateUserPreferences]
+    [navigate, enqueueSnackbar]
   );
 
   /**
@@ -151,7 +153,7 @@ const Login: React.FC = () => {
         setShowRegistrationCodeForm(true);
         return;
       }
-      updateUserPreferences(prefs);
+      userPreferencesStateService.setUserPreferences(prefs);
       await handlePostLogin(user);
     } catch (error) {
       let errorMessage;
@@ -165,7 +167,7 @@ const Login: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [enqueueSnackbar, updateUserPreferences, handlePostLogin]);
+  }, [enqueueSnackbar, handlePostLogin]);
 
   /**
    * A callback to create user preferences for a user, after they have entered a registration code
@@ -182,7 +184,7 @@ const Login: React.FC = () => {
           invitation_code: invitationCode,
         }
       );
-      updateUserPreferences(prefs);
+      userPreferencesStateService.setUserPreferences(prefs);
       await handlePostLogin(tempUser!);
     } catch (error) {
       let errorMessage;
@@ -197,7 +199,7 @@ const Login: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [enqueueSnackbar, handlePostLogin, tempUser, updateUserPreferences]);
+  }, [enqueueSnackbar, handlePostLogin, tempUser]);
 
   /* ------------------
   * Actual login handlers
@@ -278,7 +280,7 @@ const Login: React.FC = () => {
                 language: Language.en,
               }
             );
-            updateUserPreferences(prefs);
+            userPreferencesStateService.setUserPreferences(prefs);
             await handlePostLogin(_user);
         } else {
           // if a user cannot be gotten from the token, we have to throw an error
@@ -301,7 +303,7 @@ const Login: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [enqueueSnackbar, updateUserByToken, handlePostLogin, updateUserPreferences]
+    [enqueueSnackbar, updateUserByToken, handlePostLogin]
   );
 
   /**

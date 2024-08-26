@@ -4,11 +4,12 @@ import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
 import DataProtectionAgreement, { DATA_TEST_ID } from "./DataProtectionAgreement";
 import { HashRouter, useNavigate } from "react-router-dom";
 import { waitFor } from "@testing-library/react";
-import { Language, UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { TabiyaUser } from "src/auth/auth.types";
 import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
-import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
+import {
+  userPreferencesStateService,
+} from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
 import { AuthContext, authContextDefaultValue } from "src/auth/AuthProvider";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 
@@ -47,21 +48,6 @@ jest.mock("react-router-dom", () => {
 });
 
 describe("Testing Data Protection Policy component", () => {
-  const updateUserPreferencesMock = jest.fn();
-
-  const userPreferencesContextValue = {
-    getUserPreferences: jest.fn(),
-    createUserPreferences: jest.fn(),
-    updateUserPreferencesOnClient: jest.fn(),
-    userPreferences: {
-      accepted_tc: new Date(),
-      user_id: "0001",
-      language: Language.en,
-      sessions: [],
-    },
-    updateUserPreferences: updateUserPreferencesMock,
-    isLoading: false,
-  };
 
   beforeEach(() => {
     // Clear console mocks and mock functions
@@ -81,9 +67,7 @@ describe("Testing Data Protection Policy component", () => {
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <UserPreferencesContext.Provider value={userPreferencesContextValue}>
           <DataProtectionAgreement />
-        </UserPreferencesContext.Provider>
       </HashRouter>
     );
 
@@ -105,31 +89,15 @@ describe("Testing Data Protection Policy component", () => {
   });
 
   test("should successfully accept the data protection policy", async () => {
-    // GIVEN a user is logged in
-    const givenUser: TabiyaUser = {
-      id: "0001",
-      email: "foo@bar.baz",
-      name: "Foo Bar",
-    };
-    const newUserPreferences: UserPreference = {
-      user_id: givenUser.id,
-      language: Language.en,
-      accepted_tc: new Date(),
-      sessions: [],
-    };
-
-    // AND the user preferences provider will create the user preferences
-    updateUserPreferencesMock.mockImplementation((newUserPrefs, onSuccess, onError) => {
-      onSuccess(newUserPreferences);
-    });
+    // GIVEN the user preferences state service is mocked to set the user preferences
+    jest.spyOn(userPreferencesStateService, 'setUserPreferences')
+      .mockImplementation(() => {});
 
     // WHEN the component is rendered
     render(
       <HashRouter>
         <AuthContext.Provider value={authContextDefaultValue}>
-          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <DataProtectionAgreement />
-          </UserPreferencesContext.Provider>
+          <DataProtectionAgreement />
         </AuthContext.Provider>
       </HashRouter>
     );
@@ -162,9 +130,7 @@ describe("Testing Data Protection Policy component", () => {
     render(
       <HashRouter>
         <AuthContext.Provider value={{ ...authContextDefaultValue, user: givenUser }}>
-          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
             <DataProtectionAgreement />
-          </UserPreferencesContext.Provider>
         </AuthContext.Provider>
       </HashRouter>
     );

@@ -70,17 +70,6 @@ jest.mock("./theme/SnackbarProvider/SnackbarProvider", () => {
   };
 });
 
-// mock the UserPreferencesProvider
-jest.mock("./userPreferences/UserPreferencesProvider/UserPreferencesProvider", () => {
-  const mUserPreferencesProvider = jest
-    .fn()
-    .mockImplementation(({ children }) => <div data-testid="user-preferences-provider-id">{children}</div>);
-  return {
-    __esModule: true,
-    UserPreferencesProvider: mUserPreferencesProvider,
-  };
-});
-
 // mock the ViewPortWrapper
 jest.mock("src/app/ViewPortWrapper", () => {
   const mViewPortWrapper = jest.fn().mockImplementation(({ children }) => children);
@@ -134,10 +123,6 @@ describe("test the application bootstrapping", () => {
       // AND expect the email auth provider to be in the DOM and to be a child of the theme provider
       const authProviderElement = within(themeProviderElement).getByTestId("auth-provider-id");
       expect(authProviderElement).toBeInTheDocument();
-
-      // AND expect the user preferences provider to be in the DOM and to be a child of the theme provider
-      const userPreferencesProviderElement = within(themeProviderElement).getByTestId("user-preferences-provider-id");
-      expect(userPreferencesProviderElement).toBeInTheDocument();
 
       // AND expect the snackbar provider to be in the DOM and to be a child of the theme provider
       const snackbarProviderElement = within(themeProviderElement).getByTestId("snackbar-provider-id");

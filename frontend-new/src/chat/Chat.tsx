@@ -12,7 +12,9 @@ import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { ConversationMessage, ConversationMessageSender } from "./ChatService/ChatService.types";
-import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
+import {
+  userPreferencesStateService,
+} from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import ExperiencesDrawer from "src/Experiences/ExperiencesDrawer";
 import { Experience } from "src/Experiences/ExperienceService/Experiences.types";
@@ -45,7 +47,6 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const [initialized, setInitialized] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
-  const { userPreferences, updateUserPreferences } = useContext(UserPreferencesContext);
   const { user, clearUser } = useContext(AuthContext);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [experiences, setExperiences] = React.useState<Experience[]>([]);
@@ -57,10 +58,20 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
   const navigate = useNavigate();
 
+  /**
+   * adding a message to the end of the existing messages array
+   * @param message
+   */
   const addMessage = (message: IChatMessage) => {
     setMessages((prevMessages) => [...prevMessages, message]);
   };
 
+  /**
+   *  Send a message to compass through the chat service
+   *  @param userMessage - the message to send
+   *  @param session_id - the session id to use to send the message
+   *  @returns void
+   */
   const sendMessage = useCallback(async (userMessage: string, session_id?: number) => {
     const sent_at = new Date().toISOString(); // Generate current sent_at
     if (userMessage) {
@@ -108,6 +119,9 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     }
   }, []);
 
+  /**
+   * Log the user out and clear the preferences
+   */
   const handleLogout = useCallback(async () => {
     setIsLoggingOut(true);
     try {
@@ -115,8 +129,8 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       await logoutService.handleLogout();
       // clear the user from the context, and the persistent storage
       clearUser();
-      // clear the userPreferences from the context and persistent storage as well
-      updateUserPreferences(null);
+      // clear the userPreferences from the "state"
+      userPreferencesStateService.clearUserPreferences();
       navigate(routerPaths.LOGIN, { replace: true });
       enqueueSnackbar("Successfully logged out.", { variant: "success" });
     } catch (error) {
@@ -126,7 +140,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     } finally {
       setIsLoggingOut(false);
     }
-  }, [enqueueSnackbar, navigate, clearUser, updateUserPreferences]);
+  }, [enqueueSnackbar, navigate, clearUser]);
 
   const initializeChat = useCallback(
     async (session_id?: number) => {
@@ -187,17 +201,27 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   );
 
   useEffect(() => {
-    if (!initialized && userPreferences?.sessions?.length) {
-      initializeChat(userPreferences?.sessions[0]).then((_prefs) => setInitialized(true));
+    const userPreferences = userPreferencesStateService.getUserPreferences();
+    if(!userPreferences) {
+      return;
     }
-  }, [initializeChat, initialized, userPreferences?.sessions]);
+    if (!initialized && userPreferences.sessions.length) {
+      initializeChat(userPreferences.sessions[0]).then((_prefs) => setInitialized(true));
+    }
+  }, [initializeChat, initialized]);
 
   const handleSend = useCallback(async () => {
     if (currentMessage.trim()) {
       setCurrentMessage("");
-      await sendMessage(currentMessage, userPreferences?.sessions[0]);
+      const userPreferences = userPreferencesStateService.getUserPreferences();
+      if (!userPreferences?.sessions.length) {
+        console.error("User has no sessions");
+        enqueueSnackbar("Failed to send message", { variant: "error" });
+        return;
+      }
+      await sendMessage(currentMessage, userPreferences.sessions[0]);
     }
-  }, [currentMessage, sendMessage, userPreferences?.sessions]);
+  }, [currentMessage, sendMessage, enqueueSnackbar]);
 
   const startNewConversation = useCallback(async () => {
     try {
@@ -207,7 +231,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
       let user_preferences = await preferencesService.getNewSession(user?.id);
 
-      updateUserPreferences(user_preferences);
+      userPreferencesStateService.setUserPreferences(user_preferences);
 
       enqueueSnackbar("New conversation started", { variant: "success" });
 
@@ -216,13 +240,17 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     } catch (e) {
       console.error("Failed to start new conversation", e);
     }
-  }, [initializeChat, updateUserPreferences, enqueueSnackbar, user]);
+  }, [initializeChat, enqueueSnackbar, user]);
 
   const handleOpenExperiencesDrawer = async () => {
     setIsDrawerOpen(true);
     setIsLoading(true);
     try {
-      const experienceService = ExperienceService.getInstance(userPreferences?.sessions[0]!);
+      const userPreferences = userPreferencesStateService.getUserPreferences();
+      if (!userPreferences?.sessions.length) {
+        throw new Error("User has no sessions");
+      }
+      const experienceService = ExperienceService.getInstance(userPreferences.sessions[0]);
       const data = await experienceService.getExperiences();
       setExperiences(data);
       setIsLoading(false);

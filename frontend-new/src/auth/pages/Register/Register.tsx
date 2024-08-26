@@ -17,7 +17,9 @@ import { Language } from "src/userPreferences/UserPreferencesService/userPrefere
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import { logoutService } from "src/auth/services/logout/logout.service";
-import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
+import {
+  userPreferencesStateService,
+} from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
 import { StatusCodes } from "http-status-codes";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
@@ -55,7 +57,6 @@ const Register: React.FC = () => {
 
   const theme = useTheme();
   const { isAuthenticationInProgress, updateUserByToken } = useContext(AuthContext);
-  const { updateUserPreferences } = useContext(UserPreferencesContext);
 
   // a state to determine if the user is currently registering with email
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -116,7 +117,7 @@ const Register: React.FC = () => {
         if(prefs === null){
           throw new Error("User preferences not found");
         }
-        updateUserPreferences(prefs);
+        userPreferencesStateService.setUserPreferences(prefs);
         if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
           navigate(routerPaths.DPA, { replace: true });
         } else {
@@ -137,7 +138,7 @@ const Register: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [navigate, enqueueSnackbar, updateUserPreferences]
+    [navigate, enqueueSnackbar]
   );
 
   /* ------------
@@ -176,7 +177,7 @@ const Register: React.FC = () => {
                 language: Language.en,
               }
             );
-            updateUserPreferences(prefs);
+            userPreferencesStateService.setUserPreferences(prefs);
             enqueueSnackbar("Verification Email Sent!", { variant: "success" });
             // IMPORTANT NOTE: after the preferences are added, or fail to be added, we should log the user out immediately,
             // since if we don't do that, the user may be able to access the application without verifying their email
@@ -213,7 +214,6 @@ const Register: React.FC = () => {
       isInvitationCodeValid,
       registrationCode,
       updateUserByToken,
-      updateUserPreferences,
     ]
   );
 
@@ -232,7 +232,7 @@ const Register: React.FC = () => {
           language: Language.en,
         }
       );
-      updateUserPreferences(prefs);
+      userPreferencesStateService.setUserPreferences(prefs);
       // We use postLoginHandler because a social registration is parallel to a login
       // and the postLoginHandler is used to handle the post login actions
       await handlePostLogin(user);

@@ -11,7 +11,6 @@ import {
   UpdateUserPreferencesSpec,
   UserPreference,
 } from "./userPreferences.types";
-import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
 const setupFetchSpy = setupAPIServiceSpy;
 
@@ -82,9 +81,6 @@ describe("UserPreferencesService", () => {
 
       // AND expect it to return the user preferences
       expect(actualUserPreferences).toEqual(givenResponseBody);
-
-      // AND expect the service to have set the user preferences in the persistent storage
-      expect(PersistentStorageService.setUserPreferences).toHaveBeenCalledWith(givenResponseBody);
     });
 
     test("on fail to fetch, getUserPreferences should reject with the expected service error", async () => {
@@ -177,9 +173,6 @@ describe("UserPreferencesService", () => {
 
       // AND expect it to return the user preferences
       expect(actualUserPreferences).toEqual(givenUserPreferences);
-
-      // AND expect the service to have set the user preferences in the persistent storage
-      expect(PersistentStorageService.setUserPreferences).toHaveBeenCalledWith(givenUserPreferences);
     });
 
     test("on fail to fetch, updateUserPreferences should reject with the expected service error", async () => {
@@ -289,9 +282,6 @@ describe("UserPreferencesService", () => {
       }
 
       expect(actualUserPreferences).toEqual(expectedUserPreferences);
-
-      // AND expect the service to have set the user preferences in the persistent storage
-      expect(PersistentStorageService.setUserPreferences).toHaveBeenCalledWith(actualUserPreferences);
     });
 
     test("on fail to fetch, createUserPreferences should reject with the expected service error", async () => {

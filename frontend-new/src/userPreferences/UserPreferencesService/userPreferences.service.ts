@@ -3,7 +3,6 @@ import { CreateUserPreferencesSpec, UpdateUserPreferencesSpec, UserPreference } 
 import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import { getBackendUrl } from "src/envService";
-import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { fetchWithAuth } from "src/utils/fetchWithAuth/fetchWithAuth";
 
 export default class UserPreferencesService {
@@ -111,7 +110,6 @@ export default class UserPreferencesService {
     });
     const responseBody = await response.text();
     const userPreferencesResponse: UserPreference = this.parseJsonResponse(responseBody, errorFactory);
-    PersistentStorageService.setUserPreferences(userPreferencesResponse);
     return userPreferencesResponse;
   }
 
@@ -147,7 +145,6 @@ export default class UserPreferencesService {
     });
     const responseBody = await response.text();
     const userPreferencesResponse: UserPreference = this.parseJsonResponse(responseBody, errorFactory);
-    PersistentStorageService.setUserPreferences(userPreferencesResponse);
     return userPreferencesResponse;
   }
 
@@ -187,7 +184,6 @@ export default class UserPreferencesService {
 
     const responseBody = await response.text();
     const userPreferencesResponse: UserPreference = this.parseJsonResponse(responseBody, errorFactory);
-    PersistentStorageService.setUserPreferences(userPreferencesResponse);
     return userPreferencesResponse;
   }
 
@@ -219,7 +215,6 @@ export default class UserPreferencesService {
 
     const responseBody = await response.text();
     const userPreferencesResponse: UserPreference = this.parseJsonResponse(responseBody, errorFactory);
-    PersistentStorageService.setUserPreferences(userPreferencesResponse);
     return userPreferencesResponse;
   }
 }

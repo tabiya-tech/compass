@@ -6,7 +6,6 @@ import reportWebVitals from "src/reportWebVitals";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import applicationTheme, { ThemeMode } from "src/theme/applicationTheme/applicationTheme";
 import SnackbarProvider from "src/theme/SnackbarProvider/SnackbarProvider";
-import { UserPreferencesProvider } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 import { IsOnlineProvider } from "src/app/isOnlineProvider/IsOnlineProvider";
 import ViewPortWrapper from "src/app/ViewPortWrapper";
 import { HashRouter } from "react-router-dom";
@@ -25,13 +24,11 @@ root.render(
         <SnackbarProvider>
           <IsOnlineProvider>
             <AuthProvider>
-              <UserPreferencesProvider>
-                <ViewPortWrapper>
-                  <HashRouter>
-                    <App />
-                  </HashRouter>
-                </ViewPortWrapper>
-              </UserPreferencesProvider>
+              <ViewPortWrapper>
+                <HashRouter>
+                  <App />
+                </HashRouter>
+              </ViewPortWrapper>
             </AuthProvider>
           </IsOnlineProvider>
         </SnackbarProvider>

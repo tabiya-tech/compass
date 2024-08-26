@@ -18,9 +18,6 @@ import "@fontsource/roboto/700.css";
 */
 import type { Preview } from "@storybook/react";
 import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
-import {
-  UserPreferencesContext,
-} from "../src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 import { IsOnlineContext } from "../src/app/isOnlineProvider/IsOnlineProvider";
 import { AuthContext } from "../src/auth/AuthProvider";
 
@@ -74,12 +71,6 @@ export const decorators = [
   (Story, context) => {
   const isOnline = context.globals.online;
 
-  const userPreferencesValue = {
-    userPreferences: {
-      sessions: [1234]
-    }
-  }
-
   const authContextDefaultValue = {
     user: null,
     updateUserByToken: () => null,
@@ -92,16 +83,14 @@ export const decorators = [
     <Router>
       <IsOnlineContext.Provider value={isOnline}>
         <AuthContext.Provider value={authContextDefaultValue}>
-            <UserPreferencesContext.Provider value={userPreferencesValue}>
-              <CssBaseline />
-              <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
-                <SnackbarProvider>
-                  <div style={{ height: "100vh" }}>
-                    <Story />
-                  </div>
-                </SnackbarProvider>
-              </ThemeProvider>
-            </UserPreferencesContext.Provider>
+          <CssBaseline />
+            <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
+              <SnackbarProvider>
+                <div style={{ height: "100vh" }}>
+                  <Story />
+                </div>
+              </SnackbarProvider>
+            </ThemeProvider>
           </AuthContext.Provider>
       </IsOnlineContext.Provider>
     </Router>

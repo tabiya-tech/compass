@@ -7,7 +7,6 @@ import applicationTheme, { ThemeMode } from "src/theme/applicationTheme/applicat
 // Import the Firebase mock utilities
 import "src/_test_utilities/firebaseMock";
 import SnackbarProvider from "src/theme/SnackbarProvider/SnackbarProvider";
-import { UserPreferencesProvider } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
 import { IsOnlineProvider } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { AuthContext } from "src/auth/AuthProvider";
 jest.mock("firebase/compat/app", () => {
@@ -52,9 +51,7 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
     <IsOnlineProvider>
       <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
         <AuthContext.Provider value={defaultAuthContextValue}>
-          <UserPreferencesProvider>
-            <SnackbarProvider>{children}</SnackbarProvider>
-          </UserPreferencesProvider>
+          <SnackbarProvider>{children}</SnackbarProvider>
         </AuthContext.Provider>
       </ThemeProvider>
     </IsOnlineProvider>

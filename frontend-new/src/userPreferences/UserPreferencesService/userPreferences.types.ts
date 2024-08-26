@@ -21,9 +21,3 @@ export enum Language {
   en = "en",
   // fr = 'fr', // French in the future
 }
-
-export type UserPreferencesContextValue = {
-  userPreferences: UserPreference | null;
-  isLoading: boolean;
-  updateUserPreferences: (userPreferences: UserPreference | null) => void;
-};
