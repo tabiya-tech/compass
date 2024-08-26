@@ -6,13 +6,11 @@ import { HashRouter, useNavigate } from "react-router-dom";
 import { waitFor } from "@testing-library/react";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { TabiyaUser } from "src/auth/auth.types";
-import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 import {
   userPreferencesStateService,
 } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
-import { AuthContext, authContextDefaultValue } from "src/auth/AuthProvider";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
-
+import authStateService from "src/auth/AuthStateService";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -56,8 +54,6 @@ describe("Testing Data Protection Policy component", () => {
     jest.clearAllMocks();
   });
 
-  beforeAll(() => mockUseTokens());
-
   beforeEach(() => {
     const mockDate = new Date(2023, 5, 14); // June 14, 2023
     jest.spyOn(global, "Date").mockImplementation(() => mockDate);
@@ -96,9 +92,7 @@ describe("Testing Data Protection Policy component", () => {
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <AuthContext.Provider value={authContextDefaultValue}>
-          <DataProtectionAgreement />
-        </AuthContext.Provider>
+        <DataProtectionAgreement />
       </HashRouter>
     );
 
@@ -126,12 +120,14 @@ describe("Testing Data Protection Policy component", () => {
     jest.spyOn(userPreferencesService, 'updateUserPreferences')
       .mockRejectedValue(new Error("Failed to update user preferences"));
 
+    // AND the authStateService is mocked to return the given user
+    jest.spyOn(authStateService, 'getUser')
+      .mockImplementation(() => givenUser);
+
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <AuthContext.Provider value={{ ...authContextDefaultValue, user: givenUser }}>
-            <DataProtectionAgreement />
-        </AuthContext.Provider>
+        <DataProtectionAgreement />
       </HashRouter>
     );
 

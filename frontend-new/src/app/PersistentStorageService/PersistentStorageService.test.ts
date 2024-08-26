@@ -10,56 +10,6 @@ describe("AuthPersistentStorage class tests", () => {
     PersistentStorageService.clear();
   });
 
-  describe("token tests", () => {
-    test("return correct previously set token", () => {
-      // GIVEN The token is stored in the session storage
-      const givenToken = "foo";
-      PersistentStorageService.setToken(givenToken);
-
-      // WHEN The token is retrieved
-      const Token = PersistentStorageService.getToken();
-
-      // THEN The token should be returned
-      expect(Token).toEqual(givenToken);
-    });
-
-    test("return null if token is not set", () => {
-      // GIVEN The token is not stored in the session storage
-      // Nothing set
-
-      // WHEN The token is retrieved
-      const Token = PersistentStorageService.getToken();
-
-      // THEN null should be returned
-      expect(Token).toBeNull();
-    });
-
-    test("clear token", () => {
-      // GIVEN The token is stored in the session storage
-      const givenToken = "foo";
-      PersistentStorageService.setToken(givenToken);
-
-      // WHEN The token is cleared
-      PersistentStorageService.clearToken();
-
-      // THEN The token should be cleared (null)
-      const Token = PersistentStorageService.getToken();
-      expect(Token).toBeNull();
-    });
-
-    test("set token", () => {
-      // GIVEN The token is not stored in the session storage
-      const givenToken = "foo";
-
-      // WHEN The token is set
-      PersistentStorageService.setToken(givenToken);
-
-      // THEN The token should be stored
-      const Token = PersistentStorageService.getToken();
-      expect(Token).toEqual(givenToken);
-    });
-  });
-
   describe("invitation tests", () => {
     test("return correct previously set invitation", () => {
       // GIVEN The invitation is stored in the session storage
@@ -270,18 +220,5 @@ describe("AuthPersistentStorage class tests", () => {
       // THEN the item should be removed from localStorage
       expect(localStorage.getItem(key)).toBeNull();
     });
-  });
-
-  test("clear all tokens", () => {
-    // GIVEN The token is stored in the session storage
-    const givenID = "foo";
-    PersistentStorageService.setToken(givenID);
-
-    // WHEN The token is cleared
-    PersistentStorageService.clear();
-
-    // THEN The token should be cleared (null)
-    const Token = PersistentStorageService.getToken();
-    expect(Token).toBeNull();
   });
 });

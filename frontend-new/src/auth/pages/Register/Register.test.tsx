@@ -4,16 +4,16 @@ import { render, screen, waitFor, act, fireEvent } from "src/_test_utilities/tes
 import { HashRouter } from "react-router-dom";
 import Register, { DATA_TEST_ID } from "./Register";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 import RegisterWithEmailForm from "src/auth/pages/Register/components/RegisterWithEmailForm/RegisterWithEmailForm";
 import { DATA_TEST_ID as AUTH_HEADER_DATA_TEST_ID } from "src/auth/components/AuthHeader/AuthHeader";
-import { AuthContext, AuthContextValue, TabiyaUser } from "src/auth/AuthProvider";
 import { emailAuthService } from "src/auth/services/emailAuth/EmailAuth.service";
 import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { logoutService } from "src/auth/services/logout/logout.service";
+import authStateService from "../../AuthStateService";
+import { TabiyaUser } from "../../auth.types";
 
 //mock the SocialAuth component
 jest.mock("src/auth/components/SocialAuth/SocialAuth", () => {
@@ -87,23 +87,12 @@ jest.mock("src/auth/components/AuthHeader/AuthHeader", () => {
 });
 
 describe("Testing Register component", () => {
-  const updateUserByTokenMock = jest.fn();
-  const authContextValue: AuthContextValue = {
-    user: null,
-    updateUserByToken: updateUserByTokenMock,
-    clearUser: jest.fn(),
-    isAuthenticationInProgress: false,
-    isAuthenticated: false,
-  };
-
   beforeEach(() => {
     // Clear console mocks and mock functions
     (console.error as jest.Mock).mockClear();
     (console.warn as jest.Mock).mockClear();
     jest.clearAllMocks();
   });
-
-  beforeAll(() => mockUseTokens());
 
   test("it should show register form successfully", async () => {
     // GIVEN a user to register
@@ -123,9 +112,7 @@ describe("Testing Register component", () => {
     // WHEN the component is rendered within the AuthContext and Router
     render(
       <HashRouter>
-        <AuthContext.Provider value={authContextValue}>
-          <Register />
-        </AuthContext.Provider>
+        <Register />
       </HashRouter>
     );
 
@@ -185,7 +172,7 @@ describe("Testing Register component", () => {
       "foo-bar-token"
     );
 
-    updateUserByTokenMock.mockImplementation((token) => {
+    jest.spyOn(authStateService, "updateUserByToken").mockImplementation((token) => {
       return { email: givenEmail, name: givenName } as TabiyaUser;
     });
 
@@ -201,9 +188,7 @@ describe("Testing Register component", () => {
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <AuthContext.Provider value={authContextValue}>
-          <Register />
-        </AuthContext.Provider>
+        <Register />
       </HashRouter>
     );
 
@@ -253,9 +238,7 @@ describe("Testing Register component", () => {
     // WHEN the register form is submitted
     render(
       <HashRouter>
-        <AuthContext.Provider value={authContextValue}>
-          <Register />
-        </AuthContext.Provider>
+        <Register />
       </HashRouter>
     );
 
@@ -293,9 +276,7 @@ describe("Testing Register component", () => {
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <AuthContext.Provider value={authContextValue}>
-          <Register />
-        </AuthContext.Provider>
+        <Register />
       </HashRouter>
     );
 

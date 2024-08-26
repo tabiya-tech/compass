@@ -4,7 +4,6 @@ import "src/_test_utilities/consoleMock";
 import React from "react";
 import { render, screen } from "src/_test_utilities/test-utils";
 import PrimaryIconButton from "./PrimaryIconButton";
-import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 
 describe("PrimaryIconButton tests", () => {
   beforeEach(() => {
@@ -12,8 +11,6 @@ describe("PrimaryIconButton tests", () => {
     (console.warn as jest.Mock).mockClear();
     jest.clearAllMocks();
   });
-
-  beforeAll(() => mockUseTokens());
 
   test("should render the icon button with default props", () => {
     // GIVEN a PrimaryIconButton component

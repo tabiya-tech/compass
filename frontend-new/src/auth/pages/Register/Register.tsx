@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Box, Container, Divider, styled, TextField, Typography, useTheme } from "@mui/material";
 import { NavLink as RouterNavLink, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -8,7 +8,6 @@ import RegisterWithEmailForm from "src/auth/pages/Register/components/RegisterWi
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
-import { AuthContext, TabiyaUser } from "src/auth/AuthProvider";
 import { emailAuthService } from "src/auth/services/emailAuth/EmailAuth.service";
 import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
@@ -21,6 +20,8 @@ import {
   userPreferencesStateService,
 } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
 import { StatusCodes } from "http-status-codes";
+import authStateService from "src/auth/AuthStateService";
+import { TabiyaUser } from "src/auth/auth.types";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -56,7 +57,6 @@ const Register: React.FC = () => {
   const [registrationCode, setRegistrationCode] = useState<string>("");
 
   const theme = useTheme();
-  const { isAuthenticationInProgress, updateUserByToken } = useContext(AuthContext);
 
   // a state to determine if the user is currently registering with email
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -166,7 +166,7 @@ const Register: React.FC = () => {
           password,
           name
         );
-        const _user = updateUserByToken(token);
+        const _user = authStateService.updateUserByToken(token);
         if (_user) {
             // create user preferences for the first time.
             // in order to do this, there needs to be a logged in user in the persistent storage
@@ -188,7 +188,7 @@ const Register: React.FC = () => {
             navigate(routerPaths.VERIFY_EMAIL, { replace: true });
           } else {
            // if a user cannot be gotten from the token, we should throw an error
-           throw new Error("Something went wrong while logging in. Please try again.");
+           throw new Error("Something went wrong while registering. Please try again.");
         }
       } catch (e: any) {
         let errorMessage;
@@ -213,7 +213,6 @@ const Register: React.FC = () => {
       setIsLoading,
       isInvitationCodeValid,
       registrationCode,
-      updateUserByToken,
     ]
   );
 
@@ -260,7 +259,7 @@ const Register: React.FC = () => {
   * aggregated states for loading and disabling ui
   */
   // register form is in the loading state if the auth context is loading, or if the user is registering with either of the methods
-  const isRegisterLoading = isAuthenticationInProgress || isLoading;
+  const isRegisterLoading = isLoading;
 
   return (
     <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.REGISTER_CONTAINER}>

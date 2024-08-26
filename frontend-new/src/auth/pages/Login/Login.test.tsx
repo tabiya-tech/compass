@@ -6,7 +6,6 @@ import Login, { DATA_TEST_ID } from "./Login";
 import LoginWithEmailForm from "src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm";
 import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm";
 import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
-import { AuthContext, AuthContextValue } from "src/auth/AuthProvider";
 import { EmailAuthService } from "src/auth/services/emailAuth/EmailAuth.service";
 import { AnonymousAuthService } from "src/auth/services/anonymousAuth/AnonymousAuth.service";
 import InvitationsService from "src/invitations/InvitationsService/invitations.service";
@@ -87,21 +86,11 @@ describe("Testing Login component", () => {
     jest.clearAllMocks();
   });
 
-  const authContextValue: AuthContextValue = {
-    user: null,
-    updateUserByToken: jest.fn(),
-    clearUser: jest.fn(),
-    isAuthenticationInProgress: false,
-    isAuthenticated: false,
-  };
-
   test("it should show login form successfully", async () => {
     // GIVEN the component is rendered within necessary context providers
     render(
       <HashRouter>
-        <AuthContext.Provider value={authContextValue}>
           <Login />
-        </AuthContext.Provider>
       </HashRouter>
     );
 
@@ -135,9 +124,7 @@ describe("Testing Login component", () => {
 
     render(
       <HashRouter>
-        <AuthContext.Provider value={authContextValue}>
           <Login />
-        </AuthContext.Provider>
       </HashRouter>
     );
 
@@ -174,9 +161,7 @@ describe("Testing Login component", () => {
 
     render(
       <HashRouter>
-        <AuthContext.Provider value={authContextValue}>
           <Login />
-        </AuthContext.Provider>
       </HashRouter>
     );
 

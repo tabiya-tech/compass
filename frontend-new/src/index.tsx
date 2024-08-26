@@ -9,7 +9,6 @@ import SnackbarProvider from "src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineProvider } from "src/app/isOnlineProvider/IsOnlineProvider";
 import ViewPortWrapper from "src/app/ViewPortWrapper";
 import { HashRouter } from "react-router-dom";
-import { AuthProvider } from "./auth/AuthProvider";
 
 // Currently the fonts are downloaded from Google via the index.css
 // Fonts could be distributed with the app instead, by explicitly importing them here
@@ -23,13 +22,11 @@ root.render(
       <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
         <SnackbarProvider>
           <IsOnlineProvider>
-            <AuthProvider>
-              <ViewPortWrapper>
-                <HashRouter>
-                  <App />
-                </HashRouter>
-              </ViewPortWrapper>
-            </AuthProvider>
+            <ViewPortWrapper>
+              <HashRouter>
+                <App />
+              </HashRouter>
+            </ViewPortWrapper>
           </IsOnlineProvider>
         </SnackbarProvider>
       </ThemeProvider>

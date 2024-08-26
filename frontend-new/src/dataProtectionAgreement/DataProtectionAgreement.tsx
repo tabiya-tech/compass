@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Box, Container, styled, Typography } from "@mui/material";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Language, UpdateUserPreferencesSpec } from "src/userPreferences/UserPreferencesService/userPreferences.types";
@@ -10,10 +10,10 @@ import LanguageContextMenu from "src/i18n/languageContextMenu/LanguageContextMen
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "src/auth/AuthProvider";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { routerPaths } from "src/app/routerPaths";
 import { userPreferencesStateService } from "../userPreferences/UserPreferencesProvider/UserPreferencesStateService";
+import authStateService from "../auth/AuthStateService";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
@@ -36,13 +36,13 @@ export const DATA_TEST_ID = {
 const DataProtectionAgreement: React.FC = () => {
   const navigate = useNavigate();
   const [isAcceptingDPA, setIsAcceptingDPA] = useState(false);
-  const { user } = useContext(AuthContext);
   const { enqueueSnackbar } = useSnackbar();
   /**
    * Persist the user's chosen preferences to the backend
    */
   const persistUserPreferences = useCallback(async () => {
     try {
+      const user = authStateService.getUser();
       if (!user) {
         enqueueSnackbar("User not found", { variant: "error" });
         navigate(routerPaths.LOGIN)
@@ -72,7 +72,7 @@ const DataProtectionAgreement: React.FC = () => {
     } finally {
       setIsAcceptingDPA(false);
     }
-  }, [user, enqueueSnackbar, navigate]);
+  }, [enqueueSnackbar, navigate]);
 
   /**
    * Handle when a user accepts the data protection agreement

@@ -48,17 +48,6 @@ jest.mock("@mui/material", () => {
   };
 });
 
-// mock EmailAuthProvider
-jest.mock("./auth/AuthProvider", () => {
-  const mAuthProvider = jest
-    .fn()
-    .mockImplementation(({ children }) => <div data-testid="auth-provider-id">{children}</div>);
-  return {
-    __esModule: true,
-    AuthProvider: mAuthProvider,
-  };
-});
-
 // mock SnackbarProvider
 jest.mock("./theme/SnackbarProvider/SnackbarProvider", () => {
   const mSnackbarProvider = jest
@@ -119,10 +108,6 @@ describe("test the application bootstrapping", () => {
       // AND expect the css baseline to be in the DOM
       const cssBaselineElement = screen.getByTestId("css-baseline-id");
       expect(cssBaselineElement).toBeInTheDocument();
-
-      // AND expect the email auth provider to be in the DOM and to be a child of the theme provider
-      const authProviderElement = within(themeProviderElement).getByTestId("auth-provider-id");
-      expect(authProviderElement).toBeInTheDocument();
 
       // AND expect the snackbar provider to be in the DOM and to be a child of the theme provider
       const snackbarProviderElement = within(themeProviderElement).getByTestId("snackbar-provider-id");

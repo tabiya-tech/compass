@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ChatService from "src/chat/ChatService/ChatService";
 import ChatList from "src/chat/ChatList/ChatList";
 import { IChatMessage } from "./Chat.types";
@@ -21,9 +21,9 @@ import { Experience } from "src/Experiences/ExperienceService/Experiences.types"
 import ExperienceService from "src/Experiences/ExperienceService/ExperienceService";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import InactiveBackdrop from "src/theme/Backdrop/InactiveBackdrop";
-import { AuthContext } from "src/auth/AuthProvider";
 import { logoutService } from "src/auth/services/logout/logout.service";
 import ApproveModal from "src/theme/ApproveModal/ApproveModal";
+import authStateService from "../auth/AuthStateService";
 
 const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -47,7 +47,6 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const [initialized, setInitialized] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
-  const { user, clearUser } = useContext(AuthContext);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [experiences, setExperiences] = React.useState<Experience[]>([]);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
@@ -128,7 +127,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       // Call the logout service to handle the logout based on the current login method
       await logoutService.handleLogout();
       // clear the user from the context, and the persistent storage
-      clearUser();
+      await authStateService.clearUser();
       // clear the userPreferences from the "state"
       userPreferencesStateService.clearUserPreferences();
       navigate(routerPaths.LOGIN, { replace: true });
@@ -140,7 +139,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     } finally {
       setIsLoggingOut(false);
     }
-  }, [enqueueSnackbar, navigate, clearUser]);
+  }, [enqueueSnackbar, navigate]);
 
   const initializeChat = useCallback(
     async (session_id?: number) => {
@@ -225,6 +224,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
   const startNewConversation = useCallback(async () => {
     try {
+      const user = authStateService.getUser()
       if (!user?.id) return;
 
       const preferencesService = new UserPreferencesService();
@@ -240,7 +240,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     } catch (e) {
       console.error("Failed to start new conversation", e);
     }
-  }, [initializeChat, enqueueSnackbar, user]);
+  }, [initializeChat, enqueueSnackbar]);
 
   const handleOpenExperiencesDrawer = async () => {
     setIsDrawerOpen(true);

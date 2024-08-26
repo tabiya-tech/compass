@@ -5,12 +5,12 @@ import { TabiyaUser } from "src/auth/auth.types";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { Box, Button, Typography } from "@mui/material";
 import { socialAuthService } from "src/auth/services/socialAuth/SocialAuth.service";
-import { AuthContext } from "src/auth/AuthProvider";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
 import { GoogleIcon } from "src/theme/Icons/GoogleIcon";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
+import authStateService from "src/auth/AuthStateService";
 
 const uniqueId = "f0324e97-83fd-49e6-95c3-1043751fa1db";
 export const DATA_TEST_ID = {
@@ -37,7 +37,6 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
   isLoading,
 }) => {
   const isOnline = useContext(IsOnlineContext);
-  const { isAuthenticationInProgress, updateUserByToken } = useContext(AuthContext);
 
   const { enqueueSnackbar } = useSnackbar();
   const [loginInProgress, setLoginInProgress] = useState(false);
@@ -58,7 +57,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       }
 
       const token = await socialAuthService.handleLoginWithGoogle();
-      const _user = updateUserByToken(token);
+      const _user = authStateService.updateUserByToken(token);
       if (_user) {
         postLoginHandler(_user);
       } else {
@@ -82,9 +81,9 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
     } finally {
       setLoginInProgress(false);
     }
-  }, [enqueueSnackbar, postLoginHandler, preLoginCheck, updateUserByToken]);
+  }, [enqueueSnackbar, postLoginHandler, preLoginCheck]);
 
-  const socialAuthLoading = isLoading || isAuthenticationInProgress || loginInProgress || !isOnline || disabled;
+  const socialAuthLoading = isLoading || loginInProgress || !isOnline || disabled;
 
   return (
     <Box

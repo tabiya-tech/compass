@@ -1,10 +1,8 @@
-import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 import { render, screen } from "src/_test_utilities/test-utils";
 import React from "react";
 import LanguageContextMenu, { DATA_TEST_ID } from "./LanguageContextMenu";
 
 describe("LanguageContextMenu", () => {
-  beforeAll(() => mockUseTokens());
   it("should render the LanguageContextMenu with the default props", () => {
     // GIVEN the component is rendered
     render(<LanguageContextMenu />);

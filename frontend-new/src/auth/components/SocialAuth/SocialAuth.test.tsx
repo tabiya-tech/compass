@@ -4,12 +4,10 @@ import { render, waitFor, screen } from "src/_test_utilities/test-utils";
 import SocialAuth, { DATA_TEST_ID } from "./SocialAuth";
 import { HashRouter } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
-import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { socialAuthService } from "src/auth/services/socialAuth/SocialAuth.service";
 import { act } from "@testing-library/react";
-import { AuthContextValue } from "src/auth/auth.types";
-import { AuthContext } from "src/auth/AuthProvider";
+import authStateService from "../../AuthStateService";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -59,8 +57,6 @@ describe("SocialAuth tests", () => {
     jest.clearAllMocks();
   });
 
-  beforeAll(() => mockUseTokens());
-
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -68,16 +64,6 @@ describe("SocialAuth tests", () => {
   beforeEach(() => {
     unmockBrowserIsOnLine();
   });
-
-  let updateUserWithTokenMock = jest.fn();
-
-  const authContextValue: AuthContextValue = {
-    user: null,
-    updateUserByToken: updateUserWithTokenMock,
-    clearUser: jest.fn(),
-    isAuthenticationInProgress: false,
-    isAuthenticated: false,
-  };
 
   test("should render the SocialAuth component", () => {
     // GIVEN a SocialAuth component
@@ -112,21 +98,14 @@ describe("SocialAuth tests", () => {
       // AND the sign-in is successful
       (socialAuthService.handleLoginWithGoogle as jest.Mock).mockResolvedValue(givenToken);
       // AND the AuthProvider updates the user successully
-      updateUserWithTokenMock = jest.fn().mockImplementation((token: string) => {
+      jest.spyOn(authStateService, "updateUserByToken").mockImplementation((token: string) => {
         return givenUser;
       });
 
       // WHEN the component is rendered
       render(
         <HashRouter>
-          <AuthContext.Provider
-            value={{
-              ...authContextValue,
-              updateUserByToken: updateUserWithTokenMock,
-            }}
-          >
-            <SocialAuth preLoginCheck={() => true} postLoginHandler={givenNotifyOnLogin} isLoading={givenIsLoading} />
-          </AuthContext.Provider>
+          <SocialAuth preLoginCheck={() => true} postLoginHandler={givenNotifyOnLogin} isLoading={givenIsLoading} />
         </HashRouter>
       );
       // AND the login button is clicked

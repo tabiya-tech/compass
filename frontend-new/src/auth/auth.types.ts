@@ -30,8 +30,6 @@ export type AuthContextValue = {
   user: TabiyaUser | null;
   updateUserByToken: (token: string) => TabiyaUser | null;
   clearUser: () => void;
-  isAuthenticationInProgress: boolean;
-  isAuthenticated: boolean;
 };
 
 export enum AuthServices {

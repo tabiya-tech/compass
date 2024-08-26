@@ -1,11 +1,11 @@
-import React, { useContext, useEffect } from "react";
+import React from "react";
 import { Navigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import {
   userPreferencesStateService,
 } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
-import { AuthContext } from "src/auth/AuthProvider";
 import { isValid } from "date-fns";
+import authStateService from "src/auth/AuthStateService";
 
 interface ProtectedRouteProps {
   authenticationAndDPARequired: boolean;
@@ -13,13 +13,9 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ authenticationAndDPARequired, children }) => {
-  const { user } = useContext(AuthContext);
+  const user = authStateService.getUser()
   const userPreferences = userPreferencesStateService.getUserPreferences();
   const isAcceptedTCValid = userPreferences?.accepted_tc && isValid(new Date(userPreferences.accepted_tc));
-
-  useEffect(() => {
-    if(user) userPreferencesStateService.loadPreferences(user?.id)
-  }, [user]);
 
   if (authenticationAndDPARequired && (!user || !isAcceptedTCValid)) {
     // if the user is not found or the terms and conditions aren't accepted

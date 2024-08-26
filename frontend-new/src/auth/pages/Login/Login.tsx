@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Box, CircularProgress, Container, Divider, styled, Typography, useTheme } from "@mui/material";
 import { NavLink as RouterNavLink, useLocation, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -13,7 +13,6 @@ import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginW
 import { validatePassword } from "src/auth/utils/validatePassword";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
-import { AuthContext, TabiyaUser } from "src/auth/AuthProvider";
 import { emailAuthService } from "src/auth/services/emailAuth/EmailAuth.service";
 import { anonymousAuthService } from "src/auth/services/anonymousAuth/AnonymousAuth.service";
 import RegistrationCodeFormModal from "src/invitations/components/RegistrationCodeFormModal/RegistrationCodeFormModal";
@@ -24,6 +23,8 @@ import {
   userPreferencesStateService,
 } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
 import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
+import authStateService from "src/auth/AuthStateService";
+import { TabiyaUser } from "src/auth/auth.types";
 
 export const INVITATIONS_PARAM_NAME = "invite-code";
 
@@ -80,7 +81,6 @@ const Login: React.FC = () => {
   // a state to keep track of whether the login process is loading
   const [isLoading, setIsLoading] = useState(false);
 
-  const { isAuthenticationInProgress, updateUserByToken } = useContext(AuthContext);
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
@@ -224,7 +224,7 @@ const Login: React.FC = () => {
           email,
           password,
         );
-        const _user = updateUserByToken(token);
+        const _user = authStateService.updateUserByToken(token);
         if (_user) {
           await handlePostLogin(_user);
         } else {
@@ -248,7 +248,7 @@ const Login: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [enqueueSnackbar, updateUserByToken, handlePostLogin]
+    [enqueueSnackbar, handlePostLogin]
   );
 
   /**
@@ -269,7 +269,7 @@ const Login: React.FC = () => {
         enqueueSnackbar("Invitation code is valid", { variant: "success" });
         const token = await anonymousAuthService.handleAnonymousLogin(
         );
-        const _user = updateUserByToken(token);
+        const _user = authStateService.updateUserByToken(token);
         if (_user) {
             // create user preferences for the first time.
             // in order to do this, there needs to be a logged in user in the persistent storage
@@ -303,7 +303,7 @@ const Login: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [enqueueSnackbar, updateUserByToken, handlePostLogin]
+    [enqueueSnackbar, handlePostLogin]
   );
 
   /**
@@ -359,7 +359,7 @@ const Login: React.FC = () => {
   * aggregated states for loading and disabling ui
   */
   // login is loading when the authentication provider or any of the login methods return a loading state
-  const isLoginLoading = isAuthenticationInProgress || isLoading;
+  const isLoginLoading = isLoading;
   // login button is disabled when login is loading, or when there is no active Form, or the fields for the active form are not filled in
   const isLoginButtonDisabled = isLoginLoading || activeLoginForm === ActiveForm.NONE || ((!email || !password) && !inviteCode);
 

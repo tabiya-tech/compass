@@ -1,7 +1,5 @@
 import { Invitation } from "src/invitations/InvitationsService/invitations.types";
 
-export const TOKEN_KEY = "token";
-
 export const INVITATION_KEY = "invitation";
 
 export const LOGIN_METHOD_KEY = "login_method";
@@ -14,29 +12,6 @@ export const LOG_OUT_FLAG_KEY = "logged_out";
  */
 export class PersistentStorageService {
   static readonly storage = localStorage;
-
-  /**
-   * Returns the token from the storage
-   * @returns string | null - The token
-   */
-  static getToken(): string | null {
-    return this.storage.getItem(TOKEN_KEY);
-  }
-
-  /**
-   * Clears the token from the storage
-   */
-  static clearToken(): void {
-    this.storage.removeItem(TOKEN_KEY);
-  }
-
-  /**
-   * Sets the token in the storage
-   * @param token
-   */
-  static setToken(token: string): void {
-    this.storage.setItem(TOKEN_KEY, token);
-  }
 
   /**
    * Returns the user's invitation details from the storage
