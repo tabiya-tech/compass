@@ -11,6 +11,9 @@ import { AuthContext, AuthContextValue, TabiyaUser } from "src/auth/AuthProvider
 import { emailAuthService } from "src/auth/services/emailAuth/EmailAuth.service";
 import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
+import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { logoutService } from "src/auth/services/logout/logout.service";
 
 //mock the SocialAuth component
 jest.mock("src/auth/components/SocialAuth/SocialAuth", () => {
@@ -84,9 +87,10 @@ jest.mock("src/auth/components/AuthHeader/AuthHeader", () => {
 });
 
 describe("Testing Register component", () => {
+  const updateUserByTokenMock = jest.fn();
   const authContextValue: AuthContextValue = {
     user: null,
-    updateUserByToken: jest.fn(),
+    updateUserByToken: updateUserByTokenMock,
     clearUser: jest.fn(),
     isAuthenticationInProgress: false,
     isAuthenticated: false,
@@ -166,8 +170,6 @@ describe("Testing Register component", () => {
         givenEmail,
         givenPassword,
         givenName,
-        expect.any(Function),
-        expect.any(Function)
       );
     });
 
@@ -189,17 +191,22 @@ describe("Testing Register component", () => {
     const givenNotifyOnLogin = jest.fn();
     const givenIsLoading = false;
 
-    (emailAuthService.handleRegisterWithEmail as jest.Mock).mockImplementation(
-      (
-        email: string,
-        password: string,
-        name: string,
-        onSuccess: (user: TabiyaUser) => void,
-        onError: (error: Error) => void
-      ) => {
-        onSuccess({ id: "mock-id", email: givenEmail, name: givenName } as TabiyaUser);
-      }
+    (emailAuthService.handleRegisterWithEmail as jest.Mock).mockResolvedValue(
+      "foo-bar-token"
     );
+
+    updateUserByTokenMock.mockImplementation((token) => {
+      return { email: givenEmail, name: givenName } as TabiyaUser;
+    });
+
+    jest.spyOn(logoutService, "handleLogout").mockResolvedValue(undefined);
+
+    jest.spyOn(userPreferencesService, "createUserPreferences").mockResolvedValue({
+      user_id: "foo-bar",
+      language: Language.en,
+      sessions: [],
+      accepted_tc: new Date(),
+    });
 
     // WHEN the component is rendered
     render(
@@ -232,8 +239,6 @@ describe("Testing Register component", () => {
         givenEmail,
         givenPassword,
         givenName,
-        expect.any(Function),
-        expect.any(Function)
       );
     });
 
@@ -244,17 +249,9 @@ describe("Testing Register component", () => {
 
   test("it should show error message on failed registration", async () => {
     // GIVEN a failed registration
-    (emailAuthService.handleRegisterWithEmail as jest.Mock).mockImplementation(
-      (
-        email: string,
-        password: string,
-        name: string,
-        onSuccess: (user: TabiyaUser) => void,
-        onError: (error: Error) => void
-      ) => {
-        onError(new Error("An unexpected error occurred. Please try again later."));
-      }
-    );
+    (emailAuthService.handleRegisterWithEmail as jest.Mock).mockRejectedValue(
+      new Error("An unexpected error occurred. Please try again later.")
+    )
 
     const givenName = "Foo Bar";
     const givenEmail = "foo@bar.baz";
@@ -293,13 +290,11 @@ describe("Testing Register component", () => {
         givenEmail,
         givenPassword,
         givenName,
-        expect.any(Function),
-        expect.any(Function)
       );
     });
 
     // AND the error message should be displayed
-    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("An internal error has occurred.", { variant: "error" });
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Registration Failed: An unexpected error occurred. Please try again later.", { variant: "error" });
   });
 
   test("it should not call register when registration code is invalid", async () => {

@@ -165,7 +165,6 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
         errorMessage = (error as Error).message;
       }
       enqueueSnackbar(errorMessage, { variant: "error" });
-      console.error("Error during login");
     }
   }, [enqueueSnackbar, postLoginHandler, tempUser, updateUserPreferences]);
 
@@ -178,41 +177,40 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
    * @param password
    */
   const handleLoginWithEmail = useCallback(
-    (email: string, password: string) => {
-      const passwordValidationResult = validatePassword(password);
-      setPasswordError(passwordValidationResult);
+    async (email: string, password: string) => {
+      try {
+        const passwordValidationResult = validatePassword(password);
+        setPasswordError(passwordValidationResult);
 
-      if (passwordValidationResult === "" && email && password) {
-        setIsLoggingInWithEmail(true);
-        emailAuthService.handleLoginWithEmail(
-          email,
-          password,
-          async (token) => {
-            setIsLoggingInWithEmail(false);
-            try {
-              const _user = updateUserByToken(token);
-              if (_user) {
-                postLoginHandler(_user);
-              }
-            } catch (e) {
-              let errorMessage;
-              if (e instanceof FirebaseError) {
-                errorMessage = getUserFriendlyFirebaseErrorMessage(e);
-                writeFirebaseErrorToLog(e, console.error);
-              } else {
-                console.error(e);
-                errorMessage = (e as Error).message;
-              }
-              enqueueSnackbar(errorMessage, { variant: "error" });
-            }
-          },
-          (error) => {
-            setIsLoggingInWithEmail(false);
-            const shownError = getUserFriendlyFirebaseErrorMessage(error);
-            writeFirebaseErrorToLog(error, console.error);
-            enqueueSnackbar(shownError, { variant: "error" });
+        if (passwordValidationResult === "" && email && password) {
+          setIsLoggingInWithEmail(true);
+          const token = await emailAuthService.handleLoginWithEmail(
+            email,
+            password,
+          );
+          const _user = updateUserByToken(token);
+          if (_user) {
+            postLoginHandler(_user);
+          } else {
+            // if a user cannot be gotten from the token, we have to throw an error
+            throw new Error("Something went wrong while logging in. Please try again.");
           }
-        );
+        }
+      } catch (error) {
+        let errorMessage;
+        if (error instanceof ServiceError) {
+          errorMessage = getUserFriendlyErrorMessage(error as Error);
+          writeServiceErrorToLog(error, console.error);
+        } else if (error instanceof FirebaseError) {
+          errorMessage = getUserFriendlyFirebaseErrorMessage(error);
+          writeFirebaseErrorToLog(error, console.error);
+        } else {
+          console.error(error);
+          errorMessage = (error as Error).message;
+        }
+        enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
+      } finally {
+        setIsLoggingInWithEmail(false);
       }
     },
     [enqueueSnackbar, updateUserByToken, postLoginHandler]

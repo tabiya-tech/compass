@@ -155,8 +155,6 @@ describe("Testing Login component", () => {
       expect(handleLoginWithEmailSpy).toHaveBeenCalledWith(
         givenEmail,
         givenPassword,
-        expect.any(Function),
-        expect.any(Function)
       );
     });
   });

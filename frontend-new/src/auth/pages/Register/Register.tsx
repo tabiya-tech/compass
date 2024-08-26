@@ -6,7 +6,7 @@ import SocialAuth from "src/auth/components/SocialAuth/SocialAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import RegisterWithEmailForm from "src/auth/pages/Register/components/RegisterWithEmailForm/RegisterWithEmailForm";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
-import { getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
+import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
 import { AuthContext, TabiyaUser } from "src/auth/AuthProvider";
 import { emailAuthService } from "src/auth/services/emailAuth/EmailAuth.service";
@@ -121,58 +121,57 @@ const Register: React.FC<Readonly<RegisterProps>> = ({ postRegisterHandler, post
   const handleRegister = useCallback(
     async (name: string, email: string, password: string) => {
       setIsRegisteringWithEmail(true);
-      // check if the invitation code is valid before proceeding with the registration
-      const pass = await isInvitationCodeValid();
+      try {
+        // check if the invitation code is valid before proceeding with the registration
+        const pass = await isInvitationCodeValid();
 
-      if (!pass) {
-        setIsRegisteringWithEmail(false);
-        return;
-      }
-      await emailAuthService.handleRegisterWithEmail(
-        email,
-        password,
-        name,
-        async (token) => {
-          const _user = updateUserByToken(token);
-          if (_user) {
-            try {
-              // create user preferences for the first time.
-              // in order to do this, there needs to be a logged in user in the persistent storage
-              const prefs = await userPreferencesService.createUserPreferences(
-                {
-                  user_id: _user.id,
-                  invitation_code: registrationCode,
-                  language: Language.en,
-                }
-              );
-              updateUserPreferences(prefs);
-              enqueueSnackbar("Verification Email Sent!", { variant: "success" });
-              postRegisterHandler();
-              // IMPORTANT NOTE: after the preferences are added, or fail to be added, we should log the user out immediately,
-              // since if we don't do that, the user may be able to access the application without verifying their email
-              // or accepting the dpa.
-              await logoutService.handleLogout();
-            } catch (e: any) {
-              if (e instanceof ServiceError) {
-                writeServiceErrorToLog(e, console.error);
-              } else {
-                console.error(e);
-              }
-              const errorMessage = getUserFriendlyErrorMessage(e as Error);
-              enqueueSnackbar(`Failed to create preferences: ${errorMessage}`, { variant: "error" });
-            } finally {
-              setIsRegisteringWithEmail(false);
-            }
-          }
-        },
-        (e) => {
+        if (!pass) {
           setIsRegisteringWithEmail(false);
-          let errorMessage;
-          errorMessage = getUserFriendlyFirebaseErrorMessage(e);
-          writeFirebaseErrorToLog(e, console.error);
-          enqueueSnackbar(errorMessage, { variant: "error" });
+          return;
         }
-      );
+        const token = await emailAuthService.handleRegisterWithEmail(
+          email,
+          password,
+          name
+        );
+        const _user = updateUserByToken(token);
+        if (_user) {
+            // create user preferences for the first time.
+            // in order to do this, there needs to be a logged in user in the persistent storage
+            const prefs = await userPreferencesService.createUserPreferences(
+              {
+                user_id: _user.id,
+                invitation_code: registrationCode,
+                language: Language.en,
+              }
+            );
+            updateUserPreferences(prefs);
+            enqueueSnackbar("Verification Email Sent!", { variant: "success" });
+            postRegisterHandler();
+            // IMPORTANT NOTE: after the preferences are added, or fail to be added, we should log the user out immediately,
+            // since if we don't do that, the user may be able to access the application without verifying their email
+            // or accepting the dpa.
+            await logoutService.handleLogout();
+          } else {
+           // if a user cannot be gotten from the token, we should throw an error
+           throw new Error("Something went wrong while logging in. Please try again.");
+        }
+      } catch (e: any) {
+        let errorMessage;
+        if (e instanceof ServiceError) {
+          writeServiceErrorToLog(e, console.error);
+          errorMessage = getUserFriendlyErrorMessage(e as Error);
+        } else if (e instanceof FirebaseError) {
+          writeFirebaseErrorToLog(e, console.error)
+          errorMessage = getUserFriendlyFirebaseErrorMessage(e);
+        } else {
+          console.error(e);
+          errorMessage = (e as Error).message
+        }
+        enqueueSnackbar(`Registration Failed: ${errorMessage}`, { variant: "error" });
+      } finally {
+        setIsRegisteringWithEmail(false);
+      }
     },
     [
       enqueueSnackbar,
