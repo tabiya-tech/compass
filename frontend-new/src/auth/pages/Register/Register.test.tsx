@@ -11,8 +11,6 @@ import { AuthContext, AuthContextValue, TabiyaUser } from "src/auth/AuthProvider
 import { emailAuthService } from "src/auth/services/emailAuth/EmailAuth.service";
 import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
-import { ServiceError } from "src/error/ServiceError/ServiceError";
-import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 
 //mock the SocialAuth component
 jest.mock("src/auth/components/SocialAuth/SocialAuth", () => {
@@ -116,16 +114,11 @@ describe("Testing Register component", () => {
     // AND check invitation code status returns a valid code
     const checkInvitationCodeStatusMock = jest
       .spyOn(invitationsService, "checkInvitationCodeStatus")
-      .mockImplementation(
-        //@ts-ignore
-        (initation_code, successCallback, failureCallback) => {
-          successCallback({
-            invitation_type: InvitationType.REGISTER,
-            status: InvitationStatus.VALID,
-            invitation_code: initation_code,
-          });
-        }
-      );
+      .mockResolvedValue({
+        invitation_type: InvitationType.REGISTER,
+        status: InvitationStatus.VALID,
+        invitation_code: givenInvitationCode,
+      })
     // WHEN the component is rendered within the AuthContext and Router
     render(
       <HashRouter>
@@ -180,9 +173,7 @@ describe("Testing Register component", () => {
 
     // AND check that the invitation code status was checked
     expect(checkInvitationCodeStatusMock).toHaveBeenCalledWith(
-      givenInvitationCode,
-      expect.any(Function),
-      expect.any(Function)
+      givenInvitationCode
     );
 
     // AND the component should match the snapshot
@@ -273,16 +264,11 @@ describe("Testing Register component", () => {
     const givenIsLoading = false;
 
     // AND check invitation code status returns a valid code
-    jest.spyOn(invitationsService, "checkInvitationCodeStatus").mockImplementation(
-      //@ts-ignore
-      (initation_code, successCallback, failureCallback) => {
-        successCallback({
-          invitation_type: InvitationType.REGISTER,
-          status: InvitationStatus.VALID,
-          invitation_code: initation_code,
-        });
-      }
-    );
+    jest.spyOn(invitationsService, "checkInvitationCodeStatus").mockResolvedValue({
+      invitation_type: InvitationType.REGISTER,
+      status: InvitationStatus.VALID,
+      invitation_code: "foo-bar",
+    });
 
     // WHEN the register form is submitted
     render(
@@ -321,20 +307,14 @@ describe("Testing Register component", () => {
     const givenInvitationCode = "foo-bar";
     const givenName = "Foo Bar";
     const givenEmail = "foo-bar@foo.bar";
-
-    const givenError = {
-      message: "Invalid invitation code",
-    }
+    const givenInvalidInvitationCode = {
+      invitation_type: InvitationType.REGISTER,
+      status: InvitationStatus.INVALID,
+      invitation_code: givenInvitationCode,
+    };
 
     // AND check invitation code check returns an invalid code
-    jest.spyOn(invitationsService, "checkInvitationCodeStatus").mockImplementation(
-      //@ts-ignore
-      (initation_code, successCallback, failureCallback) => {
-        failureCallback(givenError as ServiceError);
-      }
-    );
-
-    const getUserFriendlyErrorMessage = jest.spyOn(require("src/error/ServiceError/ServiceError"), "getUserFriendlyErrorMessage")
+    jest.spyOn(invitationsService, "checkInvitationCodeStatus").mockResolvedValue(givenInvalidInvitationCode);
 
     // WHEN the component is rendered
     render(
@@ -359,13 +339,7 @@ describe("Testing Register component", () => {
       expect(emailAuthService.handleRegisterWithEmail).not.toHaveBeenCalled();
     });
 
-
-    // AND CALL THE INVITATION CODE CHECK
-    expect(getUserFriendlyErrorMessage).toHaveBeenCalledWith({
-      ...givenError,
-      details: {
-        errorCode: ErrorConstants.ErrorCodes.INVALID_REGISTRATION_CODE
-      }
-    });
+    // AND the error message should be displayed
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Invalid registration code", { variant: "error" });
   });
 });

@@ -2,12 +2,8 @@ import "src/_test_utilities/consoleMock";
 
 import InvitationsService from "./invitations.service";
 import { StatusCodes } from "http-status-codes";
-import { ServiceError } from "src/error/ServiceError/ServiceError";
-import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
-import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
+import { setupFetchSpy } from "src/_test_utilities/fetchSpy";
 import { Invitation, InvitationStatus, InvitationType } from "./invitations.types";
-
-const setupFetchSpy = setupAPIServiceSpy;
 
 describe("InvitationsService", () => {
   // GIVEN a backend URL is returned by the envService
@@ -44,15 +40,8 @@ describe("InvitationsService", () => {
 
       // WHEN the checkInvitationCodeStatus function is called with the given code
       const service = new InvitationsService();
-      let actualStatus;
-      await service.checkInvitationCodeStatus(
+      const actualStatus= await service.checkInvitationCodeStatus(
         "test-code",
-        (data) => {
-          actualStatus = data;
-        },
-        (error) => {
-          throw error;
-        }
       );
 
       // THEN expect it to make a GET request with correct headers and payload
@@ -63,10 +52,6 @@ describe("InvitationsService", () => {
           headers: {
             "Content-Type": "application/json",
           },
-          expectedStatusCode: [200],
-          failureMessage: `Failed to check status for invitation code test-code`,
-          serviceFunction: "checkInvitationCodeStatus",
-          serviceName: "InvitationsService",
         }
       );
 
@@ -76,28 +61,18 @@ describe("InvitationsService", () => {
 
     test("on fail to fetch, should reject with the expected service error", async () => {
       // GIVEN fetch rejects with some unknown error
-      const givenFetchError = new Error();
-      jest.spyOn(require("src/utils/fetchWithAuth/fetchWithAuth"), "fetchWithAuth").mockRejectedValue(givenFetchError);
+      jest.spyOn(require("src/utils/fetchWithAuth/fetchWithAuth"), "fetchWithAuth").mockRejectedValue(new Error());
 
       // WHEN calling checkInvitationCodeStatus function with some code
       const service = new InvitationsService();
 
       // THEN expected it to reject with the error response
-      let error;
-      try {
-        await service.checkInvitationCodeStatus(
-          "test-code",
-          () => {},
-          (err) => {
-            throw err;
-          }
-        );
-      } catch (err) {
-        error = err;
-      }
+      const checkInvitationCodeCallback = async () => await service.checkInvitationCodeStatus(
+        "test-code"
+      );
 
       // AND expect the service to throw the error that the fetchWithAuth function throws
-      expect(error).toEqual(new Error("Failed to check status for invitation code"));
+      await expect(checkInvitationCodeCallback()).rejects.toThrow("Failed to check status for invitation code");
     });
 
     test.each([
@@ -112,35 +87,12 @@ describe("InvitationsService", () => {
         // WHEN the checkInvitationCodeStatus function is called with the given code
         const service = new InvitationsService();
 
-        // THEN expected it to reject with the error response
-        const expectedError = {
-          ...new ServiceError(
-            InvitationsService.name,
-            "checkInvitationCodeStatus",
-            "GET",
-            `${givenApiServerUrl}/user-invitations/check-status?invitation_code=test-code`,
-            StatusCodes.INTERNAL_SERVER_ERROR,
-            ErrorConstants.ErrorCodes.INTERNAL_SERVER_ERROR,
-            "",
-            ""
-          ),
-          details: expect.anything(),
-        };
-        let error;
-        try {
-          await service.checkInvitationCodeStatus(
-            "test-code",
-            () => {},
-            (err) => {
-              throw err;
-            }
+        const checkInvitationCodeCallback = async () => await service.checkInvitationCodeStatus(
+            "test-code"
           );
-        } catch (err) {
-          error = err;
-        }
-        expect(error).toMatchObject(expectedError);
-        // AND expect error to be service error
-        expect(error).toBeInstanceOf(ServiceError);
+
+        // AND expect the service to throw the error that the fetchWithAuth function throws
+        await expect(checkInvitationCodeCallback()).rejects.toThrow("Failed to check status for invitation code");
       }
     );
   });

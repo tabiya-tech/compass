@@ -21,6 +21,7 @@ import { Language } from "src/userPreferences/UserPreferencesService/userPrefere
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
 import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
+import { InvitationStatus, InvitationType } from "../../../invitations/InvitationsService/invitations.types";
 
 export const INVITATIONS_PARAM_NAME = "invite-code";
 
@@ -222,58 +223,65 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
    * @param code
    */
   const handleLoginWithInvitationCode = useCallback(
-    (code: string) => {
-      setIsLoggingInAnonymously(true);
-      invitationsService
-        .checkInvitationCodeStatus(
-          code,
-          (invitation) => {
-            enqueueSnackbar("Invitation code is valid", { variant: "success" });
-            anonymousAuthService.handleAnonymousLogin(
-              async (token) => {
-                const _user = updateUserByToken(token);
-                if (_user) {
-                  try {
-                    // create user preferences for the first time.
-                    // in order to do this, there needs to be a logged in user in the persistent storage
-                    const prefs = await userPreferencesService.createUserPreferences(
-                      {
-                        user_id: _user.id,
-                        invitation_code: invitation.invitation_code,
-                        language: Language.en,
-                      }
-                    );
-                    updateUserPreferences(prefs);
-                    postLoginHandler(_user);
-                  } catch (error) {
-                    let errorMessage;
-                    if (error instanceof ServiceError) {
-                      writeServiceErrorToLog(error, console.error);
-                      errorMessage = getUserFriendlyErrorMessage(error as Error);
-                    } else {
-                      console.error(error);
-                      errorMessage = (error as Error).message;
-                    }
-                    enqueueSnackbar(`Failed to create preferences: ${errorMessage}`, { variant: "error" });
+    async (code: string) => {
+      try {
+        setIsLoggingInAnonymously(true);
+        const invitation = await invitationsService
+          .checkInvitationCodeStatus(
+            code
+          )
+        if(invitation.status !== InvitationStatus.VALID || invitation.invitation_type !== InvitationType.AUTO_REGISTER) {
+          throw new Error("Invalid invitation code");
+        }
+        enqueueSnackbar("Invitation code is valid", { variant: "success" });
+        await anonymousAuthService.handleAnonymousLogin(
+          async (token) => {
+            const _user = updateUserByToken(token);
+            if (_user) {
+              try {
+                // create user preferences for the first time.
+                // in order to do this, there needs to be a logged in user in the persistent storage
+                const prefs = await userPreferencesService.createUserPreferences(
+                  {
+                    user_id: _user.id,
+                    invitation_code: invitation.invitation_code,
+                    language: Language.en,
                   }
+                );
+                updateUserPreferences(prefs);
+                postLoginHandler(_user);
+              } catch (error) {
+                let errorMessage;
+                if (error instanceof ServiceError) {
+                  writeServiceErrorToLog(error, console.error);
+                  errorMessage = getUserFriendlyErrorMessage(error as Error);
+                } else {
+                  console.error(error);
+                  errorMessage = (error as Error).message;
                 }
-              },
-              (error) => {
-                const shownError = getUserFriendlyFirebaseErrorMessage(error);
-                writeFirebaseErrorToLog(error, console.error);
-                enqueueSnackbar(shownError, { variant: "error" });
+                enqueueSnackbar(`Failed to create preferences: ${errorMessage}`, { variant: "error" });
               }
-            );
+            }
           },
-          (e) => {
-            writeServiceErrorToLog(e, console.error);
-            const errorMessage = getUserFriendlyErrorMessage(e);
-            enqueueSnackbar(errorMessage, { variant: "error" });
+          (error) => {
+            const shownError = getUserFriendlyFirebaseErrorMessage(error);
+            writeFirebaseErrorToLog(error, console.error);
+            enqueueSnackbar(shownError, { variant: "error" });
           }
-        )
-        .finally(() => {
-          setIsLoggingInAnonymously(false);
-        });
+        );
+      } catch (error) {
+        let errorMessage;
+        if (error instanceof ServiceError) {
+          writeServiceErrorToLog(error, console.error);
+          errorMessage = getUserFriendlyErrorMessage(error as Error);
+        } else {
+          console.error(error);
+          errorMessage = (error as Error).message;
+        }
+        enqueueSnackbar(errorMessage, { variant: "error" });
+      } finally {
+        setIsLoggingInAnonymously(false);
+      }
     },
     [enqueueSnackbar, updateUserByToken, postLoginHandler, updateUserPreferences]
   );
@@ -284,10 +292,10 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
    * @param event
    */
   const handleLoginSubmit = useCallback(
-    (event: React.FormEvent) => {
+    async (event: React.FormEvent) => {
       event.preventDefault();
       if (activeLoginForm === ActiveForm.INVITE_CODE) {
-        handleLoginWithInvitationCode(inviteCode);
+        await handleLoginWithInvitationCode(inviteCode);
       } else {
         handleLoginWithEmail(email, password);
       }

@@ -18,7 +18,6 @@ import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceErro
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import { logoutService } from "src/auth/services/logout/logout.service";
 import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
-import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import { StatusCodes } from "http-status-codes";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
@@ -83,40 +82,28 @@ const Register: React.FC<Readonly<RegisterProps>> = ({ postRegisterHandler, post
    */
   const isInvitationCodeValid = useCallback(async (): Promise<boolean> => {
     try {
-      return await new Promise<boolean>((resolve) => {
         // Call the service method and use callbacks to determine the result
-        invitationsService.checkInvitationCodeStatus(
+        const invitation = await invitationsService.checkInvitationCodeStatus(
           registrationCode,
-          (invitation) => {
-            if (
-              invitation.status === InvitationStatus.INVALID ||
-              invitation.invitation_type !== InvitationType.REGISTER
-            ) {
-              enqueueSnackbar("Invalid registration code", { variant: "error" });
-              resolve(false);
-            } else {
-              resolve(true);
-            }
-          },
-          (error) => {
-            // If the error is a service error, log it
-            error.details = {
-              errorCode: ErrorConstants.ErrorCodes.INVALID_REGISTRATION_CODE
-            }
-
-            const errorMessage = getUserFriendlyErrorMessage(error);
-            enqueueSnackbar(errorMessage, { variant: "error" });
-            resolve(false);
-          }
         );
-      });
+        if (
+          invitation.status === InvitationStatus.INVALID ||
+          invitation.invitation_type !== InvitationType.REGISTER
+        ) {
+          console.error("Invalid registration code")
+          enqueueSnackbar("Invalid registration code", { variant: "error" });
+          return false;
+        }
+        return true;
     } catch (e) {
+      let errorMessage;
       if (e instanceof ServiceError) {
         writeServiceErrorToLog(e, console.error);
+        errorMessage = getUserFriendlyErrorMessage(e as Error);
       } else {
         console.error(e);
+        errorMessage = (e as Error).message
       }
-      const errorMessage = getUserFriendlyErrorMessage(e as Error);
       enqueueSnackbar(errorMessage, { variant: "error" });
       return false;
     }

@@ -164,20 +164,11 @@ describe("Testing Login component", () => {
   test("it should handle invitation code login correctly", async () => {
     // AND the invitation code mock will succeed
     const handleCheckInvitationStatusSpy = jest
-      .spyOn(invitationsService, "checkInvitationCodeStatus")
-      .mockImplementation(
-        // @ts-ignore
-        (invitationCode, onSuccess, onError) => {
-          return new Promise<void>((resolve) => {
-            onSuccess({
-              invitation_code: "INVITE-CODE-123",
-              status: InvitationStatus.VALID,
-              invitation_type: InvitationType.AUTO_REGISTER,
-            });
-            resolve();
-          });
-        }
-      );
+      .spyOn(invitationsService, "checkInvitationCodeStatus").mockResolvedValue({
+        invitation_code: "INVITE-CODE-123",
+        status: InvitationStatus.VALID,
+        invitation_type: InvitationType.AUTO_REGISTER,
+      })
     // AND the anonymous auth mock will succeed
     const handleAnonymousLoginSpy = jest
       .spyOn(anonymousAuthService, "handleAnonymousLogin")
@@ -205,9 +196,7 @@ describe("Testing Login component", () => {
     // THEN the checkInvitationStatus function should be called with the correct arguments
     await waitFor(() => {
       expect(handleCheckInvitationStatusSpy).toHaveBeenCalledWith(
-        "INVITE-CODE-123",
-        expect.any(Function),
-        expect.any(Function)
+        "INVITE-CODE-123"
       );
     });
 

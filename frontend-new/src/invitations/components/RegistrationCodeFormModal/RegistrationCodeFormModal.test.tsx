@@ -90,7 +90,7 @@ describe("RegistrationCodeFormModal", () => {
 
     // THEN the registration code should be validated
     await waitFor(() => {
-      expect(checkInvitationCodeStatus).toHaveBeenCalledWith("valid-code", expect.any(Function), expect.any(Function));
+      expect(checkInvitationCodeStatus).toHaveBeenCalledWith("valid-code");
     });
   });
 
@@ -120,9 +120,7 @@ describe("RegistrationCodeFormModal", () => {
     // THEN the invitation code should be validated
     await waitFor(() => {
       expect(checkInvitationCodeStatus).toHaveBeenCalledWith(
-        "invalid-code",
-        expect.any(Function),
-        expect.any(Function)
+        "invalid-code"
       );
     });
 
