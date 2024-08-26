@@ -12,8 +12,8 @@ import { InvitationStatus, InvitationType } from "src/invitations/InvitationsSer
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { logoutService } from "src/auth/services/logout/logout.service";
-import authStateService from "../../AuthStateService";
-import { TabiyaUser } from "../../auth.types";
+import authStateService from "src/auth/AuthStateService";
+import { TabiyaUser } from "src/auth/auth.types";
 
 //mock the SocialAuth component
 jest.mock("src/auth/components/SocialAuth/SocialAuth", () => {
@@ -168,16 +168,21 @@ describe("Testing Register component", () => {
     const givenEmail = "foo@bar.baz";
     const givenPassword = "password";
 
+    // AND the register function returns a token
     (emailAuthService.handleRegisterWithEmail as jest.Mock).mockResolvedValue(
       "foo-bar-token"
     );
 
+    // AND the auth state service is mocked to return a user
     jest.spyOn(authStateService, "updateUserByToken").mockImplementation((token) => {
       return { email: givenEmail, name: givenName } as TabiyaUser;
     });
+    // AND the clear user function is mocked to succeed
+    jest.spyOn(authStateService, "clearUser").mockImplementation(() => {});
 
+    // AND the logout function is mocked to succeed
     jest.spyOn(logoutService, "handleLogout").mockResolvedValue(undefined);
-
+    // AND the user preferences service is mocked to succeed
     jest.spyOn(userPreferencesService, "createUserPreferences").mockResolvedValue({
       user_id: "foo-bar",
       language: Language.en,

@@ -25,7 +25,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       const user = authStateService.getUser();
       if (user) userPreferencesStateService.loadPreferences(user.id).then(
         () => {
-          // delay for half a sec
+          // delay for half a sec so that the loading transition is smoother for the user and not just a flash
           setTimeout(() => setLoading(false), 500)
         }
       );
@@ -39,37 +39,37 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   if (loading) return <Box sx={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", height: "100dvh"}}><Sloth width="64px"/></Box>
 
   if (targetPath === routerPaths.VERIFY_EMAIL) {
-    console.log("redirecting from /verify --> /verify because no one cares")
+    console.debug("redirecting from /verify --> /verify because no one cares")
     return <>{children}</>;
   }
   if (!user) {
     if (targetPath === routerPaths.LOGIN || targetPath === routerPaths.REGISTER) {
-      console.log("redirecting from /login/register --> /login/register because no user")
+      console.debug("redirecting from /login/register --> /login/register because no user")
       return <>{children}</>;
     }
-    console.log("redirecting from ? --> /login because no user")
+    console.debug("redirecting from ? --> /login because no user")
     return <Navigate to={routerPaths.LOGIN} />;
   }
 
   if ((targetPath === routerPaths.LOGIN || targetPath === routerPaths.REGISTER) && user) {
     if (isAcceptedTCValid) {
-      console.log("redirecting from /login/register --> /home because user and prefs.accepted")
+      console.debug("redirecting from /login/register --> /home because user and prefs.accepted")
       return <Navigate to={routerPaths.ROOT} />;
     }
-    console.log("redirecting from /login/register --> /dpa because user but no prefs.accepted")
+    console.debug("redirecting from /login/register --> /dpa because user but no prefs.accepted")
     return <Navigate to={routerPaths.DPA} />;
   }
   if (targetPath === routerPaths.DPA) {
     if (isAcceptedTCValid) {
-      console.log("redirecting from /dpa --> /home because prefs.accepted")
+      console.debug("redirecting from /dpa --> /home because prefs.accepted")
       return <Navigate to={routerPaths.ROOT} />;
     }
-    console.log("redirecting from /dpa --> /dpa because no prefs.accepted")
+    console.debug("redirecting from /dpa --> /dpa because no prefs.accepted")
     return <>{children}</>;
   }
 
   if (!isAcceptedTCValid) {
-    console.log("redirecting from ? --> /dpa because no prefs.accepted")
+    console.debug("redirecting from ? --> /dpa because no prefs.accepted")
     return <Navigate to={routerPaths.DPA} />;
   }
 
