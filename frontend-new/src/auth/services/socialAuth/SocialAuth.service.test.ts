@@ -1,7 +1,6 @@
 import { socialAuthService } from "src/auth/services/socialAuth/SocialAuth.service";
 import { FirebaseError } from "src/error/FirebaseError/firebaseError";
 import firebase from "firebase/compat/app";
-import { ServiceError } from "src/error/ServiceError/ServiceError";
 
 jest.mock("firebase/compat/app", () => {
   return {
@@ -63,7 +62,7 @@ describe("SocialAuthService class tests", () => {
       const socialLoginCallback = async () =>  await socialAuthService.handleLoginWithGoogle();
 
       // THEN the error should be thrown
-      await expect(socialLoginCallback()).rejects.toEqual(expect.any(ServiceError));
+      await expect(socialLoginCallback()).rejects.toThrow("The user could not be found");
     });
   });
 
