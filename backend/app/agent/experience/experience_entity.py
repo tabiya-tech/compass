@@ -113,7 +113,9 @@ class ExperienceEntity(BaseModel):
     # we use the name of the Enum instead of the value because that makes the code less brittle
     @field_serializer("work_type")
     def serialize_work_type(self, work_type: WorkType, _info):
-        return work_type.name
+        if work_type is not None:
+            return work_type.name
+        return None
 
     # Deserialize the work_type from the enum name
     @field_validator("work_type", mode='before')
