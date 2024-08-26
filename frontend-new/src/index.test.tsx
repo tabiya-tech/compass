@@ -77,15 +77,6 @@ jest.mock("src/app/isOnlineProvider/IsOnlineProvider", () => {
   };
 });
 
-// mock the hash router
-jest.mock("react-router-dom", () => {
-  const mHashRouter = jest.fn().mockImplementation(({ children }) => children);
-  return {
-    __esModule: true,
-    HashRouter: mHashRouter,
-  };
-});
-
 describe("test the application bootstrapping", () => {
   beforeEach(() => {
     (console.error as jest.Mock).mockClear();

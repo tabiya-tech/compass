@@ -2,7 +2,7 @@
 import { AuthMethods, FirebaseToken, TabiyaUser } from "src/auth/auth.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { logoutService } from "src/auth/services/logout/logout.service";
-import firebase from "firebase/compat/app";
+// import firebase from "firebase/compat/app";
 import { jwtDecode } from "jwt-decode";
 
 // const REFRESH_TOKEN_EXPIRATION_PERCENTAGE = 0.1;
@@ -10,6 +10,8 @@ import { jwtDecode } from "jwt-decode";
 class AuthStateService {
   private static instance: AuthStateService;
   private user: TabiyaUser | null = null;
+  private isAuthenticated = false;
+  private isAuthenticationInProgress = false;
   private FIREBASE_DB_NAME = "firebaseLocalStorageDb";
 
   private constructor() {}
@@ -25,8 +27,24 @@ class AuthStateService {
     return this.user;
   }
 
+  public isAuthInProgress(): boolean {
+    return this.isAuthenticationInProgress;
+  }
+
+  public isUserAuthenticated(): boolean {
+    return this.isAuthenticated;
+  }
+
   private setUser(user: TabiyaUser | null) {
     this.user = user;
+  }
+
+  private setIsAuthenticated(isAuthenticated: boolean) {
+    this.isAuthenticated = isAuthenticated;
+  }
+
+  private setIsAuthInProgress(isInProgress: boolean) {
+    this.isAuthenticationInProgress = isInProgress;
   }
 
   private async deleteFirebaseDB() {
@@ -74,16 +92,21 @@ class AuthStateService {
     }
   }
 
-  public async clearUser() {
+  public clearUser() {
+    this.setIsAuthInProgress(true);
+    PersistentStorageService.clearToken();
     this.setUser(null);
-    await this.deleteFirebaseDB();
+    this.deleteFirebaseDB();
+    this.setIsAuthInProgress(false);
   }
 
   public updateUserByToken(token: string): TabiyaUser | null {
     try {
       const _user = this.getUserFromToken(token);
       if (_user) {
+        PersistentStorageService.setToken(token)
         this.setUser(_user);
+        this.setIsAuthenticated(true);
         return _user;
       }
       return null;
@@ -94,28 +117,27 @@ class AuthStateService {
   }
 
   public async loadUser() {
-    console.debug("Loading user...")
+    this.setIsAuthInProgress(true);
     if (PersistentStorageService.getLoggedOutFlag()) {
       try {
         await logoutService.handleLogout();
-        await this.clearUser();
+        this.clearUser();
       } catch (e) {
         console.error("Failed to logout user on page load", e);
-        await this.clearUser();
+        this.clearUser();
       }
     }
-    firebase.auth().onAuthStateChanged(async (user) => {
-      const token = user ? await user.getIdToken(true) : null;
-      if (token) {
-        this.updateUserByToken(token);
-      } else {
-        await this.clearUser();
-      }
-    });
+    const token = PersistentStorageService.getToken();
+    if (token) {
+      this.updateUserByToken(token);
+    } else {
+      this.clearUser();
+    }
+    this.setIsAuthInProgress(false);
   }
 
-  // TODO: Implement monitorTokenExpiration
-  // public monitorTokenExpiration(refreshTimeout: NodeJS.Timeout | null) {
+  // TODO: figure out how to set this up
+  // public monitorTokenExpiration(refreshTimeout: NodeJS.Timeout) {
   //   if (auth.currentUser !== null) {
   //     auth.currentUser?.getIdTokenResult().then((idTokenResult) => {
   //       const expirationTime = new Date(idTokenResult.expirationTime).getTime();
@@ -134,7 +156,7 @@ class AuthStateService {
   //           } catch (e) {
   //             console.error("Failed to logout", e);
   //           } finally {
-  //             await this.clearUser();
+  //             this.clearUser();
   //           }
   //         }
   //       }, timeToExpiration - timeToExpiration * REFRESH_TOKEN_EXPIRATION_PERCENTAGE);
@@ -142,17 +164,20 @@ class AuthStateService {
   //   }
   // }
 
-  // TODO: Implement setupAuthListener
+  // TODO: figure out how to set this up
   // public setupAuthListener() {
   //   const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
   //     if (user) {
   //       const token = await user.getIdToken(true);
   //       this.updateUserByToken(token);
-  //       const refreshTimeout: NodeJS.Timeout | null = null;
+  //       this.setIsAuthenticated(true);
+  //       let refreshTimeout: NodeJS.Timeout;
   //       this.monitorTokenExpiration(refreshTimeout);
   //     } else {
-  //       await this.clearUser();
+  //       this.setIsAuthenticated(false);
+  //       this.clearUser();
   //     }
+  //     this.setIsAuthInProgress(false);
   //   });
   //
   //   return unsubscribe;

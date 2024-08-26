@@ -26,7 +26,7 @@ describe("ProtectedRoute test", () => {
       {
         path: routerPaths.ROOT,
         element: (
-          <ProtectedRoute authenticationAndDPARequired={true}>
+          <ProtectedRoute >
             <div>Protected page</div>
           </ProtectedRoute>
         ),
@@ -49,7 +49,7 @@ describe("ProtectedRoute test", () => {
       {
         path: routerPaths.LOGIN,
         element: (
-          <ProtectedRoute authenticationAndDPARequired={false}>
+          <ProtectedRoute>
             <div>Unprotected page</div>
           </ProtectedRoute>
         ),

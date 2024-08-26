@@ -33,14 +33,32 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   };
 });
 
+// mock the createHashRouter from react-router-dom
+jest.mock("react-router-dom", () => {
+  return {
+    __esModule: true,
+    createHashRouter: jest.fn().mockImplementation((routes) => {
+      return {
+        routes,
+      };
+    }),
+  };
+});
+
 // mock the react-router-dom
 jest.mock("react-router-dom", () => {
   return {
     __esModule: true,
+    createHashRouter: jest.fn().mockImplementation(() => {
+      return {
+        routes: [],
+      };
+    }),
     HashRouter: jest.fn().mockImplementation(({ children }) => <div data-testid="hash-router-id">{children}</div>),
     Route: jest.fn().mockImplementation(({ children }) => <div data-testid="route-id">{children}</div>),
     Routes: jest.fn().mockImplementation(({ children }) => <div data-testid="routes-id">{children}</div>),
     NavLink: jest.fn().mockImplementation(({ children }) => <div data-testid="nav-link-id">{children}</div>),
+    RouterProvider: jest.fn(),
   };
 });
 

@@ -267,8 +267,7 @@ const Login: React.FC = () => {
           throw new Error("Invalid invitation code");
         }
         enqueueSnackbar("Invitation code is valid", { variant: "success" });
-        const token = await anonymousAuthService.handleAnonymousLogin(
-        );
+        const token = await anonymousAuthService.handleAnonymousLogin();
         const _user = authStateService.updateUserByToken(token);
         if (_user) {
             // create user preferences for the first time.

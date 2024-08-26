@@ -19,7 +19,6 @@ import "@fontsource/roboto/700.css";
 import type { Preview } from "@storybook/react";
 import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineContext } from "../src/app/isOnlineProvider/IsOnlineProvider";
-import { AuthContext } from "../src/auth/AuthProvider";
 
 const preview: Preview = {
   parameters: {
@@ -82,16 +81,14 @@ export const decorators = [
   return (
     <Router>
       <IsOnlineContext.Provider value={isOnline}>
-        <AuthContext.Provider value={authContextDefaultValue}>
-          <CssBaseline />
-            <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
-              <SnackbarProvider>
-                <div style={{ height: "100vh" }}>
-                  <Story />
-                </div>
-              </SnackbarProvider>
-            </ThemeProvider>
-          </AuthContext.Provider>
+        <CssBaseline />
+          <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
+            <SnackbarProvider>
+              <div style={{ height: "100vh" }}>
+                <Story />
+              </div>
+            </SnackbarProvider>
+          </ThemeProvider>
       </IsOnlineContext.Provider>
     </Router>
     );

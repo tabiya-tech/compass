@@ -1,5 +1,6 @@
 import { jwtDecode } from "jwt-decode";
 import { auth } from "src/auth/firebaseConfig";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
 type DecodedToken = {
   exp: number;
@@ -11,8 +12,10 @@ type DecodedToken = {
  */
 const getRefreshedToken = async (): Promise<string> => {
   let refreshed_token = await auth.currentUser?.getIdToken(true);
-  if(!refreshed_token) throw new Error("Failed to get refreshed token");
-  return refreshed_token;
+
+  if (refreshed_token) PersistentStorageService.setToken(refreshed_token);
+
+  return refreshed_token!;
 };
 
 /**
@@ -26,7 +29,12 @@ const EXPIRATION_TOLERANCE = 300; // 5 minutes, 300 seconds
  * @returns {string} The active access token
  */
 export async function getActiveToken(): Promise<string> {
-  const token = await getRefreshedToken();
+  let token = PersistentStorageService.getToken();
+
+  // if no token avaialble, get a refreshed one
+  if (!token) {
+    return getRefreshedToken();
+  }
 
   let decodedToken: DecodedToken = jwtDecode<DecodedToken>(token);
 

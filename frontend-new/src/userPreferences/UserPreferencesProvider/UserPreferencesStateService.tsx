@@ -18,8 +18,9 @@ class UserPreferencesService {
   }
 
   public async loadPreferences(user_id: string) {
-    console.debug("Loading user preferences...")
+    console.log("Loading user preferences...")
     this.userPreferences = await userPreferencesService.getUserPreferences(user_id)
+    console.log("User preferences loaded: ", this.userPreferences)
   }
 
   public getUserPreferences(): UserPreference | null {

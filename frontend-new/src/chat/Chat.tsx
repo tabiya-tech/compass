@@ -127,7 +127,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       // Call the logout service to handle the logout based on the current login method
       await logoutService.handleLogout();
       // clear the user from the context, and the persistent storage
-      await authStateService.clearUser();
+      authStateService.clearUser();
       // clear the userPreferences from the "state"
       userPreferencesStateService.clearUserPreferences();
       navigate(routerPaths.LOGIN, { replace: true });

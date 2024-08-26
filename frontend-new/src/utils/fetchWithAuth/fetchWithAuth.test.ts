@@ -9,11 +9,10 @@ describe("Api Service tests", () => {
     jest.clearAllMocks();
   });
 
-  const givenApiUrl = "https://api.example.com/data";
-  const givenToken = "someAuthToken";
-
   test("fetchWithAuth should add Authorization header when authToken is present", async () => {
     // GIVEN an API URL and a valid auth token in sessionStorage
+    const givenApiUrl = "https://api.example.com/data";
+    const givenToken = "someAuthToken";
 
     jest.spyOn(getActiveTokenModule, "getActiveToken").mockResolvedValueOnce(givenToken);
 
@@ -68,7 +67,6 @@ describe("Api Service tests", () => {
   });
 
   test("fetchWithAuth should throw an error if the server responds with an unexpected status code", async () => {
-    jest.spyOn(getActiveTokenModule, "getActiveToken").mockResolvedValueOnce(givenToken);
     // GIVEN an API URL and a valid auth token in sessionStorage
     const givenApiUrl = "https://api.example.com/data";
     const givenAuthToken = "someAuthToken";
@@ -117,7 +115,6 @@ describe("Api Service tests", () => {
   });
 
   test("fetchWithAuth should throw an error if the server responds with an unexpected Content-Type", async () => {
-    jest.spyOn(getActiveTokenModule, "getActiveToken").mockResolvedValueOnce(givenToken);
     // GIVEN an API URL and a valid auth token in sessionStorage
     const givenApiUrl = "https://api.example.com/data";
     const givenAuthToken = "someAuthToken";
@@ -168,7 +165,6 @@ describe("Api Service tests", () => {
   });
 
   test("fetchWithAuth should allow all Content-Types if expectedContentType is not provided", async () => {
-    jest.spyOn(getActiveTokenModule, "getActiveToken").mockResolvedValueOnce(givenToken);
     // GIVEN an API URL and a valid auth token in sessionStorage
     const givenApiUrl = "https://api.example.com/data";
     const givenAuthToken = "someAuthToken";
@@ -202,7 +198,6 @@ describe("Api Service tests", () => {
   });
 
   test("fetchWithAuth should throw an error if the fetch fails", async () => {
-    jest.spyOn(getActiveTokenModule, "getActiveToken").mockResolvedValueOnce(givenToken);
     // GIVEN an API URL and a valid auth token in sessionStorage
     const givenApiUrl = "https://api.example.com/data";
     const givenAuthToken = "someAuthToken";
