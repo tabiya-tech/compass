@@ -20,7 +20,6 @@ import ExperienceService from "src/Experiences/ExperienceService/ExperienceServi
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import InactiveBackdrop from "src/theme/Backdrop/InactiveBackdrop";
 import { AuthContext } from "src/auth/AuthProvider";
-import { FirebaseError } from "src/error/FirebaseError/firebaseError";
 import { logoutService } from "src/auth/services/logout/logout.service";
 import ApproveModal from "src/theme/ApproveModal/ApproveModal";
 
@@ -110,28 +109,22 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   }, []);
 
   const handleLogout = useCallback(async () => {
-    const successCallback = () => {
-      setIsLoggingOut(false);
+    setIsLoggingOut(true);
+    try {
+      // Call the logout service to handle the logout based on the current login method
+      await logoutService.handleLogout();
       // clear the user from the context, and the persistent storage
       clearUser();
       // clear the userPreferences from the context and persistent storage as well
       updateUserPreferences(null);
       navigate(routerPaths.LOGIN, { replace: true });
       enqueueSnackbar("Successfully logged out.", { variant: "success" });
-    };
-    const failureCallback = (error: FirebaseError) => {
-      setIsLoggingOut(false);
-      const errorMessage = getUserFriendlyErrorMessage(error);
-      enqueueSnackbar(errorMessage, { variant: "error" });
-    };
-    setIsLoggingOut(true);
-    try {
-      // Call the logout service to handle the logout based on the current login method
-      logoutService.handleLogout(successCallback, failureCallback);
     } catch (error) {
       setIsLoggingOut(false);
       console.error("Failed to logout", error);
-      enqueueSnackbar("Failed to logout", { variant: "error" });
+      enqueueSnackbar(`Failed to logout: ${error}`, { variant: "error" });
+    } finally {
+      setIsLoggingOut(false);
     }
   }, [enqueueSnackbar, navigate, clearUser, updateUserPreferences]);
 

@@ -37,18 +37,13 @@ describe("AuthService class tests", () => {
       const mockSignOut = jest.fn();
       jest.spyOn(firebase.auth(), "signOut").mockImplementation(mockSignOut);
 
-      const successCallback = jest.fn();
-      const failureCallback = jest.fn();
-
       // WHEN the logout is attempted
-      await authService.handleLogout(successCallback, failureCallback);
+      const logoutCallback = async () => await authService.handleLogout();
 
-      // THEN test should call the firebase signOut function
+      // THEN the logout should succeed
+      await expect(logoutCallback()).resolves.toBeUndefined()
+      // AND test should call the firebase signOut function
       expect(firebase.auth().signOut).toHaveBeenCalled();
-      // AND test should call the success callback
-      expect(successCallback).toHaveBeenCalled();
-      // AND test should not call the error callback
-      expect(failureCallback).not.toHaveBeenCalled();
     });
 
     test("should call failureCallback on logout failure", async () => {
@@ -58,18 +53,15 @@ describe("AuthService class tests", () => {
         message: "Internal error",
       });
 
-      const successCallback = jest.fn();
-      const failureCallback = jest.fn();
 
       // WHEN the logout is attempted
-      await authService.handleLogout(successCallback, failureCallback);
+      const logoutCallback = async () => await authService.handleLogout();
 
-      // THEN test should call the firebase signOut function
+      // THEN expect the logout to throw an error
+      await expect(logoutCallback()).rejects.toThrow("auth/internal-error")
+
+      // AND test should call the firebase signOut function
       expect(firebase.auth().signOut).toHaveBeenCalled();
-      // AND test should not call the success callback
-      expect(successCallback).not.toHaveBeenCalled();
-      // AND test should call the error callback
-      expect(failureCallback).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 

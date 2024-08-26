@@ -22,21 +22,11 @@ export class LogoutService {
 
   /**
    * Handle user logout, based on the login method that is found in the persistent storage.
-   * @param {() => void} successCallback - Callback to execute on successful logout.
-   * @param {(error: any) => void} failureCallback - Callback to execute on logout error.
+   * @returns {Promise<void>}
    */
-  async handleLogout(successCallback: () => void, failureCallback: (error: any) => void): Promise<void> {
-    const onFailure = (error: any) => {
-      // if an error occurs, persist a flag in the storage to indicate that the user is logged out
-      // this will tell the application to log the user out on the next possible opportunity
-      console.log("Error logging out", error);
-      PersistentStorageService.setLoggedOutFlag(true);
-      // call the failure callback
-      failureCallback(error);
-    }
+  async handleLogout(): Promise<void> {
     // set the login method to email for future reference
     // we'll want to know how the user logged in, when we want to log them out for example
-    try {
       const userLoginMethod = PersistentStorageService.getLoginMethod();
       let authService: AuthService;
       // Call the appropriate logout method based on the login method
@@ -51,13 +41,9 @@ export class LogoutService {
           authService = emailAuthService;
           break;
         default:
-          failureCallback("Invalid login method");
-          return;
+          throw new Error("Invalid login method");
       }
-      authService.handleLogout(successCallback, onFailure);
-    } catch (error) {
-      onFailure(error)
-    }
+      await authService.handleLogout();
   }
 }
 

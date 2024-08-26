@@ -24,23 +24,19 @@ export class AnonymousAuthService implements AuthService {
 
   /**
    * Handle user logout.
-   * @param {() => void} successCallback - Callback to execute on successful logout.
-   * @param {(error: any) => void} failureCallback - Callback to execute on logout error.
+   * @returns {Promise<void>}
    */
-  async handleLogout(successCallback: () => void, failureCallback: (error: any) => void): Promise<void> {
+  async handleLogout(): Promise<void> {
     const errorFactory = getServiceErrorFactory("AnonymousAuthService", "handleLogout", "POST", "signOut");
     try {
       await auth.signOut();
-      successCallback();
     } catch (error) {
       const firebaseError = (error as any).code;
-      failureCallback(
-        errorFactory(
+      throw errorFactory(
           firebaseError.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
           firebaseError || FirebaseErrorCodes.INTERNAL_ERROR,
           firebaseError.message || FirebaseErrorCodes.INTERNAL_ERROR,
           {}
-        )
       );
     }
   }

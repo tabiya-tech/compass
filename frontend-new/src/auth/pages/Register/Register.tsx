@@ -151,14 +151,7 @@ const Register: React.FC<Readonly<RegisterProps>> = ({ postRegisterHandler, post
               // IMPORTANT NOTE: after the preferences are added, or fail to be added, we should log the user out immediately,
               // since if we don't do that, the user may be able to access the application without verifying their email
               // or accepting the dpa.
-              await logoutService.handleLogout(
-                () => {
-                  // do nothing
-                },
-                (error) => {
-                  console.error(error);
-                }
-              );
+              await logoutService.handleLogout();
             } catch (e: any) {
               if (e instanceof ServiceError) {
                 writeServiceErrorToLog(e, console.error);

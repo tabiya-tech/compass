@@ -99,9 +99,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // First check if the user is supposed to be logged out
     // If so, clear the user and logged out flag
     if (PersistentStorageService.getLoggedOutFlag()) {
-      await logoutService.handleLogout(clearUser, console.error);
-      setPageLoadComplete(true);
-      return;
+      try {
+        await logoutService.handleLogout();
+        clearUser();
+      } catch (e) {
+        console.error("Failed to logout user on page load", e);
+        clearUser();
+      } finally {
+        setPageLoadComplete(true);
+      }
     }
     // Get the token from the storage
     const token = getToken();
@@ -139,8 +145,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             console.error("Failed to refresh token:", error);
             // If the token refresh fails, log the user out
             try {
-              await logoutService.handleLogout(clearUser, console.error);
-            } finally {
+              await logoutService.handleLogout();
+            } catch (e) {
+              console.error("Failed to logout", e);
+            }
+            finally {
               clearUser();
             }
           }
