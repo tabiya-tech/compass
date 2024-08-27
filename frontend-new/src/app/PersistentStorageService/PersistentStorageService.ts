@@ -1,12 +1,13 @@
 import { Invitation } from "src/invitations/InvitationsService/invitations.types";
 
-export const TOKEN_KEY = "token";
+const PERSISTENT_STORAGE_VERSION = "0.0.1";
+export const TOKEN_KEY = `token_${PERSISTENT_STORAGE_VERSION}`;
 
-export const INVITATION_KEY = "invitation";
+export const INVITATION_KEY = `invitation_${PERSISTENT_STORAGE_VERSION}`
 
-export const LOGIN_METHOD_KEY = "login_method";
+export const LOGIN_METHOD_KEY = `login_method_${PERSISTENT_STORAGE_VERSION}`;
 
-export const LOG_OUT_FLAG_KEY = "logged_out";
+export const LOG_OUT_FLAG_KEY = `log_out_flag_${PERSISTENT_STORAGE_VERSION}`;
 
 /**
  * This class is used to store the tokens in the session storage.
