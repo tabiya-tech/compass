@@ -131,14 +131,14 @@ test_cases_data_extraction = [
                                    'I heat up the ovens',
                                    'I make the bread',
                                    'I need to be at the bakery on time',
-                                   'I use part of the money to buy the stuff we need to make the bread',
+                                   'I use part of the money to buy the stuff my brother and I need to make the bread',
                                    'I wake up very early in the morning',
                                    'It is important to keep track of what I have spent',
-                                   'We meet later the same day',
-                                   'We split the money'],
+                                   'My brother and I meet later the same day',
+                                   'My brother and I split the money',
+                                   'The bread must be ready when the customers come'],
         expected_non_responsibilities=[],
-        expected_other_peoples_responsibilities=['My brother sells the bread',
-                                                 'The bread must be ready when the customers come']
+        expected_other_peoples_responsibilities=['My brother sells the bread']
     ),
 ]
 
@@ -165,10 +165,12 @@ async def test_data_extraction(test_case: _TestCaseDataExtraction):
                                                                         context=context)
 
     # THEN the last referenced experience index should be the expected one
-    assert sorted(actual_responsibilities_data.responsibilities) == sorted(test_case.expected_responsibilities)
-    assert sorted(actual_responsibilities_data.non_responsibilities) == sorted(test_case.expected_non_responsibilities)
-    assert sorted(actual_responsibilities_data.other_peoples_responsibilities) == sorted(
-        test_case.expected_other_peoples_responsibilities)
+    assert {"responsibilities": sorted(actual_responsibilities_data.responsibilities),
+            "non_responsibilities": sorted(actual_responsibilities_data.non_responsibilities),
+            "other_peoples_responsibilities": sorted(actual_responsibilities_data.other_peoples_responsibilities)} == \
+           {"responsibilities": sorted(test_case.expected_responsibilities),
+            "non_responsibilities": sorted(test_case.expected_non_responsibilities),
+            "other_peoples_responsibilities": sorted(test_case.expected_other_peoples_responsibilities)}
 
 
 def _add_turn_to_context(user_input: str, agent_output: str, context: ConversationContext):

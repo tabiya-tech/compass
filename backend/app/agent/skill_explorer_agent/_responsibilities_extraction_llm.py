@@ -98,7 +98,7 @@ class _ResponsibilitiesExtractionLLM:
             You will collect and place the entities into the 'extracted_entities' list of output.
         
         # Classification instructions
-            Classify the named entities into the following three classes:
+            Classify the named entities into one of the following four classes:
                 - other_peoples_responsibilities: What other people are responsible for.
                 - non_responsibilities: What the user is not responsible for.
                 - responsibilities: What the user is responsible for.
@@ -106,24 +106,30 @@ class _ResponsibilitiesExtractionLLM:
             
             There are two criteria that either one can be met for a named entity to be in non_responsibilities:
                 1. The named entity must be something that the user is not responsible for,
-                 does not possess, does not do, does not perform, does not take, does not exhibit, does not engage in, or  does not know.
+                 does not possess, does not do, does not perform, does not take, does not exhibit, does not engage in, or does not know.
                  OR
-                2. The subject or the subject pronoun of the named entity is not referring to the user.
+                2. None of the subjects or subject pronouns of the named entity are referring to the user.
             
-            There are two criteria and must both be met for a named entity to be in responsibilities:
+            There are two criteria and both must be met for a named entity to be in responsibilities:
                 1. The named entity must be something that the user is directly responsible for,
                  possesses, does, performs, takes, exhibits, engages in, or knows.
                  AND
-                2. The subject or the subject pronoun of the named entity must be referring to the user.
+                2. At least one of the subjects or the subject pronouns of the named entity must be referring to the user.
             
             The user is referred to in first person in <User's Last Input>.
             
             
             Examples of Classification:
-            "He tests the software that i build"
-                responsibilities: ["i build the software"]
-                other_peoples_responsibilities: ["He tests the software"]
-        
+                "He tests the software that I build, but I do not sell, that he designs when the weather is nice"
+                    responsibilities: ["i build the software"]
+                    other_peoples_responsibilities: ["He tests the software", "He designs the software"]
+                    non_responsibilities: ["I do not sell the software"]
+                    irrelevant_entities: ["The weather is nice"]
+                "He and they and I develop software that they designed and we test, but I do not deploy"
+                    responsibilities: ["I develop software", "I test the software"]
+                    other_peoples_responsibilities: ["He develops software", "They develop software", "They design the software", "He tests the software"]
+                    non_responsibilities: ["I do not deploy the software"]            
+                    
         # JSON Output instructions
             Your response must always be a JSON object with the following schema:
             - extracted_entities: list of JSON strings, can be empty
