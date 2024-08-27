@@ -379,7 +379,6 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, showNewEx
             notifyOnClose={handleDrawerClose}
             isLoading={isLoading}
             experiences={experiences}
-            conversationCompleted={conversationCompleted}
             conversationCompletedAt={conversationCompletedAt}
           />
           {newConversationDialog && (
