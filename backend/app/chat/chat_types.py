@@ -32,6 +32,8 @@ class ConversationResponse(BaseModel):
     """Whether the conversation is finished"""
     conversation_completed_at: Optional[datetime] = None
     """The time the conversation was completed"""
+    experiences_explored: int = 0
+    """The number of experiences explored"""
 
     @field_serializer('conversation_completed_at')
     def serialize_conversation_completed_at(self, value: Optional[datetime]) -> Optional[str]:
