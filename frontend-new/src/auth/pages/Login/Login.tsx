@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect,  useState } from "react";
 import { Box, CircularProgress, Container, Divider, styled, Typography, useTheme } from "@mui/material";
 import { NavLink as RouterNavLink, useLocation, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -65,9 +65,7 @@ const Login: React.FC = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const inviteCodeParam = params.get(INVITATIONS_PARAM_NAME);
-
-  const renderCount = useRef(0);
-
+  
   const [tempUser, setTempUser] = useState<TabiyaUser | null>(null);
   const [showRegistrationCodeForm, setShowRegistrationCodeForm] = useState(false);
 
@@ -83,6 +81,9 @@ const Login: React.FC = () => {
 
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
+
+  // A state to track if the user has been cleared on first render
+  const [isUserCleared, setIsUserCleared] = useState(false);
 
   /* ------------------
    * Callbacks to handle changes in the form fields
@@ -342,21 +343,33 @@ const Login: React.FC = () => {
   }, [activeLoginForm]);
 
   /**
-   * Clear the user from the auth state service and check for invite code when the component mounts
+   * Clear the user on mount
    */
   useEffect(() => {
-    const initializeLogin = async () => {
+    const clearUser = async () => {
       console.debug("Login: Clearing user on mount");
       await authStateService.clearUser();
-
-      renderCount.current++;
-      if (inviteCodeParam && renderCount.current > 1) {
-        handleLoginWithInvitationCode(inviteCodeParam);
-      }
+      setIsUserCleared(true);
     };
 
-    initializeLogin();
-  }, [handleLoginWithInvitationCode, inviteCodeParam]);
+    clearUser();
+  }, []);
+
+  /**
+   * Check if the user was invited with an invitation code in the URL
+   */
+  useEffect(() => {
+    if (isUserCleared && inviteCodeParam) {
+      handleLoginWithInvitationCode(inviteCodeParam);
+      // Remove the invite code from the URL
+      const newSearchParams = new URLSearchParams(location.search);
+      newSearchParams.delete(INVITATIONS_PARAM_NAME);
+      navigate({
+        pathname: location.pathname,
+        search: newSearchParams.toString()
+      }, { replace: true });
+    }
+  }, [isUserCleared, inviteCodeParam, handleLoginWithInvitationCode, location, navigate]);
 
   /* ------------------
   * aggregated states for loading and disabling ui
