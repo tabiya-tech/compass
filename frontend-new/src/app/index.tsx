@@ -1,4 +1,3 @@
-import React from "react";
 import { createHashRouter, RouterProvider } from "react-router-dom";
 import Home from "src/homePage/Home";
 import Info from "src/info/Info";
@@ -28,7 +27,6 @@ const ProtectedRouteKeys = {
 
 
 const App = () => {
-  // Define the routes using createHashRouter
   const router = createHashRouter([
     {
       path: routerPaths.ROOT,

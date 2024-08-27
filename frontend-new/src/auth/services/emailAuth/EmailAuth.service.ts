@@ -68,9 +68,16 @@ export class EmailAuthService implements AuthService {
     if (!userCredential.user) {
       throw firebaseErrorFactory(StatusCodes.NOT_FOUND, FirebaseErrorCodes.USER_NOT_FOUND, "User not found", {});
     }
-
+    
     if (!userCredential.user.emailVerified) {
-      throw firebaseErrorFactory(StatusCodes.FORBIDDEN, FirebaseErrorCodes.EMAIL_NOT_VERIFIED, "Email not verified", {})
+      // we cant stop firebase from logging the user in when their email is unverified,
+      // best we can do is log them out ourselves and then throw an error
+      try {
+        await this.handleLogout();
+      } catch (signOutError) {
+        throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (signOutError as any).code, (signOutError as any).message);
+      }
+      throw firebaseErrorFactory(StatusCodes.FORBIDDEN, FirebaseErrorCodes.EMAIL_NOT_VERIFIED, "Email not verified", {});
     }
 
     // in the case of email login, firebase doesnt give us a way to access the access token directly

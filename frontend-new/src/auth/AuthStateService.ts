@@ -1,18 +1,20 @@
-// import { auth } from "src/auth/firebaseConfig";
+import { auth } from "src/auth/firebaseConfig";
 import { AuthMethods, FirebaseToken, TabiyaUser } from "src/auth/auth.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import { logoutService } from "src/auth/services/logout/logout.service";
-// import firebase from "firebase/compat/app";
 import { jwtDecode } from "jwt-decode";
+import { logoutService } from "./services/logout/logout.service";
 
-// const REFRESH_TOKEN_EXPIRATION_PERCENTAGE = 0.1;
+const REFRESH_TOKEN_EXPIRATION_PERCENTAGE = 0.1;
 
 class AuthStateService {
   private static instance: AuthStateService;
   private user: TabiyaUser | null = null;
   private FIREBASE_DB_NAME = "firebaseLocalStorageDb";
+  private refreshTimeout: NodeJS.Timeout | null = null;
 
-  private constructor() {}
+  private constructor() {
+    console.debug("Initializing");
+  }
 
   public static getInstance(): AuthStateService {
     if (!AuthStateService.instance) {
@@ -75,9 +77,11 @@ class AuthStateService {
   }
 
   public clearUser() {
+    console.debug("Clearing user");
     PersistentStorageService.clearToken();
     this.setUser(null);
     this.deleteFirebaseDB();
+    this.clearRefreshTimeout();
   }
 
   public updateUserByToken(token: string): TabiyaUser | null {
@@ -95,74 +99,87 @@ class AuthStateService {
     }
   }
 
-  public async loadUser() {
-    try {
-      if (PersistentStorageService.getLoggedOutFlag()) {
-        try {
-          await logoutService.handleLogout();
-          await this.clearUser();
-        } catch (e) {
-          console.error("Failed to logout user on page load", e);
-          await this.clearUser();
-        }
+  public async loadUser(): Promise<TabiyaUser | null> {
+    console.debug("Loading user");
+    if (PersistentStorageService.getLoggedOutFlag()) {
+      try {
+        await logoutService.handleLogout();
+        this.clearUser();
+      } catch (e) {
+        console.error("Failed to logout user on page load", e);
+        this.clearUser();
       }
-      const token = PersistentStorageService.getToken();
-      if (token) {
-        this.updateUserByToken(token);
-      } else {
-        await this.clearUser();
-      }
-    } catch (error) {
-      console.error("Error loading user", error);
+    }
+    const token = PersistentStorageService.getToken();
+    if (token) {
+      console.debug("Token found in storage");
+      return this.updateUserByToken(token);
+    } else {
+      console.debug("No token found in storage");
+      return null;
     }
   }
 
-  // TODO: figure out how to set this up
-  // public monitorTokenExpiration(refreshTimeout: NodeJS.Timeout) {
-  //   if (auth.currentUser !== null) {
-  //     auth.currentUser?.getIdTokenResult().then((idTokenResult) => {
-  //       const expirationTime = new Date(idTokenResult.expirationTime).getTime();
-  //       const currentTime = new Date().getTime();
-  //       const timeToExpiration = expirationTime - currentTime;
-  //
-  //       refreshTimeout = setTimeout(async () => {
-  //         try {
-  //           const newToken = await auth.currentUser?.getIdToken(true);
-  //           this.updateUserByToken(newToken!);
-  //           this.monitorTokenExpiration(refreshTimeout);
-  //         } catch (error) {
-  //           console.error("Failed to refresh token:", error);
-  //           try {
-  //             await logoutService.handleLogout();
-  //           } catch (e) {
-  //             console.error("Failed to logout", e);
-  //           } finally {
-  //             this.clearUser();
-  //           }
-  //         }
-  //       }, timeToExpiration - timeToExpiration * REFRESH_TOKEN_EXPIRATION_PERCENTAGE);
-  //     });
-  //   }
-  // }
+  public async refreshToken() {
+    console.debug("Attempting to refresh token");
+    const oldToken = PersistentStorageService.getToken();
+    console.debug("Old token", "..." + oldToken?.slice(-20));
+  
+    if (auth.currentUser) {
+      try {
+        const newToken = await auth.currentUser.getIdToken(true);
+        console.debug("New token obtained", "..." + newToken.slice(-20));
+        this.updateUserByToken(newToken);
+        this.scheduleTokenRefresh(newToken);
+        return newToken;
+      } catch (error) {
+        console.error("Error refreshing token:", error);
+        this.clearUser();
+        return null;
+      }
+    } else {
+      console.debug("No current user to refresh token");
+      return null;
+    }
+  }
 
-  // TODO: figure out how to set this up
-  // public setupAuthListener() {
-  //   const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
-  //     if (user) {
-  //       const token = await user.getIdToken(true);
-  //       this.updateUserByToken(token);
-  //       this.setIsAuthenticated(true);
-  //       let refreshTimeout: NodeJS.Timeout;
-  //       this.monitorTokenExpiration(refreshTimeout);
-  //     } else {
-  //       this.setIsAuthenticated(false);
-  //       this.clearUser();
-  //     }
-  //     this.setIsAuthInProgress(false);
-  //   });
-  //
-  //   return unsubscribe;
-  // }
+  private scheduleTokenRefresh(token: string) {
+    console.debug("Scheduling next token refresh");
+    this.clearRefreshTimeout();
+
+    const decodedToken: FirebaseToken = jwtDecode(token);
+    const expirationTime = decodedToken.exp * 1000;
+    const currentTime = Date.now();
+    const timeToExpiration = expirationTime - currentTime;
+    const refreshTime = timeToExpiration- (timeToExpiration * REFRESH_TOKEN_EXPIRATION_PERCENTAGE); // Refresh token 10% before expiration
+
+    console.debug(`Next refresh scheduled in ${refreshTime / 1000} seconds`);
+
+    this.refreshTimeout = setTimeout(() => {
+      this.refreshToken();
+    }, refreshTime);
+  }
+
+  public clearRefreshTimeout() {
+    console.debug("Clearing refresh timeout");
+    if (this.refreshTimeout) {
+      clearTimeout(this.refreshTimeout);
+      this.refreshTimeout = null;
+    }
+  }
+
+  public setupAuthListener() {
+    console.debug("Setting up auth listener");
+    return auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        console.debug("User authenticated");
+        const token = await user.getIdToken(true);
+        this.scheduleTokenRefresh(token);
+      } else {
+        console.debug("User not authenticated");
+      }
+    });
+  }
 }
 
 export default AuthStateService.getInstance();
