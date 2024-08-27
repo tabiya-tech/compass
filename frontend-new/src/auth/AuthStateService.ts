@@ -10,8 +10,6 @@ import { jwtDecode } from "jwt-decode";
 class AuthStateService {
   private static instance: AuthStateService;
   private user: TabiyaUser | null = null;
-  private isAuthenticated = false;
-  private isAuthenticationInProgress = false;
   private FIREBASE_DB_NAME = "firebaseLocalStorageDb";
 
   private constructor() {}
@@ -27,24 +25,8 @@ class AuthStateService {
     return this.user;
   }
 
-  public isAuthInProgress(): boolean {
-    return this.isAuthenticationInProgress;
-  }
-
-  public isUserAuthenticated(): boolean {
-    return this.isAuthenticated;
-  }
-
   private setUser(user: TabiyaUser | null) {
     this.user = user;
-  }
-
-  private setIsAuthenticated(isAuthenticated: boolean) {
-    this.isAuthenticated = isAuthenticated;
-  }
-
-  private setIsAuthInProgress(isInProgress: boolean) {
-    this.isAuthenticationInProgress = isInProgress;
   }
 
   private async deleteFirebaseDB() {
@@ -93,11 +75,9 @@ class AuthStateService {
   }
 
   public clearUser() {
-    this.setIsAuthInProgress(true);
     PersistentStorageService.clearToken();
     this.setUser(null);
     this.deleteFirebaseDB();
-    this.setIsAuthInProgress(false);
   }
 
   public updateUserByToken(token: string): TabiyaUser | null {
@@ -106,7 +86,6 @@ class AuthStateService {
       if (_user) {
         PersistentStorageService.setToken(token)
         this.setUser(_user);
-        this.setIsAuthenticated(true);
         return _user;
       }
       return null;
@@ -117,23 +96,25 @@ class AuthStateService {
   }
 
   public async loadUser() {
-    this.setIsAuthInProgress(true);
-    if (PersistentStorageService.getLoggedOutFlag()) {
-      try {
-        await logoutService.handleLogout();
-        this.clearUser();
-      } catch (e) {
-        console.error("Failed to logout user on page load", e);
-        this.clearUser();
+    try {
+      if (PersistentStorageService.getLoggedOutFlag()) {
+        try {
+          await logoutService.handleLogout();
+          await this.clearUser();
+        } catch (e) {
+          console.error("Failed to logout user on page load", e);
+          await this.clearUser();
+        }
       }
+      const token = PersistentStorageService.getToken();
+      if (token) {
+        this.updateUserByToken(token);
+      } else {
+        await this.clearUser();
+      }
+    } catch (error) {
+      console.error("Error loading user", error);
     }
-    const token = PersistentStorageService.getToken();
-    if (token) {
-      this.updateUserByToken(token);
-    } else {
-      this.clearUser();
-    }
-    this.setIsAuthInProgress(false);
   }
 
   // TODO: figure out how to set this up

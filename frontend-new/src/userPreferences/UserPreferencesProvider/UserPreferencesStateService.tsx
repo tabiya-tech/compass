@@ -18,8 +18,12 @@ class UserPreferencesService {
   }
 
   public async loadPreferences(user_id: string) {
-    if(!this.userPreferences?.accepted_tc) {
-      this.userPreferences = await userPreferencesService.getUserPreferences(user_id)
+    try {
+      if(!this.userPreferences?.accepted_tc) {
+        this.userPreferences = await userPreferencesService.getUserPreferences(user_id)
+      }
+    } catch (error) {
+      console.error("Error loading user preferences", error);
     }
   }
 
