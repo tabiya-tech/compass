@@ -14,6 +14,7 @@ from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_types import AgentInput
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.agent.experience.experience_entity import ExperienceEntity
+from app.agent.explore_experiences_agent_director import DiveInPhase
 from app.application_state import ApplicationStateManager
 from app.constants.errors import HTTPErrorResponse
 from app.invitations import add_user_invitations_routes
@@ -205,12 +206,21 @@ async def conversation(request: Request, body: ConversationInput, clear_memory: 
         # get the date when the conversation is completed
         if state.agent_director_state.current_phase == ConversationPhase.ENDED:
             state.agent_director_state.conversation_completed_at = datetime.now(timezone.utc)
+        # Count for number of experiences explored in the conversation
+        experiences_explored = 0
+
+        for exp in state.explore_experiences_director_state.experiences_state.values():
+            # Check if the experience has been processed and has top skills
+            if exp.dive_in_phase == DiveInPhase.PROCESSED and len(exp.experience.top_skills) > 0:
+                experiences_explored += 1
+
         # save the state, before responding to the user
         await application_state_manager.save_state(state)
         return ConversationResponse(
             messages=response,
             conversation_completed=state.agent_director_state.current_phase == ConversationPhase.ENDED,
-            conversation_completed_at=state.agent_director_state.conversation_completed_at
+            conversation_completed_at=state.agent_director_state.conversation_completed_at,
+            experiences_explored=experiences_explored
         )
     except Exception as e:  # pylint: disable=broad-except
         logger.exception(
@@ -257,10 +267,19 @@ async def get_conversation_history(
         context = await conversation_memory_manager.get_conversation_context()
         messages = filter_conversation_history(context.all_history)
 
+        # Count the number of experiences explored in the conversation
+        experiences_explored = 0
+
+        for exp in state.explore_experiences_director_state.experiences_state.values():
+            # Check if the experience has been processed and has top skills
+            if exp.dive_in_phase == DiveInPhase.PROCESSED and len(exp.experience.top_skills) > 0:
+                experiences_explored += 1
+
         return ConversationResponse(
             messages=messages,
             conversation_completed=state.agent_director_state.current_phase == ConversationPhase.ENDED,
-            conversation_completed_at=state.agent_director_state.conversation_completed_at
+            conversation_completed_at=state.agent_director_state.conversation_completed_at,
+            experiences_explored=experiences_explored
         )
     except Exception as e:
         logger.exception(e)

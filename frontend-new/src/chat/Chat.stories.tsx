@@ -195,3 +195,14 @@ export const ShownWhenUserIsInactive: Story = {
     mockData: generateRealisticConversation(false, true),
   },
 };
+
+
+export const ShowWhenNewWxperienceIsDiscovered: Story = {
+  args: {
+    showNewExperienceAlert: true,
+    disableInactivityCheck: false,
+  },
+  parameters: {
+    mockData: generateRealisticConversation(false, true),
+  },
+};
