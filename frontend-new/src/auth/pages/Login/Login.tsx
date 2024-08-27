@@ -342,16 +342,20 @@ const Login: React.FC = () => {
   }, [activeLoginForm]);
 
   /**
-   * Check if there is an invite code in the URL when the component mounts
+   * Clear the user from the auth state service and check for invite code when the component mounts
    */
   useEffect(() => {
-    renderCount.current++;
-    if (!inviteCodeParam && renderCount.current === 1) {
-      return;
-    }
-    if (inviteCodeParam) {
-      handleLoginWithInvitationCode(inviteCodeParam);
-    }
+    const initializeLogin = async () => {
+      console.debug("Login: Clearing user on mount");
+      await authStateService.clearUser();
+
+      renderCount.current++;
+      if (inviteCodeParam && renderCount.current > 1) {
+        handleLoginWithInvitationCode(inviteCodeParam);
+      }
+    };
+
+    initializeLogin();
   }, [handleLoginWithInvitationCode, inviteCodeParam]);
 
   /* ------------------

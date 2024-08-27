@@ -31,12 +31,29 @@ class AuthStateService {
     this.user = user;
   }
 
-  private async deleteFirebaseDB() {
-    try {
-      indexedDB.deleteDatabase(this.FIREBASE_DB_NAME);
-    } catch (error) {
-      console.error("Failed to delete user from Firebase DB", error);
-    }
+  private async deleteFirebaseDB(): Promise<Event | undefined> {
+    return new Promise((resolve, reject) => {
+      console.debug("Attempting to delete Firebase IndexedDB");
+
+      const DBDeleteRequest = window.indexedDB.deleteDatabase(this.FIREBASE_DB_NAME);
+
+      DBDeleteRequest.onerror = (event) => {
+        console.error("Error deleting Firebase IndexedDB", event);
+        reject(event);
+      };
+
+      DBDeleteRequest.onsuccess = (event) => {
+        console.debug("Firebase IndexedDB deleted successfully");
+        resolve(event);
+      };
+
+      DBDeleteRequest.onblocked = (event) => {
+        console.warn("Firebase IndexedDB deletion blocked", event);
+        // We resolve here instead of rejecting because a blocked event doesn't necessarily mean failure
+        // The database will be deleted when all connections are closed
+        resolve(event);
+      };
+    });
   }
 
   private getUserFromToken = (token: string): TabiyaUser | null => {
@@ -76,12 +93,17 @@ class AuthStateService {
     }
   }
 
-  public clearUser() {
-    console.debug("Clearing user");
+  public async clearUser() {
+    console.debug("AuthStateService: Clearing user");
     PersistentStorageService.clearToken();
     this.setUser(null);
-    this.deleteFirebaseDB();
     this.clearRefreshTimeout();
+
+    try {
+      await this.deleteFirebaseDB();
+    } catch (error) {
+      console.error("AuthStateService: Failed to delete Firebase IndexedDB", error);
+    }
   }
 
   public updateUserByToken(token: string): TabiyaUser | null {

@@ -178,7 +178,7 @@ describe("Testing Register component", () => {
       return { email: givenEmail, name: givenName } as TabiyaUser;
     });
     // AND the clear user function is mocked to succeed
-    jest.spyOn(authStateService, "clearUser").mockImplementation(() => {});
+    jest.spyOn(authStateService, "clearUser").mockResolvedValue(undefined);
 
     // AND the logout function is mocked to succeed
     jest.spyOn(logoutService, "handleLogout").mockResolvedValue(undefined);
