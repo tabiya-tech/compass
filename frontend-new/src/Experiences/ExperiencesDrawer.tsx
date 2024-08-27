@@ -16,7 +16,6 @@ export interface ExperiencesDrawerProps {
   notifyOnClose: (event: CloseEvent) => void;
   experiences: Experience[];
   isLoading: boolean;
-  conversationCompleted: boolean;
   conversationCompletedAt: string | null;
 }
 
@@ -65,7 +64,6 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   isLoading,
   experiences,
   notifyOnClose,
-  conversationCompleted,
   conversationCompletedAt,
 }) => {
   const theme = useTheme();
@@ -77,6 +75,11 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
     email: "",
     address: "",
   });
+  const [hasTopSkills, setHasTopSkills] = useState(false);
+
+  useEffect(() => {
+    setHasTopSkills(experiences.some((experience) => experience.top_skills && experience.top_skills.length > 0));
+  }, [experiences]);
 
   const validatedPersonalInfo = Object.fromEntries(
     Object.entries(personalInfo).map(([fieldName, fieldValue]) => [fieldName, trimAndValidate(fieldValue)])
@@ -115,7 +118,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
             address={validatedPersonalInfo.address}
             experiences={experiences}
             conversationCompletedAt={conversationCompletedAt!}
-            disabled={!conversationCompleted}
+            disabled={!hasTopSkills}
           />
         </Box>
         <CustomAccordion title="Personal Information" tooltipText={tooltipText}>

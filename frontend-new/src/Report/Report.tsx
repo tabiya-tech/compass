@@ -44,13 +44,17 @@ const SkillReport: React.FC<SkillReportProps> = ({
   experiences,
   conversationCompletedAt,
 }) => {
-  const selfEmploymentExperiences = experiences.filter(
+  const experiencesWithTopSkills = experiences.filter(
+    (experience) => experience.top_skills && experience.top_skills.length > 0
+  );
+
+  const selfEmploymentExperiences = experiencesWithTopSkills.filter(
     (experience) => experience.work_type === WorkType.SELF_EMPLOYMENT
   );
-  const salaryWorkExperiences = experiences.filter(
+  const salaryWorkExperiences = experiencesWithTopSkills.filter(
     (experience) => experience.work_type === WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT
   );
-  const unpaidWorkExperiences = experiences.filter(
+  const unpaidWorkExperiences = experiencesWithTopSkills.filter(
     (experience) =>
       experience.work_type === WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK ||
       experience.work_type === WorkType.UNSEEN_UNPAID
@@ -69,6 +73,11 @@ const SkillReport: React.FC<SkillReportProps> = ({
     });
     return skillOnly.sort((a, b) => a.preferredLabel.localeCompare(b.preferredLabel));
   }, [experiences]);
+
+  // show current date if conversation is not completed
+  const currentDate = conversationCompletedAt
+    ? formatDate(conversationCompletedAt)
+    : formatDate(new Date().toLocaleDateString());
 
   return (
     <Document data-testid={DATA_TEST_ID.SKILL_REPORT_CONTAINER}>
@@ -113,12 +122,11 @@ const SkillReport: React.FC<SkillReportProps> = ({
             )}
           </View>
           <Text x={0} y={0} style={styles.bodyText} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY_TEXT}>
-            This report summarizes the key information gathered during a conversation with Compass on{" "}
-            {formatDate(conversationCompletedAt!)}. Compass is an AI chatbot that assists job-seekers in exploring their
-            skills and experiences. This report presents the candidate’s work experience and the skills identified from
-            each experience. This information can be used to guide job search and highlight their skills when applying
-            for jobs, especially during interviews with potential employers. It can be a good starting point for
-            creating a complete CV.
+            This report summarizes the key information gathered during a conversation with Compass on {currentDate}.
+            Compass is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report
+            presents the candidate’s work experience and the skills identified from each experience. This information
+            can be used to guide job search and highlight their skills when applying for jobs, especially during
+            interviews with potential employers. It can be a good starting point for creating a complete CV.
           </Text>
           <View style={styles.divider} />
           <Text x={0} y={0} style={styles.experiencesTitle} data-testid={DATA_TEST_ID.SKILL_REPORT_EXPERIENCES_TITLE}>
