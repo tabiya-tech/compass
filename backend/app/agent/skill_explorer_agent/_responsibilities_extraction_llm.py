@@ -17,19 +17,10 @@ _TAGS_TO_FILTER = ["system instructions", "user's last input", "conversation his
 
 
 class ResponsibilitiesExtractionResponse(ResponsibilitiesData):
-    data_extraction_reasoning: Optional[str] = None
-    """
-    The reasoning behind the data extraction.
-    """
-
     extracted_entities: list[str] = Field(default_factory=list)
     """
     The extracted entities from the user's input.
-    """
-
-    classification_reasoning: Optional[str] = None
-    """
-    The reasoning behind the classification.
+    This acts as a "reasoning" field and should be predicted before the classes.
     """
 
     irrelevant_entities: Optional[list[str]] = Field(default_factory=list)
@@ -63,7 +54,7 @@ class _ResponsibilitiesExtractionLLM:
                                                                 llm_input=_ResponsibilitiesExtractionLLM._extraction_prompt_template(
                                                                     context=context, last_user_input=last_user_input),
                                                                 logger=self.logger)
-        self.logger.debug("LLM output: %s", llm_output.dict())
+        self.logger.debug("LLM output: %s", llm_output.model_dump())
         return ResponsibilitiesData(
             responsibilities=llm_output.responsibilities,
             non_responsibilities=llm_output.non_responsibilities,
