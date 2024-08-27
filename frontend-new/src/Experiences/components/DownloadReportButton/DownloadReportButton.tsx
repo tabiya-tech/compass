@@ -30,7 +30,7 @@ const DownloadReportButton: React.FC<DownloadReportButtonProps> = (props) => {
   const theme = useTheme();
 
   const downloadPdf = async () => {
-    const fileName = "skillsReport.pdf";
+    const fileName = "compass-skills-report.pdf";
     const blob = await pdf(
       <SkillReport
         name={props.name}
