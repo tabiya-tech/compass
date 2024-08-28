@@ -9,10 +9,9 @@ import NotFound from "src/errorPage/NotFound";
 import ProtectedRoute from "src/app/ProtectedRoute/ProtectedRoute";
 import { routerPaths } from "src/app/routerPaths";
 import React, { useEffect, useState } from "react";
-import authStateService from "../auth/AuthStateService";
-import { userPreferencesStateService } from "../userPreferences/UserPreferencesProvider/UserPreferencesStateService";
-import { Box } from "@mui/material";
-import { Sloth } from "../theme/Sloth/Sloth";
+import authStateService from "src/auth/AuthStateService";
+import { userPreferencesStateService } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
+import { Backdrop } from "src/theme/Backdrop/Backdrop";
 
 const uniqueId = "17ccbdb7-1855-44b2-bc68-ef066e5c4e6f";
 export const SNACKBAR_KEYS = {
@@ -74,7 +73,7 @@ const App = () => {
     initializeAuth();
   }, []);
 
-  if (loading) return <Box sx={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", height: "100dvh"}}><Sloth width="64px"/></Box>
+  if (loading)  return <Backdrop isShown={loading} transparent={true} />
 
   const router = createHashRouter([
     {
