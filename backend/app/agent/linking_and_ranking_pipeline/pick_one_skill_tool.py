@@ -17,7 +17,10 @@ T = TypeVar('T', bound=BaseEntity)
 
 class _PickOneSkillLLMOutput(BaseModel):
     reasoning: Optional[str]
-    picked_skill: str
+    # The model may refuse to pick a skill if it does not find one
+    # that matches the relevance criteria and returns picked_skill: null.
+    # For that reason picked_skill is set to optional.
+    picked_skill: Optional[str]
     remaining_skills: list[str]
 
 
