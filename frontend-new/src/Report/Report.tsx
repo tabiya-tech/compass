@@ -188,8 +188,8 @@ const SkillReport: React.FC<SkillReportProps> = ({
               </View>
             ) : null}
           </View>
-          <View style={styles.skillDescriptionContainer}>
-            <Text x={0} y={0} style={styles.skillDescriptionTitle} break>
+          <View style={styles.skillDescriptionContainer} break={true}>
+            <Text x={0} y={0} style={styles.skillDescriptionTitle}>
               Skills Description
             </Text>
             <Text x={0} y={0} style={styles.info} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY_TEXT}>
