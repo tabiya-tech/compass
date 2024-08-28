@@ -284,7 +284,7 @@ describe("Chat", () => {
             messages: [
               {
                 id: expect.any(Number),
-                sender: ConversationMessageSender.COMPASS,
+                sender: ConversationMessageSender.USER,
                 message: "",
                 sent_at: expect.any(String),
               },

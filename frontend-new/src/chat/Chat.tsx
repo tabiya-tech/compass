@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useRef } from "react";
 import ChatService from "src/chat/ChatService/ChatService";
 import ChatList from "src/chat/ChatList/ChatList";
 import { IChatMessage } from "./Chat.types";
@@ -45,7 +45,6 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const [conversationCompleted, setConversationCompleted] = useState<boolean>(false);
   const [conversationCompletedAt, setConversationCompletedAt] = useState<string | null>(null);
   const [currentMessage, setCurrentMessage] = useState<string>("");
-  const [initialized, setInitialized] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [experiences, setExperiences] = React.useState<Experience[]>([]);
@@ -56,6 +55,8 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const [newConversationDialog, setNewConversationDialog] = React.useState<boolean>(false);
 
   const navigate = useNavigate();
+
+  const initializationRef = useRef(false);
 
   /**
    * adding a message to the end of the existing messages array
@@ -104,15 +105,12 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       const response = await chatService.sendMessage(userMessage);
       setConversationCompleted(response.conversation_completed);
       setConversationCompletedAt(response.conversation_completed_at);
-      const botMessages = response.messages.map((messageItem) =>
-        generateCompassMessage(messageItem.message, messageItem.sent_at)
+      response.messages.forEach((messageItem) => 
+        addMessage(generateCompassMessage(messageItem.message, messageItem.sent_at))
       );
-      botMessages.forEach((message) => addMessage(message));
     } catch (error) {
       console.error("Failed to send message:", error);
-      addMessage(
-        generateCompassMessage("I'm sorry, Something seems to have gone wrong on my end... Can you try again?", sent_at)
-      );
+      addMessage(generateCompassMessage("I'm sorry, Something seems to have gone wrong on my end... Can you try again?", sent_at));
     } finally {
       setIsTyping(false);
     }
@@ -141,73 +139,57 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     }
   }, [enqueueSnackbar, navigate]);
 
-  const initializeChat = useCallback(
-    async (session_id?: number) => {
-      setMessages([]);
+  const initializeChat = useCallback(async (session_id?: number) => {
+    if (!session_id) {
+      console.error("User has no sessions");
+      addMessage(generateCompassMessage("I'm sorry, Something seems to have gone wrong on my end... Can you try again?", new Date().toISOString()));
+      return;
+    }
 
-      try {
-        if (!session_id) {
-          console.error("User has no sessions");
-          addMessage(
-            generateCompassMessage(
-              "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
-              new Date().toISOString()
-            )
-          );
-          return;
-        }
-        const chatService = ChatService.getInstance(session_id);
-        if (!chatService) {
-          console.error("Chat service is not initialized");
-          addMessage(
-            generateCompassMessage(
-              "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
-              new Date().toISOString()
-            )
-          );
-          return;
-        }
-        setIsTyping(true);
+    const chatService = ChatService.getInstance(session_id);
+    if (!chatService) {
+      console.error("Chat service is not initialized");
+      addMessage(generateCompassMessage("I'm sorry, Something seems to have gone wrong on my end... Can you try again?", new Date().toISOString()));
+      return;
+    }
 
-        const history = await chatService.getChatHistory();
-        if (history.conversation_completed) setConversationCompleted(true);
-        if (history.conversation_completed_at) setConversationCompletedAt(history.conversation_completed_at);
-        if (history.messages.length) {
-          setMessages([]); // Clear the messages before adding the new ones
-          history.messages.forEach((message: ConversationMessage) => {
-            if (message.sender === ConversationMessageSender.USER && message.message !== "") {
-              addMessage(generateUserMessage(message.message, message.sent_at));
-            } else {
-              addMessage(generateCompassMessage(message.message, message.sent_at));
-            }
-          });
-        } else {
-          await sendMessage("", session_id);
-        }
-      } catch (e) {
-        if (e instanceof ServiceError) {
-          writeServiceErrorToLog(e, console.error);
-        } else {
-          console.error("Failed to initialize chat", e);
-        }
-        const errorMessage = getUserFriendlyErrorMessage(e as Error);
-        enqueueSnackbar(errorMessage, { variant: "error" });
-      } finally {
-        setIsTyping(false);
+    try {
+      setIsTyping(true);
+      const history = await chatService.getChatHistory();
+      setConversationCompleted(history.conversation_completed);
+      setConversationCompletedAt(history.conversation_completed_at);
+      
+      setMessages(history.messages.map((message: ConversationMessage) => 
+        message.sender === ConversationMessageSender.USER
+          ? generateUserMessage(message.message, message.sent_at)
+          : generateCompassMessage(message.message, message.sent_at)
+      ));
+
+      if (!history.messages.length) {
+        await sendMessage("", session_id);
       }
-    },
-    [enqueueSnackbar, sendMessage]
-  );
+    } catch (e) {
+      if (e instanceof ServiceError) {
+        writeServiceErrorToLog(e, console.error);
+      } else {
+        console.error("Failed to initialize chat", e);
+      }
+      const errorMessage = getUserFriendlyErrorMessage(e as Error);
+      enqueueSnackbar(errorMessage, { variant: "error" });
+    } finally {
+      setIsTyping(false);
+    }
+  }, [enqueueSnackbar, sendMessage]);
 
   useEffect(() => {
     const userPreferences = userPreferencesStateService.getUserPreferences();
-    if(!userPreferences) {
+    if(!userPreferences || initializationRef.current) {
       return;
     }
-    if (!initialized && userPreferences.sessions.length) {
-      initializeChat(userPreferences.sessions[0]).then((_prefs) => setInitialized(true));
+    if (userPreferences.sessions.length) {
+      initializeChat(userPreferences.sessions[0]).then(() => initializationRef.current = true);
     }
-  }, [initializeChat, initialized]);
+  }, [initializeChat]);
 
   const handleSend = useCallback(async () => {
     if (currentMessage.trim()) {
@@ -286,21 +268,14 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     // Reset the timer when the user interacts with the page
     const resetTimer = () => {
       setLastActivityTime(Date.now());
-      if (showBackdrop) {
-        setShowBackdrop(false);
-      }
+      setShowBackdrop(false);
     };
 
-    const handleUserActivity = () => resetTimer();
+    const events = ["mousedown", "keydown"];
+    events.forEach(event => document.addEventListener(event, resetTimer));
 
-    document.addEventListener("mousedown", handleUserActivity);
-    document.addEventListener("keydown", handleUserActivity);
-
-    return () => {
-      document.removeEventListener("mousedown", handleUserActivity);
-      document.removeEventListener("keydown", handleUserActivity);
-    };
-  }, [showBackdrop, disableInactivityCheck]);
+    return () => events.forEach(event => document.removeEventListener(event, resetTimer));
+  }, [disableInactivityCheck]);
 
   const handleOpenNewConversationDialog = () => {
     setNewConversationDialog(true);
