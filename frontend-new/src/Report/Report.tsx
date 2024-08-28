@@ -37,13 +37,13 @@ function formatDate(dateString: string): string {
 }
 
 const SkillReport: React.FC<SkillReportProps> = ({
-  name,
-  email,
-  phone,
-  address,
-  experiences,
-  conversationCompletedAt,
-}) => {
+                                                   name,
+                                                   email,
+                                                   phone,
+                                                   address,
+                                                   experiences,
+                                                   conversationCompletedAt,
+                                                 }) => {
   const experiencesWithTopSkills = experiences.filter(
     (experience) => experience.top_skills && experience.top_skills.length > 0
   );
@@ -91,35 +91,35 @@ const SkillReport: React.FC<SkillReportProps> = ({
             Skills Report
           </Text>
           <View style={styles.column}>
-            {name && (
+            {name ? (
               <Text x={0} y={0} style={styles.subtitle} data-testid={DATA_TEST_ID.SKILL_REPORT_NAME}>
                 {name}
               </Text>
-            )}
-            {address && (
+            ) : null}
+            {address ? (
               <View style={styles.rowView} data-testid={DATA_TEST_ID.SKILL_REPORT_ADDRESS}>
                 <Image src={`${process.env.PUBLIC_URL}/location.png`} style={styles.infoIcon} />
                 <Text x={0} y={0} style={styles.text}>
                   {address}
                 </Text>
               </View>
-            )}
-            {phone && (
+            ) : null}
+            {phone ? (
               <View style={styles.rowView} data-testid={DATA_TEST_ID.SKILL_REPORT_PHONE}>
                 <Image src={`${process.env.PUBLIC_URL}/phone-call.png`} style={styles.infoIcon} />
                 <Text x={0} y={0} style={styles.text}>
                   {phone}
                 </Text>
               </View>
-            )}
-            {email && (
+            ) : null}
+            {email ? (
               <View style={styles.rowView} data-testid={DATA_TEST_ID.SKILL_REPORT_EMAIL}>
                 <Image src={`${process.env.PUBLIC_URL}/email.png`} style={styles.infoIcon} />
                 <Text x={0} y={0} style={styles.text}>
                   {email}
                 </Text>
               </View>
-            )}
+            ) : null}
           </View>
           <Text x={0} y={0} style={styles.bodyText} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY_TEXT}>
             This report summarizes the key information gathered during a conversation with Compass on {currentDate}.
@@ -133,7 +133,7 @@ const SkillReport: React.FC<SkillReportProps> = ({
             EXPERIENCES
           </Text>
           <View style={styles.experiencesContainer} data-testid={DATA_TEST_ID.SKILL_REPORT_EXPERIENCES_CONTAINER}>
-            {selfEmploymentExperiences.length > 0 && (
+            {selfEmploymentExperiences.length > 0 ? (
               <View style={styles.categoryContainer}>
                 <View wrap={false}>
                   <View style={styles.categoryTitleContainer}>
@@ -150,8 +150,8 @@ const SkillReport: React.FC<SkillReportProps> = ({
                   <ExperiencesReportContent key={index} experience={experience} />
                 ))}
               </View>
-            )}
-            {salaryWorkExperiences.length > 0 && (
+            ) : null}
+            {salaryWorkExperiences.length > 0 ? (
               <View style={styles.categoryContainer}>
                 <View wrap={false}>
                   <View style={styles.categoryTitleContainer}>
@@ -168,8 +168,8 @@ const SkillReport: React.FC<SkillReportProps> = ({
                   <ExperiencesReportContent key={index} experience={experience} />
                 ))}
               </View>
-            )}
-            {unpaidWorkExperiences.length > 0 && (
+            ) : null}
+            {unpaidWorkExperiences.length > 0 ? (
               <View style={styles.categoryContainer}>
                 <View wrap={false}>
                   <View style={styles.categoryTitleContainer}>
@@ -186,7 +186,7 @@ const SkillReport: React.FC<SkillReportProps> = ({
                   <ExperiencesReportContent key={index} experience={experience} />
                 ))}
               </View>
-            )}
+            ) : null}
           </View>
           <View style={styles.skillDescriptionContainer}>
             <Text x={0} y={0} style={styles.skillDescriptionTitle} break>
@@ -223,14 +223,14 @@ const SkillReport: React.FC<SkillReportProps> = ({
               this information, speak with Compass again or create a complete CV based on this report.
             </Text>
           </View>
-          {experiences.length > 2 && (
+          {experiences.length > 2 ? (
             <Text
               x={0}
               y={0}
               style={styles.pageNumber}
               render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`}
             />
-          )}
+          ) : null}
         </View>
       </Page>
     </Document>
