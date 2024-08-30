@@ -1,6 +1,6 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect,  useState } from "react";
 import { Box, CircularProgress, Container, Divider, styled, Typography, useTheme } from "@mui/material";
-import { NavLink as RouterNavLink, useLocation } from "react-router-dom";
+import { NavLink as RouterNavLink, useLocation, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import SocialAuth from "src/auth/components/SocialAuth/SocialAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -13,14 +13,18 @@ import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginW
 import { validatePassword } from "src/auth/utils/validatePassword";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
-import { AuthContext, TabiyaUser } from "src/auth/AuthProvider";
 import { emailAuthService } from "src/auth/services/emailAuth/EmailAuth.service";
 import { anonymousAuthService } from "src/auth/services/anonymousAuth/AnonymousAuth.service";
 import RegistrationCodeFormModal from "src/invitations/components/RegistrationCodeFormModal/RegistrationCodeFormModal";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
-import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
+import {
+  userPreferencesStateService,
+} from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
+import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
+import authStateService from "src/auth/AuthStateService";
+import { TabiyaUser } from "src/auth/auth.types";
 
 export const INVITATIONS_PARAM_NAME = "invite-code";
 
@@ -50,27 +54,20 @@ export const DATA_TEST_ID = {
   LANGUAGE_SELECTOR: `login-language-selector-${uniqueId}`,
 };
 
-export interface LoginProps {
-  postLoginHandler: (user: TabiyaUser) => void;
-  isLoading: boolean;
-}
-
 enum ActiveForm {
   NONE = "NONE",
   EMAIL = "EMAIL",
   INVITE_CODE = "INVITE_CODE",
 }
 
-const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) => {
+const Login: React.FC = () => {
   const theme = useTheme();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const inviteCodeParam = params.get(INVITATIONS_PARAM_NAME);
-
-  const renderCount = useRef(0);
-
+  
   const [tempUser, setTempUser] = useState<TabiyaUser | null>(null);
-  const [showInviteCodeForm, setShowInviteCodeForm] = useState(false);
+  const [showRegistrationCodeForm, setShowRegistrationCodeForm] = useState(false);
 
   const [inviteCode, setInviteCode] = useState("");
   const [email, setEmail] = useState("");
@@ -79,14 +76,18 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
 
   const [activeLoginForm, setActiveLoginForm] = useState(ActiveForm.NONE);
 
-  const [isLoggingInWithEmail, setIsLoggingInWithEmail] = useState(false);
-  const [isLoggingInAnonymously, setIsLoggingInAnonymously] = useState(false);
+  // a state to keep track of whether the login process is loading
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { isAuthenticationInProgress, updateUserByToken } = useContext(AuthContext);
-  const { updateUserPreferences } = useContext(UserPreferencesContext);
   const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
 
-  // callbacks to pass on to child components
+  // A state to track if the user has been cleared on first render
+  const [isUserCleared, setIsUserCleared] = useState(false);
+
+  /* ------------------
+   * Callbacks to handle changes in the form fields
+   */
   const handleEmailChanged = (email: string) => {
     setActiveLoginForm(ActiveForm.EMAIL);
     setEmail(email);
@@ -100,49 +101,155 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
     setInviteCode(code);
   };
 
-  /**
-   * Handle the login form submission
-   * @param event
-   */
-  const handleLoginWithEmail = useCallback(
-    (email: string, password: string) => {
-      const passwordValidationResult = validatePassword(password);
-      setPasswordError(passwordValidationResult);
-
-      if (passwordValidationResult === "" && email && password) {
-        setIsLoggingInWithEmail(true);
-        emailAuthService.handleLoginWithEmail(
-          email,
-          password,
-          async (token) => {
-            setIsLoggingInWithEmail(false);
-            try {
-              const _user = updateUserByToken(token);
-              if (_user) {
-                postLoginHandler(_user);
-              }
-            } catch (e) {
-              let errorMessage;
-              if (e instanceof FirebaseError) {
-                errorMessage = getUserFriendlyFirebaseErrorMessage(e);
-                writeFirebaseErrorToLog(e, console.error);
-              } else {
-                console.error(e);
-                errorMessage = (e as Error).message;
-              }
-              enqueueSnackbar(errorMessage, { variant: "error" });
-            }
-          },
-          (error) => {
-            setIsLoggingInWithEmail(false);
-            const shownError = getUserFriendlyFirebaseErrorMessage(error);
-            writeFirebaseErrorToLog(error, console.error);
-            enqueueSnackbar(shownError, { variant: "error" });
-          }
+  /* ------------------
+  * Callbacks to handle successful logins
+  */
+  const handlePostLogin = useCallback(
+    async (user: TabiyaUser) => {
+      try {
+        const prefs = await userPreferencesService.getUserPreferences(
+          user.id
         );
+        if(prefs === null){
+          throw new Error("User preferences not found");
+        }
+        // set the local preferences "state" ( for lack of a better word )
+        userPreferencesStateService.setUserPreferences(prefs);
+        if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
+          navigate(routerPaths.DPA, { replace: true });
+        } else {
+          navigate(routerPaths.ROOT, { replace: true });
+          enqueueSnackbar("Welcome back!", { variant: "success" });
+        }
+      } catch (error) {
+        let errorMessage;
+        if(error instanceof ServiceError) {
+          writeServiceErrorToLog(error, console.error);
+          errorMessage = getUserFriendlyErrorMessage(error);
+        } else {
+          errorMessage = (error as Error).message;
+          console.error("An error occurred while trying to get your preferences", error)
+        }
+        enqueueSnackbar(`An error occurred while trying to get your preferences: ${errorMessage}`, { variant: "error" });
       }
     },
-    [enqueueSnackbar, updateUserByToken, postLoginHandler]
+    [navigate, enqueueSnackbar]
+  );
+
+  /**
+   * A callback to handle what happens after the user has logged in with a social provider
+   * This function is passed to the SocialAuth component, which calls it after a successful login
+   * @param user
+   */
+  const successfulSocialLoginCallback = useCallback(async (user: TabiyaUser) => {
+    setIsLoading(true);
+    try {
+      const prefs = await userPreferencesService.getUserPreferences(
+        user.id,
+      );
+      // if the user is not found, it means that the user is new and needs to create user preferences
+      // but first, we need to ask the user for a registration code
+      if (prefs === null) {
+        setTempUser(user);
+        setShowRegistrationCodeForm(true);
+        return;
+      }
+      userPreferencesStateService.setUserPreferences(prefs);
+      await handlePostLogin(user);
+    } catch (error) {
+      let errorMessage;
+      if (error instanceof ServiceError) {
+        errorMessage = getUserFriendlyErrorMessage(error as Error);
+      } else {
+        console.error(error);
+        errorMessage = (error as Error).message;
+      }
+      enqueueSnackbar(errorMessage, { variant: "error" });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [enqueueSnackbar, handlePostLogin]);
+
+  /**
+   * A callback to create user preferences for a user, after they have entered a registration code
+   * We pass this to the RegistrationCodeFormModal component to use after the user has entered a registration code
+   * @param invitationCode
+   */
+  const createUserPreferencesCallback = useCallback(async (invitationCode: string) => {
+    setIsLoading(true)
+    try {
+      const prefs = await userPreferencesService.createUserPreferences(
+        {
+          user_id: tempUser?.id!,
+          language: Language.en,
+          invitation_code: invitationCode,
+        }
+      );
+      userPreferencesStateService.setUserPreferences(prefs);
+      await handlePostLogin(tempUser!);
+    } catch (error) {
+      let errorMessage;
+      if (error instanceof ServiceError) {
+        errorMessage = getUserFriendlyErrorMessage(error as Error);
+        writeServiceErrorToLog(error, console.error);
+      } else {
+        console.error(error);
+        errorMessage = (error as Error).message;
+      }
+      enqueueSnackbar(errorMessage, { variant: "error" });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [enqueueSnackbar, handlePostLogin, tempUser]);
+
+  /* ------------------
+  * Actual login handlers
+  */
+  /**
+   * Handle the login form submission
+   * @param email
+   * @param password
+   */
+  const handleLoginWithEmail = useCallback(
+    async (email: string, password: string) => {
+      try {
+        const passwordValidationResult = validatePassword(password);
+        setPasswordError(passwordValidationResult);
+
+        if (passwordValidationResult !== "") {
+          return;
+        }
+
+        setIsLoading(true);
+        const token = await emailAuthService.handleLoginWithEmail(
+          email,
+          password,
+        );
+        const _user = authStateService.updateUserByToken(token);
+        if (_user) {
+          await handlePostLogin(_user);
+        } else {
+          // if a user cannot be gotten from the token, we have to throw an error
+          throw new Error("Something went wrong while logging in. Please try again.");
+        }
+      } catch (error) {
+        let errorMessage;
+        if (error instanceof ServiceError) {
+          errorMessage = getUserFriendlyErrorMessage(error as Error);
+          writeServiceErrorToLog(error, console.error);
+        } else if (error instanceof FirebaseError) {
+          errorMessage = getUserFriendlyFirebaseErrorMessage(error);
+          writeFirebaseErrorToLog(error, console.error);
+        } else {
+          console.error(error);
+          errorMessage = (error as Error).message;
+        }
+        enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [enqueueSnackbar, handlePostLogin]
   );
 
   /**
@@ -150,113 +257,81 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
    * @param code
    */
   const handleLoginWithInvitationCode = useCallback(
-    (code: string) => {
-      setIsLoggingInAnonymously(true);
-      invitationsService
-        .checkInvitationCodeStatus(
-          code,
-          (invitation) => {
-            enqueueSnackbar("Invitation code is valid", { variant: "success" });
-            anonymousAuthService.handleAnonymousLogin(
-              async (token) => {
-                const _user = updateUserByToken(token);
-                if (_user) {
-                  try {
-                    // create user preferences for the first time.
-                    // in order to do this, there needs to be a logged in user in the persistent storage
-                    await userPreferencesService.createUserPreferences(
-                      {
-                        user_id: _user.id,
-                        invitation_code: invitation.invitation_code,
-                        language: Language.en,
-                      },
-                      (_prefs) => {
-                        updateUserPreferences(_prefs);
-                        postLoginHandler(_user);
-                      },
-                      (error) => {
-                        writeServiceErrorToLog(error, console.error);
-                        const errorMessage = getUserFriendlyErrorMessage(error as Error);
-                        enqueueSnackbar(errorMessage, { variant: "error" });
-                      }
-                    );
-                  } catch (error) {
-                    if (error instanceof ServiceError) {
-                      writeServiceErrorToLog(error, console.error);
-                    } else {
-                      console.error(error);
-                    }
-                    const errorMessage = getUserFriendlyErrorMessage(error as Error);
-                    enqueueSnackbar(errorMessage, { variant: "error" });
-                  }
-                }
-              },
-              (error) => {
-                const shownError = getUserFriendlyFirebaseErrorMessage(error);
-                writeFirebaseErrorToLog(error, console.error);
-                enqueueSnackbar(shownError, { variant: "error" });
+    async (code: string) => {
+      try {
+        setIsLoading(true)
+        const invitation = await invitationsService
+          .checkInvitationCodeStatus(
+            code
+          )
+        if(invitation.status !== InvitationStatus.VALID || invitation.invitation_type !== InvitationType.AUTO_REGISTER) {
+          throw new Error("Invalid invitation code");
+        }
+        enqueueSnackbar("Invitation code is valid", { variant: "success" });
+        const token = await anonymousAuthService.handleAnonymousLogin();
+        const _user = authStateService.updateUserByToken(token);
+        if (_user) {
+            // create user preferences for the first time.
+            // in order to do this, there needs to be a logged in user in the persistent storage
+            const prefs = await userPreferencesService.createUserPreferences(
+              {
+                user_id: _user.id,
+                invitation_code: invitation.invitation_code,
+                language: Language.en,
               }
             );
-          },
-          (e) => {
-            writeServiceErrorToLog(e, console.error);
-            const errorMessage = getUserFriendlyErrorMessage(e);
-            enqueueSnackbar(errorMessage, { variant: "error" });
-          }
-        )
-        .finally(() => {
-          setIsLoggingInAnonymously(false);
-        });
+            userPreferencesStateService.setUserPreferences(prefs);
+            await handlePostLogin(_user);
+        } else {
+          // if a user cannot be gotten from the token, we have to throw an error
+          throw new Error("User not found");
+        }
+      } catch (error) {
+        let errorMessage;
+        if (error instanceof ServiceError) {
+          writeServiceErrorToLog(error, console.error);
+          errorMessage = getUserFriendlyErrorMessage(error as Error);
+        } else if (error instanceof FirebaseError) {
+          writeFirebaseErrorToLog(error, console.error);
+          errorMessage = getUserFriendlyFirebaseErrorMessage(error);
+        } else {
+          console.error(error);
+          errorMessage = (error as Error).message;
+        }
+        enqueueSnackbar(errorMessage, { variant: "error" });
+      } finally {
+        setIsLoading(false);
+      }
     },
-    [enqueueSnackbar, updateUserByToken, postLoginHandler, updateUserPreferences]
+    [enqueueSnackbar, handlePostLogin]
   );
 
   /**
-   * Handle logging in with social media idps
-   * @param user
+   * The submit button could be used to login with email/password or with an invitation code
+   * This function handles the submission of the form, and decides which method to use based on the active form
+   * @param event
    */
-  const socialLoginHandler = async (user: TabiyaUser) => {
-    try {
-      await userPreferencesService.getUserPreferences(
-        user.id,
-        (prefs) => {
-          updateUserPreferences(prefs);
-          if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
-            setTempUser(user);
-            setShowInviteCodeForm(true);
-            return;
-          }
-          postLoginHandler(user);
-        },
-        (error) => {
-          setTempUser(user);
-          setShowInviteCodeForm(true);
-          writeServiceErrorToLog(error, console.error);
-        }
-      );
-    } catch (e) {
-      console.log(e);
-
-      const errorMessage = getUserFriendlyErrorMessage(e as Error);
-      enqueueSnackbar(errorMessage, { variant: "error" });
-      console.error("Error during login process", e);
-    }
-  };
-
-  // depending on which form is active, handle submit button
   const handleLoginSubmit = useCallback(
-    (event: React.FormEvent) => {
+    async (event: React.FormEvent) => {
       event.preventDefault();
       if (activeLoginForm === ActiveForm.INVITE_CODE) {
-        handleLoginWithInvitationCode(inviteCode);
+        await handleLoginWithInvitationCode(inviteCode);
+      } else if (activeLoginForm === ActiveForm.EMAIL && email && password){
+        await handleLoginWithEmail(email, password);
       } else {
-        handleLoginWithEmail(email, password);
+        enqueueSnackbar("Please fill in the email and password fields", { variant: "error" });
       }
     },
-    [email, handleLoginWithInvitationCode, handleLoginWithEmail, activeLoginForm, inviteCode, password]
+    [email, handleLoginWithInvitationCode, handleLoginWithEmail, activeLoginForm, inviteCode, password, enqueueSnackbar]
   );
 
-  // clear whichever form is not active
+  /* ------------------
+  * side effects, like checking the invite code in the URL
+  */
+
+  /**
+   * Reset the form fields when the active form changes
+   */
   useEffect(() => {
     if (activeLoginForm === ActiveForm.EMAIL) {
       setInviteCode("");
@@ -267,50 +342,42 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
     }
   }, [activeLoginForm]);
 
-  // Check if the user was invited by checking the invite code in the URL
+  /**
+   * Clear the user on mount
+   */
   useEffect(() => {
-    renderCount.current++;
-    if (!inviteCodeParam && renderCount.current === 1) {
-      return;
-    }
+    const clearUser = async () => {
+      console.debug("Login: Clearing user on mount");
+      await authStateService.clearUser();
+      setIsUserCleared(true);
+    };
 
-    if (inviteCodeParam) {
+    clearUser();
+  }, []);
+
+  /**
+   * Check if the user was invited with an invitation code in the URL
+   */
+  useEffect(() => {
+    if (isUserCleared && inviteCodeParam) {
       handleLoginWithInvitationCode(inviteCodeParam);
+      // Remove the invite code from the URL
+      const newSearchParams = new URLSearchParams(location.search);
+      newSearchParams.delete(INVITATIONS_PARAM_NAME);
+      navigate({
+        pathname: location.pathname,
+        search: newSearchParams.toString()
+      }, { replace: true });
     }
-  }, [handleLoginWithInvitationCode, inviteCodeParam]);
+  }, [isUserCleared, inviteCodeParam, handleLoginWithInvitationCode, location, navigate]);
 
-  // login is loading when any of the login methods return a loading state
-  const isLoginLoading = isAuthenticationInProgress || isLoggingInWithEmail || isLoggingInAnonymously;
+  /* ------------------
+  * aggregated states for loading and disabling ui
+  */
+  // login is loading when the authentication provider or any of the login methods return a loading state
+  const isLoginLoading = isLoading;
   // login button is disabled when login is loading, or when there is no active Form, or the fields for the active form are not filled in
-  const isLoginButtonDisabled =
-    isLoginLoading || activeLoginForm === ActiveForm.NONE || ((!email || !password) && !inviteCode);
-
-  const createUser = async (invitationCode: string) => {
-    try {
-      await userPreferencesService.createUserPreferences(
-        {
-          user_id: tempUser?.id!,
-          language: Language.en,
-          invitation_code: invitationCode,
-        },
-        (_prefs) => {
-          updateUserPreferences(_prefs);
-          postLoginHandler(tempUser!);
-        },
-        (error) => {
-          writeServiceErrorToLog(error, console.error);
-          const errorMessage = getUserFriendlyErrorMessage(error as Error);
-          enqueueSnackbar(errorMessage, { variant: "error" });
-        }
-      );
-    } catch (e) {
-      console.log(e);
-
-      const errorMessage = getUserFriendlyErrorMessage(e as Error);
-      enqueueSnackbar(errorMessage, { variant: "error" });
-      console.error("Error during login");
-    }
-  };
+  const isLoginButtonDisabled = isLoginLoading || activeLoginForm === ActiveForm.NONE || ((!email || !password) && !inviteCode);
 
   return (
     <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.LOGIN_CONTAINER}>
@@ -334,7 +401,7 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
             inviteCode={inviteCode}
             notifyOnInviteCodeChanged={handleInviteCodeChanged}
             isDisabled={isLoginLoading}
-            notifyOnFocused={() => {}}
+            notifyOnFocused={() => {}} //TODO: remove this
           />
           <Divider textAlign="center" style={{ width: "100%" }}>
             <Typography
@@ -380,8 +447,8 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
         </Box>
         <SocialAuth
           disabled={false}
-          preLoginCheck={() => true}
-          postLoginHandler={socialLoginHandler}
+          preLoginCheck={() => true} // no checks need to happen before logging in with social providers
+          postLoginHandler={successfulSocialLoginCallback}
           isLoading={isLoading}
         />
         <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.LOGIN_LINK}>
@@ -398,9 +465,9 @@ const Login: React.FC<Readonly<LoginProps>> = ({ postLoginHandler, isLoading }) 
         </Typography>
       </Box>
       <RegistrationCodeFormModal
-        show={showInviteCodeForm}
-        onSuccess={createUser}
-        onClose={() => setShowInviteCodeForm(false)}
+        show={showRegistrationCodeForm}
+        onSuccess={createUserPreferencesCallback}
+        onClose={() => setShowRegistrationCodeForm(false)}
       />
     </Container>
   );

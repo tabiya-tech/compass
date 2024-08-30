@@ -1,14 +1,13 @@
-import { UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { Invitation } from "src/invitations/InvitationsService/invitations.types";
 
-export const TOKEN_KEY = "token";
-export const USER_PREFERENCES_KEY = "user_preferences";
+const PERSISTENT_STORAGE_VERSION = "0.0.1";
+export const TOKEN_KEY = `token_${PERSISTENT_STORAGE_VERSION}`;
 
-export const INVITATION_KEY = "invitation";
+export const INVITATION_KEY = `invitation_${PERSISTENT_STORAGE_VERSION}`
 
-export const LOGIN_METHOD_KEY = "login_method";
+export const LOGIN_METHOD_KEY = `login_method_${PERSISTENT_STORAGE_VERSION}`;
 
-export const LOG_OUT_FLAG_KEY = "logged_out";
+export const LOG_OUT_FLAG_KEY = `log_out_flag_${PERSISTENT_STORAGE_VERSION}`;
 
 /**
  * This class is used to store the tokens in the session storage.
@@ -38,37 +37,6 @@ export class PersistentStorageService {
    */
   static setToken(token: string): void {
     this.storage.setItem(TOKEN_KEY, token);
-  }
-
-  /**
-   * Returns the user preferences from the storage
-   * @returns UserPreference | null - The user preferences
-   */
-  static getUserPreferences(): UserPreference | null {
-    const item = this.storage.getItem(USER_PREFERENCES_KEY);
-    const validAcceptedTc = item ? JSON.parse(item).accepted_tc : undefined;
-    return item
-      ? {
-          ...JSON.parse(item),
-          accepted_tc: validAcceptedTc,
-        }
-      : null;
-  }
-
-  /**
-   * Sets the user preferences in the storage
-   * @param preferences
-   */
-  static setUserPreferences(preferences: UserPreference): void {
-    this.storage.setItem(USER_PREFERENCES_KEY, JSON.stringify(preferences));
-  }
-
-  /**
-   * Clears the user preferences from the storage
-   * @returns void
-   */
-  static clearUserPreferences(): void {
-    this.storage.removeItem(USER_PREFERENCES_KEY);
   }
 
   /**

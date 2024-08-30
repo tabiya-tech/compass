@@ -6,7 +6,6 @@ import Login, { DATA_TEST_ID } from "./Login";
 import LoginWithEmailForm from "src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm";
 import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm";
 import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
-import { AuthContext, AuthContextValue } from "src/auth/AuthProvider";
 import { EmailAuthService } from "src/auth/services/emailAuth/EmailAuth.service";
 import { AnonymousAuthService } from "src/auth/services/anonymousAuth/AnonymousAuth.service";
 import InvitationsService from "src/invitations/InvitationsService/invitations.service";
@@ -87,21 +86,11 @@ describe("Testing Login component", () => {
     jest.clearAllMocks();
   });
 
-  const authContextValue: AuthContextValue = {
-    user: null,
-    updateUserByToken: jest.fn(),
-    clearUser: jest.fn(),
-    isAuthenticationInProgress: false,
-    isAuthenticated: false,
-  };
-
   test("it should show login form successfully", async () => {
     // GIVEN the component is rendered within necessary context providers
     render(
       <HashRouter>
-        <AuthContext.Provider value={authContextValue}>
-          <Login postLoginHandler={jest.fn()} isLoading={false} />
-        </AuthContext.Provider>
+          <Login />
       </HashRouter>
     );
 
@@ -135,9 +124,7 @@ describe("Testing Login component", () => {
 
     render(
       <HashRouter>
-        <AuthContext.Provider value={authContextValue}>
-          <Login postLoginHandler={jest.fn()} isLoading={false} />
-        </AuthContext.Provider>
+          <Login />
       </HashRouter>
     );
 
@@ -155,8 +142,6 @@ describe("Testing Login component", () => {
       expect(handleLoginWithEmailSpy).toHaveBeenCalledWith(
         givenEmail,
         givenPassword,
-        expect.any(Function),
-        expect.any(Function)
       );
     });
   });
@@ -164,33 +149,19 @@ describe("Testing Login component", () => {
   test("it should handle invitation code login correctly", async () => {
     // AND the invitation code mock will succeed
     const handleCheckInvitationStatusSpy = jest
-      .spyOn(invitationsService, "checkInvitationCodeStatus")
-      .mockImplementation(
-        // @ts-ignore
-        (invitationCode, onSuccess, onError) => {
-          return new Promise<void>((resolve) => {
-            onSuccess({
-              invitation_code: "INVITE-CODE-123",
-              status: InvitationStatus.VALID,
-              invitation_type: InvitationType.AUTO_REGISTER,
-            });
-            resolve();
-          });
-        }
-      );
+      .spyOn(invitationsService, "checkInvitationCodeStatus").mockResolvedValue({
+        invitation_code: "INVITE-CODE-123",
+        status: InvitationStatus.VALID,
+        invitation_type: InvitationType.AUTO_REGISTER,
+      })
     // AND the anonymous auth mock will succeed
     const handleAnonymousLoginSpy = jest
       .spyOn(anonymousAuthService, "handleAnonymousLogin")
-      // @ts-ignore
-      .mockImplementation((user, onSuccess, onError) => {
-        onSuccess(user);
-      });
+      .mockResolvedValue("mock-token");
 
     render(
       <HashRouter>
-        <AuthContext.Provider value={authContextValue}>
-          <Login postLoginHandler={jest.fn()} isLoading={false} />
-        </AuthContext.Provider>
+          <Login />
       </HashRouter>
     );
 
@@ -205,15 +176,13 @@ describe("Testing Login component", () => {
     // THEN the checkInvitationStatus function should be called with the correct arguments
     await waitFor(() => {
       expect(handleCheckInvitationStatusSpy).toHaveBeenCalledWith(
-        "INVITE-CODE-123",
-        expect.any(Function),
-        expect.any(Function)
+        "INVITE-CODE-123"
       );
     });
 
     // AND the anonymousAuthService should be called with the correct arguments
     await waitFor(() => {
-      expect(handleAnonymousLoginSpy).toHaveBeenCalledWith(expect.any(Function), expect.any(Function));
+      expect(handleAnonymousLoginSpy).toHaveBeenCalledWith();
     });
   });
 });

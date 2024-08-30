@@ -6,7 +6,6 @@ import { act, render, screen } from "src/_test_utilities/test-utils";
 import { DATA_TEST_ID, useSnackbar } from "./SnackbarProvider";
 import userEvent from "@testing-library/user-event";
 import { Button } from "@mui/material";
-import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 
 describe("SnackbarProvider render tests", () => {
   beforeEach(() => {
@@ -14,8 +13,6 @@ describe("SnackbarProvider render tests", () => {
     (console.warn as jest.Mock).mockClear();
     jest.clearAllMocks();
   });
-
-  beforeAll(() => mockUseTokens());
 
   it("renders children correctly", () => {
     render(<div data-testid="test-child">Test Child</div>);
@@ -30,7 +27,6 @@ describe("SnackbarProvider render tests", () => {
 });
 
 describe("SnackbarProvider render action tests", () => {
-  beforeAll(() => mockUseTokens());
   afterEach(() => {
     jest.clearAllMocks();
   });

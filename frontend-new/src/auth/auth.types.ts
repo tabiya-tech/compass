@@ -30,8 +30,6 @@ export type AuthContextValue = {
   user: TabiyaUser | null;
   updateUserByToken: (token: string) => TabiyaUser | null;
   clearUser: () => void;
-  isAuthenticationInProgress: boolean;
-  isAuthenticated: boolean;
 };
 
 export enum AuthServices {
@@ -61,9 +59,7 @@ export enum AuthProviderIds {
 export interface AuthService {
   /**
    * Handle Logout: Method to handle user logout.
-   * @param {() => void} successCallback - Callback to execute on successful logout.
-   * @param {(error: any) => void} failureCallback - Callback to execute on logout error.
    * @returns {Promise<void>}
    */
-  handleLogout(successCallback: () => void, failureCallback: (error: any) => void): Promise<void>;
+  handleLogout(): Promise<void>;
 }
