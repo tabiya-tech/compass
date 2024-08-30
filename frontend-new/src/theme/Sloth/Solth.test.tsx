@@ -3,10 +3,8 @@
 import React from "react";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { Sloth, DATA_TEST_ID, SlothProps } from "./Sloth";
-import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
 
 describe("Sloth", () => {
-  beforeAll(() => mockUseTokens());
   it("should render the sloth with the default props", () => {
     // GIVEN some children
     const children = <div data-testid="children" />;

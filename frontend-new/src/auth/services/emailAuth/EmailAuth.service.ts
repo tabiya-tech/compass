@@ -1,7 +1,7 @@
 import { auth } from "src/auth/firebaseConfig";
 import { AuthService, AuthServices } from "src/auth/auth.types";
 import { StatusCodes } from "http-status-codes";
-import { FirebaseError, getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
+import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
@@ -23,23 +23,19 @@ export class EmailAuthService implements AuthService {
 
   /**
    * Handle user logout.
-   * @param {() => void} successCallback - Callback to execute on successful logout.
-   * @param {(error: any) => void} failureCallback - Callback to execute on logout error.
+   * @returns {Promise<void>}
    */
-  async handleLogout(successCallback: () => void, failureCallback: (error: any) => void): Promise<void> {
+  async handleLogout(): Promise<void> {
     const errorFactory = getFirebaseErrorFactory("EmailAuthService", "handleLogout", "POST", "signOut");
     try {
       await auth.signOut();
-      successCallback();
     } catch (error) {
       const firebaseError = (error as any).code;
-      failureCallback(
-        errorFactory(
+      throw errorFactory(
           firebaseError.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
           firebaseError || FirebaseErrorCodes.INTERNAL_ERROR,
           firebaseError.message || FirebaseErrorCodes.INTERNAL_ERROR,
           {}
-        )
       );
     }
   }
@@ -48,54 +44,49 @@ export class EmailAuthService implements AuthService {
    * Handle user login with email and password.
    * @param {string} email - The user's email address.
    * @param {string} password - The user's password.
-   * @param {(data: TFirebaseAccessToken) => void} successCallback - Callback to execute on successful login.
-   * @param {(error: any) => void} failureCallback - Callback to execute on login error.
-   * @returns {Promise<void>}
+   * @returns {Promise<string>} - The firebase token.
    */
   async handleLoginWithEmail(
     email: string,
     password: string,
-    successCallback: (data: string) => void,
-    failureCallback: (error: FirebaseError) => void
-  ): Promise<void> {
-    const errorFactory = getFirebaseErrorFactory(
+  ): Promise<string> {
+    const firebaseErrorFactory = getFirebaseErrorFactory(
       "EmailAuthService",
       "handleLogin",
       "POST",
       "signInWithEmailAndPassword"
     );
+
+    let userCredential;
+
     try {
-      const userCredential = await auth.signInWithEmailAndPassword(email, password);
-      if (!userCredential.user) {
-        failureCallback(errorFactory(StatusCodes.NOT_FOUND, FirebaseErrorCodes.USER_NOT_FOUND, "User not found", {}));
-        return;
-      }
-      if (!userCredential.user.emailVerified) {
-        failureCallback(
-          errorFactory(StatusCodes.FORBIDDEN, FirebaseErrorCodes.EMAIL_NOT_VERIFIED, "Email not verified", {})
-        );
-        return;
-      }
-
-      // in the case of email login, firebase doesnt give us a way to access the access token directly
-      // but we can use the getIdToken method to get the id token, which will be identical to the access token
-      const token = await userCredential.user.getIdToken();
-      // set the login method to email for future reference
-      // we'll want to know how the user logged in, when we want to log them out for example
-      PersistentStorageService.setLoginMethod(AuthServices.EMAIL);
-      successCallback(token);
+      userCredential = await auth.signInWithEmailAndPassword(email, password);
     } catch (error) {
-      const firebaseError = (error as any).code;
-
-      failureCallback(
-        errorFactory(
-          firebaseError.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
-          firebaseError || FirebaseErrorCodes.INTERNAL_ERROR,
-          firebaseError.message || FirebaseErrorCodes.INTERNAL_ERROR,
-          {}
-        )
-      );
+        throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (error as any).code, (error as any).message);
     }
+
+    if (!userCredential.user) {
+      throw firebaseErrorFactory(StatusCodes.NOT_FOUND, FirebaseErrorCodes.USER_NOT_FOUND, "User not found", {});
+    }
+    
+    if (!userCredential.user.emailVerified) {
+      // we cant stop firebase from logging the user in when their email is unverified,
+      // best we can do is log them out ourselves and then throw an error
+      try {
+        await this.handleLogout();
+      } catch (signOutError) {
+        throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (signOutError as any).code, (signOutError as any).message);
+      }
+      throw firebaseErrorFactory(StatusCodes.FORBIDDEN, FirebaseErrorCodes.EMAIL_NOT_VERIFIED, "Email not verified", {});
+    }
+
+    // in the case of email login, firebase doesnt give us a way to access the access token directly
+    // but we can use the getIdToken method to get the id token, which will be identical to the access token
+    const token = await userCredential.user.getIdToken();
+    // set the login method to email for future reference
+    // we'll want to know how the user logged in, when we want to log them out for example
+    PersistentStorageService.setLoginMethod(AuthServices.EMAIL);
+    return token;
   }
 
   /**
@@ -103,57 +94,56 @@ export class EmailAuthService implements AuthService {
    * @param {string} email - The user's email address.
    * @param {string} password - The user's password.
    * @param {string} name - The user's name.
-   * @param {(data: TFirebaseAccessToken) => void} successCallback - Callback to execute on successful registration.
-   * @param {(error: any) => void} failureCallback - Callback to execute on registration error.
-   * @returns {Promise<TFirebaseAccessToken | undefined>} The registration response, or undefined if there was an error.
+   * @returns {Promise<string>} - The firebase token.
    */
   async handleRegisterWithEmail(
     email: string,
     password: string,
     name: string,
-    successCallback: (token: string) => void,
-    failureCallback: (error: FirebaseError) => void
-  ): Promise<void> {
-    const errorFactory = getFirebaseErrorFactory(
+  ): Promise<string> {
+
+    const firebaseErrorFactory = getFirebaseErrorFactory(
       "EmailAuthService",
       "handleRegister",
       "POST",
       "createUserWithEmailAndPassword"
     );
+
+    let userCredential;
+
     try {
-      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-      if (!userCredential.user) {
-        failureCallback(errorFactory(StatusCodes.NOT_FOUND, FirebaseErrorCodes.USER_NOT_FOUND, "User not found", {}));
-        return;
-      }
+      userCredential = await auth.createUserWithEmailAndPassword(email, password);
+    } catch (error) {
+        throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (error as any).code, (error as any).message);
+    }
+
+    if (!userCredential.user) {
+      throw firebaseErrorFactory(StatusCodes.NOT_FOUND, FirebaseErrorCodes.USER_NOT_FOUND, "User not found", {});
+    }
+
+    try {
+      // update the user's display name
       await userCredential.user.updateProfile({
         displayName: name,
       });
+      // send a verification email
       await userCredential.user.sendEmailVerification();
-      // return the user object
-      // in the case of email login, firebase doesnt give us a way to access the access token directly
-      // but we can use the getIdToken method to get the id token, which will be identical to the access token
-      const token = await userCredential.user.getIdToken();
-      // set the login method to email for future reference
-      // we'll want to know how the user logged in, when we want to log them out for example
-      PersistentStorageService.setLoginMethod(AuthServices.EMAIL);
-
-      //Note: when you register a user on firebase, they are automatically logged in
-      // typically we would sign the user out immediately after registration
-      // however we need to keep the user logged in to create user preferences
-      // so once the preferences are created we will log the user out
-      successCallback(token);
     } catch (error) {
-      const firebaseError = (error as any).code;
-      failureCallback(
-        errorFactory(
-          firebaseError?.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
-          firebaseError || FirebaseErrorCodes.INTERNAL_ERROR,
-          firebaseError?.message || FirebaseErrorCodes.INTERNAL_ERROR,
-          {}
-        )
-      );
+      throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (error as any).code, (error as any).message);
     }
+
+    // in the case of email login, firebase doesnt give us a way to access the access token directly
+    // but we can use the getIdToken method to get the id token, which will be identical to the access token
+    const token = await userCredential.user.getIdToken();
+    // set the login method to email for future reference
+    // we'll want to know how the user logged in, when we want to log them out for example
+    PersistentStorageService.setLoginMethod(AuthServices.EMAIL);
+
+    //Note: when you register a user on firebase, they are automatically logged in
+    // typically we would sign the user out immediately after registration
+    // however we need to keep the user logged in to create user preferences
+    // so once the preferences are created we will log the user out
+    return token;
   }
 }
 

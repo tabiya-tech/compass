@@ -1,9 +1,6 @@
-export type UserLanguage = {
+export type UserPreference = {
   user_id: string;
   language: Language;
-};
-
-export type UserPreference = UserLanguage & {
   accepted_tc?: Date;
   sessions: number[];
 };
@@ -24,9 +21,3 @@ export enum Language {
   en = "en",
   // fr = 'fr', // French in the future
 }
-
-export type UserPreferencesContextValue = {
-  userPreferences: UserPreference | null;
-  isLoading: boolean;
-  updateUserPreferences: (userPreferences: UserPreference | null) => void;
-};

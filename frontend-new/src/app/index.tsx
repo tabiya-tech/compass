@@ -1,14 +1,17 @@
-import { Route, Routes } from "react-router-dom";
-import { routerPaths } from "src/app/routerPaths";
+import { createHashRouter, RouterProvider } from "react-router-dom";
 import Home from "src/homePage/Home";
 import Info from "src/info/Info";
-import RegisterWithEmail from "src/auth/pages/Register/Register";
-import LoginWithEmail from "src/auth/pages/Login/Login";
+import Register from "src/auth/pages/Register/Register";
+import Login from "src/auth/pages/Login/Login";
 import DataProtectionAgreement from "src/dataProtectionAgreement/DataProtectionAgreement";
 import VerifyEmail from "src/auth/pages/VerifyEmail/VerifyEmail";
 import NotFound from "src/errorPage/NotFound";
 import ProtectedRoute from "src/app/ProtectedRoute/ProtectedRoute";
-import { useRouteHandlers } from "src/app/hooks/useRouteHandlers";
+import { routerPaths } from "src/app/routerPaths";
+import React, { useEffect, useState } from "react";
+import authStateService from "src/auth/AuthStateService";
+import { userPreferencesStateService } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
+import { Backdrop } from "src/theme/Backdrop/Backdrop";
 
 const uniqueId = "17ccbdb7-1855-44b2-bc68-ef066e5c4e6f";
 export const SNACKBAR_KEYS = {
@@ -16,72 +19,117 @@ export const SNACKBAR_KEYS = {
   ONLINE_SUCCESS: `online-success-${uniqueId}`,
 };
 
-const App = () => {
-  const { handleLogin, handleRegister, handleAcceptDPA, handleVerifyEmail, isPostLoginLoading } = useRouteHandlers();
-
-  return (
-    <Routes>
-      {/*------*/}
-      {/*The following routes require the user to be authenticated*/}
-      {/*------*/}
-      <Route
-        path={routerPaths.ROOT}
-        element={
-          <ProtectedRoute authenticationAndDPARequired={true}>
-            <Home />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path={routerPaths.SETTINGS}
-        element={
-          <ProtectedRoute authenticationAndDPARequired={true}>
-            <Info />
-          </ProtectedRoute>
-        }
-      />
-      {/*------*/}
-      {/*The following routes do not require the user to be authenticated*/}
-      {/*------*/}
-      <Route
-        path={routerPaths.REGISTER}
-        element={
-          <ProtectedRoute authenticationAndDPARequired={false}>
-            <RegisterWithEmail
-              postRegisterHandler={handleRegister}
-              postLoginHandler={handleLogin}
-              isPostLoginLoading={isPostLoginLoading}
-            />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path={routerPaths.LOGIN}
-        element={
-          <ProtectedRoute authenticationAndDPARequired={false}>
-            <LoginWithEmail postLoginHandler={handleLogin} isLoading={isPostLoginLoading} />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path={routerPaths.VERIFY_EMAIL}
-        element={
-          <ProtectedRoute authenticationAndDPARequired={false}>
-            <VerifyEmail notifyOnEmailVerified={handleVerifyEmail} />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path={routerPaths.DPA}
-        element={
-          <ProtectedRoute authenticationAndDPARequired={false}>
-            <DataProtectionAgreement notifyOnAcceptDPA={handleAcceptDPA} isLoading={isPostLoginLoading} />
-          </ProtectedRoute>
-        }
-      />
-      <Route path="*" element={<NotFound />} />
-      {/*-----*/}
-    </Routes>
-  );
+const ProtectedRouteKeys = {
+  ROOT: "ROOT",
+  SETTINGS: "SETTINGS",
+  REGISTER: "REGISTER",
+  LOGIN: "LOGIN",
+  VERIFY_EMAIL: "VERIFY_EMAIL",
+  DPA: "DPA",
 };
+const App = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const initializeAuth = async () => {
+      setLoading(true);
+      try {
+        await authStateService.loadUser();
+        const user = authStateService.getUser();
+        if (user) {
+          console.debug("User authenticated: Welcome,", user.email);
+          try {
+            await userPreferencesStateService.loadPreferences(user.id);
+            // check if user preferences have been loaded
+            const preferences = userPreferencesStateService.getUserPreferences();
+            console.debug("User preferences loaded", preferences);
+            // delay for half a sec so that the loading transition is smoother for the user and not just a flash
+            setTimeout(() => setLoading(false), 500)
+          } catch (error) {
+            console.error("Error loading user preferences", error);
+            // delay for half a sec so that the loading transition is smoother for the user and not just a flash
+            setTimeout(() => setLoading(false), 500)
+          }
+        } else {
+          console.debug("User not authenticated");
+          // delay for half a sec so that the loading transition is smoother for the user and not just a flash
+          setTimeout(() => setLoading(false), 500)
+        }
+      } catch (error) {
+        console.error("Error initializing auth", error);
+        // delay for half a sec so that the loading transition is smoother for the user and not just a flash
+        setTimeout(() => setLoading(false), 500)
+      }
+
+      const unsubscribe = authStateService.setupAuthListener();
+
+      return () => {
+        console.debug("Cleaning up auth");
+        unsubscribe();
+        authStateService.clearRefreshTimeout();
+      };
+    };
+
+    initializeAuth();
+  }, []);
+
+  if (loading)  return <Backdrop isShown={loading} transparent={true} />
+
+  const router = createHashRouter([
+    {
+      path: routerPaths.ROOT,
+      element: (
+        <ProtectedRoute key={ProtectedRouteKeys.ROOT}>
+          <Home />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: routerPaths.SETTINGS,
+      element: (
+        <ProtectedRoute key={ProtectedRouteKeys.SETTINGS}>
+          <Info />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: routerPaths.REGISTER,
+      element: (
+        <ProtectedRoute key={ProtectedRouteKeys.REGISTER}>
+          <Register />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: routerPaths.LOGIN,
+      element: (
+        <ProtectedRoute key={ProtectedRouteKeys.LOGIN}>
+          <Login />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: routerPaths.VERIFY_EMAIL,
+      element: (
+        <ProtectedRoute key={ProtectedRouteKeys.VERIFY_EMAIL}>
+          <VerifyEmail />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: routerPaths.DPA,
+      element: (
+        <ProtectedRoute key={ProtectedRouteKeys.DPA}>
+          <DataProtectionAgreement />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "*",
+      element: <NotFound />,
+    },
+  ]);
+  return <RouterProvider router={router} />;
+};
+
 export default App;

@@ -2,14 +2,15 @@ import "src/_test_utilities/consoleMock";
 import React from "react";
 import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
 import DataProtectionAgreement, { DATA_TEST_ID } from "./DataProtectionAgreement";
-import { HashRouter } from "react-router-dom";
+import { HashRouter, useNavigate } from "react-router-dom";
 import { waitFor } from "@testing-library/react";
-import { Language, UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { TabiyaUser } from "src/auth/auth.types";
-import { mockUseTokens } from "src/_test_utilities/mockUseTokens";
-import { UserPreferencesContext } from "src/userPreferences/UserPreferencesProvider/UserPreferencesProvider";
-import { AuthContext, authContextDefaultValue } from "src/auth/AuthProvider";
+import {
+  userPreferencesStateService,
+} from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
+import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import authStateService from "src/auth/AuthStateService";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -31,15 +32,6 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   };
 });
 
-// mock the UserPreferencesService
-jest.mock("src/userPreferences/UserPreferencesService/userPreferences.service", () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      getUserPreferences: jest.fn(),
-    };
-  });
-});
-
 // mock the router
 jest.mock("react-router-dom", () => {
   const actual = jest.requireActual("react-router-dom");
@@ -54,24 +46,6 @@ jest.mock("react-router-dom", () => {
 });
 
 describe("Testing Data Protection Policy component", () => {
-  const createUserPreferencesMock = jest.fn();
-  const updateUserPreferencesMock = jest.fn();
-
-  const userPreferencesContextValue = {
-    getUserPreferences: jest.fn(),
-    createUserPreferences: createUserPreferencesMock,
-    updateUserPreferencesOnClient: jest.fn(),
-    userPreferences: {
-      accepted_tc: new Date(),
-      user_id: "0001",
-      language: Language.en,
-      sessions: [],
-    },
-    updateUserPreferences: updateUserPreferencesMock,
-    isLoading: false,
-  };
-  const givenNotifyOnAcceptDPA = jest.fn();
-  const givenIsLoading = false;
 
   beforeEach(() => {
     // Clear console mocks and mock functions
@@ -79,8 +53,6 @@ describe("Testing Data Protection Policy component", () => {
     (console.warn as jest.Mock).mockClear();
     jest.clearAllMocks();
   });
-
-  beforeAll(() => mockUseTokens());
 
   beforeEach(() => {
     const mockDate = new Date(2023, 5, 14); // June 14, 2023
@@ -91,9 +63,7 @@ describe("Testing Data Protection Policy component", () => {
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-          <DataProtectionAgreement notifyOnAcceptDPA={givenNotifyOnAcceptDPA} isLoading={givenIsLoading} />
-        </UserPreferencesContext.Provider>
+          <DataProtectionAgreement />
       </HashRouter>
     );
 
@@ -115,32 +85,14 @@ describe("Testing Data Protection Policy component", () => {
   });
 
   test("should successfully accept the data protection policy", async () => {
-    // GIVEN a user is logged in
-    const givenUser: TabiyaUser = {
-      id: "0001",
-      email: "foo@bar.baz",
-      name: "Foo Bar",
-    };
-    const newUserPreferences: UserPreference = {
-      user_id: givenUser.id,
-      language: Language.en,
-      accepted_tc: new Date(),
-      sessions: [],
-    };
-
-    // AND the user preferences provider will create the user preferences
-    updateUserPreferencesMock.mockImplementation((newUserPrefs, onSuccess, onError) => {
-      onSuccess(newUserPreferences);
-    });
+    // GIVEN the user preferences state service is mocked to set the user preferences
+    jest.spyOn(userPreferencesStateService, 'setUserPreferences')
+      .mockImplementation(() => {});
 
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <AuthContext.Provider value={authContextDefaultValue}>
-          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <DataProtectionAgreement notifyOnAcceptDPA={givenNotifyOnAcceptDPA} isLoading={givenIsLoading} />
-          </UserPreferencesContext.Provider>
-        </AuthContext.Provider>
+        <DataProtectionAgreement />
       </HashRouter>
     );
 
@@ -156,45 +108,6 @@ describe("Testing Data Protection Policy component", () => {
     fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_BUTTON));
   });
 
-  test("should not call accepting DPA service method if no invitation is in state", async () => {
-    // GIVEN a user is logged in
-    const givenUser: TabiyaUser = {
-      id: "0001",
-      email: "foo@bar.baz",
-      name: "Foo Bar",
-    };
-    const newUserPreferences: UserPreference = {
-      user_id: givenUser.id,
-      language: Language.en,
-      accepted_tc: new Date(),
-      sessions: [],
-    };
-
-    // AND the user preferences provider will create the user preferences
-    createUserPreferencesMock.mockImplementation((newUserPrefs, onSuccess, onError) => {
-      onSuccess(newUserPreferences);
-    });
-
-    // WHEN the component is rendered
-    render(
-      <HashRouter>
-        <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-          <DataProtectionAgreement notifyOnAcceptDPA={givenNotifyOnAcceptDPA} isLoading={givenIsLoading} />
-        </UserPreferencesContext.Provider>
-      </HashRouter>
-    );
-
-    // AND the givenNotifyOnAcceptDPA should not have been called
-    await waitFor(() => {
-      expect(givenNotifyOnAcceptDPA).not.toHaveBeenCalled();
-    });
-
-    // AND the success message should not be displayed
-    await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalled();
-    });
-  });
-
   test("should fail to accept the data protection policy gracefully", async () => {
     // GIVEN a user is logged in
     const givenUser: TabiyaUser = {
@@ -203,19 +116,18 @@ describe("Testing Data Protection Policy component", () => {
       name: "Foo Bar",
     };
 
-    // AND the user preferences provider will fail to create the user preferences
-    createUserPreferencesMock.mockImplementation((newUserPrefs, onSuccess, onError) => {
-      onError(new Error("Failed to create user preferences"));
-    });
+    // AND the user preferences service is mocked to throw an error
+    jest.spyOn(userPreferencesService, 'updateUserPreferences')
+      .mockRejectedValue(new Error("Failed to update user preferences"));
+
+    // AND the authStateService is mocked to return the given user
+    jest.spyOn(authStateService, 'getUser')
+      .mockImplementation(() => givenUser);
 
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <AuthContext.Provider value={{ ...authContextDefaultValue, user: givenUser }}>
-          <UserPreferencesContext.Provider value={userPreferencesContextValue}>
-            <DataProtectionAgreement notifyOnAcceptDPA={givenNotifyOnAcceptDPA} isLoading={givenIsLoading} />
-          </UserPreferencesContext.Provider>
-        </AuthContext.Provider>
+        <DataProtectionAgreement />
       </HashRouter>
     );
 
@@ -230,12 +142,12 @@ describe("Testing Data Protection Policy component", () => {
     fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_BUTTON));
 
     await waitFor(() => {
-      expect(givenNotifyOnAcceptDPA).not.toHaveBeenCalled();
+      expect(useNavigate()).not.toHaveBeenCalled();
     });
 
     // AND the error message should be displayed
     await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to update user preferences", {
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to update user preferences: Failed to update user preferences", {
         variant: "error",
       });
     });

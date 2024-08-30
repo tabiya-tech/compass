@@ -36,7 +36,7 @@ export async function getActiveToken(): Promise<string> {
     return getRefreshedToken();
   }
 
-  let decodedToken: DecodedToken = jwtDecode<DecodedToken>(token!);
+  let decodedToken: DecodedToken = jwtDecode<DecodedToken>(token);
 
   // Check if the token has expired
   // if the token has expired, return a refreshed one

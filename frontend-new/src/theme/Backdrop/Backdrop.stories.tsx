@@ -18,3 +18,7 @@ export const ShownWithMessage: Story = {
 export const ShownWithoutMessage: Story = {
   args: { isShown: true },
 };
+
+export const ShownTransparent: Story = {
+  args: { isShown: true, transparent: true },
+};

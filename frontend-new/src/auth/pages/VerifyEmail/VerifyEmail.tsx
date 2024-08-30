@@ -2,6 +2,8 @@ import React from "react";
 import { Box, Container } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
+import { routerPaths } from "../../../app/routerPaths";
+import { useNavigate } from "react-router-dom";
 
 const uniqueId = "f1228c6a-e447-4946-b810-0c7ddc8ca833";
 
@@ -14,16 +16,14 @@ export const DATA_TEST_ID = {
   BACK_TO_LOGIN_BUTTON: `verification-back-to-login-button-${uniqueId}`,
 };
 
-export interface VerifyEmailProps {
-  notifyOnEmailVerified: () => void;
-}
 
-const VerifyEmail: React.FC<Readonly<VerifyEmailProps>> = ({ notifyOnEmailVerified }) => {
+const VerifyEmail: React.FC = () => {
+  const navigate = useNavigate();
   /**
    * Handle when a user clicks back to login
    */
   const handleBackToLogin = async () => {
-    notifyOnEmailVerified();
+    navigate(routerPaths.LOGIN, { replace: true });
   };
 
   return (

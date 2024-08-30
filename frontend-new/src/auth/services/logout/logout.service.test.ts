@@ -6,7 +6,6 @@ import { socialAuthService } from "src/auth/services/socialAuth/SocialAuth.servi
 import { anonymousAuthService } from "src/auth/services/anonymousAuth/AnonymousAuth.service";
 import { emailAuthService } from "src/auth/services/emailAuth/EmailAuth.service";
 import { AuthServices } from "src/auth/auth.types";
-import { FirebaseError } from "src/error/FirebaseError/firebaseError";
 
 // mock the SocialAuthServices
 jest.mock("src/auth/services/socialAuth/SocialAuth.service", () => {
@@ -68,125 +67,83 @@ describe("LogoutService class tests", () => {
   });
 
   describe("handleLogout", () => {
-    test("should call successCallback on successful logout for social login", async () => {
+    test("should successfully logout using the social service logout", async () => {
       // GIVEN the user is logged in with social login
       (PersistentStorageService.getLoginMethod as jest.Mock).mockReturnValue(AuthServices.SOCIAL);
       //@ts-ignore
-      jest.spyOn(socialAuthService, "handleLogout").mockImplementation((successCallback, failureCallback) => {
-        successCallback();
-      });
-
-      const successCallback = jest.fn();
-      const failureCallback = jest.fn();
+      jest.spyOn(socialAuthService, "handleLogout").mockResolvedValue(undefined)
 
       // WHEN the logout is attempted
-      await logoutService.handleLogout(successCallback, failureCallback);
+      const logoutCallback = async () => await logoutService.handleLogout();
 
-      // THEN the success callback should be called
-      expect(successCallback).toHaveBeenCalled();
-      // AND the failure callback should not be called
-      expect(failureCallback).not.toHaveBeenCalled();
+      // THEN the logout should succeed
+      await expect(logoutCallback()).resolves.toBeUndefined()
     });
 
-    test("should call failureCallback on logout error for social login", async () => {
+    test("should throw an error on social auth service logout error", async () => {
       // GIVEN the user is logged in with social login
       (PersistentStorageService.getLoginMethod as jest.Mock).mockReturnValue(AuthServices.SOCIAL);
-      const mockError = {
-        message: "Logout failed",
-        code: "auth/logout-failed",
-      };
+      const mockError = new Error("Logout failed");
       //@ts-ignore
-      jest.spyOn(socialAuthService, "handleLogout").mockImplementation((successCallback, failureCallback) => {
-        failureCallback(mockError as unknown as FirebaseError);
-      });
+      jest.spyOn(socialAuthService, "handleLogout").mockRejectedValue(mockError)
 
-      const successCallback = jest.fn();
-      const failureCallback = jest.fn();
 
       // WHEN the logout is attempted
-      await logoutService.handleLogout(successCallback, failureCallback);
+      const logoutCallback = async () => await logoutService.handleLogout();
 
-      // THEN the success callback should not be called
-      expect(successCallback).not.toHaveBeenCalled();
-      // AND the failure callback should be called with the error
-      expect(failureCallback).toHaveBeenCalledWith(mockError);
+      // THEN the logout should throw an error
+      await expect(logoutCallback()).rejects.toThrow("Logout failed")
     });
 
-    test("should call successCallback on successful logout for anonymous login", async () => {
+    test("should successfully logout using anonymous service logout", async () => {
       // GIVEN the user is logged in with anonymous login
       (PersistentStorageService.getLoginMethod as jest.Mock).mockReturnValue(AuthServices.ANONYMOUS);
       //@ts-ignore
-      jest.spyOn(anonymousAuthService, "handleLogout").mockImplementation((successCallback, failureCallback) => {
-        successCallback();
-      });
-
-      const successCallback = jest.fn();
-      const failureCallback = jest.fn();
+      jest.spyOn(anonymousAuthService, "handleLogout").mockResolvedValue(undefined)
 
       // WHEN the logout is attempted
-      await logoutService.handleLogout(successCallback, failureCallback);
+      const logoutCallback = async () => await logoutService.handleLogout();
 
-      // THEN the success callback should be called
-      expect(successCallback).toHaveBeenCalled();
-      // AND the failure callback should not be called
-      expect(failureCallback).not.toHaveBeenCalled();
+      // THEN the logout should succeed
+      await expect(logoutCallback()).resolves.toBeUndefined()
     });
 
-    test("should call failureCallback on logout error for anonymous login", async () => {
+    test("should throw an error on anonymous auth service logout error", async () => {
       // GIVEN the user is logged in with anonymous login
       (PersistentStorageService.getLoginMethod as jest.Mock).mockReturnValue(AuthServices.ANONYMOUS);
       const mockError = new Error("Logout failed");
       //@ts-ignore
-      jest.spyOn(anonymousAuthService, "handleLogout").mockImplementation((successCallback, failureCallback) => {
-        failureCallback(mockError);
-      });
-
-      const successCallback = jest.fn();
-      const failureCallback = jest.fn();
+      jest.spyOn(anonymousAuthService, "handleLogout").mockRejectedValue(mockError)
 
       // WHEN the logout is attempted
-      await logoutService.handleLogout(successCallback, failureCallback);
+      const logoutCallback = async () => await logoutService.handleLogout();
 
-      // THEN the success callback should not be called
-      expect(successCallback).not.toHaveBeenCalled();
-      // AND the failure callback should be called with the error
-      expect(failureCallback).toHaveBeenCalledWith(mockError);
+      //THEN the logout should throw an error
+      await expect(logoutCallback()).rejects.toThrow("Logout failed")
     });
 
-    test("should call successCallback on successful logout for email login", async () => {
+    test("should successfully logout using email service logout", async () => {
       // GIVEN the user is logged in with email login
       (PersistentStorageService.getLoginMethod as jest.Mock).mockReturnValue(AuthServices.EMAIL);
       //@ts-ignore
-      jest.spyOn(emailAuthService, "handleLogout").mockImplementation((successCallback, failureCallback) => {
-        successCallback();
-      });
-
-      const givenSuccessCallback = jest.fn();
-      const givenFailureCallback = jest.fn();
+      jest.spyOn(emailAuthService, "handleLogout").mockResolvedValue()
 
       // WHEN the logout is attempted
-      await logoutService.handleLogout(givenSuccessCallback, givenFailureCallback);
+      const logoutCallback = async () => await logoutService.handleLogout();
 
-      // THEN the success callback should be called
-      expect(givenSuccessCallback).toHaveBeenCalled();
-      // AND the failure callback should not be called
-      expect(givenFailureCallback).not.toHaveBeenCalled();
+      // THEN the logout should succeed
+      await expect(logoutCallback()).resolves.toBeUndefined()
     });
 
-    test("should call failureCallback on invalid login method", async () => {
+    test("should throw an error on email auth service logout error", async () => {
       // GIVEN the user has an invalid login method
       (PersistentStorageService.getLoginMethod as jest.Mock).mockReturnValue("INVALID_METHOD");
 
-      const givenSuccessCallback = jest.fn();
-      const givenFailureCallback = jest.fn();
-
       // WHEN the logout is attempted
-      await logoutService.handleLogout(givenSuccessCallback, givenFailureCallback);
+      const logoutCallback = async () => await logoutService.handleLogout();
 
-      // THEN the success callback should not be called
-      expect(givenSuccessCallback).not.toHaveBeenCalled();
-      // AND the failure callback should be called with the error
-      expect(givenFailureCallback).toHaveBeenCalledWith("Invalid login method");
+      // THEN the logout should throw an error
+      await expect(logoutCallback()).rejects.toThrow("Invalid login method")
     });
   });
 });

@@ -5,6 +5,7 @@ import { Box, TextField, Typography } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import InvitationsService from "src/invitations/InvitationsService/invitations.service";
+import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
 
 const uniqueId = "f782907a-6904-482c-b148-3c6682bf7b54";
 
@@ -68,22 +69,19 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ sho
     else onClose();
   }, [isValidated, onClose, invitationCode]);
 
-  const validateInvitationCode = useCallback(async () => {
+  const validateRegistrationCode = useCallback(async () => {
     try {
       setIsValidating(true);
       const service = InvitationsService.getInstance();
-
-      await service.checkInvitationCodeStatus(
-        invitationCode,
-        (invitation) => {
-          enqueueSnackbar("Registration code is valid!", { variant: "success" });
-          setIsValidated(true);
-          onSuccess(invitation.invitation_code);
-        },
-        () => {
-          enqueueSnackbar("Invalid registration code, try again.", { variant: "error" });
-        }
+      const invitation = await service.checkInvitationCodeStatus(
+        invitationCode
       );
+      if(invitation.status !== InvitationStatus.VALID || invitation.invitation_type !== InvitationType.REGISTER) {
+        throw new Error("Invalid registration code");
+      }
+      enqueueSnackbar("Registration code is valid!", { variant: "success" });
+      setIsValidated(true);
+      onSuccess(invitation.invitation_code);
     } catch (e: any) {
       enqueueSnackbar("Invalid registration code", { variant: "error" });
     } finally {
@@ -119,7 +117,7 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ sho
         <PrimaryButton
           fullWidth
           disableWhenOffline
-          onClick={validateInvitationCode}
+          onClick={validateRegistrationCode}
           disabled={!invitationCode.length || isValidating}
         >
           {isValidating ? "Validating..." : "Validate"}
