@@ -25,6 +25,9 @@ on:
       taxonomy-database-name:
         description: "The taxonomy database name of the in the target environment"
         value: ${{ jobs.setup-env.outputs.taxonomy-database-name }}
+      taxonomy-model-id:
+        description: "The taxonomy model id in the target environment/partner"
+        value: ${{ jobs.setup-env.outputs.taxonomy-model-id }}
       application-database-name:
         description: "The application database name in the target environment"
         value: ${{ jobs.setup-env.outputs.application-database-name }}
@@ -43,6 +46,7 @@ jobs:
       frontend-domain: ${{ steps.setup.outputs.frontend_domain }}
       backend-domain: ${{ steps.setup.outputs.backend_domain }}
       taxonomy-database-name: ${{ vars.TAXONOMY_DATABASE_NAME }}
+      taxonomy-model-id: ${{ vars.TAXONOMY_MODEL_ID }}
       application-database-name: ${{ vars.APPLICATION_DATABASE_NAME }}
       vertex-api-region: ${{ vars.VERTEX_API_REGION }}
     steps:
@@ -63,5 +67,6 @@ jobs:
           echo "frontend-domain: ${{ steps.setup.outputs.frontend_domain }}"
           echo "backend-domain: ${{ steps.setup.outputs.backend_domain }}"
           echo "taxonomy-database-name: ${{ steps.setup.outputs.taxonomy-database-name }}"
+          echo "taxonomy-model-id: ${{ steps.setup.outputs.taxonomy-model-id }}"
           echo "application-database-name: ${{ steps.setup.outputs.application-database-name }}"
           echo "vertex-api-region: ${{ steps.setup.outputs.vertex-api-region }}"

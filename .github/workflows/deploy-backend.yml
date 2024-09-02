@@ -8,6 +8,9 @@ on:
       taxonomy-database-name:
         required: true
         type: string
+      taxonomy-model-id:
+        required: true
+        type: string
       application-database-name:
         required: true
         type: string
@@ -90,6 +93,7 @@ jobs:
         env:
           TAXONOMY_MONGODB_URI: ${{ secrets.TAXONOMY_MONGODB_URI }}
           TAXONOMY_DATABASE_NAME: ${{ inputs.taxonomy-database-name }}
+          TAXONOMY_MODEL_ID: ${{ inputs.taxonomy-model-id }}
           APPLICATION_MONGODB_URI: ${{ secrets.APPLICATION_MONGODB_URI }}
           APPLICATION_DATABASE_NAME: ${{ inputs.application-database-name }}
           TARGET_ENVIRONMENT: ${{ inputs.target-environment }}
@@ -111,6 +115,7 @@ jobs:
           GCP_OAUTH_CLIENT_ID: ${{ secrets.GCP_OAUTH_CLIENT_ID }}
           TAXONOMY_MONGODB_URI: ${{ secrets.TAXONOMY_MONGODB_URI }}
           TAXONOMY_DATABASE_NAME: ${{ inputs.taxonomy-database-name }}
+          TAXONOMY_MODEL_ID: ${{ inputs.taxonomy-model-id }}
           APPLICATION_MONGODB_URI: ${{ secrets.APPLICATION_MONGODB_URI }}
           APPLICATION_DATABASE_NAME: ${{ inputs.application-database-name }}
           TARGET_ENVIRONMENT: ${{ inputs.target-environment }}

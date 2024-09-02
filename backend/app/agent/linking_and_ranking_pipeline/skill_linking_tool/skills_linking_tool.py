@@ -4,6 +4,7 @@ from typing import List, Coroutine, Any
 
 from pydantic import BaseModel
 
+from app.vector_search.similarity_search_service import FilterSpec
 from ._relevant_skills_classifier_llm import _RelevantSkillsClassifierLLM
 from app.agent.agent_types import LLMStats
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
@@ -132,7 +133,7 @@ class SkillLinkingTool:
     async def _responsibility_to_skills(self, *, responsibility_text: str, responsibility_embedding: list[float], esco_skills_uuids: list[str],
                                         job_titles: list[str], top_k: int, top_p: int) -> tuple[list[SkillEntity], list[LLMStats]]:
         # 2.1 Find the top_p most similar skills that are within the list of skills of the esco_occupations
-        filter_spec = {"UUID": {"$in": esco_skills_uuids}} if len(esco_skills_uuids) > 0 else None
+        filter_spec = FilterSpec(UUID=esco_skills_uuids) if len(esco_skills_uuids) > 0 else None
         similar_skills = await self._skill_search_service.search(query=responsibility_embedding, filter_spec=filter_spec, k=top_p)
         # 2.2  Discard the skills that are not relevant by using the relevance classifier and return the top_k most relevant skills for the responsibility
         relevant_skills_output = await self._relevant_skills_tool.execute(

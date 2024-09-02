@@ -4,6 +4,7 @@ from typing import Optional
 
 import pytest
 from _pytest.logging import LogCaptureFixture
+from bson import ObjectId
 
 from app.agent.linking_and_ranking_pipeline.skill_linking_tool._relevant_skills_classifier_llm import _RelevantSkillsClassifierLLM
 from app.vector_search.esco_entities import SkillEntity
@@ -15,6 +16,7 @@ def _get_skill_entity(*, preferred_label: str, description: Optional[str] = "", 
     return SkillEntity(
         id=f"{uuid.uuid4().hex[:24]}",  # id is a random sting 24 character hex string
         UUID=f"{uuid.uuid4()}",
+        modelId=f"{str(ObjectId())}",
         preferredLabel=preferred_label,
         altLabels=[],  # AltLabels is interesting and can be used to improve the classifier
         description=description,

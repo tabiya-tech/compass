@@ -9,6 +9,7 @@ from tqdm import tqdm
 
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
 from app.vector_search.esco_search_service import VectorSearchConfig, OccupationSearchService, SkillSearchService
+from app.vector_search.settings import VectorSearchSettings
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
 from common_libs.environment_settings.constants import EmbeddingConfig
@@ -118,11 +119,12 @@ if __name__ == "__main__":
     vertexai.init()
     compass_db = AsyncIOMotorClient(MONGO_SETTINGS.taxonomy_mongodb_uri).get_database(MONGO_SETTINGS.taxonomy_database_name)
     gecko_embedding_service = GoogleGeckoEmbeddingService()
+    settings = VectorSearchSettings()
     _occupation_search_service = OccupationSearchService(compass_db, gecko_embedding_service,
-                                                         _get_vector_search_config(Type.OCCUPATION))
+                                                         _get_vector_search_config(Type.OCCUPATION), settings)
     # TODO: Also evaluate the OccupationSkillSearchService.
     _skill_search_service = SkillSearchService(compass_db, gecko_embedding_service,
-                                               _get_vector_search_config(Type.SKILL))
+                                               _get_vector_search_config(Type.SKILL), settings)
     occupation_dataset = load_dataset(OCCUPATION_REPO_ID, data_files=[OCCUPATION_FILENAME],
                                       token=SCRIPT_SETTINGS.hf_access_token).get("train")
     # Load the skill dataset. The columns are not consistent with the definition in the dataset so we need to override

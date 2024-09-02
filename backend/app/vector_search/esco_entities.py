@@ -1,4 +1,4 @@
-from typing import List, Literal, Protocol, Any
+from typing import List, Literal, Any
 
 from pydantic.main import BaseModel
 
@@ -8,6 +8,7 @@ class BaseEntity(BaseModel):
     Represents an entity.
     """
     id: str
+    modelId: str
     UUID: str
     preferredLabel: str
     altLabels: List[str]
@@ -44,8 +45,10 @@ class SkillEntity(BaseEntity):
 class AssociatedSkillEntity(SkillEntity):
     """
     Represents a skill entity associated with an occupation.
+    it can be either essential or optional. but also can be empty. when we have signaling values.
+    for more info: check platform RelationType enum.
     """
-    relationType: Literal['essential', 'optional']
+    relationType: Literal['essential', 'optional', '']
 
     def __init__(self, **data: Any):
         super().__init__(**data)
