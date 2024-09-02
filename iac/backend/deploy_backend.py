@@ -356,7 +356,7 @@ def _deploy_cloud_run_service(
         template=gcp.cloudrunv2.ServiceTemplateArgs(
             scaling=gcp.cloudrunv2.ServiceTemplateScalingArgs(
                 min_instance_count=1,
-                max_instance_count=1,
+                max_instance_count=2,
             ),
             containers=[
                 gcp.cloudrunv2.ServiceTemplateContainerArgs(
