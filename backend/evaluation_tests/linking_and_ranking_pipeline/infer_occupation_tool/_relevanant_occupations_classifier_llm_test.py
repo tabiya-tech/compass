@@ -5,6 +5,7 @@ from typing import Optional
 
 import pytest
 from _pytest.logging import LogCaptureFixture
+from bson import ObjectId
 
 from app.agent.linking_and_ranking_pipeline.infer_occupation_tool._relevant_occupations_classifier_llm import _RelevantOccupationsClassifierLLM
 from app.vector_search.esco_entities import OccupationEntity
@@ -16,6 +17,7 @@ def _get_occupation_entity(*, preferred_label: str, description: Optional[str] =
     return OccupationEntity(
         id=f"{uuid.uuid4().hex[:24]}",  # id is a random sting 24 character hex string
         UUID=f"{uuid.uuid4()}",
+        modelId=f"{str(ObjectId())}",
         code="1234.1",
         preferredLabel=preferred_label,
         altLabels=[],  # AltLabels is interesting and can be used to improve the classifier

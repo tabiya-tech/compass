@@ -1,12 +1,13 @@
 import asyncio
 import logging
-import os
+import re
 from datetime import datetime
 from enum import Enum
 from typing import Literal
 
 import vertexai
 from pydantic import BaseModel, Field
+from pymongo.errors import OperationFailure
 from pymongo.operations import SearchIndexModel
 from tqdm import tqdm
 from dotenv import load_dotenv
@@ -43,6 +44,7 @@ class PlatformCollections(Enum):
     SKILLS = "skillmodels"
     RELATIONS = "occupationtoskillrelationmodels"
     OCCUPATIONS = "occupationmodels"
+    MODEL_INFO = "modelinfos"
 
 
 COMPASS_DB = AsyncIOMotorClient(
@@ -53,6 +55,7 @@ class CompassCollections(Enum):
     SKILLS = "skillsmodelsembeddings"
     RELATIONS = "occupationtoskillrelationmodels"
     OCCUPATIONS = "occupationmodelsembeddings"
+    MODEL_INFO = "modelinfos"
 
 
 ##########################
@@ -67,6 +70,66 @@ class EmbeddingContext(BaseModel):
     destination_collection: str
     id_field_name: str
     extra_fields: list[str] = Field(default_factory=list)
+
+
+_OCCUPATIONS_EMBEDDING_CONTEXT = EmbeddingContext(
+    collection_schema="occupation",
+    source_collection=PlatformCollections.OCCUPATIONS.value,
+    destination_collection=CompassCollections.OCCUPATIONS.value,
+    id_field_name="occupationId",
+    extra_fields=["code"]
+)
+
+_SKILLS_EMBEDDING_CONTEXT = EmbeddingContext(
+    collection_schema="skill",
+    source_collection=PlatformCollections.SKILLS.value,
+    destination_collection=CompassCollections.SKILLS.value,
+    id_field_name="skillId",
+    extra_fields=["skillType"]
+)
+
+
+def redact_credentials_from_uri(uri: str) -> str:
+    # Regular expression pattern to match username and password
+    pattern = r'//[^@]+@'
+
+    # Replace the matched username and password with asterisks
+    return re.sub(pattern, "//*:*@", uri)
+
+
+async def upsert_index(collection, keys, name, **index_options):
+    """
+    Upserts an index in a MongoDB collection using motor.
+
+    :param collection: The MongoDB collection object
+    :param name: The name of the index
+    :param keys: A list of tuples specifying the index fields and order (e.g., [('field1', 1), ('field2', -1)])
+    :param index_options: Additional options for the index (e.g., unique=True)
+    """
+
+    # Get the existing indexes in the collection
+    existing_indexes = await collection.index_information()
+
+    # Check if the index already exists
+    if name in existing_indexes:
+        logger.info(f"Index '{collection.name}.{name}' already exists")
+
+        # Update the index by dropping it and recreating with new options
+        await collection.drop_index(name)
+        logger.info(f"Dropped existing index '{collection.name}.{name}'")
+
+    # Create the index
+    try:
+        await collection.create_index(keys, name=name, **index_options)
+        logger.info(f"Created index '{collection.name}.{name}' with options {index_options}")
+    except OperationFailure as e:
+        # Error code 85 indicates IndexOptionsConflict, which means even though the name has been updated
+        # the index with the same keys already exists
+        # For more information read: https://www.mongodb.com/docs/manual/reference/error-codes/#mongodb-error-85
+        if e.code == 85:
+            logger.error(f"IndexOptionsConflict: '{collection.name}.{name}': {e}")
+    except Exception as e:
+        logger.error(f"Failed to create index '{collection.name}.{name}': {e}")
 
 
 async def generate_and_save_embeddings(documents: list[dict[str, any]], ctx: EmbeddingContext):
@@ -141,42 +204,40 @@ async def generate_and_save_embeddings(documents: list[dict[str, any]], ctx: Emb
     await COMPASS_DB[ctx.destination_collection].insert_many(insertable_documents)
 
 
-async def create_indexes(ctx: EmbeddingContext):
+async def create_std_indexes(ctx: EmbeddingContext):
     """
     Create the indexes for the destination collection
     :param ctx: EmbeddingContext - the context
     """
 
-    # create index for model_id and _id,
-    # this is used to search for the document by the model_id and the original document id.
-    # to ensure that the combination of model_id and id_field_name is reserved on every import.
-    await COMPASS_DB[ctx.destination_collection].create_index(
-        {"modelId": 1, ctx.id_field_name: 1},
-        name=f"model_id_and_{ctx.id_field_name}_index",
-    )
-
     # unique index for modelId, ctx.id_field_name, embedded_field
     # we have to ensure that the combination of modelId, ctx.id_field_name, embedded_field is unique
-    await COMPASS_DB[ctx.destination_collection].create_index(
+
+    # delete all indexes apart from _id index.
+    for index in await COMPASS_DB[ctx.destination_collection].index_information():
+        if index != "_id_":
+            await COMPASS_DB[ctx.destination_collection].drop_index(index)
+            logger.info(f"Dropped existing index '{ctx.destination_collection}.{index}'")
+
+    await upsert_index(
+        COMPASS_DB[ctx.destination_collection],
         {
             'modelId': 1,
             ctx.id_field_name: 1,
             'embedded_field': 1
         },
         unique=True,
-        name='UUID_embedded_field_index'
+        name=f"model_id_and_{ctx.id_field_name}_index",
     )
 
-    await COMPASS_DB[ctx.destination_collection].create_index(
+    await upsert_index(
+        COMPASS_DB[ctx.destination_collection],
         {'UUID': 1},
         name='UUID_index'
     )
 
-    await COMPASS_DB[ctx.destination_collection].create_index(
-        {ctx.id_field_name: 1},
-        name=ctx.id_field_name + '_index'
-    )
 
+async def create_vector_search_index(ctx: EmbeddingContext):
     vector_index_definition = {
         "fields": [
             {
@@ -186,36 +247,55 @@ async def create_indexes(ctx: EmbeddingContext):
                 "type": "vector"
             },
             {
+                "path": "modelId",
+                "type": "filter"
+            },
+            {
                 "path": "UUID",
                 "type": "filter"
-            }
+            },
         ]
     }
 
-    search_index_model = SearchIndexModel(
-        definition=vector_index_definition,
-        name="embedding_index",
-        type="vectorSearch",
-    )
-
     # if search index exists, update it.
-    existing_indexes = []
-    async for index in COMPASS_DB[ctx.destination_collection].list_search_indexes():
-        existing_indexes.append(index["name"])
+    embedding_index_exists: bool = False
 
-    if "embedding_index" in existing_indexes:
+    async for index in COMPASS_DB[ctx.destination_collection].list_search_indexes():
+        if index["name"] == "embedding_index":
+            embedding_index_exists = True
+            break
+
+    if embedding_index_exists:
         # if it exists, update it
         await COMPASS_DB[ctx.destination_collection].update_search_index("embedding_index", vector_index_definition)
     else:
         # if it does not exist, create it
+        search_index_model = SearchIndexModel(
+            definition=vector_index_definition,
+            name="embedding_index",
+            type="vectorSearch",
+        )
         await COMPASS_DB[ctx.destination_collection].create_search_index(model=search_index_model)
 
-    # Create the indexes for the relations collection
-    # this index is used for the search of already generated embeddings
-    await COMPASS_DB[ctx.destination_collection].create_index(
-        {"modelId": 1, "source_id": 1},
-        name="model_id_index",
+
+async def create_occupations_indexes():
+    # Create the indexes
+    logger.info("[2/2] creating indexes for occupations collection")
+    await create_std_indexes(_OCCUPATIONS_EMBEDDING_CONTEXT)
+    # add an index to searching for a specific occupation code
+    await upsert_index(
+        COMPASS_DB[_OCCUPATIONS_EMBEDDING_CONTEXT.destination_collection],
+        {"modelId": 1, "code": 1},
+        name="model_code_index",
     )
+    await create_vector_search_index(_OCCUPATIONS_EMBEDDING_CONTEXT)
+
+
+async def create_skills_indexes():
+    # Create the indexes
+    logger.info("[2/2] creating indexes for skills collection")
+    await create_std_indexes(_SKILLS_EMBEDDING_CONTEXT)
+    await create_vector_search_index(_SKILLS_EMBEDDING_CONTEXT)
 
 
 async def process_schema(ctx: EmbeddingContext):
@@ -243,15 +323,22 @@ async def process_schema(ctx: EmbeddingContext):
             "$nin": done_ids
         }
     }
+
+    documents_to_process_count = await from_collection.count_documents(search_filter)
+    if documents_to_process_count == 0:
+        logger.info(f"No documents to process for {ctx.collection_schema}")
+        return
+
+    progress = tqdm(
+        desc=f'generating embeddings for {ctx.collection_schema}',
+        total=documents_to_process_count,
+    )
+
     # Set the batch size
     # The batch size is the number of documents to insert in one batch
     batch_size = 1000
     cursor = from_collection.find(search_filter).batch_size(batch_size)
     documents = []
-    progress = tqdm(
-        desc=f'generating embeddings for {ctx.collection_schema}',
-        total=await from_collection.count_documents(search_filter),
-    )
 
     async for document in cursor:
         documents.append(document)
@@ -272,9 +359,37 @@ async def process_schema(ctx: EmbeddingContext):
     # Close the progress bar
     progress.close()
 
-    # Create the indexes
-    logger.info("[2/2] creating indexes for embeddings-collection")
-    await create_indexes(ctx)
+
+async def copy_model_info():
+    model_id = SCRIPT_SETTINGS.tabiya_model_id
+
+    logger.info("[1/2] Copying the model info")
+
+    # Get the model info document for the model_id from the PLATFORM_DB
+    from_model_info = await PLATFORM_DB[PlatformCollections.MODEL_INFO.value].find_one({"_id": ObjectId(model_id)})
+    del from_model_info["_id"]
+    from_model_info["modelId"] = ObjectId(model_id)
+
+    # add the source db info
+    from_model_info["sourceDb"] = {
+        "uri": redact_credentials_from_uri(SCRIPT_SETTINGS.tabiya_mongodb_uri),
+        "db": SCRIPT_SETTINGS.tabiya_db_name,
+        "modelId": model_id
+    }
+
+    # Upsert the model info document in the COMPASS_DB
+    await COMPASS_DB[CompassCollections.MODEL_INFO.value].update_one(
+        {"modelId": ObjectId(model_id)},
+        {"$set": from_model_info},
+        upsert=True
+    )
+    logger.info("[2/2] creating indexes for model info collection")
+    # Create the index
+    await upsert_index(
+        COMPASS_DB[CompassCollections.MODEL_INFO.value],
+        {"modelId": 1},
+        name="model_id_index",
+    )
 
 
 async def copy_relations_collection():
@@ -300,9 +415,14 @@ async def copy_relations_collection():
         }
     }
 
+    documents_to_process_count = await from_collection.count_documents(search_filter)
+    if documents_to_process_count == 0:
+        logger.info("No relations to process")
+        return
+
     progress = tqdm(
         desc='copying progress for relations',
-        total=await from_collection.count_documents(search_filter),
+        total=documents_to_process_count,
     )
 
     # Set the batch size
@@ -334,17 +454,20 @@ async def copy_relations_collection():
     progress.close()
 
     logger.info("[2/2] creating indexes")
-    await to_collection.create_index(
-        {"requiringOccupationId": 1},
+    await upsert_index(
+        to_collection,
+        {"modelId": 1, "requiringOccupationId": 1},
         name="requiring_occupation_id_index",
     )
 
-    await to_collection.create_index(
-        {"requiredSkillId": 1},
+    await upsert_index(
+        to_collection,
+        {"modelId": 1, "requiredSkillId": 1},
         name="required_skill_id_index",
     )
 
-    await to_collection.create_index(
+    await upsert_index(
+        to_collection,
         {"modelId": 1, "source_id": 1},
         name="model_id_and_source_id_index",
     )
@@ -360,26 +483,23 @@ async def main():
 
     # run the three tasks in parallel
     await asyncio.gather(
-        # [1/3] Copy the relations collection
+        # [1/5] Copy the model info
+        copy_model_info(),
+
+        # [2/5] Copy the relations collection
         copy_relations_collection(),
 
-        # [2/3] Process the occupations
-        process_schema(EmbeddingContext(
-            collection_schema="occupation",
-            source_collection=PlatformCollections.OCCUPATIONS.value,
-            destination_collection=CompassCollections.OCCUPATIONS.value,
-            id_field_name="occupationId",
-            extra_fields=["code"]
-        )),
+        # [3/5] Process the occupations
+        process_schema(_OCCUPATIONS_EMBEDDING_CONTEXT),
 
-        # [3/3] Process the skills
-        process_schema(EmbeddingContext(
-            collection_schema="skill",
-            source_collection=PlatformCollections.SKILLS.value,
-            destination_collection=CompassCollections.SKILLS.value,
-            id_field_name="skillId",
-            extra_fields=["skillType"]
-        )),
+        # [4/5] Process the skills
+        process_schema(_SKILLS_EMBEDDING_CONTEXT),
+    )
+
+    # [5/5] Create the indexes
+    await asyncio.gather(
+        create_occupations_indexes(),
+        create_skills_indexes()
     )
 
     logger.info("Script execution completed")

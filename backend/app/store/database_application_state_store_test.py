@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from uuid import uuid4
 
 import pytest
+from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from app.agent.agent_director.abstract_agent_director import AgentDirectorState, \
@@ -56,6 +57,7 @@ def generate_random_experience(index: int) -> ExperienceEntity:
             SkillEntity(
                 id=f"Skill {index}",
                 UUID=str(uuid4()),
+                modelId=str(ObjectId()),
                 preferredLabel=f"preferred label {index}",
                 altLabels=[f"label {index}", f"label {index + 1}"],
                 description=f"Skill description {index} ",

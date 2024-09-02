@@ -150,6 +150,7 @@ The backend uses the following environment variables:
 - `GOOGLE_APPLICATION_CREDENTIALS`: The path to the service account key file.
 - `TAXONOMY_MONGODB_URI`: The URI of the MongoDB Atlas instance where the ESCO taxonomy data is stored.
 - `TAXONOMY_DATABASE_NAME`: The name of mongo db database where the ESCO taxonomy data with the embeddings is stored.
+- `TAXONOMY_MODEL_ID`: The model ID of the ESCO model in the compass taxonomy database.
 - `APPLICATION_MONGODB_URI`: The URI of the MongoDB Atlas instance for the application database.
 - `APPLICATION_DATABASE_NAME`: The name of mongo db database used by the application to store data.
 - `VERTEX_API_REGION`: (optional) The region of the Vertex API to use. If not set defaults to `us-central1`.
@@ -168,6 +169,7 @@ directory of the backend project and set the environment variables as follows:
 # .env file
 GOOGLE_APPLICATION_CREDENTIALS=<PATH_TO_KEY_FILE>
 TAXONOMY_MONGODB_URI=<URI_TO_MONGODB>
+TAXONOMY_MODEL_ID=<TAXONOMY_MODEL_ID>
 TAXONOMY_DATABASE_NAME=<TAXONOMY_DATABASE_NAME>
 APPLICATION_MONGODB_URI=<URI_TO_MONGODB>
 APPLICATION_DATABASE_NAME=<APPLICATION_DATABASE_NAME>
@@ -241,6 +243,7 @@ named `credentials.json` is in a folder named `keys` in the root directory and a
 ```dotenv
 TAXONOMY_MONGODB_URI=mongodb+srv://<USERNAME>:<PASSORD>@<CLUSTER>/?retryWrites=true&w=majority&appName=Compass-Dev
 TAXONOMY_DATABASE_NAME=compass-taxonomy-dev
+TAXONOMY_MODEL_ID=<MODEL_ID>
 APPLICATION_MONGODB_URI=mongodb://localhost:27017
 APPLICATION_DATABASE_NAME=_compass-application-local
 GOOGLE_APPLICATION_CREDENTIALS=keys/credentials.json

@@ -28,6 +28,7 @@ jobs:
       backend-url: ${{ needs.setup-env.outputs.backend-url }}
       frontend-url: ${{ needs.setup-env.outputs.frontend-url }}
       taxonomy-database-name: ${{ needs.setup-env.outputs.taxonomy-database-name }}
+      taxonomy-model-id: ${{ needs.setup-env.outputs.taxonomy-model-id }}
       application-database-name: ${{ needs.setup-env.outputs.application-database-name }}
       vertex-api-region: ${{ needs.setup-env.outputs.vertex-api-region }}
   build-frontend:
@@ -55,6 +56,7 @@ jobs:
       backend-url: ${{ needs.setup-env.outputs.backend-url }}
       frontend-url: ${{ needs.setup-env.outputs.frontend-url }}
       taxonomy-database-name: ${{ needs.setup-env.outputs.taxonomy-database-name }}
+      taxonomy-model-id: ${{ needs.setup-env.outputs.taxonomy-model-id }}
       application-database-name: ${{ needs.setup-env.outputs.application-database-name }}
       vertex-api-region: ${{ needs.setup-env.outputs.vertex-api-region }}
   smoke-test-backend-apigateway:

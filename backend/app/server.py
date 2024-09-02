@@ -118,6 +118,8 @@ if not os.getenv('APPLICATION_MONGODB_URI'):
     raise ValueError("Mandatory APPLICATION_MONGODB_URI env variable is not set!")
 if not os.getenv("APPLICATION_DATABASE_NAME"):
     raise ValueError("Mandatory APPLICATION_DATABASE_NAME environment variable is not set")
+if not os.getenv('TAXONOMY_MODEL_ID'):
+    raise ValueError("Mandatory TAXONOMY_MODEL_ID env variable is not set!")
 
 ############################################
 # Initiate the Authentication Module for the FastAPI app

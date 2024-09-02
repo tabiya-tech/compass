@@ -146,6 +146,7 @@ The deployment requires the following environment variables to be set:
 - `BACKEND_URL`: The URL of the backend api, typically it is `https://<ENVIRONMENT>.compass.tabiya.tech/api`. Should be different than `FRONTEND_URL`
 - `TAXONOMY_MONGODB_URI`: The URI of the MongoDB Atlas instance where the ESCO taxonomy data is stored.
 - `TAXONOMY_DATABASE_NAME`: The name of mongo db database where the ESCO taxonomy data with the embeddings is stored.
+- `TAXONOMY_MODEL_ID`: The ID of the model used to store the taxonomy data in the database.
 - `APPLICATION_MONGODB_URI`: The URI of the MongoDB Atlas instance for the application database.
 - `APPLICATION_DATABASE_NAME`: The name of mongo db database used by the application to store data.
 - `VERTEX_API_REGION`: The region of the Vertex API that will be used by the backend.
@@ -164,6 +165,7 @@ BACKEND_DOMAIN="<BACKEND_DOMAIN>"
 BACKEND_URL="<BACKEND_URL>"
 TAXONOMY_MONGODB_URI="<URI_TO_MONGODB>"
 TAXONOMY_DATABASE_NAME="<DATABASE_NAME>"
+TAXONOMY_MODEL_ID="<TAXONOMY_MODEL_ID>"
 APPLICATION_MONGODB_URI="<URI_TO_MONGODB>"
 APPLICATION_DATABASE_NAME="<DATABASE_NAME>"
 VERTEX_API_REGION="<REGION>"
