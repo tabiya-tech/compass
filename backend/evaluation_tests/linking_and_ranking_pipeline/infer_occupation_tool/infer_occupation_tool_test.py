@@ -8,6 +8,7 @@ from app.agent.linking_and_ranking_pipeline.infer_occupation_tool import InferOc
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
 from app.vector_search.esco_search_service import OccupationSkillSearchService
+from app.vector_search.settings import VectorSearchSettings
 from .test_occupation_inference_test_case import test_cases
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 from evaluation_tests.linking_and_ranking_pipeline.infer_occupation_tool.test_occupation_inference_test_case import InferOccupationToolTestCase
@@ -16,8 +17,9 @@ from evaluation_tests.linking_and_ranking_pipeline.infer_occupation_tool.test_oc
 @pytest.fixture(scope="function")
 async def setup_agent_tool():
     db = await CompassDBProvider.get_taxonomy_db()
+    settings = VectorSearchSettings()
     embedding_service = GoogleGeckoEmbeddingService()
-    search_service = OccupationSkillSearchService(db, embedding_service)
+    search_service = OccupationSkillSearchService(db, embedding_service, settings)
     tool = InferOccupationTool(search_service)
     return tool
 

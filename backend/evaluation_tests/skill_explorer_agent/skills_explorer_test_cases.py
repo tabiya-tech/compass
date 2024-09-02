@@ -1,5 +1,5 @@
 from textwrap import dedent
-from typing import Optional, Literal, Any
+from typing import Any
 
 from app.agent.experience.experience_entity import ExperienceEntity
 from app.agent.experience.work_type import WorkType

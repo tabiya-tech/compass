@@ -11,6 +11,7 @@ from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService, \
 from app.vector_search.esco_entities import OccupationEntity, OccupationSkillEntity, SkillEntity
 from app.vector_search.esco_search_service import VectorSearchConfig, OccupationSearchService, \
     OccupationSkillSearchService, SkillSearchService
+from app.vector_search.settings import VectorSearchSettings
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from common_libs.environment_settings.constants import EmbeddingConfig
 
@@ -19,7 +20,7 @@ logger = logging.getLogger(__name__)
 # Define a singleton instance of the Google VertexAI embeddings
 _embeddings = GoogleGeckoEmbeddingService()
 
-_embedding_settings = EmbeddingConfig()
+_embedding_config = EmbeddingConfig()
 
 
 def get_gecko_embeddings() -> GoogleGeckoEmbeddingService:
@@ -29,6 +30,8 @@ def get_gecko_embeddings() -> GoogleGeckoEmbeddingService:
 
 # Lock to ensure that the singleton instances are thread-safe
 _lock = asyncio.Lock()
+
+_vector_search_settings = VectorSearchSettings()
 
 # Define a singleton instance of the skill search service
 _skill_search_service_singleton: SimilaritySearchService[SkillEntity] = None
@@ -43,11 +46,11 @@ async def get_skill_search_service(db: AsyncIOMotorDatabase = Depends(CompassDBP
             if _skill_search_service_singleton is None:  # double check after acquiring the lock
                 logger.info("Creating a new instance of the skill search service.")
                 skill_vector_search_config = VectorSearchConfig(
-                    collection_name=_embedding_settings.skill_collection_name,
-                    index_name=_embedding_settings.embedding_index,
-                    embedding_key=_embedding_settings.embedding_key,
+                    collection_name=_embedding_config.skill_collection_name,
+                    index_name=_embedding_config.embedding_index,
+                    embedding_key=_embedding_config.embedding_key,
                 )
-                _skill_search_service_singleton = SkillSearchService(db, embedding_model, skill_vector_search_config)
+                _skill_search_service_singleton = SkillSearchService(db, embedding_model, skill_vector_search_config, _vector_search_settings)
 
     return _skill_search_service_singleton
 
@@ -65,11 +68,11 @@ async def get_occupation_search_service(db: AsyncIOMotorDatabase = Depends(Compa
             if _occupation_search_service_singleton is None:  # double check after acquiring the lock
                 logger.info("Creating a new instance of the occupation search service.")
                 occupation_vector_search_config = VectorSearchConfig(
-                    collection_name=_embedding_settings.occupation_collection_name,
-                    index_name=_embedding_settings.embedding_index,
-                    embedding_key=_embedding_settings.embedding_key,
+                    collection_name=_embedding_config.occupation_collection_name,
+                    index_name=_embedding_config.embedding_index,
+                    embedding_key=_embedding_config.embedding_key,
                 )
-                _occupation_search_service_singleton = OccupationSearchService(db, embedding_model, occupation_vector_search_config)
+                _occupation_search_service_singleton = OccupationSearchService(db, embedding_model, occupation_vector_search_config, _vector_search_settings)
 
     return _occupation_search_service_singleton
 
@@ -86,7 +89,7 @@ async def get_occupation_skill_search_service(db: AsyncIOMotorDatabase = Depends
         async with _lock:  # before modifying the singleton instance, acquire the lock
             if _occupation_skill_search_service_singleton is None:  # double check after acquiring the lock
                 logger.info("Creating a new instance of the occupation search service.")
-                _occupation_skill_search_service_singleton = OccupationSkillSearchService(db, embedding_model)
+                _occupation_skill_search_service_singleton = OccupationSkillSearchService(db, embedding_model, _vector_search_settings)
 
     return _occupation_skill_search_service_singleton
 
