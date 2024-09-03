@@ -354,12 +354,20 @@ def _deploy_cloud_run_service(
         location=basic_config.location,
         ingress="INGRESS_TRAFFIC_ALL",
         template=gcp.cloudrunv2.ServiceTemplateArgs(
+            max_instance_request_concurrency=10,  # Set max concurrency per instance
+            execution_environment='EXECUTION_ENVIRONMENT_GEN2',  # Set the execution environment to second generation
             scaling=gcp.cloudrunv2.ServiceTemplateScalingArgs(
                 min_instance_count=2,
                 max_instance_count=10,
             ),
             containers=[
                 gcp.cloudrunv2.ServiceTemplateContainerArgs(
+                    resources=gcp.cloudrunv2.ServiceTemplateContainerResourcesArgs(
+                        limits={
+                            'memory': '1Gi',  # Set memory limit to 1 GB
+                            'cpu': '2',  # Set CPU limit to 2
+                        },
+                    ),
                     image=fully_qualified_image_name,
                     envs=[
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="TAXONOMY_MONGODB_URI",
