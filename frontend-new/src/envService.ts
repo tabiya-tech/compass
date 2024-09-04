@@ -25,3 +25,7 @@ export const getFirebaseAPIKey = () => {
 export const getBackendUrl = () => {
   return getEnv("BACKEND_URL");
 };
+
+export const getSentryDSN = () => {
+  return getEnv("SENTRY_DSN");
+};

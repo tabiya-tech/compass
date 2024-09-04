@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`InternalError InternalError page renders correctly 1`] = `
+<div
+  class="MuiBox-root css-11wbkob"
+  data-testid="internal-error-37d307ae-4f1e-4d8d-bafe-fd642f8af4ab}"
+>
+  <img
+    alt="internal error"
+    data-testid="internal-error-illustration-37d307ae-4f1e-4d8d-bafe-fd642f8af4ab}"
+    src="/logo.svg"
+    width="250px"
+  />
+  <h2
+    class="MuiTypography-root MuiTypography-h2 css-1mw548o-MuiTypography-root"
+    data-testid="internal-error-message-37d307ae-4f1e-4d8d-bafe-fd642f8af4ab"
+  >
+    500 Error - Internal Server Error
+  </h2>
+</div>
+`;
