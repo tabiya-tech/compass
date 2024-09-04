@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, View } from "@react-pdf/renderer";
 import { Experience } from "src/Experiences/ExperienceService/Experiences.types";
-import styles from "src/Report/styles";
+import styles from "src/Report/ReactPdf/styles";
 
 interface ExperienceProps {
   experience: Experience;

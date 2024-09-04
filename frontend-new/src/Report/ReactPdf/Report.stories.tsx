@@ -1,4 +1,4 @@
-import Report from "src/Report/Report";
+import Report from "src/Report/ReactPdf/Report";
 import { Meta, type StoryObj } from "@storybook/react";
 import { generateRandomExperiences } from "src/Experiences/ExperienceService/_test_utilities/mockExperiencesResponses";
 

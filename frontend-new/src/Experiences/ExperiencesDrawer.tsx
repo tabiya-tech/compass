@@ -9,7 +9,7 @@ import { Experience } from "src/Experiences/ExperienceService/Experiences.types"
 import CustomTextField from "src/theme/CustomTextField/CustomTextField";
 import CustomAccordion from "src/theme/CustomAccordion/CustomAccordion";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import DownloadReportButton from "src/Experiences/components/DownloadReportButton/DownloadReportButton";
+import DownloadReportDropdown from "src/Experiences/components/DownloadReportDropdown/DownloadReportDropdown";
 
 export interface ExperiencesDrawerProps {
   isOpen: boolean;
@@ -111,7 +111,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
       <ExperiencesDrawerHeader notifyOnClose={handleClose} />
       <Box display="flex" flexDirection="column" gap={2}>
         <Box display="flex" flexDirection="column" gap={1} alignItems="end" justifyContent="flex-end">
-          <DownloadReportButton
+          <DownloadReportDropdown
             name={validatedPersonalInfo.name}
             email={validatedPersonalInfo.email}
             phone={validatedPersonalInfo.phone}

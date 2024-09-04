@@ -18,7 +18,7 @@ jest.mock("@react-pdf/renderer", () => {
 });
 
 // mock SkillReport
-jest.mock("src/Report/Report", () => {
+jest.mock("src/Report/ReactPdf/Report", () => {
   return jest.fn(() => {
     return <div data-testid={"mock-SkillReport"} />;
   });
@@ -28,6 +28,13 @@ jest.mock("src/Report/Report", () => {
 jest.mock("src/theme/CustomTextField/CustomTextField", () => {
   return jest.fn(({ label, ...props }) => {
     return <input aria-label={label} {...props} data-testid={"mock-CustomTextField"} />;
+  });
+});
+
+// mock DownloadReportDropdown
+jest.mock("src/Experiences/components/DownloadReportDropdown/DownloadReportDropdown", () => {
+  return jest.fn(() => {
+    return <div data-testid={"mock-DownloadReportDropdown"} />;
   });
 });
 

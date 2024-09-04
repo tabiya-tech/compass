@@ -130,15 +130,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingBottom: 18,
-    paddingHorizontal: 32,
+    paddingHorizontal: 48,
     paddingTop: 32,
-    gap: 4,
+    gap: 26,
   },
   image: {
     height: 42,
   },
   compassImage: {
-    height: 62,
+    height: 54,
   },
   infoIcon: {
     height: 12,
