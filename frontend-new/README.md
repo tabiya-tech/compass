@@ -35,7 +35,18 @@ To develop this application locally, follow these steps:
     ```shell
     yarn install
     ```
-5. Make sure to set up a `env.js` file in the public/data directory. You can use the [`env.example.js`](public/data/env.example.js) file as a template. Please request the necessary environment variables from the project team.
+5. Set up the required environment variables:
+
+   - Create a `env.js` file in the `public/data` directory. You can use the [`env.example.js`](public/data/env.example.js) file as a template.
+   - The following environment variables are required:
+     - `FIREBASE_API_KEY`: The API key for Firebase authentication
+     - `FIREBASE_AUTH_DOMAIN`: The Firebase authentication domain
+     - `BACKEND_URL`: The URL of the backend API
+     - `SENTRY_DSN`: The Sentry Data Source Name for error tracking
+     - `SENTRY_AUTH_TOKEN`: The Sentry authentication token, used to upload source maps
+     - `FRONTEND_URL`: The URL of the frontend application
+
+   Please request the necessary environment variable values from the project team.
 
 
 ## Running the development server locally

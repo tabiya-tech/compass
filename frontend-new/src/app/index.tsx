@@ -13,6 +13,13 @@ import authStateService from "src/auth/AuthStateService";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 
+import * as Sentry from "@sentry/react";
+
+// Wrap the createHashRouter function with Sentry to capture errors that occur during router initialization
+const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouter(
+  createHashRouter
+);
+
 const uniqueId = "17ccbdb7-1855-44b2-bc68-ef066e5c4e6f";
 export const SNACKBAR_KEYS = {
   OFFLINE_ERROR: `offline-error-${uniqueId}`,
@@ -75,7 +82,7 @@ const App = () => {
 
   if (loading)  return <Backdrop isShown={loading} transparent={true} />
 
-  const router = createHashRouter([
+  const router = sentryCreateBrowserRouter([
     {
       path: routerPaths.ROOT,
       element: (
@@ -132,4 +139,4 @@ const App = () => {
   return <RouterProvider router={router} />;
 };
 
-export default App;
+export default Sentry.withProfiler(App);
