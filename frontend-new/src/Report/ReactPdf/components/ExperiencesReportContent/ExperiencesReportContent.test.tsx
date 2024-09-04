@@ -1,7 +1,9 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
 
-import ExperiencesReportContent, { DATA_TEST_ID } from "src/Report/ExperiencesReportContent/ExperiencesReportContent";
+import ExperiencesReportContent, {
+  DATA_TEST_ID,
+} from "src/Report/ReactPdf/components/ExperiencesReportContent/ExperiencesReportContent";
 import { mockExperiences } from "src/Experiences/ExperienceService/_test_utilities/mockExperiencesResponses";
 import { render, screen } from "src/_test_utilities/test-utils";
 
