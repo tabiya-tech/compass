@@ -57,6 +57,7 @@
     "@mui/material": "^5.15.12",
     "@mui/system": "^5.15.15",
     "@react-pdf/renderer": "^3.4.4",
+    "docx": "^8.5.0",
     "file-saver": "^2.0.5",
     "firebase": "^10.12.2",
     "firebaseui": "^6.1.0",
@@ -109,7 +110,8 @@
       "!src/**/_test_utilities/*",
       "!src/**/*.stories.{ts,tsx}",
       "!**/**/*.d.ts",
-      "!**/**/*.types.ts"
+      "!**/**/*.types.ts",
+      "!src/Report/ReportDocx/**/*"
     ],
     "coverageReporters": [
       [

@@ -12,14 +12,14 @@ exports[`Report should render Report correctly 1`] = `
       style="display: flex; flex-direction: column;"
     >
       <view
-        style="display: flex; flex-direction: row; align-items: center; padding-bottom: 18px; padding-top: 32px; gap: 4px;"
+        style="display: flex; flex-direction: row; align-items: center; padding-bottom: 18px; padding-top: 32px; gap: 26px;"
       >
         <image
-          src="/logo.jpg"
-          style="height: 62px;"
+          src="/logo.png"
+          style="height: 54px;"
         />
         <image
-          src="/oxford-logo.jpg"
+          src="/oxford-logo.png"
           style="height: 42px;"
         />
       </view>
@@ -97,9 +97,12 @@ exports[`Report should render Report correctly 1`] = `
         x="0"
         y="0"
       >
-        This report summarizes the key information gathered during a conversation with Compass on 
-        June 01, 2021
-        . Compass is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report presents the candidate’s work experience and the skills identified from each experience. This information can be used to guide job search and highlight their skills when applying for jobs, especially during interviews with potential employers. It can be a good starting point for creating a complete CV.
+        This report summarizes the key information gathered during a conversation with Compass on
+  June 01, 2021. Compass is an AI chatbot that assists job-seekers in exploring their skills 
+  and experiences. This report presents the candidate’s work experience and the skills identified 
+  from each experience. This information can be used to guide job search and highlight their skills 
+  when applying for jobs, especially during interviews with potential employers. It can be a good
+  starting point for creating a complete CV.
       </text>
       <view
         style="border: 1px; color: rgb(67, 71, 78); margin-top: 12px; margin-bottom: 16px;"
@@ -201,10 +204,9 @@ exports[`Report should render Report correctly 1`] = `
           x="0"
           y="0"
         >
-          Skills Description
+          Skills Report
         </text>
         <text
-          data-testid="skill-report-body-text-5a296552-f91f-4c38-b88f-542cacaced8e"
           style="font-size: 11px; font-family: Inter; font-weight: normal; word-break: break-word; color: rgb(67, 71, 78);"
           x="0"
           y="0"
@@ -268,14 +270,14 @@ exports[`Report should render Report correctly 1`] = `
           y="0"
         >
            
-          Disclaimer:
+          Disclaimer: 
            
           <text
             style="font-size: 9px; color: rgb(0, 0, 0);"
             x="0"
             y="0"
           >
-            Listed skills are based on a conversation with the candidate, are not verified or validated by Tabiya, and may be inaccurate.
+            Listed skills are based on a conversation with the candidate, are not verified or validated by Tabiya, and may be inaccurate. 
              
           </text>
           Information should be checked before use for job search, job interviews, or for creating a CV. To revise this information, speak with Compass again or create a complete CV based on this report.
