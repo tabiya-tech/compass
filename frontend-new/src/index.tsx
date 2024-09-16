@@ -10,18 +10,22 @@ import { IsOnlineProvider } from "src/app/isOnlineProvider/IsOnlineProvider";
 import ViewPortWrapper from "src/app/ViewPortWrapper";
 
 import * as Sentry from "@sentry/react";
-import { getBackendUrl, getSentryDSN } from "./envService";
+import { getBackendUrl, getReleaseVersion, getSentryDSN, getTargetEnvironment } from "./envService";
 import InternalError from "./errorPage/InternalError";
 import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from "react-router-dom";
 
 Sentry.init({
   dsn: getSentryDSN(),
+  release: getReleaseVersion(), // This will allow you to see the release version in Sentry
+  environment: getTargetEnvironment(), // This will allow you to see the environment in Sentry
+  attachStacktrace: true, // all logs will have a stack trace attached
+  autoSessionTracking: true, // This will automatically track sessions, one session per page load/navigation
   integrations: [
-    Sentry.browserTracingIntegration(),
+    Sentry.browserTracingIntegration(), // performance monitoring by sentry
     Sentry.replayIntegration(), // This will allow errors logged to Sentry to have a video replay of the user's session
     Sentry.feedbackIntegration(), // This will add a feedback button to the side of the page
     Sentry.captureConsoleIntegration({
-      levels: ["error"],
+      levels: ["error"], // depending on dev, test ... you can set this to ["error", "warn", "log", "info", "debug"]
     }), // This will capture console errors
     Sentry.reactRouterV6BrowserTracingIntegration({
       useEffect: React.useEffect,

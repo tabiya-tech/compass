@@ -29,3 +29,10 @@ export const getBackendUrl = () => {
 export const getSentryDSN = () => {
   return getEnv("SENTRY_DSN");
 };
+
+export const getReleaseVersion = () => {
+  return getEnv("RELEASE_VERSION");
+};
+export const getTargetEnvironment = () => {
+  return getEnv("TARGET_ENVIRONMENT");
+}

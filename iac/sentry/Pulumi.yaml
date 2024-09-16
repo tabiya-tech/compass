@@ -1,0 +1,4 @@
+name: compass-sentry
+runtime:
+  name: python
+description: Tabiya compass

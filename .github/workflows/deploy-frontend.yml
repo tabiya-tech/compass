@@ -80,6 +80,17 @@ jobs:
         uses: google-github-actions/auth@v2.1.2
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+      - name: Create Sentry Project
+        id: create-sentry
+        uses: pulumi/actions@v5
+        with:
+          work-dir: iac/sentry
+          command: up
+          stack-name: tabiya-tech/compass-frontend-sentry/${{ inputs.target-environment }}
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
       - name: Build frontend-new env.js file
         # we are basically creating a js file with the passed env variables
         # that can be executed in the client browser when the js file is loaded
@@ -89,8 +100,10 @@ jobs:
           echo "\"FIREBASE_API_KEY\": btoa(\"${{ inputs.identity_platform_client_api_key }}\")," >> frontend-new/build/data/env.js
           echo "\"FIREBASE_AUTH_DOMAIN\": btoa(\"${{ inputs.identity_platform_client_firebase_auth_domain }}\")," >> frontend-new/build/data/env.js
           echo "\"BACKEND_URL\": btoa(\"${{ inputs.backend-url }}\")," >> frontend-new/build/data/env.js
-          echo "\"SENTRY_DSN\": btoa(\"${{ secrets.SENTRY_DSN }}\")," >> frontend-new/build/data/env.js
-          echo "\"SENTRY_AUTH_TOKEN\": btoa(\"${{ secrets.SENTRY_AUTH_TOKEN }}\")" >> frontend-new/build/data/env.js
+          echo "\"SENTRY_DSN\": btoa(\"${{ steps.create-sentry.outputs.sentry_dsn }}\")," >> frontend-new/build/data/env.js
+          echo "\"SENTRY_AUTH_TOKEN\": btoa(\"${{ secrets.SENTRY_AUTH_TOKEN }}\")," >> frontend-new/build/data/env.js
+          echo "\"RELEASE_VERSION\": btoa(\"${{ github.ref_name }}-${{ github.sha }}\")," >> frontend-new/build/data/env.js
+          echo "\"TARGET_ENVIRONMENT\": btoa(\"${{ inputs.target-environment }}\")" >> frontend-new/build/data/env.js
           echo "};" >> frontend-new/build/data/env.js
           cat frontend-new/build/data/env.js
       - name: Deploy both frontends
@@ -102,7 +115,10 @@ jobs:
           stack-name: tabiya-tech/compass-frontend/${{ inputs.target-environment }}
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-      - name: Show frontend URL
+          TARGET_ENVIRONMENT: ${{ inputs.target-environment }}
+      - name: Upload source maps
         run: |
-          echo "frontend-url<<${{ steps.pulumi.outputs.bucket_url }}"
-          echo "newUI-url<<${{ steps.pulumi.outputs.new_ui_url }}"
+          cd frontend-new
+          npx @sentry/cli releases new ${{ github.ref_name }}
+          npx @sentry/cli releases files ${{ github.ref_name }} upload-sourcemaps ./build --url-prefix "~/"
+          npx @sentry/cli releases finalize ${{ github.ref_name }}

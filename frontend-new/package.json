@@ -57,6 +57,7 @@
     "@mui/material": "^5.15.12",
     "@mui/system": "^5.15.15",
     "@react-pdf/renderer": "^3.4.4",
+    "@sentry/cli": "^2.36.1",
     "@sentry/react": "^8.28.0",
     "@sentry/webpack-plugin": "^2.22.4",
     "file-saver": "^2.0.5",
