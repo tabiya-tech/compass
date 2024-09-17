@@ -35,34 +35,35 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
     : formatDate(new Date().toLocaleDateString());
 
   // Create a paragraph with an image
-  const createParagraphWithImage = async (text: string, imageUrl: string) => {
+  const createParagraphWithImage = async (text: string, imageUrl: string, width: number) => {
     if (!text) return new Paragraph({});
     return new Paragraph({
       children: [
         new ImageRun({
           data: await getBase64Image(imageUrl),
-          transformation: { width: 16, height: 16 },
+          transformation: { width: width, height: 16 },
         }),
         new TextRun({
           text: "\u00A0\u00A0",
         }),
         new TextRun({
           text,
+          color: "#000000",
           size: 24,
         }),
       ],
       alignment: AlignmentType.LEFT,
-      spacing: { after: 100 },
+      spacing: { after: 50 },
     });
   };
 
   // Create a paragraph with an image and text
-  const createParagraphWithImageAndText = async (text: string, imageUrl: string) => {
+  const createParagraphWithImageAndText = async (text: string, imageUrl: string, width: number) => {
     return new Paragraph({
       children: [
         new ImageRun({
           data: await getBase64Image(imageUrl),
-          transformation: { width: 20, height: 20 },
+          transformation: { width: width, height: 22 },
         }),
         new TextRun({
           text: "\u00A0\u00A0",
@@ -71,12 +72,12 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
           text,
           bold: true,
           size: 26,
-          color: "#43474E",
+          color: "#000000",
         }),
       ],
       heading: HeadingLevel.HEADING_6,
       alignment: AlignmentType.LEFT,
-      spacing: { before: 200 },
+      spacing: { before: 300 },
     });
   };
 
@@ -95,6 +96,14 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
       {
         headers: { default: header },
         footers: { default: footer },
+        properties: {
+          page: {
+            margin: {
+              left: 1000,
+              right: 1000,
+            },
+          },
+        },
         children: [
           new Paragraph({
             children: [
@@ -102,12 +111,12 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
                 text: ReportContent.SKILLS_REPORT_TITLE,
                 bold: true,
                 color: "#083763",
-                size: 36,
+                size: 32,
               }),
             ],
             heading: HeadingLevel.TITLE,
             alignment: AlignmentType.LEFT,
-            spacing: { after: 200 },
+            spacing: { after: 300 },
           }),
 
           name
@@ -115,6 +124,7 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
                 children: [
                   new TextRun({
                     text: name,
+                    color: "#000000",
                     bold: true,
                     size: 28,
                   }),
@@ -123,11 +133,11 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
               })
             : new Paragraph(""),
 
-          await createParagraphWithImage(address, ReportContent.IMAGE_URLS.LOCATION_ICON),
+          await createParagraphWithImage(address, ReportContent.IMAGE_URLS.LOCATION_ICON, 12),
 
-          await createParagraphWithImage(phone, ReportContent.IMAGE_URLS.PHONE_ICON),
+          await createParagraphWithImage(phone, ReportContent.IMAGE_URLS.PHONE_ICON, 16),
 
-          await createParagraphWithImage(email, ReportContent.IMAGE_URLS.EMAIL_ICON),
+          await createParagraphWithImage(email, ReportContent.IMAGE_URLS.EMAIL_ICON, 22),
 
           new Paragraph({
             children: [
@@ -137,12 +147,12 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
               }),
             ],
             alignment: AlignmentType.START,
-            spacing: { before: 200, after: 200 },
+            spacing: { before: 300, after: 200 },
           }),
 
           new Paragraph({
             border: {
-              top: { style: BorderStyle.SINGLE, size: 4 },
+              top: { style: BorderStyle.SINGLE, size: 10 },
             },
             spacing: { before: 200 },
           }),
@@ -153,7 +163,7 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
               new TextRun({
                 text: ReportContent.EXPERIENCES_TITLE,
                 bold: true,
-                size: 28,
+                size: 26,
                 color: "#083763",
               }),
             ],
@@ -166,7 +176,8 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
             ? [
                 await createParagraphWithImageAndText(
                   ReportContent.SELF_EMPLOYMENT_TITLE,
-                  ReportContent.IMAGE_URLS.BRIEFCASE_ICON
+                  ReportContent.IMAGE_URLS.BRIEFCASE_ICON,
+                  22
                 ),
                 ...selfEmploymentExperiences.flatMap((experience) => generateContent(experience)),
               ]
@@ -176,7 +187,8 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
             ? [
                 await createParagraphWithImageAndText(
                   ReportContent.SALARY_WORK_TITLE,
-                  ReportContent.IMAGE_URLS.DOLLAR_BAG_ICON
+                  ReportContent.IMAGE_URLS.DOLLAR_BAG_ICON,
+                  16
                 ),
                 ...salaryWorkExperiences.flatMap((experience) => generateContent(experience)),
               ]
@@ -186,7 +198,8 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
             ? [
                 await createParagraphWithImageAndText(
                   ReportContent.UNPAID_WORK_TITLE,
-                  ReportContent.IMAGE_URLS.FRIENDLY_ICON
+                  ReportContent.IMAGE_URLS.FRIENDLY_ICON,
+                  22
                 ),
                 ...unpaidWorkExperiences.flatMap((experience) => generateContent(experience)),
               ]

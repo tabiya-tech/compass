@@ -12,7 +12,7 @@ const FooterComponent = async () => {
         children: [
           new ImageRun({
             data: await getBase64Image(ReportContent.IMAGE_URLS.DANGER_ICON),
-            transformation: { width: 14, height: 14 },
+            transformation: { width: 16, height: 14 },
           }),
           new TextRun({
             text: " ",
@@ -36,9 +36,9 @@ const FooterComponent = async () => {
         alignment: AlignmentType.LEFT,
         border: {
           top: { style: BorderStyle.SINGLE, size: 2, color: "#666666", space: 5 },
-          bottom: { style: BorderStyle.SINGLE, size: 2, color: "#666666", space: 5 },
+          bottom: { style: BorderStyle.SINGLE, size: 2, color: "#666666", space: 10 },
           left: { style: BorderStyle.SINGLE, size: 2, color: "#666666", space: 10 },
-          right: { style: BorderStyle.SINGLE, size: 2, color: "#666666", space: 10 },
+          right: { style: BorderStyle.SINGLE, size: 2, color: "#666666", space: 5 },
         },
       }),
       new Paragraph({

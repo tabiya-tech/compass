@@ -2,7 +2,7 @@ import ReportDocx from "src/Report/ReportDocx/ReportDocx";
 import { IReportFormatProvider, ReportProps } from "src/Report/types";
 
 export class DocxReportDownloadProvider implements IReportFormatProvider {
-  props: ReportProps
+  props: ReportProps;
 
   constructor(props: ReportProps) {
     this.props = props;

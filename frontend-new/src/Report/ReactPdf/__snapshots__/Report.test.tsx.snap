@@ -16,7 +16,7 @@ exports[`Report should render Report correctly 1`] = `
       >
         <image
           src="/logo.png"
-          style="height: 54px;"
+          style="height: 46px;"
         />
         <image
           src="/oxford-logo.png"
@@ -128,7 +128,7 @@ exports[`Report should render Report correctly 1`] = `
             >
               <image
                 src="/dollar-bag.png"
-                style="width: 16px; height: 16px; margin-bottom: 2px; margin-right: 8px;"
+                style="height: 16px; margin-bottom: 2px; margin-right: 8px;"
               />
               <text
                 style="font-family: Inter; font-weight: bold; font-size: 13px;"
@@ -136,6 +136,82 @@ exports[`Report should render Report correctly 1`] = `
                 y="0"
               >
                 Salary Work
+              </text>
+            </view>
+            <view
+              data-testid="experiences-content-report-container-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+              style="display: flex; flex-direction: row; align-items: flex-start; margin-bottom: 14px;"
+            >
+              <view
+                style="display: flex; flex-direction: column;"
+              >
+                <text
+                  data-testid="experiences-content-report-experience-title-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+                  style="font-family: Inter; font-weight: bold; font-size: 12px;"
+                  x="0"
+                  y="0"
+                >
+                  Project Manager
+                </text>
+                <text
+                  data-testid="experiences-content-report-date-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+                  style="font-size: 10px; font-weight: normal; font-family: Inter;"
+                  x="0"
+                  y="0"
+                >
+                  2022 — Present
+                </text>
+                <view>
+                  <text
+                    style="font-family: Inter; font-weight: bold; font-size: 12px; padding-bottom: 4px;"
+                    x="0"
+                    y="0"
+                  >
+                    Top skills:
+                  </text>
+                  <view
+                    data-testid="experiences-content-report-skills-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+                    style="display: flex; flex-direction: column; flex-wrap: wrap; align-items: flex-start; gap: 4px;"
+                  >
+                    <text
+                      style="font-size: 11px; color: rgb(33, 31, 29); font-family: Inter;"
+                      x="0"
+                      y="0"
+                    >
+                      • 
+                      Management
+                    </text>
+                    <text
+                      style="font-size: 11px; color: rgb(33, 31, 29); font-family: Inter;"
+                      x="0"
+                      y="0"
+                    >
+                      • 
+                      Communication
+                    </text>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+        <view
+          style="display: flex; flex-direction: column; padding-bottom: 10px;"
+        >
+          <view>
+            <view
+              style="display: flex; flex-direction: row; align-items: center; margin-bottom: 12px;"
+            >
+              <image
+                src="/friendly.png"
+                style="height: 16px; margin-bottom: 2px; margin-right: 8px;"
+              />
+              <text
+                style="font-family: Inter; font-weight: bold; font-size: 13px;"
+                x="0"
+                y="0"
+              >
+                Unpaid Work
               </text>
             </view>
             <view
@@ -204,7 +280,7 @@ exports[`Report should render Report correctly 1`] = `
           x="0"
           y="0"
         >
-          Skills Report
+          Skills Description
         </text>
         <text
           style="font-size: 11px; font-family: Inter; font-weight: normal; word-break: break-word; color: rgb(67, 71, 78);"

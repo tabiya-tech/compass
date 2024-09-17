@@ -10,7 +10,7 @@ interface SkillsDescriptionProps {
 const SkillsDescription: React.FC<SkillsDescriptionProps> = ({ skillsList }) => (
   <View style={styles.skillDescriptionContainer} break={true}>
     <Text x={0} y={0} style={styles.skillDescriptionTitle}>
-      {ReportContent.SKILLS_REPORT_TITLE}
+      {ReportContent.SKILLS_DESCRIPTION_TITLE}
     </Text>
     <Text x={0} y={0} style={styles.info}>
       {ReportContent.SKILLS_DESCRIPTION_TEXT}
