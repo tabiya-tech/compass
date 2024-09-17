@@ -97,7 +97,7 @@ const DataProtectionAgreement: React.FC = () => {
     setIsChecked(event.target.checked);
   };
 
-  const label = "I have read and agree to Compass's ";
+  const label = "I have read and agree to the ";
 
   return (
     <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.DPA_CONTAINER}>
@@ -151,8 +151,8 @@ const DataProtectionAgreement: React.FC = () => {
             {label}
             <StyledAnchor href="https://compass.tabiya.org/dpa.html" target="_blank" rel="noreferrer">
               Terms and Conditions
-            </StyledAnchor>
-            .
+            </StyledAnchor>{" "}
+            of Compass.
           </Typography>
         </Box>
         <Typography>
