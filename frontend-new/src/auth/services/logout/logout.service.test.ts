@@ -71,13 +71,13 @@ describe("LogoutService class tests", () => {
       // GIVEN the user is logged in with social login
       (PersistentStorageService.getLoginMethod as jest.Mock).mockReturnValue(AuthServices.SOCIAL);
       //@ts-ignore
-      jest.spyOn(socialAuthService, "handleLogout").mockResolvedValue(undefined)
+      jest.spyOn(socialAuthService, "handleLogout").mockResolvedValue(undefined);
 
       // WHEN the logout is attempted
       const logoutCallback = async () => await logoutService.handleLogout();
 
       // THEN the logout should succeed
-      await expect(logoutCallback()).resolves.toBeUndefined()
+      await expect(logoutCallback()).resolves.toBeUndefined();
     });
 
     test("should throw an error on social auth service logout error", async () => {
@@ -85,27 +85,26 @@ describe("LogoutService class tests", () => {
       (PersistentStorageService.getLoginMethod as jest.Mock).mockReturnValue(AuthServices.SOCIAL);
       const mockError = new Error("Logout failed");
       //@ts-ignore
-      jest.spyOn(socialAuthService, "handleLogout").mockRejectedValue(mockError)
-
+      jest.spyOn(socialAuthService, "handleLogout").mockRejectedValue(mockError);
 
       // WHEN the logout is attempted
       const logoutCallback = async () => await logoutService.handleLogout();
 
       // THEN the logout should throw an error
-      await expect(logoutCallback()).rejects.toThrow("Logout failed")
+      await expect(logoutCallback()).rejects.toThrow("Logout failed");
     });
 
     test("should successfully logout using anonymous service logout", async () => {
       // GIVEN the user is logged in with anonymous login
       (PersistentStorageService.getLoginMethod as jest.Mock).mockReturnValue(AuthServices.ANONYMOUS);
       //@ts-ignore
-      jest.spyOn(anonymousAuthService, "handleLogout").mockResolvedValue(undefined)
+      jest.spyOn(anonymousAuthService, "handleLogout").mockResolvedValue(undefined);
 
       // WHEN the logout is attempted
       const logoutCallback = async () => await logoutService.handleLogout();
 
       // THEN the logout should succeed
-      await expect(logoutCallback()).resolves.toBeUndefined()
+      await expect(logoutCallback()).resolves.toBeUndefined();
     });
 
     test("should throw an error on anonymous auth service logout error", async () => {
@@ -113,26 +112,26 @@ describe("LogoutService class tests", () => {
       (PersistentStorageService.getLoginMethod as jest.Mock).mockReturnValue(AuthServices.ANONYMOUS);
       const mockError = new Error("Logout failed");
       //@ts-ignore
-      jest.spyOn(anonymousAuthService, "handleLogout").mockRejectedValue(mockError)
+      jest.spyOn(anonymousAuthService, "handleLogout").mockRejectedValue(mockError);
 
       // WHEN the logout is attempted
       const logoutCallback = async () => await logoutService.handleLogout();
 
       //THEN the logout should throw an error
-      await expect(logoutCallback()).rejects.toThrow("Logout failed")
+      await expect(logoutCallback()).rejects.toThrow("Logout failed");
     });
 
     test("should successfully logout using email service logout", async () => {
       // GIVEN the user is logged in with email login
       (PersistentStorageService.getLoginMethod as jest.Mock).mockReturnValue(AuthServices.EMAIL);
       //@ts-ignore
-      jest.spyOn(emailAuthService, "handleLogout").mockResolvedValue()
+      jest.spyOn(emailAuthService, "handleLogout").mockResolvedValue();
 
       // WHEN the logout is attempted
       const logoutCallback = async () => await logoutService.handleLogout();
 
       // THEN the logout should succeed
-      await expect(logoutCallback()).resolves.toBeUndefined()
+      await expect(logoutCallback()).resolves.toBeUndefined();
     });
 
     test("should throw an error on email auth service logout error", async () => {
@@ -143,7 +142,7 @@ describe("LogoutService class tests", () => {
       const logoutCallback = async () => await logoutService.handleLogout();
 
       // THEN the logout should throw an error
-      await expect(logoutCallback()).rejects.toThrow("Invalid login method")
+      await expect(logoutCallback()).rejects.toThrow("Invalid login method");
     });
   });
 });

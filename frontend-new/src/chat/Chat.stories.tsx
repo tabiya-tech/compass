@@ -196,7 +196,6 @@ export const ShownWhenUserIsInactive: Story = {
   },
 };
 
-
 export const ShowWhenNewWxperienceIsDiscovered: Story = {
   args: {
     showNewExperienceAlert: true,

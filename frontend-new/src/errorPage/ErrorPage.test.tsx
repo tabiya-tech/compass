@@ -5,7 +5,7 @@ describe("ErrorPage", () => {
   test("ErrorPage renders correctly", () => {
     // GIVEN an error message
     const errorMessage = "404 Error - Page Not Found";
-    
+
     jest.spyOn(console, "error");
     jest.spyOn(console, "warn");
 

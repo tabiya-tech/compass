@@ -31,7 +31,7 @@ export const Backdrop = (props: Readonly<IBackdropProps>) => {
     >
       <Sloth width={"64px"}>
         <Paper
-          elevation={props.transparent ? 0: 24}
+          elevation={props.transparent ? 0 : 24}
           sx={{
             backgroundColor: "containerBackground.main",
             border: props.transparent ? theme.tabiyaSpacing.md : 0,

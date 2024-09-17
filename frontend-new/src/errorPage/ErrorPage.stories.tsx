@@ -26,7 +26,8 @@ export const ShownWithNoErrorMessage: Story = {
 
 export const ShownWithLongErrorMessage: Story = {
   args: {
-    errorMessage: "An error occurred. An error occurred. An error occurred. An error occurred. An error occurred. An error occurred."
+    errorMessage:
+      "An error occurred. An error occurred. An error occurred. An error occurred. An error occurred. An error occurred.",
   },
 };
 
@@ -35,5 +36,3 @@ export const ShownWith404ErrorMessage: Story = {
     errorMessage: "404 Error - Page Not Found",
   },
 };
-
-

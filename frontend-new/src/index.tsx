@@ -14,7 +14,7 @@ import InternalError from "./errorPage/ErrorPage";
 import { initSentry } from "./sentryInit";
 
 // initialize react sentry for log aggregation
-initSentry()
+initSentry();
 
 // Currently the fonts are downloaded from Google via the index.css
 // Fonts could be distributed with the app instead, by explicitly importing them here
@@ -22,18 +22,20 @@ initSentry()
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 root.render(
   <React.StrictMode>
-      <Sentry.ErrorBoundary fallback={<InternalError errorMessage={"Something went wrong with Compass. Try reloading the page..."} />}>
-        <CssBaseline />
-        <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
-          <SnackbarProvider>
-            <IsOnlineProvider>
-              <ViewPortWrapper>
-                <App />
-              </ViewPortWrapper>
-            </IsOnlineProvider>
-          </SnackbarProvider>
-        </ThemeProvider>
-      </Sentry.ErrorBoundary>
+    <Sentry.ErrorBoundary
+      fallback={<InternalError errorMessage={"Something went wrong with Compass. Try reloading the page..."} />}
+    >
+      <CssBaseline />
+      <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
+        <SnackbarProvider>
+          <IsOnlineProvider>
+            <ViewPortWrapper>
+              <App />
+            </ViewPortWrapper>
+          </IsOnlineProvider>
+        </SnackbarProvider>
+      </ThemeProvider>
+    </Sentry.ErrorBoundary>
   </React.StrictMode>
 );
 

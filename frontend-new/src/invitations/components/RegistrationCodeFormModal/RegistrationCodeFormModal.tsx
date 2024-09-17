@@ -73,10 +73,8 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ sho
     try {
       setIsValidating(true);
       const service = InvitationsService.getInstance();
-      const invitation = await service.checkInvitationCodeStatus(
-        invitationCode
-      );
-      if(invitation.status !== InvitationStatus.VALID || invitation.invitation_type !== InvitationType.REGISTER) {
+      const invitation = await service.checkInvitationCodeStatus(invitationCode);
+      if (invitation.status !== InvitationStatus.VALID || invitation.invitation_type !== InvitationType.REGISTER) {
         throw new Error("Invalid registration code");
       }
       enqueueSnackbar("Registration code is valid!", { variant: "success" });

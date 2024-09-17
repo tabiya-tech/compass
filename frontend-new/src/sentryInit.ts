@@ -3,7 +3,7 @@ import { getBackendUrl, getSentryDSN } from "./envService";
 import React from "react";
 import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from "react-router-dom";
 
-export function initSentry () {
+export function initSentry() {
   Sentry.init({
     dsn: getSentryDSN(),
     integrations: [

@@ -24,10 +24,10 @@ export class SocialAuthService implements AuthService {
     } catch (error) {
       const firebaseError = (error as any).code;
       throw errorFactory(
-          firebaseError.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
-          firebaseError || FirebaseErrorCodes.INTERNAL_ERROR,
-          firebaseError.message || FirebaseErrorCodes.INTERNAL_ERROR,
-          {}
+        firebaseError.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
+        firebaseError || FirebaseErrorCodes.INTERNAL_ERROR,
+        firebaseError.message || FirebaseErrorCodes.INTERNAL_ERROR,
+        {}
       );
     }
   }
@@ -54,7 +54,12 @@ export class SocialAuthService implements AuthService {
 
     // @ts-ignore
     if (!userCredential?.user?.multiFactor?.user?.accessToken) {
-      throw firebaseErrorFactory(StatusCodes.NOT_FOUND, FirebaseErrorCodes.USER_NOT_FOUND, "The user could not be found", {})
+      throw firebaseErrorFactory(
+        StatusCodes.NOT_FOUND,
+        FirebaseErrorCodes.USER_NOT_FOUND,
+        "The user could not be found",
+        {}
+      );
     }
 
     // @ts-ignore

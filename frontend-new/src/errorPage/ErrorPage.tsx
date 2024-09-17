@@ -26,10 +26,10 @@ const ErrorPage: React.FC<ErrorPageProps> = ({ errorMessage }) => {
       }}
       data-testid={DATA_TEST_ID.ERROR_CONTAINER}
     >
-      <img 
-        src="/logo.svg" 
-        alt="error illustration" 
-        width="250px" 
+      <img
+        src="/logo.svg"
+        alt="error illustration"
+        width="250px"
         data-testid={DATA_TEST_ID.ERROR_ILLUSTRATION}
         style={{ marginBottom: "2rem" }}
       />

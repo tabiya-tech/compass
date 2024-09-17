@@ -16,7 +16,6 @@ jest.mock("./info.service", () => {
 });
 
 describe("Testing Info component", () => {
-
   test("it should show frontend info successfully", async () => {
     // GIVEN some frontend and backend info data are available and loaded
     const expectedFrontendInfoData: InfoProps = {
