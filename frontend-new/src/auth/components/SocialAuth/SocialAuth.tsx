@@ -66,7 +66,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       }
     } catch (error: any) {
       let errorMessage;
-      if(error instanceof ServiceError) {
+      if (error instanceof ServiceError) {
         errorMessage = getUserFriendlyErrorMessage(error);
         writeServiceErrorToLog(error, console.error);
       } else if (error instanceof FirebaseError) {

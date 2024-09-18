@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ErrorPage ErrorPage renders correctly 1`] = `
+<div
+  class="MuiBox-root css-fe75so"
+  data-testid="error-37d307ae-4f1e-4d8d-bafe-fd642f8af4ab}"
+>
+  <img
+    alt="error illustration"
+    data-testid="error-illustration-37d307ae-4f1e-4d8d-bafe-fd642f8af4ab}"
+    src="/logo.svg"
+    style="margin-bottom: 2rem;"
+    width="250px"
+  />
+  <h2
+    class="MuiTypography-root MuiTypography-h2 css-1mw548o-MuiTypography-root"
+    data-testid="error-message-37d307ae-4f1e-4d8d-bafe-fd642f8af4ab"
+  >
+    404 Error - Page Not Found
+  </h2>
+</div>
+`;

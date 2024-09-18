@@ -108,7 +108,7 @@ describe("Testing Register component", () => {
         invitation_type: InvitationType.REGISTER,
         status: InvitationStatus.VALID,
         invitation_code: givenInvitationCode,
-      })
+      });
     // WHEN the component is rendered within the AuthContext and Router
     render(
       <HashRouter>
@@ -146,17 +146,11 @@ describe("Testing Register component", () => {
 
     // Expect the register function to have been called
     await waitFor(() => {
-      expect(emailAuthService.handleRegisterWithEmail).toHaveBeenCalledWith(
-        givenEmail,
-        givenPassword,
-        givenName,
-      );
+      expect(emailAuthService.handleRegisterWithEmail).toHaveBeenCalledWith(givenEmail, givenPassword, givenName);
     });
 
     // AND check that the invitation code status was checked
-    expect(checkInvitationCodeStatusMock).toHaveBeenCalledWith(
-      givenInvitationCode
-    );
+    expect(checkInvitationCodeStatusMock).toHaveBeenCalledWith(givenInvitationCode);
 
     // AND the component should match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.REGISTER_CONTAINER)).toMatchSnapshot();
@@ -169,9 +163,7 @@ describe("Testing Register component", () => {
     const givenPassword = "password";
 
     // AND the register function returns a token
-    (emailAuthService.handleRegisterWithEmail as jest.Mock).mockResolvedValue(
-      "foo-bar-token"
-    );
+    (emailAuthService.handleRegisterWithEmail as jest.Mock).mockResolvedValue("foo-bar-token");
 
     // AND the auth state service is mocked to return a user
     jest.spyOn(authStateService, "updateUserByToken").mockImplementation((token) => {
@@ -211,11 +203,7 @@ describe("Testing Register component", () => {
 
     // THEN expect the register function to have been called
     await waitFor(() => {
-      expect(emailAuthService.handleRegisterWithEmail).toHaveBeenCalledWith(
-        givenEmail,
-        givenPassword,
-        givenName,
-      );
+      expect(emailAuthService.handleRegisterWithEmail).toHaveBeenCalledWith(givenEmail, givenPassword, givenName);
     });
 
     // AND no errors or warning to have occurred
@@ -227,7 +215,7 @@ describe("Testing Register component", () => {
     // GIVEN a failed registration
     (emailAuthService.handleRegisterWithEmail as jest.Mock).mockRejectedValue(
       new Error("An unexpected error occurred. Please try again later.")
-    )
+    );
 
     const givenName = "Foo Bar";
     const givenEmail = "foo@bar.baz";
@@ -253,15 +241,14 @@ describe("Testing Register component", () => {
     });
     // THEN expect the register function to have been called
     await waitFor(() => {
-      expect(emailAuthService.handleRegisterWithEmail).toHaveBeenCalledWith(
-        givenEmail,
-        givenPassword,
-        givenName,
-      );
+      expect(emailAuthService.handleRegisterWithEmail).toHaveBeenCalledWith(givenEmail, givenPassword, givenName);
     });
 
     // AND the error message should be displayed
-    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Registration Failed: An unexpected error occurred. Please try again later.", { variant: "error" });
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+      "Registration Failed: An unexpected error occurred. Please try again later.",
+      { variant: "error" }
+    );
   });
 
   test("it should not call register when registration code is invalid", async () => {
@@ -292,7 +279,7 @@ describe("Testing Register component", () => {
     // AND the register form is submitted
     await act(async () => {
       (RegisterWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnRegister(givenName, givenEmail, "password");
-    })
+    });
 
     // THEN expect the register function to not have been called
     await waitFor(() => {

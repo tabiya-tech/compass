@@ -16,9 +16,7 @@ import { Language } from "src/userPreferences/UserPreferencesService/userPrefere
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import { logoutService } from "src/auth/services/logout/logout.service";
-import {
-  userPreferencesStateService,
-} from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
+import { userPreferencesStateService } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
 import { StatusCodes } from "http-status-codes";
 import authStateService from "src/auth/AuthStateService";
 import { TabiyaUser } from "src/auth/auth.types";
@@ -64,8 +62,8 @@ const Register: React.FC = () => {
   const navigate = useNavigate();
 
   /* -----------
-  * callbacks to pass to the child components
-  */
+   * callbacks to pass to the child components
+   */
   const handleRegistrationCodeChanged = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     setRegistrationCode(event.target.value);
   };
@@ -76,19 +74,14 @@ const Register: React.FC = () => {
    */
   const isInvitationCodeValid = useCallback(async (): Promise<boolean> => {
     try {
-        // Call the service method and use callbacks to determine the result
-        const invitation = await invitationsService.checkInvitationCodeStatus(
-          registrationCode,
-        );
-        if (
-          invitation.status === InvitationStatus.INVALID ||
-          invitation.invitation_type !== InvitationType.REGISTER
-        ) {
-          console.error("Invalid registration code")
-          enqueueSnackbar("Invalid registration code", { variant: "error" });
-          return false;
-        }
-        return true;
+      // Call the service method and use callbacks to determine the result
+      const invitation = await invitationsService.checkInvitationCodeStatus(registrationCode);
+      if (invitation.status === InvitationStatus.INVALID || invitation.invitation_type !== InvitationType.REGISTER) {
+        console.error("Invalid registration code");
+        enqueueSnackbar("Invalid registration code", { variant: "error" });
+        return false;
+      }
+      return true;
     } catch (e) {
       let errorMessage;
       if (e instanceof ServiceError) {
@@ -96,7 +89,7 @@ const Register: React.FC = () => {
         errorMessage = getUserFriendlyErrorMessage(e as Error);
       } else {
         console.error(e);
-        errorMessage = (e as Error).message
+        errorMessage = (e as Error).message;
       }
       enqueueSnackbar(errorMessage, { variant: "error" });
       return false;
@@ -111,10 +104,8 @@ const Register: React.FC = () => {
     async (user: TabiyaUser) => {
       try {
         setIsLoading(true);
-        const prefs = await userPreferencesService.getUserPreferences(
-          user.id
-        );
-        if(prefs === null){
+        const prefs = await userPreferencesService.getUserPreferences(user.id);
+        if (prefs === null) {
           throw new Error("User preferences not found");
         }
         userPreferencesStateService.setUserPreferences(prefs);
@@ -126,14 +117,16 @@ const Register: React.FC = () => {
         }
       } catch (error) {
         let errorMessage;
-        if(error instanceof ServiceError) {
+        if (error instanceof ServiceError) {
           writeServiceErrorToLog(error, console.error);
           errorMessage = getUserFriendlyErrorMessage(error);
         } else {
           errorMessage = (error as Error).message;
-          console.error("An error occurred while trying to get your preferences", error)
+          console.error("An error occurred while trying to get your preferences", error);
         }
-        enqueueSnackbar(`An error occurred while trying to get your preferences: ${errorMessage}`, { variant: "error" });
+        enqueueSnackbar(`An error occurred while trying to get your preferences: ${errorMessage}`, {
+          variant: "error",
+        });
       } finally {
         setIsLoading(false);
       }
@@ -142,8 +135,8 @@ const Register: React.FC = () => {
   );
 
   /* ------------
-  * Actual registration handlers
-  */
+   * Actual registration handlers
+   */
   /**
    * Handle the register form submission
    * @param name
@@ -161,36 +154,30 @@ const Register: React.FC = () => {
           setIsLoading(false);
           return;
         }
-        const token = await emailAuthService.handleRegisterWithEmail(
-          email,
-          password,
-          name
-        );
+        const token = await emailAuthService.handleRegisterWithEmail(email, password, name);
         const _user = authStateService.updateUserByToken(token);
         if (_user) {
-            // create user preferences for the first time.
-            // in order to do this, there needs to be a logged in user in the persistent storage
-            const prefs = await userPreferencesService.createUserPreferences(
-              {
-                user_id: _user.id,
-                invitation_code: registrationCode,
-                language: Language.en,
-              }
-            );
-            userPreferencesStateService.setUserPreferences(prefs);
-            enqueueSnackbar("Verification Email Sent!", { variant: "success" });
-            // IMPORTANT NOTE: after the preferences are added, or fail to be added, we should log the user out immediately,
-            // since if we don't do that, the user may be able to access the application without verifying their email
-            // or accepting the dpa.
-            await logoutService.handleLogout();
-            userPreferencesStateService.clearUserPreferences();
-            await authStateService.clearUser();
+          // create user preferences for the first time.
+          // in order to do this, there needs to be a logged in user in the persistent storage
+          const prefs = await userPreferencesService.createUserPreferences({
+            user_id: _user.id,
+            invitation_code: registrationCode,
+            language: Language.en,
+          });
+          userPreferencesStateService.setUserPreferences(prefs);
+          enqueueSnackbar("Verification Email Sent!", { variant: "success" });
+          // IMPORTANT NOTE: after the preferences are added, or fail to be added, we should log the user out immediately,
+          // since if we don't do that, the user may be able to access the application without verifying their email
+          // or accepting the dpa.
+          await logoutService.handleLogout();
+          userPreferencesStateService.clearUserPreferences();
+          await authStateService.clearUser();
 
-            // navigate to the verify email page
-            navigate(routerPaths.VERIFY_EMAIL, { replace: true });
-          } else {
-           // if a user cannot be gotten from the token, we should throw an error
-           throw new Error("Something went wrong while registering. Please try again.");
+          // navigate to the verify email page
+          navigate(routerPaths.VERIFY_EMAIL, { replace: true });
+        } else {
+          // if a user cannot be gotten from the token, we should throw an error
+          throw new Error("Something went wrong while registering. Please try again.");
         }
       } catch (e: any) {
         let errorMessage;
@@ -198,24 +185,18 @@ const Register: React.FC = () => {
           writeServiceErrorToLog(e, console.error);
           errorMessage = getUserFriendlyErrorMessage(e as Error);
         } else if (e instanceof FirebaseError) {
-          writeFirebaseErrorToLog(e, console.error)
+          writeFirebaseErrorToLog(e, console.error);
           errorMessage = getUserFriendlyFirebaseErrorMessage(e);
         } else {
           console.error(e);
-          errorMessage = (e as Error).message
+          errorMessage = (e as Error).message;
         }
         enqueueSnackbar(`Registration Failed: ${errorMessage}`, { variant: "error" });
       } finally {
         setIsLoading(false);
       }
     },
-    [
-      navigate,
-      enqueueSnackbar,
-      setIsLoading,
-      isInvitationCodeValid,
-      registrationCode,
-    ]
+    [navigate, enqueueSnackbar, setIsLoading, isInvitationCodeValid, registrationCode]
   );
 
   /**
@@ -223,16 +204,14 @@ const Register: React.FC = () => {
    * we pass this to the SocialAuth component which will call it after a successful social registration
    * */
   const successfulSocialRegistrationCallback = async (user: TabiyaUser) => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       // create user preferences for the first time.
-      const prefs = await userPreferencesService.createUserPreferences(
-        {
-          user_id: user.id,
-          invitation_code: registrationCode,
-          language: Language.en,
-        }
-      );
+      const prefs = await userPreferencesService.createUserPreferences({
+        user_id: user.id,
+        invitation_code: registrationCode,
+        language: Language.en,
+      });
       userPreferencesStateService.setUserPreferences(prefs);
       // We use postLoginHandler because a social registration is parallel to a login
       // and the postLoginHandler is used to handle the post login actions
@@ -241,7 +220,7 @@ const Register: React.FC = () => {
       let errorMessage;
       if (e instanceof ServiceError) {
         // if the user preferences already exist, we should just log the user in
-        if((e).statusCode === StatusCodes.CONFLICT) {
+        if (e.statusCode === StatusCodes.CONFLICT) {
           await handlePostLogin(user);
           return;
         }
@@ -249,7 +228,7 @@ const Register: React.FC = () => {
         writeServiceErrorToLog(e, console.error);
       } else {
         console.error(e);
-        errorMessage = (e as Error).message
+        errorMessage = (e as Error).message;
       }
       enqueueSnackbar(`Failed to create preferences: ${errorMessage}`, { variant: "error" });
     } finally {
@@ -258,8 +237,8 @@ const Register: React.FC = () => {
   };
 
   /* ------------------
-  * aggregated states for loading and disabling ui
-  */
+   * aggregated states for loading and disabling ui
+   */
   // register form is in the loading state if the auth context is loading, or if the user is registering with either of the methods
   const isRegisterLoading = isLoading;
 

@@ -59,9 +59,7 @@ describe("UserPreferencesService", () => {
 
       // WHEN the getUserPreferences function is called with the given arguments
       const service = new UserPreferencesService();
-      const actualUserPreferences = await service.getUserPreferences(
-        givenResponseBody.user_id,
-      );
+      const actualUserPreferences = await service.getUserPreferences(givenResponseBody.user_id);
 
       // THEN expect it to make a GET request with correct headers and payload
       expect(fetchSpy).toHaveBeenCalledWith(
@@ -93,9 +91,7 @@ describe("UserPreferencesService", () => {
 
       // THEN expected it to reject with the error response
 
-      const getUserPreferencesCallback = async () => await service.getUserPreferences(
-          "1",
-        );
+      const getUserPreferencesCallback = async () => await service.getUserPreferences("1");
 
       // AND expect the service to throw the error that the fetchWithAuth function throws
       await expect(getUserPreferencesCallback).rejects.toThrow("Failed to get user preferences");
@@ -114,7 +110,7 @@ describe("UserPreferencesService", () => {
         const service = new UserPreferencesService();
 
         // THEN expected it to reject with the error response
-        const expectedError : ServiceError = {
+        const expectedError: ServiceError = {
           ...new ServiceError(
             UserPreferencesService.name,
             "getUserPreferences",
@@ -127,9 +123,7 @@ describe("UserPreferencesService", () => {
           ),
           details: expect.anything(),
         };
-        const getUserPreferencesCallback = async () => await service.getUserPreferences(
-            "1",
-          );
+        const getUserPreferencesCallback = async () => await service.getUserPreferences("1");
 
         // THEN expected it to reject with the error response
         await expect(getUserPreferencesCallback).rejects.toMatchObject(expectedError);
@@ -143,33 +137,28 @@ describe("UserPreferencesService", () => {
       const givenUserPreferences: UpdateUserPreferencesSpec = {
         user_id: "1",
         language: Language.en,
-        accepted_tc: new Date()
+        accepted_tc: new Date(),
       };
 
       const fetchSpy = setupFetchSpy(StatusCodes.OK, givenUserPreferences, "application/json;charset=UTF-8");
 
       // WHEN the updateUserPreferences function is called with the given arguments
       const service = new UserPreferencesService();
-      const actualUserPreferences = await service.updateUserPreferences(
-        givenUserPreferences,
-      );
+      const actualUserPreferences = await service.updateUserPreferences(givenUserPreferences);
 
       // THEN expect it to make a PATCH request with correct headers and payload
-      expect(fetchSpy).toHaveBeenCalledWith(
-        `${givenApiServerUrl}/users/preferences`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(givenUserPreferences),
-          expectedStatusCode: 200,
-          failureMessage: `Failed to update user preferences for user with id ${givenUserPreferences.user_id}`,
-          serviceFunction: "updateUserPreferences",
-          serviceName: "UserPreferencesService",
-          expectedContentType: "application/json",
-        }
-      );
+      expect(fetchSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/users/preferences`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(givenUserPreferences),
+        expectedStatusCode: 200,
+        failureMessage: `Failed to update user preferences for user with id ${givenUserPreferences.user_id}`,
+        serviceFunction: "updateUserPreferences",
+        serviceName: "UserPreferencesService",
+        expectedContentType: "application/json",
+      });
 
       // AND expect it to return the user preferences
       expect(actualUserPreferences).toEqual(givenUserPreferences);
@@ -184,13 +173,12 @@ describe("UserPreferencesService", () => {
       const service = new UserPreferencesService();
 
       // THEN expected it to reject with the error response
-      let updateUserPreferencesCallback = async () => await service.updateUserPreferences(
-        {
+      let updateUserPreferencesCallback = async () =>
+        await service.updateUserPreferences({
           user_id: "1",
           language: Language.en,
-          accepted_tc: new Date()
-        },
-      );
+          accepted_tc: new Date(),
+        });
 
       // AND expect the service to throw the error that the fetchWithAuth function throws
       await expect(updateUserPreferencesCallback).rejects.toThrow("Failed to update user preferences");
@@ -207,7 +195,7 @@ describe("UserPreferencesService", () => {
 
         // WHEN the updateUserPreferences function is called with the given user preferences
         const service = new UserPreferencesService();
-        const expectedError : ServiceError = {
+        const expectedError: ServiceError = {
           ...new ServiceError(
             UserPreferencesService.name,
             "updateUserPreferences",
@@ -220,17 +208,17 @@ describe("UserPreferencesService", () => {
           ),
           details: expect.anything(),
         };
-        const updateUserPreferencesCallback = async () =>  await service.updateUserPreferences(
-            {
-              user_id: "1",
-              language: Language.en,
-              accepted_tc: new Date()
-            },
-          );
+        const updateUserPreferencesCallback = async () =>
+          await service.updateUserPreferences({
+            user_id: "1",
+            language: Language.en,
+            accepted_tc: new Date(),
+          });
 
         // THEN expected it to reject with the error response
         await expect(updateUserPreferencesCallback).rejects.toMatchObject(expectedError);
-      });
+      }
+    );
   });
 
   describe("createUserPreferences", () => {
@@ -243,43 +231,38 @@ describe("UserPreferencesService", () => {
       };
 
       // WHEN the createUserPreferences function is called with the given arguments
-     const mockResponseFormBackend: UserPreference = {
-       user_id: givenUserPreferences.user_id,
-       language: givenUserPreferences.language,
-       sessions: [],
-       accepted_tc: undefined
-     }
+      const mockResponseFormBackend: UserPreference = {
+        user_id: givenUserPreferences.user_id,
+        language: givenUserPreferences.language,
+        sessions: [],
+        accepted_tc: undefined,
+      };
       const fetchSpy = setupFetchSpy(StatusCodes.CREATED, mockResponseFormBackend, "application/json;charset=UTF-8");
 
       const service = new UserPreferencesService();
-      const actualUserPreferences = await service.createUserPreferences(
-        givenUserPreferences,
-      );
+      const actualUserPreferences = await service.createUserPreferences(givenUserPreferences);
 
       // THEN expect it to make a POST request with correct headers and payload
-      expect(fetchSpy).toHaveBeenCalledWith(
-        `${givenApiServerUrl}/users/preferences`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(givenUserPreferences),
-          expectedStatusCode: 201,
-          failureMessage: `Failed to create new user preferences for user with id ${givenUserPreferences.user_id}`,
-          serviceFunction: "createUserPreferences",
-          serviceName: "UserPreferencesService",
-          expectedContentType: "application/json",
-        }
-      );
+      expect(fetchSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/users/preferences`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(givenUserPreferences),
+        expectedStatusCode: 201,
+        failureMessage: `Failed to create new user preferences for user with id ${givenUserPreferences.user_id}`,
+        serviceFunction: "createUserPreferences",
+        serviceName: "UserPreferencesService",
+        expectedContentType: "application/json",
+      });
 
       // AND expect it to return the user preferences
       const expectedUserPreferences: UserPreference = {
         user_id: givenUserPreferences.user_id,
         language: givenUserPreferences.language,
         sessions: [],
-        accepted_tc: undefined
-      }
+        accepted_tc: undefined,
+      };
 
       expect(actualUserPreferences).toEqual(expectedUserPreferences);
     });
@@ -293,13 +276,12 @@ describe("UserPreferencesService", () => {
       const service = new UserPreferencesService();
 
       // THEN expected it to reject with the error response
-      let createUserPreferencesCallback = async () => await service.createUserPreferences(
-        {
+      let createUserPreferencesCallback = async () =>
+        await service.createUserPreferences({
           user_id: "1",
           language: Language.en,
           invitation_code: "1234",
-        },
-      );
+        });
 
       // AND expect the service to throw the error that the fetchWithAuth function throws
       await expect(createUserPreferencesCallback).rejects.toThrow("Failed to create new user preferences");
@@ -316,7 +298,7 @@ describe("UserPreferencesService", () => {
 
         // WHEN the createUserPreferences function is called with the given user preferences
         const service = new UserPreferencesService();
-        const expectedError : ServiceError = {
+        const expectedError: ServiceError = {
           ...new ServiceError(
             UserPreferencesService.name,
             "createUserPreferences",
@@ -329,16 +311,16 @@ describe("UserPreferencesService", () => {
           ),
           details: expect.anything(),
         };
-        const createUserPreferencesCallback = async () =>  await service.createUserPreferences(
-            {
-              user_id: "1",
-              language: Language.en,
-              invitation_code: "1234",
-            },
-          );
+        const createUserPreferencesCallback = async () =>
+          await service.createUserPreferences({
+            user_id: "1",
+            language: Language.en,
+            invitation_code: "1234",
+          });
 
         // THEN expected it to reject with the error response
         await expect(createUserPreferencesCallback).rejects.toMatchObject(expectedError);
-      });
+      }
+    );
   });
 });

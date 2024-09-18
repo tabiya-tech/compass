@@ -16,7 +16,6 @@ export const DATA_TEST_ID = {
   BACK_TO_LOGIN_BUTTON: `verification-back-to-login-button-${uniqueId}`,
 };
 
-
 const VerifyEmail: React.FC = () => {
   const navigate = useNavigate();
   /**

@@ -45,8 +45,7 @@ export default class UserPreferencesService {
    * @private
    */
   private parseJsonResponse(responseBody: string, errorFactory: ServiceErrorFactory): UserPreference {
-
-// parse the response body
+    // parse the response body
     let userPreferencesResponse: UserPreference;
     try {
       const jsonPayload: UserPreference = JSON.parse(responseBody);
@@ -61,7 +60,7 @@ export default class UserPreferencesService {
         StatusCodes.UNPROCESSABLE_ENTITY,
         ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
         "Failed to parse response body",
-        responseBody,
+        responseBody
       );
     }
     return userPreferencesResponse;
@@ -83,9 +82,7 @@ export default class UserPreferencesService {
    * This is used to create a user profile for the first time.
    * you provide user_id and invitation_code
    */
-  async createUserPreferences(
-    user_preferences: CreateUserPreferencesSpec,
-  ): Promise<UserPreference> {
+  async createUserPreferences(user_preferences: CreateUserPreferencesSpec): Promise<UserPreference> {
     const serviceName = "UserPreferencesService";
     const serviceFunction = "createUserPreferences";
     const method = "POST";
@@ -93,7 +90,7 @@ export default class UserPreferencesService {
       serviceName,
       serviceFunction,
       method,
-      this.createUserPreferencesEndpointURL,
+      this.createUserPreferencesEndpointURL
     );
     const requestBody = JSON.stringify(user_preferences);
     const response = await fetchWithAuth(this.createUserPreferencesEndpointURL, {
@@ -117,9 +114,7 @@ export default class UserPreferencesService {
    * Creates an entry for the user preferences of a user with an ID
    *
    */
-  async updateUserPreferences(
-    newUserPreferencesSpec: UpdateUserPreferencesSpec,
-  ): Promise<UserPreference> {
+  async updateUserPreferences(newUserPreferencesSpec: UpdateUserPreferencesSpec): Promise<UserPreference> {
     const serviceName = "UserPreferencesService";
     const serviceFunction = "updateUserPreferences";
     const method = "PATCH";
@@ -127,7 +122,7 @@ export default class UserPreferencesService {
       serviceName,
       serviceFunction,
       method,
-      this.updateUserPreferencesEndpointUrl,
+      this.updateUserPreferencesEndpointUrl
     );
 
     const requestBody = JSON.stringify(newUserPreferencesSpec);
@@ -152,19 +147,12 @@ export default class UserPreferencesService {
    * Gets the user preferences of a user with an ID
    *
    */
-  async getUserPreferences(
-    userId: string,
-  ): Promise<UserPreference | null> {
+  async getUserPreferences(userId: string): Promise<UserPreference | null> {
     const serviceName = "UserPreferencesService";
     const serviceFunction = "getUserPreferences";
     const method = "GET";
     const qualifiedURL = `${this.getUserPreferencesEndpointUrl}?user_id=${userId}`;
-    const errorFactory = getServiceErrorFactory(
-      "UserPreferencesService",
-      "getUserPreferences",
-      method,
-      qualifiedURL,
-    );
+    const errorFactory = getServiceErrorFactory("UserPreferencesService", "getUserPreferences", method, qualifiedURL);
 
     const response = await fetchWithAuth(qualifiedURL, {
       method: method,
@@ -196,12 +184,7 @@ export default class UserPreferencesService {
     const method = "GET";
     const qualifiedURL = `${this.generateNewSessionEndpointUrl}?user_id=${userId}`;
 
-    const errorFactory = getServiceErrorFactory(
-      "UserPreferencesService",
-      "getUserPreferences",
-      method,
-      qualifiedURL,
-    );
+    const errorFactory = getServiceErrorFactory("UserPreferencesService", "getUserPreferences", method, qualifiedURL);
 
     const response = await fetchWithAuth(qualifiedURL, {
       method: method,

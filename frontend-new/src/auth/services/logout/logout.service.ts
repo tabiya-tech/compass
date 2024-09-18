@@ -27,23 +27,23 @@ export class LogoutService {
   async handleLogout(): Promise<void> {
     // set the login method to email for future reference
     // we'll want to know how the user logged in, when we want to log them out for example
-      const userLoginMethod = PersistentStorageService.getLoginMethod();
-      let authService: AuthService;
-      // Call the appropriate logout method based on the login method
-      switch (userLoginMethod) {
-        case AuthServices.SOCIAL:
-          authService = socialAuthService;
-          break;
-        case AuthServices.ANONYMOUS:
-          authService = anonymousAuthService;
-          break;
-        case AuthServices.EMAIL:
-          authService = emailAuthService;
-          break;
-        default:
-          throw new Error("Invalid login method");
-      }
-      await authService.handleLogout();
+    const userLoginMethod = PersistentStorageService.getLoginMethod();
+    let authService: AuthService;
+    // Call the appropriate logout method based on the login method
+    switch (userLoginMethod) {
+      case AuthServices.SOCIAL:
+        authService = socialAuthService;
+        break;
+      case AuthServices.ANONYMOUS:
+        authService = anonymousAuthService;
+        break;
+      case AuthServices.EMAIL:
+        authService = emailAuthService;
+        break;
+      default:
+        throw new Error("Invalid login method");
+    }
+    await authService.handleLogout();
   }
 }
 

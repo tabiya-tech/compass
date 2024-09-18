@@ -31,9 +31,7 @@ export default class InvitationsService {
    * @param {string} code - The invitation code to check.
    * @returns {Promise<Invitation>}
    */
-  async checkInvitationCodeStatus(
-    code: string
-  ): Promise<Invitation> {
+  async checkInvitationCodeStatus(code: string): Promise<Invitation> {
     const serviceName = "InvitationsService";
     const serviceFunction = "checkInvitationCodeStatus";
     const method = "GET";
@@ -53,13 +51,23 @@ export default class InvitationsService {
         // The responseBody should be an ErrorResponse but that is not guaranteed e.g. if a gateway in the middle returns a 502,
         // or if the server is not conforming to the error response schema
         const responseBody = await response.text();
-        throw errorFactory(response.status, ErrorConstants.ErrorCodes.API_ERROR, "Failed to check status for invitation code", responseBody);
+        throw errorFactory(
+          response.status,
+          ErrorConstants.ErrorCodes.API_ERROR,
+          "Failed to check status for invitation code",
+          responseBody
+        );
       }
 
       // check if the response is in the expected format
       const responseContentType = response.headers.get("Content-Type");
       if (!responseContentType?.includes("application/json")) {
-        throw errorFactory(response.status, ErrorConstants.ErrorCodes.INVALID_RESPONSE_HEADER, "Response Content-Type should be 'application/json'", `Content-Type header was ${responseContentType}`);
+        throw errorFactory(
+          response.status,
+          ErrorConstants.ErrorCodes.INVALID_RESPONSE_HEADER,
+          "Response Content-Type should be 'application/json'",
+          `Content-Type header was ${responseContentType}`
+        );
       }
 
       const responseBody = await response.text();

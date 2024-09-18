@@ -40,9 +40,7 @@ describe("InvitationsService", () => {
 
       // WHEN the checkInvitationCodeStatus function is called with the given code
       const service = new InvitationsService();
-      const actualStatus= await service.checkInvitationCodeStatus(
-        "test-code",
-      );
+      const actualStatus = await service.checkInvitationCodeStatus("test-code");
 
       // THEN expect it to make a GET request with correct headers and payload
       expect(fetchSpy).toHaveBeenCalledWith(
@@ -67,9 +65,7 @@ describe("InvitationsService", () => {
       const service = new InvitationsService();
 
       // THEN expected it to reject with the error response
-      const checkInvitationCodeCallback = async () => await service.checkInvitationCodeStatus(
-        "test-code"
-      );
+      const checkInvitationCodeCallback = async () => await service.checkInvitationCodeStatus("test-code");
 
       // AND expect the service to throw the error that the fetchWithAuth function throws
       await expect(checkInvitationCodeCallback()).rejects.toThrow("Failed to check status for invitation code");
@@ -87,9 +83,7 @@ describe("InvitationsService", () => {
         // WHEN the checkInvitationCodeStatus function is called with the given code
         const service = new InvitationsService();
 
-        const checkInvitationCodeCallback = async () => await service.checkInvitationCodeStatus(
-            "test-code"
-          );
+        const checkInvitationCodeCallback = async () => await service.checkInvitationCodeStatus("test-code");
 
         // AND expect the service to throw the error that the fetchWithAuth function throws
         await expect(checkInvitationCodeCallback()).rejects.toThrow("Failed to check status for invitation code");

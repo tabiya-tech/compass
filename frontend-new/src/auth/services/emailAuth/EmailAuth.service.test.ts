@@ -153,7 +153,8 @@ describe("AuthService class tests", () => {
       (jwtDecode as jest.Mock).mockReturnValueOnce(givenUser);
 
       // WHEN the registration is attempted
-      const registerCallback = async () => await authService.handleRegisterWithEmail(givenEmail, givenPassword, givenName);
+      const registerCallback = async () =>
+        await authService.handleRegisterWithEmail(givenEmail, givenPassword, givenName);
 
       // AND registerWithEmail should return the token
       await expect(registerCallback()).resolves.toBe(givenTokenResponse);
@@ -167,7 +168,8 @@ describe("AuthService class tests", () => {
       });
 
       // WHEN the registration is attempted
-      const registerCallback = async () => await authService.handleRegisterWithEmail(givenEmail, givenPassword, givenName);
+      const registerCallback = async () =>
+        await authService.handleRegisterWithEmail(givenEmail, givenPassword, givenName);
 
       // AND test should throw an error
       await expect(registerCallback()).rejects.toThrow("Internal error");
@@ -180,7 +182,8 @@ describe("AuthService class tests", () => {
       } as firebase.auth.UserCredential);
 
       // WHEN the registration is attempted
-      const registerCallback = async () => await authService.handleRegisterWithEmail(givenEmail, givenPassword, givenName);
+      const registerCallback = async () =>
+        await authService.handleRegisterWithEmail(givenEmail, givenPassword, givenName);
       // THEN the registration should throw an error
       await expect(registerCallback()).rejects.toThrow("User not found");
     });
