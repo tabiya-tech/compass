@@ -97,7 +97,7 @@ class AuthStateService {
     } catch (error) {
       return null;
     }
-  }
+  };
 
   public async clearUser() {
     console.debug("AuthStateService: Clearing user");
@@ -116,7 +116,7 @@ class AuthStateService {
     try {
       const _user = this.getUserFromToken(token);
       if (_user) {
-        PersistentStorageService.setToken(token)
+        PersistentStorageService.setToken(token);
         this.setUser(_user);
         return _user;
       }
@@ -131,7 +131,7 @@ class AuthStateService {
     try {
       const decodedToken: FirebaseToken = jwtDecode(token);
       const currentTime = Math.floor(Date.now() / 1000);
-      
+
       // Check if token is expired
       if (decodedToken.exp < currentTime) {
         console.debug("Token is expired");
@@ -144,7 +144,7 @@ class AuthStateService {
         return false;
       }
 
-      console.debug("Token checked. Token is valid")
+      console.debug("Token checked. Token is valid");
       return true;
     } catch (error) {
       console.error("Error decoding token:", error);
@@ -165,7 +165,7 @@ class AuthStateService {
       }
     }
     const token = PersistentStorageService.getToken();
-    
+
     if (token && this.isTokenValid(token)) {
       console.debug("Valid token found in storage");
       return this.updateUserByToken(token);
@@ -180,7 +180,7 @@ class AuthStateService {
     console.debug("Attempting to refresh token");
     const oldToken = PersistentStorageService.getToken();
     console.debug("Old token", "..." + oldToken?.slice(-20));
-  
+
     if (auth.currentUser) {
       try {
         const newToken = await auth.currentUser.getIdToken(true);
@@ -207,7 +207,7 @@ class AuthStateService {
     const expirationTime = decodedToken.exp * 1000;
     const currentTime = Date.now();
     const timeToExpiration = expirationTime - currentTime;
-    const refreshTime = timeToExpiration- (timeToExpiration * REFRESH_TOKEN_EXPIRATION_PERCENTAGE); // Refresh token 10% before expiration
+    const refreshTime = timeToExpiration - timeToExpiration * REFRESH_TOKEN_EXPIRATION_PERCENTAGE; // Refresh token 10% before expiration
 
     console.debug(`Next refresh scheduled in ${refreshTime / 1000} seconds`);
 

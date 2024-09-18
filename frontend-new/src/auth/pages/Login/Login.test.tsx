@@ -90,7 +90,7 @@ describe("Testing Login component", () => {
     // GIVEN the component is rendered within necessary context providers
     render(
       <HashRouter>
-          <Login />
+        <Login />
       </HashRouter>
     );
 
@@ -124,7 +124,7 @@ describe("Testing Login component", () => {
 
     render(
       <HashRouter>
-          <Login />
+        <Login />
       </HashRouter>
     );
 
@@ -139,21 +139,19 @@ describe("Testing Login component", () => {
 
     // THEN the loginWithEmail function should be called with the correct arguments
     await waitFor(() => {
-      expect(handleLoginWithEmailSpy).toHaveBeenCalledWith(
-        givenEmail,
-        givenPassword,
-      );
+      expect(handleLoginWithEmailSpy).toHaveBeenCalledWith(givenEmail, givenPassword);
     });
   });
 
   test("it should handle invitation code login correctly", async () => {
     // AND the invitation code mock will succeed
     const handleCheckInvitationStatusSpy = jest
-      .spyOn(invitationsService, "checkInvitationCodeStatus").mockResolvedValue({
+      .spyOn(invitationsService, "checkInvitationCodeStatus")
+      .mockResolvedValue({
         invitation_code: "INVITE-CODE-123",
         status: InvitationStatus.VALID,
         invitation_type: InvitationType.AUTO_REGISTER,
-      })
+      });
     // AND the anonymous auth mock will succeed
     const handleAnonymousLoginSpy = jest
       .spyOn(anonymousAuthService, "handleAnonymousLogin")
@@ -161,7 +159,7 @@ describe("Testing Login component", () => {
 
     render(
       <HashRouter>
-          <Login />
+        <Login />
       </HashRouter>
     );
 
@@ -175,9 +173,7 @@ describe("Testing Login component", () => {
 
     // THEN the checkInvitationStatus function should be called with the correct arguments
     await waitFor(() => {
-      expect(handleCheckInvitationStatusSpy).toHaveBeenCalledWith(
-        "INVITE-CODE-123"
-      );
+      expect(handleCheckInvitationStatusSpy).toHaveBeenCalledWith("INVITE-CODE-123");
     });
 
     // AND the anonymousAuthService should be called with the correct arguments

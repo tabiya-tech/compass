@@ -41,7 +41,7 @@ describe("AuthService class tests", () => {
       const logoutCallback = async () => await authService.handleLogout();
 
       // THEN the logout should succeed
-      await expect(logoutCallback()).resolves.toBeUndefined()
+      await expect(logoutCallback()).resolves.toBeUndefined();
       // AND test should call the firebase signOut function
       expect(firebase.auth().signOut).toHaveBeenCalled();
     });
@@ -53,12 +53,11 @@ describe("AuthService class tests", () => {
         message: "Internal error",
       });
 
-
       // WHEN the logout is attempted
       const logoutCallback = async () => await authService.handleLogout();
 
       // THEN expect the logout to throw an error
-      await expect(logoutCallback()).rejects.toThrow("auth/internal-error")
+      await expect(logoutCallback()).rejects.toThrow("auth/internal-error");
 
       // AND test should call the firebase signOut function
       expect(firebase.auth().signOut).toHaveBeenCalled();

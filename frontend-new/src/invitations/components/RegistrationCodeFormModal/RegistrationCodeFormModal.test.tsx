@@ -119,9 +119,7 @@ describe("RegistrationCodeFormModal", () => {
 
     // THEN the invitation code should be validated
     await waitFor(() => {
-      expect(checkInvitationCodeStatus).toHaveBeenCalledWith(
-        "invalid-code"
-      );
+      expect(checkInvitationCodeStatus).toHaveBeenCalledWith("invalid-code");
     });
 
     await waitFor(() => {

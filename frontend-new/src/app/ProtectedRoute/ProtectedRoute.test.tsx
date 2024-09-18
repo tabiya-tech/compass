@@ -26,7 +26,7 @@ describe("ProtectedRoute test", () => {
       {
         path: routerPaths.ROOT,
         element: (
-          <ProtectedRoute >
+          <ProtectedRoute>
             <div>Protected page</div>
           </ProtectedRoute>
         ),
@@ -34,9 +34,7 @@ describe("ProtectedRoute test", () => {
     ]);
 
     // WHEN the user navigates to the page
-    render(
-        <RouterProvider router={router} />
-    );
+    render(<RouterProvider router={router} />);
 
     // THEN expect the user to be redirected to the login page
     expect(screen.queryByText("protected page")).not.toBeInTheDocument();
@@ -57,9 +55,7 @@ describe("ProtectedRoute test", () => {
     ]);
 
     // WHEN the user navigates to the page
-    render(
-        <RouterProvider router={router} />
-    );
+    render(<RouterProvider router={router} />);
 
     // THEN expect the user to be redirected to the root page
     expect(screen.queryByText("Unprotected component")).not.toBeInTheDocument();

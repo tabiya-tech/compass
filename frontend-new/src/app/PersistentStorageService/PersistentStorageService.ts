@@ -3,7 +3,7 @@ import { Invitation } from "src/invitations/InvitationsService/invitations.types
 const PERSISTENT_STORAGE_VERSION = "0.0.1";
 export const TOKEN_KEY = `token_${PERSISTENT_STORAGE_VERSION}`;
 
-export const INVITATION_KEY = `invitation_${PERSISTENT_STORAGE_VERSION}`
+export const INVITATION_KEY = `invitation_${PERSISTENT_STORAGE_VERSION}`;
 
 export const LOGIN_METHOD_KEY = `login_method_${PERSISTENT_STORAGE_VERSION}`;
 

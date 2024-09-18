@@ -59,7 +59,7 @@ describe("SocialAuthService class tests", () => {
       jest.spyOn(firebase.auth(), "signInWithPopup").mockResolvedValueOnce({ user: { multiFactor: { user: {} } } });
 
       // WHEN the Google login is attempted
-      const socialLoginCallback = async () =>  await socialAuthService.handleLoginWithGoogle();
+      const socialLoginCallback = async () => await socialAuthService.handleLoginWithGoogle();
 
       // THEN the error should be thrown
       await expect(socialLoginCallback()).rejects.toThrow("The user could not be found");
@@ -88,7 +88,7 @@ describe("SocialAuthService class tests", () => {
       jest.spyOn(firebase.auth(), "signOut").mockRejectedValueOnce(mockError);
 
       // WHEN the logout is attempted
-      const socialAuthCallback = async () =>  await socialAuthService.handleLogout();
+      const socialAuthCallback = async () => await socialAuthService.handleLogout();
 
       // THEN the success callback should not be called
       await expect(socialAuthCallback()).rejects.toEqual(expect.any(FirebaseError));

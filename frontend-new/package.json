@@ -58,6 +58,8 @@
     "@mui/system": "^5.15.15",
     "@react-pdf/renderer": "^3.4.4",
     "docx": "^8.5.0",
+    "@sentry/react": "^8.28.0",
+    "@sentry/webpack-plugin": "^2.22.4",
     "file-saver": "^2.0.5",
     "firebase": "^10.12.2",
     "firebaseui": "^6.1.0",

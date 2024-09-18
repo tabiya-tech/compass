@@ -32,10 +32,10 @@ export class EmailAuthService implements AuthService {
     } catch (error) {
       const firebaseError = (error as any).code;
       throw errorFactory(
-          firebaseError.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
-          firebaseError || FirebaseErrorCodes.INTERNAL_ERROR,
-          firebaseError.message || FirebaseErrorCodes.INTERNAL_ERROR,
-          {}
+        firebaseError.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
+        firebaseError || FirebaseErrorCodes.INTERNAL_ERROR,
+        firebaseError.message || FirebaseErrorCodes.INTERNAL_ERROR,
+        {}
       );
     }
   }
@@ -46,10 +46,7 @@ export class EmailAuthService implements AuthService {
    * @param {string} password - The user's password.
    * @returns {Promise<string>} - The firebase token.
    */
-  async handleLoginWithEmail(
-    email: string,
-    password: string,
-  ): Promise<string> {
+  async handleLoginWithEmail(email: string, password: string): Promise<string> {
     const firebaseErrorFactory = getFirebaseErrorFactory(
       "EmailAuthService",
       "handleLogin",
@@ -62,22 +59,31 @@ export class EmailAuthService implements AuthService {
     try {
       userCredential = await auth.signInWithEmailAndPassword(email, password);
     } catch (error) {
-        throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (error as any).code, (error as any).message);
+      throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (error as any).code, (error as any).message);
     }
 
     if (!userCredential.user) {
       throw firebaseErrorFactory(StatusCodes.NOT_FOUND, FirebaseErrorCodes.USER_NOT_FOUND, "User not found", {});
     }
-    
+
     if (!userCredential.user.emailVerified) {
       // we cant stop firebase from logging the user in when their email is unverified,
       // best we can do is log them out ourselves and then throw an error
       try {
         await this.handleLogout();
       } catch (signOutError) {
-        throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (signOutError as any).code, (signOutError as any).message);
+        throw firebaseErrorFactory(
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          (signOutError as any).code,
+          (signOutError as any).message
+        );
       }
-      throw firebaseErrorFactory(StatusCodes.FORBIDDEN, FirebaseErrorCodes.EMAIL_NOT_VERIFIED, "Email not verified", {});
+      throw firebaseErrorFactory(
+        StatusCodes.FORBIDDEN,
+        FirebaseErrorCodes.EMAIL_NOT_VERIFIED,
+        "Email not verified",
+        {}
+      );
     }
 
     // in the case of email login, firebase doesnt give us a way to access the access token directly
@@ -96,12 +102,7 @@ export class EmailAuthService implements AuthService {
    * @param {string} name - The user's name.
    * @returns {Promise<string>} - The firebase token.
    */
-  async handleRegisterWithEmail(
-    email: string,
-    password: string,
-    name: string,
-  ): Promise<string> {
-
+  async handleRegisterWithEmail(email: string, password: string, name: string): Promise<string> {
     const firebaseErrorFactory = getFirebaseErrorFactory(
       "EmailAuthService",
       "handleRegister",
@@ -114,7 +115,7 @@ export class EmailAuthService implements AuthService {
     try {
       userCredential = await auth.createUserWithEmailAndPassword(email, password);
     } catch (error) {
-        throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (error as any).code, (error as any).message);
+      throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (error as any).code, (error as any).message);
     }
 
     if (!userCredential.user) {

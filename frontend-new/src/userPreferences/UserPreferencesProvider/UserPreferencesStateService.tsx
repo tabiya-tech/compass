@@ -1,14 +1,11 @@
-import {
-  UserPreference,
-} from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 
 class UserPreferencesService {
   private static instance: UserPreferencesService;
   private userPreferences: UserPreference | null = null;
 
-  private constructor() {
-  }
+  private constructor() {}
 
   public static getInstance(): UserPreferencesService {
     if (!UserPreferencesService.instance) {
@@ -19,8 +16,8 @@ class UserPreferencesService {
 
   public async loadPreferences(user_id: string) {
     try {
-      if(!this.userPreferences?.accepted_tc) {
-        this.userPreferences = await userPreferencesService.getUserPreferences(user_id)
+      if (!this.userPreferences?.accepted_tc) {
+        this.userPreferences = await userPreferencesService.getUserPreferences(user_id);
       }
     } catch (error) {
       console.error("Error loading user preferences", error);

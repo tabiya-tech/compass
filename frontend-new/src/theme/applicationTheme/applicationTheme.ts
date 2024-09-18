@@ -331,8 +331,8 @@ export const applicationTheme = (theme: ThemeMode) => {
             padding: "0",
 
             "& .Mui-disabled": {
-              opacity: .5,
-            }
+              opacity: 0.5,
+            },
           },
         },
       },

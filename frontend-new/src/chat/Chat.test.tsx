@@ -11,9 +11,7 @@ import { HashRouter } from "react-router-dom";
 import { DEFAULT_SNACKBAR_AUTO_HIDE_DURATION, useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { ConversationMessageSender } from "./ChatService/ChatService.types";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import {
-  userPreferencesStateService,
-} from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
+import { userPreferencesStateService } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
 import ChatService from "./ChatService/ChatService";
 import ExperienceService from "src/Experiences/ExperienceService/ExperienceService";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
@@ -398,7 +396,7 @@ describe("Chat", () => {
       // WHEN a user sends a message with a router and snackbar provider
       render(
         <HashRouter>
-            <Chat />
+          <Chat />
         </HashRouter>
       );
 
@@ -452,7 +450,7 @@ describe("Chat", () => {
       mockSendMessage.mockResolvedValue({
         messages: [],
         experiences_explored: givenExploredExperiences,
-      })
+      });
 
       // WHEN: the chat is rendered
       render(
@@ -468,7 +466,6 @@ describe("Chat", () => {
       fireEvent.change(input, { target: { value: "Test message" } });
       fireEvent.click(sendButton);
 
-
       await waitFor(() => {
         expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(`There is a new experience in your Skills Report.`, {
           variant: "info",
@@ -476,7 +473,7 @@ describe("Chat", () => {
           action: expect.any(Object),
         });
       });
-    })
+    });
   });
 
   describe("test user experience drawer", () => {
