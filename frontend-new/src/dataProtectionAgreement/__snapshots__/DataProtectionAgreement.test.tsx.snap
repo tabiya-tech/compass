@@ -78,7 +78,7 @@ exports[`Testing Data Protection Policy component it should show data protection
         data-testid="dpa-accept-checkbox-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
       >
         <input
-          aria-label="I have read and agree to Compass's "
+          aria-label="I have read and agree to the "
           class="PrivateSwitchBase-input css-1m9pwf3"
           data-indeterminate="false"
           type="checkbox"
@@ -102,7 +102,7 @@ exports[`Testing Data Protection Policy component it should show data protection
         class="MuiTypography-root MuiTypography-body2 css-bbtak5-MuiTypography-root"
         data-testid="dpa-terms-and-conditions-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
       >
-        I have read and agree to Compass's 
+        I have read and agree to the 
         <a
           class="css-8nw4ws"
           href="https://compass.tabiya.org/dpa.html"
@@ -111,7 +111,8 @@ exports[`Testing Data Protection Policy component it should show data protection
         >
           Terms and Conditions
         </a>
-        .
+         
+        of Compass.
       </p>
     </div>
     <p
