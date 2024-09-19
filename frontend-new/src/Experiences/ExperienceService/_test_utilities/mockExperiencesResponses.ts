@@ -27,6 +27,29 @@ export const mockExperiences: Experience[] = [
       },
     ],
   },
+  {
+    UUID: "c3c8b43d-73dd-4c6d-9e71-010492e86d5e",
+    start_date: "2022",
+    end_date: "Present",
+    experience_title: "Project Manager",
+    company: "Business Inc",
+    location: "New York, NY",
+    work_type: WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK,
+    top_skills: [
+      {
+        UUID: "2512652c-49ba-4751-b654-8fc525ce98ca",
+        preferredLabel: "Management",
+        description: "The process of dealing with or controlling things or people",
+        altLabels: ["Leadership", "Administration"],
+      },
+      {
+        UUID: "815f3660-4c7f-43ba-859d-cf50dd527fe0",
+        preferredLabel: "Communication",
+        description: "The imparting or exchanging of information or news",
+        altLabels: ["Interpersonal Communication", "Public Speaking"],
+      },
+    ],
+  },
 ];
 
 const allWorkTypes = [

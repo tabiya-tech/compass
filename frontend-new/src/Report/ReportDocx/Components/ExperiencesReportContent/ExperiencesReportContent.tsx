@@ -8,13 +8,14 @@ export const generateContent = (experience: Experience) => {
     children: [
       new TextRun({
         text: experience.experience_title,
+        color: "#000000",
         bold: true,
         size: 24,
       }),
     ],
     spacing: {
       after: 100,
-      before: 200,
+      before: 300,
     },
   });
 
@@ -25,6 +26,7 @@ export const generateContent = (experience: Experience) => {
           experience.end_date && experience.start_date
             ? `${experience.start_date} — ${experience.end_date}`
             : experience.start_date || experience.end_date,
+        color: "#000000",
         size: 20,
       }),
     ],
@@ -37,6 +39,7 @@ export const generateContent = (experience: Experience) => {
     children: [
       new TextRun({
         text: ReportContent.TOP_SKILLS_TITLE,
+        color: "#000000",
         bold: true,
         size: 24,
       }),
@@ -52,6 +55,7 @@ export const generateContent = (experience: Experience) => {
         children: [
           new TextRun({
             text: `• ${capitalizeFirstLetter(skill.preferredLabel)}`,
+            color: "#000000",
             size: 22,
           }),
         ],
