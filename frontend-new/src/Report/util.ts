@@ -53,3 +53,13 @@ export const getBase64Image = async (url: string) => {
     reader.readAsDataURL(blob);
   });
 };
+
+/**
+ * Note: We cannot use the theme colors directly since the reports are not React components.
+ * Most of the colors come from an export in the `applicationTheme.tsx` file.
+ * However, the colors that we cannot export are redefined here.
+ **/
+export const COLORS = {
+  textBlack: "#000000",
+  grey700: "#605E5B",
+};

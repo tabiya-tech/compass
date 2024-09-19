@@ -3,7 +3,8 @@ import { Document, Paragraph, Packer, TextRun, ImageRun, HeadingLevel, Alignment
 import { Experience } from "src/Experiences/ExperienceService/Experiences.types";
 import { generateContent } from "src/Report/ReportDocx/Components/ExperiencesReportContent/ExperiencesReportContent";
 import { ReportContent } from "src/Report/ReportContent";
-import { formatDate, getBase64Image, getUniqueSkills, groupExperiencesByWorkType } from "src/Report/util";
+import { TabiyaBasicColors } from "src/theme/applicationTheme/applicationTheme";
+import { COLORS, formatDate, getBase64Image, getUniqueSkills, groupExperiencesByWorkType } from "src/Report/util";
 import SkillsDescription from "src/Report/ReportDocx/Components/SkillsDescription";
 import HeaderComponent from "src/Report/ReportDocx/Components/Header";
 import FooterComponent from "src/Report/ReportDocx/Components/Footer";
@@ -48,7 +49,7 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
         }),
         new TextRun({
           text,
-          color: "#000000",
+          color: COLORS.textBlack,
           size: 24,
         }),
       ],
@@ -72,7 +73,7 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
           text,
           bold: true,
           size: 26,
-          color: "#000000",
+          color: COLORS.textBlack,
         }),
       ],
       heading: HeadingLevel.HEADING_6,
@@ -87,7 +88,7 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
         document: {
           run: {
             font: "Inter",
-            color: "#43474E",
+            color: TabiyaBasicColors.GrayDark,
           },
         },
       },
@@ -110,7 +111,7 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
               new TextRun({
                 text: ReportContent.SKILLS_REPORT_TITLE,
                 bold: true,
-                color: "#083763",
+                color: TabiyaBasicColors.DarkBlue,
                 size: 32,
               }),
             ],
@@ -124,7 +125,7 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
                 children: [
                   new TextRun({
                     text: name,
-                    color: "#000000",
+                    color: COLORS.textBlack,
                     bold: true,
                     size: 28,
                   }),
@@ -164,7 +165,7 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
                 text: ReportContent.EXPERIENCES_TITLE,
                 bold: true,
                 size: 26,
-                color: "#083763",
+                color: TabiyaBasicColors.DarkBlue,
               }),
             ],
             heading: HeadingLevel.HEADING_5,
