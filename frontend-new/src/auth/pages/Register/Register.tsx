@@ -20,6 +20,7 @@ import { userPreferencesStateService } from "src/userPreferences/UserPreferences
 import { StatusCodes } from "http-status-codes";
 import authStateService from "src/auth/AuthStateService";
 import { TabiyaUser } from "src/auth/auth.types";
+import { Backdrop } from "src/theme/Backdrop/Backdrop";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -200,6 +201,13 @@ const Register: React.FC = () => {
   );
 
   /**
+   * A callback function for the social auth component to set the loading state
+   */
+  const notifyOnSocialLoading = useCallback((socialAuthLoading: boolean) => {
+    setIsLoading(socialAuthLoading);
+  }, []);
+
+  /**
    * A callback to handle what to do after a social registration
    * we pass this to the SocialAuth component which will call it after a successful social registration
    * */
@@ -236,65 +244,63 @@ const Register: React.FC = () => {
     }
   };
 
-  /* ------------------
-   * aggregated states for loading and disabling ui
-   */
-  // register form is in the loading state if the auth context is loading, or if the user is registering with either of the methods
-  const isRegisterLoading = isLoading;
-
   return (
-    <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.REGISTER_CONTAINER}>
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent={"space-evenly"}
-        gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
-        height={"80%"}
-        width={"100%"}
-      >
-        <AuthHeader title={"Welcome to Compass!"} subtitle={"We need some information to get started"} />
-        <Typography variant="subtitle2">Enter your registration code to sign up</Typography>
-        <TextField
-          fullWidth
-          label="Registration code"
-          variant="outlined"
-          required
-          value={registrationCode}
-          onChange={(e) => handleRegistrationCodeChanged(e)}
-          inputProps={{ "data-testid": DATA_TEST_ID.REGISTRATION_CODE_INPUT }}
-        />
-        <Divider textAlign="center" style={{ width: "100%" }}>
-          <Typography variant="subtitle2" padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-            and then continue with
+    <>
+      <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.REGISTER_CONTAINER}>
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent={"space-evenly"}
+          gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
+          height={"80%"}
+          width={"100%"}
+        >
+          <AuthHeader title={"Welcome to Compass!"} subtitle={"We need some information to get started"} />
+          <Typography variant="subtitle2">Enter your registration code to sign up</Typography>
+          <TextField
+            fullWidth
+            label="Registration code"
+            variant="outlined"
+            required
+            value={registrationCode}
+            onChange={(e) => handleRegistrationCodeChanged(e)}
+            inputProps={{ "data-testid": DATA_TEST_ID.REGISTRATION_CODE_INPUT }}
+          />
+          <Divider textAlign="center" style={{ width: "100%" }}>
+            <Typography variant="subtitle2" padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
+              and then continue with
+            </Typography>
+          </Divider>
+          <RegisterWithEmailForm
+            disabled={!registrationCode}
+            notifyOnRegister={handleRegister}
+            isRegistering={isLoading}
+          />
+          <SocialAuth
+            preLoginCheck={isInvitationCodeValid}
+            postLoginHandler={successfulSocialRegistrationCallback}
+            isLoading={isLoading}
+            disabled={!registrationCode}
+            label={"Sign up with Google"}
+            notifyOnLoading={notifyOnSocialLoading}
+          />
+          <Typography variant="body2" data-testid={DATA_TEST_ID.LOGIN_LINK}>
+            Already have an account?{" "}
+            <StyledNavLink
+              to={routerPaths.LOGIN}
+              style={{
+                color: theme.palette.text.textAccent,
+                fontStyle: "italic",
+              }}
+            >
+              Login
+            </StyledNavLink>
           </Typography>
-        </Divider>
-        <RegisterWithEmailForm
-          disabled={!registrationCode}
-          notifyOnRegister={handleRegister}
-          isRegistering={isRegisterLoading}
-        />
-        <SocialAuth
-          preLoginCheck={isInvitationCodeValid}
-          postLoginHandler={successfulSocialRegistrationCallback}
-          isLoading={isLoading}
-          disabled={!registrationCode}
-          label={"Sign up with Google"}
-        />
-        <Typography variant="body2" data-testid={DATA_TEST_ID.LOGIN_LINK}>
-          Already have an account?{" "}
-          <StyledNavLink
-            to={routerPaths.LOGIN}
-            style={{
-              color: theme.palette.text.textAccent,
-              fontStyle: "italic",
-            }}
-          >
-            Login
-          </StyledNavLink>
-        </Typography>
-      </Box>
-    </Container>
+        </Box>
+      </Container>
+      <Backdrop isShown={isLoading} message="Registering you..." />
+    </>
   );
 };
 

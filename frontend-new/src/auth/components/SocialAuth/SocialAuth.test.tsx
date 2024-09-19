@@ -68,11 +68,16 @@ describe("SocialAuth tests", () => {
   test("should render the SocialAuth component", () => {
     // GIVEN a SocialAuth component
     const givenNotifyOnLogin = jest.fn();
+    const givenNotifyOnLoading = jest.fn();
     const givenIsLoading = false;
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <SocialAuth postLoginHandler={givenNotifyOnLogin} isLoading={givenIsLoading} />
+        <SocialAuth
+          postLoginHandler={givenNotifyOnLogin}
+          isLoading={givenIsLoading}
+          notifyOnLoading={givenNotifyOnLoading}
+        />
       </HashRouter>
     );
 
@@ -95,6 +100,7 @@ describe("SocialAuth tests", () => {
         name: "foo bar",
         email: "foo@bar.baz",
       };
+      const givenNotifyOnLoading = jest.fn();
       // AND the sign-in is successful
       (socialAuthService.handleLoginWithGoogle as jest.Mock).mockResolvedValue(givenToken);
       // AND the AuthProvider updates the user successully
@@ -105,7 +111,12 @@ describe("SocialAuth tests", () => {
       // WHEN the component is rendered
       render(
         <HashRouter>
-          <SocialAuth preLoginCheck={() => true} postLoginHandler={givenNotifyOnLogin} isLoading={givenIsLoading} />
+          <SocialAuth
+            preLoginCheck={() => true}
+            postLoginHandler={givenNotifyOnLogin}
+            isLoading={givenIsLoading}
+            notifyOnLoading={givenNotifyOnLoading}
+          />
         </HashRouter>
       );
       // AND the login button is clicked
@@ -125,6 +136,7 @@ describe("SocialAuth tests", () => {
     // GIVEN a SocialAuth component
     const givenNotifyOnLogin = jest.fn();
     const givenIsLoading = false;
+    const givenNotifyOnLoading = jest.fn();
     // WHEN the sign-in fails
     (socialAuthService.handleLoginWithGoogle as jest.Mock).mockImplementation((elementId: string, config: any) => {
       config.callbacks.signInFailure(new Error("Sign-in failed"));
@@ -132,7 +144,11 @@ describe("SocialAuth tests", () => {
 
     render(
       <HashRouter>
-        <SocialAuth postLoginHandler={givenNotifyOnLogin} isLoading={givenIsLoading} />
+        <SocialAuth
+          postLoginHandler={givenNotifyOnLogin}
+          isLoading={givenIsLoading}
+          notifyOnLoading={givenNotifyOnLoading}
+        />
       </HashRouter>
     );
   });
@@ -141,16 +157,47 @@ describe("SocialAuth tests", () => {
     // GIVEN a SocialAuth component
     const givenNotifyOnLogin = jest.fn();
     const givenIsLoading = false;
+    const givenNotifyOnLoading = jest.fn();
     // AND the browser is not online
     mockBrowserIsOnLine(false);
     // WHEN the component is rendered
     render(
       <HashRouter>
-        <SocialAuth postLoginHandler={givenNotifyOnLogin} isLoading={givenIsLoading} />
+        <SocialAuth
+          postLoginHandler={givenNotifyOnLogin}
+          isLoading={givenIsLoading}
+          notifyOnLoading={givenNotifyOnLoading}
+        />
       </HashRouter>
     );
 
     // THEN expect the message text to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.FIREBASE_FALLBACK_TEXT)).toBeInTheDocument();
+  });
+
+  test("should call notifyOnLoading with true when login button is clicked", async () => {
+    // GIVEN a SocialAuth component
+    const givenNotifyOnLogin = jest.fn();
+    const givenIsLoading = false;
+    const givenNotifyOnLoading = jest.fn();
+    // WHEN the component is rendered
+    render(
+      <HashRouter>
+        <SocialAuth
+          postLoginHandler={givenNotifyOnLogin}
+          isLoading={givenIsLoading}
+          notifyOnLoading={givenNotifyOnLoading}
+        />
+      </HashRouter>
+    );
+
+    // AND the login button is clicked
+    const loginButton = screen.getByTestId(DATA_TEST_ID.CONTINUE_WITH_GOOGLE_BUTTON);
+    await act(() => {
+      loginButton.click();
+    });
+
+    // THEN expect notifyOnLoading to have been called with true
+    expect(givenNotifyOnLoading).toHaveBeenCalledWith(true);
   });
 });
