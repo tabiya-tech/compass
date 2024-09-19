@@ -86,7 +86,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   categoryIcon: {
-    width: 16,
     height: 16,
     marginBottom: 2,
     marginRight: 8,
@@ -138,7 +137,7 @@ const styles = StyleSheet.create({
     height: 42,
   },
   compassImage: {
-    height: 54,
+    height: 46,
   },
   infoIcon: {
     height: 12,

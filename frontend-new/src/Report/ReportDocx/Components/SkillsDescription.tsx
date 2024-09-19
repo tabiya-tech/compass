@@ -14,7 +14,7 @@ const SkillsDescription = ({ skillsList }: SkillsDescriptionProps) => {
         new TextRun({
           text: ReportContent.SKILLS_DESCRIPTION_TITLE,
           bold: true,
-          size: 28,
+          size: 32,
           color: "#083763",
         }),
       ],
@@ -33,7 +33,7 @@ const SkillsDescription = ({ skillsList }: SkillsDescriptionProps) => {
     }),
     new Paragraph({
       border: {
-        top: { style: BorderStyle.SINGLE, size: 4 },
+        top: { style: BorderStyle.SINGLE, size: 10 },
       },
       spacing: { before: 200, after: 100 },
     }),
@@ -42,7 +42,7 @@ const SkillsDescription = ({ skillsList }: SkillsDescriptionProps) => {
         children: [
           new TextRun({
             text: capitalizeFirstLetter(skill.preferredLabel),
-            size: 22,
+            size: 24,
             bold: true,
           }),
           new TextRun({

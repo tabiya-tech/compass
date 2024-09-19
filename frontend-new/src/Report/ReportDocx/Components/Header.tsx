@@ -9,14 +9,14 @@ const HeaderComponent = async () => {
         children: [
           new ImageRun({
             data: await getBase64Image(ReportContent.IMAGE_URLS.COMPASS_LOGO),
-            transformation: { width: 180, height: 60 },
+            transformation: { width: 250, height: 62 },
           }),
           new TextRun({
             text: "\u00A0\u00A0\u00A0\u00A0\u00A0",
           }),
           new ImageRun({
             data: await getBase64Image(ReportContent.IMAGE_URLS.OXFORD_LOGO),
-            transformation: { width: 180, height: 52 },
+            transformation: { width: 200, height: 58 },
           }),
         ],
         alignment: AlignmentType.LEFT,
