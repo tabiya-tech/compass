@@ -27,6 +27,7 @@ export interface SocialAuthProps {
   label?: string;
   postLoginHandler: (user: TabiyaUser) => void;
   isLoading: boolean;
+  notifyOnLoading: (loading: boolean) => void;
 }
 
 const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
@@ -35,24 +36,24 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
   label,
   postLoginHandler,
   isLoading,
+  notifyOnLoading,
 }) => {
   const isOnline = useContext(IsOnlineContext);
 
   const { enqueueSnackbar } = useSnackbar();
-  const [loginInProgress, setLoginInProgress] = useState(false);
 
   const [error, setError] = useState("");
 
   const loginWithPopup = useCallback(async () => {
     try {
-      setLoginInProgress(true);
+      notifyOnLoading(true);
       // If preLoginCheck is provided, run it and only proceed if it returns true
       // Pre login check is mostly used to check if the user has a valid code.
       // NOTE: a default function that returns true should be added otherwise users will not be able to login using social auth
       const passed = await preLoginCheck?.();
 
       if (!passed) {
-        setLoginInProgress(false);
+        notifyOnLoading(false);
         return;
       }
 
@@ -79,11 +80,11 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       setError(errorMessage);
       enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
     } finally {
-      setLoginInProgress(false);
+      notifyOnLoading(false);
     }
-  }, [enqueueSnackbar, postLoginHandler, preLoginCheck]);
+  }, [enqueueSnackbar, postLoginHandler, preLoginCheck, notifyOnLoading]);
 
-  const socialAuthLoading = isLoading || loginInProgress || !isOnline || disabled;
+  const socialAuthLoading = isLoading || !isOnline || disabled;
 
   return (
     <Box
