@@ -27,7 +27,7 @@ class AgentDirectorState(BaseModel):
     """
     session_id: int
     current_phase: ConversationPhase = Field(default=ConversationPhase.INTRO)
-    conversation_completed_at: Optional[datetime] = None
+    conversation_conducted_at: Optional[datetime] = None
 
     class Config:
         extra = "forbid"
@@ -37,7 +37,7 @@ class AgentDirectorState(BaseModel):
         }
 
     def __setattr__(self, key, value):
-        if key == "conversation_completed_at":
+        if key == "conversation_conducted_at":
             value = _parse_data(value)
         super().__setattr__(key, value)
 
@@ -54,16 +54,16 @@ class AgentDirectorState(BaseModel):
             return ConversationPhase[value]
         return value
 
-    # Deserialize the conversation_completed_at datetime and ensure it's interpreted as UTC
-    @field_validator("conversation_completed_at", mode='before')
-    def deserialize_conversation_completed_at(cls, value: Optional[datetime]) -> Optional[datetime]:
+    # Deserialize the conversation_conducted_at datetime and ensure it's interpreted as UTC
+    @field_validator("conversation_conducted_at", mode='before')
+    def deserialize_conversation_conducted_at(cls, value: Optional[datetime]) -> Optional[datetime]:
         return _parse_data(value)
 
     @staticmethod
     def from_document(_doc: Mapping[str, Any]) -> "AgentDirectorState":
         return AgentDirectorState(session_id=_doc["session_id"],
                                   current_phase=_doc["current_phase"],
-                                  conversation_completed_at=_doc["conversation_completed_at"])
+                                  conversation_conducted_at=_doc["conversation_conducted_at"])
 
 
 def _parse_data(value: Optional[datetime | str]) -> Optional[datetime]:

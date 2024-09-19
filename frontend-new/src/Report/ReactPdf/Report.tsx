@@ -14,7 +14,7 @@ interface SkillReportProps {
   phone: string;
   address: string;
   experiences: Experience[];
-  conversationCompletedAt: string | null;
+  conversationConductedAt: string | null;
 }
 
 const uniqueId = "5a296552-f91f-4c38-b88f-542cacaced8e";
@@ -40,7 +40,7 @@ const SkillReport: React.FC<SkillReportProps> = ({
   phone,
   address,
   experiences,
-  conversationCompletedAt,
+  conversationConductedAt,
 }) => {
   // Group experiences by work type
   const { selfEmploymentExperiences, salaryWorkExperiences, unpaidWorkExperiences } =
@@ -48,11 +48,6 @@ const SkillReport: React.FC<SkillReportProps> = ({
 
   // list of all unique skills
   const skillsList = getUniqueSkills(experiences);
-
-  // show current date if conversation is not completed
-  const currentDate = conversationCompletedAt
-    ? formatDate(conversationCompletedAt)
-    : formatDate(new Date().toLocaleDateString());
 
   // Experience category
   const ExperienceCategory = (title: string, icon: string, experiences: Experience[]) =>
@@ -114,7 +109,7 @@ const SkillReport: React.FC<SkillReportProps> = ({
             {renderPersonalInfo(email, ReportContent.IMAGE_URLS.EMAIL_ICON, DATA_TEST_ID.SKILL_REPORT_EMAIL)}
           </View>
           <Text x={0} y={0} style={styles.bodyText} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY_TEXT}>
-            {ReportContent.REPORT_BODY_TEXT(currentDate)}
+            {ReportContent.REPORT_BODY_TEXT(formatDate(conversationConductedAt!))}
           </Text>
           <View style={styles.divider} />
           <Text x={0} y={0} style={styles.experiencesTitle} data-testid={DATA_TEST_ID.SKILL_REPORT_EXPERIENCES_TITLE}>

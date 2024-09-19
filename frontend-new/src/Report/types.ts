@@ -6,7 +6,7 @@ export type ReportProps = {
   phone: string;
   address: string;
   experiences: Experience[];
-  conversationCompletedAt: string | null;
+  conversationConductedAt: string | null;
 };
 
 export enum ExportFormat {

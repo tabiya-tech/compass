@@ -15,7 +15,7 @@ export class DocxReportDownloadProvider implements IReportFormatProvider {
       phone: this.props.phone,
       address: this.props.address,
       experiences: this.props.experiences,
-      conversationCompletedAt: this.props.conversationCompletedAt,
+      conversationConductedAt: this.props.conversationConductedAt,
     });
   }
 }
