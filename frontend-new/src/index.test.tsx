@@ -41,8 +41,10 @@ jest.mock("@mui/material", () => {
     .fn()
     .mockImplementation(({ children }) => <div data-testid="theme-provider-id">{children}</div>);
   const mCssBaseline = () => <div data-testid="css-baseline-id">Mock CssBaseline</div>;
+  const actual = jest.requireActual("@mui/material");
   return {
     __esModule: true,
+    ...actual,
     ThemeProvider: mThemeProvider,
     CssBaseline: mCssBaseline,
   };
@@ -107,6 +109,9 @@ describe("test the application bootstrapping", () => {
       // AND expect the compass app to be in the DOM and to be a child of the theme provider
       const compassAppElement = within(themeProviderElement).getByTestId("compass-app-id");
       expect(compassAppElement).toBeInTheDocument();
+
+      // AND expect the compass app to match the snapshot
+      expect(compassAppElement).toMatchSnapshot();
     });
   });
 });

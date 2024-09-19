@@ -7,6 +7,7 @@ import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
+import * as Sentry from "@sentry/react";
 
 export type ChatHeaderProps = {
   notifyOnLogout: () => void;
@@ -28,6 +29,7 @@ export const MENU_ITEM_ID = {
   LOGOUT_BUTTON: `logout-button-${uniqueId}`,
   START_NEW_CONVERSATION: `start-new-conversation-${uniqueId}`,
   EXPERIENCES_BUTTON: `experiences-button-${uniqueId}`,
+  REPORT_BUG_BUTTON: `report-bug-button-${uniqueId}`,
 };
 
 export const MENU_ITEM_TEXT = {
@@ -35,6 +37,7 @@ export const MENU_ITEM_TEXT = {
   LOGOUT: "logout",
   START_NEW_CONVERSATION: "start new conversation",
   EXPERIENCES: "view experiences",
+  REPORT_BUG: "report a bug",
 };
 
 const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
@@ -69,6 +72,22 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
       },
     },
     {
+      id: MENU_ITEM_ID.REPORT_BUG_BUTTON,
+      text: MENU_ITEM_TEXT.REPORT_BUG,
+      disabled: !isOnline,
+      action: () => {
+        const feedback = Sentry.getFeedback();
+        if (feedback) {
+          feedback.createForm().then((form) => {
+            if (form) {
+              form.appendToDom();
+              form.open();
+            }
+          });
+        }
+      },
+    },
+    {
       id: MENU_ITEM_ID.LOGOUT_BUTTON,
       text: MENU_ITEM_TEXT.LOGOUT,
       disabled: !isOnline,
@@ -93,16 +112,25 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         />
       </NavLink>
       <Typography variant="h1">Compass</Typography>
-      <PrimaryIconButton
+      <Box
         sx={{
-          color: theme.palette.common.black,
+          display: "flex",
+          alignItems: "center",
+          flexDirection: "row",
+          gap: theme.spacing(theme.tabiyaSpacing.md),
         }}
-        onClick={(event) => setAnchorEl(event.currentTarget)}
-        data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_USER}
-        title="user info"
       >
-        <PermIdentityIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_USER} />
-      </PrimaryIconButton>
+        <PrimaryIconButton
+          sx={{
+            color: theme.palette.common.black,
+          }}
+          onClick={(event) => setAnchorEl(event.currentTarget)}
+          data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_USER}
+          title="user info"
+        >
+          <PermIdentityIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_USER} />
+        </PrimaryIconButton>
+      </Box>
       <ContextMenu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}

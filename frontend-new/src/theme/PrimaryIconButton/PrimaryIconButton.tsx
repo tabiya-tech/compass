@@ -7,7 +7,7 @@ interface PrimaryIconButtonProps extends IconButtonProps {}
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   borderRadius: theme.spacing(theme.tabiyaSpacing.sm),
   lineHeight: "0",
-  padding: 0,
+  padding: theme.spacing(theme.tabiyaSpacing.xs),
   color: theme.palette.primary.main,
   ":hover": {
     backgroundColor: theme.palette.secondary.dark,
