@@ -21,6 +21,7 @@ import { StatusCodes } from "http-status-codes";
 import authStateService from "src/auth/AuthStateService";
 import { TabiyaUser } from "src/auth/auth.types";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
+import FeedbackButton from "src/feedback/FeedbackButton";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -299,6 +300,7 @@ const Register: React.FC = () => {
           </Typography>
         </Box>
       </Container>
+      <FeedbackButton bottomAlign={true} />
       <Backdrop isShown={isLoading} message="Registering you..." />
     </>
   );
