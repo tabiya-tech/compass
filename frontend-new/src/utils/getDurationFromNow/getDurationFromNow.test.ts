@@ -1,3 +1,4 @@
+import "src/_test_utilities/consoleMock";
 import { getDurationFromNow } from "./getDurationFromNow";
 
 describe("getDurationFromNow", () => {
@@ -118,15 +119,17 @@ describe("getDurationFromNow", () => {
       expect(result).toBe("just now");
     });
 
-    test("should throw an error when the given date is in the future", () => {
+    test("should log a warning when the given date is in the future", () => {
       // GIVEN a date in the future
       const givenDate = new Date(new Date().getTime() + 10000);
 
       // WHEN getDurationFromNow is called with the given date
-      // THEN expect an error to be thrown
-      expect(() => getDurationFromNow(givenDate)).toThrowError(
-        "Invalid date range: First date must be before second date"
-      );
+      getDurationFromNow(givenDate);
+      // THEN expect a warning to be logged to the console
+      expect(console.warn).toHaveBeenCalledWith("Invalid date range: First date must be before second date", {
+        now: expect.any(String),
+        given: expect.any(String),
+      });
     });
 
     test("should return the expected result when the dates are strings", () => {

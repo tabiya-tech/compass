@@ -4,7 +4,10 @@ export function getDurationFromNow(givenDate: Date): string {
 
   const duration = now.getTime() - given.getTime();
 
-  if (duration < 0) throw new Error("Invalid date range: First date must be before second date");
+  if (duration < 0) console.warn("Invalid date range: First date must be before second date", {
+    now: now.toISOString(),
+    given: given.toISOString(),
+  });
 
   const days = Math.floor(duration / (1000 * 60 * 60 * 24));
   const hours = Math.floor((duration % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
