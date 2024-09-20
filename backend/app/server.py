@@ -205,9 +205,8 @@ async def conversation(request: Request, body: ConversationInput, clear_memory: 
         # get the context again after updating the history
         context = await conversation_memory_manager.get_conversation_context()
         response = await get_messages_from_conversation_manager(context, from_index=current_index)
-        # get the date when the conversation is completed
-        if state.agent_director_state.current_phase == ConversationPhase.ENDED:
-            state.agent_director_state.conversation_completed_at = datetime.now(timezone.utc)
+        # get the date when the conversation was conducted
+        state.agent_director_state.conversation_conducted_at = datetime.now(timezone.utc)
         # Count for number of experiences explored in the conversation
         experiences_explored = 0
 
@@ -221,7 +220,7 @@ async def conversation(request: Request, body: ConversationInput, clear_memory: 
         return ConversationResponse(
             messages=response,
             conversation_completed=state.agent_director_state.current_phase == ConversationPhase.ENDED,
-            conversation_completed_at=state.agent_director_state.conversation_completed_at,
+            conversation_conducted_at=state.agent_director_state.conversation_conducted_at,
             experiences_explored=experiences_explored
         )
     except Exception as e:  # pylint: disable=broad-except
@@ -280,7 +279,7 @@ async def get_conversation_history(
         return ConversationResponse(
             messages=messages,
             conversation_completed=state.agent_director_state.current_phase == ConversationPhase.ENDED,
-            conversation_completed_at=state.agent_director_state.conversation_completed_at,
+            conversation_conducted_at=state.agent_director_state.conversation_conducted_at,
             experiences_explored=experiences_explored
         )
     except Exception as e:

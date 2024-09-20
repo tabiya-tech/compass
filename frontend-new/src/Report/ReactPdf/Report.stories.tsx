@@ -20,7 +20,7 @@ export const Shown: Story = {
     phone: "1234567890",
     address: "1234 Main St",
     experiences: generateRandomExperiences(3),
-    conversationCompletedAt: "2021-06-01T00:00:00Z",
+    conversationConductedAt: "2021-06-01T00:00:00Z",
   },
 };
 
@@ -31,7 +31,7 @@ export const ShownWithNoPersonalInfo: Story = {
     phone: "",
     address: "",
     experiences: generateRandomExperiences(3),
-    conversationCompletedAt: "2021-06-01T00:00:00Z",
+    conversationConductedAt: "2021-06-01T00:00:00Z",
   },
 };
 
@@ -42,6 +42,6 @@ export const ShownWithSomePersonalInfo: Story = {
     phone: "",
     address: "",
     experiences: generateRandomExperiences(3),
-    conversationCompletedAt: "2021-06-01T00:00:00Z",
+    conversationConductedAt: "2021-06-01T00:00:00Z",
   },
 };
