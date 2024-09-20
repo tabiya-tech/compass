@@ -1,4 +1,6 @@
 import { Font, StyleSheet } from "@react-pdf/renderer";
+import { TabiyaBasicColors } from "src/theme/applicationTheme/applicationTheme";
+import { COLORS } from "src/Report/util";
 
 Font.register({
   family: "Inter",
@@ -7,40 +9,35 @@ Font.register({
 
 const styles = StyleSheet.create({
   page: {
+    fontFamily: "Inter",
     display: "flex",
     flexDirection: "column",
     paddingBottom: 100,
   },
   title: {
     fontSize: 16,
-    fontFamily: "Inter",
     fontWeight: "bold",
     paddingBottom: 18,
-    color: "#083763",
+    color: TabiyaBasicColors.DarkBlue,
     paddingHorizontal: 48,
   },
   subtitle: {
     fontSize: 14,
-    fontFamily: "Inter",
     fontWeight: "bold",
   },
   text: {
-    fontFamily: "Inter",
     fontSize: 12,
-    fontWeight: "normal",
     wordBreak: "break-word",
   },
   boldText: {
-    fontFamily: "Inter",
     fontWeight: "bold",
     fontSize: 12,
   },
   experiencesTitle: {
-    fontFamily: "Inter",
     fontSize: 13,
     fontWeight: "bold",
     paddingHorizontal: 48,
-    color: "#083763",
+    color: TabiyaBasicColors.DarkBlue,
   },
   body: {
     display: "flex",
@@ -62,10 +59,8 @@ const styles = StyleSheet.create({
   },
   bodyText: {
     fontSize: 11,
-    fontFamily: "Inter",
-    fontWeight: "normal",
     wordBreak: "break-word",
-    color: "#43474E",
+    color: TabiyaBasicColors.GrayDark,
     paddingHorizontal: 48,
   },
   experiencesContainer: {
@@ -91,7 +86,6 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   categoryTitle: {
-    fontFamily: "Inter",
     fontWeight: "bold",
     fontSize: 13,
   },
@@ -102,14 +96,11 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   experienceTitle: {
-    fontFamily: "Inter",
     fontWeight: "bold",
     fontSize: 12,
   },
   date: {
     fontSize: 10,
-    fontWeight: "normal",
-    fontFamily: "Inter",
     paddingVertical: 6,
   },
   contentColumn: {
@@ -120,7 +111,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 48,
     borderBottomWidth: 1,
     border: 1,
-    color: "#43474E",
+    color: TabiyaBasicColors.GrayDark,
     marginTop: 12,
     marginBottom: 16,
   },
@@ -143,7 +134,6 @@ const styles = StyleSheet.create({
     height: 12,
   },
   skillsTitle: {
-    fontFamily: "Inter",
     fontWeight: "bold",
     fontSize: 12,
     paddingBottom: 4,
@@ -151,7 +141,6 @@ const styles = StyleSheet.create({
   skillText: {
     fontSize: 11,
     color: "#211F1D",
-    fontFamily: "Inter",
   },
   skillsContainer: {
     display: "flex",
@@ -167,22 +156,19 @@ const styles = StyleSheet.create({
   },
   skillDescriptionTitle: {
     fontSize: 16,
-    fontFamily: "Inter",
     fontWeight: "bold",
     paddingBottom: 18,
-    color: "#083763",
+    color: TabiyaBasicColors.DarkBlue,
   },
   info: {
     fontSize: 11,
-    fontFamily: "Inter",
-    fontWeight: "normal",
     wordBreak: "break-word",
-    color: "#43474E",
+    color: TabiyaBasicColors.GrayDark,
   },
   skillDivider: {
     borderBottomWidth: 1,
     border: 1,
-    color: "#43474E",
+    color: TabiyaBasicColors.GrayDark,
     marginTop: 12,
     marginBottom: 20,
   },
@@ -192,16 +178,13 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   label: {
-    fontFamily: "Inter",
     fontWeight: "bold",
     fontSize: 12,
-    color: "#43474E",
+    color: TabiyaBasicColors.GrayDark,
   },
   description: {
-    fontFamily: "Inter",
-    fontWeight: "normal",
     fontSize: 10,
-    color: "#43474E",
+    color: TabiyaBasicColors.GrayDark,
     paddingBottom: 12,
   },
   footer: {
@@ -219,20 +202,18 @@ const styles = StyleSheet.create({
     marginHorizontal: 48,
     padding: 8,
     border: 1,
-    borderColor: "#666666",
+    borderColor: TabiyaBasicColors.GrayDark,
   },
   disclaimerText: {
     display: "flex",
     flex: 1,
     flexWrap: "wrap",
-    fontFamily: "Inter",
-    fontWeight: "normal",
     fontSize: 9,
-    color: "#666666",
+    color: COLORS.grey700,
   },
   disclaimerTextBold: {
     fontSize: 9,
-    color: "#000000",
+    color: COLORS.textBlack,
   },
   disclaimerIcon: {
     width: 12,
@@ -243,7 +224,7 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     textAlign: "center",
-    color: "#666666",
+    color: TabiyaBasicColors.GrayDark,
   },
 });
 

@@ -1,6 +1,7 @@
 import { ReportContent } from "src/Report/ReportContent";
 import { Footer, Paragraph, ImageRun, AlignmentType, TextRun, PageNumber, BorderStyle } from "docx";
-import { getBase64Image } from "src/Report/util";
+import { COLORS, getBase64Image } from "src/Report/util";
+import { TabiyaBasicColors } from "src/theme/applicationTheme/applicationTheme";
 
 const FooterComponent = async () => {
   return new Footer({
@@ -20,25 +21,25 @@ const FooterComponent = async () => {
           new TextRun({
             text: ReportContent.DISCLAIMER_TEXT_PART1,
             size: 18,
-            color: "#666666",
+            color: COLORS.grey700,
           }),
           new TextRun({
             text: ReportContent.DISCLAIMER_TEXT_PART2,
             size: 18,
-            color: "#000000",
+            color: COLORS.textBlack,
           }),
           new TextRun({
             text: ReportContent.DISCLAIMER_TEXT_PART3,
             size: 18,
-            color: "#666666",
+            color: COLORS.grey700,
           }),
         ],
         alignment: AlignmentType.LEFT,
         border: {
-          top: { style: BorderStyle.SINGLE, size: 2, color: "#666666", space: 5 },
-          bottom: { style: BorderStyle.SINGLE, size: 2, color: "#666666", space: 10 },
-          left: { style: BorderStyle.SINGLE, size: 2, color: "#666666", space: 10 },
-          right: { style: BorderStyle.SINGLE, size: 2, color: "#666666", space: 5 },
+          top: { style: BorderStyle.SINGLE, size: 2, color: TabiyaBasicColors.GrayDark, space: 5 },
+          bottom: { style: BorderStyle.SINGLE, size: 2, color: TabiyaBasicColors.GrayDark, space: 10 },
+          left: { style: BorderStyle.SINGLE, size: 2, color: TabiyaBasicColors.GrayDark, space: 10 },
+          right: { style: BorderStyle.SINGLE, size: 2, color: TabiyaBasicColors.GrayDark, space: 5 },
         },
       }),
       new Paragraph({

@@ -2,6 +2,7 @@ import { Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle } from "do
 import { Skill } from "src/Experiences/ExperienceService/Experiences.types";
 import { ReportContent } from "src/Report/ReportContent";
 import { capitalizeFirstLetter } from "src/Report/ReactPdf/components/ExperiencesReportContent/ExperiencesReportContent";
+import { TabiyaBasicColors } from "src/theme/applicationTheme/applicationTheme";
 
 interface SkillsDescriptionProps {
   skillsList: Skill[];
@@ -15,7 +16,7 @@ const SkillsDescription = ({ skillsList }: SkillsDescriptionProps) => {
           text: ReportContent.SKILLS_DESCRIPTION_TITLE,
           bold: true,
           size: 32,
-          color: "#083763",
+          color: TabiyaBasicColors.DarkBlue,
         }),
       ],
       heading: HeadingLevel.HEADING_5,
