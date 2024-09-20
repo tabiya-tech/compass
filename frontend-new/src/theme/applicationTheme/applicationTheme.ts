@@ -25,7 +25,7 @@ const augmentedThemeColor = (color: string, contrastColor?: string) =>
     },
   });
 
-const TabiyaBasicColors = {
+export const TabiyaBasicColors = {
   DarkBlue: "#002147",
   LightBlue: "#265EA7",
   Yellow: "#EEFF41",
