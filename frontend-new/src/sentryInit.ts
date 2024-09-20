@@ -9,7 +9,12 @@ export function initSentry() {
     integrations: [
       Sentry.browserTracingIntegration(), // performance monitoring by sentry
       Sentry.replayIntegration(), // This will allow errors logged to Sentry to have a video replay of the user's session
-      Sentry.feedbackIntegration(), // This will add a feedback button to the side of the page
+      Sentry.feedbackIntegration({
+        showBranding: false, // This will hide the Sentry branding
+        autoInject: false, // This will disable the automatic injection of the feedback button
+        colorScheme: "light", // This will set the color scheme of the feedback form to light
+        enableScreenshot: true, // This will enable the screenshot feature
+      }), // This will add a feedback button to the side of the page
       Sentry.captureConsoleIntegration({
         levels: ["error"], // depending on dev, test ... you can set this to ["error", "warn", "log", "info", "debug"]
       }), // This will capture console errors

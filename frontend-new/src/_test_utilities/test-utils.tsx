@@ -38,6 +38,14 @@ jest.mock("firebaseui", () => {
     },
   };
 });
+
+jest.mock("@sentry/react", () => ({
+  withSentry: (Component: any) => Component,
+  getFeedback: jest.fn(),
+  withProfiler: (Component: any) => Component,
+  wrapCreateBrowserRouter: (Component: any) => Component,
+}));
+
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <IsOnlineProvider>

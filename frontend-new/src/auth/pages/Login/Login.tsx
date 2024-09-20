@@ -24,6 +24,7 @@ import { InvitationStatus, InvitationType } from "src/invitations/InvitationsSer
 import authStateService from "src/auth/AuthStateService";
 import { TabiyaUser } from "src/auth/auth.types";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
+import FeedbackButton from "src/feedback/FeedbackButton";
 
 export const INVITATIONS_PARAM_NAME = "invite-code";
 
@@ -477,6 +478,7 @@ const Login: React.FC = () => {
           onSuccess={createUserPreferencesCallback}
           onClose={() => setShowRegistrationCodeForm(false)}
         />
+        <FeedbackButton bottomAlign={true} />
       </Container>
       <Backdrop isShown={isLoading} message={"Logging you in..."} />
     </>
