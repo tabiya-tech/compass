@@ -16,7 +16,7 @@ export interface ExperiencesDrawerProps {
   notifyOnClose: (event: CloseEvent) => void;
   experiences: Experience[];
   isLoading: boolean;
-  conversationCompletedAt: string | null;
+  conversationConductedAt: string | null;
 }
 
 export enum CloseEventName {
@@ -64,7 +64,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   isLoading,
   experiences,
   notifyOnClose,
-  conversationCompletedAt,
+  conversationConductedAt,
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
@@ -117,7 +117,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
             phone={validatedPersonalInfo.phone}
             address={validatedPersonalInfo.address}
             experiences={experiences}
-            conversationCompletedAt={conversationCompletedAt!}
+            conversationConductedAt={conversationConductedAt!}
             disabled={!hasTopSkills}
           />
         </Box>

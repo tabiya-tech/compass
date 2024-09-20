@@ -14,6 +14,6 @@ export interface ConversationMessage {
 export interface ConverstaionResponse {
   messages: ConversationMessage[];
   conversation_completed: boolean;
-  conversation_completed_at: string | null; // ISO formatted datetime string
+  conversation_conducted_at: string | null; // ISO formatted datetime string
   experiences_explored: number; // a count for all the experiences explored (processed)
 }

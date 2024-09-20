@@ -54,7 +54,7 @@ const Chat: React.FC<ChatProps> = ({
   const [messages, setMessages] = useState<IChatMessage[]>([]);
   const [conversationCompleted, setConversationCompleted] = useState<boolean>(false);
   const [exploredExperiences, setExploredExperiences] = useState<number>(0);
-  const [conversationCompletedAt, setConversationCompletedAt] = useState<string | null>(null);
+  const [conversationConductedAt, setconversationConductedAt] = useState<string | null>(null);
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
@@ -160,7 +160,7 @@ const Chat: React.FC<ChatProps> = ({
         setIsTyping(true);
         const response = await chatService.sendMessage(userMessage);
         setConversationCompleted(response.conversation_completed);
-        setConversationCompletedAt(response.conversation_completed_at);
+        setconversationConductedAt(response.conversation_conducted_at);
 
         if (response.experiences_explored > exploredExperiences) {
           showNewExperienceAlertHandler(response);
@@ -242,7 +242,7 @@ const Chat: React.FC<ChatProps> = ({
         }
 
         setConversationCompleted(history.conversation_completed);
-        setConversationCompletedAt(history.conversation_completed_at);
+        setconversationConductedAt(history.conversation_conducted_at);
 
         setMessages(
           history.messages.map((message: ConversationMessage) =>
@@ -339,7 +339,7 @@ const Chat: React.FC<ChatProps> = ({
           messages: [],
           experiences_explored: 10,
           conversation_completed: false,
-          conversation_completed_at: "",
+          conversation_conducted_at: "",
         },
         DEFAULT_SNACKBAR_AUTO_HIDE_DURATION * 1000
       );
@@ -412,7 +412,7 @@ const Chat: React.FC<ChatProps> = ({
             notifyOnClose={handleDrawerClose}
             isLoading={isLoading}
             experiences={experiences}
-            conversationCompletedAt={conversationCompletedAt}
+            conversationConductedAt={conversationConductedAt}
           />
           {newConversationDialog && (
             <ApproveModal

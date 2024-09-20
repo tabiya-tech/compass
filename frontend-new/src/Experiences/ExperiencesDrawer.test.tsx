@@ -47,7 +47,7 @@ describe("ExperiencesDrawer", () => {
         isLoading={false}
         experiences={mockExperiences}
         notifyOnClose={jest.fn()}
-        conversationCompletedAt="2021-06-01T00:00:00Z"
+        conversationConductedAt="2021-06-01T00:00:00Z"
       />
     );
 
@@ -85,7 +85,7 @@ describe("ExperiencesDrawer", () => {
         isLoading={false}
         experiences={mockExperiences}
         notifyOnClose={notifyOnClose}
-        conversationCompletedAt="2021-06-01T00:00:00Z"
+        conversationConductedAt="2021-06-01T00:00:00Z"
       />
     );
     // AND the component is rendered
@@ -107,7 +107,7 @@ describe("ExperiencesDrawer", () => {
         isLoading={false}
         experiences={[]}
         notifyOnClose={jest.fn()}
-        conversationCompletedAt="2021-06-01T00:00:00Z"
+        conversationConductedAt="2021-06-01T00:00:00Z"
       />
     );
     // AND the component is rendered
@@ -128,7 +128,7 @@ describe("ExperiencesDrawer", () => {
         isLoading={true}
         experiences={[]}
         notifyOnClose={jest.fn()}
-        conversationCompletedAt="2021-06-01T00:00:00Z"
+        conversationConductedAt="2021-06-01T00:00:00Z"
       />
     );
     // AND the component is rendered
@@ -147,7 +147,7 @@ describe("ExperiencesDrawer", () => {
         isLoading={false}
         experiences={mockExperiences}
         notifyOnClose={jest.fn()}
-        conversationCompletedAt="2021-06-01T00:00:00Z"
+        conversationConductedAt="2021-06-01T00:00:00Z"
       />
     );
     // AND the component is rendered

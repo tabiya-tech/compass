@@ -12,7 +12,7 @@ interface DownloadReportDropdownProps {
   phone: string;
   address: string;
   experiences: Experience[];
-  conversationCompletedAt: string;
+  conversationConductedAt: string;
   disabled?: boolean;
 }
 
@@ -37,7 +37,7 @@ const DownloadReportDropdown: React.FC<DownloadReportDropdownProps> = (props) =>
     phone: props.phone,
     address: props.address,
     experiences: props.experiences,
-    conversationCompletedAt: props.conversationCompletedAt,
+    conversationConductedAt: props.conversationConductedAt,
   };
 
   const docsReportProvider = ReportFormatProvider.init(reportProps, ExportFormat.DOCX);

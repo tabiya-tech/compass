@@ -41,7 +41,7 @@ def database_application_state_store(in_memory_mongo_server):
 def update_agent_director_state(application_state: ApplicationState):
     application_state.agent_director_state.current_phase = random.choice(
         list(AgentDirectorConversationPhase))  # nosec B311 # random is used for testing purposes
-    application_state.agent_director_state.conversation_completed_at = datetime.now(timezone.utc)
+    application_state.agent_director_state.conversation_conducted_at = datetime.now(timezone.utc)
 
 
 def generate_random_experience(index: int) -> ExperienceEntity:

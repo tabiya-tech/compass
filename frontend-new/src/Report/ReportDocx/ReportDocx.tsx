@@ -15,11 +15,11 @@ interface SkillReportDocxProps {
   phone: string;
   address: string;
   experiences: Experience[];
-  conversationCompletedAt: string | null;
+  conversationConductedAt: string | null;
 }
 
 const SkillReportDocx = async (props: SkillReportDocxProps) => {
-  const { name, email, phone, address, experiences, conversationCompletedAt } = props;
+  const { name, email, phone, address, experiences, conversationConductedAt } = props;
   const header = await HeaderComponent();
   const footer = await FooterComponent();
 
@@ -29,11 +29,6 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
 
   // list of all unique skills
   const skillsList = getUniqueSkills(experiences);
-
-  // show current date if conversation is not completed
-  const currentDate = conversationCompletedAt
-    ? formatDate(conversationCompletedAt)
-    : formatDate(new Date().toLocaleDateString());
 
   // Create a paragraph with an image
   const createParagraphWithImage = async (text: string, imageUrl: string, width: number) => {
@@ -143,7 +138,7 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
           new Paragraph({
             children: [
               new TextRun({
-                text: ReportContent.REPORT_BODY_TEXT(currentDate),
+                text: ReportContent.REPORT_BODY_TEXT(formatDate(conversationConductedAt!)),
                 size: 22,
               }),
             ],
