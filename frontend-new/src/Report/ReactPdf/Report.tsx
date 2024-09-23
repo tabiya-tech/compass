@@ -1,7 +1,7 @@
 import React from "react";
 import { Document, Text, Page, View, Image as DefaultImage, ImageWithSrcProp } from "@react-pdf/renderer";
 import { Experience } from "src/Experiences/ExperienceService/Experiences.types";
-import { formatDate, getUniqueSkills, groupExperiencesByWorkType } from "src/Report/util";
+import { formatDate, getBase64Image, getUniqueSkills, groupExperiencesByWorkType } from "src/Report/util";
 import { ReportContent } from "src/Report/ReportContent";
 import Footer from "src/Report/ReactPdf/components/Footer";
 import ExperiencesReportContent from "src/Report/ReactPdf/components/ExperiencesReportContent/ExperiencesReportContent";
@@ -55,7 +55,7 @@ const SkillReport: React.FC<SkillReportProps> = ({
       <View style={styles.categoryContainer}>
         <View wrap={false}>
           <View style={styles.categoryTitleContainer}>
-            <Image src={icon} style={styles.categoryIcon} />
+            <Image src={getBase64Image(icon)} style={styles.categoryIcon} />
             <Text x={0} y={0} style={styles.categoryTitle}>
               {title}
             </Text>
@@ -76,7 +76,7 @@ const SkillReport: React.FC<SkillReportProps> = ({
 
     return (
       <View style={styles.rowView} data-testid={dataTestId}>
-        <Image src={icon} style={styles.infoIcon} />
+        <Image src={getBase64Image(icon)} style={styles.infoIcon} />
         <Text x={0} y={0} style={styles.text}>
           {value}
         </Text>
@@ -89,8 +89,8 @@ const SkillReport: React.FC<SkillReportProps> = ({
       <Page size="A4" style={styles.page}>
         <View style={styles.body} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY}>
           <View fixed style={styles.logoContainer}>
-            <Image src={ReportContent.IMAGE_URLS.COMPASS_LOGO} style={styles.compassImage} />
-            <Image src={ReportContent.IMAGE_URLS.OXFORD_LOGO} style={styles.image} />
+            <Image src={getBase64Image(ReportContent.IMAGE_URLS.COMPASS_LOGO)} style={styles.compassImage} />
+            <Image src={getBase64Image(ReportContent.IMAGE_URLS.OXFORD_LOGO)} style={styles.image} />
           </View>
           <Text x={0} y={0} style={styles.title} data-testid={DATA_TEST_ID.SKILL_REPORT_TITLE}>
             {ReportContent.SKILLS_REPORT_TITLE}
