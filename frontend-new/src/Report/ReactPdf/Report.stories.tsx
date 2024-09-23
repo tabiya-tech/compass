@@ -1,47 +1,96 @@
 import Report from "src/Report/ReactPdf/Report";
-import { Meta, type StoryObj } from "@storybook/react";
+import { Meta } from "@storybook/react";
 import { generateRandomExperiences } from "src/Experiences/ExperienceService/_test_utilities/mockExperiencesResponses";
+import { pdf } from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
+import { ReportProps } from "src/Report/types";
+import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
-const meta: Meta<typeof Report> = {
-  title: "Report/Report",
-  component: Report,
+const meta: Meta = {
+  title: "Report/ReportPdf",
   tags: ["autodocs"],
   argTypes: {},
 };
 
 export default meta;
 
-type Story = StoryObj<typeof Report>;
-
-export const Shown: Story = {
-  args: {
-    name: "John Doe",
-    email: "example@mail.com",
-    phone: "1234567890",
-    address: "1234 Main St",
-    experiences: generateRandomExperiences(3),
-    conversationConductedAt: "2021-06-01T00:00:00Z",
-  },
+const mockedData = {
+  name: "John Doe",
+  email: "john.doe@example.com",
+  phone: "123-456-7890",
+  address: "123 Main St, Chicago, USA",
+  experiences: generateRandomExperiences(2),
+  conversationConductedAt: "2021-08-01T00:00:00Z",
 };
 
-export const ShownWithNoPersonalInfo: Story = {
-  args: {
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-    experiences: generateRandomExperiences(3),
-    conversationConductedAt: "2021-06-01T00:00:00Z",
-  },
+const generatePdf = async (data: ReportProps) => {
+  const fileName = "compass-skills-report.pdf";
+  const blob = await pdf(<Report {...data} />).toBlob();
+  saveAs(blob, fileName);
 };
 
-export const ShownWithSomePersonalInfo: Story = {
-  args: {
-    name: "John Doe",
-    email: "example@mail.com",
-    phone: "",
-    address: "",
-    experiences: generateRandomExperiences(3),
-    conversationConductedAt: "2021-06-01T00:00:00Z",
-  },
+export const Shown = () => <PrimaryButton onClick={() => generatePdf(mockedData)}>Download Report Pdf</PrimaryButton>;
+
+export const ShownWithSingleExperience = () => {
+  return (
+    <PrimaryButton
+      onClick={() =>
+        generatePdf({
+          ...mockedData,
+          experiences: generateRandomExperiences(1).slice(0, 1),
+        })
+      }
+    >
+      Download Report Pdf
+    </PrimaryButton>
+  );
+};
+
+export const ShownWithManyExperiences = () => {
+  return (
+    <PrimaryButton
+      onClick={() =>
+        generatePdf({
+          ...mockedData,
+          experiences: generateRandomExperiences(10),
+        })
+      }
+    >
+      Download Report Pdf
+    </PrimaryButton>
+  );
+};
+
+export const ShownWithNoPersonalInfo = () => {
+  return (
+    <PrimaryButton
+      onClick={() =>
+        generatePdf({
+          ...mockedData,
+          name: "",
+          email: "",
+          phone: "",
+          address: "",
+        })
+      }
+    >
+      Download Report Pdf
+    </PrimaryButton>
+  );
+};
+
+export const ShownWithSomePersonalInfo = () => {
+  return (
+    <PrimaryButton
+      onClick={() =>
+        generatePdf({
+          ...mockedData,
+          email: "",
+          phone: "",
+        })
+      }
+    >
+      Download Report Pdf
+    </PrimaryButton>
+  );
 };

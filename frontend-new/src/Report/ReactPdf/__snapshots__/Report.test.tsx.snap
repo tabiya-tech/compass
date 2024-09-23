@@ -15,11 +15,11 @@ exports[`Report should render Report correctly 1`] = `
         style="display: flex; flex-direction: row; align-items: center; padding-bottom: 18px; padding-top: 32px; gap: 26px;"
       >
         <image
-          src="/logo.png"
+          src="[object Promise]"
           style="height: 46px;"
         />
         <image
-          src="/oxford-logo.png"
+          src="[object Promise]"
           style="height: 42px;"
         />
       </view>
@@ -47,7 +47,7 @@ exports[`Report should render Report correctly 1`] = `
           style="display: flex; flex-direction: row; align-items: center; gap: 6px;"
         >
           <image
-            src="/location.png"
+            src="[object Promise]"
             style="height: 12px;"
           />
           <text
@@ -63,7 +63,7 @@ exports[`Report should render Report correctly 1`] = `
           style="display: flex; flex-direction: row; align-items: center; gap: 6px;"
         >
           <image
-            src="/phone-call.png"
+            src="[object Promise]"
             style="height: 12px;"
           />
           <text
@@ -79,7 +79,7 @@ exports[`Report should render Report correctly 1`] = `
           style="display: flex; flex-direction: row; align-items: center; gap: 6px;"
         >
           <image
-            src="/email.png"
+            src="[object Promise]"
             style="height: 12px;"
           />
           <text
@@ -127,7 +127,7 @@ exports[`Report should render Report correctly 1`] = `
               style="display: flex; flex-direction: row; align-items: center; margin-bottom: 12px;"
             >
               <image
-                src="/dollar-bag.png"
+                src="[object Promise]"
                 style="height: 16px; margin-bottom: 2px; margin-right: 8px;"
               />
               <text
@@ -203,7 +203,7 @@ exports[`Report should render Report correctly 1`] = `
               style="display: flex; flex-direction: row; align-items: center; margin-bottom: 12px;"
             >
               <image
-                src="/friendly.png"
+                src="[object Promise]"
                 style="height: 16px; margin-bottom: 2px; margin-right: 8px;"
               />
               <text
@@ -337,7 +337,7 @@ exports[`Report should render Report correctly 1`] = `
         style="display: flex; flex-direction: row; padding: 8px; border: 1px; border-color: #43474e;"
       >
         <image
-          src="/danger.png"
+          src="[object Promise]"
           style="width: 12px; height: 12px;"
         />
         <text

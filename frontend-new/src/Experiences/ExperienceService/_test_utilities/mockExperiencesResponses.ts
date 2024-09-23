@@ -70,6 +70,15 @@ const skillsLabels = [
   "community Volunteering",
   "ensured the project was completed on time",
   "took care of the garden",
+  "communication",
+  "helped with the family business",
+  "time management",
+  "organise product display",
+  "assist customers",
+  "maintain work area cleanliness",
+  "teamwork",
+  "attention to details",
+  "problem solving",
 ];
 
 const generateRandomSkill = (usedLabels: string[]): Skill => {
