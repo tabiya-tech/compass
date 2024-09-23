@@ -2,6 +2,11 @@ import { Font, StyleSheet } from "@react-pdf/renderer";
 import { TabiyaBasicColors } from "src/theme/applicationTheme/applicationTheme";
 import { COLORS } from "src/Report/util";
 
+// Function to check if running in Storybook
+const isStorybook = () => {
+  return process.env.STORYBOOK === "true";
+};
+
 Font.register({
   family: "Inter",
   fonts: [{ src: "/fonts/Inter-4.0/ttf/Inter-Regular.ttf" }, { src: "/fonts/Inter-4.0/ttf/Inter-Bold.ttf" }],
@@ -9,7 +14,7 @@ Font.register({
 
 const styles = StyleSheet.create({
   page: {
-    fontFamily: "Inter",
+    ...(isStorybook() ? {} : { fontFamily: "Inter" }),
     display: "flex",
     flexDirection: "column",
     paddingBottom: 100,
