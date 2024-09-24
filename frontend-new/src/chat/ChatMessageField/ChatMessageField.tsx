@@ -21,7 +21,7 @@ export const DATA_TEST_ID = {
 };
 
 export const CHAT_MESSAGE_MAX_LENGTH = 1000;
-export const DISALLOWED_CHARACTERS = /["\\{}()[\]*_#`<>\-+~|&/]/g;
+export const DISALLOWED_CHARACTERS = /["\\{}[\]*_#`<>~|/]/g;
 
 const StyledTextField = styled(TextField)(({ theme, disabled }) => ({
   "& .MuiOutlinedInput-root": {

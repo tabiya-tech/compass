@@ -12,7 +12,7 @@ export const validatePassword = (password: string): string => {
   if (!/(?=.*\d)/.test(password)) {
     return "Password must include at least one number.";
   }
-  if (!/(?=.*[@$!%*?&])/.test(password)) {
+  if (!/(?=.*[^a-zA-Z0-9])/.test(password)) {
     return "Password must include at least one special character.";
   }
   return "";
