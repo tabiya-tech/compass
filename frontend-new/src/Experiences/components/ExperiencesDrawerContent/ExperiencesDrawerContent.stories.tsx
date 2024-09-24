@@ -21,3 +21,21 @@ export const Shown = {
 export const Loading = {
   render: () => <LoadingExperienceDrawerContent />,
 };
+
+export const ShownWithNoCompany = {
+  args: {
+    experience: {
+      ...generateRandomExperiences(1)[0],
+      company: "",
+    },
+  },
+};
+
+export const ShownWithNoLocation = {
+  args: {
+    experience: {
+      ...generateRandomExperiences(1)[0],
+      location: "",
+    },
+  },
+};

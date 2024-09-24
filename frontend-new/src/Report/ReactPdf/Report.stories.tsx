@@ -94,3 +94,43 @@ export const ShownWithSomePersonalInfo = () => {
     </PrimaryButton>
   );
 };
+
+export const ShownWithNoCompany = () => {
+  return (
+    <PrimaryButton
+      onClick={() =>
+        generatePdf({
+          ...mockedData,
+          experiences: [
+            {
+              ...generateRandomExperiences(1)[0],
+              company: "",
+            },
+          ],
+        })
+      }
+    >
+      Download Report Pdf
+    </PrimaryButton>
+  );
+};
+
+export const ShownWithNoLocation = () => {
+  return (
+    <PrimaryButton
+      onClick={() =>
+        generatePdf({
+          ...mockedData,
+          experiences: [
+            {
+              ...generateRandomExperiences(1)[0],
+              location: "",
+            },
+          ],
+        })
+      }
+    >
+      Download Report Pdf
+    </PrimaryButton>
+  );
+};

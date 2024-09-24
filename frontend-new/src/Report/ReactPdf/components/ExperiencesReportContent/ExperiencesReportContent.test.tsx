@@ -24,6 +24,12 @@ describe("ExperiencesReportContent", () => {
     expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_EXPERIENCE_TITLE)).toBeInTheDocument();
     // AND the report content skills to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_SKILLS)).toBeInTheDocument();
+    // AND the experience info to be in the document
+    expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_EXPERIENCE_INFO)).toBeInTheDocument();
+    // AND the company to be in the document
+    expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_COMPANY)).toBeInTheDocument();
+    // AND the location to be in the document
+    expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_LOCATION)).toBeInTheDocument();
     // AND to match the snapshot
     expect(reportContentContainer).toMatchSnapshot();
   });

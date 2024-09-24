@@ -59,9 +59,18 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience }) => 
         {experience.experience_title}
       </Typography>
       <Typography variant="body2" data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_DATE}>
+        {/* display the start and end dates */}
         {experience.end_date && experience.start_date
           ? `${experience.start_date} — ${experience.end_date}`
           : experience.start_date || experience.end_date}
+
+        {(experience.start_date || experience.end_date) && experience.company && ", "}
+
+        {/* display the company if it exists */}
+        {experience.company && experience.company}
+
+        {/* display the location if it exists */}
+        {experience.location && <i>{` (${experience.location})`}</i>}
       </Typography>
       <Box display="flex" alignItems="center">
         <Typography

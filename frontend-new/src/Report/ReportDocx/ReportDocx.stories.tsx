@@ -87,3 +87,43 @@ export const ShownWithSomePersonalInfo = () => {
     </PrimaryButton>
   );
 };
+
+export const ShownWithNoCompany = () => {
+  return (
+    <PrimaryButton
+      onClick={() =>
+        SkillReportDocx({
+          ...mockedData,
+          experiences: [
+            {
+              ...generateRandomExperiences(1)[0],
+              company: "",
+            },
+          ],
+        })
+      }
+    >
+      Download Report Docx
+    </PrimaryButton>
+  );
+};
+
+export const ShownWithNoLocation = () => {
+  return (
+    <PrimaryButton
+      onClick={() =>
+        SkillReportDocx({
+          ...mockedData,
+          experiences: [
+            {
+              ...generateRandomExperiences(1)[0],
+              location: "",
+            },
+          ],
+        })
+      }
+    >
+      Download Report Docx
+    </PrimaryButton>
+  );
+};
