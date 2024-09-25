@@ -42,7 +42,7 @@ To develop this application locally, follow these steps:
      - `FIREBASE_API_KEY`: The API key for Firebase authentication
      - `FIREBASE_AUTH_DOMAIN`: The Firebase authentication domain
      - `BACKEND_URL`: The URL of the backend API
-     - `SENTRY_DSN`: The Sentry Data Source Name for error tracking
+     - `SENTRY_FRONTEND_DSN`: The Sentry Data Source Name for error tracking (the frontend DSN is for the project used to track frontend errors)
      - `SENTRY_AUTH_TOKEN`: The Sentry authentication token, used to upload source maps
 
    Please request the necessary environment variable values from the project team.

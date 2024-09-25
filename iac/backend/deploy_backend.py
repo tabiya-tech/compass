@@ -9,7 +9,6 @@ import pulumiverse_time as time
 from dataclasses import dataclass
 from pathlib import Path
 
-
 @dataclass
 class ProjectBaseConfig:
     project: str
@@ -317,6 +316,8 @@ class BackendEnvVarsConfig:
     TARGET_ENVIRONMENT: str
     BACKEND_URL: str
     FRONTEND_URL: str
+    SENTRY_BACKEND_DSN: str
+    ENABLE_SENTRY: str
 
 
 # See https://cloud.google.com/run/docs/overview/what-is-cloud-run for more information
@@ -389,6 +390,10 @@ def _deploy_cloud_run_service(
                                                                        value=backend_env_vars_cfg.BACKEND_URL),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="FRONTEND_URL",
                                                                        value=backend_env_vars_cfg.FRONTEND_URL),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="SENTRY_BACKEND_DSN",
+                                                                       value=backend_env_vars_cfg.SENTRY_BACKEND_DSN),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="ENABLE_SENTRY",
+                                                                          value=backend_env_vars_cfg.ENABLE_SENTRY),
 
                         # Add more environment variables here
                     ],
@@ -435,6 +440,14 @@ def _get_backend_env_vars(environment: str):
     if not backend_url:
         raise ValueError("BACKEND_URL environment variable is not set")
 
+    sentry_backend_dsn = os.getenv("SENTRY_BACKEND_DSN")
+    if not sentry_backend_dsn:
+        raise ValueError("SENTRY_BACKEND_DSN environment variable is not set")
+
+    enable_sentry = os.getenv("ENABLE_SENTRY")
+    if not enable_sentry:
+        raise ValueError("ENABLE_SENTRY environment variable is not set")
+
     return BackendEnvVarsConfig(
         TAXONOMY_MONGODB_URI=taxonomy_mongodb_uri,
         TAXONOMY_DATABASE_NAME=taxonomy_database_name,
@@ -445,6 +458,8 @@ def _get_backend_env_vars(environment: str):
         TARGET_ENVIRONMENT=environment,
         BACKEND_URL=backend_url,
         FRONTEND_URL=frontend_url,
+        SENTRY_BACKEND_DSN=sentry_backend_dsn,
+        ENABLE_SENTRY=enable_sentry
     )
 
 

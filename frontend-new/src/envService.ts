@@ -27,5 +27,5 @@ export const getBackendUrl = () => {
 };
 
 export const getSentryDSN = () => {
-  return getEnv("SENTRY_DSN");
+  return getEnv("SENTRY_FRONTEND_DSN");
 };
