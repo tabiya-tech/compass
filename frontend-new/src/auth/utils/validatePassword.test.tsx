@@ -54,7 +54,7 @@ describe("validatePassword", () => {
     const result = validatePassword(password);
 
     // THEN expect the correct error message
-    expect(result).toBe("Password must include at least one special character.");
+    expect(result).toBe("Password must include at least one special character such as: !@#$%*& etc.");
   });
 
   test("should return empty string for valid passwords", () => {
