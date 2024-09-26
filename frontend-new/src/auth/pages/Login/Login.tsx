@@ -10,7 +10,6 @@ import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
 import LoginWithEmailForm from "src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm";
-import { validatePassword } from "src/auth/utils/validatePassword";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
 import { emailAuthService } from "src/auth/services/emailAuth/EmailAuth.service";
@@ -72,7 +71,6 @@ const Login: React.FC = () => {
   const [inviteCode, setInviteCode] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [passwordError, setPasswordError] = useState<string>("");
 
   const [activeLoginForm, setActiveLoginForm] = useState(ActiveForm.NONE);
 
@@ -214,15 +212,8 @@ const Login: React.FC = () => {
    */
   const handleLoginWithEmail = useCallback(
     async (email: string, password: string) => {
+      setIsLoading(true);
       try {
-        const passwordValidationResult = validatePassword(password);
-        setPasswordError(passwordValidationResult);
-
-        if (passwordValidationResult !== "") {
-          return;
-        }
-
-        setIsLoading(true);
         const token = await emailAuthService.handleLoginWithEmail(email, password);
         const _user = authStateService.updateUserByToken(token);
         if (_user) {
@@ -343,7 +334,6 @@ const Login: React.FC = () => {
     } else if (activeLoginForm === ActiveForm.INVITE_CODE) {
       setEmail("");
       setPassword("");
-      setPasswordError("");
     }
   }, [activeLoginForm]);
 
@@ -424,7 +414,6 @@ const Login: React.FC = () => {
             <LoginWithEmailForm
               email={email}
               password={password}
-              passwordError={passwordError}
               notifyOnEmailChanged={handleEmailChanged}
               notifyOnPasswordChanged={handlePasswordChanged}
               isDisabled={isLoading}

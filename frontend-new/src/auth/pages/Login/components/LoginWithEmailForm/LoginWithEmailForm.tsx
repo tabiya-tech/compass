@@ -12,7 +12,6 @@ export const DATA_TEST_ID = {
 export interface LoginFormProps {
   email: string;
   password: string;
-  passwordError: string;
   notifyOnEmailChanged: (email: string) => void;
   notifyOnPasswordChanged: (password: string) => void;
   notifyOnFocused: () => void;
@@ -21,7 +20,6 @@ export interface LoginFormProps {
 const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({
   email,
   password,
-  passwordError,
   notifyOnEmailChanged,
   notifyOnPasswordChanged,
   isDisabled,
@@ -64,8 +62,6 @@ const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({
         value={password}
         onChange={(e) => handlePasswordChange(e)}
         inputProps={{ "data-testid": DATA_TEST_ID.EMAIL_LOGIN_FORM_PASSWORD_INPUT }}
-        error={!!passwordError}
-        helperText={passwordError}
       />
     </Box>
   );
