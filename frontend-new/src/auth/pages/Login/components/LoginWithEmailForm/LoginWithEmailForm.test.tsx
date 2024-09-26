@@ -21,7 +21,7 @@ describe("Testing LoginWithEmailForm component", () => {
     const givenEmailValue = "email";
     const givenPasswordValue = "password";
     const givenIsDisabled = false;
-    const givenPasswordError = "";
+
     render(
       <HashRouter>
         <LoginWithEmailForm
@@ -31,7 +31,6 @@ describe("Testing LoginWithEmailForm component", () => {
           notifyOnPasswordChanged={givenNotifyOnPasswordChange}
           notifyOnFocused={givenNotifyOnFocused}
           isDisabled={givenIsDisabled}
-          passwordError={givenPasswordError}
         />
       </HashRouter>
     );
@@ -59,7 +58,7 @@ describe("Testing LoginWithEmailForm component", () => {
       const givenEmailValue = "email";
       const givenPasswordValue = "password";
       const givenIsDisabled = false;
-      const givenPasswordError = "";
+
       render(
         <HashRouter>
           <LoginWithEmailForm
@@ -69,7 +68,6 @@ describe("Testing LoginWithEmailForm component", () => {
             notifyOnPasswordChanged={givenNotifyOnPasswordChange}
             notifyOnFocused={givenNotifyOnFocused}
             isDisabled={givenIsDisabled}
-            passwordError={givenPasswordError}
           />
         </HashRouter>
       );
@@ -91,7 +89,7 @@ describe("Testing LoginWithEmailForm component", () => {
       const givenEmailValue = "email";
       const givenPasswordValue = "password";
       const givenIsDisabled = false;
-      const givenPasswordError = "";
+
       render(
         <HashRouter>
           <LoginWithEmailForm
@@ -101,7 +99,6 @@ describe("Testing LoginWithEmailForm component", () => {
             notifyOnPasswordChanged={givenNotifyOnPasswordChange}
             notifyOnFocused={givenNotifyOnFocused}
             isDisabled={givenIsDisabled}
-            passwordError={givenPasswordError}
           />
         </HashRouter>
       );
