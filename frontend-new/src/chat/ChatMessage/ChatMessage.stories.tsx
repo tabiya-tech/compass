@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import ChatMessage from "./ChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
+import { nanoid } from "nanoid";
 
 const meta: Meta<typeof ChatMessage> = {
   title: "Chat/ChatMessage",
@@ -15,7 +16,7 @@ type Story = StoryObj<typeof ChatMessage>;
 export const FromCompass: Story = {
   args: {
     chatMessage: {
-      id: 1,
+      id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       sent_at: new Date().toISOString(),
       message:
@@ -27,7 +28,7 @@ export const FromCompass: Story = {
 export const FromMe: Story = {
   args: {
     chatMessage: {
-      id: 1,
+      id: nanoid(),
       sender: ConversationMessageSender.USER,
       sent_at: new Date().toISOString(),
       message: "Hi. I'm here to learn about my skills!",
@@ -38,7 +39,7 @@ export const FromMe: Story = {
 export const LongMessage: Story = {
   args: {
     chatMessage: {
-      id: 1,
+      id: nanoid(),
       sender: ConversationMessageSender.USER,
       sent_at: new Date().toISOString(),
       message:
@@ -50,7 +51,7 @@ export const LongMessage: Story = {
 export const LongUnBrokenWord: Story = {
   args: {
     chatMessage: {
-      id: 1,
+      id: nanoid(),
       sender: ConversationMessageSender.USER,
       sent_at: new Date().toISOString(),
       message: "a".repeat(1000),
@@ -61,7 +62,7 @@ export const LongUnBrokenWord: Story = {
 export const SingleLetter: Story = {
   args: {
     chatMessage: {
-      id: 1,
+      id: nanoid(),
       sender: ConversationMessageSender.USER,
       sent_at: new Date().toISOString(),
       message: "a",
@@ -74,7 +75,7 @@ export const ShownWithDifferentTimestamps: Story = {
     <>
       <ChatMessage
         chatMessage={{
-          id: 1,
+          id: nanoid(),
           sender: ConversationMessageSender.USER,
           sent_at: new Date().toISOString(),
           message: "sent just now",
@@ -83,7 +84,7 @@ export const ShownWithDifferentTimestamps: Story = {
       />
       <ChatMessage
         chatMessage={{
-          id: 2,
+          id: nanoid(),
           sender: ConversationMessageSender.USER,
           sent_at: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
           message: "sent an hour ago",
@@ -92,7 +93,7 @@ export const ShownWithDifferentTimestamps: Story = {
       />
       <ChatMessage
         chatMessage={{
-          id: 3,
+          id: nanoid(),
           sender: ConversationMessageSender.USER,
           sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
           message: "sent yesterday",
@@ -101,7 +102,7 @@ export const ShownWithDifferentTimestamps: Story = {
       />
       <ChatMessage
         chatMessage={{
-          id: 4,
+          id: nanoid(),
           sender: ConversationMessageSender.USER,
           sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
           message: "sent two days ago",
@@ -110,7 +111,7 @@ export const ShownWithDifferentTimestamps: Story = {
       />
       <ChatMessage
         chatMessage={{
-          id: 5,
+          id: nanoid(),
           sender: ConversationMessageSender.USER,
           sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(),
           message: "sent a week ago",
@@ -119,7 +120,7 @@ export const ShownWithDifferentTimestamps: Story = {
       />
       <ChatMessage
         chatMessage={{
-          id: 5,
+          id: nanoid(),
           sender: ConversationMessageSender.USER,
           sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(),
           message: "sent a month ago",
@@ -128,7 +129,7 @@ export const ShownWithDifferentTimestamps: Story = {
       />
       <ChatMessage
         chatMessage={{
-          id: 6,
+          id: nanoid(),
           sender: ConversationMessageSender.USER,
           sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30 * 12).toISOString(),
           message: "sent a year ago",

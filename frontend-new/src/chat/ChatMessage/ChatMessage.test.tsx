@@ -5,6 +5,7 @@ import ChatMessage, { DATA_TEST_ID } from "./ChatMessage";
 import { render, screen } from "src/_test_utilities/test-utils";
 import * as GetDurationFromNow from "src/utils/getDurationFromNow/getDurationFromNow";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
+import { nanoid } from "nanoid";
 
 jest.mock("src/auth/services/socialAuth/SocialAuth.service", () => {
   return {
@@ -31,7 +32,7 @@ describe("render tests", () => {
     // WHEN the chat header is rendered
     const givenDate = new Date(2024, 6, 25).toISOString();
     const givenMessage = {
-      id: 1,
+      id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       message: "Hello, I'm Compass",
       sent_at: givenDate,
@@ -58,7 +59,7 @@ describe("render tests", () => {
   test("should render the Chat message without a sent_at when typing is set to true", () => {
     // WHEN the chat header is rendered
     const givenMessage = {
-      id: 1,
+      id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       message: "Hello, I'm Compass",
       sent_at: new Date().toISOString(),
