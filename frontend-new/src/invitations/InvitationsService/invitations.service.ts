@@ -30,6 +30,7 @@ export default class InvitationsService {
    * Checks the status of an invitation code.
    * @param {string} code - The invitation code to check.
    * @returns {Promise<Invitation>}
+   * @throws {ServiceError} If the invitation code is invalid
    */
   async checkInvitationCodeStatus(code: string): Promise<Invitation> {
     const serviceName = "InvitationsService";

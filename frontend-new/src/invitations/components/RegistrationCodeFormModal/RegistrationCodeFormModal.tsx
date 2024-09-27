@@ -1,11 +1,8 @@
 import React, { useCallback, useState } from "react";
 import Modal from "@mui/material/Modal";
 
-import { Box, TextField, Typography } from "@mui/material";
+import { Box, CircularProgress, TextField, Typography, useTheme } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
-import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import InvitationsService from "src/invitations/InvitationsService/invitations.service";
-import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
 
 const uniqueId = "f782907a-6904-482c-b148-3c6682bf7b54";
 
@@ -17,24 +14,20 @@ export const DATA_TEST_ID = {
   INVITATION_CODE_INPUT: `invitation-code-input-${uniqueId}`,
   MODAL_TITLE: `invitation-code-modal-title-${uniqueId}`,
   MODAL_SUBTITLE: `invitation-code-modal-subtitle-${uniqueId}`,
+  SUBMIT_BUTTON: `invitation-code-submit-button-${uniqueId}`,
+  PROGRESS_ELEMENT: `invitation-code-progress-element-${uniqueId}`,
 };
 
 export interface InvitationCodeFormModalProps {
   /**
-   * Whether the modal is shown or not
+   * Whether the modal is modal state or not
    */
-  show: boolean;
-
-  /**
-   * Function to close the modal, Ideally this is to set the show prop to false
-   */
-  onClose: () => void;
-
+  modalState: RegistrationCodeFormModalState;
   /**
    * Function to call when the registration code is validated
-   * @param invitationCode
+   * @param registrationCode
    */
-  onSuccess: (invitationCode: string) => void;
+  onSuccess: (registrationCode: string) => void;
 }
 
 /**
@@ -53,44 +46,23 @@ const style = {
   p: 4,
 };
 
-const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ show, onClose, onSuccess }) => {
-  const { enqueueSnackbar } = useSnackbar();
+export enum RegistrationCodeFormModalState {
+  SHOW,
+  HIDE,
+  LOADING,
+}
 
-  const [invitationCode, setInvitationCode] = useState("");
-  const [isValidating, setIsValidating] = useState<boolean>(false);
-  const [isValidated, setIsValidated] = useState<boolean>(false);
+const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ modalState, onSuccess }) => {
+  const theme = useTheme();
+  const [registrationCode, setRegistrationCode] = useState("");
 
-  const closeModal = useCallback(() => {
-    /**
-     * If the registration code is not validated, do not close the modal
-     * This is to prevent the user from closing the modal without validating the registration code
-     */
-    if (!invitationCode || !isValidated) return;
-    else onClose();
-  }, [isValidated, onClose, invitationCode]);
-
-  const validateRegistrationCode = useCallback(async () => {
-    try {
-      setIsValidating(true);
-      const service = InvitationsService.getInstance();
-      const invitation = await service.checkInvitationCodeStatus(invitationCode);
-      if (invitation.status !== InvitationStatus.VALID || invitation.invitation_type !== InvitationType.REGISTER) {
-        throw new Error("Invalid registration code");
-      }
-      enqueueSnackbar("Registration code is valid!", { variant: "success" });
-      setIsValidated(true);
-      onSuccess(invitation.invitation_code);
-    } catch (e: any) {
-      enqueueSnackbar("Invalid registration code", { variant: "error" });
-    } finally {
-      setIsValidating(false);
-    }
-  }, [invitationCode, enqueueSnackbar, onSuccess]);
+  const handleAcceptRegistrationCode = useCallback(async () => {
+    onSuccess(registrationCode);
+  }, [onSuccess, registrationCode]);
 
   return (
     <Modal
-      open={show}
-      onClose={closeModal}
+      open={modalState === RegistrationCodeFormModalState.SHOW || modalState === RegistrationCodeFormModalState.LOADING}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
       data-testid={DATA_TEST_ID.CONTAINER}
@@ -109,16 +81,25 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ sho
           placeholder={"Enter your registration code"}
           margin="normal"
           required
-          onChange={(e) => setInvitationCode(e.target.value)}
+          onChange={(e) => setRegistrationCode(e.target.value)}
           inputProps={{ "data-testid": DATA_TEST_ID.INVITATION_CODE_INPUT }}
         />
         <PrimaryButton
+          data-testid={DATA_TEST_ID.SUBMIT_BUTTON}
           fullWidth
           disableWhenOffline
-          onClick={validateRegistrationCode}
-          disabled={!invitationCode.length || isValidating}
+          onClick={handleAcceptRegistrationCode}
+          disabled={!registrationCode.length}
         >
-          {isValidating ? "Validating..." : "Validate"}
+          {modalState === RegistrationCodeFormModalState.LOADING ? (
+            <CircularProgress
+              sx={{ color: (theme) => theme.palette.info.contrastText }}
+              size={2 * theme.typography.fontSize}
+              data-testid={DATA_TEST_ID.PROGRESS_ELEMENT}
+            />
+          ) : (
+            "Submit"
+          )}
         </PrimaryButton>
       </Box>
     </Modal>

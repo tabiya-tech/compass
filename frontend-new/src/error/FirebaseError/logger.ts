@@ -1,7 +1,7 @@
 import { FirebaseError } from "./firebaseError";
 
 export function writeFirebaseErrorToLog(err: FirebaseError, logFunction: (msg: any) => void): void {
-  const logMessage = `FirebaseError: ${err.serviceName} ${err.serviceFunction} ${err.errorCode} ${err.method} ${err.statusCode}`;
+  const logMessage = `FirebaseError: ${err.serviceName} ${err.serviceFunction} ${err.errorCode} ${err.method}`;
 
   if (err! instanceof FirebaseError) {
     logFunction(err);

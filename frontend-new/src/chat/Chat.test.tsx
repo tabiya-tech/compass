@@ -11,16 +11,19 @@ import { HashRouter } from "react-router-dom";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { ConversationMessageSender } from "./ChatService/ChatService.types";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
+import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import ChatService from "./ChatService/ChatService";
 import ExperienceService from "src/Experiences/ExperienceService/ExperienceService";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { act } from "@testing-library/react";
 
+import * as FirebaseAuthenticationServiceFactoryModule from "src/auth/services/Authentication.service.factory";
+import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
+
 // Mock the ChatService module
 jest.mock("src/chat/ChatService/ChatService");
 
-jest.mock("src/auth/services/socialAuth/SocialAuth.service", () => {
+jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service", () => {
   return {
     __esModule: true,
     default: jest.fn().mockImplementation(() => {
@@ -122,6 +125,11 @@ describe("Chat", () => {
       sendMessage: mockSendMessage,
       getChatHistory: mockGetChatHistory,
     });
+    // Mock the firebaseAuthenticationServiceManager getFirebaseAuthenticationService to return a mock instance
+    // in this case firebaseEmailAuthenticationService
+    jest
+      .spyOn(FirebaseAuthenticationServiceFactoryModule, "default")
+      .mockReturnValue(FirebaseEmailAuthService.getInstance());
   });
 
   afterEach(() => {
