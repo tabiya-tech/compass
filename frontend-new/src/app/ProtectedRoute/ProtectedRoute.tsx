@@ -1,9 +1,9 @@
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
+import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { isValid } from "date-fns";
-import authStateService from "src/auth/AuthStateService";
+import authStateService from "src/auth/services/AuthenticationState.service";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

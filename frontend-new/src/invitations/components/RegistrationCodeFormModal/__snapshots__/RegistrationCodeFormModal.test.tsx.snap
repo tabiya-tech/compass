@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`RegistrationCodeFormModal renders correctly when modal is shown 1`] = `
+exports[`RegistrationCodeFormModal renders correctly when modal is shown and call onSuccess with the provided code 1`] = `
 <div
   aria-describedby="modal-modal-description"
   aria-labelledby="modal-modal-title"
@@ -82,11 +82,12 @@ exports[`RegistrationCodeFormModal renders correctly when modal is shown 1`] = `
     </div>
     <button
       class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-q25fil-MuiButtonBase-root-MuiButton-root"
+      data-testid="invitation-code-submit-button-f782907a-6904-482c-b148-3c6682bf7b54"
       disabled=""
       tabindex="-1"
       type="button"
     >
-      Validate
+      Submit
     </button>
   </div>
   <div
