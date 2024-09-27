@@ -10,7 +10,7 @@ const uniqueId = "6cf1a0fa-8d75-4342-bf6b-1203d5b114d7";
 export const DATA_TEST_ID = {
   FORM: `register-form-${uniqueId}`,
   REGISTRATION_CODE_INPUT: `register-registration-code-input-${uniqueId}`,
-  NAME_INPUT: `register-name-input-${uniqueId}`,
+  USERNAME_INPUT: `register-username-input-${uniqueId}`,
   EMAIL_INPUT: `register-email-input-${uniqueId}`,
   PASSWORD_INPUT: `register-password-input-${uniqueId}`,
   REGISTER_BUTTON: `register-button-${uniqueId}`,
@@ -19,7 +19,7 @@ export const DATA_TEST_ID = {
 
 export interface RegisterFormProps {
   disabled?: boolean;
-  notifyOnRegister: (name: string, email: string, password: string) => void;
+  notifyOnRegister: (username: string, email: string, password: string) => void;
   isRegistering: boolean;
 }
 
@@ -29,14 +29,14 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
   isRegistering,
 }) => {
   const theme = useTheme();
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(true);
   const [validationResults, setValidationResults] = useState(validatePassword(""));
 
-  const handleNameChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    setName(event.target.value);
+  const handleUserNameChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    setUsername(event.target.value);
   };
   const handleEmailChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     setEmail(event.target.value);
@@ -59,7 +59,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
     setIsPasswordValid(isValid);
 
     if (isValid) {
-      notifyOnRegister(name, email, password);
+      notifyOnRegister(username, email, password);
     }
   };
 
@@ -76,12 +76,12 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
     >
       <TextField
         fullWidth
-        label="Name"
+        label="Username"
         variant="outlined"
         disabled={isRegistering || disabled}
         required
-        onChange={(e) => handleNameChange(e)}
-        inputProps={{ "data-testid": DATA_TEST_ID.NAME_INPUT }}
+        onChange={(e) => handleUserNameChange(e)}
+        inputProps={{ "data-testid": DATA_TEST_ID.USERNAME_INPUT }}
       />
       <TextField
         fullWidth

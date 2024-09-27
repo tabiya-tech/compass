@@ -81,6 +81,8 @@ export default class UserPreferencesService {
    * Creates an entry for the user preferences of a user with an ID.
    * This is used to create a user profile for the first time.
    * you provide user_id and invitation_code
+   * @returns {Promise<UserPreference>} The user preferences object
+   * @throws {ServiceError} If the user preferences are invalid
    */
   async createUserPreferences(user_preferences: CreateUserPreferencesSpec): Promise<UserPreference> {
     const serviceName = "UserPreferencesService";
@@ -112,7 +114,8 @@ export default class UserPreferencesService {
 
   /**
    * Creates an entry for the user preferences of a user with an ID
-   *
+   * @returns {Promise<UserPreference>} The user preferences object
+   * @throws {ServiceError} If the user preferences are invalid
    */
   async updateUserPreferences(newUserPreferencesSpec: UpdateUserPreferencesSpec): Promise<UserPreference> {
     const serviceName = "UserPreferencesService";
@@ -145,7 +148,8 @@ export default class UserPreferencesService {
 
   /**
    * Gets the user preferences of a user with an ID
-   *
+   * @returns {Promise<UserPreference | null>} The user preferences object or null if the user preferences are not found
+   * @throws {ServiceError} If the user preferences are invalid
    */
   async getUserPreferences(userId: string): Promise<UserPreference | null> {
     const serviceName = "UserPreferencesService";
@@ -177,6 +181,8 @@ export default class UserPreferencesService {
 
   /**
    * Get a new session ID from the chat service.
+   * @returns {Promise<UserPreference>} The user preferences object
+   * @throws {ServiceError} If the user preferences are invalid
    */
   async getNewSession(userId: string): Promise<UserPreference> {
     const serviceName = "UserPreferencesService";

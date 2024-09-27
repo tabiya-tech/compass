@@ -172,67 +172,6 @@ describe("AuthPersistentStorage class tests", () => {
     });
   });
 
-  describe("logged out flag tests", () => {
-    test("return correct previously set logged out flag", () => {
-      // GIVEN The logged out flag is stored in the session storage
-      const givenLoggedOutFlag = true;
-      PersistentStorageService.setLoggedOutFlag(givenLoggedOutFlag);
-
-      // WHEN The logged out flag is retrieved
-      const loggedOutFlag = PersistentStorageService.getLoggedOutFlag();
-
-      // THEN The logged out flag should be returned
-      expect(loggedOutFlag).toEqual(givenLoggedOutFlag);
-    });
-    test("return false if logged out flag is set to false", () => {
-      // GIVEN The logged out flag is stored in the session storage
-      const givenLoggedOutFlag = false;
-      PersistentStorageService.setLoggedOutFlag(givenLoggedOutFlag);
-
-      // WHEN The logged out flag is retrieved
-      const loggedOutFlag = PersistentStorageService.getLoggedOutFlag();
-
-      // THEN The logged out flag should be returned
-      expect(loggedOutFlag).toEqual(givenLoggedOutFlag);
-    });
-
-    test("return false if logged out flag is not set", () => {
-      // GIVEN The logged out flag is not stored in the session storage
-      // Nothing set
-
-      // WHEN The logged out flag is retrieved
-      const loggedOutFlag = PersistentStorageService.getLoggedOutFlag();
-
-      // THEN null should be returned
-      expect(loggedOutFlag).toBe(false);
-    });
-
-    test("clear logged out flag", () => {
-      // GIVEN The logged out flag is stored in the session storage
-      const givenLoggedOutFlag = true;
-      PersistentStorageService.setLoggedOutFlag(givenLoggedOutFlag);
-
-      // WHEN The logged out flag is cleared
-      PersistentStorageService.clearLoggedOutFlag();
-
-      // THEN The logged out flag should be cleared (null)
-      const loggedOutFlag = PersistentStorageService.getLoggedOutFlag();
-      expect(loggedOutFlag).toBe(false);
-    });
-
-    test("set logged out flag", () => {
-      // GIVEN The logged out flag is not stored in the session storage
-      const givenLoggedOutFlag = true;
-
-      // WHEN The logged out flag is set
-      PersistentStorageService.setLoggedOutFlag(givenLoggedOutFlag);
-
-      // THEN The logged out flag should be stored
-      const loggedOutFlag = PersistentStorageService.getLoggedOutFlag();
-      expect(loggedOutFlag).toEqual(givenLoggedOutFlag);
-    });
-  });
-
   describe("getItem tests", () => {
     test("should return correct item from localStorage", () => {
       // GIVEN an item is stored in localStorage

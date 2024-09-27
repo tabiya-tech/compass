@@ -5,7 +5,7 @@ import ChatMessageField, { DATA_TEST_ID, CHAT_MESSAGE_MAX_LENGTH, DISALLOWED_CHA
 import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
 import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 
-jest.mock("src/auth/services/socialAuth/SocialAuth.service", () => {
+jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service", () => {
   return {
     __esModule: true,
     default: jest.fn().mockImplementation(() => {

@@ -12,18 +12,11 @@ import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
-import { emailAuthService } from "src/auth/services/emailAuth/EmailAuth.service";
-import { anonymousAuthService } from "src/auth/services/anonymousAuth/AnonymousAuth.service";
-import RegistrationCodeFormModal from "src/invitations/components/RegistrationCodeFormModal/RegistrationCodeFormModal";
-import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
-import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
-import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
-import authStateService from "src/auth/AuthStateService";
-import { TabiyaUser } from "src/auth/auth.types";
+import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
+import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import FeedbackButton from "src/feedback/FeedbackButton";
+import FirebaseInvitationCodeAuthenticationService from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
 
 export const INVITATIONS_PARAM_NAME = "invite-code";
 
@@ -65,9 +58,6 @@ const Login: React.FC = () => {
   const params = new URLSearchParams(location.search);
   const inviteCodeParam = params.get(INVITATIONS_PARAM_NAME);
 
-  const [tempUser, setTempUser] = useState<TabiyaUser | null>(null);
-  const [showRegistrationCodeForm, setShowRegistrationCodeForm] = useState(false);
-
   const [inviteCode, setInviteCode] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -80,8 +70,27 @@ const Login: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
-  // A state to track if the user has been cleared on first render
-  const [isUserCleared, setIsUserCleared] = useState(false);
+  const handleError = useCallback(
+    async (error: Error) => {
+      // if something goes wrong, log the user out
+      const firebaseEmailAuthServiceInstance = await FirebaseEmailAuthService.getInstance();
+      await firebaseEmailAuthServiceInstance.logout();
+
+      let errorMessage;
+      if (error instanceof ServiceError) {
+        errorMessage = getUserFriendlyErrorMessage(error);
+        writeServiceErrorToLog(error, console.error);
+      } else if (error instanceof FirebaseError) {
+        errorMessage = getUserFriendlyFirebaseErrorMessage(error);
+        writeFirebaseErrorToLog(error, console.error);
+      } else {
+        errorMessage = error.message;
+        console.error(error);
+      }
+      enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
+    },
+    [enqueueSnackbar]
+  );
 
   /* ------------------
    * Callbacks to handle changes in the form fields
@@ -102,105 +111,31 @@ const Login: React.FC = () => {
   /* ------------------
    * Callbacks to handle successful logins
    */
-  const handlePostLogin = useCallback(
-    async (user: TabiyaUser) => {
-      try {
-        const prefs = await userPreferencesService.getUserPreferences(user.id);
-        if (prefs === null) {
-          throw new Error("User preferences not found");
-        }
-        // set the local preferences "state" ( for lack of a better word )
-        userPreferencesStateService.setUserPreferences(prefs);
-        if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
-          navigate(routerPaths.DPA, { replace: true });
-        } else {
-          navigate(routerPaths.ROOT, { replace: true });
-          enqueueSnackbar("Welcome back!", { variant: "success" });
-        }
-      } catch (error) {
-        let errorMessage;
-        if (error instanceof ServiceError) {
-          writeServiceErrorToLog(error, console.error);
-          errorMessage = getUserFriendlyErrorMessage(error);
-        } else {
-          errorMessage = (error as Error).message;
-          console.error("An error occurred while trying to get your preferences", error);
-        }
-        enqueueSnackbar(`An error occurred while trying to get your preferences: ${errorMessage}`, {
-          variant: "error",
-        });
+  const handlePostLogin = useCallback(async () => {
+    try {
+      const prefs = userPreferencesStateService.getUserPreferences();
+      // once the user is logged in, we need to get their preferences from the state and
+      // decide, based on the preferences, where to navigate the user
+      if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
+        navigate(routerPaths.DPA, { replace: true });
+      } else {
+        navigate(routerPaths.ROOT, { replace: true });
+        enqueueSnackbar("Welcome back!", { variant: "success" });
       }
-    },
-    [navigate, enqueueSnackbar]
-  );
-
-  /**
-   * A callback to handle what happens after the user has logged in with a social provider
-   * This function is passed to the SocialAuth component, which calls it after a successful login
-   * @param user
-   */
-  const successfulSocialLoginCallback = useCallback(
-    async (user: TabiyaUser) => {
-      setIsLoading(true);
-      try {
-        const prefs = await userPreferencesService.getUserPreferences(user.id);
-        // if the user is not found, it means that the user is new and needs to create user preferences
-        // but first, we need to ask the user for a registration code
-        if (prefs === null) {
-          setTempUser(user);
-          setShowRegistrationCodeForm(true);
-          return;
-        }
-        userPreferencesStateService.setUserPreferences(prefs);
-        await handlePostLogin(user);
-      } catch (error) {
-        let errorMessage;
-        if (error instanceof ServiceError) {
-          errorMessage = getUserFriendlyErrorMessage(error as Error);
-        } else {
-          console.error(error);
-          errorMessage = (error as Error).message;
-        }
-        enqueueSnackbar(errorMessage, { variant: "error" });
-      } finally {
-        setIsLoading(false);
+    } catch (error) {
+      let errorMessage;
+      if (error instanceof ServiceError) {
+        writeServiceErrorToLog(error, console.error);
+        errorMessage = getUserFriendlyErrorMessage(error);
+      } else {
+        errorMessage = (error as Error).message;
+        console.error("An error occurred while trying to get your preferences", error);
       }
-    },
-    [enqueueSnackbar, handlePostLogin]
-  );
-
-  /**
-   * A callback to create user preferences for a user, after they have entered a registration code
-   * We pass this to the RegistrationCodeFormModal component to use after the user has entered a registration code
-   * @param invitationCode
-   */
-  const createUserPreferencesCallback = useCallback(
-    async (invitationCode: string) => {
-      setIsLoading(true);
-      try {
-        const prefs = await userPreferencesService.createUserPreferences({
-          user_id: tempUser?.id!,
-          language: Language.en,
-          invitation_code: invitationCode,
-        });
-        userPreferencesStateService.setUserPreferences(prefs);
-        await handlePostLogin(tempUser!);
-      } catch (error) {
-        let errorMessage;
-        if (error instanceof ServiceError) {
-          errorMessage = getUserFriendlyErrorMessage(error as Error);
-          writeServiceErrorToLog(error, console.error);
-        } else {
-          console.error(error);
-          errorMessage = (error as Error).message;
-        }
-        enqueueSnackbar(errorMessage, { variant: "error" });
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [enqueueSnackbar, handlePostLogin, tempUser]
-  );
+      enqueueSnackbar(`An error occurred while trying to get your preferences: ${errorMessage}`, {
+        variant: "error",
+      });
+    }
+  }, [navigate, enqueueSnackbar]);
 
   /* ------------------
    * Actual login handlers
@@ -214,84 +149,37 @@ const Login: React.FC = () => {
     async (email: string, password: string) => {
       setIsLoading(true);
       try {
-        const token = await emailAuthService.handleLoginWithEmail(email, password);
-        const _user = authStateService.updateUserByToken(token);
-        if (_user) {
-          await handlePostLogin(_user);
-        } else {
-          // if a user cannot be gotten from the token, we have to throw an error
-          throw new Error("Something went wrong while logging in. Please try again.");
-        }
+        const firebaseEmailAuthServiceInstance = await FirebaseEmailAuthService.getInstance();
+        await firebaseEmailAuthServiceInstance.login(email, password);
+        await handlePostLogin();
       } catch (error) {
-        let errorMessage;
-        if (error instanceof ServiceError) {
-          errorMessage = getUserFriendlyErrorMessage(error as Error);
-          writeServiceErrorToLog(error, console.error);
-        } else if (error instanceof FirebaseError) {
-          errorMessage = getUserFriendlyFirebaseErrorMessage(error);
-          writeFirebaseErrorToLog(error, console.error);
-        } else {
-          console.error(error);
-          errorMessage = (error as Error).message;
-        }
-        enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
+        await handleError(error as Error);
       } finally {
         setIsLoading(false);
       }
     },
-    [enqueueSnackbar, handlePostLogin]
+    [handleError, handlePostLogin]
   );
 
   /**
-   * Check if the user was invited
+   * Handle the login with an invitation code
    * @param code
    */
   const handleLoginWithInvitationCode = useCallback(
     async (code: string) => {
       try {
         setIsLoading(true);
-        const invitation = await invitationsService.checkInvitationCodeStatus(code);
-        if (
-          invitation.status !== InvitationStatus.VALID ||
-          invitation.invitation_type !== InvitationType.AUTO_REGISTER
-        ) {
-          throw new Error("Invalid invitation code");
-        }
+        const firebaseInvitationAuthServiceInstance = await FirebaseInvitationCodeAuthenticationService.getInstance();
+        await firebaseInvitationAuthServiceInstance.login(code);
         enqueueSnackbar("Invitation code is valid", { variant: "success" });
-        const token = await anonymousAuthService.handleAnonymousLogin();
-        const _user = authStateService.updateUserByToken(token);
-        if (_user) {
-          // create user preferences for the first time.
-          // in order to do this, there needs to be a logged in user in the persistent storage
-          const prefs = await userPreferencesService.createUserPreferences({
-            user_id: _user.id,
-            invitation_code: invitation.invitation_code,
-            language: Language.en,
-          });
-          userPreferencesStateService.setUserPreferences(prefs);
-          await handlePostLogin(_user);
-        } else {
-          // if a user cannot be gotten from the token, we have to throw an error
-          throw new Error("User not found");
-        }
+        await handlePostLogin();
       } catch (error) {
-        let errorMessage;
-        if (error instanceof ServiceError) {
-          writeServiceErrorToLog(error, console.error);
-          errorMessage = getUserFriendlyErrorMessage(error as Error);
-        } else if (error instanceof FirebaseError) {
-          writeFirebaseErrorToLog(error, console.error);
-          errorMessage = getUserFriendlyFirebaseErrorMessage(error);
-        } else {
-          console.error(error);
-          errorMessage = (error as Error).message;
-        }
-        enqueueSnackbar(errorMessage, { variant: "error" });
+        await handleError(error as Error);
       } finally {
         setIsLoading(false);
       }
     },
-    [enqueueSnackbar, handlePostLogin]
+    [enqueueSnackbar, handleError, handlePostLogin]
   );
 
   /**
@@ -338,23 +226,10 @@ const Login: React.FC = () => {
   }, [activeLoginForm]);
 
   /**
-   * Clear the user on mount
-   */
-  useEffect(() => {
-    const clearUser = async () => {
-      console.debug("Login: Clearing user on mount");
-      await authStateService.clearUser();
-      setIsUserCleared(true);
-    };
-
-    clearUser();
-  }, []);
-
-  /**
    * Check if the user was invited with an invitation code in the URL
    */
   useEffect(() => {
-    if (isUserCleared && inviteCodeParam) {
+    if (inviteCodeParam) {
       handleLoginWithInvitationCode(inviteCodeParam);
       // Remove the invite code from the URL
       const newSearchParams = new URLSearchParams(location.search);
@@ -367,7 +242,7 @@ const Login: React.FC = () => {
         { replace: true }
       );
     }
-  }, [isUserCleared, inviteCodeParam, handleLoginWithInvitationCode, location, navigate]);
+  }, [inviteCodeParam, handleLoginWithInvitationCode, location, navigate]);
 
   /* ------------------
    * aggregated states for loading and disabling ui
@@ -399,7 +274,6 @@ const Login: React.FC = () => {
               inviteCode={inviteCode}
               notifyOnInviteCodeChanged={handleInviteCodeChanged}
               isDisabled={isLoading}
-              notifyOnFocused={() => {}} //TODO: remove this
             />
             <Divider textAlign="center" style={{ width: "100%" }}>
               <Typography
@@ -444,8 +318,7 @@ const Login: React.FC = () => {
           </Box>
           <SocialAuth
             disabled={false}
-            preLoginCheck={() => true} // no checks need to happen before logging in with social providers
-            postLoginHandler={successfulSocialLoginCallback}
+            postLoginHandler={handlePostLogin}
             isLoading={isLoading}
             notifyOnLoading={notifyOnSocialLoading}
           />
@@ -462,11 +335,6 @@ const Login: React.FC = () => {
             </StyledNavLink>
           </Typography>
         </Box>
-        <RegistrationCodeFormModal
-          show={showRegistrationCodeForm}
-          onSuccess={createUserPreferencesCallback}
-          onClose={() => setShowRegistrationCodeForm(false)}
-        />
         <FeedbackButton bottomAlign={true} />
       </Container>
       <Backdrop isShown={isLoading} message={"Logging you in..."} />

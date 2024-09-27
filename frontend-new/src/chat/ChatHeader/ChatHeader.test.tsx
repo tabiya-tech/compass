@@ -40,7 +40,7 @@ jest.mock("react-router-dom", () => {
 });
 
 // mock the SocialAuthServices
-jest.mock("src/auth/services/socialAuth/SocialAuth.service", () => {
+jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service", () => {
   return {
     __esModule: true,
     default: jest.fn().mockImplementation(() => {
