@@ -5,10 +5,8 @@ import { HashRouter } from "react-router-dom";
 import Login, { DATA_TEST_ID } from "./Login";
 import LoginWithEmailForm from "src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm";
 import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm";
-import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
-import { EmailAuthService } from "src/auth/services/emailAuth/EmailAuth.service";
-import { AnonymousAuthService } from "src/auth/services/anonymousAuth/AnonymousAuth.service";
-import InvitationsService from "src/invitations/InvitationsService/invitations.service";
+import FirebaseEmailAuthenticationService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
+import FirebaseInvitationCodeAuthenticationService from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
 
 jest.mock("src/envService", () => ({
   getFirebaseAPIKey: jest.fn(() => "mock-api-key"),
@@ -23,6 +21,19 @@ jest.mock("src/auth/components/SocialAuth/SocialAuth", () => {
     __esModule: true,
     default: jest.fn().mockImplementation(() => {
       return <span data-testid={actual.DATA_TEST_ID.FIREBASE_AUTH_CONTAINER}></span>;
+    }),
+  };
+});
+
+jest.mock("src/auth/services/Authentication.service.factory", () => {
+  const actual = jest.requireActual("src/auth/services/Authentication.service.factory");
+  return {
+    ...actual,
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return {
+        login: jest.fn(),
+      };
     }),
   };
 });
@@ -74,14 +85,7 @@ jest.mock("./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm", () => 
 });
 
 describe("Testing Login component", () => {
-  let emailAuthService: EmailAuthService;
-  let anonymousAuthService: AnonymousAuthService;
-  let invitationsService: InvitationsService;
-
   beforeEach(() => {
-    emailAuthService = EmailAuthService.getInstance();
-    anonymousAuthService = AnonymousAuthService.getInstance();
-    invitationsService = InvitationsService.getInstance();
     jest.useFakeTimers(); // Use Jest's fake timers
     jest.clearAllMocks();
   });
@@ -114,13 +118,10 @@ describe("Testing Login component", () => {
     const givenPassword = "Pa$$word123";
 
     // AND the email login mock will succeed
-    const handleLoginWithEmailSpy = jest
-      .spyOn(emailAuthService, "handleLoginWithEmail")
-      // @ts-ignore
-      .mockImplementation((email, password, onSuccess, onError) => {
-        // @ts-ignore
-        onSuccess();
-      });
+    const loginMock = jest.fn();
+    jest.spyOn(FirebaseEmailAuthenticationService, "getInstance").mockReturnValue({
+      login: loginMock,
+    } as unknown as FirebaseEmailAuthenticationService);
 
     render(
       <HashRouter>
@@ -129,7 +130,7 @@ describe("Testing Login component", () => {
     );
 
     // WHEN the user fills in their email and password
-    await act(() => {
+    act(() => {
       (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnEmailChanged(givenEmail);
       (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnPasswordChanged(givenPassword);
     });
@@ -139,23 +140,18 @@ describe("Testing Login component", () => {
 
     // THEN the loginWithEmail function should be called with the correct arguments
     await waitFor(() => {
-      expect(handleLoginWithEmailSpy).toHaveBeenCalledWith(givenEmail, givenPassword);
+      expect(loginMock).toHaveBeenCalledWith(givenEmail, givenPassword);
     });
   });
 
   test("it should handle invitation code login correctly", async () => {
-    // AND the invitation code mock will succeed
-    const handleCheckInvitationStatusSpy = jest
-      .spyOn(invitationsService, "checkInvitationCodeStatus")
-      .mockResolvedValue({
-        invitation_code: "INVITE-CODE-123",
-        status: InvitationStatus.VALID,
-        invitation_type: InvitationType.AUTO_REGISTER,
-      });
+    // GIVEN an invitation code
+    const givenInvitationCode = "INVITE-CODE-123";
     // AND the anonymous auth mock will succeed
-    const handleAnonymousLoginSpy = jest
-      .spyOn(anonymousAuthService, "handleAnonymousLogin")
-      .mockResolvedValue("mock-token");
+    const anonymousLoginMock = jest.fn().mockResolvedValue("mock-token");
+    jest.spyOn(FirebaseInvitationCodeAuthenticationService, "getInstance").mockReturnValue({
+      login: anonymousLoginMock,
+    } as unknown as FirebaseInvitationCodeAuthenticationService);
 
     render(
       <HashRouter>
@@ -165,20 +161,15 @@ describe("Testing Login component", () => {
 
     // WHEN the user fills in their invitation code
     await act(() => {
-      (LoginWithInviteCodeForm as jest.Mock).mock.calls[0][0].notifyOnInviteCodeChanged("INVITE-CODE-123");
+      (LoginWithInviteCodeForm as jest.Mock).mock.calls[0][0].notifyOnInviteCodeChanged(givenInvitationCode);
     });
 
     // AND clicks the login button
     fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
 
-    // THEN the checkInvitationStatus function should be called with the correct arguments
-    await waitFor(() => {
-      expect(handleCheckInvitationStatusSpy).toHaveBeenCalledWith("INVITE-CODE-123");
-    });
-
     // AND the anonymousAuthService should be called with the correct arguments
     await waitFor(() => {
-      expect(handleAnonymousLoginSpy).toHaveBeenCalledWith();
+      expect(anonymousLoginMock).toHaveBeenCalledWith(givenInvitationCode);
     });
   });
 });

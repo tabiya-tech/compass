@@ -1,6 +1,8 @@
-import { socialAuthService } from "src/auth/services/socialAuth/SocialAuth.service";
-import { FirebaseError } from "src/error/FirebaseError/firebaseError";
+// mock noisy console
+import "src/_test_utilities/consoleMock";
+import FirebaseSocialAuthService from "src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
 import firebase from "firebase/compat/app";
+import authenticationStateService from "src/auth/services/AuthenticationState.service";
 
 jest.mock("firebase/compat/app", () => {
   return {
@@ -8,6 +10,7 @@ jest.mock("firebase/compat/app", () => {
     auth: jest.fn().mockReturnValue({
       signOut: jest.fn(),
       signInWithPopup: jest.fn(),
+      onAuthStateChanged: jest.fn(),
     }),
   };
 });
@@ -27,8 +30,18 @@ jest.mock("firebaseui", () => {
   };
 });
 
+jest.mock("src/userPreferences/UserPreferencesService/userPreferences.service", () => {
+  return {
+    userPreferencesService: {
+      getUserPreferences: jest.fn(),
+    },
+  };
+});
+
 describe("SocialAuthService class tests", () => {
-  beforeEach(() => {
+  let authService: FirebaseSocialAuthService;
+  beforeEach(async () => {
+    authService = await FirebaseSocialAuthService.getInstance();
     // @ts-ignore
     firebase.auth.GoogleAuthProvider = class {
       static PROVIDER_ID = "google.com";
@@ -39,18 +52,35 @@ describe("SocialAuthService class tests", () => {
     jest.clearAllMocks();
   });
 
+  test("should construct a singleton", async () => {
+    // WHEN the singleton is constructed
+    const instance = await FirebaseSocialAuthService.getInstance();
+
+    // THEN the instance should be defined
+    expect(instance).toBeDefined();
+
+    // AND WHEN the singleton is constructed again
+    const newInstance = await FirebaseSocialAuthService.getInstance();
+
+    // THEN the instance should be the same as the first instance
+    expect(newInstance).toBe(instance);
+  });
+
   describe("handleLoginWithGoogle", () => {
+    const givenUser = { id: "123", name: "Foo Bar ", email: "email" };
     test("should handle Google login successfully", async () => {
       // GIVEN the Firebase UI is initialized
       const mockUser = { multiFactor: { user: { accessToken: "mockAccessToken" } } };
       // @ts-ignore
       jest.spyOn(firebase.auth(), "signInWithPopup").mockResolvedValueOnce({ user: mockUser });
+      // AND the token is decoded into a user
+      jest.spyOn(authenticationStateService.getInstance(), "getUser").mockReturnValue(givenUser);
 
       // WHEN the Google login is attempted
-      const socialLoginCalback = async () => await socialAuthService.handleLoginWithGoogle();
+      const socialLoginCallback = async () => await authService.loginWithGoogle();
 
       // THEN the token should be returned
-      await expect(socialLoginCalback()).resolves.toEqual(mockUser.multiFactor.user.accessToken);
+      await expect(socialLoginCallback()).resolves.toEqual(mockUser.multiFactor.user.accessToken);
     });
 
     test("should throw an error if user is not found during sign-in", async () => {
@@ -59,39 +89,10 @@ describe("SocialAuthService class tests", () => {
       jest.spyOn(firebase.auth(), "signInWithPopup").mockResolvedValueOnce({ user: { multiFactor: { user: {} } } });
 
       // WHEN the Google login is attempted
-      const socialLoginCallback = async () => await socialAuthService.handleLoginWithGoogle();
+      const socialLoginCallback = async () => await authService.loginWithGoogle();
 
       // THEN the error should be thrown
       await expect(socialLoginCallback()).rejects.toThrow("The user could not be found");
-    });
-  });
-
-  describe("handleLogout", () => {
-    test("should handle user logout successfully", async () => {
-      // GIVEN the user is logged in
-      jest.spyOn(firebase.auth(), "signOut").mockResolvedValueOnce(undefined);
-
-      // WHEN the logout is attempted
-      const socialAuthCallback = async () => await socialAuthService.handleLogout();
-
-      // THEN the success callback should be called
-      await expect(socialAuthCallback()).resolves.toBeUndefined();
-    });
-
-    test("should call failureCallback on logout error", async () => {
-      // GIVEN the user is logged in
-      const mockError = {
-        code: "auth/internal-error",
-        message: "Internal error",
-      };
-
-      jest.spyOn(firebase.auth(), "signOut").mockRejectedValueOnce(mockError);
-
-      // WHEN the logout is attempted
-      const socialAuthCallback = async () => await socialAuthService.handleLogout();
-
-      // THEN the success callback should not be called
-      await expect(socialAuthCallback()).rejects.toEqual(expect.any(FirebaseError));
     });
   });
 });

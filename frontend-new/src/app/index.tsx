@@ -9,11 +9,13 @@ import NotFound from "src/errorPage/ErrorPage";
 import ProtectedRoute from "src/app/ProtectedRoute/ProtectedRoute";
 import { routerPaths } from "src/app/routerPaths";
 import React, { useEffect, useState } from "react";
-import authStateService from "src/auth/AuthStateService";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
+import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
+import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 
 import * as Sentry from "@sentry/react";
+import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
+import { PersistentStorageService } from "./PersistentStorageService/PersistentStorageService";
 
 // Wrap the createHashRouter function with Sentry to capture errors that occur during router initialization
 const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouter(createHashRouter);
@@ -35,43 +37,53 @@ const ProtectedRouteKeys = {
 const App = () => {
   const [loading, setLoading] = useState(true);
 
+  const loadApplicationState = async () => {
+    try {
+      const authenticationServiceInstance = AuthenticationServiceFactory.getCurrentAuthenticationService();
+      const token = PersistentStorageService.getToken();
+
+      if (!authenticationServiceInstance || !token) {
+        console.debug("No authentication service instance found. User is not logged in");
+        // Clear the user state on app start if there is no authentication service instance or token
+        await AuthenticationServiceFactory.resetAuthenticationState();
+        return;
+      }
+
+      const user = authenticationServiceInstance.getUser(token);
+      if (!authenticationServiceInstance.isTokenValid(token) || !user) {
+        console.debug("Authentication token is not valid or user could not be extracted from token");
+        await authenticationServiceInstance.logout();
+        return;
+      }
+      console.debug("Valid token found in storage");
+      AuthenticationStateService.getInstance().setUser(user);
+
+      console.debug("User authenticated: Welcome,", user.email);
+      await userPreferencesStateService.loadPreferences(user.id);
+      // check if user preferences have been loaded
+      const preferences = userPreferencesStateService.getUserPreferences();
+      console.debug("User preferences loaded", preferences);
+    } catch (error) {
+      console.error("Error initializing authentication and user preferences state", error);
+      await AuthenticationServiceFactory.resetAuthenticationState();
+    }
+  };
+
   useEffect(() => {
     const initializeAuth = async () => {
       setLoading(true);
-      try {
-        await authStateService.loadUser();
-        const user = authStateService.getUser();
-        if (user) {
-          console.debug("User authenticated: Welcome,", user.email);
-          try {
-            await userPreferencesStateService.loadPreferences(user.id);
-            // check if user preferences have been loaded
-            const preferences = userPreferencesStateService.getUserPreferences();
-            console.debug("User preferences loaded", preferences);
-            // delay for half a sec so that the loading transition is smoother for the user and not just a flash
-            setTimeout(() => setLoading(false), 500);
-          } catch (error) {
-            console.error("Error loading user preferences", error);
-            // delay for half a sec so that the loading transition is smoother for the user and not just a flash
-            setTimeout(() => setLoading(false), 500);
-          }
-        } else {
-          console.debug("User not authenticated");
-          // delay for half a sec so that the loading transition is smoother for the user and not just a flash
-          setTimeout(() => setLoading(false), 500);
+      await loadApplicationState();
+      setTimeout(() => setLoading(false), 500); // delay for half a sec so that the loading transition is smoother for the user and not just a flash
+      return async () => {
+        const currentAuthenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
+        try {
+          console.debug("Cleaning up auth");
+          // Each of the services that implement the AuthenticationService interface will have their own cleanup method
+          // they may use this method to clean up any resources they have allocated on component unmount
+          currentAuthenticationService!.cleanup();
+        } catch (error) {
+          console.error("Error cleaning up auth", error);
         }
-      } catch (error) {
-        console.error("Error initializing auth", error);
-        // delay for half a sec so that the loading transition is smoother for the user and not just a flash
-        setTimeout(() => setLoading(false), 500);
-      }
-
-      const unsubscribe = authStateService.setupAuthListener();
-
-      return () => {
-        console.debug("Cleaning up auth");
-        unsubscribe();
-        authStateService.clearRefreshTimeout();
       };
     };
 

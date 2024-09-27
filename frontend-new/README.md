@@ -59,6 +59,10 @@ yarn start
 
 The server will run on port 3000, and you can preview the application in your browser by visiting [http://localhost:3000](http://localhost:3000).
 
+## Authentication
+
+The application currently uses Firebase for authentication. To read further about the authentication process, please refer to the [Authentication Hierarchy Documentation](authenticationHierarchyDoc.md).
+
 ## Storybook
 
 We use Storybook to test and demonstrate components in the browser. To run Storybook, execute the following command:
