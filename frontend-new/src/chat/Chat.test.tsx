@@ -281,25 +281,25 @@ describe("Chat", () => {
           expect.objectContaining({
             messages: [
               {
-                id: expect.any(Number),
+                id: expect.any(String),
                 sender: ConversationMessageSender.USER,
                 message: "",
                 sent_at: expect.any(String),
               },
               {
-                id: expect.any(Number),
+                id: expect.any(String),
                 sender: ConversationMessageSender.COMPASS,
                 message: "Hello, I'm Compass",
                 sent_at: expect.any(String),
               },
               {
-                id: expect.any(Number),
+                id: expect.any(String),
                 sender: ConversationMessageSender.USER,
                 message: "Hi, Compass, I'm foo",
                 sent_at: expect.any(String),
               },
               {
-                id: expect.any(Number),
+                id: expect.any(String),
                 sender: ConversationMessageSender.COMPASS,
                 message: "Hello foo, would you like to begin your skill exploration session?",
                 sent_at: expect.any(String),
@@ -374,13 +374,13 @@ describe("Chat", () => {
           expect.objectContaining({
             messages: [
               {
-                id: expect.any(Number),
+                id: expect.any(String),
                 sender: ConversationMessageSender.USER,
                 message: "Test message",
                 sent_at: expect.any(String),
               },
               {
-                id: expect.any(Number),
+                id: expect.any(String),
                 sender: ConversationMessageSender.COMPASS,
                 message: "Hello, I'm Compass",
                 sent_at: expect.any(String),
@@ -421,13 +421,13 @@ describe("Chat", () => {
           expect.objectContaining({
             messages: expect.arrayContaining([
               {
-                id: expect.any(Number),
+                id: expect.any(String),
                 sender: ConversationMessageSender.USER,
                 message: "Test message",
                 sent_at: expect.any(String),
               },
               {
-                id: expect.any(Number),
+                id: expect.any(String),
                 sender: ConversationMessageSender.COMPASS,
                 message: "I'm sorry, Something seems to have gone wrong on my end... Can you repeat that?",
                 sent_at: expect.any(String),
