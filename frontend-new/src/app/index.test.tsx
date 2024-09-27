@@ -6,9 +6,11 @@ import { render, screen } from "src/_test_utilities/test-utils";
 import { HashRouter } from "react-router-dom";
 import { unmockBrowserIsOnLine, mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { DEFAULT_SNACKBAR_AUTO_HIDE_DURATION, useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import FirebaseEmailAuthenticationService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
+import * as FirebaseAuthenticationFactoryModule from "src/auth/services/Authentication.service.factory";
 
 // mock the SocialAuthService
-jest.mock("src/auth/services/socialAuth/SocialAuth.service", () => {
+jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service", () => {
   return {
     __esModule: true,
     default: jest.fn().mockImplementation(() => {
@@ -66,6 +68,11 @@ describe("main compass app test", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     unmockBrowserIsOnLine();
+    // Mock the authenticationServiceFactory to return a mock instance
+    // in this case firebaseEmailAuthenticationService
+    jest
+      .spyOn(FirebaseAuthenticationFactoryModule, "default")
+      .mockReturnValue(FirebaseEmailAuthenticationService.getInstance());
   });
 
   test("should render app successfully", () => {

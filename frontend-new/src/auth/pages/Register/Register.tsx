@@ -8,20 +8,13 @@ import RegisterWithEmailForm from "src/auth/pages/Register/components/RegisterWi
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
-import { emailAuthService } from "src/auth/services/emailAuth/EmailAuth.service";
-import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
-import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
-import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
-import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
-import { logoutService } from "src/auth/services/logout/logout.service";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
-import { StatusCodes } from "http-status-codes";
-import authStateService from "src/auth/AuthStateService";
-import { TabiyaUser } from "src/auth/auth.types";
+import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import FeedbackButton from "src/feedback/FeedbackButton";
+import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -63,6 +56,23 @@ const Register: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
+  const handleError = useCallback(async (error: Error) => {
+    // if the registration code is not valid or something goes wrong, log the user out
+    await AuthenticationServiceFactory.getAuthenticationService().logout();
+    let errorMessage;
+    if (error instanceof ServiceError) {
+      writeServiceErrorToLog(error, console.error);
+      errorMessage = getUserFriendlyErrorMessage(error);
+    } else if (error instanceof FirebaseError) {
+      writeFirebaseErrorToLog(error, console.error);
+      errorMessage = getUserFriendlyFirebaseErrorMessage(error);
+    } else {
+      console.error(error);
+      errorMessage = error.message;
+    }
+    enqueueSnackbar(`Registration Failed: ${errorMessage}`, { variant: "error" });
+  }, [enqueueSnackbar]);
+
   /* -----------
    * callbacks to pass to the child components
    */
@@ -71,46 +81,14 @@ const Register: React.FC = () => {
   };
 
   /**
-   * Check if the invitation code is valid
-   * @returns {Promise<boolean>} - true if the invitation code is valid, false otherwise
-   */
-  const isInvitationCodeValid = useCallback(async (): Promise<boolean> => {
-    try {
-      // Call the service method and use callbacks to determine the result
-      const invitation = await invitationsService.checkInvitationCodeStatus(registrationCode);
-      if (invitation.status === InvitationStatus.INVALID || invitation.invitation_type !== InvitationType.REGISTER) {
-        console.error("Invalid registration code");
-        enqueueSnackbar("Invalid registration code", { variant: "error" });
-        return false;
-      }
-      return true;
-    } catch (e) {
-      let errorMessage;
-      if (e instanceof ServiceError) {
-        writeServiceErrorToLog(e, console.error);
-        errorMessage = getUserFriendlyErrorMessage(e as Error);
-      } else {
-        console.error(e);
-        errorMessage = (e as Error).message;
-      }
-      enqueueSnackbar(errorMessage, { variant: "error" });
-      return false;
-    }
-  }, [enqueueSnackbar, registrationCode]);
-
-  /**
    * Handles what happens after social registration (same process as login)
    * @param user
    */
   const handlePostLogin = useCallback(
-    async (user: TabiyaUser) => {
+    async () => {
       try {
         setIsLoading(true);
-        const prefs = await userPreferencesService.getUserPreferences(user.id);
-        if (prefs === null) {
-          throw new Error("User preferences not found");
-        }
-        userPreferencesStateService.setUserPreferences(prefs);
+        const prefs = userPreferencesStateService.getUserPreferences();
         if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
           navigate(routerPaths.DPA, { replace: true });
         } else {
@@ -118,22 +96,12 @@ const Register: React.FC = () => {
           enqueueSnackbar("Welcome back!", { variant: "success" });
         }
       } catch (error) {
-        let errorMessage;
-        if (error instanceof ServiceError) {
-          writeServiceErrorToLog(error, console.error);
-          errorMessage = getUserFriendlyErrorMessage(error);
-        } else {
-          errorMessage = (error as Error).message;
-          console.error("An error occurred while trying to get your preferences", error);
-        }
-        enqueueSnackbar(`An error occurred while trying to get your preferences: ${errorMessage}`, {
-          variant: "error",
-        });
+        await handleError(error as Error);
       } finally {
         setIsLoading(false);
       }
     },
-    [navigate, enqueueSnackbar]
+    [navigate, enqueueSnackbar, handleError]
   );
 
   /* ------------
@@ -149,56 +117,22 @@ const Register: React.FC = () => {
     async (name: string, email: string, password: string) => {
       setIsLoading(true);
       try {
-        // check if the invitation code is valid before proceeding with the registration
-        const pass = await isInvitationCodeValid();
+        await FirebaseEmailAuthService.getInstance().register(email, password, name, registrationCode);
+        enqueueSnackbar("Verification Email Sent!", { variant: "success" });
+        // IMPORTANT NOTE: after the preferences are added, or fail to be added, we should log the user out immediately,
+        // since if we don't do that, the user may be able to access the application without verifying their email
+        // or accepting the dpa.
+        await AuthenticationServiceFactory.getAuthenticationService().logout();
 
-        if (!pass) {
-          setIsLoading(false);
-          return;
-        }
-        const token = await emailAuthService.handleRegisterWithEmail(email, password, name);
-        const _user = authStateService.updateUserByToken(token);
-        if (_user) {
-          // create user preferences for the first time.
-          // in order to do this, there needs to be a logged in user in the persistent storage
-          const prefs = await userPreferencesService.createUserPreferences({
-            user_id: _user.id,
-            invitation_code: registrationCode,
-            language: Language.en,
-          });
-          userPreferencesStateService.setUserPreferences(prefs);
-          enqueueSnackbar("Verification Email Sent!", { variant: "success" });
-          // IMPORTANT NOTE: after the preferences are added, or fail to be added, we should log the user out immediately,
-          // since if we don't do that, the user may be able to access the application without verifying their email
-          // or accepting the dpa.
-          await logoutService.handleLogout();
-          userPreferencesStateService.clearUserPreferences();
-          await authStateService.clearUser();
-
-          // navigate to the verify email page
-          navigate(routerPaths.VERIFY_EMAIL, { replace: true });
-        } else {
-          // if a user cannot be gotten from the token, we should throw an error
-          throw new Error("Something went wrong while registering. Please try again.");
-        }
-      } catch (e: any) {
-        let errorMessage;
-        if (e instanceof ServiceError) {
-          writeServiceErrorToLog(e, console.error);
-          errorMessage = getUserFriendlyErrorMessage(e as Error);
-        } else if (e instanceof FirebaseError) {
-          writeFirebaseErrorToLog(e, console.error);
-          errorMessage = getUserFriendlyFirebaseErrorMessage(e);
-        } else {
-          console.error(e);
-          errorMessage = (e as Error).message;
-        }
-        enqueueSnackbar(`Registration Failed: ${errorMessage}`, { variant: "error" });
+        // navigate to the verify email page
+        navigate(routerPaths.VERIFY_EMAIL, { replace: true });
+      } catch (e) {
+        await handleError(e as Error);
       } finally {
         setIsLoading(false);
       }
     },
-    [navigate, enqueueSnackbar, setIsLoading, isInvitationCodeValid, registrationCode]
+    [navigate, enqueueSnackbar, setIsLoading, registrationCode, handleError]
   );
 
   /**
@@ -207,43 +141,6 @@ const Register: React.FC = () => {
   const notifyOnSocialLoading = useCallback((socialAuthLoading: boolean) => {
     setIsLoading(socialAuthLoading);
   }, []);
-
-  /**
-   * A callback to handle what to do after a social registration
-   * we pass this to the SocialAuth component which will call it after a successful social registration
-   * */
-  const successfulSocialRegistrationCallback = async (user: TabiyaUser) => {
-    setIsLoading(true);
-    try {
-      // create user preferences for the first time.
-      const prefs = await userPreferencesService.createUserPreferences({
-        user_id: user.id,
-        invitation_code: registrationCode,
-        language: Language.en,
-      });
-      userPreferencesStateService.setUserPreferences(prefs);
-      // We use postLoginHandler because a social registration is parallel to a login
-      // and the postLoginHandler is used to handle the post login actions
-      await handlePostLogin(user);
-    } catch (e: unknown) {
-      let errorMessage;
-      if (e instanceof ServiceError) {
-        // if the user preferences already exist, we should just log the user in
-        if (e.statusCode === StatusCodes.CONFLICT) {
-          await handlePostLogin(user);
-          return;
-        }
-        errorMessage = getUserFriendlyErrorMessage(e as Error);
-        writeServiceErrorToLog(e, console.error);
-      } else {
-        console.error(e);
-        errorMessage = (e as Error).message;
-      }
-      enqueueSnackbar(`Failed to create preferences: ${errorMessage}`, { variant: "error" });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <>
@@ -279,12 +176,12 @@ const Register: React.FC = () => {
             isRegistering={isLoading}
           />
           <SocialAuth
-            preLoginCheck={isInvitationCodeValid}
-            postLoginHandler={successfulSocialRegistrationCallback}
+            postLoginHandler={handlePostLogin}
             isLoading={isLoading}
             disabled={!registrationCode}
             label={"Sign up with Google"}
             notifyOnLoading={notifyOnSocialLoading}
+            registrationCode={registrationCode}
           />
           <Typography variant="body2" data-testid={DATA_TEST_ID.LOGIN_LINK}>
             Already have an account?{" "}

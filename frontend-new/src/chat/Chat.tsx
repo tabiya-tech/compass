@@ -11,7 +11,7 @@ import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceErro
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
+import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { ConversationMessage, ConversationMessageSender, ConverstaionResponse } from "./ChatService/ChatService.types";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import ExperiencesDrawer from "src/Experiences/ExperiencesDrawer";
@@ -19,10 +19,10 @@ import { Experience } from "src/Experiences/ExperienceService/Experiences.types"
 import ExperienceService from "src/Experiences/ExperienceService/ExperienceService";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import InactiveBackdrop from "src/theme/Backdrop/InactiveBackdrop";
-import { logoutService } from "src/auth/services/logout/logout.service";
 import ApproveModal from "src/theme/ApproveModal/ApproveModal";
-import authStateService from "src/auth/AuthStateService";
+import authStateService from "src/auth/services/AuthenticationState.service";
 import { SnackbarKey } from "notistack";
+import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 
 const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -54,7 +54,7 @@ const Chat: React.FC<ChatProps> = ({
   const [messages, setMessages] = useState<IChatMessage[]>([]);
   const [conversationCompleted, setConversationCompleted] = useState<boolean>(false);
   const [exploredExperiences, setExploredExperiences] = useState<number>(0);
-  const [conversationConductedAt, setconversationConductedAt] = useState<string | null>(null);
+  const [conversationConductedAt, setConversationConductedAt] = useState<string | null>(null);
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
@@ -160,7 +160,7 @@ const Chat: React.FC<ChatProps> = ({
         setIsTyping(true);
         const response = await chatService.sendMessage(userMessage);
         setConversationCompleted(response.conversation_completed);
-        setconversationConductedAt(response.conversation_conducted_at);
+        setConversationConductedAt(response.conversation_conducted_at);
 
         if (response.experiences_explored > exploredExperiences) {
           showNewExperienceAlertHandler(response);
@@ -192,11 +192,7 @@ const Chat: React.FC<ChatProps> = ({
     setIsLoggingOut(true);
     try {
       // Call the logout service to handle the logout based on the current login method
-      await logoutService.handleLogout();
-      // clear the user from the context, and the persistent storage
-      await authStateService.clearUser();
-      // clear the userPreferences from the "state"
-      userPreferencesStateService.clearUserPreferences();
+      await AuthenticationServiceFactory.getAuthenticationService().logout();
       navigate(routerPaths.LOGIN, { replace: true });
       enqueueSnackbar("Successfully logged out.", { variant: "success" });
     } catch (error) {
@@ -242,7 +238,7 @@ const Chat: React.FC<ChatProps> = ({
         }
 
         setConversationCompleted(history.conversation_completed);
-        setconversationConductedAt(history.conversation_conducted_at);
+        setConversationConductedAt(history.conversation_conducted_at);
 
         setMessages(
           history.messages.map((message: ConversationMessage) =>

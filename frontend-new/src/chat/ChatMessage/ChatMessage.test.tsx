@@ -7,7 +7,7 @@ import * as GetDurationFromNow from "src/utils/getDurationFromNow/getDurationFro
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
 
-jest.mock("src/auth/services/socialAuth/SocialAuth.service", () => {
+jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service", () => {
   return {
     __esModule: true,
     default: jest.fn().mockImplementation(() => {

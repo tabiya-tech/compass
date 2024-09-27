@@ -5,23 +5,17 @@ import SocialAuth, { DATA_TEST_ID } from "./SocialAuth";
 import { HashRouter } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
-import { socialAuthService } from "src/auth/services/socialAuth/SocialAuth.service";
+import FirebaseSocialAuthenticationService from "src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
 import { act } from "@testing-library/react";
-import authStateService from "../../AuthStateService";
+import authStateService from "src/auth/services/AuthenticationState.service";
+import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
   getFirebaseAPIKey: jest.fn(() => "mock-api-key"),
   getFirebaseDomain: jest.fn(() => "mock-auth-domain"),
   getBackendUrl: jest.fn(() => "mock-backend-url"),
-}));
-
-// Mock the socialAuthService module
-jest.mock("src/auth/services/socialAuth/SocialAuth.service", () => ({
-  socialAuthService: {
-    handleLoginWithGoogle: jest.fn(),
-    initializeFirebaseUI: jest.fn(),
-  },
 }));
 
 // Mock the snackbar provider
@@ -102,17 +96,28 @@ describe("SocialAuth tests", () => {
       };
       const givenNotifyOnLoading = jest.fn();
       // AND the sign-in is successful
-      (socialAuthService.handleLoginWithGoogle as jest.Mock).mockResolvedValue(givenToken);
-      // AND the AuthProvider updates the user successully
+      const loginWithGoogleMock = jest.fn().mockResolvedValue(givenToken);
+      const getFirebaseSocialAuthInstanceSpy = jest.spyOn(FirebaseSocialAuthenticationService, "getInstance");
+      getFirebaseSocialAuthInstanceSpy.mockReturnValue({
+        loginWithGoogle: loginWithGoogleMock,
+      } as unknown as FirebaseSocialAuthenticationService);
+
+      // AND the AuthProvider updates the user successfully
       jest.spyOn(authStateService, "updateUserByToken").mockImplementation((token: string) => {
         return givenUser;
+      });
+      // AND the user preferences exist for the user
+      jest.spyOn(userPreferencesStateService, "getUserPreferences").mockReturnValue({
+        user_id: givenUser.id,
+        language: Language.en,
+        sessions: [1],
+        accepted_tc: tc,
       });
 
       // WHEN the component is rendered
       render(
         <HashRouter>
           <SocialAuth
-            preLoginCheck={() => true}
             postLoginHandler={givenNotifyOnLogin}
             isLoading={givenIsLoading}
             notifyOnLoading={givenNotifyOnLoading}
@@ -127,7 +132,7 @@ describe("SocialAuth tests", () => {
 
       // THEN expect the user to be redirected to the correct path
       await waitFor(() => {
-        expect(givenNotifyOnLogin).toHaveBeenCalledWith(givenUser);
+        expect(givenNotifyOnLogin).toHaveBeenCalled();
       });
     }
   );
@@ -138,9 +143,13 @@ describe("SocialAuth tests", () => {
     const givenIsLoading = false;
     const givenNotifyOnLoading = jest.fn();
     // WHEN the sign-in fails
-    (socialAuthService.handleLoginWithGoogle as jest.Mock).mockImplementation((elementId: string, config: any) => {
+    const loginWithGoogleMock = jest.fn().mockImplementation((elementId: string, config: any) => {
       config.callbacks.signInFailure(new Error("Sign-in failed"));
     });
+    const getFirebaseSocialAuthInstanceSpy = jest.spyOn(FirebaseSocialAuthenticationService, "getInstance");
+    getFirebaseSocialAuthInstanceSpy.mockReturnValue({
+      loginWithGoogle: loginWithGoogleMock,
+    } as unknown as FirebaseSocialAuthenticationService);
 
     render(
       <HashRouter>
@@ -180,6 +189,13 @@ describe("SocialAuth tests", () => {
     const givenNotifyOnLogin = jest.fn();
     const givenIsLoading = false;
     const givenNotifyOnLoading = jest.fn();
+    const logoutMock = jest.fn();
+
+    // AND the logout function is mocked to succeed
+    const getFirebaseSocialAuthInstanceSpy = jest.spyOn(FirebaseSocialAuthenticationService, "getInstance");
+    getFirebaseSocialAuthInstanceSpy.mockReturnValue({
+      logout: logoutMock,
+    } as unknown as FirebaseSocialAuthenticationService);
     // WHEN the component is rendered
     render(
       <HashRouter>

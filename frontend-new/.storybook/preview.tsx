@@ -16,7 +16,7 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 */
-import type { Preview } from "@storybook/react";
+import type { Preview, StoryFn, StoryObj } from "@storybook/react";
 import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineContext } from "../src/app/isOnlineProvider/IsOnlineProvider";
 
@@ -42,7 +42,7 @@ const preview: Preview = {
       // An alternative to this would have been to use the `body` element to run the a11y tests on that,
       // but this does not work well because it reports false positives and false negatives.
       // The same selector is used in the `a11y` parameter in the `test-runner.js` file.
-      element: '#storybook-root:not([aria-hidden="true"]), body > div[role="presentation"]',
+      element: "#storybook-root:not([aria-hidden=\"true\"]), body > div[role=\"presentation\"]",
     },
   },
   globalTypes: {
@@ -67,16 +67,8 @@ const preview: Preview = {
 export default preview;
 
 export const decorators = [
-  (Story, context) => {
+  ( Story: StoryFn, context: { globals: { online: any; }; }) => {
   const isOnline = context.globals.online;
-
-  const authContextDefaultValue = {
-    user: null,
-    updateUserByToken: () => null,
-    clearUser: () => {},
-    isAuthenticationInProgress: false,
-    isAuthenticated: false,
-  }
 
   return (
     <Router>

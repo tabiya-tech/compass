@@ -21,7 +21,7 @@ initSentry();
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 root.render(
-  <React.StrictMode>
+  //<React.StrictMode>
     <Sentry.ErrorBoundary
       fallback={<InternalError errorMessage={"Something went wrong with Compass. Try reloading the page..."} />}
     >
@@ -36,7 +36,7 @@ root.render(
         </SnackbarProvider>
       </ThemeProvider>
     </Sentry.ErrorBoundary>
-  </React.StrictMode>
+  //</React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

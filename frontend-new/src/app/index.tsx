@@ -9,11 +9,12 @@ import NotFound from "src/errorPage/ErrorPage";
 import ProtectedRoute from "src/app/ProtectedRoute/ProtectedRoute";
 import { routerPaths } from "src/app/routerPaths";
 import React, { useEffect, useState } from "react";
-import authStateService from "src/auth/AuthStateService";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
+import authStateService from "src/auth/services/AuthenticationState.service";
+import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 
 import * as Sentry from "@sentry/react";
+import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 
 // Wrap the createHashRouter function with Sentry to capture errors that occur during router initialization
 const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouter(createHashRouter);
@@ -39,7 +40,6 @@ const App = () => {
     const initializeAuth = async () => {
       setLoading(true);
       try {
-        await authStateService.loadUser();
         const user = authStateService.getUser();
         if (user) {
           console.debug("User authenticated: Welcome,", user.email);
@@ -66,12 +66,15 @@ const App = () => {
         setTimeout(() => setLoading(false), 500);
       }
 
-      const unsubscribe = authStateService.setupAuthListener();
-
       return () => {
-        console.debug("Cleaning up auth");
-        unsubscribe();
-        authStateService.clearRefreshTimeout();
+        try{
+          console.debug("Cleaning up auth");
+          // Each of the services that implement the AuthenticationService interface will have their own cleanup method
+          // they may use this method to clean up any resources they have allocated on component unmount
+          AuthenticationServiceFactory.getAuthenticationService().cleanup();
+        } catch (error) {
+          console.error("Error cleaning up auth", error);
+        }
       };
     };
 
