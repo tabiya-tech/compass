@@ -1,7 +1,7 @@
 import { ConversationMessage } from "./ChatService/ChatService.types";
 
 export type IChatMessage = ConversationMessage & {
-  id: number;
+  id: string;
 };
 
 export type TNewSesionResponse = {

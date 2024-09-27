@@ -5,6 +5,7 @@ import ChatList, { DATA_TEST_ID } from "./ChatList";
 import { render, screen } from "src/_test_utilities/test-utils";
 import ChatMessage from "src/chat/ChatMessage/ChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
+import { nanoid } from "nanoid";
 
 // mock the chat message component
 jest.mock("src/chat/ChatMessage/ChatMessage", () => {
@@ -39,13 +40,13 @@ describe("ChatList", () => {
     // GIVEN a message list, a clear message function, a send message function, and a typing status
     const givenMessages = [
       {
-        id: 1,
+        id: nanoid(),
         sender: ConversationMessageSender.USER,
         message: "Hello",
         sent_at: new Date().toISOString(),
       },
       {
-        id: 2,
+        id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
         message: "Hi",
         sent_at: new Date().toISOString(),
@@ -81,7 +82,7 @@ describe("ChatList", () => {
       3,
       {
         chatMessage: {
-          id: -1,
+          id: expect.any(String),
           message: "Typing...",
           sender: ConversationMessageSender.COMPASS,
           sent_at: expect.any(String),
