@@ -16,11 +16,12 @@ handlers:
     formatter: standard
     maxBytes: 1000000 # 1 MB
     backupCount: 10
-    filename: 'logs/logfile.log'
+    filters: [session_filter]
+    filename: PROJECT_BASE_PATH/logs/logfile.log
 loggers:
   _template: &template_logger  # Define an anchor
     level: DEBUG
-    handlers: [ console ]
+    handlers: [ console, file ]
     propagate: yes
   #CollectExperiencesAgent: *template_logger
   #WelcomeAgent: *template_logger
@@ -32,4 +33,4 @@ filters:
 
 root:
   level: INFO
-  handlers: [ console ]
+  handlers: [ console, file ]
