@@ -7,6 +7,27 @@ const isStorybook = () => {
   return process.env.STORYBOOK === "true";
 };
 
+// Function to return the font styles
+const getFontStyles = () => ({
+  general: {
+    fontFamily: isStorybook() ? "Times-Roman" : "Inter",
+  },
+  regular: {
+    fontFamily: isStorybook() ? "Times-Roman" : "Inter",
+    fontWeight: "normal" as const,
+  },
+  bold: {
+    fontFamily: isStorybook() ? "Times-Bold" : "Inter",
+    fontWeight: "bold" as const,
+  },
+  italic: {
+    fontFamily: isStorybook() ? "Times-Italic" : "Inter",
+    fontStyle: "italic" as const,
+  },
+});
+
+const fontStyles = getFontStyles();
+
 Font.register({
   family: "Inter",
   fonts: [
@@ -18,35 +39,31 @@ Font.register({
 
 const styles = StyleSheet.create({
   page: {
-    ...(isStorybook() ? {} : { fontFamily: "Inter" }),
+    ...fontStyles.general,
     display: "flex",
     flexDirection: "column",
     paddingBottom: 100,
   },
   title: {
     fontSize: 16,
-    fontWeight: "bold",
     paddingBottom: 18,
     color: TabiyaBasicColors.DarkBlue,
     paddingHorizontal: 48,
+    ...fontStyles.bold,
   },
   subtitle: {
     fontSize: 14,
-    fontWeight: "bold",
+    ...fontStyles.bold,
   },
   text: {
     fontSize: 12,
     wordBreak: "break-word",
   },
-  boldText: {
-    fontWeight: "bold",
-    fontSize: 12,
-  },
   experiencesTitle: {
     fontSize: 13,
-    fontWeight: "bold",
     paddingHorizontal: 48,
     color: TabiyaBasicColors.DarkBlue,
+    ...fontStyles.bold,
   },
   body: {
     display: "flex",
@@ -95,8 +112,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   categoryTitle: {
-    fontWeight: "bold",
     fontSize: 13,
+    ...fontStyles.bold,
   },
   container: {
     display: "flex",
@@ -105,8 +122,8 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   experienceTitle: {
-    fontWeight: "bold",
     fontSize: 12,
+    ...fontStyles.bold,
   },
   experienceInfo: {
     display: "flex",
@@ -116,9 +133,8 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   location: {
-    fontWeight: "normal",
-    fontStyle: "italic",
     paddingLeft: 4,
+    ...fontStyles.italic,
   },
   contentColumn: {
     display: "flex",
@@ -151,9 +167,9 @@ const styles = StyleSheet.create({
     height: 12,
   },
   skillsTitle: {
-    fontWeight: "bold",
     fontSize: 12,
     paddingBottom: 4,
+    ...fontStyles.bold,
   },
   skillText: {
     fontSize: 11,
@@ -173,9 +189,9 @@ const styles = StyleSheet.create({
   },
   skillDescriptionTitle: {
     fontSize: 16,
-    fontWeight: "bold",
     paddingBottom: 18,
     color: TabiyaBasicColors.DarkBlue,
+    ...fontStyles.bold,
   },
   info: {
     fontSize: 11,
@@ -195,9 +211,9 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   label: {
-    fontWeight: "bold",
     fontSize: 12,
     color: TabiyaBasicColors.GrayDark,
+    ...fontStyles.bold,
   },
   description: {
     fontSize: 10,
