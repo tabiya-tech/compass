@@ -16,21 +16,47 @@ exports[`ExperiencesReportContent should render ExperiencesReportContent correct
     >
       Project Manager
     </text>
-    <text
-      data-testid="experiences-content-report-date-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-      style="font-size: 10px;"
-      x="0"
-      y="0"
+    <view
+      data-testid="experiences-content-report-experience-info-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+      style="display: flex; flex-direction: row; align-items: center; font-size: 10px;"
     >
-      2022 — Present
-    </text>
+      <text
+        data-testid="experiences-content-report-date-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+        x="0"
+        y="0"
+      >
+        2022 — Present
+      </text>
+      <text
+        x="0"
+        y="0"
+      >
+        ,
+         
+      </text>
+      <text
+        data-testid="experiences-content-report-company-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+        x="0"
+        y="0"
+      >
+        Business Inc
+      </text>
+      <text
+        data-testid="experiences-content-report-location-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+        style="font-weight: normal; font-style: italic; padding-left: 4px;"
+        x="0"
+        y="0"
+      >
+        (New York, NY)
+      </text>
+    </view>
     <view>
       <text
         style="font-weight: bold; font-size: 12px; padding-bottom: 4px;"
         x="0"
         y="0"
       >
-        Top skills:
+        Top Skills: 
       </text>
       <view
         data-testid="experiences-content-report-skills-e1f12442-9771-4e78-b3c7-77cd3b2172f8"

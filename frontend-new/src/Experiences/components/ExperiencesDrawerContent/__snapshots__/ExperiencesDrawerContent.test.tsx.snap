@@ -16,6 +16,11 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
     data-testid="experiences-drawer-content-date-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
   >
     2022 — Present
+    , 
+    Business Inc
+    <i>
+       (New York, NY)
+    </i>
   </p>
   <div
     class="MuiBox-root css-70qvj9"
