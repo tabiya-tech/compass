@@ -99,6 +99,11 @@ if target_env == "dev" or target_env == "local":
     logger.info(f"Setting CORS to allow all origins for the {target_env} environment.")
     origins.append("*")
 
+enable_sentry = os.getenv("ENABLE_SENTRY")
+if not enable_sentry:
+    raise ValueError("Mandatory ENABLE_SENTRY env variable is not set! Please set it to the either True or False")
+logger.info(f"ENABLE_SENTRY: {os.getenv('ENABLE_SENTRY')}")
+
 origins = list(set(origins))  # remove duplicates
 logger.info(f"Allowed origins: {origins}")
 

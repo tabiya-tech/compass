@@ -82,3 +82,4 @@ jobs:
           VERTEX_API_REGION: ${{ inputs.vertex-api-region }}
           BACKEND_URL: ${{ inputs.backend-url }}
           FRONTEND_URL: ${{ inputs.frontend-url }}
+          ENABLE_SENTRY: "False" # Disable Sentry for unit tests on the pipeline, since tests break with sentry init

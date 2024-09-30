@@ -150,6 +150,8 @@ The deployment requires the following environment variables to be set:
 - `APPLICATION_MONGODB_URI`: The URI of the MongoDB Atlas instance for the application database.
 - `APPLICATION_DATABASE_NAME`: The name of mongo db database used by the application to store data.
 - `VERTEX_API_REGION`: The region of the Vertex API that will be used by the backend.
+- `SENTRY_BACKEND_DSN`: The Sentry Data Source Name for error tracking (the backend DSN is for the project used to track backend errors)
+- `ENABLE_SENTRY`: A boolean value that determines whether Sentry error tracking is enabled. Set to `True` to enable Sentry error tracking. 
 
 It is recommended to use a `.env` file to set the environment variables. Create a `.env` file in the root directory of the project and add the following content:
 
