@@ -100,6 +100,9 @@ jobs:
           VERTEX_API_REGION: ${{ inputs.vertex-api-region }}
           BACKEND_URL: ${{ inputs.backend-url }}
           FRONTEND_URL: ${{ inputs.frontend-url }}
+          SENTRY_BACKEND_DSN: ${{ secrets.SENTRY_BACKEND_DSN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          ENABLE_SENTRY: True # Enable Sentry for backend
       - name: Authenticate to docker
         # TODO the region should be extracted from the pulumi yaml
         run: gcloud auth configure-docker us-central1-docker.pkg.dev
@@ -122,3 +125,6 @@ jobs:
           VERTEX_API_REGION: ${{ inputs.vertex-api-region }}
           BACKEND_URL: ${{ inputs.backend-url }}
           FRONTEND_URL: ${{ inputs.frontend-url }}
+          SENTRY_BACKEND_DSN: ${{ secrets.SENTRY_BACKEND_DSN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          ENABLE_SENTRY: "True" # Enable Sentry for backend

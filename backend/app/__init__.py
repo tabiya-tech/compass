@@ -7,9 +7,10 @@ import traceback
 import yaml
 from dotenv import load_dotenv
 
+from app.sentry_init import init_sentry
+
 # Load environment variables from .env file
 load_dotenv()
-
 
 # setup logging
 
@@ -44,3 +45,15 @@ def _setup_config(configuration_file):
 log_config_file = os.getenv("LOG_CONFIG_FILE", "logging.cfg.yaml")
 _setup_config(_get_configuration_filename(log_config_file))
 logging.debug("Logging initialized")
+
+# Sentry should only be initialized if the environment variable ENABLE_SENTRY is set to true
+# This environment will be set to false for local development or the CI/CD pipeline 
+# because the sentry initialization breaks the unit tests (specifically the ones that use the fastapi test client)
+if os.getenv("ENABLE_SENTRY") == "True":
+    backend_dsn = os.getenv("SENTRY_BACKEND_DSN")
+    if backend_dsn:
+        init_sentry(backend_dsn, os.getenv("TARGET_ENVIRONMENT"))
+    else :
+        logging.warning("SENTRY_BACKEND_DSN environment variable is not set. Sentry will not be initialized")
+else:
+    logging.warning("ENABLE_SENTRY environment variable is not set to True.  Sentry will not be initialized")
