@@ -9,7 +9,11 @@ const isStorybook = () => {
 
 Font.register({
   family: "Inter",
-  fonts: [{ src: "/fonts/Inter-4.0/ttf/Inter-Regular.ttf" }, { src: "/fonts/Inter-4.0/ttf/Inter-Bold.ttf" }],
+  fonts: [
+    { src: "/fonts/Inter-4.0/ttf/Inter-Regular.ttf", fontWeight: "normal" },
+    { src: "/fonts/Inter-4.0/ttf/Inter-Bold.ttf", fontWeight: "bold" },
+    { src: "/fonts/Inter-4.0/ttf/Inter-Italic.ttf", fontStyle: "italic" },
+  ],
 });
 
 const styles = StyleSheet.create({
@@ -104,9 +108,17 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 12,
   },
-  date: {
+  experienceInfo: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
     fontSize: 10,
     paddingVertical: 6,
+  },
+  location: {
+    fontWeight: "normal",
+    fontStyle: "italic",
+    paddingLeft: 4,
   },
   contentColumn: {
     display: "flex",
