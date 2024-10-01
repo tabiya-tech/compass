@@ -1,6 +1,8 @@
 import { Box, TextField, useTheme } from "@mui/material";
 import React from "react";
 
+import PasswordInput from "src/theme/PasswordInput/PasswordInput";
+
 const uniqueId = "8ab76120-a0d3-47b1-aac0-42d0169e0a58";
 
 export const DATA_TEST_ID = {
@@ -53,10 +55,9 @@ const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({
         onChange={(e) => handleEmailChange(e)}
         inputProps={{ "data-testid": DATA_TEST_ID.EMAIL_LOGIN_FORM_EMAIL_INPUT }}
       />
-      <TextField
+      <PasswordInput
         fullWidth
         label="Password"
-        type="password"
         variant="outlined"
         disabled={isDisabled}
         value={password}
