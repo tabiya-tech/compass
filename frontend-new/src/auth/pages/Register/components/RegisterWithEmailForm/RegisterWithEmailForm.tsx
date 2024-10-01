@@ -2,6 +2,7 @@ import { Box, CircularProgress, TextField, useTheme } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import React, { useState } from "react";
 import { validatePassword } from "src/auth/utils/validatePassword";
+import PasswordInput from "src/theme/PasswordInput/PasswordInput";
 
 const uniqueId = "6cf1a0fa-8d75-4342-bf6b-1203d5b114d7";
 
@@ -82,10 +83,9 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
         onChange={(e) => handleEmailChange(e)}
         inputProps={{ "data-testid": DATA_TEST_ID.EMAIL_INPUT }}
       />
-      <TextField
+      <PasswordInput
         fullWidth
         label="Password"
-        type="password"
         disabled={isRegistering || disabled}
         variant="outlined"
         required
