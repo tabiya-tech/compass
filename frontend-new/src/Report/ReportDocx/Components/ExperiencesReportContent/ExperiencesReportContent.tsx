@@ -68,7 +68,7 @@ export const generateContent = (experience: Experience) => {
         text: ReportContent.TOP_SKILLS_TITLE,
         color: COLORS.textBlack,
         bold: true,
-        size: 24,
+        size: 22,
       }),
     ],
     spacing: {
@@ -83,7 +83,7 @@ export const generateContent = (experience: Experience) => {
           new TextRun({
             text: `• ${capitalizeFirstLetter(skill.preferredLabel)}`,
             color: COLORS.textBlack,
-            size: 22,
+            size: 20,
           }),
         ],
         spacing: {
