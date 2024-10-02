@@ -43,6 +43,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     paddingBottom: 100,
+    color: COLORS.textBlack,
   },
   title: {
     fontSize: 16,
@@ -60,7 +61,7 @@ const styles = StyleSheet.create({
     wordBreak: "break-word",
   },
   experiencesTitle: {
-    fontSize: 13,
+    fontSize: 14,
     paddingHorizontal: 48,
     color: TabiyaBasicColors.DarkBlue,
     ...fontStyles.bold,
@@ -86,7 +87,6 @@ const styles = StyleSheet.create({
   bodyText: {
     fontSize: 11,
     wordBreak: "break-word",
-    color: TabiyaBasicColors.GrayDark,
     paddingHorizontal: 48,
   },
   experiencesContainer: {
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   categoryIcon: {
-    height: 16,
+    height: 13,
     marginBottom: 2,
     marginRight: 8,
   },
@@ -144,7 +144,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 48,
     borderBottomWidth: 1,
     border: 1,
-    color: TabiyaBasicColors.GrayDark,
     marginTop: 12,
     marginBottom: 16,
   },
@@ -163,16 +162,22 @@ const styles = StyleSheet.create({
   compassImage: {
     height: 46,
   },
-  infoIcon: {
+  infoIcons: {
+    width: 14,
     height: 12,
   },
+  infoIcon: {
+    maxWidth: "100%",
+    maxHeight: "100%",
+    objectFit: "contain",
+  },
   skillsTitle: {
-    fontSize: 12,
+    fontSize: 11,
     paddingBottom: 4,
     ...fontStyles.bold,
   },
   skillText: {
-    fontSize: 11,
+    fontSize: 10,
     color: "#211F1D",
   },
   skillsContainer: {
@@ -196,12 +201,10 @@ const styles = StyleSheet.create({
   info: {
     fontSize: 11,
     wordBreak: "break-word",
-    color: TabiyaBasicColors.GrayDark,
   },
   skillDivider: {
     borderBottomWidth: 1,
     border: 1,
-    color: TabiyaBasicColors.GrayDark,
     marginTop: 12,
     marginBottom: 20,
   },
@@ -211,13 +214,11 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   label: {
-    fontSize: 12,
-    color: TabiyaBasicColors.GrayDark,
+    fontSize: 11,
     ...fontStyles.bold,
   },
   description: {
     fontSize: 10,
-    color: TabiyaBasicColors.GrayDark,
     paddingBottom: 12,
   },
   footer: {
@@ -235,14 +236,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 48,
     padding: 8,
     border: 1,
-    borderColor: TabiyaBasicColors.GrayDark,
   },
   disclaimerText: {
     display: "flex",
     flex: 1,
     flexWrap: "wrap",
     fontSize: 9,
-    color: COLORS.grey700,
+    color: TabiyaBasicColors.GrayDark,
   },
   disclaimerTextBold: {
     fontSize: 9,
@@ -257,7 +257,6 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     textAlign: "center",
-    color: TabiyaBasicColors.GrayDark,
   },
 });
 

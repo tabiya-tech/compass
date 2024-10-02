@@ -1,7 +1,7 @@
 import React from "react";
 import { Document, Text, Page, View, Image as DefaultImage, ImageWithSrcProp } from "@react-pdf/renderer";
 import { Experience } from "src/Experiences/ExperienceService/Experiences.types";
-import { formatDate, getBase64Image, getUniqueSkills, groupExperiencesByWorkType } from "src/Report/util";
+import { formatDate, getBase64Image, getUniqueSkills, groupExperiencesByWorkType, prettifyText } from "src/Report/util";
 import { ReportContent } from "src/Report/ReportContent";
 import Footer from "src/Report/ReactPdf/components/Footer";
 import ExperiencesReportContent from "src/Report/ReactPdf/components/ExperiencesReportContent/ExperiencesReportContent";
@@ -76,7 +76,9 @@ const SkillReport: React.FC<SkillReportProps> = ({
 
     return (
       <View style={styles.rowView} data-testid={dataTestId}>
-        <Image src={getBase64Image(icon)} style={styles.infoIcon} />
+        <View style={styles.infoIcons}>
+          <Image src={getBase64Image(icon)} style={styles.infoIcon} />
+        </View>
         <Text x={0} y={0} style={styles.text}>
           {value}
         </Text>
@@ -109,7 +111,7 @@ const SkillReport: React.FC<SkillReportProps> = ({
             {renderPersonalInfo(email, ReportContent.IMAGE_URLS.EMAIL_ICON, DATA_TEST_ID.SKILL_REPORT_EMAIL)}
           </View>
           <Text x={0} y={0} style={styles.bodyText} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY_TEXT}>
-            {ReportContent.REPORT_BODY_TEXT(formatDate(conversationConductedAt!))}
+            {prettifyText(ReportContent.REPORT_BODY_TEXT(formatDate(conversationConductedAt!)))}
           </Text>
           <View style={styles.divider} />
           <Text x={0} y={0} style={styles.experiencesTitle} data-testid={DATA_TEST_ID.SKILL_REPORT_EXPERIENCES_TITLE}>
@@ -118,19 +120,19 @@ const SkillReport: React.FC<SkillReportProps> = ({
           <View style={styles.experiencesContainer} data-testid={DATA_TEST_ID.SKILL_REPORT_EXPERIENCES_CONTAINER}>
             {ExperienceCategory(
               ReportContent.SELF_EMPLOYMENT_TITLE,
-              ReportContent.IMAGE_URLS.BRIEFCASE_ICON,
+              ReportContent.IMAGE_URLS.SELF_EMPLOYMENT_ICON,
               selfEmploymentExperiences
             )}
 
             {ExperienceCategory(
               ReportContent.SALARY_WORK_TITLE,
-              ReportContent.IMAGE_URLS.DOLLAR_BAG_ICON,
+              ReportContent.IMAGE_URLS.EMPLOYEE_ICON,
               salaryWorkExperiences
             )}
 
             {ExperienceCategory(
               ReportContent.UNPAID_WORK_TITLE,
-              ReportContent.IMAGE_URLS.FRIENDLY_ICON,
+              ReportContent.IMAGE_URLS.COMMUNITY_WORK_ICON,
               unpaidWorkExperiences
             )}
           </View>

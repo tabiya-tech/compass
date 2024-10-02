@@ -4,7 +4,14 @@ import { Experience } from "src/Experiences/ExperienceService/Experiences.types"
 import { generateContent } from "src/Report/ReportDocx/Components/ExperiencesReportContent/ExperiencesReportContent";
 import { ReportContent } from "src/Report/ReportContent";
 import { TabiyaBasicColors } from "src/theme/applicationTheme/applicationTheme";
-import { COLORS, formatDate, getBase64Image, getUniqueSkills, groupExperiencesByWorkType } from "src/Report/util";
+import {
+  COLORS,
+  formatDate,
+  getBase64Image,
+  getUniqueSkills,
+  groupExperiencesByWorkType,
+  prettifyText,
+} from "src/Report/util";
 import SkillsDescription from "src/Report/ReportDocx/Components/SkillsDescription";
 import HeaderComponent from "src/Report/ReportDocx/Components/Header";
 import FooterComponent from "src/Report/ReportDocx/Components/Footer";
@@ -31,13 +38,13 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
   const skillsList = getUniqueSkills(experiences);
 
   // Create a paragraph with an image
-  const createParagraphWithImage = async (text: string, imageUrl: string, width: number) => {
+  const createParagraphWithImage = async (text: string, imageUrl: string) => {
     if (!text) return new Paragraph({});
     return new Paragraph({
       children: [
         new ImageRun({
           data: await getBase64Image(imageUrl),
-          transformation: { width: width, height: 16 },
+          transformation: { width: 18, height: 16 },
         }),
         new TextRun({
           text: "\u00A0\u00A0",
@@ -54,12 +61,12 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
   };
 
   // Create a paragraph with an image and text
-  const createParagraphWithImageAndText = async (text: string, imageUrl: string, width: number) => {
+  const createParagraphWithImageAndText = async (text: string, imageUrl: string) => {
     return new Paragraph({
       children: [
         new ImageRun({
           data: await getBase64Image(imageUrl),
-          transformation: { width: width, height: 22 },
+          transformation: { width: 22, height: 22 },
         }),
         new TextRun({
           text: "\u00A0\u00A0",
@@ -83,7 +90,7 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
         document: {
           run: {
             font: "Inter",
-            color: TabiyaBasicColors.GrayDark,
+            color: COLORS.textBlack,
           },
         },
       },
@@ -129,16 +136,16 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
               })
             : new Paragraph(""),
 
-          await createParagraphWithImage(address, ReportContent.IMAGE_URLS.LOCATION_ICON, 12),
+          await createParagraphWithImage(address, ReportContent.IMAGE_URLS.LOCATION_ICON),
 
-          await createParagraphWithImage(phone, ReportContent.IMAGE_URLS.PHONE_ICON, 16),
+          await createParagraphWithImage(phone, ReportContent.IMAGE_URLS.PHONE_ICON),
 
-          await createParagraphWithImage(email, ReportContent.IMAGE_URLS.EMAIL_ICON, 22),
+          await createParagraphWithImage(email, ReportContent.IMAGE_URLS.EMAIL_ICON),
 
           new Paragraph({
             children: [
               new TextRun({
-                text: ReportContent.REPORT_BODY_TEXT(formatDate(conversationConductedAt!)),
+                text: prettifyText(ReportContent.REPORT_BODY_TEXT(formatDate(conversationConductedAt!))),
                 size: 22,
               }),
             ],
@@ -159,7 +166,7 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
               new TextRun({
                 text: ReportContent.EXPERIENCES_TITLE,
                 bold: true,
-                size: 26,
+                size: 28,
                 color: TabiyaBasicColors.DarkBlue,
               }),
             ],
@@ -172,8 +179,7 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
             ? [
                 await createParagraphWithImageAndText(
                   ReportContent.SELF_EMPLOYMENT_TITLE,
-                  ReportContent.IMAGE_URLS.BRIEFCASE_ICON,
-                  22
+                  ReportContent.IMAGE_URLS.SELF_EMPLOYMENT_ICON
                 ),
                 ...selfEmploymentExperiences.flatMap((experience) => generateContent(experience)),
               ]
@@ -183,8 +189,7 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
             ? [
                 await createParagraphWithImageAndText(
                   ReportContent.SALARY_WORK_TITLE,
-                  ReportContent.IMAGE_URLS.DOLLAR_BAG_ICON,
-                  16
+                  ReportContent.IMAGE_URLS.EMPLOYEE_ICON
                 ),
                 ...salaryWorkExperiences.flatMap((experience) => generateContent(experience)),
               ]
@@ -194,8 +199,7 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
             ? [
                 await createParagraphWithImageAndText(
                   ReportContent.UNPAID_WORK_TITLE,
-                  ReportContent.IMAGE_URLS.FRIENDLY_ICON,
-                  22
+                  ReportContent.IMAGE_URLS.COMMUNITY_WORK_ICON
                 ),
                 ...unpaidWorkExperiences.flatMap((experience) => generateContent(experience)),
               ]
