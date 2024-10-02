@@ -25,7 +25,7 @@ exports[`Report should render Report correctly 1`] = `
       </view>
       <text
         data-testid="skill-report-title-5a296552-f91f-4c38-b88f-542cacaced8e"
-        style="font-size: 16px; font-weight: bold; padding-bottom: 18px; color: rgb(0, 33, 71);"
+        style="font-size: 16px; padding-bottom: 18px; color: rgb(0, 33, 71); font-family: Inter; font-weight: bold;"
         x="0"
         y="0"
       >
@@ -36,7 +36,7 @@ exports[`Report should render Report correctly 1`] = `
       >
         <text
           data-testid="skill-report-name-5a296552-f91f-4c38-b88f-542cacaced8e"
-          style="font-size: 14px; font-weight: bold;"
+          style="font-size: 14px; font-family: Inter; font-weight: bold;"
           x="0"
           y="0"
         >
@@ -109,7 +109,7 @@ exports[`Report should render Report correctly 1`] = `
       />
       <text
         data-testid="skill-report-experiences-title-5a296552-f91f-4c38-b88f-542cacaced8e"
-        style="font-size: 13px; font-weight: bold; color: rgb(0, 33, 71);"
+        style="font-size: 13px; color: rgb(0, 33, 71); font-family: Inter; font-weight: bold;"
         x="0"
         y="0"
       >
@@ -131,7 +131,7 @@ exports[`Report should render Report correctly 1`] = `
                 style="height: 16px; margin-bottom: 2px; margin-right: 8px;"
               />
               <text
-                style="font-weight: bold; font-size: 13px;"
+                style="font-size: 13px; font-family: Inter; font-weight: bold;"
                 x="0"
                 y="0"
               >
@@ -147,7 +147,7 @@ exports[`Report should render Report correctly 1`] = `
               >
                 <text
                   data-testid="experiences-content-report-experience-title-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-                  style="font-weight: bold; font-size: 12px;"
+                  style="font-size: 12px; font-family: Inter; font-weight: bold;"
                   x="0"
                   y="0"
                 >
@@ -180,7 +180,7 @@ exports[`Report should render Report correctly 1`] = `
                   </text>
                   <text
                     data-testid="experiences-content-report-location-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-                    style="font-weight: normal; font-style: italic; padding-left: 4px;"
+                    style="padding-left: 4px; font-family: Inter; font-style: italic;"
                     x="0"
                     y="0"
                   >
@@ -189,7 +189,7 @@ exports[`Report should render Report correctly 1`] = `
                 </view>
                 <view>
                   <text
-                    style="font-weight: bold; font-size: 12px; padding-bottom: 4px;"
+                    style="font-size: 12px; padding-bottom: 4px; font-family: Inter; font-weight: bold;"
                     x="0"
                     y="0"
                   >
@@ -233,7 +233,7 @@ exports[`Report should render Report correctly 1`] = `
                 style="height: 16px; margin-bottom: 2px; margin-right: 8px;"
               />
               <text
-                style="font-weight: bold; font-size: 13px;"
+                style="font-size: 13px; font-family: Inter; font-weight: bold;"
                 x="0"
                 y="0"
               >
@@ -249,7 +249,7 @@ exports[`Report should render Report correctly 1`] = `
               >
                 <text
                   data-testid="experiences-content-report-experience-title-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-                  style="font-weight: bold; font-size: 12px;"
+                  style="font-size: 12px; font-family: Inter; font-weight: bold;"
                   x="0"
                   y="0"
                 >
@@ -282,7 +282,7 @@ exports[`Report should render Report correctly 1`] = `
                   </text>
                   <text
                     data-testid="experiences-content-report-location-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-                    style="font-weight: normal; font-style: italic; padding-left: 4px;"
+                    style="padding-left: 4px; font-family: Inter; font-style: italic;"
                     x="0"
                     y="0"
                   >
@@ -291,7 +291,7 @@ exports[`Report should render Report correctly 1`] = `
                 </view>
                 <view>
                   <text
-                    style="font-weight: bold; font-size: 12px; padding-bottom: 4px;"
+                    style="font-size: 12px; padding-bottom: 4px; font-family: Inter; font-weight: bold;"
                     x="0"
                     y="0"
                   >
@@ -328,7 +328,7 @@ exports[`Report should render Report correctly 1`] = `
         style="display: flex; flex-direction: column;"
       >
         <text
-          style="font-size: 16px; font-weight: bold; padding-bottom: 18px; color: rgb(0, 33, 71);"
+          style="font-size: 16px; padding-bottom: 18px; color: rgb(0, 33, 71); font-family: Inter; font-weight: bold;"
           x="0"
           y="0"
         >
@@ -348,7 +348,7 @@ exports[`Report should render Report correctly 1`] = `
           style="display: flex; flex-direction: column; gap: 4px;"
         >
           <text
-            style="font-weight: bold; font-size: 12px; color: rgb(67, 71, 78);"
+            style="font-size: 12px; color: rgb(67, 71, 78); font-family: Inter; font-weight: bold;"
             x="0"
             y="0"
           >
@@ -366,7 +366,7 @@ exports[`Report should render Report correctly 1`] = `
           style="display: flex; flex-direction: column; gap: 4px;"
         >
           <text
-            style="font-weight: bold; font-size: 12px; color: rgb(67, 71, 78);"
+            style="font-size: 12px; color: rgb(67, 71, 78); font-family: Inter; font-weight: bold;"
             x="0"
             y="0"
           >
