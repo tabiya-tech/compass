@@ -10,7 +10,7 @@ exports[`ExperiencesReportContent should render ExperiencesReportContent correct
   >
     <text
       data-testid="experiences-content-report-experience-title-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-      style="font-weight: bold; font-size: 12px;"
+      style="font-size: 12px; font-family: Inter; font-weight: bold;"
       x="0"
       y="0"
     >
@@ -43,7 +43,7 @@ exports[`ExperiencesReportContent should render ExperiencesReportContent correct
       </text>
       <text
         data-testid="experiences-content-report-location-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-        style="font-weight: normal; font-style: italic; padding-left: 4px;"
+        style="padding-left: 4px; font-family: Inter; font-style: italic;"
         x="0"
         y="0"
       >
@@ -52,7 +52,7 @@ exports[`ExperiencesReportContent should render ExperiencesReportContent correct
     </view>
     <view>
       <text
-        style="font-weight: bold; font-size: 12px; padding-bottom: 4px;"
+        style="font-size: 12px; padding-bottom: 4px; font-family: Inter; font-weight: bold;"
         x="0"
         y="0"
       >
