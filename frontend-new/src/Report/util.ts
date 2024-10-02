@@ -63,3 +63,10 @@ export const COLORS = {
   textBlack: "#000000",
   grey700: "#605E5B",
 };
+
+// Utility function to prettify text
+export const prettifyText = (text: string) =>
+  text
+    .split("\n")
+    .map((line) => line.trim())
+    .join(" ");

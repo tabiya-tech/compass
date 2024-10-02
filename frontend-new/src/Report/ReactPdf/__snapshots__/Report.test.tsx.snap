@@ -5,7 +5,7 @@ exports[`Report should render Report correctly 1`] = `
   data-testid="skill-report-container-5a296552-f91f-4c38-b88f-542cacaced8e"
 >
   <page
-    style="font-family: Inter; display: flex; flex-direction: column; padding-bottom: 100px;"
+    style="font-family: Inter; display: flex; flex-direction: column; padding-bottom: 100px; color: rgb(0, 0, 0);"
   >
     <view
       data-testid="skill-report-body-5a296552-f91f-4c38-b88f-542cacaced8e"
@@ -46,10 +46,14 @@ exports[`Report should render Report correctly 1`] = `
           data-testid="skill-report-address-5a296552-f91f-4c38-b88f-542cacaced8e"
           style="display: flex; flex-direction: row; align-items: center; gap: 6px;"
         >
-          <image
-            src="[object Promise]"
-            style="height: 12px;"
-          />
+          <view
+            style="width: 14px; height: 12px;"
+          >
+            <image
+              src="[object Promise]"
+              style="max-width: 100%; max-height: 100%; object-fit: contain;"
+            />
+          </view>
           <text
             style="font-size: 12px; word-break: break-word;"
             x="0"
@@ -62,10 +66,14 @@ exports[`Report should render Report correctly 1`] = `
           data-testid="skill-report-phone-5a296552-f91f-4c38-b88f-542cacaced8e"
           style="display: flex; flex-direction: row; align-items: center; gap: 6px;"
         >
-          <image
-            src="[object Promise]"
-            style="height: 12px;"
-          />
+          <view
+            style="width: 14px; height: 12px;"
+          >
+            <image
+              src="[object Promise]"
+              style="max-width: 100%; max-height: 100%; object-fit: contain;"
+            />
+          </view>
           <text
             style="font-size: 12px; word-break: break-word;"
             x="0"
@@ -78,10 +86,14 @@ exports[`Report should render Report correctly 1`] = `
           data-testid="skill-report-email-5a296552-f91f-4c38-b88f-542cacaced8e"
           style="display: flex; flex-direction: row; align-items: center; gap: 6px;"
         >
-          <image
-            src="[object Promise]"
-            style="height: 12px;"
-          />
+          <view
+            style="width: 14px; height: 12px;"
+          >
+            <image
+              src="[object Promise]"
+              style="max-width: 100%; max-height: 100%; object-fit: contain;"
+            />
+          </view>
           <text
             style="font-size: 12px; word-break: break-word;"
             x="0"
@@ -93,23 +105,18 @@ exports[`Report should render Report correctly 1`] = `
       </view>
       <text
         data-testid="skill-report-body-text-5a296552-f91f-4c38-b88f-542cacaced8e"
-        style="font-size: 11px; word-break: break-word; color: rgb(67, 71, 78);"
+        style="font-size: 11px; word-break: break-word;"
         x="0"
         y="0"
       >
-        This report summarizes the key information gathered during a conversation with Compass on
-  June 01, 2021. Compass is an AI chatbot that assists job-seekers in exploring their skills 
-  and experiences. This report presents the candidate’s work experience and the skills identified 
-  from each experience. This information can be used to guide job search and highlight their skills 
-  when applying for jobs, especially during interviews with potential employers. It can be a good
-  starting point for creating a complete CV.
+        This report summarizes the key information gathered during a conversation with Compass on June 01, 2021. Compass is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report presents the candidate’s work experience and the skills identified from each experience. This information can be used to guide job search and highlight their skills when applying for jobs, especially during interviews with potential employers. It can be a good starting point for creating a complete CV.
       </text>
       <view
-        style="border: 1px; color: rgb(67, 71, 78); margin-top: 12px; margin-bottom: 16px;"
+        style="border: 1px; margin-top: 12px; margin-bottom: 16px;"
       />
       <text
         data-testid="skill-report-experiences-title-5a296552-f91f-4c38-b88f-542cacaced8e"
-        style="font-size: 13px; color: rgb(0, 33, 71); font-family: Inter; font-weight: bold;"
+        style="font-size: 14px; color: rgb(0, 33, 71); font-family: Inter; font-weight: bold;"
         x="0"
         y="0"
       >
@@ -128,7 +135,7 @@ exports[`Report should render Report correctly 1`] = `
             >
               <image
                 src="[object Promise]"
-                style="height: 16px; margin-bottom: 2px; margin-right: 8px;"
+                style="height: 13px; margin-bottom: 2px; margin-right: 8px;"
               />
               <text
                 style="font-size: 13px; font-family: Inter; font-weight: bold;"
@@ -189,7 +196,7 @@ exports[`Report should render Report correctly 1`] = `
                 </view>
                 <view>
                   <text
-                    style="font-size: 12px; padding-bottom: 4px; font-family: Inter; font-weight: bold;"
+                    style="font-size: 11px; padding-bottom: 4px; font-family: Inter; font-weight: bold;"
                     x="0"
                     y="0"
                   >
@@ -200,7 +207,7 @@ exports[`Report should render Report correctly 1`] = `
                     style="display: flex; flex-direction: column; flex-wrap: wrap; align-items: flex-start; gap: 4px;"
                   >
                     <text
-                      style="font-size: 11px; color: rgb(33, 31, 29);"
+                      style="font-size: 10px; color: rgb(33, 31, 29);"
                       x="0"
                       y="0"
                     >
@@ -208,7 +215,7 @@ exports[`Report should render Report correctly 1`] = `
                       Management
                     </text>
                     <text
-                      style="font-size: 11px; color: rgb(33, 31, 29);"
+                      style="font-size: 10px; color: rgb(33, 31, 29);"
                       x="0"
                       y="0"
                     >
@@ -230,7 +237,7 @@ exports[`Report should render Report correctly 1`] = `
             >
               <image
                 src="[object Promise]"
-                style="height: 16px; margin-bottom: 2px; margin-right: 8px;"
+                style="height: 13px; margin-bottom: 2px; margin-right: 8px;"
               />
               <text
                 style="font-size: 13px; font-family: Inter; font-weight: bold;"
@@ -291,7 +298,7 @@ exports[`Report should render Report correctly 1`] = `
                 </view>
                 <view>
                   <text
-                    style="font-size: 12px; padding-bottom: 4px; font-family: Inter; font-weight: bold;"
+                    style="font-size: 11px; padding-bottom: 4px; font-family: Inter; font-weight: bold;"
                     x="0"
                     y="0"
                   >
@@ -302,7 +309,7 @@ exports[`Report should render Report correctly 1`] = `
                     style="display: flex; flex-direction: column; flex-wrap: wrap; align-items: flex-start; gap: 4px;"
                   >
                     <text
-                      style="font-size: 11px; color: rgb(33, 31, 29);"
+                      style="font-size: 10px; color: rgb(33, 31, 29);"
                       x="0"
                       y="0"
                     >
@@ -310,7 +317,7 @@ exports[`Report should render Report correctly 1`] = `
                       Management
                     </text>
                     <text
-                      style="font-size: 11px; color: rgb(33, 31, 29);"
+                      style="font-size: 10px; color: rgb(33, 31, 29);"
                       x="0"
                       y="0"
                     >
@@ -335,27 +342,27 @@ exports[`Report should render Report correctly 1`] = `
           Skills Description
         </text>
         <text
-          style="font-size: 11px; word-break: break-word; color: rgb(67, 71, 78);"
+          style="font-size: 11px; word-break: break-word;"
           x="0"
           y="0"
         >
           Below, you will find a list of the skills discovered during your conversation with Compass, along with their descriptions.
         </text>
         <view
-          style="border: 1px; color: rgb(67, 71, 78); margin-top: 12px; margin-bottom: 20px;"
+          style="border: 1px; margin-top: 12px; margin-bottom: 20px;"
         />
         <view
           style="display: flex; flex-direction: column; gap: 4px;"
         >
           <text
-            style="font-size: 12px; color: rgb(67, 71, 78); font-family: Inter; font-weight: bold;"
+            style="font-size: 11px; font-family: Inter; font-weight: bold;"
             x="0"
             y="0"
           >
             Communication
           </text>
           <text
-            style="font-size: 10px; color: rgb(67, 71, 78); padding-bottom: 12px;"
+            style="font-size: 10px; padding-bottom: 12px;"
             x="0"
             y="0"
           >
@@ -366,14 +373,14 @@ exports[`Report should render Report correctly 1`] = `
           style="display: flex; flex-direction: column; gap: 4px;"
         >
           <text
-            style="font-size: 12px; color: rgb(67, 71, 78); font-family: Inter; font-weight: bold;"
+            style="font-size: 11px; font-family: Inter; font-weight: bold;"
             x="0"
             y="0"
           >
             Management
           </text>
           <text
-            style="font-size: 10px; color: rgb(67, 71, 78); padding-bottom: 12px;"
+            style="font-size: 10px; padding-bottom: 12px;"
             x="0"
             y="0"
           >
@@ -386,14 +393,14 @@ exports[`Report should render Report correctly 1`] = `
       style="width: 100%; display: flex; flex-direction: column; padding-bottom: 26px; position: absolute; gap: 16px; bottom: 0px;"
     >
       <view
-        style="display: flex; flex-direction: row; padding: 8px; border: 1px; border-color: #43474e;"
+        style="display: flex; flex-direction: row; padding: 8px; border: 1px;"
       >
         <image
           src="[object Promise]"
           style="width: 12px; height: 12px;"
         />
         <text
-          style="display: flex; flex: 1; flex-wrap: wrap; font-size: 9px; color: rgb(96, 94, 91);"
+          style="display: flex; flex: 1; flex-wrap: wrap; font-size: 9px; color: rgb(67, 71, 78);"
           x="0"
           y="0"
         >

@@ -15,7 +15,8 @@ const SkillsDescription = ({ skillsList }: SkillsDescriptionProps) => {
         new TextRun({
           text: ReportContent.SKILLS_DESCRIPTION_TITLE,
           bold: true,
-          size: 32,
+          size: 28,
+          allCaps: true,
           color: TabiyaBasicColors.DarkBlue,
         }),
       ],
@@ -43,7 +44,7 @@ const SkillsDescription = ({ skillsList }: SkillsDescriptionProps) => {
         children: [
           new TextRun({
             text: capitalizeFirstLetter(skill.preferredLabel),
-            size: 24,
+            size: 22,
             bold: true,
           }),
           new TextRun({
