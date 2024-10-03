@@ -1,14 +1,14 @@
 import "src/_test_utilities/consoleMock";
 import React from "react";
-import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
+import { render, screen, fireEvent, waitFor } from "src/_test_utilities/test-utils";
 import DataProtectionAgreement, { DATA_TEST_ID } from "./DataProtectionAgreement";
 import { HashRouter, useNavigate } from "react-router-dom";
-import { waitFor } from "@testing-library/react";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { TabiyaUser } from "src/auth/auth.types";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import authStateService from "src/auth/services/AuthenticationState.service";
+import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -27,6 +27,18 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
       enqueueSnackbar: jest.fn(),
       closeSnackbar: jest.fn(),
     }),
+  };
+});
+jest.mock("src/userPreferences/UserPreferencesStateService", () => {
+  const actual = jest.requireActual("src/userPreferences/UserPreferencesStateService");
+  return {
+    ...actual,
+    __esModule: true,
+    userPreferencesStateService: {
+      ...actual.userPreferencesStateService,
+      setUserPreferences: jest.fn(),
+      getUserPreferences: jest.fn(),
+    },
   };
 });
 
@@ -117,8 +129,13 @@ describe("Testing Data Protection Policy component", () => {
       email: "foo@bar.baz",
       name: "Foo Bar",
     };
-
-    // AND the user preferences service is mocked to throw an error
+    // AND the user preferences service is mocked to return the given user preferences
+    jest.spyOn(userPreferencesService, "getUserPreferences").mockResolvedValue({
+      user_id: "0001",
+      language: Language.en,
+      sessions: [1]
+    });
+    // AND the user preferences service is mocked to throw an error on update
     jest
       .spyOn(userPreferencesService, "updateUserPreferences")
       .mockRejectedValue(new Error("Failed to update user preferences"));
@@ -138,8 +155,10 @@ describe("Testing Data Protection Policy component", () => {
     expect(console.warn).not.toHaveBeenCalled();
 
     // AND the user accepts the terms and conditions
-    const checkBoxWrapper = screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_CHECKBOX);
-    expect(checkBoxWrapper).toBeInTheDocument();
+    await waitFor(() => {
+      const checkBoxWrapper = screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_CHECKBOX);
+      expect(checkBoxWrapper).toBeInTheDocument();
+    })
 
     // WHEN the user clicks the checkbox
     const checkBoxInput = screen.getByRole("checkbox") as HTMLInputElement;

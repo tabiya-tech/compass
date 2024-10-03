@@ -2,7 +2,14 @@ import React, { useCallback, useState } from "react";
 import Modal from "@mui/material/Modal";
 
 import { Box, CircularProgress, TextField, Typography, useTheme } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
+import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
+
+export enum RegistrationCodeFormModalState {
+    SHOW, HIDE, LOADING,
+}
+
 
 const uniqueId = "f782907a-6904-482c-b148-3c6682bf7b54";
 
@@ -16,6 +23,7 @@ export const DATA_TEST_ID = {
   MODAL_SUBTITLE: `invitation-code-modal-subtitle-${uniqueId}`,
   SUBMIT_BUTTON: `invitation-code-submit-button-${uniqueId}`,
   PROGRESS_ELEMENT: `invitation-code-progress-element-${uniqueId}`,
+  CLOSE_ICON: `invitation-code-close-icon-${uniqueId}`,
 };
 
 export interface InvitationCodeFormModalProps {
@@ -28,6 +36,7 @@ export interface InvitationCodeFormModalProps {
    * @param registrationCode
    */
   onSuccess: (registrationCode: string) => void;
+  onClose: () => void;
 }
 
 /**
@@ -46,12 +55,7 @@ const style = {
   p: 4,
 };
 
-
-export enum RegistrationCodeFormModalState {
-  SHOW, HIDE, LOADING,
-}
-
-const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ modalState, onSuccess }) => {
+const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ modalState, onSuccess, onClose }) => {
   const theme = useTheme();
   const [registrationCode, setRegistrationCode] = useState("");
 
@@ -61,11 +65,25 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ mod
 
   return (<Modal
       open={modalState === RegistrationCodeFormModalState.SHOW || modalState === RegistrationCodeFormModalState.LOADING}
+      onClose={onClose}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
       data-testid={DATA_TEST_ID.CONTAINER}
     >
       <Box sx={style}>
+        <PrimaryIconButton
+          data-testid={DATA_TEST_ID.CLOSE_ICON}
+          title="Close registration code form"
+          onClick={onClose}
+          sx={{
+            position: 'absolute',
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <CloseIcon />
+        </PrimaryIconButton>
         <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.MODAL_TITLE}>
           Registration code
         </Typography>

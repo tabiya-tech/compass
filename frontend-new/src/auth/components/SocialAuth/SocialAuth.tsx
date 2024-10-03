@@ -203,6 +203,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       </Box>
       <RegistrationCodeFormModal
         modalState={showRegistrationCodeForm}
+        onClose={() => setShowRegistrationCodeForm(RegistrationCodeFormModalState.HIDE)}
         onSuccess={handleRegistrationCodeSuccess}
       />
     </Box>

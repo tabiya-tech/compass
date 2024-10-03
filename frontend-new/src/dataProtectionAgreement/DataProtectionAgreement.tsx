@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { Box, Checkbox, Container, styled, Typography, useMediaQuery } from "@mui/material";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Language, UpdateUserPreferencesSpec } from "src/userPreferences/UserPreferencesService/userPreferences.types";
@@ -12,6 +12,9 @@ import { routerPaths } from "src/app/routerPaths";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import { Theme } from "@mui/material/styles";
+import { TabiyaUser } from "src/auth/auth.types";
+import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
+import { Backdrop } from "src/theme/Backdrop/Backdrop";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
@@ -47,11 +50,21 @@ const DataProtectionAgreement: React.FC = () => {
   const [isChecked, setIsChecked] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
+  const [isCheckingPreferences, setIsCheckingPreferences] = useState(true);
 
-  /**
-   * Persist the user's chosen preferences to the backend
-   */
-  const persistUserPreferences = useCallback(async () => {
+  const handleError = useCallback((error: unknown) => {
+    if (error instanceof ServiceError) {
+      writeServiceErrorToLog(error, console.error);
+      enqueueSnackbar(getUserFriendlyErrorMessage(error), { variant: "error" });
+    } else {
+      enqueueSnackbar(`Failed to check user state: ${(error as Error).message}`, { variant: "error" });
+      console.error("Failed to check user state", error);
+    }
+    navigate(routerPaths.LOGIN);
+  }, [enqueueSnackbar, navigate]);
+
+  const checkUserAndPreferences = useCallback(async () => {
+    setIsCheckingPreferences(true);
     try {
       const user = authStateService.getUser();
       if (!user) {
@@ -60,12 +73,62 @@ const DataProtectionAgreement: React.FC = () => {
         return;
       }
 
+      const prefs = await userPreferencesService.getUserPreferences(user.id);
+      if (!prefs) {
+        enqueueSnackbar("User preferences not found", { variant: "error" });
+        await AuthenticationServiceFactory.getAuthenticationService().logout();
+        navigate(routerPaths.LOGIN);
+        return;
+      }
+
+      if (prefs.accepted_tc) {
+        navigate(routerPaths.ROOT, { replace: true });
+      }
+    } catch (error) {
+      handleError(error);
+    } finally {
+      setIsCheckingPreferences(false);
+    }
+  }, [enqueueSnackbar, handleError, navigate]);
+
+  // Check user state and preferences to see if the user exists, if not redirect to login
+  useEffect(() => {
+    checkUserAndPreferences();
+  }, [checkUserAndPreferences]);
+
+  /**
+   * Check user state to see if the user exists
+   */
+  const checkUserState = useCallback(async () => {
+    try {
+      const user = authStateService.getUser();
+      if (!user) {
+        enqueueSnackbar("User not found", { variant: "error" });
+        return;
+      }
+      return user;
+    } catch (e) {
+      if (e instanceof ServiceError) {
+        writeServiceErrorToLog(e, console.error);
+        enqueueSnackbar(getUserFriendlyErrorMessage(e), { variant: "error" });
+      } else {
+        enqueueSnackbar(`Failed to get user: ${(e as Error).message}`, { variant: "error" });
+        console.error("Failed to get user", e);
+      }
+    }
+  }, [enqueueSnackbar]);
+
+  /**
+   * Persist the user's chosen preferences to the backend
+   */
+  const persistUserPreferences = useCallback(async (user: TabiyaUser) => {
+    try {
+      setIsAcceptingDPA(true);
       const newUserPreferenceSpecs: UpdateUserPreferencesSpec = {
         user_id: user.id,
         language: Language.en,
         accepted_tc: new Date(),
       };
-      setIsAcceptingDPA(true);
       const prefs = await userPreferencesService.updateUserPreferences(newUserPreferenceSpecs);
       userPreferencesStateService.setUserPreferences(prefs);
       navigate(routerPaths.ROOT, { replace: true });
@@ -87,7 +150,12 @@ const DataProtectionAgreement: React.FC = () => {
    * Handle when a user accepts the data protection agreement
    */
   const handleAcceptedDPA = async () => {
-    await persistUserPreferences();
+    const user = await checkUserState();
+    if(!user){
+      navigate(routerPaths.LOGIN);
+      return;
+    }
+    await persistUserPreferences(user);
   };
 
   /**
@@ -101,6 +169,8 @@ const DataProtectionAgreement: React.FC = () => {
 
   return (
     <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.DPA_CONTAINER}>
+      {
+        isCheckingPreferences ? (<Backdrop isShown={isCheckingPreferences} message="Checking user state..." data-testid={DATA_TEST_ID.CIRCULAR_PROGRESS}/>) :
       <Box
         display="flex"
         flexDirection="column"
@@ -172,6 +242,7 @@ const DataProtectionAgreement: React.FC = () => {
           Sure, I am ready.
         </PrimaryButton>
       </Box>
+      }
     </Container>
   );
 };
