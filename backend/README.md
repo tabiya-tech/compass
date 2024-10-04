@@ -157,8 +157,8 @@ The backend uses the following environment variables:
 - `LOG_CONFIG_FILE`: (Optional) See the [Logging](#logging) section for more information. If not set defaults to `logging.cfg.yaml`.
 - `BACKEND_URL`: The URL of the backend. It is used to correctly configure Swagger UI and the CORS policy.
 - `FRONTEND_URL`: The URL of the frontend. It is used to set the CORS policy.
-- `ENABLE_SENTRY`: (optional) Set to `True` to enable Sentry error tracking. (disable locally or on CI/CD pipeline for unit tests to run successfully)
-- `SENTRY_BACKEND_DSN`: (optional) The Sentry Data Source Name for error tracking. (the backend DSN is for the project used to track backend errors)
+- `ENABLE_SENTRY`: Set to `True` to enable Sentry error tracking. Set to `False`to disable locally or on CI/CD pipeline so that the unit tests can run successfully.
+- `SENTRY_BACKEND_DSN`: (optional) The Sentry Data Source Name used to track backend errors.
 - `TARGET_ENVIRONMENT`: (optional) The target environment where the backend is running. When set to `dev` or `local`, CORS will be set to allow all origins.
   > Note: The `FRONTEND_URL` should be set irrespective of the `TARGET_ENVIRONMENT` value.
 
@@ -180,6 +180,8 @@ LOG_CONFIG_FILE=<YAML_FILE>
 BACKEND_URL=<URL>
 FRONTEND_URL=<URL>
 TARGET_ENVIRONMENT=<ENVIRONMENT>
+ENABLE_SENTRY=False|True
+SENTRY_BACKEND_DSN=<SENTRY_DSN>
 ```
 
 > ATTENTION: The .env file should be kept secure and not shared with others as it contains sensitive information.
@@ -257,6 +259,7 @@ BACKEND_URL=*
 FRONTEND_URL=*
 # will add CORS policy to allow all origins
 TARGET_ENVIRONMENT=local
+ENABLE_SENTRY=False
 ```
 
 Run the image using the following command:
