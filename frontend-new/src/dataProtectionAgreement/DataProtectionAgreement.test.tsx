@@ -133,7 +133,7 @@ describe("Testing Data Protection Policy component", () => {
     jest.spyOn(userPreferencesService, "getUserPreferences").mockResolvedValue({
       user_id: "0001",
       language: Language.en,
-      sessions: [1]
+      sessions: [1],
     });
     // AND the user preferences service is mocked to throw an error on update
     jest
@@ -158,7 +158,7 @@ describe("Testing Data Protection Policy component", () => {
     await waitFor(() => {
       const checkBoxWrapper = screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_CHECKBOX);
       expect(checkBoxWrapper).toBeInTheDocument();
-    })
+    });
 
     // WHEN the user clicks the checkbox
     const checkBoxInput = screen.getByRole("checkbox") as HTMLInputElement;

@@ -6,24 +6,24 @@ import { jwtDecode } from "jwt-decode";
  * AuthenticationStateService manages the authentication state of the application.
  * It provides methods to get, set, and clear the current user, as well as to update
  * the user based on an authentication token.
- * 
+ *
  * Role:
  * - Acts as a centralized store for the current user's authentication state.
  * - Provides methods to manage and access the authentication state throughout the application.
- * 
+ *
  * Responsibilities:
  * - Stores and manages the current user object.
  * - Provides methods to get and set the current user.
  * - Handles token decoding and user object creation from tokens.
  * - Manages the persistence of authentication tokens.
  * - Validates token expiration.
- * 
+ *
  * Boundaries:
  * - Does not perform authentication operations (login, logout, etc.).
  * - Does not interact directly with authentication providers (e.g., Firebase).
  * - Does not manage user sessions beyond storing the current user object.
  * - Relies on PersistentStorageService for token storage.
- * 
+ *
  * Usage:
  * This service should be used whenever the application needs to access or modify
  * the current user's authentication state. It provides a single source of truth
@@ -41,7 +41,7 @@ export class AuthenticationStateService {
   /**
    * Returns the singleton instance of AuthenticationStateService.
    * Creates a new instance if one doesn't exist.
-   * 
+   *
    * @returns {AuthenticationStateService} The singleton instance.
    */
   public static getInstance(): AuthenticationStateService {
@@ -53,7 +53,7 @@ export class AuthenticationStateService {
 
   /**
    * Retrieves the current user.
-   * 
+   *
    * @returns {TabiyaUser | null} The current user object or null if no user is authenticated.
    */
   public getUser(): TabiyaUser | null {
@@ -62,7 +62,7 @@ export class AuthenticationStateService {
 
   /**
    * Sets the current user.
-   * 
+   *
    * @param {TabiyaUser | null} user - The user object to set.
    */
   private setUser(user: TabiyaUser | null) {
@@ -71,7 +71,7 @@ export class AuthenticationStateService {
 
   /**
    * Extracts user information from a JWT token.
-   * 
+   *
    * @param {string} token - The JWT token to decode.
    * @returns {TabiyaUser | null} The user object extracted from the token, or null if extraction fails.
    */
@@ -125,7 +125,7 @@ export class AuthenticationStateService {
 
   /**
    * Updates the current user based on a provided token.
-   * 
+   *
    * @param {string} token - The authentication token to use for updating the user.
    * @returns {TabiyaUser | null} The updated user object, or null if update fails.
    */
@@ -146,7 +146,7 @@ export class AuthenticationStateService {
 
   /**
    * Checks if a given token is valid (not expired and not issued in the future).
-   * 
+   *
    * @param {string} token - The token to validate.
    * @returns {boolean} True if the token is valid, false otherwise.
    */
@@ -177,7 +177,7 @@ export class AuthenticationStateService {
 
   /**
    * Loads the user from the stored token if available and valid.
-   * 
+   *
    * @returns {Promise<TabiyaUser | null>} The loaded user object, or null if loading fails.
    */
   public async loadUser(): Promise<TabiyaUser | null> {

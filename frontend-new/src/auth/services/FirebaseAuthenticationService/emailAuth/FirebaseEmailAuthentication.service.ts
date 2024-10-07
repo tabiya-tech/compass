@@ -99,7 +99,7 @@ class FirebaseEmailAuthenticationService extends FirebaseAuthenticationService {
     );
     const invitation = await invitationsService.checkInvitationCodeStatus(registrationCode);
     if (invitation.status === InvitationStatus.INVALID || invitation.invitation_type !== InvitationType.REGISTER) {
-      console.log(invitation)
+      console.log(invitation);
       throw new Error("Invalid invitation code");
     }
 

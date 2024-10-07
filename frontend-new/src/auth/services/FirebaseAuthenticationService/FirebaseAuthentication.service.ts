@@ -32,8 +32,7 @@ class FirebaseAuthenticationService extends AuthenticationService {
   private refreshTimeout: NodeJS.Timeout | null = null;
   private readonly unsubscribeAuthListener: () => void;
 
-  constructor(
-  ) {
+  constructor() {
     super();
     this.finishPendingLogout();
     this.unsubscribeAuthListener = this.setupAuthListener();
@@ -182,10 +181,10 @@ class FirebaseAuthenticationService extends AuthenticationService {
     });
   }
 
-   /**
+  /**
    * Clears the refresh timeout if it exists.
    */
-   private clearRefreshTimeout() {
+  private clearRefreshTimeout() {
     console.debug("Clearing refresh timeout");
     if (this.refreshTimeout) {
       clearTimeout(this.refreshTimeout);
@@ -209,7 +208,7 @@ class FirebaseAuthenticationService extends AuthenticationService {
   private async finishPendingLogout() {
     if (PersistentStorageService.getLoggedOutFlag()) {
       try {
-        await this.logout()
+        await this.logout();
       } catch (e) {
         console.error("Failed to logout user on page load", e);
       }

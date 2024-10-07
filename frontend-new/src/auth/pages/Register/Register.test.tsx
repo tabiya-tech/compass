@@ -13,9 +13,7 @@ import { userPreferencesService } from "src/userPreferences/UserPreferencesServi
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import { TabiyaUser } from "src/auth/auth.types";
-import {
-  userPreferencesStateService
-} from "src/userPreferences/UserPreferencesStateService";
+import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import * as AuthenticationServiceFactoryModule from "src/auth/services/Authentication.service.factory";
 
 //mock the SocialAuth component
@@ -234,14 +232,14 @@ describe("Testing Register component", () => {
     });
     // AND the user has a valid invitation code
     // AND check invitation code status returns a valid code
+    jest.spyOn(invitationsService, "checkInvitationCodeStatus").mockResolvedValue({
+      invitation_type: InvitationType.REGISTER,
+      status: InvitationStatus.VALID,
+      invitation_code: givenInvitationCode,
+    });
     jest
-      .spyOn(invitationsService, "checkInvitationCodeStatus")
-      .mockResolvedValue({
-        invitation_type: InvitationType.REGISTER,
-        status: InvitationStatus.VALID,
-        invitation_code: givenInvitationCode,
-      });
-    jest.spyOn(AuthenticationServiceFactoryModule.default, "getAuthenticationService").mockReturnValue(FirebaseEmailAuthenticationService.getInstance());
+      .spyOn(AuthenticationServiceFactoryModule.default, "getAuthenticationService")
+      .mockReturnValue(FirebaseEmailAuthenticationService.getInstance());
 
     // AND the auth state service is mocked to return a user
     jest.spyOn(authStateService, "updateUserByToken").mockImplementation((token) => {
@@ -289,9 +287,9 @@ describe("Testing Register component", () => {
 
   test("it should show error message on failed registration", async () => {
     // GIVEN a failed registration
-    const registerMock = jest.fn().mockRejectedValue(
-      new Error("An unexpected error occurred. Please try again later.")
-    );
+    const registerMock = jest
+      .fn()
+      .mockRejectedValue(new Error("An unexpected error occurred. Please try again later."));
     jest.spyOn(FirebaseEmailAuthenticationService, "getInstance").mockImplementation(() => {
       return {
         register: registerMock,
@@ -305,7 +303,9 @@ describe("Testing Register component", () => {
     const givenPassword = "password";
     const givenInvitationCode = "foo-bar";
 
-    jest.spyOn(AuthenticationServiceFactoryModule.default, "getAuthenticationService").mockReturnValue(FirebaseEmailAuthenticationService.getInstance());
+    jest
+      .spyOn(AuthenticationServiceFactoryModule.default, "getAuthenticationService")
+      .mockReturnValue(FirebaseEmailAuthenticationService.getInstance());
     // WHEN the component is rendered
     render(
       <HashRouter>

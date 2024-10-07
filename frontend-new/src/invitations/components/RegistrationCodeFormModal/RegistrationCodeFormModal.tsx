@@ -7,9 +7,10 @@ import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 
 export enum RegistrationCodeFormModalState {
-    SHOW, HIDE, LOADING,
+  SHOW,
+  HIDE,
+  LOADING,
 }
-
 
 const uniqueId = "f782907a-6904-482c-b148-3c6682bf7b54";
 
@@ -63,7 +64,8 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ mod
     onSuccess(registrationCode);
   }, [onSuccess, registrationCode]);
 
-  return (<Modal
+  return (
+    <Modal
       open={modalState === RegistrationCodeFormModalState.SHOW || modalState === RegistrationCodeFormModalState.LOADING}
       onClose={onClose}
       aria-labelledby="modal-modal-title"
@@ -76,7 +78,7 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ mod
           title="Close registration code form"
           onClick={onClose}
           sx={{
-            position: 'absolute',
+            position: "absolute",
             right: 8,
             top: 8,
             color: (theme) => theme.palette.grey[500],
@@ -107,13 +109,19 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ mod
           onClick={handleAcceptRegistrationCode}
           disabled={!registrationCode.length}
         >
-          {modalState === RegistrationCodeFormModalState.LOADING ?
-            <CircularProgress sx={{ color: (theme) => theme.palette.info.contrastText }}
-                              size={2 * theme.typography.fontSize}
-                              data-testid={DATA_TEST_ID.PROGRESS_ELEMENT} /> : "Submit"}
+          {modalState === RegistrationCodeFormModalState.LOADING ? (
+            <CircularProgress
+              sx={{ color: (theme) => theme.palette.info.contrastText }}
+              size={2 * theme.typography.fontSize}
+              data-testid={DATA_TEST_ID.PROGRESS_ELEMENT}
+            />
+          ) : (
+            "Submit"
+          )}
         </PrimaryButton>
       </Box>
-    </Modal>);
+    </Modal>
+  );
 };
 
 export default RegistrationCodeFormModal;

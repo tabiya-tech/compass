@@ -52,16 +52,19 @@ const DataProtectionAgreement: React.FC = () => {
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
   const [isCheckingPreferences, setIsCheckingPreferences] = useState(true);
 
-  const handleError = useCallback((error: unknown) => {
-    if (error instanceof ServiceError) {
-      writeServiceErrorToLog(error, console.error);
-      enqueueSnackbar(getUserFriendlyErrorMessage(error), { variant: "error" });
-    } else {
-      enqueueSnackbar(`Failed to check user state: ${(error as Error).message}`, { variant: "error" });
-      console.error("Failed to check user state", error);
-    }
-    navigate(routerPaths.LOGIN);
-  }, [enqueueSnackbar, navigate]);
+  const handleError = useCallback(
+    (error: unknown) => {
+      if (error instanceof ServiceError) {
+        writeServiceErrorToLog(error, console.error);
+        enqueueSnackbar(getUserFriendlyErrorMessage(error), { variant: "error" });
+      } else {
+        enqueueSnackbar(`Failed to check user state: ${(error as Error).message}`, { variant: "error" });
+        console.error("Failed to check user state", error);
+      }
+      navigate(routerPaths.LOGIN);
+    },
+    [enqueueSnackbar, navigate]
+  );
 
   const checkUserAndPreferences = useCallback(async () => {
     setIsCheckingPreferences(true);
@@ -121,37 +124,40 @@ const DataProtectionAgreement: React.FC = () => {
   /**
    * Persist the user's chosen preferences to the backend
    */
-  const persistUserPreferences = useCallback(async (user: TabiyaUser) => {
-    try {
-      setIsAcceptingDPA(true);
-      const newUserPreferenceSpecs: UpdateUserPreferencesSpec = {
-        user_id: user.id,
-        language: Language.en,
-        accepted_tc: new Date(),
-      };
-      const prefs = await userPreferencesService.updateUserPreferences(newUserPreferenceSpecs);
-      userPreferencesStateService.setUserPreferences(prefs);
-      navigate(routerPaths.ROOT, { replace: true });
-      enqueueSnackbar("Data Protection Agreement Accepted", { variant: "success" });
-    } catch (e) {
-      if (e instanceof ServiceError) {
-        writeServiceErrorToLog(e, console.error);
-        enqueueSnackbar(getUserFriendlyErrorMessage(e), { variant: "error" });
-      } else {
-        enqueueSnackbar(`Failed to update user preferences: ${(e as Error).message}`, { variant: "error" });
-        console.error("Failed to update user preferences", e);
+  const persistUserPreferences = useCallback(
+    async (user: TabiyaUser) => {
+      try {
+        setIsAcceptingDPA(true);
+        const newUserPreferenceSpecs: UpdateUserPreferencesSpec = {
+          user_id: user.id,
+          language: Language.en,
+          accepted_tc: new Date(),
+        };
+        const prefs = await userPreferencesService.updateUserPreferences(newUserPreferenceSpecs);
+        userPreferencesStateService.setUserPreferences(prefs);
+        navigate(routerPaths.ROOT, { replace: true });
+        enqueueSnackbar("Data Protection Agreement Accepted", { variant: "success" });
+      } catch (e) {
+        if (e instanceof ServiceError) {
+          writeServiceErrorToLog(e, console.error);
+          enqueueSnackbar(getUserFriendlyErrorMessage(e), { variant: "error" });
+        } else {
+          enqueueSnackbar(`Failed to update user preferences: ${(e as Error).message}`, { variant: "error" });
+          console.error("Failed to update user preferences", e);
+        }
+      } finally {
+        setIsAcceptingDPA(false);
       }
-    } finally {
-      setIsAcceptingDPA(false);
-    }
-  }, [enqueueSnackbar, navigate]);
+    },
+    [enqueueSnackbar, navigate]
+  );
 
   /**
    * Handle when a user accepts the data protection agreement
    */
   const handleAcceptedDPA = async () => {
     const user = await checkUserState();
-    if(!user){
+    if (!user) {
       navigate(routerPaths.LOGIN);
       return;
     }
@@ -169,80 +175,85 @@ const DataProtectionAgreement: React.FC = () => {
 
   return (
     <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.DPA_CONTAINER}>
-      {
-        isCheckingPreferences ? (<Backdrop isShown={isCheckingPreferences} message="Checking user state..." data-testid={DATA_TEST_ID.CIRCULAR_PROGRESS}/>) :
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="start"
-        justifyContent={"space-evenly"}
-        m={4}
-        height={"80%"}
-      >
-        <Box display="flex" flexDirection="row" justifyContent="center" alignItems="center">
-          <img
-            src={`${process.env.PUBLIC_URL}/logo.svg`}
-            alt="Logo"
-            style={{ maxWidth: "60%", margin: "10%" }}
-            data-testid={DATA_TEST_ID.LOGO}
-          />
-          <LanguageContextMenu />
-        </Box>
-        <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.TITLE}>
-          Thank you for using Compass.
-        </Typography>
-        <Typography variant="body2" gutterBottom data-testid={DATA_TEST_ID.AGREEMENT_BODY}>
-          We created this AI tool for you with care to help you and other young people like you explore their skills and
-          discover new opportunities.
-          <br />
-          <br />
-          <HighlightedSpan>Please use AI responsibly!</HighlightedSpan>
-          <br />
-          <br />
-          AI technology is new and far from perfect. It doesn't understand context like humans do.
-          <br />
-          <br />
-          Always double-check any important information and avoid sharing personal data.
-          <br />
-          <br />
-          Help us keep all AI interactions safe and positive! 😊
-          <br />
-          <br />
-        </Typography>
-        <Box display="flex" alignItems="start" paddingBottom={3} gap={isSmallMobile ? 3 : 1.5}>
-          <Checkbox
-            checked={isChecked}
-            onChange={handleCheckboxChange}
-            sx={{ padding: 0, marginTop: 0.5, transform: "scale(1.3)" }}
-            inputProps={{ "aria-label": label }}
-            data-testid={DATA_TEST_ID.ACCEPT_DPA_CHECKBOX}
-          />
-          <Typography variant="body2" data-testid={DATA_TEST_ID.TERMS_AND_CONDITIONS}>
-            {label}
-            <StyledAnchor href="https://compass.tabiya.org/dpa.html" target="_blank" rel="noreferrer">
-              Terms and Conditions
-            </StyledAnchor>{" "}
-            of Compass.
-          </Typography>
-        </Box>
-        <Typography>
-          Are you ready to start?
-          <br />
-        </Typography>
-        <PrimaryButton
-          fullWidth
-          variant="contained"
-          color="primary"
-          style={{ marginTop: 16 }}
-          disabled={isAcceptingDPA || !isChecked}
-          disableWhenOffline={true}
-          data-testid={DATA_TEST_ID.ACCEPT_DPA_BUTTON}
-          onClick={handleAcceptedDPA}
+      {isCheckingPreferences ? (
+        <Backdrop
+          isShown={isCheckingPreferences}
+          message="Checking user state..."
+          data-testid={DATA_TEST_ID.CIRCULAR_PROGRESS}
+        />
+      ) : (
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="start"
+          justifyContent={"space-evenly"}
+          m={4}
+          height={"80%"}
         >
-          Sure, I am ready.
-        </PrimaryButton>
-      </Box>
-      }
+          <Box display="flex" flexDirection="row" justifyContent="center" alignItems="center">
+            <img
+              src={`${process.env.PUBLIC_URL}/logo.svg`}
+              alt="Logo"
+              style={{ maxWidth: "60%", margin: "10%" }}
+              data-testid={DATA_TEST_ID.LOGO}
+            />
+            <LanguageContextMenu />
+          </Box>
+          <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.TITLE}>
+            Thank you for using Compass.
+          </Typography>
+          <Typography variant="body2" gutterBottom data-testid={DATA_TEST_ID.AGREEMENT_BODY}>
+            We created this AI tool for you with care to help you and other young people like you explore their skills
+            and discover new opportunities.
+            <br />
+            <br />
+            <HighlightedSpan>Please use AI responsibly!</HighlightedSpan>
+            <br />
+            <br />
+            AI technology is new and far from perfect. It doesn't understand context like humans do.
+            <br />
+            <br />
+            Always double-check any important information and avoid sharing personal data.
+            <br />
+            <br />
+            Help us keep all AI interactions safe and positive! 😊
+            <br />
+            <br />
+          </Typography>
+          <Box display="flex" alignItems="start" paddingBottom={3} gap={isSmallMobile ? 3 : 1.5}>
+            <Checkbox
+              checked={isChecked}
+              onChange={handleCheckboxChange}
+              sx={{ padding: 0, marginTop: 0.5, transform: "scale(1.3)" }}
+              inputProps={{ "aria-label": label }}
+              data-testid={DATA_TEST_ID.ACCEPT_DPA_CHECKBOX}
+            />
+            <Typography variant="body2" data-testid={DATA_TEST_ID.TERMS_AND_CONDITIONS}>
+              {label}
+              <StyledAnchor href="https://compass.tabiya.org/dpa.html" target="_blank" rel="noreferrer">
+                Terms and Conditions
+              </StyledAnchor>{" "}
+              of Compass.
+            </Typography>
+          </Box>
+          <Typography>
+            Are you ready to start?
+            <br />
+          </Typography>
+          <PrimaryButton
+            fullWidth
+            variant="contained"
+            color="primary"
+            style={{ marginTop: 16 }}
+            disabled={isAcceptingDPA || !isChecked}
+            disableWhenOffline={true}
+            data-testid={DATA_TEST_ID.ACCEPT_DPA_BUTTON}
+            onClick={handleAcceptedDPA}
+          >
+            Sure, I am ready.
+          </PrimaryButton>
+        </Box>
+      )}
     </Container>
   );
 };

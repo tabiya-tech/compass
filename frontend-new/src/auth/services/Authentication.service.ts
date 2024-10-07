@@ -11,13 +11,13 @@ import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
 
 /**
  * Abstract class representing an authentication service.
- * 
+ *
  * This class defines the contract for any authentication service implementation.
  * It ensures that all implementing classes provide methods to refresh tokens,
  * perform cleanup operations, and handle logout.
- * 
+ *
  * Subclasses must implement the abstract methods to provide specific authentication logic.
- * 
+ *
  * All instances of AuthenticationServices should be singletons.
  */
 abstract class AuthenticationService {
@@ -25,8 +25,8 @@ abstract class AuthenticationService {
   private readonly userPreferencesStateService: UserPreferencesStateService;
 
   protected constructor() {
-      this.authenticationStateService = AuthenticationStateService.getInstance();
-      this.userPreferencesStateService = UserPreferencesStateService.getInstance();
+    this.authenticationStateService = AuthenticationStateService.getInstance();
+    this.userPreferencesStateService = UserPreferencesStateService.getInstance();
   }
 
   /**
@@ -74,7 +74,7 @@ abstract class AuthenticationService {
       "POST",
       "onSuccessfulRegistration"
     );
-    try{
+    try {
       const _user = authStateService.updateUserByToken(token);
       if (_user) {
         // create user preferences for the first time.
@@ -87,8 +87,8 @@ abstract class AuthenticationService {
         userPreferencesStateService.setUserPreferences(prefs);
       } else {
         throw new Error("User not found");
-      }}
-    catch (error) {
+      }
+    } catch (error) {
       throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (error as any).code, (error as any).message);
     }
   }
@@ -96,7 +96,6 @@ abstract class AuthenticationService {
   async onSuccessfulRefresh(token: string): Promise<void> {
     this.authenticationStateService.updateUserByToken(token);
   }
-
 }
 
 export default AuthenticationService;

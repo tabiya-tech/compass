@@ -2,7 +2,7 @@
 import "src/_test_utilities/consoleMock";
 
 import React from "react";
-import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
+import { fireEvent, render, screen } from "src/_test_utilities/test-utils";
 import RegistrationCodeFormModal, { DATA_TEST_ID, RegistrationCodeFormModalState } from "./RegistrationCodeFormModal";
 
 // Mock InvitationsService
@@ -26,8 +26,6 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
 });
 
 describe("RegistrationCodeFormModal", () => {
-
-
   it("renders correctly when modal is shown and call onSuccess with the provided code", () => {
     // GIVEN the component is shown
     const givenShown = RegistrationCodeFormModalState.SHOW;
@@ -52,7 +50,6 @@ describe("RegistrationCodeFormModal", () => {
     // AND the component should match the snapshot
     expect(container).toMatchSnapshot();
 
-
     // WHEN the registration code is entered
     const registrationCode = "foo";
     fireEvent.change(screen.getByTestId(DATA_TEST_ID.INVITATION_CODE_INPUT), { target: { value: registrationCode } });
@@ -65,13 +62,13 @@ describe("RegistrationCodeFormModal", () => {
   });
   test("closes the modal when the close icon is clicked", () => {
     // GIVEN the component is shown
-    const givenShown = true;
+    const givenModalState = RegistrationCodeFormModalState.SHOW;
 
     // AND the onClose function is a jest function
     const givenOnClose = jest.fn();
 
     // WHEN the component is rendered
-    render(<RegistrationCodeFormModal onClose={givenOnClose} show={givenShown} onSuccess={jest.fn()} />);
+    render(<RegistrationCodeFormModal onClose={givenOnClose} modalState={givenModalState} onSuccess={jest.fn()} />);
 
     // THEN the component should render correctly
     const container = screen.getByTestId(DATA_TEST_ID.CONTAINER);

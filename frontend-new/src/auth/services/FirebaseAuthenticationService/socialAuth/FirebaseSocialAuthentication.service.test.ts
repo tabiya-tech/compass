@@ -33,10 +33,10 @@ jest.mock("firebaseui", () => {
 jest.mock("src/userPreferences/UserPreferencesService/userPreferences.service", () => {
   return {
     userPreferencesService: {
-      getUserPreferences: jest.fn()
+      getUserPreferences: jest.fn(),
     },
   };
-})
+});
 
 describe("SocialAuthService class tests", () => {
   let authService: FirebaseSocialAuthService;

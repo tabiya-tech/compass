@@ -84,25 +84,22 @@ const Register: React.FC = () => {
    * Handles what happens after social registration (same process as login)
    * @param user
    */
-  const handlePostLogin = useCallback(
-    async () => {
-      try {
-        setIsLoading(true);
-        const prefs = userPreferencesStateService.getUserPreferences();
-        if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
-          navigate(routerPaths.DPA, { replace: true });
-        } else {
-          navigate(routerPaths.ROOT, { replace: true });
-          enqueueSnackbar("Welcome back!", { variant: "success" });
-        }
-      } catch (error) {
-        await handleError(error as Error);
-      } finally {
-        setIsLoading(false);
+  const handlePostLogin = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const prefs = userPreferencesStateService.getUserPreferences();
+      if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
+        navigate(routerPaths.DPA, { replace: true });
+      } else {
+        navigate(routerPaths.ROOT, { replace: true });
+        enqueueSnackbar("Welcome back!", { variant: "success" });
       }
-    },
-    [navigate, enqueueSnackbar, handleError]
-  );
+    } catch (error) {
+      await handleError(error as Error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [navigate, enqueueSnackbar, handleError]);
 
   /* ------------
    * Actual registration handlers

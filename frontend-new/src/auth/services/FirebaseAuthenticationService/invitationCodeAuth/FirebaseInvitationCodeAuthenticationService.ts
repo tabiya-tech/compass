@@ -49,21 +49,18 @@ class FirebaseInvitationCodeAuthenticationService extends FirebaseAuthentication
       "handleInvitationCodeLogin",
       "POST",
       "signInAnonymously"
-    )
+    );
     let userCredential;
     let invitation;
     try {
       // first check if the invitation code is valid
       invitation = await invitationsService.checkInvitationCodeStatus(code);
-      if (
-        invitation.status !== InvitationStatus.VALID ||
-        invitation.invitation_type !== InvitationType.AUTO_REGISTER
-      ) {
+      if (invitation.status !== InvitationStatus.VALID || invitation.invitation_type !== InvitationType.AUTO_REGISTER) {
         throw serviceErrorFactory(
           StatusCodes.FORBIDDEN,
           serviceErrorConstants.ErrorCodes.INVALID_INVITATION_CODE,
           "Invalid invitation code"
-        )
+        );
       }
       userCredential = await auth.signInAnonymously();
     } catch (error: unknown) {
@@ -97,13 +94,13 @@ class FirebaseInvitationCodeAuthenticationService extends FirebaseAuthentication
           StatusCodes.NOT_FOUND,
           serviceErrorConstants.ErrorCodes.NOT_FOUND,
           "User could not be extracted from token"
-        )
+        );
       }
     } catch (err) {
       throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (err as any).code, (err as any).message);
     }
     // call the parent class method once the user is successfully logged in
-    await super.onSuccessfulLogin(token)
+    await super.onSuccessfulLogin(token);
     return token;
   }
 }

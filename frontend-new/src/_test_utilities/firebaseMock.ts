@@ -5,7 +5,7 @@ const auth = {
   },
   onAuthStateChanged: jest.fn().mockReturnValue(jest.fn()),
   signInWithPopup: jest.fn(),
-  GoogleAuthProvider: { PROVIDER_ID: "google.com"},
+  GoogleAuthProvider: { PROVIDER_ID: "google.com" },
 };
 
 const firebase = {

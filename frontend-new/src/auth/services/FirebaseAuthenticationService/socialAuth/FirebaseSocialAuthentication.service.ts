@@ -51,7 +51,6 @@ class FirebaseSocialAuthenticationService extends FirebaseAuthenticationService 
       // call the parent class method once the user is successfully logged in
       await super.onSuccessfulLogin(tokenResponse);
       return tokenResponse;
-
     } catch (error) {
       throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (error as any).code, (error as any).message);
     }

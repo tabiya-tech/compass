@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`RegistrationCodeFormModal renders correctly when modal is shown and call onSuccess with the provided code 1`] = `
+exports[`RegistrationCodeFormModal closes the modal when the close icon is clicked 1`] = `
 <div
   aria-describedby="modal-modal-description"
   aria-labelledby="modal-modal-title"
