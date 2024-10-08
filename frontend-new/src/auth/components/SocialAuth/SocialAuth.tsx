@@ -38,31 +38,32 @@ export interface SocialAuthProps {
 }
 
 const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
-  registrationCode,
-  disabled = false,
-  label,
-  postLoginHandler,
-  isLoading,
-  notifyOnLoading,
-}) => {
+                                                           registrationCode,
+                                                           disabled = false,
+                                                           label,
+                                                           postLoginHandler,
+                                                           isLoading,
+                                                           notifyOnLoading,
+                                                         }) => {
   const isOnline = useContext(IsOnlineContext);
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const [error, setError] = useState("");
   const [_registrationCode, setRegistrationCode] = useState(registrationCode);
+
   const [showRegistrationCodeForm, setShowRegistrationCodeForm] = useState<RegistrationCodeFormModalState>(
-    RegistrationCodeFormModalState.HIDE
+    RegistrationCodeFormModalState.HIDE,
   );
 
   useEffect(() => {
     setRegistrationCode(registrationCode);
   }, [registrationCode]);
 
+
   const handleError = useCallback(
     async (error: Error) => {
       // if the registration code is not valid or something goes wrong, log the user out
-      const firebaseSocialAuthServiceInstance = await FirebaseSocialAuthenticationService.getInstance();
+      const firebaseSocialAuthServiceInstance = FirebaseSocialAuthenticationService.getInstance();
       await firebaseSocialAuthServiceInstance.logout();
       // clear the registration code from the state
       setRegistrationCode(registrationCode);
@@ -77,10 +78,9 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
         errorMessage = error.message;
         console.error(error);
       }
-      setError(errorMessage);
       enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
     },
-    [enqueueSnackbar, registrationCode]
+    [enqueueSnackbar, registrationCode],
   );
 
   const registerUser = useCallback(
@@ -92,11 +92,15 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
           throw new Error("Something went wrong: No user found");
         }
         const invitation = await invitationsService.checkInvitationCodeStatus(registrationCode);
-        if (invitation.status !== InvitationStatus.VALID || invitation.invitation_type !== InvitationType.REGISTER) {
-          throw new Error("Invalid invitation code");
+        if (invitation.status === InvitationStatus.INVALID) {
+          throw Error("The registration code is invalid");
         }
+        if (invitation.invitation_type !== InvitationType.REGISTER) {
+          throw Error("The invitation code is not for registration");
+        }
+
         // create user preferences for the first time.
-        // in order to do this, there needs to be a logged in user in the persistent storage
+        // in order to do this, there needs to be a logged-in user in the persistent storage
         const prefs = await userPreferencesService.createUserPreferences({
           user_id: _user.id,
           invitation_code: invitation.invitation_code,
@@ -107,14 +111,14 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
         await handleError(error);
       }
     },
-    [handleError]
+    [handleError],
   );
 
   const loginWithPopup = useCallback(async () => {
     try {
       notifyOnLoading(true);
-      // first login with google
-      const firebaseSocialAuthServiceInstance = await FirebaseSocialAuthenticationService.getInstance();
+      // first login with Google
+      const firebaseSocialAuthServiceInstance = FirebaseSocialAuthenticationService.getInstance();
       await firebaseSocialAuthServiceInstance.loginWithGoogle();
       // check if the user is already registered
       const prefs = userPreferencesStateService.getUserPreferences();
@@ -145,7 +149,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       postLoginHandler();
       setShowRegistrationCodeForm(RegistrationCodeFormModalState.HIDE);
     },
-    [registerUser, postLoginHandler]
+    [registerUser, postLoginHandler],
   );
 
   const socialAuthLoading = isLoading || !isOnline || disabled;
@@ -164,19 +168,6 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       </Typography>
       <Box mt={2} width="100%">
         <div data-test_id={DATA_TEST_ID.FIREBASE_AUTH}>
-          {error && (
-            <Typography
-              variant="subtitle2"
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                color: (theme) => theme.palette.error.main,
-              }}
-            >
-              {error}
-            </Typography>
-          )}
           <Button
             variant="text"
             size={"medium"}
