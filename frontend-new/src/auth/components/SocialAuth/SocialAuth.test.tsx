@@ -10,7 +10,7 @@ import { act } from "@testing-library/react";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import { TabiyaUser } from "../../auth.types";
+import { TabiyaUser } from "src/auth/auth.types";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({

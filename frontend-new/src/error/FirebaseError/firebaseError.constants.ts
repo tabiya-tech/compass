@@ -11,6 +11,7 @@ export enum FirebaseErrorCodes {
   TOO_MANY_REQUESTS = "auth/too-many-requests",
   INTERNAL_ERROR = "auth/internal-error",
   TOO_MANY_USERS = "auth/too-many-users",
+  POPUP_CLOSED_BY_USER = "auth/popup-closed-by-user",
   INVALID_REGISTRATION_CODE = "INVALID_REGISTRATION_CODE",
   INVALID_INVITATION_CODE = "INVALID_INVITATION_CODE",
   INVALID_INVITATION_TYPE = "INVALID_INVITATION_TYPE",
@@ -44,4 +45,5 @@ export const USER_FRIENDLY_FIREBASE_ERROR_MESSAGES: Record<FirebaseErrorCodes, s
     "The invitation code you used is for registration rather than logging in. Please go to the register page.",
   [FirebaseErrorCodes.INVALID_REGISTRATION_TYPE]:
     "The invitation code you used is for logging in rather than registration. Please go to the login page.",
+  [FirebaseErrorCodes.POPUP_CLOSED_BY_USER]: "The Google sign-in popup was closed before completing the sign-in process.",
 };
