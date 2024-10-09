@@ -2,14 +2,18 @@ import React, { useEffect, useState } from "react";
 import { Box, Divider, Drawer, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import ExperiencesDrawerHeader from "src/Experiences/components/ExperiencesDrawerHeader/ExperiencesDrawerHeader";
-import ExperiencesDrawerContent, {
-  LoadingExperienceDrawerContent,
-} from "src/Experiences/components/ExperiencesDrawerContent/ExperiencesDrawerContent";
+import { LoadingExperienceDrawerContent } from "src/Experiences/components/ExperiencesDrawerContent/ExperiencesDrawerContent";
 import { Experience } from "src/Experiences/ExperienceService/Experiences.types";
 import CustomTextField from "src/theme/CustomTextField/CustomTextField";
 import CustomAccordion from "src/theme/CustomAccordion/CustomAccordion";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import DownloadReportDropdown from "src/Experiences/components/DownloadReportDropdown/DownloadReportDropdown";
+import { groupExperiencesByWorkType } from "src/Report/util";
+import { ReportContent } from "src/Report/ReportContent";
+import StoreIcon from "@mui/icons-material/Store";
+import WorkIcon from "@mui/icons-material/Work";
+import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
+import ExperienceCategory from "src/Experiences/components/ExperienceCategory/ExperienceCategory";
 
 export interface ExperiencesDrawerProps {
   isOpen: boolean;
@@ -93,6 +97,10 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
     notifyOnClose({ name: CloseEventName.DISMISS });
   };
 
+  // Group experiences by work type
+  const { selfEmploymentExperiences, salaryWorkExperiences, unpaidWorkExperiences } =
+    groupExperiencesByWorkType(experiences);
+
   const tooltipText = "We don’t save these information. The information you provide will only be used for the report.";
   return (
     <Drawer
@@ -173,8 +181,25 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
           )}
 
           {/* EXPERIENCES */}
-          {!isLoading &&
-            experiences.map((experience, index) => <ExperiencesDrawerContent key={index} experience={experience} />)}
+          {!isLoading && (
+            <Box display="flex" flexDirection="column" gap={isSmallMobile ? 10 : 6}>
+              <ExperienceCategory
+                icon={<StoreIcon />}
+                title={ReportContent.SELF_EMPLOYMENT_TITLE}
+                experiences={selfEmploymentExperiences}
+              />
+              <ExperienceCategory
+                icon={<WorkIcon />}
+                title={ReportContent.SALARY_WORK_TITLE}
+                experiences={salaryWorkExperiences}
+              />
+              <ExperienceCategory
+                icon={<VolunteerActivismIcon />}
+                title={ReportContent.UNPAID_WORK_TITLE}
+                experiences={unpaidWorkExperiences}
+              />
+            </Box>
+          )}
         </Box>
       </Box>
     </Drawer>

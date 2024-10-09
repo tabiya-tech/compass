@@ -183,186 +183,246 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
         class="MuiBox-root css-7qwnnv"
       >
         <div
-          class="MuiBox-root css-yj95vr"
-          data-testid="experiences-drawer-content-container-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+          class="MuiBox-root css-7qwnnv"
         >
-          <p
-            class="MuiTypography-root MuiTypography-body1 css-1wdfbkk-MuiTypography-root"
-            data-testid="experiences-drawer-content-occupation-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
-          >
-            Project Manager
-          </p>
-          <p
-            class="MuiTypography-root MuiTypography-body2 css-bbtak5-MuiTypography-root"
-            data-testid="experiences-drawer-content-date-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
-          >
-            2022 — Present
-            , 
-            Business Inc
-            <i>
-               (New York, NY)
-            </i>
-          </p>
           <div
-            class="MuiBox-root css-70qvj9"
+            class="MuiBox-root css-1n10a4f"
           >
-            <p
-              class="MuiTypography-root MuiTypography-body1 css-nd2r4d-MuiTypography-root"
-              data-testid="experiences-drawer-content-skills-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
-            >
-              <b>
-                Top Skills
-              </b>
-            </p>
-            <button
-              aria-label="help"
-              class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1bmk3sv-MuiButtonBase-root-MuiIconButton-root"
-              data-mui-internal-clone-element="true"
-              data-testid="help-icon-4b757f12-fb67-4a59-94b1-b8a2498a7a49"
-              tabindex="0"
-              type="button"
+            <div
+              class="MuiBox-root css-1elaak3"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8lbdna-MuiSvgIcon-root"
-                data-testid="InfoIcon"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-il7e6s-MuiSvgIcon-root"
+                data-testid="WorkIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
               >
                 <path
-                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m1 15h-2v-6h2zm0-8h-2V7h2z"
+                  d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2m-6 0h-4V4h4z"
                 />
               </svg>
-              <span
-                class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-              />
-            </button>
-          </div>
-          <div
-            class="MuiBox-root css-147bxu4"
-            data-testid="experiences-drawer-skills-container-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
-          >
-            <div
-              class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-c3w7rz-MuiButtonBase-root-MuiChip-root"
-              data-testid="experiences-drawer-chip-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
-              role="button"
-              tabindex="0"
-            >
-              <span
-                class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
+              <h6
+                class="MuiTypography-root MuiTypography-subtitle1 css-1ce2uu2-MuiTypography-root"
               >
-                Management
-              </span>
-              <span
-                class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-              />
+                Salary Work
+              </h6>
             </div>
             <div
-              class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-c3w7rz-MuiButtonBase-root-MuiChip-root"
-              data-testid="experiences-drawer-chip-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
-              role="button"
-              tabindex="0"
+              class="MuiBox-root css-c4dei4"
             >
-              <span
-                class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
+              <div
+                class="MuiBox-root css-yj95vr"
+                data-testid="experiences-drawer-content-container-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
               >
-                Communication
-              </span>
-              <span
-                class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-              />
+                <p
+                  class="MuiTypography-root MuiTypography-body1 css-1wdfbkk-MuiTypography-root"
+                  data-testid="experiences-drawer-content-occupation-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                >
+                  Project Manager
+                </p>
+                <p
+                  class="MuiTypography-root MuiTypography-body2 css-bbtak5-MuiTypography-root"
+                  data-testid="experiences-drawer-content-date-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                >
+                  2022 — Present
+                  , 
+                  Business Inc
+                  <i>
+                     (New York, NY)
+                  </i>
+                </p>
+                <div
+                  class="MuiBox-root css-70qvj9"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body1 css-nd2r4d-MuiTypography-root"
+                    data-testid="experiences-drawer-content-skills-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                  >
+                    <b>
+                      Top Skills
+                    </b>
+                  </p>
+                  <button
+                    aria-label="help"
+                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1bmk3sv-MuiButtonBase-root-MuiIconButton-root"
+                    data-mui-internal-clone-element="true"
+                    data-testid="help-icon-4b757f12-fb67-4a59-94b1-b8a2498a7a49"
+                    tabindex="0"
+                    type="button"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8lbdna-MuiSvgIcon-root"
+                      data-testid="InfoIcon"
+                      focusable="false"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m1 15h-2v-6h2zm0-8h-2V7h2z"
+                      />
+                    </svg>
+                    <span
+                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                    />
+                  </button>
+                </div>
+                <div
+                  class="MuiBox-root css-147bxu4"
+                  data-testid="experiences-drawer-skills-container-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                >
+                  <div
+                    class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-c3w7rz-MuiButtonBase-root-MuiChip-root"
+                    data-testid="experiences-drawer-chip-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                    role="button"
+                    tabindex="0"
+                  >
+                    <span
+                      class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
+                    >
+                      Management
+                    </span>
+                    <span
+                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                    />
+                  </div>
+                  <div
+                    class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-c3w7rz-MuiButtonBase-root-MuiChip-root"
+                    data-testid="experiences-drawer-chip-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                    role="button"
+                    tabindex="0"
+                  >
+                    <span
+                      class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
+                    >
+                      Communication
+                    </span>
+                    <span
+                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        <div
-          class="MuiBox-root css-yj95vr"
-          data-testid="experiences-drawer-content-container-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
-        >
-          <p
-            class="MuiTypography-root MuiTypography-body1 css-1wdfbkk-MuiTypography-root"
-            data-testid="experiences-drawer-content-occupation-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
-          >
-            Project Manager
-          </p>
-          <p
-            class="MuiTypography-root MuiTypography-body2 css-bbtak5-MuiTypography-root"
-            data-testid="experiences-drawer-content-date-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
-          >
-            2022 — Present
-            , 
-            Business Inc
-            <i>
-               (New York, NY)
-            </i>
-          </p>
           <div
-            class="MuiBox-root css-70qvj9"
+            class="MuiBox-root css-1n10a4f"
           >
-            <p
-              class="MuiTypography-root MuiTypography-body1 css-nd2r4d-MuiTypography-root"
-              data-testid="experiences-drawer-content-skills-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
-            >
-              <b>
-                Top Skills
-              </b>
-            </p>
-            <button
-              aria-label="help"
-              class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1bmk3sv-MuiButtonBase-root-MuiIconButton-root"
-              data-mui-internal-clone-element="true"
-              data-testid="help-icon-4b757f12-fb67-4a59-94b1-b8a2498a7a49"
-              tabindex="0"
-              type="button"
+            <div
+              class="MuiBox-root css-1elaak3"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8lbdna-MuiSvgIcon-root"
-                data-testid="InfoIcon"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-il7e6s-MuiSvgIcon-root"
+                data-testid="VolunteerActivismIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
               >
                 <path
-                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m1 15h-2v-6h2zm0-8h-2V7h2z"
+                  d="M1 11h4v11H1zm15-7.75C16.65 2.49 17.66 2 18.7 2 20.55 2 22 3.45 22 5.3c0 2.27-2.91 4.9-6 7.7-3.09-2.81-6-5.44-6-7.7C10 3.45 11.45 2 13.3 2c1.04 0 2.05.49 2.7 1.25M20 17h-7l-2.09-.73.33-.94L13 16h2.82c.65 0 1.18-.53 1.18-1.18 0-.49-.31-.93-.77-1.11L8.97 11H7v9.02L14 22l8.01-3c-.01-1.1-.9-2-2.01-2"
                 />
               </svg>
-              <span
-                class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-              />
-            </button>
-          </div>
-          <div
-            class="MuiBox-root css-147bxu4"
-            data-testid="experiences-drawer-skills-container-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
-          >
-            <div
-              class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-c3w7rz-MuiButtonBase-root-MuiChip-root"
-              data-testid="experiences-drawer-chip-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
-              role="button"
-              tabindex="0"
-            >
-              <span
-                class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
+              <h6
+                class="MuiTypography-root MuiTypography-subtitle1 css-1ce2uu2-MuiTypography-root"
               >
-                Management
-              </span>
-              <span
-                class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-              />
+                Unpaid Work
+              </h6>
             </div>
             <div
-              class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-c3w7rz-MuiButtonBase-root-MuiChip-root"
-              data-testid="experiences-drawer-chip-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
-              role="button"
-              tabindex="0"
+              class="MuiBox-root css-c4dei4"
             >
-              <span
-                class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
+              <div
+                class="MuiBox-root css-yj95vr"
+                data-testid="experiences-drawer-content-container-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
               >
-                Communication
-              </span>
-              <span
-                class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-              />
+                <p
+                  class="MuiTypography-root MuiTypography-body1 css-1wdfbkk-MuiTypography-root"
+                  data-testid="experiences-drawer-content-occupation-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                >
+                  Project Manager
+                </p>
+                <p
+                  class="MuiTypography-root MuiTypography-body2 css-bbtak5-MuiTypography-root"
+                  data-testid="experiences-drawer-content-date-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                >
+                  2022 — Present
+                  , 
+                  Business Inc
+                  <i>
+                     (New York, NY)
+                  </i>
+                </p>
+                <div
+                  class="MuiBox-root css-70qvj9"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body1 css-nd2r4d-MuiTypography-root"
+                    data-testid="experiences-drawer-content-skills-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                  >
+                    <b>
+                      Top Skills
+                    </b>
+                  </p>
+                  <button
+                    aria-label="help"
+                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1bmk3sv-MuiButtonBase-root-MuiIconButton-root"
+                    data-mui-internal-clone-element="true"
+                    data-testid="help-icon-4b757f12-fb67-4a59-94b1-b8a2498a7a49"
+                    tabindex="0"
+                    type="button"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8lbdna-MuiSvgIcon-root"
+                      data-testid="InfoIcon"
+                      focusable="false"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m1 15h-2v-6h2zm0-8h-2V7h2z"
+                      />
+                    </svg>
+                    <span
+                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                    />
+                  </button>
+                </div>
+                <div
+                  class="MuiBox-root css-147bxu4"
+                  data-testid="experiences-drawer-skills-container-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                >
+                  <div
+                    class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-c3w7rz-MuiButtonBase-root-MuiChip-root"
+                    data-testid="experiences-drawer-chip-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                    role="button"
+                    tabindex="0"
+                  >
+                    <span
+                      class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
+                    >
+                      Management
+                    </span>
+                    <span
+                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                    />
+                  </div>
+                  <div
+                    class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-c3w7rz-MuiButtonBase-root-MuiChip-root"
+                    data-testid="experiences-drawer-chip-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                    role="button"
+                    tabindex="0"
+                  >
+                    <span
+                      class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
+                    >
+                      Communication
+                    </span>
+                    <span
+                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
