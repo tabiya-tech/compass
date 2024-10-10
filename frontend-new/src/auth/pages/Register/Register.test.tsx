@@ -6,14 +6,17 @@ import Register, { DATA_TEST_ID } from "./Register";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import RegisterWithEmailForm from "src/auth/pages/Register/components/RegisterWithEmailForm/RegisterWithEmailForm";
 import { DATA_TEST_ID as AUTH_HEADER_DATA_TEST_ID } from "src/auth/components/AuthHeader/AuthHeader";
-import { emailAuthService } from "src/auth/services/emailAuth/EmailAuth.service";
+import FirebaseEmailAuthenticationService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import { logoutService } from "src/auth/services/logout/logout.service";
-import authStateService from "src/auth/AuthStateService";
+import authStateService from "src/auth/services/AuthenticationState.service";
 import { TabiyaUser } from "src/auth/auth.types";
+import {
+  userPreferencesStateService
+} from "src/userPreferences/UserPreferencesStateService";
+import * as AuthenticationServiceFactoryModule from "src/auth/services/Authentication.service.factory";
 
 //mock the SocialAuth component
 jest.mock("src/auth/components/SocialAuth/SocialAuth", () => {
@@ -28,14 +31,63 @@ jest.mock("src/auth/components/SocialAuth/SocialAuth", () => {
 });
 
 // mock the emailAuthService
-jest.mock("src/auth/services/emailAuth/EmailAuth.service", () => {
+jest.mock("src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service", () => {
+  const actual = jest.requireActual(
+    "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service"
+  );
   return {
-    emailAuthService: {
-      handleRegisterWithEmail: jest.fn(),
-      handleLogout: jest.fn(),
+    ...actual,
+    __esModule: true,
+    default: {
+      getInstance: jest.fn().mockImplementation(() => {
+        return {
+          register: jest.fn(),
+          login: jest.fn(),
+          logout: jest.fn(),
+        };
+      }),
     },
   };
 });
+
+// mock the auth state service
+jest.mock("src/auth/services/AuthenticationState.service", () => {
+  const actual = jest.requireActual("src/auth/services/AuthenticationState.service");
+  return {
+    ...actual,
+    __esModule: true,
+    default: {
+      updateUserByToken: jest.fn(),
+      clearUser: jest.fn(),
+    },
+  };
+});
+
+// mock the authentication service factory
+jest.mock("src/auth/services/Authentication.service.factory", () => {
+  const actual = jest.requireActual("src/auth/services/Authentication.service.factory");
+  return {
+    ...actual,
+    __esModule: true,
+    default: {
+      getAuthenticationService: jest.fn(),
+    },
+  };
+});
+
+// mock the user preferences service
+jest.mock("src/userPreferences/UserPreferencesService/userPreferences.service", () => {
+  const actual = jest.requireActual("src/userPreferences/UserPreferencesService/userPreferences.service");
+  return {
+    ...actual,
+    __esModule: true,
+    userPreferencesService: {
+      createUserPreferences: jest.fn(),
+      getUserPreferences: jest.fn(),
+    },
+  };
+});
+
 // mock the snack bar provider
 jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   const actual = jest.requireActual("src/theme/SnackbarProvider/SnackbarProvider");
@@ -101,14 +153,25 @@ describe("Testing Register component", () => {
     const givenEmail = "foo@bar.baz";
     const givenPassword = "password";
 
-    // AND check invitation code status returns a valid code
-    const checkInvitationCodeStatusMock = jest
-      .spyOn(invitationsService, "checkInvitationCodeStatus")
-      .mockResolvedValue({
-        invitation_type: InvitationType.REGISTER,
-        status: InvitationStatus.VALID,
-        invitation_code: givenInvitationCode,
-      });
+    // AND the register method is mocked to succeed
+    const registerMock = jest.fn();
+    jest.spyOn(FirebaseEmailAuthenticationService, "getInstance").mockImplementation(() => {
+      return {
+        register: registerMock,
+        login: jest.fn(),
+        logout: jest.fn(),
+      } as unknown as FirebaseEmailAuthenticationService;
+    });
+    // AND the auth state service is mocked to return a user
+    jest.spyOn(authStateService, "updateUserByToken").mockImplementation((token) => {
+      return { email: givenEmail, name: givenName } as TabiyaUser;
+    });
+    // AND the user preferences state service is mocked to succeed
+    jest.spyOn(userPreferencesStateService, "setUserPreferences");
+    // AND the authentication service factory is mocked to return the email auth service
+    jest
+      .spyOn(AuthenticationServiceFactoryModule.default, "getAuthenticationService")
+      .mockReturnValueOnce(FirebaseEmailAuthenticationService.getInstance());
     // WHEN the component is rendered within the AuthContext and Router
     render(
       <HashRouter>
@@ -144,13 +207,10 @@ describe("Testing Register component", () => {
       expect(screen.getByTestId(DATA_TEST_ID.REGISTRATION_CODE_INPUT)).toHaveValue(givenInvitationCode);
     });
 
-    // Expect the register function to have been called
+    // THEN the register function should have been called
     await waitFor(() => {
-      expect(emailAuthService.handleRegisterWithEmail).toHaveBeenCalledWith(givenEmail, givenPassword, givenName);
+      expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenName, givenInvitationCode);
     });
-
-    // AND check that the invitation code status was checked
-    expect(checkInvitationCodeStatusMock).toHaveBeenCalledWith(givenInvitationCode);
 
     // AND the component should match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.REGISTER_CONTAINER)).toMatchSnapshot();
@@ -161,9 +221,27 @@ describe("Testing Register component", () => {
     const givenName = "Foo Bar";
     const givenEmail = "foo@bar.baz";
     const givenPassword = "password";
+    const givenInvitationCode = "foo-bar";
 
     // AND the register function returns a token
-    (emailAuthService.handleRegisterWithEmail as jest.Mock).mockResolvedValue("foo-bar-token");
+    const registerMock = jest.fn().mockResolvedValue("foo-bar-token");
+    jest.spyOn(FirebaseEmailAuthenticationService, "getInstance").mockImplementation(() => {
+      return {
+        register: registerMock,
+        login: jest.fn(),
+        logout: jest.fn(),
+      } as unknown as FirebaseEmailAuthenticationService;
+    });
+    // AND the user has a valid invitation code
+    // AND check invitation code status returns a valid code
+    jest
+      .spyOn(invitationsService, "checkInvitationCodeStatus")
+      .mockResolvedValue({
+        invitation_type: InvitationType.REGISTER,
+        status: InvitationStatus.VALID,
+        invitation_code: givenInvitationCode,
+      });
+    jest.spyOn(AuthenticationServiceFactoryModule.default, "getAuthenticationService").mockReturnValue(FirebaseEmailAuthenticationService.getInstance());
 
     // AND the auth state service is mocked to return a user
     jest.spyOn(authStateService, "updateUserByToken").mockImplementation((token) => {
@@ -173,10 +251,10 @@ describe("Testing Register component", () => {
     jest.spyOn(authStateService, "clearUser").mockResolvedValue(undefined);
 
     // AND the logout function is mocked to succeed
-    jest.spyOn(logoutService, "handleLogout").mockResolvedValue(undefined);
+    jest.spyOn(FirebaseEmailAuthenticationService.getInstance(), "logout").mockResolvedValue(undefined);
     // AND the user preferences service is mocked to succeed
     jest.spyOn(userPreferencesService, "createUserPreferences").mockResolvedValue({
-      user_id: "foo-bar",
+      user_id: "foo-bar-id",
       language: Language.en,
       sessions: [],
       accepted_tc: new Date(),
@@ -188,22 +266,20 @@ describe("Testing Register component", () => {
         <Register />
       </HashRouter>
     );
+    // AND the registration code is set
+    fireEvent.change(screen.getByTestId(DATA_TEST_ID.REGISTRATION_CODE_INPUT), {
+      target: { value: givenInvitationCode },
+    });
 
     // AND the register form is submitted
-    await act(() => {
-      (RegisterWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnRegister(givenName, givenEmail, givenPassword);
-    });
-
     await act(async () => {
-      // Simulate form submission
       const calls = (RegisterWithEmailForm as jest.Mock).mock.calls;
-
-      await calls[calls.length - 1][0].notifyOnRegister(givenName, givenEmail, givenPassword);
+      await calls[calls.length - 1][0].notifyOnRegister(givenName, givenEmail, givenPassword, givenInvitationCode);
     });
 
-    // THEN expect the register function to have been called
+    // THEN expect the register function to have been called with the correct arguments
     await waitFor(() => {
-      expect(emailAuthService.handleRegisterWithEmail).toHaveBeenCalledWith(givenEmail, givenPassword, givenName);
+      expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenName, givenInvitationCode);
     });
 
     // AND no errors or warning to have occurred
@@ -213,58 +289,23 @@ describe("Testing Register component", () => {
 
   test("it should show error message on failed registration", async () => {
     // GIVEN a failed registration
-    (emailAuthService.handleRegisterWithEmail as jest.Mock).mockRejectedValue(
+    const registerMock = jest.fn().mockRejectedValue(
       new Error("An unexpected error occurred. Please try again later.")
     );
+    jest.spyOn(FirebaseEmailAuthenticationService, "getInstance").mockImplementation(() => {
+      return {
+        register: registerMock,
+        login: jest.fn(),
+        logout: jest.fn(),
+      } as unknown as FirebaseEmailAuthenticationService;
+    });
 
     const givenName = "Foo Bar";
     const givenEmail = "foo@bar.baz";
     const givenPassword = "password";
-
-    // AND check invitation code status returns a valid code
-    jest.spyOn(invitationsService, "checkInvitationCodeStatus").mockResolvedValue({
-      invitation_type: InvitationType.REGISTER,
-      status: InvitationStatus.VALID,
-      invitation_code: "foo-bar",
-    });
-
-    // WHEN the register form is submitted
-    render(
-      <HashRouter>
-        <Register />
-      </HashRouter>
-    );
-
-    // AND the register form is submitted
-    await act(() => {
-      (RegisterWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnRegister(givenName, givenEmail, givenPassword);
-    });
-    // THEN expect the register function to have been called
-    await waitFor(() => {
-      expect(emailAuthService.handleRegisterWithEmail).toHaveBeenCalledWith(givenEmail, givenPassword, givenName);
-    });
-
-    // AND the error message should be displayed
-    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-      "Registration Failed: An unexpected error occurred. Please try again later.",
-      { variant: "error" }
-    );
-  });
-
-  test("it should not call register when registration code is invalid", async () => {
-    // GIVEN an invalid invitation code
     const givenInvitationCode = "foo-bar";
-    const givenName = "Foo Bar";
-    const givenEmail = "foo-bar@foo.bar";
-    const givenInvalidInvitationCode = {
-      invitation_type: InvitationType.REGISTER,
-      status: InvitationStatus.INVALID,
-      invitation_code: givenInvitationCode,
-    };
 
-    // AND check invitation code check returns an invalid code
-    jest.spyOn(invitationsService, "checkInvitationCodeStatus").mockResolvedValue(givenInvalidInvitationCode);
-
+    jest.spyOn(AuthenticationServiceFactoryModule.default, "getAuthenticationService").mockReturnValue(FirebaseEmailAuthenticationService.getInstance());
     // WHEN the component is rendered
     render(
       <HashRouter>
@@ -272,21 +313,26 @@ describe("Testing Register component", () => {
       </HashRouter>
     );
 
+    // AND the registration code is set
     fireEvent.change(screen.getByTestId(DATA_TEST_ID.REGISTRATION_CODE_INPUT), {
       target: { value: givenInvitationCode },
     });
 
     // AND the register form is submitted
     await act(async () => {
-      (RegisterWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnRegister(givenName, givenEmail, "password");
+      const calls = (RegisterWithEmailForm as jest.Mock).mock.calls;
+      await calls[calls.length - 1][0].notifyOnRegister(givenName, givenEmail, givenPassword, givenInvitationCode);
     });
 
-    // THEN expect the register function to not have been called
+    // THEN expect the register function to have been called with the correct arguments
     await waitFor(() => {
-      expect(emailAuthService.handleRegisterWithEmail).not.toHaveBeenCalled();
+      expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenName, givenInvitationCode);
     });
 
     // AND the error message should be displayed
-    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Invalid registration code", { variant: "error" });
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+      "Registration Failed: An unexpected error occurred. Please try again later.",
+      { variant: "error" }
+    );
   });
 });

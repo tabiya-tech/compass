@@ -1,16 +1,24 @@
-import React, { useCallback, useContext, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import "firebaseui/dist/firebaseui.css";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { TabiyaUser } from "src/auth/auth.types";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { Box, Button, Typography } from "@mui/material";
-import { socialAuthService } from "src/auth/services/socialAuth/SocialAuth.service";
+import FirebaseSocialAuthenticationService from "src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
 import { GoogleIcon } from "src/theme/Icons/GoogleIcon";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
-import authStateService from "src/auth/AuthStateService";
+import authStateService from "src/auth/services/AuthenticationState.service";
+import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import RegistrationCodeFormModal
+  , {
+  RegistrationCodeFormModalState,
+} from "src/invitations/components/RegistrationCodeFormModal/RegistrationCodeFormModal";
+import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
+import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
+import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 
 const uniqueId = "f0324e97-83fd-49e6-95c3-1043751fa1db";
 export const DATA_TEST_ID = {
@@ -22,16 +30,16 @@ export const DATA_TEST_ID = {
 };
 
 export interface SocialAuthProps {
-  preLoginCheck?: () => Promise<boolean> | boolean;
+  registrationCode?: string;
   disabled?: boolean;
   label?: string;
-  postLoginHandler: (user: TabiyaUser) => void;
+  postLoginHandler: () => void;
   isLoading: boolean;
   notifyOnLoading: (loading: boolean) => void;
 }
 
 const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
-  preLoginCheck,
+  registrationCode,
   disabled = false,
   label,
   postLoginHandler,
@@ -43,46 +51,93 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
   const { enqueueSnackbar } = useSnackbar();
 
   const [error, setError] = useState("");
+  const [_registrationCode, setRegistrationCode] = useState(registrationCode);
+  const [showRegistrationCodeForm, setShowRegistrationCodeForm] = useState<RegistrationCodeFormModalState>(RegistrationCodeFormModalState.HIDE);
+
+  useEffect(() =>{
+    setRegistrationCode(registrationCode);
+  }, [registrationCode])
+
+  const handleError = useCallback(async (error: Error) => {
+    // if the registration code is not valid or something goes wrong, log the user out
+    await FirebaseSocialAuthenticationService.getInstance().logout();
+    // clear the registration code from the state
+    setRegistrationCode(registrationCode);
+    let errorMessage;
+    if (error instanceof ServiceError) {
+      errorMessage = getUserFriendlyErrorMessage(error);
+      writeServiceErrorToLog(error, console.error);
+    } else if (error instanceof FirebaseError) {
+      errorMessage = getUserFriendlyFirebaseErrorMessage(error);
+      writeFirebaseErrorToLog(error, console.error);
+    } else {
+      errorMessage = error.message;
+      console.error(error);
+    }
+    setError(errorMessage);
+    enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
+  }, [enqueueSnackbar, registrationCode]);
+
+  const registerUser = useCallback(async (registrationCode: string) => {
+    try{
+      // first check if the invitation code is valid
+      const _user = authStateService.getUser();
+      if(!_user) {
+        throw new Error("Something went wrong: No user found");
+      }
+      const invitation = await invitationsService.checkInvitationCodeStatus(registrationCode);
+      if (
+        invitation.status !== InvitationStatus.VALID ||
+        invitation.invitation_type !== InvitationType.REGISTER
+      ) {
+        throw new Error("Invalid invitation code");
+      }
+      // create user preferences for the first time.
+      // in order to do this, there needs to be a logged in user in the persistent storage
+      const prefs = await userPreferencesService.createUserPreferences({
+        user_id: _user.id,
+        invitation_code: invitation.invitation_code,
+        language: Language.en,
+      });
+      userPreferencesStateService.setUserPreferences(prefs);
+    } catch (error: any) {
+      await handleError(error);
+    }
+  }, [handleError]);
 
   const loginWithPopup = useCallback(async () => {
     try {
       notifyOnLoading(true);
-      // If preLoginCheck is provided, run it and only proceed if it returns true
-      // Pre login check is mostly used to check if the user has a valid code.
-      // NOTE: a default function that returns true should be added otherwise users will not be able to login using social auth
-      const passed = await preLoginCheck?.();
-
-      if (!passed) {
-        notifyOnLoading(false);
-        return;
-      }
-
-      const token = await socialAuthService.handleLoginWithGoogle();
-      const _user = authStateService.updateUserByToken(token);
-      if (_user) {
-        postLoginHandler(_user);
+      // first login with google
+      await FirebaseSocialAuthenticationService.getInstance().loginWithGoogle();
+      // check if the user is already registered
+      const prefs = userPreferencesStateService.getUserPreferences()
+      // if the user is not registered, create user preferences for the first time
+      if(!prefs) {
+        // if no registration code was provided, show the registration code form
+        if(!_registrationCode) {
+          setShowRegistrationCodeForm(RegistrationCodeFormModalState.SHOW);
+          return;
+        }
+        await registerUser(_registrationCode);
       } else {
-        // if the user cannot be gotten from the token, throw an error
-        throw new Error("Something went wrong while logging in. Please try again.");
+        userPreferencesStateService.setUserPreferences(prefs);
       }
+      postLoginHandler();
     } catch (error: any) {
-      let errorMessage;
-      if (error instanceof ServiceError) {
-        errorMessage = getUserFriendlyErrorMessage(error);
-        writeServiceErrorToLog(error, console.error);
-      } else if (error instanceof FirebaseError) {
-        errorMessage = getUserFriendlyFirebaseErrorMessage(error);
-        writeFirebaseErrorToLog(error, console.error);
-      } else {
-        errorMessage = (error as Error).message;
-        console.error(error);
-      }
-      setError(errorMessage);
-      enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
+      await handleError(error);
     } finally {
       notifyOnLoading(false);
     }
-  }, [enqueueSnackbar, postLoginHandler, preLoginCheck, notifyOnLoading]);
+  }, [notifyOnLoading, postLoginHandler, _registrationCode, registerUser, handleError]);
+
+  const handleRegistrationCodeSuccess = useCallback(async (registrationCode: string) => {
+    setShowRegistrationCodeForm(RegistrationCodeFormModalState.LOADING);
+    await registerUser(registrationCode);
+    setRegistrationCode(registrationCode);
+    postLoginHandler();
+    setShowRegistrationCodeForm(RegistrationCodeFormModalState.HIDE);
+  }, [registerUser, postLoginHandler]);
 
   const socialAuthLoading = isLoading || !isOnline || disabled;
 
@@ -146,6 +201,10 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
           )}
         </div>
       </Box>
+      <RegistrationCodeFormModal
+        modalState={showRegistrationCodeForm}
+        onSuccess={handleRegistrationCodeSuccess}
+      />
     </Box>
   );
 };

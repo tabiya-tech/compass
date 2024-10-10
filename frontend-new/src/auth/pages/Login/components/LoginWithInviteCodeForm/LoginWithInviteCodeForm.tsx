@@ -13,7 +13,6 @@ export const DATA_TEST_ID = {
 export interface LoginFormProps {
   inviteCode: string;
   notifyOnInviteCodeChanged: (inviteCode: string) => void;
-  notifyOnFocused: () => void;
   isDisabled: boolean;
 }
 const LoginWithInviteCodeForm: React.FC<Readonly<LoginFormProps>> = ({

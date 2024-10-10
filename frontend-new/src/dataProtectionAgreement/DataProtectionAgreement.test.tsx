@@ -6,9 +6,9 @@ import { HashRouter, useNavigate } from "react-router-dom";
 import { waitFor } from "@testing-library/react";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { TabiyaUser } from "src/auth/auth.types";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
+import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
-import authStateService from "src/auth/AuthStateService";
+import authStateService from "src/auth/services/AuthenticationState.service";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
