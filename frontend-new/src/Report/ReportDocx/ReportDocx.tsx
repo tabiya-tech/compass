@@ -31,7 +31,7 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
   const footer = await FooterComponent();
 
   // Group experiences by work type
-  const { selfEmploymentExperiences, salaryWorkExperiences, unpaidWorkExperiences } =
+  const { selfEmploymentExperiences, salaryWorkExperiences, unpaidWorkExperiences, traineeWorkExperiences } =
     groupExperiencesByWorkType(experiences);
 
   // list of all unique skills
@@ -202,6 +202,16 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
                   ReportContent.IMAGE_URLS.COMMUNITY_WORK_ICON
                 ),
                 ...unpaidWorkExperiences.flatMap((experience) => generateContent(experience)),
+              ]
+            : []),
+
+          ...(traineeWorkExperiences.length > 0
+            ? [
+                await createParagraphWithImageAndText(
+                  ReportContent.TRAINEE_WORK_TITLE,
+                  ReportContent.IMAGE_URLS.TRAINEE_WORK_ICON
+                ),
+                ...traineeWorkExperiences.flatMap((experience) => generateContent(experience)),
               ]
             : []),
 

@@ -12,7 +12,7 @@ const FooterComponent = async () => {
       new Paragraph({
         children: [
           new ImageRun({
-            data: await getBase64Image(ReportContent.IMAGE_URLS.DANGER_ICON),
+            data: await getBase64Image(ReportContent.IMAGE_URLS.WARNING_ICON),
             transformation: { width: 16, height: 14 },
           }),
           new TextRun({
