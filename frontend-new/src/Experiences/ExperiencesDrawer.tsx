@@ -13,6 +13,7 @@ import { ReportContent } from "src/Report/ReportContent";
 import StoreIcon from "@mui/icons-material/Store";
 import WorkIcon from "@mui/icons-material/Work";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
+import SchoolIcon from "@mui/icons-material/School";
 import ExperienceCategory from "src/Experiences/components/ExperienceCategory/ExperienceCategory";
 
 export interface ExperiencesDrawerProps {
@@ -98,7 +99,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   };
 
   // Group experiences by work type
-  const { selfEmploymentExperiences, salaryWorkExperiences, unpaidWorkExperiences } =
+  const { selfEmploymentExperiences, salaryWorkExperiences, unpaidWorkExperiences, traineeWorkExperiences } =
     groupExperiencesByWorkType(experiences);
 
   const tooltipText = "We don’t save these information. The information you provide will only be used for the report.";
@@ -197,6 +198,11 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
                 icon={<VolunteerActivismIcon />}
                 title={ReportContent.UNPAID_WORK_TITLE}
                 experiences={unpaidWorkExperiences}
+              />
+              <ExperienceCategory
+                icon={<SchoolIcon />}
+                title={ReportContent.TRAINEE_WORK_TITLE}
+                experiences={traineeWorkExperiences}
               />
             </Box>
           )}
