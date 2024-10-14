@@ -6,5 +6,7 @@ The [report-icons-inskscape.svg](report-icons-inskscape.svg) was created using [
 - [employee.png](../public/employee.png) <img src="../public/employee.png" height="24" /> 
 - [self-employment.png](../public/self-employment.png) <img src="../public/self-employment.png" height="24" />
 - [community-work.png](../public/community-work.png) <img src="../public/community-work.png" height="24" />
+- [trainee-work.png](../public/trainee-work.png) <img src="../public/trainee-work.png" height="24" />
+- [warning.png](../public/warning.png) <img src="../public/warning.png" height="24" />
 
 The above report icons are based on icons from the [@mui/icons-material](https://mui.com/material-ui/material-icons/) project.

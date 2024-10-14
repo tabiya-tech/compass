@@ -34,12 +34,14 @@ export const groupExperiencesByWorkType = (experiences: Experience[]) => {
   );
 
   const unpaidWorkExperiences = experiencesWithTopSkills.filter(
-    (experience) =>
-      experience.work_type === WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK ||
-      experience.work_type === WorkType.UNSEEN_UNPAID
+    (experience) => experience.work_type === WorkType.UNSEEN_UNPAID
   );
 
-  return { selfEmploymentExperiences, salaryWorkExperiences, unpaidWorkExperiences };
+  const traineeWorkExperiences = experiencesWithTopSkills.filter(
+    (experience) => experience.work_type === WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK
+  );
+
+  return { selfEmploymentExperiences, salaryWorkExperiences, unpaidWorkExperiences, traineeWorkExperiences };
 };
 
 // Convert local image to base64

@@ -43,7 +43,7 @@ const SkillReport: React.FC<SkillReportProps> = ({
   conversationConductedAt,
 }) => {
   // Group experiences by work type
-  const { selfEmploymentExperiences, salaryWorkExperiences, unpaidWorkExperiences } =
+  const { selfEmploymentExperiences, salaryWorkExperiences, unpaidWorkExperiences, traineeWorkExperiences } =
     groupExperiencesByWorkType(experiences);
 
   // list of all unique skills
@@ -134,6 +134,11 @@ const SkillReport: React.FC<SkillReportProps> = ({
               ReportContent.UNPAID_WORK_TITLE,
               ReportContent.IMAGE_URLS.COMMUNITY_WORK_ICON,
               unpaidWorkExperiences
+            )}
+            {ExperienceCategory(
+              ReportContent.TRAINEE_WORK_TITLE,
+              ReportContent.IMAGE_URLS.TRAINEE_WORK_ICON,
+              traineeWorkExperiences
             )}
           </View>
           <SkillsDescription skillsList={skillsList} />
