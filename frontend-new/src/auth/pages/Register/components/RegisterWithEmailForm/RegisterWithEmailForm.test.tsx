@@ -147,8 +147,15 @@ describe("Testing Register Email Form component", () => {
 
     test("should not call notifyOnRegister if the password is invalid", async () => {
       // GIVEN the password validator will return false for the given password
-      (validatePassword as jest.Mock).mockReturnValueOnce("Password must contain at least one uppercase letter");
+      (validatePassword as jest.Mock).mockReturnValue({
+        length: false,
+        lowercase: false,
+        uppercase: false,
+        number: false,
+        specialChar: false,
+      });
       const givenPassword = "password";
+
       // WHEN the component is rendered
       render(
         <HashRouter>
@@ -156,23 +163,21 @@ describe("Testing Register Email Form component", () => {
         </HashRouter>
       );
 
-      // AND the register button should not be disabled
-      expect(screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON)).not.toBeDisabled();
-
       // AND the register button should be rendered
       const registerButton = screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON);
       expect(registerButton).toBeInTheDocument();
+      // AND the register button should not be disabled
+      expect(registerButton).not.toBeDisabled();
 
       // Simulate form input and submission
       fireEvent.change(screen.getByTestId(DATA_TEST_ID.NAME_INPUT), { target: { value: "Foo Bar" } });
       fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: "foo@bar.baz" } });
       fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: givenPassword } });
 
-      // AND the form is submitted
-      fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
-
       // THEN expect notifyOnRegister to not have been called
       expect(givenNotifyOnRegister).not.toHaveBeenCalled();
+      // AND the register button should be disabled
+      expect(registerButton).toBeDisabled();
     });
 
     test("should disable everything if registering is still in progress", () => {

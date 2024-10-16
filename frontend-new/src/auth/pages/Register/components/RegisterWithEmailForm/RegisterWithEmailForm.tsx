@@ -3,6 +3,7 @@ import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import React, { useState } from "react";
 import { validatePassword } from "src/auth/utils/validatePassword";
 import PasswordInput from "src/theme/PasswordInput/PasswordInput";
+import PasswordRequirements from "src/auth/components/PasswordRequirements/PasswordRequirements";
 
 const uniqueId = "6cf1a0fa-8d75-4342-bf6b-1203d5b114d7";
 
@@ -31,7 +32,8 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [passwordError, setPasswordError] = useState<string>("");
+  const [isPasswordValid, setIsPasswordValid] = useState(true);
+  const [validationResults, setValidationResults] = useState(validatePassword(""));
 
   const handleNameChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     setName(event.target.value);
@@ -39,20 +41,28 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
   const handleEmailChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     setEmail(event.target.value);
   };
+
   const handlePasswordChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    setPassword(event.target.value);
+    const newPassword = event.target.value;
+    setPassword(newPassword);
+    const validationResult = validatePassword(newPassword);
+    setValidationResults(validationResult);
+    setIsPasswordValid(Object.values(validationResult).every(Boolean));
   };
 
   const handleRegister = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const passwordValidationResult = validatePassword(password);
-    setPasswordError(passwordValidationResult);
+    const isValid = Object.values(passwordValidationResult).every(Boolean);
+    setValidationResults(passwordValidationResult);
+    setIsPasswordValid(isValid);
 
-    if (passwordValidationResult === "") {
+    if (isValid) {
       notifyOnRegister(name, email, password);
     }
   };
+
   return (
     <Box
       display="flex"
@@ -91,8 +101,8 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
         required
         onChange={(e) => handlePasswordChange(e)}
         inputProps={{ "data-testid": DATA_TEST_ID.PASSWORD_INPUT }}
-        error={!!passwordError}
-        helperText={passwordError}
+        error={!isPasswordValid && password !== ""}
+        helperText={password && !isPasswordValid && <PasswordRequirements validationResults={validationResults} />}
       />
       <PrimaryButton
         fullWidth
@@ -100,7 +110,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
         color="primary"
         style={{ marginTop: 16 }}
         type="submit"
-        disabled={isRegistering || disabled}
+        disabled={isRegistering || disabled || !isPasswordValid}
         disableWhenOffline={true}
         data-testid={DATA_TEST_ID.REGISTER_BUTTON}
       >
