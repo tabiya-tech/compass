@@ -1,5 +1,3 @@
-import { AuthProviderIds } from "src/auth/auth.types";
-
 const auth = {
   currentUser: {
     getIdToken: jest.fn(),
@@ -7,7 +5,7 @@ const auth = {
   },
   onAuthStateChanged: jest.fn().mockReturnValue(jest.fn()),
   signInWithPopup: jest.fn(),
-  GoogleAuthProvider: { PROVIDER_ID: AuthProviderIds.GOOGLE },
+  GoogleAuthProvider: { PROVIDER_ID: "google.com"},
 };
 
 const firebase = {
