@@ -30,7 +30,7 @@ async def setup_agent_tool():
     "test_case", get_test_cases_to_run(test_cases),
     ids=[f"{index} - {case.name} - {case.given_experience_title}" for index, case in enumerate(get_test_cases_to_run(test_cases))])
 async def test_occupation_inference_tool(test_case: InferOccupationToolTestCase, setup_agent_tool):
-    tool = setup_agent_tool
+    tool = await setup_agent_tool
     # GIVEN an experience and a country of interest
     # shuffle the responsibilities to ensure the test is not dependent on the order of the responsibilities
     random.shuffle(test_case.given_responsibilities)
