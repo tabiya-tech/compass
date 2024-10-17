@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import random
 
 import pytest
@@ -17,7 +18,7 @@ from evaluation_tests.linking_and_ranking_pipeline.infer_occupation_tool.test_oc
 @pytest.fixture(scope="function")
 async def setup_agent_tool():
     db = await CompassDBProvider.get_taxonomy_db()
-    settings = VectorSearchSettings()
+    settings = VectorSearchSettings(taxonomy_model_id = os.environ.get("TAXONOMY_MODEL_ID"))
     embedding_service = GoogleGeckoEmbeddingService()
     search_service = OccupationSkillSearchService(db, embedding_service, settings)
     tool = InferOccupationTool(search_service)
