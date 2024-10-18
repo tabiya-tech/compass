@@ -5,7 +5,7 @@ import pulumi_gcp as gcp
 
 from urllib.parse import urlparse
 
-from lib.std_pulumi import get_resource_name, ProjectBaseConfig, enable_services
+from lib.std_pulumi import get_resource_name, ProjectBaseConfig, enable_services, get_project_base_config
 
 _SERVICES = [
         # GCP Cloud DNS
@@ -25,6 +25,7 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
             get_resource_name(environment=basic_config.environment, resource="lb-ipaddress"),
             project=basic_config.project,
             address_type="EXTERNAL",
+            opts=pulumi.ResourceOptions(provider=basic_config.provider)
     )
 
     # Add an A record with the GLB IP
@@ -34,7 +35,10 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
                       managed_zone=dns_zone.name,
                       type="A",
                       ttl=300,
-                      rrdatas=[ipaddress.address])
+                      rrdatas=[ipaddress.address],
+                      opts=pulumi.ResourceOptions(provider=basic_config.provider)
+    )
+    
     # Create a backend service for the frontend bucket
     backend_service_bucket = gcp.compute.BackendBucket(
             get_resource_name(environment=basic_config.environment, resource="lb-backend-bucket-for-frontend"),
@@ -44,6 +48,7 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
             cdn_policy=gcp.compute.BackendBucketCdnPolicyArgs(
                     cache_mode="USE_ORIGIN_HEADERS",  # Use the cache headers from the origin
             ),
+            opts=pulumi.ResourceOptions(provider=basic_config.provider)
     )
 
     # create a region network endpoint group for connecting to the api gateway
@@ -55,7 +60,8 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
             serverless_deployment=gcp.compute.RegionNetworkEndpointGroupServerlessDeploymentArgs(
                     platform="apigateway.googleapis.com",
                     resource=api_gateway_id
-            )
+            ),
+            opts=pulumi.ResourceOptions(provider=basic_config.provider)
     )
 
     # Create a backend service for the api gateway
@@ -68,7 +74,7 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
             load_balancing_scheme="EXTERNAL_MANAGED",
             backends=[gcp.compute.BackendServiceBackendArgs(group=endpoint_group.id)],
             log_config=gcp.compute.BackendServiceLogConfigArgs(enable=True),
-            opts=pulumi.ResourceOptions(depends_on=[endpoint_group]),
+            opts=pulumi.ResourceOptions(depends_on=[endpoint_group], provider=basic_config.provider),
     )
 
     route_action = gcp.compute.URLMapPathMatcherPathRuleRouteActionArgs(
@@ -122,7 +128,7 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
                     default_service=backend_service_bucket.id,
                     path_rules=[backend_rule, backend_openapi_rule, frontend_rule],
             )],
-            opts=pulumi.ResourceOptions(depends_on=[backend_service_bucket]),
+            opts=pulumi.ResourceOptions(depends_on=[backend_service_bucket], provider=basic_config.provider),
     )
 
     ssl_certificate = gcp.compute.ManagedSslCertificate(
@@ -130,27 +136,31 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
             project=basic_config.project,
             managed=gcp.compute.ManagedSslCertificateManagedArgs(
                     domains=[frontend_domain + "."],
-            ))
+            ),
+            opts=pulumi.ResourceOptions(provider=basic_config.provider)
+    )
 
     https_proxy = gcp.compute.TargetHttpsProxy(
             get_resource_name(environment=basic_config.environment, resource="https-proxy"),
             project=basic_config.project,
             url_map=https_url_map.id,
             ssl_certificates=[ssl_certificate.id],
-            opts=pulumi.ResourceOptions(depends_on=[https_url_map, ssl_certificate]),
+            opts=pulumi.ResourceOptions(depends_on=[https_url_map, ssl_certificate], provider=basic_config.provider),
     )
 
     http_url_map = gcp.compute.URLMap(
         get_resource_name(environment=basic_config.environment, resource="http-urlmap-redirect"),
         default_url_redirect=gcp.compute.URLMapDefaultUrlRedirectArgs(
                 https_redirect=True,
-                strip_query=False))
+                strip_query=False)
+    )
 
     http_proxy = gcp.compute.TargetHttpProxy(
         get_resource_name(environment=basic_config.environment, resource="http-proxy"),
         project=basic_config.project,
         url_map=http_url_map.id,
-        opts=pulumi.ResourceOptions(depends_on=[http_url_map]))
+        opts=pulumi.ResourceOptions(depends_on=[http_url_map]),
+    )
 
     # forwarding rule for HTTP
     gcp.compute.GlobalForwardingRule(
@@ -160,7 +170,8 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
             ip_address=ipaddress.address,
             port_range=port,
             load_balancing_scheme="EXTERNAL_MANAGED",
-            opts=pulumi.ResourceOptions(depends_on=[http_proxy]))
+            opts=pulumi.ResourceOptions(depends_on=[http_proxy], provider=basic_config.provider)
+    )
 
     # forwarding rule for HTTPS
     gcp.compute.GlobalForwardingRule(
@@ -170,7 +181,8 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
             ip_address=ipaddress.address,
             port_range=443,
             load_balancing_scheme="EXTERNAL_MANAGED",
-            opts=pulumi.ResourceOptions(depends_on=[https_proxy]))
+            opts=pulumi.ResourceOptions(depends_on=[https_proxy], provider=basic_config.provider)
+    )
 
 
 def _create_dns(*, basic_config: ProjectBaseConfig, domain_name: str,
@@ -180,7 +192,7 @@ def _create_dns(*, basic_config: ProjectBaseConfig, domain_name: str,
                                    name=get_resource_name(environment=basic_config.environment, resource="dns-zone"),
                                    dns_name=domain_name + ".",
                                    project=basic_config.project,
-                                   opts=pulumi.ResourceOptions(depends_on=dependencies))
+                                   opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider))
 
     return dns_zone
 
@@ -192,7 +204,9 @@ def deploy_common(project: str,
         frontend_domain: str,
         frontend_url: str,
         backend_url: str):
-    basic_config = ProjectBaseConfig(project=project, location=location, environment=environment)
+
+    basic_config = get_project_base_config(project=project, location=location, environment=environment)
+
     # Get the frontend bucket name
     frontend_stack_ref = pulumi.StackReference(f"tabiya-tech/compass-frontend/{basic_config.environment}")
     frontend_bucket_name = frontend_stack_ref.get_output("bucket_name")
