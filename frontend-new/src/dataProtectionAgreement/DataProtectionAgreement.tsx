@@ -9,8 +9,8 @@ import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { useNavigate } from "react-router-dom";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { routerPaths } from "src/app/routerPaths";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
-import authStateService from "src/auth/AuthStateService";
+import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import authStateService from "src/auth/services/AuthenticationState.service";
 import { Theme } from "@mui/material/styles";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";

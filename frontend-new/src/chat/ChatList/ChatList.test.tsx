@@ -17,7 +17,7 @@ jest.mock("src/chat/ChatMessage/ChatMessage", () => {
   };
 });
 
-jest.mock("src/auth/services/socialAuth/SocialAuth.service", () => {
+jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service", () => {
   return {
     __esModule: true,
     default: jest.fn().mockImplementation(() => {
