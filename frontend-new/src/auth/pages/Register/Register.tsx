@@ -22,6 +22,7 @@ import authStateService from "src/auth/AuthStateService";
 import { TabiyaUser } from "src/auth/auth.types";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import FeedbackButton from "src/feedback/FeedbackButton";
+import { useTranslation } from "react-i18next";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -54,6 +55,7 @@ export const DATA_TEST_ID = {
 };
 
 const Register: React.FC = () => {
+  const { t } = useTranslation();
   const [registrationCode, setRegistrationCode] = useState<string>("");
 
   const theme = useTheme();
@@ -257,11 +259,11 @@ const Register: React.FC = () => {
           height={"80%"}
           width={"100%"}
         >
-          <AuthHeader title={"Welcome to Compass!"} subtitle={"We need some information to get started"} />
-          <Typography variant="subtitle2">Enter your registration code to sign up</Typography>
+          <AuthHeader title={t("register.welcome", { appName: "Compass" })} subtitle={t("register.subtitle")} />
+          <Typography variant="subtitle2">{t("register.enterCode")}</Typography>
           <TextField
             fullWidth
-            label="Registration code"
+            label={t("register.registrationCodeFieldLabel")}
             variant="outlined"
             required
             value={registrationCode}
@@ -270,7 +272,7 @@ const Register: React.FC = () => {
           />
           <Divider textAlign="center" style={{ width: "100%" }}>
             <Typography variant="subtitle2" padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-              and then continue with
+              {t("register.continueWith")}
             </Typography>
           </Divider>
           <RegisterWithEmailForm
@@ -283,11 +285,11 @@ const Register: React.FC = () => {
             postLoginHandler={successfulSocialRegistrationCallback}
             isLoading={isLoading}
             disabled={!registrationCode}
-            label={"Sign up with Google"}
+            label={t("register.registerButton")}
             notifyOnLoading={notifyOnSocialLoading}
           />
           <Typography variant="body2" data-testid={DATA_TEST_ID.LOGIN_LINK}>
-            Already have an account?{" "}
+            {t("register.haveAccount")}{" "}
             <StyledNavLink
               to={routerPaths.LOGIN}
               style={{
@@ -295,13 +297,13 @@ const Register: React.FC = () => {
                 fontStyle: "italic",
               }}
             >
-              Login
+              {t("register.login")}
             </StyledNavLink>
           </Typography>
         </Box>
       </Container>
       <FeedbackButton bottomAlign={true} />
-      <Backdrop isShown={isLoading} message="Registering you..." />
+      <Backdrop isShown={isLoading} message={t("register.registering")} />
     </>
   );
 };

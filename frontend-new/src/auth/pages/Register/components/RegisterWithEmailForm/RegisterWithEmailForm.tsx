@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { validatePassword } from "src/auth/utils/validatePassword";
 import PasswordInput from "src/theme/PasswordInput/PasswordInput";
 import PasswordRequirements from "src/auth/components/PasswordRequirements/PasswordRequirements";
+import { useTranslation } from "react-i18next";
 
 const uniqueId = "6cf1a0fa-8d75-4342-bf6b-1203d5b114d7";
 
@@ -28,6 +29,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
   notifyOnRegister,
   isRegistering,
 }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -76,7 +78,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
     >
       <TextField
         fullWidth
-        label="Name"
+        label={t("register.nameFieldLabel")}
         variant="outlined"
         disabled={isRegistering || disabled}
         required
@@ -85,7 +87,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
       />
       <TextField
         fullWidth
-        label="Email"
+        label={t("register.emailFieldLabel")}
         type="email"
         disabled={isRegistering || disabled}
         variant="outlined"
@@ -95,7 +97,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
       />
       <PasswordInput
         fullWidth
-        label="Password"
+        label={t("register.passwordFieldLabel")}
         disabled={isRegistering || disabled}
         variant="outlined"
         required
@@ -117,13 +119,13 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
         {isRegistering ? (
           <CircularProgress
             color={"secondary"}
-            aria-label={"Registering"}
+            aria-label={t("register.registering")}
             data-testid={DATA_TEST_ID.REGISTER_BUTTON_CIRCULAR_PROGRESS}
             size={16}
             sx={{ marginTop: theme.tabiyaSpacing.sm, marginBottom: theme.tabiyaSpacing.sm }}
           />
         ) : (
-          "Register"
+          t("register.registerButton")
         )}
       </PrimaryButton>
     </Box>

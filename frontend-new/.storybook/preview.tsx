@@ -19,6 +19,10 @@ import "@fontsource/roboto/700.css";
 import type { Preview } from "@storybook/react";
 import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineContext } from "../src/app/isOnlineProvider/IsOnlineProvider";
+import i18n from "../src/i18n/i18n";
+import { I18nextProvider } from "react-i18next";
+import { useEffect } from "react";
+import { Language } from "../src/userPreferences/UserPreferencesService/userPreferences.types";
 
 const preview: Preview = {
   parameters: {
@@ -58,6 +62,19 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    language: {
+      name: "Language",
+      description: "Set the language for internationalization",
+      defaultValue: "en",
+      toolbar: {
+        icon: "globe",
+        items: [
+          { value: Language.en, title: "English" },
+          { value: Language.fr, title: "French" },
+          // Add more languages as needed
+        ],
+      },
+    },
   },
   args: {
     online: true,
@@ -67,30 +84,29 @@ const preview: Preview = {
 export default preview;
 
 export const decorators = [
-  (Story, context) => {
-  const isOnline = context.globals.online;
+  (Story: any, context: any) => {
+    const isOnline = context.globals.online;
+    const language = context.globals.language;
 
-  const authContextDefaultValue = {
-    user: null,
-    updateUserByToken: () => null,
-    clearUser: () => {},
-    isAuthenticationInProgress: false,
-    isAuthenticated: false,
-  }
+    useEffect(() => {
+      i18n.changeLanguage(language);
+    }, [language]);
 
-  return (
-    <Router>
-      <IsOnlineContext.Provider value={isOnline}>
-        <CssBaseline />
-          <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
-            <SnackbarProvider>
-              <div style={{ height: "100vh" }}>
-                <Story />
-              </div>
-            </SnackbarProvider>
-          </ThemeProvider>
-      </IsOnlineContext.Provider>
-    </Router>
+    return (
+      <Router>
+        <IsOnlineContext.Provider value={isOnline}>
+          <I18nextProvider i18n={i18n}>
+            <CssBaseline />
+            <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
+              <SnackbarProvider>
+                <div style={{ height: "100vh" }}>
+                  <Story />
+                </div>
+              </SnackbarProvider>
+            </ThemeProvider>
+          </I18nextProvider>
+        </IsOnlineContext.Provider>
+      </Router>
     );
   }
 ];

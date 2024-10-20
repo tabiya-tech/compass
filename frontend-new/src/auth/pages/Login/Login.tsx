@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Box, CircularProgress, Container, Divider, styled, Typography, useTheme } from "@mui/material";
 import { NavLink as RouterNavLink, useLocation, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -60,6 +61,7 @@ enum ActiveForm {
 }
 
 const Login: React.FC = () => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -380,7 +382,7 @@ const Login: React.FC = () => {
     <>
       <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.LOGIN_CONTAINER}>
         <Box display="flex" flexDirection="column" alignItems="center" justifyContent={"space-evenly"} height={"80%"}>
-          <AuthHeader title={"Welcome to Compass!"} subtitle={"Login to your account to continue"} />
+          <AuthHeader title={t("login.welcome", { appName: "Compass" })} subtitle={t("login.signIn")} />
           <Box
             component="form"
             onSubmit={handleLoginSubmit}
@@ -393,7 +395,7 @@ const Login: React.FC = () => {
             gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
           >
             <Typography variant="subtitle2" data-testid={DATA_TEST_ID.SUBTITLE}>
-              Login using
+              {t("login.loginUsing")}
             </Typography>
             <LoginWithInviteCodeForm
               inviteCode={inviteCode}
@@ -407,7 +409,7 @@ const Login: React.FC = () => {
                 padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
                 data-testid={DATA_TEST_ID.SUBTITLE}
               >
-                Or
+                {t("login.or")}
               </Typography>
             </Divider>
 
@@ -433,12 +435,12 @@ const Login: React.FC = () => {
                 <CircularProgress
                   color={"secondary"}
                   data-testid={DATA_TEST_ID.LOGIN_BUTTON_CIRCULAR_PROGRESS}
-                  aria-label={"Logging in"}
+                  aria-label={t("login.loggingIn")}
                   size={16}
                   sx={{ marginTop: theme.tabiyaSpacing.sm, marginBottom: theme.tabiyaSpacing.sm }}
                 />
               ) : (
-                "Login"
+                t("login.loginButton")
               )}
             </PrimaryButton>
           </Box>
@@ -450,7 +452,7 @@ const Login: React.FC = () => {
             notifyOnLoading={notifyOnSocialLoading}
           />
           <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.LOGIN_LINK}>
-            Don't have an account?{" "}
+            {t("login.noAccount")}{" "}
             <StyledNavLink
               to={routerPaths.REGISTER}
               style={{
@@ -458,7 +460,7 @@ const Login: React.FC = () => {
                 fontStyle: "italic",
               }}
             >
-              Register
+              {t("login.signUp")}
             </StyledNavLink>
           </Typography>
         </Box>

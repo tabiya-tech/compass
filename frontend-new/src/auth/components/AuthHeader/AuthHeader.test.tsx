@@ -1,3 +1,4 @@
+import "src/_test_utilities/i18nMock";
 import { render, screen } from "src/_test_utilities/test-utils";
 import AuthHeader, { DATA_TEST_ID } from "./AuthHeader";
 

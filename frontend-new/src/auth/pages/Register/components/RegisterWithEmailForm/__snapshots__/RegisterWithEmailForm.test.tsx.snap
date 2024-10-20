@@ -14,7 +14,7 @@ exports[`Testing Register Email Form component it should show register form 1`] 
       for=":r0:"
       id=":r0:-label"
     >
-      Name
+      register.nameFieldLabel
       <span
         aria-hidden="true"
         class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-1th3aq5-MuiFormLabel-asterisk"
@@ -43,7 +43,7 @@ exports[`Testing Register Email Form component it should show register form 1`] 
           class="css-yjsfm1"
         >
           <span>
-            Name
+            register.nameFieldLabel
              
             *
           </span>
@@ -60,7 +60,7 @@ exports[`Testing Register Email Form component it should show register form 1`] 
       for=":r1:"
       id=":r1:-label"
     >
-      Email
+      register.emailFieldLabel
       <span
         aria-hidden="true"
         class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-1th3aq5-MuiFormLabel-asterisk"
@@ -89,7 +89,7 @@ exports[`Testing Register Email Form component it should show register form 1`] 
           class="css-yjsfm1"
         >
           <span>
-            Email
+            register.emailFieldLabel
              
             *
           </span>
@@ -106,7 +106,7 @@ exports[`Testing Register Email Form component it should show register form 1`] 
       for=":r2:"
       id=":r2:-label"
     >
-      Password
+      register.passwordFieldLabel
       <span
         aria-hidden="true"
         class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-1th3aq5-MuiFormLabel-asterisk"
@@ -161,7 +161,7 @@ exports[`Testing Register Email Form component it should show register form 1`] 
           class="css-yjsfm1"
         >
           <span>
-            Password
+            register.passwordFieldLabel
              
             *
           </span>
@@ -176,7 +176,7 @@ exports[`Testing Register Email Form component it should show register form 1`] 
     tabindex="0"
     type="submit"
   >
-    Register
+    register.registerButton
     <span
       class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
     />

@@ -1,0 +1,31 @@
+{
+    "login": {
+        "welcome": "Bienvenue sur {{appName}}",
+        "signIn": "Se connecter",
+        "loginUsing": "Se connecter avec",
+        "or": "Ou",
+        "loginButton": "Se connecter",
+        "loggingIn": "Connexion en cours",
+        "noAccount": "Vous n'avez pas de compte?",
+        "signUp": "S'inscrire"
+    },
+    "register": {
+        "welcome": "Bienvenue sur {{appName}} !",
+        "subtitle": "Nous avons besoin de quelques informations pour commencer",
+        "enterCode": "Entrez votre code d'inscription pour vous inscrire",
+        "continueWith": "puis continuez avec",
+        "registrationCodeFieldLabel": "Code d'inscription",
+        "nameFieldLabel": "Nom",
+        "emailFieldLabel": "Email",
+        "passwordFieldLabel": "Mot de passe",
+        "registerButton": "S'inscrire",
+        "registering": "Inscription en cours...",
+        "haveAccount": "Vous avez déjà un compte ?",
+        "login": "Se connecter"
+    },
+    "socialAuth": {
+        "continueWith": "Ou continuer avec",
+        "signInWithGoogle": "Se connecter avec Google",
+        "offlineMessage": "La connexion Google n'est pas disponible hors ligne."
+    }
+}

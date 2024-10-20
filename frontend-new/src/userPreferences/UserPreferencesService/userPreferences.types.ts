@@ -19,5 +19,5 @@ export type UpdateUserPreferencesSpec = {
 
 export enum Language {
   en = "en",
-  // fr = 'fr', // French in the future
+  fr = 'fr'
 }

@@ -14,7 +14,7 @@ exports[`Testing Register component it should show register form successfully 1`
     <h6
       class="MuiTypography-root MuiTypography-subtitle2 css-ohbpz3-MuiTypography-root"
     >
-      Enter your registration code to sign up
+      register.enterCode
     </h6>
     <div
       class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1pcwqdd-MuiFormControl-root-MuiTextField-root"
@@ -25,7 +25,7 @@ exports[`Testing Register component it should show register form successfully 1`
         for=":r0:"
         id=":r0:-label"
       >
-        Registration code
+        register.registrationCodeFieldLabel
         <span
           aria-hidden="true"
           class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-1th3aq5-MuiFormLabel-asterisk"
@@ -54,7 +54,7 @@ exports[`Testing Register component it should show register form successfully 1`
             class="css-14lo706"
           >
             <span>
-              Registration code
+              register.registrationCodeFieldLabel
                
               *
             </span>
@@ -73,7 +73,7 @@ exports[`Testing Register component it should show register form successfully 1`
         <h6
           class="MuiTypography-root MuiTypography-subtitle2 css-zq12aa-MuiTypography-root"
         >
-          and then continue with
+          register.continueWith
         </h6>
       </span>
     </div>
@@ -87,7 +87,7 @@ exports[`Testing Register component it should show register form successfully 1`
       class="MuiTypography-root MuiTypography-body2 css-bbtak5-MuiTypography-root"
       data-testid="register-login-link-ab02918f-d559-47ba-9662-ea6b3a3606d0"
     >
-      Already have an account?
+      register.haveAccount
        
     </p>
   </div>
