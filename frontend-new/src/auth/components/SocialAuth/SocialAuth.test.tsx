@@ -1,4 +1,5 @@
 import "src/_test_utilities/consoleMock";
+import "src/_test_utilities/i18nMock";
 import React from "react";
 import { render, waitFor, screen } from "src/_test_utilities/test-utils";
 import SocialAuth, { DATA_TEST_ID } from "./SocialAuth";

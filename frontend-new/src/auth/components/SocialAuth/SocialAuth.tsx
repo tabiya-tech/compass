@@ -11,6 +11,7 @@ import { GoogleIcon } from "src/theme/Icons/GoogleIcon";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import authStateService from "src/auth/AuthStateService";
+import { useTranslation } from "react-i18next";
 
 const uniqueId = "f0324e97-83fd-49e6-95c3-1043751fa1db";
 export const DATA_TEST_ID = {
@@ -38,11 +39,10 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
   isLoading,
   notifyOnLoading,
 }) => {
-  const isOnline = useContext(IsOnlineContext);
-
+  const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const isOnline = useContext(IsOnlineContext);
 
   const loginWithPopup = useCallback(async () => {
     try {
@@ -96,7 +96,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       data-testid={DATA_TEST_ID.FIREBASE_AUTH_CONTAINER}
     >
       <Typography variant="caption" mt={2} data-testid={DATA_TEST_ID.CONTINUE_WITH_GOOGLE}>
-        Or continue with
+        {t("socialAuth.continueWith")}
       </Typography>
       <Box mt={2} width="100%">
         <div data-test_id={DATA_TEST_ID.FIREBASE_AUTH}>
@@ -133,7 +133,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
             <div style={{ display: "flex", alignItems: "center" }}>
               <GoogleIcon disabled={socialAuthLoading} />
             </div>
-            <Typography variant="body2">{label ?? "Sign in with Google"}</Typography>
+            <Typography variant="body2">{label ?? t("socialAuth.signInWithGoogle")}</Typography>
           </Button>
           {!isOnline && (
             <Typography
@@ -141,7 +141,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
               sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
               data-testid={DATA_TEST_ID.FIREBASE_FALLBACK_TEXT}
             >
-              Google sign in is not available when offline.
+              {t("socialAuth.offlineMessage")}
             </Typography>
           )}
         </div>
@@ -150,4 +150,4 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
   );
 };
 
-export default React.memo(SocialAuth);
+export default SocialAuth;

@@ -1,0 +1,31 @@
+{
+  "login": {
+    "welcome": "Welcome to {{appName}}",
+    "signIn": "Sign in",
+    "loginUsing": "Login using",
+    "or": "Or",
+    "loginButton": "Login",
+    "loggingIn": "Logging in",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign up"
+  },
+  "register": {
+    "welcome": "Welcome to {{appName}}!",
+    "subtitle": "We need some information to get started",
+    "enterCode": "Enter your registration code to sign up",
+    "continueWith": "and then continue with",
+    "registrationCodeFieldLabel": "Registration code",
+    "nameFieldLabel": "Name",
+    "emailFieldLabel": "Email",
+    "passwordFieldLabel": "Password",
+    "registerButton": "Register",
+    "registering": "Registering you...",
+    "haveAccount": "Already have an account?",
+    "login": "Login"
+  },
+  "socialAuth": {
+    "continueWith": "Or continue with",
+    "signInWithGoogle": "Sign in with Google",
+    "offlineMessage": "Google sign in is not available when offline."
+  }
+}

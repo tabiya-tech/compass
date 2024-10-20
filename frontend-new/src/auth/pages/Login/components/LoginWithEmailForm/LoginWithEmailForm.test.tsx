@@ -1,5 +1,6 @@
 // silence chatty errors
 import "src/_test_utilities/consoleMock";
+import "src/_test_utilities/i18nMock";
 import LoginWithEmailForm, { DATA_TEST_ID } from "./LoginWithEmailForm";
 import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
 import { HashRouter } from "react-router-dom";

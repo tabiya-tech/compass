@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { useTheme } from "@mui/material";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
+import i18n from "src/i18n/i18n";
+import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 
 const uniqueId = "f4d06e4b-0e0c-49c7-ad93-924c5ac89070";
 
@@ -14,10 +16,12 @@ export const DATA_TEST_ID = {
 
 export const MENU_ITEM_ID = {
   AUTH_ENGLISH_SELECTOR: `english-selector-${uniqueId}`,
+  AUTH_FRENCH_SELECTOR: `french-selector-${uniqueId}`,
 };
 
 export const MENU_ITEM_TEXT = {
   ENGLISH: `English`,
+  FRENCH: `French`,
 };
 
 const LanguageContextMenu = () => {
@@ -27,7 +31,13 @@ const LanguageContextMenu = () => {
       id: MENU_ITEM_ID.AUTH_ENGLISH_SELECTOR,
       text: MENU_ITEM_TEXT.ENGLISH,
       disabled: false,
-      action: () => {},
+      action: () => i18n.changeLanguage(Language.en),
+    },
+    {
+      id: MENU_ITEM_ID.AUTH_FRENCH_SELECTOR,
+      text: MENU_ITEM_TEXT.FRENCH,
+      disabled: false,
+      action: () => i18n.changeLanguage(Language.fr),
     },
   ];
 

@@ -12,6 +12,7 @@ import ViewPortWrapper from "src/app/ViewPortWrapper";
 import * as Sentry from "@sentry/react";
 import InternalError from "./errorPage/ErrorPage";
 import { initSentry } from "./sentryInit";
+import "src/i18n/i18n";
 
 // initialize react sentry for log aggregation
 initSentry();

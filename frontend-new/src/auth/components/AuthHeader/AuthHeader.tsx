@@ -37,7 +37,7 @@ const AuthHeader: React.FC<Readonly<AuthHeaderProps>> = ({ title, subtitle }) =>
       <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.AUTH_HEADER_TITLE}>
         {title}
       </Typography>
-      <Typography variant="body2" gutterBottom data-testid={DATA_TEST_ID.AUTH_HEADER_SUBTITLE}>
+      <Typography variant="body2" gutterBottom data-testid={DATA_TEST_ID.AUTH_HEADER_SUBTITLE} sx={{ textAlign: "center" }}>
         {subtitle}
       </Typography>
     </Box>

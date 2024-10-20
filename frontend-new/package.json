@@ -29,6 +29,8 @@
     "@types/supertest": "~2.0.12",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
+    "ajv": "^8.17.1",
+    "ajv-cli": "^5.0.0",
     "axe-playwright": "^1.2.3",
     "babel-plugin-named-exports-order": "^0.0.2",
     "concurrently": "~8.2.1",
@@ -64,10 +66,14 @@
     "firebase": "^10.12.2",
     "firebaseui": "^6.1.0",
     "framer-motion": "^11.2.11",
+    "i18next": "^23.16.0",
+    "i18next-browser-languagedetector": "^8.0.0",
+    "i18next-http-backend": "^2.6.2",
     "jwt-decode": "^4.0.0",
     "notistack": "^3.0.1",
     "react": "~18.2.0",
     "react-dom": "~18.2.0",
+    "react-i18next": "^15.0.3",
     "react-router-dom": "^6.23.1",
     "react-scripts": "^5.0.1",
     "web-vitals": "^2.1.4"
@@ -86,7 +92,8 @@
     "test-storybook": "test-storybook",
     "test:accessibility": "npx concurrently -k -s first -n 'STORYBOOK,TEST' -c 'magenta,blue' 'npx http-server storybook-static --port 6007 --silent' 'npx wait-on http://127.0.0.1:6007 && yarn test-storybook --url http://127.0.0.1:6007'",
     "format:check": "prettier --check src/",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "validate-translations": "ajv validate -s src/i18n/translations.schema.json -d \"public/locales/languages/*.json\""
   },
   "eslintConfig": {
     "extends": [

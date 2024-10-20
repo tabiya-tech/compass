@@ -1,0 +1,148 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "login": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "welcome": {
+            "description": "Welcome message for login page",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "signIn": {
+            "description": "Sign in text",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "loginUsing": {
+            "description": "Login using text",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "or": {
+            "description": "Or text",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "loginButton": {
+            "description": "Login button text",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "loggingIn": {
+            "description": "Logging in progress text",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "noAccount": {
+            "description": "No account text",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "signUp": {
+            "description": "Sign up text",
+            "type": "string",
+            "pattern": "\\S"
+          }
+        },
+        "required": ["welcome", "signIn", "loginUsing", "or", "loginButton", "loggingIn", "noAccount", "signUp"]
+      },
+      "register": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "welcome": {
+            "description": "Welcome message for registration page",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "subtitle": {
+            "description": "Subtitle for registration page",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "enterCode": {
+            "description": "Enter registration code text",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "continueWith": {
+            "description": "Continue with text",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "registrationCodeFieldLabel": {
+            "description": "Registration code field label",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "nameFieldLabel": {
+            "description": "Name field label",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "emailFieldLabel": {
+            "description": "Email field label",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "passwordFieldLabel": {
+            "description": "Password field label",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "registerButton": {
+            "description": "Register button text",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "registering": {
+            "description": "Registering progress text",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "haveAccount": {
+            "description": "Already have an account text",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "login": {
+            "description": "Login text",
+            "type": "string",
+            "pattern": "\\S"
+          }
+        },
+        "required": [
+          "welcome", "subtitle", "enterCode", "continueWith", "registrationCodeFieldLabel",
+          "nameFieldLabel", "emailFieldLabel", "passwordFieldLabel", "registerButton",
+          "registering", "haveAccount", "login"
+        ]
+      },
+      "socialAuth": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "continueWith": {
+            "description": "Continue with text for social auth",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "signInWithGoogle": {
+            "description": "Sign in with Google text",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "offlineMessage": {
+            "description": "Offline message for social auth",
+            "type": "string",
+            "pattern": "\\S"
+          }
+        },
+        "required": ["continueWith", "signInWithGoogle", "offlineMessage"]
+      }
+    },
+    "required": ["login", "register", "socialAuth"]
+  }

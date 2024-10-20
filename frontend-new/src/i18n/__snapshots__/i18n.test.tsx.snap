@@ -1,0 +1,69 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`i18n translations should match english translation snapshot 1`] = `
+Object {
+  "login": Object {
+    "loggingIn": "Logging in",
+    "loginButton": "Login",
+    "loginUsing": "Login using",
+    "noAccount": "Don't have an account?",
+    "or": "Or",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "welcome": "Welcome to {{appName}}",
+  },
+  "register": Object {
+    "continueWith": "and then continue with",
+    "emailFieldLabel": "Email",
+    "enterCode": "Enter your registration code to sign up",
+    "haveAccount": "Already have an account?",
+    "login": "Login",
+    "nameFieldLabel": "Name",
+    "passwordFieldLabel": "Password",
+    "registerButton": "Register",
+    "registering": "Registering you...",
+    "registrationCodeFieldLabel": "Registration code",
+    "subtitle": "We need some information to get started",
+    "welcome": "Welcome to {{appName}}!",
+  },
+  "socialAuth": Object {
+    "continueWith": "Or continue with",
+    "offlineMessage": "Google sign in is not available when offline.",
+    "signInWithGoogle": "Sign in with Google",
+  },
+}
+`;
+
+exports[`i18n translations should match french translation snapshot 1`] = `
+Object {
+  "login": Object {
+    "loggingIn": "Connexion en cours",
+    "loginButton": "Se connecter",
+    "loginUsing": "Se connecter avec",
+    "noAccount": "Vous n'avez pas de compte?",
+    "or": "Ou",
+    "signIn": "Se connecter",
+    "signUp": "S'inscrire",
+    "welcome": "Bienvenue sur {{appName}}",
+  },
+  "register": Object {
+    "continueWith": "puis continuez avec",
+    "emailFieldLabel": "Email",
+    "enterCode": "Entrez votre code d'inscription pour vous inscrire",
+    "haveAccount": "Vous avez déjà un compte ?",
+    "login": "Se connecter",
+    "nameFieldLabel": "Nom",
+    "passwordFieldLabel": "Mot de passe",
+    "registerButton": "S'inscrire",
+    "registering": "Inscription en cours...",
+    "registrationCodeFieldLabel": "Code d'inscription",
+    "subtitle": "Nous avons besoin de quelques informations pour commencer",
+    "welcome": "Bienvenue sur {{appName}} !",
+  },
+  "socialAuth": Object {
+    "continueWith": "Ou continuer avec",
+    "offlineMessage": "La connexion Google n'est pas disponible hors ligne.",
+    "signInWithGoogle": "Se connecter avec Google",
+  },
+}
+`;

@@ -1,5 +1,6 @@
 // silence chatty console
 import "src/_test_utilities/consoleMock";
+import "src/_test_utilities/i18nMock";
 import RegisterWithEmailForm, { DATA_TEST_ID } from "./RegisterWithEmailForm";
 import React from "react";
 import { HashRouter } from "react-router-dom";
