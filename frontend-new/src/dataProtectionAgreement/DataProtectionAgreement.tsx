@@ -12,6 +12,7 @@ import { routerPaths } from "src/app/routerPaths";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
 import authStateService from "src/auth/AuthStateService";
 import { Theme } from "@mui/material/styles";
+import i18n from "../i18n/i18n";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
@@ -62,7 +63,7 @@ const DataProtectionAgreement: React.FC = () => {
 
       const newUserPreferenceSpecs: UpdateUserPreferencesSpec = {
         user_id: user.id,
-        language: Language.en,
+        language: i18n.language as Language,
         accepted_tc: new Date(),
       };
       setIsAcceptingDPA(true);
