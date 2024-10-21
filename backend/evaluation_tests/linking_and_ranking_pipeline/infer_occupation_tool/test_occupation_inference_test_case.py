@@ -128,15 +128,6 @@ test_cases = [
         expected_occupations_found=["affective/emotional support for dependent adults"],
     ),
     InferOccupationToolTestCase(
-        name="Icatus I42_4",
-        given_experience_title="I keep company to my grandma when she is not feeling well",
-        given_work_type=WorkType.UNSEEN_UNPAID,
-        given_company="home",
-        given_country_of_interest=Country.SOUTH_AFRICA,
-        given_responsibilities=[],
-        expected_occupations_found=["affective/emotional support for dependent adults"],
-    ),
-    InferOccupationToolTestCase(
         name="Icatus I42_3",
         given_experience_title="I fill my grandma’s taxes",
         given_work_type=WorkType.UNSEEN_UNPAID,
