@@ -1,0 +1,5 @@
+config:
+  gcp:project: "compass-dev-418218"
+  gcp:region: "us-central1"
+  backend_repository_name: "compass-docker-repository"
+  backend_image_name: "compass-backend"

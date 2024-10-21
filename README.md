@@ -15,10 +15,13 @@ their skills and interests based on their lived experiences.
 
 - **[Backend](backend)**: Explore the Backend directory for detailed insights about the backend project.
 
+<<<<<<< HEAD
 - **[Frontend(POC)](frontend)**: Explore the Frontend directory for detailed insights about the old, temporary chat app. This is a proof of concept and is not the final product, but can be used to test the backend.
 
 - **[Frontend(New)](frontend-new)**: Explore the Frontend(New) directory for detailed insights about the new frontend project. This project is still a work in progress.
 
+=======
+>>>>>>> 84389fc (Your new commit message)
 - **[Infrastructure As Code (IaC)](iac)**: Explore the Infrastructure as code(IAC) directory for detailed insights about
   the infrastructure-as-code components.
 

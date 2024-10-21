@@ -1,14 +1,23 @@
+<<<<<<< HEAD
 tes# Infrastructure as Code
 The infrastructure for Compass is managed using [Pulumi](https://www.pulumi.com/). The infrastructure is defined in code and can be deployed to Google Cloud Platform (GCP) using Pulumi. 
 
 ## Prerequisites
 ### General
+=======
+# Infrastructure as Code
+
+https://www.pulumi.com/ai/answers/15xDqB9xyu6D17Kb297Dfi/configuring-google-cloud-project-with-python
+
+## Prerequisites
+>>>>>>> 84389fc (Your new commit message)
 
 - A recent version of [git](https://git-scm.com/) (e.g. ^2.37 )
 - [Python 3.8 or higher](https://www.python.org/downloads/)
 - [Pulumi CLI](https://www.pulumi.com/docs/install/).
 - [Google Cloud SDK (gcloud)](https://cloud.google.com/sdk/docs/install)
 
+<<<<<<< HEAD
 ### GCP project setup
 
 To use Pulumi to manage the Compass infrastructure in GCP, the following setup must be performed manually:
@@ -55,6 +64,11 @@ The target project is the project where the Compass resources are to be created.
 
 ## Installation
 In the iac directory, run the following commands:
+=======
+
+## Installation
+In the root directory of the project, run the following commands:
+>>>>>>> 84389fc (Your new commit message)
 
 ```shell
 # create a virtual environment
@@ -83,6 +97,7 @@ pip install -r requirements.txt
 > ```
 
 
+<<<<<<< HEAD
 ## Running the Pulumi
 
 Before running the code, you need to configure the Google Cloud SDK to use the credentials of the principal that will manage the infrastructure. That principal should have the necessary roles to manage the infrastructure in the particular project that we target. Also, you need to authenticate with Docker to push the images to the Google Cloud Artifact Registry.
@@ -120,6 +135,26 @@ Besides the service account keys authentication, there are [others ways you can 
 Even though it is best practice to use service account impersonation when running the code locally, it can be cumbersome to set up and use.
 
 Here is how to authenticate to Google Cloud using service account impersonation.
+=======
+## Running the code locally
+
+
+Before running the code, you need to configure the Google Cloud SDK to use the credentials of the principal that will manage the infrastructure. That principal should have the necessary roles to manage the infrastructure in the particular project that we target. Also, you need to authenticate with Docker to push the images to the Google Cloud Artifact Registry.
+
+### Roles required for the principal
+
+The principal used to manage the infrastructure should have the following roles:
+
+The account should have the following roles:
+
+- `role/editor`
+
+### Authenticate with Google Cloud
+
+There are [multiple ways you can authenticate with Google Cloud](https://cloud.google.com/sdk/gcloud/reference/auth). 
+
+As a best practice, we recommend using service account impersonation when running the code locally.
+>>>>>>> 84389fc (Your new commit message)
 
 Initially authenticate with your personal Google Cloud account:
 
@@ -134,6 +169,7 @@ Then, impersonate the service account that has the necessary roles to manage the
 > Note:
 > When using service account impersonation, your account should be granted access with the `roles/iam.serviceAccountTokenCreator` to that service account. Ask the project owner to grant you that role.
 
+<<<<<<< HEAD
 ### Environment variables
 The deployment requires the following environment variables to be set:
 - `GITHUB_SHA`: GitHub commit SHA that will be used as the docker image label. This does not have to be an actual git commit SHA, but using a static SHA (like `latest`) might have weird consequences (like the service not picking up the latest version).
@@ -152,11 +188,34 @@ The deployment requires the following environment variables to be set:
 - `VERTEX_API_REGION`: The region of the Vertex API that will be used by the backend.
 - `SENTRY_BACKEND_DSN`: The Sentry Data Source Name for error tracking (the backend DSN is for the project used to track backend errors)
 - `ENABLE_SENTRY`: A boolean value that determines whether Sentry error tracking is enabled. Set to `True` to enable Sentry error tracking. 
+=======
+#### Using the Service account keys (CI/CD)
+Using the [service account credentials, authenticate with Google Cloud](https://cloud.google.com/sdk/gcloud/reference/auth/activate-service-account) is the way preferred when running in a CI/CD environment
+
+ ```shell
+gcloud auth activate-service-account <SERVICE_ACCOUNT_EMAIL> --key-file=<KEY_FILE> --project=<PROJECT_ID>
+ ```
+
+### Authenticate to Docker
+
+Add credentials to docker:
+
+```shell
+# add credentials to docker
+# replace <LOCATION> with the location of the Google Cloud Artifact Registry
+gcloud auth configure-docker <LOCATION>-docker.pkg.dev
+```
+
+### Running pulumi locally
+The deployment requires the following environment variables to be set:
+- `MONGO_URI`: The URI of the MongoDB instance to use where the ESCO data is stored.
+>>>>>>> 84389fc (Your new commit message)
 
 It is recommended to use a `.env` file to set the environment variables. Create a `.env` file in the root directory of the project and add the following content:
 
 ```shell
 # .env file
+<<<<<<< HEAD
 GITHUB_SHA="<GIT_COMMIT_SHA>"
 GCP_OAUTH_CLIENT_ID="<GCP_OAUTH_CLIENT_ID>"
 GCP_OAUTH_CLIENT_SECRET="<GCP_OAUTH_CLIENT_SECRET>"
@@ -227,3 +286,16 @@ Replace `<GCP_PROJECT_ID>` with the GCP project ID where the Identity Platform A
 Once the configuration is imported, you can run pulumi commands as usual.
 
 > Note: Don't forget to unprotect the imported resource, since imported resources are protected by default. It is important to do this, since pulumi will not allow you to destroy a protected resource.
+=======
+MONGO_URI="<URI_TO_MONGODB>"
+```
+
+Run the pulumi code locally, using the appropriate commands. For example, to preview the changes for the dev stack, run the following command:
+
+```shell
+# preview the changes for the dev stack
+pulumi preview --stack dev
+```
+
+See the [Pulumi documentation](https://www.pulumi.com/docs/) for more information on how to use Pulumi.
+>>>>>>> 84389fc (Your new commit message)

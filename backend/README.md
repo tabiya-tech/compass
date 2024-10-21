@@ -3,15 +3,21 @@
 ## Prerequisites
 
 - A recent version of [git](https://git-scm.com/) (e.g. ^2.37 )
+<<<<<<< HEAD
 - [Python 3.11 or higher](https://www.python.org/downloads/)
 - [Poerty 1.8 or higher](https://python-poetry.org/)
   > Note: to install Poetry consult the [Poetry documentation](https://python-poetry.org/docs/#installing-with-the-official-installer)
   >
+=======
+- [Python 3.8 or higher](https://www.python.org/downloads/)
+- [Poerty](https://python-poetry.org/)
+>>>>>>> 84389fc (Your new commit message)
   > Note: When you install Poetry, you may encounter an `SSL: CERTIFICATE_VERIFY_FAILED`.
   See [here](https://github.com/python-poetry/install.python-poetry.org/issues/112#issuecomment-1555925766) on how to
   resolve the issue.
 - [Google Cloud SDK (gcloud)](https://cloud.google.com/sdk/docs/install)
 - Access to a MongoDB Atlas instance with the ESCO data.
+<<<<<<< HEAD
 - Optionally, [Docker](https://www.docker.com/) if you want to build and run the backend in a container.
 
 ## Installation
@@ -19,6 +25,13 @@
 #### Set up virtualenv
 
 In the **root directory** of the backend project (so, the same directory as this README file), run the following commands:
+=======
+- optionally, [Docker](https://www.docker.com/) if you want to build and run the backend in a container.
+
+## Installation
+
+In the root directory of the backend project, run the following commands:
+>>>>>>> 84389fc (Your new commit message)
 
 ```shell
 # create a virtual environment
@@ -28,6 +41,7 @@ python3 -m venv venv-backend
 source venv-backend/bin/activate
 ```
 
+<<<<<<< HEAD
 #### Install the dependencies
 
 ```shell
@@ -39,6 +53,14 @@ poetry install --sync
 
 > Note: Install poetry system-wide (not in a virtualenv).
 
+=======
+Install the dependencies:
+
+```shell
+poetry install
+```
+
+>>>>>>> 84389fc (Your new commit message)
 > Note:
 > Before running performing any tasks such as building the image or running the code locally, activate the virtual
 > environment so that the installed dependencies are available:
