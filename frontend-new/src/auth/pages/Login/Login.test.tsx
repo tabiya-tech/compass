@@ -121,11 +121,9 @@ describe("Testing Login component", () => {
 
     // AND the email login mock will succeed
     const loginMock = jest.fn();
-    jest.spyOn(FirebaseEmailAuthenticationService, "getInstance").mockImplementation(() => {
-      return {
+    jest.spyOn(FirebaseEmailAuthenticationService, "getInstance").mockResolvedValueOnce({
         login: loginMock,
-      } as unknown as FirebaseEmailAuthenticationService;
-    });
+      } as unknown as FirebaseEmailAuthenticationService);
 
     render(
       <HashRouter>
@@ -153,11 +151,9 @@ describe("Testing Login component", () => {
     const givenInvitationCode = "INVITE-CODE-123";
     // AND the anonymous auth mock will succeed
     const anonymousLoginMock = jest.fn().mockResolvedValue("mock-token");
-    jest.spyOn(FirebaseInvitationCodeAuthenticationService, "getInstance").mockImplementation(() => {
-      return {
+    jest.spyOn(FirebaseInvitationCodeAuthenticationService, "getInstance").mockResolvedValueOnce( {
         login: anonymousLoginMock,
-      } as unknown as FirebaseInvitationCodeAuthenticationService;
-    });
+      } as unknown as FirebaseInvitationCodeAuthenticationService);
 
     render(
       <HashRouter>

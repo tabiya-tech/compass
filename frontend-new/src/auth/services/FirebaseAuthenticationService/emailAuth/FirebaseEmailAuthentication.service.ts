@@ -2,14 +2,16 @@ import { auth } from "src/auth/firebaseConfig";
 import { StatusCodes } from "http-status-codes";
 import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
-import FirebaseAuthenticationService from "src/auth/services/FirebaseAuthenticationService/FirebaseAuthentication.service";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { AuthenticationServices } from "src/auth/auth.types";
 import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
+import AuthenticationService from "../../Authentication.service";
+import StdFirebaseAuthenticationService from "../StdFirebaseAuthenticationService";
 
-class FirebaseEmailAuthenticationService extends FirebaseAuthenticationService {
+class FirebaseEmailAuthenticationService extends AuthenticationService {
   private static instance: FirebaseEmailAuthenticationService;
+  private static stdFirebaseAuthServiceInstance: StdFirebaseAuthenticationService;
 
   private constructor() {
     super();
@@ -18,7 +20,9 @@ class FirebaseEmailAuthenticationService extends FirebaseAuthenticationService {
    * Get the singleton instance of the EmailAuthService.
    * @returns {FirebaseEmailAuthenticationService} The singleton instance of the EmailAuthService.
    */
-  static getInstance(): FirebaseEmailAuthenticationService {
+  static async getInstance(): Promise<FirebaseEmailAuthenticationService> {
+    this.stdFirebaseAuthServiceInstance = await StdFirebaseAuthenticationService.getInstance()
+    await StdFirebaseAuthenticationService.getInstance()
     if (!FirebaseEmailAuthenticationService.instance) {
       FirebaseEmailAuthenticationService.instance = new FirebaseEmailAuthenticationService();
     }
@@ -145,6 +149,28 @@ class FirebaseEmailAuthenticationService extends FirebaseAuthenticationService {
     // by calling the parent class method once the user is successfully registered
     await super.onSuccessfulRegistration(token, invitation.invitation_code);
     return token;
+  }
+
+  async cleanup(): Promise<void> {
+    FirebaseEmailAuthenticationService.stdFirebaseAuthServiceInstance.cleanup();
+  }
+
+  async logout(): Promise<void> {
+    await FirebaseEmailAuthenticationService.stdFirebaseAuthServiceInstance.logout();
+    // call the parent class method once the user is successfully logged out (or even if it fails)
+    await super.onSuccessfulLogout();
+  }
+
+  async refreshToken(): Promise<void> {
+    try{
+      const newToken = await FirebaseEmailAuthenticationService.stdFirebaseAuthServiceInstance.refreshToken();
+      // call the parent class method once the token is successfully refreshed
+      await super.onSuccessfulRefresh(newToken);
+    } catch (error) {
+      console.error("Error refreshing token:", error);
+      // if token refresh fails, log the user out
+      await this.logout();
+    }
   }
 }
 

@@ -43,8 +43,8 @@ jest.useFakeTimers();
 describe("AuthService class tests", () => {
   let authService: FirebaseInvitationCodeAuthenticationService;
 
-  beforeAll(() => {
-    authService = FirebaseInvitationCodeAuthenticationService.getInstance();
+  beforeAll(async () => {
+    authService = await FirebaseInvitationCodeAuthenticationService.getInstance();
   });
 
   afterEach(() => {

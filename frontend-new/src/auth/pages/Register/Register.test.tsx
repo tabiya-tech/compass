@@ -155,13 +155,11 @@ describe("Testing Register component", () => {
 
     // AND the register method is mocked to succeed
     const registerMock = jest.fn();
-    jest.spyOn(FirebaseEmailAuthenticationService, "getInstance").mockImplementation(() => {
-      return {
+    jest.spyOn(FirebaseEmailAuthenticationService, "getInstance").mockResolvedValue({
         register: registerMock,
         login: jest.fn(),
         logout: jest.fn(),
-      } as unknown as FirebaseEmailAuthenticationService;
-    });
+      } as unknown as FirebaseEmailAuthenticationService);
     // AND the auth state service is mocked to return a user
     jest.spyOn(authStateService, "updateUserByToken").mockImplementation((token) => {
       return { email: givenEmail, name: givenName } as TabiyaUser;
@@ -225,13 +223,11 @@ describe("Testing Register component", () => {
 
     // AND the register function returns a token
     const registerMock = jest.fn().mockResolvedValue("foo-bar-token");
-    jest.spyOn(FirebaseEmailAuthenticationService, "getInstance").mockImplementation(() => {
-      return {
+    jest.spyOn(FirebaseEmailAuthenticationService, "getInstance").mockResolvedValueOnce({
         register: registerMock,
         login: jest.fn(),
         logout: jest.fn(),
-      } as unknown as FirebaseEmailAuthenticationService;
-    });
+      } as unknown as FirebaseEmailAuthenticationService);
     // AND the user has a valid invitation code
     // AND check invitation code status returns a valid code
     jest
@@ -251,7 +247,12 @@ describe("Testing Register component", () => {
     jest.spyOn(authStateService, "clearUser").mockResolvedValue(undefined);
 
     // AND the logout function is mocked to succeed
-    jest.spyOn(FirebaseEmailAuthenticationService.getInstance(), "logout").mockResolvedValue(undefined);
+    jest.spyOn(FirebaseEmailAuthenticationService, "getInstance").mockResolvedValue({
+      register: registerMock,
+      login: jest.fn(),
+      logout: jest.fn(),
+    } as unknown as FirebaseEmailAuthenticationService);
+
     // AND the user preferences service is mocked to succeed
     jest.spyOn(userPreferencesService, "createUserPreferences").mockResolvedValue({
       user_id: "foo-bar-id",
@@ -292,13 +293,13 @@ describe("Testing Register component", () => {
     const registerMock = jest.fn().mockRejectedValue(
       new Error("An unexpected error occurred. Please try again later.")
     );
-    jest.spyOn(FirebaseEmailAuthenticationService, "getInstance").mockImplementation(() => {
-      return {
+    jest.spyOn(FirebaseEmailAuthenticationService, "getInstance").mockResolvedValue(
+       {
         register: registerMock,
         login: jest.fn(),
         logout: jest.fn(),
-      } as unknown as FirebaseEmailAuthenticationService;
-    });
+      } as unknown as FirebaseEmailAuthenticationService
+    );
 
     const givenName = "Foo Bar";
     const givenEmail = "foo@bar.baz";

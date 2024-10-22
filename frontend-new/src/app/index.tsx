@@ -66,12 +66,13 @@ const App = () => {
         setTimeout(() => setLoading(false), 500);
       }
 
-      return () => {
-        try{
+      return async () => {
+        const authenticationServiceFactory = await AuthenticationServiceFactory.getAuthenticationService()
+        try {
           console.debug("Cleaning up auth");
           // Each of the services that implement the AuthenticationService interface will have their own cleanup method
           // they may use this method to clean up any resources they have allocated on component unmount
-          AuthenticationServiceFactory.getAuthenticationService().cleanup();
+          authenticationServiceFactory.cleanup();
         } catch (error) {
           console.error("Error cleaning up auth", error);
         }

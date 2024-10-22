@@ -98,7 +98,7 @@ describe("SocialAuth tests", () => {
       // AND the sign-in is successful
       const loginWithGoogleMock = jest.fn().mockResolvedValue(givenToken);
       const getFirebaseSocialAuthInstanceSpy = jest.spyOn(FirebaseSocialAuthenticationService, "getInstance");
-      getFirebaseSocialAuthInstanceSpy.mockReturnValue({
+      getFirebaseSocialAuthInstanceSpy.mockResolvedValueOnce({
         loginWithGoogle: loginWithGoogleMock,
       } as unknown as FirebaseSocialAuthenticationService);
 
@@ -147,7 +147,7 @@ describe("SocialAuth tests", () => {
       config.callbacks.signInFailure(new Error("Sign-in failed"));
     });
     const getFirebaseSocialAuthInstanceSpy = jest.spyOn(FirebaseSocialAuthenticationService, "getInstance");
-    getFirebaseSocialAuthInstanceSpy.mockReturnValue({
+    getFirebaseSocialAuthInstanceSpy.mockResolvedValueOnce({
       loginWithGoogle: loginWithGoogleMock,
     } as unknown as FirebaseSocialAuthenticationService);
 
@@ -193,7 +193,7 @@ describe("SocialAuth tests", () => {
 
     // AND the logout function is mocked to succeed
     const getFirebaseSocialAuthInstanceSpy = jest.spyOn(FirebaseSocialAuthenticationService, "getInstance");
-    getFirebaseSocialAuthInstanceSpy.mockReturnValue({
+    getFirebaseSocialAuthInstanceSpy.mockResolvedValueOnce({
       logout: logoutMock,
     } as unknown as FirebaseSocialAuthenticationService);
     // WHEN the component is rendered

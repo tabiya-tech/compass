@@ -192,7 +192,8 @@ const Chat: React.FC<ChatProps> = ({
     setIsLoggingOut(true);
     try {
       // Call the logout service to handle the logout based on the current login method
-      await AuthenticationServiceFactory.getAuthenticationService().logout();
+      const authenticationService = await AuthenticationServiceFactory.getAuthenticationService();
+      await authenticationService.logout();
       navigate(routerPaths.LOGIN, { replace: true });
       enqueueSnackbar("Successfully logged out.", { variant: "success" });
     } catch (error) {

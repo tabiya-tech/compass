@@ -40,20 +40,20 @@ import { AuthenticationServices } from "src/auth/auth.types";
 class AuthenticationServiceFactory {
   /**
    * Retrieves an instance of the appropriate AuthenticationService based on the user's current login method.
-   * 
+   *
    * @returns {AuthenticationService} The instance of the authentication service.
    * @throws {Error} If an invalid or unrecognized authentication method is encountered.
    */
-  static getAuthenticationService(): AuthenticationService {
+  static async getAuthenticationService(): Promise<AuthenticationService> { // Review: Get current authentication service would be a better name for this perhaps
     const authMethod = PersistentStorageService.getLoginMethod();
-    
+
     switch (authMethod) {
       case AuthenticationServices.FIREBASE_ANONYMOUS:
-        return FirebaseInvitationCodeAuthenticationService.getInstance();
+        return await FirebaseInvitationCodeAuthenticationService.getInstance();
       case AuthenticationServices.FIREBASE_EMAIL:
-        return FirebaseEmailAuthenticationService.getInstance();
+        return await FirebaseEmailAuthenticationService.getInstance();
       case AuthenticationServices.FIREBASE_SOCIAL:
-        return FirebaseSocialAuthenticationService.getInstance();
+        return await FirebaseSocialAuthenticationService.getInstance();
       default:
         throw new Error(`Invalid authentication method: ${authMethod}`);
     }

@@ -5,7 +5,6 @@ import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.consta
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { FirebaseToken } from "src/auth/auth.types";
 import { jwtDecode } from "jwt-decode";
-import AuthenticationService from "src/auth/services/Authentication.service";
 
 /**
  * The FirebaseAuthenticationService is a concrete class that provides common functionality
@@ -26,20 +25,26 @@ import AuthenticationService from "src/auth/services/Authentication.service";
  * - Interacts with Firebase authentication,
  * - Uses callbacks to notify the parent class of successful logout and token refresh events
  */
-class FirebaseAuthenticationService extends AuthenticationService {
+class StdFirebaseAuthenticationService {
   private readonly FIREBASE_DB_NAME = "firebaseLocalStorageDb";
   private readonly REFRESH_TOKEN_EXPIRATION_PERCENTAGE = 0.1;
   private refreshTimeout: NodeJS.Timeout | null = null;
   private readonly unsubscribeAuthListener: () => void;
 
-  protected constructor(
+  private constructor(
   ) {
-    super();
-    this.finishPendingLogout(); // REVIEW: why is the promise not awaited? this should be moved to the getInstance()
-                                //  or where the getInstance is used or the factory depending on how you want ot handle it
     this.unsubscribeAuthListener = this.setupAuthListener();
   }
 
+  private async init() {
+    await this.finishPendingLogout();
+  }
+
+  static async getInstance(): Promise<StdFirebaseAuthenticationService> {
+    const instance = new StdFirebaseAuthenticationService();
+    await instance.init();
+    return instance;
+  }
   /**
    * Logs out the user from the Firebase authentication service.
    * It signs out the user, deletes the Firebase IndexedDB, clears the refresh timeout,
@@ -53,9 +58,8 @@ class FirebaseAuthenticationService extends AuthenticationService {
     try {
       await auth.signOut();
       await this.deleteFirebaseDB();
-      this.clearRefreshTimeout(); // REVIEW On logout do unsubscribeAuthListener()
-      // call the parent class method once the user is successfully logged out
-      await super.onSuccessfulLogout();
+      this.clearRefreshTimeout();
+      this.unsubscribeAuthListener();
     } catch (error) {
       const firebaseError = (error as any).code;
       throw errorFactory(
@@ -66,9 +70,6 @@ class FirebaseAuthenticationService extends AuthenticationService {
       );
     } finally {
       PersistentStorageService.clearLoggedOutFlag();
-      // call the parent class method in case the logout was unsuccessful
-      // this means that even if the logout fails on the firebase side, the user will still be logged out of the app
-      await super.onSuccessfulLogout();
     }
   }
 
@@ -78,26 +79,21 @@ class FirebaseAuthenticationService extends AuthenticationService {
    * and schedules the next token refresh.
    *
    * @returns {Promise<void>} A promise that resolves when the token refresh process is complete.
+   * @throws {Error} If an error occurs during the token refresh process.
    */
-  public async refreshToken(): Promise<void> {
+  public async refreshToken(): Promise<string> {
     console.debug("Attempting to refresh token");
     const oldToken = PersistentStorageService.getToken();
     console.debug("Old token", "..." + oldToken?.slice(-20));
 
     if (auth.currentUser) {
-      try {
-        const newToken = await auth.currentUser.getIdToken(true);
-        console.debug("New token obtained", "..." + newToken.slice(-20));
-        this.scheduleTokenRefresh(newToken);
-        // call the parent class method once the token is successfully refreshed
-        await super.onSuccessfulRefresh(newToken);
-      } catch (error) {
-        console.error("Error refreshing token:", error);
-        // if token refresh fails, log the user out
-        await this.logout();
-      }
+      const newToken = await auth.currentUser.getIdToken(true);
+      console.debug("New token obtained", "..." + newToken.slice(-20));
+      this.scheduleTokenRefresh(newToken);
+      return newToken;
     } else {
       console.debug("No current user to refresh token");
+      throw new Error("No current user to refresh token");
     }
   }
 
@@ -218,4 +214,4 @@ class FirebaseAuthenticationService extends AuthenticationService {
   }
 }
 
-export default FirebaseAuthenticationService;
+export default StdFirebaseAuthenticationService;

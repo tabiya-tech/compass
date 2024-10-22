@@ -77,7 +77,9 @@ const Login: React.FC = () => {
 
   const handleError = useCallback(async (error: Error) => {
     // if something goes wrong, log the user out
-    await FirebaseEmailAuthService.getInstance().logout();
+    const firebaseEmailAuthServiceInstance = await FirebaseEmailAuthService.getInstance();
+    await firebaseEmailAuthServiceInstance.logout();
+
     let errorMessage;
     if (error instanceof ServiceError) {
       errorMessage = getUserFriendlyErrorMessage(error);
@@ -153,7 +155,8 @@ const Login: React.FC = () => {
     async (email: string, password: string) => {
       setIsLoading(true);
       try {
-        await FirebaseEmailAuthService.getInstance().login(email, password);
+        const firebaseEmailAuthServiceInstance = await FirebaseEmailAuthService.getInstance();
+        await firebaseEmailAuthServiceInstance.login(email, password);
         await handlePostLogin();
       } catch (error) {
         await handleError(error as Error);
@@ -172,7 +175,8 @@ const Login: React.FC = () => {
     async (code: string) => {
       try {
         setIsLoading(true);
-        await FirebaseInvitationCodeAuthenticationService.getInstance().login(code);
+        const firebaseInvitationAuthServiceInstance = await FirebaseInvitationCodeAuthenticationService.getInstance();
+        await firebaseInvitationAuthServiceInstance.login(code);
         enqueueSnackbar("Invitation code is valid", { variant: "success" });
         await handlePostLogin();
       } catch (error) {

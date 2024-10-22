@@ -40,8 +40,8 @@ jest.mock("src/userPreferences/UserPreferencesService/userPreferences.service", 
 
 describe("SocialAuthService class tests", () => {
   let authService: FirebaseSocialAuthService;
-  beforeEach(() => {
-    authService = FirebaseSocialAuthService.getInstance();
+  beforeEach(async () => {
+    authService = await FirebaseSocialAuthService.getInstance();
     // @ts-ignore
     firebase.auth.GoogleAuthProvider = class {
       static PROVIDER_ID = "google.com";

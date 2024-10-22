@@ -58,7 +58,8 @@ const Register: React.FC = () => {
 
   const handleError = useCallback(async (error: Error) => {
     // if the registration code is not valid or something goes wrong, log the user out
-    await AuthenticationServiceFactory.getAuthenticationService().logout();
+    const authenticationServiceFactory = await AuthenticationServiceFactory.getAuthenticationService()
+    await authenticationServiceFactory.logout();
     let errorMessage;
     if (error instanceof ServiceError) {
       writeServiceErrorToLog(error, console.error);
@@ -117,13 +118,14 @@ const Register: React.FC = () => {
     async (name: string, email: string, password: string) => {
       setIsLoading(true);
       try {
-        await FirebaseEmailAuthService.getInstance().register(email, password, name, registrationCode);
+        const firebaseEmailAuthServiceInstance = await FirebaseEmailAuthService.getInstance()
+        await firebaseEmailAuthServiceInstance.register(email, password, name, registrationCode);
         enqueueSnackbar("Verification Email Sent!", { variant: "success" });
         // IMPORTANT NOTE: after the preferences are added, or fail to be added, we should log the user out immediately,
         // since if we don't do that, the user may be able to access the application without verifying their email
         // or accepting the dpa.
-        await AuthenticationServiceFactory.getAuthenticationService().logout();
-
+        const authenticationServiceFactory = await AuthenticationServiceFactory.getAuthenticationService()
+        await authenticationServiceFactory.logout();
         // navigate to the verify email page
         navigate(routerPaths.VERIFY_EMAIL, { replace: true });
       } catch (e) {

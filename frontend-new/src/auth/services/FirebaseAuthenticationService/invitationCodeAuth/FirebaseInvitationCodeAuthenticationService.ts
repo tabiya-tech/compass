@@ -2,7 +2,7 @@ import { auth } from "src/auth/firebaseConfig";
 import { StatusCodes } from "http-status-codes";
 import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
-import FirebaseAuthenticationService from "src/auth/services/FirebaseAuthenticationService/FirebaseAuthentication.service";
+import StdFirebaseAuthenticationService from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { AuthenticationServices } from "src/auth/auth.types";
 import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
@@ -13,9 +13,11 @@ import { Language } from "src/userPreferences/UserPreferencesService/userPrefere
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { getServiceErrorFactory } from "src/error/ServiceError/ServiceError";
 import serviceErrorConstants from "src/error/ServiceError/ServiceError.constants";
+import AuthenticationService from "../../Authentication.service";
 
-class FirebaseInvitationCodeAuthenticationService extends FirebaseAuthenticationService {
+class FirebaseInvitationCodeAuthenticationService extends AuthenticationService {
   private static instance: FirebaseInvitationCodeAuthenticationService;
+  private static stdFirebaseAuthServiceInstance: StdFirebaseAuthenticationService;
 
   private constructor() {
     super();
@@ -25,7 +27,8 @@ class FirebaseInvitationCodeAuthenticationService extends FirebaseAuthentication
    * Get the singleton instance of the InvitationCodeAuthService.
    * @returns {FirebaseInvitationCodeAuthenticationService} The singleton instance of the InvitationCodeAuthService.
    */
-  static getInstance(): FirebaseInvitationCodeAuthenticationService {
+  static async getInstance(): Promise<FirebaseInvitationCodeAuthenticationService> {
+    this.stdFirebaseAuthServiceInstance = await StdFirebaseAuthenticationService.getInstance()
     if (!FirebaseInvitationCodeAuthenticationService.instance) {
       FirebaseInvitationCodeAuthenticationService.instance = new FirebaseInvitationCodeAuthenticationService();
     }
@@ -114,6 +117,28 @@ class FirebaseInvitationCodeAuthenticationService extends FirebaseAuthentication
     // call the parent class method once the user is successfully logged in
     await super.onSuccessfulLogin(token)
     return token;
+  }
+
+  async cleanup(): Promise<void> {
+    FirebaseInvitationCodeAuthenticationService.stdFirebaseAuthServiceInstance.cleanup();
+  }
+
+  async logout(): Promise<void> {
+    await FirebaseInvitationCodeAuthenticationService.stdFirebaseAuthServiceInstance.logout();
+    // call the parent class method once the user is successfully logged out (or even if it fails)
+    await super.onSuccessfulLogout();
+  }
+
+  async refreshToken(): Promise<void> {
+    try{
+      const newToken = await FirebaseInvitationCodeAuthenticationService.stdFirebaseAuthServiceInstance.refreshToken();
+      // call the parent class method once the token is successfully refreshed
+      await super.onSuccessfulRefresh(newToken);
+    } catch (error) {
+      console.error("Error refreshing token:", error);
+      // if token refresh fails, log the user out
+      await this.logout();
+    }
   }
 }
 
