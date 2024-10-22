@@ -98,6 +98,11 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
     notifyOnClose({ name: CloseEventName.DISMISS });
   };
 
+  // Experiences with top skills
+  const experiencesWithTopSkills = experiences.filter(
+    (experience) => experience.top_skills && experience.top_skills.length > 0
+  );
+
   // Group experiences by work type
   const { selfEmploymentExperiences, salaryWorkExperiences, unpaidWorkExperiences, traineeWorkExperiences } =
     groupExperiencesByWorkType(experiences);
@@ -125,7 +130,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
             email={validatedPersonalInfo.email}
             phone={validatedPersonalInfo.phone}
             address={validatedPersonalInfo.address}
-            experiences={experiences}
+            experiences={experiencesWithTopSkills}
             conversationConductedAt={conversationConductedAt!}
             disabled={!hasTopSkills}
           />

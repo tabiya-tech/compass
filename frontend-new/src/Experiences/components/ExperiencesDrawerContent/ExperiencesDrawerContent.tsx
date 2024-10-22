@@ -56,7 +56,7 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience }) => 
       data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_CONTAINER}
     >
       <Typography variant="body1" fontWeight="bold" data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_OCCUPATION}>
-        {experience.experience_title}
+        {experience.experience_title ? experience.experience_title : <i>Untitled!</i>}
       </Typography>
       <Typography variant="body2" data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_DATE}>
         {/* display the start and end dates */}
@@ -91,7 +91,7 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience }) => 
         data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_SKILLS_CONTAINER}
       >
         {formattedSkills.length === 0 ? (
-          <Typography>No skills yet</Typography>
+          <Typography>No skills discovered yet</Typography>
         ) : (
           formattedSkills.map((skill) => (
             <Chip
