@@ -39,3 +39,13 @@ export const ShownWithNoLocation = {
     },
   },
 };
+
+export const ShownWithNoDate = {
+  args: {
+    experience: {
+      ...generateRandomExperiences(1)[0],
+      start_date: "",
+      end_date: "",
+    },
+  },
+};

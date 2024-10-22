@@ -67,7 +67,7 @@ describe("ReportDrawerContent", () => {
     render(givenReportDrawerContent);
 
     // THEN expect No skills yet to be in the document
-    expect(screen.getByText("No skills yet")).toBeInTheDocument();
+    expect(screen.getByText("No skills discovered yet")).toBeInTheDocument();
   });
 
   test("should show skill description when chip is clicked", () => {

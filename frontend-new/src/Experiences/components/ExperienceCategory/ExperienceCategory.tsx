@@ -21,7 +21,7 @@ const ExperienceCategory: React.FC<ExperienceCategoryProps> = ({ icon, title, ex
       <Box display="flex" alignItems="center" gap={isSmallMobile ? 2 : 1}>
         {React.cloneElement(icon as React.ReactElement, { sx: { color: theme.palette.text.secondary } })}
         <Typography variant="subtitle1" fontWeight="bold" color={theme.palette.text.secondary}>
-          {title}
+          {title ? title : <i>Untitled!</i>}
         </Typography>
       </Box>
       <Box display="flex" flexDirection="column" gap={isSmallMobile ? 8 : 4}>

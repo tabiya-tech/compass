@@ -46,7 +46,7 @@ const DownloadReportButton: React.FC<DownloadReportButtonProps> = (props) => {
       </IconButton>
       {props.disabled && (
         <HelpTip icon={<InfoIcon />} data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_HELP_TIP}>
-          You cannot download the report until the conversation is completed.
+          You cannot download the report until you finish exploring at least one experience.
         </HelpTip>
       )}
     </Box>
