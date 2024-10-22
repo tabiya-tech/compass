@@ -35,7 +35,7 @@ export class AuthenticationStateService {
 
   private constructor() {
     console.debug("Initializing AuthenticationStateService");
-    this.loadUser();
+    this.loadUser(); // REVIEW: why is the promise ignored?
   }
 
   /**
@@ -76,6 +76,7 @@ export class AuthenticationStateService {
    * @returns {TabiyaUser | null} The user object extracted from the token, or null if extraction fails.
    */
   //TODO: remove the idea of storing a user in this state. Store a token instead and decode it when needed (util)
+    // REVIEW why does it need to know how to decode the token and why does it know that there is a FirebaseToken? It should have been the job of the (Firebase)AuthProvider to know how to handle the token issued by the specific auth backend counterpart.
   private getUserFromToken = (token: string): TabiyaUser | null => {
     try {
       const decodedToken: FirebaseToken = jwtDecode(token);
@@ -117,6 +118,7 @@ export class AuthenticationStateService {
   /**
    * Clears the current user and removes the authentication token from storage.
    */
+  // REVIEW: why is this async?
   public async clearUser() {
     console.debug("AuthenticationStateService: Clearing user");
     PersistentStorageService.clearToken();
@@ -129,6 +131,7 @@ export class AuthenticationStateService {
    * @param {string} token - The authentication token to use for updating the user.
    * @returns {TabiyaUser | null} The updated user object, or null if update fails.
    */
+  // REVIEW: why is the token not validated here?
   public updateUserByToken(token: string): TabiyaUser | null {
     try {
       const _user = this.getUserFromToken(token);

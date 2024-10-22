@@ -4,6 +4,7 @@ export type TabiyaUser = {
   email: string;
 };
 
+// REVIEW: move to FirebaseAuthenticationService
 export type FirebaseToken = {
   name: string;
   iss: string;

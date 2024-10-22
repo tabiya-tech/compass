@@ -34,6 +34,7 @@ class FirebaseSocialAuthenticationService extends FirebaseAuthenticationService 
 
       // @ts-expect-error - we know that the userCredential is not null
       if (!userCredential?.user?.multiFactor?.user?.accessToken) {
+        //  qREVIEW do not throw to catch
         throw firebaseErrorFactory(
           StatusCodes.NOT_FOUND,
           FirebaseErrorCodes.USER_NOT_FOUND,

@@ -32,10 +32,11 @@ class FirebaseAuthenticationService extends AuthenticationService {
   private refreshTimeout: NodeJS.Timeout | null = null;
   private readonly unsubscribeAuthListener: () => void;
 
-  constructor(
+  protected constructor(
   ) {
     super();
-    this.finishPendingLogout();
+    this.finishPendingLogout(); // REVIEW: why is the promise not awaited? this should be moved to the getInstance()
+                                //  or where the getInstance is used or the factory depending on how you want ot handle it
     this.unsubscribeAuthListener = this.setupAuthListener();
   }
 
@@ -52,7 +53,7 @@ class FirebaseAuthenticationService extends AuthenticationService {
     try {
       await auth.signOut();
       await this.deleteFirebaseDB();
-      this.clearRefreshTimeout();
+      this.clearRefreshTimeout(); // REVIEW On logout do unsubscribeAuthListener()
       // call the parent class method once the user is successfully logged out
       await super.onSuccessfulLogout();
     } catch (error) {

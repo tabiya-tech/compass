@@ -90,6 +90,7 @@ class FirebaseEmailAuthenticationService extends FirebaseAuthenticationService {
    * @param registrationCode - The registration code.
    * @returns {Promise<string>} - The firebase token.
    */
+  // REVIEW name -> username as opposed to name=lastname, firstname?
   async register(email: string, password: string, name: string, registrationCode: string): Promise<string> {
     const firebaseErrorFactory = getFirebaseErrorFactory(
       "EmailAuthService",
@@ -99,8 +100,11 @@ class FirebaseEmailAuthenticationService extends FirebaseAuthenticationService {
     );
     const invitation = await invitationsService.checkInvitationCodeStatus(registrationCode);
     if (invitation.status === InvitationStatus.INVALID || invitation.invitation_type !== InvitationType.REGISTER) {
-      console.log(invitation)
-      throw new Error("Invalid invitation code");
+      console.log(invitation) // REVIEW remove this
+      throw new Error("Invalid invitation code"); // REVIEW (1) should be invalid registration code,
+                                                  //  (2) perhaps even a differentiation between the two conditions to give a better error message
+                                                  //  (not a registration code vs invalid)
+                                                  //  (3) shouldn't this be a firebaseErrorFactory?
     }
 
     let userCredential;

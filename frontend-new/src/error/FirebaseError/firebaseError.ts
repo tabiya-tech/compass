@@ -62,7 +62,7 @@ export class FirebaseError extends Error {
 
 //factory function
 export type FirebaseErrorFactory = (
-  statusCode: number,
+  statusCode: number, // REVIEW why do we need this? Is there an example that the status code is actually used?
   errorCode: FirebaseErrorCodes,
   message: string,
   details?: ServiceErrorDetails

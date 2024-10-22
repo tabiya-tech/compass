@@ -29,9 +29,11 @@ abstract class AuthenticationService {
       this.userPreferencesStateService = UserPreferencesStateService.getInstance();
   }
 
+
   /**
    * Abstract methods to implement in the child classes
    */
+  // REVIEW each method should be explained as there is a very specific expectation what is should do and  when it should be used
   abstract refreshToken(): Promise<void>;
   abstract cleanup(): void;
   abstract logout(): Promise<void>;

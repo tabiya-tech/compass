@@ -59,6 +59,13 @@ class FirebaseInvitationCodeAuthenticationService extends FirebaseAuthentication
         invitation.status !== InvitationStatus.VALID ||
         invitation.invitation_type !== InvitationType.AUTO_REGISTER
       ) {
+      // REVIEW (1) perhaps even a differentiation between the two conditions to give a better error message
+      //  (not a registration code vs invalid)
+      //  (2) this is a misuse of serviceErrorFactory(), serviceErrorFactory is a convenient way to handle backend errors
+      //  this is a frontend error, and it artificially constructs an error as if a HTTP response return a FORBIDDEN.
+      //  this is deceiving because it implies that the API return that but it did not!
+      //  this should simply be a  firebaseErrorFactory with  INVALID_INVITATION_CODE nothing else
+      // additionally why throw and catch put this in a separate try catch
         throw serviceErrorFactory(
           StatusCodes.FORBIDDEN,
           serviceErrorConstants.ErrorCodes.INVALID_INVITATION_CODE,
@@ -67,7 +74,7 @@ class FirebaseInvitationCodeAuthenticationService extends FirebaseAuthentication
       }
       userCredential = await auth.signInAnonymously();
     } catch (error: unknown) {
-      console.log("error", error);
+      console.log("error", error); // REVIEW remove this
       throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (error as any).code, (error as any).message);
     }
     if (!userCredential.user) {
@@ -93,13 +100,15 @@ class FirebaseInvitationCodeAuthenticationService extends FirebaseAuthentication
         });
         userPreferencesStateService.setUserPreferences(prefs);
       } else {
+        // REVIEW do not throw and catch, and do not misuse the serviceErrorFactory!
+        //  move this error out of the try catch
         throw serviceErrorFactory(
           StatusCodes.NOT_FOUND,
           serviceErrorConstants.ErrorCodes.NOT_FOUND,
           "User could not be extracted from token"
         )
       }
-    } catch (err) {
+    } catch (err) { // REVIEW after moving this out of the try catch this now become a serviceErrorFactory because that is what createUserPreferences throws
       throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (err as any).code, (err as any).message);
     }
     // call the parent class method once the user is successfully logged in
