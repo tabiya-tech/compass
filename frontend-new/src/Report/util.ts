@@ -21,23 +21,17 @@ export const formatDate = (dateString: string): string => {
 
 // Utility function to group experiences by work type
 export const groupExperiencesByWorkType = (experiences: Experience[]) => {
-  const experiencesWithTopSkills = experiences.filter(
-    (experience) => experience.top_skills && experience.top_skills.length > 0
-  );
-
-  const selfEmploymentExperiences = experiencesWithTopSkills.filter(
+  const selfEmploymentExperiences = experiences.filter(
     (experience) => experience.work_type === WorkType.SELF_EMPLOYMENT
   );
 
-  const salaryWorkExperiences = experiencesWithTopSkills.filter(
+  const salaryWorkExperiences = experiences.filter(
     (experience) => experience.work_type === WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT
   );
 
-  const unpaidWorkExperiences = experiencesWithTopSkills.filter(
-    (experience) => experience.work_type === WorkType.UNSEEN_UNPAID
-  );
+  const unpaidWorkExperiences = experiences.filter((experience) => experience.work_type === WorkType.UNSEEN_UNPAID);
 
-  const traineeWorkExperiences = experiencesWithTopSkills.filter(
+  const traineeWorkExperiences = experiences.filter(
     (experience) => experience.work_type === WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK
   );
 

@@ -49,8 +49,20 @@ export const ShownWithNoExperiences = {
   },
 };
 
+const ShownWithNoExperienceTitle_experiences = generateRandomExperiences(1);
+ShownWithNoExperienceTitle_experiences.forEach((experience) => {
+  experience.experience_title = "";
+  experience.top_skills = [];
+});
+export const ShownWithNoExperienceTitle = {
+  args: {
+    isOpen: true,
+    experiences: ShownWithNoExperienceTitle_experiences,
+  },
+};
+
 const ShownWithExperienceWithEmptySkills_experiences = generateRandomExperiences(1);
-ShownWithExperienceWithEmptySkills_experiences[0].top_skills = [];
+ShownWithExperienceWithEmptySkills_experiences.forEach((experience) => (experience.top_skills = []));
 export const ShownWithExperienceWithEmptySkills = {
   args: {
     isOpen: true,
