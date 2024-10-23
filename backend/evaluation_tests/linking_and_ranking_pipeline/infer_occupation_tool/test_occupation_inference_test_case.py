@@ -118,25 +118,26 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["hairdresser"],
     ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out
         name="Icatus I42_4",
         given_experience_title="I keep company to my grandma when she is not feeling well",
         given_work_type=WorkType.UNSEEN_UNPAID,
         given_company="home",
+        skip_force="force",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
         expected_occupations_found=["affective/emotional support for dependent adults"],
     ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Passed
         name="Icatus I42_3",
         given_experience_title="I fill my grandma’s taxes",
         given_work_type=WorkType.UNSEEN_UNPAID,
         given_company="home",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
-        expected_occupations_found=["assisting dependent adults with forms, administration, accounts	"],
+        expected_occupations_found=["assisting dependent adults with forms, administration, accounts"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Passed
         name="Icatus I42_2",
         given_experience_title="I give my uncle his medication ",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -145,7 +146,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["assisting dependent adults with medical care"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Passed
         name="Icatus I42_1",
         given_experience_title="I make my grandma have lunch and I help her wash herself",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -154,7 +155,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["assisting dependent adults with tasks of daily living"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Passed
         name="Icatus I42_6",
         given_experience_title="I take care of my dad’s medical appointments",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -163,7 +164,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["meetings and arrangements with adult care service providers"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Passed
         name="Icatus I42_5",
         given_experience_title="I keep an eye on my Grandpa",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -172,7 +173,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["passive care of dependent adults"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out
         name="Icatus I41_1",
         given_experience_title="I change my little brother’s diapers",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -181,16 +182,16 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["caring for children including feeding, cleaning, physical care"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out
         name="Icatus I41_3",
         given_experience_title="I help my sister with her homework. ",
         given_work_type=WorkType.UNSEEN_UNPAID,
         given_company="home",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
-        expected_occupations_found=["Instructing, teaching, training, helping children"],
+        expected_occupations_found=["instructing, teaching, training, helping children"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out
         name="Icatus I41_7",
         given_experience_title="I go to teacher/parents meetings.",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -199,7 +200,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["meetings and arrangements with schools and childcare service providers"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Passed
         name="Icatus I41_6",
         given_experience_title="I keep an eye on my siblings during the day",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -208,16 +209,16 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["minding children (passive care)"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Passed
         name="Icatus I41_5",
         given_experience_title="I play football with my cousins",
         given_work_type=WorkType.UNSEEN_UNPAID,
         given_company="home",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
-        expected_occupations_found=["Playing and sports with children"],
+        expected_occupations_found=["playing and sports with children"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out
         name="Icatus I41_2",
         given_experience_title="I give my brother medication",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -226,7 +227,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["providing medical care to children"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Passed
         name="Icatus I41_4",
         given_experience_title="I read bedtime stories to my niece",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -235,7 +236,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["talking with and reading to children"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out
         name="Icatus I44_3",
         given_experience_title="I take my grandma to the supermarket",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -244,16 +245,16 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["accompanying dependent adults"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out (but wrong example)
         name="Icatus I44_2",
         given_experience_title="I bring my sister to school",
         given_work_type=WorkType.UNSEEN_UNPAID,
         given_company="home",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
-        expected_occupations_found=["accompanying own children"],
+        expected_occupations_found=["accompanying own children"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out
         name="Icatus I43_2",
         given_experience_title="I take care of my brother when he is having a hard time",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -262,7 +263,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["affective/emotional support for non-dependent adult household and family members"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out
         name="Icatus I43_1",
         given_experience_title="I help my brother move because he broke his ankle",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -280,7 +281,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["drying, hanging out, bringing in wash"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out
         name="Icatus I34_1",
         given_experience_title="I clean the sheets",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -289,7 +290,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["hand/machine-washing"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out
         name="Icatus I34_3",
         given_experience_title="I iron my dad’s shirts",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -298,7 +299,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["ironing, pressing, folding"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Passed
         name="Icatus I34_4",
         given_experience_title="I clean my shoes",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -307,7 +308,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["mending/repairing and care of clothes and shoes, cleaning and polishing shoes"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Passed
         name="Icatus I32_1",
         given_experience_title="I clean the windows",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -316,7 +317,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["indoor cleaning"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out
         name="Icatus I32_2",
         given_experience_title="I take away the snow around the house",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -325,7 +326,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["outdoor cleaning"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Passed
         name="Icatus I32_3",
         given_experience_title="I make compost with vegetable peals",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -334,7 +335,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["recycling and disposal of garbage"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Not found
         name="Icatus I32_4",
         given_experience_title="I water the plants",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -343,7 +344,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["upkeep of in/outdoor plants, hedges, garden, grounds, landscape, etc."],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out
         name="Icatus I33_1",
         given_experience_title="I paint the house’s walls",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -352,7 +353,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["do-it-yourself improvement, maintenance and repair of own dwelling"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Passed
         name="Icatus I33_2",
         given_experience_title="I install the TV",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -361,7 +362,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["installation, servicing and repair of personal and household goods including ICT equipment"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Passed
         name="Icatus I33_3",
         given_experience_title="I change the car’s oil",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -370,7 +371,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["vehicle maintenance and repairs"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out
         name="Icatus I31_3",
         given_experience_title="I do the dishes",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -379,7 +380,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["cleaning up after preparation of food, meals and snacks"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out
         name="Icatus I31_1",
         given_experience_title="I make cookies for my daughter",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -388,7 +389,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["preparing meals and snacks"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out (I31_1 is found instead)
         name="Icatus I31_2",
         given_experience_title="I set the table and serve my family",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -397,7 +398,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["serving meals and snacks"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Passed
         name="Icatus I31_4",
         given_experience_title="I put fruits in bocals to store them for the winter.",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -406,7 +407,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["storing, arranging, preserving food stocks"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out
         name="Icatus I35_2",
         given_experience_title="I check the savings to plan for trips.",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -415,7 +416,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["budgeting, planning, organizing duties and activities in the household"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out (with bad reasoning)
         name="Icatus I35_1",
         given_experience_title="I pay my bills online.",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -424,7 +425,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["paying household bills"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out
         name="Icatus I36_1",
         given_experience_title="I play with my dog outside.",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -433,7 +434,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["daily pet care"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out
         name="Icatus I36_2",
         given_experience_title="I take my dog to the dog-sitter.",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -442,7 +443,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["using veterinary care or other pet care services (grooming, stabling, holiday or day care)"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out
         name="Icatus I37_2",
         given_experience_title="I look for a hairdresser for my mom and pay for an appointment.",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -451,7 +452,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["shopping for/availing of services and related activity"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out
         name="Icatus I37_1",
         given_experience_title="I buy my parents fournitures.",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -460,7 +461,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["shopping for/purchasing of goods and related activities"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out
         name="Icatus I52_3",
         given_experience_title="I take care of yougnpeople in the community.",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -469,7 +470,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["unpaid volunteer cultural activities recreation and sports activities"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Passed
         name="Icatus I52_4",
         given_experience_title="I help my church with accounting. ",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -478,7 +479,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["unpaid volunteer office/administrative work"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Filtered out
         name="Icatus I52_2",
         given_experience_title="I sell cake at my dauther’s school baking parties",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -487,7 +488,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["unpaid volunteer preparing/serving meals, cleaning up"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Passed
         name="Icatus I52_1",
         given_experience_title="I help clean the beach after a storm.",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -496,7 +497,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["unpaid volunteer work on road/building repair, clearing and preparing land, cleaning (streets, markets, etc.), and construction"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Passed
         name="Icatus I51_4",
         given_experience_title="I check on my eldery neighboor when it’s very hot outside.",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -505,7 +506,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["unpaid volunteer care for adults"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Removed during filtering
         name="Icatus I51_3",
         given_experience_title="I teach my young neighbor spanish.",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -514,16 +515,16 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["unpaid volunteer childcare and instruction"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Never found, but example is not clear
         name="Icatus I51_1",
         given_experience_title="I babysit my cousin’s cats.",
         given_work_type=WorkType.UNSEEN_UNPAID,
         given_company="home",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
-        expected_occupations_found=["unpaid volunteer household maintenance, management, construction, renovation and repair"],
+        expected_occupations_found=["unpaid volunteer household maintenance, management, construction, renovation and repair"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Removed during filtering
         name="Icatus I51_2",
         given_experience_title="I bring groceries to my elderly neighbor.",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -532,7 +533,7 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["unpaid volunteer shopping/purchasing goods and services"],
         ),
-    InferOccupationToolTestCase(
+    InferOccupationToolTestCase( #Removed during filtering
         name="Icatus I51_5",
         given_experience_title="I replace my uncle in his shop when he is away.",
         given_work_type=WorkType.UNSEEN_UNPAID,
@@ -543,3 +544,6 @@ test_cases = [
         ),
     # Add more test cases as needed
 ]
+
+# A lot of Icatus occupations have titles that resemble activities/skills rather than occupations and therefore are filtered out
+# Some are very specific, so the more general occupation is chosen instead
