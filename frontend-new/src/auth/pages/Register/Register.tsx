@@ -58,7 +58,7 @@ const Register: React.FC = () => {
 
   const handleError = useCallback(async (error: Error) => {
     // if the registration code is not valid or something goes wrong, log the user out
-    const authenticationServiceFactory = await AuthenticationServiceFactory.getAuthenticationService()
+    const authenticationServiceFactory = await AuthenticationServiceFactory.getCurrentAuthenticationService()
     await authenticationServiceFactory.logout();
     let errorMessage;
     if (error instanceof ServiceError) {
@@ -124,7 +124,7 @@ const Register: React.FC = () => {
         // IMPORTANT NOTE: after the preferences are added, or fail to be added, we should log the user out immediately,
         // since if we don't do that, the user may be able to access the application without verifying their email
         // or accepting the dpa.
-        const authenticationServiceFactory = await AuthenticationServiceFactory.getAuthenticationService()
+        const authenticationServiceFactory = await AuthenticationServiceFactory.getCurrentAuthenticationService()
         await authenticationServiceFactory.logout();
         // navigate to the verify email page
         navigate(routerPaths.VERIFY_EMAIL, { replace: true });

@@ -70,7 +70,7 @@ const App = () => {
     try{
       const token = PersistentStorageService.getToken();
       if (token) {
-        const authenticationServiceInstance = await AuthenticationServiceFactory.getAuthenticationService();
+        const authenticationServiceInstance = await AuthenticationServiceFactory.getCurrentAuthenticationService();
         if (authenticationServiceInstance.isTokenValid(token)) {
           console.debug("Valid token found in storage");
           const user =await authenticationServiceInstance.getUser(token)
@@ -94,7 +94,7 @@ const App = () => {
       await loadUserPreferences();
 
       return async () => {
-        const authenticationServiceFactory = await AuthenticationServiceFactory.getAuthenticationService()
+        const authenticationServiceFactory = await AuthenticationServiceFactory.getCurrentAuthenticationService()
         try {
           console.debug("Cleaning up auth");
           // Each of the services that implement the AuthenticationService interface will have their own cleanup method

@@ -44,7 +44,7 @@ class AuthenticationServiceFactory {
    * @returns {AuthenticationService} The instance of the authentication service.
    * @throws {Error} If an invalid or unrecognized authentication method is encountered.
    */
-  static async getAuthenticationService(): Promise<AuthenticationService> { // Review: Get current authentication service would be a better name for this perhaps
+  static async getCurrentAuthenticationService(): Promise<AuthenticationService> {
     const authMethod = PersistentStorageService.getLoginMethod();
 
     switch (authMethod) {

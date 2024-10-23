@@ -82,8 +82,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
 
 
 
-      if (_user) {
-        try {
+    if (_user) {
         // create user preferences for the first time.
         // in order to do this, there needs to be a logged in user in the persistent storage
         const prefs = await userPreferencesService.createUserPreferences({
@@ -92,13 +91,8 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
           language: Language.en,
         });
         userPreferencesStateService.setUserPreferences(prefs);
-        } catch (err) { // REVIEW after moving this out of the try catch this now become a serviceErrorFactory because that is what createUserPreferences throws
-          throw firebaseErrorFactory((err as any).code, (err as any).message);
-        }
-      } else {
-        throw firebaseErrorFactory(
-          FirebaseErrorCodes.USER_NOT_FOUND,
-          "User could not be extracted from token"
+    } else {
+      throw firebaseErrorFactory(FirebaseErrorCodes.USER_NOT_FOUND, "User could not be extracted from token"
         )
       }
 

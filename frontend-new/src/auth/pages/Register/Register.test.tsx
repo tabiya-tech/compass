@@ -72,7 +72,7 @@ jest.mock("src/auth/services/Authentication.service.factory", () => {
     ...actual,
     __esModule: true,
     default: {
-      getAuthenticationService: jest.fn(),
+      getCurrentAuthenticationService: jest.fn(),
     },
   };
 });
@@ -170,7 +170,7 @@ describe("Testing Register component", () => {
     jest.spyOn(userPreferencesStateService, "setUserPreferences");
     // AND the authentication service factory is mocked to return the email auth service
     jest
-      .spyOn(AuthenticationServiceFactoryModule.default, "getAuthenticationService")
+      .spyOn(AuthenticationServiceFactoryModule.default, "getCurrentAuthenticationService")
       .mockReturnValueOnce(FirebaseEmailAuthenticationService.getInstance());
     // WHEN the component is rendered within the AuthContext and Router
     render(
@@ -239,7 +239,7 @@ describe("Testing Register component", () => {
         status: InvitationStatus.VALID,
         invitation_code: givenInvitationCode,
       });
-    jest.spyOn(AuthenticationServiceFactoryModule.default, "getAuthenticationService").mockReturnValue(FirebaseEmailAuthenticationService.getInstance());
+    jest.spyOn(AuthenticationServiceFactoryModule.default, "getCurrentAuthenticationService").mockReturnValue(FirebaseEmailAuthenticationService.getInstance());
 
     // AND the auth state service is mocked to return a user
     jest.spyOn(authStateService.getInstance(), "setUser").mockImplementation((token) => {
@@ -308,7 +308,7 @@ describe("Testing Register component", () => {
     const givenPassword = "password";
     const givenInvitationCode = "foo-bar";
 
-    jest.spyOn(AuthenticationServiceFactoryModule.default, "getAuthenticationService").mockReturnValue(FirebaseEmailAuthenticationService.getInstance());
+    jest.spyOn(AuthenticationServiceFactoryModule.default, "getCurrentAuthenticationService").mockReturnValue(FirebaseEmailAuthenticationService.getInstance());
     // WHEN the component is rendered
     render(
       <HashRouter>
