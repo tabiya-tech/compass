@@ -104,7 +104,7 @@ describe("SocialAuth tests", () => {
       } as unknown as FirebaseSocialAuthenticationService);
 
       // AND the AuthProvider updates the user successfully
-      jest.spyOn(await authStateService, "setUser").mockImplementation((user: TabiyaUser | null) => {
+      jest.spyOn(authStateService.getInstance(), "setUser").mockImplementation((user: TabiyaUser | null) => {
         return givenUser;
       });
       // AND the user preferences exist for the user

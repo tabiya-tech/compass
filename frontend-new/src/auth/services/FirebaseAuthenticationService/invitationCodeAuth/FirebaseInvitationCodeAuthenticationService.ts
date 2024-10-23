@@ -77,10 +77,10 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
       userCredential = await auth.signInAnonymously();
     } catch (error: unknown) {
       console.log("error", error); // REVIEW remove this
-      throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (error as any).code, (error as any).message);
+      throw firebaseErrorFactory((error as any).code, (error as any).message);
     }
     if (!userCredential.user) {
-      throw firebaseErrorFactory(StatusCodes.NOT_FOUND, FirebaseErrorCodes.USER_NOT_FOUND, "User not found", {});
+      throw firebaseErrorFactory(FirebaseErrorCodes.USER_NOT_FOUND, "User not found", {});
     }
     // in the case of anonymous login, firebase doesn't give us a way to access the access token directly,
     // but we can use the getIdToken method to get the id token, which will be identical to the access token
@@ -91,8 +91,8 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
 
     try {
       // we set the user state in order to get a decoded version of the token
-        (await this.authenticationStateService).setUser(await this.getUser(token));
-        const _user =(await this.authenticationStateService).getUser();
+        this.authenticationStateService.setUser(await this.getUser(token));
+        const _user =(this.authenticationStateService).getUser();
       if (_user) {
         // create user preferences for the first time.
         // in order to do this, there needs to be a logged in user in the persistent storage
@@ -112,7 +112,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
         )
       }
     } catch (err) { // REVIEW after moving this out of the try catch this now become a serviceErrorFactory because that is what createUserPreferences throws
-      throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (err as any).code, (err as any).message);
+      throw firebaseErrorFactory((err as any).code, (err as any).message);
     }
     // call the parent class method once the user is successfully logged in
     await super.onSuccessfulLogin(token)
@@ -141,12 +141,12 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
     }
   }
 
-  async getUser(token: string): Promise<TabiyaUser | null> {
+  getUser(token: string): TabiyaUser | null {
     if(!this.isTokenValid(token)) {
       console.error("Could not get user from token. Token is invalid.")
       return null;
     }
-    return await FirebaseInvitationCodeAuthenticationService.stdFirebaseAuthServiceInstance.getUser(token);
+    return FirebaseInvitationCodeAuthenticationService.stdFirebaseAuthServiceInstance.getUser(token);
   }
 }
 

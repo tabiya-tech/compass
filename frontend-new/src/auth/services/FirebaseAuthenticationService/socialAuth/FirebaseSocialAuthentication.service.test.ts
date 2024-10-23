@@ -60,7 +60,7 @@ describe("SocialAuthService class tests", () => {
       // @ts-ignore
       jest.spyOn(firebase.auth(), "signInWithPopup").mockResolvedValueOnce({ user: mockUser });
       // AND the token is decoded into a user
-      jest.spyOn(await authenticationStateService, "getUser").mockReturnValue(givenUser);
+      jest.spyOn(authenticationStateService.getInstance(), "getUser").mockReturnValue(givenUser);
 
       // WHEN the Google login is attempted
       const socialLoginCallback = async () => await authService.loginWithGoogle();

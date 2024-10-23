@@ -15,6 +15,7 @@ import { Backdrop } from "src/theme/Backdrop/Backdrop";
 
 import * as Sentry from "@sentry/react";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
+import { PersistentStorageService } from "./PersistentStorageService/PersistentStorageService";
 
 // Wrap the createHashRouter function with Sentry to capture errors that occur during router initialization
 const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouter(createHashRouter);
@@ -36,35 +37,61 @@ const ProtectedRouteKeys = {
 const App = () => {
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const initializeAuth = async () => {
-      setLoading(true);
-      try {
-        const user = (await authStateService).getUser();
-        if (user) {
-          console.debug("User authenticated: Welcome,", user.email);
-          try {
-            await userPreferencesStateService.loadPreferences(user.id);
-            // check if user preferences have been loaded
-            const preferences = userPreferencesStateService.getUserPreferences();
-            console.debug("User preferences loaded", preferences);
-            // delay for half a sec so that the loading transition is smoother for the user and not just a flash
-            setTimeout(() => setLoading(false), 500);
-          } catch (error) {
-            console.error("Error loading user preferences", error);
-            // delay for half a sec so that the loading transition is smoother for the user and not just a flash
-            setTimeout(() => setLoading(false), 500);
-          }
-        } else {
-          console.debug("User not authenticated");
+  const loadUserPreferences = async () => {
+    try {
+      const user = authStateService.getInstance().getUser();
+      if (user) {
+        console.debug("User authenticated: Welcome,", user.email);
+        try {
+          await userPreferencesStateService.loadPreferences(user.id);
+          // check if user preferences have been loaded
+          const preferences = userPreferencesStateService.getUserPreferences();
+          console.debug("User preferences loaded", preferences);
+          // delay for half a sec so that the loading transition is smoother for the user and not just a flash
+          setTimeout(() => setLoading(false), 500);
+        } catch (error) {
+          console.error("Error loading user preferences", error);
           // delay for half a sec so that the loading transition is smoother for the user and not just a flash
           setTimeout(() => setLoading(false), 500);
         }
-      } catch (error) {
-        console.error("Error initializing auth", error);
+      } else {
+        console.debug("User not authenticated");
         // delay for half a sec so that the loading transition is smoother for the user and not just a flash
         setTimeout(() => setLoading(false), 500);
       }
+    } catch (error) {
+      console.error("Error initializing auth", error);
+      // delay for half a sec so that the loading transition is smoother for the user and not just a flash
+      setTimeout(() => setLoading(false), 500);
+    }
+  }
+
+  const loadUserFromPersistentStorage = async () => {
+    try{
+      const token = PersistentStorageService.getToken();
+      if (token) {
+        const authenticationServiceInstance = await AuthenticationServiceFactory.getAuthenticationService();
+        if (authenticationServiceInstance.isTokenValid(token)) {
+          console.debug("Valid token found in storage");
+          const user =await authenticationServiceInstance.getUser(token)
+          authStateService.getInstance().setUser(user);
+        } else {
+          console.debug("Authentication token is not valid");
+        }
+      } else {
+        console.debug("No valid token found in storage");
+        authStateService.getInstance().clearUser(); // Clear user data if token is invalid or missing
+      }
+    } catch (error) {
+      console.error("Error loading user from storage", error);
+    }
+  }
+
+  useEffect(() => {
+    const initializeAuth = async () => {
+      setLoading(true);
+      await loadUserFromPersistentStorage();
+      await loadUserPreferences();
 
       return async () => {
         const authenticationServiceFactory = await AuthenticationServiceFactory.getAuthenticationService()

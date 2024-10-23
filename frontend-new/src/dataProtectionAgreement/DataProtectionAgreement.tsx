@@ -53,7 +53,7 @@ const DataProtectionAgreement: React.FC = () => {
    */
   const persistUserPreferences = useCallback(async () => {
     try {
-      const user = (await authStateService).getUser();
+      const user = authStateService.getInstance().getUser();
       if (!user) {
         enqueueSnackbar("User not found", { variant: "error" });
         navigate(routerPaths.LOGIN);

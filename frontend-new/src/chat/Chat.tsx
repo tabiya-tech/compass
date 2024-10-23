@@ -292,7 +292,7 @@ const Chat: React.FC<ChatProps> = ({
 
   const startNewConversation = useCallback(async () => {
     try {
-      const user = (await authStateService).getUser();
+      const user = authStateService.getInstance().getUser();
       if (!user?.id) return;
 
       const preferencesService = new UserPreferencesService();

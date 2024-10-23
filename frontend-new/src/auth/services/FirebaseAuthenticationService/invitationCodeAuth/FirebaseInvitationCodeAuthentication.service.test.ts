@@ -60,7 +60,7 @@ describe("AuthService class tests", () => {
       } as unknown as firebase.auth.UserCredential);
 
       // AND the token is decoded into a user
-      jest.spyOn(await authenticationStateService, "getUser").mockReturnValue(givenUser);
+      jest.spyOn(authenticationStateService.getInstance(), "getUser").mockReturnValue(givenUser);
 
       // AND the registration code is valid
       (invitationsService.checkInvitationCodeStatus as jest.Mock).mockResolvedValueOnce({

@@ -1,5 +1,4 @@
 import { auth } from "src/auth/firebaseConfig";
-import { StatusCodes } from "http-status-codes";
 import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
@@ -48,11 +47,11 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     try {
       userCredential = await auth.signInWithEmailAndPassword(email, password);
     } catch (error) {
-      throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (error as any).code, (error as any).message);
+      throw firebaseErrorFactory((error as any).code, (error as any).message);
     }
 
     if (!userCredential.user) {
-      throw firebaseErrorFactory(StatusCodes.NOT_FOUND, FirebaseErrorCodes.USER_NOT_FOUND, "User not found", {});
+      throw firebaseErrorFactory(FirebaseErrorCodes.USER_NOT_FOUND, "User not found", {});
     }
 
     if (!userCredential.user.emailVerified) {
@@ -62,13 +61,11 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
         await this.logout();
       } catch (signOutError) {
         throw firebaseErrorFactory(
-          StatusCodes.INTERNAL_SERVER_ERROR,
           (signOutError as any).code,
           (signOutError as any).message
         );
       }
       throw firebaseErrorFactory(
-        StatusCodes.FORBIDDEN,
         FirebaseErrorCodes.EMAIL_NOT_VERIFIED,
         "Email not verified",
         {}
@@ -116,11 +113,11 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     try {
       userCredential = await auth.createUserWithEmailAndPassword(email, password);
     } catch (error) {
-      throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (error as any).code, (error as any).message);
+      throw firebaseErrorFactory((error as any).code, (error as any).message);
     }
 
     if (!userCredential.user) {
-      throw firebaseErrorFactory(StatusCodes.NOT_FOUND, FirebaseErrorCodes.USER_NOT_FOUND, "User not found", {});
+      throw firebaseErrorFactory(FirebaseErrorCodes.USER_NOT_FOUND, "User not found", {});
     }
 
     try {
@@ -131,7 +128,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
       // send a verification email
       await userCredential.user.sendEmailVerification();
     } catch (error) {
-      throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (error as any).code, (error as any).message);
+      throw firebaseErrorFactory((error as any).code, (error as any).message);
     }
 
     // in the case of email login, firebase doesnt give us a way to access the access token directly
@@ -173,7 +170,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     }
   }
 
-  public async getUser(token: string): Promise<TabiyaUser | null> {
+  public getUser(token: string): TabiyaUser | null {
     if(!this.isTokenValid(token)) {
       console.error("Could not get user from token. Token is invalid.")
       return null;

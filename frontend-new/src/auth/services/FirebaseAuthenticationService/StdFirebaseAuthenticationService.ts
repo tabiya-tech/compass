@@ -1,6 +1,5 @@
 import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
 import { auth } from "src/auth/firebaseConfig";
-import { StatusCodes } from "http-status-codes";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { FirebaseToken, TabiyaUser } from "src/auth/auth.types";
@@ -64,7 +63,6 @@ class StdFirebaseAuthenticationService {
     } catch (error) {
       const firebaseError = (error as any).code;
       throw errorFactory(
-        firebaseError.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
         firebaseError || FirebaseErrorCodes.INTERNAL_ERROR,
         firebaseError.message || FirebaseErrorCodes.INTERNAL_ERROR,
         {}
@@ -215,12 +213,12 @@ class StdFirebaseAuthenticationService {
   }
 
 
-  public async getUser(token: string): Promise<TabiyaUser | null> {
+  public getUser(token: string): TabiyaUser | null {
     try {
       const _user = this.getFirebaseUserFromToken(token);
       if (_user) {
         PersistentStorageService.setToken(token);
-        (await authenticationStateService).setUser(_user)
+        authenticationStateService.getInstance().setUser(_user)
         return _user;
       }
       return null;

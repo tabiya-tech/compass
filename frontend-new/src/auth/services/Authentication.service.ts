@@ -6,7 +6,6 @@ import {
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import { StatusCodes } from "http-status-codes";
 import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
 import { FirebaseToken, TabiyaUser } from "src/auth/auth.types";
 import { jwtDecode } from "jwt-decode";
@@ -23,7 +22,7 @@ import { jwtDecode } from "jwt-decode";
  * All instances of AuthenticationServices should be singletons.
  */
 abstract class AuthenticationService {
-  protected readonly authenticationStateService: Promise<AuthenticationStateService>;
+  protected readonly authenticationStateService: AuthenticationStateService;
   protected readonly userPreferencesStateService: UserPreferencesStateService;
 
   protected constructor() {
@@ -38,14 +37,14 @@ abstract class AuthenticationService {
   abstract refreshToken(): Promise<void>;
   abstract cleanup(): void;
   abstract logout(): Promise<void>;
-  abstract getUser(token: string): Promise<TabiyaUser | null>;
+  abstract getUser(token: string): TabiyaUser | null;
 
   /**
    * "callbacks" to be called by the child classes when specific events occur
    */
   async onSuccessfulLogout(): Promise<void> {
     // clear the user from the context, and the persistent storage
-    await (await this.authenticationStateService).clearUser();
+    this.authenticationStateService.clearUser();
     // clear the userPreferences from the "state"
     this.userPreferencesStateService.clearUserPreferences();
     // clear the login method from the persistent storage
@@ -61,15 +60,15 @@ abstract class AuthenticationService {
     );
     try {
       const _user = await this.getUser(token);
-      (await this.authenticationStateService).setUser(_user);
-      const user = (await this.authenticationStateService).getUser();
+      this.authenticationStateService.setUser(_user);
+      const user = this.authenticationStateService.getUser();
       const prefs = await userPreferencesService.getUserPreferences(user!.id);
       if (prefs !== null) {
         // set the local preferences "state" ( for lack of a better word )
         userPreferencesStateService.setUserPreferences(prefs);
       }
     } catch (err) {
-      throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (err as any).code, (err as any).message);
+      throw firebaseErrorFactory((err as any).code, (err as any).message);
     }
   }
 
@@ -82,8 +81,8 @@ abstract class AuthenticationService {
     );
     try{
       const _user = await this.getUser(token);
-      (await this.authenticationStateService).setUser(_user);
-      const user = (await this.authenticationStateService).getUser()
+      this.authenticationStateService.setUser(_user);
+      const user = this.authenticationStateService.getUser()
       if (user) {
         // create user preferences for the first time.
         // in order to do this, there needs to be a logged in user in the persistent storage
@@ -97,13 +96,13 @@ abstract class AuthenticationService {
         throw new Error("User not found");
       }}
     catch (error) {
-      throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (error as any).code, (error as any).message);
+      throw firebaseErrorFactory((error as any).code, (error as any).message);
     }
   }
 
   async onSuccessfulRefresh(token: string): Promise<void> {
     const _user = await this.getUser(token);
-    (await this.authenticationStateService).setUser(_user);
+    this.authenticationStateService.setUser(_user);
   }
 
 

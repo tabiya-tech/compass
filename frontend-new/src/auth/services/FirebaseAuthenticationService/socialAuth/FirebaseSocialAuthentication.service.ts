@@ -1,5 +1,4 @@
 import { auth } from "src/auth/firebaseConfig";
-import { StatusCodes } from "http-status-codes";
 import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import firebase from "firebase/compat/app";
@@ -45,7 +44,6 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
       if (!userCredential?.user?.multiFactor?.user?.accessToken) {
         //  qREVIEW do not throw to catch
         throw firebaseErrorFactory(
-          StatusCodes.NOT_FOUND,
           FirebaseErrorCodes.USER_NOT_FOUND,
           "The user could not be found",
           {}
@@ -63,7 +61,7 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
       return tokenResponse;
 
     } catch (error) {
-      throw firebaseErrorFactory(StatusCodes.INTERNAL_SERVER_ERROR, (error as any).code, (error as any).message);
+      throw firebaseErrorFactory( (error as any).code, (error as any).message);
     }
   }
 
@@ -89,12 +87,12 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
     }
   }
 
-  async getUser(token: string): Promise<TabiyaUser | null> {
+  getUser(token: string): TabiyaUser | null {
     if(!this.isTokenValid(token)) {
       console.error("Could not get user from token. Token is invalid.")
       return null;
     }
-    return await FirebaseSocialAuthenticationService.stdFirebaseAuthServiceInstance.getUser(token);
+    return FirebaseSocialAuthenticationService.stdFirebaseAuthServiceInstance.getUser(token);
   }
 }
 

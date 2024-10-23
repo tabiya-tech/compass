@@ -124,7 +124,7 @@ describe("Testing Data Protection Policy component", () => {
       .mockRejectedValue(new Error("Failed to update user preferences"));
 
     // AND the authStateService is mocked to return the given user
-    jest.spyOn(await authStateService, "getUser").mockImplementation(() => givenUser);
+    jest.spyOn(authStateService.getInstance(), "getUser").mockImplementation(() => givenUser);
 
     // WHEN the component is rendered
     render(

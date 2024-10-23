@@ -67,7 +67,7 @@ describe("AuthService class tests", () => {
         user: mockUser,
       } as firebase.auth.UserCredential);
 
-      jest.spyOn(await authStateService, "setUser").mockReturnValue(givenUser);
+      jest.spyOn(authStateService.getInstance(), "getUser").mockReturnValue(givenUser);
 
       // WHEN the login is attempted
       const loginCallback = async () => await authService.login(givenEmail, givenPassword);
@@ -143,7 +143,7 @@ describe("AuthService class tests", () => {
       } as firebase.auth.UserCredential);
 
       // AND the token is decoded into a user
-      jest.spyOn(await authStateService, "getUser").mockReturnValue(givenUser);
+      jest.spyOn(authStateService.getInstance(), "getUser").mockReturnValue(givenUser);
 
       // AND the registration code is valid
       (invitationsService.checkInvitationCodeStatus as jest.Mock).mockResolvedValueOnce({

@@ -1,6 +1,5 @@
 import { FirebaseToken, TabiyaUser } from "src/auth/auth.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import AuthenticationServiceFactory from "./Authentication.service.factory";
 import { jwtDecode } from "jwt-decode";
 
 /**
@@ -37,21 +36,16 @@ export class AuthenticationStateService {
   private constructor() {
   }
 
-  private async init() {
-    await this.loadUser();
-  }
-
   /**
    * Returns the singleton instance of AuthenticationStateService.
    * Creates a new instance if one doesn't exist.
    * 
    * @returns {AuthenticationStateService} The singleton instance.
    */
-  public static async getInstance(): Promise<AuthenticationStateService> {
+  public static getInstance(): AuthenticationStateService {
     if (!AuthenticationStateService.instance) {
       AuthenticationStateService.instance = new AuthenticationStateService();
     }
-    await AuthenticationStateService.instance.init();
     return AuthenticationStateService.instance;
   }
 
@@ -114,28 +108,6 @@ export class AuthenticationStateService {
       return false;
     }
   }
-  /**
-   * Loads the user from the stored token if available and valid.
-   *
-   * @returns {Promise<TabiyaUser | null>} The loaded user object, or null if loading fails.
-   */
-  public async loadUser(): Promise<TabiyaUser | null> {
-    const token = PersistentStorageService.getToken();
-    if (token) {
-      const authenticationServiceInstance = await AuthenticationServiceFactory.getAuthenticationService();
-      if (authenticationServiceInstance.isTokenValid(token)) {
-        console.debug("Valid token found in storage");
-        return authenticationServiceInstance.getUser(token)
-      } else {
-        console.debug("Authentication token is not valid");
-        return null;
-      }
-    } else {
-      console.debug("No valid token found in storage");
-      await this.clearUser(); // Clear user data if token is invalid or missing
-      return null;
-    }
-  }
 }
 
-export default AuthenticationStateService.getInstance();
+export default AuthenticationStateService;
