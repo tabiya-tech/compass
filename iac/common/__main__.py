@@ -1,6 +1,5 @@
 import os
 import sys
-from urllib.parse import urlparse
 
 # Determine the absolute path to the 'iac' directory
 libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -8,6 +7,7 @@ libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # so that we can import the iac/lib module when we run pulumi from withing the iac/common directory
 sys.path.insert(0, libs_dir)
 
+from urllib.parse import urlparse
 import pulumi
 from deploy_common import deploy_common
 from dotenv import load_dotenv
