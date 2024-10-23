@@ -1,19 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { isValid } from "date-fns";
 import authStateService from "src/auth/services/AuthenticationState.service";
+import { TabiyaUser } from "../../auth/auth.types";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const user = authStateService.getUser();
+  const [user, setUser] = useState<TabiyaUser | null>(null);
   const userPreferences = userPreferencesStateService.getUserPreferences();
   const isAcceptedTCValid = userPreferences?.accepted_tc && isValid(new Date(userPreferences.accepted_tc));
   const targetPath = useLocation().pathname;
+
+  useEffect(() => {
+    authStateService.then(authStateServiceInstance => {
+      setUser(authStateServiceInstance.getUser());
+    })
+  })
 
   if (targetPath === routerPaths.VERIFY_EMAIL) {
     console.debug("redirecting from /verify --> /verify because no one cares");

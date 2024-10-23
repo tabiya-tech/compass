@@ -10,6 +10,7 @@ import { act } from "@testing-library/react";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { TabiyaUser } from "../../auth.types";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -103,7 +104,7 @@ describe("SocialAuth tests", () => {
       } as unknown as FirebaseSocialAuthenticationService);
 
       // AND the AuthProvider updates the user successfully
-      jest.spyOn(authStateService, "updateUserByToken").mockImplementation((token: string) => {
+      jest.spyOn(await authStateService, "setUser").mockImplementation((user: TabiyaUser | null) => {
         return givenUser;
       });
       // AND the user preferences exist for the user

@@ -237,7 +237,7 @@ const Login: React.FC = () => {
   useEffect(() => {
     const clearUser = async () => {
       console.debug("Login: Clearing user on mount");
-      await authStateService.clearUser();
+      await (await authStateService).clearUser();
       setIsUserCleared(true);
     };
 

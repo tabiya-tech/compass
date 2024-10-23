@@ -1,14 +1,10 @@
 // mute chatty console
 import "src/_test_utilities/consoleMock";
 import FirebaseEmailAuthenticationService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
-import { jwtDecode } from "jwt-decode";
 import firebase from "firebase/compat/app";
-import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
 import authStateService from "src/auth/services/AuthenticationState.service";
-
-jest.mock("jwt-decode");
 
 jest.mock("firebase/compat/app", () => {
   return {
@@ -71,10 +67,7 @@ describe("AuthService class tests", () => {
         user: mockUser,
       } as firebase.auth.UserCredential);
 
-      jest.spyOn(authenticationStateService, "updateUserByToken").mockReturnValue(givenUser);
-
-      // AND the token is decoded without any errors
-      (jwtDecode as jest.Mock).mockReturnValueOnce(givenUser);
+      jest.spyOn(await authStateService, "setUser").mockReturnValue(givenUser);
 
       // WHEN the login is attempted
       const loginCallback = async () => await authService.login(givenEmail, givenPassword);
@@ -150,7 +143,7 @@ describe("AuthService class tests", () => {
       } as firebase.auth.UserCredential);
 
       // AND the token is decoded into a user
-      jest.spyOn(authStateService, "updateUserByToken").mockReturnValue(givenUser);
+      jest.spyOn(await authStateService, "getUser").mockReturnValue(givenUser);
 
       // AND the registration code is valid
       (invitationsService.checkInvitationCodeStatus as jest.Mock).mockResolvedValueOnce({

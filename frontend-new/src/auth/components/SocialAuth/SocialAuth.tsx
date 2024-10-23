@@ -82,7 +82,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
   const registerUser = useCallback(async (registrationCode: string) => {
     try{
       // first check if the invitation code is valid
-      const _user = authStateService.getUser();
+      const _user = (await authStateService).getUser();
       if(!_user) {
         throw new Error("Something went wrong: No user found");
       }

@@ -57,7 +57,7 @@ jest.mock("src/auth/services/AuthenticationState.service", () => {
     ...actual,
     __esModule: true,
     default: {
-      updateUserByToken: jest.fn(),
+      setUser: jest.fn(),
       clearUser: jest.fn(),
     },
   };
@@ -161,7 +161,7 @@ describe("Testing Register component", () => {
         logout: jest.fn(),
       } as unknown as FirebaseEmailAuthenticationService);
     // AND the auth state service is mocked to return a user
-    jest.spyOn(authStateService, "updateUserByToken").mockImplementation((token) => {
+    jest.spyOn(await authStateService, "setUser").mockImplementation((token) => {
       return { email: givenEmail, name: givenName } as TabiyaUser;
     });
     // AND the user preferences state service is mocked to succeed
@@ -240,11 +240,11 @@ describe("Testing Register component", () => {
     jest.spyOn(AuthenticationServiceFactoryModule.default, "getAuthenticationService").mockReturnValue(FirebaseEmailAuthenticationService.getInstance());
 
     // AND the auth state service is mocked to return a user
-    jest.spyOn(authStateService, "updateUserByToken").mockImplementation((token) => {
+    jest.spyOn(await authStateService, "setUser").mockImplementation((token) => {
       return { email: givenEmail, name: givenName } as TabiyaUser;
     });
     // AND the clear user function is mocked to succeed
-    jest.spyOn(authStateService, "clearUser").mockResolvedValue(undefined);
+    jest.spyOn(await authStateService, "clearUser").mockResolvedValue(undefined);
 
     // AND the logout function is mocked to succeed
     jest.spyOn(FirebaseEmailAuthenticationService, "getInstance").mockResolvedValue({

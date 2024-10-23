@@ -3,8 +3,9 @@ import { auth } from "src/auth/firebaseConfig";
 import { StatusCodes } from "http-status-codes";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import { FirebaseToken } from "src/auth/auth.types";
+import { FirebaseToken, TabiyaUser } from "src/auth/auth.types";
 import { jwtDecode } from "jwt-decode";
+import authenticationStateService from "../AuthenticationState.service";
 
 /**
  * The FirebaseAuthenticationService is a concrete class that provides common functionality
@@ -212,6 +213,67 @@ class StdFirebaseAuthenticationService {
       }
     }
   }
+
+
+  public async getUser(token: string): Promise<TabiyaUser | null> {
+    try {
+      const _user = this.getFirebaseUserFromToken(token);
+      if (_user) {
+        PersistentStorageService.setToken(token);
+        (await authenticationStateService).setUser(_user)
+        return _user;
+      }
+      return null;
+    } catch (error) {
+      console.error("Invalid token", error);
+      return null;
+    }
+  }
+
+  /**
+   * Extracts user information from a JWT token.
+   *
+   * @param {string} token - The JWT token to decode.
+   * @returns {TabiyaUser | null} The user object extracted from the token, or null if extraction fails.
+   */
+    //TODO: remove the idea of storing a user in this state. Store a token instead and decode it when needed (util)
+  private readonly getFirebaseUserFromToken = (token: string): TabiyaUser | null => {
+    try {
+      const decodedToken: FirebaseToken = jwtDecode(token);
+      const GOOGLE_ISSUER = "accounts.google.com";
+      if (decodedToken.iss === GOOGLE_ISSUER) {
+        // Google OAuth Token
+        return {
+          id: decodedToken.sub,
+          name: decodedToken.name || decodedToken.email, // Google tokens might not have a name field
+          email: decodedToken.email,
+        };
+      } else if (decodedToken.firebase?.sign_in_provider) {
+        // Firebase Token
+        const signInProvider = decodedToken.firebase.sign_in_provider;
+        if (signInProvider === "password") {
+          // Firebase Password Auth Token
+          return {
+            id: decodedToken.user_id,
+            name: decodedToken.name,
+            email: decodedToken.email,
+          };
+        } else {
+          // Other Firebase Auth Providers (e.g., Facebook, Twitter, etc.)
+          return {
+            id: decodedToken.user_id,
+            name: decodedToken.name || decodedToken.email, // Use email if name is not available
+            email: decodedToken.email,
+          };
+        }
+      } else {
+        throw new Error("Unknown token issuer");
+      }
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      return null;
+    }
+  };
 }
 
 export default StdFirebaseAuthenticationService;

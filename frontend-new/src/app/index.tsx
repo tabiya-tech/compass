@@ -40,7 +40,7 @@ const App = () => {
     const initializeAuth = async () => {
       setLoading(true);
       try {
-        const user = authStateService.getUser();
+        const user = (await authStateService).getUser();
         if (user) {
           console.debug("User authenticated: Welcome,", user.email);
           try {

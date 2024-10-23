@@ -3,11 +3,11 @@ import { StatusCodes } from "http-status-codes";
 import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import { AuthenticationServices } from "src/auth/auth.types";
+import { AuthenticationServices, TabiyaUser } from "src/auth/auth.types";
 import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
-import AuthenticationService from "../../Authentication.service";
-import StdFirebaseAuthenticationService from "../StdFirebaseAuthenticationService";
+import AuthenticationService from "src/auth/services/Authentication.service";
+import StdFirebaseAuthenticationService from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
 
 class FirebaseEmailAuthenticationService extends AuthenticationService {
   private static instance: FirebaseEmailAuthenticationService;
@@ -171,6 +171,14 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
       // if token refresh fails, log the user out
       await this.logout();
     }
+  }
+
+  public async getUser(token: string): Promise<TabiyaUser | null> {
+    if(!this.isTokenValid(token)) {
+      console.error("Could not get user from token. Token is invalid.")
+      return null;
+    }
+    return FirebaseEmailAuthenticationService.stdFirebaseAuthServiceInstance.getUser(token);
   }
 }
 

@@ -4,16 +4,15 @@ import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import StdFirebaseAuthenticationService from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import { AuthenticationServices } from "src/auth/auth.types";
+import { AuthenticationServices, TabiyaUser } from "src/auth/auth.types";
 import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
-import authStateService from "src/auth/services/AuthenticationState.service";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { getServiceErrorFactory } from "src/error/ServiceError/ServiceError";
 import serviceErrorConstants from "src/error/ServiceError/ServiceError.constants";
-import AuthenticationService from "../../Authentication.service";
+import AuthenticationService from "src/auth/services/Authentication.service";
 
 class FirebaseInvitationCodeAuthenticationService extends AuthenticationService {
   private static instance: FirebaseInvitationCodeAuthenticationService;
@@ -92,7 +91,8 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
 
     try {
       // we set the user state in order to get a decoded version of the token
-      const _user = authStateService.updateUserByToken(token);
+        (await this.authenticationStateService).setUser(await this.getUser(token));
+        const _user =(await this.authenticationStateService).getUser();
       if (_user) {
         // create user preferences for the first time.
         // in order to do this, there needs to be a logged in user in the persistent storage
@@ -139,6 +139,14 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
       // if token refresh fails, log the user out
       await this.logout();
     }
+  }
+
+  async getUser(token: string): Promise<TabiyaUser | null> {
+    if(!this.isTokenValid(token)) {
+      console.error("Could not get user from token. Token is invalid.")
+      return null;
+    }
+    return await FirebaseInvitationCodeAuthenticationService.stdFirebaseAuthServiceInstance.getUser(token);
   }
 }
 

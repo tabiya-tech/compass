@@ -1,4 +1,4 @@
-import authStateService, { AuthenticationStateService } from "./AuthenticationState.service";
+import { AuthenticationStateService } from "./AuthenticationState.service";
 import {
   userPreferencesStateService,
   UserPreferencesStateService,
@@ -8,6 +8,8 @@ import { userPreferencesService } from "src/userPreferences/UserPreferencesServi
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { StatusCodes } from "http-status-codes";
 import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
+import { FirebaseToken, TabiyaUser } from "src/auth/auth.types";
+import { jwtDecode } from "jwt-decode";
 
 /**
  * Abstract class representing an authentication service.
@@ -21,14 +23,13 @@ import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
  * All instances of AuthenticationServices should be singletons.
  */
 abstract class AuthenticationService {
-  private readonly authenticationStateService: AuthenticationStateService;
-  private readonly userPreferencesStateService: UserPreferencesStateService;
+  protected readonly authenticationStateService: Promise<AuthenticationStateService>;
+  protected readonly userPreferencesStateService: UserPreferencesStateService;
 
   protected constructor() {
-      this.authenticationStateService = AuthenticationStateService.getInstance();
-      this.userPreferencesStateService = UserPreferencesStateService.getInstance();
+    this.authenticationStateService = AuthenticationStateService.getInstance();
+    this.userPreferencesStateService = UserPreferencesStateService.getInstance();
   }
-
 
   /**
    * Abstract methods to implement in the child classes
@@ -37,13 +38,14 @@ abstract class AuthenticationService {
   abstract refreshToken(): Promise<void>;
   abstract cleanup(): void;
   abstract logout(): Promise<void>;
+  abstract getUser(token: string): Promise<TabiyaUser | null>;
 
   /**
    * "callbacks" to be called by the child classes when specific events occur
    */
   async onSuccessfulLogout(): Promise<void> {
     // clear the user from the context, and the persistent storage
-    await this.authenticationStateService.clearUser();
+    await (await this.authenticationStateService).clearUser();
     // clear the userPreferences from the "state"
     this.userPreferencesStateService.clearUserPreferences();
     // clear the login method from the persistent storage
@@ -58,7 +60,9 @@ abstract class AuthenticationService {
       "onSuccessfulRegistration"
     );
     try {
-      const user = authStateService.updateUserByToken(token);
+      const _user = await this.getUser(token);
+      (await this.authenticationStateService).setUser(_user);
+      const user = (await this.authenticationStateService).getUser();
       const prefs = await userPreferencesService.getUserPreferences(user!.id);
       if (prefs !== null) {
         // set the local preferences "state" ( for lack of a better word )
@@ -77,12 +81,14 @@ abstract class AuthenticationService {
       "onSuccessfulRegistration"
     );
     try{
-      const _user = authStateService.updateUserByToken(token);
-      if (_user) {
+      const _user = await this.getUser(token);
+      (await this.authenticationStateService).setUser(_user);
+      const user = (await this.authenticationStateService).getUser()
+      if (user) {
         // create user preferences for the first time.
         // in order to do this, there needs to be a logged in user in the persistent storage
         const prefs = await userPreferencesService.createUserPreferences({
-          user_id: _user.id,
+          user_id: user.id,
           invitation_code: registrationCode,
           language: Language.en,
         });
@@ -96,9 +102,41 @@ abstract class AuthenticationService {
   }
 
   async onSuccessfulRefresh(token: string): Promise<void> {
-    this.authenticationStateService.updateUserByToken(token);
+    const _user = await this.getUser(token);
+    (await this.authenticationStateService).setUser(_user);
   }
 
+
+  /**
+   * Checks if a given token is valid (not expired and not issued in the future).
+   *
+   * @param {string} token - The token to validate.
+   * @returns {boolean} True if the token is valid, false otherwise.
+   */
+  public isTokenValid(token: string): boolean {
+    try {
+      const decodedToken: FirebaseToken = jwtDecode(token);
+      const currentTime = Math.floor(Date.now() / 1000);
+
+      // Check if token is expired
+      if (decodedToken.exp < currentTime) {
+        console.debug("Token is expired");
+        return false;
+      }
+
+      // Check if token was issued in the future (should never happen, but good to check)
+      if (decodedToken.iat > currentTime) {
+        console.debug("Token issued in the future");
+        return false;
+      }
+
+      console.debug("Token checked. Token is valid");
+      return true;
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      return false;
+    }
+  }
 }
 
 export default AuthenticationService;

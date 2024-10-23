@@ -5,12 +5,16 @@ import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.consta
 import firebase from "firebase/compat/app";
 import StdFirebaseAuthenticationService from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import { AuthenticationServices } from "src/auth/auth.types";
-import AuthenticationService from "../../Authentication.service";
+import { AuthenticationServices, TabiyaUser } from "src/auth/auth.types";
+import AuthenticationService from "src/auth/services/Authentication.service";
 
 class FirebaseSocialAuthenticationService extends AuthenticationService {
   private static instance: FirebaseSocialAuthenticationService;
   private static stdFirebaseAuthServiceInstance: StdFirebaseAuthenticationService;
+
+  private constructor() {
+    super();
+  }
 
   static async getInstance(): Promise<FirebaseSocialAuthenticationService> {
     this.stdFirebaseAuthServiceInstance = await StdFirebaseAuthenticationService.getInstance()
@@ -20,9 +24,6 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
     return FirebaseSocialAuthenticationService.instance;
   }
 
-  private constructor() {
-    super();
-  }
   /**
    * Handle login with google popup.
    * @returns {Promise<string>} - The firebase token.
@@ -86,6 +87,14 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
       // if token refresh fails, log the user out
       await this.logout();
     }
+  }
+
+  async getUser(token: string): Promise<TabiyaUser | null> {
+    if(!this.isTokenValid(token)) {
+      console.error("Could not get user from token. Token is invalid.")
+      return null;
+    }
+    return await FirebaseSocialAuthenticationService.stdFirebaseAuthServiceInstance.getUser(token);
   }
 }
 
