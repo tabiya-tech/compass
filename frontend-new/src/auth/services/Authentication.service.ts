@@ -31,12 +31,33 @@ abstract class AuthenticationService {
   }
 
   /**
-   * Abstract methods to implement in the child classes
+   * Refreshes the authentication token.
+   * This method should be called to schedule a refresh of the token
+   * It should obtain a new token from the authentication provider and update it in the application state.
+   * @returns {Promise<void>} A promise that resolves when the token has been refreshed.
    */
-  // REVIEW each method should be explained as there is a very specific expectation what is should do and  when it should be used
   abstract refreshToken(): Promise<void>;
+
+  /**
+   * Performs cleanup operations when the application unmounts.
+   * This method should be used to clear any artifacts, listeners, or timeouts set up by the authentication service.
+   * It's crucial for preventing memory leaks and ensuring proper application shutdown.
+   */
   abstract cleanup(): void;
+
+  /**
+   * Logs out the current user.
+   * This method should clear all user-related data from the application state and storage.
+   * @returns {Promise<void>} A promise that resolves when the logout process is complete.
+   */
   abstract logout(): Promise<void>;
+
+  /**
+   * Retrieves user information based on the provided token.
+   * This method should decode the token and extract relevant user data.
+   * @param {string} token - The authentication token.
+   * @returns {TabiyaUser | null} The user object if the token is valid, null otherwise.
+   */
   abstract getUser(token: string): TabiyaUser | null;
 
   /**
