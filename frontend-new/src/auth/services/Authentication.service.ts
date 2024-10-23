@@ -7,7 +7,7 @@ import { PersistentStorageService } from "src/app/PersistentStorageService/Persi
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
-import { FirebaseToken, TabiyaUser } from "src/auth/auth.types";
+import { TabiyaUser, Token } from "src/auth/auth.types";
 import { jwtDecode } from "jwt-decode";
 
 /**
@@ -135,7 +135,7 @@ abstract class AuthenticationService {
    */
   public isTokenValid(token: string): boolean {
     try {
-      const decodedToken: FirebaseToken = jwtDecode(token);
+      const decodedToken: Token = jwtDecode(token);
       const currentTime = Math.floor(Date.now() / 1000);
 
       // Check if token is expired

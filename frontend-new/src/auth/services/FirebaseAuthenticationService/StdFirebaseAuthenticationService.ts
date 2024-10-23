@@ -1,10 +1,26 @@
 import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
-import { auth } from "src/auth/firebaseConfig";
+import { firebaseAuth } from "src/auth/firebaseConfig";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import { FirebaseToken, TabiyaUser } from "src/auth/auth.types";
+import { TabiyaUser, Token } from "src/auth/auth.types";
 import { jwtDecode } from "jwt-decode";
 import authenticationStateService from "../AuthenticationState.service";
+
+export type FirebaseToken = Token & {
+  name: string;
+  aud: string;
+  auth_time: number;
+  user_id: string;
+  sub: string;
+  email: string;
+  email_verified: boolean;
+  firebase: {
+    identities: {
+      email: string[];
+    };
+    sign_in_provider: string;
+  };
+};
 
 /**
  * The FirebaseAuthenticationService is a concrete class that provides common functionality
@@ -56,7 +72,7 @@ class StdFirebaseAuthenticationService {
   async logout(): Promise<void> {
     const errorFactory = getFirebaseErrorFactory("FirebaseAuthService", "logout", "POST", "signOut");
     try {
-      await auth.signOut();
+      await firebaseAuth.signOut();
       await this.deleteFirebaseDB();
       this.clearRefreshTimeout();
       this.unsubscribeAuthListener();
@@ -85,8 +101,8 @@ class StdFirebaseAuthenticationService {
     const oldToken = PersistentStorageService.getToken();
     console.debug("Old token", "..." + oldToken?.slice(-20));
 
-    if (auth.currentUser) {
-      const newToken = await auth.currentUser.getIdToken(true);
+    if (firebaseAuth.currentUser) {
+      const newToken = await firebaseAuth.currentUser.getIdToken(true);
       console.debug("New token obtained", "..." + newToken.slice(-20));
       this.scheduleTokenRefresh(newToken);
       return newToken;
@@ -129,7 +145,7 @@ class StdFirebaseAuthenticationService {
    */
   private setupAuthListener(): () => void {
     console.debug("Setting up auth listener");
-    return auth.onAuthStateChanged(async (user) => {
+    return firebaseAuth.onAuthStateChanged(async (user) => {
       if (user) {
         console.debug("User authenticated");
         const token = await user.getIdToken(true);

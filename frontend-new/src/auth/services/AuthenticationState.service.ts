@@ -1,6 +1,5 @@
-import { FirebaseToken, TabiyaUser } from "src/auth/auth.types";
+import { TabiyaUser } from "src/auth/auth.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import { jwtDecode } from "jwt-decode";
 
 /**
  * AuthenticationStateService manages the authentication state of the application.
@@ -75,38 +74,6 @@ export class AuthenticationStateService {
     console.debug("AuthenticationStateService: Clearing user");
     PersistentStorageService.clearToken();
     this.setUser(null);
-  }
-
-
-  /**
-   * Checks if a given token is valid (not expired and not issued in the future).
-   *
-   * @param {string} token - The token to validate.
-   * @returns {boolean} True if the token is valid, false otherwise.
-   */
-  public isTokenValid(token: string): boolean {
-    try {
-      const decodedToken: FirebaseToken = jwtDecode(token);
-      const currentTime = Math.floor(Date.now() / 1000);
-
-      // Check if token is expired
-      if (decodedToken.exp < currentTime) {
-        console.debug("Token is expired");
-        return false;
-      }
-
-      // Check if token was issued in the future (should never happen, but good to check)
-      if (decodedToken.iat > currentTime) {
-        console.debug("Token issued in the future");
-        return false;
-      }
-
-      console.debug("Token checked. Token is valid");
-      return true;
-    } catch (error) {
-      console.error("Error decoding token:", error);
-      return false;
-    }
   }
 }
 

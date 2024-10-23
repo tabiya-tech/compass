@@ -1,4 +1,4 @@
-import { auth } from "src/auth/firebaseConfig";
+import { firebaseAuth } from "src/auth/firebaseConfig";
 import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import firebase from "firebase/compat/app";
@@ -38,7 +38,7 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
     let userCredential;
     try {
       // first login with google
-      userCredential = await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+      userCredential = await firebaseAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
 
     } catch (error) {
       throw firebaseErrorFactory( (error as any).code, (error as any).message);

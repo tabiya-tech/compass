@@ -7,5 +7,5 @@ const auth = jest.fn(() => ({
 }));
 
 export function mockFirebaseConfig() {
-  jest.spyOn(require("src/auth/firebaseConfig"), "auth").mockImplementation(auth);
+  jest.spyOn(require("src/auth/firebaseConfig"), "firebaseAuth").mockImplementation(auth);
 }

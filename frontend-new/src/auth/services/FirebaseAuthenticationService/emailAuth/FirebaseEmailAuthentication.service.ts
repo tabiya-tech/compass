@@ -1,4 +1,4 @@
-import { auth } from "src/auth/firebaseConfig";
+import { firebaseAuth } from "src/auth/firebaseConfig";
 import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
@@ -46,7 +46,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     let userCredential;
 
     try {
-      userCredential = await auth.signInWithEmailAndPassword(email, password);
+      userCredential = await firebaseAuth.signInWithEmailAndPassword(email, password);
     } catch (error) {
       throw firebaseErrorFactory((error as any).code, (error as any).message);
     }
@@ -110,7 +110,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     let userCredential;
 
     try {
-      userCredential = await auth.createUserWithEmailAndPassword(email, password);
+      userCredential = await firebaseAuth.createUserWithEmailAndPassword(email, password);
     } catch (error) {
       throw firebaseErrorFactory((error as any).code, (error as any).message);
     }

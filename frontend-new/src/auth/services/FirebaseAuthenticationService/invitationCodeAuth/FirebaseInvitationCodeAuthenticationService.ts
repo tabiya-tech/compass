@@ -1,4 +1,4 @@
-import { auth } from "src/auth/firebaseConfig";
+import { firebaseAuth } from "src/auth/firebaseConfig";
 import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import StdFirebaseAuthenticationService
@@ -61,7 +61,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
       )
     }
     try {
-      userCredential = await auth.signInAnonymously();
+      userCredential = await firebaseAuth.signInAnonymously();
     } catch (error) {
       throw firebaseErrorFactory((error as any).code, (error as any).message);
     }
