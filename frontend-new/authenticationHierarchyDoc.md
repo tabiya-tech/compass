@@ -8,8 +8,8 @@ This document provides an overview of the authentication hierarchy in the fronte
 
 The authentication system consists of several services that work together to handle user authentication, state management, and persistent storage. The main services are:
 - `AuthenticationService`: An abstract base class that defines common methods for authentication services.
-- `FirebaseAuthenticationService`: Extends the AuthenticationService and provides a base implementation for Firebase authentication services.
-- `FirebaseEmailAuthenticationService`, `FirebaseSocialAuthenticationService`, `FirebaseInvitation CodeAuthenticationService`: Extend the FirebaseAuthenticationService and handle specific authentication methods (email/password, social providers, anonymous).
+- `StdFirebaseAuthenticationService`: A utility class that provides a base implementation for Firebase authentication services.
+- `FirebaseEmailAuthenticationService`, `FirebaseSocialAuthenticationService`, `FirebaseInvitation CodeAuthenticationService`: Extend the AuthenticationService class and handle specific authentication methods (email/password, social providers, anonymous).
 - `AuthenticationStateService`: Manages the current user's authentication state and token.
 - `UserPreferencesStateService`: Manages the user's preferences and settings.
 - `PersistentStorageUtil`: A utility class for storing and retrieving data from the browser's local storage.
@@ -35,7 +35,7 @@ erDiagram
         onSuccessfulRefresh(token)  void
     }
 
-    FirebaseAuthenticationService {
+    StdFirebaseAuthenticationService {
         refreshToken() void
         cleanup() void
         logout() void
@@ -85,13 +85,15 @@ erDiagram
     }
 
     User ||--|| AuthenticationStateService : "current user"
-    AuthenticationService ||--|| FirebaseAuthenticationService : "extends"
-    FirebaseAuthenticationService ||--|| FirebaseEmailAuthenticationService : "extends"
-    FirebaseAuthenticationService ||--|| FirebaseSocialAuthenticationService : "extends"
-    FirebaseAuthenticationService ||--|| FirebaseInvitationCodeAuthenticationService : "extends"
-    FirebaseAuthenticationService ||--|{ AuthenticationStateService : "uses"
-    FirebaseAuthenticationService ||--|{ UserPreferencesStateService : "uses"
-    FirebaseAuthenticationService ||--|{ PersistentStorageService : "uses"
+    AuthenticationService ||--|| FirebaseEmailAuthenticationService : "extends"
+    AuthenticationService ||--|| FirebaseSocialAuthenticationService : "extends"
+    AuthenticationService ||--|| FirebaseInvitationCodeAuthenticationService : "extends"
+    FirebaseEmailAuthenticationService ||--|| StdFirebaseAuthenticationService : "uses"
+    FirebaseSocialAuthenticationService ||--|| StdFirebaseAuthenticationService : "uses"
+    FirebaseInvitationCodeAuthenticationService ||--|| StdFirebaseAuthenticationService : "uses"
+    StdFirebaseAuthenticationService ||--|{ AuthenticationStateService : "uses"
+    StdFirebaseAuthenticationService ||--|{ UserPreferencesStateService : "uses"
+    StdFirebaseAuthenticationService ||--|{ PersistentStorageService : "uses"
     AuthenticationStateService ||--|{ PersistentStorageService : "uses"
 ```
     
@@ -198,23 +200,20 @@ participant Persistent Storage Service
     Main Application->>Login Page: Redirect user
 ```
 ## Key Responsibilities and Boundaries
-### FirebaseAuthenticationService
+### StdFirebaseAuthenticationService
 - Provides a base implementation for Firebase authentication services
 - Handles common authentication tasks such as logging out, refreshing tokens, and managing authentication state
 - Manages the Firebase authentication listener and token refresh process
 - Does not handle the actual authentication process (login, signup) which is delegated to child classes
-- Relies on the AuthenticationService class for common authentication functionality
 - Interacts with Firebase authentication, AuthenticationStateService, and UserPreferencesStateService
 ### AuthenticationStateService
 - Manages the current user's authentication state
 - Stores and retrieves the user token and login method using PersistentStorageUtil
-- Provides methods to get/set the current user, token, and login method
-- Clears the user state and related data during logout
+- Provides methods to get/set/clear the current user
 ### UserPreferencesStateService
 - Manages the user's preferences and settings
-- Provides methods to get/set user preferences
-- Clears user preferences during logout
-### PersistentStorageUtil
+- Provides methods to get/set/clear user preferences
+### PersistentStorageService
 - A utility class for storing and retrieving data from the browser's local storage
 - Provides methods to get/set/remove the user token and login method
 - Used by AuthenticationStateService to persist user state
