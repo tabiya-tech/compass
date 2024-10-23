@@ -5,7 +5,7 @@ import pulumi_gcp as gcp
 
 from urllib.parse import urlparse
 
-from lib.std_pulumi import get_resource_name, ProjectBaseConfig, enable_services
+from lib.std_pulumi import get_resource_name, ProjectBaseConfig, enable_services, get_project_base_config
 
 _SERVICES = [
         # GCP Cloud DNS
@@ -192,7 +192,9 @@ def deploy_common(project: str,
         frontend_domain: str,
         frontend_url: str,
         backend_url: str):
-    basic_config = ProjectBaseConfig(project=project, location=location, environment=environment)
+
+    basic_config = get_project_base_config(project=project, location=location, environment=environment)
+
     # Get the frontend bucket name
     frontend_stack_ref = pulumi.StackReference(f"tabiya-tech/compass-frontend/{basic_config.environment}")
     frontend_bucket_name = frontend_stack_ref.get_output("bucket_name")
