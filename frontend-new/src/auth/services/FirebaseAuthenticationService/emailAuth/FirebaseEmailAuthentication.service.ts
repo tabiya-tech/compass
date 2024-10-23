@@ -6,7 +6,8 @@ import { AuthenticationServices, TabiyaUser } from "src/auth/auth.types";
 import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
 import AuthenticationService from "src/auth/services/Authentication.service";
-import StdFirebaseAuthenticationService from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
+import StdFirebaseAuthenticationService
+  from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
 
 class FirebaseEmailAuthenticationService extends AuthenticationService {
   private static instance: FirebaseEmailAuthenticationService;
@@ -100,12 +101,11 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
       "createUserWithEmailAndPassword"
     );
     const invitation = await invitationsService.checkInvitationCodeStatus(registrationCode);
-    if (invitation.status === InvitationStatus.INVALID || invitation.invitation_type !== InvitationType.REGISTER) {
-      console.log(invitation) // REVIEW remove this
-      throw new Error("Invalid invitation code"); // REVIEW (1) should be invalid registration code,
-                                                  //  (2) perhaps even a differentiation between the two conditions to give a better error message
-                                                  //  (not a registration code vs invalid)
-                                                  //  (3) shouldn't this be a firebaseErrorFactory?
+    if (invitation.status === InvitationStatus.INVALID ) {
+      throw firebaseErrorFactory(FirebaseErrorCodes.INVALID_REGISTRATION_CODE, "The registration code is invalid");
+    }
+    if(invitation.invitation_type !== InvitationType.REGISTER) {
+      throw firebaseErrorFactory(FirebaseErrorCodes.INVALID_REGISTRATION_TYPE, "The invitation code is not for registration");
     }
 
     let userCredential;

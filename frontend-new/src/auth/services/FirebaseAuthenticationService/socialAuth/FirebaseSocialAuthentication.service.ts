@@ -40,29 +40,29 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
       // first login with google
       userCredential = await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
 
-      // @ts-expect-error - we know that the userCredential is not null
-      if (!userCredential?.user?.multiFactor?.user?.accessToken) {
-        //  qREVIEW do not throw to catch
-        throw firebaseErrorFactory(
-          FirebaseErrorCodes.USER_NOT_FOUND,
-          "The user could not be found",
-          {}
-        );
-      }
-
-      // @ts-ignore
-      const tokenResponse = userCredential.user.multiFactor.user.accessToken as string;
-      // set the login method to social for future reference
-      // we'll want to know how the user logged in, when we want to log them out for example
-      PersistentStorageService.setLoginMethod(AuthenticationServices.FIREBASE_SOCIAL);
-
-      // call the parent class method once the user is successfully logged in
-      await super.onSuccessfulLogin(tokenResponse);
-      return tokenResponse;
-
     } catch (error) {
       throw firebaseErrorFactory( (error as any).code, (error as any).message);
     }
+
+    // @ts-expect-error - we know that the userCredential is not null
+    if (!userCredential?.user?.multiFactor?.user?.accessToken) {
+      //  qREVIEW do not throw to catch
+      throw firebaseErrorFactory(
+        FirebaseErrorCodes.USER_NOT_FOUND,
+        "The user could not be found",
+        {}
+      );
+    }
+
+    // @ts-ignore
+    const tokenResponse = userCredential.user.multiFactor.user.accessToken as string;
+    // set the login method to social for future reference
+    // we'll want to know how the user logged in, when we want to log them out for example
+    PersistentStorageService.setLoginMethod(AuthenticationServices.FIREBASE_SOCIAL);
+
+    // call the parent class method once the user is successfully logged in
+    await super.onSuccessfulLogin(tokenResponse);
+    return tokenResponse;
   }
 
   async cleanup(): Promise<void> {

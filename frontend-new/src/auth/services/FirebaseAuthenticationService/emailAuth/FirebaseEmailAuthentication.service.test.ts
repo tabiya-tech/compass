@@ -205,7 +205,7 @@ describe("AuthService class tests", () => {
       // WHEN the registration is attempted
       const registerCallback = async () => await authService.register(givenEmail, givenPassword, givenName, givenRegistrationToken);
       // THEN the registration should throw an error
-      await expect(registerCallback()).rejects.toThrow("Invalid invitation code");
+      await expect(registerCallback()).rejects.toThrow("The invitation code is not for registration");
     });
   });
 });
