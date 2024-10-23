@@ -86,7 +86,7 @@ describe("Testing Register Email Form component", () => {
       expect(registerButton).toBeInTheDocument();
 
       // Simulate form input and submission
-      fireEvent.change(screen.getByTestId(DATA_TEST_ID.NAME_INPUT), { target: { value: "Foo Bar" } });
+      fireEvent.change(screen.getByTestId(DATA_TEST_ID.USERNAME_INPUT), { target: { value: "Foo Bar" } });
       fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: "foo@bar.baz" } });
       fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: "Password123$" } });
 
@@ -134,7 +134,7 @@ describe("Testing Register Email Form component", () => {
       expect(registerButton).toBeInTheDocument();
 
       // Simulate form input and submission
-      fireEvent.change(screen.getByTestId(DATA_TEST_ID.NAME_INPUT), { target: { value: givenValue.name } });
+      fireEvent.change(screen.getByTestId(DATA_TEST_ID.USERNAME_INPUT), { target: { value: givenValue.name } });
       fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: givenValue.email } });
       fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: givenValue.password } });
 
@@ -170,7 +170,7 @@ describe("Testing Register Email Form component", () => {
       expect(registerButton).not.toBeDisabled();
 
       // Simulate form input and submission
-      fireEvent.change(screen.getByTestId(DATA_TEST_ID.NAME_INPUT), { target: { value: "Foo Bar" } });
+      fireEvent.change(screen.getByTestId(DATA_TEST_ID.USERNAME_INPUT), { target: { value: "Foo Bar" } });
       fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: "foo@bar.baz" } });
       fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: givenPassword } });
 
@@ -190,7 +190,7 @@ describe("Testing Register Email Form component", () => {
       );
 
       // THEN expect all inputs and buttons to be disabled
-      expect(screen.getByTestId(DATA_TEST_ID.NAME_INPUT)).toBeDisabled();
+      expect(screen.getByTestId(DATA_TEST_ID.USERNAME_INPUT)).toBeDisabled();
       expect(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT)).toBeDisabled();
       expect(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT)).toBeDisabled();
       expect(screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON)).toBeDisabled();

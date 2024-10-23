@@ -125,7 +125,7 @@ describe("AuthService class tests", () => {
   describe("register", () => {
     const givenEmail = "foo@bar.baz";
     const givenPassword = "password";
-    const givenName = "foo";
+    const givenUserName = "foo";
     const givenUser = { id: "123", name: "Foo", email: givenEmail };
     const givenTokenResponse = "foo";
     const givenRegistrationToken = "foo-bar";
@@ -152,7 +152,7 @@ describe("AuthService class tests", () => {
       });
 
       // WHEN the registration is attempted
-      const registerCallback = async () => await authService.register(givenEmail, givenPassword, givenName, givenRegistrationToken);
+      const registerCallback = async () => await authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationToken);
 
       // AND registerWithEmail should return the token
       await expect(registerCallback()).resolves.toBe(givenTokenResponse);
@@ -172,7 +172,7 @@ describe("AuthService class tests", () => {
 
 
       // WHEN the registration is attempted
-      const registerCallback = async () => await authService.register(givenEmail, givenPassword, givenName, givenRegistrationToken);
+      const registerCallback = async () => await authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationToken);
 
       // AND test should throw an error
       await expect(registerCallback()).rejects.toThrow("Internal error");
@@ -190,7 +190,7 @@ describe("AuthService class tests", () => {
       });
 
       // WHEN the registration is attempted
-      const registerCallback = async () => await authService.register(givenEmail, givenPassword, givenName, givenRegistrationToken);
+      const registerCallback = async () => await authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationToken);
       // THEN the registration should throw an error
       await expect(registerCallback()).rejects.toThrow("User not found");
     });
@@ -203,7 +203,7 @@ describe("AuthService class tests", () => {
       });
 
       // WHEN the registration is attempted
-      const registerCallback = async () => await authService.register(givenEmail, givenPassword, givenName, givenRegistrationToken);
+      const registerCallback = async () => await authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationToken);
       // THEN the registration should throw an error
       await expect(registerCallback()).rejects.toThrow("The invitation code is not for registration");
     });

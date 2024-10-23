@@ -151,7 +151,7 @@ describe("Testing Register component", () => {
   test("it should show register form successfully", async () => {
     // GIVEN a user to register
     const givenInvitationCode = "foo-bar";
-    const givenName = "Foo Bar";
+    const givenUserName = "Foo Bar";
     const givenEmail = "foo@bar.baz";
     const givenPassword = "password";
 
@@ -164,7 +164,7 @@ describe("Testing Register component", () => {
       } as unknown as FirebaseEmailAuthenticationService);
     // AND the auth state service is mocked to return a user
     jest.spyOn(authStateService.getInstance(), "setUser").mockImplementation((token) => {
-      return { email: givenEmail, name: givenName } as TabiyaUser;
+      return { email: givenEmail, name: givenUserName } as TabiyaUser;
     });
     // AND the user preferences state service is mocked to succeed
     jest.spyOn(userPreferencesStateService, "setUserPreferences");
@@ -200,7 +200,7 @@ describe("Testing Register component", () => {
       // Simulate form submission
       const calls = (RegisterWithEmailForm as jest.Mock).mock.calls;
 
-      await calls[calls.length - 1][0].notifyOnRegister(givenName, givenEmail, givenPassword);
+      await calls[calls.length - 1][0].notifyOnRegister(givenUserName, givenEmail, givenPassword);
     });
 
     await waitFor(() => {
@@ -209,7 +209,7 @@ describe("Testing Register component", () => {
 
     // THEN the register function should have been called
     await waitFor(() => {
-      expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenName, givenInvitationCode);
+      expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenUserName, givenInvitationCode);
     });
 
     // AND the component should match the snapshot
@@ -218,7 +218,7 @@ describe("Testing Register component", () => {
 
   test("it should show success message on successful registration", async () => {
     // GIVEN a successful registration
-    const givenName = "Foo Bar";
+    const givenUserName = "Foo Bar";
     const givenEmail = "foo@bar.baz";
     const givenPassword = "password";
     const givenInvitationCode = "foo-bar";
@@ -243,7 +243,7 @@ describe("Testing Register component", () => {
 
     // AND the auth state service is mocked to return a user
     jest.spyOn(authStateService.getInstance(), "setUser").mockImplementation((token) => {
-      return { email: givenEmail, name: givenName } as TabiyaUser;
+      return { email: givenEmail, name: givenUserName } as TabiyaUser;
     });
     // AND the clear user function is mocked to succeed
     jest.spyOn(authStateService.getInstance(), "clearUser").mockReturnValue(undefined);
@@ -277,12 +277,12 @@ describe("Testing Register component", () => {
     // AND the register form is submitted
     await act(async () => {
       const calls = (RegisterWithEmailForm as jest.Mock).mock.calls;
-      await calls[calls.length - 1][0].notifyOnRegister(givenName, givenEmail, givenPassword, givenInvitationCode);
+      await calls[calls.length - 1][0].notifyOnRegister(givenUserName, givenEmail, givenPassword, givenInvitationCode);
     });
 
     // THEN expect the register function to have been called with the correct arguments
     await waitFor(() => {
-      expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenName, givenInvitationCode);
+      expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenUserName, givenInvitationCode);
     });
 
     // AND no errors or warning to have occurred
@@ -303,7 +303,7 @@ describe("Testing Register component", () => {
       } as unknown as FirebaseEmailAuthenticationService
     );
 
-    const givenName = "Foo Bar";
+    const givenUserName = "Foo Bar";
     const givenEmail = "foo@bar.baz";
     const givenPassword = "password";
     const givenInvitationCode = "foo-bar";
@@ -324,12 +324,12 @@ describe("Testing Register component", () => {
     // AND the register form is submitted
     await act(async () => {
       const calls = (RegisterWithEmailForm as jest.Mock).mock.calls;
-      await calls[calls.length - 1][0].notifyOnRegister(givenName, givenEmail, givenPassword, givenInvitationCode);
+      await calls[calls.length - 1][0].notifyOnRegister(givenUserName, givenEmail, givenPassword, givenInvitationCode);
     });
 
     // THEN expect the register function to have been called with the correct arguments
     await waitFor(() => {
-      expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenName, givenInvitationCode);
+      expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenUserName, givenInvitationCode);
     });
 
     // AND the error message should be displayed

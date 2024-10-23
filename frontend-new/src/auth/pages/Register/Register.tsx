@@ -34,7 +34,7 @@ export const DATA_TEST_ID = {
   TITLE: `register-title-${uniqueId}`,
   SUBTITLE: `register-subtitle-${uniqueId}`,
   FORM: `register-form-${uniqueId}`,
-  NAME_INPUT: `register-name-input-${uniqueId}`,
+  USERNAME_INPUT: `register-username-input-${uniqueId}`,
   EMAIL_INPUT: `register-email-input-${uniqueId}`,
   PASSWORD_INPUT: `register-password-input-${uniqueId}`,
   REGISTER_BUTTON: `register-button-${uniqueId}`,
@@ -110,16 +110,16 @@ const Register: React.FC = () => {
    */
   /**
    * Handle the register form submission
-   * @param name
+   * @param username
    * @param email
    * @param password
    */
   const handleRegister = useCallback(
-    async (name: string, email: string, password: string) => {
+    async (username: string, email: string, password: string) => {
       setIsLoading(true);
       try {
         const firebaseEmailAuthServiceInstance = await FirebaseEmailAuthService.getInstance()
-        await firebaseEmailAuthServiceInstance.register(email, password, name, registrationCode);
+        await firebaseEmailAuthServiceInstance.register(email, password, username, registrationCode);
         enqueueSnackbar("Verification Email Sent!", { variant: "success" });
         // IMPORTANT NOTE: after the preferences are added, or fail to be added, we should log the user out immediately,
         // since if we don't do that, the user may be able to access the application without verifying their email

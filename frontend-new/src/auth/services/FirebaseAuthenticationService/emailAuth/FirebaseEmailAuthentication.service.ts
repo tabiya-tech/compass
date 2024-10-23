@@ -85,15 +85,14 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
   }
 
   /**
-   * Handle user registration with email, password, and name.
+   * Handle user registration with email, password, and username.
    * @param {string} email - The user's email address.
    * @param {string} password - The user's password.
-   * @param {string} name - The user's name.
+   * @param {string} username - The user's username.
    * @param registrationCode - The registration code.
    * @returns {Promise<string>} - The firebase token.
    */
-  // REVIEW name -> username as opposed to name=lastname, firstname?
-  async register(email: string, password: string, name: string, registrationCode: string): Promise<string> {
+  async register(email: string, password: string, username: string, registrationCode: string): Promise<string> {
     const firebaseErrorFactory = getFirebaseErrorFactory(
       "EmailAuthService",
       "handleRegister",
@@ -121,9 +120,9 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     }
 
     try {
-      // update the user's display name
+      // update the user's display username
       await userCredential.user.updateProfile({
-        displayName: name,
+        displayName: username,
       });
       // send a verification email
       await userCredential.user.sendEmailVerification();
