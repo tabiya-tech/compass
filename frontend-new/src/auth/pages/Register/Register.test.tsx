@@ -244,7 +244,7 @@ describe("Testing Register component", () => {
       return { email: givenEmail, name: givenName } as TabiyaUser;
     });
     // AND the clear user function is mocked to succeed
-    jest.spyOn(await authStateService, "clearUser").mockResolvedValue(undefined);
+    jest.spyOn(await authStateService, "clearUser").mockReturnValue(undefined);
 
     // AND the logout function is mocked to succeed
     jest.spyOn(FirebaseEmailAuthenticationService, "getInstance").mockResolvedValue({

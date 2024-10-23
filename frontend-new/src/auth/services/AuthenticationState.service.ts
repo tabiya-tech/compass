@@ -77,8 +77,7 @@ export class AuthenticationStateService {
   /**
    * Clears the current user and removes the authentication token from storage.
    */
-  // REVIEW: why is this async?
-  public async clearUser() {
+  public clearUser() {
     console.debug("AuthenticationStateService: Clearing user");
     PersistentStorageService.clearToken();
     this.setUser(null);
