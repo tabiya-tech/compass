@@ -6,8 +6,7 @@ import { AuthenticationServices, TabiyaUser } from "src/auth/auth.types";
 import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
 import AuthenticationService from "src/auth/services/Authentication.service";
-import StdFirebaseAuthenticationService
-  from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
+import StdFirebaseAuthenticationService from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
 
 class FirebaseEmailAuthenticationService extends AuthenticationService {
   private static instance: FirebaseEmailAuthenticationService;
@@ -21,8 +20,8 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
    * @returns {FirebaseEmailAuthenticationService} The singleton instance of the EmailAuthService.
    */
   static async getInstance(): Promise<FirebaseEmailAuthenticationService> {
-    this.stdFirebaseAuthServiceInstance = await StdFirebaseAuthenticationService.getInstance()
-    await StdFirebaseAuthenticationService.getInstance()
+    this.stdFirebaseAuthServiceInstance = await StdFirebaseAuthenticationService.getInstance();
+    await StdFirebaseAuthenticationService.getInstance();
     if (!FirebaseEmailAuthenticationService.instance) {
       FirebaseEmailAuthenticationService.instance = new FirebaseEmailAuthenticationService();
     }
@@ -61,16 +60,9 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
       try {
         await this.logout();
       } catch (signOutError) {
-        throw firebaseErrorFactory(
-          (signOutError as any).code,
-          (signOutError as any).message
-        );
+        throw firebaseErrorFactory((signOutError as any).code, (signOutError as any).message);
       }
-      throw firebaseErrorFactory(
-        FirebaseErrorCodes.EMAIL_NOT_VERIFIED,
-        "Email not verified",
-        {}
-      );
+      throw firebaseErrorFactory(FirebaseErrorCodes.EMAIL_NOT_VERIFIED, "Email not verified", {});
     }
 
     // in the case of email login, firebase doesnt give us a way to access the access token directly
@@ -100,11 +92,14 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
       "createUserWithEmailAndPassword"
     );
     const invitation = await invitationsService.checkInvitationCodeStatus(registrationCode);
-    if (invitation.status === InvitationStatus.INVALID ) {
+    if (invitation.status === InvitationStatus.INVALID) {
       throw firebaseErrorFactory(FirebaseErrorCodes.INVALID_REGISTRATION_CODE, "The registration code is invalid");
     }
-    if(invitation.invitation_type !== InvitationType.REGISTER) {
-      throw firebaseErrorFactory(FirebaseErrorCodes.INVALID_REGISTRATION_TYPE, "The invitation code is not for registration");
+    if (invitation.invitation_type !== InvitationType.REGISTER) {
+      throw firebaseErrorFactory(
+        FirebaseErrorCodes.INVALID_REGISTRATION_TYPE,
+        "The invitation code is not for registration"
+      );
     }
 
     let userCredential;
@@ -158,7 +153,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
   }
 
   async refreshToken(): Promise<void> {
-    try{
+    try {
       const newToken = await FirebaseEmailAuthenticationService.stdFirebaseAuthServiceInstance.refreshToken();
       // call the parent class method once the token is successfully refreshed
       await super.onSuccessfulRefresh(newToken);
@@ -170,8 +165,8 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
   }
 
   public getUser(token: string): TabiyaUser | null {
-    if(!this.isTokenValid(token)) {
-      console.error("Could not get user from token. Token is invalid.")
+    if (!this.isTokenValid(token)) {
+      console.error("Could not get user from token. Token is invalid.");
       return null;
     }
     return FirebaseEmailAuthenticationService.stdFirebaseAuthServiceInstance.getUser(token);

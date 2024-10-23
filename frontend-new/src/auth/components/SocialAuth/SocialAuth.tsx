@@ -11,8 +11,7 @@ import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceErro
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
-import RegistrationCodeFormModal
-  , {
+import RegistrationCodeFormModal, {
   RegistrationCodeFormModalState,
 } from "src/invitations/components/RegistrationCodeFormModal/RegistrationCodeFormModal";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
@@ -52,59 +51,64 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
 
   const [error, setError] = useState("");
   const [_registrationCode, setRegistrationCode] = useState(registrationCode);
-  const [showRegistrationCodeForm, setShowRegistrationCodeForm] = useState<RegistrationCodeFormModalState>(RegistrationCodeFormModalState.HIDE);
+  const [showRegistrationCodeForm, setShowRegistrationCodeForm] = useState<RegistrationCodeFormModalState>(
+    RegistrationCodeFormModalState.HIDE
+  );
 
-  useEffect(() =>{
+  useEffect(() => {
     setRegistrationCode(registrationCode);
-  }, [registrationCode])
+  }, [registrationCode]);
 
-  const handleError = useCallback(async (error: Error) => {
-    // if the registration code is not valid or something goes wrong, log the user out
-    const firebaseSocialAuthServiceInstance = await FirebaseSocialAuthenticationService.getInstance();
-    await firebaseSocialAuthServiceInstance.logout();
-    // clear the registration code from the state
-    setRegistrationCode(registrationCode);
-    let errorMessage;
-    if (error instanceof ServiceError) {
-      errorMessage = getUserFriendlyErrorMessage(error);
-      writeServiceErrorToLog(error, console.error);
-    } else if (error instanceof FirebaseError) {
-      errorMessage = getUserFriendlyFirebaseErrorMessage(error);
-      writeFirebaseErrorToLog(error, console.error);
-    } else {
-      errorMessage = error.message;
-      console.error(error);
-    }
-    setError(errorMessage);
-    enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
-  }, [enqueueSnackbar, registrationCode]);
+  const handleError = useCallback(
+    async (error: Error) => {
+      // if the registration code is not valid or something goes wrong, log the user out
+      const firebaseSocialAuthServiceInstance = await FirebaseSocialAuthenticationService.getInstance();
+      await firebaseSocialAuthServiceInstance.logout();
+      // clear the registration code from the state
+      setRegistrationCode(registrationCode);
+      let errorMessage;
+      if (error instanceof ServiceError) {
+        errorMessage = getUserFriendlyErrorMessage(error);
+        writeServiceErrorToLog(error, console.error);
+      } else if (error instanceof FirebaseError) {
+        errorMessage = getUserFriendlyFirebaseErrorMessage(error);
+        writeFirebaseErrorToLog(error, console.error);
+      } else {
+        errorMessage = error.message;
+        console.error(error);
+      }
+      setError(errorMessage);
+      enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
+    },
+    [enqueueSnackbar, registrationCode]
+  );
 
-  const registerUser = useCallback(async (registrationCode: string) => {
-    try{
-      // first check if the invitation code is valid
-      const _user = (authStateService.getInstance()).getUser();
-      if(!_user) {
-        throw new Error("Something went wrong: No user found");
+  const registerUser = useCallback(
+    async (registrationCode: string) => {
+      try {
+        // first check if the invitation code is valid
+        const _user = authStateService.getInstance().getUser();
+        if (!_user) {
+          throw new Error("Something went wrong: No user found");
+        }
+        const invitation = await invitationsService.checkInvitationCodeStatus(registrationCode);
+        if (invitation.status !== InvitationStatus.VALID || invitation.invitation_type !== InvitationType.REGISTER) {
+          throw new Error("Invalid invitation code");
+        }
+        // create user preferences for the first time.
+        // in order to do this, there needs to be a logged in user in the persistent storage
+        const prefs = await userPreferencesService.createUserPreferences({
+          user_id: _user.id,
+          invitation_code: invitation.invitation_code,
+          language: Language.en,
+        });
+        userPreferencesStateService.setUserPreferences(prefs);
+      } catch (error: any) {
+        await handleError(error);
       }
-      const invitation = await invitationsService.checkInvitationCodeStatus(registrationCode);
-      if (
-        invitation.status !== InvitationStatus.VALID ||
-        invitation.invitation_type !== InvitationType.REGISTER
-      ) {
-        throw new Error("Invalid invitation code");
-      }
-      // create user preferences for the first time.
-      // in order to do this, there needs to be a logged in user in the persistent storage
-      const prefs = await userPreferencesService.createUserPreferences({
-        user_id: _user.id,
-        invitation_code: invitation.invitation_code,
-        language: Language.en,
-      });
-      userPreferencesStateService.setUserPreferences(prefs);
-    } catch (error: any) {
-      await handleError(error);
-    }
-  }, [handleError]);
+    },
+    [handleError]
+  );
 
   const loginWithPopup = useCallback(async () => {
     try {
@@ -113,11 +117,11 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       const firebaseSocialAuthServiceInstance = await FirebaseSocialAuthenticationService.getInstance();
       await firebaseSocialAuthServiceInstance.loginWithGoogle();
       // check if the user is already registered
-      const prefs = userPreferencesStateService.getUserPreferences()
+      const prefs = userPreferencesStateService.getUserPreferences();
       // if the user is not registered, create user preferences for the first time
-      if(!prefs) {
+      if (!prefs) {
         // if no registration code was provided, show the registration code form
-        if(!_registrationCode) {
+        if (!_registrationCode) {
           setShowRegistrationCodeForm(RegistrationCodeFormModalState.SHOW);
           return;
         }
@@ -133,13 +137,16 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
     }
   }, [notifyOnLoading, postLoginHandler, _registrationCode, registerUser, handleError]);
 
-  const handleRegistrationCodeSuccess = useCallback(async (registrationCode: string) => {
-    setShowRegistrationCodeForm(RegistrationCodeFormModalState.LOADING);
-    await registerUser(registrationCode);
-    setRegistrationCode(registrationCode);
-    postLoginHandler();
-    setShowRegistrationCodeForm(RegistrationCodeFormModalState.HIDE);
-  }, [registerUser, postLoginHandler]);
+  const handleRegistrationCodeSuccess = useCallback(
+    async (registrationCode: string) => {
+      setShowRegistrationCodeForm(RegistrationCodeFormModalState.LOADING);
+      await registerUser(registrationCode);
+      setRegistrationCode(registrationCode);
+      postLoginHandler();
+      setShowRegistrationCodeForm(RegistrationCodeFormModalState.HIDE);
+    },
+    [registerUser, postLoginHandler]
+  );
 
   const socialAuthLoading = isLoading || !isOnline || disabled;
 
@@ -203,10 +210,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
           )}
         </div>
       </Box>
-      <RegistrationCodeFormModal
-        modalState={showRegistrationCodeForm}
-        onSuccess={handleRegistrationCodeSuccess}
-      />
+      <RegistrationCodeFormModal modalState={showRegistrationCodeForm} onSuccess={handleRegistrationCodeSuccess} />
     </Box>
   );
 };

@@ -47,8 +47,7 @@ class StdFirebaseAuthenticationService {
   private refreshTimeout: NodeJS.Timeout | null = null;
   private readonly unsubscribeAuthListener: () => void;
 
-  private constructor(
-  ) {
+  private constructor() {
     this.unsubscribeAuthListener = this.setupAuthListener();
   }
 
@@ -194,10 +193,10 @@ class StdFirebaseAuthenticationService {
     });
   }
 
-   /**
+  /**
    * Clears the refresh timeout if it exists.
    */
-   private clearRefreshTimeout() {
+  private clearRefreshTimeout() {
     console.debug("Clearing refresh timeout");
     if (this.refreshTimeout) {
       clearTimeout(this.refreshTimeout);
@@ -221,20 +220,19 @@ class StdFirebaseAuthenticationService {
   private async finishPendingLogout() {
     if (PersistentStorageService.getLoggedOutFlag()) {
       try {
-        await this.logout()
+        await this.logout();
       } catch (e) {
         console.error("Failed to logout user on page load", e);
       }
     }
   }
 
-
   public getUser(token: string): TabiyaUser | null {
     try {
       const _user = this.getFirebaseUserFromToken(token);
       if (_user) {
         PersistentStorageService.setToken(token);
-        authenticationStateService.getInstance().setUser(_user)
+        authenticationStateService.getInstance().setUser(_user);
         return _user;
       }
       return null;
@@ -250,7 +248,7 @@ class StdFirebaseAuthenticationService {
    * @param {string} token - The JWT token to decode.
    * @returns {TabiyaUser | null} The user object extracted from the token, or null if extraction fails.
    */
-    //TODO: remove the idea of storing a user in this state. Store a token instead and decode it when needed (util)
+  //TODO: remove the idea of storing a user in this state. Store a token instead and decode it when needed (util)
   private readonly getFirebaseUserFromToken = (token: string): TabiyaUser | null => {
     try {
       const decodedToken: FirebaseToken = jwtDecode(token);

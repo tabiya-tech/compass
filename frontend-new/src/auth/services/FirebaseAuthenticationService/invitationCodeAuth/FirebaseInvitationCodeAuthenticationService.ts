@@ -1,8 +1,7 @@
 import { firebaseAuth } from "src/auth/firebaseConfig";
 import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
-import StdFirebaseAuthenticationService
-  from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
+import StdFirebaseAuthenticationService from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { AuthenticationServices, TabiyaUser } from "src/auth/auth.types";
 import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
@@ -25,7 +24,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
    * @returns {FirebaseInvitationCodeAuthenticationService} The singleton instance of the InvitationCodeAuthService.
    */
   static async getInstance(): Promise<FirebaseInvitationCodeAuthenticationService> {
-    this.stdFirebaseAuthServiceInstance = await StdFirebaseAuthenticationService.getInstance()
+    this.stdFirebaseAuthServiceInstance = await StdFirebaseAuthenticationService.getInstance();
     if (!FirebaseInvitationCodeAuthenticationService.instance) {
       FirebaseInvitationCodeAuthenticationService.instance = new FirebaseInvitationCodeAuthenticationService();
     }
@@ -48,17 +47,11 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
     let invitation;
 
     invitation = await invitationsService.checkInvitationCodeStatus(code);
-    if(invitation.status !== InvitationStatus.VALID) {
-      throw firebaseErrorFactory(
-        FirebaseErrorCodes.INVALID_INVITATION_CODE,
-        "Invalid invitation code"
-      )
+    if (invitation.status !== InvitationStatus.VALID) {
+      throw firebaseErrorFactory(FirebaseErrorCodes.INVALID_INVITATION_CODE, "Invalid invitation code");
     }
     if (invitation.invitation_type !== InvitationType.AUTO_REGISTER) {
-      throw firebaseErrorFactory(
-        FirebaseErrorCodes.INVALID_INVITATION_TYPE,
-        "The invitation code is not for login"
-      )
+      throw firebaseErrorFactory(FirebaseErrorCodes.INVALID_INVITATION_TYPE, "The invitation code is not for login");
     }
     try {
       userCredential = await firebaseAuth.signInAnonymously();
@@ -78,26 +71,23 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
 
     // we set the user state in order to get a decoded version of the token
     this.authenticationStateService.setUser(this.getUser(token));
-    const _user =(this.authenticationStateService).getUser();
-
-
+    const _user = this.authenticationStateService.getUser();
 
     if (_user) {
-        // create user preferences for the first time.
-        // in order to do this, there needs to be a logged in user in the persistent storage
-        const prefs = await userPreferencesService.createUserPreferences({
-          user_id: _user.id,
-          invitation_code: invitation.invitation_code,
-          language: Language.en,
-        });
-        userPreferencesStateService.setUserPreferences(prefs);
+      // create user preferences for the first time.
+      // in order to do this, there needs to be a logged in user in the persistent storage
+      const prefs = await userPreferencesService.createUserPreferences({
+        user_id: _user.id,
+        invitation_code: invitation.invitation_code,
+        language: Language.en,
+      });
+      userPreferencesStateService.setUserPreferences(prefs);
     } else {
-      throw firebaseErrorFactory(FirebaseErrorCodes.USER_NOT_FOUND, "User could not be extracted from token"
-        )
-      }
+      throw firebaseErrorFactory(FirebaseErrorCodes.USER_NOT_FOUND, "User could not be extracted from token");
+    }
 
     // call the parent class method once the user is successfully logged in
-    await super.onSuccessfulLogin(token)
+    await super.onSuccessfulLogin(token);
     return token;
   }
 
@@ -112,7 +102,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
   }
 
   async refreshToken(): Promise<void> {
-    try{
+    try {
       const newToken = await FirebaseInvitationCodeAuthenticationService.stdFirebaseAuthServiceInstance.refreshToken();
       // call the parent class method once the token is successfully refreshed
       await super.onSuccessfulRefresh(newToken);
@@ -124,8 +114,8 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
   }
 
   getUser(token: string): TabiyaUser | null {
-    if(!this.isTokenValid(token)) {
-      console.error("Could not get user from token. Token is invalid.")
+    if (!this.isTokenValid(token)) {
+      console.error("Could not get user from token. Token is invalid.");
       return null;
     }
     return FirebaseInvitationCodeAuthenticationService.stdFirebaseAuthServiceInstance.getUser(token);

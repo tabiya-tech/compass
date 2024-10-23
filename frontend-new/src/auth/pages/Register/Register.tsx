@@ -56,23 +56,26 @@ const Register: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
-  const handleError = useCallback(async (error: Error) => {
-    // if the registration code is not valid or something goes wrong, log the user out
-    const authenticationServiceFactory = await AuthenticationServiceFactory.getCurrentAuthenticationService()
-    await authenticationServiceFactory.logout();
-    let errorMessage;
-    if (error instanceof ServiceError) {
-      writeServiceErrorToLog(error, console.error);
-      errorMessage = getUserFriendlyErrorMessage(error);
-    } else if (error instanceof FirebaseError) {
-      writeFirebaseErrorToLog(error, console.error);
-      errorMessage = getUserFriendlyFirebaseErrorMessage(error);
-    } else {
-      console.error(error);
-      errorMessage = error.message;
-    }
-    enqueueSnackbar(`Registration Failed: ${errorMessage}`, { variant: "error" });
-  }, [enqueueSnackbar]);
+  const handleError = useCallback(
+    async (error: Error) => {
+      // if the registration code is not valid or something goes wrong, log the user out
+      const authenticationServiceFactory = await AuthenticationServiceFactory.getCurrentAuthenticationService();
+      await authenticationServiceFactory.logout();
+      let errorMessage;
+      if (error instanceof ServiceError) {
+        writeServiceErrorToLog(error, console.error);
+        errorMessage = getUserFriendlyErrorMessage(error);
+      } else if (error instanceof FirebaseError) {
+        writeFirebaseErrorToLog(error, console.error);
+        errorMessage = getUserFriendlyFirebaseErrorMessage(error);
+      } else {
+        console.error(error);
+        errorMessage = error.message;
+      }
+      enqueueSnackbar(`Registration Failed: ${errorMessage}`, { variant: "error" });
+    },
+    [enqueueSnackbar]
+  );
 
   /* -----------
    * callbacks to pass to the child components
@@ -85,25 +88,22 @@ const Register: React.FC = () => {
    * Handles what happens after social registration (same process as login)
    * @param user
    */
-  const handlePostLogin = useCallback(
-    async () => {
-      try {
-        setIsLoading(true);
-        const prefs = userPreferencesStateService.getUserPreferences();
-        if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
-          navigate(routerPaths.DPA, { replace: true });
-        } else {
-          navigate(routerPaths.ROOT, { replace: true });
-          enqueueSnackbar("Welcome back!", { variant: "success" });
-        }
-      } catch (error) {
-        await handleError(error as Error);
-      } finally {
-        setIsLoading(false);
+  const handlePostLogin = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const prefs = userPreferencesStateService.getUserPreferences();
+      if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
+        navigate(routerPaths.DPA, { replace: true });
+      } else {
+        navigate(routerPaths.ROOT, { replace: true });
+        enqueueSnackbar("Welcome back!", { variant: "success" });
       }
-    },
-    [navigate, enqueueSnackbar, handleError]
-  );
+    } catch (error) {
+      await handleError(error as Error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [navigate, enqueueSnackbar, handleError]);
 
   /* ------------
    * Actual registration handlers
@@ -118,13 +118,13 @@ const Register: React.FC = () => {
     async (username: string, email: string, password: string) => {
       setIsLoading(true);
       try {
-        const firebaseEmailAuthServiceInstance = await FirebaseEmailAuthService.getInstance()
+        const firebaseEmailAuthServiceInstance = await FirebaseEmailAuthService.getInstance();
         await firebaseEmailAuthServiceInstance.register(email, password, username, registrationCode);
         enqueueSnackbar("Verification Email Sent!", { variant: "success" });
         // IMPORTANT NOTE: after the preferences are added, or fail to be added, we should log the user out immediately,
         // since if we don't do that, the user may be able to access the application without verifying their email
         // or accepting the dpa.
-        const authenticationServiceFactory = await AuthenticationServiceFactory.getCurrentAuthenticationService()
+        const authenticationServiceFactory = await AuthenticationServiceFactory.getCurrentAuthenticationService();
         await authenticationServiceFactory.logout();
         // navigate to the verify email page
         navigate(routerPaths.VERIFY_EMAIL, { replace: true });

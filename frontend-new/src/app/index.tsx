@@ -64,16 +64,16 @@ const App = () => {
       // delay for half a sec so that the loading transition is smoother for the user and not just a flash
       setTimeout(() => setLoading(false), 500);
     }
-  }
+  };
 
   const loadUserFromPersistentStorage = async () => {
-    try{
+    try {
       const token = PersistentStorageService.getToken();
       if (token) {
         const authenticationServiceInstance = await AuthenticationServiceFactory.getCurrentAuthenticationService();
         if (authenticationServiceInstance.isTokenValid(token)) {
           console.debug("Valid token found in storage");
-          const user =await authenticationServiceInstance.getUser(token)
+          const user = await authenticationServiceInstance.getUser(token);
           authStateService.getInstance().setUser(user);
         } else {
           console.debug("Authentication token is not valid");
@@ -85,7 +85,7 @@ const App = () => {
     } catch (error) {
       console.error("Error loading user from storage", error);
     }
-  }
+  };
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -94,7 +94,7 @@ const App = () => {
       await loadUserPreferences();
 
       return async () => {
-        const authenticationServiceFactory = await AuthenticationServiceFactory.getCurrentAuthenticationService()
+        const authenticationServiceFactory = await AuthenticationServiceFactory.getCurrentAuthenticationService();
         try {
           console.debug("Cleaning up auth");
           // Each of the services that implement the AuthenticationService interface will have their own cleanup method

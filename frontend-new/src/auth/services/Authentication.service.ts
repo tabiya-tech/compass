@@ -12,13 +12,13 @@ import { jwtDecode } from "jwt-decode";
 
 /**
  * Abstract class representing an authentication service.
- * 
+ *
  * This class defines the contract for any authentication service implementation.
  * It ensures that all implementing classes provide methods to refresh tokens,
  * perform cleanup operations, and handle logout.
- * 
+ *
  * Subclasses must implement the abstract methods to provide specific authentication logic.
- * 
+ *
  * All instances of AuthenticationServices should be singletons.
  */
 abstract class AuthenticationService {
@@ -100,10 +100,10 @@ abstract class AuthenticationService {
       "POST",
       "onSuccessfulRegistration"
     );
-    try{
+    try {
       const _user = await this.getUser(token);
       this.authenticationStateService.setUser(_user);
-      const user = this.authenticationStateService.getUser()
+      const user = this.authenticationStateService.getUser();
       if (user) {
         // create user preferences for the first time.
         // in order to do this, there needs to be a logged in user in the persistent storage
@@ -115,8 +115,8 @@ abstract class AuthenticationService {
         userPreferencesStateService.setUserPreferences(prefs);
       } else {
         throw new Error("User not found");
-      }}
-    catch (error) {
+      }
+    } catch (error) {
       throw firebaseErrorFactory((error as any).code, (error as any).message);
     }
   }
@@ -125,7 +125,6 @@ abstract class AuthenticationService {
     const _user = await this.getUser(token);
     this.authenticationStateService.setUser(_user);
   }
-
 
   /**
    * Checks if a given token is valid (not expired and not issued in the future).

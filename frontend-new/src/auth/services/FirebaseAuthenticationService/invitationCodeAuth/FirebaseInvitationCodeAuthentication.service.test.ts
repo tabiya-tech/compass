@@ -27,8 +27,7 @@ jest.mock("src/userPreferences/UserPreferencesService/userPreferences.service", 
       createUserPreferences: jest.fn(),
     },
   };
-})
-
+});
 
 jest.mock("src/invitations/InvitationsService/invitations.service", () => {
   return {
@@ -36,7 +35,7 @@ jest.mock("src/invitations/InvitationsService/invitations.service", () => {
       checkInvitationCodeStatus: jest.fn(),
     },
   };
-})
+});
 
 jest.useFakeTimers();
 
@@ -52,7 +51,7 @@ describe("AuthService class tests", () => {
   });
 
   describe("handleAnonymousLogin", () => {
-    const givenUser = { id: "123", name:"Foo Bar ", email: "email"};
+    const givenUser = { id: "123", name: "Foo Bar ", email: "email" };
     test("should return token on successful anonymous login", async () => {
       // GIVEN the user is logged in anonymously
       jest.spyOn(firebase.auth(), "signInAnonymously").mockResolvedValue({

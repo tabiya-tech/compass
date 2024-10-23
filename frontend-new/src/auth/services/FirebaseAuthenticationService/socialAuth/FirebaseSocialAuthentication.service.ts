@@ -16,7 +16,7 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
   }
 
   static async getInstance(): Promise<FirebaseSocialAuthenticationService> {
-    this.stdFirebaseAuthServiceInstance = await StdFirebaseAuthenticationService.getInstance()
+    this.stdFirebaseAuthServiceInstance = await StdFirebaseAuthenticationService.getInstance();
     if (!FirebaseSocialAuthenticationService.instance) {
       FirebaseSocialAuthenticationService.instance = new FirebaseSocialAuthenticationService();
     }
@@ -39,19 +39,14 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
     try {
       // first login with google
       userCredential = await firebaseAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-
     } catch (error) {
-      throw firebaseErrorFactory( (error as any).code, (error as any).message);
+      throw firebaseErrorFactory((error as any).code, (error as any).message);
     }
 
     // @ts-expect-error - we know that the userCredential is not null
     if (!userCredential?.user?.multiFactor?.user?.accessToken) {
       //  qREVIEW do not throw to catch
-      throw firebaseErrorFactory(
-        FirebaseErrorCodes.USER_NOT_FOUND,
-        "The user could not be found",
-        {}
-      );
+      throw firebaseErrorFactory(FirebaseErrorCodes.USER_NOT_FOUND, "The user could not be found", {});
     }
 
     // @ts-ignore
@@ -76,7 +71,7 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
   }
 
   async refreshToken(): Promise<void> {
-    try{
+    try {
       const newToken = await FirebaseSocialAuthenticationService.stdFirebaseAuthServiceInstance.refreshToken();
       // call the parent class method once the token is successfully refreshed
       await super.onSuccessfulRefresh(newToken);
@@ -88,8 +83,8 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
   }
 
   getUser(token: string): TabiyaUser | null {
-    if(!this.isTokenValid(token)) {
-      console.error("Could not get user from token. Token is invalid.")
+    if (!this.isTokenValid(token)) {
+      console.error("Could not get user from token. Token is invalid.");
       return null;
     }
     return FirebaseSocialAuthenticationService.stdFirebaseAuthServiceInstance.getUser(token);

@@ -19,10 +19,12 @@ export const USER_FRIENDLY_FIREBASE_ERROR_MESSAGES = {
   "auth/too-many-requests": "We have blocked all requests from this device due to unusual activity. Try again later.",
   "auth/internal-error": "An internal error has occurred.",
   "auth/too-many-users": "There are too many users on this Firebase project.",
-  "INVALID_REGISTRATION_CODE": "The registration code you entered is invalid. Please check the code and try again.",
-  "INVALID_INVITATION_CODE": "The invitation code you entered is invalid. Please check the code and try again.",
-  "INVALID_INVITATION_TYPE": "The invitation code you used is for registration rather than logging in. Please go to the register page.",
-  "INVALID_REGISTRATION_TYPE": "The invitation code you used is for logging in rather than registration. Please go to the login page.",
+  INVALID_REGISTRATION_CODE: "The registration code you entered is invalid. Please check the code and try again.",
+  INVALID_INVITATION_CODE: "The invitation code you entered is invalid. Please check the code and try again.",
+  INVALID_INVITATION_TYPE:
+    "The invitation code you used is for registration rather than logging in. Please go to the register page.",
+  INVALID_REGISTRATION_TYPE:
+    "The invitation code you used is for logging in rather than registration. Please go to the login page.",
 };
 
 export class FirebaseError extends Error {
@@ -74,11 +76,7 @@ export function getFirebaseErrorFactory(
   method: string,
   path: string
 ): FirebaseErrorFactory {
-  return (
-    errorCode: FirebaseErrorCodes,
-    message: string,
-    details?: ServiceErrorDetails
-  ): FirebaseError => {
+  return (errorCode: FirebaseErrorCodes, message: string, details?: ServiceErrorDetails): FirebaseError => {
     return new FirebaseError(serviceName, serviceFunction, method, errorCode, message, details);
   };
 }

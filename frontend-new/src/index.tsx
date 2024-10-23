@@ -22,20 +22,20 @@ initSentry();
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 root.render(
   //<React.StrictMode>
-    <Sentry.ErrorBoundary
-      fallback={<InternalError errorMessage={"Something went wrong with Compass. Try reloading the page..."} />}
-    >
-      <CssBaseline />
-      <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
-        <SnackbarProvider>
-          <IsOnlineProvider>
-            <ViewPortWrapper>
-              <App />
-            </ViewPortWrapper>
-          </IsOnlineProvider>
-        </SnackbarProvider>
-      </ThemeProvider>
-    </Sentry.ErrorBoundary>
+  <Sentry.ErrorBoundary
+    fallback={<InternalError errorMessage={"Something went wrong with Compass. Try reloading the page..."} />}
+  >
+    <CssBaseline />
+    <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
+      <SnackbarProvider>
+        <IsOnlineProvider>
+          <ViewPortWrapper>
+            <App />
+          </ViewPortWrapper>
+        </IsOnlineProvider>
+      </SnackbarProvider>
+    </ThemeProvider>
+  </Sentry.ErrorBoundary>
   //</React.StrictMode>
 );
 

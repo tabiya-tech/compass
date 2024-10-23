@@ -17,8 +17,7 @@ import { userPreferencesStateService } from "src/userPreferences/UserPreferences
 import authStateService from "src/auth/services/AuthenticationState.service";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import FeedbackButton from "src/feedback/FeedbackButton";
-import FirebaseInvitationCodeAuthenticationService
-  from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
+import FirebaseInvitationCodeAuthenticationService from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
 
 export const INVITATIONS_PARAM_NAME = "invite-code";
 
@@ -75,24 +74,27 @@ const Login: React.FC = () => {
   // A state to track if the user has been cleared on first render
   const [isUserCleared, setIsUserCleared] = useState(false);
 
-  const handleError = useCallback(async (error: Error) => {
-    // if something goes wrong, log the user out
-    const firebaseEmailAuthServiceInstance = await FirebaseEmailAuthService.getInstance();
-    await firebaseEmailAuthServiceInstance.logout();
+  const handleError = useCallback(
+    async (error: Error) => {
+      // if something goes wrong, log the user out
+      const firebaseEmailAuthServiceInstance = await FirebaseEmailAuthService.getInstance();
+      await firebaseEmailAuthServiceInstance.logout();
 
-    let errorMessage;
-    if (error instanceof ServiceError) {
-      errorMessage = getUserFriendlyErrorMessage(error);
-      writeServiceErrorToLog(error, console.error);
-    } else if (error instanceof FirebaseError) {
-      errorMessage = getUserFriendlyFirebaseErrorMessage(error);
-      writeFirebaseErrorToLog(error, console.error);
-    } else {
-      errorMessage = error.message;
-      console.error(error);
-    }
-    enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
-  }, [enqueueSnackbar]);
+      let errorMessage;
+      if (error instanceof ServiceError) {
+        errorMessage = getUserFriendlyErrorMessage(error);
+        writeServiceErrorToLog(error, console.error);
+      } else if (error instanceof FirebaseError) {
+        errorMessage = getUserFriendlyFirebaseErrorMessage(error);
+        writeFirebaseErrorToLog(error, console.error);
+      } else {
+        errorMessage = error.message;
+        console.error(error);
+      }
+      enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
+    },
+    [enqueueSnackbar]
+  );
 
   /* ------------------
    * Callbacks to handle changes in the form fields
@@ -113,35 +115,31 @@ const Login: React.FC = () => {
   /* ------------------
    * Callbacks to handle successful logins
    */
-  const handlePostLogin = useCallback(
-    async () => {
-      try {
-        const prefs = userPreferencesStateService.getUserPreferences();
-        // once the user is logged in, we need to get their preferences from the state and
-        // decide, based on the preferences, where to navigate the user
-        if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
-          navigate(routerPaths.DPA, { replace: true });
-        } else {
-          navigate(routerPaths.ROOT, { replace: true });
-          enqueueSnackbar("Welcome back!", { variant: "success" });
-        }
-
-      } catch (error) {
-        let errorMessage;
-        if (error instanceof ServiceError) {
-          writeServiceErrorToLog(error, console.error);
-          errorMessage = getUserFriendlyErrorMessage(error);
-        } else {
-          errorMessage = (error as Error).message;
-          console.error("An error occurred while trying to get your preferences", error);
-        }
-        enqueueSnackbar(`An error occurred while trying to get your preferences: ${errorMessage}`, {
-          variant: "error",
-        });
+  const handlePostLogin = useCallback(async () => {
+    try {
+      const prefs = userPreferencesStateService.getUserPreferences();
+      // once the user is logged in, we need to get their preferences from the state and
+      // decide, based on the preferences, where to navigate the user
+      if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
+        navigate(routerPaths.DPA, { replace: true });
+      } else {
+        navigate(routerPaths.ROOT, { replace: true });
+        enqueueSnackbar("Welcome back!", { variant: "success" });
       }
-    },
-    [navigate, enqueueSnackbar]
-  );
+    } catch (error) {
+      let errorMessage;
+      if (error instanceof ServiceError) {
+        writeServiceErrorToLog(error, console.error);
+        errorMessage = getUserFriendlyErrorMessage(error);
+      } else {
+        errorMessage = (error as Error).message;
+        console.error("An error occurred while trying to get your preferences", error);
+      }
+      enqueueSnackbar(`An error occurred while trying to get your preferences: ${errorMessage}`, {
+        variant: "error",
+      });
+    }
+  }, [navigate, enqueueSnackbar]);
 
   /* ------------------
    * Actual login handlers

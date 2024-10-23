@@ -5,10 +5,8 @@ import { HashRouter } from "react-router-dom";
 import Login, { DATA_TEST_ID } from "./Login";
 import LoginWithEmailForm from "src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm";
 import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm";
-import FirebaseEmailAuthenticationService
-  from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
-import FirebaseInvitationCodeAuthenticationService
-  from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
+import FirebaseEmailAuthenticationService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
+import FirebaseInvitationCodeAuthenticationService from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
 
 jest.mock("src/envService", () => ({
   getFirebaseAPIKey: jest.fn(() => "mock-api-key"),
@@ -122,8 +120,8 @@ describe("Testing Login component", () => {
     // AND the email login mock will succeed
     const loginMock = jest.fn();
     jest.spyOn(FirebaseEmailAuthenticationService, "getInstance").mockResolvedValueOnce({
-        login: loginMock,
-      } as unknown as FirebaseEmailAuthenticationService);
+      login: loginMock,
+    } as unknown as FirebaseEmailAuthenticationService);
 
     render(
       <HashRouter>
@@ -151,9 +149,9 @@ describe("Testing Login component", () => {
     const givenInvitationCode = "INVITE-CODE-123";
     // AND the anonymous auth mock will succeed
     const anonymousLoginMock = jest.fn().mockResolvedValue("mock-token");
-    jest.spyOn(FirebaseInvitationCodeAuthenticationService, "getInstance").mockResolvedValueOnce( {
-        login: anonymousLoginMock,
-      } as unknown as FirebaseInvitationCodeAuthenticationService);
+    jest.spyOn(FirebaseInvitationCodeAuthenticationService, "getInstance").mockResolvedValueOnce({
+      login: anonymousLoginMock,
+    } as unknown as FirebaseInvitationCodeAuthenticationService);
 
     render(
       <HashRouter>

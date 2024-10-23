@@ -46,9 +46,10 @@ const style = {
   p: 4,
 };
 
-
 export enum RegistrationCodeFormModalState {
-  SHOW, HIDE, LOADING,
+  SHOW,
+  HIDE,
+  LOADING,
 }
 
 const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ modalState, onSuccess }) => {
@@ -59,7 +60,8 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ mod
     onSuccess(registrationCode);
   }, [onSuccess, registrationCode]);
 
-  return (<Modal
+  return (
+    <Modal
       open={modalState === RegistrationCodeFormModalState.SHOW || modalState === RegistrationCodeFormModalState.LOADING}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
@@ -89,13 +91,19 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ mod
           onClick={handleAcceptRegistrationCode}
           disabled={!registrationCode.length}
         >
-          {modalState === RegistrationCodeFormModalState.LOADING ?
-            <CircularProgress sx={{ color: (theme) => theme.palette.info.contrastText }}
-                              size={2 * theme.typography.fontSize}
-                              data-testid={DATA_TEST_ID.PROGRESS_ELEMENT} /> : "Submit"}
+          {modalState === RegistrationCodeFormModalState.LOADING ? (
+            <CircularProgress
+              sx={{ color: (theme) => theme.palette.info.contrastText }}
+              size={2 * theme.typography.fontSize}
+              data-testid={DATA_TEST_ID.PROGRESS_ELEMENT}
+            />
+          ) : (
+            "Submit"
+          )}
         </PrimaryButton>
       </Box>
-    </Modal>);
+    </Modal>
+  );
 };
 
 export default RegistrationCodeFormModal;

@@ -26,8 +26,6 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
 });
 
 describe("RegistrationCodeFormModal", () => {
-
-
   it("renders correctly when modal is shown and call onSuccess with the provided code", () => {
     // GIVEN the component is shown
     const givenShown = RegistrationCodeFormModalState.SHOW;

@@ -24,7 +24,7 @@ describe("PasswordInput component", () => {
     expect(screen.getByTestId(DATA_TEST_ID.VISIBILITY_ON_ICON)).toBeInTheDocument();
 
     // AND input should be in the document.
-    const input = screen.getByTestId(DATA_TEST_ID.TEXT_FIELD_INPUT)
+    const input = screen.getByTestId(DATA_TEST_ID.TEXT_FIELD_INPUT);
     expect(input).toBeInTheDocument();
 
     // AND it should have type=password.
@@ -46,7 +46,7 @@ describe("PasswordInput component", () => {
     fireEvent.click(screen.getByTestId(DATA_TEST_ID.ICON_BUTTON));
 
     // THEN input should be in the document.
-    const input = screen.getByTestId(DATA_TEST_ID.TEXT_FIELD_INPUT)
+    const input = screen.getByTestId(DATA_TEST_ID.TEXT_FIELD_INPUT);
 
     // AND it should have type=text.
     expect(input).toHaveAttribute("type", "text");
@@ -58,7 +58,7 @@ describe("PasswordInput component", () => {
     fireEvent.click(screen.getByTestId(DATA_TEST_ID.ICON_BUTTON));
 
     // THEN input should be in the document.
-    const input2 = screen.getByTestId(DATA_TEST_ID.TEXT_FIELD_INPUT)
+    const input2 = screen.getByTestId(DATA_TEST_ID.TEXT_FIELD_INPUT);
 
     // AND it should have type=password.
     expect(input2).toHaveAttribute("type", "password");
