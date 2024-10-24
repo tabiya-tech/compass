@@ -485,13 +485,17 @@ describe("Chat", () => {
 
     test("should open the drawer and fetch experiences when the button is clicked", async () => {
       // GIVEN the chat component is rendered
+      jest.spyOn(userPreferencesStateService, "getUserPreferences").mockReturnValue({
+        accepted_tc: new Date(),
+        user_id: "0001",
+        language: Language.en,
+        sessions: [givenSessionId],
+      });
       render(chatComponent);
-      // AND the user button is clicked
-      const userButton = screen.getByTestId(CHAT_HEADER_TEST_ID.CHAT_HEADER_BUTTON_USER);
-      fireEvent.click(userButton);
-      // AND the experiences button is clicked
-      const experiencesMenuItem = screen.getByTestId(MENU_ITEM_ID.EXPERIENCES_BUTTON);
-      fireEvent.click(experiencesMenuItem);
+
+      // WHEN the experiences button is clicked
+      const experiencesButton = screen.getByTestId(CHAT_HEADER_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES);
+      fireEvent.click(experiencesButton);
       // AND the drawer is open
       expect(screen.getByTestId(EXPERIENCES_DRAWER_CONTAINER_TEST_ID.EXPERIENCES_DRAWER_CONTAINER)).toBeInTheDocument();
 
@@ -506,12 +510,9 @@ describe("Chat", () => {
 
       // GIVEN the chat component is rendered
       render(chatComponent);
-      // AND the user button is clicked
-      const userButton = screen.getByTestId(CHAT_HEADER_TEST_ID.CHAT_HEADER_BUTTON_USER);
-      fireEvent.click(userButton);
       // AND the experiences button is clicked
-      const experiencesMenuItem = screen.getByTestId(MENU_ITEM_ID.EXPERIENCES_BUTTON);
-      fireEvent.click(experiencesMenuItem);
+      const experiencesButton = screen.getByTestId(CHAT_HEADER_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES);
+      fireEvent.click(experiencesButton);
       // AND the drawer is open
       expect(screen.getByTestId(EXPERIENCES_DRAWER_CONTAINER_TEST_ID.EXPERIENCES_DRAWER_CONTAINER)).toBeInTheDocument();
 
@@ -527,12 +528,9 @@ describe("Chat", () => {
     test("should close the drawer when the close button is clicked", async () => {
       // GIVEN the chat component is rendered
       render(chatComponent);
-      // AND the user button is clicked
-      const userButton = screen.getByTestId(CHAT_HEADER_TEST_ID.CHAT_HEADER_BUTTON_USER);
-      fireEvent.click(userButton);
       // AND the experiences button is clicked
-      const experiencesMenuItem = screen.getByTestId(MENU_ITEM_ID.EXPERIENCES_BUTTON);
-      fireEvent.click(experiencesMenuItem);
+      const experiencesButton = screen.getByTestId(CHAT_HEADER_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES);
+      fireEvent.click(experiencesButton);
 
       // WHEN the close button is clicked
       const closeButton = screen.getByTestId(EXPERIENCES_DRAWER_HEADER_TEST_ID.EXPERIENCES_DRAWER_HEADER_BUTTON);
