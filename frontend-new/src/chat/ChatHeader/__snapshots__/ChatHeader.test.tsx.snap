@@ -29,6 +29,39 @@ exports[`ChatHeader should render the Chat Header 1`] = `
   >
     <button
       class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-s7wd0n-MuiButtonBase-root-MuiIconButton-root"
+      data-testid="chat-header-button-experiences-7413b63a-887b-4f41-b930-89e9770db12b"
+      tabindex="0"
+      title="view experiences"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+        data-testid="chat-header-icon-experiences-7413b63a-887b-4f41-b930-89e9770db12b"
+        focusable="false"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M14 12h4v1.5h-4zm0 3h4v1.5h-4z"
+        />
+        <path
+          d="M20 7h-5V4c0-1.1-.9-2-2-2h-2c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2m-9 0V4h2v5h-2zm9 13H4V9h5c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2h5z"
+        />
+        <circle
+          cx="9"
+          cy="13.5"
+          r="1.5"
+        />
+        <path
+          d="M11.08 16.18c-.64-.28-1.34-.43-2.08-.43s-1.44.15-2.08.43c-.56.24-.92.78-.92 1.39V18h6v-.43c0-.61-.36-1.15-.92-1.39"
+        />
+      </svg>
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+    <button
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-s7wd0n-MuiButtonBase-root-MuiIconButton-root"
       data-testid="chat-header-button-user-7413b63a-887b-4f41-b930-89e9770db12b"
       tabindex="0"
       title="user info"
@@ -57,11 +90,6 @@ exports[`ChatHeader should render the Chat Header 1`] = `
       data-testid="start-new-conversation-7413b63a-887b-4f41-b930-89e9770db12b"
     >
       start new conversation
-    </div>
-    <div
-      data-testid="experiences-button-7413b63a-887b-4f41-b930-89e9770db12b"
-    >
-      view experiences
     </div>
     <div
       data-testid="settings-selector-7413b63a-887b-4f41-b930-89e9770db12b"
