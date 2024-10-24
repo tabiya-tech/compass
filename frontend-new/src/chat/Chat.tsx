@@ -3,8 +3,8 @@ import ChatService from "src/chat/ChatService/ChatService";
 import ChatList from "src/chat/ChatList/ChatList";
 import { IChatMessage } from "./Chat.types";
 import { generateCompassMessage, generateUserMessage } from "./util";
-import { DEFAULT_SNACKBAR_AUTO_HIDE_DURATION, useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { Box, Button, ButtonProps } from "@mui/material";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import { Box } from "@mui/material";
 import ChatHeader from "./ChatHeader/ChatHeader";
 import ChatMessageField from "./ChatMessageField/ChatMessageField";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
@@ -12,7 +12,7 @@ import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
-import { ConversationMessage, ConversationMessageSender, ConverstaionResponse } from "./ChatService/ChatService.types";
+import { ConversationMessage, ConversationMessageSender } from "./ChatService/ChatService.types";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import ExperiencesDrawer from "src/Experiences/ExperiencesDrawer";
 import { Experience } from "src/Experiences/ExperienceService/Experiences.types";
@@ -22,7 +22,6 @@ import InactiveBackdrop from "src/theme/Backdrop/InactiveBackdrop";
 import { logoutService } from "src/auth/services/logout/logout.service";
 import ApproveModal from "src/theme/ApproveModal/ApproveModal";
 import authStateService from "src/auth/AuthStateService";
-import { SnackbarKey } from "notistack";
 
 const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -35,22 +34,11 @@ export const DATA_TEST_ID = {
 
 interface ChatProps {
   showInactiveSessionAlert?: boolean;
-  showNewExperienceAlert?: boolean;
   disableInactivityCheck?: boolean;
 }
 
-const ViewExperienceAction: React.FC<Pick<ButtonProps, "onClick">> = (props) => (
-  <Button color={"info"} variant={"text"} {...props}>
-    View
-  </Button>
-);
-
-const Chat: React.FC<ChatProps> = ({
-  showInactiveSessionAlert = false,
-  showNewExperienceAlert = false,
-  disableInactivityCheck = false,
-}) => {
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableInactivityCheck = false }) => {
+  const { enqueueSnackbar } = useSnackbar();
   const [messages, setMessages] = useState<IChatMessage[]>([]);
   const [conversationCompleted, setConversationCompleted] = useState<boolean>(false);
   const [exploredExperiences, setExploredExperiences] = useState<number>(0);
@@ -64,6 +52,7 @@ const Chat: React.FC<ChatProps> = ({
   const [showBackdrop, setShowBackdrop] = useState(showInactiveSessionAlert);
   const [lastActivityTime, setLastActivityTime] = React.useState<number>(Date.now());
   const [newConversationDialog, setNewConversationDialog] = React.useState<boolean>(false);
+  const [exploredExperiencesNotification, setExploredExperiencesNotification] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -94,32 +83,6 @@ const Chat: React.FC<ChatProps> = ({
       console.error("Failed to retrieve experiences", error);
     }
   }, [enqueueSnackbar]);
-
-  /**
-   * Action handler: View experiences drawer
-   * This function is called when the user clicks on the view experiences drawer notification button
-   * @returns void
-   *
-   */
-  const viewExperiencesDrawerHandler = useCallback(
-    (key: SnackbarKey) => {
-      closeSnackbar(key);
-      handleOpenExperiencesDrawer().then();
-    },
-    [closeSnackbar, handleOpenExperiencesDrawer]
-  );
-
-  const showNewExperienceAlertHandler = useCallback(
-    (response: ConverstaionResponse, autoHideDuration = DEFAULT_SNACKBAR_AUTO_HIDE_DURATION) => {
-      setExploredExperiences(response.experiences_explored);
-      const key = enqueueSnackbar(`There is a new experience in your Skills Report.`, {
-        autoHideDuration,
-        variant: "info",
-        action: <ViewExperienceAction onClick={() => viewExperiencesDrawerHandler(key)} />,
-      });
-    },
-    [viewExperiencesDrawerHandler, enqueueSnackbar]
-  );
 
   /**
    *  Send a message to compass through the chat service
@@ -163,8 +126,8 @@ const Chat: React.FC<ChatProps> = ({
         setconversationConductedAt(response.conversation_conducted_at);
 
         if (response.experiences_explored > exploredExperiences) {
-          showNewExperienceAlertHandler(response);
           setExploredExperiences(response.experiences_explored);
+          setExploredExperiencesNotification(true);
         }
 
         response.messages.forEach((messageItem) =>
@@ -182,7 +145,7 @@ const Chat: React.FC<ChatProps> = ({
         setIsTyping(false);
       }
     },
-    [exploredExperiences, showNewExperienceAlertHandler]
+    [exploredExperiences]
   );
 
   /**
@@ -237,7 +200,7 @@ const Chat: React.FC<ChatProps> = ({
         setIsTyping(true);
         const history = await chatService.getChatHistory();
 
-        if (history.experiences_explored && history.experiences_explored > exploredExperiences) {
+        if (history.experiences_explored > exploredExperiences) {
           setExploredExperiences(history.experiences_explored);
         }
 
@@ -332,20 +295,6 @@ const Chat: React.FC<ChatProps> = ({
     return () => clearInterval(interval);
   }, [lastActivityTime, disableInactivityCheck, conversationCompleted]);
 
-  useEffect(() => {
-    if (showNewExperienceAlert) {
-      showNewExperienceAlertHandler(
-        {
-          messages: [],
-          experiences_explored: 10,
-          conversation_completed: false,
-          conversation_conducted_at: "",
-        },
-        DEFAULT_SNACKBAR_AUTO_HIDE_DURATION * 1000
-      );
-    }
-  }, [showNewExperienceAlert, showNewExperienceAlertHandler]);
-
   // Close backdrop when user interacts with the page
   useEffect(() => {
     if (disableInactivityCheck) return;
@@ -392,6 +341,9 @@ const Chat: React.FC<ChatProps> = ({
               notifyOnLogout={handleLogout}
               startNewConversation={handleOpenNewConversationDialog}
               notifyOnExperiencesDrawerOpen={handleOpenExperiencesDrawer}
+              experiencesExplored={exploredExperiences}
+              exploredExperiencesNotification={exploredExperiencesNotification}
+              setExploredExperiencesNotification={setExploredExperiencesNotification}
             />
             <Box sx={{ flex: 1, overflowY: "auto" }}>
               <ChatList messages={messages} isTyping={isTyping} />
