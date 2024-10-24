@@ -4,6 +4,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
+import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
@@ -22,13 +23,14 @@ export const DATA_TEST_ID = {
   CHAT_HEADER_LOGO_LINK: `chat-header-logo-link-${uniqueId}`,
   CHAT_HEADER_ICON_USER: `chat-header-icon-user-${uniqueId}`,
   CHAT_HEADER_BUTTON_USER: `chat-header-button-user-${uniqueId}`,
+  CHAT_HEADER_ICON_EXPERIENCES: `chat-header-icon-experiences-${uniqueId}`,
+  CHAT_HEADER_BUTTON_EXPERIENCES: `chat-header-button-experiences-${uniqueId}`,
 };
 
 export const MENU_ITEM_ID = {
   SETTINGS_SELECTOR: `settings-selector-${uniqueId}`,
   LOGOUT_BUTTON: `logout-button-${uniqueId}`,
   START_NEW_CONVERSATION: `start-new-conversation-${uniqueId}`,
-  EXPERIENCES_BUTTON: `experiences-button-${uniqueId}`,
   REPORT_BUG_BUTTON: `report-bug-button-${uniqueId}`,
 };
 
@@ -36,7 +38,6 @@ export const MENU_ITEM_TEXT = {
   SETTINGS: "settings",
   LOGOUT: "logout",
   START_NEW_CONVERSATION: "start new conversation",
-  EXPERIENCES: "view experiences",
   REPORT_BUG: "report a bug",
 };
 
@@ -56,12 +57,6 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
       text: MENU_ITEM_TEXT.START_NEW_CONVERSATION,
       disabled: !isOnline,
       action: startNewConversation,
-    },
-    {
-      id: MENU_ITEM_ID.EXPERIENCES_BUTTON,
-      text: MENU_ITEM_TEXT.EXPERIENCES,
-      disabled: false,
-      action: notifyOnExperiencesDrawerOpen,
     },
     {
       id: MENU_ITEM_ID.SETTINGS_SELECTOR,
@@ -120,6 +115,16 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
           gap: theme.spacing(theme.tabiyaSpacing.md),
         }}
       >
+        <PrimaryIconButton
+          sx={{
+            color: theme.palette.common.black,
+          }}
+          onClick={notifyOnExperiencesDrawerOpen}
+          data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES}
+          title="view experiences"
+        >
+          <BadgeOutlinedIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_EXPERIENCES} />
+        </PrimaryIconButton>
         <PrimaryIconButton
           sx={{
             color: theme.palette.common.black,

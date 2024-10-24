@@ -87,6 +87,11 @@ describe("ChatHeader", () => {
     expect(chatHeaderButton).toBeInTheDocument();
     const chatHeaderUserIcon = within(chatHeaderButton).getByTestId(DATA_TEST_ID.CHAT_HEADER_ICON_USER);
     expect(chatHeaderUserIcon).toBeInTheDocument();
+    // AND the experiences button to be shown with the experiences icon
+    const chatHeaderExperiencesButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES);
+    expect(chatHeaderExperiencesButton).toBeInTheDocument();
+    const chatHeaderExperiencesIcon = within(chatHeaderExperiencesButton).getByTestId(DATA_TEST_ID.CHAT_HEADER_ICON_EXPERIENCES);
+    expect(chatHeaderExperiencesIcon).toBeInTheDocument();
     // AND to match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_CONTAINER)).toMatchSnapshot();
   });
@@ -254,7 +259,7 @@ describe("ChatHeader", () => {
       expect(ContextMenu).toHaveBeenNthCalledWith(3, expect.objectContaining({ anchorEl: null, open: false }), {});
     });
 
-    test("should call notifyOnExperiencesDrawerOpen when the experiences menu item is clicked", async () => {
+    test("should call notifyOnExperiencesDrawerOpen when the experiences button is clicked", async () => {
       // GIVEN a ChatHeader component
       const givenNotifyOnExperiencesDrawerOpen = jest.fn();
       const givenChatHeader = (
@@ -268,13 +273,10 @@ describe("ChatHeader", () => {
       );
       // AND the chat header is rendered
       render(givenChatHeader);
-      // AND the context menu is opened
-      const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
-      fireEvent.click(userButton);
 
-      // WHEN the experiences menu item is clicked
-      const experiencesMenuItem = screen.getByTestId(MENU_ITEM_ID.EXPERIENCES_BUTTON);
-      fireEvent.click(experiencesMenuItem);
+      // WHEN the experiences button is clicked
+      const experiencesButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES);
+      fireEvent.click(experiencesButton);
 
       // THEN expect notifyOnExperiencesDrawerOpen to be called
       expect(givenNotifyOnExperiencesDrawerOpen).toHaveBeenCalled();
