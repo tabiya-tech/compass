@@ -8,7 +8,7 @@ import { DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID } from "src/Experienc
 import { DATA_TEST_ID as EXPERIENCES_DRAWER_CONTAINER_TEST_ID } from "src/Experiences/ExperiencesDrawer";
 import { DATA_TEST_ID as APPROVE_MODEL_TEST_ID } from "src/theme/ApproveModal/ApproveModal";
 import { HashRouter } from "react-router-dom";
-import { DEFAULT_SNACKBAR_AUTO_HIDE_DURATION, useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { ConversationMessageSender } from "./ChatService/ChatService.types";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesProvider/UserPreferencesStateService";
@@ -436,42 +436,6 @@ describe("Chat", () => {
           }),
           {}
         );
-      });
-    });
-
-    it("should show a message when the message has triggered a new exploration of the skill", async () => {
-      // @ts-ignore
-      useSnackbar().enqueueSnackbar.mockClear();
-
-      // GIVEN: 10 experiences have been explored
-      const givenExploredExperiences = 10;
-
-      // AND: the chat has been initialized
-      mockSendMessage.mockResolvedValue({
-        messages: [],
-        experiences_explored: givenExploredExperiences,
-      });
-
-      // WHEN: the chat is rendered
-      render(
-        <HashRouter>
-          <Chat />
-        </HashRouter>
-      );
-
-      // AND: a message is sent.
-      const input = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD);
-      const sendButton = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
-
-      fireEvent.change(input, { target: { value: "Test message" } });
-      fireEvent.click(sendButton);
-
-      await waitFor(() => {
-        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(`There is a new experience in your Skills Report.`, {
-          variant: "info",
-          autoHideDuration: DEFAULT_SNACKBAR_AUTO_HIDE_DURATION,
-          action: expect.any(Object),
-        });
       });
     });
   });

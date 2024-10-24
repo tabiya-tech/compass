@@ -55,17 +55,24 @@ describe("ChatHeader", () => {
     (ContextMenu as jest.Mock).mockClear();
   });
 
-  test("should render the Chat Header", () => {
+  test.each([
+    ["exploredExperiencesNotification shown", true],
+    ["exploredExperiencesNotification not shown", false],
+  ])("should render the Chat Header with %s", (desc, givenExploredExperiencesNotification) => {
     // GIVEN a ChatHeader component
     const givenNotifyOnLogout = jest.fn();
     const givenStartNewConversation = jest.fn();
     const givenNotifyOnExperiencesDrawerOpen = jest.fn();
+    const givenNumberOfExploredExperiences = 1;
     const givenChatHeader = (
       <HashRouter>
         <ChatHeader
           notifyOnLogout={givenNotifyOnLogout}
           startNewConversation={givenStartNewConversation}
           notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+          experiencesExplored={givenNumberOfExploredExperiences}
+          exploredExperiencesNotification={givenExploredExperiencesNotification}
+          setExploredExperiencesNotification={jest.fn()}
         />
       </HashRouter>
     );
@@ -90,7 +97,9 @@ describe("ChatHeader", () => {
     // AND the experiences button to be shown with the experiences icon
     const chatHeaderExperiencesButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES);
     expect(chatHeaderExperiencesButton).toBeInTheDocument();
-    const chatHeaderExperiencesIcon = within(chatHeaderExperiencesButton).getByTestId(DATA_TEST_ID.CHAT_HEADER_ICON_EXPERIENCES);
+    const chatHeaderExperiencesIcon = within(chatHeaderExperiencesButton).getByTestId(
+      DATA_TEST_ID.CHAT_HEADER_ICON_EXPERIENCES
+    );
     expect(chatHeaderExperiencesIcon).toBeInTheDocument();
     // AND to match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_CONTAINER)).toMatchSnapshot();
@@ -104,6 +113,9 @@ describe("ChatHeader", () => {
         notifyOnLogout={givenNotifyOnLogout}
         startNewConversation={givenStartNewConversation}
         notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+        experiencesExplored={0}
+        exploredExperiencesNotification={true}
+        setExploredExperiencesNotification={jest.fn()}
       />
     );
     testNavigateToPath(givenChatHeader, "Compass logo", DATA_TEST_ID.CHAT_HEADER_LOGO_LINK, routerPaths.ROOT);
@@ -117,6 +129,9 @@ describe("ChatHeader", () => {
             notifyOnLogout={givenNotifyOnLogout}
             startNewConversation={givenStartNewConversation}
             notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+            experiencesExplored={0}
+            exploredExperiencesNotification={true}
+            setExploredExperiencesNotification={jest.fn()}
           />
         </HashRouter>
       );
@@ -148,6 +163,9 @@ describe("ChatHeader", () => {
             notifyOnLogout={givenNotifyOnLogout}
             startNewConversation={givenStartNewConversation}
             notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+            experiencesExplored={0}
+            exploredExperiencesNotification={true}
+            setExploredExperiencesNotification={jest.fn()}
           />
         </HashRouter>
       );
@@ -196,6 +214,9 @@ describe("ChatHeader", () => {
             notifyOnLogout={givenNotifyOnLogout}
             startNewConversation={givenStartNewConversation}
             notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+            experiencesExplored={0}
+            exploredExperiencesNotification={true}
+            setExploredExperiencesNotification={jest.fn()}
           />
         </HashRouter>
       );
@@ -235,6 +256,9 @@ describe("ChatHeader", () => {
             notifyOnLogout={givenNotifyOnLogout}
             startNewConversation={givenStartNewConversation}
             notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+            experiencesExplored={0}
+            exploredExperiencesNotification={false}
+            setExploredExperiencesNotification={jest.fn()}
           />
         </HashRouter>
       );
@@ -268,6 +292,9 @@ describe("ChatHeader", () => {
             notifyOnLogout={jest.fn()}
             startNewConversation={jest.fn()}
             notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+            experiencesExplored={0}
+            exploredExperiencesNotification={true}
+            setExploredExperiencesNotification={jest.fn()}
           />
         </HashRouter>
       );
@@ -301,6 +328,9 @@ describe("ChatHeader", () => {
               notifyOnLogout={givenNotifyOnLogout}
               startNewConversation={givenStartNewConversation}
               notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+              experiencesExplored={0}
+              exploredExperiencesNotification={false}
+              setExploredExperiencesNotification={jest.fn()}
             />
           </HashRouter>
         );

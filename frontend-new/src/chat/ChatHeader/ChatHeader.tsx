@@ -1,5 +1,5 @@
-import React, { useContext, useState } from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import React, { SetStateAction, useContext, useState } from "react";
+import { Badge, Box, Typography, useTheme } from "@mui/material";
 import { NavLink, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
@@ -14,6 +14,9 @@ export type ChatHeaderProps = {
   notifyOnLogout: () => void;
   startNewConversation: () => void;
   notifyOnExperiencesDrawerOpen: () => void;
+  experiencesExplored: number;
+  exploredExperiencesNotification: boolean;
+  setExploredExperiencesNotification: React.Dispatch<SetStateAction<boolean>>;
 };
 
 const uniqueId = "7413b63a-887b-4f41-b930-89e9770db12b";
@@ -45,12 +48,21 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   notifyOnLogout,
   startNewConversation,
   notifyOnExperiencesDrawerOpen,
+  experiencesExplored,
+  exploredExperiencesNotification,
+  setExploredExperiencesNotification,
 }) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   const isOnline = useContext(IsOnlineContext);
+
+  const handleViewExperiences = () => {
+    notifyOnExperiencesDrawerOpen();
+    setExploredExperiencesNotification(false);
+  };
+
   const contextMenuItems: MenuItemConfig[] = [
     {
       id: MENU_ITEM_ID.START_NEW_CONVERSATION,
@@ -119,11 +131,13 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
           sx={{
             color: theme.palette.common.black,
           }}
-          onClick={notifyOnExperiencesDrawerOpen}
+          onClick={handleViewExperiences}
           data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES}
           title="view experiences"
         >
-          <BadgeOutlinedIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_EXPERIENCES} />
+          <Badge color="primary" badgeContent={experiencesExplored} invisible={!exploredExperiencesNotification}>
+            <BadgeOutlinedIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_EXPERIENCES} />
+          </Badge>
         </PrimaryIconButton>
         <PrimaryIconButton
           sx={{
