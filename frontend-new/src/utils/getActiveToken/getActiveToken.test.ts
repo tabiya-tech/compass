@@ -1,6 +1,6 @@
 import { getActiveToken } from "./getActiveToken";
 import { jwtDecode } from "jwt-decode";
-import { auth } from "src/auth/firebaseConfig";
+import { firebaseAuth } from "src/auth/firebaseConfig";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
 jest.mock("jwt-decode");
@@ -11,7 +11,7 @@ describe("getActiveToken", () => {
   const mockGetToken = PersistentStorageService.getToken as jest.Mock;
   const mockSetToken = PersistentStorageService.setToken as jest.Mock;
   const mockJwtDecode = jwtDecode as jest.Mock;
-  const mockAuth = auth.currentUser?.getIdToken as jest.Mock;
+  const mockAuth = firebaseAuth.currentUser?.getIdToken as jest.Mock;
 
   const mockDecodedToken = { exp: Date.now() / 1000 + 4000 };
 

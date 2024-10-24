@@ -1,3 +1,5 @@
+// silence chatty console
+import "src/_test_utilities/consoleMock";
 import { render, screen } from "src/_test_utilities/test-utils";
 import AuthHeader, { DATA_TEST_ID } from "./AuthHeader";
 

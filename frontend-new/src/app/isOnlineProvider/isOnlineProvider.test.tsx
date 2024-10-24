@@ -4,7 +4,7 @@ import { useContext } from "react";
 import * as React from "react";
 import { unmockBrowserIsOnLine, mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 // mock the SocialAuthService
-jest.mock("src/auth/services/socialAuth/SocialAuth.service", () => {
+jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service", () => {
   return {
     __esModule: true,
     default: jest.fn().mockImplementation(() => {

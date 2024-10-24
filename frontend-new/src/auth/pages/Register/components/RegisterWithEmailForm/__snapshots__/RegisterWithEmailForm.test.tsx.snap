@@ -14,7 +14,7 @@ exports[`Testing Register Email Form component it should show register form 1`] 
       for=":r0:"
       id=":r0:-label"
     >
-      Name
+      Username
       <span
         aria-hidden="true"
         class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-1th3aq5-MuiFormLabel-asterisk"
@@ -29,7 +29,7 @@ exports[`Testing Register Email Form component it should show register form 1`] 
       <input
         aria-invalid="false"
         class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-        data-testid="register-name-input-6cf1a0fa-8d75-4342-bf6b-1203d5b114d7"
+        data-testid="register-username-input-6cf1a0fa-8d75-4342-bf6b-1203d5b114d7"
         id=":r0:"
         required=""
         type="text"
@@ -43,7 +43,7 @@ exports[`Testing Register Email Form component it should show register form 1`] 
           class="css-yjsfm1"
         >
           <span>
-            Name
+            Username
              
             *
           </span>

@@ -32,9 +32,6 @@ export const USER_FRIENDLY_ERROR_MESSAGES = {
     "The email you are using is registered, but you have not yet verified it. Please verify your email to continue.",
   USER_NOT_FOUND: "The user you are trying to use does not exist. Please try again with different credentials",
   UNABLE_TO_PROCESS_REQUEST: "Apologies. Something went wrong while processing your request.",
-  INVITATION_CODE_INVALID: "The invitation code you entered is invalid. Please check the code and try again.",
-  INVALID_REGISTRATION_CODE: "The registration code you entered is invalid. Please check the code and try again.",
-  INVALID_INVITATION_CODE: "Invalid invitation code",
 };
 
 /**
@@ -258,21 +255,6 @@ export const getUserFriendlyErrorMessage = (error: ServiceError | Error): string
         return USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_REQUEST;
       }
       break;
-    case ErrorConstants.ErrorCodes.INVALID_REGISTRATION_CODE:
-      //
-      return USER_FRIENDLY_ERROR_MESSAGES.INVALID_REGISTRATION_CODE;
-    case ErrorConstants.ErrorCodes.VALIDATION_ERROR:
-      // The client could not validate something about the data received from the server.
-      // This can happen when:
-      // - there is a specific validation error that the client can handle (eg. invalid invite code)
-      if ((error.details as ServiceErrorObject).errorCode === ErrorCodes.FORBIDDEN) {
-        return USER_FRIENDLY_ERROR_MESSAGES.INVITATION_CODE_INVALID;
-      }
-
-      // - when registration code is invalid
-      if ((error.details as ServiceErrorObject).errorCode === ErrorConstants.ErrorCodes.INVALID_REGISTRATION_CODE) {
-        return USER_FRIENDLY_ERROR_MESSAGES.INVALID_REGISTRATION_CODE;
-      }
   }
   // If we get here, then
   // - we messed and don't know what the error is, or

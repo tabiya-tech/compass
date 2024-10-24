@@ -7,8 +7,8 @@ import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import { routerPaths } from "src/app/routerPaths";
 
-// mock the SocialAuthService
-jest.mock("src/auth/services/socialAuth/SocialAuth.service", () => {
+// mock the FirebaseSocialAuthentication service
+jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service", () => {
   return {
     __esModule: true,
     default: jest.fn().mockImplementation(() => {

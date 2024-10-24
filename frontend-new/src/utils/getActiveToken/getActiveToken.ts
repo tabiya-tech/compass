@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-import { auth } from "src/auth/firebaseConfig";
+import { firebaseAuth } from "src/auth/firebaseConfig";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
 type DecodedToken = {
@@ -11,7 +11,7 @@ type DecodedToken = {
  * @returns {string} The refreshed token
  */
 const getRefreshedToken = async (): Promise<string> => {
-  let refreshed_token = await auth.currentUser?.getIdToken(true);
+  let refreshed_token = await firebaseAuth.currentUser?.getIdToken(true);
 
   if (refreshed_token) PersistentStorageService.setToken(refreshed_token);
 

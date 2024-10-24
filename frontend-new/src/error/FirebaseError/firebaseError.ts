@@ -14,18 +14,23 @@ export const USER_FRIENDLY_FIREBASE_ERROR_MESSAGES = {
   "auth/operation-not-allowed": "Email/password accounts are not enabled.",
   "auth/weak-password": "The password is too weak.",
   "auth/user-disabled": "The user account has been disabled.",
-  "auth/user-not-found": "There is no user record corresponding to this email.",
+  "auth/user-not-found": "No user was found for the given credentials.",
   "auth/wrong-password": "The password is invalid.",
   "auth/too-many-requests": "We have blocked all requests from this device due to unusual activity. Try again later.",
   "auth/internal-error": "An internal error has occurred.",
   "auth/too-many-users": "There are too many users on this Firebase project.",
+  INVALID_REGISTRATION_CODE: "The registration code you entered is invalid. Please check the code and try again.",
+  INVALID_INVITATION_CODE: "The invitation code you entered is invalid. Please check the code and try again.",
+  INVALID_INVITATION_TYPE:
+    "The invitation code you used is for registration rather than logging in. Please go to the register page.",
+  INVALID_REGISTRATION_TYPE:
+    "The invitation code you used is for logging in rather than registration. Please go to the login page.",
 };
 
 export class FirebaseError extends Error {
   serviceName: string;
   serviceFunction: string;
   method: string;
-  statusCode: number;
   errorCode: FirebaseErrorCodes;
   details: ServiceErrorDetails;
 
@@ -33,7 +38,6 @@ export class FirebaseError extends Error {
     serviceName: string,
     serviceFunction: string,
     method: string,
-    statusCode: number,
     errorCode: FirebaseErrorCodes,
     message: string,
     details?: ServiceErrorDetails
@@ -42,7 +46,6 @@ export class FirebaseError extends Error {
     this.serviceName = serviceName;
     this.serviceFunction = serviceFunction;
     this.method = method;
-    this.statusCode = statusCode;
     this.errorCode = errorCode;
 
     // if the details is an object, or a JSON representation of an object,
@@ -62,7 +65,6 @@ export class FirebaseError extends Error {
 
 //factory function
 export type FirebaseErrorFactory = (
-  statusCode: number,
   errorCode: FirebaseErrorCodes,
   message: string,
   details?: ServiceErrorDetails
@@ -74,13 +76,8 @@ export function getFirebaseErrorFactory(
   method: string,
   path: string
 ): FirebaseErrorFactory {
-  return (
-    statusCode: number,
-    errorCode: FirebaseErrorCodes,
-    message: string,
-    details?: ServiceErrorDetails
-  ): FirebaseError => {
-    return new FirebaseError(serviceName, serviceFunction, method, statusCode, errorCode, message, details);
+  return (errorCode: FirebaseErrorCodes, message: string, details?: ServiceErrorDetails): FirebaseError => {
+    return new FirebaseError(serviceName, serviceFunction, method, errorCode, message, details);
   };
 }
 

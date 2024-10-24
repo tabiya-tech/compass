@@ -1,17 +1,17 @@
 import { UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 
-class UserPreferencesService {
-  private static instance: UserPreferencesService;
+export class UserPreferencesStateService {
+  private static instance: UserPreferencesStateService;
   private userPreferences: UserPreference | null = null;
 
   private constructor() {}
 
-  public static getInstance(): UserPreferencesService {
-    if (!UserPreferencesService.instance) {
-      UserPreferencesService.instance = new UserPreferencesService();
+  public static getInstance(): UserPreferencesStateService {
+    if (!UserPreferencesStateService.instance) {
+      UserPreferencesStateService.instance = new UserPreferencesStateService();
     }
-    return UserPreferencesService.instance;
+    return UserPreferencesStateService.instance;
   }
 
   public async loadPreferences(user_id: string) {
@@ -37,4 +37,4 @@ class UserPreferencesService {
   }
 }
 
-export const userPreferencesStateService = UserPreferencesService.getInstance();
+export const userPreferencesStateService = UserPreferencesStateService.getInstance();
