@@ -1,13 +1,13 @@
 import base64
-import os
-from wsgiref.util import application_uri
 
 import pulumi
 import pulumi_docker as docker
 import pulumi_gcp as gcp
 from dataclasses import dataclass
 
-from lib.std_pulumi import get_resource_name, ProjectBaseConfig, get_project_base_config, get_file_as_string, enable_services
+from pulumi import Output
+
+from lib.std_pulumi import get_resource_name, ProjectBaseConfig, get_project_base_config, get_file_as_string, enable_services, getenv
 
 GCP_API_GATEWAY_CONFIG_FILE = "./config/gcp_api_gateway_config.yaml"
 
@@ -16,8 +16,6 @@ REQUIRED_SERVICES = [
     "aiplatform.googleapis.com",
     # GCP API Gateway
     "apigateway.googleapis.com",
-    # Docker image registry
-    "artifactregistry.googleapis.com",
     # GCP Cloud Build
     "cloudbuild.googleapis.com",
     # Cloud Data Loss Prevention - Required for de-identifying data
@@ -25,6 +23,30 @@ REQUIRED_SERVICES = [
     # GCP Cloud Run
     "run.googleapis.com",
 ]
+
+@dataclass
+class BackendEnvVarsConfig:
+    """
+    Environment variables for the backend service
+    See the backend service for more information on the environment variables
+    """
+    TAXONOMY_MONGODB_URI: str
+    TAXONOMY_DATABASE_NAME: str
+    TAXONOMY_MODEL_ID: str
+    APPLICATION_MONGODB_URI: str
+    APPLICATION_DATABASE_NAME: str
+    VERTEX_API_REGION: str
+    TARGET_ENVIRONMENT: str
+    BACKEND_URL: str
+    FRONTEND_URL: str
+    SENTRY_BACKEND_DSN: str
+    ENABLE_SENTRY: str
+    ROOT_PROJECT_ID: str
+    GCP_OAUTH_CLIENT_ID: str
+    GITHUB_SHA: str
+    GITHUB_REF_NAME: str
+    GITHUB_RUN_NUMBER: str
+
 
 """
 # Set up GCP API Gateway.
@@ -48,14 +70,14 @@ def _setup_api_gateway(*,
         account_id=f"compassapigwsrvacct{basic_config.environment.replace('-', '')}",
         project=basic_config.project,
         display_name=f"Compass API Gateway {basic_config.environment} Service Account",
-        opts=pulumi.ResourceOptions(depends_on=dependencies),
+        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
     )
 
     apigw_api = gcp.apigateway.Api(
         resource_name=get_resource_name(environment=basic_config.environment, resource="api-gateway-api"),
         api_id=get_resource_name(environment=basic_config.environment, resource="api-gateway-api"),
         project=basic_config.project,
-        opts=pulumi.ResourceOptions(depends_on=dependencies),
+        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
     )
 
     # The GCP API Gateway uses OpenAPI 2.0 yaml files for the configurations.
@@ -82,6 +104,7 @@ def _setup_api_gateway(*,
                 google_service_account=apigw_service_account.email
             )
         ),
+        opts=pulumi.ResourceOptions(provider=basic_config.provider)
     )
 
     apigw_gateway = gcp.apigateway.Gateway(
@@ -91,7 +114,7 @@ def _setup_api_gateway(*,
         gateway_id=get_resource_name(environment=basic_config.environment, resource="api-gateway"),
         project=basic_config.project,
         region=basic_config.location,
-        opts=pulumi.ResourceOptions(depends_on=dependencies),
+        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
     )
 
     # Only allow access (roles/run.invoker permission) to apigw_service_account
@@ -103,7 +126,7 @@ def _setup_api_gateway(*,
         service=cloudrun.name,
         role="roles/run.invoker",
         members=[apigw_service_account.email.apply(lambda email: f"serviceAccount:{email}")],
-        opts=pulumi.ResourceOptions(depends_on=dependencies),
+        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
     )
 
     pulumi.export("apigateway_url", apigw_gateway.default_hostname.apply(lambda hostname: f"https://{hostname}"))
@@ -111,28 +134,40 @@ def _setup_api_gateway(*,
     return apigw_gateway
 
 
-def _create_repository(
-        basic_config: ProjectBaseConfig, repository_name: str, dependencies: list[pulumi.Resource]
-) -> gcp.artifactregistry.Repository:
-    # Create a repository
-    return gcp.artifactregistry.Repository(
-        get_resource_name(environment=basic_config.environment, resource="docker-repository"),
-        project=basic_config.project,
+def _get_repository(
+        basic_config: ProjectBaseConfig,
+        dependencies: list[pulumi.Resource],
+        project_number: pulumi.Output[str],
+        root_project_id: str
+) -> pulumi.Output[gcp.artifactregistry.Repository]:
+    # get the root repository from the organization
+    # we are using one repository for all the environments
+    # that is why we can not create it here we do get the root one
+    organization_reference = pulumi.StackReference("tabiya-tech/compass-organization/base")
+    repository = organization_reference.get_output("repository")
+
+    # allow the current environment to read and write to the repository
+    gcp.artifactregistry.RepositoryIamMember(
+        resource_name=get_resource_name(environment=basic_config.environment, resource="docker-repository-read-write-iam"),
+        project=root_project_id,
         location=basic_config.location,
-        format="DOCKER",
-        repository_id=repository_name,
-        opts=pulumi.ResourceOptions(depends_on=dependencies),
+        repository=repository.apply(lambda repo: repo.get("name")),
+        # you can read, write and delete the images to the repository
+        role="roles/artifactregistry.repoAdmin",
+        member=project_number.apply(lambda _project_number: f"serviceAccount:service-{_project_number}@serverless-robot-prod.iam.gserviceaccount.com"),
+        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
     )
 
+    return repository
 
-def _build_and_push_image(fully_qualified_image_name: str, dependencies: list[pulumi.Resource], provider: pulumi.ProviderResource) -> docker.Image:
+def _build_and_push_image(fully_qualified_image_name: pulumi.Output[str], dependencies: list[pulumi.Resource], basic_config: ProjectBaseConfig) -> docker.Image:
     # Build and push image to gcr repository
     image = docker.Image(
-        "compass-image",
+        get_resource_name(environment=basic_config.environment, resource="backend-image"),
         image_name=fully_qualified_image_name,
         build=docker.DockerBuildArgs(context="../../backend", platform="linux/amd64"),
         registry=None,  # use gcloud for authentication.
-        opts=pulumi.ResourceOptions(depends_on=dependencies),
+        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
     )
 
     # Digest exported so it's easy to match updates happening in cloud run project
@@ -140,31 +175,40 @@ def _build_and_push_image(fully_qualified_image_name: str, dependencies: list[pu
     return image
 
 
-def _get_fully_qualified_image_name(basic_config: ProjectBaseConfig, repository_name: str, image_name: str):
-    label = os.getenv("GITHUB_SHA")
-    return f"{basic_config.location}-docker.pkg.dev/{basic_config.project}/{repository_name}/{image_name}:{label}"
+def _get_fully_qualified_image_name(
+        basic_config: ProjectBaseConfig,
+        _repository: pulumi.Output[gcp.artifactregistry.Repository],
+        image_name: str,
+        environment_type: Output[str],
+        env_vars: BackendEnvVarsConfig
+) -> pulumi.Output[str]:
+    def _get_name(values):
+        repository_info, _environment_type = values
 
+        commit_hash = env_vars.GITHUB_SHA
+
+        # replace / with __ to avoid issues with docker image names, tags shouldn't have / in them,
+        # and we have to replace - with _ because we might want to differentiate between branches and tags same with hashes
+        branch_name = env_vars.GITHUB_REF_NAME.replace("/", "__").replace("-", "_")
+
+        run_number = env_vars.GITHUB_RUN_NUMBER
+
+        repository_name = repository_info.get("name")
+
+        if _environment_type == "dev":
+            label = f"{branch_name}-{commit_hash}"
+        else:
+            label = f"{branch_name}-b{run_number}"
+
+        name = f"{basic_config.location}-docker.pkg.dev/{env_vars.ROOT_PROJECT_ID}/{repository_name}/{image_name}:{label}"
+
+        pulumi.info("using image name: " + name)
+
+        return name
+
+    return Output.all(_repository, environment_type).apply(_get_name)
 
 # Deploy cloud run service
-
-@dataclass
-class BackendEnvVarsConfig:
-    """
-    Environment variables for the backend service
-    See the backend service for more information on the environment variables
-    """
-    TAXONOMY_MONGODB_URI: str
-    TAXONOMY_DATABASE_NAME: str
-    TAXONOMY_MODEL_ID: str
-    APPLICATION_MONGODB_URI: str
-    APPLICATION_DATABASE_NAME: str
-    VERTEX_API_REGION: str
-    TARGET_ENVIRONMENT: str
-    BACKEND_URL: str
-    FRONTEND_URL: str
-    SENTRY_BACKEND_DSN: str
-    ENABLE_SENTRY: str
-
 
 # See https://cloud.google.com/run/docs/overview/what-is-cloud-run for more information
 def _deploy_cloud_run_service(
@@ -181,7 +225,7 @@ def _deploy_cloud_run_service(
         account_id=get_resource_name(environment=basic_config.environment, resource="backend-sa"),
         display_name="The dedicated service account for the Compass backend service",
         project=basic_config.project,
-        opts=pulumi.ResourceOptions(depends_on=dependencies),
+        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
     )
 
     # Assign the necessary roles to the service account for Vertex AI access
@@ -190,7 +234,7 @@ def _deploy_cloud_run_service(
         members=[service_account.email.apply(lambda email: f"serviceAccount:{email}")],
         role="roles/aiplatform.user",
         project=basic_config.project,
-        opts=pulumi.ResourceOptions(depends_on=dependencies),
+        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
     )
 
     # Deploy cloud run service
@@ -239,7 +283,7 @@ def _deploy_cloud_run_service(
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="SENTRY_BACKEND_DSN",
                                                                        value=backend_env_vars_cfg.SENTRY_BACKEND_DSN),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="ENABLE_SENTRY",
-                                                                          value=backend_env_vars_cfg.ENABLE_SENTRY),
+                                                                       value=backend_env_vars_cfg.ENABLE_SENTRY),
 
                         # Add more environment variables here
                     ],
@@ -247,52 +291,28 @@ def _deploy_cloud_run_service(
             ],
             service_account=service_account.email,
         ),
-        opts=pulumi.ResourceOptions(depends_on=dependencies),
+        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
     )
     pulumi.export("cloud_run_url", service.uri)
     return service
 
 
 def _get_backend_env_vars(environment: str):
-    taxonomy_mongodb_uri = os.getenv("TAXONOMY_MONGODB_URI")
-    if not taxonomy_mongodb_uri:
-        raise ValueError("TAXONOMY_MONGODB_URI environment variable is not set")
-
-    taxonomy_database_name = os.getenv("TAXONOMY_DATABASE_NAME")
-    if not taxonomy_database_name:
-        raise ValueError("TAXONOMY_DATABASE_NAME environment variable is not set")
-
-    taxonomy_model_id = os.getenv("TAXONOMY_MODEL_ID")
-    if not taxonomy_model_id:
-        raise ValueError("TAXONOMY_MODEL_ID environment variable is not set")
-
-    application_mongodb_uri = os.getenv("APPLICATION_MONGODB_URI")
-    if not application_mongodb_uri:
-        raise ValueError("APPLICATION_MONGODB_URI environment variable is not set")
-
-    application_database_name = os.getenv("APPLICATION_DATABASE_NAME")
-    if not application_database_name:
-        raise ValueError("APPLICATION_DATABASE_NAME environment variable is not set")
-
-    vertex_api_region = os.getenv("VERTEX_API_REGION")
-    if not vertex_api_region:
-        raise ValueError("VERTEX_API_REGION environment variable is not set")
-
-    frontend_url = os.getenv("FRONTEND_URL")
-    if not frontend_url:
-        raise ValueError("FRONTEND_URL environment variable is not set")
-
-    backend_url = os.getenv("BACKEND_URL")
-    if not backend_url:
-        raise ValueError("BACKEND_URL environment variable is not set")
-
-    sentry_backend_dsn = os.getenv("SENTRY_BACKEND_DSN")
-    if not sentry_backend_dsn:
-        raise ValueError("SENTRY_BACKEND_DSN environment variable is not set")
-
-    enable_sentry = os.getenv("ENABLE_SENTRY")
-    if not enable_sentry:
-        raise ValueError("ENABLE_SENTRY environment variable is not set")
+    taxonomy_mongodb_uri = getenv("TAXONOMY_MONGODB_URI")
+    taxonomy_database_name = getenv("TAXONOMY_DATABASE_NAME")
+    taxonomy_model_id = getenv("TAXONOMY_MODEL_ID")
+    application_mongodb_uri = getenv("APPLICATION_MONGODB_URI")
+    application_database_name = getenv("APPLICATION_DATABASE_NAME")
+    vertex_api_region = getenv("VERTEX_API_REGION")
+    frontend_url = getenv("FRONTEND_URL")
+    backend_url = getenv("BACKEND_URL")
+    sentry_backend_dsn = getenv("SENTRY_BACKEND_DSN")
+    enable_sentry = getenv("ENABLE_SENTRY")
+    root_project_id = getenv("GCP_ROOT_PROJECT_NAME")
+    gcp_oauth_client_id = getenv("GCP_OAUTH_CLIENT_ID")
+    commit_hash = getenv("GITHUB_SHA")
+    branch_name = getenv("GITHUB_REF_NAME")
+    run_number = getenv("GITHUB_RUN_NUMBER")
 
     return BackendEnvVarsConfig(
         TAXONOMY_MONGODB_URI=taxonomy_mongodb_uri,
@@ -305,39 +325,50 @@ def _get_backend_env_vars(environment: str):
         BACKEND_URL=backend_url,
         FRONTEND_URL=frontend_url,
         SENTRY_BACKEND_DSN=sentry_backend_dsn,
-        ENABLE_SENTRY=enable_sentry
+        ENABLE_SENTRY=enable_sentry,
+        ROOT_PROJECT_ID=root_project_id,
+        GCP_OAUTH_CLIENT_ID=gcp_oauth_client_id,
+        GITHUB_SHA=commit_hash,
+        GITHUB_REF_NAME=branch_name,
+        GITHUB_RUN_NUMBER=run_number
     )
 
 
 # export a function build_and_push_image that will be used in the main pulumi program
-def deploy_backend(project: str, location: str, environment: str):
+def deploy_backend(project: str, location: str, environment: str, project_number: Output[str], environment_type: Output[str]):
+    env_vars = _get_backend_env_vars(environment)
 
     basic_config = get_project_base_config(project=project, location=location, environment=environment)
 
     # Enable the necessary services for building and pushing the image
     services = enable_services(basic_config=basic_config, service_names=REQUIRED_SERVICES)
 
-    repository_name = get_resource_name(environment=environment, resource="docker-repository")
     image_name = get_resource_name(environment=environment, resource="backend")
 
-    # Create an artifact repository
-    repository = _create_repository(basic_config, repository_name, services)
+    # Get the repository from the organisation/root-project
+    repository = _get_repository(basic_config, services, project_number, env_vars.ROOT_PROJECT_ID)
 
     # Build and push image to gcr repository
-    fully_qualified_image_name = _get_fully_qualified_image_name(basic_config, repository_name, image_name)
-    image = _build_and_push_image(fully_qualified_image_name, [repository], basic_config.provider)
+    fully_qualified_image_name = _get_fully_qualified_image_name(
+        basic_config,
+        repository,
+        image_name,
+        environment_type,
+        env_vars
+    )
+    image = _build_and_push_image(fully_qualified_image_name, [], basic_config)
 
     # Deploy the image as a cloud run service
     cloud_run = _deploy_cloud_run_service(
         basic_config=basic_config,
-        fully_qualified_image_name=fully_qualified_image_name,
-        backend_env_vars_cfg=_get_backend_env_vars(environment),
+        fully_qualified_image_name=fully_qualified_image_name.apply(lambda value: value),
+        backend_env_vars_cfg=env_vars,
         dependencies=services + [image],
     )
 
-    api_gateway = _setup_api_gateway(
+    _api_gateway = _setup_api_gateway(
         basic_config=basic_config,
         cloudrun=cloud_run,
-        gcp_oauth_client_id=os.getenv("GCP_OAUTH_CLIENT_ID"),
+        gcp_oauth_client_id=env_vars.GCP_OAUTH_CLIENT_ID,
         dependencies=services + [cloud_run]
     )

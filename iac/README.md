@@ -1,17 +1,20 @@
-tes# Infrastructure as Code
+# Infrastructure as Code
 The infrastructure for Compass is managed using [Pulumi](https://www.pulumi.com/). The infrastructure is defined in code and can be deployed to Google Cloud Platform (GCP) using Pulumi. 
 
 ## Prerequisites
 ### General
 
 - A recent version of [git](https://git-scm.com/) (e.g. ^2.37 )
+
 - [Python 3.8 or higher](https://www.python.org/downloads/)
 - [Pulumi CLI](https://www.pulumi.com/docs/install/).
 - [Google Cloud SDK (gcloud)](https://cloud.google.com/sdk/docs/install)
+- [Docker](https://docs.docker.com/get-docker/) (specifically for backend)
 
 ### GCP project setup
 
 To use Pulumi to manage the Compass infrastructure in GCP, the following setup must be performed manually:
+
 #### Root Project
 
 The root project is used to manage the resources of the target projects where the resources will be created. The root project must be created manually and the service account used to run pulumi must be granted access to the root project. Here are the steps to set up the root project:
@@ -21,37 +24,64 @@ The root project is used to manage the resources of the target projects where th
   The service account must have permissions to use Service Usage API in the root project:
   - `roles/serviceusage.serviceUsageAdmin`
 - The Service Usage API must be enabled manually using Google Cloud Console in the root project.
-- The root project is specified in the `Pulumi.<ENVIRONMENT>.yaml` file:
-    ```yaml
-    # e.g .Pulumi.dev.yaml
-  
-    gcp_root_project: <ROOT-PROJECT-ID>
-    ```  
-  
-> **Explanation**:
-> When a new GCP project is created, the Service Usage API will be in a disabled state. This API is required for managing (enabling/disabling) other APIs in GCP. If the Service Usage API is disabled, Pulumi will throw an error. The current workaround for this issue is to have a root project with the Service Usage API enabled. Pulumi will then call the Service Usage API of the root project to enable the Service Usage API of the target GCP project where the resources are to be created.
+- The root project is specified in the organisation project environment as `GCP_ROOT_PROJECT_NAME` and it will be propagated throughout all projects
+- The main usage for this root project is for billing. (check environment project) where the billing account is linked to the root project
 
-#### Target Project
-The target project is the project where the Compass resources are to be created. The service account used to run pulumi must be created in the target project. The target project must be created manually:
-- Create a new GCP target project (`TARGET-PROJECT-ID`)  
-- Create a service account in the target project and grant it the necessary roles to manage the resources in the target project:
-  - `roles/editor`
-  - `roles/resourcemanager.projectIamAdmin`
-  - `roles/cloudfunctions.admin`
+- Another usage for root project is for Service Usage API
+> **Explanation:** Service Usage API is used for enabling APIs
+> Pulumi cannot enable Service Usage API to a project directly as the Service Usage API
+> must be enabled to enable the API. This is a known limitation of Terraform/Pulumi.
+> The workaround is to have a separate project - here called "root_project" where the
+> Service Usage API is enabled. We will call the root_project's Service Usage API to
+> enable the APIs for the new project/environment. 
+> That is why the service account to run CI/CD should be created under this root project
 
-  This is the service account that will be used to run pulumi and manage the resources in the target project. This account should be added to the [Root Project](#root-project) as well.
-  >**Note:** It is important to create the service account in the target project because any subsequent service accounts created via Pulumi using that service account will be created in the project where the initial service account was created. Not doing so will result in service accounts being incorrectly created in projects other than the target project.
+#### Identity Project
 
-- For deploying the firebase authentication via pulumi, the following steps must be performed manually in the target project:
-    - Set up a consent screen in the Google Cloud Console 
-    - Set up an OAuth 2.0 client ID in the Google Cloud Console. \
-      When creating the OAuth 2.0 client ID, the **Authorized redirect URIs** must be set to `https://<TARGET-PROJECT-ID>.firebaseapp.com/__/auth/handler`. In the future, they should be adjusted to the actual authentication domain of the environment e.g. `https://auth.<ENVIRONMENT>.compass.tabiya.tech/__/auth/handler`. \
-      The client ID and client secret used to authenticate the application with Firebase are passed to pulumi as environment variables:
-      ```shell
-      GCP_OAUTH_CLIENT_ID="<GCP_OAUTH_CLIENT_ID>"
-      GCP_OAUTH_CLIENT_SECRET="<GCP_OAUTH_CLIENT_SECRET>"
-      ```
-      > Note: To the best of our knowledge, the OAuth 2.0 client ID and client secret cannot be created via pulumi/terraform. They must be created manually in the Google Cloud Console as the there is no API for creating/reading or updating OAuth 2.0 client IDs.
+The identity API is enabled manually, It can be enabled on the root project, 
+the reason why this is done manually is that there are some manual steps that need to be done in the Identity Platform console like consent screen.
+
+The exported keys from the identity project should be added to the .env/environment variables file. they must be added to the environment of backend and auth subprojects
+```shell
+    GCP_OAUTH_CLIENT_ID="<GCP_OAUTH_CLIENT_ID>"
+    GCP_OAUTH_CLIENT_SECRET="<GCP_OAUTH_CLIENT_SECRET>"
+```
+
+#### Service Account
+
+We need to have a service account created on root project so that it can be able to enable other services on the environment.
+
+##### pre-requisites for the service account
+
+- it must be the owner of the organisation, 
+- it must be able to manage and delete folders on the organisation
+  - create a folder
+  - delete a folder
+  - update a folder
+  - get folder IAM Policy
+  - set folder IAM Policy
+- it must be able to manage projects on the organisation
+  - create a project
+  - delete a project
+  - update a project
+  - get a project
+- roles/iam.organizationRoleAdmin: to be able to manage roles on the organisation
+  Reference is here: https://cloud.google.com/iam/docs/understanding-roles#iam.organizationRoleAdmin
+- it must be able to manage groups on the identity project (Note: this is done on admin organisation as groups are only created on google workspace admin panel)
+  - create a group
+  - delete a group
+  - update a group
+  - get a group
+> Note: it is recommended to create a custom admin role named  `Groups Small Admin` with only CRUD permissions on groups.
+- it must be a member of the `root project` in order for it to use ServiceUsageAPI so that it can be able to enable services on the subprojects
+
+In summary, we need the following roles.
+
+1. Billing Account User
+2. Folder Admin
+3. Organization Administrator
+4. Organization Role Administrator
+5. Project Creator
 
 ## Installation
 In the iac directory, run the following commands:
@@ -81,7 +111,6 @@ pip install -r requirements.txt
 > # deactivate the virtual environment
 > deactivate
 > ```
-
 
 ## Running the Pulumi
 
@@ -152,6 +181,9 @@ The deployment requires the following environment variables to be set:
 - `VERTEX_API_REGION`: The region of the Vertex API that will be used by the backend.
 - `SENTRY_BACKEND_DSN`: The Sentry Data Source Name for error tracking (the backend DSN is for the project used to track backend errors)
 - `ENABLE_SENTRY`: A boolean value that determines whether Sentry error tracking is enabled. Set to `True` to enable Sentry error tracking. 
+- `GCP_BILLING_ACCOUNT`: The billing account ID of the GCP project. This is used to link the billing account to the project.
+- `GCP_ORGANISATION_ID`: The organisation ID of the GCP organisation. This is to add all projects under this organisation.
+- `GCP_ROOT_PROJECT_NAME`: The name of the root project that will be used to manage the resources of the target projects.
 
 It is recommended to use a `.env` file to set the environment variables. Create a `.env` file in the root directory of the project and add the following content:
 
@@ -171,6 +203,11 @@ TAXONOMY_MODEL_ID="<TAXONOMY_MODEL_ID>"
 APPLICATION_MONGODB_URI="<URI_TO_MONGODB>"
 APPLICATION_DATABASE_NAME="<DATABASE_NAME>"
 VERTEX_API_REGION="<REGION>"
+SENTRY_BACKEND_DSN="<SENTRY_BACKEND_DSN>"
+ENABLE_SENTRY="False"
+GCP_BILLING_ACCOUNT="<BILLING_ACCOUNT>"
+GCP_ORGANISATION_ID="<ORGANISATION_ID>"
+GCP_ROOT_PROJECT_NAME="<ROOT_PROJECT_NAME>"
 ```
 Refer to the backend and frontend projects for information on the environment variables.
 
@@ -227,3 +264,15 @@ Replace `<GCP_PROJECT_ID>` with the GCP project ID where the Identity Platform A
 Once the configuration is imported, you can run pulumi commands as usual.
 
 > Note: Don't forget to unprotect the imported resource, since imported resources are protected by default. It is important to do this, since pulumi will not allow you to destroy a protected resource.
+
+## IaC Codebase Components
+
+The IaC is divided into seven subprojects and lib folder for re-usable code/functions/types.
+
+- [auth](auth): Sets up the authentication infrastructure, which is a Firebase project and related DNS Record.
+- [backend](backend): Sets up the backend application's infrastructure. API Gateway, Cloudrun and Docker image for the backend application.
+- [frontend](frontend): Sets up the frontend application's infrastructure, which is a static website hosted on Google Cloud Storage.
+- [aws-ns](aws-ns): Sets up the AWS name servers for the subdomains. It is used to set up domain delegation for the subdomains.
+- [common](common): Sets up the foundational infrastructure such as DNS records for the entire application.
+- [environment](environment): sets up the environment specific configuration, for more information you can check [environment/README.md](environment/README.md)
+- [organization](organization): sets up the organization specific configuration, for more information you can check [organization/README.md](organization/README.md)

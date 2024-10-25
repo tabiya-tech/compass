@@ -14,20 +14,24 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+from lib.std_pulumi import getconfig
 
 def main():
-    # Get the config values
-    config = pulumi.Config("gcp")
-    project = config.require("project")
-    pulumi.info(f'Using project:{project}')
-    location = config.require("region")
-    pulumi.info(f'Using location:{location}')
     environment = pulumi.get_stack()
     pulumi.info(f"Using Environment: {environment}")
 
-    # Deploy the backend
-    deploy_backend(project, location, environment)
+    # Get the config values
+    location = getconfig("region", "gcp")
+    pulumi.info(f'Using location: {location}')
 
+    # Get stack references
+    env_reference = pulumi.StackReference(f"tabiya-tech/compass-environment/{environment}")
+    project = env_reference.get_output("project_id")
+    project_number = env_reference.get_output("project_number")
+    environment_type = env_reference.get_output("environment_type")
+
+    # Deploy the backend
+    deploy_backend(project, location, environment, project_number, environment_type)
 
 if __name__ == "__main__":
     main()

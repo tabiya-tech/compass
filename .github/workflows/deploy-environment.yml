@@ -1,0 +1,70 @@
+name: Tabiya Compass Deploy Environment
+on:
+  workflow_call:
+    inputs:
+      target-environment:
+        required: true
+        type: string
+
+jobs:
+  setup-organization:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.target-environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip' # caching pip dependencies
+      - name: Install python packages
+        run: pip install -r requirements.txt
+        working-directory: iac
+      - name: Setup google-cloud-auth
+        uses: google-github-actions/auth@v2.1.2
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+      - name: Set up Organisation
+        id: pulumi
+        uses: pulumi/actions@v5
+        with:
+          work-dir: iac/organization
+          command: up
+          stack-name: tabiya-tech/compass-organization/base
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          GCP_ORGANISATION_ID: ${{ secrets.GCP_ORGANISATION_ID }}
+          GCP_ROOT_PROJECT_NAME: ${{ secrets.GCP_ROOT_PROJECT_NAME }}
+          CUSTOMER_ID: ${{ secrets.CUSTOMER_ID }}
+  create-environment:
+    runs-on: ubuntu-latest
+    needs:
+      - setup-organization
+    environment: ${{ inputs.target-environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip' # caching pip dependencies
+      - name: Install python packages
+        run: pip install -r requirements.txt
+        working-directory: iac
+      - name: Setup google-cloud-auth
+        uses: google-github-actions/auth@v2.1.2
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+      - name: Set up Environment
+        id: pulumi
+        uses: pulumi/actions@v5
+        with:
+          work-dir: iac/environment
+          command: up
+          stack-name: tabiya-tech/compass-environment/${{ inputs.target-environment }}
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          GCP_BILLING_ACCOUNT: ${{ secrets.GCP_BILLING_ACCOUNT }}
+          GCP_ROOT_PROJECT_NAME: ${{ secrets.GCP_ROOT_PROJECT_NAME }}

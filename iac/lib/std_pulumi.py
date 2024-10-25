@@ -1,7 +1,11 @@
+import os
+
 import pulumi
 import pulumi_gcp as gcp
 from dataclasses import dataclass
 from pathlib import Path
+
+from typing import Optional
 
 
 @dataclass
@@ -10,6 +14,34 @@ class ProjectBaseConfig:
     location: str
     environment: str
     provider: pulumi.ProviderResource
+
+
+def getconfig(name: str, config: Optional[str] = None) -> str:
+    """
+    Get the configuration value from the pulumi configuration
+    :param name: the configuration name
+    :param config: the pulumi configuration
+    :return: the configuration value
+    :raises ValueError: if the configuration value is not set
+    """
+
+    value = pulumi.Config(config).require(name)
+    if not value:
+        raise ValueError(f"configuration value {name} is not set")
+    return value
+
+
+def getenv(name: str) -> str:
+    """
+    Get the environment variable
+    :param name: the environment variable name
+    :return: the environment variable value
+    :raises ValueError: if the environment variable is not set
+    """
+    value = os.getenv(name)
+    if not value:
+        raise ValueError(f"environment variable {name} is not set")
+    return value
 
 
 def get_file_as_string(file: str):

@@ -91,6 +91,7 @@ jobs:
           poetry run convert_openapi
           cp openapi2.yaml ../../iac/backend/config/gcp_api_gateway_config.yaml
         env:
+
           TAXONOMY_MONGODB_URI: ${{ secrets.TAXONOMY_MONGODB_URI }}
           TAXONOMY_DATABASE_NAME: ${{ inputs.taxonomy-database-name }}
           TAXONOMY_MODEL_ID: ${{ inputs.taxonomy-model-id }}
@@ -127,4 +128,5 @@ jobs:
           FRONTEND_URL: ${{ inputs.frontend-url }}
           SENTRY_BACKEND_DSN: ${{ secrets.SENTRY_BACKEND_DSN }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          GCP_ROOT_PROJECT_NAME: ${{ secrets.GCP_ROOT_PROJECT_NAME }}
           ENABLE_SENTRY: "True" # Enable Sentry for backend

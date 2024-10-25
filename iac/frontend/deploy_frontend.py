@@ -17,7 +17,7 @@ def _create_bucket(basic_config: ProjectBaseConfig, bucket_name: str,
             main_page_suffix="index.html",
             not_found_page="404.html",
         ),
-        opts=pulumi.ResourceOptions(depends_on=dependencies))
+        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider))
 
 
 def _upload_directory_to_bucket(basic_config: ProjectBaseConfig, bucket_name: pulumi.Output, source_dir: str,
@@ -42,7 +42,7 @@ def _upload_directory_to_bucket(basic_config: ProjectBaseConfig, bucket_name: pu
                 source=pulumi.FileAsset(absolute_file_path),
                 content_type=mime_type,  # Ensure correct MIME type
                 cache_control="no-store" if file_path in do_not_cache else None,  # Do not cache index.html
-                opts=pulumi.ResourceOptions(depends_on=dependencies)
+                opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider)
             )
 
 
@@ -54,7 +54,7 @@ def _make_bucket_public(basic_config: ProjectBaseConfig, bucket_name: pulumi.Out
         bucket=bucket_name,
         role="roles/storage.objectViewer",
         member="allUsers",
-        opts=pulumi.ResourceOptions(depends_on=dependencies)
+        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider)
     )
 
 

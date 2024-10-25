@@ -1,6 +1,8 @@
+import { getBackendUrl } from "src/envService";
+
 const infoURL = {
   frontend: "data/version.json",
-  backend: "https://dev.compass.tabiya.tech/api/version",
+  backend: `${getBackendUrl()}/version`,
 };
 
 export default infoURL;
