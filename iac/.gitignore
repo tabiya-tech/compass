@@ -1,2 +1,7 @@
 *.pyc
 venv-iac
+.env
+realm/Pulumi.*.yaml
+environment/Pulumi.*.yaml
+keys/
+_tmp/

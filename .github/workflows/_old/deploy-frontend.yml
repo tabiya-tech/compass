@@ -20,6 +20,13 @@ on:
       sensitive-data-encryption-key-id:
         required: true
         type: string
+      version:
+        description: 'which version to deploy, it may be a hash or a tag or a version'
+        required: true
+        type: string
+      realm-name:
+        required: true
+        type: string
     outputs:
       frontend-url:
         description: 'The bucket frontend url'
@@ -27,6 +34,7 @@ on:
 
 jobs:
   deploy:
+    name: deploy-frontend
     runs-on: ubuntu-latest
     environment: ${{ inputs.target-environment }}
     outputs:
@@ -34,46 +42,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Set Version Info for POC frontend
-        id: setPOCVersionInfo
+      - name: authenticate to google cloud
+        uses: google-github-actions/auth@v2.1.2
+        with:
+          project_id: ${{ secrets.GCP_ROOT_PROJECT_ID }}
+          credentials_json:
+            ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+      - name: download frontend build bundle
         run: |
-          ./pipeline/setVersionInfo.sh frontend/public/data/version.json
-          cat frontend/public/data/version.json
-          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "version-info<<$EOF" >> "$GITHUB_OUTPUT"
-          echo "$(cat ./frontend/public/data/version.json)" >> "$GITHUB_OUTPUT"
-          echo "$EOF" >> "$GITHUB_OUTPUT"
-      - name: Use Node.js 20.x for POC frontend
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.x
-          cache: 'yarn'
-          cache-dependency-path: frontend/yarn.lock
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v4
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - name: Install node packages in POC frontend
-        run: yarn install
-        working-directory: frontend
-      - name: build POC frontend
-        run: yarn run export
-        working-directory: frontend
-        env:
-          NEXT_PUBLIC_COMPASS_URL: ${{ inputs.backend-url }}
-          NEXT_PUBLIC_DEFAULT_COMPASS_ENDPOINT: 'poc/conversation'
-          NEXT_PUBLIC_AVAILABLE_COMPASS_ENDPOINTS: '["poc/conversation", "poc/conversation_sandbox"]'
-      - name: Download frontend build bundle
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend.build.folder
-          path: frontend-new/build/
+          gcloud artifacts generic download --package=frontend \
+            --repository=${{ inputs.realm-name }}-generic-repository \
+            --location=${{ vars.ARTIFACT_REGISTRY_REGION }} \
+            --destination=./ \
+            --project=${{ secrets.GCP_ROOT_PROJECT_ID }} \
+            --version=${{ inputs.version }}
+          tar -xvf build-v1.0.tar.gz
       - name: Setup python
         uses: actions/setup-python@v5
         with:

@@ -1,0 +1,180 @@
+name: Tabiya compass frontend test
+on:
+  workflow_call:
+    inputs:
+      target-environment:
+        required: true
+        type: string
+      upload-artifacts:
+        required: true
+        type: boolean
+        description: 'Whether to upload deployable the artifacts or not'
+      realm-name:
+        required: true
+        type: string
+    outputs:
+      version-info:
+        description: 'The frontend version info'
+        value: ${{ jobs.upload-artifacts.outputs.version-info }}
+
+jobs:
+  poc-lint:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.target-environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'yarn'
+          cache-dependency-path: frontend/yarn.lock
+
+      - name: Install node packages
+        run: yarn install
+        working-directory: frontend
+
+      - name: Lint POC Frontend
+        run: yarn run lint
+        working-directory: frontend
+
+  test:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.target-environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'yarn'
+          cache-dependency-path: frontend-new/yarn.lock
+
+      - name: Install node packages
+        run: yarn install
+        working-directory: frontend-new
+
+      - name: Lint new Frontend
+        run: yarn run lint
+        working-directory: frontend-new
+
+      - name: Test new Frontend
+        run: yarn run test
+        working-directory: frontend-new
+
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend.lcov.info
+          path: frontend-new/coverage/lcov.info
+          retention-days: 1
+
+  build:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.target-environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'yarn'
+          cache-dependency-path: frontend-new/yarn.lock
+
+      - name: Install node packages
+        run: yarn install
+        working-directory: frontend-new
+
+      - name: Build
+        run: yarn build
+        working-directory: frontend-new
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+      - name: Archive build bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend.build.folder
+          path: frontend-new/build/
+          retention-days: 1
+
+  accessibility:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'yarn'
+          cache-dependency-path: frontend-new/yarn.lock
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-browsers-${{ runner.os }}-v1
+          restore-keys: playwright-browsers-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: yarn install
+        working-directory: frontend-new
+
+      - name: Accessibility Tests
+        run: |
+          npx playwright install --with-deps
+          yarn run build-storybook && yarn run test:accessibility
+        working-directory: frontend-new
+
+  upload-artifacts:
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ inputs.upload-artifacts }}
+    environment: ${{ inputs.target-environment }}
+    outputs:
+      version-info: ${{ steps.setNewVersionInfo.outputs.version-info }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: authenticate to google cloud
+        uses: google-github-actions/auth@v2.1.2
+
+        with:
+          project_id: ${{ secrets.GCP_ROOT_PROJECT_ID }}
+          credentials_json:
+            ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+
+      - name: Download frontend build bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend.build.folder
+          path: frontend-new/build/
+
+      - name: Set Version Info for new frontend
+        id: setNewVersionInfo
+        run: |
+          ./pipeline/setVersionInfo.sh frontend-new/build/data/version.json
+          cat frontend-new/build/data/version.json
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "version-info<<$EOF" >> "$GITHUB_OUTPUT"
+          echo "$(cat ./frontend-new/build/data/version.json)" >> "$GITHUB_OUTPUT"
+          echo "$EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Push frontend build bundle to artifact repository
+        run: |
+          tar -czvf build-frontend.tar.gz ./frontend-new/build/
+          gcloud artifacts generic upload --package=frontend \
+            --repository=generic-repository \
+            --location=${{ vars.ARTIFACT_REGISTRY_REGION }} \
+            --source=./build-frontend.tar.gz \
+            --project=${{ secrets.GCP_ROOT_PROJECT_ID }} \
+            --version=${{ github.sha }}

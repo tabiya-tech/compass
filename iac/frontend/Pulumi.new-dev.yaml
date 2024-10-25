@@ -1,0 +1,2 @@
+config:
+  gcp:region: "us-central1"

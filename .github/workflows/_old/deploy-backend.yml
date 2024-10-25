@@ -26,16 +26,18 @@ on:
       vertex-api-region:
         required: true
         type: string
+      version:
+        description: 'which version to deploy, it may be a hash or a tag or a version'
+        required: true
+        type: string
     outputs:
       api-gateway-url:
         description: "The backend rest api url via the api gateway"
         value: ${{ jobs.deploy.outputs.api-gateway-url }}
-      version-info:
-        description: "The backend version info"
-        value: ${{ jobs.deploy.outputs.version-info }}
 
 jobs:
   deploy:
+    name: deploy-backend
     runs-on: ubuntu-latest
     environment: ${{ inputs.target-environment }}
     outputs:
@@ -43,51 +45,49 @@ jobs:
       version-info: ${{ steps.setVersionInfo.outputs.version-info }}
     steps:
       - name: Checkout code
+        if: github.event_name == 'workflow_call'
         uses: actions/checkout@v4
-      - name: Set Version Info
-        id: setVersionInfo
-        # see https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
-        # for multiline strings
-        run: |
-          ./pipeline/setVersionInfo.sh ./backend/app/version/version.json
-          cat ./backend/app/version/version.json
-          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "version-info<<$EOF" >> "$GITHUB_OUTPUT"
-          echo "$(cat ./backend/app/version/version.json)" >> "$GITHUB_OUTPUT"
-          echo "$EOF" >> "$GITHUB_OUTPUT"
+
       - name: Setup python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip' # caching pip dependencies
+
       - name: Install IaC python packages
         run: pip install -r requirements.txt
         working-directory: iac
+
       - name: Load cached Poetry installation
         id: cached-poetry
         uses: actions/cache@v4
         with:
           path: ~/.local
           key: poetry-0
+
       - name: Install Poetry
         uses: snok/install-poetry@v1
         with:
           version: 1.8.5
+
       - name: Load cached Poetry cache
         uses: actions/cache@v4
         with:
           path: ~/.cache/pypoetry
           key: poetry-cache-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ env.POETRY_VERSION }}
+
       - name: Install dependencies
         shell: bash
         run: |
           poetry lock --no-update --no-interaction
           poetry install --no-interaction
         working-directory: backend
+
       - name: Setup google-cloud-auth
         uses: google-github-actions/auth@v2.1.2
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+
       - name: Export OpenAPI2 docs (required in Pulumi)
         shell: bash
         working-directory: ./backend/scripts
@@ -110,9 +110,10 @@ jobs:
           SENTRY_BACKEND_DSN: ${{ secrets.SENTRY_BACKEND_DSN }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           ENABLE_SENTRY: True # Enable Sentry for backend
+
       - name: Authenticate to docker
-        # TODO the region should be extracted from the pulumi yaml
-        run: gcloud auth configure-docker us-central1-docker.pkg.dev
+        run: gcloud auth configure-docker ${{ vars.ARTIFACT_REGISTRY_REGION }}-docker.pkg.dev
+
       - name: Deploy backend
         id: pulumi
         uses: pulumi/actions@v5
@@ -136,4 +137,6 @@ jobs:
           FRONTEND_URL: ${{ inputs.frontend-url }}
           SENTRY_BACKEND_DSN: ${{ secrets.SENTRY_BACKEND_DSN }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          GCP_ROOT_PROJECT_ID: ${{ secrets.GCP_ROOT_PROJECT_ID }}
           ENABLE_SENTRY: "True" # Enable Sentry for backend
+          ARTIFACTS_VERSION: ${{ inputs.version }}

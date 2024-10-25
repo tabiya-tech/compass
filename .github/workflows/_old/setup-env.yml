@@ -7,6 +7,9 @@ on:
         required: true
         type: string
     outputs:
+      realm-name:
+        description: "The realm name in the target environment"
+        value: ${{ jobs.setup-env.outputs.realm-name }}
       domain-name:
         description: "The domain name in the target environment"
         value: ${{ jobs.setup-env.outputs.domain-name }}
@@ -49,6 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.target-environment }}
     outputs:
+      realm-name: ${{ steps.setup.outputs.realm-name }}
       domain-name: ${{ steps.setup.outputs.domain_name }}
       frontend-url: ${{ steps.setup.outputs.frontend_url }}
       backend-url: ${{ steps.setup.outputs.backend_url }}
@@ -68,7 +72,7 @@ jobs:
         id: setup
         run: |
           chmod +x setupEnv.sh
-          ./setupEnv.sh ${{ inputs.target-environment }} ${{ vars.BASE_DOMAIN }}
+          ./setupEnv.sh ${{ inputs.target-environment }}
         working-directory: pipeline
       - name: Verify PII RSA Certificate
         run: |
@@ -83,6 +87,7 @@ jobs:
           fi
       - name: Log set envs
         run: |
+          echo "realm-name: ${{ steps.setup.outputs.realm-name }}"
           echo "domain-name: ${{ steps.setup.outputs.domain_name }}"
           echo "frontend-url: ${{ steps.setup.outputs.frontend_url }}"
           echo "backend-url: ${{ steps.setup.outputs.backend_url }}"

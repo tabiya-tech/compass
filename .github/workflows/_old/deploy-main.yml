@@ -1,0 +1,114 @@
+name: deploy
+
+on:
+  workflow_call:
+    inputs:
+      target-environment:
+        required: true
+        type: string
+
+      frontend-version-info:
+        required: true
+        type: string
+
+      backend-version-info:
+        required: true
+        type: string
+
+      realm-name:
+        required: true
+        type: string
+      version:
+        description: 'which version to deploy, it may be a hash or a tag or a version'
+        required: true
+        type: string
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.target-environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip' # caching pip dependencies
+
+      - name: Load cached Poetry installation
+        id: cached-poetry
+        uses: actions/cache@v4
+        with:
+          path: ~/.local
+          key: poetry-0
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.8.5
+
+      - name: Load cached Poetry cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry
+          key: poetry-cache-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ env.POETRY_VERSION }}
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          poetry lock --no-update --no-interaction
+          poetry install --no-interaction
+        working-directory: backend
+
+      - name: Export OpenAPI2 docs (required in Pulumi)
+        shell: bash
+        working-directory: ./backend/scripts
+        run: |
+          poetry run export_openapi
+          poetry run convert_openapi
+          cp openapi2.yaml ../../iac/backend/config/gcp_api_gateway_config.yaml
+        env:
+          TAXONOMY_MONGODB_URI: foo
+          TAXONOMY_DATABASE_NAME: bar
+          TAXONOMY_MODEL_ID: foo
+          APPLICATION_MONGODB_URI: bar
+          APPLICATION_DATABASE_NAME: foo
+          USERDATA_MONGODB_URI: bar
+          USERDATA_DATABASE_NAME: bar
+          TARGET_ENVIRONMENT: foo
+          VERTEX_API_REGION: foo
+          BACKEND_URL: https://test.foo.bar/api
+          FRONTEND_URL: https://test.foo.bar/api
+          ENABLE_SENTRY: False # Disable when exporting OpenAPI2 docs
+
+      - name: Install IaC python packages
+        run: pip install -r requirements.txt
+        working-directory: iac
+
+      - name: Setup google-cloud-auth
+        uses: google-github-actions/auth@v2.1.2
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+
+      - name: Authenticate to docker
+        run: gcloud auth configure-docker ${{ vars.ARTIFACT_REGISTRY_REGION }}-docker.pkg.dev
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_DNS_UPDATE_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_DNS_UPDATE_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+          role-duration-seconds: 1200
+          role-session-name: Compass AWS NS
+
+      - name: Run deploy script
+        working-directory: iac/deploy
+        run: |
+          pulumi login
+          pulumi org set-default tabiya-tech
+          python3 __main__.py --deploy-tag=${{ inputs.version }} --env-type=dev
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}

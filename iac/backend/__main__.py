@@ -1,32 +1,85 @@
 import sys
 import os
+import pulumi
 
 # Determine the absolute path to the 'iac' directory
 libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add this directory to sys.path,
-# so that we can import the iac/lib module when we run pulumi from withing the iac/common directory
+# so that we can import the iac/lib module when we run pulumi from withing the iac/backend directory.
 sys.path.insert(0, libs_dir)
 
-import pulumi
-from deploy_backend import deploy_backend
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
+from deploy_backend import deploy_backend, BackendServiceConfig
+from lib import getconfig, getstackref, getenv, parse_realm_env_name_from_stack, load_dot_realm_env, get_deployment_id, \
+    parse_artifacts_version
 
 
 def main():
+    # The environment is the stack name
+    realm_name, environment_name, stack_name = parse_realm_env_name_from_stack()
+
+    # Load environment variables
+    load_dot_realm_env(stack_name)
+
     # Get the config values
-    config = pulumi.Config("gcp")
-    project = config.require("project")
-    pulumi.info(f'Using project:{project}')
-    location = config.require("region")
-    pulumi.info(f'Using location:{location}')
-    environment = pulumi.get_stack()
-    pulumi.info(f"Using Environment: {environment}")
+    location = getconfig("region", "gcp")
+    pulumi.info(f'Using location: {location}')
+
+    # Get stack references
+    env_reference = pulumi.StackReference(f"tabiya-tech/compass-environment/{stack_name}")
+    docker_repository = getstackref(env_reference, "docker_repository")
+    project = getstackref(env_reference, "project_id")
+    project_number = getstackref(env_reference, "project_number")
+    environment_type = getstackref(env_reference, "environment_type")
+
+    backend_url = getstackref(env_reference, "backend_url")
+    frontend_url = getstackref(env_reference, "frontend_url")
+
+    realm_reference = pulumi.StackReference(f"tabiya-tech/compass-realm/{realm_name}")
+    root_project_id = getstackref(realm_reference, "root_project_id")
+
+    # Get backend service configuration
+    backend_service_cfg = BackendServiceConfig(
+        taxonomy_mongodb_uri=getenv("TAXONOMY_MONGODB_URI", True),
+        taxonomy_database_name=getenv("TAXONOMY_DATABASE_NAME"),
+        taxonomy_model_id=getenv("TAXONOMY_MODEL_ID"),
+        application_mongodb_uri=getenv("APPLICATION_MONGODB_URI", True),
+        application_database_name=getenv("APPLICATION_DATABASE_NAME"),
+        userdata_database_name=getenv("USERDATA_DATABASE_NAME"),
+        userdata_mongodb_uri=getenv("USERDATA_MONGODB_URI", True),
+        vertex_api_region=getenv("VERTEX_API_REGION", True),
+        target_environment_name=environment_name,
+        target_environment_type=environment_type,
+        backend_url=backend_url,
+        frontend_url=frontend_url,
+        sentry_backend_dsn=getenv("SENTRY_BACKEND_DSN", True),
+        enable_sentry=getenv("ENABLE_SENTRY"),
+        gcp_oauth_client_id=getenv("GCP_OAUTH_CLIENT_ID"),
+    )
+
+    # version of the artifacts to deploy
+    artifacts_version = getenv("ARTIFACTS_VERSION")
+    backend_version = parse_artifacts_version(artifacts_version).backend_version
+
+    # the key identifier of this deployment, used to identify the deployment.
+    run_number = getenv("DEPLOYMENT_RUN_NUMBER")
+
+    # deployment id will be used to know where to find the backend config,
+    # for now api_gateway_config
+    deployment_id = get_deployment_id(
+        deployment_number=run_number,
+        deploy_version=backend_version)
 
     # Deploy the backend
-    deploy_backend(project, location, environment)
+    deploy_backend(
+        root_project_id=root_project_id,
+        project=project,
+        location=location,
+        project_number=project_number,
+        backend_service_cfg=backend_service_cfg,
+        docker_repository=docker_repository,
+        artifacts_version=backend_version,
+        deployment_id=deployment_id
+    )
 
 
 if __name__ == "__main__":
