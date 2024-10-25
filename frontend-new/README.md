@@ -49,6 +49,7 @@ To develop this application locally, follow these steps:
      - `FIREBASE_API_KEY`: The API key for Firebase authentication
      - `FIREBASE_AUTH_DOMAIN`: The Firebase authentication domain
      - `BACKEND_URL`: The URL of the backend API
+     - `TARGET_ENVIRONMENT_NAME`: The name of the environment (e.g. "dev", "test", "demo", ....)
      - `SENTRY_FRONTEND_DSN`: The Sentry Data Source Name for error tracking (the frontend DSN is for the project used to track frontend errors)
      - `SENTRY_AUTH_TOKEN`: The Sentry authentication token, used to upload source maps
      - `SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY`: The RSA public key used to encrypt sensitive personal data. It is in the [PEM](https://www.rfc-editor.org/rfc/rfc7468) format.

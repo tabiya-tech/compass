@@ -1,8 +1,9 @@
 console.log('env.js loaded.....');
 window.tabiyaConfig = {
   "FIREBASE_API_KEY": btoa("Some API Key"),
-  "FIREBASE_AUTH_DOMAIN": btoa("someAuthDomain"), // auth domain without the ".firebaseapp.com"
+  "FIREBASE_AUTH_DOMAIN": btoa("someAuthDomain"), // auth domain. auth.<env-name>.<realm-name>.<base-domain-name>
   "BACKEND_URL": btoa("https://foo.bar/api"),
+  "TARGET_ENVIRONMENT_NAME": btoa("local"),
   // The SENTRY_DSN variable is picked up by the Sentry SDK.
   // It's used for error tracking.
   "SENTRY_FRONTEND_DSN": btoa("https://foo@bar.sentry.io/baz"),

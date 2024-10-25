@@ -11,6 +11,7 @@ import {
   getSensitivePersonalDataRSAEncryptionKeyId,
   ensureRequiredEnvVars,
   requiredEnvVariables,
+  getTargetEnvironmentName,
 } from "./envService";
 
 test("getEnv should return the decoded environment variable value", () => {
@@ -36,6 +37,7 @@ describe.each([
   ["SENTRY_FRONTEND_DSN", getSentryDSN],
   ["SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY", getSensitivePersonalDataRSAEncryptionKey],
   ["SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID", getSensitivePersonalDataRSAEncryptionKeyId],
+  ["TARGET_ENVIRONMENT_NAME", getTargetEnvironmentName],
 ])("Env Getters", (ENV_KEY, getterFn) => {
   describe(`${ENV_KEY} Getter (${getterFn.name}) tests`, () => {
     test(`getAPI should not fail if the ${ENV_KEY} is not set`, () => {
@@ -133,6 +135,7 @@ describe("Ensure Required Environment Variables", () => {
         FIREBASE_API_KEY: btoa("foo"),
         FIREBASE_AUTH_DOMAIN: btoa("foo"),
         BACKEND_URL: btoa("foo"),
+        TARGET_ENVIRONMENT_NAME: btoa("foo"),
         SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY: btoa("foo"),
         SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID: btoa("foo"),
       },

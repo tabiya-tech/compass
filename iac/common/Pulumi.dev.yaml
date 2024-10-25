@@ -1,4 +1,0 @@
-config:
-  gcp:project: "compass-dev-425015"
-  gcp:region: "us-central1"
-  gcp_root_project: "compass-dev-root"

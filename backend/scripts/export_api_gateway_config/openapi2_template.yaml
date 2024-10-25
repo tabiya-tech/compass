@@ -1,0 +1,64 @@
+# openapi2-functions.yaml
+swagger: '2.0'
+info:
+  title: Compass API Gateway Config
+  description: Compass API Gateway Config
+  version: 1.0.0
+schemes:
+  - https
+produces:
+  - application/json
+x-google-management:
+  # Read https://cloud.google.com/endpoints/docs/openapi/quotas-configure for more information
+  # on how to configure quotas
+  metrics:
+    - name: "request-metric"
+      displayName: "Request metric"
+      valueType: INT64
+      metricKind: DELTA
+  quota:
+    limits:
+      - name: "request-limit"
+        metric: "request-metric"
+        unit: "1/min/{project}"
+        values:
+          STANDARD: 120 # requests per minute
+x-google-backend:
+  address: "__BACKEND_URI__"
+  deadline: "__API_GATEWAY_TIMEOUT__" # timeout as the cloud run container may take a while to start, and some requests may take a while to process. Reference: https://cloud.google.com/endpoints/docs/openapi/openapi-extensions#deadline
+securityDefinitions:
+  firebase:
+    authorizationUrl: ""
+    flow: "implicit"
+    type: "oauth2"
+    x-google-issuer: "https://securetoken.google.com/__PROJECT_ID__"
+    x-google-jwks_uri: "https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com"
+    x-google-audiences: "__PROJECT_ID__"
+paths:
+  /poc/conversation:
+    get:
+      summary: Chat Conversation
+      operationId: conversation
+      responses:
+        '200':
+          description: A successful response
+          schema:
+            type: string
+  /docs:
+    get:
+      summary: Docs endpoint
+      operationId: api_docs
+      responses:
+        '200':
+          description: Docs page
+          schema:
+            type: string
+  /openapi.json:
+    get:
+      summary: OAS file
+      operationId: oas_file
+      responses:
+        '200':
+          description: OAS file
+          schema:
+            type: string

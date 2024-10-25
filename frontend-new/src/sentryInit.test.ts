@@ -3,6 +3,7 @@ import "src/_test_utilities/consoleMock";
 import * as Sentry from "@sentry/react";
 import { initSentry } from "./sentryInit";
 import { getBackendUrl, getSentryDSN } from "./envService";
+import * as EnvServiceModule from "./envService";
 import AuthenticationStateService from "./auth/services/AuthenticationState.service";
 import UserPreferencesStateService from "./userPreferences/UserPreferencesStateService";
 import { TabiyaUser } from "./auth/auth.types";
@@ -21,6 +22,7 @@ jest.mock("@sentry/react", () => ({
 
 jest.mock("./envService", () => ({
   getBackendUrl: jest.fn(),
+  getTargetEnvironmentName: jest.fn(),
   getSentryDSN: jest.fn(),
 }));
 
@@ -55,11 +57,14 @@ describe("sentryInit", () => {
     const mockConsole = { name: "console" };
     const mockRouter = { name: "router" };
 
+    const givenTargetEnvironmentName = "given-target-environment-name";
+
     (Sentry.browserTracingIntegration as jest.Mock).mockReturnValue(mockBrowserTracing);
     (Sentry.replayIntegration as jest.Mock).mockReturnValue(mockReplay);
     (Sentry.feedbackIntegration as jest.Mock).mockReturnValue(mockFeedback);
     (Sentry.captureConsoleIntegration as jest.Mock).mockReturnValue(mockConsole);
     (Sentry.reactRouterV6BrowserTracingIntegration as jest.Mock).mockReturnValue(mockRouter);
+    (EnvServiceModule.getTargetEnvironmentName as jest.Mock).mockReturnValue(givenTargetEnvironmentName);
 
     // WHEN initSentry is called
     initSentry();
@@ -67,6 +72,7 @@ describe("sentryInit", () => {
     // THEN expect Sentry.init to be called with the correct configuration
     expect(Sentry.init).toHaveBeenCalledWith({
       dsn: "mock-dsn",
+      environment: givenTargetEnvironmentName,
       integrations: [
         mockBrowserTracing,
         mockReplay,
