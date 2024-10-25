@@ -13,11 +13,14 @@ import { jwtDecode } from "jwt-decode";
 /**
  * Abstract class representing an authentication service.
  *
- * This class defines the contract for any authentication service implementation.
- * It ensures that all implementing classes provide methods to refresh tokens,
- * perform cleanup operations, and handle logout.
+ * Its responsibilities are:
+ * (a) to offer a common interface for all authentication services.
+ * This class defines the interface that specific authentication service implementations should implement,
+ * which includes how to refresh tokens, cleanup operations, and logout.
  *
- * Subclasses must implement the abstract methods to provide specific authentication logic.
+ * (b) to manage the application state and user preferences.
+ * Additionally, this class provides callback methods that should be called by the child classes when specific events occur to update the application state,
+ * which includes the authentication state and user preferences. Subclasses should manage the state directly
  *
  * All instances of AuthenticationServices should be singletons.
  */

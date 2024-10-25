@@ -7,8 +7,9 @@ This document provides an overview of the authentication hierarchy in the fronte
 ### Authentication Services
 
 The authentication system consists of several services that work together to handle user authentication, state management, and persistent storage. The main services are:
-- `AuthenticationService`: An abstract base class that defines common methods for authentication services.
-- `StdFirebaseAuthenticationService`: A utility class that provides a base implementation for Firebase authentication services.
+- [`AuthenticationService`](src/auth/services/Authentication.service.ts) (abstract class): An abstract base class that defines common methods for authentication services.
+- )`: An abstract base class that defines common methods for authentication services.
+- [`StdFirebaseAuthenticationService`](src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService.ts): A utility class that provides a base implementation for Firebase authentication services.
 - `FirebaseEmailAuthenticationService`, `FirebaseSocialAuthenticationService`, `FirebaseInvitation CodeAuthenticationService`: Extend the AuthenticationService class and handle specific authentication methods (email/password, social providers, anonymous).
 - `AuthenticationStateService`: Manages the current user's authentication state and token.
 - `UserPreferencesStateService`: Manages the user's preferences and settings.
@@ -33,6 +34,7 @@ erDiagram
         onSuccessfulLogin(token)  void
         onSuccessfulRegistration()  void
         onSuccessfulRefresh(token)  void
+        
     }
 
     StdFirebaseAuthenticationService {
