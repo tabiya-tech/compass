@@ -1,16 +1,22 @@
 name: Main CI
-on: push
+on:
+  push:
+    branches:
+      - '**'  # Runs on push to any branch
+  release:
+    types: [ created ]  # Runs when a new release is created
+
+
   #push:
   # branches:
   #   - main
-  #pull_request:
-  #  types: [ opened, synchronize, reopened ]
+#pull_request:
+#  types: [ opened, synchronize, reopened ]
 
 # only one job should run at a time when deploying
 concurrency:
   group: ${{github.workflow}}-${{ github.ref_name != 'main' && !contains(github.event.head_commit.message, '[pulumi up]') && github.ref_name || 'deploying' }}
   cancel-in-progress: false
-
 
 jobs:
   ## Echo the group name to see if the concurrency is working
@@ -19,122 +25,65 @@ jobs:
   #  steps:
   #    - name: Echo group name
   #      run: echo ${{github.workflow}}-${{ github.ref_name != 'main' && !contains(github.event.head_commit.message, '[pulumi up]') && github.ref_name || 'deploying' }}
-  # Setup envs
-  setup-env:
-    uses: ./.github/workflows/setup-env.yml
+  frontend-ci:
+    uses: ./.github/workflows/frontend-ci.yml
     secrets: inherit
     with:
-      target-environment: dev
-  # Backend
-  test-backend:
-    uses: ./.github/workflows/unit-test-backend.yml
-    secrets: inherit
-    needs: [ setup-env ]
-    with:
-      target-environment: dev
-      backend-url: ${{ needs.setup-env.outputs.backend-url }}
-      frontend-url: ${{ needs.setup-env.outputs.frontend-url }}
-      taxonomy-database-name: ${{ needs.setup-env.outputs.taxonomy-database-name }}
-      taxonomy-model-id: ${{ needs.setup-env.outputs.taxonomy-model-id }}
-      application-database-name: ${{ needs.setup-env.outputs.application-database-name }}
-      userdata-database-name: ${{ needs.setup-env.outputs.userdata-database-name }}
-      vertex-api-region: ${{ needs.setup-env.outputs.vertex-api-region }}
-  build-frontend:
-    uses: ./.github/workflows/build-frontend.yml
-    secrets: inherit
-    with:
-      target-environment: dev
-  deploy-auth:
-    # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
-    if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
-    uses: ./.github/workflows/deploy-auth.yml
-    needs: [ setup-env ]
-    secrets: inherit
-    with:
-      target-environment: dev
-      frontend-domain: ${{ needs.setup-env.outputs.frontend-domain }}
-  deploy-backend:
-    # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
-    if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
-    needs: [ test-backend, setup-env ]
-    uses: ./.github/workflows/deploy-backend.yml
-    secrets: inherit
-    with:
-      target-environment: dev
-      backend-url: ${{ needs.setup-env.outputs.backend-url }}
-      frontend-url: ${{ needs.setup-env.outputs.frontend-url }}
-      taxonomy-database-name: ${{ needs.setup-env.outputs.taxonomy-database-name }}
-      taxonomy-model-id: ${{ needs.setup-env.outputs.taxonomy-model-id }}
-      application-database-name: ${{ needs.setup-env.outputs.application-database-name }}
-      userdata-database-name: ${{ needs.setup-env.outputs.userdata-database-name }}
-      vertex-api-region: ${{ needs.setup-env.outputs.vertex-api-region }}
-  smoke-test-backend-apigateway:
-    needs: [ deploy-backend ]
-    uses: ./.github/workflows/smoke-test-backend-version.yml
-    secrets: inherit
-    with:
-      component: backend
-      expected-version-info: ${{ needs.deploy-backend.outputs.version-info }}
-      component-url: ${{ needs.deploy-backend.outputs.api-gateway-url }}
-      get-version-url: /version
-  deploy-frontend:
-    # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
-    if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
-    needs: [ setup-env, build-frontend, deploy-auth ]
-    uses: ./.github/workflows/deploy-frontend.yml
-    secrets: inherit
-    with:
-      target-environment: dev
-      backend-url: ${{ needs.setup-env.outputs.backend-url }}
-      identity_platform_client_api_key: ${{ needs.deploy-auth.outputs.identity_platform_client_api_key }}
-      identity_platform_client_firebase_auth_domain: ${{ needs.deploy-auth.outputs.identity_platform_client_firebase_auth_domain }}
-      sensitive-data-encryption-key: ${{ needs.setup-env.outputs.sensitive-data-encryption-key }}
-      sensitive-data-encryption-key-id: ${{ needs.setup-env.outputs.sensitive-data-encryption-key-id }}
-  smoke-test-frontend-bucket:
-    needs: [ setup-env, build-frontend, deploy-frontend ]
-    uses: ./.github/workflows/smoke-test-frontend-version.yml
-    secrets: inherit
-    with:
-      component: frontend-new
-      expected-version-info: ${{ needs.build-frontend.outputs.version-info }}
-      component-url: ${{ needs.deploy-frontend.outputs.frontend-url }}
-  deploy-common:
-    # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
-    if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
-    needs: [ setup-env, deploy-frontend, smoke-test-backend-apigateway, smoke-test-frontend-bucket ]
-    uses: ./.github/workflows/deploy-common.yml
-    secrets: inherit
-    with:
-      target-environment: dev
-      domain-name: ${{ needs.setup-env.outputs.domain-name }}
-      frontend-domain: ${{ needs.setup-env.outputs.frontend-domain }}
-      frontend-url: ${{ needs.setup-env.outputs.frontend-url }}
-      backend-domain: ${{ needs.setup-env.outputs.backend-domain }}
-      backend-url: ${{ needs.setup-env.outputs.backend-url }}
+      # only upload artifacts if
+      #  a) event is push
+      #    -> to main
+      #    -> with a commit message containing '[pulumi up]'
+      #    -> a tag
+      #  b) a release has been created.
 
-  deploy-aws-ns:
-    # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
-    if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
-    needs: [ setup-env, deploy-common ]
-    uses: ./.github/workflows/deploy-aws-ns.yml
+      upload-artifacts: ${{ (github.event_name == 'push' && (github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))) || (github.event_name == 'release') }}
+
+  backend-ci:
+    uses: ./.github/workflows/backend-ci.yml
     secrets: inherit
     with:
-      target-environment: dev
-      domain-name: ${{ needs.setup-env.outputs.domain-name }}
-  smoke-test-backend:
-    needs: [ setup-env, deploy-backend, deploy-aws-ns ]
-    uses: ./.github/workflows/smoke-test-backend-version.yml
+      # only upload artifacts if:
+      #  a) event is push
+      #    -> to main
+      #    -> with a commit message containing '[pulumi up]'
+      #    -> a tag
+      #  b) a release has been created.
+
+      upload-artifacts: ${{ (github.event_name == 'push' && (github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))) || github.event_name == 'release'}}
+
+  config-ci:
+    uses: ./.github/workflows/config-ci.yml
+    secrets: inherit
+    if: ${{ (github.event_name == 'push' && (github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))) || github.event_name == 'release' }}
+
+
+  deploy:
+    needs: [ frontend-ci, backend-ci, config-ci ]
+    # only deploy if:
+    #  a) event is push
+    #    -> to main
+    #    -> with a commit message containing '[pulumi up]'
+    #    -> a tag
+    #  b) a release has been created.
+
+    if: ${{ (github.event_name == 'push' && (github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))) || github.event_name == 'release' }}
+    uses: ./.github/workflows/deploy.yml
     secrets: inherit
     with:
-      component: backend
-      expected-version-info: ${{ needs.deploy-backend.outputs.version-info }}
-      component-url: ${{ needs.setup-env.outputs.backend-url }}
-      get-version-url: /version
-  smoke-test-frontend:
-    needs: [ setup-env, build-frontend, deploy-frontend, deploy-aws-ns ]
-    uses: ./.github/workflows/smoke-test-frontend-version.yml
+      # if the event is a release, the env-type is testing environment, otherwise it is dev environment.
+      env-type: ${{ (github.event_name == 'release' && 'test') || 'dev'  }}
+      target-git-sha: ${{ github.sha }}
+      target-git-branch: ${{ github.ref_name }}
+
+
+  deploy-prod:
+    needs: [ deploy ]
+    # only deploy to production if:
+    #  a) a release has been created and deployment to test was finished.
+    if: ${{ github.event_name == 'release' }}
+    uses: ./.github/workflows/deploy.yml
     secrets: inherit
     with:
-      component: frontend-new
-      expected-version-info: ${{ needs.build-frontend.outputs.version-info }}
-      component-url: ${{ needs.setup-env.outputs.frontend-url }}
+      env-type: prod
+      target-git-sha: ${{ github.sha }}
+      target-git-branch: ${{ github.ref_name }}
