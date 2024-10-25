@@ -1,0 +1,103 @@
+name: Frontend CI & Artifact Upload
+
+on:
+  workflow_call:
+    inputs:
+      upload-artifacts:
+        required: true
+        type: boolean
+        description: 'Whether to upload deployable artifacts'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'yarn'
+          cache-dependency-path: frontend-new/yarn.lock
+
+      - name: Install node packages
+        run: yarn install
+        working-directory: frontend-new
+
+      - name: Lint Frontend
+        run: yarn run lint
+        working-directory: frontend-new
+
+      - name: Compile
+        run: yarn run compile
+        working-directory: frontend-new
+
+      - name: Test Frontend
+        run: yarn run test
+        working-directory: frontend-new
+
+  accessibility:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'yarn'
+          cache-dependency-path: frontend-new/yarn.lock
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-browsers-${{ runner.os }}-v1
+          restore-keys: playwright-browsers-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: yarn install
+        working-directory: frontend-new
+
+      - name: Accessibility Tests
+        run: |
+          npx playwright install --with-deps
+          yarn run build-storybook && yarn run test:accessibility
+        working-directory: frontend-new
+
+  build-and-upload:
+    runs-on: ubuntu-latest
+    if: ${{ inputs.upload-artifacts }}
+    needs: [ test, accessibility ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'yarn'
+          cache-dependency-path: frontend-new/yarn.lock
+
+      - name: Install node packages
+        run: yarn install
+        working-directory: frontend-new
+
+      - name: Authenticate to google cloud
+        id: auth
+        uses: google-github-actions/auth@v2.1.2
+        with:
+          credentials_json:
+            ${{ secrets.GCP_LOWER_ENVS_SERVICE_ACCOUNT_JSON }}
+
+      - name: Run build and upload script.
+        shell: bash
+        run: |
+          ./iac/scripts/build-and-upload-fe.sh ${{ vars.ARTIFACT_REGISTRY_REGION }} ${{ secrets.GCP_REALM_ROOT_PROJECT_ID }} $GITHUB_STEP_SUMMARY $GITHUB_RUN_NUMBER
+        env:
+          # sentry token is required to upload sourcemaps.
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}

@@ -1,4 +1,4 @@
 name: compass-frontend
 runtime:
   name: python
-description: Tabiya compass
+description: Tabiya Compass Frontend Infrastructure

@@ -1,0 +1,4 @@
+name: compass-dns
+runtime:
+  name: python
+description: Tabiya Compass DNS for environment domains

@@ -4,81 +4,56 @@ import sys
 # Determine the absolute path to the 'iac' directory
 libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add this directory to sys.path,
-# so that we can import the iac/lib module when we run pulumi from withing the iac/common directory
+# so that we can import the iac/lib module when we run pulumi from withing the iac/common directory.
 sys.path.insert(0, libs_dir)
 
-from urllib.parse import urlparse
 import pulumi
 from deploy_common import deploy_common
-from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+from lib.std_pulumi import getconfig, getstackref, parse_realm_env_name_from_stack, load_dot_realm_env
 
 
 def main():
+    _, _, stack_name = parse_realm_env_name_from_stack()
+
+    # Load environment variables.
+    load_dot_realm_env(stack_name)
+
     # Get the config values
-    config = pulumi.Config("gcp")
-    project = config.require("project")
-    pulumi.info(f'Using project:{project}')
-    location = config.require("region")
-    pulumi.info(f'Using location:{location}')
-    environment = pulumi.get_stack()
-    pulumi.info(f"Using Environment: {environment}")
-    domain_name = os.getenv("DOMAIN_NAME")
-    pulumi.info(f"Using Domain: {domain_name}")
-    if not domain_name:
-        pulumi.error("environment variable DOMAIN_NAME is not set")
-        sys.exit(1)
+    location = getconfig("region", "gcp")
 
-    frontend_domain = os.getenv("FRONTEND_DOMAIN")
-    if not frontend_domain:
-        pulumi.error("environment variable FRONTEND_DOMAIN is not set")
-        sys.exit(1)
-    pulumi.info(f"Frontend Domain: {frontend_domain}")
+    # Get stack reference for environment
+    env_reference = pulumi.StackReference(f"tabiya-tech/compass-environment/{stack_name}")
+    project = getstackref(env_reference, "project_id")
 
-    if frontend_domain != domain_name and not frontend_domain.endswith("." + domain_name):
-        pulumi.error(f"Frontend domain {frontend_domain} is not conforming to the given domain {domain_name}")
-        sys.exit(1)
+    frontend_domain = getstackref(env_reference, "frontend_domain")
+    frontend_url = getstackref(env_reference, "frontend_url")
+    backend_url = getstackref(env_reference, "backend_url")
 
-    frontend_url = os.getenv("FRONTEND_URL")
-    if not frontend_url:
-        pulumi.error("environment variable FRONTEND_URL is not set")
-        sys.exit(1)
-    pulumi.info(f"Frontend URL: {frontend_url}")
+    # Get stack reference for dns
+    dns_stack_ref = pulumi.StackReference(f"tabiya-tech/compass-dns/{stack_name}")
+    dns_zone_name = getstackref(dns_stack_ref, "dns_zone_name")
 
-    frontend_parsed_url = urlparse(frontend_url)
-    if frontend_parsed_url.hostname != frontend_domain:
-        pulumi.error(f"Frontend URL domain {frontend_url} does not match the given domain {frontend_domain}")
-        sys.exit(1)
+    # Get stack reference for frontend
+    frontend_stack_ref = pulumi.StackReference(f"tabiya-tech/compass-frontend/{stack_name}")
+    frontend_bucket_name = getstackref(frontend_stack_ref, "bucket_name")
+    frontend_bucket_name.apply(lambda name: print(f"Using frontend bucket name: {name}"))
 
-    backend_domain = os.getenv("BACKEND_DOMAIN")
-    if not backend_domain:
-        pulumi.error("environment variable BACKEND_DOMAIN is not set")
-        sys.exit(1)
-    pulumi.info(f"Backend Domain: {backend_domain}")
-
-    if backend_domain != frontend_domain:
-        pulumi.error(f"Backend domain {backend_domain} is not equal to the frontend domain {frontend_domain}")
-        sys.exit(1)
-
-    backend_url = os.getenv("BACKEND_URL")
-    if not backend_url:
-        pulumi.error("environment variable BACKEND_URL is not set")
-        sys.exit(1)
-    if backend_url == frontend_url:
-        pulumi.error("environment variable BACKEND_URL should not be equal to FRONTEND_URL")
-        sys.exit(1)
-    pulumi.info(f"Backend URL: {backend_url}")
-
-    backend_parsed_url = urlparse(backend_url)
-    if backend_parsed_url.hostname != backend_domain:
-        pulumi.error(f"Backend URL domain {backend_url} does not match the given domain {backend_domain}")
-        sys.exit(1)
-
+    # Get stack reference for backend
+    backend_stack_ref = pulumi.StackReference(f"tabiya-tech/compass-backend/{stack_name}")
+    api_gateway_id = getstackref(backend_stack_ref, "apigateway_id")
+    api_gateway_id.apply(lambda _id: print(f"Using API gateway id: {_id}"))
 
     # Deploy common
-    deploy_common(project, location, environment, domain_name, frontend_domain, frontend_url, backend_url)
+    deploy_common(
+        project=project,
+        location=location,
+        dns_zone_name=dns_zone_name,
+        frontend_domain=frontend_domain,
+        frontend_bucket_name=frontend_bucket_name,
+        frontend_url=frontend_url,
+        backend_url=backend_url,
+        api_gateway_id=api_gateway_id)
 
 
 if __name__ == "__main__":
