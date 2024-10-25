@@ -1,0 +1,16 @@
+dns:
+  config:
+    gcp:region: <region>
+    aws:region: <region>
+auth:
+  config:
+    gcp:region: <region>
+backend:
+  config:
+    gcp:region: <region>
+frontend:
+  config:
+    gcp:region: <region>
+common:
+  config:
+    gcp:region: <region>

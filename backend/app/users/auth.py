@@ -141,7 +141,7 @@ class Authentication:
             :param request: Request object.
             :return: UserInfo object.
             """
-            target_env = os.getenv("TARGET_ENVIRONMENT")
+            target_env = os.getenv("TARGET_ENVIRONMENT_TYPE")
             try:
                 credentials: str = provider.credentials
                 token_info: Any

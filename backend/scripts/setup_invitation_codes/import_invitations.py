@@ -52,20 +52,34 @@ async def import_invitations(repository: UserInvitationRepository, invitations_d
     logger.info(f"Successfully imported {len(invitations)} invitation codes.")
 
 
-async def _main(input_file: str):
+async def _main(*, input_file: str, mongo_uri: str, db_name: str, hot_run: bool):
     # 1. Import the JSON input file.
     with open(os.path.join(input_file)) as f:
         invitations_dicts = json.load(f)
 
     # 2. Connect to the database
-    settings = ScriptSettings()  # type: ignore
-    client = AsyncIOMotorClient(settings.mongodb_uri, tlsAllowInvalidCertificates=True)
-    db = client.get_database(settings.db_name)
+    client = AsyncIOMotorClient(mongo_uri, tlsAllowInvalidCertificates=True)
+    # wait for the connection to be established
+    si = await client.server_info()
+    db = client.get_database(db_name)
     repository = UserInvitationRepository(db)
+
+    host, port = client.address
+    logger.info(f"Connected to the database {db_name} at {host}:{port} version:{si.get('version', 'Unknown version')}")
 
     # 3. Import the invitation codes
     try:
-        await import_invitations(repository, invitations_dicts)
+        if hot_run:
+            logger.info("The script is running in hot-run mode. Importing the invitation codes to the database.")
+            await import_invitations(repository, invitations_dicts)
+        else:
+            logger.info("The script is running in dry-run mode. No changes will be made to the database.")
+            logger.info("The following invitation codes would have been imported:")
+            log_msg = ""
+            for invitation_dict in invitations_dicts:
+                ui = UserInvitation(**invitation_dict)
+                log_msg += ui.model_dump_json(indent=2) + "\n"
+            logger.info(log_msg)
     except Exception as e:
         logger.exception(e)
         logger.error(f"An error occurred while importing the invitation codes: {e}")
@@ -105,6 +119,13 @@ if __name__ == "__main__":
         required=True,
         help="The path to the JSON file with invitation codes, (absolute or relative to the current working directory)",
     )
-
+    # add --hot-run
+    parser.add_argument(
+        "--hot-run",
+        action="store_true",
+        help="Run the script in a hot-run mode, which will import the invitation codes to the database.",
+    )
     args = parser.parse_args()
-    asyncio.run(_main(input_file=args.input_file))
+    # Load the script settings from the environment variables
+    settings = ScriptSettings()  # type: ignore
+    asyncio.run(_main(input_file=args.input_file, mongo_uri=settings.mongodb_uri, db_name=settings.db_name, hot_run=args.hot_run))

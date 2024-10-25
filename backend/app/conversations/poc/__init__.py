@@ -7,7 +7,7 @@ from app.users.auth import Authentication
 
 
 def add_poc_routes(app: FastAPI, authentication: Authentication):
-    target_env = os.getenv("TARGET_ENVIRONMENT")
+    target_env = os.getenv("TARGET_ENVIRONMENT_TYPE")
     include_in_schema = False
 
     # Only include poc routes in the schema if the target environment is local

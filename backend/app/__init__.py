@@ -98,8 +98,10 @@ logging.debug("Logging initialized")
 # because the sentry initialization breaks the unit tests (specifically the ones that use the fastapi test client)
 if os.getenv("ENABLE_SENTRY") == "True":
     backend_dsn = os.getenv("SENTRY_BACKEND_DSN")
+    target_environment_name = os.getenv("TARGET_ENVIRONMENT_NAME")
+
     if backend_dsn:
-        init_sentry(backend_dsn, os.getenv("TARGET_ENVIRONMENT"))
+        init_sentry(backend_dsn, target_environment_name)
     else:
         logging.warning("SENTRY_BACKEND_DSN environment variable is not set. Sentry will not be initialized")
 else:
