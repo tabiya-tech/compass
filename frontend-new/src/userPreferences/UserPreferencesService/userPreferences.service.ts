@@ -81,6 +81,7 @@ export default class UserPreferencesService {
    * Creates an entry for the user preferences of a user with an ID.
    * This is used to create a user profile for the first time.
    * you provide user_id and invitation_code
+   * throws a ServiceError if the user preferences could not be created or some other error occurred.
    */
   async createUserPreferences(user_preferences: CreateUserPreferencesSpec): Promise<UserPreference> {
     const serviceName = "UserPreferencesService";

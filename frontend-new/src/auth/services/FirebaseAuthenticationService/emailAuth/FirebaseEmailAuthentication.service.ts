@@ -147,9 +147,14 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
   }
 
   async logout(): Promise<void> {
-    await FirebaseEmailAuthenticationService.stdFirebaseAuthServiceInstance.logout();
-    // call the parent class method once the user is successfully logged out (or even if it fails)
-    await super.onSuccessfulLogout();
+    try {
+      await FirebaseEmailAuthenticationService.stdFirebaseAuthServiceInstance.logout();
+    } catch (e) {
+      throw e; // rethrow the error if logout fails so that calling code can handle it
+    } finally {
+      // call the parent class method once the user is successfully logged out (or even if it fails)
+      await super.onSuccessfulLogout();
+    }
   }
 
   async refreshToken(): Promise<void> {

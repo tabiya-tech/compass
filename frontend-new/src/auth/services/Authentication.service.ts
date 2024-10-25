@@ -83,7 +83,7 @@ abstract class AuthenticationService {
       "onSuccessfulRegistration"
     );
     try {
-      const _user = await this.getUser(token);
+      const _user = this.getUser(token);
       this.authenticationStateService.setUser(_user);
       const user = this.authenticationStateService.getUser();
       const prefs = await userPreferencesService.getUserPreferences(user!.id);
@@ -104,7 +104,7 @@ abstract class AuthenticationService {
       "onSuccessfulRegistration"
     );
     try {
-      const _user = await this.getUser(token);
+      const _user = this.getUser(token);
       this.authenticationStateService.setUser(_user);
       const user = this.authenticationStateService.getUser();
       if (user) {
@@ -125,7 +125,7 @@ abstract class AuthenticationService {
   }
 
   async onSuccessfulRefresh(token: string): Promise<void> {
-    const _user = await this.getUser(token);
+    const _user = this.getUser(token);
     this.authenticationStateService.setUser(_user);
   }
 

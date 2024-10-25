@@ -35,13 +35,14 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
    * handle anonymous login
    * @param {string} code - The invitation code to login with
    * @returns {Promise<string>} The firebase token
+   * @throws {FirebaseError| ServiceError} - If the invitation code is invalid or the login fails
    */
   async login(code: string): Promise<string> {
     const firebaseErrorFactory = getFirebaseErrorFactory(
       "InvitationCodeAuthService",
       "handleInvitationCodeLogin",
       "POST",
-      "signInAnonymously"
+      "signInAnonymously",
     );
     let userCredential;
     let invitation;
@@ -73,18 +74,18 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
     this.authenticationStateService.setUser(this.getUser(token));
     const _user = this.authenticationStateService.getUser();
 
-    if (_user) {
-      // create user preferences for the first time.
-      // in order to do this, there needs to be a logged in user in the persistent storage
-      const prefs = await userPreferencesService.createUserPreferences({
-        user_id: _user.id,
-        invitation_code: invitation.invitation_code,
-        language: Language.en,
-      });
-      userPreferencesStateService.setUserPreferences(prefs);
-    } else {
+    if (!_user) {
       throw firebaseErrorFactory(FirebaseErrorCodes.USER_NOT_FOUND, "User could not be extracted from token");
     }
+
+    // create user preferences for the first time.
+    // in order to do this, there needs to be a logged in user in the persistent storage
+    const prefs = await userPreferencesService.createUserPreferences({
+      user_id: _user.id,
+      invitation_code: invitation.invitation_code,
+      language: Language.en,
+    });
+    userPreferencesStateService.setUserPreferences(prefs);
 
     // call the parent class method once the user is successfully logged in
     await super.onSuccessfulLogin(token);
@@ -96,9 +97,14 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
   }
 
   async logout(): Promise<void> {
-    await FirebaseInvitationCodeAuthenticationService.stdFirebaseAuthServiceInstance.logout();
-    // call the parent class method once the user is successfully logged out (or even if it fails)
-    await super.onSuccessfulLogout();
+    try {
+      await FirebaseInvitationCodeAuthenticationService.stdFirebaseAuthServiceInstance.logout();
+    } catch (e) {
+      throw e; // rethrow the error if logout fails so that calling code can handle it
+    } finally {
+      // call the parent class method once the user is successfully logged out (or even if it fails)
+      await super.onSuccessfulLogout();
+    }
   }
 
   async refreshToken(): Promise<void> {

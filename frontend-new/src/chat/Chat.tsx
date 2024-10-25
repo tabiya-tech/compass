@@ -23,6 +23,7 @@ import ApproveModal from "src/theme/ApproveModal/ApproveModal";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import { SnackbarKey } from "notistack";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
+import { PersistentStorageService } from "../app/PersistentStorageService/PersistentStorageService";
 
 const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -197,6 +198,9 @@ const Chat: React.FC<ChatProps> = ({
       navigate(routerPaths.LOGIN, { replace: true });
       enqueueSnackbar("Successfully logged out.", { variant: "success" });
     } catch (error) {
+      // failed to log out perhaps due to network error,
+      // set the logged out flag to true so that the user is logged out once the app is reloaded
+      PersistentStorageService.setLoggedOutFlag(true);
       setIsLoggingOut(false);
       console.error("Failed to logout", error);
       enqueueSnackbar(`Failed to logout: ${error}`, { variant: "error" });

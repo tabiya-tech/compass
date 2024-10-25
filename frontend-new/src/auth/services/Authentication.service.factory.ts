@@ -55,6 +55,7 @@ class AuthenticationServiceFactory {
       case AuthenticationServices.FIREBASE_SOCIAL:
         return await FirebaseSocialAuthenticationService.getInstance();
       default:
+        PersistentStorageService.clearLoginMethod();
         throw new Error(`Invalid authentication method: ${authMethod}`);
     }
   }

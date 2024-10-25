@@ -87,12 +87,43 @@ const App = () => {
     }
   };
 
+  const __loadUserPreferences = async () => {
+    try {
+      const token = PersistentStorageService.getToken();
+      if (!token) {
+        // why not do a authenticationServiceInstance.logout() to clear the user data in any case?
+        console.debug("No valid token found in storage");
+        return
+      }
+      const authenticationServiceInstance = await AuthenticationServiceFactory.getCurrentAuthenticationService();
+
+      const user = authenticationServiceInstance.getUser(token);
+      if (!authenticationServiceInstance.isTokenValid(token) || ! user) {
+        console.debug("Authentication token is not valid or user could not be extracted from token");
+        await authenticationServiceInstance.logout();
+        return
+      }
+      console.debug("Valid token found in storage");
+      authStateService.getInstance().setUser(user);
+
+      console.debug("User authenticated: Welcome,", user.email);
+      await userPreferencesStateService.loadPreferences(user.id);
+      // check if user preferences have been loaded
+      const preferences = userPreferencesStateService.getUserPreferences();
+      console.debug("User preferences loaded", preferences);
+
+    } catch (error) {
+      console.error("Error loading user preferences", error);
+      PersistentStorageService.clearToken();
+      PersistentStorageService.clearLoginMethod();
+    }
+  };
+
   useEffect(() => {
     const initializeAuth = async () => {
       setLoading(true);
-      await loadUserFromPersistentStorage();
-      await loadUserPreferences();
-
+      await __loadUserPreferences()
+      setTimeout(() => setLoading(false), 500);// delay for half a sec so that the loading transition is smoother for the user and not just a flash
       return async () => {
         const authenticationServiceFactory = await AuthenticationServiceFactory.getCurrentAuthenticationService();
         try {
