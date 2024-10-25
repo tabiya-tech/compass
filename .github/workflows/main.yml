@@ -24,7 +24,7 @@ jobs:
     uses: ./.github/workflows/setup-env.yml
     secrets: inherit
     with:
-      target-environment: dev
+      target-environment: new-dev
   # Backend
   test-backend:
     uses: ./.github/workflows/unit-test-backend.yml
@@ -43,24 +43,31 @@ jobs:
     uses: ./.github/workflows/build-frontend.yml
     secrets: inherit
     with:
-      target-environment: dev
+      target-environment: new-dev
+  # sets up the organization and deploys the environment.
+  deploy-environment:
+    uses: ./.github/workflows/deploy-environment.yml
+    if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
+    secrets: inherit
+    with:
+      target-environment: new-dev
   deploy-auth:
     # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
     if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
     uses: ./.github/workflows/deploy-auth.yml
-    needs: [ setup-env ]
+    needs: [ setup-env, deploy-environment ]
     secrets: inherit
     with:
-      target-environment: dev
+      target-environment: new-dev
       frontend-domain: ${{ needs.setup-env.outputs.frontend-domain }}
   deploy-backend:
     # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
     if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
-    needs: [ test-backend, setup-env ]
+    needs: [ test-backend, setup-env, deploy-environment ]
     uses: ./.github/workflows/deploy-backend.yml
     secrets: inherit
     with:
-      target-environment: dev
+      target-environment: new-dev
       backend-url: ${{ needs.setup-env.outputs.backend-url }}
       frontend-url: ${{ needs.setup-env.outputs.frontend-url }}
       taxonomy-database-name: ${{ needs.setup-env.outputs.taxonomy-database-name }}
@@ -80,11 +87,11 @@ jobs:
   deploy-frontend:
     # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
     if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
-    needs: [ setup-env, build-frontend, deploy-auth ]
+    needs: [ setup-env, build-frontend, deploy-auth, deploy-environment ]
     uses: ./.github/workflows/deploy-frontend.yml
     secrets: inherit
     with:
-      target-environment: dev
+      target-environment: new-dev
       backend-url: ${{ needs.setup-env.outputs.backend-url }}
       identity_platform_client_api_key: ${{ needs.deploy-auth.outputs.identity_platform_client_api_key }}
       identity_platform_client_firebase_auth_domain: ${{ needs.deploy-auth.outputs.identity_platform_client_firebase_auth_domain }}
@@ -105,7 +112,7 @@ jobs:
     uses: ./.github/workflows/deploy-common.yml
     secrets: inherit
     with:
-      target-environment: dev
+      target-environment: new-dev
       domain-name: ${{ needs.setup-env.outputs.domain-name }}
       frontend-domain: ${{ needs.setup-env.outputs.frontend-domain }}
       frontend-url: ${{ needs.setup-env.outputs.frontend-url }}
@@ -119,7 +126,7 @@ jobs:
     uses: ./.github/workflows/deploy-aws-ns.yml
     secrets: inherit
     with:
-      target-environment: dev
+      target-environment: new-dev
       domain-name: ${{ needs.setup-env.outputs.domain-name }}
   smoke-test-backend:
     needs: [ setup-env, deploy-backend, deploy-aws-ns ]
