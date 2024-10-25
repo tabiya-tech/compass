@@ -1,0 +1,50 @@
+dns:
+  config:
+    gcp:region: <region>
+    aws:region: <region>
+auth:
+  config:
+    gcp:region: <region>
+backend:
+  config:
+    # The region where resources will be deployed
+    gcp:region: <region>
+
+    ############################
+    # Cloud Run settings
+    # See the pulumi documentation https://www.pulumi.com/registry/packages/gcp/api-docs/cloudrunv2/service/#inputs for more details.
+
+    # See https://cloud.google.com/run/docs/about-concurrency
+    # Between 1 and 1000
+    cloudrun:max_instance_request_concurrency: <max_instance_request_concurrency>
+
+    # See https://cloud.google.com/run/docs/about-instance-autoscaling
+    cloudrun:min_instance_count: <min_instance_count>
+    cloudrun:max_instance_count: <max_instance_count>
+    # See https://cloud.google.com/run/docs/configuring/request-timeout
+    # In seconds e.g. 60s or 3.05s
+    # This should be equal or less than the timeout of the API Gateway
+    cloudrun:request_timeout: <timeout>
+
+    # See https://cloud.google.com/run/docs/configuring/services/memory-limits
+    # Units are Ki | Mi | Gi | Ti | Pi | Ei e.g. 512Mi, 2Gi
+    cloudrun:memory_limit: <memory_limit>
+
+    # See https://cloud.google.com/run/docs/configuring/services/cpu
+    # Units are 1,2,4,6,8 or less and one in increments of 0.01
+    cloudrun:cpu_limit: <cpu_limit>
+    ############################
+
+    ############################
+    # Api Gateway settings
+    # See https://cloud.google.com/endpoints/docs/openapi/openapi-extensions#deadline
+    # In seconds as a double e.g. 15.0
+    api_gateway:timeout: <api_gateway_timeout>
+    ############################
+
+frontend:
+  config:
+    gcp:region: <region>
+common:
+  config:
+    gcp:region: <region>

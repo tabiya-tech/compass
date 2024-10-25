@@ -1,0 +1,85 @@
+name: Backend CI & Artifact Upload
+
+on:
+  workflow_call:
+    inputs:
+      upload-artifacts:
+        required: true
+        type: boolean
+        description: 'Whether to upload deployable artifacts'
+
+jobs:
+  test-build-and-upload:
+    runs-on: ubuntu-latest
+    steps:
+      # setup.
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Load cached Poetry installation
+        id: cached-poetry
+        uses: actions/cache@v4
+        with:
+          path: ~/.local
+          key: poetry-0
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.8.5
+
+      - name: Load cached Poetry cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry
+          key: poetry-cache-${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-${{ env.POETRY_VERSION }}
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          poetry lock --no-update --no-interaction
+          poetry install --no-interaction
+        working-directory: backend
+
+      # test and lint
+
+      - name: Linting Bandit
+        shell: bash
+        run: poetry run bandit -c bandit.yaml -r .
+        working-directory: backend
+
+      - name: Linting Pylint
+        shell: bash
+        # Do not fail the build if linting errors (--exit-zero)
+        # Once we have fixed all the linting errors, we can remove this flag.
+        run: poetry run pylint --exit-zero --recursive=y .
+        working-directory: backend
+
+      - name: Copy the template .env.example to .env
+        run: cp backend/.env.example backend/.env
+
+      - name: Run unit tests
+        shell: bash
+        run: poetry run pytest -m 'not (evaluation_test or smoke_test)'
+        working-directory: backend
+
+      # build and upload artifacts
+
+      - name: Authenticate to google cloud
+        if: ${{ inputs.upload-artifacts }}
+        uses: google-github-actions/auth@v2.1.2
+        with:
+          credentials_json:
+            ${{ secrets.GCP_LOWER_ENVS_SERVICE_ACCOUNT_JSON }}
+
+      - name: Run build and upload script.
+        shell: bash
+        if: ${{ inputs.upload-artifacts }}
+        run: |
+          ./iac/scripts/build-and-upload-be.sh ${{ vars.ARTIFACT_REGISTRY_REGION }} ${{ secrets.GCP_REALM_ROOT_PROJECT_ID }} $GITHUB_STEP_SUMMARY $GITHUB_RUN_NUMBER

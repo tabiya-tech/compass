@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/react";
-import { getBackendUrl, getSentryDSN } from "./envService";
+import { getBackendUrl, getSentryDSN, getTargetEnvironmentName } from "./envService";
 import React from "react";
 import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from "react-router-dom";
 import UserPreferencesStateService from "./userPreferences/UserPreferencesStateService";
@@ -12,6 +12,7 @@ export function initSentry() {
   }
   Sentry.init({
     dsn: getSentryDSN(),
+    environment: getTargetEnvironmentName(),
     integrations: [
       Sentry.browserTracingIntegration(), // performance monitoring by sentry
       Sentry.replayIntegration(), // This will allow errors logged to Sentry to have a video replay of the user's session

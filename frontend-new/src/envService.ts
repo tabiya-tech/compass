@@ -4,6 +4,7 @@ export enum EnvVariables {
   FIREBASE_API_KEY = "FIREBASE_API_KEY",
   BACKEND_URL = "BACKEND_URL",
   SENTRY_FRONTEND_DSN = "SENTRY_FRONTEND_DSN",
+  TARGET_ENVIRONMENT_NAME = "TARGET_ENVIRONMENT_NAME",
   SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY = "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY",
   SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID = "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID",
 }
@@ -12,6 +13,7 @@ export const requiredEnvVariables = [
   EnvVariables.FIREBASE_AUTH_DOMAIN,
   EnvVariables.FIREBASE_API_KEY,
   EnvVariables.BACKEND_URL,
+  EnvVariables.TARGET_ENVIRONMENT_NAME,
   EnvVariables.SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY,
   EnvVariables.SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID,
 ];
@@ -46,6 +48,10 @@ export const getBackendUrl = () => {
 
 export const getSentryDSN = () => {
   return getEnv(EnvVariables.SENTRY_FRONTEND_DSN);
+};
+
+export const getTargetEnvironmentName = () => {
+  return getEnv(EnvVariables.TARGET_ENVIRONMENT_NAME);
 };
 
 export const getSensitivePersonalDataRSAEncryptionKey = () => {

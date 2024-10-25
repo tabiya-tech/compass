@@ -1,0 +1,23 @@
+name: Upload configurations and templates
+
+on:
+  workflow_call:
+
+jobs:
+  upload-templates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to google cloud
+        id: auth
+        uses: google-github-actions/auth@v2.1.2
+        with:
+          credentials_json:
+            ${{ secrets.GCP_LOWER_ENVS_SERVICE_ACCOUNT_JSON }}
+
+      - name: upload templates
+        working-directory: iac
+        run: |
+          ./scripts/upload-templates.sh ${{ vars.ARTIFACT_REGISTRY_REGION }} ${{ secrets.GCP_REALM_ROOT_PROJECT_ID }}
