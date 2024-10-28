@@ -29,7 +29,7 @@ exports[`Chat render tests should render the Chat Component 1`] = `
       Compass
     </h1>
     <div
-      class="MuiBox-root css-1wy436c"
+      class="MuiBox-root css-cpd3fg"
     >
       <button
         class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-s7wd0n-MuiButtonBase-root-MuiIconButton-root"
@@ -40,6 +40,7 @@ exports[`Chat render tests should render the Chat Component 1`] = `
       >
         <span
           class="MuiBadge-root css-1c32n2y-MuiBadge-root"
+          data-testid="animated-badge-a348462e-a393-4445-9a3b-c9603e878ce7"
         >
           <svg
             aria-hidden="true"
@@ -64,7 +65,7 @@ exports[`Chat render tests should render the Chat Component 1`] = `
             />
           </svg>
           <span
-            class="MuiBadge-badge MuiBadge-standard MuiBadge-invisible MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightRectangular MuiBadge-overlapRectangular MuiBadge-colorPrimary css-1sbnmk8-MuiBadge-badge"
+            class="MuiBadge-badge MuiBadge-standard MuiBadge-invisible MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightRectangular MuiBadge-overlapRectangular css-ohrnoc-MuiBadge-badge"
           />
         </span>
         <span

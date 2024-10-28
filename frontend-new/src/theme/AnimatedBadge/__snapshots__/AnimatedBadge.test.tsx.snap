@@ -1,0 +1,79 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AnimatedBadge should render the badge for a large number 1`] = `
+<span
+  class="MuiBadge-root css-1c32n2y-MuiBadge-root"
+  data-testid="animated-badge-a348462e-a393-4445-9a3b-c9603e878ce7"
+>
+  <svg
+    aria-hidden="true"
+    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+    data-testid="badge-icon"
+    focusable="false"
+    viewBox="0 0 24 24"
+  >
+    <path
+      d="M14 12h4v1.5h-4zm0 3h4v1.5h-4z"
+    />
+    <path
+      d="M20 7h-5V4c0-1.1-.9-2-2-2h-2c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2m-9 0V4h2v5h-2zm9 13H4V9h5c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2h5z"
+    />
+    <circle
+      cx="9"
+      cy="13.5"
+      r="1.5"
+    />
+    <path
+      d="M11.08 16.18c-.64-.28-1.34-.43-2.08-.43s-1.44.15-2.08.43c-.56.24-.92.78-.92 1.39V18h6v-.43c0-.61-.36-1.15-.92-1.39"
+    />
+  </svg>
+  <span
+    class="MuiBadge-badge MuiBadge-standard MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightRectangular MuiBadge-overlapRectangular css-9cqolc-MuiBadge-badge"
+  >
+    <span
+      class="css-1tmou61"
+    >
+      99+
+    </span>
+  </span>
+</span>
+`;
+
+exports[`AnimatedBadge should render the badge with provided content 1`] = `
+<span
+  class="MuiBadge-root css-1c32n2y-MuiBadge-root"
+  data-testid="animated-badge-a348462e-a393-4445-9a3b-c9603e878ce7"
+>
+  <svg
+    aria-hidden="true"
+    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+    data-testid="badge-icon"
+    focusable="false"
+    viewBox="0 0 24 24"
+  >
+    <path
+      d="M14 12h4v1.5h-4zm0 3h4v1.5h-4z"
+    />
+    <path
+      d="M20 7h-5V4c0-1.1-.9-2-2-2h-2c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2m-9 0V4h2v5h-2zm9 13H4V9h5c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2h5z"
+    />
+    <circle
+      cx="9"
+      cy="13.5"
+      r="1.5"
+    />
+    <path
+      d="M11.08 16.18c-.64-.28-1.34-.43-2.08-.43s-1.44.15-2.08.43c-.56.24-.92.78-.92 1.39V18h6v-.43c0-.61-.36-1.15-.92-1.39"
+    />
+  </svg>
+  <span
+    class="MuiBadge-badge MuiBadge-standard MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightRectangular MuiBadge-overlapRectangular css-9cqolc-MuiBadge-badge"
+  >
+    <span
+      class="css-1tmou61"
+    >
+      2
+    </span>
+  </span>
+</span>
+`;
