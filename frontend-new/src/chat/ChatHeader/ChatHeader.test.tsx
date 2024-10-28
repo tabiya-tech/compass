@@ -10,6 +10,7 @@ import { testNavigateToPath } from "src/_test_utilities/routeNavigation";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
+import { DATA_TEST_ID as ANIMATED_BADGE_DATA_TEST_ID } from "src/theme/AnimatedBadge/AnimatedBadge";
 
 // mock the ContextMenu
 jest.mock("src/theme/ContextMenu/ContextMenu", () => {
@@ -307,6 +308,69 @@ describe("ChatHeader", () => {
 
       // THEN expect notifyOnExperiencesDrawerOpen to be called
       expect(givenNotifyOnExperiencesDrawerOpen).toHaveBeenCalled();
+    });
+
+    test("should show notification badge when new experience is explored", async () => {
+      // GIVEN experience explored
+      const givenExploredExperiences = 1;
+      // AND the notification badge
+      const givenExploredExperiencesNotification = true;
+
+      // WHEN the component is rendered
+      const givenChatHeader = (
+        <HashRouter>
+          <ChatHeader
+            notifyOnLogout={jest.fn()}
+            startNewConversation={jest.fn()}
+            notifyOnExperiencesDrawerOpen={jest.fn()}
+            experiencesExplored={givenExploredExperiences}
+            exploredExperiencesNotification={givenExploredExperiencesNotification}
+            setExploredExperiencesNotification={jest.fn()}
+          />
+        </HashRouter>
+      );
+      render(givenChatHeader);
+
+      // THEN expect the notification badge to be shown
+      const badge = screen.getByTestId(ANIMATED_BADGE_DATA_TEST_ID.ANIMATED_BADGE);
+      expect(badge).toBeInTheDocument();
+      // AND the badge icon to be displayed
+      const badgeIcon = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_ICON_EXPERIENCES);
+      expect(badgeIcon).toBeInTheDocument();
+      // AND the badge content to be displayed
+      expect(screen.getByText(givenExploredExperiences)).toBeInTheDocument();
+    });
+
+    test("should close the notification badge when the experiences button is clicked", async () => {
+      // GIVEN experience explored
+      const givenExploredExperiences = 1;
+      // AND the notification badge
+      const givenExploredExperiencesNotification = false;
+      // AND the notifyOnExperiencesDrawerOpen function
+      const givenNotifyOnExperiencesDrawerOpen = jest.fn();
+      // AND the component is rendered
+      const givenChatHeader = (
+        <HashRouter>
+          <ChatHeader
+            notifyOnLogout={jest.fn()}
+            startNewConversation={jest.fn()}
+            notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+            experiencesExplored={givenExploredExperiences}
+            exploredExperiencesNotification={givenExploredExperiencesNotification}
+            setExploredExperiencesNotification={jest.fn()}
+          />
+        </HashRouter>
+      );
+      render(givenChatHeader);
+
+      // WHEN the experiences button is clicked
+      const experiencesButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES);
+      fireEvent.click(experiencesButton);
+
+      // THEN expect notifyOnExperiencesDrawerOpen to be called
+      expect(givenNotifyOnExperiencesDrawerOpen).toHaveBeenCalled();
+      // AND expect the notification badge content to be hidden
+      expect(screen.queryByText(givenExploredExperiences)).not.toBeInTheDocument();
     });
   });
 

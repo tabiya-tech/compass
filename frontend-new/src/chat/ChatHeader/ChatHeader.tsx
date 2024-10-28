@@ -1,11 +1,12 @@
 import React, { SetStateAction, useContext, useState } from "react";
-import { Badge, Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import { NavLink, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
+import AnimatedBadge from "src/theme/AnimatedBadge/AnimatedBadge";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import * as Sentry from "@sentry/react";
@@ -124,7 +125,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
           display: "flex",
           alignItems: "center",
           flexDirection: "row",
-          gap: theme.spacing(theme.tabiyaSpacing.md),
+          gap: theme.spacing(theme.tabiyaSpacing.xl),
         }}
       >
         <PrimaryIconButton
@@ -135,9 +136,9 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
           data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES}
           title="view experiences"
         >
-          <Badge color="primary" badgeContent={experiencesExplored} invisible={!exploredExperiencesNotification}>
+          <AnimatedBadge badgeContent={experiencesExplored} invisible={!exploredExperiencesNotification}>
             <BadgeOutlinedIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_EXPERIENCES} />
-          </Badge>
+          </AnimatedBadge>
         </PrimaryIconButton>
         <PrimaryIconButton
           sx={{
