@@ -81,6 +81,45 @@ const skillsLabels = [
   "problem solving",
 ];
 
+const companyNames = [
+  "Tech Innovators Inc",
+  "Global Solutions Ltd",
+  "Creative Minds Co",
+  "Business Ventures LLC",
+  "Enterprise Corp",
+  "Insight Analytics",
+  "Visionary Labs",
+  "BrightPath Consultants",
+  "NextGen Enterprises",
+  "Skyline Technologies",
+];
+
+const locations = [
+  "New York, NY",
+  "San Francisco, CA",
+  "Austin, TX",
+  "Seattle, WA",
+  "Boston, MA",
+  "Chicago, IL",
+  "Los Angeles, CA",
+  "Denver, CO",
+  "Miami, FL",
+  "Atlanta, GA",
+];
+
+const jobTitles = [
+  "Software Engineer",
+  "Project Manager",
+  "Data Scientist",
+  "Marketing Specialist",
+  "Product Designer",
+  "Sales Representative",
+  "Operations Manager",
+  "HR Coordinator",
+  "Financial Analyst",
+  "Content Writer",
+];
+
 const generateRandomSkill = (usedLabels: string[]): Skill => {
   let randomLabel;
   do {
@@ -117,9 +156,9 @@ const generateRandomExperience = (workType?: WorkType): Experience => {
     UUID: uuidv4(),
     start_date: startDate,
     end_date: endDate,
-    experience_title: faker.person.jobTitle(),
-    company: faker.company.name(),
-    location: faker.location.city(),
+    experience_title: jobTitles[Math.floor(Math.random() * jobTitles.length)],
+    company: companyNames[Math.floor(Math.random() * companyNames.length)],
+    location: locations[Math.floor(Math.random() * locations.length)],
     work_type: randomWorkType,
     top_skills: [
       generateRandomSkill(usedLabels),
