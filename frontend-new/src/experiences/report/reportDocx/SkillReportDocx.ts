@@ -1,4 +1,3 @@
-import { saveAs } from "file-saver";
 import { Document, Paragraph, Packer, TextRun, ImageRun, HeadingLevel, AlignmentType, BorderStyle } from "docx";
 import { Experience } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
 import { generateContent } from "src/experiences/report/reportDocx/components/experiencesReportContent/ExperiencesReportContent";
@@ -25,7 +24,7 @@ interface SkillReportDocxProps {
   conversationConductedAt: string | null;
 }
 
-const SkillReportDocx = async (props: SkillReportDocxProps) => {
+const SkillReportDocx = async (props: SkillReportDocxProps): Promise<Blob> => {
   const { name, email, phone, address, experiences, conversationConductedAt } = props;
   const header = await HeaderComponent();
   const footer = await FooterComponent();
@@ -222,8 +221,16 @@ const SkillReportDocx = async (props: SkillReportDocxProps) => {
     ],
   });
 
-  Packer.toBlob(doc).then((blob) => {
-    saveAs(blob, "compass-skills-report.docx");
+  return new Promise((resolve, reject) => {
+    Packer.toBlob(doc).then(
+      (blob) => {
+        resolve(blob);
+      },
+      (error) => {
+        console.log(error);
+        reject(error);
+      }
+    );
   });
 };
 

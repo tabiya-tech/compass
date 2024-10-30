@@ -60,7 +60,6 @@
     "@sentry/react": "^8.28.0",
     "@sentry/webpack-plugin": "^2.22.4",
     "docx": "^8.5.0",
-    "file-saver": "^2.0.5",
     "firebase": "^10.12.2",
     "firebaseui": "^6.1.0",
     "framer-motion": "^11.2.11",

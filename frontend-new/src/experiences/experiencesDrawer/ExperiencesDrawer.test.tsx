@@ -8,22 +8,6 @@ import { mockExperiences } from "src/experiences/experiencesDrawer/experienceSer
 import { DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID } from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
 import { DATA_TEST_ID as EXPERIENCES_DRAWER_CONTENT_TEST_ID } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
 
-// mock PDFDownloadLink
-jest.mock("@react-pdf/renderer", () => {
-  return {
-    PDFDownloadLink: jest.fn(() => {
-      return <div data-testid={"mock-PDFDownloadLink"} />;
-    }),
-  };
-});
-
-// mock SkillReport
-jest.mock("src/experiences/report/reactPdf/Report", () => {
-  return jest.fn(() => {
-    return <div data-testid={"mock-SkillReport"} />;
-  });
-});
-
 // mock custom text field
 jest.mock("src/theme/CustomTextField/CustomTextField", () => {
   return jest.fn(({ label, ...props }) => {

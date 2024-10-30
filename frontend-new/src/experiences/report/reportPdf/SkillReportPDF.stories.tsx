@@ -1,12 +1,12 @@
-import React from "react";
 import { Meta } from "@storybook/react";
-import SkillReportDocx from "src/experiences/report/reportDocx/ReportDocx";
-import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { generateRandomExperiences } from "src/experiences/experiencesDrawer/experienceService/_test_utilities/mockExperiencesResponses";
+import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
+import { PDFReportDownloadProvider } from "./provider";
 
 const meta: Meta = {
-  title: "Report/ReportDocx",
+  title: "Report/ReportPdf",
   tags: ["autodocs"],
+  argTypes: {},
 };
 
 export default meta;
@@ -20,21 +20,23 @@ const mockedData = {
   conversationConductedAt: "2021-08-01T00:00:00Z",
 };
 
+const reportDownloadProvider = new PDFReportDownloadProvider();
+
 export const Shown = () => (
-  <PrimaryButton onClick={() => SkillReportDocx(mockedData)}>Download Report Docx</PrimaryButton>
+  <PrimaryButton onClick={() => reportDownloadProvider.download(mockedData)}>Download Report Pdf</PrimaryButton>
 );
 
 export const ShownWithSingleExperience = () => {
   return (
     <PrimaryButton
       onClick={() =>
-        SkillReportDocx({
+        reportDownloadProvider.download({
           ...mockedData,
           experiences: generateRandomExperiences(1).slice(0, 1),
         })
       }
     >
-      Download Report Docx
+      Download Report Pdf
     </PrimaryButton>
   );
 };
@@ -43,22 +45,22 @@ export const ShownWithManyExperiences = () => {
   return (
     <PrimaryButton
       onClick={() =>
-        SkillReportDocx({
+        reportDownloadProvider.download({
           ...mockedData,
           experiences: generateRandomExperiences(10),
         })
       }
     >
-      Download Report Docx
+      Download Report Pdf
     </PrimaryButton>
   );
 };
 
-export const ShowWithNoPersonalInfo = () => {
+export const ShownWithNoPersonalInfo = () => {
   return (
     <PrimaryButton
       onClick={() =>
-        SkillReportDocx({
+        reportDownloadProvider.download({
           ...mockedData,
           name: "",
           email: "",
@@ -67,7 +69,7 @@ export const ShowWithNoPersonalInfo = () => {
         })
       }
     >
-      Download Report Docx
+      Download Report Pdf
     </PrimaryButton>
   );
 };
@@ -76,14 +78,14 @@ export const ShownWithSomePersonalInfo = () => {
   return (
     <PrimaryButton
       onClick={() =>
-        SkillReportDocx({
+        reportDownloadProvider.download({
           ...mockedData,
           email: "",
           phone: "",
         })
       }
     >
-      Download Report Docx
+      Download Report Pdf
     </PrimaryButton>
   );
 };
@@ -92,7 +94,7 @@ export const ShownWithNoCompany = () => {
   return (
     <PrimaryButton
       onClick={() =>
-        SkillReportDocx({
+        reportDownloadProvider.download({
           ...mockedData,
           experiences: [
             {
@@ -103,7 +105,7 @@ export const ShownWithNoCompany = () => {
         })
       }
     >
-      Download Report Docx
+      Download Report Pdf
     </PrimaryButton>
   );
 };
@@ -112,7 +114,7 @@ export const ShownWithNoLocation = () => {
   return (
     <PrimaryButton
       onClick={() =>
-        SkillReportDocx({
+        reportDownloadProvider.download({
           ...mockedData,
           experiences: [
             {
@@ -123,7 +125,7 @@ export const ShownWithNoLocation = () => {
         })
       }
     >
-      Download Report Docx
+      Download Report Pdf
     </PrimaryButton>
   );
 };

@@ -9,11 +9,6 @@ export type ReportProps = {
   conversationConductedAt: string | null;
 };
 
-export enum ExportFormat {
-  PDF = "pdf",
-  DOCX = "docx",
-}
-
 export interface IReportFormatProvider {
-  download: () => void;
+  download: (props: ReportProps) => void;
 }
