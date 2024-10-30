@@ -4,8 +4,8 @@ import { fireEvent, render, screen, waitFor } from "src/_test_utilities/test-uti
 import { DATA_TEST_ID as CHAT_HEADER_TEST_ID, MENU_ITEM_ID } from "./ChatHeader/ChatHeader";
 import ChatList, { DATA_TEST_ID as CHAT_LIST_TEST_ID } from "./ChatList/ChatList";
 import ChatMessageField, { DATA_TEST_ID as CHAT_MESSAGE_FIELD_TEST_ID } from "./ChatMessageField/ChatMessageField";
-import { DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID } from "src/Experiences/components/ExperiencesDrawerHeader/ExperiencesDrawerHeader";
-import { DATA_TEST_ID as EXPERIENCES_DRAWER_CONTAINER_TEST_ID } from "src/Experiences/ExperiencesDrawer";
+import { DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID } from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
+import { DATA_TEST_ID as EXPERIENCES_DRAWER_CONTAINER_TEST_ID } from "src/experiences//experiencesDrawer/ExperiencesDrawer";
 import { DATA_TEST_ID as APPROVE_MODEL_TEST_ID } from "src/theme/ApproveModal/ApproveModal";
 import { HashRouter } from "react-router-dom";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -13,7 +13,7 @@ import { ConversationMessageSender } from "./ChatService/ChatService.types";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import ChatService from "./ChatService/ChatService";
-import ExperienceService from "src/Experiences/ExperienceService/ExperienceService";
+import ExperienceService from "src/experiences/experiencesDrawer/experienceService/experienceService";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { act } from "@testing-library/react";
 
@@ -35,7 +35,7 @@ jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSo
 });
 
 // mock the ExperienceService module
-jest.mock("src/Experiences/ExperienceService/ExperienceService", () => {
+jest.mock("src/experiences/experiencesDrawer/experienceService/experienceService", () => {
   return {
     __esModule: true,
     default: {
