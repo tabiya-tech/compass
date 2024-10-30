@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import Chat from "./Chat";
 import { getBackendUrl } from "src/envService";
-import { mockExperiences } from "src/Experiences/ExperienceService/_test_utilities/mockExperiencesResponses";
+import { mockExperiences } from "src/experiences/experiencesDrawer/experienceService/_test_utilities/mockExperiencesResponses";
 
 const meta: Meta<typeof Chat> = {
   title: "Chat/Chat-Component",
