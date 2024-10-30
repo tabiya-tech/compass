@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text } from "@react-pdf/renderer";
-import styles from "src/experiences/report/reactPdf/styles";
+import styles from "src/experiences/report/reportPdf/styles";
 import { ReportContent } from "src/experiences/report/reportContent";
 
 interface SkillsDescriptionProps {

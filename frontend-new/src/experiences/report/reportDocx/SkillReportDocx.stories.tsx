@@ -1,15 +1,12 @@
-import Report from "src/experiences/report/reactPdf/Report";
+import React from "react";
 import { Meta } from "@storybook/react";
-import { generateRandomExperiences } from "src/experiences/experiencesDrawer/experienceService/_test_utilities/mockExperiencesResponses";
-import { pdf } from "@react-pdf/renderer";
-import { saveAs } from "file-saver";
-import { ReportProps } from "src/experiences/report/types";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
+import { generateRandomExperiences } from "src/experiences/experiencesDrawer/experienceService/_test_utilities/mockExperiencesResponses";
+import { DocxReportDownloadProvider } from "./provider";
 
 const meta: Meta = {
-  title: "Report/ReportPdf",
+  title: "Report/ReportDocx",
   tags: ["autodocs"],
-  argTypes: {},
 };
 
 export default meta;
@@ -22,26 +19,23 @@ const mockedData = {
   experiences: generateRandomExperiences(2),
   conversationConductedAt: "2021-08-01T00:00:00Z",
 };
+const reportDownloadProvider = new DocxReportDownloadProvider();
 
-const generatePdf = async (data: ReportProps) => {
-  const fileName = "compass-skills-report.pdf";
-  const blob = await pdf(<Report {...data} />).toBlob();
-  saveAs(blob, fileName);
-};
-
-export const Shown = () => <PrimaryButton onClick={() => generatePdf(mockedData)}>Download Report Pdf</PrimaryButton>;
+export const Shown = () => (
+  <PrimaryButton onClick={() => reportDownloadProvider.download(mockedData)}>Download Report Docx</PrimaryButton>
+);
 
 export const ShownWithSingleExperience = () => {
   return (
     <PrimaryButton
       onClick={() =>
-        generatePdf({
+        reportDownloadProvider.download({
           ...mockedData,
           experiences: generateRandomExperiences(1).slice(0, 1),
         })
       }
     >
-      Download Report Pdf
+      Download Report Docx
     </PrimaryButton>
   );
 };
@@ -50,22 +44,22 @@ export const ShownWithManyExperiences = () => {
   return (
     <PrimaryButton
       onClick={() =>
-        generatePdf({
+        reportDownloadProvider.download({
           ...mockedData,
           experiences: generateRandomExperiences(10),
         })
       }
     >
-      Download Report Pdf
+      Download Report Docx
     </PrimaryButton>
   );
 };
 
-export const ShownWithNoPersonalInfo = () => {
+export const ShowWithNoPersonalInfo = () => {
   return (
     <PrimaryButton
       onClick={() =>
-        generatePdf({
+        reportDownloadProvider.download({
           ...mockedData,
           name: "",
           email: "",
@@ -74,7 +68,7 @@ export const ShownWithNoPersonalInfo = () => {
         })
       }
     >
-      Download Report Pdf
+      Download Report Docx
     </PrimaryButton>
   );
 };
@@ -83,14 +77,14 @@ export const ShownWithSomePersonalInfo = () => {
   return (
     <PrimaryButton
       onClick={() =>
-        generatePdf({
+        reportDownloadProvider.download({
           ...mockedData,
           email: "",
           phone: "",
         })
       }
     >
-      Download Report Pdf
+      Download Report Docx
     </PrimaryButton>
   );
 };
@@ -99,7 +93,7 @@ export const ShownWithNoCompany = () => {
   return (
     <PrimaryButton
       onClick={() =>
-        generatePdf({
+        reportDownloadProvider.download({
           ...mockedData,
           experiences: [
             {
@@ -110,7 +104,7 @@ export const ShownWithNoCompany = () => {
         })
       }
     >
-      Download Report Pdf
+      Download Report Docx
     </PrimaryButton>
   );
 };
@@ -119,7 +113,7 @@ export const ShownWithNoLocation = () => {
   return (
     <PrimaryButton
       onClick={() =>
-        generatePdf({
+        reportDownloadProvider.download({
           ...mockedData,
           experiences: [
             {
@@ -130,7 +124,7 @@ export const ShownWithNoLocation = () => {
         })
       }
     >
-      Download Report Pdf
+      Download Report Docx
     </PrimaryButton>
   );
 };

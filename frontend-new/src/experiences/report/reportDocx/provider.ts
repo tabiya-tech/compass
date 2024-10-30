@@ -1,21 +1,18 @@
-import ReportDocx from "src/experiences/report/reportDocx/ReportDocx";
+import SkillReportDocx from "src/experiences/report/reportDocx/SkillReportDocx";
 import { IReportFormatProvider, ReportProps } from "src/experiences/report/types";
+import { saveAs } from "src/experiences/saveAs";
 
 export class DocxReportDownloadProvider implements IReportFormatProvider {
-  props: ReportProps;
-
-  constructor(props: ReportProps) {
-    this.props = props;
-  }
-
-  async download() {
-    await ReportDocx({
-      name: this.props.name,
-      email: this.props.email,
-      phone: this.props.phone,
-      address: this.props.address,
-      experiences: this.props.experiences,
-      conversationConductedAt: this.props.conversationConductedAt,
+  async download(props: ReportProps) {
+    const fileName = "compass-skills-report.docx";
+    const blob = await SkillReportDocx({
+      name: props.name,
+      email: props.email,
+      phone: props.phone,
+      address: props.address,
+      experiences: props.experiences,
+      conversationConductedAt: props.conversationConductedAt,
     });
+    saveAs(blob, fileName);
   }
 }

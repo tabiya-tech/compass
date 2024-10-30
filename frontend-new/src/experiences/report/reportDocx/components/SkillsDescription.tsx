@@ -1,7 +1,7 @@
 import { Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle } from "docx";
 import { Skill } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
 import { ReportContent } from "src/experiences/report/reportContent";
-import { capitalizeFirstLetter } from "src/experiences/report/reactPdf/components/experiencesReportContent/ExperiencesReportContent";
+import { capitalizeFirstLetter } from "src/experiences/report/reportPdf/components/experiencesReportContent/ExperiencesReportContent";
 import { TabiyaBasicColors } from "src/theme/applicationTheme/applicationTheme";
 
 interface SkillsDescriptionProps {

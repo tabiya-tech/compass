@@ -3,8 +3,8 @@ import { Experience } from "src/experiences/experiencesDrawer/experienceService/
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import DownloadReportButton from "src/experiences/experiencesDrawer/components/downloadReportButton/DownloadReportButton";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
-import { ExportFormat } from "src/experiences/report/types";
-import { ReportFormatProvider } from "src/experiences/report/reportProvider";
+import { PDFReportDownloadProvider } from "src/experiences/report/reportPdf/provider";
+import { DocxReportDownloadProvider } from "src/experiences/report/reportDocx/provider";
 
 interface DownloadReportDropdownProps {
   name: string;
@@ -40,21 +40,21 @@ const DownloadReportDropdown: React.FC<DownloadReportDropdownProps> = (props) =>
     conversationConductedAt: props.conversationConductedAt,
   };
 
-  const docsReportProvider = ReportFormatProvider.init(reportProps, ExportFormat.DOCX);
-  const pdfReportProvider = ReportFormatProvider.init(reportProps, ExportFormat.PDF);
+  const docxsReportProvider = new DocxReportDownloadProvider();
+  const pdfReportProvider = new PDFReportDownloadProvider();
 
   const contextMenuItems: MenuItemConfig[] = [
     {
       id: MENU_ITEM_ID.REPORT_PDF,
       text: MENU_ITEM_TEXT.REPORT_PDF,
       disabled: false,
-      action: () => pdfReportProvider.download(),
+      action: () => pdfReportProvider.download(reportProps),
     },
     {
       id: MENU_ITEM_ID.REPORT_DOCX,
       text: MENU_ITEM_TEXT.REPORT_DOCX,
       disabled: false,
-      action: () => docsReportProvider.download(),
+      action: () => docxsReportProvider.download(reportProps),
     },
   ];
 

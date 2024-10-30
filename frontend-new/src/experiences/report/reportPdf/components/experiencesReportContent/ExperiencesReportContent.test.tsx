@@ -3,7 +3,7 @@ import "src/_test_utilities/consoleMock";
 
 import ExperiencesReportContent, {
   DATA_TEST_ID,
-} from "src/experiences/report/reactPdf/components/experiencesReportContent/ExperiencesReportContent";
+} from "src/experiences/report/reportPdf/components/experiencesReportContent/ExperiencesReportContent";
 import { mockExperiences } from "src/experiences/experiencesDrawer/experienceService/_test_utilities/mockExperiencesResponses";
 import { render, screen } from "src/_test_utilities/test-utils";
 

@@ -1,7 +1,7 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
 
-import SkillReport, { DATA_TEST_ID } from "src/experiences/report/reactPdf/Report";
+import SkillReportPDF, { DATA_TEST_ID } from "src/experiences/report/reportPdf/SkillReportPDF";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { mockExperiences } from "src/experiences/experiencesDrawer/experienceService/_test_utilities/mockExperiencesResponses";
 
@@ -10,7 +10,7 @@ describe("Report", () => {
     // GIVEN the Report component
     const experiences = mockExperiences;
     const givenReport = (
-      <SkillReport
+      <SkillReportPDF
         name="John Doe"
         email="johndoe@example.com"
         phone="1234567890"

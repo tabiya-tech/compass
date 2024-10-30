@@ -1,5 +1,5 @@
 import React from "react";
-import { Document, Text, Page, View, Image as DefaultImage, ImageWithSrcProp } from "@react-pdf/renderer";
+import { Document, Text, Page, View, Image } from "@react-pdf/renderer";
 import { Experience } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
 import {
   formatDate,
@@ -9,10 +9,10 @@ import {
   prettifyText,
 } from "src/experiences/report/util";
 import { ReportContent } from "src/experiences/report/reportContent";
-import Footer from "src/experiences/report/reactPdf/components/Footer";
-import ExperiencesReportContent from "src/experiences/report/reactPdf/components/experiencesReportContent/ExperiencesReportContent";
-import SkillsDescription from "src/experiences/report/reactPdf/components/SkillsDescription";
-import styles from "src/experiences/report/reactPdf/styles";
+import Footer from "src/experiences/report/reportPdf/components/Footer";
+import ExperiencesReportContent from "src/experiences/report/reportPdf/components/experiencesReportContent/ExperiencesReportContent";
+import SkillsDescription from "src/experiences/report/reportPdf/components/SkillsDescription";
+import styles from "src/experiences/report/reportPdf/styles";
 
 interface SkillReportProps {
   name: string;
@@ -38,9 +38,7 @@ export const DATA_TEST_ID = {
   SKILL_REPORT_EXPERIENCES_CONTAINER: `skill-report-experiences-container-${uniqueId}`,
 };
 
-export const Image = (props: ImageWithSrcProp) => <DefaultImage {...props} />;
-
-const SkillReport: React.FC<SkillReportProps> = ({
+const SkillReportPDF: React.FC<SkillReportProps> = ({
   name,
   email,
   phone,
@@ -61,7 +59,7 @@ const SkillReport: React.FC<SkillReportProps> = ({
       <View style={styles.categoryContainer}>
         <View wrap={false}>
           <View style={styles.categoryTitleContainer}>
-            <Image src={getBase64Image(icon)} style={styles.categoryIcon} />
+            <Image src={getBase64Image(icon)} style={styles.categoryIcon} source={undefined}/>
             <Text x={0} y={0} style={styles.categoryTitle}>
               {title}
             </Text>
@@ -83,7 +81,7 @@ const SkillReport: React.FC<SkillReportProps> = ({
     return (
       <View style={styles.rowView} data-testid={dataTestId}>
         <View style={styles.infoIcons}>
-          <Image src={getBase64Image(icon)} style={styles.infoIcon} />
+          <Image src={getBase64Image(icon)} style={styles.infoIcon} source={undefined}/>
         </View>
         <Text x={0} y={0} style={styles.text}>
           {value}
@@ -97,8 +95,8 @@ const SkillReport: React.FC<SkillReportProps> = ({
       <Page size="A4" style={styles.page}>
         <View style={styles.body} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY}>
           <View fixed style={styles.logoContainer}>
-            <Image src={getBase64Image(ReportContent.IMAGE_URLS.COMPASS_LOGO)} style={styles.compassImage} />
-            <Image src={getBase64Image(ReportContent.IMAGE_URLS.OXFORD_LOGO)} style={styles.image} />
+            <Image src={getBase64Image(ReportContent.IMAGE_URLS.COMPASS_LOGO)} style={styles.compassImage} source={undefined}/>
+            <Image src={getBase64Image(ReportContent.IMAGE_URLS.OXFORD_LOGO)} style={styles.image} source={undefined}/>
           </View>
           <Text x={0} y={0} style={styles.title} data-testid={DATA_TEST_ID.SKILL_REPORT_TITLE}>
             {ReportContent.SKILLS_REPORT_TITLE}
@@ -155,4 +153,4 @@ const SkillReport: React.FC<SkillReportProps> = ({
   );
 };
 
-export default SkillReport;
+export default SkillReportPDF;
