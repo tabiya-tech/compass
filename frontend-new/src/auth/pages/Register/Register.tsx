@@ -14,7 +14,7 @@ import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import FeedbackButton from "src/feedback/FeedbackButton";
-import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
+import FirebaseSocialAuthenticationService from "../../services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -58,9 +58,6 @@ const Register: React.FC = () => {
 
   const handleError = useCallback(
     async (error: Error) => {
-      // if the registration code is not valid or something goes wrong, log the user out
-      const authenticationServiceFactory = AuthenticationServiceFactory.getCurrentAuthenticationService();
-      await authenticationServiceFactory!.logout();
       let errorMessage;
       if (error instanceof ServiceError) {
         writeServiceErrorToLog(error, console.error);
@@ -99,6 +96,8 @@ const Register: React.FC = () => {
         enqueueSnackbar("Welcome back!", { variant: "success" });
       }
     } catch (error) {
+      const firebaseSocialAuthServiceInstance = FirebaseSocialAuthenticationService.getInstance();
+      await firebaseSocialAuthServiceInstance.logout(); // this does not throw an error, at least in the current implementation
       await handleError(error as Error);
     } finally {
       setIsLoading(false);
@@ -118,14 +117,13 @@ const Register: React.FC = () => {
     async (username: string, email: string, password: string) => {
       setIsLoading(true);
       try {
-        const firebaseEmailAuthServiceInstance = await FirebaseEmailAuthService.getInstance();
+        const firebaseEmailAuthServiceInstance = FirebaseEmailAuthService.getInstance();
         await firebaseEmailAuthServiceInstance.register(email, password, username, registrationCode);
         enqueueSnackbar("Verification Email Sent!", { variant: "success" });
         // IMPORTANT NOTE: after the preferences are added, or fail to be added, we should log the user out immediately,
         // since if we don't do that, the user may be able to access the application without verifying their email
         // or accepting the dpa.
-        const authenticationServiceFactory = AuthenticationServiceFactory.getCurrentAuthenticationService();
-        await authenticationServiceFactory!.logout();
+        await firebaseEmailAuthServiceInstance.logout();
         // navigate to the verify email page
         navigate(routerPaths.VERIFY_EMAIL, { replace: true });
       } catch (e) {

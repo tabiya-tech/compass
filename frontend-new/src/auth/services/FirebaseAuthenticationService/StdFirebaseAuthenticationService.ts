@@ -69,7 +69,6 @@ class StdFirebaseAuthenticationService {
    * and clears user data from the authentication state and user preferences state services.
    *
    * @returns {Promise<void>} A promise that resolves when the logout process is complete.
-   * @throws {FirebaseError} If an error occurs during the logout process.
    */
   async logout(): Promise<void> {
     try {

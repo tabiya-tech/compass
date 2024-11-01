@@ -63,7 +63,6 @@ abstract class AuthenticationService {
 
   /**
    * Updates the application state when a successful logout occurs
-   * @throws {Error} If clearing the persistent storage fails
    */
   async onSuccessfulLogout(): Promise<void> {
     // clear the user from the context, and the persistent storage
