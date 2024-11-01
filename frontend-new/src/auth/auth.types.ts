@@ -8,6 +8,13 @@ export type Token = {
   iss: string;
   exp: number;
   iat: number;
+  [key: string]: any;
+};
+
+export type TokenHeader = {
+  typ: string;
+  kid: string;
+  alg: string;
 };
 
 export enum AuthenticationServices {

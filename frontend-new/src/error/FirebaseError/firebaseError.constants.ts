@@ -45,5 +45,6 @@ export const USER_FRIENDLY_FIREBASE_ERROR_MESSAGES: Record<FirebaseErrorCodes, s
     "The invitation code you used is for registration rather than logging in. Please go to the register page.",
   [FirebaseErrorCodes.INVALID_REGISTRATION_TYPE]:
     "The invitation code you used is for logging in rather than registration. Please go to the login page.",
-  [FirebaseErrorCodes.POPUP_CLOSED_BY_USER]: "The Google sign-in popup was closed before completing the sign-in process.",
+  [FirebaseErrorCodes.POPUP_CLOSED_BY_USER]:
+    "The Google sign-in popup was closed before completing the sign-in process.",
 };

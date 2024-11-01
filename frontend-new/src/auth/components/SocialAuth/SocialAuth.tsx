@@ -38,13 +38,13 @@ export interface SocialAuthProps {
 }
 
 const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
-                                                           registrationCode,
-                                                           disabled = false,
-                                                           label,
-                                                           postLoginHandler,
-                                                           isLoading,
-                                                           notifyOnLoading,
-                                                         }) => {
+  registrationCode,
+  disabled = false,
+  label,
+  postLoginHandler,
+  isLoading,
+  notifyOnLoading,
+}) => {
   const isOnline = useContext(IsOnlineContext);
 
   const { enqueueSnackbar } = useSnackbar();
@@ -52,13 +52,12 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
   const [_registrationCode, setRegistrationCode] = useState(registrationCode);
 
   const [showRegistrationCodeForm, setShowRegistrationCodeForm] = useState<RegistrationCodeFormModalState>(
-    RegistrationCodeFormModalState.HIDE,
+    RegistrationCodeFormModalState.HIDE
   );
 
   useEffect(() => {
     setRegistrationCode(registrationCode);
   }, [registrationCode]);
-
 
   const handleError = useCallback(
     async (error: Error) => {
@@ -80,7 +79,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       }
       enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
     },
-    [enqueueSnackbar, registrationCode],
+    [enqueueSnackbar, registrationCode]
   );
 
   const registerUser = useCallback(
@@ -111,7 +110,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
         await handleError(error);
       }
     },
-    [handleError],
+    [handleError]
   );
 
   const loginWithPopup = useCallback(async () => {
@@ -149,7 +148,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       postLoginHandler();
       setShowRegistrationCodeForm(RegistrationCodeFormModalState.HIDE);
     },
-    [registerUser, postLoginHandler],
+    [registerUser, postLoginHandler]
   );
 
   const socialAuthLoading = isLoading || !isOnline || disabled;

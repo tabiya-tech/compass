@@ -1,6 +1,5 @@
 import { TabiyaUser } from "src/auth/auth.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-
 /**
  * AuthenticationStateService manages the authentication state of the application.
  * It provides methods to get, set, and clear the current user, as well as to update

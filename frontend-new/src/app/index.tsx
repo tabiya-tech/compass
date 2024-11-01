@@ -50,11 +50,12 @@ const App = () => {
       }
 
       const user = authenticationServiceInstance.getUser(token);
-      if (!authenticationServiceInstance.isTokenValid(token) || !user) {
+      if (!user || !authenticationServiceInstance.isTokenValid(token).isValid) {
         console.debug("Authentication token is not valid or user could not be extracted from token");
         await authenticationServiceInstance.logout();
         return;
       }
+
       console.debug("Valid token found in storage");
       AuthenticationStateService.getInstance().setUser(user);
 
