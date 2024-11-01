@@ -2,7 +2,6 @@
 import "src/_test_utilities/consoleMock";
 import FirebaseSocialAuthService from "src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
 import firebase from "firebase/compat/app";
-import authenticationStateService from "src/auth/services/AuthenticationState.service";
 
 jest.mock("firebase/compat/app", () => {
   return {
@@ -74,13 +73,13 @@ describe("SocialAuthService class tests", () => {
       // @ts-ignore
       jest.spyOn(firebase.auth(), "signInWithPopup").mockResolvedValueOnce({ user: mockUser });
       // AND the token is decoded into a user
-      jest.spyOn(authenticationStateService.getInstance(), "getUser").mockReturnValue(givenUser);
+      jest.spyOn(authService, "getUser").mockReturnValue(givenUser);
 
       // WHEN the Google login is attempted
-      const socialLoginCallback = async () => await authService.loginWithGoogle();
+      const actualToken = await authService.loginWithGoogle();
 
       // THEN the token should be returned
-      await expect(socialLoginCallback()).resolves.toEqual(mockUser.multiFactor.user.accessToken);
+      expect(actualToken).toEqual(mockUser.multiFactor.user.accessToken);
     });
 
     test("should throw an error if user is not found during sign-in", async () => {
@@ -89,10 +88,10 @@ describe("SocialAuthService class tests", () => {
       jest.spyOn(firebase.auth(), "signInWithPopup").mockResolvedValueOnce({ user: { multiFactor: { user: {} } } });
 
       // WHEN the Google login is attempted
-      const socialLoginCallback = async () => await authService.loginWithGoogle();
+      const socialLoginPromise = authService.loginWithGoogle();
 
       // THEN the error should be thrown
-      await expect(socialLoginCallback()).rejects.toThrow("The user could not be found");
+      await expect(socialLoginPromise).rejects.toThrow("The user could not be found");
     });
   });
 });

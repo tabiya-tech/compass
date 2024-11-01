@@ -108,8 +108,7 @@ export default class UserPreferencesService {
       expectedContentType: "application/json",
     });
     const responseBody = await response.text();
-    const userPreferencesResponse: UserPreference = this.parseJsonResponse(responseBody, errorFactory);
-    return userPreferencesResponse;
+    return this.parseJsonResponse(responseBody, errorFactory);
   }
 
   /**
@@ -142,8 +141,7 @@ export default class UserPreferencesService {
       expectedContentType: "application/json",
     });
     const responseBody = await response.text();
-    const userPreferencesResponse: UserPreference = this.parseJsonResponse(responseBody, errorFactory);
-    return userPreferencesResponse;
+    return this.parseJsonResponse(responseBody, errorFactory);
   }
 
   /**
@@ -175,8 +173,7 @@ export default class UserPreferencesService {
     }
 
     const responseBody = await response.text();
-    const userPreferencesResponse: UserPreference = this.parseJsonResponse(responseBody, errorFactory);
-    return userPreferencesResponse;
+    return this.parseJsonResponse(responseBody, errorFactory);
   }
 
   /**
@@ -203,8 +200,7 @@ export default class UserPreferencesService {
     });
 
     const responseBody = await response.text();
-    const userPreferencesResponse: UserPreference = this.parseJsonResponse(responseBody, errorFactory);
-    return userPreferencesResponse;
+    return this.parseJsonResponse(responseBody, errorFactory);
   }
 }
 

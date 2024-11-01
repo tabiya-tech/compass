@@ -5,8 +5,7 @@ import {
 } from "src/userPreferences/UserPreferencesStateService";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
-import { TabiyaUser, Token } from "src/auth/auth.types";
+import { TabiyaUser, Token, TokenHeader } from "src/auth/auth.types";
 import { jwtDecode } from "jwt-decode";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
@@ -80,23 +79,16 @@ abstract class AuthenticationService {
    * @throws {FirebaseError} If the user is not found after successful login
    */
   async onSuccessfulLogin(token: string): Promise<void> {
-    const firebaseErrorFactory = getFirebaseErrorFactory(
-      "AuthenticationService",
-      "onSuccessfulRegistration",
-      "POST",
-      "onSuccessfulRegistration"
-    );
-    try {
-      const _user = this.getUser(token);
-      this.authenticationStateService.setUser(_user);
-      const user = this.authenticationStateService.getUser();
-      const prefs = await userPreferencesService.getUserPreferences(user!.id);
-      if (prefs !== null) {
-        // set the local preferences "state" ( for lack of a better word )
-        userPreferencesStateService.setUserPreferences(prefs);
-      }
-    } catch (err) {
-      throw firebaseErrorFactory((err as any).code, (err as any).message);
+    const user = this.getUser(token);
+    if (!user) {
+      throw Error("User not found in the token");
+    }
+    PersistentStorageService.setToken(token);
+    this.authenticationStateService.setUser(user);
+    const prefs = await userPreferencesService.getUserPreferences(user.id);
+    if (prefs !== null) {
+      // set the local preferences "state" ( for lack of a better word )
+      userPreferencesStateService.setUserPreferences(prefs);
     }
   }
 
@@ -105,31 +97,21 @@ abstract class AuthenticationService {
    * @throws {FirebaseError} If the user is not found after successful registration
    */
   async onSuccessfulRegistration(token: string, registrationCode: string): Promise<void> {
-    const firebaseErrorFactory = getFirebaseErrorFactory(
-      "AuthenticationService",
-      "onSuccessfulRegistration",
-      "POST",
-      "onSuccessfulRegistration"
-    );
-    try {
-      const _user = this.getUser(token);
-      this.authenticationStateService.setUser(_user);
-      const user = this.authenticationStateService.getUser();
-      if (user) {
-        // create user preferences for the first time.
-        // in order to do this, there needs to be a logged in user in the persistent storage
-        const prefs = await userPreferencesService.createUserPreferences({
-          user_id: user.id,
-          invitation_code: registrationCode,
-          language: Language.en,
-        });
-        userPreferencesStateService.setUserPreferences(prefs);
-      } else {
-        throw new Error("User not found");
-      }
-    } catch (error) {
-      throw firebaseErrorFactory((error as any).code, (error as any).message);
+    const user = this.getUser(token);
+    if (!user) {
+      throw Error("User not found in the token");
     }
+    PersistentStorageService.setToken(token);
+    this.authenticationStateService.setUser(user);
+
+    // create user preferences for the first time.
+    // in order to do this, there needs to be a logged-in user in the persistent storage
+    const prefs = await userPreferencesService.createUserPreferences({
+      user_id: user.id,
+      invitation_code: registrationCode,
+      language: Language.en,
+    });
+    userPreferencesStateService.setUserPreferences(prefs);
   }
 
   /**
@@ -137,8 +119,12 @@ abstract class AuthenticationService {
    * @param {string} token - The authentication token
    */
   async onSuccessfulRefresh(token: string): Promise<void> {
-    const _user = this.getUser(token);
-    this.authenticationStateService.setUser(_user);
+    const user = this.getUser(token);
+    if (!user) {
+      throw Error("User not found in the token");
+    }
+    PersistentStorageService.setToken(token);
+    this.authenticationStateService.setUser(user);
   }
 
   /**
@@ -147,28 +133,40 @@ abstract class AuthenticationService {
    * @param {string} token - The token to validate.
    * @returns {boolean} True if the token is valid, false otherwise.
    */
-  public isTokenValid(token: string): boolean {
+  public isTokenValid(token: string): { isValid: boolean; decodedToken: Token | null } {
     try {
-      const decodedToken: Token = jwtDecode(token);
-      const currentTime = Math.floor(Date.now() / 1000);
-
-      // Check if token is expired
-      if (decodedToken.exp < currentTime) {
-        console.debug("Token is expired");
-        return false;
+      // Decode the header and validate it
+      const decodedHeader: TokenHeader = jwtDecode(token, { header: true });
+      if (decodedHeader.typ !== "JWT") {
+        console.debug("Token is not a JWT");
+        return { isValid: false, decodedToken: null };
+      }
+      if (!decodedHeader.alg) {
+        console.debug("Token is not signed");
+        return { isValid: false, decodedToken: null };
+      }
+      if (!decodedHeader.kid) {
+        console.debug("Token does not have a key ID (kid)");
+        return { isValid: false, decodedToken: null };
       }
 
-      // Check if token was issued in the future (should never happen, but good to check)
+      // Decode the token and validate it
+      const decodedToken: Token = jwtDecode(token);
+      const currentTime = Math.floor(Date.now() / 1000);
+      if (decodedToken.exp < currentTime) {
+        console.debug("Token is expired");
+        return { isValid: false, decodedToken: null };
+      }
       if (decodedToken.iat > currentTime) {
         console.debug("Token issued in the future");
-        return false;
+        return { isValid: false, decodedToken: null };
       }
 
       console.debug("Token checked. Token is valid");
-      return true;
+      return { isValid: true, decodedToken: decodedToken };
     } catch (error) {
       console.error("Error decoding token:", error);
-      return false;
+      return { isValid: false, decodedToken: null };
     }
   }
 }

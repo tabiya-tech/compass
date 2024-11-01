@@ -2,17 +2,21 @@ import { firebaseAuth } from "src/auth/firebaseConfig";
 import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import firebase from "firebase/compat/app";
-import StdFirebaseAuthenticationService from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
+import StdFirebaseAuthenticationService, {
+  FirebaseToken,
+  FirebaseTokenProviders,
+} from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { AuthenticationServices, TabiyaUser } from "src/auth/auth.types";
 import AuthenticationService from "src/auth/services/Authentication.service";
 
 class FirebaseSocialAuthenticationService extends AuthenticationService {
   private static instance: FirebaseSocialAuthenticationService;
-  private static stdFirebaseAuthServiceInstance: StdFirebaseAuthenticationService;
+  private stdFirebaseAuthServiceInstance: StdFirebaseAuthenticationService;
 
   private constructor() {
     super();
+    this.stdFirebaseAuthServiceInstance = StdFirebaseAuthenticationService.getInstance();
   }
 
   /**
@@ -21,9 +25,6 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
    * @throws {Error} If initialization of StdFirebaseAuthService fails
    */
   static getInstance(): FirebaseSocialAuthenticationService {
-    if (!this.stdFirebaseAuthServiceInstance) {
-      this.stdFirebaseAuthServiceInstance = StdFirebaseAuthenticationService.getInstance();
-    }
     if (!this.instance) {
       this.instance = new this();
     }
@@ -54,7 +55,6 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
 
     // @ts-expect-error - we know that the userCredential is not null
     if (!userCredential?.user?.multiFactor?.user?.accessToken) {
-      //  qREVIEW do not throw to catch
       throw firebaseErrorFactory(FirebaseErrorCodes.USER_NOT_FOUND, "The user could not be found", {});
     }
 
@@ -74,14 +74,14 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
    * @throws {Error} If cleanup of StdFirebaseAuthService fails
    */
   async cleanup(): Promise<void> {
-    FirebaseSocialAuthenticationService.stdFirebaseAuthServiceInstance.cleanup();
+    this.stdFirebaseAuthServiceInstance.cleanup();
   }
 
   /**
    * Log out the current user
    */
   async logout(): Promise<void> {
-    await FirebaseSocialAuthenticationService.stdFirebaseAuthServiceInstance.logout();
+    await this.stdFirebaseAuthServiceInstance.logout();
     await super.onSuccessfulLogout();
   }
 
@@ -91,7 +91,7 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
    */
   async refreshToken(): Promise<void> {
     try {
-      const newToken = await FirebaseSocialAuthenticationService.stdFirebaseAuthServiceInstance.refreshToken();
+      const newToken = await this.stdFirebaseAuthServiceInstance.refreshToken();
       // call the parent class method once the token is successfully refreshed
       await super.onSuccessfulRefresh(newToken);
     } catch (error) {
@@ -107,11 +107,33 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
    * @returns {TabiyaUser | null} The user information or null if token is invalid
    */
   getUser(token: string): TabiyaUser | null {
-    if (!this.isTokenValid(token)) {
+    const { isValid, decodedToken } = this.isTokenValid(token);
+
+    if (!isValid) {
       console.error("Could not get user from token. Token is invalid.");
       return null;
     }
-    return FirebaseSocialAuthenticationService.stdFirebaseAuthServiceInstance.getUser(token);
+    return this.stdFirebaseAuthServiceInstance.getUserFromDecodedToken(decodedToken!);
+  }
+
+  /**
+   * Check if the token is a valid Google firebase token
+   * @param {string} token - The authentication token
+   * @returns {boolean} True if the token is valid, false otherwise
+   */
+  public isTokenValid(token: string): { isValid: boolean; decodedToken: FirebaseToken | null } {
+    const { isValid, decodedToken } = super.isTokenValid(token);
+
+    if (!isValid || !this.stdFirebaseAuthServiceInstance.isFirebaseTokenValid(decodedToken as FirebaseToken)) {
+      console.debug("token is invalid");
+      return { isValid: false, decodedToken: null };
+    }
+    if ((decodedToken as FirebaseToken).firebase.sign_in_provider !== FirebaseTokenProviders.GOOGLE) {
+      console.debug("token is not a valid firebase Google token");
+      return { isValid: false, decodedToken: null };
+    }
+
+    return { isValid: true, decodedToken: decodedToken as FirebaseToken };
   }
 }
 
