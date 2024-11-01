@@ -2,9 +2,8 @@ import { firebaseAuth } from "src/auth/firebaseConfig";
 import { TabiyaUser, Token } from "src/auth/auth.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { jwtDecode } from "jwt-decode";
-import authenticationStateService from "../AuthenticationState.service";
 
-export type FirebaseToken = Token & {
+export interface FirebaseToken extends Token {
   name: string;
   aud: string;
   auth_time: number;
@@ -18,7 +17,13 @@ export type FirebaseToken = Token & {
     };
     sign_in_provider: string;
   };
-};
+}
+
+export enum FirebaseTokenProviders {
+  GOOGLE = "google.com",
+  PASSWORD = "password",
+  ANONYMOUS = "anonymous",
+}
 
 /**
  * The FirebaseAuthenticationService is a concrete class that provides common functionality
@@ -209,65 +214,36 @@ class StdFirebaseAuthenticationService {
     this.clearRefreshTimeout();
   }
 
-  public getUser(token: string): TabiyaUser | null {
-    try {
-      const _user = this.getFirebaseUserFromToken(token);
-      if (_user) {
-        PersistentStorageService.setToken(token);
-        authenticationStateService.getInstance().setUser(_user);
-        return _user;
-      }
-      return null;
-    } catch (error) {
-      console.error("Invalid token", error);
-      return null;
-    }
+  public getUserFromDecodedToken(decodedToken: FirebaseToken): TabiyaUser {
+    return {
+      id: decodedToken.user_id,
+      name: decodedToken.name || decodedToken.email, // Use email if name is not available
+      email: decodedToken.email,
+    };
   }
 
   /**
-   * Extracts user information from a JWT token.
+   * Checks if a given decode token is valid firebase token.
+   * It does not general token validation, but checks specifically for firebase token properties.
    *
-   * @param {string} token - The JWT token to decode.
-   * @returns {TabiyaUser | null} The user object extracted from the token, or null if extraction fails.
+   * @param {FirebaseToken} decodedToken - The decoded token to validate.
+   * @returns {boolean} True if the token is a valid firebase token, false otherwise.
    */
-  //TODO: remove the idea of storing a user in this state. Store a token instead and decode it when needed (util)
-  private readonly getFirebaseUserFromToken = (token: string): TabiyaUser | null => {
-    try {
-      const decodedToken: FirebaseToken = jwtDecode(token);
-      const GOOGLE_ISSUER = "accounts.google.com";
-      if (decodedToken.iss === GOOGLE_ISSUER) {
-        // Google OAuth Token
-        return {
-          id: decodedToken.sub,
-          name: decodedToken.name || decodedToken.email, // Google tokens might not have a name field
-          email: decodedToken.email,
-        };
-      } else if (decodedToken.firebase?.sign_in_provider) {
-        // Firebase Token
-        const signInProvider = decodedToken.firebase.sign_in_provider;
-        if (signInProvider === "password") {
-          // Firebase Password Auth Token
-          return {
-            id: decodedToken.user_id,
-            name: decodedToken.name,
-            email: decodedToken.email,
-          };
-        } else {
-          // Other Firebase Auth Providers (e.g., Facebook, Twitter, etc.)
-          return {
-            id: decodedToken.user_id,
-            name: decodedToken.name || decodedToken.email, // Use email if name is not available
-            email: decodedToken.email,
-          };
-        }
-      } else {
-        throw new Error("Unknown token issuer");
-      }
-    } catch (error) {
-      console.error("Error decoding token:", error);
-      return null;
+  public isFirebaseTokenValid(decodedToken: FirebaseToken): boolean {
+    if (!decodedToken.firebase) {
+      console.debug("Token is not a valid firebase token");
+      return false;
     }
-  };
+    if (!decodedToken.firebase.sign_in_provider) {
+      console.debug("Token does not have a sign in provider");
+      return false;
+    }
+    if (!decodedToken.user_id) {
+      console.debug("Token does not have a user ID");
+      return false;
+    }
+    return true;
+  }
 }
 
 export default StdFirebaseAuthenticationService;

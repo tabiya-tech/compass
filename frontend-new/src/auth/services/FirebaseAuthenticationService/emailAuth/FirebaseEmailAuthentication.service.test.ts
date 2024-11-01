@@ -4,7 +4,6 @@ import FirebaseEmailAuthenticationService from "src/auth/services/FirebaseAuthen
 import firebase from "firebase/compat/app";
 import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
-import authStateService from "src/auth/services/AuthenticationState.service";
 
 jest.mock("firebase/compat/app", () => {
   return {
@@ -81,13 +80,13 @@ describe("AuthService class tests", () => {
         user: mockUser,
       } as firebase.auth.UserCredential);
 
-      jest.spyOn(authStateService.getInstance(), "getUser").mockReturnValue(givenUser);
+      jest.spyOn(authService, "getUser").mockReturnValue(givenUser);
 
       // WHEN the login is attempted
-      const loginCallback = async () => await authService.login(givenEmail, givenPassword);
+      const actualToken = await authService.login(givenEmail, givenPassword);
 
       // AND test should return the token
-      await expect(loginCallback()).resolves.toBe(givenTokenResponse);
+      expect(actualToken).toEqual(givenTokenResponse);
     });
 
     test("should throw an error on login failure", async () => {
@@ -97,10 +96,10 @@ describe("AuthService class tests", () => {
         message: "Internal error",
       });
       // WHEN the login is attempted
-      const loginCallback = async () => await authService.login(givenEmail, givenPassword);
+      const emailLoginPromise = authService.login(givenEmail, givenPassword);
 
       // AND test should throw an error
-      await expect(loginCallback()).rejects.toThrow("Internal error");
+      await expect(emailLoginPromise).rejects.toThrow("Internal error");
     });
 
     test("should throw an error when the email is not verified", async () => {
@@ -117,10 +116,10 @@ describe("AuthService class tests", () => {
       jest.spyOn(authService, "logout").mockImplementation(async () => {});
 
       // WHEN the login is attempted
-      const loginCallback = async () => await authService.login(givenEmail, givenPassword);
+      const emailLoginPromise = authService.login(givenEmail, givenPassword);
 
       // THEN the error callback should be called with Email not verified
-      await expect(loginCallback()).rejects.toThrow("Email not verified");
+      await expect(emailLoginPromise).rejects.toThrow("Email not verified");
     });
 
     test("should throw an error when the firebase signIn method fails to return a user", async () => {
@@ -130,9 +129,10 @@ describe("AuthService class tests", () => {
       } as firebase.auth.UserCredential);
 
       // WHEN the login is attempted
-      const loginCallback = async () => await authService.login(givenEmail, givenPassword);
+      const emailLoginPromise = authService.login(givenEmail, givenPassword);
+
       // THEN an error should be thrown
-      await expect(loginCallback()).rejects.toThrow("User not found");
+      await expect(emailLoginPromise).rejects.toThrow("User not found");
     });
   });
 
@@ -157,7 +157,7 @@ describe("AuthService class tests", () => {
       } as firebase.auth.UserCredential);
 
       // AND the token is decoded into a user
-      jest.spyOn(authStateService.getInstance(), "getUser").mockReturnValue(givenUser);
+      jest.spyOn(authService, "getUser").mockReturnValue(givenUser);
 
       // AND the registration code is valid
       (invitationsService.checkInvitationCodeStatus as jest.Mock).mockResolvedValueOnce({
@@ -166,11 +166,10 @@ describe("AuthService class tests", () => {
       });
 
       // WHEN the registration is attempted
-      const registerCallback = async () =>
-        await authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationToken);
+      const actualToken = await authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationToken);
 
       // AND registerWithEmail should return the token
-      await expect(registerCallback()).resolves.toBe(givenTokenResponse);
+      expect(actualToken).toEqual(givenTokenResponse);
     });
 
     test("should throw an error on registration failure", async () => {
@@ -205,10 +204,10 @@ describe("AuthService class tests", () => {
       });
 
       // WHEN the registration is attempted
-      const registerCallback = async () =>
-        await authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationToken);
+      const emailLoginPromise = authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationToken);
+
       // THEN the registration should throw an error
-      await expect(registerCallback()).rejects.toThrow("User not found");
+      await expect(emailLoginPromise).rejects.toThrow("User not found");
     });
 
     test("should throw an error when the registration code is not valid", async () => {
@@ -219,10 +218,10 @@ describe("AuthService class tests", () => {
       });
 
       // WHEN the registration is attempted
-      const registerCallback = async () =>
-        await authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationToken);
+      const emailLoginPromise = authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationToken);
+
       // THEN the registration should throw an error
-      await expect(registerCallback()).rejects.toThrow("The invitation code is not for registration");
+      await expect(emailLoginPromise).rejects.toThrow("The invitation code is not for registration");
     });
   });
 });
