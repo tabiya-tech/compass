@@ -42,9 +42,9 @@ export const USER_FRIENDLY_FIREBASE_ERROR_MESSAGES: Record<FirebaseErrorCodes, s
   [FirebaseErrorCodes.INVALID_INVITATION_CODE]:
     "The invitation code you entered is invalid. Please check the code and try again.",
   [FirebaseErrorCodes.INVALID_INVITATION_TYPE]:
-    "The invitation code you used is for registration rather than logging in. Please go to the register page.",
+    "The code you used is for registration and not for login. Please go to the register page.",
   [FirebaseErrorCodes.INVALID_REGISTRATION_TYPE]:
-    "The invitation code you used is for logging in rather than registration. Please go to the login page.",
+    "The code you used is for login and not for registration. Please go to the login page.",
   [FirebaseErrorCodes.POPUP_CLOSED_BY_USER]:
     "The Google sign-in popup was closed before completing the sign-in process.",
 };
