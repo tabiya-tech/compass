@@ -70,7 +70,7 @@ class AuthenticationServiceFactory {
    * Used to bring the application state to a predictable state on page load.
    */
   static async resetAuthenticationState(): Promise<void> {
-    // As we dont necessarily know the current authentication service, we have to go to all implementations of authentication service and logout
+    // As we don't necessarily know the current authentication service, we have to go to all implementations of authentication service and logout
     // since we currently only have firebase, we can go to the stdFirebaseAuthenticationService and logout
     await stdFirebaseAuthenticationService.getInstance().logout();
     AuthenticationStateService.getInstance().clearUser();
