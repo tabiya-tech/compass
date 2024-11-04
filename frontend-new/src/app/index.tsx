@@ -16,6 +16,7 @@ import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import * as Sentry from "@sentry/react";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 import { PersistentStorageService } from "./PersistentStorageService/PersistentStorageService";
+import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 
 // Wrap the createHashRouter function with Sentry to capture errors that occur during router initialization
 const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouter(createHashRouter);
@@ -59,10 +60,15 @@ const App = () => {
       console.debug("Valid token found in storage");
       AuthenticationStateService.getInstance().setUser(user);
 
+      const preferences =  await userPreferencesService.getUserPreferences(user.id)
+      if (!preferences) {
+        console.debug("User has not registered !", user.id);
+        await authenticationServiceInstance.logout();
+        return;
+      }
       console.debug("User authenticated: Welcome,", user.email);
-      await userPreferencesStateService.loadPreferences(user.id);
-      // check if user preferences have been loaded
-      const preferences = userPreferencesStateService.getUserPreferences();
+      userPreferencesStateService.setUserPreferences(preferences);
+
       console.debug("User preferences loaded", preferences);
     } catch (error) {
       console.error("Error initializing authentication and user preferences state", error);
