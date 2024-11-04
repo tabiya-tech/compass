@@ -49,6 +49,18 @@ def get_file_as_string(file: str):
 
 
 def get_project_base_config(project: str, location: str, environment: str):
+    """
+    Get the project base configuration
+    The configuration includes a provider that can be used to create resources in the project, independently of the
+    project the serviceaccount that pulumi will run was created in.
+    This is especially important when creating resources in a project that is not the root project (the service account
+    is created in the root project).
+
+    :param project: The project id to create the resources in
+    :param location: The location of the project
+    :param environment: The environment the project is in
+    :return: The project base configuration
+    """
     gcp_provider = gcp.Provider(
         "gcp_provider",
         project=project,

@@ -37,7 +37,14 @@ def main():
     root_project = getenv("GCP_ROOT_PROJECT_NAME")
 
     # set up the environment/project
-    create_new_environment(folder_id, billing_account, root_project, environment, environment_name, environment_type)
+    create_new_environment(
+        folder_id=folder_id,
+        billing_account=billing_account,
+        root_project=root_project,
+        environment=environment,
+        environment_name=environment_name,
+        environment_type=environment_type
+    )
 
 
 if __name__ == "__main__":

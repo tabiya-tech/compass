@@ -16,22 +16,23 @@ BASE_SERVICES = [
 ]
 
 
-def create_new_environment(
-        folder_id: pulumi.Output[str],
-        billing_account: str,
-        root_project: str,
-        environment: str,
-        environment_name: str,
-        environment_type: str
-):
+def create_new_environment(*,
+                           folder_id: pulumi.Output[str],
+                           billing_account: str,
+                           root_project: str,
+                           environment: str,
+                           environment_name: str,
+                           environment_type: str
+                           ):
+    # REVIEW explain what this project is about
     project = gcp.organizations.Project(
-        resource_name=f'compass-project-{environment}',
-        project_id=f'compass-project-{environment}',
+        resource_name=f'compass-project-{environment}',  # REVIEW why not use the get_resource_name function? This is a pattern we should follow in every name.
+        project_id=f'compass-project-{environment}',  # REVIEW: why do we need to set the project_id?
         name=environment_name,
         folder_id=folder_id,
         billing_account=billing_account
     )
-
+    # REVIEW explain why a provider is needed, and how it will be used
     gcp_provider = gcp.Provider(
         "gcp_provider",
         project=project.id,
@@ -58,7 +59,7 @@ def create_new_environment(
         # For this reason, it is better to keep the service when the resource is destroyed.
         disable_dependent_services=False,
         disable_on_destroy=False,
-        opts=pulumi.ResourceOptions(provider=gcp_provider)
+        opts=pulumi.ResourceOptions(provider=gcp_provider)  # Use the gcp_provider to create the resource in the project
     )
 
     initial_apis.append(service_usage)

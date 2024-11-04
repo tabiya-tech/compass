@@ -7,7 +7,9 @@ REQUIRED_SERVICES = [
     "artifactregistry.googleapis.com",
 ]
 
-ROOT_ENVIRONMENT = "root"
+ROOT_ENVIRONMENT = "root"  # REVIEW: Why is this not coming from the pulumi.stack()?
+                           #  Eventually it could be pulumi.root.yaml or pulumi.base.yaml but not hardcoded here.
+                           #  Also be aware of stack referneces in the environment/__main__.py (pulumi.StackReference("tabiya-tech/compass-organization/base"))
 
 
 def _create_repository(*,
@@ -38,7 +40,7 @@ def _create_folders(organization_id: str, customer_id: str) -> tuple[gcp.organiz
     #   - Compass Prod Environments
     # These folders should be protected from deletion as they are common to all environments
     compass_folder = gcp.organizations.Folder(
-        "compass",
+        "compass",  # REVIEW why not use the get_resource_name function? This is a pattern we should follow
         display_name="compass",
         parent=f"organizations/{organization_id}",
         opts=pulumi.ResourceOptions(protect=True)
