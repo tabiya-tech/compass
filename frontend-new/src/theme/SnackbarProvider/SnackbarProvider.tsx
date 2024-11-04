@@ -7,12 +7,19 @@ import {
 } from "notistack";
 import { IconButton, styled } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { GlobalStyles as InjectStyles } from "@mui/system";
 import * as React from "react";
 
 const uniqueId = "bade4e92-baed-40f8-a098-0e745563e786";
 export const DATA_TEST_ID = {
   SNACKBAR_CLOSE_BUTTON: `snackbar-close-button-${uniqueId}`,
 };
+
+declare module 'notistack' {
+  interface VariantOverrides {
+    offline: true
+  }
+}
 
 const SnackbarCloseButton = (key: SnackbarKey) => {
   const { closeSnackbar } = useSnackbar();
@@ -80,6 +87,15 @@ const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ theme }) =>
       color: theme.palette.warning.dark,
     },
   },
+  "&.notistack-MuiContent-offline": {
+    color: theme.palette.warning.dark,
+    backgroundColor: theme.palette.warning.light,
+    fontFamily: theme.typography.body1.fontFamily,
+    fontSize: theme.typography.body1.fontSize,
+    "& .MuiSvgIcon-root": {
+      color: theme.palette.warning.dark,
+    },
+  },
   "&.notistack-MuiContent-info": {
     color: theme.palette.info.dark,
     backgroundColor: theme.palette.info.light,
@@ -90,6 +106,17 @@ const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ theme }) =>
     },
   },
 }));
+
+const ContainerStyles = {
+  ".notistack-SnackbarContainer:has(.notistack-MuiContent-offline)": {
+    width: "fit-content"
+  },
+
+  '.notistack-Snackbar:has(.notistack-MuiContent-offline)': {
+    minWidth: "0px",
+  }
+}
+
 export const DEFAULT_SNACKBAR_AUTO_HIDE_DURATION = 5000;
 
 const SnackbarProvider: React.FC<OriginalSnackbarProviderProps> = ({
@@ -109,6 +136,7 @@ const SnackbarProvider: React.FC<OriginalSnackbarProviderProps> = ({
       error: StyledMaterialDesignContent,
       warning: StyledMaterialDesignContent,
       info: StyledMaterialDesignContent,
+      offline: StyledMaterialDesignContent,
     },
     dense: false,
     style: {
@@ -121,9 +149,10 @@ const SnackbarProvider: React.FC<OriginalSnackbarProviderProps> = ({
   };
 
   return (
-    <OriginalSnackbarProvider {...notistackOptions} action={SnackbarCloseButton}>
-      {children}
-    </OriginalSnackbarProvider>
+      <OriginalSnackbarProvider {...notistackOptions} action={SnackbarCloseButton}>
+        <InjectStyles styles={ContainerStyles}/>
+        {children}
+      </OriginalSnackbarProvider>
   );
 };
 

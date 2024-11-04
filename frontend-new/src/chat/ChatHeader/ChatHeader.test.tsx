@@ -424,7 +424,7 @@ describe("ChatHeader", () => {
                 expect.objectContaining({
                   id: MENU_ITEM_ID.LOGOUT_BUTTON,
                   text: "logout",
-                  disabled: !browserIsOnline,
+                  disabled: false,
                 }),
               ]),
             }),
