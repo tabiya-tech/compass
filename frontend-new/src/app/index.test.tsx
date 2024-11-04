@@ -96,11 +96,20 @@ describe("main compass app test", () => {
 
   describe("when the app is offline/online", () => {
     const expectedOfflineSnackBar = {
-      variant: "warning",
+      variant: "offline",
       key: SNACKBAR_KEYS.OFFLINE_ERROR,
       preventDuplicate: true,
       persist: true,
       action: [],
+      anchorOrigin: {
+        horizontal: "center",
+        vertical: "top",
+      },
+      style: {
+        margin: "0 auto",
+        minWidth: "0",
+        width: "fit-content",
+      },
     };
     const expectedOnlineSnackBar = {
       variant: "success",
