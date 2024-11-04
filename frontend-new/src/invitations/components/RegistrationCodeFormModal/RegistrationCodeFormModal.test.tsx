@@ -34,7 +34,7 @@ describe("RegistrationCodeFormModal", () => {
     const givenOnSuccess = jest.fn();
 
     // WHEN the component is rendered
-    render(<RegistrationCodeFormModal modalState={givenShown} onSuccess={givenOnSuccess} />);
+    render(<RegistrationCodeFormModal onClose={jest.fn} modalState={givenShown} onSuccess={givenOnSuccess} />);
 
     // THEN the component should render correctly
     const container = screen.getByTestId(DATA_TEST_ID.CONTAINER);
@@ -45,6 +45,7 @@ describe("RegistrationCodeFormModal", () => {
     expect(screen.getByTestId(DATA_TEST_ID.MODAL_SUBTITLE)).toBeInTheDocument();
     expect(screen.getByTestId(DATA_TEST_ID.INVITATION_CODE_INPUT)).toBeInTheDocument();
     expect(screen.getByTestId(DATA_TEST_ID.SUBMIT_BUTTON)).toBeInTheDocument();
+    expect(screen.getByTestId(DATA_TEST_ID.CLOSE_ICON)).toBeInTheDocument();
 
     // AND the component should match the snapshot
     expect(container).toMatchSnapshot();
@@ -58,5 +59,35 @@ describe("RegistrationCodeFormModal", () => {
 
     // THEN the onSuccess function should be called with the registration code
     expect(givenOnSuccess).toHaveBeenCalledWith(registrationCode);
+  });
+  test("closes the modal when the close icon is clicked", () => {
+    // GIVEN the component is shown
+    const givenShown = RegistrationCodeFormModalState.SHOW;
+
+    // AND the onClose function is a jest function
+    const givenOnClose = jest.fn();
+
+    // WHEN the component is rendered
+    render(<RegistrationCodeFormModal onClose={givenOnClose} modalState={givenShown} onSuccess={jest.fn()} />);
+
+    // THEN the component should render correctly
+    const container = screen.getByTestId(DATA_TEST_ID.CONTAINER);
+    expect(container).toBeInTheDocument();
+
+    // AND the component should contain the necessary elements
+    expect(screen.getByTestId(DATA_TEST_ID.MODAL_TITLE)).toBeInTheDocument();
+    expect(screen.getByTestId(DATA_TEST_ID.MODAL_SUBTITLE)).toBeInTheDocument();
+    expect(screen.getByTestId(DATA_TEST_ID.INVITATION_CODE_INPUT)).toBeInTheDocument();
+    expect(screen.getByTestId(DATA_TEST_ID.SUBMIT_BUTTON)).toBeInTheDocument();
+    expect(screen.getByTestId(DATA_TEST_ID.CLOSE_ICON)).toBeInTheDocument();
+
+    // AND the component should match the snapshot
+    expect(container).toMatchSnapshot();
+
+    // WHEN the close icon is clicked
+    fireEvent.click(screen.getByTestId(DATA_TEST_ID.CLOSE_ICON));
+
+    // THEN the onClose function should be called
+    expect(givenOnClose).toHaveBeenCalled();
   });
 });
