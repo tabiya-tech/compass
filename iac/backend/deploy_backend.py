@@ -3,11 +3,12 @@ import base64
 import pulumi
 import pulumi_docker as docker
 import pulumi_gcp as gcp
-from dataclasses import dataclass
 
 from pulumi import Output
 
-from lib.std_pulumi import get_resource_name, ProjectBaseConfig, get_project_base_config, get_file_as_string, enable_services, getenv
+from lib.std_pulumi import get_resource_name, ProjectBaseConfig, get_project_base_config, get_file_as_string, enable_services
+
+from __main__ import BackendEnvVarsConfig
 
 GCP_API_GATEWAY_CONFIG_FILE = "./config/gcp_api_gateway_config.yaml"
 
@@ -24,28 +25,6 @@ REQUIRED_SERVICES = [
     "run.googleapis.com",
 ]
 
-@dataclass
-class BackendEnvVarsConfig:
-    """
-    Environment variables for the backend service
-    See the backend service for more information on the environment variables
-    """
-    TAXONOMY_MONGODB_URI: str
-    TAXONOMY_DATABASE_NAME: str
-    TAXONOMY_MODEL_ID: str
-    APPLICATION_MONGODB_URI: str
-    APPLICATION_DATABASE_NAME: str
-    VERTEX_API_REGION: str
-    TARGET_ENVIRONMENT: str
-    BACKEND_URL: str
-    FRONTEND_URL: str
-    SENTRY_BACKEND_DSN: str
-    ENABLE_SENTRY: str
-    ROOT_PROJECT_ID: str
-    GCP_OAUTH_CLIENT_ID: str
-    GITHUB_SHA: str
-    GITHUB_REF_NAME: str
-    GITHUB_RUN_NUMBER: str
 
 
 """
@@ -296,48 +275,8 @@ def _deploy_cloud_run_service(
     pulumi.export("cloud_run_url", service.uri)
     return service
 
-
-def _get_backend_env_vars(environment: str):
-    taxonomy_mongodb_uri = getenv("TAXONOMY_MONGODB_URI")
-    taxonomy_database_name = getenv("TAXONOMY_DATABASE_NAME")
-    taxonomy_model_id = getenv("TAXONOMY_MODEL_ID")
-    application_mongodb_uri = getenv("APPLICATION_MONGODB_URI")
-    application_database_name = getenv("APPLICATION_DATABASE_NAME")
-    vertex_api_region = getenv("VERTEX_API_REGION")
-    frontend_url = getenv("FRONTEND_URL")
-    backend_url = getenv("BACKEND_URL")
-    sentry_backend_dsn = getenv("SENTRY_BACKEND_DSN")
-    enable_sentry = getenv("ENABLE_SENTRY")
-    root_project_id = getenv("GCP_ROOT_PROJECT_NAME")
-    gcp_oauth_client_id = getenv("GCP_OAUTH_CLIENT_ID")
-    commit_hash = getenv("GITHUB_SHA")
-    branch_name = getenv("GITHUB_REF_NAME")
-    run_number = getenv("GITHUB_RUN_NUMBER")
-
-    return BackendEnvVarsConfig(
-        TAXONOMY_MONGODB_URI=taxonomy_mongodb_uri,
-        TAXONOMY_DATABASE_NAME=taxonomy_database_name,
-        TAXONOMY_MODEL_ID=taxonomy_model_id,
-        APPLICATION_MONGODB_URI=application_mongodb_uri,
-        APPLICATION_DATABASE_NAME=application_database_name,
-        VERTEX_API_REGION=vertex_api_region,
-        TARGET_ENVIRONMENT=environment,
-        BACKEND_URL=backend_url,
-        FRONTEND_URL=frontend_url,
-        SENTRY_BACKEND_DSN=sentry_backend_dsn,
-        ENABLE_SENTRY=enable_sentry,
-        ROOT_PROJECT_ID=root_project_id,
-        GCP_OAUTH_CLIENT_ID=gcp_oauth_client_id,
-        GITHUB_SHA=commit_hash,
-        GITHUB_REF_NAME=branch_name,
-        GITHUB_RUN_NUMBER=run_number
-    )
-
-
 # export a function build_and_push_image that will be used in the main pulumi program
-def deploy_backend(project: str, location: str, environment: str, project_number: Output[str], environment_type: Output[str]):
-    env_vars = _get_backend_env_vars(environment)
-
+def deploy_backend(project: str, location: str, environment: str, project_number: Output[str], environment_type: Output[str], env_vars: BackendEnvVarsConfig):
     basic_config = get_project_base_config(project=project, location=location, environment=environment)
 
     # Enable the necessary services for building and pushing the image

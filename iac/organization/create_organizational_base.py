@@ -10,7 +10,8 @@ REQUIRED_SERVICES = [
 ROOT_ENVIRONMENT = "root"  # REVIEW: Why is this not coming from the pulumi.stack()?
                            #  Eventually it could be pulumi.root.yaml or pulumi.base.yaml but not hardcoded here.
                            #  Also be aware of stack referneces in the environment/__main__.py (pulumi.StackReference("tabiya-tech/compass-organization/base"))
-
+                           # > This is for root project (compass-root), it is just a constant, I didn't want to create a new stack for it. yes, you are right perhaps we can use  base environment instead of root.
+                           # So we will have to rename the project `compass-root` to `compass-base` then we can be able to use the stack
 
 def _create_repository(*,
                        root_project_id: str,

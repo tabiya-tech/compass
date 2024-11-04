@@ -24,15 +24,29 @@ def create_new_environment(*,
                            environment_name: str,
                            environment_type: str
                            ):
-    # REVIEW explain what this project is about
+    # project is used to group all environment resources togather,
+    # it is also used to enable APIs and services that are required by the environment.
+    # in other context it is regarded as a combination of partner and environment. for example compass-dev or harambe-dev
+    # it is on the top level of the environment hierarchy, all other resources are created under this project.
     project = gcp.organizations.Project(
-        resource_name=f'compass-project-{environment}',  # REVIEW why not use the get_resource_name function? This is a pattern we should follow in every name.
-        project_id=f'compass-project-{environment}',  # REVIEW: why do we need to set the project_id?
+        # we are using the get_resource_name function to generate a unique name for the project
+        # eg: compass-dev-project
+        resource_name=get_resource_name(environment=environment, resource="project"),
         name=environment_name,
         folder_id=folder_id,
         billing_account=billing_account
     )
-    # REVIEW explain why a provider is needed, and how it will be used
+    # By default, resources use package-wide configuration
+    # settings, however an explicit `Provider` instance may be created and passed during resource
+    # construction to achieve fine-grained programmatic control over provider settings. See the
+    # [documentation](https://www.pulumi.com/docs/reference/programming-model/#providers) for more information.
+    # Our This provider is project specific, it is used to create resources in the project.
+
+    # This project is going to be used in std_pulumi.py to create re-use the provider
+    # for other resources that are going to be created in the project.
+    # So important information is added here, and we won't have to be repeating it in other places.
+    # eg: billing id
+    # that is why the resource_name is a constant for the stack.
     gcp_provider = gcp.Provider(
         "gcp_provider",
         project=project.id,
@@ -40,6 +54,11 @@ def create_new_environment(*,
         user_project_override=True,
         opts=pulumi.ResourceOptions(depends_on=[project])
     )
+
+    # The next step is to enable the required GCP APIs for the environment.
+    # Otherwise, the environment will not be able to use the GCP services that require these APIs.
+    # The following APIs are required by the GCP services that Compass uses.
+    # The APIs are enabled in a specific order to avoid any issues.
 
     # GCP APIs that must be enabled first in order to enable other GCP APIs
     initial_apis = []
