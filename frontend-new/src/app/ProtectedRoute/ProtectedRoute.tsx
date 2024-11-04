@@ -19,7 +19,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     console.debug("redirecting from /verify --> /verify because no one cares");
     return <>{children}</>;
   }
-  if (!user) {
+  if (!user || !userPreferences) {
     if (targetPath === routerPaths.LOGIN || targetPath === routerPaths.REGISTER) {
       console.debug("redirecting from /login/register --> /login/register because no user");
       return <>{children}</>;
