@@ -24,10 +24,10 @@ def create_new_environment(*,
                            environment_name: str,
                            environment_type: str
                            ):
-    # project is used to group all environment resources togather,
-    # it is also used to enable APIs and services that are required by the environment.
-    # in other context it is regarded as a combination of partner and environment. for example compass-dev or harambe-dev
-    # it is on the top level of the environment hierarchy, all other resources are created under this project.
+    # This is the project for the environment.
+    # All resources of the environment are created in this project.
+    # The project should be created in either the Lower Environments folder or the Prod Folder
+
     project = gcp.organizations.Project(
         # we are using the get_resource_name function to generate a unique name for the project
         # eg: compass-dev-project
@@ -36,6 +36,7 @@ def create_new_environment(*,
         folder_id=folder_id,
         billing_account=billing_account
     )
+    # REVIEW: be specific... explain why we need the provider ( see also std_lib)
     # By default, resources use package-wide configuration
     # settings, however an explicit `Provider` instance may be created and passed during resource
     # construction to achieve fine-grained programmatic control over provider settings. See the
@@ -50,7 +51,7 @@ def create_new_environment(*,
     gcp_provider = gcp.Provider(
         "gcp_provider",
         project=project.id,
-        billing_project=root_project,
+        billing_project=root_project,  # REVIEW why do it need the billing project and why do we use the root_project and not the newly created project
         user_project_override=True,
         opts=pulumi.ResourceOptions(depends_on=[project])
     )
