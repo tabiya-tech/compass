@@ -57,11 +57,13 @@ class AuthenticationServiceFactory {
         return FirebaseEmailAuthenticationService.getInstance();
       case AuthenticationServices.FIREBASE_SOCIAL:
         return FirebaseSocialAuthenticationService.getInstance();
+      case "":
+      case null:
+        console.debug("The authentication method is or empty. The user is not logged in.");
+        return null;
       default:
         PersistentStorageService.clearLoginMethod();
-        console.warn(
-          "The authentication method is invalid or empty. Either the user is not logged in or the login method was corrupted."
-        );
+        console.warn("The authentication method is invalid.");
         return null;
     }
   }
