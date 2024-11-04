@@ -48,11 +48,16 @@ export const IsOnlineProvider: React.FC<IsOnlineProviderProps> = ({ children }) 
       setWasOffline(true);
       closeSnackbar(SNACKBAR_KEYS.ONLINE_SUCCESS);
       enqueueSnackbar(`You are offline`, {
-        variant: "warning",
+        variant: "offline",
         key: SNACKBAR_KEYS.OFFLINE_ERROR,
         preventDuplicate: true,
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "center",
+        },
         persist: true,
         action: [],
+        style: { minWidth: "0", width: "fit-content", margin: "0 auto" },
       });
     } else {
       if (wasOffline) {

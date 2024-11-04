@@ -98,7 +98,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
     {
       id: MENU_ITEM_ID.LOGOUT_BUTTON,
       text: MENU_ITEM_TEXT.LOGOUT,
-      disabled: !isOnline,
+      disabled: false,
       action: notifyOnLogout,
     },
   ];
@@ -135,6 +135,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
           onClick={handleViewExperiences}
           data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES}
           title="view experiences"
+          disabled={!isOnline}
         >
           <AnimatedBadge badgeContent={experiencesExplored} invisible={!exploredExperiencesNotification}>
             <BadgeOutlinedIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_EXPERIENCES} />
