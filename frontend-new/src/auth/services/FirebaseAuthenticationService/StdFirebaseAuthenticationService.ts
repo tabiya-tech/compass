@@ -2,6 +2,8 @@ import { firebaseAuth } from "src/auth/firebaseConfig";
 import { TabiyaUser, Token } from "src/auth/auth.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { jwtDecode } from "jwt-decode";
+import firebase from "firebase/compat/app";
+import Unsubscribe = firebase.Unsubscribe;
 
 export interface FirebaseToken extends Token {
   name: string;
@@ -48,12 +50,12 @@ class StdFirebaseAuthenticationService {
   private readonly FIREBASE_DB_NAME = "firebaseLocalStorageDb";
   private readonly REFRESH_TOKEN_EXPIRATION_PERCENTAGE = 0.1;
   private refreshTimeout: NodeJS.Timeout | null = null;
-  private readonly unsubscribeAuthListener: () => void;
+  private readonly unsubscribeAuthListener: Unsubscribe;
 
   private static instance: StdFirebaseAuthenticationService;
 
   private constructor() {
-    this.unsubscribeAuthListener = this.setupAuthListener();
+    this.unsubscribeAuthListener = () => this.setupAuthListener();
   }
 
   static getInstance(): StdFirebaseAuthenticationService {
@@ -138,9 +140,9 @@ class StdFirebaseAuthenticationService {
    * @returns {() => void} A function to unsubscribe from the authentication listener.
    * @throws {Error} If an error occurs during the setup of the authentication listener.
    */
-  private setupAuthListener(): () => void {
+  private setupAuthListener(): Unsubscribe {
     console.debug("Setting up auth listener");
-    return firebaseAuth.onAuthStateChanged(async (user) => {
+    return firebaseAuth.onAuthStateChanged((user) => {
       if (user) {
         console.debug("User authenticated");
         user.getIdToken(true).then((token) => {
@@ -178,7 +180,7 @@ class StdFirebaseAuthenticationService {
         resolve();
       };
 
-      DBDeleteRequest.onsuccess = (event) => {
+      DBDeleteRequest.onsuccess = (_event) => {
         console.debug("Firebase IndexedDB deleted successfully");
         clearTimeout(timeoutId);
         resolve();
@@ -205,7 +207,7 @@ class StdFirebaseAuthenticationService {
   /**
    * Cleans up the Firebase authentication service.
    * It unsubscribes from the authentication listener and clears the refresh timeout.
-   * @throws {Error} If the unsubscribe from the authentication listener fails.
+   * @throws {Error} If the unsubscribe function from the authentication listener fails.
    */
   public cleanup() {
     console.debug("Cleaning up FirebaseAuthService");
