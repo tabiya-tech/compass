@@ -3,6 +3,7 @@ import pulumi_aws as aws
 
 from lib.std_pulumi import get_resource_name
 
+
 def _configure_ns_in_aws(sub_domain_name: str, environment: str):
     """
     This script is used to deploy the NS records for the subdomain in AWS Route53.
@@ -16,7 +17,7 @@ def _configure_ns_in_aws(sub_domain_name: str, environment: str):
     aws_zone = aws.route53.get_zone(name="tabiya.tech", private_zone=False)
 
     aws.route53.Record(
-        get_resource_name(environment=environment, resource="subdomain-record"),
+        get_resource_name(resource="subdomain", resource_type="ns-record"),
         zone_id=aws_zone.zone_id,
         name=sub_domain_name,
         type=aws.route53.RecordType.NS,

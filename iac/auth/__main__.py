@@ -1,8 +1,6 @@
 import os
 import sys
 
-from pulumi_aws import config
-
 # Determine the absolute path to the 'iac' directory
 libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add this directory to sys.path,

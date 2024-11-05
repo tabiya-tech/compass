@@ -7,15 +7,7 @@ libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # so that we can import the iac/lib module when we run pulumi from withing the iac/common directory
 sys.path.insert(0, libs_dir)
 
-import pulumi
-from deploy_backend import deploy_backend
-from dotenv import load_dotenv
 from dataclasses import dataclass
-
-# Load environment variables from .env file
-load_dotenv()
-
-from lib.std_pulumi import getconfig, getenv
 
 @dataclass
 class BackendEnvVarsConfig:
@@ -40,6 +32,15 @@ class BackendEnvVarsConfig:
     GITHUB_REF_NAME: str
     GITHUB_RUN_NUMBER: str
 
+import pulumi
+from deploy_backend import deploy_backend
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+from lib.std_pulumi import getconfig, getenv
+
 def _get_backend_env_vars(environment: str):
     taxonomy_mongodb_uri = getenv("TAXONOMY_MONGODB_URI")
     taxonomy_database_name = getenv("TAXONOMY_DATABASE_NAME")
@@ -51,7 +52,7 @@ def _get_backend_env_vars(environment: str):
     backend_url = getenv("BACKEND_URL")
     sentry_backend_dsn = getenv("SENTRY_BACKEND_DSN")
     enable_sentry = getenv("ENABLE_SENTRY")
-    root_project_id = getenv("GCP_ROOT_PROJECT_NAME")
+    root_project_id = getenv("GCP_ROOT_PROJECT_ID")
     gcp_oauth_client_id = getenv("GCP_OAUTH_CLIENT_ID")
     commit_hash = getenv("GITHUB_SHA")
     branch_name = getenv("GITHUB_REF_NAME")

@@ -18,7 +18,7 @@ load_dotenv()
 def main():
     # Get the environment variables
     organization_id = getenv("GCP_ORGANISATION_ID")
-    root_project_id = getenv("GCP_ROOT_PROJECT_NAME")
+    root_project_id = getenv("GCP_ROOT_PROJECT_ID")
     customer_id = getenv("CUSTOMER_ID")
 
     # Get the config values

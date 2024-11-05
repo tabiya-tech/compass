@@ -35,7 +35,7 @@ jobs:
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
           GCP_ORGANISATION_ID: ${{ secrets.GCP_ORGANISATION_ID }}
-          GCP_ROOT_PROJECT_NAME: ${{ secrets.GCP_ROOT_PROJECT_NAME }}
+          GCP_ROOT_PROJECT_ID: ${{ secrets.GCP_ROOT_PROJECT_ID }}
           CUSTOMER_ID: ${{ secrets.CUSTOMER_ID }}
   create-environment:
     runs-on: ubuntu-latest
@@ -67,4 +67,4 @@ jobs:
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
           GCP_BILLING_ACCOUNT: ${{ secrets.GCP_BILLING_ACCOUNT }}
-          GCP_ROOT_PROJECT_NAME: ${{ secrets.GCP_ROOT_PROJECT_NAME }}
+          GCP_ROOT_PROJECT_ID: ${{ secrets.GCP_ROOT_PROJECT_ID }}

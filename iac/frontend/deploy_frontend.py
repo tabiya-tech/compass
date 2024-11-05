@@ -3,13 +3,12 @@ import mimetypes
 import pulumi
 import pulumi_gcp as gcp
 
-from lib.std_pulumi import get_resource_name, ProjectBaseConfig, enable_services, get_project_base_config
+from lib.std_pulumi import ProjectBaseConfig, get_project_base_config, get_resource_name
 
 
-def _create_bucket(basic_config: ProjectBaseConfig, bucket_name: str,
-                   dependencies: list[pulumi.Resource]) -> gcp.storage.Bucket:
+def _create_bucket(basic_config: ProjectBaseConfig, bucket_name: str) -> gcp.storage.Bucket:
     return gcp.storage.Bucket(
-        get_resource_name(environment=basic_config.environment, resource_type="bucket", resource=bucket_name),
+        get_resource_name(resource=bucket_name, resource_type="bucket"),
         project=basic_config.project,
         location=basic_config.location,
         uniform_bucket_level_access=True,
@@ -17,7 +16,7 @@ def _create_bucket(basic_config: ProjectBaseConfig, bucket_name: str,
             main_page_suffix="index.html",
             not_found_page="404.html",
         ),
-        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider))
+        opts=pulumi.ResourceOptions(provider=basic_config.provider))
 
 
 def _upload_directory_to_bucket(basic_config: ProjectBaseConfig, bucket_name: pulumi.Output, source_dir: str,
@@ -35,8 +34,7 @@ def _upload_directory_to_bucket(basic_config: ProjectBaseConfig, bucket_name: pu
 
             gcp.storage.BucketObject(
                 # Use a unique name for Pulumi resource while preserving the path
-                get_resource_name(environment=basic_config.environment, resource_type="file",
-                                  resource=target_name.replace("/", '_')),
+                get_resource_name(resource=target_name.replace("/", '_'), resource_type="bucket-object"),
                 name=target_name,
                 bucket=bucket_name,
                 source=pulumi.FileAsset(absolute_file_path),
@@ -49,8 +47,7 @@ def _upload_directory_to_bucket(basic_config: ProjectBaseConfig, bucket_name: pu
 def _make_bucket_public(basic_config: ProjectBaseConfig, bucket_name: pulumi.Output,
                         dependencies: list[pulumi.Resource]) -> None:
     gcp.storage.BucketIAMMember(
-        get_resource_name(environment=basic_config.environment, resource_type="BucketIAMMember",
-                          resource="allUsers-objectViewer"),
+        get_resource_name(resource="all-users-object-viewer", resource_type="bucket-membership"),
         bucket=bucket_name,
         role="roles/storage.objectViewer",
         member="allUsers",
@@ -60,10 +57,8 @@ def _make_bucket_public(basic_config: ProjectBaseConfig, bucket_name: pulumi.Out
 
 def deploy_frontend(project: str, location: str, environment: str):
     basic_config = get_project_base_config(project=project, location=location, environment=environment)
-    required_services = ["storage.googleapis.com"]
-    services = enable_services(basic_config, required_services)
 
-    bucket = _create_bucket(basic_config, "frontend", services)
+    bucket = _create_bucket(basic_config, "frontend")
 
     new_ui_build_dir = "../../frontend-new/build"
     _upload_directory_to_bucket(basic_config, bucket.name, new_ui_build_dir, "",

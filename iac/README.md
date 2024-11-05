@@ -19,12 +19,12 @@ To use Pulumi to manage the Compass infrastructure in GCP, the following setup m
 
 The root project is used to manage the resources of the target projects where the resources will be created. The root project must be created manually and the service account used to run pulumi must be granted access to the root project. Here are the steps to set up the root project:
 
-- Create a root GCP project (`ROOT-PROJECT-ID`). The same root project can be used to manage the resources of other target projects.
-- The service account used to run pulumi must be granted access to the root project (see the [Target Project](#target-project) section bellow for details on the service account). \
-  The service account must have permissions to use Service Usage API in the root project:
+- Create a root GCP project (`GCP_ROOT_PROJECT_ID`). The same root project can be used to manage the resources of other target projects.
+- The service account used to run pulumi must be granted access to the root project
+- The service account must have permissions to use Service Usage API in the root project:
   - `roles/serviceusage.serviceUsageAdmin`
 - The Service Usage API must be enabled manually using Google Cloud Console in the root project.
-- The root project is specified in the organisation project environment as `GCP_ROOT_PROJECT_NAME` and it will be propagated throughout all projects
+- The root project is specified in the organisation project environment as `GCP_ROOT_PROJECT_ID` and it will be propagated throughout all projects
 - The main usage for this root project is for billing. (check environment project) where the billing account is linked to the root project
 
 - Another usage for root project is for Service Usage API
@@ -38,7 +38,7 @@ The root project is used to manage the resources of the target projects where th
 
 #### Identity Project
 
-The identity API is enabled manually, It can be enabled on the root project, 
+The identity API is enabled manually, It can be enabled on the root project or any other project of choice, 
 the reason why this is done manually is that there are some manual steps that need to be done in the Identity Platform console like consent screen.
 
 The exported keys from the identity project should be added to the .env/environment variables file. they must be added to the environment of backend and auth subprojects
@@ -78,10 +78,10 @@ We need to have a service account created on root project so that it can be able
 In summary, we need the following roles.
 
 1. Billing Account User
-2. Folder Admin
-3. Organization Administrator
-4. Organization Role Administrator
-5. Project Creator
+2. Folder Admin: `roles/resourcemanager.folderAdmin`, `roles/resourcemanager.folderIamAdmin`
+3. Organization Administrator: `roles/resourcemanager.organizationAdmin`
+4. Organization Role Administrator: `roles/orgpolicy.policyAdmin`
+5. Projects Admin, usually this is granted by default when you are an organization admin and folder owner, you are able to add projects there
 
 ## Installation
 In the iac directory, run the following commands:
@@ -116,9 +116,9 @@ pip install -r requirements.txt
 
 Before running the code, you need to configure the Google Cloud SDK to use the credentials of the principal that will manage the infrastructure. That principal should have the necessary roles to manage the infrastructure in the particular project that we target. Also, you need to authenticate with Docker to push the images to the Google Cloud Artifact Registry.
 
-See the details in the [Root Project](#root-project) and [Target project](#target-project) for the required roles of the principal. 
+See the details in the [Root Project](#root-project) for the required roles of the principal. 
 
-### Authenticate via service account keys (preffered method)
+### Authenticate via service account keys (preferred method)
 
 Using the [service account credentials, authenticate with Google Cloud](https://cloud.google.com/sdk/gcloud/reference/auth/activate-service-account) is the way preferred when running in a CI/CD environment and the most convenient method for running pulumi locally. 
 
@@ -166,6 +166,8 @@ Then, impersonate the service account that has the necessary roles to manage the
 ### Environment variables
 The deployment requires the following environment variables to be set:
 - `GITHUB_SHA`: GitHub commit SHA that will be used as the docker image label. This does not have to be an actual git commit SHA, but using a static SHA (like `latest`) might have weird consequences (like the service not picking up the latest version).
+- `GITHUB_REF_NAME`: The name of the branch or tag that triggered the deployment.
+- `GITHUB_RUN_NUMBER`: The number of the GitHub run that triggered the deployment.
 - `GCP_OAUTH_CLIENT_ID`: The OAuth client ID used to authenticate the application with Firebase.
 - `GCP_OAUTH_CLIENT_SECRET`: The OAuth client secret used to authenticate the application with Firebase.
 - `DOMAIN_NAME`: The domain name of the environment, typically it is `<ENVIRONMENT>.compass.tabiya.tech`
@@ -183,31 +185,38 @@ The deployment requires the following environment variables to be set:
 - `ENABLE_SENTRY`: A boolean value that determines whether Sentry error tracking is enabled. Set to `True` to enable Sentry error tracking. 
 - `GCP_BILLING_ACCOUNT`: The billing account ID of the GCP project. This is used to link the billing account to the project.
 - `GCP_ORGANISATION_ID`: The organisation ID of the GCP organisation. This is to add all projects under this organisation.
-- `GCP_ROOT_PROJECT_NAME`: The name of the root project that will be used to manage the resources of the target projects.
+- `GCP_ROOT_PROJECT_ID`: The name of the root project that will be used to manage the resources of the target projects.
+- `GOOGLE_CREDENTIALS`: The path to the service account key file used to authenticate with Google Cloud.
+- `CUSTOMER_ID`: The customer ID of the GCP project. This is used to identify the customer in the GCP project.
 
 It is recommended to use a `.env` file to set the environment variables. Create a `.env` file in the root directory of the project and add the following content:
 
 ```shell
 # .env file
-GITHUB_SHA="<GIT_COMMIT_SHA>"
-GCP_OAUTH_CLIENT_ID="<GCP_OAUTH_CLIENT_ID>"
-GCP_OAUTH_CLIENT_SECRET="<GCP_OAUTH_CLIENT_SECRET>"
-DOMAIN_NAME="<DOMAIN_NAME>"
-FRONTEND_DOMAIN="<FRONTEND_DOMAIN>"
-FRONTEND_URL="<FRONTEND_URL>"
-BACKEND_DOMAIN="<BACKEND_DOMAIN>"
-BACKEND_URL="<BACKEND_URL>"
-TAXONOMY_MONGODB_URI="<URI_TO_MONGODB>"
-TAXONOMY_DATABASE_NAME="<DATABASE_NAME>"
-TAXONOMY_MODEL_ID="<TAXONOMY_MODEL_ID>"
-APPLICATION_MONGODB_URI="<URI_TO_MONGODB>"
-APPLICATION_DATABASE_NAME="<DATABASE_NAME>"
-VERTEX_API_REGION="<REGION>"
-SENTRY_BACKEND_DSN="<SENTRY_BACKEND_DSN>"
-ENABLE_SENTRY="False"
-GCP_BILLING_ACCOUNT="<BILLING_ACCOUNT>"
-GCP_ORGANISATION_ID="<ORGANISATION_ID>"
-GCP_ROOT_PROJECT_NAME="<ROOT_PROJECT_NAME>"
+GITHUB_SHA=<GITHUB_SHA>
+GITHUB_REF_NAME=<GITHUB_REF_NAME>
+GITHUB_RUN_NUMBER=<GITHUB_RUN_NUMBER>
+GCP_OAUTH_CLIENT_ID=<GCP_OAUTH_CLIENT_ID>
+GCP_OAUTH_CLIENT_SECRET=<GCP_OAUTH_CLIENT_SECRET>
+CUSTOMER_ID=<GCP_CUSTOMER_ID>
+DOMAIN_NAME=<ENVIRONMENT>.compass.tabiya.tech
+FRONTEND_DOMAIN=<ENVIRONMENT>.compass.tabiya.tech
+FRONTEND_URL=https://<ENVIRONMENT>.compass.tabiya.tech
+GCP_BILLING_ACCOUNT=<GCP_BILLING_ACCOUNT>
+BACKEND_DOMAIN=<ENVIRONMENT>.compass.tabiya.tech
+BACKEND_URL=https://<ENVIRONMENT>.compass.tabiya.tech/api
+TAXONOMY_MONGODB_URI=<MONGODB_URI>
+TAXONOMY_DATABASE_NAME=<DATABASE_NAME>
+TAXONOMY_MODEL_ID=<MODEL_ID>
+APPLICATION_MONGODB_URI=<MONGODB_URI>
+APPLICATION_DATABASE_NAME=<DATABASE_NAME>
+VERTEX_API_REGION=<REGION>
+SENTRY_BACKEND_DSN=<SENTRY_BACKEND_DSN>
+ENABLE_SENTRY=<True/False>
+GCP_ROOT_PROJECT_ID=<GCP_ROOT_PROJECT_ID>
+GCP_ORGANISATION_ID=<GCP_ORGANISATION_ID>
+GOOGLE_CREDENTIALS=<KEY_FILE>
+
 ```
 Refer to the backend and frontend projects for information on the environment variables.
 
@@ -215,12 +224,9 @@ Refer to the backend and frontend projects for information on the environment va
 
 Before running the pulumi code.
 
-
 1. Activate the virtual environment as instructed in the [Installation](#installation) section.
 2. Set up the [Environment Variables](#environment-variables)
-
 3. Ensure that the Docker daemon is running locally.
-
 4. Authenticate with Google Cloud as instructed in [Authenticate via Service Account Keys](#authenticate-via-service-account-keys-preffered-method).
    ```shell
     # assuming the service account key file is in a folder named keys in the project's root directory and the key file is named credentials.json
@@ -229,10 +235,10 @@ Before running the pulumi code.
     gcloud auth configure-docker us-central1-docker.pkg.dev
    ```
 
-5. Run the pulumi code for the infrastructure part you want to deploy. 
-
+5. Run the pulumi code for the infrastructure part you want to deploy.
 
 For example assuming the `.env` file is in the root directory of the IaC project and the service account key file named `credentials.json` is in a folder named `keys` in the project's root directory, to preview the changes for the `backend` infrastructure of the `dev` environment, run the following command:
+Copy pase from `.env.example` to `.env` and replace the values with the correct ones, Conduct the team for necessary values or create them if they are not available. Refer to the documentation on how to get the variables.
 
  ```shell
 GOOGLE_CREDENTIALS="$(pwd)/keys/credentials.json" pulumi preview -C backend -s dev
@@ -241,10 +247,9 @@ GOOGLE_CREDENTIALS="$(pwd)/keys/credentials.json" pulumi preview -C backend -s d
 ## Useful links
 
 See the [Pulumi documentation](https://www.pulumi.com/docs/) for more information on how to use Pulumi.
-
 See the [Pulumi GCP provider documentation](https://www.pulumi.com/docs/reference/clouds/gcp/) for more information on how to use the GCP provider.
 
-You can read more about how to configure pulumi with a a google cloud project in python [here](https://www.pulumi.com/ai/answers/15xDqB9xyu6D17Kb297Dfi/configuring-google-cloud-project-with-python)
+You can read more about how to configure pulumi with a Google cloud project in python [here](https://www.pulumi.com/ai/answers/15xDqB9xyu6D17Kb297Dfi/configuring-google-cloud-project-with-python)
 
 ##  Some caveats
 
@@ -265,6 +270,8 @@ Once the configuration is imported, you can run pulumi commands as usual.
 
 > Note: Don't forget to unprotect the imported resource, since imported resources are protected by default. It is important to do this, since pulumi will not allow you to destroy a protected resource.
 
+- You are going to see a warning requiring you to set `gcp:project`, This is because the project is not set in the `Pulumi.<env>.yaml` file. This is not a problem, because we are using a custom gcp_provider with project set dynamically because the project is created in an environment microtask and passed throughout other subprojects.
+
 ## IaC Codebase Components
 
 The IaC is divided into seven subprojects and lib folder for re-usable code/functions/types.
@@ -274,5 +281,61 @@ The IaC is divided into seven subprojects and lib folder for re-usable code/func
 - [frontend](frontend): Sets up the frontend application's infrastructure, which is a static website hosted on Google Cloud Storage.
 - [aws-ns](aws-ns): Sets up the AWS name servers for the subdomains. It is used to set up domain delegation for the subdomains.
 - [common](common): Sets up the foundational infrastructure such as DNS records for the entire application.
-- [environment](environment): sets up the environment specific configuration, for more information you can check [environment/README.md](environment/README.md)
-- [organization](organization): sets up the organization specific configuration, for more information you can check [organization/README.md](organization/README.md)
+- [organization](organization): sets up the organization specific configuration, for more information you can check [organization/README.md](#organization)
+- [environment](environment): sets up the environment specific configuration, for more information you can check [environment/README.md](#environment)
+
+### Organization
+
+## What does this micro-stack do?
+
+This micro-stack creates the following GCP resources
+
+* top level folder for the organization (compass).
+* folder for lower (`dev/test`) environments.
+* folder for production environments.
+* organisation groups common role, a role that is common for all groups which are not added by default.
+* compass developers and compass admins groups. These groups are used for granting permissions to the users. (Note: Memberships will be added manually)
+* makes admins owners for all projects (lower and production environments) and developers viewers for all projects (lower and production environments).\ and editors for only lower environments.
+* a common docker registry used by all environments.
+
+
+The roles/permissions will be inherited from the upper level to the lower level in the hierarchy. Examples:
+* a new project (~read `environment`) to the `lower environment` folder.
+  * all users in the `compass.developers` group gains `roles/owner` permissions to the new project.
+  * all users in the `compass.admins` group gains `roles/owner` permissions to the new project.
+* a new project (~read `environment`) to the `production environment` folder.
+  * all users in the `compass.developers` group gains `roles/viewer` permissions to the new project.
+  * all users in the `compass.admins` group gains `roles/owner` permissions to the new project.
+
+
+### Environment
+
+The purpose of this Pulumi micro-stack is to create a new project (~read `environment`).
+_"A combination between partner and environment"_
+
+####  What does this micro-stack do?
+
+The `environment` Pulumi micro-stack creates a new project under the target folder in the `tabiya.org` GCP organization. It will then enable a set of base APIs for this new project using the `"root project"`. After the project has been created, Pulumi enables a set of required base APIs for the project.\
+\
+The target folder is determined based on the `environment_type` configuration parameter. Check `organization` micro-stack for more information about `folders, projects, and environments`\
+\
+After the new `project/environment` has been created, the next micro-stacks can be set up
+- auth
+- backend
+- frontend
+- common
+- aws-ns
+
+#### Prerequisites
+
+##### Required configuration
+
+The configurations should be added to a file called `Pulumi.<ENV>.yaml`
+* `gcp:region`: <This might actually not be necessary>
+* `environment_type`: Used for determining the type of the environment, which will be used for choosing the folder where this environment will be created. Valid values are `dev`, `test` and `prod`. (To understand the `projects, folders, and environments`, check the `README.md` in the `organization` micro-stack).
+
+```yaml
+config:
+  gcp:region: "us-central1"
+  environment_type: "dev"
+```

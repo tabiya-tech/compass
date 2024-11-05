@@ -6,25 +6,11 @@ import pulumi_gcp as gcp
 
 from pulumi import Output
 
-from lib.std_pulumi import get_resource_name, ProjectBaseConfig, get_project_base_config, get_file_as_string, enable_services
+from lib.std_pulumi import ProjectBaseConfig, get_resource_name, get_project_base_config, get_file_as_string
 
 from __main__ import BackendEnvVarsConfig
 
 GCP_API_GATEWAY_CONFIG_FILE = "./config/gcp_api_gateway_config.yaml"
-
-REQUIRED_SERVICES = [
-    # Required for VertexAI see https://cloud.google.com/vertex-ai/docs/start/cloud-environment
-    "aiplatform.googleapis.com",
-    # GCP API Gateway
-    "apigateway.googleapis.com",
-    # GCP Cloud Build
-    "cloudbuild.googleapis.com",
-    # Cloud Data Loss Prevention - Required for de-identifying data
-    "dlp.googleapis.com",
-    # GCP Cloud Run
-    "run.googleapis.com",
-]
-
 
 
 """
@@ -44,7 +30,7 @@ def _setup_api_gateway(*,
                        dependencies: list[pulumi.Resource]
                        ):
     apigw_service_account = gcp.serviceaccount.Account(
-        resource_name=get_resource_name(environment=basic_config.environment, resource="api-gateway-sa"),
+        resource_name=get_resource_name(resource="api-gateway", resource_type="sa"),
         # unclear why the resource name is not used here, something to do with account_id constraints? Link to docs?
         account_id=f"compassapigwsrvacct{basic_config.environment.replace('-', '')}",
         project=basic_config.project,
@@ -53,8 +39,8 @@ def _setup_api_gateway(*,
     )
 
     apigw_api = gcp.apigateway.Api(
-        resource_name=get_resource_name(environment=basic_config.environment, resource="api-gateway-api"),
-        api_id=get_resource_name(environment=basic_config.environment, resource="api-gateway-api"),
+        resource_name=get_resource_name(resource="api-gateway", resource_type="api"),
+        api_id="backend-api-gateway-api",
         project=basic_config.project,
         opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
     )
@@ -67,13 +53,13 @@ def _setup_api_gateway(*,
     apigw_config_yaml_b64encoded = apigw_config_yaml.apply(lambda yaml: base64.b64encode(yaml.encode()).decode())
 
     apigw_config = gcp.apigateway.ApiConfig(
-        resource_name=get_resource_name(environment=basic_config.environment, resource="api-gateway-config"),
+        resource_name=get_resource_name(resource="api-gateway", resource_type="api-config"),
         api=apigw_api.api_id,
         project=basic_config.project,
         openapi_documents=[
             gcp.apigateway.ApiConfigOpenapiDocumentArgs(
                 document=gcp.apigateway.ApiConfigOpenapiDocumentDocumentArgs(
-                    path=get_resource_name(environment=basic_config.environment, resource="api-gateway-config.yaml"),
+                    path=get_resource_name(resource="api-gateway", resource_type="config.yaml"),
                     contents=apigw_config_yaml_b64encoded,
                 ),
             )
@@ -86,11 +72,11 @@ def _setup_api_gateway(*,
         opts=pulumi.ResourceOptions(provider=basic_config.provider)
     )
 
-    apigw_gateway = gcp.apigateway.Gateway(
-        resource_name=get_resource_name(environment=basic_config.environment, resource="api-gateway"),
+    api_gateway = gcp.apigateway.Gateway(
+        resource_name=get_resource_name(resource="api-gateway"),
         api_config=apigw_config.id,
         display_name=f"Compass API Gateway {basic_config.environment}",
-        gateway_id=get_resource_name(environment=basic_config.environment, resource="api-gateway"),
+        gateway_id="backend-api-gateway",
         project=basic_config.project,
         region=basic_config.location,
         opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
@@ -99,7 +85,7 @@ def _setup_api_gateway(*,
     # Only allow access (roles/run.invoker permission) to apigw_service_account
     # This prevents the service from being accessed directly from the internet
     gcp.cloudrun.IamBinding(
-        resource_name=get_resource_name(environment=basic_config.environment, resource="api-gateway-iam-access"),
+        resource_name=get_resource_name(resource="api-gateway-sa", resource_type="iam-binding"),
         project=basic_config.project,
         location=basic_config.location,
         service=cloudrun.name,
@@ -108,14 +94,13 @@ def _setup_api_gateway(*,
         opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
     )
 
-    pulumi.export("apigateway_url", apigw_gateway.default_hostname.apply(lambda hostname: f"https://{hostname}"))
-    pulumi.export("apigateway_id", apigw_gateway.gateway_id)
-    return apigw_gateway
+    pulumi.export("apigateway_url", api_gateway.default_hostname.apply(lambda hostname: f"https://{hostname}"))
+    pulumi.export("apigateway_id", api_gateway.gateway_id)
+    return api_gateway
 
 
 def _get_repository(
         basic_config: ProjectBaseConfig,
-        dependencies: list[pulumi.Resource],
         project_number: pulumi.Output[str],
         root_project_id: str
 ) -> pulumi.Output[gcp.artifactregistry.Repository]:
@@ -127,14 +112,14 @@ def _get_repository(
 
     # allow the current environment to read and write to the repository
     gcp.artifactregistry.RepositoryIamMember(
-        resource_name=get_resource_name(environment=basic_config.environment, resource="docker-repository-read-write-iam"),
+        resource_name=get_resource_name(resource="docker-repository", resource_type="read-write-iam"),
         project=root_project_id,
         location=basic_config.location,
         repository=repository.apply(lambda repo: repo.get("name")),
         # you can read, write and delete the images to the repository
         role="roles/artifactregistry.repoAdmin",
         member=project_number.apply(lambda _project_number: f"serviceAccount:service-{_project_number}@serverless-robot-prod.iam.gserviceaccount.com"),
-        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
+        opts=pulumi.ResourceOptions(provider=basic_config.provider),
     )
 
     return repository
@@ -142,7 +127,7 @@ def _get_repository(
 def _build_and_push_image(fully_qualified_image_name: pulumi.Output[str], dependencies: list[pulumi.Resource], basic_config: ProjectBaseConfig) -> docker.Image:
     # Build and push image to gcr repository
     image = docker.Image(
-        get_resource_name(environment=basic_config.environment, resource="backend-image"),
+        get_resource_name(resource="backend", resource_type="image"),
         image_name=fully_qualified_image_name,
         build=docker.DockerBuildArgs(context="../../backend", platform="linux/amd64"),
         registry=None,  # use gcloud for authentication.
@@ -179,7 +164,7 @@ def _get_fully_qualified_image_name(
         else:
             label = f"{branch_name}-b{run_number}"
 
-        name = f"{basic_config.location}-docker.pkg.dev/{env_vars.ROOT_PROJECT_ID}/{repository_name}/{image_name}:{label}"
+        name = f"{basic_config.location}-docker.pkg.dev/{env_vars.ROOT_PROJECT_ID}/{repository_name}/{image_name}-{_environment_type}:{label}"
 
         pulumi.info("using image name: " + name)
 
@@ -200,8 +185,8 @@ def _deploy_cloud_run_service(
     # See https://cloud.google.com/run/docs/securing/service-identity#per-service-identity for more information
     # Create a service account for the Cloud Run service
     service_account = gcp.serviceaccount.Account(
-        get_resource_name(environment=basic_config.environment, resource="backend-sa"),
-        account_id=get_resource_name(environment=basic_config.environment, resource="backend-sa"),
+        get_resource_name(resource="backend-sa", resource_type="sa"),
+        account_id="backend-sa",
         display_name="The dedicated service account for the Compass backend service",
         project=basic_config.project,
         opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
@@ -209,7 +194,7 @@ def _deploy_cloud_run_service(
 
     # Assign the necessary roles to the service account for Vertex AI access
     gcp.projects.IAMBinding(
-        get_resource_name(environment=basic_config.environment, resource="ai-user-binding"),
+        get_resource_name(resource="backend-sa", resource_type="ai-user-binding"),
         members=[service_account.email.apply(lambda email: f"serviceAccount:{email}")],
         role="roles/aiplatform.user",
         project=basic_config.project,
@@ -219,8 +204,8 @@ def _deploy_cloud_run_service(
     # Deploy cloud run service
 
     service = gcp.cloudrunv2.Service(
-        get_resource_name(environment=basic_config.environment, resource="cloudrun-service"),
-        name=get_resource_name(environment=basic_config.environment, resource="cloudrun-service"),
+        get_resource_name(resource="cloudrun", resource_type="service"),
+        name="cloudrun-service",
         project=basic_config.project,
         location=basic_config.location,
         ingress="INGRESS_TRAFFIC_ALL",
@@ -279,13 +264,10 @@ def _deploy_cloud_run_service(
 def deploy_backend(project: str, location: str, environment: str, project_number: Output[str], environment_type: Output[str], env_vars: BackendEnvVarsConfig):
     basic_config = get_project_base_config(project=project, location=location, environment=environment)
 
-    # Enable the necessary services for building and pushing the image
-    services = enable_services(basic_config=basic_config, service_names=REQUIRED_SERVICES)
-
-    image_name = get_resource_name(environment=environment, resource="backend")
+    image_name = "backend"
 
     # Get the repository from the organisation/root-project
-    repository = _get_repository(basic_config, services, project_number, env_vars.ROOT_PROJECT_ID)
+    repository = _get_repository(basic_config, project_number, env_vars.ROOT_PROJECT_ID)
 
     # Build and push image to gcr repository
     fully_qualified_image_name = _get_fully_qualified_image_name(
@@ -302,12 +284,12 @@ def deploy_backend(project: str, location: str, environment: str, project_number
         basic_config=basic_config,
         fully_qualified_image_name=fully_qualified_image_name.apply(lambda value: value),
         backend_env_vars_cfg=env_vars,
-        dependencies=services + [image],
+        dependencies=[image],
     )
 
     _api_gateway = _setup_api_gateway(
         basic_config=basic_config,
         cloudrun=cloud_run,
         gcp_oauth_client_id=env_vars.GCP_OAUTH_CLIENT_ID,
-        dependencies=services + [cloud_run]
+        dependencies=[cloud_run]
     )

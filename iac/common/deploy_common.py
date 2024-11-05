@@ -5,12 +5,7 @@ import pulumi_gcp as gcp
 
 from urllib.parse import urlparse
 
-from lib.std_pulumi import get_resource_name, ProjectBaseConfig, enable_services, get_project_base_config
-
-_SERVICES = [
-    # GCP Cloud DNS
-    "dns.googleapis.com",
-]
+from lib.std_pulumi import get_resource_name, ProjectBaseConfig, get_project_base_config
 
 
 def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
@@ -22,14 +17,14 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
                         api_gateway_id: pulumi.Output[str]):
     # Create a global IP address for the load balancer
     ipaddress = gcp.compute.GlobalAddress(
-        get_resource_name(environment=basic_config.environment, resource="lb-ipaddress"),
+        get_resource_name(resource="lb", resource_type="global-ip-address"),
         project=basic_config.project,
         address_type="EXTERNAL",
         opts=pulumi.ResourceOptions(provider=basic_config.provider)
     )
 
     # Add an A record with the GLB IP
-    gcp.dns.RecordSet(get_resource_name(environment=basic_config.environment, resource="a-record"),
+    gcp.dns.RecordSet(get_resource_name(resource="lb", resource_type="record-set"),
                       project=basic_config.project,
                       name=dns_zone.dns_name,
                       managed_zone=dns_zone.name,
@@ -41,7 +36,7 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
 
     # Create a backend service for the frontend bucket
     backend_service_bucket = gcp.compute.BackendBucket(
-        get_resource_name(environment=basic_config.environment, resource="lb-backend-bucket-for-frontend"),
+        get_resource_name(resource="lb", resource_type="frontend-bucket"),
         project=basic_config.project,
         bucket_name=frontend_bucket_name,
         enable_cdn=True,
@@ -53,7 +48,7 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
 
     # create a region network endpoint group for connecting to the api gateway
     endpoint_group = gcp.compute.RegionNetworkEndpointGroup(
-        get_resource_name(environment=basic_config.environment, resource="lb-endpoint-group"),
+        get_resource_name(resource="lb", resource_type="endpoint-group"),
         network_endpoint_type="SERVERLESS",
         project=basic_config.project,
         region=basic_config.location,
@@ -66,7 +61,7 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
 
     # Create a backend service for the api gateway
     api_gateway_backend_service = gcp.compute.BackendService(
-        get_resource_name(environment=basic_config.environment, resource="lb-backend-service-for-api-gateway"),
+        get_resource_name(resource="lb", resource_type="backend-service"),
         project=basic_config.project,
         connection_draining_timeout_sec=10,
         protocol="HTTP",
@@ -114,7 +109,7 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
         sys.exit(1)
 
     https_url_map = gcp.compute.URLMap(
-        get_resource_name(environment=basic_config.environment, resource="https-urlmap"),
+        get_resource_name(resource="lb", resource_type="https-urlmap"),
         project=basic_config.project,
         default_service=backend_service_bucket.id,
         host_rules=[
@@ -132,7 +127,7 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
     )
 
     ssl_certificate = gcp.compute.ManagedSslCertificate(
-        resource_name=get_resource_name(environment=basic_config.environment, resource="ssl-certificate"),
+        resource_name=get_resource_name(resource="lb", resource_type="ssl-certificate"),
         project=basic_config.project,
         managed=gcp.compute.ManagedSslCertificateManagedArgs(
             domains=[frontend_domain + "."],
@@ -141,7 +136,7 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
     )
 
     https_proxy = gcp.compute.TargetHttpsProxy(
-        get_resource_name(environment=basic_config.environment, resource="https-proxy"),
+        get_resource_name(resource="lb", resource_type="https-proxy"),
         project=basic_config.project,
         url_map=https_url_map.id,
         ssl_certificates=[ssl_certificate.id],
@@ -149,7 +144,7 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
     )
 
     http_url_map = gcp.compute.URLMap(
-        get_resource_name(environment=basic_config.environment, resource="http-urlmap-redirect"),
+        get_resource_name(resource="lb", resource_type="http-urlmap-redirect"),
         default_url_redirect=gcp.compute.URLMapDefaultUrlRedirectArgs(
             https_redirect=True,
             strip_query=False),
@@ -157,7 +152,7 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
     )
 
     http_proxy = gcp.compute.TargetHttpProxy(
-        get_resource_name(environment=basic_config.environment, resource="http-proxy"),
+        get_resource_name(resource="lb", resource_type="http-proxy"),
         project=basic_config.project,
         url_map=http_url_map.id,
         opts=pulumi.ResourceOptions(depends_on=[http_url_map], provider=basic_config.provider),
@@ -165,7 +160,7 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
 
     # forwarding rule for HTTP
     gcp.compute.GlobalForwardingRule(
-        get_resource_name(environment=basic_config.environment, resource="http-global-fw-rule"),
+        get_resource_name(resource="lb", resource_type="http-global-fw-rule"),
         project=basic_config.project,
         target=http_proxy.id,
         ip_address=ipaddress.address,
@@ -176,7 +171,7 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
 
     # forwarding rule for HTTPS
     gcp.compute.GlobalForwardingRule(
-        get_resource_name(environment=basic_config.environment, resource="https-global-fw-rule"),
+        get_resource_name(resource="lb", resource_type="https-global-fw-rule"),
         project=basic_config.project,
         target=https_proxy.id,
         ip_address=ipaddress.address,
@@ -186,14 +181,13 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
     )
 
 
-def _create_dns(*, basic_config: ProjectBaseConfig, domain_name: str,
-                dependencies: list[pulumi.Resource]) -> gcp.dns.ManagedZone:
+def _create_dns(*, basic_config: ProjectBaseConfig, domain_name: str) -> gcp.dns.ManagedZone:
     # create sub domain in gcp
-    dns_zone = gcp.dns.ManagedZone(get_resource_name(environment=basic_config.environment, resource="dns-zone"),
-                                   name=get_resource_name(environment=basic_config.environment, resource="dns-zone"),
+    dns_zone = gcp.dns.ManagedZone(get_resource_name(resource="dns", resource_type="zone"),
+                                   name="dns-zone",
                                    dns_name=domain_name + ".",
                                    project=basic_config.project,
-                                   opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider))
+                                   opts=pulumi.ResourceOptions(provider=basic_config.provider))
 
     return dns_zone
 
@@ -218,14 +212,9 @@ def deploy_common(project: str,
     api_gateway_id = backend_stack_ref.get_output("apigateway_id")
     api_gateway_id.apply(lambda id: print(f"Using API gateway id: {id}"))
 
-    # Enable the necessary services
-    services = enable_services(basic_config=basic_config,
-                               service_names=_SERVICES)
-
     # Create the DNS
     dns_zone = _create_dns(basic_config=basic_config,
-                           domain_name=domain_name,
-                           dependencies=services)
+                           domain_name=domain_name)
     pulumi.export("ns-records", dns_zone.name_servers)
 
     # Create the Global Load Balancer

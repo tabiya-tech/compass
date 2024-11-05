@@ -34,14 +34,13 @@ def main():
 
     # Get the environment variables
     billing_account = getenv("GCP_BILLING_ACCOUNT")
-    root_project = getenv("GCP_ROOT_PROJECT_NAME")
+    root_project_id= getenv("GCP_ROOT_PROJECT_ID")
 
     # set up the environment/project
     create_new_environment(
         folder_id=folder_id,
+        root_project_id=root_project_id,
         billing_account=billing_account,
-        root_project=root_project,
-        environment=environment,
         environment_name=environment_name,
         environment_type=environment_type
     )
