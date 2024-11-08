@@ -57,7 +57,7 @@ jobs:
         run: yarn install
         working-directory: frontend
       - name: build POC frontend
-        run: yarn run build
+        run: yarn run export
         working-directory: frontend
         env:
           NEXT_PUBLIC_COMPASS_URL: ${{ inputs.backend-url }}
