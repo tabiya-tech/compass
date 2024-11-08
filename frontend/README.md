@@ -16,6 +16,22 @@ To run the demo chat UI and connect to a local instance of the backend:
    yarn install
    yarn run dev
    
+
+To run the application in production mode, use the following command:
+```sh
+yarn run build
+yarn start
+```
+
+>To run the application using `yarn start` you will need to set the environment variables in a `.env` file.
+>
+> copy content from `.env.development` to `.env`. This is because the build process will use the production environment variables when running the app locally.
+> so `.env.development` is used to set the environment variables for local development.
+
+
+After starting the chatbot either in development or production mode, it will be available at [http://localhost:3000](http://localhost:3000).
+Specifically under the path `/poc-ui` [http://localhost:3000/poc-ui](http://localhost:3000/poc-ui).
+
 ## Use the conversation sandbox UI
 
 The UI can be configured to use an alternative path for the conversation backend.

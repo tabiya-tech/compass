@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "NEXT_OUTPUT=standalone next build",
+    "export": "NEXT_OUTPUT=export next build",
     "start": "next start",
     "lint": "next lint",
     "format:check": "prettier --check src/",

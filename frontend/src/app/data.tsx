@@ -24,7 +24,7 @@ export const generateUserMessageFromResponse = (message: any): Message => {
 export const generateTabiyaMessageFromResponse = (message: any): Message => {
   return {
     id: Math.floor(Math.random() * 1000),
-    avatar: "/tabiya.png",
+    avatar: "/poc-ui/tabiya.png",
     name: "Tabiya",
     message: message,
   };
@@ -32,7 +32,7 @@ export const generateTabiyaMessageFromResponse = (message: any): Message => {
 
 export const tabiyaCompassUser: User = {
   id: 1,
-  avatar: "/tabiya.png",
+  avatar: "/poc-ui/tabiya.png",
   name: "Tabiya",
   messages: [],
 };
