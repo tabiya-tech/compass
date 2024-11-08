@@ -46,7 +46,7 @@ export function Chat({ isMobile, sessionId }: Readonly<ChatProps>) {
       if (typing) {
         addMessage({
           id: Math.floor(Math.random() * 1000),
-          avatar: "/tabiya.png",
+          avatar: "/poc-ui/tabiya.png",
           name: "Tabiya",
           message: "Typing...",
         });
