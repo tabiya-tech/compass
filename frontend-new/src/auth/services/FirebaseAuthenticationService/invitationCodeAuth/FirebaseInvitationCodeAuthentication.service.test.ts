@@ -2,8 +2,8 @@
 import "src/_test_utilities/consoleMock";
 import FirebaseInvitationCodeAuthenticationService from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
 import firebase from "firebase/compat/app";
-import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
-import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
+import { invitationsService } from "src/auth/services/invitationsService/invitations.service";
+import { InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
 
 jest.mock("jwt-decode");
 
@@ -28,7 +28,7 @@ jest.mock("src/userPreferences/UserPreferencesService/userPreferences.service", 
   };
 });
 
-jest.mock("src/invitations/InvitationsService/invitations.service", () => {
+jest.mock("src/auth/services/invitationsService/invitations.service", () => {
   return {
     invitationsService: {
       checkInvitationCodeStatus: jest.fn(),
