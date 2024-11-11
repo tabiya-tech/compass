@@ -1,4 +1,4 @@
-import { FirebaseError } from "./firebaseError";
+import { FirebaseError } from "src/error/FirebaseError/firebaseError";
 
 export function writeFirebaseErrorToLog(err: FirebaseError, logFunction: (msg: any) => void): void {
   const logMessage = `FirebaseError: ${err.serviceName} ${err.serviceFunction} ${err.errorCode} ${err.method}`;
@@ -17,9 +17,13 @@ export function writeFirebaseErrorToLog(err: FirebaseError, logFunction: (msg: a
   }
   // @ts-ignore
   obj["message"] = err.message;
+
   // @ts-ignore
   obj["stack"] = err.stack;
+
   // @ts-ignore
   obj["class"] = err.name === "Error" ? err.constructor.name : err.name;
-  logFunction(logMessage + obj);
+
+  // Log both the error and the structured message
+  logFunction({ message: logMessage, error: obj });
 }
