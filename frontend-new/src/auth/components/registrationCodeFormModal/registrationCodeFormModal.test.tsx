@@ -6,7 +6,7 @@ import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
 import RegistrationCodeFormModal, { DATA_TEST_ID, RegistrationCodeFormModalState } from "./RegistrationCodeFormModal";
 
 // Mock InvitationsService
-jest.mock("src/invitations/InvitationsService/invitations.service", () => ({
+jest.mock("src/auth/services/invitationsService/invitations.service", () => ({
   getInstance: jest.fn().mockReturnValue({
     checkInvitationCodeStatus: jest.fn(),
   }),

@@ -1,7 +1,7 @@
 import { Meta, type StoryObj } from "@storybook/react";
 import RegistrationCodeFormModal, {
   RegistrationCodeFormModalState,
-} from "src/invitations/components/RegistrationCodeFormModal/RegistrationCodeFormModal";
+} from "src/auth/components/registrationCodeFormModal/RegistrationCodeFormModal";
 
 const meta: Meta<typeof RegistrationCodeFormModal> = {
   title: "Invitations/RegistrationCodeFormModal",
