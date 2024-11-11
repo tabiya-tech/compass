@@ -1,6 +1,5 @@
 import { StatusCodes } from "http-status-codes/";
 import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
-import ErrorCodes = ErrorConstants.ErrorCodes;
 
 export type ServiceErrorObject = {
   errorCode: ErrorConstants.ErrorCodes;

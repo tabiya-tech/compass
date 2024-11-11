@@ -10,7 +10,8 @@ import { IsOnlineProvider } from "src/app/isOnlineProvider/IsOnlineProvider";
 import ViewPortWrapper from "src/app/ViewPortWrapper";
 
 import * as Sentry from "@sentry/react";
-import InternalError from "./errorPage/ErrorPage";
+import ErrorPage from "src/error/errorPage/ErrorPage";
+
 import { initSentry } from "./sentryInit";
 
 // initialize react sentry for log aggregation
@@ -23,7 +24,7 @@ const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement)
 root.render(
   //<React.StrictMode>
   <Sentry.ErrorBoundary
-    fallback={<InternalError errorMessage={"Something went wrong with Compass. Try reloading the page..."} />}
+    fallback={<ErrorPage errorMessage={"Something went wrong with Compass. Try reloading the page..."} />}
   >
     <CssBaseline />
     <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>

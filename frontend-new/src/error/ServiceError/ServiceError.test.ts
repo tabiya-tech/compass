@@ -4,8 +4,8 @@ import {
   ServiceError,
   getUserFriendlyErrorMessage,
   USER_FRIENDLY_ERROR_MESSAGES,
-} from "./ServiceError";
-import { StatusCodes } from "http-status-codes/";
+} from "src/error/ServiceError/ServiceError";
+import { StatusCodes } from "http-status-codes";
 
 describe("Test the ServiceError class", () => {
   it.each([
@@ -140,6 +140,7 @@ describe("Test the getUserFriendlyErrorMessage function", () => {
       [ErrorConstants.ErrorCodes.FAILED_TO_FETCH, USER_FRIENDLY_ERROR_MESSAGES.SERVER_CONNECTION_ERROR],
       [ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY, USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_RESPONSE],
       [ErrorConstants.ErrorCodes.INVALID_RESPONSE_HEADER, USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_RESPONSE],
+      [ErrorConstants.ErrorCodes.FORBIDDEN, USER_FRIENDLY_ERROR_MESSAGES.UNEXPECTED_ERROR],
       ["(none of the above)", USER_FRIENDLY_ERROR_MESSAGES.UNEXPECTED_ERROR],
     ])("Should return correct message for '%s' error code", (errorCode, errorMessage) => {
       // GIVEN a ServiceError with the given error code
@@ -158,5 +159,25 @@ describe("Test the getUserFriendlyErrorMessage function", () => {
       // THEN the function should return the appropriate message
       expect(message).toBe(errorMessage);
     });
+
+    test("Should return correct message for 'FORBIDDEN' error code and status is 422", () => {
+      // GIVEN Error with 'FORBIDDEN' error code and status code 422
+      const error = new ServiceError(
+        "service",
+        "function",
+        "method",
+        "path",
+        422,
+        ErrorConstants.ErrorCodes.FORBIDDEN,
+        "Failed to fetch models",
+        "Failed to fetch models"
+      );
+
+      // WHEN calling getUserFriendlyErrorMessage
+      const message = getUserFriendlyErrorMessage(error);
+
+      // THEN the function should return the appropriate message
+      expect(message).toBe(USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_REQUEST);
+    })
   });
 });

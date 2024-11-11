@@ -1,14 +1,15 @@
+import React, { useEffect, useState } from "react";
 import { createHashRouter, RouterProvider } from "react-router-dom";
 import Chat from "src/chat/Chat";
 import Info from "src/info/Info";
-import Register from "src/auth/pages/Register/Register";
 import Login from "src/auth/pages/Login/Login";
-import DataProtectionAgreement from "src/dataProtectionAgreement/DataProtectionAgreement";
+import ErrorPage from "src/error/errorPage/ErrorPage";
+import Register from "src/auth/pages/Register/Register";
 import VerifyEmail from "src/auth/pages/VerifyEmail/VerifyEmail";
-import NotFound from "src/errorPage/ErrorPage";
+import DataProtectionAgreement from "src/dataProtectionAgreement/DataProtectionAgreement";
+
 import ProtectedRoute from "src/app/ProtectedRoute/ProtectedRoute";
 import { routerPaths } from "src/app/routerPaths";
-import React, { useEffect, useState } from "react";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
@@ -150,7 +151,7 @@ const App = () => {
     },
     {
       path: "*",
-      element: <NotFound errorMessage={"404 Error - Page Not Found"} />,
+      element: <ErrorPage errorMessage={"404 Error - Page Not Found"} />,
     },
   ]);
   return <RouterProvider router={router} />;
