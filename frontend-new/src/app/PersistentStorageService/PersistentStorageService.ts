@@ -1,4 +1,4 @@
-import { Invitation } from "src/invitations/InvitationsService/invitations.types";
+import { Invitation } from "src/auth/services/invitationsService/invitations.types";
 
 const PERSISTENT_STORAGE_VERSION = "0.0.1";
 export const TOKEN_KEY = `token_${PERSISTENT_STORAGE_VERSION}`;

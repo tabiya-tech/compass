@@ -7,8 +7,8 @@ import StdFirebaseAuthenticationService, {
 } from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { AuthenticationServices, TabiyaUser } from "src/auth/auth.types";
-import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
-import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
+import { invitationsService } from "src/auth/services/invitationsService/invitations.service";
+import { InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
