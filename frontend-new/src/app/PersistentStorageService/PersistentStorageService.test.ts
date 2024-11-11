@@ -1,5 +1,5 @@
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import { Invitation, InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
+import { Invitation, InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
 
 describe("AuthPersistentStorage class tests", () => {
   beforeEach(() => {

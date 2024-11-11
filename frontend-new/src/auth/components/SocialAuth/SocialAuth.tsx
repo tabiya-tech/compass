@@ -13,10 +13,10 @@ import authStateService from "src/auth/services/AuthenticationState.service";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import RegistrationCodeFormModal, {
   RegistrationCodeFormModalState,
-} from "src/invitations/components/RegistrationCodeFormModal/RegistrationCodeFormModal";
+} from "src/auth/components/registrationCodeFormModal/RegistrationCodeFormModal";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
-import { invitationsService } from "src/invitations/InvitationsService/invitations.service";
-import { InvitationStatus, InvitationType } from "src/invitations/InvitationsService/invitations.types";
+import { invitationsService } from "src/auth/services/invitationsService/invitations.service";
+import { InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 
 const uniqueId = "f0324e97-83fd-49e6-95c3-1043751fa1db";
