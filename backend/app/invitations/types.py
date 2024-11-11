@@ -43,9 +43,9 @@ class UserInvitation(BaseModel):
     Unique code for the invitation
     """
 
-    remaining_usage: int = 0
+    remaining_usage: int
     """
-    The number of times the invitation has been used
+    The number of times the invitation can still be used
     """
 
     allowed_usage: int

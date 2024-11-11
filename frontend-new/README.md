@@ -1,6 +1,6 @@
 # Compass Frontend
 
-The deployed version can be found here: [Frontend URL](http://compass-frontend-dev-418218-6a5e4c1.storage.googleapis.com/newUI/index.html)
+The deployed version can be found here: [Frontend URL](https://dev.compass.tabiya.tech)
 ## Prerequisites
 
 To develop the frontend locally, you must install the following:
@@ -27,7 +27,7 @@ To develop this application locally, follow these steps:
 
 3. Navigate to the frontend-new directory:
 
-    ```
+    ```shell
     cd ./frontend-new
     ```
 
@@ -50,7 +50,6 @@ To develop this application locally, follow these steps:
 
 ## Running the development server locally
 
-
 After installing and setting up the project locally, run the development server with the following command:
 
 ```shell
@@ -63,18 +62,19 @@ The server will run on port 3000, and you can preview the application in your br
 
 The application currently uses Firebase for authentication. To read further about the authentication process, please refer to the [Authentication Hierarchy Documentation](authenticationHierarchyDoc.md).
 
+Currently, only invited users can access the application as part of the Authentication and Authorization process. Invitation codes play a key role in this setup. For more details, please refer to this [documentation](invitations.md).
 ## Storybook
 
 We use Storybook to test and demonstrate components in the browser. To run Storybook, execute the following command:
 
-```
+```shell
 yarn storybook
 ```
 ## Testing
 
 To run the test cases for the application, execute the following command:
 
-```
+```shell
 yarn test 
 ```
 
@@ -85,7 +85,7 @@ https://github.com/abhinaba-ghosh/axe-playwright) to test the accessibility of t
 
 To run the accessibility tests cases locally, execute the following commands, open a shell and start storybook:
 
-```
+```shell
 yarn storybook
 ```
 
