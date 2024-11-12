@@ -149,6 +149,9 @@ describe("Chat", () => {
       // THEN expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
+      // AND the container to be in the document
+      expect(screen.getByTestId(DATA_TEST_ID.CONTAINER)).toBeInTheDocument();
+
       // AND the chat container to be visible
       expect(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER)).toBeInTheDocument();
       // AND the chat header to be in the document
@@ -171,6 +174,9 @@ describe("Chat", () => {
         },
         {}
       );
+
+      // AND content should match snapshot
+      expect(screen.getByTestId(DATA_TEST_ID.CONTAINER)).toMatchSnapshot();
     });
 
     test("should show the backdrop when the user is inactive", async () => {
@@ -496,6 +502,34 @@ describe("Chat", () => {
         });
       });
     });
+
+    test("should throw an error if userPreferences don't have any session", async () => {
+      (console.error as jest.Mock).mockClear();
+
+      // GIVEN getUserPreferences returns a user without any session
+      jest.spyOn(userPreferencesStateService, "getUserPreferences").mockReturnValue({
+        accepted_tc: new Date(),
+        user_id: "0001",
+        language: Language.en,
+        sessions: [],
+      });
+
+      // WHEN the chat is rendered with a router and snackbar provider
+      render(chatComponent);
+      // AND the experiences button is clicked
+      const experiencesButton = screen.getByTestId(CHAT_HEADER_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES);
+      fireEvent.click(experiencesButton);
+      // AND the drawer is open
+      expect(screen.getByTestId(EXPERIENCES_DRAWER_CONTAINER_TEST_ID.EXPERIENCES_DRAWER_CONTAINER)).toBeInTheDocument();
+
+      // THEN expect an error message to be shown
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith("Failed to retrieve experiences", new Error("User has no sessions"));
+      })
+
+      // AND enqueSnackbar should be called
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to retrieve experiences", { variant: "error" })
+    })
 
     test("should close the drawer when the close button is clicked", async () => {
       // GIVEN the chat component is rendered
