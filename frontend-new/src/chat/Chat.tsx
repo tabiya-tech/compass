@@ -4,7 +4,7 @@ import ChatList from "src/chat/ChatList/ChatList";
 import { IChatMessage } from "./Chat.types";
 import { generateCompassMessage, generateUserMessage } from "./util";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { Box } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import ChatHeader from "./ChatHeader/ChatHeader";
 import ChatMessageField from "./ChatMessageField/ChatMessageField";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
@@ -29,6 +29,7 @@ const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 export const CHECK_INACTIVITY_INTERVAL = INACTIVITY_TIMEOUT + INACTIVITY_TIMEOUT / 3;
 const uniqueId = "b7ea1e82-0002-432d-a768-11bdcd186e1d";
 export const DATA_TEST_ID = {
+  CONTAINER: `container-${uniqueId}`,
   CHAT_CONTAINER: `chat-container-${uniqueId}`,
 };
 
@@ -38,7 +39,9 @@ interface ChatProps {
 }
 
 const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableInactivityCheck = false }) => {
+  const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
+
   const [messages, setMessages] = useState<IChatMessage[]>([]);
   const [conversationCompleted, setConversationCompleted] = useState<boolean>(false);
   const [exploredExperiences, setExploredExperiences] = useState<number>(0);
@@ -314,7 +317,13 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   };
 
   return (
-    <>
+    <Box
+      display="flex"
+      height="100%"
+      width="100%"
+      padding={theme.tabiyaSpacing.lg}
+      data-testid={DATA_TEST_ID.CONTAINER}
+    >
       {isLoggingOut ? (
         <Backdrop isShown={isLoggingOut} message={"Logging you out, wait a moment..."} />
       ) : (
@@ -375,7 +384,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           )}
         </>
       )}
-    </>
+    </Box>
   );
 };
 

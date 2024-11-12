@@ -1,5 +1,5 @@
 import { createHashRouter, RouterProvider } from "react-router-dom";
-import Home from "src/homePage/Home";
+import Chat from "src/chat/Chat";
 import Info from "src/info/Info";
 import Register from "src/auth/pages/Register/Register";
 import Login from "src/auth/pages/Login/Login";
@@ -104,7 +104,7 @@ const App = () => {
       path: routerPaths.ROOT,
       element: (
         <ProtectedRoute key={ProtectedRouteKeys.ROOT}>
-          <Home />
+          <Chat />
         </ProtectedRoute>
       ),
     },
