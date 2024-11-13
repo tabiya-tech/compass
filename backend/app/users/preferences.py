@@ -6,10 +6,11 @@ from app.invitations.service import UserInvitationService
 from app.invitations.types import InvitationCodeStatus, InvitationType
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, UserInfo, SignInProvider
+from app.users.feedback.service import UserFeedbackService
 from app.users.repositories import UserPreferenceRepository
 from app.users.sessions import generate_new_session_id, SessionsService
 from app.users.types import UserPreferencesUpdateRequest, UserPreferences, \
-    CreateUserPreferencesRequest, UserPreferencesRepositoryUpdateRequest
+    CreateUserPreferencesRequest, UserPreferencesRepositoryUpdateRequest, GetUsersPreferencesResponse
 
 import logging
 
@@ -18,8 +19,9 @@ logger = logging.getLogger(__name__)
 
 async def _get_user_preferences(
         repository: UserPreferenceRepository,
+        user_feedback_service: UserFeedbackService,
         user_id: str,
-        authed_user: UserInfo) -> UserPreferences:
+        authed_user: UserInfo) -> GetUsersPreferencesResponse:
     try:
         if user_id != authed_user.user_id:
             raise HTTPException(status_code=403, detail="forbidden")
@@ -41,6 +43,14 @@ async def _get_user_preferences(
                     sessions=[session_id]
                 )
             )
+
+        user_preferences = GetUsersPreferencesResponse(
+            **user_preferences.model_dump()
+        )
+
+        # Fetch feedback sessions
+        feedback_sessions = user_feedback_service.get_user_feedback(user_id)
+        user_preferences.sessions_with_feedback = feedback_sessions
 
         return user_preferences
     except Exception as e:
@@ -186,6 +196,10 @@ async def _get_user_invitations_service(db: AsyncIOMotorDatabase = Depends(Compa
     return UserInvitationService(db)
 
 
+async def _get_user_feedback_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)):
+    return UserFeedbackService(db)
+
+
 def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     """
     Add all routes related to user preferences to the users router.
@@ -203,14 +217,15 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     # GET /preferences - Get user preferences by user id
     #########################
     @router.get("",
-                response_model=UserPreferences,
+                response_model=GetUsersPreferencesResponse,
                 status_code=200,
                 responses={403: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
                 name="get user preferences",
                 description="Get user preferences, (language and time when they accepted terms and conditions)")
     async def _get_user_preferences_handler(user_id: str, user_info: UserInfo = Depends(auth.get_user_info()),
-                                            user_preference_repository: UserPreferenceRepository = Depends(_get_user_preferences_service)):
-        return await _get_user_preferences(user_preference_repository, user_id, user_info)
+                                            user_preference_repository: UserPreferenceRepository = Depends(_get_user_preferences_service),
+                                            user_feedback_service: UserFeedbackService = Depends(_get_user_feedback_service)):
+        return await _get_user_preferences(user_preference_repository, user_feedback_service, user_id, user_info)
 
     #########################
     # POST /preferences - Add user preferences, this is a one-time operation otherwise it will return 409

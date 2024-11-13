@@ -76,6 +76,15 @@ class CompassDBProvider:
             ("session_id", 1)
         ], unique=True)
 
+        # Create the user feedback indexes
+        await application_db.get_collection(Collections.USER_FEEDBACK).create_index([
+            ("user_id", 1)
+        ], unique=True)
+
+        await application_db.get_collection(Collections.USER_FEEDBACK).create_index([
+            ("session_id", 1)
+        ], unique=True)
+
     @classmethod
     async def get_application_db(cls) -> AsyncIOMotorDatabase:
         if cls._application_mongo_db is None:  # Check if the database instance has been created
