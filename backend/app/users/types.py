@@ -76,6 +76,13 @@ class UserPreferences(BaseModel):
         extra = "forbid"
 
 
+class GetUsersPreferencesResponse(UserPreferences):
+    sessions_with_feedback: list[int] = Field(default_factory=list)
+
+    class Config:
+        extra = "forbid"
+
+
 class CreateUserPreferencesRequest(BaseModel):
     user_id: str
     """
@@ -89,14 +96,6 @@ class CreateUserPreferencesRequest(BaseModel):
     """
     Invitation code
     """
-
-    class Config:
-        extra = "forbid"
-
-
-class CreateUserPreferenceResponse(BaseModel):
-    user_preference_id: str
-    user_preferences: UserPreferences
 
     class Config:
         extra = "forbid"

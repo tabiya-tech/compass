@@ -1,0 +1,17 @@
+{
+  "interaction_ease": "How easy was it to interact with Compass and understand its responses?",
+  "clarity_of_skills": "Did Compass help you gain a clearer understanding of your skills? If not, why?",
+  "accuracy_relevance": {
+    "question_text": "How accurate and relevant do you feel the identified information is? Why?",
+    "options": {
+      "experience_title": "Experience title/Experience duplication",
+      "parsing_dates": "Parsing of dates",
+      "parsing_location": "Parsing of location",
+      "skills": "Skills"
+    }
+  },
+  "incorrect_skills": "Are there any skills that Compass incorrectly identified for you?",
+  "missing_skills": "Are there any skills you have that Compass did not identify?",
+  "recommendation": "Would you recommend Compass to other job seekers?",
+  "additional_feedback": "Any other feedback or suggestions for improving Compass?"
+}
