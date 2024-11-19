@@ -28,17 +28,6 @@ async def load_questions() -> Dict[str, Any]:
         try:
             questions_data = await asyncio.to_thread(questions_file.read_text)
             questions_cache = json.loads(questions_data)
-
-            # Standardize the structure of questions_data
-            for question_id, value in questions_cache.items():
-                # if the value of the question_id is a string,
-                # then it is the question text
-                # otherwise the value should be a dictionary with the question text and options
-                if isinstance(value, str):
-                    questions_cache[question_id] = {
-                        "question_text": value,
-                        "options": {}
-                    }
         except FileNotFoundError:
             raise HTTPException(status_code=500, detail="Questions file not found")
         except Exception as e:
@@ -100,8 +89,9 @@ class UserFeedbackService:
                 feedback=[
                     FeedbackItem(
                         question_id=feedback.question_id,
-                        question_text=questions_data.get(feedback.question_id, {}).get("question_text", ""),
-                        answer=feedback.answer
+                        question_text=questions_data[feedback.question_id]["question_text"],
+                        answer=feedback.answer,
+                        description=questions_data[feedback.question_id]["description"]
                     )
                     for feedback in body.feedback
                 ]

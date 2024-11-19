@@ -6,6 +6,7 @@ import ChatMessage from "src/chat/ChatMessage/ChatMessage";
 import { motion, AnimatePresence } from "framer-motion";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
+import FeedbackFormButton from "src/feedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
 
 const uniqueId = "0397ee51-f637-4453-9e2f-5cc8900c9554";
 export const DATA_TEST_ID = {
@@ -15,6 +16,7 @@ export const DATA_TEST_ID = {
 export type ChatListProps = {
   messages: IChatMessage[];
   isTyping: boolean;
+  notifyOpenFeedbackForm: () => void;
 };
 
 const ChatListContainer = styled(Box)(({ theme }) => ({
@@ -35,12 +37,15 @@ const MessagesContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
 }));
 
-const ChatList: React.FC<ChatListProps> = ({ messages, isTyping }) => {
+const ChatList: React.FC<ChatListProps> = ({ messages, isTyping, notifyOpenFeedbackForm }) => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      // we are making scrollIntoView optionally called,
+      // because in jest (jsdom) scrollIntoView is not a function
+      // as jest jsdom doesn't have any view.
+      messagesEndRef.current.scrollIntoView?.({ behavior: "smooth" });
     }
   }, [messages, isTyping]);
 
@@ -91,7 +96,15 @@ const ChatList: React.FC<ChatListProps> = ({ messages, isTyping }) => {
                 transition={{ duration: 0.3 }}
                 sx={{ width: "100%" }}
               >
-                <ChatMessage chatMessage={message} isTyping={false} />
+                <ChatMessage
+                  chatMessage={message}
+                  isTyping={false}
+                  chatMessageFooter={
+                    message.sender === ConversationMessageSender.COMPASS && message.isFeedbackMessage && (
+                      <FeedbackFormButton notifyOpenFeedbackForm={notifyOpenFeedbackForm} />
+                    )
+                  }
+                />
               </ListItem>
             ))}
             {isTyping && (

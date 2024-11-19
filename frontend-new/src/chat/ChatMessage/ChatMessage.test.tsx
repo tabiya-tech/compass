@@ -6,6 +6,7 @@ import { render, screen } from "src/_test_utilities/test-utils";
 import * as GetDurationFromNow from "src/utils/getDurationFromNow/getDurationFromNow";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
+import { DATA_TEST_ID as CHAT_MESSAGE_FOOTER_DATA_TEST_ID } from "src/chat/chatMessageFooter/ChatMessageFooter";
 
 jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service", () => {
   return {
@@ -72,5 +73,29 @@ describe("render tests", () => {
 
     // AND expect the timeout to not be visible
     expect(screen.queryByTestId(DATA_TEST_ID.CHAT_MESSAGE_TIMESTAMP)).not.toBeInTheDocument();
+  });
+  test("should render ChatMessageFooter when it is provided", () => {
+    // GIVEN a ChatMessageFooter component
+    const givenComponent = <div>Test children</div>;
+    // AND a chat message
+    const givenMessage = {
+      id: nanoid(),
+      sender: ConversationMessageSender.COMPASS,
+      message: "Hello, I'm Compass",
+      sent_at: new Date().toISOString(),
+      isFeedbackMessage: true,
+    };
+
+    // WHEN the component is rendered
+    render(<ChatMessage chatMessage={givenMessage} isTyping={false} chatMessageFooter={givenComponent} />);
+
+    // THEN expect the chat message footer component to be displayed
+    expect(screen.getByTestId(CHAT_MESSAGE_FOOTER_DATA_TEST_ID.CHAT_MESSAGE_FOOTER)).toBeInTheDocument();
+    // AND the divider to be displayed
+    expect(screen.getByTestId(CHAT_MESSAGE_FOOTER_DATA_TEST_ID.CHAT_MESSAGE_FOOTER_DIVIDER)).toBeInTheDocument();
+    // AND the children to be displayed
+    expect(screen.getByText("Test children")).toBeInTheDocument();
+    // AND the component to match the snapshot
+    expect(screen.getByTestId(CHAT_MESSAGE_FOOTER_DATA_TEST_ID.CHAT_MESSAGE_FOOTER)).toMatchSnapshot();
   });
 });
