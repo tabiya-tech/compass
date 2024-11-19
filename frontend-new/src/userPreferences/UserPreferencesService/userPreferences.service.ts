@@ -54,6 +54,7 @@ export default class UserPreferencesService {
         language: jsonPayload.language,
         sessions: jsonPayload.sessions,
         accepted_tc: this.formatAcceptedTC(jsonPayload.accepted_tc),
+        sessions_with_feedback: jsonPayload.sessions_with_feedback,
       };
     } catch (error) {
       throw errorFactory(
