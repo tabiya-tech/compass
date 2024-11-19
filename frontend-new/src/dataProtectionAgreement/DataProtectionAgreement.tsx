@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { Box, Checkbox, Container, styled, Typography, useMediaQuery } from "@mui/material";
+import { Box, Checkbox, Container, styled, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Language, UpdateUserPreferencesSpec } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
@@ -12,6 +12,7 @@ import { routerPaths } from "src/app/routerPaths";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import { Theme } from "@mui/material/styles";
+import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
@@ -27,6 +28,7 @@ export const DATA_TEST_ID = {
   DPA: `dpa-form-${uniqueId}`,
   LANGUAGE_SELECTOR: `dpa-language-selector-${uniqueId}`,
   ACCEPT_DPA_BUTTON: `dpa-accept-button-${uniqueId}`,
+  REJECT_DPA_BUTTON: `dpa-reject-button-${uniqueId}`,
   CIRCULAR_PROGRESS: `dpa-circular-progress-${uniqueId}`,
   ACCEPT_DPA_CHECKBOX: `dpa-accept-checkbox-${uniqueId}`,
   TERMS_AND_CONDITIONS: `dpa-terms-and-conditions-${uniqueId}`,
@@ -35,15 +37,19 @@ export const DATA_TEST_ID = {
 const StyledAnchor = styled("a")(({ theme }) => ({
   color: theme.palette.tabiyaBlue.main,
   textDecoration: "underline",
+  cursor: "pointer",
   fontWeight: "bold",
+  whiteSpace: "nowrap",
   "&:hover": {
     color: theme.palette.tabiyaBlue.light,
   },
 }));
 
 const DataProtectionAgreement: React.FC = () => {
+  const theme = useTheme();
   const navigate = useNavigate();
   const [isAcceptingDPA, setIsAcceptingDPA] = useState(false);
+  const [isRejectingDPA, setIsRejectingDPA] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
@@ -89,6 +95,30 @@ const DataProtectionAgreement: React.FC = () => {
   const handleAcceptedDPA = async () => {
     await persistUserPreferences();
   };
+
+  /**
+   * Handle when a user rejects the data protection agreement
+   */
+  const handleRejectedDPA = useCallback(
+    async (event: React.MouseEvent<HTMLAnchorElement>) => {
+      event.preventDefault();
+
+      setIsRejectingDPA(true);
+
+      try {
+        const authenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
+        await authenticationService!.logout();
+        navigate(routerPaths.LOGIN, { replace: true });
+        enqueueSnackbar("Successfully logged out.", { variant: "success" });
+      } catch (e) {
+        console.error("Failed to log out", e);
+        enqueueSnackbar("Failed to log out.", { variant: "error" });
+      } finally {
+        setIsRejectingDPA(false);
+      }
+    },
+    [enqueueSnackbar, navigate]
+  );
 
   /**
    * Handle when a user checks the checkbox
@@ -159,18 +189,32 @@ const DataProtectionAgreement: React.FC = () => {
           Are you ready to start?
           <br />
         </Typography>
-        <PrimaryButton
-          fullWidth
-          variant="contained"
-          color="primary"
-          style={{ marginTop: 16 }}
-          disabled={isAcceptingDPA || !isChecked}
-          disableWhenOffline={true}
-          data-testid={DATA_TEST_ID.ACCEPT_DPA_BUTTON}
-          onClick={handleAcceptedDPA}
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginTop: theme.spacing(2),
+            gap: theme.tabiyaSpacing.xl ,
+          }}
         >
-          Sure, I am ready.
-        </PrimaryButton>
+          <StyledAnchor data-testid={DATA_TEST_ID.REJECT_DPA_BUTTON} onClick={handleRejectedDPA}>
+            No, thank you
+          </StyledAnchor>
+          <PrimaryButton
+            fullWidth
+            variant="contained"
+            color="primary"
+            disabled={isAcceptingDPA || !isChecked || isRejectingDPA}
+            disableWhenOffline={true}
+            data-testid={DATA_TEST_ID.ACCEPT_DPA_BUTTON}
+            onClick={handleAcceptedDPA}
+          >
+            Sure, I am ready.
+          </PrimaryButton>
+        </Box>
       </Box>
     </Container>
   );
