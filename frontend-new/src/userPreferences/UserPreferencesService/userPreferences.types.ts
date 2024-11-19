@@ -3,6 +3,7 @@ export type UserPreference = {
   language: Language;
   accepted_tc?: Date;
   sessions: number[];
+  sessions_with_feedback?: number[];
 };
 
 export type CreateUserPreferencesSpec = {

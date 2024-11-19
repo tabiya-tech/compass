@@ -1,5 +1,21 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`render tests should render ChatMessageFooter when it is provided 1`] = `
+<div
+  class="MuiBox-root css-0"
+  data-testid="chat-message-footer-74bf72e8-1ed8-4dcf-8d3a-262d82cdd4b2"
+>
+  <hr
+    class="MuiDivider-root MuiDivider-fullWidth css-ohsnik-MuiDivider-root"
+    color="#F3F1EE"
+    data-testid="chat-message-footer-divider-74bf72e8-1ed8-4dcf-8d3a-262d82cdd4b2"
+  />
+  <div>
+    Test children
+  </div>
+</div>
+`;
+
 exports[`render tests should render the Chat message with sent_at when typing is set to false 1`] = `
 <div
   class="MuiBox-root css-1c8zvho"

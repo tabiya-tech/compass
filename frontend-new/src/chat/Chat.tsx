@@ -22,6 +22,7 @@ import InactiveBackdrop from "src/theme/Backdrop/InactiveBackdrop";
 import ApproveModal from "src/theme/ApproveModal/ApproveModal";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
+import FeedbackForm from "src/feedback/feedbackForm/FeedbackForm";
 
 const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -56,6 +57,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const [lastActivityTime, setLastActivityTime] = React.useState<number>(Date.now());
   const [newConversationDialog, setNewConversationDialog] = React.useState<boolean>(false);
   const [exploredExperiencesNotification, setExploredExperiencesNotification] = useState<boolean>(false);
+  const [isFeedbackFormOpen, setIsFeedbackFormOpen] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -67,6 +69,35 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
    */
   const addMessage = (message: IChatMessage) => {
     setMessages((prevMessages) => [...prevMessages, message]);
+  };
+
+  // Check if the conversation is completed and add a feedback message if it is
+  const checkAndAddFeedbackMessage = useCallback((conversationCompleted: boolean) => {
+    const userPreferences = userPreferencesStateService.getUserPreferences();
+    if (!userPreferences?.sessions.length){
+      console.error("User has no sessions");
+      return;
+    }
+
+    const activeSessionId = userPreferences.sessions[0];
+    const hasFeedback = userPreferences.sessions_with_feedback?.includes(activeSessionId)
+
+    if (conversationCompleted && !hasFeedback) {
+      addMessage({
+        ...generateCompassMessage(
+          "We’d love your feedback on this conversation. It’ll only take 5 minutes and will help us improve your experience",
+          new Date().toISOString()
+        ),
+        isFeedbackMessage: true,
+      });
+    }
+  }, []);
+
+  const generateThankYouMessage = () => {
+    return generateCompassMessage(
+      "Thank you for taking the time to share your valuable feedback. Your input is important to us.",
+      new Date().toISOString()
+    );
   };
 
   const handleOpenExperiencesDrawer = useCallback(async () => {
@@ -136,6 +167,9 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         response.messages.forEach((messageItem) =>
           addMessage(generateCompassMessage(messageItem.message, messageItem.sent_at))
         );
+
+        checkAndAddFeedbackMessage(response.conversation_completed);
+
       } catch (error) {
         console.error("Failed to send message:", error);
         addMessage(
@@ -148,7 +182,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setIsTyping(false);
       }
     },
-    [exploredExperiences]
+    [exploredExperiences, checkAndAddFeedbackMessage]
   );
 
   /**
@@ -207,6 +241,13 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           )
         );
 
+        const userPreferences = userPreferencesStateService.getUserPreferences();
+        if (userPreferences?.sessions_with_feedback?.includes(session_id)) {
+          addMessage(generateThankYouMessage());
+        } else {
+          checkAndAddFeedbackMessage(history.conversation_completed);
+        }
+
         if (!history.messages.length) {
           await sendMessage("", session_id);
         }
@@ -222,7 +263,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setIsTyping(false);
       }
     },
-    [enqueueSnackbar, sendMessage, exploredExperiences]
+    [enqueueSnackbar, sendMessage, exploredExperiences, checkAndAddFeedbackMessage]
   );
 
   useEffect(() => {
@@ -316,6 +357,21 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     await startNewConversation();
   };
 
+  const handleOpenFeedbackForm = () => {
+    setIsFeedbackFormOpen(true);
+  };
+
+  const handleCloseFeedbackForm = () => {
+    setIsFeedbackFormOpen(false);
+  };
+
+  const handleFeedbackSubmit = () => {
+    setMessages((prevMessages) =>
+      prevMessages.filter((message) => !message.isFeedbackMessage)
+    );
+    addMessage(generateThankYouMessage());
+  };
+
   return (
     <Box
       display="flex"
@@ -333,6 +389,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
             height="100%"
             display="flex"
             flexDirection="column"
+            position="relative"
             data-testid={DATA_TEST_ID.CHAT_CONTAINER}
           >
             <ChatHeader
@@ -344,7 +401,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
               setExploredExperiencesNotification={setExploredExperiencesNotification}
             />
             <Box sx={{ flex: 1, overflowY: "auto" }}>
-              <ChatList messages={messages} isTyping={isTyping} />
+              <ChatList messages={messages} isTyping={isTyping} notifyOpenFeedbackForm={handleOpenFeedbackForm} />
             </Box>
             {showBackdrop && <InactiveBackdrop isShown={showBackdrop} />}
             <Box sx={{ flexShrink: 0 }}>
@@ -382,6 +439,11 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
               approveButtonText="Yes, I'm sure"
             />
           )}
+          <FeedbackForm
+            isOpen={isFeedbackFormOpen}
+            notifyOnClose={handleCloseFeedbackForm}
+            onFeedbackSubmit={handleFeedbackSubmit}
+          />
         </>
       )}
     </Box>

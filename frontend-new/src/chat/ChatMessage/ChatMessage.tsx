@@ -3,6 +3,7 @@ import { Box, Typography, styled, alpha } from "@mui/material";
 import { IChatMessage } from "src/chat/Chat.types";
 import { getDurationFromNow } from "src/utils/getDurationFromNow/getDurationFromNow";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
+import ChatMessageFooter from "src/chat/chatMessageFooter/ChatMessageFooter";
 
 const uniqueId = "2fbaf2ef-9eab-485a-bd28-b4a164e18b06";
 
@@ -43,9 +44,10 @@ const TimeStamp = styled(Typography)(({ theme }) => ({
 type ChatMessageProps = {
   chatMessage: IChatMessage;
   isTyping: boolean;
+  chatMessageFooter?: React.ReactNode;
 };
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage, isTyping }) => {
+const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage, isTyping, chatMessageFooter }) => {
   let duration;
   try {
     duration = getDurationFromNow(new Date(chatMessage.sent_at));
@@ -56,6 +58,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage, isTyping }) => {
     <MessageContainer origin={chatMessage.sender} data-testid={DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}>
       <MessageBubble origin={chatMessage.sender}>
         <Typography whiteSpace="pre-line">{chatMessage.message}</Typography>
+        {chatMessageFooter && <ChatMessageFooter>{chatMessageFooter}</ChatMessageFooter>}
       </MessageBubble>
       {!isTyping && (
         <TimeStamp data-testid={DATA_TEST_ID.CHAT_MESSAGE_TIMESTAMP} variant="caption">
