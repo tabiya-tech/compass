@@ -70,6 +70,7 @@ class EmbeddingContext(BaseModel):
     destination_collection: str
     id_field_name: str
     extra_fields: list[str] = Field(default_factory=list)
+    excluded_codes: list[str] = Field(default_factory=list)
 
 
 _OCCUPATIONS_EMBEDDING_CONTEXT = EmbeddingContext(
@@ -77,7 +78,8 @@ _OCCUPATIONS_EMBEDDING_CONTEXT = EmbeddingContext(
     source_collection=PlatformCollections.OCCUPATIONS.value,
     destination_collection=CompassCollections.OCCUPATIONS.value,
     id_field_name="occupationId",
-    extra_fields=["code"]
+    extra_fields=["code"],
+    excluded_codes=MONGO_SETTINGS.taxonomy_excluded_occupations
 )
 
 _SKILLS_EMBEDDING_CONTEXT = EmbeddingContext(
@@ -85,7 +87,8 @@ _SKILLS_EMBEDDING_CONTEXT = EmbeddingContext(
     source_collection=PlatformCollections.SKILLS.value,
     destination_collection=CompassCollections.SKILLS.value,
     id_field_name="skillId",
-    extra_fields=["skillType"]
+    extra_fields=["skillType"],
+    excluded_codes=MONGO_SETTINGS.taxonomy_excluded_skills
 )
 
 
@@ -321,6 +324,9 @@ async def process_schema(ctx: EmbeddingContext):
         "modelId": ObjectId(SCRIPT_SETTINGS.tabiya_model_id),
         "_id": {
             "$nin": done_ids
+        },
+        "code": {
+            "$nin": ctx.excluded_codes
         }
     }
 
@@ -423,6 +429,7 @@ async def copy_relations_collection():
     progress = tqdm(
         desc='copying progress for relations',
         total=documents_to_process_count,
+
     )
 
     # Set the batch size

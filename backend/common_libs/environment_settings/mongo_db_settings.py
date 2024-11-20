@@ -1,3 +1,4 @@
+from pydantic import Field
 from pydantic_settings import BaseSettings
 
 
@@ -22,4 +23,14 @@ class MongoDbSettings(BaseSettings):
     taxonomy_database_name: str
     """
     The name of the taxonomy database
+    """
+
+    taxonomy_excluded_occupations: list[str] = Field(default_factory=list)
+    """
+    The list of occupations to exclude from the taxonomy.
+    """
+
+    taxonomy_excluded_skills: list[str] = Field(default_factory=list)
+    """
+    The list of skills to exclude from the taxonomy.
     """
