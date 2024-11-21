@@ -1,9 +1,16 @@
+export enum SensitivePersonalDataRequirement {
+  REQUIRED = "REQUIRED",
+  NOT_REQUIRED = "NOT_REQUIRED",
+}
+
 export type UserPreference = {
   user_id: string;
   language: Language;
   accepted_tc?: Date;
   sessions: number[];
   sessions_with_feedback?: number[];
+  sensitive_personal_data_requirement: SensitivePersonalDataRequirement;
+  has_sensitive_personal_data: boolean;
 };
 
 export type CreateUserPreferencesSpec = {
@@ -11,6 +18,8 @@ export type CreateUserPreferencesSpec = {
   invitation_code: string;
   language: Language;
 };
+
+export type CreateUserPreferencesResponse = Omit<UserPreference, "sensitive_personal_data_status">;
 
 export type UpdateUserPreferencesSpec = {
   user_id: string;

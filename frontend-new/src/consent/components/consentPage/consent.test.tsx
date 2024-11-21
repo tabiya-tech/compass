@@ -1,7 +1,7 @@
 import "src/_test_utilities/consoleMock";
 import React from "react";
 import { fireEvent, render, screen, waitFor } from "src/_test_utilities/test-utils";
-import DataProtectionAgreement, { DATA_TEST_ID } from "./DataProtectionAgreement";
+import Consent, { DATA_TEST_ID } from "./Consent";
 import { HashRouter, useNavigate } from "react-router-dom";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { TabiyaUser } from "src/auth/auth.types";
@@ -12,7 +12,10 @@ import AuthenticationServiceFactory from "src/auth/services/Authentication.servi
 import AuthenticationService from "src/auth/services/Authentication.service";
 import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { routerPaths } from "src/app/routerPaths";
-import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import {
+  SensitivePersonalDataRequirement,
+  Language,
+} from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { ServiceError } from "src/error/ServiceError/ServiceError";
 import * as ServiceErrorLoggerModule from "src/error/ServiceError/logger";
 import { AuthenticationError } from "src/error/commonErrors";
@@ -50,7 +53,7 @@ jest.mock("react-router-dom", () => {
   };
 });
 
-describe("Testing Data Protection Policy component", () => {
+describe("Testing Consent Page", () => {
   beforeEach(() => {
     // Clear console mocks and mock functions
     (console.error as jest.Mock).mockClear();
@@ -64,11 +67,11 @@ describe("Testing Data Protection Policy component", () => {
   });
 
   describe("render tests", () => {
-    test("it should show data protection policy", async () => {
+    test("it should show consent screen with both agreements", async () => {
       // WHEN the component is rendered
       render(
         <HashRouter>
-          <DataProtectionAgreement />
+          <Consent />
         </HashRouter>
       );
 
@@ -77,31 +80,36 @@ describe("Testing Data Protection Policy component", () => {
       expect(console.warn).not.toHaveBeenCalled();
 
       // AND the component should be rendered
-      expect(screen.getByTestId(DATA_TEST_ID.DPA_CONTAINER)).toBeDefined();
+      expect(screen.getByTestId(DATA_TEST_ID.CONSENT_CONTAINER)).toBeDefined();
 
       // AND the agreement body should be rendered
       expect(screen.getByTestId(DATA_TEST_ID.AGREEMENT_BODY)).toBeInTheDocument();
 
       // AND the accept button should be rendered
-      expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_BUTTON)).toBeInTheDocument();
+      expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON)).toBeInTheDocument();
 
       // AND the accept checkbox should be rendered
-      expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_CHECKBOX)).toBeInTheDocument();
+      expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER)).toBeInTheDocument();
 
       // AND the reject button should be rendered
-      expect(screen.getByTestId(DATA_TEST_ID.REJECT_DPA_BUTTON)).toBeInTheDocument();
+      expect(screen.getByTestId(DATA_TEST_ID.REJECT_BUTTON)).toBeInTheDocument();
 
       // AND the terms and conditions should be rendered
-      expect(screen.getByTestId(DATA_TEST_ID.TERMS_AND_CONDITIONS)).toBeInTheDocument();
+      expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_TEXT)).toBeInTheDocument();
+      expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_CHECKBOX_CONTAINER)).toBeInTheDocument();
+
+      // AND The data protection checkbox should be rendered
+      expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER)).toBeInTheDocument();
+      expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_TEXT)).toBeInTheDocument();
 
       // AND the component should match the snapshot
-      expect(screen.getByTestId(DATA_TEST_ID.DPA_CONTAINER)).toMatchSnapshot();
+      expect(screen.getByTestId(DATA_TEST_ID.CONSENT_CONTAINER)).toMatchSnapshot();
     });
   });
 
   describe("action tests", () => {
-    describe("accept DPA", () => {
-      test("should successfully accept the data protection policy", async () => {
+    describe("accept agreements", () => {
+      test("should successfully accept the agreements", async () => {
         mockBrowserIsOnLine(true);
 
         // GIVEN the user preferences state service is mocked to set the user preferences
@@ -112,6 +120,8 @@ describe("Testing Data Protection Policy component", () => {
           language: Language.en,
           accepted_tc: new Date(),
           sessions: [],
+          has_sensitive_personal_data: false,
+          sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
         });
 
         // AND the authStateService is mocked to return the given user
@@ -126,19 +136,25 @@ describe("Testing Data Protection Policy component", () => {
         // WHEN the component is rendered
         render(
           <HashRouter>
-            <DataProtectionAgreement />
+            <Consent />
           </HashRouter>
         );
 
-        // WHEN the user accepts the terms and conditions
-        const checkBoxWrapper = screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_CHECKBOX);
-        expect(checkBoxWrapper).toBeInTheDocument();
-        const checkBoxInput = screen.getByRole("checkbox") as HTMLInputElement;
-        fireEvent.click(checkBoxInput);
+        // WHEN the user accepts Data protection Agreement
+        const dpaCheckBoxWrapper = screen.getByTestId(DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER);
+        expect(dpaCheckBoxWrapper).toBeInTheDocument();
+        const dpaCheckbox = dpaCheckBoxWrapper.getElementsByTagName("input")[0] as HTMLInputElement;
+        fireEvent.click(dpaCheckbox);
+
+        // AND Terms and Conditions are accepted
+        const tcCheckBoxWrapper = screen.getByTestId(DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_CHECKBOX_CONTAINER);
+        expect(tcCheckBoxWrapper).toBeInTheDocument();
+        const tcCheckbox = tcCheckBoxWrapper.getElementsByTagName("input")[0] as HTMLInputElement;
+        fireEvent.click(tcCheckbox);
 
         // AND the user clicks the accept button
-        expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_BUTTON)).toBeEnabled();
-        fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_BUTTON));
+        expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON)).toBeEnabled();
+        fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON));
 
         // THEN update user preferences should be called
         await waitFor(() => {
@@ -155,7 +171,7 @@ describe("Testing Data Protection Policy component", () => {
         });
       });
 
-      test("should fail to accept the data protection policy gracefully", async () => {
+      test("should fail to accept agreements gracefully", async () => {
         // GIVEN a user is logged in
         const givenUser: TabiyaUser = {
           id: "0001",
@@ -174,7 +190,7 @@ describe("Testing Data Protection Policy component", () => {
         // WHEN the component is rendered
         render(
           <HashRouter>
-            <DataProtectionAgreement />
+            <Consent />
           </HashRouter>
         );
 
@@ -183,22 +199,31 @@ describe("Testing Data Protection Policy component", () => {
         expect(console.warn).not.toHaveBeenCalled();
 
         // AND the user accepts the terms and conditions
-        const checkBoxWrapper = screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_CHECKBOX);
+        const checkBoxWrapper = screen.getByTestId(DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER);
         expect(checkBoxWrapper).toBeInTheDocument();
 
-        // WHEN the user clicks the checkbox
-        const checkBoxInput = screen.getByRole("checkbox") as HTMLInputElement;
+        // WHEN the user accepts data protection agreement
+        const dpaCheckbox = screen
+          .getByTestId(DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER)
+          .getElementsByTagName("input")[0] as HTMLInputElement;
+        fireEvent.click(dpaCheckbox);
+
+        // AND Terms and Conditions are accepted
+        const checkBoxInput = screen
+          .getByTestId(DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_CHECKBOX_CONTAINER)
+          .getElementsByTagName("input")[0] as HTMLInputElement;
+
         fireEvent.click(checkBoxInput);
 
         // THEN expect the checkbox to be checked
         expect(checkBoxInput.checked).toBe(true);
 
         // AND the accept button should be enabled
-        const acceptButton = screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_BUTTON);
+        const acceptButton = screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON);
         expect(acceptButton).toBeEnabled();
 
         // WHEN the user clicks the accept button
-        fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_BUTTON));
+        fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON));
 
         await waitFor(() => {
           expect(useNavigate()).not.toHaveBeenCalled();
@@ -229,16 +254,25 @@ describe("Testing Data Protection Policy component", () => {
         // WHEN the component is rendered
         render(
           <HashRouter>
-            <DataProtectionAgreement />
+            <Consent />
           </HashRouter>
         );
 
-        // AND the user clicks the checkbox
-        const checkBoxInput = screen.getByRole("checkbox") as HTMLInputElement;
+        // AND the user accepts data protection agreement
+        const dpaCheckbox = screen
+          .getByTestId(DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER)
+          .getElementsByTagName("input")[0] as HTMLInputElement;
+
+        fireEvent.click(dpaCheckbox);
+
+        // AND Terms and Conditions are accepted
+        const checkBoxInput = screen
+          .getByTestId(DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_CHECKBOX_CONTAINER)
+          .getElementsByTagName("input")[0] as HTMLInputElement;
         fireEvent.click(checkBoxInput);
 
         // AND the user clicks the accept button
-        fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_BUTTON));
+        fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON));
 
         // THEN expect the error to be logged
         expect(console.error).toHaveBeenCalled();
@@ -257,16 +291,24 @@ describe("Testing Data Protection Policy component", () => {
         // WHEN the component is rendered
         render(
           <HashRouter>
-            <DataProtectionAgreement />
+            <Consent />
           </HashRouter>
         );
 
-        // AND the user clicks the checkbox
-        const checkBoxInput = screen.getByRole("checkbox") as HTMLInputElement;
-        fireEvent.click(checkBoxInput);
+        //  the user accepts data protection agreement
+        const dpaCheckbox = screen
+          .getByTestId(DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER)
+          .getElementsByTagName("input")[0] as HTMLInputElement;
+        fireEvent.click(dpaCheckbox);
 
+        // AND Terms and Conditions are accepted
+        const checkBoxInput = screen
+          .getByTestId(DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_CHECKBOX_CONTAINER)
+          .getElementsByTagName("input")[0] as HTMLInputElement;
+
+        fireEvent.click(checkBoxInput);
         // AND the user clicks the accept button
-        fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_BUTTON));
+        fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON));
 
         // AND the user should be navigated to the login page
         await waitFor(() => {
@@ -275,8 +317,8 @@ describe("Testing Data Protection Policy component", () => {
       });
     });
 
-    describe("reject DPA", () => {
-      test("should successfully log the user out when the user rejects the data protection policy", async () => {
+    describe("reject consent", () => {
+      test("should successfully log the user out when the user rejects the agreements", async () => {
         const getCurrentAuthenticationService = jest.spyOn(
           AuthenticationServiceFactory,
           "getCurrentAuthenticationService"
@@ -287,15 +329,15 @@ describe("Testing Data Protection Policy component", () => {
 
         getCurrentAuthenticationService.mockReturnValue(authenticationService as unknown as AuthenticationService);
 
-        // GIVEN DPA Component is rendered
+        // GIVEN Consent Component is rendered
         render(
           <HashRouter>
-            <DataProtectionAgreement />
+            <Consent />
           </HashRouter>
         );
 
-        // AND there is a Reject DPA Button.
-        const rejectButton = screen.getByTestId(DATA_TEST_ID.REJECT_DPA_BUTTON);
+        // AND there is a Reject Consent Button.
+        const rejectButton = screen.getByTestId(DATA_TEST_ID.REJECT_BUTTON);
         expect(rejectButton).toBeInTheDocument();
 
         // WHEN the user clicks the reject button
@@ -306,7 +348,7 @@ describe("Testing Data Protection Policy component", () => {
         expect(authenticationService.logout).toHaveBeenCalled();
 
         // THEN the accept buttons should be disabled while the user is being logged out
-        expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_BUTTON)).toBeDisabled();
+        expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON)).toBeDisabled();
 
         // AND the user should be navigated to the login page
         await waitFor(() => {
@@ -339,18 +381,125 @@ describe("Testing Data Protection Policy component", () => {
         // WHEN the component is rendered
         render(
           <HashRouter>
-            <DataProtectionAgreement />
+            <Consent />
           </HashRouter>
         );
 
         // AND the reject button is clicked
-        fireEvent.click(screen.getByTestId(DATA_TEST_ID.REJECT_DPA_BUTTON));
+        fireEvent.click(screen.getByTestId(DATA_TEST_ID.REJECT_BUTTON));
 
         // THEN expect the error to be logged
         expect(console.error).toHaveBeenCalledWith(new AuthenticationError("Failed to log out", error));
 
         // AND snack bar should display an error message
         expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to log out.", { variant: "error" });
+      });
+    });
+
+    describe("Redirecting", () => {
+      it("should redirect the user to the root page if the user does not require sensitive personal data", async () => {
+        // GIVEN the user preferences state service is mocked to set the user preferences
+        jest.spyOn(userPreferencesService, "updateUserPreferences").mockResolvedValue({
+          user_id: "given user id",
+          language: Language.en,
+          accepted_tc: new Date(),
+          has_sensitive_personal_data: false,
+          sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+          sessions: [],
+        });
+
+        // AND the authStateService  returns an actual user
+        jest.spyOn(authStateService.getInstance(), "getUser").mockReturnValue({
+          id: "given user id",
+          name: "given user name",
+          email: "given email",
+        });
+
+        // WHEN the component is rendered
+        render(
+          <HashRouter>
+            <Consent />
+          </HashRouter>
+        );
+
+        // AND the user accepts data protection agreement
+        const dpaCheckbox = screen
+          .getByTestId(DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER)
+          .getElementsByTagName("input")[0] as HTMLInputElement;
+
+        fireEvent.click(dpaCheckbox);
+
+        // AND Terms and Conditions are accepted
+        const checkBoxInput = screen
+          .getByTestId(DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_CHECKBOX_CONTAINER)
+          .getElementsByTagName("input")[0] as HTMLInputElement;
+
+        fireEvent.click(checkBoxInput);
+
+        // AND the user clicks the accept button
+        fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON));
+
+        // AND the user should be navigated to the login page
+        await waitFor(() => {
+          expect(useNavigate()).toHaveBeenCalledWith(routerPaths.ROOT, { replace: true });
+        });
+      });
+
+      it("should redirect the user to the sensitive data page if the user requires sensitive personal data", async () => {
+        // GIVEN the user preferences state service is mocked to set the user preferences.
+        jest.spyOn(userPreferencesService, "updateUserPreferences").mockResolvedValue({
+          user_id: "given user id",
+          language: Language.en,
+          accepted_tc: new Date(),
+          has_sensitive_personal_data: false,
+          sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+          sessions: [],
+        });
+
+        // AND the authStateService  returns an actual user
+        jest.spyOn(authStateService.getInstance(), "getUser").mockReturnValue({
+          id: "given user id",
+          name: "given user name",
+          email: "given email",
+        });
+
+        // AND the user requires sensitive personal data.
+        jest.spyOn(userPreferencesStateService, "getUserPreferences").mockReturnValue({
+          user_id: "given user id",
+          language: Language.en,
+          accepted_tc: new Date(),
+          has_sensitive_personal_data: false,
+          sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
+          sessions: [],
+        });
+
+        // WHEN the component is rendered
+        render(
+          <HashRouter>
+            <Consent />
+          </HashRouter>
+        );
+
+        // AND the user accepts data protection agreement
+        const dpaCheckbox = screen
+          .getByTestId(DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER)
+          .getElementsByTagName("input")[0] as HTMLInputElement;
+        fireEvent.click(dpaCheckbox);
+
+        // AND Terms and Conditions are accepted
+        const checkBoxInput = screen
+          .getByTestId(DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_CHECKBOX_CONTAINER)
+          .getElementsByTagName("input")[0] as HTMLInputElement;
+
+        fireEvent.click(checkBoxInput);
+
+        // AND the user clicks the accept button
+        fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON));
+
+        // AND the user should be navigated to the login page
+        await waitFor(() => {
+          expect(useNavigate()).toHaveBeenCalledWith(routerPaths.SENSITIVE_DATA, { replace: true });
+        });
       });
     });
   });

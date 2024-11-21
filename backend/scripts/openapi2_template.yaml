@@ -20,20 +20,20 @@ x-google-management:
     limits:
       - name: "request-limit"
         metric: "request-metric"
-        unit: "1/min/{{project}}"
+        unit: "1/min/{project}"
         values:
           STANDARD: 120 # requests per minute
 x-google-backend:
-  address: "{1}"
+  address: "__BACKEND_URI__"
   deadline: 90.0 # 90 seconds as the cloud run container may take a while to start, and some requests may take a while to process
 securityDefinitions:
   firebase:
     authorizationUrl: ""
     flow: "implicit"
     type: "oauth2"
-    x-google-issuer: "https://securetoken.google.com/{0}"
+    x-google-issuer: "https://securetoken.google.com/__PROJECT_ID__"
     x-google-jwks_uri: "https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com"
-    x-google-audiences: "{0}"
+    x-google-audiences: "__PROJECT_ID__"
 paths:
   /poc/conversation:
     get:

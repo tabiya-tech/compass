@@ -70,6 +70,7 @@ def _setup_identity_platform(*, basic_config: ProjectBaseConfig, frontend_domain
         opts=pulumi.ResourceOptions(depends_on=dependencies + [default]),
     )
 
+
 def deploy_auth(project: str, location: str, environment: str, frontend_domain: str):
     _basic_config = get_project_base_config(project=project, location=location, environment=environment)
     # Enable the required services

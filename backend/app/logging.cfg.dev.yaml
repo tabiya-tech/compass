@@ -17,7 +17,7 @@ handlers:
     maxBytes: 1000000 # 1 MB
     backupCount: 10
     filters: [session_filter]
-    filename: logs/logfile.log
+    filename: {PROJECT_BASE_PATH}/logs/logfile.log
 loggers:
   _template: &template_logger  # Define an anchor
     level: DEBUG

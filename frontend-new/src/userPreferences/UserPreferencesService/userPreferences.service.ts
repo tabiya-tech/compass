@@ -1,5 +1,9 @@
 import { getServiceErrorFactory, ServiceErrorFactory } from "src/error/ServiceError/ServiceError";
-import { CreateUserPreferencesSpec, UpdateUserPreferencesSpec, UserPreference } from "./userPreferences.types";
+import {
+  CreateUserPreferencesSpec,
+  UpdateUserPreferencesSpec,
+  UserPreference,
+} from "./userPreferences.types";
 import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import { getBackendUrl } from "src/envService";
@@ -42,18 +46,21 @@ export default class UserPreferencesService {
   /**
    * Parse the JSON response from the backend into a UserPreference object.
    * @param responseBody
+   * @param userId
    * @param errorFactory
    * @private
    */
-  private parseJsonResponse(responseBody: string, errorFactory: ServiceErrorFactory): UserPreference {
+  private parseJsonResponse(responseBody: string, userId: string, errorFactory: ServiceErrorFactory): UserPreference {
     // parse the response body
     let userPreferencesResponse: UserPreference;
     try {
       const jsonPayload: UserPreference = JSON.parse(responseBody);
       userPreferencesResponse = {
-        user_id: jsonPayload.user_id,
+        user_id: userId,
         language: jsonPayload.language,
         sessions: jsonPayload.sessions,
+        sensitive_personal_data_requirement: jsonPayload.sensitive_personal_data_requirement,
+        has_sensitive_personal_data: jsonPayload.has_sensitive_personal_data,
         accepted_tc: this.formatAcceptedTC(jsonPayload.accepted_tc),
         sessions_with_feedback: jsonPayload.sessions_with_feedback,
       };
@@ -110,7 +117,7 @@ export default class UserPreferencesService {
       expectedContentType: "application/json",
     });
     const responseBody = await response.text();
-    return this.parseJsonResponse(responseBody, errorFactory);
+    return this.parseJsonResponse(responseBody, user_preferences.user_id, errorFactory);
   }
 
   /**
@@ -143,7 +150,7 @@ export default class UserPreferencesService {
       expectedContentType: "application/json",
     });
     const responseBody = await response.text();
-    return this.parseJsonResponse(responseBody, errorFactory);
+    return this.parseJsonResponse(responseBody, newUserPreferencesSpec.user_id, errorFactory);
   }
 
   /**
@@ -171,7 +178,7 @@ export default class UserPreferencesService {
     });
 
     const responseBody = await response.text();
-    return this.parseJsonResponse(responseBody, errorFactory);
+    return this.parseJsonResponse(responseBody, userId, errorFactory);
   }
 
   /**
@@ -198,7 +205,7 @@ export default class UserPreferencesService {
     });
 
     const responseBody = await response.text();
-    return this.parseJsonResponse(responseBody, errorFactory);
+    return this.parseJsonResponse(responseBody, userId, errorFactory);
   }
 }
 

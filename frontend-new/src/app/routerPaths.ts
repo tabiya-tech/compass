@@ -5,5 +5,6 @@ export const routerPaths = {
   LOGIN: "/login",
   FORGOT_PASSWORD: "/reset",
   VERIFY_EMAIL: "/verify-email",
-  DPA: "/dpa",
+  CONSENT: "/consent",
+  SENSITIVE_DATA: "/sensitive-data",
 };
