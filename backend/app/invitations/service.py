@@ -3,6 +3,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.constants.errors import ErrorService
 from app.invitations.repository import UserInvitationRepository
 from app.invitations.types import GetInvitationCodeStatusResponse, InvitationCodeStatus
+from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
 
 
 class UserInvitationService:
@@ -28,14 +29,16 @@ class UserInvitationService:
             if not invitation:
                 return GetInvitationCodeStatusResponse(
                     invitation_code=invitation_code,
-                    status=InvitationCodeStatus.INVALID
+                    status=InvitationCodeStatus.INVALID,
+                    sensitive_personal_data_requirement=SensitivePersonalDataRequirement.NOT_REQUIRED
                 )
 
             return GetInvitationCodeStatusResponse(
                 invitation_code=invitation_code,
                 status=InvitationCodeStatus.VALID,
                 # Return the invitation type if the status is valid
-                invitation_type=invitation.invitation_type
+                invitation_type=invitation.invitation_type,
+                sensitive_personal_data_requirement=invitation.sensitive_personal_data_requirement
             )
         except Exception as e:
             ErrorService.handle(__name__, e)

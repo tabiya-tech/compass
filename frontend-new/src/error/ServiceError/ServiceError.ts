@@ -11,7 +11,7 @@ export type ServiceErrorDetails = string | ServiceErrorObject | object | undefin
 
 export const USER_FRIENDLY_ERROR_MESSAGES = {
   REQUEST_TOO_LONG:
-    "The data sent to the service seems to be to large. " +
+    "The data sent to the service seems to be too large. " +
     "Please try again with a smaller payload. " +
     "If the problem persists, clear your browser's cache and refresh the page.",
   TOO_MANY_REQUESTS: "It looks like you are making too many requests. Please slow down and try again later.",

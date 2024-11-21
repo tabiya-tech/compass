@@ -9,7 +9,10 @@ import FirebaseSocialAuthenticationService from "src/auth/services/FirebaseAuthe
 import { act } from "@testing-library/react";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
-import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import {
+  SensitivePersonalDataRequirement,
+  Language,
+} from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { TabiyaUser } from "src/auth/auth.types";
 
 // Mock the envService module
@@ -82,7 +85,7 @@ describe("SocialAuth tests", () => {
 
   test.each([
     ["accepted", new Date(), routerPaths.ROOT],
-    ["not accepted", undefined, routerPaths.DPA],
+    ["not accepted", undefined, routerPaths.CONSENT],
   ])(
     "it should handle successful sign-in for a user who has %s terms and conditions",
     async (_description: string, tc: Date | undefined, expectedPath: string) => {
@@ -113,6 +116,8 @@ describe("SocialAuth tests", () => {
         language: Language.en,
         sessions: [1],
         accepted_tc: tc,
+        has_sensitive_personal_data: false,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       });
 
       // WHEN the component is rendered

@@ -22,6 +22,8 @@ their skills and interests based on their lived experiences.
 - **[Infrastructure As Code (IaC)](iac)**: Explore the Infrastructure as code(IAC) directory for detailed insights about
   the infrastructure-as-code components.
 
+- **[Sensitive Data Protection](sensitive-data-protection.md)**: Explore the sensitive data protection functionality for detailed insights about how we are safeguarding sensitive personal data.
+
 
 ## Contribution Guidelines
 
@@ -58,7 +60,6 @@ To work with this repository you should have a system with a bash compatible ter
 6. Open a pull request to our main branch.
 
 Happy contributing! 🚀
-
 
 ## License
 

@@ -1,6 +1,5 @@
 import base64
 import os
-from wsgiref.util import application_uri
 
 import pulumi
 import pulumi_docker as docker
@@ -60,8 +59,20 @@ def _setup_api_gateway(*,
 
     # The GCP API Gateway uses OpenAPI 2.0 yaml files for the configurations.
     # The yaml must be base64 encoded.
-    apigw_config_yaml = get_file_as_string(GCP_API_GATEWAY_CONFIG_FILE)
-    apigw_config_yaml = pulumi.Output.format(apigw_config_yaml, basic_config.project, cloudrun.uri, gcp_oauth_client_id)
+    apigw_config_yml_string = get_file_as_string(GCP_API_GATEWAY_CONFIG_FILE)
+
+    # update the yaml with the correct values
+    # we are not using pulumi.Output.format because with path variables they are encapsulated in {}
+    # which causes issues with pulumi.Output.format to throw because we want to keep them as {path variable}.
+    apigw_config_yaml = pulumi.Output.all(basic_config.project, cloudrun.uri).apply(
+        lambda args:
+        apigw_config_yml_string
+        # project ID
+        .replace('__PROJECT_ID__', args[0])
+
+        # cloud run uri
+        .replace('__BACKEND_URI__', args[1])
+    )
 
     apigw_config_yaml_b64encoded = apigw_config_yaml.apply(lambda yaml: base64.b64encode(yaml.encode()).decode())
 
@@ -158,6 +169,8 @@ class BackendEnvVarsConfig:
     TAXONOMY_MODEL_ID: str
     APPLICATION_MONGODB_URI: str
     APPLICATION_DATABASE_NAME: str
+    USERS_MONGODB_URI: str
+    USERS_DATABASE_NAME: str
     VERTEX_API_REGION: str
     TARGET_ENVIRONMENT: str
     BACKEND_URL: str
@@ -228,6 +241,10 @@ def _deploy_cloud_run_service(
                                                                        value=backend_env_vars_cfg.APPLICATION_MONGODB_URI),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="APPLICATION_DATABASE_NAME",
                                                                        value=backend_env_vars_cfg.APPLICATION_DATABASE_NAME),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="USERS_MONGODB_URI",
+                                                                       value=backend_env_vars_cfg.USERS_MONGODB_URI),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="USERS_DATABASE_NAME",
+                                                                       value=backend_env_vars_cfg.USERS_DATABASE_NAME),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="VERTEX_API_REGION",
                                                                        value=backend_env_vars_cfg.VERTEX_API_REGION),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="TARGET_ENVIRONMENT",
@@ -274,6 +291,14 @@ def _get_backend_env_vars(environment: str):
     if not application_database_name:
         raise ValueError("APPLICATION_DATABASE_NAME environment variable is not set")
 
+    users_mongodb_uri = os.getenv("USERS_MONGODB_URI")
+    if not users_mongodb_uri:
+        raise ValueError("USERS_MONGODB_URI environment variable is not set")
+
+    users_database_name = os.getenv("USERS_DATABASE_NAME")
+    if not users_database_name:
+        raise ValueError("USERS_DATABASE_NAME environment variable is not set")
+
     vertex_api_region = os.getenv("VERTEX_API_REGION")
     if not vertex_api_region:
         raise ValueError("VERTEX_API_REGION environment variable is not set")
@@ -300,6 +325,8 @@ def _get_backend_env_vars(environment: str):
         TAXONOMY_MODEL_ID=taxonomy_model_id,
         APPLICATION_MONGODB_URI=application_mongodb_uri,
         APPLICATION_DATABASE_NAME=application_database_name,
+        USERS_MONGODB_URI=users_mongodb_uri,
+        USERS_DATABASE_NAME=users_database_name,
         VERTEX_API_REGION=vertex_api_region,
         TARGET_ENVIRONMENT=environment,
         BACKEND_URL=backend_url,

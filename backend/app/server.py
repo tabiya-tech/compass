@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 
@@ -31,7 +32,7 @@ from app.version.version_routes import add_version_routes
 
 from contextlib import asynccontextmanager
 
-from app.users import add_users_routes
+from app.users.routes import add_users_routes
 from app.poc import add_poc_routes
 
 from app.types import Experience, Skill
@@ -51,11 +52,25 @@ load_dotenv()
 async def lifespan(_app: FastAPI):
     # Startup logic
     logger.info("Starting up...")
-    db = await CompassDBProvider.get_application_db()
-    await CompassDBProvider.initialize_application_mongo_db(db, logger)
+
+    application_db = await CompassDBProvider.get_application_db()
+    users_db = await CompassDBProvider.get_users_db()
+
+    # Initialize the MongoDB databases
+    # run the initialization in parallel
+    await asyncio.gather(
+        CompassDBProvider.initialize_application_mongo_db(application_db, logger),
+        CompassDBProvider.initialize_users_mongo_db(users_db, logger)
+    )
+
     yield
+
     # Shutdown logic
     logger.info("Shutting down...")
+
+    # close the database connections
+    application_db.client.close()
+    users_db.client.close()
 
 
 # Retrieve the backend URL from the environment variables,
@@ -70,7 +85,6 @@ app = FastAPI(
         }],
     lifespan=lifespan
 )
-
 
 # Setup CORS policy
 # Keep the backend, frontend urls and the environment as separate env variables as a failsafe measure,
@@ -123,6 +137,10 @@ if not os.getenv('APPLICATION_MONGODB_URI'):
     raise ValueError("Mandatory APPLICATION_MONGODB_URI env variable is not set!")
 if not os.getenv("APPLICATION_DATABASE_NAME"):
     raise ValueError("Mandatory APPLICATION_DATABASE_NAME environment variable is not set")
+if not os.getenv('USERS_MONGODB_URI'):
+    raise ValueError("Mandatory USERS_MONGODB_URI env variable is not set!")
+if not os.getenv("USERS_DATABASE_NAME"):
+    raise ValueError("Mandatory USERS_DATABASE_NAME environment variable is not set")
 if not os.getenv('TAXONOMY_MODEL_ID'):
     raise ValueError("Mandatory TAXONOMY_MODEL_ID env variable is not set!")
 

@@ -54,5 +54,5 @@ jobs:
           export EXPECTED_VERSION_INFO='${{ inputs.expected-version-info }}'
           export E2E_BASE_URL=${{ inputs.component-url }}
           export GET_VERSION_URL=${{ inputs.get-version-url }}
-          poetry run pytest smoke_test/test_version.py
+          poetry run pytest smoke_test/test_version.py --noconftest
         working-directory: backend
