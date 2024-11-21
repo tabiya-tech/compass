@@ -17,7 +17,7 @@ from app.sensitive_filter import sensitive_filter
 from app.server_dependencies.agent_director_dependencies import get_agent_director
 from app.server_dependencies.application_state_dependencies import get_application_state_manager
 from app.server_dependencies.conversation_manager_dependencies import get_conversation_memory_manager
-from app.users import Authentication
+from app.users.auth import Authentication
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from app.vector_search.vector_search_dependencies import get_occupation_skill_search_service, get_all_search_services, SearchServices
 from app.vector_search.occupation_search_routes import add_occupation_search_routes

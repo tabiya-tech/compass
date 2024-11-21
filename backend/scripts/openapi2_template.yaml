@@ -20,7 +20,7 @@ x-google-management:
     limits:
       - name: "request-limit"
         metric: "request-metric"
-        unit: "1/min/{{project}}"
+        unit: "1/min/{project}"
         values:
           STANDARD: 120 # requests per minute
 x-google-backend:

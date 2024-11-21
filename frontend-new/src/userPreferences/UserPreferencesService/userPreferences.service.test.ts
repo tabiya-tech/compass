@@ -7,6 +7,7 @@ import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import {
   CreateUserPreferencesSpec,
+  SensitivePersonalDataRequirement,
   Language,
   UpdateUserPreferencesSpec,
   UserPreference,
@@ -53,6 +54,8 @@ describe("UserPreferencesService", () => {
         language: Language.en,
         accepted_tc: new Date(),
         sessions: [1234],
+        has_sensitive_personal_data: false,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       };
 
       const fetchSpy = setupFetchSpy(StatusCodes.OK, givenResponseBody, "application/json;charset=UTF-8");
@@ -236,6 +239,8 @@ describe("UserPreferencesService", () => {
         language: givenUserPreferences.language,
         sessions: [],
         accepted_tc: undefined,
+        has_sensitive_personal_data: false,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       };
       const fetchSpy = setupFetchSpy(StatusCodes.CREATED, mockResponseFormBackend, "application/json;charset=UTF-8");
 
@@ -261,6 +266,8 @@ describe("UserPreferencesService", () => {
         user_id: givenUserPreferences.user_id,
         language: givenUserPreferences.language,
         sessions: [],
+        has_sensitive_personal_data: false,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
         accepted_tc: undefined,
       };
 

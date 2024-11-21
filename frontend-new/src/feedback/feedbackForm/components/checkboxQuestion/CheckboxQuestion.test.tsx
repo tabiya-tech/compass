@@ -7,7 +7,7 @@ import CheckboxQuestion, {
   CheckboxQuestionProps,
   DATA_TEST_ID,
 } from "src/feedback/feedbackForm/components/checkboxQuestion/CheckboxQuestion";
-import  {DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID} from "src/feedback/feedbackForm/components/commentTextField/CommentTextField";
+import { DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID } from "src/feedback/feedbackForm/components/commentTextField/CommentTextField";
 
 describe("CheckboxQuestion", () => {
   // mock question

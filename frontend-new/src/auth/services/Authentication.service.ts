@@ -176,10 +176,13 @@ abstract class AuthenticationService {
         console.debug("Token is expired: ", { exp: decodedToken.exp, currentTime });
         return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.TOKEN_EXPIRED };
       } else if (decodedToken.exp < currentTime) {
-        console.warn("Warning: token expiration time has elapsed, but is still within the acceptable tolerance period", {
-          exp: decodedToken.exp,
-          currentTime,
-        });
+        console.warn(
+          "Warning: token expiration time has elapsed, but is still within the acceptable tolerance period",
+          {
+            exp: decodedToken.exp,
+            currentTime,
+          }
+        );
       }
 
       // Check issued time with buffer
@@ -188,10 +191,13 @@ abstract class AuthenticationService {
         console.debug("Token issued in the future: ", { iat: decodedToken.iat, currentTime });
         return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.TOKEN_NOT_YET_VALID };
       } else if (decodedToken.iat > currentTime) {
-        console.warn("Warning: token issued at time was after the current time, but within the acceptable tolerance period ", {
-          iat: decodedToken.iat,
-          currentTime,
-        });
+        console.warn(
+          "Warning: token issued at time was after the current time, but within the acceptable tolerance period ",
+          {
+            iat: decodedToken.iat,
+            currentTime,
+          }
+        );
       }
       console.debug("Token checked. Token is valid");
       return { isValid: true, decodedToken: decodedToken };

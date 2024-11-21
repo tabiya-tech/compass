@@ -13,9 +13,13 @@ import * as Sentry from "@sentry/react";
 import ErrorPage from "src/error/errorPage/ErrorPage";
 
 import { initSentry } from "./sentryInit";
+import { ensureRequiredEnvVars } from "./envService";
 
 // initialize react sentry for log aggregation
 initSentry();
+
+// Ensure all required environment variables are set
+ensureRequiredEnvVars();
 
 // Currently the fonts are downloaded from Google via the index.css
 // Fonts could be distributed with the app instead, by explicitly importing them here

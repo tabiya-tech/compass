@@ -44,9 +44,12 @@ To develop this application locally, follow these steps:
      - `BACKEND_URL`: The URL of the backend API
      - `SENTRY_FRONTEND_DSN`: The Sentry Data Source Name for error tracking (the frontend DSN is for the project used to track frontend errors)
      - `SENTRY_AUTH_TOKEN`: The Sentry authentication token, used to upload source maps
+     - `SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY`: The RSA public key used to encrypt sensitive personal data
+     - `SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID`: The ID of the RSA public key. This is used to identify the key used to encrypt the sensitive personal data as it may be rotated over time.
 
    Please request the necessary environment variable values from the project team.
-
+   
+   For Encryption keys, please refer to the [how to set up sensitive data protection keys](../sensitive-data-protection.md#1-you-need-to-create-a-certificate-an-rsa-privatepublic-key) documentation.
 
 ## Running the development server locally
 

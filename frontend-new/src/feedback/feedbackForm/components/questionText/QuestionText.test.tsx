@@ -1,7 +1,7 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
 
-import QuestionText, { DATA_TEST_ID } from "src/feedback/feedbackForm/components/questionText/QuestionText"
+import QuestionText, { DATA_TEST_ID } from "src/feedback/feedbackForm/components/questionText/QuestionText";
 import { render, screen } from "src/_test_utilities/test-utils";
 
 describe("QuestionText", () => {

@@ -40,7 +40,7 @@ const StepsComponent: React.FC<StepProps> = ({ questions, feedbackItems, onChang
     <Box
       display="flex"
       flexDirection="column"
-      gap={(theme) => isSmallMobile ? theme.tabiyaSpacing.xl * 3 : theme.tabiyaSpacing.xl * 1.2}
+      gap={(theme) => (isSmallMobile ? theme.tabiyaSpacing.xl * 3 : theme.tabiyaSpacing.xl * 1.2)}
       data-testid={DATA_TEST_ID.STEPS_COMPONENT}
     >
       {questions.map((question) => {

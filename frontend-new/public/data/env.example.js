@@ -9,4 +9,10 @@ window.tabiyaConfig = {
   // The SENTRY_AUTH_TOKEN variable is picked up by the Sentry Build Plugin.
   // It's used for authentication when uploading source maps.
   "SENTRY_AUTH_TOKEN":btoa("Some Auth Token"),
+
+  // The SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY variable is used to encrypt sensitive personal data.
+  "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY": "sensitive-data-encryption-key",
+
+  // The SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID variable is used to identify the encryption key.
+  "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID": "key_id",
 };

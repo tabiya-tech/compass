@@ -1,5 +1,5 @@
 enum AuthError {
-  TOKEN_ERROR = 'TokenError',
+  TOKEN_ERROR = "TokenError",
 }
 
 /**

@@ -47,7 +47,7 @@ const stepsContent: Step[] = [
         lowRatingLabel: "Inaccurate",
         highRatingLabel: "Very accurate",
         placeholder: questions["work_experience_accuracy"].comment_placeholder,
-      }
+      },
     ],
   },
   {
