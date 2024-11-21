@@ -1,6 +1,7 @@
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import { SensitivePersonalDataRequirement } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { Invitation, InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
-import { StoredPersonalInfo } from "../../experiences/experiencesDrawer/experienceService/experiences.types";
+import { StoredPersonalInfo } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
 
 describe("AuthPersistentStorage class tests", () => {
   beforeEach(() => {
@@ -68,6 +69,7 @@ describe("AuthPersistentStorage class tests", () => {
         invitation_code: "foo",
         invitation_type: InvitationType.REGISTER,
         status: InvitationStatus.VALID,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       };
       PersistentStorageService.setInvitation(givenInvitation);
 
@@ -95,6 +97,7 @@ describe("AuthPersistentStorage class tests", () => {
         invitation_code: "foo",
         invitation_type: InvitationType.REGISTER,
         status: InvitationStatus.VALID,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       };
       PersistentStorageService.setInvitation(givenInvitation);
 
@@ -112,6 +115,7 @@ describe("AuthPersistentStorage class tests", () => {
         invitation_code: "foo",
         invitation_type: InvitationType.REGISTER,
         status: InvitationStatus.VALID,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       };
 
       // WHEN The invitation is set

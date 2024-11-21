@@ -10,7 +10,10 @@ import FirebaseEmailAuthenticationService from "src/auth/services/FirebaseAuthen
 import { invitationsService } from "src/auth/services/invitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
-import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import {
+  SensitivePersonalDataRequirement,
+  Language,
+} from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import { TabiyaUser } from "src/auth/auth.types";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
@@ -234,7 +237,9 @@ describe("Testing Register component", () => {
       invitation_type: InvitationType.REGISTER,
       status: InvitationStatus.VALID,
       invitation_code: givenInvitationCode,
+      sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
     });
+
     jest
       .spyOn(AuthenticationServiceFactoryModule.default, "getCurrentAuthenticationService")
       .mockReturnValue(FirebaseEmailAuthenticationService.getInstance());
@@ -259,6 +264,8 @@ describe("Testing Register component", () => {
       language: Language.en,
       sessions: [],
       accepted_tc: new Date(),
+      has_sensitive_personal_data: false,
+      sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
     });
 
     // WHEN the component is rendered
