@@ -1,5 +1,5 @@
-const sampleValidSpecialCharacters = "^°!\"§$%&/()=?`´*+#'-_.,;<>öäü@[]{}|¡“¶¢[]≠¿'„…∞~<•±æœ";
-const sampleInternationalCharacters = "αβγδεζηθικλμνξοπρστυφχψω";
+const sampleValidSpecialCharacters = "€^°!\"§$%&/()=?`´*+#'-_.,;<>öäü@[]{}|¡“¶¢]≠¿'„…∞~<•±æœ";
+const sampleInternationalCharacters = "αβγδεζηθικλμνξοπρστυφχψωأبجدهوزحطيكلمنسعفصقرشتثخذضظغሀለሐመሠረሰሸቀበተቸኀአከኸወዘዠየደጀገጠጰፈፐፘ一二三四五六七八九十百千万亿";
 const THREE_BYTE_UTF8_CHAR = "€";
 export const WHITESPACE = " \n\r\t";
 
@@ -19,6 +19,10 @@ export function getRandomString(length: number) {
     counter += 1;
   }
   return result;
+}
+
+export function getThreeBytesUTF8Char(length: number) {
+  return THREE_BYTE_UTF8_CHAR.repeat(length);
 }
 
 export function getRandomLorem(length: number) {

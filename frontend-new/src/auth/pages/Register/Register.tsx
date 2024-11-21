@@ -90,7 +90,7 @@ const Register: React.FC = () => {
       setIsLoading(true);
       const prefs = userPreferencesStateService.getUserPreferences();
       if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
-        navigate(routerPaths.DPA, { replace: true });
+        navigate(routerPaths.CONSENT, { replace: true });
       } else {
         navigate(routerPaths.ROOT, { replace: true });
         enqueueSnackbar("Welcome back!", { variant: "success" });

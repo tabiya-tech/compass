@@ -120,7 +120,7 @@ const Login: React.FC = () => {
       // once the user is logged in, we need to get their preferences from the state and
       // decide, based on the preferences, where to navigate the user
       if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
-        navigate(routerPaths.DPA, { replace: true });
+        navigate(routerPaths.CONSENT, { replace: true });
       } else {
         navigate(routerPaths.ROOT, { replace: true });
         enqueueSnackbar("Welcome back!", { variant: "success" });

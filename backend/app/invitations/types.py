@@ -4,6 +4,8 @@ from typing import Mapping, Optional
 
 from pydantic import BaseModel
 
+from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
+
 
 class InvitationType(Enum):
     AUTO_REGISTER = "AUTO_REGISTER"
@@ -68,6 +70,11 @@ class UserInvitation(BaseModel):
     The type of invitation
     """
 
+    sensitive_personal_data_requirement: SensitivePersonalDataRequirement
+    """
+    Sensitive Personal data requirement for the invitation, whether sensitive personal data required or not for now
+    """
+
     @staticmethod
     def from_dict(_dict: Mapping[str, any]) -> "UserInvitation":
         """
@@ -75,6 +82,7 @@ class UserInvitation(BaseModel):
         :param _dict: Mapping[str, any]: The dictionary to create the UserInvitation object from
         :return: UserInvitation: The created UserInvitation object
         """
+
         return UserInvitation(
             id=str(_dict.get("_id")),
             invitation_code=_dict.get("invitation_code"),
@@ -82,10 +90,20 @@ class UserInvitation(BaseModel):
             allowed_usage=_dict.get("allowed_usage"),
             valid_from=_dict.get("valid_from"),
             valid_until=_dict.get("valid_until"),
-            invitation_type=_dict.get("invitation_type")
+            invitation_type=_dict.get("invitation_type"),
+            # If the key is not found, default to NOT_REQUIRED
+            # for legacy invitation codes
+            sensitive_personal_data_requirement=_dict.get(
+                "sensitive_personal_data_requirement",
+                SensitivePersonalDataRequirement.NOT_REQUIRED
+            )
         )
 
     class Config:
+        """
+        Pydantic configuration
+        """
+
         extra = "forbid"
         use_enum_values = True
 
@@ -106,6 +124,15 @@ class GetInvitationCodeStatusResponse(BaseModel):
     If the invitation is found, the type of the invitation
     """
 
+    sensitive_personal_data_requirement: SensitivePersonalDataRequirement
+    """
+    The sensitive data requirement for the invitation
+    """
+
     class Config:
+        """
+        Pydantic configuration
+        """
+
         extra = "forbid"
         use_enum_values = True

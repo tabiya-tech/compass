@@ -30,6 +30,7 @@ jobs:
       taxonomy-database-name: ${{ needs.setup-env.outputs.taxonomy-database-name }}
       taxonomy-model-id: ${{ needs.setup-env.outputs.taxonomy-model-id }}
       application-database-name: ${{ needs.setup-env.outputs.application-database-name }}
+      userdata-database-name: ${{ needs.setup-env.outputs.userdata-database-name }}
       vertex-api-region: ${{ needs.setup-env.outputs.vertex-api-region }}
   build-frontend:
     uses: ./.github/workflows/build-frontend.yml
@@ -58,6 +59,7 @@ jobs:
       taxonomy-database-name: ${{ needs.setup-env.outputs.taxonomy-database-name }}
       taxonomy-model-id: ${{ needs.setup-env.outputs.taxonomy-model-id }}
       application-database-name: ${{ needs.setup-env.outputs.application-database-name }}
+      userdata-database-name: ${{ needs.setup-env.outputs.userdata-database-name }}
       vertex-api-region: ${{ needs.setup-env.outputs.vertex-api-region }}
   smoke-test-backend-apigateway:
     needs: [ deploy-backend ]
@@ -79,6 +81,8 @@ jobs:
       backend-url: ${{ needs.setup-env.outputs.backend-url }}
       identity_platform_client_api_key: ${{ needs.deploy-auth.outputs.identity_platform_client_api_key }}
       identity_platform_client_firebase_auth_domain: ${{ needs.deploy-auth.outputs.identity_platform_client_firebase_auth_domain }}
+      sensitive-data-encryption-key: ${{ needs.setup-env.outputs.sensitive-data-encryption-key }}
+      sensitive-data-encryption-key-id: ${{ needs.setup-env.outputs.sensitive-data-encryption-key-id }}
   smoke-test-frontend-bucket:
     needs: [ setup-env, build-frontend, deploy-frontend ]
     uses: ./.github/workflows/smoke-test-frontend-version.yml

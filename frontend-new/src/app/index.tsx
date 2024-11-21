@@ -6,7 +6,8 @@ import Login from "src/auth/pages/Login/Login";
 import ErrorPage from "src/error/errorPage/ErrorPage";
 import Register from "src/auth/pages/Register/Register";
 import VerifyEmail from "src/auth/pages/VerifyEmail/VerifyEmail";
-import DataProtectionAgreement from "src/dataProtectionAgreement/DataProtectionAgreement";
+import Consent from "src/consent/components/consentPage/Consent";
+import SensitiveDataForm from "src/sensitiveData/components/sensitiveDataForm/SensitiveDataForm";
 
 import ProtectedRoute from "src/app/ProtectedRoute/ProtectedRoute";
 import { routerPaths } from "src/app/routerPaths";
@@ -39,8 +40,10 @@ const ProtectedRouteKeys = {
   REGISTER: "REGISTER",
   LOGIN: "LOGIN",
   VERIFY_EMAIL: "VERIFY_EMAIL",
-  DPA: "DPA",
+  CONSENT: "CONSENT",
+  SENSITIVE_DATA: "SENSITIVE_DATA",
 };
+
 const App = () => {
   const [loading, setLoading] = useState(true);
 
@@ -166,10 +169,18 @@ const App = () => {
       ),
     },
     {
-      path: routerPaths.DPA,
+      path: routerPaths.CONSENT,
       element: (
-        <ProtectedRoute key={ProtectedRouteKeys.DPA}>
-          <DataProtectionAgreement />
+        <ProtectedRoute key={ProtectedRouteKeys.CONSENT}>
+          <Consent />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: routerPaths.SENSITIVE_DATA,
+      element: (
+        <ProtectedRoute key={ProtectedRouteKeys.SENSITIVE_DATA}>
+          <SensitiveDataForm />
         </ProtectedRoute>
       ),
     },

@@ -95,6 +95,10 @@ describe("test the application bootstrapping", () => {
 
   test("should render the app", () => {
     jest.isolateModules(() => {
+      const ensureRequiredEnvVarsMock = jest
+        .spyOn(require("src/envService"), "ensureRequiredEnvVars")
+        .mockImplementation(jest.fn);
+
       // WHEN the main index module is imported
       require("./index");
 
@@ -117,6 +121,9 @@ describe("test the application bootstrapping", () => {
       // AND expect the compass app to be in the DOM and to be a child of the theme provider
       const compassAppElement = within(themeProviderElement).getByTestId("compass-app-id");
       expect(compassAppElement).toBeInTheDocument();
+
+      // AND expect the ensureRequiredEnvVars function to have been called
+      expect(ensureRequiredEnvVarsMock).toHaveBeenCalled();
 
       // AND expect the compass app to match the snapshot
       expect(compassAppElement).toMatchSnapshot();

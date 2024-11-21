@@ -14,6 +14,12 @@ on:
       identity_platform_client_firebase_auth_domain:
         required: true
         type: string
+      sensitive-data-encryption-key:
+        required: true
+        type: string
+      sensitive-data-encryption-key-id:
+        required: true
+        type: string
     outputs:
       frontend-url:
         description: 'The bucket frontend url'
@@ -90,7 +96,9 @@ jobs:
           echo "\"FIREBASE_AUTH_DOMAIN\": btoa(\"${{ inputs.identity_platform_client_firebase_auth_domain }}\")," >> frontend-new/build/data/env.js
           echo "\"BACKEND_URL\": btoa(\"${{ inputs.backend-url }}\")," >> frontend-new/build/data/env.js
           echo "\"SENTRY_FRONTEND_DSN\": btoa(\"${{ secrets.SENTRY_FRONTEND_DSN }}\")," >> frontend-new/build/data/env.js
-          echo "\"SENTRY_AUTH_TOKEN\": btoa(\"${{ secrets.SENTRY_AUTH_TOKEN }}\")" >> frontend-new/build/data/env.js
+          echo "\"SENTRY_AUTH_TOKEN\": btoa(\"${{ secrets.SENTRY_AUTH_TOKEN }}\")," >> frontend-new/build/data/env.js
+          echo "\"SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY\": btoa(\`${{ vars.SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY }}\`)," >> frontend-new/build/data/env.js
+          echo "\"SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID\": btoa(\"${{ vars.SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID }}\")," >> frontend-new/build/data/env.js
           echo "};" >> frontend-new/build/data/env.js
           cat frontend-new/build/data/env.js
       - name: Deploy both frontends

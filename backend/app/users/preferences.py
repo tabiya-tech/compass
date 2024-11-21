@@ -1,9 +1,13 @@
+import asyncio
+
 from fastapi import APIRouter, HTTPException, Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.constants.errors import ErrorService, HTTPErrorResponse
 from app.invitations.service import UserInvitationService
 from app.invitations.types import InvitationCodeStatus, InvitationType
+from app.users.sensitive_personal_data.routes import get_sensitive_personal_data_service
+from app.users.sensitive_personal_data.service import ISensitivePersonalDataService
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, UserInfo, SignInProvider
 from app.users.feedback.service import UserFeedbackService
@@ -20,6 +24,7 @@ logger = logging.getLogger(__name__)
 async def _get_user_preferences(
         repository: UserPreferenceRepository,
         user_feedback_service: UserFeedbackService,
+        sensitive_personal_data_service: ISensitivePersonalDataService,
         user_id: str,
         authed_user: UserInfo) -> GetUsersPreferencesResponse:
     try:
@@ -44,13 +49,17 @@ async def _get_user_preferences(
                 )
             )
 
-        user_preferences = GetUsersPreferencesResponse(
-            **user_preferences.model_dump()
+        # Fetch feedback sessions together with if they have sensitive personal data
+        sessions_with_feedback, has_sensitive_personal_data = await asyncio.gather(
+            user_feedback_service.get_user_feedback(user_id),
+            sensitive_personal_data_service.exists_by_user_id(user_id)
         )
 
-        # Fetch feedback sessions
-        feedback_sessions = await user_feedback_service.get_user_feedback(user_id)
-        user_preferences.sessions_with_feedback = feedback_sessions
+        user_preferences = GetUsersPreferencesResponse(
+            **user_preferences.model_dump(),
+            has_sensitive_personal_data=has_sensitive_personal_data,
+            sessions_with_feedback=sessions_with_feedback
+        )
 
         return user_preferences
     except Exception as e:
@@ -105,13 +114,14 @@ async def _create_user_preferences(
             raise HTTPException(status_code=400, detail=INVALID_INVITATION_CODE_MESSAGE)
 
         # Generating a 64-bit integer session ID
-        session_id = generate_new_session_id()  # nosec
+        session_id = generate_new_session_id()
         sessions = [session_id]
 
         # Create the user preferences
         created = await repository.insert_user_preference(preferences.user_id, UserPreferences(
             language=preferences.language,
             invitation_code=preferences.invitation_code,
+            sensitive_personal_data_requirement=invitation.sensitive_personal_data_requirement,
             sessions=sessions
         ))
 
@@ -222,10 +232,19 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
                 responses={403: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
                 name="get user preferences",
                 description="Get user preferences, (language and time when they accepted terms and conditions)")
-    async def _get_user_preferences_handler(user_id: str, user_info: UserInfo = Depends(auth.get_user_info()),
-                                            user_preference_repository: UserPreferenceRepository = Depends(_get_user_preferences_service),
-                                            user_feedback_service: UserFeedbackService = Depends(_get_user_feedback_service)):
-        return await _get_user_preferences(user_preference_repository, user_feedback_service, user_id, user_info)
+    async def _get_user_preferences_handler(
+            user_id: str, user_info: UserInfo = Depends(auth.get_user_info()),
+            user_preference_repository: UserPreferenceRepository = Depends(_get_user_preferences_service),
+            sensitive_personal_data_service: ISensitivePersonalDataService = Depends(get_sensitive_personal_data_service),
+            user_feedback_service: UserFeedbackService = Depends(_get_user_feedback_service)
+    ) -> GetUsersPreferencesResponse:
+        return await _get_user_preferences(
+            user_preference_repository,
+            user_feedback_service,
+            sensitive_personal_data_service,
+            user_id,
+            user_info
+        )
 
     #########################
     # POST /preferences - Add user preferences, this is a one-time operation otherwise it will return 409
@@ -233,19 +252,21 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     @router.post("",
                  response_model=UserPreferences,
                  status_code=201,
-                 responses={403: {"model": HTTPErrorResponse}, 409: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
+                 responses={403: {"model": HTTPErrorResponse}, 409: {"model": HTTPErrorResponse},
+                            500: {"model": HTTPErrorResponse}},
                  name="add user preferences",
                  description="Add user preferences, (language and time when they accepted terms and conditions)"
                  )
     async def _create_handler(body: CreateUserPreferencesRequest,
                               user_info: UserInfo = Depends(auth.get_user_info()),
                               user_invitation_service: UserInvitationService = Depends(_get_user_invitations_service),
-                              user_preference_repository: UserPreferenceRepository = Depends(_get_user_preferences_service)
+                              user_preference_repository: UserPreferenceRepository = Depends(
+                                  _get_user_preferences_service)
                               ):
         return await _create_user_preferences(user_invitation_service, user_preference_repository, body, user_info)
 
     #########################
-    # POS /users/preferences - Create a user profile
+    # POS /users/preferences - Create a user preferences
     #########################
     @router.patch(
         path="",
@@ -274,7 +295,8 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
                 responses={403: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
                 description="""Endpoint for starting a new conversation session.""")
     async def _get_new_session_handler(user_id: str, user_info: UserInfo = Depends(auth.get_user_info()),
-                                       user_preference_repository: UserPreferenceRepository = Depends(_get_user_preferences_service)
+                                       user_preference_repository: UserPreferenceRepository = Depends(
+                                           _get_user_preferences_service)
                                        ):
         """
         Endpoint for starting a new conversation session.

@@ -31,9 +31,18 @@ on:
       application-database-name:
         description: "The application database name in the target environment"
         value: ${{ jobs.setup-env.outputs.application-database-name }}
+      userdata-database-name:
+        description: "The userdata database name in the target environment"
+        value: ${{ jobs.setup-env.outputs.userdata-database-name }}
       vertex-api-region:
         description: "The vertex api region in the target environment"
         value: ${{ jobs.setup-env.outputs.vertex-api-region }}
+      sensitive-data-encryption-key:
+        description: "The sensitive data RSA encryption key in the target environment"
+        value: ${{ jobs.setup-env.outputs.sensitive-data-encryption-key }}
+      sensitive-data-encryption-key-id:
+        description: "The sensitive data RSA encryption key id in the target environment"
+        value: ${{ jobs.setup-env.outputs.sensitive-data-encryption-key-id }}
 
 jobs:
   setup-env:
@@ -48,17 +57,30 @@ jobs:
       taxonomy-database-name: ${{ vars.TAXONOMY_DATABASE_NAME }}
       taxonomy-model-id: ${{ vars.TAXONOMY_MODEL_ID }}
       application-database-name: ${{ vars.APPLICATION_DATABASE_NAME }}
+      userdata-database-name: ${{ vars.USERDATA_DATABASE_NAME }}
       vertex-api-region: ${{ vars.VERTEX_API_REGION }}
+      sensitive-data-encryption-key: ${{ vars.SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY }}
+      sensitive-data-encryption-key-id: ${{ vars.SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Run setup script
         id: setup
         run: |
           chmod +x setupEnv.sh
           ./setupEnv.sh ${{ inputs.target-environment }} ${{ vars.BASE_DOMAIN }}
         working-directory: pipeline
+      - name: Verify PII RSA Certificate
+        run: |
+          [ -n "${{ vars.SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY }}" ] || { echo "Error: SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY is empty or unset." >&2; exit 1; }
+          [ -n "${{ vars.SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID }}" ] || { echo "Error: SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID is empty or unset." >&2; exit 1; }
+          echo "${{ vars.SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY }}" | openssl rsa -inform PEM -pubin -noout
+          if [ $? != 0 ] ; then 
+              echo "Could not verify the RSA public key in PEM format"
+              exit 1
+          else
+              echo "Successfully verified the RSA public key in PEM format"
+          fi
       - name: Log set envs
         run: |
           echo "domain-name: ${{ steps.setup.outputs.domain_name }}"
@@ -66,7 +88,10 @@ jobs:
           echo "backend-url: ${{ steps.setup.outputs.backend_url }}"
           echo "frontend-domain: ${{ steps.setup.outputs.frontend_domain }}"
           echo "backend-domain: ${{ steps.setup.outputs.backend_domain }}"
-          echo "taxonomy-database-name: ${{ steps.setup.outputs.taxonomy-database-name }}"
-          echo "taxonomy-model-id: ${{ steps.setup.outputs.taxonomy-model-id }}"
-          echo "application-database-name: ${{ steps.setup.outputs.application-database-name }}"
-          echo "vertex-api-region: ${{ steps.setup.outputs.vertex-api-region }}"
+          echo "taxonomy-database-name: ${{ vars.TAXONOMY_DATABASE_NAME }}"
+          echo "taxonomy-model-id: ${{ vars.TAXONOMY_MODEL_ID }}"
+          echo "application-database-name: ${{ vars.APPLICATION_DATABASE_NAME }}"
+          echo "userdata-database-name: ${{ vars.USERDATA_DATABASE_NAME }}"
+          echo "vertex-api-region: ${{ vars.VERTEX_API_REGION }}"
+          echo "sensitive-data-encryption-key: ${{ vars.SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY }}"
+          echo "sensitive-data-encryption-key-id: ${{ vars.SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID }}"
