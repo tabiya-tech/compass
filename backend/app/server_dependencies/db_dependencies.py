@@ -79,7 +79,7 @@ class CompassDBProvider:
         # Create the user feedback indexes
         await application_db.get_collection(Collections.USER_FEEDBACK).create_index([
             ("user_id", 1)
-        ], unique=True)
+        ])
 
         await application_db.get_collection(Collections.USER_FEEDBACK).create_index([
             ("session_id", 1)

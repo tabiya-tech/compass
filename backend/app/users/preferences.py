@@ -49,7 +49,7 @@ async def _get_user_preferences(
         )
 
         # Fetch feedback sessions
-        feedback_sessions = user_feedback_service.get_user_feedback(user_id)
+        feedback_sessions = await user_feedback_service.get_user_feedback(user_id)
         user_preferences.sessions_with_feedback = feedback_sessions
 
         return user_preferences
