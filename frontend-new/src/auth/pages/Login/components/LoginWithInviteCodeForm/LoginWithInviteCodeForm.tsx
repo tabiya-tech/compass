@@ -28,7 +28,7 @@ const LoginWithInviteCodeForm: React.FC<Readonly<LoginFormProps>> = ({
   return (
     <TextField
       fullWidth
-      label="Invite Code"
+      label="Login Code"
       variant="outlined"
       value={inviteCode}
       disabled={isDisabled}
