@@ -1,48 +1,48 @@
-,CODE,DEFINITION
-0,I42_4,I keep company to my grandma when she is not feeling well
-1,I42_3,I fill my grandma’s taxes
-2,I42_2,I give my uncle his medication 
-3,I42_1,I make my grandma have lunch and I help her wash herself
-4,I42_6,I take care of my dad’s medical appointments
-5,I42_5,I keep an eye on my Grandpa
-6,I41_1,I change my little brother’s diapers
-7,I41_3,I help my sister with her homework. 
-8,I41_7,I go to teacher/parents meetings.
-9,I41_6,I keep an eye on my siblings during the day 
-10,I41_5,I play football with my cousins 
-11,I41_2,I give my brother medication 
-12,I41_4,I read bedtime stories to my niece
-13,I44_3,I take my grandma to the supermarket 
-14,I44_2,I bring my sister to school 
-15,I43_2,I take care of my brother when he is having a hard time 
-16,I43_1,I help my brother move because he broke his ankle
-17,I34_2,I dry the laundry 
-18,I34_1,I clean the sheets 
-19,I34_3,I iron my dad’s shirts
-20,I34_4,I clean my shoes
-21,I32_1,I clean the windows 
-22,I32_2,I take away the snow around the house
-23,I32_3,I make compost with vegetable peals 
-24,I32_4,I water the plants
-25,I33_1,I paint the house’s walls 
-26,I33_2,I install the TV
-27,I33_3,I change the car’s oil 
-28,I31_3,I do the dishes
-29,I31_1,I make cookies for my daughter
-30,I31_2,I set the table and serve my family
-31,I31_4,I put fruits in bocals to store them for the winter. 
-32,I35_2,I check the savings to plan for trips. 
-33,I35_1,I pay my bills online. 
-34,I36_1,I play with my dog outside. 
-35,I36_2,I take my dog to the dog-sitter. 
-36,I37_2,I look for a hairdresser for my mom and pay for an appointment.
-37,I37_1,I buy my parents fournitures. 
-38,I52_3,I take care of yougnpeople in the community. 
-39,I52_4,I help my church with accounting. 
-40,I52_2,I sell cake at my dauther’s school baking parties
-41,I52_1,I help clean the beach after a storm. 
-42,I51_4,I check on my eldery neighboor when it’s very hot outside. 
-43,I51_3,I teach my young neighbor spanish. 
-44,I51_1,I babysit my cousin’s cats. 
-45,I51_2,I bring groceries to my elderly neighbor. 
-46,I51_5,I replace my uncle in his shop when he is away. 
+,CODE,OLD_CODE,DEFINITION
+0,I42_0,I42_4,I keep company to my grandma when she is not feeling well
+1,I42_0,I42_3,I fill my grandma’s taxes
+2,I42_0,I42_2,I give my uncle his medication 
+3,I42_0,I42_1,I make my grandma have lunch and I help her wash herself
+4,I42_0,I42_6,I take care of my dad’s medical appointments
+5,I42_0,I42_5,I keep an eye on my Grandpa
+6,I41_0,I41_1,I change my little brother’s diapers
+7,I41_0,I41_3,I help my sister with her homework. 
+8,I41_0,I41_7,I go to teacher/parents meetings.
+9,I41_0,I41_6,I keep an eye on my siblings during the day 
+10,I41_0,I41_5,I play football with my cousins 
+11,I41_0,I41_2,I give my brother medication 
+12,I41_0,I41_4,I read bedtime stories to my niece
+13,I44_0,I44_3,I take my grandma to the supermarket 
+14,I44_0,I44_2,I bring my sister to school 
+15,I43_0,I43_2,I take care of my brother when he is having a hard time 
+16,I43_0,I43_1,I help my brother move because he broke his ankle
+17,I34_0,I34_2,I dry the laundry 
+18,I34_0,I34_1,I clean the sheets 
+19,I34_0,I34_3,I iron my dad’s shirts
+20,I34_0,I34_4,I clean my shoes
+21,I32_0,I32_1,I clean the windows 
+22,I32_0,I32_2,I take away the snow around the house
+23,I32_0,I32_3,I make compost with vegetable peals 
+24,I32_0,I32_4,I water the plants
+25,I33_0,I33_1,I paint the house’s walls 
+26,I33_0,I33_2,I install the TV
+27,I33_0,I33_3,I change the car’s oil 
+28,I31_0,I31_3,I do the dishes
+29,I31_0,I31_1,I make cookies for my daughter
+30,I31_0,I31_2,I set the table and serve my family
+31,I31_0,I31_4,I put fruits in bocals to store them for the winter. 
+32,I35_0,I35_2,I check the savings to plan for trips. 
+33,I35_0,I35_1,I pay my bills online. 
+34,I36_0,I36_1,I play with my dog outside. 
+35,I36_0,I36_2,I take my dog to the dog-sitter. 
+36,I37_0,I37_2,I look for a hairdresser for my mom and pay for an appointment.
+37,I37_0,I37_1,I buy my parents fournitures. 
+38,I52_3,I52_3,I take care of yougnpeople in the community. 
+39,I52_4,I52_4,I help my church with accounting. 
+40,I52_2,I52_2,I sell cake at my dauther’s school baking parties
+41,I52_1,I52_1,I help clean the beach after a storm. 
+42,I51_4,I51_4,I check on my eldery neighboor when it’s very hot outside. 
+43,I51_3,I51_3,I teach my young neighbor spanish. 
+44,I51_1,I51_1,I babysit my cousin’s cats. 
+45,I51_2,I51_2,I bring groceries to my elderly neighbor. 
+46,I51_5,I51_5,I replace my uncle in his shop when he is away. 
