@@ -127,7 +127,7 @@ abstract class AuthenticationService {
   }
 
   /**
-   * Checks if a given token is valid (not expired and not issued in the future).
+   * Checks if a given token is valid (not expired).
    *
    * @param {string} token - The token to validate.
    * @returns {boolean} True if the token is valid, false otherwise.
@@ -154,10 +154,6 @@ abstract class AuthenticationService {
       const currentTime = Math.floor(Date.now() / 1000);
       if (decodedToken.exp < currentTime) {
         console.debug("Token is expired");
-        return { isValid: false, decodedToken: null };
-      }
-      if (decodedToken.iat > currentTime) {
-        console.debug("Token issued in the future");
         return { isValid: false, decodedToken: null };
       }
 
