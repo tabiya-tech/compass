@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import { getServiceErrorFactory } from "src/error/ServiceError/ServiceError";
 import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
-import { getActiveToken } from "src/utils/getActiveToken/getActiveToken";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
 // This function is used to make authenticated fetch requests
 // It adds the Authorization header with the Token from the session storage
@@ -16,7 +16,7 @@ export type ExtendedRequestInit = RequestInit & {
   failureMessage: string;
   expectedContentType?: string;
 };
-export const fetchWithAuth = async (
+export const customFetch = async (
   apiUrl: string,
   init: ExtendedRequestInit = {
     expectedStatusCode: StatusCodes.OK,
@@ -34,11 +34,14 @@ export const fetchWithAuth = async (
 
   const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, init.method ?? "Unknown method", apiUrl);
   let response: Response;
-  try {
-    const token = await getActiveToken();
+  const token = PersistentStorageService.getToken();
 
+  try {
     const headers = new Headers(init.headers || {});
-    headers.append("Authorization", `Bearer ${token ?? "ANONYMOUS"}`);
+    // if no token available, add it to the headers
+    if (token) {
+      headers.append("Authorization", `Bearer ${token}`);
+    }
 
     const enhancedInit = { ...options, headers };
 

@@ -84,7 +84,7 @@ describe("UserPreferencesService", () => {
     test("on fail to fetch, getUserPreferences should reject with the expected service error", async () => {
       // GIVEN fetch rejects with some unknown error
       const givenFetchError = new Error("Failed to get user preferences");
-      jest.spyOn(require("src/utils/fetchWithAuth/fetchWithAuth"), "fetchWithAuth").mockRejectedValue(givenFetchError);
+      jest.spyOn(require("src/utils/customFetch/customFetch"), "customFetch").mockRejectedValue(givenFetchError);
 
       // WHEN calling getUserPreferences function with some user id
       const service = new UserPreferencesService();
@@ -167,7 +167,7 @@ describe("UserPreferencesService", () => {
     test("on fail to fetch, updateUserPreferences should reject with the expected service error", async () => {
       // GIVEN fetch rejects with some unknown error
       const givenFetchError = new Error("Failed to update user preferences");
-      jest.spyOn(require("src/utils/fetchWithAuth/fetchWithAuth"), "fetchWithAuth").mockRejectedValue(givenFetchError);
+      jest.spyOn(require("src/utils/customFetch/customFetch"), "customFetch").mockRejectedValue(givenFetchError);
 
       // WHEN calling updateUserPreferences function with some user preferences
       const service = new UserPreferencesService();
@@ -270,7 +270,7 @@ describe("UserPreferencesService", () => {
     test("on fail to fetch, createUserPreferences should reject with the expected service error", async () => {
       // GIVEN fetch rejects with some unknown error
       const givenFetchError = new Error("Failed to create new user preferences");
-      jest.spyOn(require("src/utils/fetchWithAuth/fetchWithAuth"), "fetchWithAuth").mockRejectedValue(givenFetchError);
+      jest.spyOn(require("src/utils/customFetch/customFetch"), "customFetch").mockRejectedValue(givenFetchError);
 
       // WHEN calling createUserPreferences function with some user preferences
       const service = new UserPreferencesService();

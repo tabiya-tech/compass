@@ -1,8 +1,8 @@
-import { fetchWithAuth } from "./fetchWithAuth";
+import { customFetch } from "./customFetch";
 import { setupFetchSpy } from "src/_test_utilities/fetchSpy";
 import { ServiceError } from "src/error/ServiceError/ServiceError";
 import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
-import * as getActiveTokenModule from "src/utils/getActiveToken/getActiveToken";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
 describe("Api Service tests", () => {
   beforeEach(() => {
@@ -14,13 +14,13 @@ describe("Api Service tests", () => {
     const givenApiUrl = "https://api.example.com/data";
     const givenToken = "someAuthToken";
 
-    jest.spyOn(getActiveTokenModule, "getActiveToken").mockResolvedValueOnce(givenToken);
+    jest.spyOn(PersistentStorageService, "getToken").mockReturnValueOnce(givenToken);
 
     // AND the server responds with a 200 status code
     setupFetchSpy(200, "fetch response", "application/json;charset=UTF-8");
 
     // WHEN fetchWithAuth is called with an api url
-    const response = await fetchWithAuth(givenApiUrl);
+    const response = await customFetch(givenApiUrl);
 
     // THEN expect fetch to have been called with the correct arguments
     expect(global.fetch).toHaveBeenCalledWith(
@@ -39,31 +39,27 @@ describe("Api Service tests", () => {
     expect(response.status).toBe(200);
   });
 
-  test("fetchWithAuth should work without authToken", async () => {
+  test("fetchWithAuth should still send the request without an Authorization header when authToken is not found in the storage", async () => {
     // GIVEN an API URL and no auth token in sessionStorage
     const givenApiUrl = "https://api.example.com/data";
-    jest.spyOn(getActiveTokenModule, "getActiveToken").mockResolvedValueOnce("");
+
+    jest.spyOn(PersistentStorageService, "getToken").mockReturnValueOnce(null);
 
     // AND the server responds with a 200 status code
-    setupFetchSpy(200, "fetch response without token", "application/json;charset=UTF-8");
+    setupFetchSpy(200, "fetch response", "application/json;charset=UTF-8");
 
     // WHEN fetchWithAuth is called with an apiUrl
-    const response = await fetchWithAuth(givenApiUrl);
+    await customFetch(givenApiUrl);
 
-    // THEN expect fetch to have been called without an Authorization header
+    // THEN expect fetch to have been called without the Authorization header
     expect(global.fetch).toHaveBeenCalledWith(
       givenApiUrl,
       expect.objectContaining({
-        headers: {
-          map:
-            expect.any(Headers) &&
-            expect.objectContaining({
-              authorization: `Bearer `,
-            }),
-        },
+        headers: expect.not.objectContaining({
+          Authorization: expect.any(String)
+        })
       })
     );
-    expect(response.status).toBe(200);
   });
 
   test("fetchWithAuth should throw an error if the server responds with an unexpected status code", async () => {
@@ -75,12 +71,7 @@ describe("Api Service tests", () => {
     const givenMethod = "GET";
     const givenFailureMessage = "fetchWithAuth failed";
 
-    jest.spyOn(global, "sessionStorage", "get").mockImplementation(
-      () =>
-        ({
-          getItem: jest.fn().mockReturnValue(givenAuthToken),
-        }) as unknown as Storage
-    );
+    jest.spyOn(PersistentStorageService, "getToken").mockReturnValueOnce(givenAuthToken);
 
     // AND the server responds with a 404 status code
     setupFetchSpy(404, "Not Found", "application/json;charset=UTF-8");
@@ -88,7 +79,7 @@ describe("Api Service tests", () => {
     // WHEN fetchWithAuth is called with an apiUrl and an init configuration
     let error: Error | undefined;
     try {
-      await fetchWithAuth(givenApiUrl, {
+      await customFetch(givenApiUrl, {
         expectedStatusCode: 200,
         serviceName: givenServiceName,
         serviceFunction: givenServiceFunction,
@@ -123,12 +114,7 @@ describe("Api Service tests", () => {
     const givenMethod = "GET";
     const givenFailureMessage = "fetchWithAuth failed";
 
-    jest.spyOn(global, "sessionStorage", "get").mockImplementation(
-      () =>
-        ({
-          getItem: jest.fn().mockReturnValue(givenAuthToken),
-        }) as unknown as Storage
-    );
+    jest.spyOn(PersistentStorageService, "getToken").mockReturnValueOnce(givenAuthToken);
 
     // AND the server responds with an XML response
     // @ts-ignore
@@ -137,7 +123,7 @@ describe("Api Service tests", () => {
     // WHEN fetchWithAuth is called with an apiUrl and an init configuration
     let error: Error | undefined;
     try {
-      await fetchWithAuth(givenApiUrl, {
+      await customFetch(givenApiUrl, {
         expectedStatusCode: 200,
         serviceName: givenServiceName,
         serviceFunction: givenServiceFunction,
@@ -173,19 +159,14 @@ describe("Api Service tests", () => {
     const givenMethod = "GET";
     const givenFailureMessage = "fetchWithAuth failed";
 
-    jest.spyOn(global, "sessionStorage", "get").mockImplementation(
-      () =>
-        ({
-          getItem: jest.fn().mockReturnValue(givenAuthToken),
-        }) as unknown as Storage
-    );
+    jest.spyOn(PersistentStorageService, "getToken").mockReturnValueOnce(givenAuthToken);
 
     // AND the server responds with an XML response
     // @ts-ignore
     setupFetchSpy(200, "fetch response", "application/xml;charset=UTF-8");
 
     // WHEN fetchWithAuth is called with an apiUrl and an init configuration
-    const response = await fetchWithAuth(givenApiUrl, {
+    const response = await customFetch(givenApiUrl, {
       expectedStatusCode: 200,
       serviceName: givenServiceName,
       serviceFunction: givenServiceFunction,
@@ -206,12 +187,7 @@ describe("Api Service tests", () => {
     const givenMethod = "GET";
     const givenFailureMessage = "fetchWithAuth failed";
 
-    jest.spyOn(global, "sessionStorage", "get").mockImplementation(
-      () =>
-        ({
-          getItem: jest.fn().mockReturnValue(givenAuthToken),
-        }) as unknown as Storage
-    );
+    jest.spyOn(PersistentStorageService, "getToken").mockReturnValueOnce(givenAuthToken);
 
     // AND fetch fails
     jest.spyOn(global, "fetch").mockRejectedValue(new Error("Failed to fetch"));
@@ -219,7 +195,7 @@ describe("Api Service tests", () => {
     // WHEN fetchWithAuth is called with an apiUrl and an init configuration
     let error: Error | undefined;
     try {
-      await fetchWithAuth(givenApiUrl, {
+      await customFetch(givenApiUrl, {
         expectedStatusCode: 200,
         serviceName: givenServiceName,
         serviceFunction: givenServiceFunction,
