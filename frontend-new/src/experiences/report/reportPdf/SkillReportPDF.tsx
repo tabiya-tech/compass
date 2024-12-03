@@ -59,7 +59,7 @@ const SkillReportPDF: React.FC<SkillReportProps> = ({
       <View style={styles.categoryContainer}>
         <View wrap={false}>
           <View style={styles.categoryTitleContainer}>
-            <Image src={getBase64Image(icon)} style={styles.categoryIcon} source={undefined}/>
+            <Image src={getBase64Image(icon)} style={styles.categoryIcon} source={undefined} />
             <Text x={0} y={0} style={styles.categoryTitle}>
               {title}
             </Text>
@@ -81,7 +81,7 @@ const SkillReportPDF: React.FC<SkillReportProps> = ({
     return (
       <View style={styles.rowView} data-testid={dataTestId}>
         <View style={styles.infoIcons}>
-          <Image src={getBase64Image(icon)} style={styles.infoIcon} source={undefined}/>
+          <Image src={getBase64Image(icon)} style={styles.infoIcon} source={undefined} />
         </View>
         <Text x={0} y={0} style={styles.text}>
           {value}
@@ -95,8 +95,12 @@ const SkillReportPDF: React.FC<SkillReportProps> = ({
       <Page size="A4" style={styles.page}>
         <View style={styles.body} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY}>
           <View fixed style={styles.logoContainer}>
-            <Image src={getBase64Image(ReportContent.IMAGE_URLS.COMPASS_LOGO)} style={styles.compassImage} source={undefined}/>
-            <Image src={getBase64Image(ReportContent.IMAGE_URLS.OXFORD_LOGO)} style={styles.image} source={undefined}/>
+            <Image
+              src={getBase64Image(ReportContent.IMAGE_URLS.COMPASS_LOGO)}
+              style={styles.compassImage}
+              source={undefined}
+            />
+            <Image src={getBase64Image(ReportContent.IMAGE_URLS.OXFORD_LOGO)} style={styles.image} source={undefined} />
           </View>
           <Text x={0} y={0} style={styles.title} data-testid={DATA_TEST_ID.SKILL_REPORT_TITLE}>
             {ReportContent.SKILLS_REPORT_TITLE}

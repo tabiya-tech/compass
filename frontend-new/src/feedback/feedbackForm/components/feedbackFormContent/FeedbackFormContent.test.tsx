@@ -3,9 +3,7 @@ import "src/_test_utilities/consoleMock";
 
 import { render, screen } from "src/_test_utilities/test-utils";
 import { fireEvent } from "@testing-library/react";
-import {
-  DATA_TEST_ID as CUSTOM_RATING_DATA_TEST_ID,
-} from "src/feedback/feedbackForm/components/customRating/CustomRating";
+import { DATA_TEST_ID as CUSTOM_RATING_DATA_TEST_ID } from "src/feedback/feedbackForm/components/customRating/CustomRating";
 import { DATA_TEST_ID as YES_NO_DATA_TEST_ID } from "src/feedback/feedbackForm/components/yesNoQuestion/YesNoQuestion";
 import FeedbackFormContent, {
   DATA_TEST_ID,
@@ -88,7 +86,7 @@ describe("FeedbackFormContent", () => {
       // WHEN on the first step, answer the yes/no question
       const yesNoInput = screen.getAllByTestId(YES_NO_DATA_TEST_ID.RADIO_YES)[0];
       fireEvent.click(yesNoInput);
-      
+
       // AND move to next step
       const nextButton = screen.getByTestId(DATA_TEST_ID.FEEDBACK_FORM_NEXT_BUTTON);
       fireEvent.click(nextButton);
@@ -96,7 +94,7 @@ describe("FeedbackFormContent", () => {
       // AND on the second step, select a checkbox option
       const checkboxInput = screen.getAllByTestId(CHECKBOX_DATA_TEST_ID.CHECKBOX_OPTION)[0];
       fireEvent.click(checkboxInput);
-      
+
       // AND move to next step
       fireEvent.click(nextButton);
 
@@ -122,8 +120,8 @@ describe("FeedbackFormContent", () => {
           comment: "",
           rating_boolean: true,
           rating_numeric: undefined,
-          selected_options: undefined
-        }
+          selected_options: undefined,
+        },
       });
 
       // Second step answer (checkbox)
@@ -133,8 +131,8 @@ describe("FeedbackFormContent", () => {
           comment: "",
           rating_boolean: undefined,
           rating_numeric: undefined,
-          selected_options: [stepsContent[1].questions[0].options![0].key]
-        }
+          selected_options: [stepsContent[1].questions[0].options![0].key],
+        },
       });
 
       // Third step answer (custom rating)
@@ -144,8 +142,8 @@ describe("FeedbackFormContent", () => {
           comment: expectedComment,
           rating_boolean: undefined,
           rating_numeric: null,
-          selected_options: undefined
-        }
+          selected_options: undefined,
+        },
       });
     });
 

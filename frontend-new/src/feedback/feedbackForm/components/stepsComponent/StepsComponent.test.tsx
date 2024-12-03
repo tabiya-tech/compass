@@ -6,16 +6,9 @@ import { render, screen } from "src/_test_utilities/test-utils";
 import StepsComponent, { DATA_TEST_ID } from "src/feedback/feedbackForm/components/stepsComponent/StepsComponent";
 import { FeedbackItem } from "src/feedback/feedbackForm/feedbackFormService/feedbackFormService.types";
 import { DetailedQuestion, QuestionType, YesNoEnum } from "src/feedback/feedbackForm/feedback.types";
-import {
-  DATA_TEST_ID as CUSTOM_RATING_DATA_TEST_ID,
-} from "src/feedback/feedbackForm/components/customRating/CustomRating";
-import {
-  DATA_TEST_ID as YES_NO_QUESTION_DATA_TEST_ID,
-} from "src/feedback/feedbackForm/components/yesNoQuestion/YesNoQuestion";
-import {
-  DATA_TEST_ID as CHECKBOX_QUESTION_DATA_TEST_ID,
-} from "src/feedback/feedbackForm/components/checkboxQuestion/CheckboxQuestion";
-
+import { DATA_TEST_ID as CUSTOM_RATING_DATA_TEST_ID } from "src/feedback/feedbackForm/components/customRating/CustomRating";
+import { DATA_TEST_ID as YES_NO_QUESTION_DATA_TEST_ID } from "src/feedback/feedbackForm/components/yesNoQuestion/YesNoQuestion";
+import { DATA_TEST_ID as CHECKBOX_QUESTION_DATA_TEST_ID } from "src/feedback/feedbackForm/components/checkboxQuestion/CheckboxQuestion";
 
 describe("StepsComponent", () => {
   const mockQuestions: DetailedQuestion[] = [
@@ -23,7 +16,10 @@ describe("StepsComponent", () => {
       questionId: "q1",
       type: QuestionType.Checkbox,
       questionText: "Select options",
-      options: [{ key: "option1", value: "option1" }, { key: "option2", value: "option2" }],
+      options: [
+        { key: "option1", value: "option1" },
+        { key: "option2", value: "option2" },
+      ],
     },
     {
       questionId: "q2",
@@ -51,8 +47,9 @@ describe("StepsComponent", () => {
 
   test("should render component successfully", () => {
     // Given the component
-    const givenStepsComponent = <StepsComponent questions={mockQuestions} feedbackItems={mockAnswers}
-                                                onChange={mockOnChange} />;
+    const givenStepsComponent = (
+      <StepsComponent questions={mockQuestions} feedbackItems={mockAnswers} onChange={mockOnChange} />
+    );
 
     // When the component is rendered
     render(givenStepsComponent);

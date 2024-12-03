@@ -151,4 +151,4 @@ export const ShownWithChatMessageFooter: Story = {
     },
     chatMessageFooter: <PrimaryButton>Click here</PrimaryButton>,
   },
-}
+};

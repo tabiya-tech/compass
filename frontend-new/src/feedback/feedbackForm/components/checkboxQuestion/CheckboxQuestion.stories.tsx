@@ -6,11 +6,12 @@ const meta: Meta<typeof CheckboxQuestion> = {
   title: "Feedback/CheckboxQuestion",
   component: CheckboxQuestion,
   tags: ["autodocs"],
-  args: { notifyChange: (selectedOptions, comments) => {
-     action("notifyChange")(selectedOptions, comments);
-    }
+  args: {
+    notifyChange: (selectedOptions, comments) => {
+      action("notifyChange")(selectedOptions, comments);
+    },
   },
-}
+};
 
 export default meta;
 

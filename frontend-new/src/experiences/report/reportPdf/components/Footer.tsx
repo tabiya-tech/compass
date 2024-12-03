@@ -8,7 +8,11 @@ import { getBase64Image } from "src/experiences/report/util";
 const Footer: React.FC<{ experiences: Experience[] }> = ({ experiences }) => (
   <View fixed style={styles.footer}>
     <View style={styles.disclaimerContainer}>
-      <Image src={getBase64Image(ReportContent.IMAGE_URLS.WARNING_ICON)} style={styles.disclaimerIcon} source={undefined}/>
+      <Image
+        src={getBase64Image(ReportContent.IMAGE_URLS.WARNING_ICON)}
+        style={styles.disclaimerIcon}
+        source={undefined}
+      />
       <Text x={0} y={0} style={styles.disclaimerText}>
         {" "}
         {ReportContent.DISCLAIMER_TEXT_PART1}{" "}

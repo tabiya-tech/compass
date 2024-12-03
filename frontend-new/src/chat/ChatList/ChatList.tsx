@@ -100,9 +100,8 @@ const ChatList: React.FC<ChatListProps> = ({ messages, isTyping, notifyOpenFeedb
                   chatMessage={message}
                   isTyping={false}
                   chatMessageFooter={
-                    message.sender === ConversationMessageSender.COMPASS && message.isFeedbackMessage && (
-                      <FeedbackFormButton notifyOpenFeedbackForm={notifyOpenFeedbackForm} />
-                    )
+                    message.sender === ConversationMessageSender.COMPASS &&
+                    message.isFeedbackMessage && <FeedbackFormButton notifyOpenFeedbackForm={notifyOpenFeedbackForm} />
                   }
                 />
               </ListItem>

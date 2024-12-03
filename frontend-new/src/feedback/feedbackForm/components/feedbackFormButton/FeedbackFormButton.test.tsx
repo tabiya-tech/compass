@@ -4,7 +4,9 @@ import "src/_test_utilities/consoleMock";
 import { fireEvent } from "@testing-library/react";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { FeedbackItem } from "src/feedback/feedbackForm/feedbackFormService/feedbackFormService.types";
-import FeedbackFormButton, { DATA_TEST_ID } from "src/feedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
+import FeedbackFormButton, {
+  DATA_TEST_ID,
+} from "src/feedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
 
 // mock the PersistentStorageService
 jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => {
@@ -13,7 +15,7 @@ jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => {
     answer: {
       rating_numeric: 7,
     },
-  }
+  };
   return {
     __esModule: true,
     PersistentStorageService: {

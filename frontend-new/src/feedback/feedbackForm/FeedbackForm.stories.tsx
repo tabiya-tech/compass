@@ -10,7 +10,7 @@ const meta: Meta<typeof FeedbackForm> = {
     notifyOnClose: action("notifyOnClose"),
   },
   argTypes: {},
-}
+};
 
 export default meta;
 

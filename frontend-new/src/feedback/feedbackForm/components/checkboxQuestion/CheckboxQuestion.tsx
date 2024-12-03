@@ -18,7 +18,13 @@ export const DATA_TEST_ID = {
   TEXT_FIELD: `checkbox-with-textarea-text-field-${uniqueId}`,
 };
 
-const CheckboxQuestion: React.FC<CheckboxQuestionProps> = ({ questionText, selectedOptions, notifyChange, options, comments }) => {
+const CheckboxQuestion: React.FC<CheckboxQuestionProps> = ({
+  questionText,
+  selectedOptions,
+  notifyChange,
+  options,
+  comments,
+}) => {
   const [checkedOptions, setCheckedOptions] = useState<string[]>(selectedOptions);
   const [commentText, setCommentText] = useState(comments || "");
 
@@ -43,16 +49,20 @@ const CheckboxQuestion: React.FC<CheckboxQuestionProps> = ({ questionText, selec
 
   return (
     <FormControl component="fieldset" fullWidth margin="normal" data-testid={DATA_TEST_ID.FORM_CONTROL}>
-      <FormLabel component="legend"  sx={{
-        fontSize: theme => theme.typography.subtitle1.fontSize,
-        "&.Mui-focused": {
-          color: theme => theme.palette.common.black,
-        },
-      }} data-testid={DATA_TEST_ID.FORM_LABEL}>
+      <FormLabel
+        component="legend"
+        sx={{
+          fontSize: (theme) => theme.typography.subtitle1.fontSize,
+          "&.Mui-focused": {
+            color: (theme) => theme.palette.common.black,
+          },
+        }}
+        data-testid={DATA_TEST_ID.FORM_LABEL}
+      >
         {questionText}
       </FormLabel>
       <FormGroup>
-        { options?.map((option) => (
+        {options?.map((option) => (
           <FormControlLabel
             key={option.key}
             control={

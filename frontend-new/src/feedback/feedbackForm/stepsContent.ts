@@ -29,7 +29,7 @@ const stepsContent: Step[] = [
         questionText: questions["satisfaction_with_compass"].question_text,
         lowRatingLabel: "Not satisfied",
         highRatingLabel: "Very satisfied",
-      }
+      },
     ],
   },
   {
@@ -56,7 +56,7 @@ const stepsContent: Step[] = [
         showCommentsOn: YesNoEnum.Yes,
       },
       {
-       type: QuestionType.YesNo,
+        type: QuestionType.YesNo,
         questionId: "skill_recognition",
         questionText: questions["skill_recognition"].question_text,
         showCommentsOn: YesNoEnum.No,
