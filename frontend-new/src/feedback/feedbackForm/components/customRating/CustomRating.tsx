@@ -4,11 +4,11 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Rating from "@mui/material/Rating";
 import TextField from "@mui/material/TextField";
-import { BaseQuestion, } from "src/feedback/feedbackForm/feedback.types";
+import { BaseQuestion } from "src/feedback/feedbackForm/feedback.types";
 
 export interface CustomRatingProps extends BaseQuestion {
   ratingValue: number | null;
-  notifyChange: (value: number| null, comments?: string) => void;
+  notifyChange: (value: number | null, comments?: string) => void;
   lowRatingLabel: string;
   highRatingLabel: string;
   comments?: string;
@@ -27,15 +27,15 @@ export const DATA_TEST_ID = {
 };
 
 const CustomRating: React.FC<CustomRatingProps> = ({
-   questionId,
-   ratingValue,
-   notifyChange,
-   questionText,
-   lowRatingLabel,
-   highRatingLabel,
-   comments,
-   displayRating = true,
-  }) => {
+  questionId,
+  ratingValue,
+  notifyChange,
+  questionText,
+  lowRatingLabel,
+  highRatingLabel,
+  comments,
+  displayRating = true,
+}) => {
   const theme = useTheme();
   const [commentText, setCommentText] = React.useState(comments || "");
   const isSmallMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -51,12 +51,22 @@ const CustomRating: React.FC<CustomRatingProps> = ({
   };
 
   return (
-    <Box display="flex" flexDirection="column" gap={theme.spacing(2)}
-         data-testid={DATA_TEST_ID.CUSTOM_RATING_CONTAINER}>
+    <Box
+      display="flex"
+      flexDirection="column"
+      gap={theme.spacing(2)}
+      data-testid={DATA_TEST_ID.CUSTOM_RATING_CONTAINER}
+    >
       <Box display="flex" flexDirection="column" gap={theme.spacing(1)}>
-        <Typography variant="subtitle1" color={theme => theme.palette.text.secondary}
-                    data-testid={DATA_TEST_ID.CUSTOM_RATING_TEXT}>{questionText}</Typography>
-        {displayRating && (<Box display="flex" flexDirection="column" width="fit-content">
+        <Typography
+          variant="subtitle1"
+          color={(theme) => theme.palette.text.secondary}
+          data-testid={DATA_TEST_ID.CUSTOM_RATING_TEXT}
+        >
+          {questionText}
+        </Typography>
+        {displayRating && (
+          <Box display="flex" flexDirection="column" width="fit-content">
             <Rating
               name={questionId}
               value={ratingValue}
@@ -70,21 +80,25 @@ const CustomRating: React.FC<CustomRatingProps> = ({
                   fontSize: theme.fixedSpacing(isSmallMobile ? theme.tabiyaSpacing.lg : theme.tabiyaSpacing.xl),
                 },
               }}
-              IconContainerComponent ={(props: any) => {
+              IconContainerComponent={(props: any) => {
                 return <span {...props} data-testid={DATA_TEST_ID.CUSTOM_RATING_ICON} />;
               }}
             />
-            <Box sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-end",
-              paddingX: 0.5,
-              color: theme.palette.text.secondary,
-            }}>
-              <Typography variant="caption"
-                          data-testid={DATA_TEST_ID.CUSTOM_RATING_LOW_LABEL}>{lowRatingLabel}</Typography>
-              <Typography variant="caption"
-                          data-testid={DATA_TEST_ID.CUSTOM_RATING_HIGH_LABEL}>{highRatingLabel}</Typography>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-end",
+                paddingX: 0.5,
+                color: theme.palette.text.secondary,
+              }}
+            >
+              <Typography variant="caption" data-testid={DATA_TEST_ID.CUSTOM_RATING_LOW_LABEL}>
+                {lowRatingLabel}
+              </Typography>
+              <Typography variant="caption" data-testid={DATA_TEST_ID.CUSTOM_RATING_HIGH_LABEL}>
+                {highRatingLabel}
+              </Typography>
             </Box>
           </Box>
         )}

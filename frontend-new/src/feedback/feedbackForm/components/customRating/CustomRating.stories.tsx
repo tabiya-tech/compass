@@ -30,6 +30,6 @@ export const ShownWithNoRating: Story = {
   args: {
     questionText: "How easy was it to interact with the system?",
     questionId: "interaction_ease",
-    displayRating: false
+    displayRating: false,
   },
 };

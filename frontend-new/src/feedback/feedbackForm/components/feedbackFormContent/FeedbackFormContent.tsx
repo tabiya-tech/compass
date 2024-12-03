@@ -46,7 +46,7 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
       PersistentStorageService.removeItem(STORAGE, FEEDBACK_FORM_ANSWERS_KEY);
       setAnswers([]);
     } else {
-      setActiveStep(prev => prev + 1);
+      setActiveStep((prev) => prev + 1);
     }
   };
 
@@ -77,28 +77,38 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
   const hasAnswers = Object.keys(answers).length > 0;
 
   return (
-    <Box display="flex" flexDirection="column" gap={isSmallMobile ? 6 : 3} height="100%"
-         data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT}>
-      <Typography fontWeight="bold" color={theme.palette.text.secondary}
-                  sx={{ fontSize: theme.typography.h6.fontSize }}
-                  data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_TITLE}
-      >{stepsContent[activeStep].label}</Typography>
-      <Box sx={{
-        overflowY: "auto",
-        flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        gap: isSmallMobile ? theme.spacing(6) : theme.spacing(3),
-      }}
-           data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_QUESTIONS}
+    <Box
+      display="flex"
+      flexDirection="column"
+      gap={isSmallMobile ? 6 : 3}
+      height="100%"
+      data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT}
+    >
+      <Typography
+        fontWeight="bold"
+        color={theme.palette.text.secondary}
+        sx={{ fontSize: theme.typography.h6.fontSize }}
+        data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_TITLE}
       >
-        <StepsComponent questions={stepsContent[activeStep].questions} feedbackItems={answers} onChange={handleAnswerChange} />
+        {stepsContent[activeStep].label}
+      </Typography>
+      <Box
+        sx={{
+          overflowY: "auto",
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          gap: isSmallMobile ? theme.spacing(6) : theme.spacing(3),
+        }}
+        data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_QUESTIONS}
+      >
+        <StepsComponent
+          questions={stepsContent[activeStep].questions}
+          feedbackItems={answers}
+          onChange={handleAnswerChange}
+        />
       </Box>
-      <Divider
-        color="primary"
-        sx={{ height: "0.2rem" }}
-        data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_DIVIDER}
-      />
+      <Divider color="primary" sx={{ height: "0.2rem" }} data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_DIVIDER} />
       <MobileStepper
         variant="dots"
         steps={maxSteps}

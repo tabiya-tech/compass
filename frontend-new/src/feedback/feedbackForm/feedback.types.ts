@@ -6,12 +6,12 @@ export interface Option {
 export enum QuestionType {
   Rating = "rating",
   YesNo = "yesNo",
-  Checkbox = "checkbox"
+  Checkbox = "checkbox",
 }
 
 export enum YesNoEnum {
   Yes = "yes",
-  No = "no"
+  No = "no",
 }
 
 export interface BaseQuestion {
@@ -20,7 +20,7 @@ export interface BaseQuestion {
   questionText: string;
 }
 
-export interface DetailedQuestion extends BaseQuestion  {
+export interface DetailedQuestion extends BaseQuestion {
   lowRatingLabel?: string;
   highRatingLabel?: string;
   showCommentsOn?: YesNoEnum;

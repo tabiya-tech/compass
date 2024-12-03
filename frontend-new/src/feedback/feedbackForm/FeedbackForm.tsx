@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import { Dialog, DialogContent, DialogTitle, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import FeedbackFormContent from "src/feedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
@@ -51,7 +44,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose, onFe
     setIsSubmitting(true);
     handleClose();
     try {
-      const userPreferences =  userPreferencesStateService.getUserPreferences();
+      const userPreferences = userPreferencesStateService.getUserPreferences();
       if (!userPreferences?.sessions.length) {
         throw new Error("User has no sessions");
       }
@@ -60,7 +53,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose, onFe
       const feedbackService = new FeedbackService(sessionId);
       await feedbackService.sendFeedback(formData);
 
-      enqueueSnackbar("Feedback submitted successfully!", { variant: "success" })
+      enqueueSnackbar("Feedback submitted successfully!", { variant: "success" });
       onFeedbackSubmit();
     } catch (error) {
       console.error("Failed to submit feedback", error);
@@ -72,38 +65,40 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose, onFe
 
   return (
     <>
-    <Dialog
-      open={isOpen}
-      onClose={handleClose}
-      maxWidth="sm"
-      fullWidth={true}
-      fullScreen={isSmallMobile}
-      data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG}
-      sx={{
-        "& .MuiDialog-paper": {
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          gap: theme.spacing(4),
-        },
-      }}
-    >
-      <DialogTitle component="div" sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <Typography variant="h3" data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG_TITLE}>Help us improve!</Typography>
-        <PrimaryIconButton
-          onClick={handleClose}
-          title="close feedback form"
-          sx={{ color: theme.palette.text.secondary }}
-          data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG_BUTTON}
-        >
-          <CloseIcon data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG_ICON_BUTTON} />
-        </PrimaryIconButton>
-      </DialogTitle>
-      <DialogContent data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG_CONTENT}>
-        <FeedbackFormContent notifySubmit={handleFeedbackSubmit} />
-      </DialogContent>
-    </Dialog>
-    <Backdrop isShown={isSubmitting} message="Submitting feedback..." />
+      <Dialog
+        open={isOpen}
+        onClose={handleClose}
+        maxWidth="sm"
+        fullWidth={true}
+        fullScreen={isSmallMobile}
+        data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG}
+        sx={{
+          "& .MuiDialog-paper": {
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            gap: theme.spacing(4),
+          },
+        }}
+      >
+        <DialogTitle component="div" sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Typography variant="h3" data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG_TITLE}>
+            Help us improve!
+          </Typography>
+          <PrimaryIconButton
+            onClick={handleClose}
+            title="close feedback form"
+            sx={{ color: theme.palette.text.secondary }}
+            data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG_BUTTON}
+          >
+            <CloseIcon data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG_ICON_BUTTON} />
+          </PrimaryIconButton>
+        </DialogTitle>
+        <DialogContent data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG_CONTENT}>
+          <FeedbackFormContent notifySubmit={handleFeedbackSubmit} />
+        </DialogContent>
+      </Dialog>
+      <Backdrop isShown={isSubmitting} message="Submitting feedback..." />
     </>
   );
 };

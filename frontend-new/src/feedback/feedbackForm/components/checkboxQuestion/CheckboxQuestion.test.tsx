@@ -3,7 +3,10 @@ import "src/_test_utilities/consoleMock";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { fireEvent } from "@testing-library/react";
 import { QuestionType } from "src/feedback/feedbackForm/feedback.types";
-import CheckboxQuestion, { CheckboxQuestionProps, DATA_TEST_ID } from "src/feedback/feedbackForm/components/checkboxQuestion/CheckboxQuestion";
+import CheckboxQuestion, {
+  CheckboxQuestionProps,
+  DATA_TEST_ID,
+} from "src/feedback/feedbackForm/components/checkboxQuestion/CheckboxQuestion";
 
 describe("CheckboxQuestion", () => {
   // mock question
@@ -17,7 +20,7 @@ describe("CheckboxQuestion", () => {
       { key: "javascript", value: "JavaScript" },
       { key: "react", value: "React" },
       { key: "typescript", value: "TypeScript" },
-      { key: "nodejs", value: "Node.js" }
+      { key: "nodejs", value: "Node.js" },
     ],
     comments: "I have experience with JavaScript and React",
   };

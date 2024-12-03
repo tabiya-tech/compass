@@ -23,7 +23,7 @@ const StepsComponent: React.FC<StepProps> = ({ questions, feedbackItems, onChang
     return (feedbackItems || []).find((item: FeedbackItem) => item.question_id === questionId)?.answer;
   };
 
-  const handleInputChange = (questionId: string, value: Answer ) => {
+  const handleInputChange = (questionId: string, value: Answer) => {
     const formattedData: FeedbackItem = {
       question_id: questionId,
       answer: {
@@ -37,8 +37,12 @@ const StepsComponent: React.FC<StepProps> = ({ questions, feedbackItems, onChang
   };
 
   return (
-    <Box display="flex" flexDirection="column" gap={theme => theme.tabiyaSpacing.xl}
-         data-testid={DATA_TEST_ID.STEPS_COMPONENT}>
+    <Box
+      display="flex"
+      flexDirection="column"
+      gap={(theme) => theme.tabiyaSpacing.xl}
+      data-testid={DATA_TEST_ID.STEPS_COMPONENT}
+    >
       {questions.map((question) => {
         const {
           questionId,
@@ -60,7 +64,7 @@ const StepsComponent: React.FC<StepProps> = ({ questions, feedbackItems, onChang
                 questionId={questionId}
                 questionText={questionText}
                 options={options || []}
-                selectedOptions={(answer.selected_options || [])}
+                selectedOptions={answer.selected_options || []}
                 notifyChange={(selectedOptions, comments) =>
                   handleInputChange(questionId, { selected_options: selectedOptions, comment: comments })
                 }

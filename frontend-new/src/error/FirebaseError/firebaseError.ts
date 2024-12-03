@@ -1,5 +1,8 @@
 import { ServiceErrorDetails } from "src/error/ServiceError/ServiceError";
-import { FirebaseErrorCodes, USER_FRIENDLY_FIREBASE_ERROR_MESSAGES } from "src/error/FirebaseError/firebaseError.constants";
+import {
+  FirebaseErrorCodes,
+  USER_FRIENDLY_FIREBASE_ERROR_MESSAGES,
+} from "src/error/FirebaseError/firebaseError.constants";
 
 export class FirebaseError extends Error {
   serviceName: string;

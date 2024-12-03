@@ -37,7 +37,6 @@ describe("saveAs", () => {
    * The test is week as it does not check the actual download, but better than nothing.
    */
   it("should create a temporary URL and trigger download (non-IE scenario)", () => {
-
     // GIVEN: A standard environment without msSaveOrOpenBlob
     // No need to mock navigator but we need to mock URL.createObjectURL and URL.revokeObjectURL
     // as it is not available in JSDOM

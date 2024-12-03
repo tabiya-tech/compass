@@ -178,6 +178,6 @@ describe("Test the getUserFriendlyErrorMessage function", () => {
 
       // THEN the function should return the appropriate message
       expect(message).toBe(USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_REQUEST);
-    })
+    });
   });
 });

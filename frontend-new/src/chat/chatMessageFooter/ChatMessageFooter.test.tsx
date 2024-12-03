@@ -7,7 +7,12 @@ import ChatMessageFooter, { DATA_TEST_ID } from "src/chat/chatMessageFooter/Chat
 describe("ChatMessageFooter", () => {
   test("should render component successfully with default props", () => {
     // GIVEN a ChatMessageFooter component
-    const givenComponent = <ChatMessageFooter> <div>Test children</div>v</ChatMessageFooter>;
+    const givenComponent = (
+      <ChatMessageFooter>
+        {" "}
+        <div>Test children</div>v
+      </ChatMessageFooter>
+    );
 
     // WHEN the component is rendered
     render(givenComponent);

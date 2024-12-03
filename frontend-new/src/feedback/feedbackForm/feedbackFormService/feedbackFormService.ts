@@ -2,10 +2,13 @@ import { getServiceErrorFactory } from "src/error/ServiceError/ServiceError";
 import { StatusCodes } from "http-status-codes";
 import { customFetch } from "src/utils/customFetch/customFetch";
 import { getBackendUrl } from "src/envService";
-import { FeedbackItem, FeedbackResponse } from "src/feedback/feedbackForm/feedbackFormService/feedbackFormService.types";
+import {
+  FeedbackItem,
+  FeedbackResponse,
+} from "src/feedback/feedbackForm/feedbackFormService/feedbackFormService.types";
 import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import InfoService from "src/info/info.service";
-import authStateService from "src/auth/services/AuthenticationState.service"
+import authStateService from "src/auth/services/AuthenticationState.service";
 
 export default class FeedbackService {
   readonly feedbackEndpointUrl: string;
@@ -15,7 +18,7 @@ export default class FeedbackService {
   constructor(sessionId: number) {
     this.apiServerUrl = getBackendUrl();
     this.feedbackEndpointUrl = `${this.apiServerUrl}/users/feedback`;
-    this.sessionId= sessionId;
+    this.sessionId = sessionId;
   }
 
   /**

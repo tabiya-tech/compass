@@ -7,9 +7,11 @@ const meta: Meta<typeof YesNoQuestion> = {
   title: "Feedback/YesNoQuestion",
   component: YesNoQuestion,
   tags: ["autodocs"],
-  args: { notifyChange: (value, comments) => {
-    action("notifyChange")(value, comments);
-    } },
+  args: {
+    notifyChange: (value, comments) => {
+      action("notifyChange")(value, comments);
+    },
+  },
 };
 
 export default meta;

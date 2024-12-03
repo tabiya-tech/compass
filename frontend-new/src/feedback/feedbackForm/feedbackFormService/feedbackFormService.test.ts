@@ -22,7 +22,6 @@ jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => {
   };
 });
 
-
 // mock the authentication state service
 jest.mock("src/auth/services/AuthenticationState.service", () => {
   return {
@@ -46,7 +45,6 @@ jest.mock("src/info/info.service", () => {
     }),
   };
 });
-
 
 describe("FeedbackFormService", () => {
   let givenApiServerUrl: string = "/path/to/api";
@@ -92,11 +90,7 @@ describe("FeedbackFormService", () => {
         },
         feedback: givenFeedbackData,
       };
-      const fetchSpy = setupAPIServiceSpy(
-        StatusCodes.CREATED,
-        expectedResponse,
-        "application/json;charset=UTF-8",
-      );
+      const fetchSpy = setupAPIServiceSpy(StatusCodes.CREATED, expectedResponse, "application/json;charset=UTF-8");
 
       // WHEN the sendFeedback method is called
       const givenSessionId = 1234;
@@ -141,31 +135,34 @@ describe("FeedbackFormService", () => {
     test.each([
       ["is a malformed json", "{"],
       ["is a string", "foo"],
-    ])("on 201, should reject with an error ERROR_CODE.INVALID_RESPONSE_BODY if response %s", async (_description, givenResponse) => {
-      // GIVEN fetch resolves with a response that has invalid JSON
-      setupAPIServiceSpy(StatusCodes.CREATED, givenResponse, "application/json;charset=UTF-8");
+    ])(
+      "on 201, should reject with an error ERROR_CODE.INVALID_RESPONSE_BODY if response %s",
+      async (_description, givenResponse) => {
+        // GIVEN fetch resolves with a response that has invalid JSON
+        setupAPIServiceSpy(StatusCodes.CREATED, givenResponse, "application/json;charset=UTF-8");
 
-      // WHEN the sendFeedback method is called
-      const givenSessionId = 1234;
-      const service = new FeedbackService(givenSessionId);
-      const sendFeedbackPromise = service.sendFeedback([]);
+        // WHEN the sendFeedback method is called
+        const givenSessionId = 1234;
+        const service = new FeedbackService(givenSessionId);
+        const sendFeedbackPromise = service.sendFeedback([]);
 
-      // THEN expect it to reject with the expected error
-      const expectedError = {
-        ...new ServiceError(
-          "FeedbackService",
-          "sendFeedback",
-          "POST",
-          `${givenApiServerUrl}/users/feedback`,
-          StatusCodes.CREATED,
-          ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
-          "",
-          "",
-        ),
-        details: expect.anything(),
-      };
-      await expect(sendFeedbackPromise).rejects.toMatchObject(expectedError);
-    });
+        // THEN expect it to reject with the expected error
+        const expectedError = {
+          ...new ServiceError(
+            "FeedbackService",
+            "sendFeedback",
+            "POST",
+            `${givenApiServerUrl}/users/feedback`,
+            StatusCodes.CREATED,
+            ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
+            "",
+            ""
+          ),
+          details: expect.anything(),
+        };
+        await expect(sendFeedbackPromise).rejects.toMatchObject(expectedError);
+      }
+    );
 
     test("should throw an error if user ID is not found", async () => {
       // Mock the authStateService to return a user without an ID
