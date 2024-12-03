@@ -142,7 +142,7 @@ describe("AuthService class tests", () => {
     const givenUserName = "foo";
     const givenUser = { id: "123", name: "Foo", email: givenEmail };
     const givenTokenResponse = "foo";
-    const givenRegistrationToken = "foo-bar";
+    const givenRegistrationCode = "foo-bar";
 
     test("should return the token on successful registration", async () => {
       // GIVEN the registration credentials are correct
@@ -166,7 +166,7 @@ describe("AuthService class tests", () => {
       });
 
       // WHEN the registration is attempted
-      const actualToken = await authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationToken);
+      const actualToken = await authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationCode);
 
       // AND registerWithEmail should return the token
       expect(actualToken).toEqual(givenTokenResponse);
@@ -186,7 +186,7 @@ describe("AuthService class tests", () => {
 
       // WHEN the registration is attempted
       const registerCallback = async () =>
-        await authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationToken);
+        await authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationCode);
 
       // AND test should throw an error
       await expect(registerCallback()).rejects.toThrow("Internal error");
@@ -204,7 +204,7 @@ describe("AuthService class tests", () => {
       });
 
       // WHEN the registration is attempted
-      const emailLoginPromise = authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationToken);
+      const emailLoginPromise = authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationCode);
 
       // THEN the registration should throw an error
       await expect(emailLoginPromise).rejects.toThrow("User not found");
@@ -218,10 +218,10 @@ describe("AuthService class tests", () => {
       });
 
       // WHEN the registration is attempted
-      const emailLoginPromise = authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationToken);
+      const emailLoginPromise = authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationCode);
 
       // THEN the registration should throw an error
-      await expect(emailLoginPromise).rejects.toThrow("The invitation code is not for registration");
+      await expect(emailLoginPromise).rejects.toThrow("the invitation code is not for registration: " + givenRegistrationCode);
     });
   });
 });

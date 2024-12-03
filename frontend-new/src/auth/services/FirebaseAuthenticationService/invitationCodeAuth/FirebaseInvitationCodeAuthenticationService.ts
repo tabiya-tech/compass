@@ -16,7 +16,7 @@ import AuthenticationService from "src/auth/services/Authentication.service";
 
 class FirebaseInvitationCodeAuthenticationService extends AuthenticationService {
   private static instance: FirebaseInvitationCodeAuthenticationService;
-  private stdFirebaseAuthServiceInstance: StdFirebaseAuthenticationService;
+  private readonly stdFirebaseAuthServiceInstance: StdFirebaseAuthenticationService;
 
   private constructor() {
     super();
@@ -53,10 +53,10 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
 
     invitation = await invitationsService.checkInvitationCodeStatus(code);
     if (invitation.status !== InvitationStatus.VALID) {
-      throw firebaseErrorFactory(FirebaseErrorCodes.INVALID_INVITATION_CODE, "Invalid invitation code");
+      throw firebaseErrorFactory(FirebaseErrorCodes.INVALID_INVITATION_CODE, `invalid invitation code: ${code}`);
     }
     if (invitation.invitation_type !== InvitationType.AUTO_REGISTER) {
-      throw firebaseErrorFactory(FirebaseErrorCodes.INVALID_INVITATION_TYPE, "The invitation code is not for login");
+      throw firebaseErrorFactory(FirebaseErrorCodes.INVALID_INVITATION_TYPE, `the invitation code is not for login: ${code}`);
     }
     try {
       userCredential = await firebaseAuth.signInAnonymously();
@@ -79,7 +79,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
     const _user = this.authenticationStateService.getUser();
 
     if (!_user) {
-      throw firebaseErrorFactory(FirebaseErrorCodes.USER_NOT_FOUND, "User could not be extracted from token");
+      throw firebaseErrorFactory(FirebaseErrorCodes.USER_NOT_FOUND, `user could not be extracted from token: ...${token.slice(-20)}`);
     }
 
     // create user preferences for the first time.
@@ -122,7 +122,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
       // call the parent class method once the token is successfully refreshed
       await super.onSuccessfulRefresh(newToken);
     } catch (error) {
-      console.error("Error refreshing token:", error);
+      console.error("error refreshing token: ", error);
       // if token refresh fails, log the user out
       await this.logout();
     }
@@ -138,7 +138,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
     const { isValid, decodedToken } = this.isTokenValid(token);
 
     if (!isValid) {
-      console.error("Could not get user from token. Token is invalid.");
+      console.error(`could not get user from token: ${"..." + token.slice(-20)}`);
       return null;
     }
     return this.stdFirebaseAuthServiceInstance.getUserFromDecodedToken(decodedToken!);
@@ -150,14 +150,14 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
    * @returns {boolean} True if the token is valid, false otherwise
    */
   public isTokenValid(token: string): { isValid: boolean; decodedToken: FirebaseToken | null } {
-    const { isValid, decodedToken } = super.isTokenValid(token);
+    const { isValid, decodedToken } = super.isTokenValid("..." + token.slice(-20));
 
     if (!isValid || !this.stdFirebaseAuthServiceInstance.isFirebaseTokenValid(decodedToken as FirebaseToken)) {
-      console.debug("token is invalid");
+      console.debug(`token is invalid: ${"..." + token.slice(-20)}`);
       return { isValid: false, decodedToken: null };
     }
     if ((decodedToken as FirebaseToken).firebase.sign_in_provider !== FirebaseTokenProviders.ANONYMOUS) {
-      console.debug("token is not a valid firebase anonymous token");
+      console.debug(`token is not a valid firebase anonymous token: ${"..." + token.slice(-20)}`);
       return { isValid: false, decodedToken: null };
     }
 

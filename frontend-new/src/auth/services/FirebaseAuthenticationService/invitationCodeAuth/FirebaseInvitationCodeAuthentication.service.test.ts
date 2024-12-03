@@ -133,6 +133,7 @@ describe("AuthService class tests", () => {
     });
 
     test("should throw an error when the invitation code is not valid", async () => {
+      const givenCode = "foo";
       // GIVEN the invitation code is not valid
       (invitationsService.checkInvitationCodeStatus as jest.Mock).mockResolvedValueOnce({
         status: InvitationStatus.INVALID,
@@ -140,10 +141,10 @@ describe("AuthService class tests", () => {
       });
 
       // WHEN the anonymous login is attempted
-      const anonymousLoginPromise = authService.login("foo");
+      const anonymousLoginPromise = authService.login(givenCode);
 
       // THEN the error callback should be called with Invalid invitation code
-      await expect(anonymousLoginPromise).rejects.toThrow("Invalid invitation code");
+      await expect(anonymousLoginPromise).rejects.toThrow("invalid invitation code: " + givenCode);
     });
   });
 });

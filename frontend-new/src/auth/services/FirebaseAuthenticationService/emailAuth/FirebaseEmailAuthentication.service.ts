@@ -13,7 +13,7 @@ import StdFirebaseAuthenticationService, {
 
 class FirebaseEmailAuthenticationService extends AuthenticationService {
   private static instance: FirebaseEmailAuthenticationService;
-  private stdFirebaseAuthServiceInstance: StdFirebaseAuthenticationService;
+  private readonly stdFirebaseAuthServiceInstance: StdFirebaseAuthenticationService;
 
   private constructor() {
     super();
@@ -101,12 +101,12 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     );
     const invitation = await invitationsService.checkInvitationCodeStatus(registrationCode);
     if (invitation.status === InvitationStatus.INVALID) {
-      throw firebaseErrorFactory(FirebaseErrorCodes.INVALID_REGISTRATION_CODE, "The registration code is invalid");
+      throw firebaseErrorFactory(FirebaseErrorCodes.INVALID_REGISTRATION_CODE, `the registration code is invalid: ${registrationCode}`);
     }
     if (invitation.invitation_type !== InvitationType.REGISTER) {
       throw firebaseErrorFactory(
         FirebaseErrorCodes.INVALID_REGISTRATION_TYPE,
-        "The invitation code is not for registration"
+        `the invitation code is not for registration: ${registrationCode}`
       );
     }
 
@@ -186,12 +186,13 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
    * Get user information from token
    * @param {string} token - The authentication token
    * @returns {TabiyaUser | null} The user information or null if token is invalid
+   * @throws {Error} If token parsing fails
    */
-  public getUser(token: string): TabiyaUser | null {
+  getUser(token: string): TabiyaUser | null {
     const { isValid, decodedToken } = this.isTokenValid(token);
 
     if (!isValid) {
-      console.error("Could not get user from token. Token is invalid.");
+      console.error(`could not get user from token: ${"..." + token.slice(-20)}`);
       return null;
     }
     return this.stdFirebaseAuthServiceInstance.getUserFromDecodedToken(decodedToken!);
@@ -206,11 +207,11 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     const { isValid, decodedToken } = super.isTokenValid(token);
 
     if (!isValid || !this.stdFirebaseAuthServiceInstance.isFirebaseTokenValid(decodedToken as FirebaseToken)) {
-      console.debug("token is invalid");
+      console.debug(`token is invalid: ${"..." + token.slice(-20)}`);
       return { isValid: false, decodedToken: null };
     }
     if ((decodedToken as FirebaseToken).firebase.sign_in_provider !== FirebaseTokenProviders.PASSWORD) {
-      console.debug("token is not a valid firebase email token");
+      console.debug(`token is not a valid firebase email token: ${"..." + token.slice(-20)}`);
       return { isValid: false, decodedToken: null };
     }
 
