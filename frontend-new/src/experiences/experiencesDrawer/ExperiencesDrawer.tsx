@@ -1,13 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Box, Divider, Drawer, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
-import ExperiencesDrawerHeader from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
-import { LoadingExperienceDrawerContent } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
-import { Experience } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
+import ExperiencesDrawerHeader
+  from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
+import {
+  LoadingExperienceDrawerContent,
+} from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
+import { Experience, StoredPersonalInfo } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
 import CustomTextField from "src/theme/CustomTextField/CustomTextField";
 import CustomAccordion from "src/theme/CustomAccordion/CustomAccordion";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import DownloadReportDropdown from "src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown";
+import DownloadReportDropdown
+  from "src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown";
 import { groupExperiencesByWorkType } from "src/experiences/report/util";
 import { ReportContent } from "src/experiences/report/reportContent";
 import StoreIcon from "@mui/icons-material/Store";
@@ -38,27 +42,22 @@ export const DATA_TEST_ID = {
   EXPERIENCES_DIVIDER: `experiences-divider-${uniqueId}`,
 };
 
-const trimAndValidate = (value: string) => {
-  const trimmedValue = value.trim();
-  return trimmedValue === "" ? "" : trimmedValue;
-};
-
 const useLocalStorage = (key: string, initialValue: Record<string, string>) => {
   // Retrieve value from localStorage or fallback to initialValue
   const [value, setValue] = useState<Record<string, string>>(() => {
-    const savedValue = PersistentStorageService.getItem(PersistentStorageService.storage, key);
-    const parsedValue = savedValue ? JSON.parse(savedValue) : initialValue;
+    const savedValue = PersistentStorageService.getPersonalInfo();
+    const parsedValue = savedValue ?? initialValue;
     return Object.fromEntries(
-      Object.entries(parsedValue).map(([fieldName, fieldValue]) => [fieldName, trimAndValidate(fieldValue as string)])
+      Object.entries(parsedValue).map(([fieldName, fieldValue]) => [fieldName, (fieldValue as string).trim() ?? ""])
     );
   });
 
   useEffect(() => {
     const validatedValue = Object.fromEntries(
-      Object.entries(value).map(([fieldName, fieldValue]) => [fieldName, trimAndValidate(fieldValue)])
+      Object.entries(value).map(([fieldName, fieldValue]) => [fieldName, (fieldValue).trim() ?? ""])
     );
 
-    PersistentStorageService.setItem(PersistentStorageService.storage, key, JSON.stringify(validatedValue));
+    PersistentStorageService.setPersonalInfo(validatedValue as unknown as StoredPersonalInfo);
   }, [key, value]);
 
   return [value, setValue] as const;
@@ -86,9 +85,6 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
     setHasTopSkills(experiences.some((experience) => experience.top_skills && experience.top_skills.length > 0));
   }, [experiences]);
 
-  const validatedPersonalInfo = Object.fromEntries(
-    Object.entries(personalInfo).map(([fieldName, fieldValue]) => [fieldName, trimAndValidate(fieldValue)])
-  );
 
   const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setPersonalInfo({ ...personalInfo, [field]: e.target.value });
@@ -99,17 +95,13 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   };
 
   // Experiences with top skills
-  const experiencesWithTopSkills = experiences.filter(
-    (experience) => experience.top_skills && experience.top_skills.length > 0
-  );
+  const experiencesWithTopSkills = useMemo(() => experiences.filter((experience) => experience.top_skills && experience.top_skills.length > 0), [experiences]);
 
   // Group experiences by work type
-  const { selfEmploymentExperiences, salaryWorkExperiences, unpaidWorkExperiences, traineeWorkExperiences } =
-    groupExperiencesByWorkType(experiences);
+  const groupedExperiences = useMemo(() => groupExperiencesByWorkType(experiences), [experiences]);
 
   const tooltipText = "We don’t save these information. The information you provide will only be used for the report.";
-  return (
-    <Drawer
+  return (<Drawer
       anchor="right"
       open={isOpen}
       onClose={handleClose}
@@ -126,10 +118,10 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
       <Box display="flex" flexDirection="column" gap={2}>
         <Box display="flex" flexDirection="column" gap={1} alignItems="end" justifyContent="flex-end">
           <DownloadReportDropdown
-            name={validatedPersonalInfo.name}
-            email={validatedPersonalInfo.email}
-            phone={validatedPersonalInfo.phone}
-            address={validatedPersonalInfo.address}
+            name={personalInfo.name}
+            email={personalInfo.email}
+            phone={personalInfo.phone}
+            address={personalInfo.address}
             experiences={experiencesWithTopSkills}
             conversationConductedAt={conversationConductedAt!}
             disabled={!hasTopSkills}
@@ -168,13 +160,9 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
         />
         <Box display="flex" flexDirection="column" gap={isSmallMobile ? 10 : 6}>
           {/* LOADING STATE */}
-          {isLoading && (
-            <Box data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_LOADER}>
-              {Array.from({ length: 5 }).map((_, index) => (
-                <LoadingExperienceDrawerContent key={index} />
-              ))}
-            </Box>
-          )}
+          {isLoading && (<Box data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_LOADER}>
+              {Array.from({ length: 5 }).map((_, index) => (<LoadingExperienceDrawerContent key={index} />))}
+            </Box>)}
 
           {/* EMPTY STATE */}
           {experiences.length === 0 && !isLoading && (
@@ -183,38 +171,34 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
                 🤷‍♀️
               </Typography>
               <Typography>We haven’t yet discovered any experiences so far, Let's continue chatting.</Typography>
-            </Box>
-          )}
+            </Box>)}
 
           {/* EXPERIENCES */}
-          {!isLoading && (
-            <Box display="flex" flexDirection="column" gap={isSmallMobile ? 10 : 6}>
+          {!isLoading && (<Box display="flex" flexDirection="column" gap={isSmallMobile ? 10 : 6}>
               <ExperienceCategory
                 icon={<StoreIcon />}
                 title={ReportContent.SELF_EMPLOYMENT_TITLE}
-                experiences={selfEmploymentExperiences}
+                experiences={groupedExperiences.selfEmploymentExperiences}
               />
               <ExperienceCategory
                 icon={<WorkIcon />}
                 title={ReportContent.SALARY_WORK_TITLE}
-                experiences={salaryWorkExperiences}
+                experiences={groupedExperiences.salaryWorkExperiences}
               />
               <ExperienceCategory
                 icon={<VolunteerActivismIcon />}
                 title={ReportContent.UNPAID_WORK_TITLE}
-                experiences={unpaidWorkExperiences}
+                experiences={groupedExperiences.unpaidWorkExperiences}
               />
               <ExperienceCategory
                 icon={<SchoolIcon />}
                 title={ReportContent.TRAINEE_WORK_TITLE}
-                experiences={traineeWorkExperiences}
+                experiences={groupedExperiences.traineeWorkExperiences}
               />
-            </Box>
-          )}
+            </Box>)}
         </Box>
       </Box>
-    </Drawer>
-  );
+    </Drawer>);
 };
 
 export default ExperiencesDrawer;
