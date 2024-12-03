@@ -15,9 +15,9 @@ export const DATA_TEST_ID = {
   SNACKBAR_CLOSE_BUTTON: `snackbar-close-button-${uniqueId}`,
 };
 
-declare module 'notistack' {
+declare module "notistack" {
   interface VariantOverrides {
-    offline: true
+    offline: true;
   }
 }
 
@@ -109,13 +109,13 @@ const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ theme }) =>
 
 const ContainerStyles = {
   ".notistack-SnackbarContainer:has(.notistack-MuiContent-offline)": {
-    width: "fit-content"
+    width: "fit-content",
   },
 
-  '.notistack-Snackbar:has(.notistack-MuiContent-offline)': {
+  ".notistack-Snackbar:has(.notistack-MuiContent-offline)": {
     minWidth: "0px",
-  }
-}
+  },
+};
 
 export const DEFAULT_SNACKBAR_AUTO_HIDE_DURATION = 5000;
 
@@ -149,10 +149,10 @@ const SnackbarProvider: React.FC<OriginalSnackbarProviderProps> = ({
   };
 
   return (
-      <OriginalSnackbarProvider {...notistackOptions} action={SnackbarCloseButton}>
-        <InjectStyles styles={ContainerStyles}/>
-        {children}
-      </OriginalSnackbarProvider>
+    <OriginalSnackbarProvider {...notistackOptions} action={SnackbarCloseButton}>
+      <InjectStyles styles={ContainerStyles} />
+      {children}
+    </OriginalSnackbarProvider>
   );
 };
 

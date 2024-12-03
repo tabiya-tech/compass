@@ -74,13 +74,13 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   // Check if the conversation is completed and add a feedback message if it is
   const checkAndAddFeedbackMessage = useCallback((conversationCompleted: boolean) => {
     const userPreferences = userPreferencesStateService.getUserPreferences();
-    if (!userPreferences?.sessions.length){
+    if (!userPreferences?.sessions.length) {
       console.error("User has no sessions");
       return;
     }
 
     const activeSessionId = userPreferences.sessions[0];
-    const hasFeedback = userPreferences.sessions_with_feedback?.includes(activeSessionId)
+    const hasFeedback = userPreferences.sessions_with_feedback?.includes(activeSessionId);
 
     if (conversationCompleted && !hasFeedback) {
       addMessage({
@@ -169,7 +169,6 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         );
 
         checkAndAddFeedbackMessage(response.conversation_completed);
-
       } catch (error) {
         console.error("Failed to send message:", error);
         addMessage(
@@ -366,9 +365,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   };
 
   const handleFeedbackSubmit = () => {
-    setMessages((prevMessages) =>
-      prevMessages.filter((message) => !message.isFeedbackMessage)
-    );
+    setMessages((prevMessages) => prevMessages.filter((message) => !message.isFeedbackMessage));
     addMessage(generateThankYouMessage());
   };
 

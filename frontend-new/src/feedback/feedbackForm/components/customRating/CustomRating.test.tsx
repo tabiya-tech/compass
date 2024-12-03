@@ -20,7 +20,7 @@ describe("CustomRating", () => {
     lowRatingLabel: "Very Difficult",
     highRatingLabel: "Very Easy",
     notifyChange: jest.fn(),
-  }
+  };
 
   test("should render component successfully", () => {
     // GIVEN the component
@@ -58,21 +58,20 @@ describe("CustomRating", () => {
     const commentTextField = screen.getByTestId(DATA_TEST_ID.CUSTOM_RATING_FIELD);
     fireEvent.change(commentTextField, { target: { value: "This is a comment" } });
 
-
     // THEN expect the notifyChange function to have been called
     expect(mockNotifyChange).toHaveBeenCalled();
   });
 
   test("should call handleRatingChange when rating value is changed", () => {
-   // GIVEN the component
+    // GIVEN the component
     const mockNotifyChange = jest.fn();
     const givenCustomRating = <CustomRating {...mockQuestion} notifyChange={mockNotifyChange} />;
     // AND the component is rendered
     render(givenCustomRating);
 
     // WHEN the rating is changed
-    const stars = screen.getAllByTestId(DATA_TEST_ID.CUSTOM_RATING_ICON)
-    fireEvent.click(stars[2])
+    const stars = screen.getAllByTestId(DATA_TEST_ID.CUSTOM_RATING_ICON);
+    fireEvent.click(stars[2]);
 
     // THEN expect the notifyChange function to have been called
     expect(mockNotifyChange).toHaveBeenCalled();

@@ -4,12 +4,8 @@ import "src/_test_utilities/consoleMock";
 import FeedbackForm, { DATA_TEST_ID } from "src/feedback/feedbackForm/FeedbackForm";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { fireEvent, waitFor } from "@testing-library/react";
-import {
-  DATA_TEST_ID as FEEDBACK_FORM_CONTENT_DATA_TEST_ID,
-} from "src/feedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
-import {
-  DATA_TEST_ID as CUSTOM_RATING_DATA_TEST_ID,
-} from "src/feedback/feedbackForm/components/customRating/CustomRating";
+import { DATA_TEST_ID as FEEDBACK_FORM_CONTENT_DATA_TEST_ID } from "src/feedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
+import { DATA_TEST_ID as CUSTOM_RATING_DATA_TEST_ID } from "src/feedback/feedbackForm/components/customRating/CustomRating";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
@@ -70,7 +66,9 @@ describe("FeedbackForm", () => {
   test("should call handleClose when close button is clicked", () => {
     // GIVEN the component
     const mockHandleClose = jest.fn();
-    const givenFeedbackForm = <FeedbackForm isOpen={true} notifyOnClose={mockHandleClose} onFeedbackSubmit={jest.fn()} />;
+    const givenFeedbackForm = (
+      <FeedbackForm isOpen={true} notifyOnClose={mockHandleClose} onFeedbackSubmit={jest.fn()} />
+    );
     // AND the component is rendered
     render(givenFeedbackForm);
 
@@ -83,7 +81,6 @@ describe("FeedbackForm", () => {
   });
 
   describe("FeedbackForm handleFeedbackSubmit", () => {
-
     const mockSendFeedback = jest.fn();
 
     beforeEach(() => {
@@ -94,7 +91,9 @@ describe("FeedbackForm", () => {
     test("should call handleFeedbackSubmit when submit button is clicked", async () => {
       // GIVEN the component
       const mockHandleClose = jest.fn();
-      const givenFeedbackForm = <FeedbackForm isOpen={true} notifyOnClose={mockHandleClose} onFeedbackSubmit={jest.fn()} />;
+      const givenFeedbackForm = (
+        <FeedbackForm isOpen={true} notifyOnClose={mockHandleClose} onFeedbackSubmit={jest.fn()} />
+      );
       // AND the component is rendered
       render(givenFeedbackForm);
       // AND there is at least one answer
@@ -112,7 +111,11 @@ describe("FeedbackForm", () => {
       // AND the sendFeedback function to have been called
       await waitFor(() => expect(mockSendFeedback).toHaveBeenCalled());
       // AND the snackbar to have been called
-      await waitFor(() => expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Feedback submitted successfully!", { variant: "success" }));
+      await waitFor(() =>
+        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Feedback submitted successfully!", {
+          variant: "success",
+        })
+      );
     });
 
     test("should call handleFeedbackSubmit when submit button is clicked and handle error", async () => {
@@ -127,7 +130,7 @@ describe("FeedbackForm", () => {
       });
 
       // WHEN the component is rendered
-      render(<FeedbackForm isOpen={true} notifyOnClose={jest.fn()}  onFeedbackSubmit={jest.fn()}/>);
+      render(<FeedbackForm isOpen={true} notifyOnClose={jest.fn()} onFeedbackSubmit={jest.fn()} />);
       // AND there is at least one answer
       const input = screen.getAllByTestId(CUSTOM_RATING_DATA_TEST_ID.CUSTOM_RATING_FIELD);
       fireEvent.change(input[0], { target: { value: "This is a comment" } });
@@ -142,7 +145,12 @@ describe("FeedbackForm", () => {
         expect(console.error).toHaveBeenCalledWith("Failed to submit feedback", new Error("User has no sessions"));
       });
       // AND the snackbar to have been called
-      await waitFor(() => expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to submit feedback. Please try again later.", { variant: "error" }));
+      await waitFor(() =>
+        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+          "Failed to submit feedback. Please try again later.",
+          { variant: "error" }
+        )
+      );
     });
   });
 });

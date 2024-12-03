@@ -176,7 +176,7 @@ describe("AuthPersistentStorage class tests", () => {
   describe("personal info tests", () => {
     test("return correct previously set personal info", () => {
       // GIVEN The personal info is stored in the session storage
-      const givenPersonalInfo : StoredPersonalInfo= {
+      const givenPersonalInfo: StoredPersonalInfo = {
         name: "foo",
         email: "foo@bar.baz",
         phone: "1234567890",
@@ -204,7 +204,7 @@ describe("AuthPersistentStorage class tests", () => {
 
     test("clear personal info", () => {
       // GIVEN The personal info is stored in the session storage
-      const givenPersonalInfo : StoredPersonalInfo= {
+      const givenPersonalInfo: StoredPersonalInfo = {
         name: "foo",
         email: "foo@bar.baz",
         phone: "1234567890",
@@ -222,7 +222,7 @@ describe("AuthPersistentStorage class tests", () => {
 
     test("set personal info", () => {
       // GIVEN The personal info is not stored in the session storage
-      const givenPersonalInfo : StoredPersonalInfo= {
+      const givenPersonalInfo: StoredPersonalInfo = {
         name: "foo",
         email: "foo@bar.baz",
         phone: "1234567890",
@@ -236,7 +236,7 @@ describe("AuthPersistentStorage class tests", () => {
       const personalInfo = PersistentStorageService.getPersonalInfo();
       expect(personalInfo).toEqual(givenPersonalInfo);
     });
-  })
+  });
 
   describe("getItem tests", () => {
     test("should return correct item from localStorage", () => {

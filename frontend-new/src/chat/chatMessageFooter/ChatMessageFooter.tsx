@@ -10,7 +10,7 @@ const uniqueId = "74bf72e8-1ed8-4dcf-8d3a-262d82cdd4b2";
 export const DATA_TEST_ID = {
   CHAT_MESSAGE_FOOTER: `chat-message-footer-${uniqueId}`,
   CHAT_MESSAGE_FOOTER_DIVIDER: `chat-message-footer-divider-${uniqueId}`,
-}
+};
 
 const ChatMessageFooter: React.FC<MessageFooterProps> = ({ children }) => {
   const theme = useTheme();

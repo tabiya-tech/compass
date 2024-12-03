@@ -56,8 +56,8 @@ describe("Api Service tests", () => {
       givenApiUrl,
       expect.objectContaining({
         headers: expect.not.objectContaining({
-          Authorization: expect.any(String)
-        })
+          Authorization: expect.any(String),
+        }),
       })
     );
   });

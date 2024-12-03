@@ -61,7 +61,7 @@ const App = () => {
       console.debug("Valid token found in storage");
       AuthenticationStateService.getInstance().setUser(user);
 
-      const preferences =  await userPreferencesService.getUserPreferences(user.id)
+      const preferences = await userPreferencesService.getUserPreferences(user.id);
       if (!preferences) {
         console.debug("User has not registered !", user.id);
         await authenticationServiceInstance.logout();

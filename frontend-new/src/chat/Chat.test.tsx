@@ -1,6 +1,6 @@
 import "src/_test_utilities/consoleMock";
 
-import * as ChatListModule from "./ChatList/ChatList"
+import * as ChatListModule from "./ChatList/ChatList";
 
 import Chat, { CHECK_INACTIVITY_INTERVAL, DATA_TEST_ID } from "./Chat";
 import { fireEvent, render, screen, waitFor } from "src/_test_utilities/test-utils";
@@ -23,12 +23,8 @@ import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { act } from "@testing-library/react";
 import * as FirebaseAuthenticationServiceFactoryModule from "src/auth/services/Authentication.service.factory";
 import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
-import {
-  DATA_TEST_ID as FEEDBACK_FORM_CONTENT_DATA_TEST_ID
-} from "src/feedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
-import {
-  DATA_TEST_ID as CUSTOM_RATING_DATA_TEST_ID,
-} from "src/feedback/feedbackForm/components/customRating/CustomRating";
+import { DATA_TEST_ID as FEEDBACK_FORM_CONTENT_DATA_TEST_ID } from "src/feedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
+import { DATA_TEST_ID as CUSTOM_RATING_DATA_TEST_ID } from "src/feedback/feedbackForm/components/customRating/CustomRating";
 import stepsContent from "src/feedback/feedbackForm/stepsContent";
 import FeedbackService from "src/feedback/feedbackForm/feedbackFormService/feedbackFormService";
 
@@ -123,7 +119,9 @@ describe("Chat", () => {
   const mockGetChatHistory = jest.fn();
 
   // Mock the ChatList component
-  const ChatList = jest.spyOn(ChatListModule, "default").mockImplementation(() => <div data-testid={CHAT_LIST_TEST_ID.CHAT_LIST_CONTAINER}></div>)
+  const ChatList = jest
+    .spyOn(ChatListModule, "default")
+    .mockImplementation(() => <div data-testid={CHAT_LIST_TEST_ID.CHAT_LIST_CONTAINER}></div>);
 
   beforeEach(() => {
     // Mock the static getInstance method to return an instance with mocked methods
@@ -531,11 +529,13 @@ describe("Chat", () => {
       // THEN expect an error message to be shown
       await waitFor(() => {
         expect(console.error).toHaveBeenCalledWith("Failed to retrieve experiences", new Error("User has no sessions"));
-      })
+      });
 
       // AND enqueSnackbar should be called
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to retrieve experiences", { variant: "error" })
-    })
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to retrieve experiences", {
+        variant: "error",
+      });
+    });
 
     test("should close the drawer when the close button is clicked", async () => {
       // GIVEN the chat component is rendered
@@ -705,7 +705,7 @@ describe("Chat", () => {
 
     test("should log the same error that the service throws when sending feedback fails", async () => {
       // mock the sendFeedback method
-      const givenError = new Error("Failed to send feedback")
+      const givenError = new Error("Failed to send feedback");
       const mockSendFeedback = jest.fn().mockRejectedValue(givenError);
       (FeedbackService as jest.Mocked<typeof FeedbackService>).prototype.sendFeedback = mockSendFeedback;
       // GIVEN a chat component
@@ -729,7 +729,10 @@ describe("Chat", () => {
 
       // THEN expect an error message to be shown
       await waitFor(() => {
-       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to submit feedback. Please try again later.", { variant: "error" });
+        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+          "Failed to submit feedback. Please try again later.",
+          { variant: "error" }
+        );
       });
       expect(console.error).toHaveBeenCalledWith("Failed to submit feedback", givenError);
     });
@@ -761,7 +764,7 @@ describe("Chat", () => {
       // THEN expect an error message to be logged
       await waitFor(() => {
         expect(console.error).toHaveBeenCalledWith("User has no sessions");
-      })
+      });
     });
   });
 });

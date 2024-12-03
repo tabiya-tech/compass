@@ -63,7 +63,7 @@ describe("ChatList", () => {
     const givenIsTyping = true; // Simulate typing state
 
     // WHEN the chat header is rendered
-    render(<ChatList messages={givenMessages} isTyping={givenIsTyping} notifyOpenFeedbackForm={jest.fn()}/>);
+    render(<ChatList messages={givenMessages} isTyping={givenIsTyping} notifyOpenFeedbackForm={jest.fn()} />);
 
     // THEN expect the chat header to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
@@ -114,7 +114,7 @@ describe("ChatList", () => {
     const givenIsTyping = true;
 
     // WHEN the chat header is rendered
-    render(<ChatList messages={givenMessages} isTyping={givenIsTyping} notifyOpenFeedbackForm={jest.fn()}/>);
+    render(<ChatList messages={givenMessages} isTyping={givenIsTyping} notifyOpenFeedbackForm={jest.fn()} />);
 
     // THEN expect the chat header to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
@@ -150,13 +150,19 @@ describe("ChatList", () => {
         message: "Hi",
         sent_at: new Date().toISOString(),
         isFeedbackMessage: true,
-      }
+      },
     ];
     const givenIsTyping = false;
     const givenNotifyOpenFeedbackForm = jest.fn();
 
     // WHEN the chat header is rendered
-    render(<ChatList messages={givenMessages} isTyping={givenIsTyping} notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm}/>);
+    render(
+      <ChatList
+        messages={givenMessages}
+        isTyping={givenIsTyping}
+        notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm}
+      />
+    );
 
     // THEN expect the chat header to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
@@ -170,10 +176,10 @@ describe("ChatList", () => {
           message: givenMessages[0].message,
           sender: givenMessages[0].sender,
           sent_at: expect.any(String),
-          isFeedbackMessage: true
+          isFeedbackMessage: true,
         },
         isTyping: false,
-        chatMessageFooter: expect.any(Object)
+        chatMessageFooter: expect.any(Object),
       },
       {}
     );

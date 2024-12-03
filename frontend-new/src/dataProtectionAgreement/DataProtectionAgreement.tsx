@@ -197,7 +197,7 @@ const DataProtectionAgreement: React.FC = () => {
             justifyContent: "space-between",
             alignItems: "center",
             marginTop: theme.spacing(2),
-            gap: theme.tabiyaSpacing.xl ,
+            gap: theme.tabiyaSpacing.xl,
           }}
         >
           <StyledAnchor data-testid={DATA_TEST_ID.REJECT_DPA_BUTTON} onClick={handleRejectedDPA}>
