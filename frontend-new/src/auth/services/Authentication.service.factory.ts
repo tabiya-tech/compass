@@ -78,6 +78,7 @@ class AuthenticationServiceFactory {
     AuthenticationStateService.getInstance().clearUser();
     UserPreferencesStateService.getInstance().clearUserPreferences();
     PersistentStorageService.clearLoginMethod();
+    PersistentStorageService.clearPersonalInfo();
   }
 }
 

@@ -1,4 +1,5 @@
 import { Invitation } from "src/auth/services/invitationsService/invitations.types";
+import { StoredPersonalInfo } from "../../experiences/experiencesDrawer/experienceService/experiences.types";
 
 const PERSISTENT_STORAGE_VERSION = "0.0.1";
 export const TOKEN_KEY = `token_${PERSISTENT_STORAGE_VERSION}`;
@@ -6,6 +7,8 @@ export const TOKEN_KEY = `token_${PERSISTENT_STORAGE_VERSION}`;
 export const INVITATION_KEY = `invitation_${PERSISTENT_STORAGE_VERSION}`;
 
 export const LOGIN_METHOD_KEY = `login_method_${PERSISTENT_STORAGE_VERSION}`;
+
+export const PERSONAL_INFO_KEY = `personal_info_${PERSISTENT_STORAGE_VERSION}`;
 
 /**
  * This class is used to store the tokens in the session storage.
@@ -83,6 +86,29 @@ export class PersistentStorageService {
     this.storage.removeItem(LOGIN_METHOD_KEY);
   }
 
+  /**
+   * Returns the personalInfo from the storage
+   * @returns StoredPersonalInfo | null - The personalInfo
+   */
+  static getPersonalInfo(): StoredPersonalInfo | null {
+    const item = this.storage.getItem(PERSONAL_INFO_KEY);
+    return item ? JSON.parse(item) : null;
+  }
+
+  /**
+   * Sets the personalInfo in the storage
+   * @param personalInfo
+   */
+  static setPersonalInfo(personalInfo: StoredPersonalInfo): void {
+    this.storage.setItem(PERSONAL_INFO_KEY, JSON.stringify(personalInfo));
+  }
+
+  /**
+   * Clears the personalInfo from the storage
+   */
+  static clearPersonalInfo(): void {
+    this.storage.removeItem(PERSONAL_INFO_KEY);
+  }
   /**
    * Returns the item from the storage
    * @returns string | null - The item from the storage
