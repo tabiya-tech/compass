@@ -22,3 +22,10 @@ export interface Experience {
   work_type: WorkType;
   top_skills: Skill[];
 }
+
+export interface StoredPersonalInfo {
+  name: string;
+  phone: string;
+  email: string;
+  address: string;
+}

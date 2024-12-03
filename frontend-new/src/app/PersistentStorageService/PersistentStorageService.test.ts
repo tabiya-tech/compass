@@ -1,5 +1,6 @@
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { Invitation, InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
+import { StoredPersonalInfo } from "../../experiences/experiencesDrawer/experienceService/experiences.types";
 
 describe("AuthPersistentStorage class tests", () => {
   beforeEach(() => {
@@ -171,6 +172,71 @@ describe("AuthPersistentStorage class tests", () => {
       expect(loginMethod).toEqual(givenLoginMethod);
     });
   });
+
+  describe("personal info tests", () => {
+    test("return correct previously set personal info", () => {
+      // GIVEN The personal info is stored in the session storage
+      const givenPersonalInfo : StoredPersonalInfo= {
+        name: "foo",
+        email: "foo@bar.baz",
+        phone: "1234567890",
+        address: "123 Main St",
+      };
+      PersistentStorageService.setPersonalInfo(givenPersonalInfo);
+
+      // WHEN The personal info is retrieved
+      const personalInfo = PersistentStorageService.getPersonalInfo();
+
+      // THEN The personal info should be returned
+      expect(personalInfo).toEqual(givenPersonalInfo);
+    });
+
+    test("return null if personal info is not set", () => {
+      // GIVEN The personal info is not stored in the session storage
+      // Nothing set
+
+      // WHEN The personal info is retrieved
+      const personalInfo = PersistentStorageService.getPersonalInfo();
+
+      // THEN null should be returned
+      expect(personalInfo).toBeNull();
+    });
+
+    test("clear personal info", () => {
+      // GIVEN The personal info is stored in the session storage
+      const givenPersonalInfo : StoredPersonalInfo= {
+        name: "foo",
+        email: "foo@bar.baz",
+        phone: "1234567890",
+        address: "123 Main St",
+      };
+      PersistentStorageService.setPersonalInfo(givenPersonalInfo);
+
+      // WHEN The personal info is cleared
+      PersistentStorageService.clearPersonalInfo();
+
+      // THEN The personal info should be cleared (null)
+      const personalInfo = PersistentStorageService.getPersonalInfo();
+      expect(personalInfo).toBeNull();
+    });
+
+    test("set personal info", () => {
+      // GIVEN The personal info is not stored in the session storage
+      const givenPersonalInfo : StoredPersonalInfo= {
+        name: "foo",
+        email: "foo@bar.baz",
+        phone: "1234567890",
+        address: "123 Main St",
+      };
+
+      // WHEN The personal info is set
+      PersistentStorageService.setPersonalInfo(givenPersonalInfo);
+
+      // THEN The personal info should be stored
+      const personalInfo = PersistentStorageService.getPersonalInfo();
+      expect(personalInfo).toEqual(givenPersonalInfo);
+    });
+  })
 
   describe("getItem tests", () => {
     test("should return correct item from localStorage", () => {

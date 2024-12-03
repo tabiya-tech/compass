@@ -69,8 +69,9 @@ abstract class AuthenticationService {
     this.authenticationStateService.clearUser();
     // clear the userPreferences from the "state"
     this.userPreferencesStateService.clearUserPreferences();
-    // clear the login method from the persistent storage only if the user is successfully logged out
+    // clear the login method and personal info from the persistent storage only if the user is successfully logged out
     PersistentStorageService.clearLoginMethod();
+    PersistentStorageService.clearPersonalInfo();
   }
 
   /**

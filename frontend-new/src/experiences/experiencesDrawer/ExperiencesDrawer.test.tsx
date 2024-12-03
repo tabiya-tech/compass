@@ -123,7 +123,7 @@ describe("ExperiencesDrawer", () => {
     expect(loadingContainer).toBeInTheDocument();
   });
 
-  test("should handle onChange correctly when the text field changes", () => {
+  test("should handle onChange correctly when the text field changes", async () => {
     // GIVEN the ExperiencesDrawer component
     const givenExperiencesDrawer = (
       <ExperiencesDrawer
