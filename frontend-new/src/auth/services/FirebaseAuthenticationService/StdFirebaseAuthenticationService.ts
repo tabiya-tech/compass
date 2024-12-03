@@ -144,12 +144,10 @@ class StdFirebaseAuthenticationService {
     console.debug("Setting up auth listener");
     return firebaseAuth.onAuthStateChanged((user) => {
       if (user) {
-        console.debug("User authenticated");
+        console.debug("User authenticated: ", user);
         user.getIdToken(true).then((token) => {
           this.scheduleTokenRefresh(token);
         });
-      } else {
-        console.debug("User not authenticated");
       }
     });
   }
@@ -232,15 +230,15 @@ class StdFirebaseAuthenticationService {
    */
   public isFirebaseTokenValid(decodedToken: FirebaseToken): boolean {
     if (!decodedToken.firebase) {
-      console.debug("Token is not a valid firebase token");
+      console.debug("Firebase Token Validation Failed: Token is not a valid firebase token");
       return false;
     }
     if (!decodedToken.firebase.sign_in_provider) {
-      console.debug("Token does not have a sign in provider");
+      console.debug("Firebase Token Validation Failed: Token does not have a sign in provider");
       return false;
     }
     if (!decodedToken.user_id) {
-      console.debug("Token does not have a user ID");
+      console.debug("Firebase Token Validation Failed: Token does not have a user ID");
       return false;
     }
     return true;
