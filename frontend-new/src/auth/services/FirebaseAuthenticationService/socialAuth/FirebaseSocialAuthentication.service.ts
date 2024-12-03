@@ -12,7 +12,7 @@ import AuthenticationService from "src/auth/services/Authentication.service";
 
 class FirebaseSocialAuthenticationService extends AuthenticationService {
   private static instance: FirebaseSocialAuthenticationService;
-  private stdFirebaseAuthServiceInstance: StdFirebaseAuthenticationService;
+  private readonly stdFirebaseAuthServiceInstance: StdFirebaseAuthenticationService;
 
   private constructor() {
     super();
@@ -105,12 +105,13 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
    * Get user information from token
    * @param {string} token - The authentication token
    * @returns {TabiyaUser | null} The user information or null if token is invalid
+   * @throws {Error} If token parsing fails
    */
   getUser(token: string): TabiyaUser | null {
     const { isValid, decodedToken } = this.isTokenValid(token);
 
     if (!isValid) {
-      console.error("Could not get user from token. Token is invalid.");
+      console.error(`could not get user from token: ${"..." + token.slice(-20)}`);
       return null;
     }
     return this.stdFirebaseAuthServiceInstance.getUserFromDecodedToken(decodedToken!);
@@ -125,11 +126,11 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
     const { isValid, decodedToken } = super.isTokenValid(token);
 
     if (!isValid || !this.stdFirebaseAuthServiceInstance.isFirebaseTokenValid(decodedToken as FirebaseToken)) {
-      console.debug("token is invalid");
+      console.debug(`token is invalid: ${"..." + token.slice(-20)}`);
       return { isValid: false, decodedToken: null };
     }
     if ((decodedToken as FirebaseToken).firebase.sign_in_provider !== FirebaseTokenProviders.GOOGLE) {
-      console.debug("token is not a valid firebase Google token");
+      console.debug(`token is not a valid firebase Google token: ${"..." + token.slice(-20)}`);
       return { isValid: false, decodedToken: null };
     }
 
