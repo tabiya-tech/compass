@@ -223,14 +223,26 @@ class ExperiencePipeline:
         llm_stats = []
         # 2.1 Infer the occupations and associated skills
 
-        inferred_occupations_response = await self._infer_occupations_tool.execute(experience_title=experience_title,
-                                                                                   company=company_name,
-                                                                                   work_type=work_type,
-                                                                                   responsibilities=responsibilities,
-                                                                                   country_of_interest=country_of_interest,
-                                                                                   number_of_titles=config.number_of_occupation_alt_titles,
-                                                                                   top_k=config.number_of_occupations_per_cluster,
-                                                                                   top_p=config.number_of_occupations_candidates_per_title)
+        if work_type == WorkType.UNSEEN_UNPAID:
+            inferred_occupations_response = await self._infer_icatus_activities_tool.execute(
+                                                                                    experience_title=experience_title,
+                                                                                    company=company_name,
+                                                                                    work_type=work_type,
+                                                                                    responsibilities=responsibilities,
+                                                                                    country_of_interest=country_of_interest,
+                                                                                    number_of_titles=config.number_of_occupation_alt_titles,
+                                                                                    top_k=config.number_of_occupations_per_cluster,
+                                                                                    top_p=config.number_of_occupations_candidates_per_title
+                                                                                    )
+        else:
+            inferred_occupations_response = await self._infer_occupations_tool.execute(experience_title=experience_title,
+                                                                                    company=company_name,
+                                                                                    work_type=work_type,
+                                                                                    responsibilities=responsibilities,
+                                                                                    country_of_interest=country_of_interest,
+                                                                                    number_of_titles=config.number_of_occupation_alt_titles,
+                                                                                    top_k=config.number_of_occupations_per_cluster,
+                                                                                    top_p=config.number_of_occupations_candidates_per_title)
         llm_stats.extend(inferred_occupations_response.llm_stats)
         occupation_labels = [esco_occupation.occupation.preferredLabel for esco_occupation in inferred_occupations_response.esco_occupations]
         # 2.2 Link responsibilities to the associated skills
