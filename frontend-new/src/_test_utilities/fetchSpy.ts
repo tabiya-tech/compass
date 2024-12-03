@@ -25,6 +25,6 @@ export function setupAPIServiceSpy(
     headers: { "Content-Type": contentType },
   });
   return jest
-    .spyOn(require("src/utils/fetchWithAuth/fetchWithAuth"), "fetchWithAuth")
+    .spyOn(require("src/utils/customFetch/customFetch"), "customFetch")
     .mockResolvedValue(expectedResponse);
 }

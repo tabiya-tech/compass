@@ -84,6 +84,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
 
     // create user preferences for the first time.
     // in order to do this, there needs to be a logged in user in the persistent storage
+    PersistentStorageService.setToken(token);
     const prefs = await userPreferencesService.createUserPreferences({
       user_id: _user.id,
       invitation_code: invitation.invitation_code,

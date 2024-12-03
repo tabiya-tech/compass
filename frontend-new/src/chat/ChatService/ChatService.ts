@@ -1,6 +1,6 @@
 import { getServiceErrorFactory } from "src/error/ServiceError/ServiceError";
 import { StatusCodes } from "http-status-codes";
-import { fetchWithAuth } from "src/utils/fetchWithAuth/fetchWithAuth";
+import { customFetch } from "src/utils/customFetch/customFetch";
 import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import { getBackendUrl } from "src/envService";
 import { ConverstaionResponse } from "./ChatService.types";
@@ -38,7 +38,7 @@ export default class ChatService {
     const ChatURL = this.chatEndpointUrl;
     const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, ChatURL);
 
-    const response = await fetchWithAuth(ChatURL, {
+    const response = await customFetch(ChatURL, {
       method: method,
       headers: {
         "Content-Type": "application/json",
@@ -80,7 +80,7 @@ export default class ChatService {
     const method = "GET";
     const qualifiedURL = `${this.chatEndpointUrl}?user_input=&clear_memory=true&session_id=${this.getSessionId()}`;
 
-    await fetchWithAuth(qualifiedURL, {
+    await customFetch(qualifiedURL, {
       method: method,
       headers: { "Content-Type": "application/json" },
       expectedStatusCode: StatusCodes.OK,
@@ -97,7 +97,7 @@ export default class ChatService {
     const method = "GET";
     const qualifiedURL = `${this.chatHistoryEndpointUrl}?session_id=${this.getSessionId()}`;
 
-    const response = await fetchWithAuth(qualifiedURL, {
+    const response = await customFetch(qualifiedURL, {
       method: method,
       headers: { "Content-Type": "application/json" },
       expectedStatusCode: StatusCodes.OK,

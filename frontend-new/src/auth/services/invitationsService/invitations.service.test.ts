@@ -59,7 +59,7 @@ describe("InvitationsService", () => {
 
     test("on fail to fetch, should reject with the expected service error", async () => {
       // GIVEN fetch rejects with some unknown error
-      jest.spyOn(require("src/utils/fetchWithAuth/fetchWithAuth"), "fetchWithAuth").mockRejectedValue(new Error());
+      jest.spyOn(require("src/utils/customFetch/customFetch"), "customFetch").mockRejectedValue(new Error());
 
       // WHEN calling checkInvitationCodeStatus function with some code
       const service = new InvitationsService();

@@ -3,7 +3,7 @@ import { CreateUserPreferencesSpec, UpdateUserPreferencesSpec, UserPreference } 
 import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import { getBackendUrl } from "src/envService";
-import { fetchWithAuth } from "src/utils/fetchWithAuth/fetchWithAuth";
+import { customFetch } from "src/utils/customFetch/customFetch";
 
 export default class UserPreferencesService {
   private static instance: UserPreferencesService;
@@ -96,7 +96,7 @@ export default class UserPreferencesService {
       this.createUserPreferencesEndpointURL
     );
     const requestBody = JSON.stringify(user_preferences);
-    const response = await fetchWithAuth(this.createUserPreferencesEndpointURL, {
+    const response = await customFetch(this.createUserPreferencesEndpointURL, {
       method: method,
       headers: {
         "Content-Type": "application/json",
@@ -129,7 +129,7 @@ export default class UserPreferencesService {
     );
 
     const requestBody = JSON.stringify(newUserPreferencesSpec);
-    const response = await fetchWithAuth(this.updateUserPreferencesEndpointUrl, {
+    const response = await customFetch(this.updateUserPreferencesEndpointUrl, {
       method: method,
       headers: {
         "Content-Type": "application/json",
@@ -157,7 +157,7 @@ export default class UserPreferencesService {
     const qualifiedURL = `${this.getUserPreferencesEndpointUrl}?user_id=${userId}`;
     const errorFactory = getServiceErrorFactory("UserPreferencesService", "getUserPreferences", method, qualifiedURL);
 
-    const response = await fetchWithAuth(qualifiedURL, {
+    const response = await customFetch(qualifiedURL, {
       method: method,
       headers: {
         "Content-Type": "application/json",
@@ -190,7 +190,7 @@ export default class UserPreferencesService {
 
     const errorFactory = getServiceErrorFactory("UserPreferencesService", "getUserPreferences", method, qualifiedURL);
 
-    const response = await fetchWithAuth(qualifiedURL, {
+    const response = await customFetch(qualifiedURL, {
       method: method,
       headers: { "Content-Type": "application/json" },
       expectedStatusCode: StatusCodes.CREATED,
