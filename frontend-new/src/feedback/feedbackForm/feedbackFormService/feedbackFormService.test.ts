@@ -124,7 +124,7 @@ describe("FeedbackFormService", () => {
     test("on fail to fetch, should reject with the expected service error", async () => {
       // GIVEN fetch rejects with some unknown error
       const givenFetchError = new Error("some error");
-      jest.spyOn(require("src/utils/fetchWithAuth/fetchWithAuth"), "fetchWithAuth").mockImplementationOnce(() => {
+      jest.spyOn(require("src/utils/customFetch/customFetch"), "customFetch").mockImplementationOnce(() => {
         return new Promise(() => {
           throw givenFetchError;
         });

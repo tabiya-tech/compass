@@ -1,6 +1,6 @@
 import { getServiceErrorFactory } from "src/error/ServiceError/ServiceError";
 import { StatusCodes } from "http-status-codes";
-import { fetchWithAuth } from "src/utils/fetchWithAuth/fetchWithAuth";
+import { customFetch } from "src/utils/customFetch/customFetch";
 import { getBackendUrl } from "src/envService";
 import { FeedbackItem, FeedbackResponse } from "src/feedback/feedbackForm/feedbackFormService/feedbackFormService.types";
 import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
@@ -57,7 +57,7 @@ export default class FeedbackService {
       feedback: feedback,
     };
 
-    const response = await fetchWithAuth(feedbackURL, {
+    const response = await customFetch(feedbackURL, {
       method: method,
       headers: {
         "Content-Type": "application/json",

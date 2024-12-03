@@ -1,6 +1,6 @@
 import { getBackendUrl } from "src/envService";
 import { getServiceErrorFactory } from "src/error/ServiceError/ServiceError";
-import { fetchWithAuth } from "src/utils/fetchWithAuth/fetchWithAuth";
+import { customFetch } from "src/utils/customFetch/customFetch";
 import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import { Experience } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
@@ -35,7 +35,7 @@ export default class ExperienceService {
 
     let response: Response;
     let responseBody: string;
-    response = await fetchWithAuth(constructedExperiencesUrl, {
+    response = await customFetch(constructedExperiencesUrl, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
