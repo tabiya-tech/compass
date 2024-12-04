@@ -20,6 +20,7 @@ jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => ({
     setToken: jest.fn(),
     clearToken: jest.fn(),
     clearLoginMethod: jest.fn(),
+    clearPersonalInfo: jest.fn(),
   },
 }));
 
