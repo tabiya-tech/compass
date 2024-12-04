@@ -27,6 +27,12 @@ export enum FirebaseTokenProviders {
   ANONYMOUS = "anonymous",
 }
 
+export enum FirebaseTokenValidationFailureCause {
+  INVALID_FIREBASE_TOKEN = "INVALID_FIREBASE_TOKEN",
+  INVALID_FIREBASE_SIGN_IN_PROVIDER = "INVALID_FIREBASE_SIGN_IN_PROVIDER",
+  INVALID_FIREBASE_USER_ID = "INVALID_FIREBASE_USER_ID",
+  INVALID_FIREBASE_TOKEN_PROVIDER = "INVALID_FIREBASE_TOKEN_PROVIDER",
+}
 /**
  * The FirebaseAuthenticationService is a concrete class that provides common functionality
  * for Firebase authentication services. It extends the AuthenticationService class and implements
@@ -226,20 +232,20 @@ class StdFirebaseAuthenticationService {
    * @param {FirebaseToken} decodedToken - The decoded token to validate.
    * @returns {boolean} True if the token is a valid firebase token, false otherwise.
    */
-  public isFirebaseTokenValid(decodedToken: FirebaseToken): boolean {
+  public isFirebaseTokenValid(decodedToken: FirebaseToken): { isValid: boolean; failureCause?: FirebaseTokenValidationFailureCause } {
     if (!decodedToken.firebase) {
       console.debug("Firebase Token Validation Failed: Token is not a valid firebase token");
-      return false;
+      return { isValid: false, failureCause: FirebaseTokenValidationFailureCause.INVALID_FIREBASE_TOKEN };
     }
     if (!decodedToken.firebase.sign_in_provider) {
       console.debug("Firebase Token Validation Failed: Token does not have a sign in provider");
-      return false;
+      return { isValid: false, failureCause: FirebaseTokenValidationFailureCause.INVALID_FIREBASE_SIGN_IN_PROVIDER };
     }
     if (!decodedToken.user_id) {
       console.debug("Firebase Token Validation Failed: Token does not have a user ID");
-      return false;
+      return { isValid: false, failureCause: FirebaseTokenValidationFailureCause.INVALID_FIREBASE_USER_ID };
     }
-    return true;
+    return { isValid: true };
   }
 }
 
