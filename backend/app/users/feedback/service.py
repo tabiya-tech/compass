@@ -91,6 +91,7 @@ class UserFeedbackService:
                         question_id=feedback.question_id,
                         question_text=questions_data[feedback.question_id]["question_text"],
                         answer=feedback.answer,
+                        is_answered=feedback.is_answered,
                         description=questions_data[feedback.question_id]["description"]
                     )
                     for feedback in body.feedback
