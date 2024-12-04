@@ -17,6 +17,7 @@ class FeedbackItem(BaseModel):
     question_id: str
     question_text: str
     answer: Answer
+    is_answered: bool = False
     description: Optional[str] = Field(default=None, max_length=1000)
 
     class Config:
