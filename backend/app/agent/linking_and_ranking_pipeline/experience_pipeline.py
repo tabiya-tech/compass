@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 from app.agent.agent_types import LLMStats
 from app.agent.experience.work_type import WorkType
+from app.agent.linking_and_ranking_pipeline.infer_icatus_activities import InferIcatusActivitiesTool
 from app.agent.linking_and_ranking_pipeline.cluster_responsibilities_tool import ClusterResponsibilitiesTool
 from .infer_occupation_tool import InferOccupationTool
 from .pick_one_skill_tool import PickOneSkillTool
@@ -105,6 +106,7 @@ class ExperiencePipeline:
         self._search_services = search_services
         self._cluster_responsibilities_tool = ClusterResponsibilitiesTool()
         self._infer_occupations_tool = InferOccupationTool(search_services.occupation_skill_search_service)
+        self._infer_icatus_activities_tool = InferIcatusActivitiesTool(search_services.occupation_skill_search_service)
         self._skills_linking_tool = SkillLinkingTool(search_services.skill_search_service)
         self._top_skills_picker = PickOneSkillTool()
         self._logger = logging.getLogger(__class__.__name__)

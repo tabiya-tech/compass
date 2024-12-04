@@ -69,7 +69,7 @@ class SkillLinkingTool:
                 # Add the uuids of the skills of the occupation
                 # if only_essential is True, only add the essential skills
                 for associated_skill in occupation.associated_skills:
-                    if not only_essential or (associated_skill.relationType == "essential"):
+                    if not only_essential or (associated_skill.relationType == "essential") or not associated_skill.relationType:
                         esco_skills_uuids.append(associated_skill.UUID)
             # remove duplicates
             esco_skills_uuids = list(set(esco_skills_uuids))
