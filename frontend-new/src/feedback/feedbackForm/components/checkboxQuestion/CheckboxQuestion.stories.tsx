@@ -28,5 +28,6 @@ export const Shown: Story = {
       { key: "easyToUnderstand", value: "Easy to understand" },
     ],
     selectedOptions: [],
+    placeholder: "Please provide comments",
   },
 };

@@ -28,6 +28,7 @@ describe("StepsComponent", () => {
       displayRating: true,
       lowRatingLabel: "Low",
       highRatingLabel: "High",
+      maxRating: 5,
     },
     {
       questionId: "q3",
@@ -38,9 +39,9 @@ describe("StepsComponent", () => {
   ];
 
   const mockAnswers: FeedbackItem[] = [
-    { question_id: "q1", answer: { selected_options: ["option1"] } },
-    { question_id: "q2", answer: { rating_numeric: 3 } },
-    { question_id: "q3", answer: { rating_boolean: true, comment: "Yes comment" } },
+    { question_id: "q1", answer: { selected_options: ["option1"] }, is_answered: true },
+    { question_id: "q2", answer: { rating_numeric: 3 }, is_answered: true},
+    { question_id: "q3", answer: { rating_boolean: true, comment: "Yes comment" }, is_answered: true },
   ];
 
   const mockOnChange = jest.fn();
@@ -87,7 +88,7 @@ describe("StepsComponent", () => {
     render(<StepsComponent questions={mockQuestions} feedbackItems={mockAnswers} onChange={mockOnChange} />);
 
     // When the rating question is answered
-    const starsIcon = screen.getAllByTestId(CUSTOM_RATING_DATA_TEST_ID.CUSTOM_RATING_ICON)[5];
+    const starsIcon = screen.getAllByTestId(CUSTOM_RATING_DATA_TEST_ID.CUSTOM_RATING_ICON)[4];
     fireEvent.click(starsIcon);
 
     // Then expect onChange to be called

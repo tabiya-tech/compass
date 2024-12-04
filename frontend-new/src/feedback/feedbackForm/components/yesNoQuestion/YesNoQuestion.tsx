@@ -1,12 +1,15 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField } from "@mui/material";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, useTheme } from "@mui/material";
 import { BaseQuestion, YesNoEnum } from "src/feedback/feedbackForm/feedback.types";
+import QuestionText from "src/feedback/feedbackForm/components/questionText/QuestionText";
+import CommentTextField from "src/feedback/feedbackForm/components/commentTextField/CommentTextField";
+import { focusAndScrollToField } from "src/feedback/feedbackForm/util";
 
 export interface YesNoQuestionProps extends BaseQuestion {
   ratingValue: boolean | null;
   notifyChange: (value: boolean | null, comments?: string) => void;
   comments?: string;
-  showCommentsOn: YesNoEnum | undefined;
+  showCommentsOn: YesNoEnum | undefined; // defines which answer that shows the comments
 }
 
 const uniqueId = "9803f91b-499a-41b3-9348-795de9e399a9";
@@ -26,6 +29,7 @@ const YesNoQuestion: React.FC<YesNoQuestionProps> = ({
   notifyChange,
   comments,
   showCommentsOn,
+  placeholder
 }) => {
   // function to determine if comments should be shown
   const shouldShowComments = useCallback(
@@ -34,8 +38,17 @@ const YesNoQuestion: React.FC<YesNoQuestionProps> = ({
     [showCommentsOn]
   );
 
+  const theme = useTheme();
   const [showComments, setShowComments] = useState(shouldShowComments(ratingValue));
   const [commentText, setCommentText] = useState(comments ?? "");
+  const commentTextFieldRef = useRef<HTMLInputElement>(null);
+
+  // focus on comment text field when text field is shown
+  useEffect(() => {
+    if (showComments) {
+      focusAndScrollToField(commentTextFieldRef);
+    }
+  }, [showComments]);
 
   useEffect(() => {
     setShowComments(shouldShowComments(ratingValue));
@@ -63,15 +76,9 @@ const YesNoQuestion: React.FC<YesNoQuestionProps> = ({
     >
       <FormLabel
         component="legend"
-        sx={{
-          fontSize: (theme) => theme.typography.subtitle1.fontSize,
-          "&.Mui-focused": {
-            color: (theme) => theme.palette.common.black,
-          },
-        }}
         data-testid={DATA_TEST_ID.FORM_LABEL}
       >
-        {questionText}
+        <QuestionText questionText={questionText} />
       </FormLabel>
       <RadioGroup
         aria-label={questionId}
@@ -79,20 +86,21 @@ const YesNoQuestion: React.FC<YesNoQuestionProps> = ({
         value={ratingValue === null ? "" : ratingValue}
         onChange={handleChange}
         row
+        sx={{
+          display: "flex",
+          gap: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+          marginTop: theme.tabiyaSpacing.md,
+        }}
       >
-        <FormControlLabel value="false" control={<Radio />} label="No" data-testid={DATA_TEST_ID.RADIO_NO} />
-        <FormControlLabel value="true" control={<Radio />} label="Yes" data-testid={DATA_TEST_ID.RADIO_YES} />
+        <FormControlLabel value="false" control={<Radio sx={{ padding: 0 }} />} label="No" data-testid={DATA_TEST_ID.RADIO_NO} sx={{ margin: 0 }} />
+        <FormControlLabel value="true" control={<Radio sx={{ padding: 0 }} />} label="Yes" data-testid={DATA_TEST_ID.RADIO_YES} sx={{ margin: 0 }} />
       </RadioGroup>
       {showComments && (
-        <TextField
-          placeholder="Write your message here!"
-          multiline
-          fullWidth
-          rows={2}
-          variant="outlined"
+        <CommentTextField
+          placeholder={placeholder}
           value={commentText}
+          ref={commentTextFieldRef}
           onChange={handleCommentChange}
-          inputProps={{ "data-testid": DATA_TEST_ID.TEXT_FIELD }}
         />
       )}
     </FormControl>

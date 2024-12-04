@@ -6,22 +6,27 @@ exports[`YesNoQuestion should render component successfully 1`] = `
   data-testid="yes-no-question-form-control-9803f91b-499a-41b3-9348-795de9e399a9"
 >
   <legend
-    class="MuiFormLabel-root MuiFormLabel-colorPrimary css-153jz83-MuiFormLabel-root"
+    class="MuiFormLabel-root MuiFormLabel-colorPrimary css-16k4sf8-MuiFormLabel-root"
     data-testid="yes-no-question-form-label-9803f91b-499a-41b3-9348-795de9e399a9"
   >
-    Do you like the product?
+    <p
+      class="MuiTypography-root MuiTypography-body1 css-1au4tcm-MuiTypography-root"
+      data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
+    >
+      Do you like the product?
+    </p>
   </legend>
   <div
     aria-label="like_product"
-    class="MuiFormGroup-root MuiFormGroup-row MuiRadioGroup-root MuiRadioGroup-row css-qfz70r-MuiFormGroup-root"
+    class="MuiFormGroup-root MuiFormGroup-row MuiRadioGroup-root MuiRadioGroup-row css-1mle1ow-MuiFormGroup-root"
     role="radiogroup"
   >
     <label
-      class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1voglh7-MuiFormControlLabel-root"
+      class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-2mfj4v-MuiFormControlLabel-root"
       data-testid="yes-no-question-radio-no-9803f91b-499a-41b3-9348-795de9e399a9"
     >
       <span
-        class="MuiButtonBase-root MuiRadio-root MuiRadio-colorPrimary PrivateSwitchBase-root MuiRadio-root MuiRadio-colorPrimary MuiRadio-root MuiRadio-colorPrimary css-njm15p-MuiButtonBase-root-MuiRadio-root"
+        class="MuiButtonBase-root MuiRadio-root MuiRadio-colorPrimary PrivateSwitchBase-root MuiRadio-root MuiRadio-colorPrimary MuiRadio-root MuiRadio-colorPrimary css-pp6yg3-MuiButtonBase-root-MuiRadio-root"
       >
         <input
           class="PrivateSwitchBase-input css-1m9pwf3"
@@ -66,11 +71,11 @@ exports[`YesNoQuestion should render component successfully 1`] = `
       </span>
     </label>
     <label
-      class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1voglh7-MuiFormControlLabel-root"
+      class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-2mfj4v-MuiFormControlLabel-root"
       data-testid="yes-no-question-radio-yes-9803f91b-499a-41b3-9348-795de9e399a9"
     >
       <span
-        class="MuiButtonBase-root MuiRadio-root MuiRadio-colorPrimary PrivateSwitchBase-root MuiRadio-root MuiRadio-colorPrimary Mui-checked MuiRadio-root MuiRadio-colorPrimary css-njm15p-MuiButtonBase-root-MuiRadio-root"
+        class="MuiButtonBase-root MuiRadio-root MuiRadio-colorPrimary PrivateSwitchBase-root MuiRadio-root MuiRadio-colorPrimary Mui-checked MuiRadio-root MuiRadio-colorPrimary css-pp6yg3-MuiButtonBase-root-MuiRadio-root"
       >
         <input
           checked=""
@@ -117,18 +122,17 @@ exports[`YesNoQuestion should render component successfully 1`] = `
     </label>
   </div>
   <div
-    class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1pcwqdd-MuiFormControl-root-MuiTextField-root"
+    class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-vg49q3-MuiFormControl-root-MuiTextField-root"
   >
     <div
-      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline css-voxow3-MuiInputBase-root-MuiOutlinedInput-root"
+      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline css-voxow3-MuiInputBase-root-MuiOutlinedInput-root"
     >
       <textarea
         aria-invalid="false"
         class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
-        data-testid="yes-no-question-text-field-9803f91b-499a-41b3-9348-795de9e399a9"
+        data-testid="comment-text-field-ab74a074-67f6-4a8a-b2b2-a582d1d56c9c"
         id=":r1:"
-        placeholder="Write your message here!"
-        rows="2"
+        rows="3"
         style="height: 0px; overflow: hidden;"
       />
       <textarea

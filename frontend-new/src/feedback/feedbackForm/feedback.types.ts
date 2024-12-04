@@ -18,6 +18,7 @@ export interface BaseQuestion {
   type: QuestionType;
   questionId: string;
   questionText: string;
+  placeholder?: string;
 }
 
 export interface DetailedQuestion extends BaseQuestion {
@@ -26,4 +27,5 @@ export interface DetailedQuestion extends BaseQuestion {
   showCommentsOn?: YesNoEnum;
   displayRating?: boolean;
   options?: Option[];
+  maxRating?: number;
 }
