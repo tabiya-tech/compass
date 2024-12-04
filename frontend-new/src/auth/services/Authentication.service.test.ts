@@ -1,5 +1,5 @@
 import "src/_test_utilities/consoleMock";
-import AuthenticationService from "./Authentication.service";
+import AuthenticationService, { TokenValidationFailureCause } from "./Authentication.service";
 import { jwtDecode } from "jwt-decode";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
@@ -186,114 +186,6 @@ describe("AuthenticationService", () => {
     });
   });
 
-  describe("isTokenValid", () => {
-    const currentTime = 1000;
-
-    beforeEach(() => {
-      jest.spyOn(Date, "now").mockReturnValue(currentTime * 1000);
-    });
-
-    test("should return true for valid token", () => {
-      // GIVEN a valid token with correct header and payload
-      const givenToken = "valid-token";
-      (jwtDecode as jest.Mock).mockReturnValueOnce({
-        typ: "JWT",
-        alg: "RS256",
-        kid: "key-id",
-      } as TokenHeader).mockReturnValueOnce({
-        exp: currentTime + 3600,
-        iat: currentTime - 3600,
-      } as Token);
-
-      // WHEN isTokenValid is called
-      const result = service.isTokenValid(givenToken);
-
-      // THEN it should return true and the decoded token
-      expect(result.isValid).toBe(true);
-      expect(result.decodedToken).toBeDefined();
-    });
-
-    test.each([
-      ["missing JWT type", { alg: "RS256", kid: "key-id" }],
-      ["missing algorithm", { typ: "JWT", kid: "key-id" }],
-      ["missing key ID", { typ: "JWT", alg: "RS256" }],
-    ])("should return false when token header is invalid due to %s", (_, header) => {
-      // GIVEN a token with invalid header
-      const givenToken = "invalid-token";
-      (jwtDecode as jest.Mock).mockReturnValueOnce(header);
-
-      // WHEN isTokenValid is called
-      const result = service.isTokenValid(givenToken);
-
-      // THEN it should return false
-      expect(result.isValid).toBe(false);
-      expect(result.decodedToken).toBeNull();
-    });
-
-    test.each(
-      [
-        ["expiration buffer zone", { exp: currentTime - 1, iat: currentTime - 3600 }],
-        ["issuance buffer zone", { exp: currentTime + 3600, iat: currentTime + 1 }],
-      ]
-    )("should succeed within %s", (_, payload) => {
-      // GIVEN a token with valid timing
-      const givenToken = "valid-token";
-      (jwtDecode as jest.Mock)
-        .mockReturnValueOnce({
-          typ: "JWT",
-          alg: "RS256",
-          kid: "key-id",
-        } as TokenHeader)
-        .mockReturnValueOnce(payload as Token);
-
-      // WHEN isTokenValid is called
-      const result = service.isTokenValid(givenToken);
-
-      // THEN it should return true and the decoded token
-      expect(result.isValid).toBe(true);
-
-      // AND the decoded token should be returned
-      expect(result.decodedToken).toBe(payload);
-    });
-
-    test.each([
-      ["expired token", { exp: currentTime - 2, iat: currentTime - 3600 }],
-      ["future token", { exp: currentTime + 3600, iat: currentTime + 2 }],
-    ])("should return false for %s", (_, payload) => {
-      // GIVEN a token with invalid timing
-      const givenToken = "invalid-token";
-      (jwtDecode as jest.Mock)
-        .mockReturnValueOnce({
-          typ: "JWT",
-          alg: "RS256",
-          kid: "key-id",
-        } as TokenHeader)
-        .mockReturnValueOnce(payload as Token);
-
-      // WHEN isTokenValid is called
-      const result = service.isTokenValid(givenToken);
-
-      // THEN it should return false
-      expect(result.isValid).toBe(false);
-      expect(result.decodedToken).toBeNull();
-    });
-
-    test("should return false when token decoding fails", () => {
-      // GIVEN jwt-decode throws an error
-      const givenToken = "invalid-token";
-      (jwtDecode as jest.Mock).mockImplementation(() => {
-        throw new Error("Invalid token");
-      });
-
-      // WHEN isTokenValid is called
-      const result = service.isTokenValid(givenToken);
-
-      // THEN it should return false
-      expect(result.isValid).toBe(false);
-      expect(result.decodedToken).toBeNull();
-    });
-  });
-
   describe("onSuccessfulRefresh", () => {
     const givenToken = "refreshed-token";
     const givenUser = {
@@ -330,6 +222,92 @@ describe("AuthenticationService", () => {
 
       // THEN it should throw an error
       await expect(refreshPromise).rejects.toThrow("User not found in the token");
+    });
+  });
+
+  describe("isTokenValid", () => {
+    const currentTime = 1000;
+
+    beforeEach(() => {
+      jest.spyOn(Date, "now").mockReturnValue(currentTime * 1000);
+    });
+
+    test("should return true for valid token", () => {
+      // GIVEN a valid token with correct header and payload
+      const givenToken = "valid-token";
+      (jwtDecode as jest.Mock).mockReturnValueOnce({
+        typ: "JWT",
+        alg: "RS256",
+        kid: "key-id",
+      } as TokenHeader).mockReturnValueOnce({
+        exp: currentTime + 3600,
+        iat: currentTime - 3600,
+      } as Token);
+
+      // WHEN isTokenValid is called
+      const result = service.isTokenValid(givenToken);
+
+      // THEN it should return true and the decoded token
+      expect(result.isValid).toBe(true);
+      expect(result.decodedToken).toBeDefined();
+      expect(result.failureCause).toBeUndefined();
+    });
+
+    test.each([
+      ["missing JWT type", { alg: "RS256", kid: "key-id" }, TokenValidationFailureCause.TOKEN_NOT_A_JWT],
+      ["missing algorithm", { typ: "JWT", kid: "key-id" }, TokenValidationFailureCause.TOKEN_NOT_SIGNED],
+      ["missing key ID", { typ: "JWT", alg: "RS256" }, TokenValidationFailureCause.TOKEN_DOES_NOT_HAVE_A_KEY_ID],
+    ])("should return false when token header is invalid due to %s", (_, header, expectedFailureCause) => {
+      // GIVEN a token with invalid header
+      const givenToken = "invalid-token";
+      (jwtDecode as jest.Mock).mockReturnValueOnce(header);
+
+      // WHEN isTokenValid is called
+      const result = service.isTokenValid(givenToken);
+
+      // THEN it should return false
+      expect(result.isValid).toBe(false);
+      expect(result.decodedToken).toBeNull();
+      expect(result.failureCause).toBe(expectedFailureCause);
+    });
+
+    test.each([
+      ["expired token", { exp: currentTime - 2, iat: currentTime - 3600 }, "TOKEN_EXPIRED"],
+      ["future token", { exp: currentTime + 3600, iat: currentTime + 2 }, "TOKEN_NOT_YET_VALID"],
+    ])("should return false for %s", (_, payload, expectedFailureCause) => {
+      // GIVEN a token with invalid timing
+      const givenToken = "invalid-token";
+      (jwtDecode as jest.Mock)
+        .mockReturnValueOnce({
+          typ: "JWT",
+          alg: "RS256",
+          kid: "key-id",
+        } as TokenHeader)
+        .mockReturnValueOnce(payload as Token);
+
+      // WHEN isTokenValid is called
+      const result = service.isTokenValid(givenToken);
+
+      // THEN it should return false
+      expect(result.isValid).toBe(false);
+      expect(result.decodedToken).toBeNull();
+      expect(result.failureCause).toBe(expectedFailureCause);
+    });
+
+    test("should return false when token decoding fails", () => {
+      // GIVEN jwt-decode throws an error
+      const givenToken = "invalid-token";
+      (jwtDecode as jest.Mock).mockImplementation(() => {
+        throw new Error("Invalid token");
+      });
+
+      // WHEN isTokenValid is called
+      const result = service.isTokenValid(givenToken);
+
+      // THEN it should return false
+      expect(result.isValid).toBe(false);
+      expect(result.decodedToken).toBeNull();
+      expect(result.failureCause).toBe(TokenValidationFailureCause.ERROR_DECODING_TOKEN);
     });
   });
 });

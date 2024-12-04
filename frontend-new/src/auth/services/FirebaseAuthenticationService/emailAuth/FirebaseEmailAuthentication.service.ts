@@ -7,9 +7,10 @@ import { invitationsService } from "src/auth/services/invitationsService/invitat
 import { InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import AuthenticationService from "src/auth/services/Authentication.service";
 import StdFirebaseAuthenticationService, {
-  FirebaseToken,
+  FirebaseToken, FirebaseTokenValidationFailureCause,
   FirebaseTokenProviders,
 } from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
+import { formatTokenForLogging } from "src/auth/utils/formatTokenForLogging";
 
 class FirebaseEmailAuthenticationService extends AuthenticationService {
   private static instance: FirebaseEmailAuthenticationService;
@@ -189,10 +190,10 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
    * @throws {Error} If token parsing fails
    */
   getUser(token: string): TabiyaUser | null {
-    const { isValid, decodedToken } = this.isTokenValid(token);
+    const { isValid, decodedToken, failureCause } = this.isTokenValid(token);
 
     if (!isValid) {
-      console.error(`could not get user from token: ${"..." + token.slice(-20)}`);
+      console.error(`could not get user from token: ${failureCause} - ${formatTokenForLogging(token)}`);
       return null;
     }
     return this.stdFirebaseAuthServiceInstance.getUserFromDecodedToken(decodedToken!);
@@ -203,16 +204,22 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
    * @param {string} token - The authentication token
    * @returns {boolean} True if the token is valid, false otherwise
    */
-  public isTokenValid(token: string): { isValid: boolean; decodedToken: FirebaseToken | null } {
-    const { isValid, decodedToken } = super.isTokenValid(token);
+  public isTokenValid(token: string): { isValid: boolean; decodedToken: FirebaseToken | null; failureCause?: string } {
+    const { isValid: isValidToken , decodedToken, failureCause: tokenValidationFailureCause } = super.isTokenValid(token);
+    const {isValid: isValidFirebaseToken, failureCause: firebaseTokenValidationFailureCause } = this.stdFirebaseAuthServiceInstance.isFirebaseTokenValid(decodedToken as FirebaseToken);
 
-    if (!isValid || !this.stdFirebaseAuthServiceInstance.isFirebaseTokenValid(decodedToken as FirebaseToken)) {
-      console.debug(`token is invalid: ${"..." + token.slice(-20)}`);
-      return { isValid: false, decodedToken: null };
+    if (!isValidToken) {
+      console.debug(`token is invalid: ${tokenValidationFailureCause} - ${formatTokenForLogging(token)}`);
+      return { isValid: false, decodedToken: null, failureCause: tokenValidationFailureCause! };
     }
+    if(!isValidFirebaseToken) {
+      console.debug(`token is not a valid firebase token: ${firebaseTokenValidationFailureCause} - ${formatTokenForLogging(token)}`);
+      return { isValid: false, decodedToken: null, failureCause: firebaseTokenValidationFailureCause! };
+    }
+
     if ((decodedToken as FirebaseToken).firebase.sign_in_provider !== FirebaseTokenProviders.PASSWORD) {
-      console.debug(`token is not a valid firebase email token: ${"..." + token.slice(-20)}`);
-      return { isValid: false, decodedToken: null };
+      console.debug(`token is not a valid firebase email token: ${FirebaseTokenValidationFailureCause.INVALID_FIREBASE_TOKEN_PROVIDER} - ${formatTokenForLogging(token)}`);
+      return { isValid: false, decodedToken: null, failureCause: FirebaseTokenValidationFailureCause.INVALID_FIREBASE_TOKEN_PROVIDER };
     }
 
     return { isValid: true, decodedToken: decodedToken as FirebaseToken };

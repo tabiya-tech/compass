@@ -1,5 +1,5 @@
 import "src/_test_utilities/consoleMock";
-import StdFirebaseAuthenticationService from "./StdFirebaseAuthenticationService";
+import StdFirebaseAuthenticationService, { FirebaseTokenValidationFailureCause } from "./StdFirebaseAuthenticationService";
 import { firebaseAuth } from "src/auth/firebaseConfig";
 import { jwtDecode } from "jwt-decode";
 import { FirebaseToken } from "./StdFirebaseAuthenticationService";
@@ -232,25 +232,26 @@ describe("StdFirebaseAuthenticationService", () => {
       };
 
       // WHEN validating the token
-      const isValid = service.isFirebaseTokenValid(mockToken);
+      const result = service.isFirebaseTokenValid(mockToken);
 
       // THEN it should be valid
-      expect(isValid).toBe(true);
+      expect(result.isValid).toBe(true);
     });
 
     test.each([
-      ["missing firebase property", { user_id: "123" }],
-      ["missing sign_in_provider", { firebase: {}, user_id: "123" }],
-      ["missing user_id", { firebase: { sign_in_provider: "password" } }],
-    ])("should return false when %s", (_scenario, tokenData) => {
+      ["missing firebase property", { user_id: "123" }, FirebaseTokenValidationFailureCause.INVALID_FIREBASE_TOKEN],
+      ["missing sign_in_provider", { firebase: {}, user_id: "123" }, FirebaseTokenValidationFailureCause.INVALID_FIREBASE_SIGN_IN_PROVIDER],
+      ["missing user_id", { firebase: { sign_in_provider: "password" } }, FirebaseTokenValidationFailureCause.INVALID_FIREBASE_USER_ID],
+    ])("should return false when %s", (_scenario, tokenData, expectedFailureCause) => {
       // GIVEN an invalid token
       const mockToken = tokenData as FirebaseToken;
 
       // WHEN validating the token
-      const isValid = service.isFirebaseTokenValid(mockToken);
+      const result = service.isFirebaseTokenValid(mockToken);
 
       // THEN it should be invalid
-      expect(isValid).toBe(false);
+      expect(result.isValid).toBe(false);
+      expect(result.failureCause).toBe(expectedFailureCause);
     });
   });
 });

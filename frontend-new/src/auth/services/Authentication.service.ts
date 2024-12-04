@@ -9,6 +9,15 @@ import { TabiyaUser, Token, TokenHeader } from "src/auth/auth.types";
 import { jwtDecode } from "jwt-decode";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
+export enum TokenValidationFailureCause {
+  TOKEN_EXPIRED = "TOKEN_EXPIRED",
+  TOKEN_NOT_YET_VALID = "TOKEN_NOT_YET_VALID",
+  TOKEN_NOT_A_JWT = "TOKEN_NOT_A_JWT",
+  TOKEN_NOT_SIGNED = "TOKEN_NOT_SIGNED",
+  TOKEN_DOES_NOT_HAVE_A_KEY_ID = "TOKEN_DOES_NOT_HAVE_A_KEY_ID",
+  ERROR_DECODING_TOKEN = "ERROR_DECODING_TOKEN",
+}
+
 /**
  * Abstract class representing an authentication service.
  *
@@ -133,21 +142,21 @@ abstract class AuthenticationService {
    * @param {string} token - The token to validate.
    * @returns {boolean} True if the token is valid, false otherwise.
    */
-  public isTokenValid(token: string): { isValid: boolean; decodedToken: Token | null } {
+  public isTokenValid(token: string): { isValid: boolean; decodedToken: Token | null, failureCause?: string } {
     try {
       // Decode the header and validate it
       const decodedHeader: TokenHeader = jwtDecode(token, { header: true });
       if (decodedHeader.typ !== "JWT") {
         console.debug("Token is not a JWT");
-        return { isValid: false, decodedToken: null };
+        return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.TOKEN_NOT_A_JWT };
       }
       if (!decodedHeader.alg) {
         console.debug("Token is not signed");
-        return { isValid: false, decodedToken: null };
+        return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.TOKEN_NOT_SIGNED };
       }
       if (!decodedHeader.kid) {
         console.debug("Token does not have a key ID (kid)");
-        return { isValid: false, decodedToken: null };
+        return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.TOKEN_DOES_NOT_HAVE_A_KEY_ID };
       }
 
       // Decode the token and validate it
@@ -160,7 +169,7 @@ abstract class AuthenticationService {
       // we add a buffer to the expiration time to account for the potential time difference
       if (decodedToken.exp < currentTime - TIME_BUFFER_SEC) {
         console.debug("Token is expired: ", {exp: decodedToken.exp, currentTime});
-        return { isValid: false, decodedToken: null };
+        return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.TOKEN_EXPIRED };
       } else if (decodedToken.exp < currentTime) {
         console.debug("Warning: Token is valid but within expiration buffer zone: ", {exp: decodedToken.exp, currentTime});
       }
@@ -169,7 +178,7 @@ abstract class AuthenticationService {
       // similarly, we add a buffer to the issuance time to account for the potential time difference between the server and client clocks
       if (decodedToken.iat > currentTime + TIME_BUFFER_SEC) {
         console.debug("Token issued in the future: ", {iat: decodedToken.iat, currentTime});
-        return { isValid: false, decodedToken: null };
+        return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.TOKEN_NOT_YET_VALID };
       } else if (decodedToken.iat > currentTime) {
         console.debug("Warning: Token is valid but within issuance buffer zone: ", {iat: decodedToken.iat, currentTime});
       }
@@ -178,7 +187,7 @@ abstract class AuthenticationService {
       return { isValid: true, decodedToken: decodedToken };
     } catch (error) {
       console.error("Error decoding token:", error);
-      return { isValid: false, decodedToken: null };
+      return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.ERROR_DECODING_TOKEN };
     }
   }
 }
