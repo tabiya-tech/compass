@@ -48,7 +48,7 @@ export enum FirebaseTokenProviders {
  */
 class StdFirebaseAuthenticationService {
   private readonly FIREBASE_DB_NAME = "firebaseLocalStorageDb";
-  private readonly REFRESH_TOKEN_EXPIRATION_PERCENTAGE = 0.1;
+  private readonly REFRESH_TOKEN_EXPIRATION_PERCENTAGE = 0.9; // Refresh token after 90% of the token expiration time has elapsed
   private refreshTimeout: NodeJS.Timeout | null = null;
   private readonly unsubscribeAuthListener: Unsubscribe;
 
@@ -122,8 +122,7 @@ class StdFirebaseAuthenticationService {
     const decodedToken: FirebaseToken = jwtDecode(token);
     const expirationTime = decodedToken.exp * 1000;
     const currentTime = Date.now();
-    const timeToExpiration = expirationTime - currentTime;
-    const refreshTime = timeToExpiration - timeToExpiration * this.REFRESH_TOKEN_EXPIRATION_PERCENTAGE; // Refresh token 10% before expiration
+    const refreshTime = (expirationTime - currentTime) * this.REFRESH_TOKEN_EXPIRATION_PERCENTAGE;
 
     console.debug(`Next refresh scheduled in ${refreshTime / 1000} seconds`);
 
