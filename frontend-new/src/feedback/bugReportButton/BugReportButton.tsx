@@ -5,7 +5,7 @@ import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import { BugReport } from "@mui/icons-material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
-interface FeedbackButtonProps {
+interface BugReportButtonProps {
   className?: string;
   bottomAlign?: boolean;
 }
@@ -13,9 +13,9 @@ interface FeedbackButtonProps {
 const uniqueId = "31d2b110-8308-4035-90a6-519e89e7f6fa";
 
 export const DATA_TEST_ID = {
-  FEEDBACK_BUTTON_CONTAINER: `feedback-button-container-${uniqueId}`,
-  FEEDBACK_BUTTON: `feedback-button-${uniqueId}`,
-  FEEDBACK_ICON: `feedback-icon-${uniqueId}`,
+  BUG_REPORT_BUTTON_CONTAINER: `feedback-button-container-${uniqueId}`,
+  BUG_REPORT_BUTTON: `feedback-button-${uniqueId}`,
+  BUG_REPORT_ICON: `feedback-icon-${uniqueId}`,
 };
 
 const StyledPrimaryIconButton = styled(PrimaryIconButton)(({ theme }) => ({
@@ -35,7 +35,7 @@ const StyledPrimaryIconButton = styled(PrimaryIconButton)(({ theme }) => ({
   },
 }));
 
-const FeedbackButton: React.FC<FeedbackButtonProps> = ({ bottomAlign, className }) => {
+const BugReportButton: React.FC<BugReportButtonProps> = ({ bottomAlign, className }) => {
   const [feedback, setFeedback] = useState<any>();
   const buttonRef = useRef<HTMLDivElement>(null);
   const theme = useTheme();
@@ -54,7 +54,7 @@ const FeedbackButton: React.FC<FeedbackButtonProps> = ({ bottomAlign, className 
   return (
     <Box
       ref={buttonRef}
-      data-testid={DATA_TEST_ID.FEEDBACK_BUTTON_CONTAINER}
+      data-testid={DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER}
       className={className}
       sx={{
         position: bottomAlign ? "fixed" : "auto",
@@ -64,15 +64,15 @@ const FeedbackButton: React.FC<FeedbackButtonProps> = ({ bottomAlign, className 
     >
       {" "}
       {isMobile ? (
-        <StyledPrimaryIconButton title={"Report a bug."} data-testid={DATA_TEST_ID.FEEDBACK_BUTTON}>
-          <BugReport data-testid={DATA_TEST_ID.FEEDBACK_ICON} />
+        <StyledPrimaryIconButton title={"Report a bug."} data-testid={DATA_TEST_ID.BUG_REPORT_BUTTON}>
+          <BugReport data-testid={DATA_TEST_ID.BUG_REPORT_ICON} />
         </StyledPrimaryIconButton>
       ) : (
         <PrimaryButton
           disableWhenOffline={true}
-          startIcon={<BugReport data-testid={DATA_TEST_ID.FEEDBACK_ICON} />}
+          startIcon={<BugReport data-testid={DATA_TEST_ID.BUG_REPORT_ICON} />}
           title={"Report a bug."}
-          data-testid={DATA_TEST_ID.FEEDBACK_BUTTON}
+          data-testid={DATA_TEST_ID.BUG_REPORT_BUTTON}
         >
           Report a bug
         </PrimaryButton>
@@ -81,4 +81,4 @@ const FeedbackButton: React.FC<FeedbackButtonProps> = ({ bottomAlign, className 
   );
 };
 
-export default FeedbackButton;
+export default BugReportButton;

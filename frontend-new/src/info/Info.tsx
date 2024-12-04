@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Box, Skeleton, Typography, useTheme } from "@mui/material";
 import InfoService from "src/info/info.service";
-import FeedbackButton from "src/feedback/FeedbackButton";
+import BugReportButton from "src/feedback/bugReportButton/BugReportButton";
 
 const uniqueId = "37d307ae-4f1e-4d8d-bafe-fd642f8af4dc";
 export const DATA_TEST_ID = {
@@ -74,7 +74,7 @@ const Info = () => {
   return (
     <div style={{ width: "100%", height: "100%" }} data-testid={DATA_TEST_ID.INFO_ROOT}>
       <ApplicationInfoMain versions={versions} />
-      <FeedbackButton bottomAlign={true} />
+      <BugReportButton bottomAlign={true} />
     </div>
   );
 };

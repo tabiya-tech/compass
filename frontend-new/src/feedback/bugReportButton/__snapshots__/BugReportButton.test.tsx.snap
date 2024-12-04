@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`FeedbackButton component should render the feedback button 1`] = `
+exports[`BugReportButton component should render the bugReport button 1`] = `
 <div
   class="MuiBox-root css-ts3wbc"
   data-testid="feedback-button-container-31d2b110-8308-4035-90a6-519e89e7f6fa"
