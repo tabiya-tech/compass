@@ -17,4 +17,5 @@ export interface Answer {
 export interface FeedbackItem {
   question_id: string;
   answer: Answer;
+  is_answered: boolean;
 }

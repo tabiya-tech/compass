@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Checkbox, FormControl, FormControlLabel, FormGroup, TextField, FormLabel } from "@mui/material";
+import React, { useState, useEffect, useRef } from "react";
+import { Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel, useTheme } from "@mui/material";
 import { BaseQuestion, Option } from "src/feedback/feedbackForm/feedback.types";
+import QuestionText from "src/feedback/feedbackForm/components/questionText/QuestionText";
+import CommentTextField from "src/feedback/feedbackForm/components/commentTextField/CommentTextField";
+import { focusAndScrollToField } from "src/feedback/feedbackForm/util";
 
 export interface CheckboxQuestionProps extends BaseQuestion {
   selectedOptions: string[];
@@ -24,9 +27,20 @@ const CheckboxQuestion: React.FC<CheckboxQuestionProps> = ({
   notifyChange,
   options,
   comments,
+  placeholder
 }) => {
+  const theme = useTheme();
   const [checkedOptions, setCheckedOptions] = useState<string[]>(selectedOptions);
-  const [commentText, setCommentText] = useState(comments || "");
+  const [commentText, setCommentText] = useState(comments ?? "");
+  const commentTextFieldRef = useRef<HTMLInputElement>(null);
+
+  // focus on comment text field when text field is shown
+  useEffect(() => {
+    if (checkedOptions.length > 0) {
+      focusAndScrollToField(commentTextFieldRef);
+    }
+  }, [checkedOptions]);
+
 
   useEffect(() => {
     setCheckedOptions(selectedOptions);
@@ -48,20 +62,26 @@ const CheckboxQuestion: React.FC<CheckboxQuestionProps> = ({
   };
 
   return (
-    <FormControl component="fieldset" fullWidth margin="normal" data-testid={DATA_TEST_ID.FORM_CONTROL}>
+    <FormControl
+      component="fieldset"
+      fullWidth margin="normal"
+      sx={{ margin: 0, display: "flex", flexDirection: "column", gap: theme.tabiyaSpacing.md }}
+      data-testid={DATA_TEST_ID.FORM_CONTROL}
+    >
       <FormLabel
         component="legend"
-        sx={{
-          fontSize: (theme) => theme.typography.subtitle1.fontSize,
-          "&.Mui-focused": {
-            color: (theme) => theme.palette.common.black,
-          },
-        }}
         data-testid={DATA_TEST_ID.FORM_LABEL}
       >
-        {questionText}
+        <QuestionText questionText={questionText} />
       </FormLabel>
-      <FormGroup>
+      <FormGroup
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: theme.tabiyaSpacing.sm,
+          marginTop: theme.tabiyaSpacing.md,
+        }}
+      >
         {options?.map((option) => (
           <FormControlLabel
             key={option.key}
@@ -70,22 +90,20 @@ const CheckboxQuestion: React.FC<CheckboxQuestionProps> = ({
                 checked={checkedOptions.includes(option.key)}
                 onChange={() => handleCheckboxChange(option.key)}
                 data-testid={DATA_TEST_ID.CHECKBOX_OPTION}
+                sx={{ padding: 0, marginRight: theme.tabiyaSpacing.sm }}
               />
             }
             label={option.value}
+            sx={{ margin: 0, width: "fit-content" }}
           />
         ))}
       </FormGroup>
       {checkedOptions.length > 0 && (
-        <TextField
-          placeholder="Write your message here!"
-          multiline
-          fullWidth
-          rows={2}
-          variant="outlined"
+        <CommentTextField
+          placeholder={placeholder}
           value={commentText}
+          ref={commentTextFieldRef}
           onChange={handleCommentChange}
-          inputProps={{ "data-testid": DATA_TEST_ID.TEXT_FIELD }}
         />
       )}
     </FormControl>

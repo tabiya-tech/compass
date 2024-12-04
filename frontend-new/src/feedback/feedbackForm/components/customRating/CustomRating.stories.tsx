@@ -23,6 +23,7 @@ export const Shown: Story = {
     questionId: "interaction_ease",
     lowRatingLabel: "Not easy",
     highRatingLabel: "Very easy",
+    placeholder: "Please provide comments",
   },
 };
 
@@ -31,5 +32,6 @@ export const ShownWithNoRating: Story = {
     questionText: "How easy was it to interact with the system?",
     questionId: "interaction_ease",
     displayRating: false,
+    placeholder: "Please provide comments",
   },
 };

@@ -9,14 +9,14 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
     class="MuiTypography-root MuiTypography-body1 css-1lysc6y-MuiTypography-root"
     data-testid="feedback-form-content-title-07d1ed9d-6ced-4a24-912a-9b89199df67f"
   >
-    Ease of Use & Skill Insight
+    Overall Satisfaction
   </p>
   <div
     class="MuiBox-root css-15bovrc"
     data-testid="feedback-form-content-questions-07d1ed9d-6ced-4a24-912a-9b89199df67f"
   >
     <div
-      class="MuiBox-root css-c4dei4"
+      class="MuiBox-root css-ifx08d"
       data-testid="steps-component-3bf900a2-f9fa-4b28-8c20-8bc21570635c"
     >
       <div
@@ -29,12 +29,12 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
           <div
             class="MuiBox-root css-1w00lo4"
           >
-            <h6
-              class="MuiTypography-root MuiTypography-subtitle1 css-1elec29-MuiTypography-root"
-              data-testid="custom-rating-text-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+            <p
+              class="MuiTypography-root MuiTypography-body1 css-1au4tcm-MuiTypography-root"
+              data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
             >
-              How easy was it to interact with Compass and understand its responses?
-            </h6>
+              How easy or difficult was it to interact with Compass and understand its responses?
+            </p>
             <div
               class="MuiBox-root css-a0ovpn"
             >
@@ -280,108 +280,6 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                   value="7"
                 />
                 <label
-                  class="css-dqr9h-MuiRating-label"
-                  for=":r8:"
-                >
-                  <span
-                    class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                    data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                    value="8"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                      data-testid="StarBorderIcon"
-                      focusable="false"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                      />
-                    </svg>
-                  </span>
-                  <span
-                    class="MuiRating-visuallyHidden"
-                  >
-                    8 Stars
-                  </span>
-                </label>
-                <input
-                  class="MuiRating-visuallyHidden"
-                  id=":r8:"
-                  name="interaction_ease"
-                  type="radio"
-                  value="8"
-                />
-                <label
-                  class="css-dqr9h-MuiRating-label"
-                  for=":r9:"
-                >
-                  <span
-                    class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                    data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                    value="9"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                      data-testid="StarBorderIcon"
-                      focusable="false"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                      />
-                    </svg>
-                  </span>
-                  <span
-                    class="MuiRating-visuallyHidden"
-                  >
-                    9 Stars
-                  </span>
-                </label>
-                <input
-                  class="MuiRating-visuallyHidden"
-                  id=":r9:"
-                  name="interaction_ease"
-                  type="radio"
-                  value="9"
-                />
-                <label
-                  class="css-dqr9h-MuiRating-label"
-                  for=":ra:"
-                >
-                  <span
-                    class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                    data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                    value="10"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                      data-testid="StarBorderIcon"
-                      focusable="false"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                      />
-                    </svg>
-                  </span>
-                  <span
-                    class="MuiRating-visuallyHidden"
-                  >
-                    10 Stars
-                  </span>
-                </label>
-                <input
-                  class="MuiRating-visuallyHidden"
-                  id=":ra:"
-                  name="interaction_ease"
-                  type="radio"
-                  value="10"
-                />
-                <label
                   class="MuiRating-label MuiRating-pristine css-dqr9h-MuiRating-label"
                 >
                   <input
@@ -400,25 +298,25 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                 </label>
               </span>
               <div
-                class="MuiBox-root css-nm6hhy"
+                class="MuiBox-root css-jyedia"
               >
-                <span
-                  class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
+                <p
+                  class="MuiTypography-root MuiTypography-body2 css-bwgvvh-MuiTypography-root"
                   data-testid="custom-rating-low-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
                 >
-                  Not easy
-                </span>
-                <span
-                  class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
+                  Difficult
+                </p>
+                <p
+                  class="MuiTypography-root MuiTypography-body2 css-bwgvvh-MuiTypography-root"
                   data-testid="custom-rating-high-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
                 >
-                  Very easy
-                </span>
+                  Easy
+                </p>
               </div>
             </div>
           </div>
           <div
-            class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1pcwqdd-MuiFormControl-root-MuiTextField-root"
+            class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-vg49q3-MuiFormControl-root-MuiTextField-root"
           >
             <div
               class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline css-voxow3-MuiInputBase-root-MuiOutlinedInput-root"
@@ -426,10 +324,10 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
               <textarea
                 aria-invalid="false"
                 class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
-                data-testid="custom-rating-field-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                id=":rb:"
-                placeholder="Write your message here!"
-                rows="2"
+                data-testid="comment-text-field-ab74a074-67f6-4a8a-b2b2-a582d1d56c9c"
+                id=":r8:"
+                placeholder="Please explain your rating and share any suggestions for improving the ease of interaction with Compass."
+                rows="3"
                 style="height: 0px; overflow: hidden;"
               />
               <textarea
@@ -460,125 +358,6 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
       <div
         class="MuiBox-root css-0"
       >
-        <fieldset
-          class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth css-7h8wka-MuiFormControl-root"
-          data-testid="yes-no-question-form-control-9803f91b-499a-41b3-9348-795de9e399a9"
-        >
-          <legend
-            class="MuiFormLabel-root MuiFormLabel-colorPrimary css-153jz83-MuiFormLabel-root"
-            data-testid="yes-no-question-form-label-9803f91b-499a-41b3-9348-795de9e399a9"
-          >
-            Did Compass help you gain a clearer understanding of your skills? If not, why?
-          </legend>
-          <div
-            aria-label="clarity_of_skills"
-            class="MuiFormGroup-root MuiFormGroup-row MuiRadioGroup-root MuiRadioGroup-row css-qfz70r-MuiFormGroup-root"
-            role="radiogroup"
-          >
-            <label
-              class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1voglh7-MuiFormControlLabel-root"
-              data-testid="yes-no-question-radio-no-9803f91b-499a-41b3-9348-795de9e399a9"
-            >
-              <span
-                class="MuiButtonBase-root MuiRadio-root MuiRadio-colorPrimary PrivateSwitchBase-root MuiRadio-root MuiRadio-colorPrimary MuiRadio-root MuiRadio-colorPrimary css-njm15p-MuiButtonBase-root-MuiRadio-root"
-              >
-                <input
-                  class="PrivateSwitchBase-input css-1m9pwf3"
-                  name="clarity_of_skills"
-                  type="radio"
-                  value="false"
-                />
-                <span
-                  class="css-hyxlzm"
-                >
-                  <svg
-                    aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-wycp9y-MuiSvgIcon-root"
-                    data-testid="RadioButtonUncheckedIcon"
-                    focusable="false"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"
-                    />
-                  </svg>
-                  <svg
-                    aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-wyntia-MuiSvgIcon-root"
-                    data-testid="RadioButtonCheckedIcon"
-                    focusable="false"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      d="M8.465 8.465C9.37 7.56 10.62 7 12 7C14.76 7 17 9.24 17 12C17 13.38 16.44 14.63 15.535 15.535C14.63 16.44 13.38 17 12 17C9.24 17 7 14.76 7 12C7 10.62 7.56 9.37 8.465 8.465Z"
-                    />
-                  </svg>
-                </span>
-                <span
-                  class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-                />
-              </span>
-              <span
-                class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-7xnq80-MuiTypography-root"
-              >
-                No
-              </span>
-            </label>
-            <label
-              class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1voglh7-MuiFormControlLabel-root"
-              data-testid="yes-no-question-radio-yes-9803f91b-499a-41b3-9348-795de9e399a9"
-            >
-              <span
-                class="MuiButtonBase-root MuiRadio-root MuiRadio-colorPrimary PrivateSwitchBase-root MuiRadio-root MuiRadio-colorPrimary MuiRadio-root MuiRadio-colorPrimary css-njm15p-MuiButtonBase-root-MuiRadio-root"
-              >
-                <input
-                  class="PrivateSwitchBase-input css-1m9pwf3"
-                  name="clarity_of_skills"
-                  type="radio"
-                  value="true"
-                />
-                <span
-                  class="css-hyxlzm"
-                >
-                  <svg
-                    aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-wycp9y-MuiSvgIcon-root"
-                    data-testid="RadioButtonUncheckedIcon"
-                    focusable="false"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"
-                    />
-                  </svg>
-                  <svg
-                    aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-wyntia-MuiSvgIcon-root"
-                    data-testid="RadioButtonCheckedIcon"
-                    focusable="false"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      d="M8.465 8.465C9.37 7.56 10.62 7 12 7C14.76 7 17 9.24 17 12C17 13.38 16.44 14.63 15.535 15.535C14.63 16.44 13.38 17 12 17C9.24 17 7 14.76 7 12C7 10.62 7.56 9.37 8.465 8.465Z"
-                    />
-                  </svg>
-                </span>
-                <span
-                  class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-                />
-              </span>
-              <span
-                class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-7xnq80-MuiTypography-root"
-              >
-                Yes
-              </span>
-            </label>
-          </div>
-        </fieldset>
-      </div>
-      <div
-        class="MuiBox-root css-0"
-      >
         <div
           class="MuiBox-root css-yj95vr"
           data-testid="custom-rating-container-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
@@ -586,12 +365,12 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
           <div
             class="MuiBox-root css-1w00lo4"
           >
-            <h6
-              class="MuiTypography-root MuiTypography-subtitle1 css-1elec29-MuiTypography-root"
-              data-testid="custom-rating-text-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+            <p
+              class="MuiTypography-root MuiTypography-body1 css-1au4tcm-MuiTypography-root"
+              data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
             >
               How satisfied are you with Compass?
-            </h6>
+            </p>
             <div
               class="MuiBox-root css-a0ovpn"
             >
@@ -600,7 +379,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
               >
                 <label
                   class="css-dqr9h-MuiRating-label"
-                  for=":re:"
+                  for=":ra:"
                 >
                   <span
                     class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
@@ -627,14 +406,14 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                 </label>
                 <input
                   class="MuiRating-visuallyHidden"
-                  id=":re:"
+                  id=":ra:"
                   name="satisfaction_with_compass"
                   type="radio"
                   value="1"
                 />
                 <label
                   class="css-dqr9h-MuiRating-label"
-                  for=":rf:"
+                  for=":rb:"
                 >
                   <span
                     class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
@@ -661,14 +440,14 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                 </label>
                 <input
                   class="MuiRating-visuallyHidden"
-                  id=":rf:"
+                  id=":rb:"
                   name="satisfaction_with_compass"
                   type="radio"
                   value="2"
                 />
                 <label
                   class="css-dqr9h-MuiRating-label"
-                  for=":rg:"
+                  for=":rc:"
                 >
                   <span
                     class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
@@ -695,14 +474,14 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                 </label>
                 <input
                   class="MuiRating-visuallyHidden"
-                  id=":rg:"
+                  id=":rc:"
                   name="satisfaction_with_compass"
                   type="radio"
                   value="3"
                 />
                 <label
                   class="css-dqr9h-MuiRating-label"
-                  for=":rh:"
+                  for=":rd:"
                 >
                   <span
                     class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
@@ -729,14 +508,14 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                 </label>
                 <input
                   class="MuiRating-visuallyHidden"
-                  id=":rh:"
+                  id=":rd:"
                   name="satisfaction_with_compass"
                   type="radio"
                   value="4"
                 />
                 <label
                   class="css-dqr9h-MuiRating-label"
-                  for=":ri:"
+                  for=":re:"
                 >
                   <span
                     class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
@@ -763,180 +542,10 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                 </label>
                 <input
                   class="MuiRating-visuallyHidden"
-                  id=":ri:"
+                  id=":re:"
                   name="satisfaction_with_compass"
                   type="radio"
                   value="5"
-                />
-                <label
-                  class="css-dqr9h-MuiRating-label"
-                  for=":rj:"
-                >
-                  <span
-                    class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                    data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                    value="6"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                      data-testid="StarBorderIcon"
-                      focusable="false"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                      />
-                    </svg>
-                  </span>
-                  <span
-                    class="MuiRating-visuallyHidden"
-                  >
-                    6 Stars
-                  </span>
-                </label>
-                <input
-                  class="MuiRating-visuallyHidden"
-                  id=":rj:"
-                  name="satisfaction_with_compass"
-                  type="radio"
-                  value="6"
-                />
-                <label
-                  class="css-dqr9h-MuiRating-label"
-                  for=":rk:"
-                >
-                  <span
-                    class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                    data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                    value="7"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                      data-testid="StarBorderIcon"
-                      focusable="false"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                      />
-                    </svg>
-                  </span>
-                  <span
-                    class="MuiRating-visuallyHidden"
-                  >
-                    7 Stars
-                  </span>
-                </label>
-                <input
-                  class="MuiRating-visuallyHidden"
-                  id=":rk:"
-                  name="satisfaction_with_compass"
-                  type="radio"
-                  value="7"
-                />
-                <label
-                  class="css-dqr9h-MuiRating-label"
-                  for=":rl:"
-                >
-                  <span
-                    class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                    data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                    value="8"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                      data-testid="StarBorderIcon"
-                      focusable="false"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                      />
-                    </svg>
-                  </span>
-                  <span
-                    class="MuiRating-visuallyHidden"
-                  >
-                    8 Stars
-                  </span>
-                </label>
-                <input
-                  class="MuiRating-visuallyHidden"
-                  id=":rl:"
-                  name="satisfaction_with_compass"
-                  type="radio"
-                  value="8"
-                />
-                <label
-                  class="css-dqr9h-MuiRating-label"
-                  for=":rm:"
-                >
-                  <span
-                    class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                    data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                    value="9"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                      data-testid="StarBorderIcon"
-                      focusable="false"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                      />
-                    </svg>
-                  </span>
-                  <span
-                    class="MuiRating-visuallyHidden"
-                  >
-                    9 Stars
-                  </span>
-                </label>
-                <input
-                  class="MuiRating-visuallyHidden"
-                  id=":rm:"
-                  name="satisfaction_with_compass"
-                  type="radio"
-                  value="9"
-                />
-                <label
-                  class="css-dqr9h-MuiRating-label"
-                  for=":rn:"
-                >
-                  <span
-                    class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                    data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                    value="10"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                      data-testid="StarBorderIcon"
-                      focusable="false"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                      />
-                    </svg>
-                  </span>
-                  <span
-                    class="MuiRating-visuallyHidden"
-                  >
-                    10 Stars
-                  </span>
-                </label>
-                <input
-                  class="MuiRating-visuallyHidden"
-                  id=":rn:"
-                  name="satisfaction_with_compass"
-                  type="radio"
-                  value="10"
                 />
                 <label
                   class="MuiRating-label MuiRating-pristine css-dqr9h-MuiRating-label"
@@ -957,59 +566,21 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                 </label>
               </span>
               <div
-                class="MuiBox-root css-nm6hhy"
+                class="MuiBox-root css-jyedia"
               >
-                <span
-                  class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
+                <p
+                  class="MuiTypography-root MuiTypography-body2 css-bwgvvh-MuiTypography-root"
                   data-testid="custom-rating-low-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
                 >
-                  Not satisfied
-                </span>
-                <span
-                  class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
+                  Unsatisfied
+                </p>
+                <p
+                  class="MuiTypography-root MuiTypography-body2 css-bwgvvh-MuiTypography-root"
                   data-testid="custom-rating-high-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
                 >
-                  Very satisfied
-                </span>
+                  Satisfied
+                </p>
               </div>
-            </div>
-          </div>
-          <div
-            class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1pcwqdd-MuiFormControl-root-MuiTextField-root"
-          >
-            <div
-              class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline css-voxow3-MuiInputBase-root-MuiOutlinedInput-root"
-            >
-              <textarea
-                aria-invalid="false"
-                class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
-                data-testid="custom-rating-field-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                id=":ro:"
-                placeholder="Write your message here!"
-                rows="2"
-                style="height: 0px; overflow: hidden;"
-              />
-              <textarea
-                aria-hidden="true"
-                class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
-                readonly=""
-                style="visibility: hidden; position: absolute; overflow: hidden; height: 0px; top: 0px; left: 0px; transform: translateZ(0); padding-top: 0px; padding-bottom: 0px; width: 100%;"
-                tabindex="-1"
-              />
-              <fieldset
-                aria-hidden="true"
-                class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
-              >
-                <legend
-                  class="css-ihdtdm"
-                >
-                  <span
-                    class="notranslate"
-                  >
-                    ​
-                  </span>
-                </legend>
-              </fieldset>
             </div>
           </div>
         </div>
@@ -1025,10 +596,9 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
     class="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiMobileStepper-root MuiMobileStepper-positionStatic css-ge39m6-MuiPaper-root-MuiMobileStepper-root"
   >
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-1u1l2nj-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-1kyjyn3-MuiButtonBase-root-MuiButton-root"
       data-testid="feedback-form-back-button-07d1ed9d-6ced-4a24-912a-9b89199df67f"
       disabled=""
-      style="color: rgb(0, 0, 0); width: 100px;"
       tabindex="-1"
       type="button"
     >
@@ -1039,6 +609,9 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
     >
       <div
         class="MuiMobileStepper-dot MuiMobileStepper-dotActive css-15nuweu-MuiMobileStepper-dot"
+      />
+      <div
+        class="MuiMobileStepper-dot css-114p2tk-MuiMobileStepper-dot"
       />
       <div
         class="MuiMobileStepper-dot css-114p2tk-MuiMobileStepper-dot"

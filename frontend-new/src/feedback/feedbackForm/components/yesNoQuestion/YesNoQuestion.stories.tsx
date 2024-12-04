@@ -23,6 +23,7 @@ export const ShowCommentsWhenYesSelected: Story = {
     questionText: "Is this a question?",
     questionId: "is_question",
     showCommentsOn: YesNoEnum.Yes,
+    placeholder: "Please provide comments",
   },
 };
 
@@ -31,5 +32,6 @@ export const ShowCommentsWhenNoSelected: Story = {
     questionText: "Is this not a question?",
     questionId: "is_not_question",
     showCommentsOn: YesNoEnum.No,
+    placeholder: "Please provide comments",
   },
 };
