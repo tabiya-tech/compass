@@ -143,7 +143,6 @@ class StdFirebaseAuthenticationService {
     console.debug("Setting up auth listener");
     return firebaseAuth.onAuthStateChanged((user) => {
       if (user) {
-        console.debug("User authenticated: ", user);
         user.getIdToken(true).then((token) => {
           this.scheduleTokenRefresh(token);
         });

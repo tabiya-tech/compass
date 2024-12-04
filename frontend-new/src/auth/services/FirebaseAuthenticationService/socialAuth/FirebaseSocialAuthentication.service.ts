@@ -124,6 +124,7 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
    */
   public isTokenValid(token: string): { isValid: boolean; decodedToken: FirebaseToken | null } {
     const { isValid, decodedToken } = super.isTokenValid(token);
+    console.log(token, "bbbb")
 
     if (!isValid || !this.stdFirebaseAuthServiceInstance.isFirebaseTokenValid(decodedToken as FirebaseToken)) {
       console.debug(`token is invalid: ${"..." + token.slice(-20)}`);
