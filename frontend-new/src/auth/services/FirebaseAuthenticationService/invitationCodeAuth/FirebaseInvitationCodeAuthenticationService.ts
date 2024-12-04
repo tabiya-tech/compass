@@ -2,7 +2,7 @@ import { firebaseAuth } from "src/auth/firebaseConfig";
 import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import StdFirebaseAuthenticationService, {
-  FirebaseToken,
+  FirebaseToken, FirebaseTokenValidationFailureCause,
   FirebaseTokenProviders,
 } from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
@@ -13,6 +13,7 @@ import { userPreferencesService } from "src/userPreferences/UserPreferencesServi
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import AuthenticationService from "src/auth/services/Authentication.service";
+import { formatTokenForLogging } from "src/auth/utils/formatTokenForLogging";
 
 class FirebaseInvitationCodeAuthenticationService extends AuthenticationService {
   private static instance: FirebaseInvitationCodeAuthenticationService;
@@ -135,10 +136,10 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
    * @throws {Error} If token parsing fails
    */
   getUser(token: string): TabiyaUser | null {
-    const { isValid, decodedToken } = this.isTokenValid(token);
+    const { isValid, decodedToken, failureCause } = this.isTokenValid(token);
 
     if (!isValid) {
-      console.error(`could not get user from token: ${"..." + token.slice(-20)}`);
+      console.error(`could not get user from token: ${failureCause} - ${formatTokenForLogging(token)}`);
       return null;
     }
     return this.stdFirebaseAuthServiceInstance.getUserFromDecodedToken(decodedToken!);
@@ -149,15 +150,21 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
    * @param {string} token - The authentication token
    * @returns {boolean} True if the token is valid, false otherwise
    */
-  public isTokenValid(token: string): { isValid: boolean; decodedToken: FirebaseToken | null } {
-    const { isValid, decodedToken } = super.isTokenValid(token);
+  public isTokenValid(token: string): { isValid: boolean; decodedToken: FirebaseToken | null; failureCause?: string } {
+    const { isValid: isValidToken , decodedToken, failureCause: tokenValidationFailureCause } = super.isTokenValid(token);
+    const {isValid: isValidFirebaseToken, failureCause: firebaseTokenValidationFailureCause } = this.stdFirebaseAuthServiceInstance.isFirebaseTokenValid(decodedToken as FirebaseToken);
 
-    if (!isValid || !this.stdFirebaseAuthServiceInstance.isFirebaseTokenValid(decodedToken as FirebaseToken)) {
-      console.debug(`token is invalid: ${"..." + token.slice(-20)}`);
-      return { isValid: false, decodedToken: null };
+    if (!isValidToken) {
+      console.debug(`token is invalid: ${tokenValidationFailureCause} - ${formatTokenForLogging(token)}`);
+      return { isValid: false, decodedToken: null, failureCause: tokenValidationFailureCause! };
     }
+    if(!isValidFirebaseToken) {
+      console.debug(`token is not a valid firebase token: ${firebaseTokenValidationFailureCause} - ${formatTokenForLogging(token)}`);
+      return { isValid: false, decodedToken: null, failureCause: firebaseTokenValidationFailureCause! };
+    }
+
     if ((decodedToken as FirebaseToken).firebase.sign_in_provider !== FirebaseTokenProviders.ANONYMOUS) {
-      console.debug(`token is not a valid firebase anonymous token: ${"..." + token.slice(-20)}`);
+      console.debug(`token is not a valid firebase anonymous token: ${"..." + token.slice(-20)} - ${FirebaseTokenValidationFailureCause.INVALID_FIREBASE_TOKEN_PROVIDER}`);
       return { isValid: false, decodedToken: null };
     }
 
