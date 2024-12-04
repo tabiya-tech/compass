@@ -149,7 +149,7 @@ const DataProtectionAgreement: React.FC = () => {
           <LanguageContextMenu />
         </Box>
         <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.TITLE}>
-          Thank you for using Compass.
+          Welcome to Compass.
         </Typography>
         <Typography variant="body2" gutterBottom data-testid={DATA_TEST_ID.AGREEMENT_BODY}>
           We created this AI tool for you with care to help you and other young people like you explore their skills and
@@ -162,7 +162,7 @@ const DataProtectionAgreement: React.FC = () => {
           AI technology is new and far from perfect. It doesn't understand context like humans do.
           <br />
           <br />
-          Always double-check any important information and avoid sharing personal data.
+          Always double-check important details and avoid sharing personal information with the AI. If we ever need personal information, we’ll always ask for your consent first.
           <br />
           <br />
           Help us keep all AI interactions safe and positive! 😊
@@ -212,7 +212,7 @@ const DataProtectionAgreement: React.FC = () => {
             data-testid={DATA_TEST_ID.ACCEPT_DPA_BUTTON}
             onClick={handleAcceptedDPA}
           >
-            Sure, I am ready.
+            Sure, I am ready
           </PrimaryButton>
         </Box>
       </Box>
