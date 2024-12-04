@@ -13,8 +13,8 @@ import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceErro
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
-import FeedbackButton from "src/feedback/FeedbackButton";
-import FirebaseSocialAuthenticationService from "../../services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
+import BugReportButton from "src/feedback/bugReportButton/BugReportButton";
+import FirebaseSocialAuthenticationService from "src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -197,7 +197,7 @@ const Register: React.FC = () => {
           </Typography>
         </Box>
       </Container>
-      <FeedbackButton bottomAlign={true} />
+      <BugReportButton bottomAlign={true} />
       <Backdrop isShown={isLoading} message="Registering you..." />
     </>
   );
