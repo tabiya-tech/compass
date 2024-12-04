@@ -150,7 +150,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
    * @returns {boolean} True if the token is valid, false otherwise
    */
   public isTokenValid(token: string): { isValid: boolean; decodedToken: FirebaseToken | null } {
-    const { isValid, decodedToken } = super.isTokenValid("..." + token.slice(-20));
+    const { isValid, decodedToken } = super.isTokenValid(token);
 
     if (!isValid || !this.stdFirebaseAuthServiceInstance.isFirebaseTokenValid(decodedToken as FirebaseToken)) {
       console.debug(`token is invalid: ${"..." + token.slice(-20)}`);
