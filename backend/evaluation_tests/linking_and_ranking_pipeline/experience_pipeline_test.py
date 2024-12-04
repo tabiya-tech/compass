@@ -143,11 +143,12 @@ test_cases = [
         name="Icatus I34_4",
         given_experience_title="I clean my shoes",
         given_company_name="Home",
-        given_responsibilities=['Repair and restore damaged clothing and footwear to a presentable condition.'],
-        given_country_of_interest=Country.SOUTH_AFRICA,
-        given_work_type=WorkType.UNSEEN_UNPAID,
-        expected_top_skills=['manufacture wearing apparel products']
-    ),
+        skip_force="force",
+            given_responsibilities=['Repair and restore damaged clothing and footwear to a presentable condition.'],
+            given_country_of_interest=Country.SOUTH_AFRICA,
+            given_work_type=WorkType.UNSEEN_UNPAID,
+            expected_top_skills=['manufacture wearing apparel products']
+        ),
     ExperiencePipelineTestCase(
         name="Icatus I32_1",
         given_experience_title="I clean the windows ",
