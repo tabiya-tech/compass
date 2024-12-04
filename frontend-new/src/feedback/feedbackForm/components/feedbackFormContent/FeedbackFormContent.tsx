@@ -129,7 +129,7 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
             variant="text"
             onClick={handlePrevious}
             disabled={activeStep === 0}
-            style={{ color: theme.palette.common.black, width: 100 }}
+            sx={{ color: theme.palette.common.black, width: 100 }}
             data-testid={DATA_TEST_ID.FEEDBACK_FORM_BACK_BUTTON}
           >
             Previous

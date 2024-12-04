@@ -8,6 +8,7 @@ import YesNoQuestion, {
 import { render, screen } from "src/_test_utilities/test-utils";
 import { fireEvent } from "@testing-library/react";
 import { QuestionType, YesNoEnum } from "src/feedback/feedbackForm/feedback.types";
+import  {DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID} from "src/feedback/feedbackForm/components/commentTextField/CommentTextField";
 
 describe("YesNoQuestion", () => {
   // mock question
@@ -40,7 +41,7 @@ describe("YesNoQuestion", () => {
     // AND the yes no question radio no to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.RADIO_NO)).toBeInTheDocument();
     // AND the yes no question text field to be in the document
-    expect(screen.getByTestId(DATA_TEST_ID.TEXT_FIELD)).toBeInTheDocument();
+    expect(screen.getByTestId(COMMENT_TEXT_FIELD_TEST_ID.COMMENT_TEXT_FIELD)).toBeInTheDocument();
     // AND to match the snapshot
     expect(yesNoQuestionContainer).toMatchSnapshot();
   });
@@ -53,7 +54,7 @@ describe("YesNoQuestion", () => {
     render(givenYesNoQuestion);
 
     // WHEN the comment text field is changed
-    const commentTextField = screen.getByTestId(DATA_TEST_ID.TEXT_FIELD);
+    const commentTextField = screen.getByTestId(COMMENT_TEXT_FIELD_TEST_ID.COMMENT_TEXT_FIELD);
     fireEvent.change(commentTextField, { target: { value: "This is a comment" } });
 
     // THEN expect the notifyChange function to have been called

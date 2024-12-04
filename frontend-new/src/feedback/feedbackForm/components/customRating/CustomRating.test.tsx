@@ -8,6 +8,8 @@ import CustomRating, {
 import { render, screen } from "src/_test_utilities/test-utils";
 import { fireEvent } from "@testing-library/react";
 import { QuestionType } from "src/feedback/feedbackForm/feedback.types";
+import  {DATA_TEST_ID as QUESTION_TEXT_DATA_TEST_ID} from "src/feedback/feedbackForm/components/questionText/QuestionText";
+import  {DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID} from "src/feedback/feedbackForm/components/commentTextField/CommentTextField";
 
 describe("CustomRating", () => {
   // mock question
@@ -15,11 +17,13 @@ describe("CustomRating", () => {
     type: QuestionType.Rating,
     questionText: "How would you rate the overall experience?",
     questionId: "overall_experience",
+    placeholder: "Please provide your feedback here",
     ratingValue: 6,
     displayRating: true,
     lowRatingLabel: "Very Difficult",
     highRatingLabel: "Very Easy",
     notifyChange: jest.fn(),
+    maxRating: 5,
   };
 
   test("should render component successfully", () => {
@@ -36,9 +40,9 @@ describe("CustomRating", () => {
     const customRatingContainer = screen.getByTestId(DATA_TEST_ID.CUSTOM_RATING_CONTAINER);
     expect(customRatingContainer).toBeInTheDocument();
     // AND the custom rating label to be in the document
-    expect(screen.getByTestId(DATA_TEST_ID.CUSTOM_RATING_TEXT)).toBeInTheDocument();
+    expect(screen.getByTestId(QUESTION_TEXT_DATA_TEST_ID.QUESTION_TEXT)).toBeInTheDocument();
     // AND the custom rating comments to be in the document
-    expect(screen.getByTestId(DATA_TEST_ID.CUSTOM_RATING_FIELD)).toBeInTheDocument();
+    expect(screen.getByTestId(COMMENT_TEXT_FIELD_TEST_ID.COMMENT_TEXT_FIELD)).toBeInTheDocument();
     // AND the custom rating low label to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.CUSTOM_RATING_LOW_LABEL)).toBeInTheDocument();
     // AND the custom rating high label to be in the document
@@ -55,7 +59,7 @@ describe("CustomRating", () => {
     render(givenCustomRating);
 
     // WHEN the comment text field is changed
-    const commentTextField = screen.getByTestId(DATA_TEST_ID.CUSTOM_RATING_FIELD);
+    const commentTextField = screen.getByTestId(COMMENT_TEXT_FIELD_TEST_ID.COMMENT_TEXT_FIELD);
     fireEvent.change(commentTextField, { target: { value: "This is a comment" } });
 
     // THEN expect the notifyChange function to have been called
@@ -75,5 +79,43 @@ describe("CustomRating", () => {
 
     // THEN expect the notifyChange function to have been called
     expect(mockNotifyChange).toHaveBeenCalled();
+  });
+
+  test.each([
+    20, 5, 1
+  ])("should show the expected number of stars for a max rating of %s", (givenMaxRating: number) => {
+    // GIVEN the component
+    const mockNotifyChange = jest.fn();
+    const givenQuestion = {
+      ...mockQuestion,
+      maxRating: givenMaxRating
+    }
+    const givenCustomRating = <CustomRating {...givenQuestion} notifyChange={mockNotifyChange} />;
+    // AND the component is rendered
+    render(givenCustomRating);
+
+    // WHEN the rating is changed
+    const stars = screen.getAllByTestId(DATA_TEST_ID.CUSTOM_RATING_ICON)
+
+    // THEN expect the number of stars to match the max rating
+    expect(stars).toHaveLength(givenMaxRating);
+  });
+
+  test("should show no stars when max rating is 0", () => {
+    // GIVEN the component
+    const mockNotifyChange = jest.fn();
+    const givenQuestion = {
+      ...mockQuestion,
+      maxRating: 0
+    }
+    const givenCustomRating = <CustomRating {...givenQuestion} notifyChange={mockNotifyChange} />;
+    // AND the component is rendered
+    render(givenCustomRating);
+
+    // WHEN the rating is changed
+    const stars = screen.queryAllByTestId(DATA_TEST_ID.CUSTOM_RATING_ICON)
+
+    // THEN expect no stars to be rendered
+    expect(stars).toHaveLength(0);
   });
 });

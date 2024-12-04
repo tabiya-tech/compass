@@ -7,6 +7,7 @@ import CheckboxQuestion, {
   CheckboxQuestionProps,
   DATA_TEST_ID,
 } from "src/feedback/feedbackForm/components/checkboxQuestion/CheckboxQuestion";
+import  {DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID} from "src/feedback/feedbackForm/components/commentTextField/CommentTextField";
 
 describe("CheckboxQuestion", () => {
   // mock question
@@ -43,7 +44,7 @@ describe("CheckboxQuestion", () => {
     // AND the checkbox question checkbox option to be in the document
     expect(screen.getAllByTestId(DATA_TEST_ID.CHECKBOX_OPTION)).toHaveLength(4);
     // AND the checkbox question text field to be in the document
-    expect(screen.getByTestId(DATA_TEST_ID.TEXT_FIELD)).toBeInTheDocument();
+    expect(screen.getByTestId(COMMENT_TEXT_FIELD_TEST_ID.COMMENT_TEXT_FIELD)).toBeInTheDocument();
     // AND to match the snapshot
     expect(checkboxQuestionContainer).toMatchSnapshot();
   });
@@ -71,7 +72,7 @@ describe("CheckboxQuestion", () => {
     render(givenCheckboxQuestion);
 
     // WHEN the comment text field is changed
-    const commentTextField = screen.getByTestId(DATA_TEST_ID.TEXT_FIELD);
+    const commentTextField = screen.getByTestId(COMMENT_TEXT_FIELD_TEST_ID.COMMENT_TEXT_FIELD);
     fireEvent.change(commentTextField, { target: { value: "I have experience with  React and TypeScript" } });
 
     // THEN expect the notifyChange function to have been called

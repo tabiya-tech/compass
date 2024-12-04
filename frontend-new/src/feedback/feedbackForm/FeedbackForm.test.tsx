@@ -5,12 +5,12 @@ import FeedbackForm, { DATA_TEST_ID } from "src/feedback/feedbackForm/FeedbackFo
 import { render, screen } from "src/_test_utilities/test-utils";
 import { fireEvent, waitFor } from "@testing-library/react";
 import { DATA_TEST_ID as FEEDBACK_FORM_CONTENT_DATA_TEST_ID } from "src/feedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
-import { DATA_TEST_ID as CUSTOM_RATING_DATA_TEST_ID } from "src/feedback/feedbackForm/components/customRating/CustomRating";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import FeedbackService from "src/feedback/feedbackForm/feedbackFormService/feedbackFormService";
 import stepsContent from "src/feedback/feedbackForm/stepsContent";
+import { DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID } from "src/feedback/feedbackForm/components/commentTextField/CommentTextField";
 
 // mock the feedback service
 jest.mock("src/feedback/feedbackForm/feedbackFormService/feedbackFormService");
@@ -97,7 +97,7 @@ describe("FeedbackForm", () => {
       // AND the component is rendered
       render(givenFeedbackForm);
       // AND there is at least one answer
-      const input = screen.getAllByTestId(CUSTOM_RATING_DATA_TEST_ID.CUSTOM_RATING_FIELD);
+      const input = screen.getAllByTestId(COMMENT_TEXT_FIELD_TEST_ID.COMMENT_TEXT_FIELD);
       fireEvent.change(input[0], { target: { value: "This is a comment" } });
 
       // WHEN the submit button is clicked
@@ -132,7 +132,7 @@ describe("FeedbackForm", () => {
       // WHEN the component is rendered
       render(<FeedbackForm isOpen={true} notifyOnClose={jest.fn()} onFeedbackSubmit={jest.fn()} />);
       // AND there is at least one answer
-      const input = screen.getAllByTestId(CUSTOM_RATING_DATA_TEST_ID.CUSTOM_RATING_FIELD);
+      const input = screen.getAllByTestId(COMMENT_TEXT_FIELD_TEST_ID.COMMENT_TEXT_FIELD);
       fireEvent.change(input[0], { target: { value: "This is a comment" } });
       // AND the submit button is clicked
       const nextButton = screen.getByTestId(FEEDBACK_FORM_CONTENT_DATA_TEST_ID.FEEDBACK_FORM_NEXT_BUTTON);
