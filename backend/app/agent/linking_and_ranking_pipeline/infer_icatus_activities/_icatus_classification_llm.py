@@ -39,7 +39,7 @@ def _get_prompt(*,
 
 
 class _IcatusClassificationLLM:
-    def __init__(self, *,
+    def __init__(self,
                  classification_level: int,
                  logger: logging.Logger):
         self.classification_level = classification_level
@@ -69,6 +69,7 @@ class _IcatusClassificationLLM:
         llm_response, llm_stats = await self._llm_caller.call_llm(
             llm=self._llm,
             llm_input=prompt,
+            logger=self._logger
         )
         if not llm_response.code:
             self._logger.warning("Failed to classify the experience.")
