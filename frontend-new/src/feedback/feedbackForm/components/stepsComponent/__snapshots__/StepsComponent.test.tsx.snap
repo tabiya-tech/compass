@@ -2,30 +2,35 @@
 
 exports[`StepsComponent should render component successfully 1`] = `
 <div
-  class="MuiBox-root css-c4dei4"
+  class="MuiBox-root css-ifx08d"
   data-testid="steps-component-3bf900a2-f9fa-4b28-8c20-8bc21570635c"
 >
   <div
     class="MuiBox-root css-0"
   >
     <fieldset
-      class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth css-1iledgx-MuiFormControl-root"
+      class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth css-198mkhu-MuiFormControl-root"
       data-testid="checkbox-with-textarea-form-control-989402f0-9fda-4400-958c-2d6c7bce9821"
     >
       <legend
-        class="MuiFormLabel-root MuiFormLabel-colorPrimary css-153jz83-MuiFormLabel-root"
+        class="MuiFormLabel-root MuiFormLabel-colorPrimary css-16k4sf8-MuiFormLabel-root"
         data-testid="checkbox-with-textarea-form-label-989402f0-9fda-4400-958c-2d6c7bce9821"
       >
-        Select options
+        <p
+          class="MuiTypography-root MuiTypography-body1 css-1au4tcm-MuiTypography-root"
+          data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
+        >
+          Select options
+        </p>
       </legend>
       <div
-        class="MuiFormGroup-root css-dmmspl-MuiFormGroup-root"
+        class="MuiFormGroup-root css-1aqk0pa-MuiFormGroup-root"
       >
         <label
-          class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1voglh7-MuiFormControlLabel-root"
+          class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
         >
           <span
-            class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium Mui-checked MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-nnw3t0-MuiButtonBase-root-MuiCheckbox-root"
+            class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium Mui-checked MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-r3m1bu-MuiButtonBase-root-MuiCheckbox-root"
             data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
           >
             <input
@@ -56,10 +61,10 @@ exports[`StepsComponent should render component successfully 1`] = `
           </span>
         </label>
         <label
-          class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1voglh7-MuiFormControlLabel-root"
+          class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
         >
           <span
-            class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-nnw3t0-MuiButtonBase-root-MuiCheckbox-root"
+            class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-r3m1bu-MuiButtonBase-root-MuiCheckbox-root"
             data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
           >
             <input
@@ -90,7 +95,7 @@ exports[`StepsComponent should render component successfully 1`] = `
         </label>
       </div>
       <div
-        class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1pcwqdd-MuiFormControl-root-MuiTextField-root"
+        class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-vg49q3-MuiFormControl-root-MuiTextField-root"
       >
         <div
           class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline css-voxow3-MuiInputBase-root-MuiOutlinedInput-root"
@@ -98,10 +103,9 @@ exports[`StepsComponent should render component successfully 1`] = `
           <textarea
             aria-invalid="false"
             class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
-            data-testid="checkbox-with-textarea-text-field-989402f0-9fda-4400-958c-2d6c7bce9821"
+            data-testid="comment-text-field-ab74a074-67f6-4a8a-b2b2-a582d1d56c9c"
             id=":r0:"
-            placeholder="Write your message here!"
-            rows="2"
+            rows="3"
             style="height: 0px; overflow: hidden;"
           />
           <textarea
@@ -139,12 +143,12 @@ exports[`StepsComponent should render component successfully 1`] = `
       <div
         class="MuiBox-root css-1w00lo4"
       >
-        <h6
-          class="MuiTypography-root MuiTypography-subtitle1 css-1elec29-MuiTypography-root"
-          data-testid="custom-rating-text-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+        <p
+          class="MuiTypography-root MuiTypography-body1 css-1au4tcm-MuiTypography-root"
+          data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
         >
           Rate this
-        </h6>
+        </p>
         <div
           class="MuiBox-root css-a0ovpn"
         >
@@ -323,176 +327,6 @@ exports[`StepsComponent should render component successfully 1`] = `
               value="5"
             />
             <label
-              class="css-dqr9h-MuiRating-label"
-              for=":r7:"
-            >
-              <span
-                class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                value="6"
-              >
-                <svg
-                  aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                  data-testid="StarBorderIcon"
-                  focusable="false"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                  />
-                </svg>
-              </span>
-              <span
-                class="MuiRating-visuallyHidden"
-              >
-                6 Stars
-              </span>
-            </label>
-            <input
-              class="MuiRating-visuallyHidden"
-              id=":r7:"
-              name="q2"
-              type="radio"
-              value="6"
-            />
-            <label
-              class="css-dqr9h-MuiRating-label"
-              for=":r8:"
-            >
-              <span
-                class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                value="7"
-              >
-                <svg
-                  aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                  data-testid="StarBorderIcon"
-                  focusable="false"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                  />
-                </svg>
-              </span>
-              <span
-                class="MuiRating-visuallyHidden"
-              >
-                7 Stars
-              </span>
-            </label>
-            <input
-              class="MuiRating-visuallyHidden"
-              id=":r8:"
-              name="q2"
-              type="radio"
-              value="7"
-            />
-            <label
-              class="css-dqr9h-MuiRating-label"
-              for=":r9:"
-            >
-              <span
-                class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                value="8"
-              >
-                <svg
-                  aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                  data-testid="StarBorderIcon"
-                  focusable="false"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                  />
-                </svg>
-              </span>
-              <span
-                class="MuiRating-visuallyHidden"
-              >
-                8 Stars
-              </span>
-            </label>
-            <input
-              class="MuiRating-visuallyHidden"
-              id=":r9:"
-              name="q2"
-              type="radio"
-              value="8"
-            />
-            <label
-              class="css-dqr9h-MuiRating-label"
-              for=":ra:"
-            >
-              <span
-                class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                value="9"
-              >
-                <svg
-                  aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                  data-testid="StarBorderIcon"
-                  focusable="false"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                  />
-                </svg>
-              </span>
-              <span
-                class="MuiRating-visuallyHidden"
-              >
-                9 Stars
-              </span>
-            </label>
-            <input
-              class="MuiRating-visuallyHidden"
-              id=":ra:"
-              name="q2"
-              type="radio"
-              value="9"
-            />
-            <label
-              class="css-dqr9h-MuiRating-label"
-              for=":rb:"
-            >
-              <span
-                class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                value="10"
-              >
-                <svg
-                  aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                  data-testid="StarBorderIcon"
-                  focusable="false"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                  />
-                </svg>
-              </span>
-              <span
-                class="MuiRating-visuallyHidden"
-              >
-                10 Stars
-              </span>
-            </label>
-            <input
-              class="MuiRating-visuallyHidden"
-              id=":rb:"
-              name="q2"
-              type="radio"
-              value="10"
-            />
-            <label
               class="MuiRating-label MuiRating-pristine css-dqr9h-MuiRating-label"
             >
               <input
@@ -510,59 +344,21 @@ exports[`StepsComponent should render component successfully 1`] = `
             </label>
           </span>
           <div
-            class="MuiBox-root css-nm6hhy"
+            class="MuiBox-root css-jyedia"
           >
-            <span
-              class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
+            <p
+              class="MuiTypography-root MuiTypography-body2 css-bwgvvh-MuiTypography-root"
               data-testid="custom-rating-low-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
             >
               Low
-            </span>
-            <span
-              class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
+            </p>
+            <p
+              class="MuiTypography-root MuiTypography-body2 css-bwgvvh-MuiTypography-root"
               data-testid="custom-rating-high-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
             >
               High
-            </span>
+            </p>
           </div>
-        </div>
-      </div>
-      <div
-        class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1pcwqdd-MuiFormControl-root-MuiTextField-root"
-      >
-        <div
-          class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline css-voxow3-MuiInputBase-root-MuiOutlinedInput-root"
-        >
-          <textarea
-            aria-invalid="false"
-            class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
-            data-testid="custom-rating-field-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-            id=":rc:"
-            placeholder="Write your message here!"
-            rows="2"
-            style="height: 0px; overflow: hidden;"
-          />
-          <textarea
-            aria-hidden="true"
-            class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
-            readonly=""
-            style="visibility: hidden; position: absolute; overflow: hidden; height: 0px; top: 0px; left: 0px; transform: translateZ(0); padding-top: 0px; padding-bottom: 0px; width: 100%;"
-            tabindex="-1"
-          />
-          <fieldset
-            aria-hidden="true"
-            class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
-          >
-            <legend
-              class="css-ihdtdm"
-            >
-              <span
-                class="notranslate"
-              >
-                ​
-              </span>
-            </legend>
-          </fieldset>
         </div>
       </div>
     </div>
@@ -575,22 +371,27 @@ exports[`StepsComponent should render component successfully 1`] = `
       data-testid="yes-no-question-form-control-9803f91b-499a-41b3-9348-795de9e399a9"
     >
       <legend
-        class="MuiFormLabel-root MuiFormLabel-colorPrimary css-153jz83-MuiFormLabel-root"
+        class="MuiFormLabel-root MuiFormLabel-colorPrimary css-16k4sf8-MuiFormLabel-root"
         data-testid="yes-no-question-form-label-9803f91b-499a-41b3-9348-795de9e399a9"
       >
-        Yes or No?
+        <p
+          class="MuiTypography-root MuiTypography-body1 css-1au4tcm-MuiTypography-root"
+          data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
+        >
+          Yes or No?
+        </p>
       </legend>
       <div
         aria-label="q3"
-        class="MuiFormGroup-root MuiFormGroup-row MuiRadioGroup-root MuiRadioGroup-row css-qfz70r-MuiFormGroup-root"
+        class="MuiFormGroup-root MuiFormGroup-row MuiRadioGroup-root MuiRadioGroup-row css-1mle1ow-MuiFormGroup-root"
         role="radiogroup"
       >
         <label
-          class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1voglh7-MuiFormControlLabel-root"
+          class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-2mfj4v-MuiFormControlLabel-root"
           data-testid="yes-no-question-radio-no-9803f91b-499a-41b3-9348-795de9e399a9"
         >
           <span
-            class="MuiButtonBase-root MuiRadio-root MuiRadio-colorPrimary PrivateSwitchBase-root MuiRadio-root MuiRadio-colorPrimary MuiRadio-root MuiRadio-colorPrimary css-njm15p-MuiButtonBase-root-MuiRadio-root"
+            class="MuiButtonBase-root MuiRadio-root MuiRadio-colorPrimary PrivateSwitchBase-root MuiRadio-root MuiRadio-colorPrimary MuiRadio-root MuiRadio-colorPrimary css-pp6yg3-MuiButtonBase-root-MuiRadio-root"
           >
             <input
               class="PrivateSwitchBase-input css-1m9pwf3"
@@ -635,11 +436,11 @@ exports[`StepsComponent should render component successfully 1`] = `
           </span>
         </label>
         <label
-          class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1voglh7-MuiFormControlLabel-root"
+          class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-2mfj4v-MuiFormControlLabel-root"
           data-testid="yes-no-question-radio-yes-9803f91b-499a-41b3-9348-795de9e399a9"
         >
           <span
-            class="MuiButtonBase-root MuiRadio-root MuiRadio-colorPrimary PrivateSwitchBase-root MuiRadio-root MuiRadio-colorPrimary Mui-checked MuiRadio-root MuiRadio-colorPrimary css-njm15p-MuiButtonBase-root-MuiRadio-root"
+            class="MuiButtonBase-root MuiRadio-root MuiRadio-colorPrimary PrivateSwitchBase-root MuiRadio-root MuiRadio-colorPrimary Mui-checked MuiRadio-root MuiRadio-colorPrimary css-pp6yg3-MuiButtonBase-root-MuiRadio-root"
           >
             <input
               checked=""
@@ -686,18 +487,17 @@ exports[`StepsComponent should render component successfully 1`] = `
         </label>
       </div>
       <div
-        class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1pcwqdd-MuiFormControl-root-MuiTextField-root"
+        class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-vg49q3-MuiFormControl-root-MuiTextField-root"
       >
         <div
-          class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline css-voxow3-MuiInputBase-root-MuiOutlinedInput-root"
+          class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline css-voxow3-MuiInputBase-root-MuiOutlinedInput-root"
         >
           <textarea
             aria-invalid="false"
             class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
-            data-testid="yes-no-question-text-field-9803f91b-499a-41b3-9348-795de9e399a9"
-            id=":re:"
-            placeholder="Write your message here!"
-            rows="2"
+            data-testid="comment-text-field-ab74a074-67f6-4a8a-b2b2-a582d1d56c9c"
+            id=":r8:"
+            rows="3"
             style="height: 0px; overflow: hidden;"
           >
             Yes comment

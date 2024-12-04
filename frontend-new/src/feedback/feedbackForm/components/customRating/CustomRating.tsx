@@ -1,10 +1,13 @@
 import * as React from "react";
+import { useRef } from "react";
 import { useMediaQuery, useTheme } from "@mui/material";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Rating from "@mui/material/Rating";
-import TextField from "@mui/material/TextField";
 import { BaseQuestion } from "src/feedback/feedbackForm/feedback.types";
+import QuestionText from "src/feedback/feedbackForm/components/questionText/QuestionText";
+import CommentTextField from "src/feedback/feedbackForm/components/commentTextField/CommentTextField";
+import { focusAndScrollToField } from "src/feedback/feedbackForm/util";
 
 export interface CustomRatingProps extends BaseQuestion {
   ratingValue: number | null;
@@ -13,13 +16,13 @@ export interface CustomRatingProps extends BaseQuestion {
   highRatingLabel: string;
   comments?: string;
   displayRating?: boolean;
+  maxRating: number;
 }
 
 const uniqueId = "7bb1da6e-bd0f-4edf-bbbb-ff7ade168944";
 
 export const DATA_TEST_ID = {
   CUSTOM_RATING_CONTAINER: `custom-rating-container-${uniqueId}`,
-  CUSTOM_RATING_TEXT: `custom-rating-text-${uniqueId}`,
   CUSTOM_RATING_ICON: `custom-rating-icon-${uniqueId}`,
   CUSTOM_RATING_FIELD: `custom-rating-field-${uniqueId}`,
   CUSTOM_RATING_LOW_LABEL: `custom-rating-low-label-${uniqueId}`,
@@ -35,13 +38,19 @@ const CustomRating: React.FC<CustomRatingProps> = ({
   highRatingLabel,
   comments,
   displayRating = true,
+  maxRating,
+  placeholder
 }) => {
   const theme = useTheme();
   const [commentText, setCommentText] = React.useState(comments || "");
   const isSmallMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const commentTextFieldRef = useRef<HTMLInputElement>(null);
 
   const handleRatingChange = (newValue: number | null) => {
-    notifyChange(newValue, commentText);
+    if (newValue !== null) {
+      notifyChange(newValue, commentText);
+      focusAndScrollToField(commentTextFieldRef);
+    }
   };
 
   const handleCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,27 +66,21 @@ const CustomRating: React.FC<CustomRatingProps> = ({
       gap={theme.spacing(2)}
       data-testid={DATA_TEST_ID.CUSTOM_RATING_CONTAINER}
     >
-      <Box display="flex" flexDirection="column" gap={theme.spacing(1)}>
-        <Typography
-          variant="subtitle1"
-          color={(theme) => theme.palette.text.secondary}
-          data-testid={DATA_TEST_ID.CUSTOM_RATING_TEXT}
-        >
-          {questionText}
-        </Typography>
+      <Box display="flex" flexDirection="column" gap={theme.tabiyaSpacing.sm}>
+        <QuestionText questionText={questionText} />
         {displayRating && (
           <Box display="flex" flexDirection="column" width="fit-content">
             <Rating
               name={questionId}
               value={ratingValue}
               onChange={(_, newValue) => handleRatingChange(newValue)}
-              max={10}
+              max={maxRating}
               precision={1}
               size="small"
               sx={{
                 color: theme.palette.primary.main,
                 "& .MuiSvgIcon-root": {
-                  fontSize: theme.fixedSpacing(isSmallMobile ? theme.tabiyaSpacing.lg : theme.tabiyaSpacing.xl),
+                  fontSize: isSmallMobile ? theme.fixedSpacing(theme.tabiyaSpacing.lg) : theme.fixedSpacing(theme.tabiyaSpacing.xl),
                 },
               }}
               IconContainerComponent={(props: any) => {
@@ -88,31 +91,31 @@ const CustomRating: React.FC<CustomRatingProps> = ({
               sx={{
                 display: "flex",
                 justifyContent: "space-between",
-                alignItems: "flex-end",
                 paddingX: 0.5,
-                color: theme.palette.text.secondary,
               }}
             >
-              <Typography variant="caption" data-testid={DATA_TEST_ID.CUSTOM_RATING_LOW_LABEL}>
+              <Typography variant="body2" data-testid={DATA_TEST_ID.CUSTOM_RATING_LOW_LABEL}
+                          sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.sm * 1.2) }}>
                 {lowRatingLabel}
               </Typography>
-              <Typography variant="caption" data-testid={DATA_TEST_ID.CUSTOM_RATING_HIGH_LABEL}>
+              <Typography variant="body2" data-testid={DATA_TEST_ID.CUSTOM_RATING_HIGH_LABEL}
+                          sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.sm * 1.2) }}>
                 {highRatingLabel}
               </Typography>
             </Box>
           </Box>
         )}
       </Box>
-      <TextField
-        placeholder="Write your message here!"
-        multiline
-        fullWidth
-        rows={2}
-        variant="outlined"
-        value={commentText}
-        onChange={handleCommentChange}
-        inputProps={{ "data-testid": DATA_TEST_ID.CUSTOM_RATING_FIELD }}
-      />
+      {
+        placeholder && (
+          <CommentTextField
+            placeholder={placeholder}
+            value={commentText}
+            ref={commentTextFieldRef}
+            onChange={handleCommentChange}
+          />
+        )
+      }
     </Box>
   );
 };
