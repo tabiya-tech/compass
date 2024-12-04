@@ -151,14 +151,26 @@ abstract class AuthenticationService {
 
       // Decode the token and validate it
       const decodedToken: Token = jwtDecode(token);
+      const TIME_BUFFER_SEC = 1; // 1 second buffer for expiration and issuance time
       const currentTime = Math.floor(Date.now() / 1000);
-      if (decodedToken.exp < currentTime) {
-        console.debug("Token is expired");
+
+      // Check expiration with buffer
+      // ideally this would be a simple check, but since there is a chance that the server and client clocks are not perfectly synchronized,
+      // we add a buffer to the expiration time to account for the potential time difference
+      if (decodedToken.exp < currentTime - TIME_BUFFER_SEC) {
+        console.debug("Token is expired: ", {exp: decodedToken.exp, currentTime});
         return { isValid: false, decodedToken: null };
+      } else if (decodedToken.exp < currentTime) {
+        console.debug("Warning: Token is valid but within expiration buffer zone: ", {exp: decodedToken.exp, currentTime});
       }
-      if (decodedToken.iat > currentTime) {
-        console.debug("Token issued in the future");
+
+      // Check issued time with buffer
+      // similarly, we add a buffer to the issuance time to account for the potential time difference between the server and client clocks
+      if (decodedToken.iat > currentTime + TIME_BUFFER_SEC) {
+        console.debug("Token issued in the future: ", {iat: decodedToken.iat, currentTime});
         return { isValid: false, decodedToken: null };
+      } else if (decodedToken.iat > currentTime) {
+        console.debug("Warning: Token is valid but within issuance buffer zone: ", {iat: decodedToken.iat, currentTime});
       }
 
       console.debug("Token checked. Token is valid");
