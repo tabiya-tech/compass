@@ -1,19 +1,19 @@
+import asyncio
 import logging
 
 from app.agent.experience.work_type import WorkType
+from app.agent.linking_and_ranking_pipeline.infer_occupation_tool.infer_occupation_tool import InferOccupationTool, InferOccupationToolOutput
 from app.countries import Country
-from backend.app.agent.linking_and_ranking_pipeline.infer_occupation_tool.infer_occupation_tool import InferOccupationTool, InferOccupationToolOutput
 
 from ._icatus_classification_llm import _IcatusClassificationLLM
 from ..infer_occupation_tool._contextualization_llm import _ContextualizationLLM
-from .utils import IcatusTerminalNode
+from .utils import IcatusTerminalNode, TopLevelDivision
 from app.vector_search.esco_search_service import OccupationSkillSearchService
 
 
 
 
 class InferIcatusActivitiesTool:
-
     def __init__(
             self,
             occupation_skill_search_service: OccupationSkillSearchService,
@@ -21,21 +21,19 @@ class InferIcatusActivitiesTool:
         self._logger = logging.getLogger(self.__class__.__name__)
         self._occupation_skill_search_service = occupation_skill_search_service
         self._infer_occupations_tool = InferOccupationTool(self._occupation_skill_search_service)
-        self.classification_level = 0
+        self.classification_level = 2
 
     async def find_occupations(self, nodes: list[IcatusTerminalNode]):
-        occupation_data = await [self._occupation_skill_search_service.get_by_esco_code(
-                    node.code
-                ) for node in nodes]
+        occupation_data = await asyncio.gather(*(self._occupation_skill_search_service.get_by_esco_code(code=node.code) for node in nodes))
         return occupation_data
     
     def find_terminal_icatus_nodes(self, classification_response):
-        if self.classification_level == 0 and classification_response.value: # Volunteering
+        if self.classification_level == 0 and classification_response.icatus_node == TopLevelDivision.VOLUNTEERING: # Volunteering
             return [node for node in IcatusTerminalNode if node.value.startswith("I5")]
         elif self.classification_level == 0:
             return [node for node in IcatusTerminalNode if not node.value.startswith("I5")]
         else:
-            return classification_response.get_terminal_nodes()
+            return classification_response.icatus_node.get_terminal_nodes()
 
     async def execute(self, *,
                       experience_title: str,
@@ -87,7 +85,7 @@ class InferIcatusActivitiesTool:
                                                             )
             return InferOccupationToolOutput(
                 contextual_titles=icatus_contextualization_response.contextual_titles + esco_occupations.contextual_titles,
-                esco_occupations=icatus_occupations+esco_occupations,
+                esco_occupations=icatus_occupations+esco_occupations.esco_occupations,
                 responsibilities=responsibilities,
                 llm_stats=classification_response.llm_stats +icatus_contextualization_response.llm_stats
                 )
