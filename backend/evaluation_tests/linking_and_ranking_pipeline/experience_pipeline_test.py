@@ -173,7 +173,6 @@ test_cases = [
             name="Icatus I34_4",
             given_experience_title="I clean my shoes",
             given_company_name="Home",
-            skip_force="force",
             given_responsibilities=['Repair and restore damaged clothing and footwear to a presentable condition.'],
             given_country_of_interest=Country.SOUTH_AFRICA,
             given_work_type=WorkType.UNSEEN_UNPAID,
