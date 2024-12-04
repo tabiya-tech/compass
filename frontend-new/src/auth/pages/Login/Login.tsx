@@ -15,7 +15,7 @@ import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
 import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
-import FeedbackButton from "src/feedback/FeedbackButton";
+import BugReportButton from "src/feedback/bugReportButton/BugReportButton";
 import FirebaseInvitationCodeAuthenticationService from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
 
 export const INVITATIONS_PARAM_NAME = "invite-code";
@@ -335,7 +335,7 @@ const Login: React.FC = () => {
             </StyledNavLink>
           </Typography>
         </Box>
-        <FeedbackButton bottomAlign={true} />
+        <BugReportButton bottomAlign={true} />
       </Container>
       <Backdrop isShown={isLoading} message={"Logging you in..."} />
     </>
