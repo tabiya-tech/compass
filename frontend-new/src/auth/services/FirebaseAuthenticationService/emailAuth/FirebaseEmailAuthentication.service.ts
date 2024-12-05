@@ -7,8 +7,8 @@ import { invitationsService } from "src/auth/services/invitationsService/invitat
 import { InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import AuthenticationService from "src/auth/services/Authentication.service";
 import StdFirebaseAuthenticationService, {
-  FirebaseToken, FirebaseTokenValidationFailureCause,
-  FirebaseTokenProviders,
+  FirebaseToken,
+  FirebaseTokenProvider,
 } from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
 import { formatTokenForLogging } from "src/auth/utils/formatTokenForLogging";
 
@@ -102,7 +102,10 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     );
     const invitation = await invitationsService.checkInvitationCodeStatus(registrationCode);
     if (invitation.status === InvitationStatus.INVALID) {
-      throw firebaseErrorFactory(FirebaseErrorCodes.INVALID_REGISTRATION_CODE, `the registration code is invalid: ${registrationCode}`);
+      throw firebaseErrorFactory(
+        FirebaseErrorCodes.INVALID_REGISTRATION_CODE,
+        `the registration code is invalid: ${registrationCode}`
+      );
     }
     if (invitation.invitation_type !== InvitationType.REGISTER) {
       throw firebaseErrorFactory(
@@ -205,21 +208,27 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
    * @returns {boolean} True if the token is valid, false otherwise
    */
   public isTokenValid(token: string): { isValid: boolean; decodedToken: FirebaseToken | null; failureCause?: string } {
-    const { isValid: isValidToken , decodedToken, failureCause: tokenValidationFailureCause } = super.isTokenValid(token);
-    const {isValid: isValidFirebaseToken, failureCause: firebaseTokenValidationFailureCause } = this.stdFirebaseAuthServiceInstance.isFirebaseTokenValid(decodedToken as FirebaseToken);
+    const {
+      isValid: isValidToken,
+      decodedToken,
+      failureCause: tokenValidationFailureCause,
+    } = super.isTokenValid(token);
 
     if (!isValidToken) {
       console.debug(`token is invalid: ${tokenValidationFailureCause} - ${formatTokenForLogging(token)}`);
       return { isValid: false, decodedToken: null, failureCause: tokenValidationFailureCause! };
     }
-    if(!isValidFirebaseToken) {
-      console.debug(`token is not a valid firebase token: ${firebaseTokenValidationFailureCause} - ${formatTokenForLogging(token)}`);
-      return { isValid: false, decodedToken: null, failureCause: firebaseTokenValidationFailureCause! };
-    }
 
-    if ((decodedToken as FirebaseToken).firebase.sign_in_provider !== FirebaseTokenProviders.PASSWORD) {
-      console.debug(`token is not a valid firebase email token: ${FirebaseTokenValidationFailureCause.INVALID_FIREBASE_TOKEN_PROVIDER} - ${formatTokenForLogging(token)}`);
-      return { isValid: false, decodedToken: null, failureCause: FirebaseTokenValidationFailureCause.INVALID_FIREBASE_TOKEN_PROVIDER };
+    const { isValid: isValidFirebaseToken, failureCause: firebaseTokenValidationFailureCause } =
+      this.stdFirebaseAuthServiceInstance.isFirebaseTokenValid(
+        decodedToken as FirebaseToken,
+        FirebaseTokenProvider.PASSWORD
+      );
+    if (!isValidFirebaseToken) {
+      console.debug(
+        `token is not a valid firebase token: ${firebaseTokenValidationFailureCause} - ${formatTokenForLogging(token)}`
+      );
+      return { isValid: false, decodedToken: null, failureCause: firebaseTokenValidationFailureCause! };
     }
 
     return { isValid: true, decodedToken: decodedToken as FirebaseToken };

@@ -1,5 +1,8 @@
 import "src/_test_utilities/consoleMock";
-import StdFirebaseAuthenticationService, { FirebaseTokenValidationFailureCause } from "./StdFirebaseAuthenticationService";
+import StdFirebaseAuthenticationService, {
+  FirebaseTokenProvider,
+  FirebaseTokenValidationFailureCause,
+} from "./StdFirebaseAuthenticationService";
 import { firebaseAuth } from "src/auth/firebaseConfig";
 import { jwtDecode } from "jwt-decode";
 import { FirebaseToken } from "./StdFirebaseAuthenticationService";
@@ -34,18 +37,17 @@ describe("StdFirebaseAuthenticationService", () => {
   });
 
   beforeAll(() => {
-    Object.defineProperty(global, 'indexedDB', {
+    Object.defineProperty(global, "indexedDB", {
       value: {
         deleteDatabase: jest.fn().mockReturnValue({
           onerror: jest.fn(),
           onblocked: jest.fn(),
           onsuccess: jest.fn(),
-        })
+        }),
       },
       writable: true,
     });
   });
-
 
   describe("getInstance", () => {
     test("should return the same instance when called multiple times", () => {
@@ -74,7 +76,7 @@ describe("StdFirebaseAuthenticationService", () => {
       // GIVEN firebase signOut fails
       const error = new Error("Logout failed");
       jest.spyOn(firebaseAuth, "signOut").mockRejectedValue(error);
-      
+
       // WHEN logout is called
       await service.logout();
 
@@ -212,42 +214,55 @@ describe("StdFirebaseAuthenticationService", () => {
   });
 
   describe("isFirebaseTokenValid", () => {
-    test("should return true for valid token", () => {
-      // GIVEN a valid firebase token
-      const mockToken: FirebaseToken = {
-        name: "Test User",
-        user_id: "123",
-        email: "test@example.com",
-        aud: "test",
-        auth_time: 123456789,
-        sub: "test",
-        email_verified: true,
-        exp: 123456789,
-        firebase: {
-          identities: { email: ["test@example.com"] },
-          sign_in_provider: "password",
-        },
-        iss: "https://securetoken.google.com/test",
-        iat: 123456789,
-      };
+    test.each([FirebaseTokenProvider.GOOGLE, FirebaseTokenProvider.PASSWORD, FirebaseTokenProvider.ANONYMOUS])(
+      "should return true for valid %s token",
+      (givenTokenProvider) => {
+        // GIVEN a valid firebase token with the given provider
+        const mockToken: FirebaseToken = {
+          name: "Test User",
+          user_id: "123",
+          email: "test@example.com",
+          aud: "test",
+          auth_time: 123456789,
+          sub: "test",
+          email_verified: true,
+          exp: 123456789,
+          firebase: {
+            identities: { email: ["test@example.com"] },
+            sign_in_provider: givenTokenProvider,
+          },
+          iss: "https://securetoken.google.com/test",
+          iat: 123456789,
+        };
 
-      // WHEN validating the token
-      const result = service.isFirebaseTokenValid(mockToken);
+        // WHEN validating the token
+        const result = service.isFirebaseTokenValid(mockToken, givenTokenProvider);
 
-      // THEN it should be valid
-      expect(result.isValid).toBe(true);
-    });
+        // THEN it should be valid
+        expect(result.isValid).toBe(true);
+      }
+    );
 
     test.each([
       ["missing firebase property", { user_id: "123" }, FirebaseTokenValidationFailureCause.INVALID_FIREBASE_TOKEN],
-      ["missing sign_in_provider", { firebase: {}, user_id: "123" }, FirebaseTokenValidationFailureCause.INVALID_FIREBASE_SIGN_IN_PROVIDER],
-      ["missing user_id", { firebase: { sign_in_provider: "password" } }, FirebaseTokenValidationFailureCause.INVALID_FIREBASE_USER_ID],
+      [
+        "missing sign_in_provider",
+        { firebase: {}, user_id: "123" },
+        FirebaseTokenValidationFailureCause.INVALID_FIREBASE_SIGN_IN_PROVIDER,
+      ],
+      [
+        "missing user_id",
+        { firebase: { sign_in_provider: "password" } },
+        FirebaseTokenValidationFailureCause.INVALID_FIREBASE_USER_ID,
+      ],
     ])("should return false when %s", (_scenario, tokenData, expectedFailureCause) => {
       // GIVEN an invalid token
-      const mockToken = tokenData as FirebaseToken;
+      const givenToken = tokenData as FirebaseToken;
+      // AND some token provider
+      const givenTokenProvider = FirebaseTokenProvider.PASSWORD;
 
       // WHEN validating the token
-      const result = service.isFirebaseTokenValid(mockToken);
+      const result = service.isFirebaseTokenValid(givenToken, givenTokenProvider);
 
       // THEN it should be invalid
       expect(result.isValid).toBe(false);

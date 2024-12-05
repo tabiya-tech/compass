@@ -143,7 +143,6 @@ describe("AuthenticationService", () => {
     beforeEach(() => {
       jest.spyOn(AuthenticationStateService.getInstance(), "setUser");
       jest.spyOn(UserPreferencesStateService.getInstance(), "setUserPreferences");
-
     });
 
     test("should set user data and create preferences on successful registration", async () => {
@@ -235,14 +234,16 @@ describe("AuthenticationService", () => {
     test("should return true for valid token", () => {
       // GIVEN a valid token with correct header and payload
       const givenToken = "valid-token";
-      (jwtDecode as jest.Mock).mockReturnValueOnce({
-        typ: "JWT",
-        alg: "RS256",
-        kid: "key-id",
-      } as TokenHeader).mockReturnValueOnce({
-        exp: currentTime + 3600,
-        iat: currentTime - 3600,
-      } as Token);
+      (jwtDecode as jest.Mock)
+        .mockReturnValueOnce({
+          typ: "JWT",
+          alg: "RS256",
+          kid: "key-id",
+        } as TokenHeader)
+        .mockReturnValueOnce({
+          exp: currentTime + 3600,
+          iat: currentTime - 3600,
+        } as Token);
 
       // WHEN isTokenValid is called
       const result = service.isTokenValid(givenToken);

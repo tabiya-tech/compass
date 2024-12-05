@@ -21,7 +21,7 @@ export interface FirebaseToken extends Token {
   };
 }
 
-export enum FirebaseTokenProviders {
+export enum FirebaseTokenProvider {
   GOOGLE = "google.com",
   PASSWORD = "password",
   ANONYMOUS = "anonymous",
@@ -226,19 +226,25 @@ class StdFirebaseAuthenticationService {
   }
 
   /**
-   * Checks if a given decode token is valid firebase token.
-   * It does not general token validation, but checks specifically for firebase token properties.
+   * Checks if a given decoded token is valid firebase token.
+   * Checks if the decoded has a firebase object the expected sign in provider and user ID.
    *
    * @param {FirebaseToken} decodedToken - The decoded token to validate.
+   * @param expectedTokenProvider
    * @returns {boolean} True if the token is a valid firebase token, false otherwise.
    */
-  public isFirebaseTokenValid(decodedToken: FirebaseToken): { isValid: boolean; failureCause?: FirebaseTokenValidationFailureCause } {
+  public isFirebaseTokenValid(
+    decodedToken: FirebaseToken,
+    expectedTokenProvider: FirebaseTokenProvider
+  ): { isValid: boolean; failureCause?: FirebaseTokenValidationFailureCause } {
     if (!decodedToken.firebase) {
       console.debug("Firebase Token Validation Failed: Token is not a valid firebase token");
       return { isValid: false, failureCause: FirebaseTokenValidationFailureCause.INVALID_FIREBASE_TOKEN };
     }
-    if (!decodedToken.firebase.sign_in_provider) {
-      console.debug("Firebase Token Validation Failed: Token does not have a sign in provider");
+    if (decodedToken.firebase.sign_in_provider !== expectedTokenProvider) {
+      console.debug(
+        `Firebase Token Validation Failed: Token does not have the expected sign in provider: expected ${expectedTokenProvider}, got ${decodedToken.firebase.sign_in_provider}`
+      );
       return { isValid: false, failureCause: FirebaseTokenValidationFailureCause.INVALID_FIREBASE_SIGN_IN_PROVIDER };
     }
     if (!decodedToken.user_id) {

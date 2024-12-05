@@ -221,7 +221,9 @@ describe("AuthService class tests", () => {
       const emailLoginPromise = authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationCode);
 
       // THEN the registration should throw an error
-      await expect(emailLoginPromise).rejects.toThrow("the invitation code is not for registration: " + givenRegistrationCode);
+      await expect(emailLoginPromise).rejects.toThrow(
+        "the invitation code is not for registration: " + givenRegistrationCode
+      );
     });
   });
 });

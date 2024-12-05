@@ -2,8 +2,8 @@ import { firebaseAuth } from "src/auth/firebaseConfig";
 import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import StdFirebaseAuthenticationService, {
-  FirebaseToken, FirebaseTokenValidationFailureCause,
-  FirebaseTokenProviders,
+  FirebaseToken,
+  FirebaseTokenProvider,
 } from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { AuthenticationServices, TabiyaUser } from "src/auth/auth.types";
@@ -57,7 +57,10 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
       throw firebaseErrorFactory(FirebaseErrorCodes.INVALID_INVITATION_CODE, `invalid invitation code: ${code}`);
     }
     if (invitation.invitation_type !== InvitationType.AUTO_REGISTER) {
-      throw firebaseErrorFactory(FirebaseErrorCodes.INVALID_INVITATION_TYPE, `the invitation code is not for login: ${code}`);
+      throw firebaseErrorFactory(
+        FirebaseErrorCodes.INVALID_INVITATION_TYPE,
+        `the invitation code is not for login: ${code}`
+      );
     }
     try {
       userCredential = await firebaseAuth.signInAnonymously();
@@ -80,7 +83,10 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
     const _user = this.authenticationStateService.getUser();
 
     if (!_user) {
-      throw firebaseErrorFactory(FirebaseErrorCodes.USER_NOT_FOUND, `user could not be extracted from token: ...${token.slice(-20)}`);
+      throw firebaseErrorFactory(
+        FirebaseErrorCodes.USER_NOT_FOUND,
+        `user could not be extracted from token: ...${token.slice(-20)}`
+      );
     }
 
     // create user preferences for the first time.
@@ -152,21 +158,27 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
    * @returns {boolean} True if the token is valid, false otherwise
    */
   public isTokenValid(token: string): { isValid: boolean; decodedToken: FirebaseToken | null; failureCause?: string } {
-    const { isValid: isValidToken , decodedToken, failureCause: tokenValidationFailureCause } = super.isTokenValid(token);
-    const {isValid: isValidFirebaseToken, failureCause: firebaseTokenValidationFailureCause } = this.stdFirebaseAuthServiceInstance.isFirebaseTokenValid(decodedToken as FirebaseToken);
+    const {
+      isValid: isValidToken,
+      decodedToken,
+      failureCause: tokenValidationFailureCause,
+    } = super.isTokenValid(token);
 
     if (!isValidToken) {
       console.debug(`token is invalid: ${tokenValidationFailureCause} - ${formatTokenForLogging(token)}`);
       return { isValid: false, decodedToken: null, failureCause: tokenValidationFailureCause! };
     }
-    if(!isValidFirebaseToken) {
-      console.debug(`token is not a valid firebase token: ${firebaseTokenValidationFailureCause} - ${formatTokenForLogging(token)}`);
-      return { isValid: false, decodedToken: null, failureCause: firebaseTokenValidationFailureCause! };
-    }
 
-    if ((decodedToken as FirebaseToken).firebase.sign_in_provider !== FirebaseTokenProviders.ANONYMOUS) {
-      console.debug(`token is not a valid firebase anonymous token: ${"..." + token.slice(-20)} - ${FirebaseTokenValidationFailureCause.INVALID_FIREBASE_TOKEN_PROVIDER}`);
-      return { isValid: false, decodedToken: null };
+    const { isValid: isValidFirebaseToken, failureCause: firebaseTokenValidationFailureCause } =
+      this.stdFirebaseAuthServiceInstance.isFirebaseTokenValid(
+        decodedToken as FirebaseToken,
+        FirebaseTokenProvider.ANONYMOUS
+      );
+    if (!isValidFirebaseToken) {
+      console.debug(
+        `token is not a valid firebase token: ${firebaseTokenValidationFailureCause} - ${formatTokenForLogging(token)}`
+      );
+      return { isValid: false, decodedToken: null, failureCause: firebaseTokenValidationFailureCause! };
     }
 
     return { isValid: true, decodedToken: decodedToken as FirebaseToken };
