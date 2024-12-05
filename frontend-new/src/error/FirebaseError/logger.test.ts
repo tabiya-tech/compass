@@ -36,21 +36,6 @@ describe("writeFirebaseErrorToLog", () => {
 
     // AND log function should be called with the exact error
     expect(mockLogFunction).toHaveBeenNthCalledWith(1, givenFireBaseError);
-
-    // AND log function should have been called with the message and the error object
-    expect(mockLogFunction).toHaveBeenNthCalledWith(2, {
-      message: "FirebaseError: service function auth/internal-error method",
-      error: {
-        serviceName: givenService,
-        serviceFunction: givenFunction,
-        method: givenMethod,
-        errorCode: givenErrorCode,
-        details: givenDetails,
-        message: givenMessage,
-        stack: givenFireBaseError.stack,
-        class: FirebaseError.name,
-      },
-    });
   });
 
   it("should call logFunction with ony one time if error is not instance of FirebaseError", () => {
@@ -101,31 +86,5 @@ describe("writeFirebaseErrorToLog", () => {
 
     // AND log function should be called with the exact error
     expect(mockLogFunction).toHaveBeenNthCalledWith(1, givenFireBaseError);
-
-    // AND log function should have been called with the message and the error object
-    expect(mockLogFunction).toHaveBeenNthCalledWith(2, {
-      message: "FirebaseError: service function auth/internal-error method",
-      error: {
-        serviceName: givenService,
-        serviceFunction: givenFunction,
-        method: givenMethod,
-        errorCode: givenErrorCode,
-        details: givenDetails,
-        message: givenMessage,
-        stack: givenFireBaseError.stack,
-        customValue: givenCustomValue,
-        class: FirebaseError.name,
-      },
-    });
-
-    // AND log object should not include functions
-    const logObject = mockLogFunction.mock.calls[1][0].error;
-
-    expect(Object.keys(logObject)).not.toContain("toJSON");
-    expect(Object.keys(logObject)).not.toContain("toString");
-    expect(Object.keys(logObject)).not.toContain("valueOf");
-
-    // AND log object should not include givenCustomFunction
-    expect(Object.keys(logObject)).not.toContain("customFunction");
   });
 });

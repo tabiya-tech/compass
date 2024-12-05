@@ -10058,6 +10058,11 @@ invariant@^2.2.4:
   dependencies:
     loose-envify "^1.0.0"
 
+ip-anonymize@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/ip-anonymize/-/ip-anonymize-0.1.0.tgz#5ead504d01871c5c28189a25382f852036b57f7e"
+  integrity sha512-cZJu+N5JKKFGMK0eEQWNaQMn2EhCysciVM6eotCJwfqotj16BTfVchKsJCH6mQAT9N0GC7oWRcsZ6Lb8dDiwTA==
+
 ip@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/ip/-/ip-2.0.1.tgz#e8f3595d33a3ea66490204234b77636965307105"
