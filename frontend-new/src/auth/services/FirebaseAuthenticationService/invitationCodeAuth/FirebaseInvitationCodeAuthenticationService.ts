@@ -14,6 +14,7 @@ import { Language } from "src/userPreferences/UserPreferencesService/userPrefere
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import AuthenticationService from "src/auth/services/Authentication.service";
 import { formatTokenForLogging } from "src/auth/utils/formatTokenForLogging";
+import { TokenError } from "src/auth/auth.error.types";
 
 class FirebaseInvitationCodeAuthenticationService extends AuthenticationService {
   private static instance: FirebaseInvitationCodeAuthenticationService;
@@ -130,7 +131,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
       // call the parent class method once the token is successfully refreshed
       await super.onSuccessfulRefresh(newToken);
     } catch (error) {
-      console.error("error refreshing token: ", error);
+      console.error(new TokenError("error refreshing token", error as Error));
       // if token refresh fails, log the user out
       await this.logout();
     }
@@ -146,7 +147,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
     const { isValid, decodedToken, failureCause } = this.isTokenValid(token);
 
     if (!isValid) {
-      console.error(`could not get user from token: ${failureCause} - ${formatTokenForLogging(token)}`);
+      console.error(new TokenError(`invalid token: ${formatTokenForLogging(token)}`, failureCause!));
       return null;
     }
     return this.stdFirebaseAuthServiceInstance.getUserFromDecodedToken(decodedToken!);

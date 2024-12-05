@@ -11,6 +11,7 @@ import StdFirebaseAuthenticationService, {
   FirebaseTokenProvider,
 } from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
 import { formatTokenForLogging } from "src/auth/utils/formatTokenForLogging";
+import { TokenError } from "src/auth/auth.error.types";
 
 class FirebaseEmailAuthenticationService extends AuthenticationService {
   private static instance: FirebaseEmailAuthenticationService;
@@ -180,7 +181,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
       // call the parent class method once the token is successfully refreshed
       await super.onSuccessfulRefresh(newToken);
     } catch (error) {
-      console.error("Error refreshing token:", error);
+      console.error(new TokenError("Error refreshing token:", error as Error));
       // if token refresh fails, log the user out
       await this.logout();
     }
@@ -196,7 +197,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     const { isValid, decodedToken, failureCause } = this.isTokenValid(token);
 
     if (!isValid) {
-      console.error(`could not get user from token: ${failureCause} - ${formatTokenForLogging(token)}`);
+      console.error(new TokenError(`token is invalid: ${formatTokenForLogging(token)}`, failureCause!));
       return null;
     }
     return this.stdFirebaseAuthServiceInstance.getUserFromDecodedToken(decodedToken!);
