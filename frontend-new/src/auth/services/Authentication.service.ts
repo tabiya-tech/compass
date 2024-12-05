@@ -142,7 +142,7 @@ abstract class AuthenticationService {
    * @param {string} token - The token to validate.
    * @returns {boolean} True if the token is valid, false otherwise.
    */
-  public isTokenValid(token: string): { isValid: boolean; decodedToken: Token | null, failureCause?: string } {
+  public isTokenValid(token: string): { isValid: boolean; decodedToken: Token | null; failureCause?: string } {
     try {
       // Decode the header and validate it
       const decodedHeader: TokenHeader = jwtDecode(token, { header: true });
@@ -156,7 +156,11 @@ abstract class AuthenticationService {
       }
       if (!decodedHeader.kid) {
         console.debug("Token does not have a key ID (kid)");
-        return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.TOKEN_DOES_NOT_HAVE_A_KEY_ID };
+        return {
+          isValid: false,
+          decodedToken: null,
+          failureCause: TokenValidationFailureCause.TOKEN_DOES_NOT_HAVE_A_KEY_ID,
+        };
       }
 
       // Decode the token and validate it
@@ -168,19 +172,25 @@ abstract class AuthenticationService {
       // ideally this would be a simple check, but since there is a chance that the server and client clocks are not perfectly synchronized,
       // we add a buffer to the expiration time to account for the potential time difference
       if (decodedToken.exp < currentTime - TIME_BUFFER_SEC) {
-        console.debug("Token is expired: ", {exp: decodedToken.exp, currentTime});
+        console.debug("Token is expired: ", { exp: decodedToken.exp, currentTime });
         return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.TOKEN_EXPIRED };
       } else if (decodedToken.exp < currentTime) {
-        console.debug("Warning: Token is valid but within expiration buffer zone: ", {exp: decodedToken.exp, currentTime});
+        console.debug("Warning: Token is valid but within expiration buffer zone: ", {
+          exp: decodedToken.exp,
+          currentTime,
+        });
       }
 
       // Check issued time with buffer
       // similarly, we add a buffer to the issuance time to account for the potential time difference between the server and client clocks
       if (decodedToken.iat > currentTime + TIME_BUFFER_SEC) {
-        console.debug("Token issued in the future: ", {iat: decodedToken.iat, currentTime});
+        console.debug("Token issued in the future: ", { iat: decodedToken.iat, currentTime });
         return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.TOKEN_NOT_YET_VALID };
       } else if (decodedToken.iat > currentTime) {
-        console.debug("Warning: Token is valid but within issuance buffer zone: ", {iat: decodedToken.iat, currentTime});
+        console.debug("Warning: Token is valid but within issuance buffer zone: ", {
+          iat: decodedToken.iat,
+          currentTime,
+        });
       }
 
       console.debug("Token checked. Token is valid");
