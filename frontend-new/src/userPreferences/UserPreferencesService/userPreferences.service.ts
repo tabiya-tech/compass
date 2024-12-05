@@ -109,7 +109,11 @@ export default class UserPreferencesService {
       expectedContentType: "application/json",
     });
     const responseBody = await response.text();
-    return this.parseJsonResponse(responseBody, errorFactory);
+    // the response body does not contain the user_id, so we need to add it
+    return {
+      ...this.parseJsonResponse(responseBody, errorFactory),
+      user_id: user_preferences.user_id
+    };
   }
 
   /**
@@ -142,7 +146,11 @@ export default class UserPreferencesService {
       expectedContentType: "application/json",
     });
     const responseBody = await response.text();
-    return this.parseJsonResponse(responseBody, errorFactory);
+    // the response body does not contain the user_id, so we need to add it
+    return {
+      ...this.parseJsonResponse(responseBody, errorFactory),
+      user_id: newUserPreferencesSpec.user_id
+    };
   }
 
   /**
@@ -174,7 +182,10 @@ export default class UserPreferencesService {
     }
 
     const responseBody = await response.text();
-    return this.parseJsonResponse(responseBody, errorFactory);
+    return {
+      ...this.parseJsonResponse(responseBody, errorFactory),
+      user_id: userId
+    };
   }
 
   /**
@@ -201,7 +212,11 @@ export default class UserPreferencesService {
     });
 
     const responseBody = await response.text();
-    return this.parseJsonResponse(responseBody, errorFactory);
+    // the response body does not contain the user_id, so we need to add it
+    return {
+      ...this.parseJsonResponse(responseBody, errorFactory),
+      user_id: userId
+    };
   }
 }
 
