@@ -11,18 +11,19 @@ import pulumi
 from deploy_aws_ns import deploy_aws_ns
 from dotenv import load_dotenv
 
+from lib.std_pulumi import getenv
+
 # Load environment variables from .env file
 load_dotenv()
 
 
 def main():
-    domain_name = os.getenv("DOMAIN_NAME")
-    pulumi.info(f"Using Domain: {domain_name}")
-    if not domain_name:
-        pulumi.error("environment variable DOMAIN_NAME is not set")
-        sys.exit(1)
     environment = pulumi.get_stack()
     pulumi.info(f"Using Environment: {environment}")
+
+    # Get the domain name
+    domain_name = getenv("DOMAIN_NAME")
+    pulumi.info(f"Using Domain: {domain_name}")
 
     # Deploy the aws ns
     deploy_aws_ns(domain_name, environment)
