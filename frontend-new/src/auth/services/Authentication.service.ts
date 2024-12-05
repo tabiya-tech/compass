@@ -8,6 +8,7 @@ import { Language } from "src/userPreferences/UserPreferencesService/userPrefere
 import { TabiyaUser, Token, TokenHeader } from "src/auth/auth.types";
 import { jwtDecode } from "jwt-decode";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import { TokenError } from "src/auth/auth.error.types";
 
 export enum TokenValidationFailureCause {
   TOKEN_EXPIRED = "TOKEN_EXPIRED",
@@ -137,7 +138,7 @@ abstract class AuthenticationService {
   }
 
   /**
-   * Checks if a given token is valid (not expired and not issued in the future).
+   * Checks the header and payload of the token to ensure it is a valid JWT
    *
    * @param {string} token - The token to validate.
    * @returns {boolean} True if the token is valid, false otherwise.
@@ -165,17 +166,17 @@ abstract class AuthenticationService {
 
       // Decode the token and validate it
       const decodedToken: Token = jwtDecode(token);
-      const TIME_BUFFER_SEC = 1; // 1 second buffer for expiration and issuance time
+      const TOLERANCE_BUFFER = 1; // 1 second buffer for expiration and issuance time
       const currentTime = Math.floor(Date.now() / 1000);
 
       // Check expiration with buffer
       // ideally this would be a simple check, but since there is a chance that the server and client clocks are not perfectly synchronized,
       // we add a buffer to the expiration time to account for the potential time difference
-      if (decodedToken.exp < currentTime - TIME_BUFFER_SEC) {
+      if (decodedToken.exp < currentTime - TOLERANCE_BUFFER) {
         console.debug("Token is expired: ", { exp: decodedToken.exp, currentTime });
         return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.TOKEN_EXPIRED };
       } else if (decodedToken.exp < currentTime) {
-        console.debug("Warning: Token is valid but within expiration buffer zone: ", {
+        console.warn("Warning: token expiration time has elapsed, but is still within the acceptable tolerance period", {
           exp: decodedToken.exp,
           currentTime,
         });
@@ -183,20 +184,19 @@ abstract class AuthenticationService {
 
       // Check issued time with buffer
       // similarly, we add a buffer to the issuance time to account for the potential time difference between the server and client clocks
-      if (decodedToken.iat > currentTime + TIME_BUFFER_SEC) {
+      if (decodedToken.iat > currentTime + TOLERANCE_BUFFER) {
         console.debug("Token issued in the future: ", { iat: decodedToken.iat, currentTime });
         return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.TOKEN_NOT_YET_VALID };
       } else if (decodedToken.iat > currentTime) {
-        console.debug("Warning: Token is valid but within issuance buffer zone: ", {
+        console.warn("Warning: token issued at time was after the current time, but within the acceptable tolerance period ", {
           iat: decodedToken.iat,
           currentTime,
         });
       }
-
       console.debug("Token checked. Token is valid");
       return { isValid: true, decodedToken: decodedToken };
     } catch (error) {
-      console.error("Error decoding token:", error);
+      console.error(new TokenError("Error decoding token", error as Error));
       return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.ERROR_DECODING_TOKEN };
     }
   }
