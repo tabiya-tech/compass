@@ -84,6 +84,8 @@ jobs:
         - name: Build
           run: yarn build
           working-directory: frontend-new
+          env:
+            SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         - name: Archive build bundle
           uses: actions/upload-artifact@v4
           with:
