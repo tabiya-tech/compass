@@ -2,7 +2,7 @@ export const formatTokenForLogging = (token: string): string => {
   if (!token) {
     return "<no token>";
   }
-  
+
   if (token.trim() === "") {
     return "<empty token>";
   }
@@ -18,4 +18,4 @@ export const formatTokenForLogging = (token: string): string => {
   const firstSix = token.slice(0, 6);
   const lastSix = token.slice(-6);
   return `${firstSix}...${lastSix}`;
-}
+};

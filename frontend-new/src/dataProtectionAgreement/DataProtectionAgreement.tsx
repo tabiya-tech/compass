@@ -162,7 +162,8 @@ const DataProtectionAgreement: React.FC = () => {
           AI technology is new and far from perfect. It doesn't understand context like humans do.
           <br />
           <br />
-          Always double-check important details and avoid sharing personal information about yourself and others with the AI during the conversation.
+          Always double-check important details and avoid sharing personal information about yourself and others with
+          the AI during the conversation.
           <br />
           <br />
           Help us keep all AI interactions safe and positive! 😊
