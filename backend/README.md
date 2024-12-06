@@ -352,3 +352,23 @@ Make sure to run it from the `/backend` directory as it contains the necessary e
 
 The script handles retrying, rate limiting, and processes the data in batches. Additionally, if the generation process is interrupted, the script can be re-run,
 and it will continue processing the remaining data from where it left off.
+
+## Export users feedback
+
+The script `export_feedback.py` is used to export the feedback data from the database to a CSV file.
+
+For the source database the script uses the following environment variables:
+```dotenv
+# The URI of the MongoDB instance where the feedback data is stored
+FEEDBACK_MONGO_URI=<MONGODB_URI>
+# The name of the database in the feedback MongoDB instance where the feedback data is stored
+FEEDBACK_DATABASE_NAME=<FEEDBACK_DATABASE_NAME>
+```
+
+To run the script use the following command:
+
+```shell
+ python3 scripts/export_feedback.py
+```
+
+The script will export the feedback data to a CSV file in the `/feedback-reports` directory.

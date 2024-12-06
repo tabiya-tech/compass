@@ -1,5 +1,5 @@
 import React from "react";
-import { Box } from "@mui/material";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import { DetailedQuestion, QuestionType } from "src/feedback/feedbackForm/feedback.types";
 import { Answer, FeedbackItem } from "src/feedback/feedbackForm/feedbackFormService/feedbackFormService.types";
 import CustomRating from "src/feedback/feedbackForm/components/customRating/CustomRating";
@@ -19,19 +19,19 @@ export const DATA_TEST_ID = {
 };
 
 const StepsComponent: React.FC<StepProps> = ({ questions, feedbackItems, onChange }) => {
+  const theme = useTheme();
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   const getAnswerByQuestionId = (questionId: string): FeedbackItem["answer"] | undefined => {
     return (feedbackItems || []).find((item: FeedbackItem) => item.question_id === questionId)?.answer;
   };
 
   const handleInputChange = (questionId: string, value: Answer) => {
+    const isAnswered = value !== null && value !== undefined && Object.keys(value).length > 0;
     const formattedData: FeedbackItem = {
       question_id: questionId,
-      answer: {
-        rating_numeric: value.rating_numeric,
-        rating_boolean: value.rating_boolean,
-        selected_options: value.selected_options,
-        comment: value.comment,
-      },
+      answer: value,
+      is_answered: isAnswered,
     };
     onChange(formattedData);
   };
@@ -40,7 +40,7 @@ const StepsComponent: React.FC<StepProps> = ({ questions, feedbackItems, onChang
     <Box
       display="flex"
       flexDirection="column"
-      gap={(theme) => theme.tabiyaSpacing.xl}
+      gap={(theme) => isSmallMobile ? theme.tabiyaSpacing.xl * 3 : theme.tabiyaSpacing.xl * 1.2}
       data-testid={DATA_TEST_ID.STEPS_COMPONENT}
     >
       {questions.map((question) => {
@@ -53,6 +53,7 @@ const StepsComponent: React.FC<StepProps> = ({ questions, feedbackItems, onChang
           lowRatingLabel,
           highRatingLabel,
           showCommentsOn,
+          placeholder,
         } = question;
         const answer = getAnswerByQuestionId(questionId) || {};
 
@@ -69,6 +70,7 @@ const StepsComponent: React.FC<StepProps> = ({ questions, feedbackItems, onChang
                   handleInputChange(questionId, { selected_options: selectedOptions, comment: comments })
                 }
                 comments={answer.comment ?? ""}
+                placeholder={placeholder}
               />
             )}
             {type === QuestionType.Rating && (
@@ -84,6 +86,8 @@ const StepsComponent: React.FC<StepProps> = ({ questions, feedbackItems, onChang
                 lowRatingLabel={lowRatingLabel ?? ""}
                 highRatingLabel={highRatingLabel ?? ""}
                 comments={answer.comment ?? ""}
+                maxRating={question.maxRating ?? 5}
+                placeholder={placeholder}
               />
             )}
             {type === QuestionType.YesNo && (
@@ -97,6 +101,7 @@ const StepsComponent: React.FC<StepProps> = ({ questions, feedbackItems, onChang
                 }
                 showCommentsOn={showCommentsOn ?? undefined}
                 comments={answer.comment ?? ""}
+                placeholder={placeholder}
               />
             )}
           </Box>

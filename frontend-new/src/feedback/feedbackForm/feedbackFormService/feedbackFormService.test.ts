@@ -67,6 +67,19 @@ describe("FeedbackFormService", () => {
     expect(service.feedbackEndpointUrl).toEqual(`${givenApiServerUrl}/users/feedback`);
   });
 
+  test("should return a new instance of FeedbackService with the correct sessionId", () => {
+    // GIVEN a sessionId
+    const sessionId = 1234;
+
+    // WHEN calling getInstance
+    const instance = FeedbackService.getInstance(sessionId);
+
+    // THEN expect it to return a new instance of FeedbackService
+    expect(instance).toBeInstanceOf(FeedbackService);
+    // AND the instance should have the correct sessionId
+    expect(instance).toHaveProperty("sessionId", sessionId);
+  });
+
   describe("sendFeedback", () => {
     test("should fetch the correct URL, with POST and the correct headers and payload successfully", async () => {
       // GIVEN feedback data
@@ -79,7 +92,7 @@ describe("FeedbackFormService", () => {
             selected_options: [],
             comment: "This is a comment",
           },
-        },
+          is_answered: true,       },
       ];
       // AND the REST API will respond with CREATED status
       const expectedResponse = {
@@ -179,6 +192,7 @@ describe("FeedbackFormService", () => {
             selected_options: [],
             comment: "This is a comment",
           },
+          is_answered: true
         },
       ];
 
@@ -189,5 +203,6 @@ describe("FeedbackFormService", () => {
       // THEN expect it to throw an error
       await expect(service.sendFeedback(givenFeedbackData)).rejects.toThrow("User not found");
     });
+
   });
 });

@@ -10,6 +10,7 @@ import FeedbackFormContent, {
 } from "src/feedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
 import { DATA_TEST_ID as CHECKBOX_DATA_TEST_ID } from "src/feedback/feedbackForm/components/checkboxQuestion/CheckboxQuestion";
 import stepsContent from "src/feedback/feedbackForm/stepsContent";
+import { DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID } from "src/feedback/feedbackForm/components/commentTextField/CommentTextField";
 
 describe("FeedbackFormContent", () => {
   beforeEach(() => {
@@ -83,9 +84,9 @@ describe("FeedbackFormContent", () => {
       // AND the component is rendered
       render(givenFeedbackFormContent);
 
-      // WHEN on the first step, answer the yes/no question
-      const yesNoInput = screen.getAllByTestId(YES_NO_DATA_TEST_ID.RADIO_YES)[0];
-      fireEvent.click(yesNoInput);
+      // WHEN on the first step, answer rating question
+      const starRating = screen.getAllByTestId(CUSTOM_RATING_DATA_TEST_ID.CUSTOM_RATING_ICON)[4];
+      fireEvent.click(starRating);
 
       // AND move to next step
       const nextButton = screen.getByTestId(DATA_TEST_ID.FEEDBACK_FORM_NEXT_BUTTON);
@@ -98,10 +99,17 @@ describe("FeedbackFormContent", () => {
       // AND move to next step
       fireEvent.click(nextButton);
 
-      // AND on the third step, provide a custom rating comment
-      const expectedComment = "This is a comment";
-      const customRatingInput = screen.getAllByTestId(CUSTOM_RATING_DATA_TEST_ID.CUSTOM_RATING_FIELD)[0];
-      fireEvent.change(customRatingInput, { target: { value: expectedComment } });
+      // AND on the third step, answer the yes/no question
+      const yesNoInput = screen.getAllByTestId(YES_NO_DATA_TEST_ID.RADIO_YES)[1];
+      fireEvent.click(yesNoInput);
+
+      // AND move to next step
+      fireEvent.click(nextButton);
+
+      // AND on the last step, provide a custom rating comment
+      const customRatingInput = screen.getAllByTestId(CUSTOM_RATING_DATA_TEST_ID.CUSTOM_RATING_ICON)[8];
+      fireEvent.click(customRatingInput);
+
 
       // AND submit the form
       fireEvent.click(nextButton);
@@ -111,39 +119,54 @@ describe("FeedbackFormContent", () => {
 
       // AND expect the exact answer data structure
       const submittedAnswers = mockHandleSubmit.mock.calls[0][0];
-      expect(submittedAnswers).toHaveLength(3);
+      expect(submittedAnswers).toHaveLength(4);
 
-      // First step answer (yes/no)
+      // First step answer (custom rating)
       expect(submittedAnswers[0]).toEqual({
-        question_id: stepsContent[0].questions[1].questionId,
+        question_id: stepsContent[0].questions[0].questionId,
+        answer: {
+          comment: "",
+          rating_boolean: undefined,
+          rating_numeric: 5,
+          selected_options: undefined,
+        },
+        is_answered: true,
+      });
+
+      // Second step answer (checkbox)
+      expect(submittedAnswers[1]).toEqual({
+        question_id: stepsContent[1].questions[1].questionId,
+        answer: {
+          comment: "",
+          rating_boolean: undefined,
+          rating_numeric: undefined,
+          selected_options: [stepsContent[1].questions[1].options![0].key],
+        },
+        is_answered: true,
+      });
+
+      // Third step answer (yes/no)
+      expect(submittedAnswers[2]).toEqual({
+        question_id: stepsContent[2].questions[1].questionId,
         answer: {
           comment: "",
           rating_boolean: true,
           rating_numeric: undefined,
           selected_options: undefined,
         },
+        is_answered: true,
       });
 
-      // Second step answer (checkbox)
-      expect(submittedAnswers[1]).toEqual({
-        question_id: stepsContent[1].questions[0].questionId,
+      // Last step answer (custom rating)
+      expect(submittedAnswers[3]).toEqual({
+        question_id: stepsContent[3].questions[0].questionId,
         answer: {
           comment: "",
           rating_boolean: undefined,
-          rating_numeric: undefined,
-          selected_options: [stepsContent[1].questions[0].options![0].key],
-        },
-      });
-
-      // Third step answer (custom rating)
-      expect(submittedAnswers[2]).toEqual({
-        question_id: stepsContent[2].questions[0].questionId,
-        answer: {
-          comment: expectedComment,
-          rating_boolean: undefined,
-          rating_numeric: null,
+          rating_numeric: 9,
           selected_options: undefined,
         },
+        is_answered: true,
       });
     });
 
@@ -154,10 +177,10 @@ describe("FeedbackFormContent", () => {
       render(givenFeedbackFormContent);
 
       // WHEN question is answered
-      const radioNo = screen.getByTestId(YES_NO_DATA_TEST_ID.RADIO_NO);
-      fireEvent.click(radioNo);
+      const customRating = screen.getAllByTestId(CUSTOM_RATING_DATA_TEST_ID.CUSTOM_RATING_ICON)[4];
+      fireEvent.click(customRating);
 
-      const input = screen.getByTestId(YES_NO_DATA_TEST_ID.TEXT_FIELD);
+      const input = screen.getByTestId(COMMENT_TEXT_FIELD_TEST_ID.COMMENT_TEXT_FIELD);
       fireEvent.change(input, { target: { value: "This is a comment" } });
 
       // THEN expect the answer to be saved

@@ -24,9 +24,11 @@ import { act } from "@testing-library/react";
 import * as FirebaseAuthenticationServiceFactoryModule from "src/auth/services/Authentication.service.factory";
 import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import { DATA_TEST_ID as FEEDBACK_FORM_CONTENT_DATA_TEST_ID } from "src/feedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
-import { DATA_TEST_ID as CUSTOM_RATING_DATA_TEST_ID } from "src/feedback/feedbackForm/components/customRating/CustomRating";
 import stepsContent from "src/feedback/feedbackForm/stepsContent";
 import FeedbackService from "src/feedback/feedbackForm/feedbackFormService/feedbackFormService";
+import {
+  DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID
+} from "src/feedback/feedbackForm/components/commentTextField/CommentTextField";
 
 // Mock the ChatService module
 jest.mock("src/chat/ChatService/ChatService");
@@ -691,7 +693,7 @@ describe("Chat", () => {
       fireEvent.click(feedbackButton);
 
       // WHEN the user submits the feedback
-      const input = screen.getAllByTestId(CUSTOM_RATING_DATA_TEST_ID.CUSTOM_RATING_FIELD);
+      const input = screen.getAllByTestId(COMMENT_TEXT_FIELD_TEST_ID.COMMENT_TEXT_FIELD);
       fireEvent.change(input[0], { target: { value: "This is a comment" } });
 
       const submitButton = screen.getByTestId(FEEDBACK_FORM_CONTENT_DATA_TEST_ID.FEEDBACK_FORM_NEXT_BUTTON);
@@ -719,7 +721,7 @@ describe("Chat", () => {
       fireEvent.click(feedbackButton);
 
       // WHEN the user submits the feedback
-      const input = screen.getAllByTestId(CUSTOM_RATING_DATA_TEST_ID.CUSTOM_RATING_FIELD);
+      const input = screen.getAllByTestId(COMMENT_TEXT_FIELD_TEST_ID.COMMENT_TEXT_FIELD);
       fireEvent.change(input[0], { target: { value: "This is a comment" } });
 
       const submitButton = screen.getByTestId(FEEDBACK_FORM_CONTENT_DATA_TEST_ID.FEEDBACK_FORM_NEXT_BUTTON);

@@ -7,6 +7,7 @@ from app.users.feedback.model import Answer
 class FeedbackItem(BaseModel):
     question_id: str
     answer: Answer
+    is_answered: bool
 
     class Config:
         extra = "forbid"

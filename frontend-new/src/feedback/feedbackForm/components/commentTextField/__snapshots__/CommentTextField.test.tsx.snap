@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CommentTextField should render component successfully 1`] = `
+<textarea
+  aria-invalid="false"
+  class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
+  data-testid="comment-text-field-ab74a074-67f6-4a8a-b2b2-a582d1d56c9c"
+  id=":r0:"
+  placeholder="bar"
+  rows="3"
+  style="height: 0px; overflow: hidden;"
+>
+  foo
+</textarea>
+`;

@@ -15,6 +15,7 @@ jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => {
     answer: {
       rating_numeric: 7,
     },
+    is_answered: true,
   };
   return {
     __esModule: true,
