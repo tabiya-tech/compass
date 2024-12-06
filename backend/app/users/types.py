@@ -3,6 +3,8 @@ from typing import Optional, Mapping
 from pydantic import BaseModel, Field
 from datetime import datetime
 
+from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
+
 
 class UpdateUserLanguageRequest(BaseModel):
     user_id: str
@@ -62,24 +64,53 @@ class UserPreferences(BaseModel):
     invitation_code: Optional[str] = None
     accepted_tc: Optional[datetime] = None
     sessions: list[int] = Field(default_factory=list)  # not required
+    sensitive_personal_data_requirement: SensitivePersonalDataRequirement
 
     @staticmethod
     def from_document(doc: Mapping[str, any]) -> "UserPreferences":
+        """
+        Create a new UserPreferences object from a dictionary
+
+        :param doc: python dictionary: The dictionary to create the UserPreferences object from
+        :return:  UserPreferences: The created UserPreferences object
+        """
+
         return UserPreferences(
             language=doc.get("language"),
             accepted_tc=doc.get("accepted_tc"),
             invitation_code=doc.get("invitation_code"),
             sessions=doc.get("sessions"),
+            sensitive_personal_data_requirement=doc.get(
+                "sensitive_personal_data_requirement",
+                SensitivePersonalDataRequirement.NOT_REQUIRED
+            ),
         )
 
     class Config:
         extra = "forbid"
+        use_enum_values = True
 
 
 class GetUsersPreferencesResponse(UserPreferences):
+    """
+    Represents the response for getting the user preferences
+    """
+
     sessions_with_feedback: list[int] = Field(default_factory=list)
+    """
+    The sessions with feedback (ids of the sessions)
+    """
+
+    has_sensitive_personal_data: bool
+    """
+    Weathers the user has sensitive personal data
+    """
 
     class Config:
+        """
+        Pydantic configuration
+        """
+
         extra = "forbid"
 
 

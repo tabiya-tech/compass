@@ -3,7 +3,8 @@ import "src/_test_utilities/consoleMock";
 import InvitationsService from "./invitations.service";
 import { StatusCodes } from "http-status-codes";
 import { setupFetchSpy } from "src/_test_utilities/fetchSpy";
-import { Invitation, InvitationStatus, InvitationType } from "./invitations.types";
+import { Invitation, InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
+import { SensitivePersonalDataRequirement } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 
 describe("InvitationsService", () => {
   // GIVEN a backend URL is returned by the envService
@@ -34,6 +35,7 @@ describe("InvitationsService", () => {
         invitation_code: givenCode,
         status: InvitationStatus.VALID,
         invitation_type: InvitationType.REGISTER,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       };
 
       const fetchSpy = setupFetchSpy(StatusCodes.OK, givenResponseBody, "application/json;charset=UTF-8");

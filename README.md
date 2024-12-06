@@ -59,6 +59,9 @@ To work with this repository you should have a system with a bash compatible ter
 
 Happy contributing! 🚀
 
+## Data Privacy and Security
+
+We are committed to protecting the privacy and security of our users' sensitive data. Please read how we do it on [data protection documentation](/data-protection.md) for more information.
 
 ## License
 

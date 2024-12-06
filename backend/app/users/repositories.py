@@ -64,8 +64,6 @@ class UserPreferenceRepository:
         try:
             payload = update.model_dump(exclude_none=True)
 
-            print(payload)
-
             _doc = await self.collection.update_one({"user_id": {"$eq": user_id}}, {"$set": payload})
 
             return await self.get_user_preference_by_user_id(user_id=user_id)

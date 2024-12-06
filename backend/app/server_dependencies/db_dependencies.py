@@ -20,6 +20,19 @@ def _get_application_db(mongodb_uri: str, db_name: str) -> AsyncIOMotorDatabase:
         tlsAllowInvalidCertificates=True
     ).get_database(db_name)
 
+
+def _get_users_db(users_mongodb_uri: str, users_db_name: str) -> AsyncIOMotorDatabase:
+    """
+    Decouples the database creation from the database provider.
+    This allows to mock the database creation in tests, instead of mocking the database provider.
+    """
+
+    return AsyncIOMotorClient(
+        users_mongodb_uri,
+        tlsAllowInvalidCertificates=True
+    ).get_database(users_db_name)
+
+
 def _get_taxonomy_db(mongodb_uri: str, db_name: str) -> AsyncIOMotorDatabase:
     """
     Decouples the database creation from the database provider.
@@ -30,6 +43,7 @@ def _get_taxonomy_db(mongodb_uri: str, db_name: str) -> AsyncIOMotorDatabase:
         tlsAllowInvalidCertificates=True
     ).get_database(db_name)
 
+
 class CompassDBProvider:
     """
     Provides the taxonomy and application database instances.
@@ -37,8 +51,19 @@ class CompassDBProvider:
     _settings = MongoDbSettings()
     _application_mongo_db: Optional[AsyncIOMotorDatabase] = None
     _taxonomy_mongo_db: Optional[AsyncIOMotorDatabase] = None
+    _users_mongo_db: Optional[AsyncIOMotorDatabase] = None
     _lock = asyncio.Lock()
     _logger = logging.getLogger(__qualname__)
+
+    @staticmethod
+    async def initialize_users_mongo_db(users_db: AsyncIOMotorDatabase, logger: logging.Logger):
+        """ Initialize the MongoDB database."""
+        logger.info("Initializing indexes for the users database")
+
+        # Create the sensitive personal data indexes
+        await users_db.get_collection(Collections.SENSITIVE_PERSONAL_DATA).create_index([
+            ("user_id", 1)
+        ], unique=True)
 
     @staticmethod
     async def initialize_application_mongo_db(application_db: AsyncIOMotorDatabase, logger: logging.Logger):
@@ -92,8 +117,26 @@ class CompassDBProvider:
                 if cls._application_mongo_db is None:  # Double-check after acquiring the lock
                     cls._logger.info("Initializing Application MongoDB")
                     # Create the database instance
-                    cls._application_mongo_db = _get_application_db(cls._settings.application_mongodb_uri, cls._settings.application_database_name)
+                    cls._application_mongo_db = _get_application_db(cls._settings.application_mongodb_uri,
+                                                                    cls._settings.application_database_name)
         return cls._application_mongo_db
+
+    @classmethod
+    async def get_users_db(cls) -> AsyncIOMotorDatabase:
+        """
+        Get the users database instance.
+        :return: AsyncIOMotorDatabase[users_db_name]
+        """
+        if cls._users_mongo_db is None:  # Check if the database instance has been created
+            async with cls._lock:  # Ensure that only one coroutine is creating and initializing the database instance
+                if cls._users_mongo_db is None:  # Double-check after acquiring the lock
+                    cls._logger.info("Initializing Users MongoDB")
+                    # Create the database instance
+                    cls._users_mongo_db = _get_users_db(
+                        cls._settings.users_mongodb_uri,
+                        cls._settings.users_database_name
+                    )
+        return cls._users_mongo_db
 
     @classmethod
     async def get_taxonomy_db(cls) -> AsyncIOMotorDatabase:
@@ -102,5 +145,6 @@ class CompassDBProvider:
                 if cls._taxonomy_mongo_db is None:  # Double-check after acquiring the lock
                     cls._logger.info("Initializing Taxonomy MongoDB")
                     # Create the database instance
-                    cls._taxonomy_mongo_db = _get_taxonomy_db(cls._settings.taxonomy_mongodb_uri, cls._settings.taxonomy_database_name)
+                    cls._taxonomy_mongo_db = _get_taxonomy_db(cls._settings.taxonomy_mongodb_uri,
+                                                              cls._settings.taxonomy_database_name)
         return cls._taxonomy_mongo_db

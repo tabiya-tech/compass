@@ -1,0 +1,222 @@
+[
+  {
+    "user_id": "user_id_001",
+    "first_name": "Alice",
+    "last_name": "Smith",
+    "contact_email": "alice.smith@example.com",
+    "gender": "FEMALE",
+    "age": "30",
+    "country": "Rwanda",
+    "city": "Kigali",
+    "created_at": "2024-12-04 10:00:00+00:00"
+  },
+  {
+    "user_id": "user_id_002",
+    "first_name": "Bob",
+    "last_name": "Johnson",
+    "contact_email": "bob.johnson@example.com",
+    "gender": "MALE",
+    "age": "25",
+    "country": "Uganda",
+    "city": "Kampala",
+    "created_at": "2024-12-04 10:05:00+00:00"
+  },
+  {
+    "user_id": "user_id_003",
+    "first_name": "Charlie",
+    "last_name": "Brown",
+    "contact_email": "charlie.brown@example.com",
+    "gender": "PREFER_NOT_TO_SAY",
+    "age": "34",
+    "country": "Kenya",
+    "city": "Nairobi",
+    "created_at": "2024-12-04 10:10:00+00:00"
+  },
+  {
+    "user_id": "user_id_004",
+    "first_name": "Diana",
+    "last_name": "Taylor",
+    "contact_email": "diana.taylor@example.com",
+    "gender": "FEMALE",
+    "age": "29",
+    "country": "Tanzania",
+    "city": "Dar es Salaam",
+    "created_at": "2024-12-04 10:15:00+00:00"
+  },
+  {
+    "user_id": "user_id_005",
+    "first_name": "Ethan",
+    "last_name": "Williams",
+    "contact_email": "ethan.williams@example.com",
+    "gender": "MALE",
+    "age": "40",
+    "country": "Ethiopia",
+    "city": "Addis Ababa",
+    "created_at": "2024-12-04 10:20:00+00:00"
+  },
+  {
+    "user_id": "user_id_006",
+    "first_name": "Fiona",
+    "last_name": "Clark",
+    "contact_email": "fiona.clark@example.com",
+    "gender": "FEMALE",
+    "age": "35",
+    "country": "Somalia",
+    "city": "Mogadishu",
+    "created_at": "2024-12-04 10:25:00+00:00"
+  },
+  {
+    "user_id": "user_id_007",
+    "first_name": "George",
+    "last_name": "Davis",
+    "contact_email": "george.davis@example.com",
+    "gender": "PREFER_NOT_TO_SAY",
+    "age": "28",
+    "country": "South Africa",
+    "city": "Cape Town",
+    "created_at": "2024-12-04 10:30:00+00:00"
+  },
+  {
+    "user_id": "user_id_008",
+    "first_name": "Hannah",
+    "last_name": "Lewis",
+    "contact_email": "hannah.lewis@example.com",
+    "gender": "FEMALE",
+    "age": "36",
+    "country": "Nigeria",
+    "city": "Lagos",
+    "created_at": "2024-12-04 10:35:00+00:00"
+  },
+  {
+    "user_id": "user_id_009",
+    "first_name": "Ian",
+    "last_name": "Walker",
+    "contact_email": "ian.walker@example.com",
+    "gender": "MALE",
+    "age": "33",
+    "country": "Ghana",
+    "city": "Accra",
+    "created_at": "2024-12-04 10:40:00+00:00"
+  },
+  {
+    "user_id": "user_id_010",
+    "first_name": "Julia",
+    "last_name": "Young",
+    "contact_email": "julia.young@example.com",
+    "gender": "FEMALE",
+    "age": "45",
+    "country": "Ivory Coast",
+    "city": "Abidjan",
+    "created_at": "2024-12-04 10:45:00+00:00"
+  },
+  {
+    "user_id": "user_id_011",
+    "first_name": "Kevin",
+    "last_name": "Harris",
+    "contact_email": "kevin.harris@example.com",
+    "gender": "MALE",
+    "age": "31",
+    "country": "Morocco",
+    "city": "Casablanca",
+    "created_at": "2024-12-04 10:50:00+00:00"
+  },
+  {
+    "user_id": "user_id_012",
+    "first_name": "Laura",
+    "last_name": "Adams",
+    "contact_email": "laura.adams@example.com",
+    "gender": "FEMALE",
+    "age": "27",
+    "country": "Algeria",
+    "city": "Algiers",
+    "created_at": "2024-12-04 10:55:00+00:00"
+  },
+  {
+    "user_id": "user_id_013",
+    "first_name": "Mark",
+    "last_name": "Thomas",
+    "contact_email": "mark.thomas@example.com",
+    "gender": "MALE",
+    "age": "38",
+    "country": "Egypt",
+    "city": "Cairo",
+    "created_at": "2024-12-04 11:00:00+00:00"
+  },
+  {
+    "user_id": "user_id_014",
+    "first_name": "Nina",
+    "last_name": "White",
+    "contact_email": "nina.white@example.com",
+    "gender": "FEMALE",
+    "age": "42",
+    "country": "Sudan",
+    "city": "Khartoum",
+    "created_at": "2024-12-04 11:05:00+00:00"
+  },
+  {
+    "user_id": "user_id_015",
+    "first_name": "Oscar",
+    "last_name": "Martinez",
+    "contact_email": "oscar.martinez@example.com",
+    "gender": "MALE",
+    "age": "39",
+    "country": "Libya",
+    "city": "Tripoli",
+    "created_at": "2024-12-04 11:10:00+00:00"
+  },
+  {
+    "user_id": "user_id_016",
+    "first_name": "Paula",
+    "last_name": "Scott",
+    "contact_email": "paula.scott@example.com",
+    "gender": "FEMALE",
+    "age": "44",
+    "country": "Senegal",
+    "city": "Dakar",
+    "created_at": "2024-12-04 11:15:00+00:00"
+  },
+  {
+    "user_id": "user_id_017",
+    "first_name": "Quentin",
+    "last_name": "Baker",
+    "contact_email": "quentin.baker@example.com",
+    "gender": "MALE",
+    "age": "32",
+    "country": "Zambia",
+    "city": "Lusaka",
+    "created_at": "2024-12-04 11:20:00+00:00"
+  },
+  {
+    "user_id": "user_id_018",
+    "first_name": "Rachel",
+    "last_name": "Garcia",
+    "contact_email": "rachel.garcia@example.com",
+    "gender": "FEMALE",
+    "age": "26",
+    "country": "Zimbabwe",
+    "city": "Harare",
+    "created_at": "2024-12-04 11:25:00+00:00"
+  },
+  {
+    "user_id": "user_id_019",
+    "first_name": "Sam",
+    "last_name": "Morris",
+    "contact_email": "sam.morris@example.com",
+    "gender": "MALE",
+    "age": "48",
+    "country": "Botswana",
+    "city": "Gaborone",
+    "created_at": "2024-12-04 11:30:00+00:00"
+  },
+  {
+    "user_id": "user_id_020",
+    "first_name": "Tina",
+    "last_name": "Lopez",
+    "contact_email": "tina.lopez@example.com",
+    "gender": "FEMALE",
+    "age": "37",
+    "country": "Namibia",
+    "city": "Windhoek",
+    "created_at": "2024-12-04 11:35:00+00:00"
+  }
+]

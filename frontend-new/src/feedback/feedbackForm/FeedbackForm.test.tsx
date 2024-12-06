@@ -8,7 +8,10 @@ import { DATA_TEST_ID as FEEDBACK_FORM_CONTENT_DATA_TEST_ID } from "src/feedback
 import { DATA_TEST_ID as CUSTOM_RATING_DATA_TEST_ID } from "src/feedback/feedbackForm/components/customRating/CustomRating";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import {
+  SensitivePersonalDataRequirement,
+  Language,
+} from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import FeedbackService from "src/feedback/feedbackForm/feedbackFormService/feedbackFormService";
 import stepsContent from "src/feedback/feedbackForm/stepsContent";
 
@@ -127,6 +130,8 @@ describe("FeedbackForm", () => {
         user_id: "0001",
         language: Language.en,
         sessions: [],
+        has_sensitive_personal_data: false,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       });
 
       // WHEN the component is rendered

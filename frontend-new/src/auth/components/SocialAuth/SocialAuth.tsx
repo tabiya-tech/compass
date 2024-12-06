@@ -105,6 +105,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
           invitation_code: invitation.invitation_code,
           language: Language.en,
         });
+
         userPreferencesStateService.setUserPreferences(prefs);
       } catch (error: any) {
         await handleError(error);
