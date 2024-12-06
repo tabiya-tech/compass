@@ -311,9 +311,10 @@ exports[`Sensitive Data render tests should render the component with all elemen
               aria-controls=":r5:"
               aria-expanded="false"
               aria-haspopup="listbox"
-              aria-labelledby="demo-simple-select-label demo-simple-select"
+              aria-label="gender-select"
+              aria-labelledby="gender-select-label gender-select"
               class="MuiSelect-select MuiSelect-outlined MuiInputBase-input MuiOutlinedInput-input css-loq51a-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input"
-              id="demo-simple-select"
+              id="gender-select"
               role="combobox"
               tabindex="0"
             >
