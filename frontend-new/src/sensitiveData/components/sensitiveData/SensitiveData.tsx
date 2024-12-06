@@ -206,11 +206,14 @@ const SensitiveData: React.FC = () => {
               <FormControl fullWidth>
                 <InputLabel id="select-label">Gender</InputLabel>
                 <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
+                  labelId="gender-select-label"
+                  id="gender-select"
                   label="Gender"
                   data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_GENDER_INPUT}
                   value={sensitivePersonalData.gender}
+                  inputProps={{
+                    "aria-label": "gender-select",
+                  }}
                   onChange={(event) => {
                     setValue("gender", event.target.value as Gender);
                   }}
