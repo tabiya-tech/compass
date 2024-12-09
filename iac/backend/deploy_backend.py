@@ -59,8 +59,20 @@ def _setup_api_gateway(*,
 
     # The GCP API Gateway uses OpenAPI 2.0 yaml files for the configurations.
     # The yaml must be base64 encoded.
-    apigw_config_yaml = get_file_as_string(GCP_API_GATEWAY_CONFIG_FILE)
-    apigw_config_yaml = pulumi.Output.format(apigw_config_yaml, basic_config.project, cloudrun.uri, gcp_oauth_client_id)
+    apigw_config_yml_string = get_file_as_string(GCP_API_GATEWAY_CONFIG_FILE)
+
+    # update the yaml with the correct values
+    # we are not using pulumi.Output.format because with path variables they are encapsulated in {}
+    # which causes issues with pulumi.Output.format to throw because we want to keep them as {path variable}.
+    apigw_config_yaml = pulumi.Output.all(basic_config.project, cloudrun.uri).apply(
+        lambda args:
+        apigw_config_yml_string
+        # project ID
+        .replace('{0}', args[0])
+
+        # cloud run uri
+        .replace('{1}', args[1])
+    )
 
     apigw_config_yaml_b64encoded = apigw_config_yaml.apply(lambda yaml: base64.b64encode(yaml.encode()).decode())
 
