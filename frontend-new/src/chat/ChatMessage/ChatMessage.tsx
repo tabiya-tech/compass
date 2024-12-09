@@ -52,7 +52,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage, isTyping, chatMe
   try {
     duration = getDurationFromNow(new Date(chatMessage.sent_at));
   } catch (e) {
-    console.error(e);
+    console.error(new Error("Failed to get message duration", { cause: e }));
   }
   return (
     <MessageContainer origin={chatMessage.sender} data-testid={DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}>
