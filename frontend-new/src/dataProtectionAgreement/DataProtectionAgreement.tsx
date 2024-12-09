@@ -13,6 +13,7 @@ import { userPreferencesStateService } from "src/userPreferences/UserPreferences
 import authStateService from "src/auth/services/AuthenticationState.service";
 import { Theme } from "@mui/material/styles";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
+import { AuthenticationError } from "src/error/errorClasses";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
@@ -111,7 +112,7 @@ const DataProtectionAgreement: React.FC = () => {
         navigate(routerPaths.LOGIN, { replace: true });
         enqueueSnackbar("Successfully logged out.", { variant: "success" });
       } catch (e) {
-        console.error("Failed to log out", e);
+        console.error(new AuthenticationError("Failed to log out", e as Error));
         enqueueSnackbar("Failed to log out.", { variant: "error" });
       } finally {
         setIsRejectingDPA(false);

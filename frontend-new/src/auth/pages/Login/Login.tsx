@@ -73,7 +73,7 @@ const Login: React.FC = () => {
   const handleError = useCallback(
     async (error: Error) => {
       // if something goes wrong, log the user out
-      const firebaseEmailAuthServiceInstance = await FirebaseEmailAuthService.getInstance();
+      const firebaseEmailAuthServiceInstance = FirebaseEmailAuthService.getInstance();
       await firebaseEmailAuthServiceInstance.logout();
 
       let errorMessage;
@@ -82,7 +82,7 @@ const Login: React.FC = () => {
         writeServiceErrorToLog(error, console.error);
       } else if (error instanceof FirebaseError) {
         errorMessage = getUserFriendlyFirebaseErrorMessage(error);
-        writeFirebaseErrorToLog(error, console.error);
+        writeFirebaseErrorToLog(error, console.warn);
       } else {
         errorMessage = error.message;
         console.error(error);
@@ -129,7 +129,7 @@ const Login: React.FC = () => {
         errorMessage = getUserFriendlyErrorMessage(error);
       } else {
         errorMessage = (error as Error).message;
-        console.error("An error occurred while trying to get your preferences", error);
+        console.warn("An error occurred while trying to get your preferences", error);
       }
       enqueueSnackbar(`An error occurred while trying to get your preferences: ${errorMessage}`, {
         variant: "error",

@@ -27,6 +27,7 @@ import { DATA_TEST_ID as FEEDBACK_FORM_CONTENT_DATA_TEST_ID } from "src/feedback
 import { DATA_TEST_ID as CUSTOM_RATING_DATA_TEST_ID } from "src/feedback/feedbackForm/components/customRating/CustomRating";
 import stepsContent from "src/feedback/feedbackForm/stepsContent";
 import FeedbackService from "src/feedback/feedbackForm/feedbackFormService/feedbackFormService";
+import { FeedbackError, SessionError } from "src/error/errorClasses";
 
 // Mock the ChatService module
 jest.mock("src/chat/ChatService/ChatService");
@@ -528,7 +529,7 @@ describe("Chat", () => {
 
       // THEN expect an error message to be shown
       await waitFor(() => {
-        expect(console.error).toHaveBeenCalledWith("Failed to retrieve experiences", new Error("User has no sessions"));
+        expect(console.error).toHaveBeenCalledWith(new Error("Failed to retrieve experiences"));
       });
 
       // AND enqueSnackbar should be called
@@ -734,7 +735,7 @@ describe("Chat", () => {
           { variant: "error" }
         );
       });
-      expect(console.error).toHaveBeenCalledWith("Failed to submit feedback", givenError);
+      expect(console.error).toHaveBeenCalledWith(new FeedbackError("Failed to submit feedback", givenError));
     });
 
     test("should log error when adding a message and there is no user session", async () => {
@@ -763,7 +764,7 @@ describe("Chat", () => {
 
       // THEN expect an error message to be logged
       await waitFor(() => {
-        expect(console.error).toHaveBeenCalledWith("User has no sessions");
+        expect(console.error).toHaveBeenCalledWith(new SessionError("User has no sessions"));
       });
     });
   });
