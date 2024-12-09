@@ -177,7 +177,7 @@ class StdFirebaseAuthenticationService {
       }, timeoutDuration);
 
       DBDeleteRequest.onerror = (event) => {
-        console.error("Error deleting Firebase IndexedDB", event);
+        console.warn("Error deleting Firebase IndexedDB", event);
         clearTimeout(timeoutId);
         resolve();
       };

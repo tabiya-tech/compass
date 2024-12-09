@@ -15,6 +15,7 @@ import { routerPaths } from "src/app/routerPaths";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { ServiceError } from "src/error/ServiceError/ServiceError";
 import * as ServiceErrorLoggerModule from "src/error/ServiceError/logger";
+import { AuthenticationError } from "src/error/commonErrors";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -346,7 +347,7 @@ describe("Testing Data Protection Policy component", () => {
         fireEvent.click(screen.getByTestId(DATA_TEST_ID.REJECT_DPA_BUTTON));
 
         // THEN expect the error to be logged
-        expect(console.error).toHaveBeenCalledWith("Failed to log out", error);
+        expect(console.error).toHaveBeenCalledWith(new AuthenticationError("Failed to log out", error));
 
         // AND snack bar should display an error message
         expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to log out.", { variant: "error" });
