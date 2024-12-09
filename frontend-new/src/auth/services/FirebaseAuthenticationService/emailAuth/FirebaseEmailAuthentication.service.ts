@@ -5,13 +5,13 @@ import { PersistentStorageService } from "src/app/PersistentStorageService/Persi
 import { AuthenticationServices, TabiyaUser } from "src/auth/auth.types";
 import { invitationsService } from "src/auth/services/invitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
-import AuthenticationService from "src/auth/services/Authentication.service";
+import AuthenticationService, { TokenValidationFailureCause } from "src/auth/services/Authentication.service";
 import StdFirebaseAuthenticationService, {
   FirebaseToken,
   FirebaseTokenProvider,
 } from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
 import { formatTokenForLogging } from "src/auth/utils/formatTokenForLogging";
-import { TokenError } from "src/auth/auth.error.types";
+import { TokenError } from "src/error/commonErrors";
 
 class FirebaseEmailAuthenticationService extends AuthenticationService {
   private static instance: FirebaseEmailAuthenticationService;
@@ -197,9 +197,14 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     const { isValid, decodedToken, failureCause } = this.isTokenValid(token);
 
     if (!isValid) {
-      console.error(new TokenError(`token is invalid: ${formatTokenForLogging(token)}`, failureCause!));
+      if(failureCause === TokenValidationFailureCause.TOKEN_EXPIRED) {
+        console.warn(new TokenError(`token is invalid: ${formatTokenForLogging(token)}`, failureCause));
+        return null;
+      }
+      console.error(new TokenError(`token is invalid: ${formatTokenForLogging(token)}`, failureCause));
       return null;
     }
+
     return this.stdFirebaseAuthServiceInstance.getUserFromDecodedToken(decodedToken!);
   }
 

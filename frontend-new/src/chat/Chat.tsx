@@ -23,6 +23,7 @@ import ApproveModal from "src/theme/ApproveModal/ApproveModal";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 import FeedbackForm from "src/feedback/feedbackForm/FeedbackForm";
+import { ChatError, SessionError } from "src/error/commonErrors";
 
 const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -75,7 +76,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const checkAndAddFeedbackMessage = useCallback((conversationCompleted: boolean) => {
     const userPreferences = userPreferencesStateService.getUserPreferences();
     if (!userPreferences?.sessions.length) {
-      console.error("User has no sessions");
+      console.error(new SessionError("User has no sessions", `user_id: ${userPreferences?.user_id}`));
       return;
     }
 
@@ -114,7 +115,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       setIsLoading(false);
     } catch (error) {
       enqueueSnackbar("Failed to retrieve experiences", { variant: "error" });
-      console.error("Failed to retrieve experiences", error);
+      console.error(new ChatError("Failed to retrieve experiences", error as Error));
     }
   }, [enqueueSnackbar]);
 
@@ -134,7 +135,6 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       }
       try {
         if (!session_id) {
-          console.error("User has no sessions");
           addMessage(
             generateCompassMessage(
               "I'm sorry, I'm having trouble connecting to the server. Please try again later.",
@@ -145,7 +145,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         }
         const chatService = ChatService.getInstance(session_id);
         if (!chatService) {
-          console.error("Chat service is not initialized");
+          console.error(new ChatError("Chat service is not initialized"));
           addMessage(
             generateCompassMessage(
               "I'm sorry, I'm having trouble connecting to the server. Please try again later.",
@@ -170,7 +170,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
         checkAndAddFeedbackMessage(response.conversation_completed);
       } catch (error) {
-        console.error("Failed to send message:", error);
+        console.error(new ChatError("Failed to send message:", error as Error));
         addMessage(
           generateCompassMessage(
             "I'm sorry, Something seems to have gone wrong on my end... Can you repeat that?",
@@ -199,7 +199,6 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const initializeChat = useCallback(
     async (session_id?: number) => {
       if (!session_id) {
-        console.error("User has no sessions");
         addMessage(
           generateCompassMessage(
             "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
@@ -211,7 +210,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
       const chatService = ChatService.getInstance(session_id);
       if (!chatService) {
-        console.error("Chat service is not initialized");
+        console.error(new ChatError("Chat service is not initialized"));
         addMessage(
           generateCompassMessage(
             "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
@@ -254,7 +253,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         if (e instanceof ServiceError) {
           writeServiceErrorToLog(e, console.error);
         } else {
-          console.error("Failed to initialize chat", e);
+          console.error(new ChatError("Failed to initialize chat", e as Error));
         }
         const errorMessage = getUserFriendlyErrorMessage(e as Error);
         enqueueSnackbar(errorMessage, { variant: "error" });
@@ -280,7 +279,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       setCurrentMessage("");
       const userPreferences = userPreferencesStateService.getUserPreferences();
       if (!userPreferences?.sessions.length) {
-        console.error("User has no sessions");
+        console.error(new SessionError("User has no sessions", `user_id: ${userPreferences?.user_id}`));
         enqueueSnackbar("Failed to send message", { variant: "error" });
         return;
       }
@@ -304,7 +303,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       // Initialize the new conversation with the new session id usually at the top of the sessions array
       await initializeChat(user_preferences.sessions[0]);
     } catch (e) {
-      console.error("Failed to start new conversation", e);
+      console.error(new ChatError("Failed to start new conversation", e as Error));
     }
   }, [initializeChat, enqueueSnackbar]);
 

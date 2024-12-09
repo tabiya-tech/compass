@@ -63,7 +63,7 @@ const Register: React.FC = () => {
         writeServiceErrorToLog(error, console.error);
         errorMessage = getUserFriendlyErrorMessage(error);
       } else if (error instanceof FirebaseError) {
-        writeFirebaseErrorToLog(error, console.error);
+        writeFirebaseErrorToLog(error, console.warn);
         errorMessage = getUserFriendlyFirebaseErrorMessage(error);
       } else {
         console.error(error);

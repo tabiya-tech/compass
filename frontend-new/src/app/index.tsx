@@ -18,6 +18,7 @@ import * as Sentry from "@sentry/react";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 import { PersistentStorageService } from "./PersistentStorageService/PersistentStorageService";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import { AuthenticationError } from "src/error/commonErrors";
 
 // Wrap the createHashRouter function with Sentry to capture errors that occur during router initialization
 const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouter(createHashRouter);
@@ -72,7 +73,7 @@ const App = () => {
 
       console.debug("User preferences loaded", preferences);
     } catch (error) {
-      console.error("Error initializing authentication and user preferences state", error);
+      console.error(new AuthenticationError("Error initializing authentication and user preferences state", error as Error));
       await AuthenticationServiceFactory.resetAuthenticationState();
     }
   };
@@ -90,7 +91,7 @@ const App = () => {
           // they may use this method to clean up any resources they have allocated on component unmount
           currentAuthenticationService!.cleanup();
         } catch (error) {
-          console.error("Error cleaning up auth", error);
+          console.error(new AuthenticationError("Error cleaning up auth", error as Error));
         }
       };
     };

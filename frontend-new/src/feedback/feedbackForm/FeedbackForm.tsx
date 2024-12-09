@@ -9,6 +9,7 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { FeedbackItem } from "src/feedback/feedbackForm/feedbackFormService/feedbackFormService.types";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import { FeedbackError } from "src/error/commonErrors";
 
 export interface FeedbackFormProps {
   isOpen: boolean;
@@ -56,7 +57,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose, onFe
       enqueueSnackbar("Feedback submitted successfully!", { variant: "success" });
       onFeedbackSubmit();
     } catch (error) {
-      console.error("Failed to submit feedback", error);
+      console.error(new FeedbackError("Failed to submit feedback", error as Error));
       enqueueSnackbar("Failed to submit feedback. Please try again later.", { variant: "error" });
     } finally {
       setIsSubmitting(false);

@@ -11,6 +11,7 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import FeedbackService from "src/feedback/feedbackForm/feedbackFormService/feedbackFormService";
 import stepsContent from "src/feedback/feedbackForm/stepsContent";
+import { FeedbackError } from "src/error/commonErrors";
 
 // mock the feedback service
 jest.mock("src/feedback/feedbackForm/feedbackFormService/feedbackFormService");
@@ -142,7 +143,7 @@ describe("FeedbackForm", () => {
 
       // THEN expect an error message to be shown
       await waitFor(() => {
-        expect(console.error).toHaveBeenCalledWith("Failed to submit feedback", new Error("User has no sessions"));
+        expect(console.error).toHaveBeenCalledWith(new FeedbackError("Failed to submit feedback", new Error("User has no sessions")));
       });
       // AND the snackbar to have been called
       await waitFor(() =>

@@ -1,3 +1,5 @@
+import { EnvError } from "./error/commonErrors";
+
 export const getEnv = (key: string) => {
   // This is a global variable that is set by the env.js module loaded in the index.html
   // This method can be used synchronously to get the value of an environment variable anywhere in the frontend code
@@ -9,7 +11,7 @@ export const getEnv = (key: string) => {
     }
     return window.atob(env[key]);
   } catch (e) {
-    console.error("Error loading environment variable", e);
+    console.error(new EnvError("Error loading environment variable", e as Error));
     return "";
   }
 };
