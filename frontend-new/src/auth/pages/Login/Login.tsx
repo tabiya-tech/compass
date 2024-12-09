@@ -17,6 +17,7 @@ import { userPreferencesStateService } from "src/userPreferences/UserPreferences
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import BugReportButton from "src/feedback/bugReportButton/BugReportButton";
 import FirebaseInvitationCodeAuthenticationService from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
+import { AuthenticationError } from "../../../error/commonErrors";
 
 export const INVITATIONS_PARAM_NAME = "invite-code";
 
@@ -73,7 +74,7 @@ const Login: React.FC = () => {
   const handleError = useCallback(
     async (error: Error) => {
       // if something goes wrong, log the user out
-      const firebaseEmailAuthServiceInstance = await FirebaseEmailAuthService.getInstance();
+      const firebaseEmailAuthServiceInstance = FirebaseEmailAuthService.getInstance();
       await firebaseEmailAuthServiceInstance.logout();
 
       let errorMessage;
@@ -82,7 +83,7 @@ const Login: React.FC = () => {
         writeServiceErrorToLog(error, console.error);
       } else if (error instanceof FirebaseError) {
         errorMessage = getUserFriendlyFirebaseErrorMessage(error);
-        writeFirebaseErrorToLog(error, console.error);
+        writeFirebaseErrorToLog(error, console.warn);
       } else {
         errorMessage = error.message;
         console.error(error);
@@ -129,7 +130,7 @@ const Login: React.FC = () => {
         errorMessage = getUserFriendlyErrorMessage(error);
       } else {
         errorMessage = (error as Error).message;
-        console.error("An error occurred while trying to get your preferences", error);
+        console.error(new AuthenticationError("An error occurred while trying to get your preferences", error as Error));
       }
       enqueueSnackbar(`An error occurred while trying to get your preferences: ${errorMessage}`, {
         variant: "error",
@@ -169,7 +170,7 @@ const Login: React.FC = () => {
     async (code: string) => {
       try {
         setIsLoading(true);
-        const firebaseInvitationAuthServiceInstance = await FirebaseInvitationCodeAuthenticationService.getInstance();
+        const firebaseInvitationAuthServiceInstance = FirebaseInvitationCodeAuthenticationService.getInstance();
         await firebaseInvitationAuthServiceInstance.login(code);
         enqueueSnackbar("Invitation code is valid", { variant: "success" });
         await handlePostLogin();

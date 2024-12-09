@@ -10,7 +10,7 @@ import { PersistentStorageService } from "src/app/PersistentStorageService/Persi
 import { AuthenticationServices, TabiyaUser } from "src/auth/auth.types";
 import AuthenticationService from "src/auth/services/Authentication.service";
 import { formatTokenForLogging } from "src/auth/utils/formatTokenForLogging";
-import { TokenError } from "src/auth/auth.error.types";
+import { TokenError } from "src/error/commonErrors";
 
 class FirebaseSocialAuthenticationService extends AuthenticationService {
   private static instance: FirebaseSocialAuthenticationService;
@@ -113,7 +113,7 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
     const { isValid, decodedToken, failureCause } = this.isTokenValid(token);
 
     if (!isValid) {
-      console.error(new TokenError(`token is invalid:${formatTokenForLogging(token)}`, failureCause!));
+      console.warn(new TokenError(`token is invalid:${formatTokenForLogging(token)}`, failureCause));
       return null;
     }
     return this.stdFirebaseAuthServiceInstance.getUserFromDecodedToken(decodedToken!);

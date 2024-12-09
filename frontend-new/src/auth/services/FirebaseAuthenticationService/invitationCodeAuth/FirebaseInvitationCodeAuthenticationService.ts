@@ -14,7 +14,7 @@ import { Language } from "src/userPreferences/UserPreferencesService/userPrefere
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import AuthenticationService from "src/auth/services/Authentication.service";
 import { formatTokenForLogging } from "src/auth/utils/formatTokenForLogging";
-import { TokenError } from "src/auth/auth.error.types";
+import { TokenError } from "src/error/commonErrors";
 
 class FirebaseInvitationCodeAuthenticationService extends AuthenticationService {
   private static instance: FirebaseInvitationCodeAuthenticationService;
@@ -147,7 +147,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
     const { isValid, decodedToken, failureCause } = this.isTokenValid(token);
 
     if (!isValid) {
-      console.error(new TokenError(`invalid token: ${formatTokenForLogging(token)}`, failureCause!));
+      console.warn(new TokenError(`invalid token: ${formatTokenForLogging(token)}`, failureCause));
       return null;
     }
     return this.stdFirebaseAuthServiceInstance.getUserFromDecodedToken(decodedToken!);

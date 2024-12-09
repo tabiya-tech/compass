@@ -1,6 +1,7 @@
 // silence chatty console
 import "src/_test_utilities/consoleMock";
 import { getEnv, getFirebaseAPIKey, getFirebaseDomain } from "./envService";
+import { EnvError } from "./error/commonErrors";
 
 test("getEnv should return the decoded environment variable value", () => {
   // GIVEN a key for an environment variable
@@ -86,7 +87,7 @@ describe.each([
       // THEN expect it to return an empty string
       expect(apiUrl).toBe("");
       // AND expect an error to have been logged
-      expect(console.error).toHaveBeenCalledWith("Error loading environment variable", expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith(new EnvError("Error loading environment variable", expect.any(Error)));
     });
   });
 });
