@@ -6,11 +6,11 @@ exports[`CheckboxQuestion should render component successfully 1`] = `
   data-testid="checkbox-with-textarea-form-control-989402f0-9fda-4400-958c-2d6c7bce9821"
 >
   <legend
-    class="MuiFormLabel-root MuiFormLabel-colorPrimary css-16k4sf8-MuiFormLabel-root"
+    class="MuiFormLabel-root MuiFormLabel-colorPrimary css-1y0hhg3-MuiFormLabel-root"
     data-testid="checkbox-with-textarea-form-label-989402f0-9fda-4400-958c-2d6c7bce9821"
   >
     <p
-      class="MuiTypography-root MuiTypography-body1 css-1au4tcm-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-body1 css-1rdygw0-MuiTypography-root"
       data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
     >
       What are your skills and experiences?
@@ -23,7 +23,7 @@ exports[`CheckboxQuestion should render component successfully 1`] = `
       class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
     >
       <span
-        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium Mui-checked MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-r3m1bu-MuiButtonBase-root-MuiCheckbox-root"
+        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium Mui-checked MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-50zv81-MuiButtonBase-root-MuiCheckbox-root"
         data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
       >
         <input
@@ -48,7 +48,7 @@ exports[`CheckboxQuestion should render component successfully 1`] = `
         />
       </span>
       <span
-        class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-7xnq80-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-1czz4sp-MuiTypography-root"
       >
         JavaScript
       </span>
@@ -57,7 +57,7 @@ exports[`CheckboxQuestion should render component successfully 1`] = `
       class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
     >
       <span
-        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium Mui-checked MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-r3m1bu-MuiButtonBase-root-MuiCheckbox-root"
+        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium Mui-checked MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-50zv81-MuiButtonBase-root-MuiCheckbox-root"
         data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
       >
         <input
@@ -82,7 +82,7 @@ exports[`CheckboxQuestion should render component successfully 1`] = `
         />
       </span>
       <span
-        class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-7xnq80-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-1czz4sp-MuiTypography-root"
       >
         React
       </span>
@@ -91,7 +91,7 @@ exports[`CheckboxQuestion should render component successfully 1`] = `
       class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
     >
       <span
-        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-r3m1bu-MuiButtonBase-root-MuiCheckbox-root"
+        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-50zv81-MuiButtonBase-root-MuiCheckbox-root"
         data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
       >
         <input
@@ -115,7 +115,7 @@ exports[`CheckboxQuestion should render component successfully 1`] = `
         />
       </span>
       <span
-        class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-7xnq80-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-1czz4sp-MuiTypography-root"
       >
         TypeScript
       </span>
@@ -124,7 +124,7 @@ exports[`CheckboxQuestion should render component successfully 1`] = `
       class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
     >
       <span
-        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-r3m1bu-MuiButtonBase-root-MuiCheckbox-root"
+        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-50zv81-MuiButtonBase-root-MuiCheckbox-root"
         data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
       >
         <input
@@ -148,7 +148,7 @@ exports[`CheckboxQuestion should render component successfully 1`] = `
         />
       </span>
       <span
-        class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-7xnq80-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-1czz4sp-MuiTypography-root"
       >
         Node.js
       </span>

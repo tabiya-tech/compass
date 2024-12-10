@@ -109,13 +109,12 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
       alignItems="center"
       justifyContent="space-between"
       data-testid={DATA_TEST_ID.CHAT_HEADER_CONTAINER}
-      padding={theme.spacing(theme.tabiyaSpacing.md)}
     >
       <NavLink style={{ lineHeight: 0 }} to={routerPaths.ROOT} data-testid={DATA_TEST_ID.CHAT_HEADER_LOGO_LINK}>
         <img
           src={`${process.env.PUBLIC_URL}/compass.svg`}
-          alt="Compass"
-          height="48px"
+          alt="Compass Logo"
+          height={12 * theme.tabiyaSpacing.xl} // xl wasn't quite big enough, we're going for ~48px
           data-testid={DATA_TEST_ID.CHAT_HEADER_LOGO}
         />
       </NavLink>

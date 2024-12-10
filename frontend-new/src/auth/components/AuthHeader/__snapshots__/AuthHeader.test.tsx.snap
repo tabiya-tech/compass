@@ -44,7 +44,7 @@ exports[`AuthHeader tests should render the AuthHeader 1`] = `
     Test title
   </h4>
   <p
-    class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1ncy5w-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
     data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
   >
     Test subtitle

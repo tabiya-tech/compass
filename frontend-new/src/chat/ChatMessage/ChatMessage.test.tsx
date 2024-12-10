@@ -1,12 +1,13 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
 
-import ChatMessage, { DATA_TEST_ID } from "./ChatMessage";
+import ChatMessage, { ChatMessageFooterType, DATA_TEST_ID } from "./ChatMessage";
 import { render, screen } from "src/_test_utilities/test-utils";
 import * as GetDurationFromNow from "src/utils/getDurationFromNow/getDurationFromNow";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
-import { DATA_TEST_ID as CHAT_MESSAGE_FOOTER_DATA_TEST_ID } from "src/chat/chatMessageFooter/ChatMessageFooter";
+import { DATA_TEST_ID as CHAT_MESSAGE_FOOTER_BUTTON_DATA_TEST_ID } from "src/feedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
+import { IChatMessage } from "src/chat/Chat.types";
 
 jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service", () => {
   return {
@@ -29,24 +30,27 @@ describe("render tests", () => {
     jest.useRealTimers();
   });
 
-  test("should render the Chat message with sent_at when typing is set to false", () => {
+  test("should render the Chat message with sent_at when the message is not a typing message", () => {
     // WHEN the chat header is rendered
     const givenDate = new Date(2024, 6, 25).toISOString();
-    const givenMessage = {
+    const givenMessage : IChatMessage = {
       id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       message: "Hello, I'm Compass",
       sent_at: givenDate,
+      isTypingMessage: false,
     };
+    const givenNotifyOpenFeedbackForm = jest.fn();
 
     jest.spyOn(GetDurationFromNow, "getDurationFromNow").mockReturnValue("Some Date");
 
-    render(<ChatMessage chatMessage={givenMessage} isTyping={false} />);
+    render(<ChatMessage chatMessage={givenMessage} notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm} />);
 
     // THEN expect the chat header to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_CONTAINER)).toBeInTheDocument();
-    // AND expect the timeout to be visible
+    // AND expect the timestamp to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_TIMESTAMP)).toBeInTheDocument();
+
     // AND the getDurationBetweenDates to have been called with the given date
     expect(GetDurationFromNow.getDurationFromNow).toHaveBeenCalledWith(new Date(givenDate));
     // AND the correct date to have been displayed
@@ -57,16 +61,19 @@ describe("render tests", () => {
     // AND expect the component to match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_CONTAINER)).toMatchSnapshot();
   });
-  test("should render the Chat message without a sent_at when typing is set to true", () => {
+
+  test("should render the Chat message without a sent_at when the message is a typing message", () => {
     // WHEN the chat header is rendered
-    const givenMessage = {
+    const givenMessage : IChatMessage = {
       id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       message: "Hello, I'm Compass",
       sent_at: new Date().toISOString(),
+      isTypingMessage: true,
     };
+    const givenNotifyOpenFeedbackForm = jest.fn();
 
-    render(<ChatMessage chatMessage={givenMessage} isTyping={true} />);
+    render(<ChatMessage chatMessage={givenMessage} notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm} />);
 
     // THEN expect the chat header to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_CONTAINER)).toBeInTheDocument();
@@ -74,28 +81,24 @@ describe("render tests", () => {
     // AND expect the timeout to not be visible
     expect(screen.queryByTestId(DATA_TEST_ID.CHAT_MESSAGE_TIMESTAMP)).not.toBeInTheDocument();
   });
-  test("should render ChatMessageFooter when it is provided", () => {
-    // GIVEN a ChatMessageFooter component
-    const givenComponent = <div>Test children</div>;
-    // AND a chat message
+
+  test("should render ChatMessageFooter when the footer type is FEEDBACK_FORM_BUTTON", () => {
+    // GIVEN a chat message
     const givenMessage = {
       id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       message: "Hello, I'm Compass",
       sent_at: new Date().toISOString(),
-      isFeedbackMessage: true,
+      footerType: ChatMessageFooterType.FEEDBACK_FORM_BUTTON,
     };
+    const givenNotifyOpenFeedbackForm = jest.fn();
 
     // WHEN the component is rendered
-    render(<ChatMessage chatMessage={givenMessage} isTyping={false} chatMessageFooter={givenComponent} />);
+    render(<ChatMessage chatMessage={givenMessage} notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm} />);
 
-    // THEN expect the chat message footer component to be displayed
-    expect(screen.getByTestId(CHAT_MESSAGE_FOOTER_DATA_TEST_ID.CHAT_MESSAGE_FOOTER)).toBeInTheDocument();
-    // AND the divider to be displayed
-    expect(screen.getByTestId(CHAT_MESSAGE_FOOTER_DATA_TEST_ID.CHAT_MESSAGE_FOOTER_DIVIDER)).toBeInTheDocument();
-    // AND the children to be displayed
-    expect(screen.getByText("Test children")).toBeInTheDocument();
-    // AND the component to match the snapshot
-    expect(screen.getByTestId(CHAT_MESSAGE_FOOTER_DATA_TEST_ID.CHAT_MESSAGE_FOOTER)).toMatchSnapshot();
+    // THEN expect the divider to be displayed
+    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FOOTER_DIVIDER)).toBeInTheDocument();
+    // AND the feedback form button to be displayed
+    expect(screen.getByTestId(CHAT_MESSAGE_FOOTER_BUTTON_DATA_TEST_ID.FEEDBACK_FORM_BUTTON)).toBeInTheDocument();
   });
 });

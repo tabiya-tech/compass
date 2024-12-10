@@ -4,6 +4,7 @@ import {
   CSSClampFnCalculatorRem,
   ScreenSize,
 } from "src/utils/cssClampFnCalculator/CSSClampFnCalculator";
+import Color from "colorjs.io";
 
 export enum ThemeMode {
   LIGHT = "light",
@@ -32,7 +33,7 @@ export const TabiyaBasicColors = {
   Green: "#00FF91",
   DarkGreen: "#1E7166",
   Gray: "#F3F1EE",
-  GrayDark: "#43474E",
+  GrayDark: "#41403D",
 };
 export const TabiyaIconStyles = {
   fontSizeSmall: {
@@ -47,6 +48,25 @@ export const TabiyaIconStyles = {
   root: {
     fontSize: "1.5rem",
   },
+};
+
+// Helper function to create the interpolated colors
+const createGreyScale = () => {
+  const startColor = new Color(TabiyaBasicColors.DarkBlue);
+  const greyAnchor = new Color(TabiyaBasicColors.Gray);
+  const lightColor = new Color("white");
+  //TODO: discuss and add accent colors (A series)
+  
+  return {
+    ...Object.fromEntries(
+      Array.from({ length: 9 }, (_, i) => [
+        900 - (i * 100),
+        startColor.mix(greyAnchor, i / 8, { space: "lab" }).to("srgb").toString({ format: "hex" })
+      ])
+    ),
+    100: TabiyaBasicColors.Gray,
+    50: lightColor.mix(greyAnchor, 0.5, { space: "lab" }).to("srgb").toString({ format: "hex" }),
+  };
 };
 
 const lightPalette: PaletteOptions = {
@@ -81,22 +101,7 @@ const lightPalette: PaletteOptions = {
     dark: "#1D6023",
     light: "#E8F5E9",
   },
-  grey: {
-    900: "#211F1D",
-    800: "#41403D",
-    700: "#605E5B",
-    600: "#74726F",
-    500: "#9D9B98",
-    400: "#BBB9B5",
-    300: "#D9D9D9",
-    200: "#F5F5F5",
-    100: TabiyaBasicColors.Gray,
-    50: "#F8F6F3",
-    A100: "#F0F3EE",
-    A200: "#D9F5D3",
-    A400: "#C6F7A4",
-    A700: "#CAF09D",
-  },
+  grey: createGreyScale(),
   text: {
     primary: TabiyaBasicColors.DarkBlue,
     secondary: TabiyaBasicColors.GrayDark,
@@ -161,7 +166,7 @@ export const applicationTheme = (theme: ThemeMode) => {
       return `${factor * TabiyaBaseSizes.rounding}px`;
     },
     tabiyaSpacing: {
-      none: 0,
+      none: 0, 
       xxs: 0.25,
       xs: 0.5,
       sm: 1,
@@ -185,7 +190,6 @@ export const applicationTheme = (theme: ThemeMode) => {
     typography: {
       htmlFontSize: TabiyaBaseSizes.font, // Set the base font size
       fontFamily: "Inter, sans-serif", // Set the desired font family
-      // @ts-ignore
       fontSize: TabiyaBaseSizes.font, // Set the base font size
       fontWeightLight: 300,
       fontWeightRegular: 400,
@@ -320,7 +324,7 @@ export const applicationTheme = (theme: ThemeMode) => {
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-            maxWidth: "250px",
+            maxWidth: "15.625rem",
           },
         },
       },

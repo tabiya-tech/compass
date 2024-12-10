@@ -1,39 +1,23 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`render tests should render ChatMessageFooter when it is provided 1`] = `
-<div
-  class="MuiBox-root css-0"
-  data-testid="chat-message-footer-74bf72e8-1ed8-4dcf-8d3a-262d82cdd4b2"
->
-  <hr
-    class="MuiDivider-root MuiDivider-fullWidth css-ohsnik-MuiDivider-root"
-    color="#F3F1EE"
-    data-testid="chat-message-footer-divider-74bf72e8-1ed8-4dcf-8d3a-262d82cdd4b2"
-  />
-  <div>
-    Test children
-  </div>
-</div>
-`;
-
-exports[`render tests should render the Chat message with sent_at when typing is set to false 1`] = `
+exports[`render tests should render the Chat message with sent_at when the message is not a typing message 1`] = `
 <div
   class="MuiBox-root css-1c8zvho"
   data-testid="chat-message-container-2fbaf2ef-9eab-485a-bd28-b4a164e18b06"
   origin="COMPASS"
 >
   <div
-    class="MuiBox-root css-1dw9g6t"
+    class="MuiBox-root css-13dabd1"
     origin="COMPASS"
   >
     <p
-      class="MuiTypography-root MuiTypography-body1 css-gxvxtl-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-body1 css-13zm2uq-MuiTypography-root"
     >
       Hello, I'm Compass
     </p>
   </div>
   <span
-    class="MuiTypography-root MuiTypography-caption css-1ly2vi5-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-caption css-1l3yql3-MuiTypography-root"
     data-testid="chat-message-sent_at-2fbaf2ef-9eab-485a-bd28-b4a164e18b06"
   >
     sent 

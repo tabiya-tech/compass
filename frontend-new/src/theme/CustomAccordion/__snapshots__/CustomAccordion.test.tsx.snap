@@ -21,7 +21,7 @@ exports[`CustomAccordion should render CustomAccordion correctly 1`] = `
         class="MuiAccordionSummary-content MuiAccordionSummary-contentGutters css-eqpfi5-MuiAccordionSummary-content"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-1wdfbkk-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-vvbmpr-MuiTypography-root"
         >
           foo
         </p>

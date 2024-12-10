@@ -9,7 +9,7 @@ exports[`CustomRating should render component successfully 1`] = `
     class="MuiBox-root css-1w00lo4"
   >
     <p
-      class="MuiTypography-root MuiTypography-body1 css-1au4tcm-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-body1 css-1rdygw0-MuiTypography-root"
       data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
     >
       How would you rate the overall experience?
@@ -211,13 +211,13 @@ exports[`CustomRating should render component successfully 1`] = `
         class="MuiBox-root css-jyedia"
       >
         <p
-          class="MuiTypography-root MuiTypography-body2 css-bwgvvh-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body2 css-1m7ibp6-MuiTypography-root"
           data-testid="custom-rating-low-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
         >
           Very Difficult
         </p>
         <p
-          class="MuiTypography-root MuiTypography-body2 css-bwgvvh-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body2 css-1m7ibp6-MuiTypography-root"
           data-testid="custom-rating-high-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
         >
           Very Easy
