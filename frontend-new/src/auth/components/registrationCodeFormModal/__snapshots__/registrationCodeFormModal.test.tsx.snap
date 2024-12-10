@@ -22,7 +22,7 @@ exports[`RegistrationCodeFormModal closes the modal when the close icon is click
     tabindex="-1"
   >
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-nzay5m-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1k5lmk5-MuiButtonBase-root-MuiIconButton-root"
       data-testid="invitation-code-close-icon-f782907a-6904-482c-b148-3c6682bf7b54"
       tabindex="0"
       title="Close registration code form"
@@ -50,7 +50,7 @@ exports[`RegistrationCodeFormModal closes the modal when the close icon is click
       Registration code
     </h4>
     <p
-      class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1ncy5w-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
       data-testid="invitation-code-modal-subtitle-f782907a-6904-482c-b148-3c6682bf7b54"
     >
       Enter your registration code
@@ -59,7 +59,7 @@ exports[`RegistrationCodeFormModal closes the modal when the close icon is click
       class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth MuiTextField-root css-1lbn22w-MuiFormControl-root-MuiTextField-root"
     >
       <label
-        class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-a4npng-MuiFormLabel-root-MuiInputLabel-root"
+        class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-t9prq5-MuiFormLabel-root-MuiInputLabel-root"
         data-shrink="false"
         for=":r1:"
         id=":r1:-label"
@@ -103,7 +103,7 @@ exports[`RegistrationCodeFormModal closes the modal when the close icon is click
       </div>
     </div>
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-q25fil-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1jkonhr-MuiButtonBase-root-MuiButton-root"
       data-testid="invitation-code-submit-button-f782907a-6904-482c-b148-3c6682bf7b54"
       disabled=""
       tabindex="-1"
@@ -141,7 +141,7 @@ exports[`RegistrationCodeFormModal renders correctly when modal is shown and cal
     tabindex="-1"
   >
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-nzay5m-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1k5lmk5-MuiButtonBase-root-MuiIconButton-root"
       data-testid="invitation-code-close-icon-f782907a-6904-482c-b148-3c6682bf7b54"
       tabindex="0"
       title="Close registration code form"
@@ -169,7 +169,7 @@ exports[`RegistrationCodeFormModal renders correctly when modal is shown and cal
       Registration code
     </h4>
     <p
-      class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1ncy5w-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
       data-testid="invitation-code-modal-subtitle-f782907a-6904-482c-b148-3c6682bf7b54"
     >
       Enter your registration code
@@ -178,7 +178,7 @@ exports[`RegistrationCodeFormModal renders correctly when modal is shown and cal
       class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth MuiTextField-root css-1lbn22w-MuiFormControl-root-MuiTextField-root"
     >
       <label
-        class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-a4npng-MuiFormLabel-root-MuiInputLabel-root"
+        class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-t9prq5-MuiFormLabel-root-MuiInputLabel-root"
         data-shrink="false"
         for=":r0:"
         id=":r0:-label"
@@ -222,7 +222,7 @@ exports[`RegistrationCodeFormModal renders correctly when modal is shown and cal
       </div>
     </div>
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-q25fil-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1jkonhr-MuiButtonBase-root-MuiButton-root"
       data-testid="invitation-code-submit-button-f782907a-6904-482c-b148-3c6682bf7b54"
       disabled=""
       tabindex="-1"

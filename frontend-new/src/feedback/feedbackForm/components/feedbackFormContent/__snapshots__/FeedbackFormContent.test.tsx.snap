@@ -6,7 +6,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
   data-testid="feedback-form-content-07d1ed9d-6ced-4a24-912a-9b89199df67f"
 >
   <p
-    class="MuiTypography-root MuiTypography-body1 css-1lysc6y-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-body1 css-paf3i2-MuiTypography-root"
     data-testid="feedback-form-content-title-07d1ed9d-6ced-4a24-912a-9b89199df67f"
   >
     Overall Satisfaction
@@ -30,7 +30,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
             class="MuiBox-root css-1w00lo4"
           >
             <p
-              class="MuiTypography-root MuiTypography-body1 css-1au4tcm-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-body1 css-1rdygw0-MuiTypography-root"
               data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
             >
               How easy or difficult was it to interact with Compass and understand its responses?
@@ -301,13 +301,13 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                 class="MuiBox-root css-jyedia"
               >
                 <p
-                  class="MuiTypography-root MuiTypography-body2 css-bwgvvh-MuiTypography-root"
+                  class="MuiTypography-root MuiTypography-body2 css-1m7ibp6-MuiTypography-root"
                   data-testid="custom-rating-low-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
                 >
                   Difficult
                 </p>
                 <p
-                  class="MuiTypography-root MuiTypography-body2 css-bwgvvh-MuiTypography-root"
+                  class="MuiTypography-root MuiTypography-body2 css-1m7ibp6-MuiTypography-root"
                   data-testid="custom-rating-high-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
                 >
                   Easy
@@ -366,7 +366,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
             class="MuiBox-root css-1w00lo4"
           >
             <p
-              class="MuiTypography-root MuiTypography-body1 css-1au4tcm-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-body1 css-1rdygw0-MuiTypography-root"
               data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
             >
               How satisfied are you with Compass?
@@ -569,13 +569,13 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                 class="MuiBox-root css-jyedia"
               >
                 <p
-                  class="MuiTypography-root MuiTypography-body2 css-bwgvvh-MuiTypography-root"
+                  class="MuiTypography-root MuiTypography-body2 css-1m7ibp6-MuiTypography-root"
                   data-testid="custom-rating-low-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
                 >
                   Unsatisfied
                 </p>
                 <p
-                  class="MuiTypography-root MuiTypography-body2 css-bwgvvh-MuiTypography-root"
+                  class="MuiTypography-root MuiTypography-body2 css-1m7ibp6-MuiTypography-root"
                   data-testid="custom-rating-high-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
                 >
                   Satisfied
@@ -621,7 +621,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
       />
     </div>
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-1j5hbp5-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
       data-testid="feedback-form-next-button-07d1ed9d-6ced-4a24-912a-9b89199df67f"
       style="width: 100px;"
       tabindex="0"

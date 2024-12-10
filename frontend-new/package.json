@@ -60,6 +60,7 @@
     "@sentry/cli": "^2.39.1",
     "@sentry/react": "^8.28.0",
     "@sentry/webpack-plugin": "^2.22.6",
+    "colorjs.io": "^0.5.2",
     "docx": "^8.5.0",
     "firebase": "^10.12.2",
     "firebaseui": "^6.1.0",

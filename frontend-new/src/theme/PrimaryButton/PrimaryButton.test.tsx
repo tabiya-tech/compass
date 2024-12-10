@@ -46,20 +46,20 @@ describe("Primary Button tests", () => {
   });
 
   describe.each([
-    // [true, { disable: true, disableWhenOffline: true, isOnline: true }],
-    // [true, { disable: true, disableWhenOffline: true, isOnline: false }],
-    // [true, { disable: true, disableWhenOffline: false, isOnline: true }],
-    // [true, { disable: true, disableWhenOffline: false, isOnline: false }],
-    // [true, { disable: true, disableWhenOffline: undefined, isOnline: false }],
-    // [false, { disable: false, disableWhenOffline: true, isOnline: true }],
+    [true, { disable: true, disableWhenOffline: true, isOnline: true }],
+    [true, { disable: true, disableWhenOffline: true, isOnline: false }],
+    [true, { disable: true, disableWhenOffline: false, isOnline: true }],
+    [true, { disable: true, disableWhenOffline: false, isOnline: false }],
+    [true, { disable: true, disableWhenOffline: undefined, isOnline: false }],
+    [false, { disable: false, disableWhenOffline: true, isOnline: true }],
     [true, { disable: false, disableWhenOffline: true, isOnline: false }],
-    // [false, { disable: false, disableWhenOffline: false, isOnline: true }],
-    // [false, { disable: false, disableWhenOffline: false, isOnline: false }],
-    // [false, { disable: false, disableWhenOffline: undefined, isOnline: false }],
-    // [false, { disable: undefined, disableWhenOffline: true, isOnline: true }],
-    // [true, { disable: undefined, disableWhenOffline: true, isOnline: false }],
-    // [false, { disable: undefined, disableWhenOffline: undefined, isOnline: true }],
-    // [false, { disable: undefined, disableWhenOffline: undefined, isOnline: false }],
+    [false, { disable: false, disableWhenOffline: false, isOnline: true }],
+    [false, { disable: false, disableWhenOffline: false, isOnline: false }],
+    [false, { disable: false, disableWhenOffline: undefined, isOnline: false }],
+    [false, { disable: undefined, disableWhenOffline: true, isOnline: true }],
+    [true, { disable: undefined, disableWhenOffline: true, isOnline: false }],
+    [false, { disable: undefined, disableWhenOffline: undefined, isOnline: true }],
+    [false, { disable: undefined, disableWhenOffline: undefined, isOnline: false }],
   ])("Disabled/enabled state", (expectedState, testCase) => {
     test(`should render the button disabled = ${expectedState} when ${JSON.stringify(testCase)}`, () => {
       mockBrowserIsOnLine(testCase.isOnline);

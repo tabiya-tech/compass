@@ -6,7 +6,7 @@ exports[`Custom text field should render CustomTextField correctly 1`] = `
   data-testid="custom-text-field-container-f4b3b3b3-4b3b-4b3b-4b3b-4b3b4b3b4b3b"
 >
   <p
-    class="MuiTypography-root MuiTypography-body1 css-1wdfbkk-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-body1 css-vvbmpr-MuiTypography-root"
     data-testid="custom-text-field-label-f4b3b3b3-4b3b-4b3b-4b3b-4b3b4b3b4b3b"
   >
     label
