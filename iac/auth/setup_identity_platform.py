@@ -52,7 +52,7 @@ def _setup_identity_platform(*, basic_config: ProjectBaseConfig, frontend_domain
             ),
         ),
         project=basic_config.project,
-        opts=pulumi.ResourceOptions(depends_on=dependencies)
+        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider)
     )
 
     pulumi.export("identity_platform_client_api_key", default.client.api_key.unsecret(default.client.api_key))
@@ -67,8 +67,9 @@ def _setup_identity_platform(*, basic_config: ProjectBaseConfig, frontend_domain
         idp_id="google.com",
         enabled=True,
         project=basic_config.project,
-        opts=pulumi.ResourceOptions(depends_on=dependencies + [default]),
+        opts=pulumi.ResourceOptions(depends_on=dependencies + [default], provider=basic_config.provider),
     )
+
 
 def deploy_auth(project: str, location: str, environment: str, frontend_domain: str):
     _basic_config = get_project_base_config(project=project, location=location, environment=environment)
