@@ -1,6 +1,5 @@
 import asyncio
 import logging
-from threading import Lock
 
 from fastapi import Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
@@ -34,7 +33,7 @@ _lock = asyncio.Lock()
 _vector_search_settings = VectorSearchSettings()
 
 # Define a singleton instance of the skill search service
-_skill_search_service_singleton: SimilaritySearchService[SkillEntity] = None
+_skill_search_service_singleton: SimilaritySearchService[SkillEntity] | None = None
 
 
 async def get_skill_search_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_taxonomy_db),
