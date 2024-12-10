@@ -1,4 +1,5 @@
 import asyncio
+from asyncio import sleep
 from typing import Optional
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
@@ -8,9 +9,10 @@ from app.server_dependencies.database_collections import Collections
 import logging
 
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
+from evaluation_tests.conversation_libs.evaluators.evaluation_result import logger
 
 
-def _get_database_connection_info(database) -> str:
+async def _get_database_connection_info(database: AsyncIOMotorDatabase) -> str:
     """
     Retrieves connection information for a MongoDB database, formatted for logging.
 
@@ -19,17 +21,18 @@ def _get_database_connection_info(database) -> str:
     """
     client = database.client
     db_name = database.name
-
     # Get the primary address (host and port)
     try:
+        # Ensure the client is connected, before trying to get the client.address, otherwise it might be None
+        si = await client.server_info()
         host, port = client.address
-        primary_info = f"{host}:{port}"
-    except Exception:
+        primary_info = f"{host}:{port} version:{si.get('version', 'Unknown version')}"
+    except Exception:  # noqa
         primary_info = "Unknown primary node"
 
     # Get all connected nodes
     connected_nodes = client.nodes
-    connected_nodes_info = ", ".join([f"{node[0]}:{node[1]}" for node in connected_nodes]) or "None"
+    connected_nodes_info = ", ".join([f"{node[0]}:{node[1]}" for node in connected_nodes]) or "None"  # type: ignore
 
     # Format the output for logging
     connection_info = (
@@ -156,7 +159,7 @@ class CompassDBProvider:
                     # Create the database instance
                     cls._application_mongo_db = _get_application_db(cls._settings.application_mongodb_uri,
                                                                     cls._settings.application_database_name)
-                    cls._logger.info("Connected to Application MongoDB database: %s", _get_database_connection_info(cls._application_mongo_db))
+                    cls._logger.info("Connected to Application MongoDB database: %s", await _get_database_connection_info(cls._application_mongo_db))
         return cls._application_mongo_db
 
     @classmethod
@@ -174,7 +177,7 @@ class CompassDBProvider:
                         cls._settings.users_mongodb_uri,
                         cls._settings.users_database_name
                     )
-                    cls._logger.info("Connected to Users MongoDB database: %s", _get_database_connection_info(cls._users_mongo_db))
+                    cls._logger.info("Connected to Users MongoDB database: %s", await _get_database_connection_info(cls._users_mongo_db))
         return cls._users_mongo_db
 
     @classmethod
@@ -186,5 +189,5 @@ class CompassDBProvider:
                     # Create the database instance
                     cls._taxonomy_mongo_db = _get_taxonomy_db(cls._settings.taxonomy_mongodb_uri,
                                                               cls._settings.taxonomy_database_name)
-                    cls._logger.info("Connected to MongoDB database: %s", _get_database_connection_info(cls._taxonomy_mongo_db))
+                    cls._logger.info("Connected to MongoDB database: %s", await _get_database_connection_info(cls._taxonomy_mongo_db))
         return cls._taxonomy_mongo_db
