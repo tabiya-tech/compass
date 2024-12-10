@@ -48,15 +48,28 @@ export const Typing: Story = {
         message: "Hello, how can I help you?",
         sent_at: new Date().toISOString(),
       },
+      {
+        id: nanoid(),
+        sender: ConversationMessageSender.COMPASS,
+        message: "Typing...",
+        sent_at: new Date().toString(),
+        isTypingMessage: true,
+      }
     ],
-    isTyping: true,
   },
 };
 
 export const TypingWhenEmpty: Story = {
   args: {
-    messages: [],
-    isTyping: true,
+    messages: [
+      {
+        id: nanoid(),
+        sender: ConversationMessageSender.COMPASS,
+        message: "Typing...",
+        sent_at: new Date().toString(),
+        isTypingMessage: true,
+      }
+    ],
   },
 };
 

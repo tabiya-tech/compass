@@ -1,12 +1,9 @@
 import React, { useEffect, useRef } from "react";
 import { IChatMessage } from "src/chat/Chat.types";
-import { Box, List, ListItem } from "@mui/material";
+import { Box, List, ListItem, useTheme } from "@mui/material";
 import { styled } from "@mui/system";
 import ChatMessage from "src/chat/ChatMessage/ChatMessage";
 import { motion, AnimatePresence } from "framer-motion";
-import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
-import { nanoid } from "nanoid";
-import FeedbackFormButton from "src/feedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
 
 const uniqueId = "0397ee51-f637-4453-9e2f-5cc8900c9554";
 export const DATA_TEST_ID = {
@@ -15,7 +12,6 @@ export const DATA_TEST_ID = {
 
 export type ChatListProps = {
   messages: IChatMessage[];
-  isTyping: boolean;
   notifyOpenFeedbackForm: () => void;
 };
 
@@ -24,20 +20,16 @@ const ChatListContainer = styled(Box)(({ theme }) => ({
   flexDirection: "column",
   height: "100%",
   overflowX: "hidden",
+  flexGrow: 1,
+  overflowY: "auto",
   [theme.breakpoints.up("md")]: {
-    height: "90%",
     width: "60%",
     margin: "auto",
   },
 }));
 
-const MessagesContainer = styled(Box)(({ theme }) => ({
-  flexGrow: 1,
-  overflowY: "auto",
-  padding: theme.spacing(2),
-}));
-
-const ChatList: React.FC<ChatListProps> = ({ messages, isTyping, notifyOpenFeedbackForm }) => {
+const ChatList: React.FC<ChatListProps> = ({ messages, notifyOpenFeedbackForm }) => {
+  const theme = useTheme();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -47,14 +39,7 @@ const ChatList: React.FC<ChatListProps> = ({ messages, isTyping, notifyOpenFeedb
       // as jest jsdom doesn't have any view.
       messagesEndRef.current.scrollIntoView?.({ behavior: "smooth" });
     }
-  }, [messages, isTyping]);
-
-  const loadingMessage: IChatMessage = {
-    id: nanoid(),
-    message: "Typing...",
-    sender: ConversationMessageSender.COMPASS,
-    sent_at: new Date().toISOString(),
-  };
+  }, [messages]);
 
   const messageVariants = {
     hidden: { opacity: 0, y: 10 },
@@ -77,11 +62,13 @@ const ChatList: React.FC<ChatListProps> = ({ messages, isTyping, notifyOpenFeedb
   }, []);
 
   return (
-    <ChatListContainer data-testid={DATA_TEST_ID.CHAT_LIST_CONTAINER}>
-      <MessagesContainer tabIndex={0}>
+    <ChatListContainer data-testid={DATA_TEST_ID.CHAT_LIST_CONTAINER} tabIndex={0}>
         <List
           sx={{
             width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            gap: theme.fixedSpacing(theme.tabiyaSpacing.md),
           }}
         >
           <AnimatePresence initial={false}>
@@ -93,37 +80,19 @@ const ChatList: React.FC<ChatListProps> = ({ messages, isTyping, notifyOpenFeedb
                 animate="visible"
                 exit="hidden"
                 variants={messageVariants}
+                disablePadding={true}
                 transition={{ duration: 0.3 }}
-                sx={{ width: "100%" }}
+                sx={{ width: "100%", padding: theme.tabiyaSpacing.xs}}
               >
                 <ChatMessage
                   chatMessage={message}
-                  isTyping={false}
-                  chatMessageFooter={
-                    message.sender === ConversationMessageSender.COMPASS &&
-                    message.isFeedbackMessage && <FeedbackFormButton notifyOpenFeedbackForm={notifyOpenFeedbackForm} />
-                  }
+                  notifyOpenFeedbackForm={notifyOpenFeedbackForm}
                 />
               </ListItem>
             ))}
-            {isTyping && (
-              <ListItem
-                component={motion.li}
-                key="typing"
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                variants={messageVariants}
-                transition={{ duration: 0.3 }}
-                sx={{ width: "100%" }}
-              >
-                <ChatMessage chatMessage={loadingMessage} isTyping={true} />
-              </ListItem>
-            )}
           </AnimatePresence>
         </List>
         <div ref={messagesEndRef} />
-      </MessagesContainer>
     </ChatListContainer>
   );
 };

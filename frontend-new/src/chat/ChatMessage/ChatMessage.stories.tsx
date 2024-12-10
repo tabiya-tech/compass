@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "@storybook/react";
 import ChatMessage from "./ChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
-import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
 const meta: Meta<typeof ChatMessage> = {
   title: "Chat/ChatMessage",
@@ -81,7 +80,7 @@ export const ShownWithDifferentTimestamps: Story = {
           sent_at: new Date().toISOString(),
           message: "sent just now",
         }}
-        isTyping={false}
+        notifyOpenFeedbackForm={() => {}}
       />
       <ChatMessage
         chatMessage={{
@@ -90,7 +89,7 @@ export const ShownWithDifferentTimestamps: Story = {
           sent_at: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
           message: "sent an hour ago",
         }}
-        isTyping={false}
+        notifyOpenFeedbackForm={() => {}}
       />
       <ChatMessage
         chatMessage={{
@@ -99,7 +98,7 @@ export const ShownWithDifferentTimestamps: Story = {
           sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
           message: "sent yesterday",
         }}
-        isTyping={false}
+        notifyOpenFeedbackForm={() => {}}
       />
       <ChatMessage
         chatMessage={{
@@ -108,7 +107,7 @@ export const ShownWithDifferentTimestamps: Story = {
           sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
           message: "sent two days ago",
         }}
-        isTyping={false}
+        notifyOpenFeedbackForm={() => {}}
       />
       <ChatMessage
         chatMessage={{
@@ -117,7 +116,7 @@ export const ShownWithDifferentTimestamps: Story = {
           sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(),
           message: "sent a week ago",
         }}
-        isTyping={false}
+        notifyOpenFeedbackForm={() => {}}
       />
       <ChatMessage
         chatMessage={{
@@ -126,7 +125,7 @@ export const ShownWithDifferentTimestamps: Story = {
           sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(),
           message: "sent a month ago",
         }}
-        isTyping={false}
+        notifyOpenFeedbackForm={() => {}}
       />
       <ChatMessage
         chatMessage={{
@@ -135,20 +134,8 @@ export const ShownWithDifferentTimestamps: Story = {
           sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30 * 12).toISOString(),
           message: "sent a year ago",
         }}
-        isTyping={false}
+        notifyOpenFeedbackForm={() => {}}
       />
     </>
   ),
-};
-
-export const ShownWithChatMessageFooter: Story = {
-  args: {
-    chatMessage: {
-      id: nanoid(),
-      sender: ConversationMessageSender.COMPASS,
-      sent_at: new Date().toISOString(),
-      message: "Hello, I'm Compass",
-    },
-    chatMessageFooter: <PrimaryButton>Click here</PrimaryButton>,
-  },
 };

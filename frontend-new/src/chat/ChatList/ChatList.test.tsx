@@ -45,7 +45,7 @@ describe("ChatList", () => {
   });
 
   test("should render the Chat List", () => {
-    // GIVEN a message list, a clear message function, a send message function, and a typing status
+    // GIVEN a message list
     const givenMessages = [
       {
         id: nanoid(),
@@ -59,11 +59,19 @@ describe("ChatList", () => {
         message: "Hi",
         sent_at: new Date().toISOString(),
       },
+      {
+        id: nanoid(),
+        sender: ConversationMessageSender.COMPASS,
+        message: "Typing...",
+        sent_at: new Date().toString(),
+        isTypingMessage: true,
+      }// Simulate typing state
     ];
-    const givenIsTyping = true; // Simulate typing state
+    // AND a mock function to open the feedback form
+    const givenNotifyOpenFeedbackForm = jest.fn();
 
     // WHEN the chat header is rendered
-    render(<ChatList messages={givenMessages} isTyping={givenIsTyping} notifyOpenFeedbackForm={jest.fn()} />);
+    render(<ChatList messages={givenMessages} notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm} />);
 
     // THEN expect the chat header to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
@@ -73,8 +81,7 @@ describe("ChatList", () => {
       1,
       {
         chatMessage: givenMessages[0],
-        isTyping: false,
-        chatMessageFooter: false,
+        notifyOpenFeedbackForm: givenNotifyOpenFeedbackForm,
       },
       {}
     );
@@ -82,7 +89,7 @@ describe("ChatList", () => {
       2,
       {
         chatMessage: givenMessages[1],
-        isTyping: false,
+        notifyOpenFeedbackForm: givenNotifyOpenFeedbackForm,
       },
       {}
     );
@@ -95,8 +102,9 @@ describe("ChatList", () => {
           message: "Typing...",
           sender: ConversationMessageSender.COMPASS,
           sent_at: expect.any(String),
+          isTypingMessage: true,
         },
-        isTyping: true,
+        notifyOpenFeedbackForm: givenNotifyOpenFeedbackForm,
       },
       {}
     );
@@ -110,11 +118,21 @@ describe("ChatList", () => {
 
   test("should render the Chat List with typing message", () => {
     // GIVEN no messages and no typing status
-    const givenMessages: IChatMessage[] = [];
-    const givenIsTyping = true;
+    const givenMessages: IChatMessage[] = [
+      {
+        id: nanoid(),
+        sender: ConversationMessageSender.COMPASS,
+        message: "Typing...",
+        sent_at: new Date().toString(),
+        isTypingMessage: true,
+      }
+      // Simulate typing state
+    ];
+    // AND a mock function to open the feedback form
+    const givenNotifyOpenFeedbackForm = jest.fn();
 
     // WHEN the chat header is rendered
-    render(<ChatList messages={givenMessages} isTyping={givenIsTyping} notifyOpenFeedbackForm={jest.fn()} />);
+    render(<ChatList messages={givenMessages} notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm} />);
 
     // THEN expect the chat header to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
@@ -128,8 +146,9 @@ describe("ChatList", () => {
           message: "Typing...",
           sender: ConversationMessageSender.COMPASS,
           sent_at: expect.any(String),
+          isTypingMessage: true,
         },
-        isTyping: true,
+        notifyOpenFeedbackForm: givenNotifyOpenFeedbackForm,
       },
       {}
     );
@@ -152,14 +171,12 @@ describe("ChatList", () => {
         isFeedbackMessage: true,
       },
     ];
-    const givenIsTyping = false;
     const givenNotifyOpenFeedbackForm = jest.fn();
 
     // WHEN the chat header is rendered
     render(
       <ChatList
         messages={givenMessages}
-        isTyping={givenIsTyping}
         notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm}
       />
     );
@@ -178,8 +195,7 @@ describe("ChatList", () => {
           sent_at: expect.any(String),
           isFeedbackMessage: true,
         },
-        isTyping: false,
-        chatMessageFooter: expect.any(Object),
+        notifyOpenFeedbackForm: givenNotifyOpenFeedbackForm,
       },
       {}
     );

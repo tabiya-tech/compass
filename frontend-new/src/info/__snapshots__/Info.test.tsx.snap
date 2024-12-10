@@ -29,7 +29,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
             Date
           </h6>
           <p
-            class="MuiTypography-root MuiTypography-body1 css-7xnq80-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
           >
             fooFrontend
           </p>
@@ -43,7 +43,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
             Version
           </h6>
           <p
-            class="MuiTypography-root MuiTypography-body1 css-7xnq80-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
           >
             barFrontend
           </p>
@@ -57,7 +57,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
             Build Number
           </h6>
           <p
-            class="MuiTypography-root MuiTypography-body1 css-7xnq80-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
           >
             bazFrontend
           </p>
@@ -71,7 +71,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
             GIT SHA
           </h6>
           <p
-            class="MuiTypography-root MuiTypography-body1 css-7xnq80-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
           >
             gooFrontend
           </p>
@@ -99,7 +99,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
             Date
           </h6>
           <p
-            class="MuiTypography-root MuiTypography-body1 css-7xnq80-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
           >
             fooBackend
           </p>
@@ -113,7 +113,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
             Version
           </h6>
           <p
-            class="MuiTypography-root MuiTypography-body1 css-7xnq80-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
           >
             barBackend
           </p>
@@ -127,7 +127,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
             Build Number
           </h6>
           <p
-            class="MuiTypography-root MuiTypography-body1 css-7xnq80-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
           >
             bazBackend
           </p>
@@ -141,7 +141,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
             GIT SHA
           </h6>
           <p
-            class="MuiTypography-root MuiTypography-body1 css-7xnq80-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
           >
             gooBackend
           </p>
@@ -155,7 +155,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
   >
      
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-1j5hbp5-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
       data-testid="feedback-button-31d2b110-8308-4035-90a6-519e89e7f6fa"
       tabindex="0"
       title="Report a bug."
@@ -207,7 +207,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
         Date
       </h6>
       <p
-        class="MuiTypography-root MuiTypography-body1 css-7xnq80-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
       >
         fooBackend
       </p>
@@ -221,7 +221,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
         Version
       </h6>
       <p
-        class="MuiTypography-root MuiTypography-body1 css-7xnq80-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
       >
         barBackend
       </p>
@@ -235,7 +235,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
         Build Number
       </h6>
       <p
-        class="MuiTypography-root MuiTypography-body1 css-7xnq80-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
       >
         bazBackend
       </p>
@@ -249,7 +249,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
         GIT SHA
       </h6>
       <p
-        class="MuiTypography-root MuiTypography-body1 css-7xnq80-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
       >
         gooBackend
       </p>
@@ -280,7 +280,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
         Date
       </h6>
       <p
-        class="MuiTypography-root MuiTypography-body1 css-7xnq80-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
       >
         fooFrontend
       </p>
@@ -294,7 +294,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
         Version
       </h6>
       <p
-        class="MuiTypography-root MuiTypography-body1 css-7xnq80-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
       >
         barFrontend
       </p>
@@ -308,7 +308,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
         Build Number
       </h6>
       <p
-        class="MuiTypography-root MuiTypography-body1 css-7xnq80-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
       >
         bazFrontend
       </p>
@@ -322,7 +322,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
         GIT SHA
       </h6>
       <p
-        class="MuiTypography-root MuiTypography-body1 css-7xnq80-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
       >
         gooFrontend
       </p>

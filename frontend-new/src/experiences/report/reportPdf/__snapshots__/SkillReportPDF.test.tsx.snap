@@ -400,7 +400,7 @@ exports[`Report should render Report correctly 1`] = `
           style="width: 12px; height: 12px;"
         />
         <text
-          style="display: flex; flex: 1; flex-wrap: wrap; font-size: 9px; color: rgb(67, 71, 78);"
+          style="display: flex; flex: 1; flex-wrap: wrap; font-size: 9px; color: rgb(65, 64, 61);"
           x="0"
           y="0"
         >
