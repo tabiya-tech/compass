@@ -155,8 +155,6 @@ describe("Chat", () => {
       // THEN expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
-      // AND the container to be in the document
-      expect(screen.getByTestId(DATA_TEST_ID.CONTAINER)).toBeInTheDocument();
 
       // AND the chat container to be visible
       expect(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER)).toBeInTheDocument();
@@ -182,7 +180,7 @@ describe("Chat", () => {
       );
 
       // AND content should match snapshot
-      expect(screen.getByTestId(DATA_TEST_ID.CONTAINER)).toMatchSnapshot();
+      expect(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER)).toMatchSnapshot();
     });
 
     test("should show the backdrop when the user is inactive", async () => {
@@ -297,7 +295,7 @@ describe("Chat", () => {
       // AND the ChatList component to be called with the history returned to the initialization
       await waitFor(() => {
         expect(ChatList).toHaveBeenNthCalledWith(
-          3,
+          4,
           expect.objectContaining({
             messages: [
               {
@@ -311,6 +309,7 @@ describe("Chat", () => {
                 sender: ConversationMessageSender.COMPASS,
                 message: "Hello, I'm Compass",
                 sent_at: expect.any(String),
+                isTypingMessage: false,
               },
               {
                 id: expect.any(String),
@@ -323,9 +322,10 @@ describe("Chat", () => {
                 sender: ConversationMessageSender.COMPASS,
                 message: "Hello foo, would you like to begin your skill exploration session?",
                 sent_at: expect.any(String),
+                isTypingMessage: false,
               },
             ],
-            isTyping: false,
+            notifyOpenFeedbackForm: expect.any(Function),
           }),
           {}
         );
@@ -404,8 +404,10 @@ describe("Chat", () => {
                 sender: ConversationMessageSender.COMPASS,
                 message: "Hello, I'm Compass",
                 sent_at: expect.any(String),
+                isTypingMessage: false,
               },
             ],
+            notifyOpenFeedbackForm: expect.any(Function),
           }),
           {}
         );
@@ -436,8 +438,7 @@ describe("Chat", () => {
 
       // THEN expect an error message to be shown in the chat
       await waitFor(() => {
-        expect(ChatList).toHaveBeenNthCalledWith(
-          6,
+        expect(ChatList).toHaveBeenCalledWith(
           expect.objectContaining({
             messages: expect.arrayContaining([
               {
@@ -451,8 +452,10 @@ describe("Chat", () => {
                 sender: ConversationMessageSender.COMPASS,
                 message: "I'm sorry, Something seems to have gone wrong on my end... Can you repeat that?",
                 sent_at: expect.any(String),
+                isTypingMessage: false,
               },
             ]),
+            notifyOpenFeedbackForm: expect.any(Function),
           }),
           {}
         );
@@ -530,10 +533,10 @@ describe("Chat", () => {
 
       // THEN expect an error message to be shown
       await waitFor(() => {
-        expect(console.error).toHaveBeenCalledWith("Failed to retrieve experiences", new Error("User has no sessions"));
+        expect(console.error).toHaveBeenCalledWith(new Error("Failed to retrieve experiences"));
       });
 
-      // AND enqueSnackbar should be called
+      // AND enqueueSnackbar should be called
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to retrieve experiences", {
         variant: "error",
       });

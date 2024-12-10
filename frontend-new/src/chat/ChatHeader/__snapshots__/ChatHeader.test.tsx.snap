@@ -2,7 +2,7 @@
 
 exports[`ChatHeader should render the Chat Header with exploredExperiencesNotification not shown 1`] = `
 <div
-  class="MuiBox-root css-12zc3r8"
+  class="MuiBox-root css-1lekzkb"
   data-testid="chat-header-container-7413b63a-887b-4f41-b930-89e9770db12b"
 >
   <a
@@ -13,9 +13,9 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
     style="line-height: 0;"
   >
     <img
-      alt="Compass"
+      alt="Compass Logo"
       data-testid="chat-header-logo-7413b63a-887b-4f41-b930-89e9770db12b"
-      height="48px"
+      height="48"
       src="/compass.svg"
     />
   </a>
@@ -121,7 +121,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
 
 exports[`ChatHeader should render the Chat Header with exploredExperiencesNotification shown 1`] = `
 <div
-  class="MuiBox-root css-12zc3r8"
+  class="MuiBox-root css-1lekzkb"
   data-testid="chat-header-container-7413b63a-887b-4f41-b930-89e9770db12b"
 >
   <a
@@ -132,9 +132,9 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
     style="line-height: 0;"
   >
     <img
-      alt="Compass"
+      alt="Compass Logo"
       data-testid="chat-header-logo-7413b63a-887b-4f41-b930-89e9770db12b"
-      height="48px"
+      height="48"
       src="/compass.svg"
     />
   </a>

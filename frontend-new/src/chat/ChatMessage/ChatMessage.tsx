@@ -1,15 +1,21 @@
 import React from "react";
-import { Box, Typography, styled, alpha } from "@mui/material";
+import { Box, Typography, styled, alpha, Divider, useTheme } from "@mui/material";
 import { IChatMessage } from "src/chat/Chat.types";
 import { getDurationFromNow } from "src/utils/getDurationFromNow/getDurationFromNow";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import ChatMessageFooter from "src/chat/chatMessageFooter/ChatMessageFooter";
+import FeedbackFormButton from "src/feedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
+
+export enum ChatMessageFooterType {
+  FEEDBACK_FORM_BUTTON = "feedback-form-button",
+}
 
 const uniqueId = "2fbaf2ef-9eab-485a-bd28-b4a164e18b06";
 
 export const DATA_TEST_ID = {
   CHAT_MESSAGE_CONTAINER: `chat-message-container-${uniqueId}`,
   CHAT_MESSAGE_TIMESTAMP: `chat-message-sent_at-${uniqueId}`,
+  CHAT_MESSAGE_FOOTER_DIVIDER: `chat-message-footer-divider-${uniqueId}`,
 };
 
 const MessageContainer = styled(Box)<{ origin: ConversationMessageSender }>(({ theme, origin }) => ({
@@ -43,27 +49,44 @@ const TimeStamp = styled(Typography)(({ theme }) => ({
 
 type ChatMessageProps = {
   chatMessage: IChatMessage;
-  isTyping: boolean;
-  chatMessageFooter?: React.ReactNode;
+  notifyOpenFeedbackForm: () => void;
 };
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage, isTyping, chatMessageFooter }) => {
+const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage, notifyOpenFeedbackForm }) => {
+  const theme = useTheme();
   let duration;
   try {
     duration = getDurationFromNow(new Date(chatMessage.sent_at));
   } catch (e) {
     console.error(e);
   }
+  const getFooterFromType = (type: ChatMessageFooterType) => {
+    switch (type) {
+      case ChatMessageFooterType.FEEDBACK_FORM_BUTTON:
+        return <FeedbackFormButton notifyOpenFeedbackForm={notifyOpenFeedbackForm} />;
+      default:
+        return null;
+    }
+  }
   return (
     <MessageContainer origin={chatMessage.sender} data-testid={DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}>
       <MessageBubble origin={chatMessage.sender}>
         <Typography whiteSpace="pre-line">{chatMessage.message}</Typography>
-        {chatMessageFooter && <ChatMessageFooter>{chatMessageFooter}</ChatMessageFooter>}
+        {
+          chatMessage.footerType !== undefined && <>
+            <Divider
+              color={theme.palette.grey[100]}
+              sx={{ marginY: theme.spacing(1) }}
+              data-testid={DATA_TEST_ID.CHAT_MESSAGE_FOOTER_DIVIDER}
+            />
+            <ChatMessageFooter>{getFooterFromType(chatMessage.footerType)}</ChatMessageFooter>
+          </>
+        }
       </MessageBubble>
-      {!isTyping && (
-        <TimeStamp data-testid={DATA_TEST_ID.CHAT_MESSAGE_TIMESTAMP} variant="caption">
-          sent {duration}
-        </TimeStamp>
+      {!chatMessage.isTypingMessage && (
+          <TimeStamp data-testid={DATA_TEST_ID.CHAT_MESSAGE_TIMESTAMP} variant="caption">
+            sent {duration}
+          </TimeStamp>
       )}
     </MessageContainer>
   );
