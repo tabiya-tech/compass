@@ -367,7 +367,7 @@ test_cases = [
         given_company="home",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
-        expected_occupations_found=["unpaid volunteer cultural activities recreation and sports activities"],
+        expected_occupations_found=["helping with sports, music or other cultural activities without getting paid"],
         ),
     InferIcatusActivitiesToolTestCase(
         name="Icatus I52_0_4",
@@ -376,7 +376,7 @@ test_cases = [
         given_company="home",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
-        expected_occupations_found=["unpaid volunteer office/administrative work"],
+        expected_occupations_found=["helping with office work without getting paid"],
         ),
     InferIcatusActivitiesToolTestCase(
         name="Icatus I52_0_2",
@@ -385,7 +385,7 @@ test_cases = [
         given_company="home",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
-        expected_occupations_found=["unpaid volunteer preparing/serving meals, cleaning up"],
+        expected_occupations_found=["cooking or cleaning for other people's homes without getting paid"],
         ),
     InferIcatusActivitiesToolTestCase(
         name="Icatus I52_0_1",
@@ -394,7 +394,7 @@ test_cases = [
         given_company="home",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
-        expected_occupations_found=["unpaid volunteer work on road/building repair, clearing and preparing land, cleaning (streets, markets, etc.), and construction"],
+        expected_occupations_found=["cleaning or fixing roads or buildings without getting paid"],
         ),
     InferIcatusActivitiesToolTestCase(
         name="Icatus I51_0_4",
@@ -403,7 +403,7 @@ test_cases = [
         given_company="home",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
-        expected_occupations_found=["unpaid volunteer care for adults"],
+        expected_occupations_found=["helping adults outside of your home who need care without getting paid"],
         ),
     InferIcatusActivitiesToolTestCase(
         name="Icatus I51_0_3",
@@ -412,7 +412,7 @@ test_cases = [
         given_company="home",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
-        expected_occupations_found=["unpaid volunteer childcare and instruction"],
+        expected_occupations_found=["caring for and teaching for children outside of your home without getting paid"],
         ),
     InferIcatusActivitiesToolTestCase(
         name="Icatus I51_0_1",
@@ -421,7 +421,7 @@ test_cases = [
         given_company="home",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
-        expected_occupations_found=["unpaid volunteer household maintenance, management, construction, renovation and repair"],
+        expected_occupations_found=["fixing and building things in other people's homes without getting paid"],
         ),
     InferIcatusActivitiesToolTestCase(
         name="Icatus I51_0_2",
@@ -430,7 +430,7 @@ test_cases = [
         given_company="home",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
-        expected_occupations_found=["unpaid volunteer shopping/purchasing goods and services"],
+        expected_occupations_found=["shopping for others without getting paid"],
         ),
     InferIcatusActivitiesToolTestCase(
         name="Icatus I51_0_5",
@@ -439,7 +439,7 @@ test_cases = [
         given_company="home",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
-        expected_occupations_found=["unpaid volunteer unpaid help in enterprises owned by other households"],
+        expected_occupations_found=["helping in other people's businesses without getting paid"],
         ),
     # Add more test cases as needed
 ]

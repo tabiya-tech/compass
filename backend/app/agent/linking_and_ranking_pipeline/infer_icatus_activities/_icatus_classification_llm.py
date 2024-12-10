@@ -20,6 +20,7 @@ class ClassificationLLMResponse(BaseModel):
 
 class _ClassificationLLMOutput(BaseModel):
     reasoning: Optional[str]
+    dependent: bool
     code: str
 
 
@@ -75,19 +76,19 @@ class _IcatusClassificationLLM:
             self._logger.warning("Failed to classify the experience.")
             raise ValueError("Experience was not classified correctly.")
         if self.classification_level == 0:
-            self._logger.info(f"The LLM returned the code {llm_response.code} with reasoning {llm_response.reasoning}.")
+            self._logger.info(f"The LLM returned the code {llm_response.code} with dependent {llm_response.dependent} and reasoning {llm_response.reasoning}.")
             return ClassificationLLMResponse(
                 icatus_node=TopLevelDivision(llm_response.code),
                 llm_stats=llm_stats
             )
         elif self.classification_level == 1:
-            self._logger.info(f"The LLM returned the code {llm_response.code} with reasoning {llm_response.reasoning}.")
+            self._logger.info(f"The LLM returned the code {llm_response.code} with dependent {llm_response.dependent} with reasoning {llm_response.reasoning}.")
             return ClassificationLLMResponse(
                 icatus_node=IcatusFirstLevelNode(llm_response.code),
                 llm_stats=llm_stats
             )
         elif self.classification_level == 2:
-            self._logger.info(f"The LLM returned the code {llm_response.code} with reasoning {llm_response.reasoning}.")
+            self._logger.info(f"The LLM returned the code {llm_response.code} with dependent {llm_response.dependent} with reasoning {llm_response.reasoning}.")
             return ClassificationLLMResponse(
                 icatus_node=IcatusSecondLevelNode(llm_response.code),
                 llm_stats=llm_stats
