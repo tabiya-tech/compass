@@ -116,7 +116,7 @@ exports[`Testing Consent Page render tests it should show data protection policy
            
           <a
             class="css-1dwh1c3"
-            href="https://compass.tabiya.org/dpa.html"
+            href="https://compass.tabiya.org/tc.html"
             rel="noreferrer"
             target="_blank"
           >

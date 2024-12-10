@@ -11,7 +11,6 @@ export const requiredEnvVariables = [
   EnvVariables.FIREBASE_AUTH_DOMAIN,
   EnvVariables.FIREBASE_API_KEY,
   EnvVariables.BACKEND_URL,
-  EnvVariables.SENTRY_FRONTEND_DSN,
   EnvVariables.SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY,
   EnvVariables.SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID,
 ];
@@ -27,7 +26,7 @@ export const getEnv = (key: string) => {
     }
     return window.atob(env[key]);
   } catch (e) {
-    console.error("Error loading environment variable", e);
+    console.error(`Error loading environment variable ${key}`, e);
     return "";
   }
 };

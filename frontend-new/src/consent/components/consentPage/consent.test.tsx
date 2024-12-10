@@ -139,7 +139,7 @@ describe("Testing Consent Page", () => {
           </HashRouter>
         );
 
-        // WHEN the user accepts the terms and conditions
+        // WHEN the user accepts Data protection Agreement
         const dpaCheckBoxWrapper = screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_CHECKBOX_CONTAINER);
         expect(dpaCheckBoxWrapper).toBeInTheDocument();
         const dpaCheckbox = dpaCheckBoxWrapper.getElementsByTagName("input")[0] as HTMLInputElement;
@@ -201,7 +201,7 @@ describe("Testing Consent Page", () => {
         const checkBoxWrapper = screen.getByTestId(DATA_TEST_ID.ACCEPT_DPA_CHECKBOX_CONTAINER);
         expect(checkBoxWrapper).toBeInTheDocument();
 
-        // WHEN the user accepts the terms and conditions
+        // WHEN the user accepts data protection agreement
         const dpaCheckbox = screen
           .getByTestId(DATA_TEST_ID.ACCEPT_DPA_CHECKBOX_CONTAINER)
           .getElementsByTagName("input")[0] as HTMLInputElement;
@@ -257,7 +257,7 @@ describe("Testing Consent Page", () => {
           </HashRouter>
         );
 
-        // AND the user accepts the terms and conditions
+        // AND the user accepts data protection agreement
         const dpaCheckbox = screen
           .getByTestId(DATA_TEST_ID.ACCEPT_DPA_CHECKBOX_CONTAINER)
           .getElementsByTagName("input")[0] as HTMLInputElement;
@@ -294,7 +294,7 @@ describe("Testing Consent Page", () => {
           </HashRouter>
         );
 
-        // AND the user accepts the terms and conditions
+        //  the user accepts data protection agreement
         const dpaCheckbox = screen
           .getByTestId(DATA_TEST_ID.ACCEPT_DPA_CHECKBOX_CONTAINER)
           .getElementsByTagName("input")[0] as HTMLInputElement;
@@ -318,8 +318,6 @@ describe("Testing Consent Page", () => {
 
     describe("reject DPA", () => {
       test("should successfully log the user out when the user rejects the data protection policy", async () => {
-        (console.log as jest.Mock).mockClear();
-
         const getCurrentAuthenticationService = jest.spyOn(
           AuthenticationServiceFactory,
           "getCurrentAuthenticationService"
@@ -423,7 +421,7 @@ describe("Testing Consent Page", () => {
           </HashRouter>
         );
 
-        // AND the user accepts the terms and conditions
+        // AND the user accepts data protection agreement
         const dpaCheckbox = screen
           .getByTestId(DATA_TEST_ID.ACCEPT_DPA_CHECKBOX_CONTAINER)
           .getElementsByTagName("input")[0] as HTMLInputElement;
@@ -481,7 +479,7 @@ describe("Testing Consent Page", () => {
           </HashRouter>
         );
 
-        // AND the user accepts the terms and conditions
+        // AND the user accepts data protection agreement
         const dpaCheckbox = screen
           .getByTestId(DATA_TEST_ID.ACCEPT_DPA_CHECKBOX_CONTAINER)
           .getElementsByTagName("input")[0] as HTMLInputElement;

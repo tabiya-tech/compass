@@ -54,7 +54,7 @@ exports[`Sensitive Data render tests should render the component with all elemen
         class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1ncy5w-MuiTypography-root"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
-        Provide your personal details carefully. Your information is secure and cannot be changed after submission.
+        Please make sure the information you provide is accurate and has no mistakes. Your information cannot be changed after submission.
       </p>
     </div>
     <div

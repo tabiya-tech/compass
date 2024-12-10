@@ -1,7 +1,7 @@
 import { getBackendUrl } from "src/envService";
 import { StatusCodes } from "http-status-codes";
 import { customFetch } from "src/utils/customFetch/customFetch";
-import { browserEncryptionService } from "src/sensitiveData/services/encryptionService/encryptionService";
+import { browserEncryptionService } from "src/sensitiveData/services/encryptionService/encryption.service";
 
 import { SensitivePersonalData } from "./types";
 

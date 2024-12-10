@@ -188,7 +188,7 @@ const Consent: React.FC = () => {
             label={
               <Typography variant="body2" data-testid={DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_TEXT}>
                 I have read and accept the{" "}
-                <StyledAnchor href="https://compass.tabiya.org/dpa.html" target="_blank" rel="noreferrer">
+                <StyledAnchor href="https://compass.tabiya.org/tc.html" target="_blank" rel="noreferrer">
                   {termsAndConditionsLabel}
                 </StyledAnchor>{" "}
                 of Compass.

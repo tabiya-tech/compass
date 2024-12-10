@@ -7,7 +7,6 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  styled,
   TextField,
   useTheme,
 } from "@mui/material";
@@ -24,7 +23,8 @@ import AuthenticationServiceFactory from "src/auth/services/Authentication.servi
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
 import { Gender, SensitivePersonalData } from "src/sensitiveData/services/sensitivePersonalDataService/types";
-import { sensitivePersonalDataService } from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalDataService";
+import { sensitivePersonalDataService } from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalData.service";
+import { StyledAnchor } from "src/theme/StyledAnchor/StyledAnchor";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d1";
 
@@ -47,17 +47,6 @@ export const DATA_TEST_ID = {
   SENSITIVE_DATA_FORM_BUTTON_CIRCULAR_PROGRESS: `sensitive-data-form-button-circular-progress-${uniqueId}`,
   SENSITIVE_DATA_REJECT_BUTTON: `sensitive-data-reject-button-${uniqueId}`,
 };
-
-const StyledAnchor = styled("a")(({ theme }) => ({
-  color: theme.palette.tabiyaBlue.main,
-  textDecoration: "underline",
-  cursor: "pointer",
-  fontWeight: "bold",
-  whiteSpace: "nowrap",
-  "&:hover": {
-    color: theme.palette.tabiyaBlue.light,
-  },
-}));
 
 const sensitiveDataForm = {
   fields: {
@@ -87,15 +76,15 @@ const SensitiveData: React.FC = () => {
   const handleSaveSensitivePersonalData = useCallback(async () => {
     setIsSavingSensitiveData(true);
 
+    const userPreferences = userPreferencesStateService.getUserPreferences();
+
+    if (!userPreferences) {
+      // something is not right, we should have user preferences at this point.
+      console.error(new Error("User preferences not found"));
+      return;
+    }
+
     try {
-      const userPreferences = userPreferencesStateService.getUserPreferences();
-
-      if (!userPreferences) {
-        // something is not right, we should have user preferences at this point.
-        throw new Error("User preferences not found.");
-      }
-
-      console.log({ userPreferences });
       await sensitivePersonalDataService.createSensitivePersonalData(sensitivePersonalData, userPreferences.user_id);
 
       // Update user preferences to indicate that the user has sensitive personal data
@@ -146,7 +135,7 @@ const SensitiveData: React.FC = () => {
           <AuthHeader
             title={"Provide Your Information"}
             subtitle={
-              "Provide your personal details carefully. Your information is secure and cannot be changed after submission."
+              "Please make sure the information you provide is accurate and has no mistakes. Your information cannot be changed after submission."
             }
           />
 

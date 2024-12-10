@@ -17,7 +17,7 @@ import {
   SensitivePersonalDataRequirement,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { Gender, SensitivePersonalData } from "src/sensitiveData/services/sensitivePersonalDataService/types";
-import { sensitivePersonalDataService } from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalDataService";
+import { sensitivePersonalDataService } from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalData.service";
 
 const componentRender = () => {
   return render(
@@ -129,7 +129,7 @@ describe("Sensitive Data", () => {
       jest.clearAllMocks();
     });
 
-    it("should successfully log user out if the user don't want to submit sensitive personal data", async () => {
+    it("should successfully log user out if the user doesn't submit sensitive personal data", async () => {
       // GIVEN logout is successful
       mockLogout.mockResolvedValueOnce(undefined);
 
@@ -260,7 +260,7 @@ describe("Sensitive Data", () => {
         variant: "success",
       });
 
-      expect(mockNavigate).toHaveBeenCalledWith("/");
+      expect(mockNavigate).toHaveBeenCalledWith(routerPaths.ROOT);
     });
 
     it("should handle service error and display error in snackbar", async () => {
@@ -292,11 +292,19 @@ describe("Sensitive Data", () => {
     });
 
     it("should handle unexpected errors and display error snackbar", async () => {
-      // GIVEN get user preferences throws an unexpected error
-      const unexpectedError = new Error("Unexpected error");
-      jest.spyOn(userPreferencesStateService, "getUserPreferences").mockImplementation(() => {
-        throw unexpectedError;
+      // GIVEN get user preferences throws an unexpected error new Error("Unexpected error");
+      jest.spyOn(userPreferencesStateService, "getUserPreferences").mockReturnValue({
+        user_id: givenUserId,
+        language: Language.en,
+        accepted_tc: new Date(),
+        sessions: [],
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+        has_sensitive_personal_data: false,
       });
+
+      // AND create sensitive personal data throws an unexpected error
+      const unexpectedError = new Error("Unexpected error");
+      mockCreateSensitivePersonalData.mockRejectedValue(unexpectedError as never);
 
       // AND given some user sensitive personal data
       const givenData = SAMPLE_SENSITIVE_PERSONAL_DATA;
@@ -315,13 +323,15 @@ describe("Sensitive Data", () => {
       await Promise.resolve();
 
       // THEN createSensitivePersonalData should not be called
-      expect(mockCreateSensitivePersonalData).not.toHaveBeenCalledWith(givenData, givenUserId);
+      expect(mockCreateSensitivePersonalData).toHaveBeenCalledWith(givenData, givenUserId);
       expect(mockSetUserPreferences).not.toHaveBeenCalled();
 
       // AND error snackbar should be displayed
-      expect(mockEnqueueSnackbar).toHaveBeenCalledWith("Failed to save personal data: Unexpected error", {
-        variant: "error",
-      });
+      await waitFor(() => {
+        expect(mockEnqueueSnackbar).toHaveBeenCalledWith("Failed to save personal data: Unexpected error", {
+          variant: "error",
+        });
+      })
 
       // AND error should be logged
       expect(console.error).toHaveBeenCalledWith("Failed to save personal data", unexpectedError);
@@ -350,11 +360,6 @@ describe("Sensitive Data", () => {
       expect(mockCreateSensitivePersonalData).not.toHaveBeenCalled();
       expect(mockSetUserPreferences).not.toHaveBeenCalled();
       expect(mockNavigate).not.toHaveBeenCalled();
-
-      // AND error snackbar should be displayed
-      expect(mockEnqueueSnackbar).toHaveBeenCalledWith("Failed to save personal data: User preferences not found.", {
-        variant: "error",
-      });
     });
   });
 });

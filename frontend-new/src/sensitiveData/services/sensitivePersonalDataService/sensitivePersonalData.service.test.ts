@@ -1,8 +1,8 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
-import { browserEncryptionService } from "../encryptionService/encryptionService";
+import { browserEncryptionService } from "../encryptionService/encryption.service";
 import { Gender } from "./types";
-import { sensitivePersonalDataService } from "./sensitivePersonalDataService";
+import { sensitivePersonalDataService } from "./sensitivePersonalData.service";
 
 import * as CustomFetchModule from "src/utils/customFetch/customFetch";
 import { getRandomString } from "src/_test_utilities/specialCharacters";

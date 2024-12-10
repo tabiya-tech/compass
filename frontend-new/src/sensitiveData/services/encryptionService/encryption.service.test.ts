@@ -6,7 +6,7 @@ import { getRandomLorem } from "src/_test_utilities/specialCharacters";
 import {
   browserEncryptionService,
   EncryptionService,
-} from "src/sensitiveData/services/encryptionService/encryptionService";
+} from "src/sensitiveData/services/encryptionService/encryption.service";
 import {
   decryptWithAES,
   decryptWithRSA,
@@ -77,16 +77,16 @@ describe("EncryptionService", () => {
         const givenText = getRandomLorem(100);
 
         // WHEN the service tries to convert a string to a buffer.
-        const buffer = browserEncryptionService.options.stringToBuffer(givenText);
+        const actualBuffer = browserEncryptionService.options.stringToBuffer(givenText);
 
         // THEN the buffer should be the expected buffer
-        expect(buffer).toBeInstanceOf(ArrayBuffer);
+        expect(actualBuffer).toBeInstanceOf(ArrayBuffer);
 
         // WHEN the buffer is converted to a string
-        const text = new TextDecoder().decode(buffer);
+        const actualText = new TextDecoder().decode(actualBuffer);
 
         // THEN the text should be the expected text
-        expect(text).toBe(givenText);
+        expect(actualText).toBe(givenText);
       });
     });
   });

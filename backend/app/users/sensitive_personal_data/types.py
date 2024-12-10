@@ -26,7 +26,8 @@ class SensitivePersonalDataBaseModel(BaseModel):
     )
 
     aes_encryption_key: str = Field(
-        description="The AES key used to encrypt/decrypt the sensitive user data. It is encrypted with RSA and the Base64-encoded",
+        description="The AES key used to encrypt/decrypt the sensitive user data"
+                    "It is encrypted with RSA and Base64-encoded",
         examples=["ZGFzZGE="],
         # Max field length is set to 1000 characters for the following reasons:
         # - We use a 256-bit AES key (32 bytes) encrypted with a 4096-bit RSA key.
