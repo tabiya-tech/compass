@@ -21,7 +21,7 @@ class InferIcatusActivitiesTool:
         self._logger = logging.getLogger(self.__class__.__name__)
         self._occupation_skill_search_service = occupation_skill_search_service
         self._infer_occupations_tool = InferOccupationTool(self._occupation_skill_search_service)
-        self.classification_level = 2
+        self.classification_level = 0
 
     async def find_occupations(self, nodes: list[IcatusTerminalNode]):
         occupation_data = await asyncio.gather(*(self._occupation_skill_search_service.get_by_esco_code(code=node.code) for node in nodes))
@@ -59,6 +59,7 @@ class InferIcatusActivitiesTool:
 
         terminal_icatus_nodes = self.find_terminal_icatus_nodes(classification_response)
         icatus_occupations = await self.find_occupations(terminal_icatus_nodes)
+        print([(elem.occupation.code, elem.occupation.preferredLabel) for elem in icatus_occupations])
         contextualization_llm = _ContextualizationLLM(
             country_of_interest=country_of_interest,
             number_of_titles=number_of_titles,
