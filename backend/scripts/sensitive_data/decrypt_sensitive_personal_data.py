@@ -1,3 +1,15 @@
+#!/usr/bin/env python3
+
+import sys
+import os
+
+# Get the absolute path of the project root
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+
+# Add the project root to the Python path, so that this script can import the necessary modules no matter where it is run from
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
 """
 script to decrypt the sensitive personal data
 """
@@ -21,7 +33,8 @@ from app.users.sensitive_personal_data.types import SensitivePersonalData
 from app.users.sensitive_personal_data.repository import SensitivePersonalDataRepository
 from app.server_dependencies.db_dependencies import CompassDBProvider
 
-logger = logging.getLogger(__name__)
+# Set up logging to use the module's file name
+logger = logging.getLogger(os.path.basename(__file__))
 
 IV_SIZE: Final[int] = 12  # The initialization vector size in bytes
 TAG_LENGTH: Final[int] = 16  # 16 bytes, which is 128 bits
@@ -142,12 +155,12 @@ async def _decrypt_sensitive_personal_data(_private_key: RSAPrivateKey, encrypte
         )
 
 
-async def decrypt_sensitive_data_from_database(
-        private_key_pem: bytes,
-        private_key_password: Optional[bytes],
-        output_path: str,
-        repository: SensitivePersonalDataRepository
-):
+async def decrypt_sensitive_data_from_database(*,
+                                               private_key_pem: bytes,
+                                               private_key_password: Optional[bytes],
+                                               output_path: str,
+                                               repository: SensitivePersonalDataRepository
+                                               ):
     """
     Main function to decrypt the sensitive personal data.
 
@@ -183,24 +196,40 @@ async def _main():
 
     private_key_path = args.private_key_path
     _private_key_password: str = args.password
-    _output_path = args.output_path
 
     # load the private key
     with open(private_key_path, "rb") as f:
         _private_key_pem = f.read()
 
+    # create the output directory if it doesn't exist
+    _output_path = args.output_path
+    output_dir = os.path.dirname(_output_path)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir, exist_ok=True)
+
+    # connect to the database
+    if CompassDBProvider._settings.users_mongodb_uri is None:  # noqa
+        raise ValueError("The users MongoDB URI is not set in the environment variables (USERS_MONGODB_URI)")
+
+    if CompassDBProvider._settings.users_database_name is None:  # noqa
+        raise ValueError("The users MongoDB database name is not set in the environment variables (USERS_DB_NAME)")
+
     compass_users_db = await CompassDBProvider.get_users_db()
     repository = SensitivePersonalDataRepository(db=compass_users_db)
 
+    # decrypt the data
     await decrypt_sensitive_data_from_database(
-        _private_key_pem,
-        _private_key_password.encode() if _private_key_password else None,
-        _output_path,
+        private_key_pem=_private_key_pem,
+        private_key_password=_private_key_password.encode() if _private_key_password else None,
+        output_path=_output_path,
         repository=repository
     )
 
 
 if __name__ == "__main__":
+    if sys.version_info < (3, 11):
+        sys.exit("This script requires Python 3.11 or higher.")
+
     parser = argparse.ArgumentParser(description="decrypt saved sensitive personal data")
 
     parser.add_argument(

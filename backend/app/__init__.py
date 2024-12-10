@@ -24,7 +24,26 @@ def _get_module_path():
 
     return module_path
 
+
 # setup logging
+
+def ensure_log_directory_exists(config):
+    try:
+        # Iterate over all handlers in the config
+        handlers = config.get('handlers', {})
+        for handler_name, handler in handlers.items():
+            if 'filename' in handler:  # Check if this is a file handler
+                log_file_path = handler['filename']
+                log_dir = os.path.dirname(log_file_path)
+
+                # Create the directory if it doesn't exist
+                if log_dir and not os.path.exists(log_dir):
+                    os.makedirs(log_dir, exist_ok=True)
+                    print(f"Created log directory for handler '{handler_name}': {log_dir}")
+    except OSError as e:
+        print(f"Error: Could not create log directory. Details: {e}")
+        raise
+
 
 def _get_configuration_filename(file: str):
     # Check if the given file path is an absolute path
@@ -49,11 +68,13 @@ def _setup_config(configuration_file):
 
                 # Replace the PROJECT_BASE_PATH with the module path,
                 # this project base path is used to know where the logs are going to be placed in a file
-                config = config.replace("PROJECT_BASE_PATH", module_path)
+                config = config.replace("{PROJECT_BASE_PATH}", module_path)
 
                 # Load the configuration
                 cfg = yaml.safe_load(config)
 
+                # Ensure the log directory exists
+                ensure_log_directory_exists(cfg)
                 # Configure the logging
                 logging.config.dictConfig(cfg)  # just once
             except yaml.YAMLError as exc:
@@ -79,7 +100,7 @@ if os.getenv("ENABLE_SENTRY") == "True":
     backend_dsn = os.getenv("SENTRY_BACKEND_DSN")
     if backend_dsn:
         init_sentry(backend_dsn, os.getenv("TARGET_ENVIRONMENT"))
-    else :
+    else:
         logging.warning("SENTRY_BACKEND_DSN environment variable is not set. Sentry will not be initialized")
 else:
     logging.warning("ENABLE_SENTRY environment variable is not set to True.  Sentry will not be initialized")
