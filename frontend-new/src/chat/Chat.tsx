@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import ChatService from "src/chat/ChatService/ChatService";
 import ChatList from "src/chat/ChatList/ChatList";
 import { IChatMessage } from "./Chat.types";
@@ -23,6 +23,7 @@ import ApproveModal from "src/theme/ApproveModal/ApproveModal";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 import FeedbackForm from "src/feedback/feedbackForm/FeedbackForm";
+import { ChatMessageFooterType } from "./ChatMessage/ChatMessage";
 
 const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -30,7 +31,6 @@ const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 export const CHECK_INACTIVITY_INTERVAL = INACTIVITY_TIMEOUT + INACTIVITY_TIMEOUT / 3;
 const uniqueId = "b7ea1e82-0002-432d-a768-11bdcd186e1d";
 export const DATA_TEST_ID = {
-  CONTAINER: `container-${uniqueId}`,
   CHAT_CONTAINER: `chat-container-${uniqueId}`,
 };
 
@@ -88,10 +88,19 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           "We’d love your feedback on this conversation. It’ll only take 5 minutes and will help us improve your experience",
           new Date().toISOString()
         ),
-        isFeedbackMessage: true,
+        footerType: ChatMessageFooterType.FEEDBACK_FORM_BUTTON
       });
     }
   }, []);
+
+  const checkAndAddTypingMessage = useCallback(() => {
+    if (isTyping) {
+      addMessage(generateCompassMessage("Typing...", new Date().toISOString(), true));
+    } else {
+      // filter out the typing message
+      setMessages((prevMessages) => prevMessages.filter((message) => !message.isTypingMessage));
+    }
+  }, [isTyping]);
 
   const generateThankYouMessage = () => {
     return generateCompassMessage(
@@ -103,11 +112,15 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const handleOpenExperiencesDrawer = useCallback(async () => {
     setIsDrawerOpen(true);
     setIsLoading(true);
+
+    const userPreferences = userPreferencesStateService.getUserPreferences();
+    if (!userPreferences?.sessions.length) {
+      console.error(new Error("Failed to retrieve experiences", new Error("User has no sessions", { cause: userPreferences })));
+      enqueueSnackbar("Failed to retrieve experiences", { variant: "error" });
+      return;
+    }
+
     try {
-      const userPreferences = userPreferencesStateService.getUserPreferences();
-      if (!userPreferences?.sessions.length) {
-        throw new Error("User has no sessions");
-      }
       const experienceService = ExperienceService.getInstance(userPreferences.sessions[0]);
       const data = await experienceService.getExperiences();
       setExperiences(data);
@@ -343,6 +356,11 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     return () => events.forEach((event) => document.removeEventListener(event, resetTimer));
   }, [disableInactivityCheck]);
 
+  // add a message when the user is typing
+  useEffect(() => {
+    checkAndAddTypingMessage();
+  }, [isTyping, checkAndAddTypingMessage]);
+
   const handleOpenNewConversationDialog = () => {
     setNewConversationDialog(true);
   };
@@ -365,18 +383,12 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   };
 
   const handleFeedbackSubmit = () => {
-    setMessages((prevMessages) => prevMessages.filter((message) => !message.isFeedbackMessage));
+    setMessages((prevMessages) => prevMessages.filter((message) => message.footerType !== undefined));
     addMessage(generateThankYouMessage());
   };
 
   return (
-    <Box
-      display="flex"
-      height="100%"
-      width="100%"
-      padding={theme.tabiyaSpacing.lg}
-      data-testid={DATA_TEST_ID.CONTAINER}
-    >
+    <>
       {isLoggingOut ? (
         <Backdrop isShown={isLoggingOut} message={"Logging you out, wait a moment..."} />
       ) : (
@@ -389,19 +401,21 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
             position="relative"
             data-testid={DATA_TEST_ID.CHAT_CONTAINER}
           >
-            <ChatHeader
-              notifyOnLogout={handleLogout}
-              startNewConversation={handleOpenNewConversationDialog}
-              notifyOnExperiencesDrawerOpen={handleOpenExperiencesDrawer}
-              experiencesExplored={exploredExperiences}
-              exploredExperiencesNotification={exploredExperiencesNotification}
-              setExploredExperiencesNotification={setExploredExperiencesNotification}
-            />
-            <Box sx={{ flex: 1, overflowY: "auto" }}>
-              <ChatList messages={messages} isTyping={isTyping} notifyOpenFeedbackForm={handleOpenFeedbackForm} />
+            <Box padding={theme.spacing(theme.tabiyaSpacing.xl)}>
+              <ChatHeader
+                notifyOnLogout={handleLogout}
+                startNewConversation={handleOpenNewConversationDialog}
+                notifyOnExperiencesDrawerOpen={handleOpenExperiencesDrawer}
+                experiencesExplored={exploredExperiences}
+                exploredExperiencesNotification={exploredExperiencesNotification}
+                setExploredExperiencesNotification={setExploredExperiencesNotification}
+              />
+            </Box>
+            <Box sx={{ flex: 1, overflowY: "auto", padding: theme.tabiyaSpacing.lg }}>
+              <ChatList messages={messages} notifyOpenFeedbackForm={handleOpenFeedbackForm} />
             </Box>
             {showBackdrop && <InactiveBackdrop isShown={showBackdrop} />}
-            <Box sx={{ flexShrink: 0 }}>
+            <Box sx={{ flexShrink: 0, padding: theme.tabiyaSpacing.lg, paddingTop: theme.tabiyaSpacing.xs }}>
               <ChatMessageField
                 handleSend={handleSend}
                 aiIsTyping={isTyping}
@@ -443,7 +457,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           />
         </>
       )}
-    </Box>
+    </>
   );
 };
 

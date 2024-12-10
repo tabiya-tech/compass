@@ -1,8 +1,10 @@
 import { ConversationMessage } from "./ChatService/ChatService.types";
+import { ChatMessageFooterType } from "./ChatMessage/ChatMessage";
 
 export type IChatMessage = ConversationMessage & {
   id: string;
-  isFeedbackMessage?: boolean;
+  footerType?: ChatMessageFooterType;
+  isTypingMessage?: boolean;
 };
 
 export type TNewSesionResponse = {

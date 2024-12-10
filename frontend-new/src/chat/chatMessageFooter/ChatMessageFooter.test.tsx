@@ -21,10 +21,8 @@ describe("ChatMessageFooter", () => {
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
     // AND the chat message footer component to be displayed
-    const chatMessageFooterComponent = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FOOTER);
+    const chatMessageFooterComponent = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FOOTER_CONTAINER);
     expect(chatMessageFooterComponent).toBeInTheDocument();
-    // AND the divider to be displayed
-    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FOOTER_DIVIDER)).toBeInTheDocument();
     // AND the children to be displayed
     expect(screen.getByText("Test children")).toBeInTheDocument();
     // AND the component to match the snapshot
