@@ -29,3 +29,11 @@ export const getBackendUrl = () => {
 export const getSentryDSN = () => {
   return getEnv("SENTRY_FRONTEND_DSN");
 };
+
+export const getSensitivePersonalDataRSAEncryptionKey = () => {
+  return getEnv("SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY");
+};
+
+export const getSensitivePersonalDataRSAEncryptionKeyId = () => {
+  return getEnv("SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID");
+};
