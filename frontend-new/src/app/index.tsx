@@ -5,9 +5,9 @@ import Info from "src/info/Info";
 import Login from "src/auth/pages/Login/Login";
 import ErrorPage from "src/error/errorPage/ErrorPage";
 import Register from "src/auth/pages/Register/Register";
-import SensitiveData from "src/sensitiveData/components/sensitiveData/SensitiveData";
 import VerifyEmail from "src/auth/pages/VerifyEmail/VerifyEmail";
 import Consent from "src/consent/components/consentPage/Consent";
+import SensitiveData from "src/sensitiveData/components/sensitiveData/SensitiveData";
 
 import ProtectedRoute from "src/app/ProtectedRoute/ProtectedRoute";
 import { routerPaths } from "src/app/routerPaths";

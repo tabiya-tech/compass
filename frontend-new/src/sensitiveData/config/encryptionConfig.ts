@@ -20,9 +20,13 @@ type TEncryptionConfig = {
      * The format used for representing public keys.
      * SPKI (Subject Public Key Info) is a standard format for public keys. It is widely used in web applications.
      */
-    FORMAT: "spki";
+    FORMAT: Exclude<KeyFormat, "jwk">;
   };
   AES: {
+    /**
+     * The format used for representing symmetric keys.
+     */
+    FORMAT: Exclude<KeyFormat, "jwk">,
     /**
      * The cryptographic algorithm used for encryption and decryption.
      *
@@ -74,6 +78,7 @@ export const EncryptionConfig: TEncryptionConfig = {
     FORMAT: "spki",
   },
   AES: {
+    FORMAT: "raw",
     ALGORITHM: "AES-GCM",
     KEY_LEN: 256,
     TAG_LEN: 128,

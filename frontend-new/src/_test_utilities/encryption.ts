@@ -40,6 +40,7 @@ export async function exportCryptoPublicKey(key: CryptoKey) {
 
 /**
  * Decrypt the encrypted data with the private key
+ * using RSA Algorithm.
  *
  * @param privateKey
  * @param encryptedData
@@ -57,7 +58,7 @@ export async function decryptWithRSA(privateKey: CryptoKey, encryptedData: Array
 export async function decryptWithAES(encryptedData: ArrayBuffer, iv: ArrayBuffer, key: ArrayBuffer) {
   try {
     const importedKey = await crypto.subtle.importKey(
-      "raw",
+      EncryptionConfig.AES.FORMAT,
       key,
       EncryptionConfig.AES.ALGORITHM,
       true,

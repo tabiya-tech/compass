@@ -25,7 +25,7 @@ describe("EncryptionService", () => {
   });
 
   describe("encryptSensitivePersonalData", () => {
-    test(`should encrypt sensitive data that can be decrypted`, async () => {
+    test(`should encrypt sensitive data and it is possible to decrypt the data again`, async () => {
       // GIVEN some sensitive personal data
       const givenRandomData: SensitivePersonalData = {
         contact_email: getRandomLorem(100),

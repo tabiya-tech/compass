@@ -5,7 +5,7 @@ import {
   EncryptionServiceOptions,
 } from "src/sensitiveData/services/encryptionService/types";
 import { getSensitivePersonalDataRSAEncryptionKey, getSensitivePersonalDataRSAEncryptionKeyId } from "src/envService";
-import { SensitivePersonalData } from "../sensitivePersonalDataService/types";
+import { SensitivePersonalData } from "src/sensitiveData/services/sensitivePersonalDataService/types";
 
 // function to convert a string to an ArrayBuffer
 // from https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
@@ -77,7 +77,7 @@ export class EncryptionService {
       dataBuffer
     );
 
-    const encryptionKey = await this.crypto.subtle.exportKey("raw", cryptoKey);
+    const encryptionKey = await this.crypto.subtle.exportKey(EncryptionConfig.AES.FORMAT, cryptoKey);
 
     return {
       encryptedData: encryptedData,
