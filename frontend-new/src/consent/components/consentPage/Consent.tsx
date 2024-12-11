@@ -1,9 +1,12 @@
 import React, { useCallback, useState } from "react";
-import { Box, Checkbox, Container, styled, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Container, Checkbox, styled, Typography, useTheme, FormControlLabel } from "@mui/material";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { Language, UpdateUserPreferencesSpec } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import {
+  SensitivePersonalDataRequirement,
+  Language,
+  UpdateUserPreferencesSpec,
+} from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
-import LanguageContextMenu from "src/i18n/languageContextMenu/LanguageContextMenu";
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { useNavigate } from "react-router-dom";
@@ -11,8 +14,9 @@ import { userPreferencesService } from "src/userPreferences/UserPreferencesServi
 import { routerPaths } from "src/app/routerPaths";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import authStateService from "src/auth/services/AuthenticationState.service";
-import { Theme } from "@mui/material/styles";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
+import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
+import { StyledAnchor } from "src/theme/StyledAnchor/StyledAnchor";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
@@ -30,29 +34,23 @@ export const DATA_TEST_ID = {
   ACCEPT_DPA_BUTTON: `dpa-accept-button-${uniqueId}`,
   REJECT_DPA_BUTTON: `dpa-reject-button-${uniqueId}`,
   CIRCULAR_PROGRESS: `dpa-circular-progress-${uniqueId}`,
-  ACCEPT_DPA_CHECKBOX: `dpa-accept-checkbox-${uniqueId}`,
-  TERMS_AND_CONDITIONS: `dpa-terms-and-conditions-${uniqueId}`,
+  ACCEPT_DPA_CHECKBOX_CONTAINER: `dpa-accept-dpa-checkbox-container-${uniqueId}`,
+  ACCEPT_DPA_CHECKBOX_TEXT: `dpa-accept-dpa-text-${uniqueId}`,
+  ACCEPT_TERMS_AND_CONDITIONS_TEXT: `dpa-accept-tc-text-${uniqueId}`,
+  ACCEPT_TERMS_AND_CONDITIONS_CHECKBOX_CONTAINER: `dpa-accept-tc-checkbox-container-${uniqueId}`,
 };
 
-const StyledAnchor = styled("a")(({ theme }) => ({
-  color: theme.palette.tabiyaBlue.main,
-  textDecoration: "underline",
-  cursor: "pointer",
-  fontWeight: "bold",
-  whiteSpace: "nowrap",
-  "&:hover": {
-    color: theme.palette.tabiyaBlue.light,
-  },
-}));
-
-const DataProtectionAgreement: React.FC = () => {
+const Consent: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const [isAcceptingDPA, setIsAcceptingDPA] = useState(false);
   const [isRejectingDPA, setIsRejectingDPA] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
+  const [isTCAccepted, setIsTCAccepted] = useState(false);
+  const [isDPAccepted, setIsDPAccepted] = useState(false);
+
   const { enqueueSnackbar } = useSnackbar();
-  const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
+
+  const userPreferences = userPreferencesStateService.getUserPreferences();
 
   /**
    * Persist the user's chosen preferences to the backend
@@ -73,8 +71,18 @@ const DataProtectionAgreement: React.FC = () => {
       };
       setIsAcceptingDPA(true);
       const prefs = await userPreferencesService.updateUserPreferences(newUserPreferenceSpecs);
-      userPreferencesStateService.setUserPreferences(prefs);
-      navigate(routerPaths.ROOT, { replace: true });
+
+      userPreferencesStateService.setUserPreferences({
+        ...prefs,
+        sensitive_personal_data_requirement: userPreferences?.sensitive_personal_data_requirement!,
+      });
+
+      if (userPreferences?.sensitive_personal_data_requirement! === SensitivePersonalDataRequirement.REQUIRED) {
+        navigate(routerPaths.SENSITIVE_DATA, { replace: true });
+      } else {
+        navigate(routerPaths.ROOT, { replace: true });
+      }
+
       enqueueSnackbar("Data Protection Agreement Accepted", { variant: "success" });
     } catch (e) {
       if (e instanceof ServiceError) {
@@ -87,7 +95,7 @@ const DataProtectionAgreement: React.FC = () => {
     } finally {
       setIsAcceptingDPA(false);
     }
-  }, [enqueueSnackbar, navigate]);
+  }, [enqueueSnackbar, navigate, userPreferences]);
 
   /**
    * Handle when a user accepts the data protection agreement
@@ -121,13 +129,21 @@ const DataProtectionAgreement: React.FC = () => {
   );
 
   /**
-   * Handle when a user checks the checkbox
+   * Handle when a user checks terms and conditions checkbox
    */
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsChecked(event.target.checked);
+  const handleTCChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsTCAccepted(event.target.checked);
   };
 
-  const label = "I have read and agree to the ";
+  /**
+   * Handle when a user checks the data protection agreement checkbox
+   */
+  const handleDPAChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsDPAccepted(event.target.checked);
+  };
+
+  const termsAndConditionsLabel = "Terms and Conditions";
+  const dataProtectionAgreementLabel = "Data Protection Agreement";
 
   return (
     <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.DPA_CONTAINER}>
@@ -136,21 +152,9 @@ const DataProtectionAgreement: React.FC = () => {
         flexDirection="column"
         alignItems="start"
         justifyContent={"space-evenly"}
-        m={4}
-        height={"80%"}
+        gap={theme.tabiyaSpacing.lg}
       >
-        <Box display="flex" flexDirection="row" justifyContent="center" alignItems="center">
-          <img
-            src={`${process.env.PUBLIC_URL}/logo.svg`}
-            alt="Logo"
-            style={{ maxWidth: "60%", margin: "10%" }}
-            data-testid={DATA_TEST_ID.LOGO}
-          />
-          <LanguageContextMenu />
-        </Box>
-        <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.TITLE}>
-          Before we begin...
-        </Typography>
+        <AuthHeader title={"Before we begin..."} subtitle={""} />
         <Typography variant="body2" gutterBottom data-testid={DATA_TEST_ID.AGREEMENT_BODY}>
           We created this AI tool for you with care to help you and other young people like you explore their skills and
           discover new opportunities.
@@ -167,24 +171,53 @@ const DataProtectionAgreement: React.FC = () => {
           <br />
           <br />
           Help us keep all AI interactions safe and positive! 😊
-          <br />
-          <br />
         </Typography>
-        <Box display="flex" alignItems="start" paddingBottom={3} gap={isSmallMobile ? 3 : 1.5}>
-          <Checkbox
-            checked={isChecked}
-            onChange={handleCheckboxChange}
-            sx={{ padding: 0, marginTop: 0.5, transform: "scale(1.3)" }}
-            inputProps={{ "aria-label": label }}
-            data-testid={DATA_TEST_ID.ACCEPT_DPA_CHECKBOX}
+        <Box display={"flex"} flexDirection={"column"} gap={theme.tabiyaSpacing.lg}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={isTCAccepted}
+                onChange={handleTCChange}
+                inputProps={{
+                  "aria-label": termsAndConditionsLabel,
+                }}
+                data-testid={DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_CHECKBOX_CONTAINER}
+              />
+            }
+            sx={{ alignItems: "flex-start" }}
+            label={
+              <Typography variant="body2" data-testid={DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_TEXT}>
+                I have read and accept the{" "}
+                <StyledAnchor href="https://compass.tabiya.org/tc.html" target="_blank" rel="noreferrer">
+                  {termsAndConditionsLabel}
+                </StyledAnchor>{" "}
+                of Compass.
+              </Typography>
+            }
           />
-          <Typography variant="body2" data-testid={DATA_TEST_ID.TERMS_AND_CONDITIONS}>
-            {label}
-            <StyledAnchor href="https://compass.tabiya.org/dpa.html" target="_blank" rel="noreferrer">
-              Terms and Conditions
-            </StyledAnchor>{" "}
-            of Compass.
-          </Typography>
+
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={isDPAccepted}
+                onChange={handleDPAChange}
+                inputProps={{
+                  "aria-label": dataProtectionAgreementLabel,
+                }}
+                data-testid={DATA_TEST_ID.ACCEPT_DPA_CHECKBOX_CONTAINER}
+              />
+            }
+            sx={{ alignItems: "flex-start" }}
+            label={
+              <Typography variant="body2" data-testid={DATA_TEST_ID.ACCEPT_DPA_CHECKBOX_TEXT}>
+                I have read and accept the{" "}
+                <StyledAnchor href="https://compass.tabiya.org/dpa.html" target="_blank" rel="noreferrer">
+                  {dataProtectionAgreementLabel}
+                </StyledAnchor>{" "}
+                of Compass.
+              </Typography>
+            }
+          />
         </Box>
         <Typography>
           Are you ready to start?
@@ -208,7 +241,7 @@ const DataProtectionAgreement: React.FC = () => {
             fullWidth
             variant="contained"
             color="primary"
-            disabled={isAcceptingDPA || !isChecked || isRejectingDPA}
+            disabled={isAcceptingDPA || !isTCAccepted || !isDPAccepted || isRejectingDPA}
             disableWhenOffline={true}
             data-testid={DATA_TEST_ID.ACCEPT_DPA_BUTTON}
             onClick={handleAcceptedDPA}
@@ -221,4 +254,4 @@ const DataProtectionAgreement: React.FC = () => {
   );
 };
 
-export default DataProtectionAgreement;
+export default Consent;

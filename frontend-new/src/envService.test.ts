@@ -1,6 +1,16 @@
 // silence chatty console
 import "src/_test_utilities/consoleMock";
-import { getEnv, getFirebaseAPIKey, getFirebaseDomain } from "./envService";
+import {
+  getBackendUrl,
+  getEnv,
+  getFirebaseAPIKey,
+  getFirebaseDomain,
+  getSentryDSN,
+  getSensitivePersonalDataRSAEncryptionKey,
+  getSensitivePersonalDataRSAEncryptionKeyId,
+  ensureRequiredEnvVars,
+  requiredEnvVariables,
+} from "./envService";
 
 test("getEnv should return the decoded environment variable value", () => {
   // GIVEN a key for an environment variable
@@ -21,6 +31,10 @@ test("getEnv should return the decoded environment variable value", () => {
 describe.each([
   ["FIREBASE_API_KEY", getFirebaseAPIKey],
   ["FIREBASE_AUTH_DOMAIN", getFirebaseDomain],
+  ["BACKEND_URL", getBackendUrl],
+  ["SENTRY_FRONTEND_DSN", getSentryDSN],
+  ["SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY", getSensitivePersonalDataRSAEncryptionKey],
+  ["SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID", getSensitivePersonalDataRSAEncryptionKeyId],
 ])("Env Getters", (ENV_KEY, getterFn) => {
   describe(`${ENV_KEY} Getter (${getterFn.name}) tests`, () => {
     test(`getAPI should not fail if the ${ENV_KEY} is not set`, () => {
@@ -86,7 +100,46 @@ describe.each([
       // THEN expect it to return an empty string
       expect(apiUrl).toBe("");
       // AND expect an error to have been logged
-      expect(console.error).toHaveBeenCalledWith("Error loading environment variable", expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith(`Error loading environment variable ${ENV_KEY}`, expect.any(Error));
     });
+  });
+});
+
+describe("Ensure Required Environment Variables", () => {
+  it("should log a warning if any required environment variable is not set", () => {
+    // GIVEN a required environment variable is not set
+    Object.defineProperty(window, "tabiyaConfig", {
+      value: {},
+      writable: true,
+    });
+
+    // WHEN ensureRequiredEnvVars is called
+    ensureRequiredEnvVars();
+    // THEN expect a warning to be logged
+    requiredEnvVariables.forEach((key) => {
+      expect(console.warn).toHaveBeenCalledWith(`Required environment variable ${key} is not set`);
+    });
+  });
+
+  it("should not log a warning if all required environment variables are set", () => {
+    jest.clearAllMocks();
+
+    // GIVEN all required environment variables are set
+    Object.defineProperty(window, "tabiyaConfig", {
+      value: {
+        FIREBASE_API_KEY: btoa("foo"),
+        FIREBASE_AUTH_DOMAIN: btoa("foo"),
+        BACKEND_URL: btoa("foo"),
+        SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY: btoa("foo"),
+        SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID: btoa("foo"),
+      },
+      writable: true,
+    });
+
+    // WHEN ensureRequiredEnvVars is called
+    ensureRequiredEnvVars();
+
+    // THEN expect no warning to be logged
+    expect(console.warn).not.toHaveBeenCalled();
   });
 });

@@ -1,38 +1,51 @@
-from unittest.mock import patch
+from typing import Awaitable
 
-from motor.motor_asyncio import AsyncIOMotorClient
+import pytest
+import pytest_mock
+from httpx import ASGITransport, AsyncClient
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from conftest import random_db_name
 
-
-def test_version(in_memory_mongo_server):
+@pytest.mark.asyncio
+async def test_version(
+        in_memory_users_database: Awaitable[AsyncIOMotorDatabase],
+        in_memory_application_database: Awaitable[AsyncIOMotorDatabase],
+        mocker: pytest_mock.MockFixture,
+):
     """
     Integration test for the backend server application.
     It will spin up the FastAPI application with an in memory db for the applications db and test the version endpoint.
     """
 
+    # NOTE: Import the FastAPI application and the lifespan context manager first. This is crucial because
+    # logging is configured during the app.server module's initialization. Logging configuration must be set
+    # before any other imports; otherwise, it will not be applied, and logs will not be captured during the test.
+    from app.server import app, lifespan
+
     # Using an in-memory MongoDB server for testing
+    _in_mem_application_db = mocker.patch('app.server_dependencies.db_dependencies._get_application_db')
+    _in_mem_application_db.return_value = await in_memory_application_database
 
-    # create a random db name to ensure isolation
-    _in_mem_application_db = AsyncIOMotorClient(
-        in_memory_mongo_server.connection_string,
-        tlsAllowInvalidCertificates=True
-    ).get_database(random_db_name())
+    _in_mem_users_db = mocker.patch('app.server_dependencies.db_dependencies._get_users_db')
+    _in_mem_users_db.return_value = await in_memory_users_database
 
-    with patch('app.server_dependencies.db_dependencies._get_application_db') as mock_get_application_db:
-        mock_get_application_db.return_value = _in_mem_application_db
-
-        from fastapi.testclient import TestClient
-        from app.server import app
-        # We need to use the TestClient as a context manager to ensure
-        # that the application's lifecycle startup and shutdown events are triggered.
-        # Otherwise, we cannot be sure that the application is fully started and the test is too "shallow".
-        with TestClient(app) as client:
+    # Use httpx and AsyncClient to test the application asynchronously. This ensures the application
+    # is fully started and properly shut down, as recommended for async tests in:
+    # https://fastapi.tiangolo.com/advanced/async-tests/#async-tests
+    # and https://fastapi.tiangolo.com/advanced/events/#lifespan-events
+    #
+    # NOTE: Using TestClient as a context manager is also an option. However, since it is not an async context manager,
+    # if TestClient is used this way, the application's lifecycle startup and shutdown events will not occur
+    # in the same event loop as the test. This can cause issues, especially with asynchronous code.
+    async with lifespan(app):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:  # noqa
             """
             Test the version endpoint
-            WHEN a GET request is made to the version endpoint
-            THEN it should return with OK
             :return:
             """
-            response = client.get("/version")
+            # WHEN a GET request is made to the version endpoint
+            response = await c.get("/version")
+            # THEN it should return with OK
             assert response.status_code == 200
+            # AND the response should be a JSON object
+            assert response.json() is not None

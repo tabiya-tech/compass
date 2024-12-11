@@ -1,7 +1,6 @@
 import React from "react";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
-import { Dialog, DialogActions, DialogContent, DialogTitle, useMediaQuery, useTheme } from "@mui/material";
-import { Theme } from "@mui/material/styles";
+import { Dialog, DialogActions, DialogContent, DialogTitle, useTheme } from "@mui/material";
 
 interface ApproveModalProps {
   title: string;
@@ -25,7 +24,6 @@ export const DATA_TEST_ID = {
 
 const ApproveModal: React.FC<ApproveModalProps> = (props) => {
   const theme = useTheme();
-  const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
 
   return (
     <Dialog
@@ -34,7 +32,7 @@ const ApproveModal: React.FC<ApproveModalProps> = (props) => {
       aria-labelledby="approve-model"
       data-testid={DATA_TEST_ID.APPROVE_MODEL}
       PaperProps={{
-        sx: { padding: isSmallMobile ? 8 : 4 },
+        sx: { padding: theme.tabiyaSpacing.xl },
       }}
     >
       <DialogTitle id="approve-model-title" data-testid={DATA_TEST_ID.APPROVE_MODEL_TITLE}>

@@ -27,7 +27,7 @@ const CheckboxQuestion: React.FC<CheckboxQuestionProps> = ({
   notifyChange,
   options,
   comments,
-  placeholder
+  placeholder,
 }) => {
   const theme = useTheme();
   const [checkedOptions, setCheckedOptions] = useState<string[]>(selectedOptions);
@@ -40,7 +40,6 @@ const CheckboxQuestion: React.FC<CheckboxQuestionProps> = ({
       focusAndScrollToField(commentTextFieldRef);
     }
   }, [checkedOptions]);
-
 
   useEffect(() => {
     setCheckedOptions(selectedOptions);
@@ -64,14 +63,12 @@ const CheckboxQuestion: React.FC<CheckboxQuestionProps> = ({
   return (
     <FormControl
       component="fieldset"
-      fullWidth margin="normal"
+      fullWidth
+      margin="normal"
       sx={{ margin: 0, display: "flex", flexDirection: "column", gap: theme.tabiyaSpacing.md }}
       data-testid={DATA_TEST_ID.FORM_CONTROL}
     >
-      <FormLabel
-        component="legend"
-        data-testid={DATA_TEST_ID.FORM_LABEL}
-      >
+      <FormLabel component="legend" data-testid={DATA_TEST_ID.FORM_LABEL}>
         <QuestionText questionText={questionText} />
       </FormLabel>
       <FormGroup

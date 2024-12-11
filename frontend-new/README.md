@@ -38,15 +38,25 @@ To develop this application locally, follow these steps:
 5. Set up the required environment variables:
 
    - Create a `env.js` file in the `public/data` directory. You can use the [`env.example.js`](public/data/env.example.js) file as a template.
+    
+      All the values of these variables should be encoded in base64 format. You can use the following command to encode the values:
+      ```shell
+      echo -n "your_value" | base64
+      ``` 
+     Or use `btoa()` function in the browser console to encode the values. Since this is a javascript file.
+   
    - The following environment variables are required:
      - `FIREBASE_API_KEY`: The API key for Firebase authentication
      - `FIREBASE_AUTH_DOMAIN`: The Firebase authentication domain
      - `BACKEND_URL`: The URL of the backend API
      - `SENTRY_FRONTEND_DSN`: The Sentry Data Source Name for error tracking (the frontend DSN is for the project used to track frontend errors)
      - `SENTRY_AUTH_TOKEN`: The Sentry authentication token, used to upload source maps
+     - `SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY`: The RSA public key used to encrypt sensitive personal data. It is in the [PEM](https://www.ssl.com/guide/pem-der-crt-and-cer-x-509-encodings-and-conversions/#ftoc-heading-1) format.
+     - `SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID`: The ID of the RSA public key. This is used to identify the key used to encrypt the sensitive personal data as it may be rotated over time.
 
    Please request the necessary environment variable values from the project team.
-
+   
+   For Encryption keys, please refer to the [how to set up sensitive data protection keys](../sensitive-data-protection.md#1-you-need-to-create-a-certificate-an-rsa-privatepublic-key) documentation.
 
 ## Running the development server locally
 

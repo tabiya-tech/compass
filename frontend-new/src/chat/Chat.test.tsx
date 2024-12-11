@@ -15,7 +15,10 @@ import { DATA_TEST_ID as FEEDBACK_FORM_TEST_ID } from "src/feedback/feedbackForm
 import { HashRouter } from "react-router-dom";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { ConversationMessageSender } from "./ChatService/ChatService.types";
-import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import {
+  SensitivePersonalDataRequirement,
+  Language,
+} from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import ChatService from "./ChatService/ChatService";
 import ExperienceService from "src/experiences/experiencesDrawer/experienceService/experienceService";
@@ -26,9 +29,7 @@ import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationSe
 import { DATA_TEST_ID as FEEDBACK_FORM_CONTENT_DATA_TEST_ID } from "src/feedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
 import stepsContent from "src/feedback/feedbackForm/stepsContent";
 import FeedbackService from "src/feedback/feedbackForm/feedbackFormService/feedbackFormService";
-import {
-  DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID
-} from "src/feedback/feedbackForm/components/commentTextField/CommentTextField";
+import { DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID } from "src/feedback/feedbackForm/components/commentTextField/CommentTextField";
 
 // Mock the ChatService module
 jest.mock("src/chat/ChatService/ChatService");
@@ -275,10 +276,12 @@ describe("Chat", () => {
         user_id: "0001",
         language: Language.en,
         sessions: [givenSessionId],
+        has_sensitive_personal_data: false,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       });
 
       // GIVEN a chat component
-      // WHEN the chat is rendered with a router
+      // WHEN the chat is rendered with a router.
       render(
         <HashRouter>
           <Chat />
@@ -474,6 +477,8 @@ describe("Chat", () => {
         user_id: "0001",
         language: Language.en,
         sessions: [givenSessionId],
+        has_sensitive_personal_data: false,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       });
       render(chatComponent);
 
@@ -518,6 +523,8 @@ describe("Chat", () => {
         user_id: "0001",
         language: Language.en,
         sessions: [],
+        has_sensitive_personal_data: false,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       });
 
       // WHEN the chat is rendered with a router and snackbar provider
@@ -637,6 +644,8 @@ describe("Chat", () => {
         user_id: "0001",
         language: Language.en,
         sessions: [givenSessionId],
+        has_sensitive_personal_data: false,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       });
     });
 
@@ -748,6 +757,8 @@ describe("Chat", () => {
         user_id: "0001",
         language: Language.en,
         sessions: [],
+        has_sensitive_personal_data: false,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       });
 
       // WHEN the component is rendered

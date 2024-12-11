@@ -1,5 +1,6 @@
 class Collections:
     USER_PREFERENCES: str = "user_preferences"
+    SENSITIVE_PERSONAL_DATA: str = "sensitive_personal_data"
     USER_INVITATIONS: str = "user_invitations"
     AGENT_DIRECTOR_STATE = "agent_director_state"
     EXPLORE_EXPERIENCES_DIRECTOR_STATE = "explore_experiences_director_state"
@@ -7,4 +8,3 @@ class Collections:
     COLLECT_EXPERIENCE_STATE = "collect_experience_state"
     SKILLS_EXPLORER_AGENT_STATE = "skills_explorer_agent_state"
     USER_FEEDBACK = "user_feedback"
-
