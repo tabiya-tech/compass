@@ -21,7 +21,7 @@ class InferIcatusActivitiesTool:
         self._logger = logging.getLogger(self.__class__.__name__)
         self._occupation_skill_search_service = occupation_skill_search_service
         self._infer_occupations_tool = InferOccupationTool(self._occupation_skill_search_service)
-        self.classification_level = 0
+        self.classification_level = 2
 
     async def find_occupations(self, nodes: list[IcatusTerminalNode]):
         occupation_data = await asyncio.gather(*(self._occupation_skill_search_service.get_by_esco_code(code=node.code) for node in nodes))
