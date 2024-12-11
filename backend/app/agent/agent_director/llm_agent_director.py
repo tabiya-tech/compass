@@ -292,6 +292,7 @@ class LLMAgentDirector(AbstractAgentDirector):
             while first_call or transitioned_to_new_phase:
                 if self._state.current_phase == ConversationPhase.ENDED:
                     agent_output = AgentOutput(
+                        message_for_user="The conversation has finished!",
                         finished=True,
                         agent_type=None,
                         agent_response_time_in_sec=0,  # artificial value as there is no LLM call
