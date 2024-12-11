@@ -19,14 +19,16 @@ load_dotenv()
 def main():
     # Get the config values
     config = pulumi.Config("gcp")
-    project = config.require("project")
-    pulumi.info(f'Using project:{project}')
     location = config.require("region")
     pulumi.info(f'Using location:{location}')
     environment = pulumi.get_stack()
     pulumi.info(f"Using Environment: {environment}")
     domain_name = os.getenv("DOMAIN_NAME")
     pulumi.info(f"Using Domain: {domain_name}")
+
+    env_reference = pulumi.StackReference(f"tabiya-tech/compass-environment/{environment}")
+    project = env_reference.get_output("project_id")
+
     if not domain_name:
         pulumi.error("environment variable DOMAIN_NAME is not set")
         sys.exit(1)

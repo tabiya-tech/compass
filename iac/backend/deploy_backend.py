@@ -48,14 +48,14 @@ def _setup_api_gateway(*,
         account_id=f"compassapigwsrvacct{basic_config.environment.replace('-', '')}",
         project=basic_config.project,
         display_name=f"Compass API Gateway {basic_config.environment} Service Account",
-        opts=pulumi.ResourceOptions(depends_on=dependencies),
+        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
     )
 
     apigw_api = gcp.apigateway.Api(
         resource_name=get_resource_name(environment=basic_config.environment, resource="api-gateway-api"),
         api_id=get_resource_name(environment=basic_config.environment, resource="api-gateway-api"),
         project=basic_config.project,
-        opts=pulumi.ResourceOptions(depends_on=dependencies),
+        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
     )
 
     # The GCP API Gateway uses OpenAPI 2.0 yaml files for the configurations.
@@ -82,6 +82,7 @@ def _setup_api_gateway(*,
                 google_service_account=apigw_service_account.email
             )
         ),
+        opts=pulumi.ResourceOptions(provider=basic_config.provider)
     )
 
     apigw_gateway = gcp.apigateway.Gateway(
@@ -91,7 +92,7 @@ def _setup_api_gateway(*,
         gateway_id=get_resource_name(environment=basic_config.environment, resource="api-gateway"),
         project=basic_config.project,
         region=basic_config.location,
-        opts=pulumi.ResourceOptions(depends_on=dependencies),
+        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
     )
 
     # Only allow access (roles/run.invoker permission) to apigw_service_account
@@ -103,7 +104,7 @@ def _setup_api_gateway(*,
         service=cloudrun.name,
         role="roles/run.invoker",
         members=[apigw_service_account.email.apply(lambda email: f"serviceAccount:{email}")],
-        opts=pulumi.ResourceOptions(depends_on=dependencies),
+        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
     )
 
     pulumi.export("apigateway_url", apigw_gateway.default_hostname.apply(lambda hostname: f"https://{hostname}"))
@@ -121,7 +122,7 @@ def _create_repository(
         location=basic_config.location,
         format="DOCKER",
         repository_id=repository_name,
-        opts=pulumi.ResourceOptions(depends_on=dependencies),
+        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
     )
 
 
@@ -132,7 +133,7 @@ def _build_and_push_image(fully_qualified_image_name: str, dependencies: list[pu
         image_name=fully_qualified_image_name,
         build=docker.DockerBuildArgs(context="../../backend", platform="linux/amd64"),
         registry=None,  # use gcloud for authentication.
-        opts=pulumi.ResourceOptions(depends_on=dependencies),
+        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=provider),
     )
 
     # Digest exported so it's easy to match updates happening in cloud run project
@@ -142,8 +143,8 @@ def _build_and_push_image(fully_qualified_image_name: str, dependencies: list[pu
 
 def _get_fully_qualified_image_name(basic_config: ProjectBaseConfig, repository_name: str, image_name: str):
     label = os.getenv("GITHUB_SHA")
-    return f"{basic_config.location}-docker.pkg.dev/{basic_config.project}/{repository_name}/{image_name}:{label}"
-
+    repository = "{0}-docker.pkg.dev/{1}/{2}/{3}:{4}"
+    return pulumi.Output.format(repository, basic_config.location, basic_config.project, repository_name, image_name, label)
 
 # Deploy cloud run service
 
@@ -181,7 +182,7 @@ def _deploy_cloud_run_service(
         account_id=get_resource_name(environment=basic_config.environment, resource="backend-sa"),
         display_name="The dedicated service account for the Compass backend service",
         project=basic_config.project,
-        opts=pulumi.ResourceOptions(depends_on=dependencies),
+        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
     )
 
     # Assign the necessary roles to the service account for Vertex AI access
@@ -190,7 +191,7 @@ def _deploy_cloud_run_service(
         members=[service_account.email.apply(lambda email: f"serviceAccount:{email}")],
         role="roles/aiplatform.user",
         project=basic_config.project,
-        opts=pulumi.ResourceOptions(depends_on=dependencies),
+        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
     )
 
     # Deploy cloud run service
@@ -247,7 +248,7 @@ def _deploy_cloud_run_service(
             ],
             service_account=service_account.email,
         ),
-        opts=pulumi.ResourceOptions(depends_on=dependencies),
+        opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
     )
     pulumi.export("cloud_run_url", service.uri)
     return service
