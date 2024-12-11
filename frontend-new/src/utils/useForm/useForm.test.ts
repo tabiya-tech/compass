@@ -62,6 +62,20 @@ describe("useForm", () => {
     expect(result.current.errors.name).toBe("This field is required.");
   });
 
+  it("should make the field as not valid if only spaces are entered", () => {
+    // GIVEN a form with fields
+    // WHEN the hook is called
+    const { result } = renderHook(() => useForm<TestData>({ fields }));
+
+    // AND a field is filled with spaces
+    act(() => {
+      result.current.setValue("name", "    ");
+    });
+
+    // THEN the field should be marked as invalid
+    expect(result.current.errors.name).toBe("This field is required.");
+  })
+
   it("should mark the form as valid if all required fields are filled", () => {
     // GIVEN a form with fields
     // WHEN the hook is called

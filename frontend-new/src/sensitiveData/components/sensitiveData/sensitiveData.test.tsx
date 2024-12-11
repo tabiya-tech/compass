@@ -3,6 +3,8 @@ import "src/_test_utilities/consoleMock";
 
 import SensitiveData, { DATA_TEST_ID } from "./SensitiveData";
 
+import { DATA_TEST_ID as APPROVE_MODAL_DATA_TES_IDS } from "src/theme/ApproveModal/ApproveModal"
+
 import { waitFor } from "@testing-library/react";
 import { routerPaths } from "src/app/routerPaths";
 import { HashRouter, useNavigate } from "react-router-dom";
@@ -140,6 +142,9 @@ describe("Sensitive Data", () => {
       const rejectButton = screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_REJECT_BUTTON);
       fireEvent.click(rejectButton);
 
+      // AND the user approves the action
+      fireEvent.click(screen.getByTestId(APPROVE_MODAL_DATA_TES_IDS.APPROVE_MODEL_CONFIRM))
+
       // THEN logout function should be called
       expect(mockLogout).toHaveBeenCalledTimes(1);
 
@@ -163,6 +168,9 @@ describe("Sensitive Data", () => {
       // AND the reject button is clicked
       const rejectButton = screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_REJECT_BUTTON);
       fireEvent.click(rejectButton);
+
+      // AND the user approves the action
+      fireEvent.click(screen.getByTestId(APPROVE_MODAL_DATA_TES_IDS.APPROVE_MODEL_CONFIRM))
 
       // THEN logout should be called
       expect(mockLogout).toHaveBeenCalledTimes(1);

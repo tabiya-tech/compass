@@ -78,8 +78,14 @@ export function useForm<DataType>({ fields }: UseFormHookParams<DataType>): UseF
    * Validates if the field is required and checks if the value is undefined, null, or an empty string.
    */
   const validateField = useCallback(
-    <Key extends keyof DataType>(key: Key, value: DataType[Key]): string | null => {
+    <Key extends keyof DataType>(key: Key, userValue: DataType[Key]): string | null => {
       const field = fields[key];
+      // perform some sanitization.
+      let value = userValue;
+      if (typeof value === "string") {
+        value = value.trim() as DataType[Key];
+      }
+
       if (field.required && (value === undefined || value === null || value === "")) {
         return "This field is required.";
       }

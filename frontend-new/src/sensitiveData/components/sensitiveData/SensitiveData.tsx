@@ -25,6 +25,7 @@ import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceErro
 import { Gender, SensitivePersonalData } from "src/sensitiveData/services/sensitivePersonalDataService/types";
 import { sensitivePersonalDataService } from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalData.service";
 import { StyledAnchor } from "src/theme/StyledAnchor/StyledAnchor";
+import ApproveModal from "../../../theme/ApproveModal/ApproveModal";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d1";
 
@@ -59,6 +60,20 @@ const sensitiveDataForm = {
   },
 };
 
+/**
+ * Sanitize the sensitive personal data before sending it to the server.
+ *
+ * @param data - The sensitive personal data to sanitize.
+ */
+const sanitize = (data: SensitivePersonalData): SensitivePersonalData => ({
+  ...data,
+  first_name: data.first_name.trim(),
+  last_name: data.last_name.trim(),
+  contact_email: data.contact_email.trim(),
+  phone_number: data.phone_number.trim(),
+  address: data.address.trim(),
+})
+
 const SensitiveData: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -72,6 +87,7 @@ const SensitiveData: React.FC = () => {
   } = useForm<SensitivePersonalData>(sensitiveDataForm);
 
   const [isSavingSensitiveData, setIsSavingSensitiveData] = useState(false);
+  const [confirmingReject, setConfirmingReject] = useState(false);
 
   const handleSaveSensitivePersonalData = useCallback(async () => {
     setIsSavingSensitiveData(true);
@@ -85,7 +101,7 @@ const SensitiveData: React.FC = () => {
     }
 
     try {
-      await sensitivePersonalDataService.createSensitivePersonalData(sensitivePersonalData, userPreferences.user_id);
+      await sensitivePersonalDataService.createSensitivePersonalData(sanitize(sensitivePersonalData), userPreferences.user_id);
 
       // Update user preferences to indicate that the user has sensitive personal data
       // so that the user is not prompted to provide this information again.
@@ -143,6 +159,7 @@ const SensitiveData: React.FC = () => {
             <Box display="flex" flexDirection="column" gap={theme.tabiyaSpacing.lg}>
               <TextField
                 fullWidth
+                type={"text"}
                 label="First name"
                 variant="outlined"
                 inputProps={{
@@ -153,6 +170,7 @@ const SensitiveData: React.FC = () => {
 
               <TextField
                 fullWidth
+                type={"text"}
                 label="Last name"
                 variant="outlined"
                 inputProps={{
@@ -174,6 +192,7 @@ const SensitiveData: React.FC = () => {
 
               <TextField
                 fullWidth
+                type={"text"}
                 label="Phone number"
                 variant="outlined"
                 inputProps={{
@@ -184,6 +203,7 @@ const SensitiveData: React.FC = () => {
 
               <TextField
                 fullWidth
+                type={"text"}
                 label="Address"
                 variant="outlined"
                 inputProps={{
@@ -227,7 +247,7 @@ const SensitiveData: React.FC = () => {
             >
               <StyledAnchor
                 data-testid={DATA_TEST_ID.SENSITIVE_DATA_REJECT_BUTTON}
-                onClick={handleRejectProvidingSensitiveData}
+                onClick={() => { setConfirmingReject(true)}}
               >
                 No, thank you
               </StyledAnchor>
@@ -258,6 +278,19 @@ const SensitiveData: React.FC = () => {
         </Box>
       </Container>
       <BugReportButton bottomAlign={true} />
+      <ApproveModal
+        isOpen={confirmingReject}
+        title="Are you sure?"
+        content={
+          <>
+            We're sorry that you chose not to provide your data. You will not be able to proceed and will be logged out. Are you sure you want to exit?
+          </>
+        }
+        onCancel={() => { setConfirmingReject(false) }}
+        onApprove={handleRejectProvidingSensitiveData}
+        cancelButtonText="Cancel"
+        approveButtonText="Yes, I'm sure"
+      />
     </>
   );
 };
