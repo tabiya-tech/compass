@@ -187,8 +187,8 @@ async def decrypt_sensitive_data_from_database(*,
     logger.info(f"decryption took {(asyncio.get_event_loop().time() - start_time):.2f} seconds to decrypt {len(decrypted_data)} records")
 
     # writing the decrypted data to a file
-    with open(output_path, "w") as file:
-        file.write(json.dumps([datum.model_dump() for datum in decrypted_data], indent=2))
+    with open(output_path, "w", encoding="UTF-8") as file:
+        file.write(json.dumps([datum.model_dump() for datum in decrypted_data], ensure_ascii=False, indent=2))
 
 
 async def _main():

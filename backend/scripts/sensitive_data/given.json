@@ -2,6 +2,11 @@
   {
     "user_id": "user_id_001",
     "foo": "foo",
+    "special1": "^°!\"§$%&/()=?`´*+#'-_.,;<>öäü@[]{}|¡“¶¢[]≠¿'„…∞~<•±æœ€",
+    "greek_special": "αβγδεζηθικλμνξοπρστυφχψω",
+    "arabic_special": "أبجد هوز حطي كلمن سعفص قرشت ثخذ ضظغ",
+    "amharic_special": "ሀለሐመሠረሰሸቀበተቸኀአከኸወዘዠየደጀገጠጰፈፐፘ",
+    "chinese_special": "一二三四五六七八九十百千万亿",
     "first_name": "Alice",
     "last_name": "Smith",
     "contact_email": "alice.smith@example.com",
