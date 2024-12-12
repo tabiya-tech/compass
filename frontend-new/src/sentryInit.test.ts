@@ -1,3 +1,5 @@
+import "src/_test_utilities/consoleMock"
+
 import * as Sentry from "@sentry/react";
 import { initSentry } from "./sentryInit";
 import { getBackendUrl, getSentryDSN } from "./envService";
@@ -29,6 +31,20 @@ describe("sentryInit", () => {
     // Setup default mock returns
     (getSentryDSN as jest.Mock).mockReturnValue("mock-dsn");
     (getBackendUrl as jest.Mock).mockReturnValue("https://api.example.com");
+  });
+
+  test("should not initialize Sentry if DSN is not available", () => {
+    // GIVEN the DSN is not available
+    (getSentryDSN as jest.Mock).mockReturnValue("");
+
+    // WHEN initSentry is called
+    initSentry();
+
+    // THEN expect Sentry.init not to be called
+    expect(Sentry.init).not.toHaveBeenCalled();
+
+    // AND log a warning message
+    expect(console.warn).toHaveBeenCalledWith("Sentry DSN is not available. Sentry will not be initialized.");
   });
 
   test("should initialize Sentry with correct configuration", () => {
