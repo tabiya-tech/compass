@@ -298,7 +298,6 @@ class LLMAgentDirector(AbstractAgentDirector):
                         agent_response_time_in_sec=0,  # artificial value as there is no LLM call
                         llm_stats=[]  # artificial value as there is no LLM call
                     )
-                    await self._conversation_manager.update_history(user_input, agent_output)
                     return agent_output
 
                 first_call = False
@@ -336,10 +335,12 @@ class LLMAgentDirector(AbstractAgentDirector):
         # executing an agent can raise any number of unknown exceptions
         except Exception as e:  # pylint: disable=broad-except
             self._logger.error("Error while executing the agent director: %s", e, exc_info=True)
-            return AgentOutput(
+            agent_output = AgentOutput(
                 message_for_user="I am facing some difficulties right now, could you please repeat what you said?",
                 finished=True,
                 agent_type=None,
                 agent_response_time_in_sec=0,  # TODO(Apostolos): for now an artificial value. TBC if it should be 0
                 llm_stats=[]  # TODO (Apostolos): for now an artificial value. TBC if it should be an empty list
             )
+            await self._conversation_manager.update_history(user_input, agent_output)
+            return agent_output
