@@ -257,93 +257,90 @@ const Login: React.FC = () => {
     isLoading || activeLoginForm === ActiveForm.NONE || ((!email || !password) && !inviteCode);
 
   return (
-    <>
-      <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.LOGIN_CONTAINER}>
-        <Box display="flex" flexDirection="column" alignItems="center" justifyContent={"space-evenly"} height={"80%"}>
-          <AuthHeader title={"Welcome to Compass!"} subtitle={"Login to your account to continue"} />
-          <Box
-            component="form"
-            onSubmit={handleLoginSubmit}
-            data-testid={DATA_TEST_ID.FORM}
-            display={"flex"}
-            flexDirection={"column"}
-            padding={theme.tabiyaSpacing.xs}
-            textAlign={"center"}
-            width={"100%"}
-            gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
-          >
-            <Typography variant="subtitle2" data-testid={DATA_TEST_ID.SUBTITLE}>
-              Login using
-            </Typography>
-            <LoginWithInviteCodeForm
-              inviteCode={inviteCode}
-              notifyOnInviteCodeChanged={handleInviteCodeChanged}
-              isDisabled={isLoading}
-            />
-            <Divider textAlign="center" style={{ width: "100%" }}>
-              <Typography
-                variant="subtitle2"
-                padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
-                data-testid={DATA_TEST_ID.SUBTITLE}
-              >
-                Or
-              </Typography>
-            </Divider>
-
-            <LoginWithEmailForm
-              email={email}
-              password={password}
-              notifyOnEmailChanged={handleEmailChanged}
-              notifyOnPasswordChanged={handlePasswordChanged}
-              isDisabled={isLoading}
-              notifyOnFocused={() => {}}
-            />
-            <PrimaryButton
-              fullWidth
-              variant="contained"
-              color="primary"
-              style={{ marginTop: 8 }}
-              type="submit"
-              disabled={isLoginButtonDisabled}
-              disableWhenOffline={true}
-              data-testid={DATA_TEST_ID.LOGIN_BUTTON}
-            >
-              {isLoading ? (
-                <CircularProgress
-                  color={"secondary"}
-                  data-testid={DATA_TEST_ID.LOGIN_BUTTON_CIRCULAR_PROGRESS}
-                  aria-label={"Logging in"}
-                  size={16}
-                  sx={{ marginTop: theme.tabiyaSpacing.sm, marginBottom: theme.tabiyaSpacing.sm }}
-                />
-              ) : (
-                "Login"
-              )}
-            </PrimaryButton>
-          </Box>
-          <SocialAuth
-            disabled={false}
-            postLoginHandler={handlePostLogin}
-            isLoading={isLoading}
-            notifyOnLoading={notifyOnSocialLoading}
-          />
-          <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.LOGIN_LINK}>
-            Don't have an account?{" "}
-            <StyledNavLink
-              to={routerPaths.REGISTER}
-              style={{
-                color: theme.palette.text.textAccent,
-                fontStyle: "italic",
-              }}
-            >
-              Register
-            </StyledNavLink>
-          </Typography>
-        </Box>
-        <BugReportButton bottomAlign={true} />
-      </Container>
+    <Container maxWidth="xs" sx={{ height: "100%", padding: theme.fixedSpacing(theme.tabiyaSpacing.lg) }} data-testid={DATA_TEST_ID.LOGIN_CONTAINER}>
       <Backdrop isShown={isLoading} message={"Logging you in..."} />
-    </>
+      <Box display="flex" flexDirection="column" alignItems="center" justifyContent={"space-evenly"} height={"80%"}>
+        <AuthHeader title={"Welcome to Compass!"} subtitle={"Login to your account to continue"} />
+        <Box
+          component="form"
+          onSubmit={handleLoginSubmit}
+          data-testid={DATA_TEST_ID.FORM}
+          display={"flex"}
+          flexDirection={"column"}
+          textAlign={"center"}
+          width={"100%"}
+          gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
+        >
+          <Typography variant="subtitle2" data-testid={DATA_TEST_ID.SUBTITLE}>
+            Login using
+          </Typography>
+          <LoginWithInviteCodeForm
+            inviteCode={inviteCode}
+            notifyOnInviteCodeChanged={handleInviteCodeChanged}
+            isDisabled={isLoading}
+          />
+          <Divider textAlign="center" style={{ width: "100%" }}>
+            <Typography
+              variant="subtitle2"
+              padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
+              data-testid={DATA_TEST_ID.SUBTITLE}
+            >
+              Or
+            </Typography>
+          </Divider>
+
+          <LoginWithEmailForm
+            email={email}
+            password={password}
+            notifyOnEmailChanged={handleEmailChanged}
+            notifyOnPasswordChanged={handlePasswordChanged}
+            isDisabled={isLoading}
+            notifyOnFocused={() => {}}
+          />
+          <PrimaryButton
+            fullWidth
+            variant="contained"
+            color="primary"
+            style={{ marginTop: 8 }}
+            type="submit"
+            disabled={isLoginButtonDisabled}
+            disableWhenOffline={true}
+            data-testid={DATA_TEST_ID.LOGIN_BUTTON}
+          >
+            {isLoading ? (
+              <CircularProgress
+                color={"secondary"}
+                data-testid={DATA_TEST_ID.LOGIN_BUTTON_CIRCULAR_PROGRESS}
+                aria-label={"Logging in"}
+                size={16}
+                sx={{ marginTop: theme.tabiyaSpacing.sm, marginBottom: theme.tabiyaSpacing.sm }}
+              />
+            ) : (
+              "Login"
+            )}
+          </PrimaryButton>
+        </Box>
+        <SocialAuth
+          disabled={false}
+          postLoginHandler={handlePostLogin}
+          isLoading={isLoading}
+          notifyOnLoading={notifyOnSocialLoading}
+        />
+        <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.LOGIN_LINK}>
+          Don't have an account?{" "}
+          <StyledNavLink
+            to={routerPaths.REGISTER}
+            style={{
+              color: theme.palette.text.textAccent,
+              fontStyle: "italic",
+            }}
+          >
+            Register
+          </StyledNavLink>
+        </Typography>
+      </Box>
+      <BugReportButton bottomAlign={true} />
+    </Container>
   );
 };
 
