@@ -79,6 +79,14 @@ jest.mock("src/app/isOnlineProvider/IsOnlineProvider", () => {
   };
 });
 
+// mock the sentry init
+jest.mock("./sentryInit", () => {
+  return {
+    __esModule: true,
+    initSentry: jest.fn(),
+  };
+});
+
 describe("test the application bootstrapping", () => {
   beforeEach(() => {
     (console.error as jest.Mock).mockClear();

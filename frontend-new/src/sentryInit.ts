@@ -8,6 +8,10 @@ import {
 import AuthenticationStateService from "./auth/services/AuthenticationState.service";
 
 export function initSentry() {
+  if(!getSentryDSN()) {
+    console.warn("Sentry DSN is not available. Sentry will not be initialized.");
+    return;
+  }
   Sentry.init({
     dsn: getSentryDSN(),
     integrations: [
