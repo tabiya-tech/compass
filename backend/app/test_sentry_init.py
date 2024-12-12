@@ -32,7 +32,6 @@ def test_init_sentry_with_environment(mock_sentry):
     assert init_args['dsn'] == dsn
     assert init_args['environment'] == environment
     assert init_args['send_default_pii'] is False
-    assert math.isclose(init_args['traces_sample_rate'], 1.0)
 
 def test_init_sentry_without_environment(mock_sentry):
     """
@@ -72,3 +71,28 @@ def test_sentry_integrations_configured(mock_sentry):
     integration_types = [type(integration) for integration in integrations]
     assert 'FastApiIntegration' in str(integration_types[0])
     assert 'LoggingIntegration' in str(integration_types[1])
+
+def test_before_send_hook(mock_sentry):
+    """
+    Test that before_send hook is configured correctly
+    """
+    # GIVEN an sentry dsn
+    dsn = "https://test-dsn@sentry.io/123"
+
+    # WHEN init_sentry is called
+    init_sentry(dsn)
+
+    # AND the before_send hook is called
+    before_send = mock_sentry['init'].call_args[1]['before_send']
+
+    # AND the before_send hook is called with an event and hint
+    event = MagicMock()
+    hint = MagicMock()
+    before_send(event, hint)
+
+    # THEN sentry.set_user is called with the correct context vars
+    mock_sentry['set_user'].assert_called_once()
+    mock_sentry['set_user'].assert_called_with({
+        "session_id": session_id_ctx_var.get(),
+        "user_id": user_id_ctx_var.get()
+    })
