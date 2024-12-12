@@ -2,7 +2,7 @@
 
 exports[`Testing Register component it should show register form successfully 1`] = `
 <div
-  class="MuiContainer-root MuiContainer-maxWidthXs css-xravbe-MuiContainer-root"
+  class="MuiContainer-root MuiContainer-maxWidthXs css-1ubnw5l-MuiContainer-root"
   data-testid="register-container-ab02918f-d559-47ba-9662-ea6b3a3606d0"
 >
   <div

@@ -1,6 +1,6 @@
 import "src/_test_utilities/consoleMock";
 import React from "react";
-import { fireEvent, render, screen, waitFor } from "src/_test_utilities/test-utils";
+import { userEvent, render, screen, waitFor } from "src/_test_utilities/test-utils";
 import Consent, { DATA_TEST_ID } from "./Consent";
 import { HashRouter, useNavigate } from "react-router-dom";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -18,7 +18,9 @@ import {
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { ServiceError } from "src/error/ServiceError/ServiceError";
 import * as ServiceErrorLoggerModule from "src/error/ServiceError/logger";
+import { DATA_TEST_ID as BACKDROP_TEST_ID } from "src/theme/Backdrop/Backdrop";
 import { AuthenticationError } from "src/error/commonErrors";
+import { DATA_TEST_ID as CONFIRM_MODAL_DIALOG_TEST_ID } from "src/theme/confirmModalDialog/ConfirmModalDialog";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -144,31 +146,27 @@ describe("Testing Consent Page", () => {
         const dpaCheckBoxWrapper = screen.getByTestId(DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER);
         expect(dpaCheckBoxWrapper).toBeInTheDocument();
         const dpaCheckbox = dpaCheckBoxWrapper.getElementsByTagName("input")[0] as HTMLInputElement;
-        fireEvent.click(dpaCheckbox);
+        await userEvent.click(dpaCheckbox);
 
         // AND Terms and Conditions are accepted
         const tcCheckBoxWrapper = screen.getByTestId(DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_CHECKBOX_CONTAINER);
         expect(tcCheckBoxWrapper).toBeInTheDocument();
         const tcCheckbox = tcCheckBoxWrapper.getElementsByTagName("input")[0] as HTMLInputElement;
-        fireEvent.click(tcCheckbox);
+        await userEvent.click(tcCheckbox);
 
         // AND the user clicks the accept button
         expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON)).toBeEnabled();
-        fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON));
+        await userEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON));
 
         // THEN update user preferences should be called
-        await waitFor(() => {
-          expect(updateUserPreferences).toHaveBeenCalled();
-        });
+        expect(updateUserPreferences).toHaveBeenCalled();
 
         // AND no errors should be logged
         expect(console.error).not.toHaveBeenCalled();
         expect(console.warn).not.toHaveBeenCalled();
 
         // AND user should be redirected to root
-        await waitFor(() => {
-          expect(useNavigate()).toHaveBeenCalledWith(routerPaths.ROOT, { replace: true });
-        });
+        expect(useNavigate()).toHaveBeenCalledWith(routerPaths.ROOT, { replace: true });
       });
 
       test("should fail to accept agreements gracefully", async () => {
@@ -206,14 +204,14 @@ describe("Testing Consent Page", () => {
         const dpaCheckbox = screen
           .getByTestId(DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER)
           .getElementsByTagName("input")[0] as HTMLInputElement;
-        fireEvent.click(dpaCheckbox);
+        await userEvent.click(dpaCheckbox);
 
         // AND Terms and Conditions are accepted
         const checkBoxInput = screen
           .getByTestId(DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_CHECKBOX_CONTAINER)
           .getElementsByTagName("input")[0] as HTMLInputElement;
 
-        fireEvent.click(checkBoxInput);
+        await userEvent.click(checkBoxInput);
 
         // THEN expect the checkbox to be checked
         expect(checkBoxInput.checked).toBe(true);
@@ -223,7 +221,7 @@ describe("Testing Consent Page", () => {
         expect(acceptButton).toBeEnabled();
 
         // WHEN the user clicks the accept button
-        fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON));
+        await userEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON));
 
         await waitFor(() => {
           expect(useNavigate()).not.toHaveBeenCalled();
@@ -263,16 +261,16 @@ describe("Testing Consent Page", () => {
           .getByTestId(DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER)
           .getElementsByTagName("input")[0] as HTMLInputElement;
 
-        fireEvent.click(dpaCheckbox);
+        await userEvent.click(dpaCheckbox);
 
         // AND Terms and Conditions are accepted
         const checkBoxInput = screen
           .getByTestId(DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_CHECKBOX_CONTAINER)
           .getElementsByTagName("input")[0] as HTMLInputElement;
-        fireEvent.click(checkBoxInput);
+        await userEvent.click(checkBoxInput);
 
         // AND the user clicks the accept button
-        fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON));
+        await userEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON));
 
         // THEN expect the error to be logged
         expect(console.error).toHaveBeenCalled();
@@ -299,16 +297,16 @@ describe("Testing Consent Page", () => {
         const dpaCheckbox = screen
           .getByTestId(DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER)
           .getElementsByTagName("input")[0] as HTMLInputElement;
-        fireEvent.click(dpaCheckbox);
+        await userEvent.click(dpaCheckbox);
 
         // AND Terms and Conditions are accepted
         const checkBoxInput = screen
           .getByTestId(DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_CHECKBOX_CONTAINER)
           .getElementsByTagName("input")[0] as HTMLInputElement;
 
-        fireEvent.click(checkBoxInput);
+        await userEvent.click(checkBoxInput);
         // AND the user clicks the accept button
-        fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON));
+        await userEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON));
 
         // AND the user should be navigated to the login page
         await waitFor(() => {
@@ -341,13 +339,28 @@ describe("Testing Consent Page", () => {
         expect(rejectButton).toBeInTheDocument();
 
         // WHEN the user clicks the reject button
-        fireEvent.click(rejectButton);
+        await userEvent.click(rejectButton);
+        // AND the approval model should be displayed
+        expect(screen.getByTestId(CONFIRM_MODAL_DIALOG_TEST_ID.CONFIRM_MODAL)).toBeInTheDocument();
+        // AND the user clicks the confirm button
+        const confirmButton = screen.getByTestId(CONFIRM_MODAL_DIALOG_TEST_ID.CONFIRM_MODAL_CONFIRM);
+        await userEvent.click(confirmButton);
+
+        // THEN expect the approval model to be closed
+        await waitFor(() => {
+          expect(screen.queryByTestId(CONFIRM_MODAL_DIALOG_TEST_ID.CONFIRM_MODAL)).not.toBeInTheDocument();
+        });
+        // AND the logout backdrop should be displayed
+        expect(screen.getByTestId(BACKDROP_TEST_ID.BACKDROP_CONTAINER)).toBeInTheDocument();
+        expect(screen.getByTestId(BACKDROP_TEST_ID.MESSAGE_ELEMENT)).toHaveTextContent("Logging you out...");
 
         // THEN expect the user to be logged out
-        expect(getCurrentAuthenticationService).toHaveBeenCalled();
+        await waitFor(() => {
+          expect(getCurrentAuthenticationService).toHaveBeenCalled();
+        });
         expect(authenticationService.logout).toHaveBeenCalled();
 
-        // THEN the accept buttons should be disabled while the user is being logged out
+        // THEN the accept button should be disabled while the user is being logged out
         expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON)).toBeDisabled();
 
         // AND the user should be navigated to the login page
@@ -367,7 +380,7 @@ describe("Testing Consent Page", () => {
         expect(console.log).not.toHaveBeenCalled();
       });
 
-      test("should log the error if the user fails to log out", () => {
+      test("should log the error if the user fails to log out", async () => {
         // GIVEN getting current authentication service throws an error
         const getCurrentAuthenticationService = jest.spyOn(
           AuthenticationServiceFactory,
@@ -384,15 +397,45 @@ describe("Testing Consent Page", () => {
             <Consent />
           </HashRouter>
         );
-
         // AND the reject button is clicked
-        fireEvent.click(screen.getByTestId(DATA_TEST_ID.REJECT_BUTTON));
+        await userEvent.click(screen.getByTestId(DATA_TEST_ID.REJECT_BUTTON));
+        // AND the approval model should be displayed
+        expect(screen.getByTestId(CONFIRM_MODAL_DIALOG_TEST_ID.CONFIRM_MODAL)).toBeInTheDocument();
+        // AND the user clicks the confirm button
+        const confirmButton = screen.getByTestId(CONFIRM_MODAL_DIALOG_TEST_ID.CONFIRM_MODAL_CONFIRM);
+        await userEvent.click(confirmButton);
 
         // THEN expect the error to be logged
-        expect(console.error).toHaveBeenCalledWith(new AuthenticationError("Failed to log out", error));
-
+        await waitFor(() => {
+          expect(console.error).toHaveBeenCalledWith(new AuthenticationError("Failed to log out", error));
+        });
         // AND snack bar should display an error message
         expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to log out.", { variant: "error" });
+      });
+
+      test("should not log the user out when the user clicks the cancel button on the approve modal", async () => {
+        // GIVEN DPA Component is rendered
+        render(
+          <HashRouter>
+            <Consent />
+          </HashRouter>
+        );
+
+        // WHEN the user clicks the reject button
+        const rejectButton = screen.getByTestId(DATA_TEST_ID.REJECT_BUTTON);
+        await userEvent.click(rejectButton);
+        // AND the approval model is open
+        expect(screen.getByTestId(CONFIRM_MODAL_DIALOG_TEST_ID.CONFIRM_MODAL)).toBeInTheDocument();
+        // AND the user clicks the cancel button
+        const cancelButton = screen.getByTestId(CONFIRM_MODAL_DIALOG_TEST_ID.CONFIRM_MODAL_CANCEL);
+        await userEvent.click(cancelButton);
+
+        // THEN expect the modal to be closed
+        await waitFor(() => {
+          expect(screen.queryByTestId(CONFIRM_MODAL_DIALOG_TEST_ID.CONFIRM_MODAL)).not.toBeInTheDocument();
+        });
+        // AND the user should not be logged out
+        expect(useNavigate()).not.toHaveBeenCalled();
       });
     });
 
@@ -427,17 +470,17 @@ describe("Testing Consent Page", () => {
           .getByTestId(DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER)
           .getElementsByTagName("input")[0] as HTMLInputElement;
 
-        fireEvent.click(dpaCheckbox);
+        await userEvent.click(dpaCheckbox);
 
         // AND Terms and Conditions are accepted
         const checkBoxInput = screen
           .getByTestId(DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_CHECKBOX_CONTAINER)
           .getElementsByTagName("input")[0] as HTMLInputElement;
 
-        fireEvent.click(checkBoxInput);
+        await userEvent.click(checkBoxInput);
 
         // AND the user clicks the accept button
-        fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON));
+        await userEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON));
 
         // AND the user should be navigated to the login page
         await waitFor(() => {
@@ -484,17 +527,17 @@ describe("Testing Consent Page", () => {
         const dpaCheckbox = screen
           .getByTestId(DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER)
           .getElementsByTagName("input")[0] as HTMLInputElement;
-        fireEvent.click(dpaCheckbox);
+        await userEvent.click(dpaCheckbox);
 
         // AND Terms and Conditions are accepted
         const checkBoxInput = screen
           .getByTestId(DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_CHECKBOX_CONTAINER)
           .getElementsByTagName("input")[0] as HTMLInputElement;
 
-        fireEvent.click(checkBoxInput);
+        await userEvent.click(checkBoxInput);
 
         // AND the user clicks the accept button
-        fireEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON));
+        await userEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON));
 
         // AND the user should be navigated to the login page
         await waitFor(() => {
