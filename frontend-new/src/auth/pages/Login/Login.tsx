@@ -17,7 +17,7 @@ import { userPreferencesStateService } from "src/userPreferences/UserPreferences
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import BugReportButton from "src/feedback/bugReportButton/BugReportButton";
 import FirebaseInvitationCodeAuthenticationService from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
-import { AuthenticationError } from "../../../error/commonErrors";
+import { AuthenticationError } from "src/error/commonErrors";
 
 export const INVITATIONS_PARAM_NAME = "invite-code";
 
@@ -73,11 +73,9 @@ const Login: React.FC = () => {
 
   const handleError = useCallback(
     async (error: Error) => {
-      // if something goes wrong, log the user out
-      const firebaseEmailAuthServiceInstance = FirebaseEmailAuthService.getInstance();
-      await firebaseEmailAuthServiceInstance.logout();
-
+      console.log("handleError", error)
       let errorMessage;
+      console.log("login", error)
       if (error instanceof ServiceError) {
         errorMessage = getUserFriendlyErrorMessage(error);
         writeServiceErrorToLog(error, console.error);
@@ -89,6 +87,10 @@ const Login: React.FC = () => {
         console.error(error);
       }
       enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
+
+      // if something goes wrong, log the user out
+      const firebaseEmailAuthServiceInstance = FirebaseEmailAuthService.getInstance();
+      await firebaseEmailAuthServiceInstance.logout();
     },
     [enqueueSnackbar]
   );
@@ -150,7 +152,7 @@ const Login: React.FC = () => {
     async (email: string, password: string) => {
       setIsLoading(true);
       try {
-        const firebaseEmailAuthServiceInstance = await FirebaseEmailAuthService.getInstance();
+        const firebaseEmailAuthServiceInstance = FirebaseEmailAuthService.getInstance();
         await firebaseEmailAuthServiceInstance.login(email, password);
         await handlePostLogin();
       } catch (error) {
