@@ -69,7 +69,7 @@ describe("UserPreferencesService", () => {
           headers: {
             "Content-Type": "application/json",
           },
-          expectedStatusCode: [200, 404],
+          expectedStatusCode: [200],
           failureMessage: `Failed to get user preferences for user with id ${givenResponseBody.user_id}`,
           serviceFunction: "getUserPreferences",
           serviceName: "UserPreferencesService",

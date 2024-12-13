@@ -196,7 +196,7 @@ abstract class AuthenticationService {
       console.debug("Token checked. Token is valid");
       return { isValid: true, decodedToken: decodedToken };
     } catch (error) {
-      console.warn(new TokenError("Error decoding token", error as Error));
+      console.error(new TokenError("Error decoding token", error as Error));
       return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.ERROR_DECODING_TOKEN };
     }
   }

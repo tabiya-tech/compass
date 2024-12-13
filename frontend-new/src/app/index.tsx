@@ -17,8 +17,10 @@ import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import * as Sentry from "@sentry/react";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 import { PersistentStorageService } from "./PersistentStorageService/PersistentStorageService";
-import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import UserPreferencesService, { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { AuthenticationError } from "src/error/commonErrors";
+import { ServiceError } from "../error/ServiceError/ServiceError";
+import { StatusCodes } from "http-status-codes";
 
 // Wrap the createHashRouter function with Sentry to capture errors that occur during router initialization
 const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouter(createHashRouter);
@@ -62,7 +64,16 @@ const App = () => {
       console.debug("Valid token found in storage");
       AuthenticationStateService.getInstance().setUser(user);
 
-      const preferences = await userPreferencesService.getUserPreferences(user.id);
+      const preferences = await userPreferencesService.getUserPreferences(user.id)
+        .catch((error) => {
+        console.log(error, "init")
+        if(error instanceof ServiceError) {
+          // if the user is not registered, but has a valid token, log an error and continue log the user out
+          if(error.serviceName === UserPreferencesService.serviceName && error.statusCode === StatusCodes.NOT_FOUND && error.method === "GET") {
+            console.error(new AuthenticationError(`User has not registered! Preferences could not be found for userId: ${user.id}`, error as Error));
+          }
+        }
+      });
       if (!preferences) {
         console.debug("User has not registered !", user.id);
         await authenticationServiceInstance.logout();
