@@ -7,6 +7,7 @@ import { customFetch } from "src/utils/customFetch/customFetch";
 
 export default class UserPreferencesService {
   private static instance: UserPreferencesService;
+  static serviceName = "UserPreferencesService";
 
   readonly updateUserPreferencesEndpointUrl: string;
   readonly getUserPreferencesEndpointUrl: string;
@@ -86,7 +87,7 @@ export default class UserPreferencesService {
    * @throws {ServiceError} If the user preferences are invalid
    */
   async createUserPreferences(user_preferences: CreateUserPreferencesSpec): Promise<UserPreference> {
-    const serviceName = "UserPreferencesService";
+    const serviceName = UserPreferencesService.serviceName;
     const serviceFunction = "createUserPreferences";
     const method = "POST";
     const errorFactory = getServiceErrorFactory(
@@ -118,7 +119,7 @@ export default class UserPreferencesService {
    * @throws {ServiceError} If the user preferences are invalid
    */
   async updateUserPreferences(newUserPreferencesSpec: UpdateUserPreferencesSpec): Promise<UserPreference> {
-    const serviceName = "UserPreferencesService";
+    const serviceName = UserPreferencesService.serviceName;
     const serviceFunction = "updateUserPreferences";
     const method = "PATCH";
     const errorFactory = getServiceErrorFactory(
@@ -147,11 +148,11 @@ export default class UserPreferencesService {
 
   /**
    * Gets the user preferences of a user with an ID
-   * @returns {Promise<UserPreference | null>} The user preferences object or null if the user preferences are not found
-   * @throws {ServiceError} If the user preferences are invalid
+   * @returns {Promise<UserPreference>} The user preferences object
+   * @throws {ServiceError} If the user preferences are invalid or the user does not exist
    */
-  async getUserPreferences(userId: string): Promise<UserPreference | null> {
-    const serviceName = "UserPreferencesService";
+  async getUserPreferences(userId: string): Promise<UserPreference> {
+    const serviceName = UserPreferencesService.serviceName;
     const serviceFunction = "getUserPreferences";
     const method = "GET";
     const qualifiedURL = `${this.getUserPreferencesEndpointUrl}?user_id=${userId}`;
@@ -162,16 +163,12 @@ export default class UserPreferencesService {
       headers: {
         "Content-Type": "application/json",
       },
-      expectedStatusCode: [StatusCodes.OK, StatusCodes.NOT_FOUND],
+      expectedStatusCode: [StatusCodes.OK],
       serviceName: serviceName,
       serviceFunction: serviceFunction,
       failureMessage: `Failed to get user preferences for user with id ${userId}`,
       expectedContentType: "application/json",
     });
-
-    if (response.status === StatusCodes.NOT_FOUND) {
-      return null;
-    }
 
     const responseBody = await response.text();
     return this.parseJsonResponse(responseBody, errorFactory);
@@ -183,7 +180,7 @@ export default class UserPreferencesService {
    * @throws {ServiceError} If the user preferences are invalid
    */
   async getNewSession(userId: string): Promise<UserPreference> {
-    const serviceName = "UserPreferencesService";
+    const serviceName = UserPreferencesService.serviceName;
     const serviceFunction = "getNewSession";
     const method = "GET";
     const qualifiedURL = `${this.generateNewSessionEndpointUrl}?user_id=${userId}`;
