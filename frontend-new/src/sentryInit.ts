@@ -2,13 +2,11 @@ import * as Sentry from "@sentry/react";
 import { getBackendUrl, getSentryDSN } from "./envService";
 import React from "react";
 import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from "react-router-dom";
-import {
-  UserPreferencesStateService,
-} from "./userPreferences/UserPreferencesStateService";
+import { UserPreferencesStateService } from "./userPreferences/UserPreferencesStateService";
 import AuthenticationStateService from "./auth/services/AuthenticationState.service";
 
 export function initSentry() {
-  if(!getSentryDSN()) {
+  if (!getSentryDSN()) {
     console.warn("Sentry DSN is not available. Sentry will not be initialized.");
     return;
   }
@@ -50,6 +48,6 @@ export function initSentry() {
         user_id: authenticationState?.id ?? "unknown",
       });
       return event;
-    }
+    },
   });
 }

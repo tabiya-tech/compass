@@ -33,7 +33,7 @@ describe("render tests", () => {
   test("should render the Chat message with sent_at when the message is not a typing message", () => {
     // WHEN the chat header is rendered
     const givenDate = new Date(2024, 6, 25).toISOString();
-    const givenMessage : IChatMessage = {
+    const givenMessage: IChatMessage = {
       id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       message: "Hello, I'm Compass",
@@ -64,7 +64,7 @@ describe("render tests", () => {
 
   test("should render the Chat message without a sent_at when the message is a typing message", () => {
     // WHEN the chat header is rendered
-    const givenMessage : IChatMessage = {
+    const givenMessage: IChatMessage = {
       id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       message: "Hello, I'm Compass",

@@ -110,7 +110,6 @@ describe("FeedbackFormContent", () => {
       const customRatingInput = screen.getAllByTestId(CUSTOM_RATING_DATA_TEST_ID.CUSTOM_RATING_ICON)[8];
       fireEvent.click(customRatingInput);
 
-
       // AND submit the form
       fireEvent.click(nextButton);
 

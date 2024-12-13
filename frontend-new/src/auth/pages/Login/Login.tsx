@@ -73,9 +73,9 @@ const Login: React.FC = () => {
 
   const handleError = useCallback(
     async (error: Error) => {
-      console.log("handleError", error)
+      console.log("handleError", error);
       let errorMessage;
-      console.log("login", error)
+      console.log("login", error);
       if (error instanceof ServiceError) {
         errorMessage = getUserFriendlyErrorMessage(error);
         writeServiceErrorToLog(error, console.error);
@@ -132,7 +132,9 @@ const Login: React.FC = () => {
         errorMessage = getUserFriendlyErrorMessage(error);
       } else {
         errorMessage = (error as Error).message;
-        console.error(new AuthenticationError("An error occurred while trying to get your preferences", error as Error));
+        console.error(
+          new AuthenticationError("An error occurred while trying to get your preferences", error as Error)
+        );
       }
       enqueueSnackbar(`An error occurred while trying to get your preferences: ${errorMessage}`, {
         variant: "error",

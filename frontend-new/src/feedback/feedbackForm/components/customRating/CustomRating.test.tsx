@@ -8,8 +8,8 @@ import CustomRating, {
 import { render, screen } from "src/_test_utilities/test-utils";
 import { fireEvent } from "@testing-library/react";
 import { QuestionType } from "src/feedback/feedbackForm/feedback.types";
-import  {DATA_TEST_ID as QUESTION_TEXT_DATA_TEST_ID} from "src/feedback/feedbackForm/components/questionText/QuestionText";
-import  {DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID} from "src/feedback/feedbackForm/components/commentTextField/CommentTextField";
+import { DATA_TEST_ID as QUESTION_TEXT_DATA_TEST_ID } from "src/feedback/feedbackForm/components/questionText/QuestionText";
+import { DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID } from "src/feedback/feedbackForm/components/commentTextField/CommentTextField";
 
 describe("CustomRating", () => {
   // mock question
@@ -81,21 +81,19 @@ describe("CustomRating", () => {
     expect(mockNotifyChange).toHaveBeenCalled();
   });
 
-  test.each([
-    20, 5, 1
-  ])("should show the expected number of stars for a max rating of %s", (givenMaxRating: number) => {
+  test.each([20, 5, 1])("should show the expected number of stars for a max rating of %s", (givenMaxRating: number) => {
     // GIVEN the component
     const mockNotifyChange = jest.fn();
     const givenQuestion = {
       ...mockQuestion,
-      maxRating: givenMaxRating
-    }
+      maxRating: givenMaxRating,
+    };
     const givenCustomRating = <CustomRating {...givenQuestion} notifyChange={mockNotifyChange} />;
     // AND the component is rendered
     render(givenCustomRating);
 
     // WHEN the rating is changed
-    const stars = screen.getAllByTestId(DATA_TEST_ID.CUSTOM_RATING_ICON)
+    const stars = screen.getAllByTestId(DATA_TEST_ID.CUSTOM_RATING_ICON);
 
     // THEN expect the number of stars to match the max rating
     expect(stars).toHaveLength(givenMaxRating);
@@ -106,14 +104,14 @@ describe("CustomRating", () => {
     const mockNotifyChange = jest.fn();
     const givenQuestion = {
       ...mockQuestion,
-      maxRating: 0
-    }
+      maxRating: 0,
+    };
     const givenCustomRating = <CustomRating {...givenQuestion} notifyChange={mockNotifyChange} />;
     // AND the component is rendered
     render(givenCustomRating);
 
     // WHEN the rating is changed
-    const stars = screen.queryAllByTestId(DATA_TEST_ID.CUSTOM_RATING_ICON)
+    const stars = screen.queryAllByTestId(DATA_TEST_ID.CUSTOM_RATING_ICON);
 
     // THEN expect no stars to be rendered
     expect(stars).toHaveLength(0);

@@ -7,16 +7,10 @@ import Chat, { CHECK_INACTIVITY_INTERVAL, DATA_TEST_ID } from "./Chat";
 import { fireEvent, render, screen, waitFor } from "src/_test_utilities/test-utils";
 import { DATA_TEST_ID as CHAT_HEADER_TEST_ID, MENU_ITEM_ID } from "./ChatHeader/ChatHeader";
 import ChatMessageField, { DATA_TEST_ID as CHAT_MESSAGE_FIELD_TEST_ID } from "./ChatMessageField/ChatMessageField";
-import {
-  DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID,
-} from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
-import {
-  DATA_TEST_ID as EXPERIENCES_DRAWER_CONTAINER_TEST_ID,
-} from "src/experiences//experiencesDrawer/ExperiencesDrawer";
+import { DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID } from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
+import { DATA_TEST_ID as EXPERIENCES_DRAWER_CONTAINER_TEST_ID } from "src/experiences//experiencesDrawer/ExperiencesDrawer";
 import { DATA_TEST_ID as APPROVE_MODAL_TEST_ID } from "src/theme/approveModal/ApproveModal";
-import {
-  DATA_TEST_ID as FEEDBACK_FORM_BUTTON_TEST_ID,
-} from "src/feedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
+import { DATA_TEST_ID as FEEDBACK_FORM_BUTTON_TEST_ID } from "src/feedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
 import { DATA_TEST_ID as FEEDBACK_FORM_TEST_ID } from "src/feedback/feedbackForm/FeedbackForm";
 import { HashRouter } from "react-router-dom";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -28,17 +22,12 @@ import ExperienceService from "src/experiences/experiencesDrawer/experienceServi
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { act } from "@testing-library/react";
 import * as FirebaseAuthenticationServiceFactoryModule from "src/auth/services/Authentication.service.factory";
-import FirebaseEmailAuthService
-  from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
-import {
-  DATA_TEST_ID as FEEDBACK_FORM_CONTENT_DATA_TEST_ID,
-} from "src/feedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
+import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
+import { DATA_TEST_ID as FEEDBACK_FORM_CONTENT_DATA_TEST_ID } from "src/feedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
 import stepsContent from "src/feedback/feedbackForm/stepsContent";
 import FeedbackService from "src/feedback/feedbackForm/feedbackFormService/feedbackFormService";
 import { ChatError, FeedbackError, SessionError } from "src/error/commonErrors";
-import {
-  DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID,
-} from "src/feedback/feedbackForm/components/commentTextField/CommentTextField";
+import { DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID } from "src/feedback/feedbackForm/components/commentTextField/CommentTextField";
 
 // Mock the ChatService module
 jest.mock("src/chat/ChatService/ChatService");
@@ -721,7 +710,9 @@ describe("Chat", () => {
     test("should log the same error that the service throws when sending feedback fails", async () => {
       // mock the sendFeedback method
       const givenError = new Error("Failed to send feedback");
-      (FeedbackService as jest.Mocked<typeof FeedbackService>).prototype.sendFeedback = jest.fn().mockRejectedValue(givenError);
+      (FeedbackService as jest.Mocked<typeof FeedbackService>).prototype.sendFeedback = jest
+        .fn()
+        .mockRejectedValue(givenError);
       // GIVEN a chat component
       render(
         <HashRouter>
