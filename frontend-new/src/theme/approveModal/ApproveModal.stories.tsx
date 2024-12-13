@@ -1,5 +1,5 @@
-import ApproveModal from "./ApproveModal";
 import { Meta, StoryObj } from "@storybook/react";
+import ApproveModal from "src/theme/approveModal/ApproveModal";
 
 const meta: Meta<typeof ApproveModal> = {
   title: "Components/ApproveModal",

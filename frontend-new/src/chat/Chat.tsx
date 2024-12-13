@@ -19,7 +19,7 @@ import { Experience } from "src/experiences/experiencesDrawer/experienceService/
 import ExperienceService from "src/experiences/experiencesDrawer/experienceService/experienceService";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import InactiveBackdrop from "src/theme/Backdrop/InactiveBackdrop";
-import ApproveModal from "src/theme/ApproveModal/ApproveModal";
+import ApproveModal from "src/theme/approveModal/ApproveModal";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 import FeedbackForm from "src/feedback/feedbackForm/FeedbackForm";
