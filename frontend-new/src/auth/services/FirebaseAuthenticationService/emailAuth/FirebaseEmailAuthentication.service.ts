@@ -197,7 +197,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     const { isValid, decodedToken, failureCause } = this.isTokenValid(token);
 
     if (!isValid) {
-      if(failureCause === TokenValidationFailureCause.TOKEN_EXPIRED) {
+      if (failureCause === TokenValidationFailureCause.TOKEN_EXPIRED) {
         console.warn(new TokenError(`token is invalid: ${formatTokenForLogging(token)}`, failureCause));
         return null;
       }

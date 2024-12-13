@@ -8,7 +8,7 @@ import YesNoQuestion, {
 import { render, screen } from "src/_test_utilities/test-utils";
 import { fireEvent } from "@testing-library/react";
 import { QuestionType, YesNoEnum } from "src/feedback/feedbackForm/feedback.types";
-import  {DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID} from "src/feedback/feedbackForm/components/commentTextField/CommentTextField";
+import { DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID } from "src/feedback/feedbackForm/components/commentTextField/CommentTextField";
 
 describe("YesNoQuestion", () => {
   // mock question

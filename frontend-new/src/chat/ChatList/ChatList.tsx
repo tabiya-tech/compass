@@ -63,36 +63,33 @@ const ChatList: React.FC<ChatListProps> = ({ messages, notifyOpenFeedbackForm })
 
   return (
     <ChatListContainer data-testid={DATA_TEST_ID.CHAT_LIST_CONTAINER} tabIndex={0}>
-        <List
-          sx={{
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-            gap: theme.fixedSpacing(theme.tabiyaSpacing.md),
-          }}
-        >
-          <AnimatePresence initial={false}>
-            {messages.map((message, index) => (
-              <ListItem
-                key={message.id}
-                component={motion.li}
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                variants={messageVariants}
-                disablePadding={true}
-                transition={{ duration: 0.3 }}
-                sx={{ width: "100%", padding: theme.tabiyaSpacing.xs}}
-              >
-                <ChatMessage
-                  chatMessage={message}
-                  notifyOpenFeedbackForm={notifyOpenFeedbackForm}
-                />
-              </ListItem>
-            ))}
-          </AnimatePresence>
-        </List>
-        <div ref={messagesEndRef} />
+      <List
+        sx={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          gap: theme.fixedSpacing(theme.tabiyaSpacing.md),
+        }}
+      >
+        <AnimatePresence initial={false}>
+          {messages.map((message, index) => (
+            <ListItem
+              key={message.id}
+              component={motion.li}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={messageVariants}
+              disablePadding={true}
+              transition={{ duration: 0.3 }}
+              sx={{ width: "100%", padding: theme.tabiyaSpacing.xs }}
+            >
+              <ChatMessage chatMessage={message} notifyOpenFeedbackForm={notifyOpenFeedbackForm} />
+            </ListItem>
+          ))}
+        </AnimatePresence>
+      </List>
+      <div ref={messagesEndRef} />
     </ChatListContainer>
   );
 };

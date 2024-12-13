@@ -90,7 +90,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           "We’d love your feedback on this conversation. It’ll only take 5 minutes and will help us improve your experience",
           new Date().toISOString()
         ),
-        footerType: ChatMessageFooterType.FEEDBACK_FORM_BUTTON
+        footerType: ChatMessageFooterType.FEEDBACK_FORM_BUTTON,
       });
     }
   }, []);
@@ -98,8 +98,8 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const checkAndAddTypingMessage = useCallback(() => {
     if (isTyping) {
       // Only add typing message if it doesn't already exist
-      setMessages(prevMessages => {
-        const hasTypingMessage = prevMessages.some(message => message.isTypingMessage);
+      setMessages((prevMessages) => {
+        const hasTypingMessage = prevMessages.some((message) => message.isTypingMessage);
         if (!hasTypingMessage) {
           return [...prevMessages, generateCompassMessage("Typing...", new Date().toISOString(), true)];
         }
@@ -107,7 +107,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       });
     } else {
       // filter out the typing message
-      setMessages(prevMessages => prevMessages.filter(message => !message.isTypingMessage));
+      setMessages((prevMessages) => prevMessages.filter((message) => !message.isTypingMessage));
     }
   }, [isTyping]);
 
@@ -251,7 +251,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setConversationCompleted(history.conversation_completed);
         setConversationConductedAt(history.conversation_conducted_at);
 
-        if(history.messages.length){
+        if (history.messages.length) {
           setMessages(
             history.messages.map((message: ConversationMessage) =>
               message.sender === ConversationMessageSender.USER

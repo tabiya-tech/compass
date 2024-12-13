@@ -1,10 +1,10 @@
 enum CommonError {
-  TOKEN_ERROR = 'TokenError',
-  AUTHENTICATION_ERROR = 'AuthenticationError',
-  SESSION_ERROR = 'SessionError',
-  CHAT_ERROR = 'ChatError',
-  FEEDBACK_ERROR = 'FeedbackError',
-  ENV_ERROR = 'EnvError',
+  TOKEN_ERROR = "TokenError",
+  AUTHENTICATION_ERROR = "AuthenticationError",
+  SESSION_ERROR = "SessionError",
+  CHAT_ERROR = "ChatError",
+  FEEDBACK_ERROR = "FeedbackError",
+  ENV_ERROR = "EnvError",
 }
 
 /**

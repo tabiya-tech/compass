@@ -56,12 +56,15 @@ const createGreyScale = () => {
   const greyAnchor = new Color(TabiyaBasicColors.Gray);
   const lightColor = new Color("white");
   //TODO: discuss and add accent colors (A series)
-  
+
   return {
     ...Object.fromEntries(
       Array.from({ length: 9 }, (_, i) => [
-        900 - (i * 100),
-        startColor.mix(greyAnchor, i / 8, { space: "lab" }).to("srgb").toString({ format: "hex" })
+        900 - i * 100,
+        startColor
+          .mix(greyAnchor, i / 8, { space: "lab" })
+          .to("srgb")
+          .toString({ format: "hex" }),
       ])
     ),
     100: TabiyaBasicColors.Gray,
@@ -166,7 +169,7 @@ export const applicationTheme = (theme: ThemeMode) => {
       return `${factor * TabiyaBaseSizes.rounding}px`;
     },
     tabiyaSpacing: {
-      none: 0, 
+      none: 0,
       xxs: 0.25,
       xs: 0.5,
       sm: 1,

@@ -39,10 +39,10 @@ const CustomRating: React.FC<CustomRatingProps> = ({
   comments,
   displayRating = true,
   maxRating,
-  placeholder
+  placeholder,
 }) => {
   const theme = useTheme();
-  const [commentText, setCommentText] = React.useState(comments || "");
+  const [commentText, setCommentText] = React.useState(comments ?? "");
   const isSmallMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const commentTextFieldRef = useRef<HTMLInputElement>(null);
 
@@ -80,7 +80,9 @@ const CustomRating: React.FC<CustomRatingProps> = ({
               sx={{
                 color: theme.palette.primary.main,
                 "& .MuiSvgIcon-root": {
-                  fontSize: isSmallMobile ? theme.fixedSpacing(theme.tabiyaSpacing.lg) : theme.fixedSpacing(theme.tabiyaSpacing.xl),
+                  fontSize: isSmallMobile
+                    ? theme.fixedSpacing(theme.tabiyaSpacing.lg)
+                    : theme.fixedSpacing(theme.tabiyaSpacing.xl),
                 },
               }}
               IconContainerComponent={(props: any) => {
@@ -94,28 +96,32 @@ const CustomRating: React.FC<CustomRatingProps> = ({
                 paddingX: 0.5,
               }}
             >
-              <Typography variant="body2" data-testid={DATA_TEST_ID.CUSTOM_RATING_LOW_LABEL}
-                          sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.sm * 1.2) }}>
+              <Typography
+                variant="body2"
+                data-testid={DATA_TEST_ID.CUSTOM_RATING_LOW_LABEL}
+                sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.sm * 1.2) }}
+              >
                 {lowRatingLabel}
               </Typography>
-              <Typography variant="body2" data-testid={DATA_TEST_ID.CUSTOM_RATING_HIGH_LABEL}
-                          sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.sm * 1.2) }}>
+              <Typography
+                variant="body2"
+                data-testid={DATA_TEST_ID.CUSTOM_RATING_HIGH_LABEL}
+                sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.sm * 1.2) }}
+              >
                 {highRatingLabel}
               </Typography>
             </Box>
           </Box>
         )}
       </Box>
-      {
-        placeholder && (
-          <CommentTextField
-            placeholder={placeholder}
-            value={commentText}
-            ref={commentTextFieldRef}
-            onChange={handleCommentChange}
-          />
-        )
-      }
+      {placeholder && (
+        <CommentTextField
+          placeholder={placeholder}
+          value={commentText}
+          ref={commentTextFieldRef}
+          onChange={handleCommentChange}
+        />
+      )}
     </Box>
   );
 };
