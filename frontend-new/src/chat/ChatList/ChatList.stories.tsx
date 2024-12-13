@@ -54,7 +54,7 @@ export const Typing: Story = {
         message: "Typing...",
         sent_at: new Date().toString(),
         isTypingMessage: true,
-      }
+      },
     ],
   },
 };
@@ -68,7 +68,7 @@ export const TypingWhenEmpty: Story = {
         message: "Typing...",
         sent_at: new Date().toString(),
         isTypingMessage: true,
-      }
+      },
     ],
   },
 };

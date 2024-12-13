@@ -40,7 +40,7 @@ describe("StepsComponent", () => {
 
   const mockAnswers: FeedbackItem[] = [
     { question_id: "q1", answer: { selected_options: ["option1"] }, is_answered: true },
-    { question_id: "q2", answer: { rating_numeric: 3 }, is_answered: true},
+    { question_id: "q2", answer: { rating_numeric: 3 }, is_answered: true },
     { question_id: "q3", answer: { rating_boolean: true, comment: "Yes comment" }, is_answered: true },
   ];
 

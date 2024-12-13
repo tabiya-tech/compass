@@ -14,7 +14,7 @@ const uniqueId = "2fbaf2ef-9eab-485a-bd28-b4a164e18b06";
 export const DATA_TEST_ID = {
   CHAT_MESSAGE_CONTAINER: `chat-message-container-${uniqueId}`,
   CHAT_MESSAGE_TIMESTAMP: `chat-message-sent_at-${uniqueId}`,
-  CHAT_MESSAGE_FOOTER_DIVIDER: `chat-message-footer-divider-${uniqueId}`
+  CHAT_MESSAGE_FOOTER_DIVIDER: `chat-message-footer-divider-${uniqueId}`,
 };
 
 const MessageContainer = styled(Box)<{ origin: ConversationMessageSender }>(({ theme, origin }) => ({
@@ -69,28 +69,25 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage, notifyOpenFeedba
       default:
         return null;
     }
-  }
+  };
   return (
     <MessageContainer origin={chatMessage.sender} data-testid={DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}>
       <MessageBubble origin={chatMessage.sender}>
         <Typography whiteSpace="pre-line">{chatMessage.message}</Typography>
-        {
-          chatMessage.footerType !== undefined &&
-            <Divider
-              sx={{
-                borderTop: `${theme.fixedSpacing(theme.tabiyaSpacing.xxs)} solid ${theme.palette.grey[300]}`,
-              }}
-              data-testid={DATA_TEST_ID.CHAT_MESSAGE_FOOTER_DIVIDER}
-            />
-        }
-        {
-          chatMessage.footerType !== undefined && getFooterFromType(chatMessage.footerType)
-        }
+        {chatMessage.footerType !== undefined && (
+          <Divider
+            sx={{
+              borderTop: `${theme.fixedSpacing(theme.tabiyaSpacing.xxs)} solid ${theme.palette.grey[300]}`,
+            }}
+            data-testid={DATA_TEST_ID.CHAT_MESSAGE_FOOTER_DIVIDER}
+          />
+        )}
+        {chatMessage.footerType !== undefined && getFooterFromType(chatMessage.footerType)}
       </MessageBubble>
       {!chatMessage.isTypingMessage && (
-          <TimeStamp data-testid={DATA_TEST_ID.CHAT_MESSAGE_TIMESTAMP} variant="caption">
-            sent {duration}
-          </TimeStamp>
+        <TimeStamp data-testid={DATA_TEST_ID.CHAT_MESSAGE_TIMESTAMP} variant="caption">
+          sent {duration}
+        </TimeStamp>
       )}
     </MessageContainer>
   );

@@ -92,7 +92,8 @@ describe("FeedbackFormService", () => {
             selected_options: [],
             comment: "This is a comment",
           },
-          is_answered: true,       },
+          is_answered: true,
+        },
       ];
       // AND the REST API will respond with CREATED status
       const expectedResponse = {
@@ -192,7 +193,7 @@ describe("FeedbackFormService", () => {
             selected_options: [],
             comment: "This is a comment",
           },
-          is_answered: true
+          is_answered: true,
         },
       ];
 
@@ -203,6 +204,5 @@ describe("FeedbackFormService", () => {
       // THEN expect it to throw an error
       await expect(service.sendFeedback(givenFeedbackData)).rejects.toThrow("User not found");
     });
-
   });
 });

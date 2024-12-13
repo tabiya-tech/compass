@@ -38,19 +38,16 @@ describe("writeFirebaseErrorToLog", () => {
     expect(mockLogFunction).toHaveBeenNthCalledWith(1, givenFireBaseError);
 
     // AND log function should have been called with the message and the error object
-    expect(mockLogFunction).toHaveBeenNthCalledWith(2,
-      "FirebaseError: service function auth/internal-error method",
-      {
-        serviceName: givenService,
-        serviceFunction: givenFunction,
-        method: givenMethod,
-        errorCode: givenErrorCode,
-        details: givenDetails,
-        message: givenMessage,
-        stack: givenFireBaseError.stack,
-        class: FirebaseError.name,
-      },
-    );
+    expect(mockLogFunction).toHaveBeenNthCalledWith(2, "FirebaseError: service function auth/internal-error method", {
+      serviceName: givenService,
+      serviceFunction: givenFunction,
+      method: givenMethod,
+      errorCode: givenErrorCode,
+      details: givenDetails,
+      message: givenMessage,
+      stack: givenFireBaseError.stack,
+      class: FirebaseError.name,
+    });
   });
 
   it("should call logFunction with ony one time if error is not instance of FirebaseError", () => {
@@ -103,19 +100,16 @@ describe("writeFirebaseErrorToLog", () => {
     expect(mockLogFunction).toHaveBeenNthCalledWith(1, givenFireBaseError);
 
     // AND log function should have been called with the message and the error object
-    expect(mockLogFunction).toHaveBeenNthCalledWith(2,
-      "FirebaseError: service function auth/internal-error method",
-      {
-        serviceName: givenService,
-        serviceFunction: givenFunction,
-        method: givenMethod,
-        errorCode: givenErrorCode,
-        details: givenDetails,
-        message: givenMessage,
-        stack: givenFireBaseError.stack,
-        customValue: givenCustomValue,
-        class: FirebaseError.name,
-      },
-    );
+    expect(mockLogFunction).toHaveBeenNthCalledWith(2, "FirebaseError: service function auth/internal-error method", {
+      serviceName: givenService,
+      serviceFunction: givenFunction,
+      method: givenMethod,
+      errorCode: givenErrorCode,
+      details: givenDetails,
+      message: givenMessage,
+      stack: givenFireBaseError.stack,
+      customValue: givenCustomValue,
+      class: FirebaseError.name,
+    });
   });
 });

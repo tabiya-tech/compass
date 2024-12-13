@@ -1,4 +1,4 @@
-import "src/_test_utilities/consoleMock"
+import "src/_test_utilities/consoleMock";
 
 import * as Sentry from "@sentry/react";
 import { initSentry } from "./sentryInit";
@@ -27,7 +27,7 @@ jest.mock("./envService", () => ({
 describe("sentryInit", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Setup default mock returns
     (getSentryDSN as jest.Mock).mockReturnValue("mock-dsn");
     (getBackendUrl as jest.Mock).mockReturnValue("https://api.example.com");
@@ -113,8 +113,12 @@ describe("sentryInit", () => {
     const givenUserPreferences = { sessions: ["foo-session"] };
     const givenAuthenticationState = { id: "foo-user" };
 
-    jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue(givenUserPreferences as unknown as UserPreference);
-    jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue(givenAuthenticationState as unknown as TabiyaUser);
+    jest
+      .spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences")
+      .mockReturnValue(givenUserPreferences as unknown as UserPreference);
+    jest
+      .spyOn(AuthenticationStateService.getInstance(), "getUser")
+      .mockReturnValue(givenAuthenticationState as unknown as TabiyaUser);
 
     // WHEN initSentry is called
     initSentry();

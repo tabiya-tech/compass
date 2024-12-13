@@ -65,7 +65,7 @@ describe("ChatList", () => {
         message: "Typing...",
         sent_at: new Date().toString(),
         isTypingMessage: true,
-      }// Simulate typing state
+      }, // Simulate typing state
     ];
     // AND a mock function to open the feedback form
     const givenNotifyOpenFeedbackForm = jest.fn();
@@ -125,7 +125,7 @@ describe("ChatList", () => {
         message: "Typing...",
         sent_at: new Date().toString(),
         isTypingMessage: true,
-      }
+      },
       // Simulate typing state
     ];
     // AND a mock function to open the feedback form
@@ -174,12 +174,7 @@ describe("ChatList", () => {
     const givenNotifyOpenFeedbackForm = jest.fn();
 
     // WHEN the chat header is rendered
-    render(
-      <ChatList
-        messages={givenMessages}
-        notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm}
-      />
-    );
+    render(<ChatList messages={givenMessages} notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm} />);
 
     // THEN expect the chat header to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();

@@ -143,7 +143,9 @@ describe("FeedbackForm", () => {
 
       // THEN expect an error message to be shown
       await waitFor(() => {
-        expect(console.error).toHaveBeenCalledWith(new FeedbackError("Failed to submit feedback", new Error("User has no sessions")));
+        expect(console.error).toHaveBeenCalledWith(
+          new FeedbackError("Failed to submit feedback", new Error("User has no sessions"))
+        );
       });
       // AND the snackbar to have been called
       await waitFor(() =>

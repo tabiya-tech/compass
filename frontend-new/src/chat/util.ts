@@ -11,7 +11,11 @@ export const generateUserMessage = (message: string, sent_at: string): IChatMess
   };
 };
 
-export const generateCompassMessage = (message: string, sent_at: string, isTypingMessage: boolean = false): IChatMessage => {
+export const generateCompassMessage = (
+  message: string,
+  sent_at: string,
+  isTypingMessage: boolean = false
+): IChatMessage => {
   return {
     id: nanoid(),
     sender: ConversationMessageSender.COMPASS,

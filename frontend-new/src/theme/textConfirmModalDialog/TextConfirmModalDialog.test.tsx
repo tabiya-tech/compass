@@ -19,7 +19,7 @@ describe("TextConfirmModalDialog", () => {
       { id: "001", text: "This is a sample body text for the TextConfirmModalDialog component." },
       { id: "002", text: "Are you sure you want to proceed?" },
     ];
-    
+
     const givenNewConversationDialog = (
       <TextConfirmModalDialog
         title={givenTitle}
