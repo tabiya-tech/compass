@@ -1,16 +1,22 @@
 import "src/_test_utilities/consoleMock";
 
 import * as ChatListModule from "./ChatList/ChatList";
+import { DATA_TEST_ID as CHAT_LIST_TEST_ID } from "./ChatList/ChatList";
 
 import Chat, { CHECK_INACTIVITY_INTERVAL, DATA_TEST_ID } from "./Chat";
 import { fireEvent, render, screen, waitFor } from "src/_test_utilities/test-utils";
 import { DATA_TEST_ID as CHAT_HEADER_TEST_ID, MENU_ITEM_ID } from "./ChatHeader/ChatHeader";
-import { DATA_TEST_ID as CHAT_LIST_TEST_ID } from "./ChatList/ChatList";
 import ChatMessageField, { DATA_TEST_ID as CHAT_MESSAGE_FIELD_TEST_ID } from "./ChatMessageField/ChatMessageField";
-import { DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID } from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
-import { DATA_TEST_ID as EXPERIENCES_DRAWER_CONTAINER_TEST_ID } from "src/experiences//experiencesDrawer/ExperiencesDrawer";
-import { DATA_TEST_ID as APPROVE_MODEL_TEST_ID } from "src/theme/ApproveModal/ApproveModal";
-import { DATA_TEST_ID as FEEDBACK_FORM_BUTTON_TEST_ID } from "src/feedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
+import {
+  DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID,
+} from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
+import {
+  DATA_TEST_ID as EXPERIENCES_DRAWER_CONTAINER_TEST_ID,
+} from "src/experiences//experiencesDrawer/ExperiencesDrawer";
+import { DATA_TEST_ID as APPROVE_MODAL_TEST_ID } from "src/theme/approveModal/ApproveModal";
+import {
+  DATA_TEST_ID as FEEDBACK_FORM_BUTTON_TEST_ID,
+} from "src/feedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
 import { DATA_TEST_ID as FEEDBACK_FORM_TEST_ID } from "src/feedback/feedbackForm/FeedbackForm";
 import { HashRouter } from "react-router-dom";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -22,13 +28,16 @@ import ExperienceService from "src/experiences/experiencesDrawer/experienceServi
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { act } from "@testing-library/react";
 import * as FirebaseAuthenticationServiceFactoryModule from "src/auth/services/Authentication.service.factory";
-import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
-import { DATA_TEST_ID as FEEDBACK_FORM_CONTENT_DATA_TEST_ID } from "src/feedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
+import FirebaseEmailAuthService
+  from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
+import {
+  DATA_TEST_ID as FEEDBACK_FORM_CONTENT_DATA_TEST_ID,
+} from "src/feedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
 import stepsContent from "src/feedback/feedbackForm/stepsContent";
 import FeedbackService from "src/feedback/feedbackForm/feedbackFormService/feedbackFormService";
 import { ChatError, FeedbackError, SessionError } from "src/error/commonErrors";
 import {
-  DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID
+  DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID,
 } from "src/feedback/feedbackForm/components/commentTextField/CommentTextField";
 
 // Mock the ChatService module
@@ -577,7 +586,7 @@ describe("Chat", () => {
       fireEvent.click(newConversationButton);
 
       // THEN expect the new conversation dialog to be shown
-      expect(screen.getByTestId(APPROVE_MODEL_TEST_ID.APPROVE_MODEL)).toBeInTheDocument();
+      expect(screen.getByTestId(APPROVE_MODAL_TEST_ID.APPROVE_MODAL)).toBeInTheDocument();
     });
 
     test("should close the new conversation dialog when the user clicks on the cancel button", async () => {
@@ -592,11 +601,11 @@ describe("Chat", () => {
       fireEvent.click(newConversationButton);
 
       // WHEN the cancel button is clicked
-      const cancelButton = screen.getByTestId(APPROVE_MODEL_TEST_ID.APPROVE_MODEL_CANCEL);
+      const cancelButton = screen.getByTestId(APPROVE_MODAL_TEST_ID.APPROVE_MODAL_CANCEL);
       fireEvent.click(cancelButton);
 
       // THEN expect the new conversation dialog to be closed
-      expect(screen.queryByTestId(APPROVE_MODEL_TEST_ID.APPROVE_MODEL)).not.toBeInTheDocument();
+      expect(screen.queryByTestId(APPROVE_MODAL_TEST_ID.APPROVE_MODAL)).not.toBeInTheDocument();
     });
 
     test("should start new conversation when the user clicks on the confirm button", async () => {
@@ -611,11 +620,11 @@ describe("Chat", () => {
       fireEvent.click(newConversationButton);
 
       // WHEN the confirm button is clicked
-      const confirmButton = screen.getByTestId(APPROVE_MODEL_TEST_ID.APPROVE_MODEL_CONFIRM);
+      const confirmButton = screen.getByTestId(APPROVE_MODAL_TEST_ID.APPROVE_MODAL_CONFIRM);
       fireEvent.click(confirmButton);
 
       // THEN expect the new conversation dialog to be closed
-      expect(screen.queryByTestId(APPROVE_MODEL_TEST_ID.APPROVE_MODEL)).not.toBeInTheDocument();
+      expect(screen.queryByTestId(APPROVE_MODAL_TEST_ID.APPROVE_MODAL)).not.toBeInTheDocument();
     });
   });
 
@@ -712,8 +721,7 @@ describe("Chat", () => {
     test("should log the same error that the service throws when sending feedback fails", async () => {
       // mock the sendFeedback method
       const givenError = new Error("Failed to send feedback");
-      const mockSendFeedback = jest.fn().mockRejectedValue(givenError);
-      (FeedbackService as jest.Mocked<typeof FeedbackService>).prototype.sendFeedback = mockSendFeedback;
+      (FeedbackService as jest.Mocked<typeof FeedbackService>).prototype.sendFeedback = jest.fn().mockRejectedValue(givenError);
       // GIVEN a chat component
       render(
         <HashRouter>
