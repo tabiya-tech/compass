@@ -2,7 +2,7 @@
 import "src/_test_utilities/consoleMock";
 
 import { render, screen, waitFor } from "src/_test_utilities/test-utils";
-import BugReportButton, { DATA_TEST_ID } from "src/feedback/bugReportButton/BugReportButton";
+import BugReportButton, { DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import * as Sentry from "@sentry/react";
 import { useMediaQuery } from "@mui/material";
 

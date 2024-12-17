@@ -13,7 +13,7 @@ import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceErro
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
-import BugReportButton from "src/feedback/bugReportButton/BugReportButton";
+import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import FirebaseSocialAuthenticationService from "src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
@@ -144,7 +144,11 @@ const Register: React.FC = () => {
 
   return (
     <>
-      <Container maxWidth="xs" sx={{ height: "100%", padding: theme.fixedSpacing(theme.tabiyaSpacing.lg) }} data-testid={DATA_TEST_ID.REGISTER_CONTAINER}>
+      <Container
+        maxWidth="xs"
+        sx={{ height: "100%", padding: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}
+        data-testid={DATA_TEST_ID.REGISTER_CONTAINER}
+      >
         <Box
           display="flex"
           flexDirection="column"

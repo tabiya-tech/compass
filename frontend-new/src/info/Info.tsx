@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Box, Skeleton, Typography, useTheme } from "@mui/material";
 import InfoService from "src/info/info.service";
-import BugReportButton from "src/feedback/bugReportButton/BugReportButton";
+import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
 
 const uniqueId = "37d307ae-4f1e-4d8d-bafe-fd642f8af4dc";
 export const DATA_TEST_ID = {

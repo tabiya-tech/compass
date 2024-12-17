@@ -22,7 +22,7 @@ import { StyledAnchor } from "src/theme/StyledAnchor/StyledAnchor";
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import { Gender, SensitivePersonalData } from "src/sensitiveData/types";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import BugReportButton from "src/feedback/bugReportButton/BugReportButton";
+import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";

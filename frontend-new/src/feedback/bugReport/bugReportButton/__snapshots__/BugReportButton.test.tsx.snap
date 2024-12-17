@@ -3,12 +3,12 @@
 exports[`BugReportButton component should render the bugReport button 1`] = `
 <div
   class="MuiBox-root css-ts3wbc"
-  data-testid="feedback-button-container-31d2b110-8308-4035-90a6-519e89e7f6fa"
+  data-testid="bug-report-button-container-31d2b110-8308-4035-90a6-519e89e7f6fa"
 >
    
   <button
     class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
-    data-testid="feedback-button-31d2b110-8308-4035-90a6-519e89e7f6fa"
+    data-testid="bug-report-button-31d2b110-8308-4035-90a6-519e89e7f6fa"
     tabindex="0"
     title="Report a bug."
     type="button"
@@ -19,7 +19,7 @@ exports[`BugReportButton component should render the bugReport button 1`] = `
       <svg
         aria-hidden="true"
         class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
-        data-testid="feedback-icon-31d2b110-8308-4035-90a6-519e89e7f6fa"
+        data-testid="bug-report-icon-31d2b110-8308-4035-90a6-519e89e7f6fa"
         focusable="false"
         viewBox="0 0 24 24"
       >
