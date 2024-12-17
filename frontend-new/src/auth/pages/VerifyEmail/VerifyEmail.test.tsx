@@ -30,6 +30,16 @@ jest.mock("src/auth/components/AuthHeader/AuthHeader", () => {
   };
 });
 
+// mock the bugReport component
+jest.mock("src/feedback/bugReport/bugReportButton/BugReportButton", () => {
+  return {
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return <div data-testid="bug-report"></div>;
+    }),
+  };
+});
+
 describe("Testing Verify Email component", () => {
   beforeEach(() => {
     // Clear console mocks and mock functions
