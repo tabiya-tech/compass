@@ -69,9 +69,10 @@ describe("ChatList", () => {
     ];
     // AND a mock function to open the feedback form
     const givenNotifyOpenFeedbackForm = jest.fn();
+    const givenOnReactionChange = jest.fn();
 
     // WHEN the chat header is rendered
-    render(<ChatList messages={givenMessages} notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm} />);
+    render(<ChatList messages={givenMessages} notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm} notifyReactionChange={givenOnReactionChange} />);
 
     // THEN expect the chat header to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
@@ -82,6 +83,7 @@ describe("ChatList", () => {
       {
         chatMessage: givenMessages[0],
         notifyOpenFeedbackForm: givenNotifyOpenFeedbackForm,
+        notifyReactionChange: givenOnReactionChange,
       },
       {}
     );
@@ -90,6 +92,7 @@ describe("ChatList", () => {
       {
         chatMessage: givenMessages[1],
         notifyOpenFeedbackForm: givenNotifyOpenFeedbackForm,
+        notifyReactionChange: givenOnReactionChange,
       },
       {}
     );
@@ -105,6 +108,7 @@ describe("ChatList", () => {
           isTypingMessage: true,
         },
         notifyOpenFeedbackForm: givenNotifyOpenFeedbackForm,
+        notifyReactionChange: givenOnReactionChange
       },
       {}
     );
@@ -130,9 +134,10 @@ describe("ChatList", () => {
     ];
     // AND a mock function to open the feedback form
     const givenNotifyOpenFeedbackForm = jest.fn();
+    const givenOnReactionChange = jest.fn();
 
     // WHEN the chat header is rendered
-    render(<ChatList messages={givenMessages} notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm} />);
+    render(<ChatList messages={givenMessages} notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm} notifyReactionChange={givenOnReactionChange} />);
 
     // THEN expect the chat header to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
@@ -149,6 +154,7 @@ describe("ChatList", () => {
           isTypingMessage: true,
         },
         notifyOpenFeedbackForm: givenNotifyOpenFeedbackForm,
+        notifyReactionChange: givenOnReactionChange
       },
       {}
     );
@@ -172,9 +178,10 @@ describe("ChatList", () => {
       },
     ];
     const givenNotifyOpenFeedbackForm = jest.fn();
+    const givenOnReactionChange = jest.fn();
 
     // WHEN the chat header is rendered
-    render(<ChatList messages={givenMessages} notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm} />);
+    render(<ChatList messages={givenMessages} notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm} notifyReactionChange={givenOnReactionChange} />);
 
     // THEN expect the chat header to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
@@ -191,6 +198,7 @@ describe("ChatList", () => {
           isFeedbackMessage: true,
         },
         notifyOpenFeedbackForm: givenNotifyOpenFeedbackForm,
+        notifyReactionChange: givenOnReactionChange
       },
       {}
     );

@@ -272,6 +272,7 @@ describe("Chat", () => {
               },
             ],
             notifyOpenFeedbackForm: expect.any(Function),
+            notifyReactionChange: expect.any(Function),
           },
           {}
         );
@@ -308,6 +309,7 @@ describe("Chat", () => {
                 isTypingMessage: false, // the isTypingMessage is not part of the given messages
               })),
               notifyOpenFeedbackForm: expect.any(Function),
+              notifyReactionChange: expect.any(Function),
             },
             {}
           );

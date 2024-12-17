@@ -41,10 +41,11 @@ describe("render tests", () => {
       isTypingMessage: false,
     };
     const givenNotifyOpenFeedbackForm = jest.fn();
+    const givenOnReactionChange = jest.fn();
 
     jest.spyOn(GetDurationFromNow, "getDurationFromNow").mockReturnValue("Some Date");
 
-    render(<ChatMessage chatMessage={givenMessage} notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm} />);
+    render(<ChatMessage chatMessage={givenMessage} notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm} notifyReactionChange={givenOnReactionChange} />);
 
     // THEN expect the chat header to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_CONTAINER)).toBeInTheDocument();
@@ -72,8 +73,9 @@ describe("render tests", () => {
       isTypingMessage: true,
     };
     const givenNotifyOpenFeedbackForm = jest.fn();
+    const givenOnReactionChange = jest.fn();
 
-    render(<ChatMessage chatMessage={givenMessage} notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm} />);
+    render(<ChatMessage chatMessage={givenMessage} notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm} notifyReactionChange={givenOnReactionChange} />);
 
     // THEN expect the chat header to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_CONTAINER)).toBeInTheDocument();
@@ -92,9 +94,10 @@ describe("render tests", () => {
       footerType: ChatMessageFooterType.FEEDBACK_FORM_BUTTON,
     };
     const givenNotifyOpenFeedbackForm = jest.fn();
+    const givenOnReactionChange = jest.fn();
 
     // WHEN the component is rendered
-    render(<ChatMessage chatMessage={givenMessage} notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm} />);
+    render(<ChatMessage chatMessage={givenMessage} notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm} notifyReactionChange={givenOnReactionChange} />);
 
     // THEN expect the divider to be displayed
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FOOTER_DIVIDER)).toBeInTheDocument();

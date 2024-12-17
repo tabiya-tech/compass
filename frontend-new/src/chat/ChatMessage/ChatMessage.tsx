@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Box, Typography, styled, alpha, Divider, useTheme } from "@mui/material";
 import { IChatMessage } from "src/chat/Chat.types";
 import { getDurationFromNow } from "src/utils/getDurationFromNow/getDurationFromNow";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import FeedbackFormButton from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
+import { ReactionType } from 'src/feedback/reaction/reaction.types';
 
 export enum ChatMessageFooterType {
   FEEDBACK_FORM_BUTTON = "feedback-form-button",
@@ -51,9 +52,10 @@ const TimeStamp = styled(Typography)(({ theme }) => ({
 type ChatMessageProps = {
   chatMessage: IChatMessage;
   notifyOpenFeedbackForm: () => void;
+  notifyReactionChange: (messageId: string, reaction: ReactionType) => void;
 };
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage, notifyOpenFeedbackForm }) => {
+const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage, notifyOpenFeedbackForm, notifyReactionChange }) => {
   const theme = useTheme();
 
   let duration;
@@ -62,6 +64,15 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage, notifyOpenFeedba
   } catch (e) {
     console.error(new Error("Failed to get message duration", { cause: e }));
   }
+
+  const shouldShowReactions = useMemo(() => {
+    return (
+      chatMessage.sender === ConversationMessageSender.COMPASS &&
+      !chatMessage.isTypingMessage &&
+      !chatMessage.footerType
+    );
+  }, [chatMessage.sender, chatMessage.isTypingMessage, chatMessage.footerType]);
+
   const getFooterFromType = (type: ChatMessageFooterType) => {
     switch (type) {
       case ChatMessageFooterType.FEEDBACK_FORM_BUTTON:
@@ -70,6 +81,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage, notifyOpenFeedba
         return null;
     }
   };
+
   return (
     <MessageContainer origin={chatMessage.sender} data-testid={DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}>
       <MessageBubble origin={chatMessage.sender}>
@@ -83,10 +95,19 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage, notifyOpenFeedba
         )}
         {chatMessage.footerType !== undefined && getFooterFromType(chatMessage.footerType)}
       </MessageBubble>
+
+
       {!chatMessage.isTypingMessage && (
-        <TimeStamp data-testid={DATA_TEST_ID.CHAT_MESSAGE_TIMESTAMP} variant="caption">
-          sent {duration}
-        </TimeStamp>
+        <>
+          {shouldShowReactions && (
+            <>
+            {/*  this is where the chatMessage reaction component should go */}
+            </>
+          )}
+          <TimeStamp data-testid={DATA_TEST_ID.CHAT_MESSAGE_TIMESTAMP} variant="caption">
+            sent {duration}
+          </TimeStamp>
+        </>
       )}
     </MessageContainer>
   );
