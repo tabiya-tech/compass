@@ -10,6 +10,7 @@ import stepsContent from "src/feedback/feedbackForm/stepsContent";
 import StepsComponent from "src/feedback/feedbackForm/components/stepsComponent/StepsComponent";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { FeedbackItem } from "src/feedback/feedbackForm/feedbackFormService/feedbackFormService.types";
+import SecondaryButton from "src/theme/CancelButton/SecondaryButton";
 
 interface FeedbackFormContentProps {
   notifySubmit: (formData: FeedbackItem[]) => void;
@@ -125,15 +126,14 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
           </PrimaryButton>
         }
         backButton={
-          <PrimaryButton
+          <SecondaryButton
             variant="text"
             onClick={handlePrevious}
             disabled={activeStep === 0}
-            sx={{ color: theme.palette.common.black, width: 100 }}
             data-testid={DATA_TEST_ID.FEEDBACK_FORM_BACK_BUTTON}
           >
             Previous
-          </PrimaryButton>
+          </SecondaryButton>
         }
         sx={{ height: "50px", paddingX: 0 }}
       />
