@@ -1,6 +1,16 @@
 import { render, screen } from "src/_test_utilities/test-utils";
 import ErrorPage, { DATA_TEST_ID } from "src/error/errorPage/ErrorPage";
 
+// mock the bugReport component
+jest.mock("src/feedback/bugReport/bugReportButton/BugReportButton", () => {
+  return {
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return <div data-testid="bug-report"></div>;
+    }),
+  };
+});
+
 describe("ErrorPage", () => {
   test("ErrorPage renders correctly", () => {
     // GIVEN an error message

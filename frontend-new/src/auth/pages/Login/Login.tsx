@@ -15,7 +15,7 @@ import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
 import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
-import BugReportButton from "src/feedback/bugReportButton/BugReportButton";
+import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import FirebaseInvitationCodeAuthenticationService from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
 import { AuthenticationError } from "src/error/commonErrors";
 

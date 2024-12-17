@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import BugReportButton from "src/feedback/bugReportButton/BugReportButton";
+import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
 
 const meta: Meta<typeof BugReportButton> = {
   title: "Components/BugReportButton",

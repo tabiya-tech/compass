@@ -15,6 +15,16 @@ jest.mock("./info.service", () => {
   return mockInfoService;
 });
 
+// mock the bugReport component
+jest.mock("src/feedback/bugReport/bugReportButton/BugReportButton", () => {
+  return {
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return <div data-testid="bug-report"></div>;
+    }),
+  };
+});
+
 describe("Testing Info component", () => {
   test("it should show frontend info successfully", async () => {
     // GIVEN some frontend and backend info data are available and loaded
