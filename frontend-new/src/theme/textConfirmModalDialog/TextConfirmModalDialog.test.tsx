@@ -4,7 +4,7 @@ import "src/_test_utilities/consoleMock";
 import { render, screen } from "src/_test_utilities/test-utils";
 import React from "react";
 import TextConfirmModalDialog, { DATA_TEST_ID } from "src/theme/textConfirmModalDialog/TextConfirmModalDialog";
-import { DATA_TEST_ID as APPROVAL_MODAL_TEST_ID } from "src/theme/approveModal/ApproveModal";
+import { DATA_TEST_ID as APPROVAL_MODAL_TEST_ID } from "src/theme/confirmModalDialog/ConfirmModalDialog";
 
 describe("TextConfirmModalDialog", () => {
   test("should render component correctly with expected content and handle interactions", () => {
@@ -26,9 +26,9 @@ describe("TextConfirmModalDialog", () => {
         textParagraphs={givenTextParagraphs}
         isOpen={givenIsOpen}
         onCancel={givenOnCancel}
-        onApprove={givenOnApprove}
+        onConfirm={givenOnApprove}
         cancelButtonText={givenCancelButtonText}
-        approveButtonText={givenApproveButtonText}
+        confirmButtonText={givenApproveButtonText}
       />
     );
 
@@ -40,7 +40,7 @@ describe("TextConfirmModalDialog", () => {
     expect(console.warn).not.toHaveBeenCalled();
 
     // AND dialog title should have the correct text
-    const titleElement = screen.getByTestId(APPROVAL_MODAL_TEST_ID.APPROVE_MODAL_TITLE);
+    const titleElement = screen.getByTestId(APPROVAL_MODAL_TEST_ID.CONFIRM_MODAL_TITLE);
     expect(titleElement).toHaveTextContent(givenTitle);
 
     // AND paragraphs should have the correct text
@@ -51,8 +51,8 @@ describe("TextConfirmModalDialog", () => {
     });
 
     // AND buttons should have the correct text
-    const cancelButton = screen.getByTestId(APPROVAL_MODAL_TEST_ID.APPROVE_MODAL_CANCEL);
-    const confirmButton = screen.getByTestId(APPROVAL_MODAL_TEST_ID.APPROVE_MODAL_CONFIRM);
+    const cancelButton = screen.getByTestId(APPROVAL_MODAL_TEST_ID.CONFIRM_MODAL_CANCEL);
+    const confirmButton = screen.getByTestId(APPROVAL_MODAL_TEST_ID.CONFIRM_MODAL_CONFIRM);
     expect(cancelButton).toHaveTextContent(givenCancelButtonText);
     expect(confirmButton).toHaveTextContent(givenApproveButtonText);
 
@@ -67,7 +67,7 @@ describe("TextConfirmModalDialog", () => {
     expect(givenOnApprove).toHaveBeenCalledTimes(1);
 
     // AND dialog should match the snapshot
-    const dialogContainer = screen.getByTestId(APPROVAL_MODAL_TEST_ID.APPROVE_MODAL);
+    const dialogContainer = screen.getByTestId(APPROVAL_MODAL_TEST_ID.CONFIRM_MODAL);
     expect(dialogContainer).toMatchSnapshot();
   });
 });

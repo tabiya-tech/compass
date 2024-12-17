@@ -19,7 +19,7 @@ import { Experience } from "src/experiences/experiencesDrawer/experienceService/
 import ExperienceService from "src/experiences/experiencesDrawer/experienceService/experienceService";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import InactiveBackdrop from "src/theme/Backdrop/InactiveBackdrop";
-import ApproveModal from "src/theme/approveModal/ApproveModal";
+import ConfirmModalDialog from "src/theme/confirmModalDialog/ConfirmModalDialog";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 import FeedbackForm from "src/feedback/feedbackForm/FeedbackForm";
@@ -437,7 +437,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
             conversationConductedAt={conversationConductedAt}
           />
           {newConversationDialog && (
-            <ApproveModal
+            <ConfirmModalDialog
               isOpen={newConversationDialog}
               title="Start New Conversation?"
               content={
@@ -449,9 +449,9 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
                 </>
               }
               onCancel={() => handleNewConversationDialogToggle(false)}
-              onApprove={handleConfirmNewConversation}
+              onConfirm={handleConfirmNewConversation}
               cancelButtonText="Cancel"
-              approveButtonText="Yes, I'm sure"
+              confirmButtonText="Yes, I'm sure"
             />
           )}
           <FeedbackForm

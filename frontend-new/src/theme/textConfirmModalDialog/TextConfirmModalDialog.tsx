@@ -1,14 +1,14 @@
 import React from "react";
 import { Theme } from "@mui/material/styles";
 import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
-import ApproveModal, { ApproveModalProps } from "src/theme/approveModal/ApproveModal";
+import ConfirmModalDialog, { ConfirmModalDialogProps } from "src/theme/confirmModalDialog/ConfirmModalDialog";
 
 export interface TextConfirmModalParagraph {
   id: string;
   text: string;
 }
 
-export interface TextConfirmModalDialogProps extends Omit<ApproveModalProps, "content"> {
+export interface TextConfirmModalDialogProps extends Omit<ConfirmModalDialogProps, "content"> {
   textParagraphs: TextConfirmModalParagraph[];
 }
 
@@ -29,6 +29,7 @@ const TextConfirmModalDialog: React.FC<TextConfirmModalDialogProps> = (props) =>
       flexDirection="column"
       gap={isSmallMobile ? theme.tabiyaSpacing.lg : theme.tabiyaSpacing.md}
       data-testid={DATA_TEST_ID.TEXT_CONFIRM_MODAL_CONTENT}
+      tabIndex={0}
     >
       {props.textParagraphs.map((paragraph, _index) => (
         <Typography key={paragraph.id} variant="body1" data-testid={DATA_TEST_ID.TEXT_CONFIRM_MODAL_PARAGRAPH}>
@@ -38,7 +39,7 @@ const TextConfirmModalDialog: React.FC<TextConfirmModalDialogProps> = (props) =>
     </Box>
   );
 
-  return <ApproveModal {...props} content={content} />;
+  return <ConfirmModalDialog {...props} content={content} />;
 };
 
 export default TextConfirmModalDialog;
