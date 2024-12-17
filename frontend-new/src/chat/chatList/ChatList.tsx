@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ConversationConclusionChatMessage
   from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
+import { ReactionType } from "src/feedback/reaction/reaction.types";
 
 const uniqueId = "0397ee51-f637-4453-9e2f-5cc8900c9554";
 export const DATA_TEST_ID = {
@@ -16,6 +17,7 @@ export const DATA_TEST_ID = {
 export type ChatListProps = {
   messages: IChatMessage[];
   notifyOnFeedbackFormOpened: () => void;
+  notifyReactionChange: (messageId: string, reaction: ReactionType) => void;
 };
 
 const ChatListContainer = styled(Box)(({ theme }) => ({
@@ -31,7 +33,7 @@ const ChatListContainer = styled(Box)(({ theme }) => ({
   },
 }));
 
-const ChatList: React.FC<ChatListProps> = ({ messages, notifyOnFeedbackFormOpened }) => {
+const ChatList: React.FC<ChatListProps> = ({ messages, notifyOnFeedbackFormOpened, notifyReactionChange }) => {
   const theme = useTheme();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -63,7 +65,7 @@ const ChatList: React.FC<ChatListProps> = ({ messages, notifyOnFeedbackFormOpene
     window.addEventListener("resize", resizeChatMessage);
     return () => window.removeEventListener("resize", resizeChatMessage);
   }, []);
-  
+
   const getChatMessageFlavorFromType = (chatMessage: IChatMessage)  => {
     switch (chatMessage.type) {
       case ChatMessageType.BASIC_CHAT:

@@ -25,6 +25,7 @@ import FeedbackForm from "src/feedback/overallFeedback/feedbackForm/FeedbackForm
 import { ChatError } from "src/error/commonErrors";
 import { ChatMessageType } from "src/chat/Chat.types"
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
+import { ReactionType } from "src/feedback/reaction/reaction.types";
 import { nanoid } from "nanoid";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
@@ -399,6 +400,10 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     addOrRemoveTypingMessage(isTyping);
   }, [isTyping]);
 
+  const handleReactionChange = useCallback(async (messageId: string, reaction: ReactionType) => {
+    console.log("handleReactionChange", messageId, reaction);
+  }, []);
+
   return (
     <>
       {isLoggingOut ? (
@@ -424,7 +429,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
               />
             </Box>
             <Box sx={{ flex: 1, overflowY: "auto", paddingX: theme.tabiyaSpacing.lg }}>
-              <ChatList messages={messages} notifyOnFeedbackFormOpened={() => setIsFeedbackFormOpen(true)} />
+              <ChatList messages={messages} notifyOnFeedbackFormOpened={() => setIsFeedbackFormOpen(true)} notifyReactionChange={handleReactionChange} />
             </Box>
             {showBackdrop && <InactiveBackdrop isShown={showBackdrop} />}
             <Box sx={{ flexShrink: 0, padding: theme.tabiyaSpacing.lg, paddingTop: theme.tabiyaSpacing.xs }}>

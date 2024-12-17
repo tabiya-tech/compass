@@ -1,4 +1,5 @@
 import { ConversationMessage } from "./ChatService/ChatService.types";
+import { ReactionType } from "src/feedback/reaction/reaction.types";
 
 export enum ChatMessageType {
   BASIC_CHAT = "basic_chat",
@@ -8,4 +9,5 @@ export enum ChatMessageType {
 
 export type IChatMessage = ConversationMessage & {
   type: ChatMessageType;
+  reaction?: ReactionType;
 };
