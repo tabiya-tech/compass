@@ -3,28 +3,29 @@ import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { Dialog, DialogActions, DialogContent, DialogTitle, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
+import SecondaryButton from "src/theme/CancelButton/SecondaryButton";
 
-export interface ApproveModalProps {
+export interface ConfirmModalDialogProps {
   title: string;
   content: React.ReactElement;
   isOpen: boolean;
   onCancel: () => void;
-  onApprove: () => void;
+  onConfirm: () => void;
   cancelButtonText: string;
-  approveButtonText: string;
+  confirmButtonText: string;
 }
 
 const uniqueId = "edc0ac15-67a7-4c1f-9934-94fa65757046";
 
 export const DATA_TEST_ID = {
-  APPROVE_MODAL: `approve-modal-${uniqueId}`,
-  APPROVE_MODAL_TITLE: `approve-modal-title-${uniqueId}`,
-  APPROVE_MODAL_CONTENT: `approve-modal-content-${uniqueId}`,
-  APPROVE_MODAL_CANCEL: `approve-modal-cancel-${uniqueId}`,
-  APPROVE_MODAL_CONFIRM: `approve-modal-confirm-${uniqueId}`,
+  CONFIRM_MODAL: `confirm-modal-${uniqueId}`,
+  CONFIRM_MODAL_TITLE: `confirm-modal-title-${uniqueId}`,
+  CONFIRM_MODAL_CONTENT: `confirm-modal-content-${uniqueId}`,
+  CONFIRM_MODAL_CANCEL: `confirm-modal-cancel-${uniqueId}`,
+  CONFIRM_MODAL_CONFIRM: `confirm-modal-confirm-${uniqueId}`,
 };
 
-const ApproveModal: React.FC<ApproveModalProps> = (props) => {
+const ConfirmModalDialog: React.FC<ConfirmModalDialogProps> = (props) => {
   const theme = useTheme();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
 
@@ -32,8 +33,8 @@ const ApproveModal: React.FC<ApproveModalProps> = (props) => {
     <Dialog
       open={props.isOpen}
       onClose={props.onCancel}
-      aria-labelledby="approve-modal"
-      data-testid={DATA_TEST_ID.APPROVE_MODAL}
+      aria-labelledby="confirm-modal"
+      data-testid={DATA_TEST_ID.CONFIRM_MODAL}
       PaperProps={{
         sx: {
           display: "flex",
@@ -44,29 +45,27 @@ const ApproveModal: React.FC<ApproveModalProps> = (props) => {
         },
       }}
     >
-      <DialogTitle id="approve-modal-title" data-testid={DATA_TEST_ID.APPROVE_MODAL_TITLE} sx={{ padding: 0 }}>
+      <DialogTitle id="confirm-modal-title" data-testid={DATA_TEST_ID.CONFIRM_MODAL_TITLE} sx={{ padding: 0 }}>
         <Typography variant="h6" component="span">
           {props.title}
         </Typography>
       </DialogTitle>
-      <DialogContent data-testid={DATA_TEST_ID.APPROVE_MODAL_CONTENT} sx={{ padding: 0 }}>
+      <DialogContent data-testid={DATA_TEST_ID.CONFIRM_MODAL_CONTENT} sx={{ padding: 0 }}>
         {props.content}
       </DialogContent>
       <DialogActions sx={{ padding: 0 }}>
-        <PrimaryButton
-          variant="text"
+        <SecondaryButton
           onClick={props.onCancel}
-          sx={{ color: theme.palette.text.secondary }}
-          data-testid={DATA_TEST_ID.APPROVE_MODAL_CANCEL}
+          data-testid={DATA_TEST_ID.CONFIRM_MODAL_CANCEL}
         >
           {props.cancelButtonText}
-        </PrimaryButton>
-        <PrimaryButton onClick={props.onApprove} data-testid={DATA_TEST_ID.APPROVE_MODAL_CONFIRM}>
-          {props.approveButtonText}
+        </SecondaryButton>
+        <PrimaryButton onClick={props.onConfirm} data-testid={DATA_TEST_ID.CONFIRM_MODAL_CONFIRM}>
+          {props.confirmButtonText}
         </PrimaryButton>
       </DialogActions>
     </Dialog>
   );
 };
 
-export default ApproveModal;
+export default ConfirmModalDialog;
