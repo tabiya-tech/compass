@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import ChatMessage from "./ChatMessage";
+import ChatMessage, { ChatMessageFooterType } from "./ChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
 
@@ -81,6 +81,7 @@ export const ShownWithDifferentTimestamps: Story = {
           message: "sent just now",
         }}
         notifyOpenFeedbackForm={() => {}}
+        notifyReactionChange={() => {}}
       />
       <ChatMessage
         chatMessage={{
@@ -90,6 +91,7 @@ export const ShownWithDifferentTimestamps: Story = {
           message: "sent an hour ago",
         }}
         notifyOpenFeedbackForm={() => {}}
+        notifyReactionChange={() => {}}
       />
       <ChatMessage
         chatMessage={{
@@ -99,6 +101,7 @@ export const ShownWithDifferentTimestamps: Story = {
           message: "sent yesterday",
         }}
         notifyOpenFeedbackForm={() => {}}
+        notifyReactionChange={() => {}}
       />
       <ChatMessage
         chatMessage={{
@@ -108,6 +111,7 @@ export const ShownWithDifferentTimestamps: Story = {
           message: "sent two days ago",
         }}
         notifyOpenFeedbackForm={() => {}}
+        notifyReactionChange={() => {}}
       />
       <ChatMessage
         chatMessage={{
@@ -117,6 +121,7 @@ export const ShownWithDifferentTimestamps: Story = {
           message: "sent a week ago",
         }}
         notifyOpenFeedbackForm={() => {}}
+        notifyReactionChange={() => {}}
       />
       <ChatMessage
         chatMessage={{
@@ -126,6 +131,7 @@ export const ShownWithDifferentTimestamps: Story = {
           message: "sent a month ago",
         }}
         notifyOpenFeedbackForm={() => {}}
+        notifyReactionChange={() => {}}
       />
       <ChatMessage
         chatMessage={{
@@ -135,7 +141,31 @@ export const ShownWithDifferentTimestamps: Story = {
           message: "sent a year ago",
         }}
         notifyOpenFeedbackForm={() => {}}
+        notifyReactionChange={() => {}}
       />
     </>
   ),
+};
+
+export const WithFeedbackFormButton: Story = {
+  args: {
+    chatMessage: {
+      id: nanoid(),
+      sender: ConversationMessageSender.COMPASS,
+      sent_at: new Date().toISOString(),
+      message: "Hello, I'm Compass",
+      footerType: ChatMessageFooterType.FEEDBACK_FORM_BUTTON,
+    },
+  },
+};
+
+export const WithReactions: Story = {
+  args: {
+    chatMessage: {
+      id: nanoid(),
+      sender: ConversationMessageSender.COMPASS,
+      sent_at: new Date().toISOString(),
+      message: "Hello, I'm Compass",
+    },
+  },
 };

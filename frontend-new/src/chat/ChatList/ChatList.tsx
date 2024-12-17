@@ -4,6 +4,7 @@ import { Box, List, ListItem, useTheme } from "@mui/material";
 import { styled } from "@mui/system";
 import ChatMessage from "src/chat/ChatMessage/ChatMessage";
 import { motion, AnimatePresence } from "framer-motion";
+import { ReactionType } from "src/feedback/reaction/reaction.types";
 
 const uniqueId = "0397ee51-f637-4453-9e2f-5cc8900c9554";
 export const DATA_TEST_ID = {
@@ -13,6 +14,7 @@ export const DATA_TEST_ID = {
 export type ChatListProps = {
   messages: IChatMessage[];
   notifyOpenFeedbackForm: () => void;
+  notifyReactionChange: (messageId: string, reaction: ReactionType) => void;
 };
 
 const ChatListContainer = styled(Box)(({ theme }) => ({
@@ -28,7 +30,7 @@ const ChatListContainer = styled(Box)(({ theme }) => ({
   },
 }));
 
-const ChatList: React.FC<ChatListProps> = ({ messages, notifyOpenFeedbackForm }) => {
+const ChatList: React.FC<ChatListProps> = ({ messages, notifyOpenFeedbackForm, notifyReactionChange }) => {
   const theme = useTheme();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -84,7 +86,7 @@ const ChatList: React.FC<ChatListProps> = ({ messages, notifyOpenFeedbackForm })
               transition={{ duration: 0.3 }}
               sx={{ width: "100%", padding: theme.tabiyaSpacing.xs }}
             >
-              <ChatMessage chatMessage={message} notifyOpenFeedbackForm={notifyOpenFeedbackForm} />
+              <ChatMessage chatMessage={message} notifyOpenFeedbackForm={notifyOpenFeedbackForm} notifyReactionChange={notifyReactionChange} />
             </ListItem>
           ))}
         </AnimatePresence>
