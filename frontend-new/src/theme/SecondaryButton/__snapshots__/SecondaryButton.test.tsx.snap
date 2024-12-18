@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Secondary Button tests should render the primary button with custom props 1`] = `
+<div
+  data-testid="foo"
+>
+   
+  Bar
+</div>
+`;

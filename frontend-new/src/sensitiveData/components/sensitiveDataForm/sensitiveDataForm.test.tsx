@@ -10,7 +10,7 @@ import { getRandomString, getTestString, WHITESPACE } from "src/_test_utilities/
 
 import SensitiveDataForm, { DATA_TEST_ID, ERROR_MESSAGE } from "./SensitiveDataForm";
 import { DATA_TEST_ID as BACKDROP_DATA_TEST_IDS } from "src/theme/Backdrop/Backdrop";
-import { DATA_TEST_ID as APPROVE_MODAL_DATA_TEST_IDS } from "src/theme/approveModal/ApproveModal";
+import { DATA_TEST_ID as CONFIRM_MODAL_DATA_TEST_IDS } from "src/theme/confirmModalDialog/ConfirmModalDialog";
 
 import { routerPaths } from "src/app/routerPaths";
 import * as serviceErrorModule from "src/error/ServiceError/ServiceError";
@@ -205,7 +205,7 @@ describe("Sensitive Data", () => {
       expect(screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_REJECT_BUTTON)).toBeInTheDocument();
 
       // AND the approval modal should not be rendered
-      expect(screen.queryByTestId(APPROVE_MODAL_DATA_TEST_IDS.APPROVE_MODAL)).not.toBeInTheDocument();
+      expect(screen.queryByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL)).not.toBeInTheDocument();
 
       // AND the backdrop should not be rendered
       expect(screen.queryByTestId(BACKDROP_DATA_TEST_IDS.BACKDROP_CONTAINER)).not.toBeVisible();
@@ -340,7 +340,7 @@ describe("Sensitive Data", () => {
       await user.click(rejectButton);
 
       // AND the user approves the action
-      await user.click(screen.getByTestId(APPROVE_MODAL_DATA_TEST_IDS.APPROVE_MODAL_CONFIRM));
+      await user.click(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL_CONFIRM));
 
       // THEN the button should be disabled
       await waitFor(() => expect(rejectButton).toHaveAttribute("aria-disabled", "true"));
@@ -380,13 +380,13 @@ describe("Sensitive Data", () => {
       await user.click(rejectButton);
 
       // Guard: the approval dialog is shown
-      expect(screen.getByTestId(APPROVE_MODAL_DATA_TEST_IDS.APPROVE_MODAL)).toBeVisible();
+      expect(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL)).toBeVisible();
 
       // AND the clicks on the cancel button on the confirm dialog.
-      await user.click(screen.getByTestId(APPROVE_MODAL_DATA_TEST_IDS.APPROVE_MODAL_CANCEL));
+      await user.click(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL_CANCEL));
 
       // THEN the approval modal should be closed
-      await waitFor(() => expect(screen.queryByTestId(APPROVE_MODAL_DATA_TEST_IDS.APPROVE_MODAL)).not.toBeInTheDocument());
+      await waitFor(() => expect(screen.queryByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL)).not.toBeInTheDocument());
 
       // AND the reject button should be enabled
       expect(rejectButton).toHaveAttribute("aria-disabled", "false");
@@ -417,7 +417,7 @@ describe("Sensitive Data", () => {
       await user.click(rejectButton);
 
       // AND the user approves the action
-      await user.click(screen.getByTestId(APPROVE_MODAL_DATA_TEST_IDS.APPROVE_MODAL_CONFIRM));
+      await user.click(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL_CONFIRM));
 
       // THEN the button should be disabled
       expect(rejectButton).toHaveAttribute("aria-disabled", "true");
@@ -426,7 +426,7 @@ describe("Sensitive Data", () => {
       await waitFor(() => expect(screen.getByTestId(BACKDROP_DATA_TEST_IDS.BACKDROP_CONTAINER)).toBeVisible());
 
       // AND the approval dialog should be closed
-      await waitFor(() => expect(screen.queryByTestId(APPROVE_MODAL_DATA_TEST_IDS.APPROVE_MODAL)).not.toBeInTheDocument());
+      await waitFor(() => expect(screen.queryByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL)).not.toBeInTheDocument());
 
       // AND the logout function should be called.
       expect(mockLogout).toHaveBeenCalledTimes(1);

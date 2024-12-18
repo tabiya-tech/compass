@@ -3,7 +3,7 @@ import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { Dialog, DialogActions, DialogContent, DialogTitle, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
-import SecondaryButton from "src/theme/CancelButton/SecondaryButton";
+import SecondaryButton from "src/theme/SecondaryButton/SecondaryButton";
 
 export interface ConfirmModalDialogProps {
   title: string;

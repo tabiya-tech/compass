@@ -385,10 +385,9 @@ const SensitiveDataForm: React.FC = () => {
         onCancel={() => {
           setConfirmingReject(false);
         }}
-        onApprove={handleRejectProvidingSensitiveData}
+        onConfirm={handleRejectProvidingSensitiveData}
         cancelButtonText="Cancel"
-        approveButtonText="Yes, I'm sure"
-      />
+        confirmButtonText={"Yes, I'm sure"}/>
       <Backdrop
         isShown={isRejecting}
         message={"Logging you out..."}
