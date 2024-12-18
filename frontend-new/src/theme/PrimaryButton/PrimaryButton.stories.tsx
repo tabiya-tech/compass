@@ -13,11 +13,14 @@ export default meta;
 type Story = StoryObj<typeof PrimaryButton>;
 
 export const Shown: Story = {
-  args: {},
+  args: {
+    children: "Click here",
+  },
 };
 
 export const DisabledWhenOffline: Story = {
   args: {
+    children: "Click here",
     disableWhenOffline: true,
   },
 };
