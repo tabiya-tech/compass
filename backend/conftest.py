@@ -39,26 +39,26 @@ def random_db_name():
 
 
 @pytest.fixture(scope='function')
-async def in_memory_users_database(in_memory_mongo_server) -> AsyncIOMotorDatabase:
+async def in_memory_userdata_database(in_memory_mongo_server) -> AsyncIOMotorDatabase:
     """
-    Fixture to create an in-memory users' database.
+    Fixture to create an in-memory userdata database.
 
     This is a re-usable fixture that can be used across multiple test modules.
     :param in_memory_mongo_server:  The in-memory MongoDB server.
-    :return:  The mocked users' database.
+    :return:  The mocked userdata database.
     """
 
-    users_db = AsyncIOMotorClient(
+    userdata_db = AsyncIOMotorClient(
         in_memory_mongo_server.connection_string,
         tlsAllowInvalidCertificates=True
     ).get_database(random_db_name())
 
-    await CompassDBProvider.initialize_users_mongo_db(
-        users_db,
+    await CompassDBProvider.initialize_userdata_mongo_db(
+        userdata_db,
         logger=logging.getLogger(__name__)
     )
 
-    return users_db
+    return userdata_db
 
 
 @pytest.fixture(scope='function')

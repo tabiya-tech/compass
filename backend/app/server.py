@@ -54,13 +54,13 @@ async def lifespan(_app: FastAPI):
     logger.info("Starting up...")
 
     application_db = await CompassDBProvider.get_application_db()
-    users_db = await CompassDBProvider.get_users_db()
+    userdata_db = await CompassDBProvider.get_userdata_db()
 
     # Initialize the MongoDB databases
     # run the initialization in parallel
     await asyncio.gather(
         CompassDBProvider.initialize_application_mongo_db(application_db, logger),
-        CompassDBProvider.initialize_users_mongo_db(users_db, logger)
+        CompassDBProvider.initialize_userdata_mongo_db(userdata_db, logger)
     )
 
     yield
@@ -70,7 +70,7 @@ async def lifespan(_app: FastAPI):
 
     # close the database connections
     application_db.client.close()
-    users_db.client.close()
+    userdata_db.client.close()
 
 
 # Retrieve the backend URL from the environment variables,
@@ -137,10 +137,10 @@ if not os.getenv('APPLICATION_MONGODB_URI'):
     raise ValueError("Mandatory APPLICATION_MONGODB_URI env variable is not set!")
 if not os.getenv("APPLICATION_DATABASE_NAME"):
     raise ValueError("Mandatory APPLICATION_DATABASE_NAME environment variable is not set")
-if not os.getenv('USERS_MONGODB_URI'):
-    raise ValueError("Mandatory USERS_MONGODB_URI env variable is not set!")
-if not os.getenv("USERS_DATABASE_NAME"):
-    raise ValueError("Mandatory USERS_DATABASE_NAME environment variable is not set")
+if not os.getenv('USERDATA_MONGODB_URI'):
+    raise ValueError("Mandatory USERDATA_MONGODB_URI env variable is not set!")
+if not os.getenv("USERDATA_DATABASE_NAME"):
+    raise ValueError("Mandatory USERDATA_DATABASE_NAME environment variable is not set")
 if not os.getenv('TAXONOMY_MODEL_ID'):
     raise ValueError("Mandatory TAXONOMY_MODEL_ID env variable is not set!")
 

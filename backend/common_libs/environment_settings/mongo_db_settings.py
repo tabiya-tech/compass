@@ -15,14 +15,14 @@ class MongoDbSettings(BaseSettings):
     The name of the application database
     """
 
-    users_mongodb_uri: str
+    userdata_mongodb_uri: str
     """
-    The URI of the users MongoDB instance.
+    The URI of the userdata MongoDB instance.
     """
 
-    users_database_name: str
+    userdata_database_name: str
     """
-    The name of the users database
+    The name of the userdata database
     """
 
     taxonomy_mongodb_uri: str

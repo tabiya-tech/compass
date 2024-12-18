@@ -27,6 +27,7 @@ def init_sentry(dsn: str, environment: str = None):
         before_send=attach_user_info
     )
 
+
 def attach_user_info(event: Event, hint: Hint) -> Event | None:
     # Set default user context with values from context vars
     sentry_sdk.set_user({

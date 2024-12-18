@@ -71,8 +71,8 @@ def _encrypt_sensitive_test_data(
 
 
 @pytest.mark.asyncio
-async def test_round_trip_with_size(_rsa_keys, in_memory_users_database):
-    repository = SensitivePersonalDataRepository(await in_memory_users_database)
+async def test_round_trip_with_size(_rsa_keys, in_memory_userdata_database):
+    repository = SensitivePersonalDataRepository(await in_memory_userdata_database)
 
     # GIVEN some random key ID.
     given_key_id = get_random_printable_string(10)

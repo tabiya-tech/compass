@@ -20,7 +20,7 @@ _sensitive_personal_data_service_lock = asyncio.Lock()
 _sensitive_personal_data_service_singleton: ISensitivePersonalDataService | None = None
 
 
-async def get_sensitive_personal_data_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_users_db)) -> ISensitivePersonalDataService:
+async def get_sensitive_personal_data_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_userdata_db)) -> ISensitivePersonalDataService:
     global _sensitive_personal_data_service_singleton
     if _sensitive_personal_data_service_singleton is None:  # initial check to avoid the lock if the singleton instance is already created (lock is expensive)
         async with _sensitive_personal_data_service_lock:  # before modifying the singleton instance, acquire the lock

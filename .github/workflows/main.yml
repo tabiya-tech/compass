@@ -37,7 +37,7 @@ jobs:
       taxonomy-database-name: ${{ needs.setup-env.outputs.taxonomy-database-name }}
       taxonomy-model-id: ${{ needs.setup-env.outputs.taxonomy-model-id }}
       application-database-name: ${{ needs.setup-env.outputs.application-database-name }}
-      users-database-name: ${{ needs.setup-env.outputs.users-database-name }}
+      userdata-database-name: ${{ needs.setup-env.outputs.userdata-database-name }}
       vertex-api-region: ${{ needs.setup-env.outputs.vertex-api-region }}
   build-frontend:
     uses: ./.github/workflows/build-frontend.yml
@@ -66,7 +66,7 @@ jobs:
       taxonomy-database-name: ${{ needs.setup-env.outputs.taxonomy-database-name }}
       taxonomy-model-id: ${{ needs.setup-env.outputs.taxonomy-model-id }}
       application-database-name: ${{ needs.setup-env.outputs.application-database-name }}
-      users-database-name: ${{ needs.setup-env.outputs.users-database-name }}
+      userdata-database-name: ${{ needs.setup-env.outputs.userdata-database-name }}
       vertex-api-region: ${{ needs.setup-env.outputs.vertex-api-region }}
   smoke-test-backend-apigateway:
     needs: [ deploy-backend ]

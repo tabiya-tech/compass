@@ -53,16 +53,16 @@ def _get_application_db(mongodb_uri: str, db_name: str) -> AsyncIOMotorDatabase:
     ).get_database(db_name)
 
 
-def _get_users_db(users_mongodb_uri: str, users_db_name: str) -> AsyncIOMotorDatabase:
+def _get_userdata_db(userdata_mongodb_uri: str, userdata_db_name: str) -> AsyncIOMotorDatabase:
     """
     Decouples the database creation from the database provider.
     This allows to mock the database creation in tests, instead of mocking the database provider.
     """
 
     return AsyncIOMotorClient(
-        users_mongodb_uri,
+        userdata_mongodb_uri,
         tlsAllowInvalidCertificates=True
-    ).get_database(users_db_name)
+    ).get_database(userdata_db_name)
 
 
 def _get_taxonomy_db(mongodb_uri: str, db_name: str) -> AsyncIOMotorDatabase:
@@ -83,20 +83,20 @@ class CompassDBProvider:
     _settings = MongoDbSettings()
     _application_mongo_db: Optional[AsyncIOMotorDatabase] = None
     _taxonomy_mongo_db: Optional[AsyncIOMotorDatabase] = None
-    _users_mongo_db: Optional[AsyncIOMotorDatabase] = None
+    _userdata_mongo_db: Optional[AsyncIOMotorDatabase] = None
     _lock = asyncio.Lock()
     _logger = logging.getLogger(__qualname__)
 
     @staticmethod
-    async def initialize_users_mongo_db(users_db: AsyncIOMotorDatabase, logger: logging.Logger):
+    async def initialize_userdata_mongo_db(userdata_db: AsyncIOMotorDatabase, logger: logging.Logger):
         """ Initialize the MongoDB database."""
         try:
-            logger.info("Initializing indexes for the users database")
+            logger.info("Initializing indexes for the userdata database")
             # Create the sensitive personal data indexes
-            await users_db.get_collection(Collections.SENSITIVE_PERSONAL_DATA).create_index([
+            await userdata_db.get_collection(Collections.SENSITIVE_PERSONAL_DATA).create_index([
                 ("user_id", 1)
             ], unique=True)
-            logger.info("Finished creating indexes for the users database")
+            logger.info("Finished creating indexes for the userdata database")
         except Exception as e:
             logger.exception(e)
             raise e
@@ -164,23 +164,23 @@ class CompassDBProvider:
         return cls._application_mongo_db
 
     @classmethod
-    async def get_users_db(cls) -> AsyncIOMotorDatabase:
+    async def get_userdata_db(cls) -> AsyncIOMotorDatabase:
         """
-        Get the users database instance.
-        :return: AsyncIOMotorDatabase[users_db_name]
+        Get the userdata database instance.
+        :return: AsyncIOMotorDatabase[userdata_db_name]
         """
-        if cls._users_mongo_db is None:  # Check if the database instance has been created
+        if cls._userdata_mongo_db is None:  # Check if the database instance has been created
             async with cls._lock:  # Ensure that only one coroutine is creating and initializing the database instance
-                if cls._users_mongo_db is None:  # Double-check after acquiring the lock
-                    cls._logger.info("Connecting to Users MongoDB")
+                if cls._userdata_mongo_db is None:  # Double-check after acquiring the lock
+                    cls._logger.info("Connecting to Userdata MongoDB")
                     # Create the database instance
-                    cls._users_mongo_db = _get_users_db(
-                        cls._settings.users_mongodb_uri,
-                        cls._settings.users_database_name
+                    cls._userdata_mongo_db = _get_userdata_db(
+                        cls._settings.userdata_mongodb_uri,
+                        cls._settings.userdata_database_name
                     )
-                    cls._logger.info("Connected to Users MongoDB database: %s",
-                                     await _get_database_connection_info(cls._users_mongo_db))
-        return cls._users_mongo_db
+                    cls._logger.info("Connected to Userdata MongoDB database: %s",
+                                     await _get_database_connection_info(cls._userdata_mongo_db))
+        return cls._userdata_mongo_db
 
     @classmethod
     async def get_taxonomy_db(cls) -> AsyncIOMotorDatabase:

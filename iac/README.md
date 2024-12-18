@@ -149,8 +149,8 @@ The deployment requires the following environment variables to be set:
 - `TAXONOMY_MODEL_ID`: The ID of the model used to store the taxonomy data in the database.
 - `APPLICATION_MONGODB_URI`: The URI of the MongoDB Atlas instance for the application database.
 - `APPLICATION_DATABASE_NAME`: The name of mongo db database used by the application to store data.
-- `USERS_MONGODB_URI`: The URI of the MongoDB instance for the users' database.
-- `USERS_DATABASE_NAME`: The name of the mongo db database used by the application to store user data.
+- `USERDATA_MONGODB_URI`: The URI of the MongoDB instance for the user data database.
+- `USERATA_DATABASE_NAME`: The name of the mongo db database used by the application to store user data.
 - `VERTEX_API_REGION`: The region of the Vertex API that will be used by the backend.
 - `SENTRY_BACKEND_DSN`: The Sentry Data Source Name for error tracking (the backend DSN is for the project used to track backend errors)
 - `ENABLE_SENTRY`: A boolean value that determines whether Sentry error tracking is enabled. Set to `True` to enable Sentry error tracking. 
@@ -172,8 +172,8 @@ TAXONOMY_DATABASE_NAME="<DATABASE_NAME>"
 TAXONOMY_MODEL_ID="<TAXONOMY_MODEL_ID>"
 APPLICATION_MONGODB_URI="<URI_TO_MONGODB>"
 APPLICATION_DATABASE_NAME="<DATABASE_NAME>"
-USERS_MONGODB_URI="<URI_TO_MONGODB>"
-USERS_DATABASE_NAME="<DATABASE_NAME>"
+USERDATA_MONGODB_URI="<URI_TO_MONGODB>"
+USERDATA_DATABASE_NAME="<DATABASE_NAME>"
 VERTEX_API_REGION="<REGION>"
 ```
 

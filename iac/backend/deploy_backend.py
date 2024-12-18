@@ -38,7 +38,6 @@ REQUIRED_SERVICES = [
 def _setup_api_gateway(*,
                        basic_config: ProjectBaseConfig,
                        cloudrun: gcp.cloudrunv2.Service,
-                       gcp_oauth_client_id: str,
                        dependencies: list[pulumi.Resource]
                        ):
     apigw_service_account = gcp.serviceaccount.Account(
@@ -136,7 +135,7 @@ def _create_repository(
     )
 
 
-def _build_and_push_image(fully_qualified_image_name: str, dependencies: list[pulumi.Resource], provider: pulumi.ProviderResource) -> docker.Image:
+def _build_and_push_image(fully_qualified_image_name: str, dependencies: list[pulumi.Resource], _provider: pulumi.ProviderResource) -> docker.Image:
     # Build and push image to gcr repository
     image = docker.Image(
         "compass-image",
@@ -169,8 +168,8 @@ class BackendEnvVarsConfig:
     TAXONOMY_MODEL_ID: str
     APPLICATION_MONGODB_URI: str
     APPLICATION_DATABASE_NAME: str
-    USERS_MONGODB_URI: str
-    USERS_DATABASE_NAME: str
+    USERDATA_MONGODB_URI: str
+    USERDATA_DATABASE_NAME: str
     VERTEX_API_REGION: str
     TARGET_ENVIRONMENT: str
     BACKEND_URL: str
@@ -241,10 +240,10 @@ def _deploy_cloud_run_service(
                                                                        value=backend_env_vars_cfg.APPLICATION_MONGODB_URI),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="APPLICATION_DATABASE_NAME",
                                                                        value=backend_env_vars_cfg.APPLICATION_DATABASE_NAME),
-                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="USERS_MONGODB_URI",
-                                                                       value=backend_env_vars_cfg.USERS_MONGODB_URI),
-                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="USERS_DATABASE_NAME",
-                                                                       value=backend_env_vars_cfg.USERS_DATABASE_NAME),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="USERDATA_MONGODB_URI",
+                                                                       value=backend_env_vars_cfg.USERDATA_MONGODB_URI),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="USERDATA_DATABASE_NAME",
+                                                                       value=backend_env_vars_cfg.USERDATA_DATABASE_NAME),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="VERTEX_API_REGION",
                                                                        value=backend_env_vars_cfg.VERTEX_API_REGION),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="TARGET_ENVIRONMENT",
@@ -291,13 +290,13 @@ def _get_backend_env_vars(environment: str):
     if not application_database_name:
         raise ValueError("APPLICATION_DATABASE_NAME environment variable is not set")
 
-    users_mongodb_uri = os.getenv("USERS_MONGODB_URI")
-    if not users_mongodb_uri:
-        raise ValueError("USERS_MONGODB_URI environment variable is not set")
+    userdata_mongodb_uri = os.getenv("USERDATA_MONGODB_URI")
+    if not userdata_mongodb_uri:
+        raise ValueError("USERDATA_MONGODB_URI environment variable is not set")
 
-    users_database_name = os.getenv("USERS_DATABASE_NAME")
-    if not users_database_name:
-        raise ValueError("USERS_DATABASE_NAME environment variable is not set")
+    userdata_database_name = os.getenv("USERDATA_DATABASE_NAME")
+    if not userdata_database_name:
+        raise ValueError("USERDATA_DATABASE_NAME environment variable is not set")
 
     vertex_api_region = os.getenv("VERTEX_API_REGION")
     if not vertex_api_region:
@@ -325,8 +324,8 @@ def _get_backend_env_vars(environment: str):
         TAXONOMY_MODEL_ID=taxonomy_model_id,
         APPLICATION_MONGODB_URI=application_mongodb_uri,
         APPLICATION_DATABASE_NAME=application_database_name,
-        USERS_MONGODB_URI=users_mongodb_uri,
-        USERS_DATABASE_NAME=users_database_name,
+        USERDATA_MONGODB_URI=userdata_mongodb_uri,
+        USERDATA_DATABASE_NAME=userdata_database_name,
         VERTEX_API_REGION=vertex_api_region,
         TARGET_ENVIRONMENT=environment,
         BACKEND_URL=backend_url,
@@ -365,6 +364,5 @@ def deploy_backend(project: str, location: str, environment: str):
     api_gateway = _setup_api_gateway(
         basic_config=basic_config,
         cloudrun=cloud_run,
-        gcp_oauth_client_id=os.getenv("GCP_OAUTH_CLIENT_ID"),
         dependencies=services + [cloud_run]
     )

@@ -14,7 +14,7 @@ on:
       application-database-name:
         required: true
         type: string
-      users-database-name:
+      userdata-database-name:
         required: true
         type: string
       backend-url:
@@ -99,8 +99,8 @@ jobs:
           TAXONOMY_MODEL_ID: ${{ inputs.taxonomy-model-id }}
           APPLICATION_MONGODB_URI: ${{ secrets.APPLICATION_MONGODB_URI }}
           APPLICATION_DATABASE_NAME: ${{ inputs.application-database-name }}
-          USERS_MONGODB_URI: ${{ secrets.USERS_MONGODB_URI }}
-          USERS_DATABASE_NAME: ${{ inputs.users-database-name }}
+          USERDATA_MONGODB_URI: ${{ secrets.USERDATA_MONGODB_URI }}
+          USERDATA_DATABASE_NAME: ${{ inputs.userdata-database-name }}
           TARGET_ENVIRONMENT: ${{ inputs.target-environment }}
           VERTEX_API_REGION: ${{ inputs.vertex-api-region }}
           BACKEND_URL: ${{ inputs.backend-url }}
@@ -126,8 +126,8 @@ jobs:
           TAXONOMY_MODEL_ID: ${{ inputs.taxonomy-model-id }}
           APPLICATION_MONGODB_URI: ${{ secrets.APPLICATION_MONGODB_URI }}
           APPLICATION_DATABASE_NAME: ${{ inputs.application-database-name }}
-          USERS_MONGODB_URI: ${{ secrets.USERS_MONGODB_URI }}
-          USERS_DATABASE_NAME: ${{ inputs.users-database-name }}
+          USERDATA_MONGODB_URI: ${{ secrets.USERDATA_MONGODB_URI }}
+          USERDATA_DATABASE_NAME: ${{ inputs.userdata-database-name }}
           TARGET_ENVIRONMENT: ${{ inputs.target-environment }}
           VERTEX_API_REGION: ${{ inputs.vertex-api-region }}
           BACKEND_URL: ${{ inputs.backend-url }}

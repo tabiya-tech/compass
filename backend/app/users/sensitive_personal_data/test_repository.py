@@ -1,6 +1,6 @@
 """
 This module contains the tests for the SensitivePersonalDataRepository class.
-It uses the users_mocked database, and tests if repository methods work as expected with actual data.
+It uses the userdata_mocked database, and tests if repository methods work as expected with actual data.
 """
 from typing import Awaitable
 
@@ -31,9 +31,9 @@ def _get_new_sensitive_personal_data():
 
 
 @pytest.fixture(scope="function")
-async def get_sensitive_personal_data_repository(in_memory_users_database: Awaitable[AsyncIOMotorDatabase]) -> SensitivePersonalDataRepository:
-    users_db = await in_memory_users_database
-    repository = SensitivePersonalDataRepository(users_db)
+async def get_sensitive_personal_data_repository(in_memory_userdata_database) -> SensitivePersonalDataRepository:
+    userdata_db = await in_memory_userdata_database
+    repository = SensitivePersonalDataRepository(userdata_db)
     return repository
 
 

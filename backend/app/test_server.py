@@ -8,7 +8,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 
 @pytest.mark.asyncio
 async def test_version(
-        in_memory_users_database: Awaitable[AsyncIOMotorDatabase],
+        in_memory_userdata_database,
         in_memory_application_database: Awaitable[AsyncIOMotorDatabase],
         mocker: pytest_mock.MockFixture,
 ):
@@ -26,8 +26,8 @@ async def test_version(
     _in_mem_application_db = mocker.patch('app.server_dependencies.db_dependencies._get_application_db')
     _in_mem_application_db.return_value = await in_memory_application_database
 
-    _in_mem_users_db = mocker.patch('app.server_dependencies.db_dependencies._get_users_db')
-    _in_mem_users_db.return_value = await in_memory_users_database
+    _in_mem_userdata_db = mocker.patch('app.server_dependencies.db_dependencies._get_userdata_db')
+    _in_mem_userdata_db.return_value = await in_memory_userdata_database
 
     # Use httpx and AsyncClient to test the application asynchronously. This ensures the application
     # is fully started and properly shut down, as recommended for async tests in:

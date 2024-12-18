@@ -208,14 +208,14 @@ async def _main():
         os.makedirs(output_dir, exist_ok=True)
 
     # connect to the database
-    if CompassDBProvider._settings.users_mongodb_uri is None:  # noqa
-        raise ValueError("The users MongoDB URI is not set in the environment variables (USERS_MONGODB_URI)")
+    if CompassDBProvider._settings.userdata_mongodb_uri is None:  # noqa
+        raise ValueError("The userdata MongoDB URI is not set in the environment variables (USERDATA_MONGODB_URI)")
 
-    if CompassDBProvider._settings.users_database_name is None:  # noqa
-        raise ValueError("The users MongoDB database name is not set in the environment variables (USERS_DB_NAME)")
+    if CompassDBProvider._settings.userdata_database_name is None:  # noqa
+        raise ValueError("The userdata MongoDB database name is not set in the environment variables (USERDATA_DB_NAME)")
 
-    compass_users_db = await CompassDBProvider.get_users_db()
-    repository = SensitivePersonalDataRepository(db=compass_users_db)
+    compass_userdata_db = await CompassDBProvider.get_userdata_db()
+    repository = SensitivePersonalDataRepository(db=compass_userdata_db)
 
     # decrypt the data
     await decrypt_sensitive_data_from_database(

@@ -153,8 +153,8 @@ The backend uses the following environment variables:
 - `TAXONOMY_MODEL_ID`: The model ID of the ESCO model in the compass taxonomy database.
 - `APPLICATION_MONGODB_URI`: The URI of the MongoDB Atlas instance for the application database.
 - `APPLICATION_DATABASE_NAME`: The name of mongo db database used by the application to store data.
-- `USERS_MONGODB_URI`: The URI of the MongoDB instance for the users database.
-- `USERS_DATABASE_NAME`: The name of the mongo db database used by the application to store user data.
+- `USERDATA_MONGODB_URI`: The URI of the MongoDB instance for the user data database.
+- `USERDATA_DATABASE_NAME`: The name of the mongo db database used by the application to store user data.
 - `VERTEX_API_REGION`: (optional) The region of the Vertex API to use. If not set defaults to `us-central1`.
 - `LOG_CONFIG_FILE`: (Optional) See the [Logging](#logging) section for more information. If not set defaults to `logging.cfg.yaml`.
 - `BACKEND_URL`: The URL of the backend. It is used to correctly configure Swagger UI and the CORS policy.
@@ -177,8 +177,8 @@ TAXONOMY_MODEL_ID=<TAXONOMY_MODEL_ID>
 TAXONOMY_DATABASE_NAME=<TAXONOMY_DATABASE_NAME>
 APPLICATION_MONGODB_URI=<URI_TO_MONGODB>
 APPLICATION_DATABASE_NAME=<APPLICATION_DATABASE_NAME>
-USERS_MONGODB_URI=<URI_TO_MONGODB>
-USERS_DATABASE_NAME=<USERS_DATABASE_NAME>
+USERDATA_MONGODB_URI=<URI_TO_MONGODB>
+USERDATA_DATABASE_NAME=<USERDATA_DATABASE_NAME>
 VERTEX_API_REGION=<REGION>
 LOG_CONFIG_FILE=<YAML_FILE>
 BACKEND_URL=<URL>
@@ -254,8 +254,8 @@ TAXONOMY_DATABASE_NAME=compass-taxonomy-dev
 TAXONOMY_MODEL_ID=<MODEL_ID>
 APPLICATION_MONGODB_URI=mongodb://localhost:27017
 APPLICATION_DATABASE_NAME=_compass-application-local
-USERS_MONGODB_URI=mongodb://localhost:27017
-USERS_DATABASE_NAME=_compass-users-local
+USERDATA_MONGODB_URI=mongodb://localhost:27017
+USERDATA_DATABASE_NAME=_compass-users-local
 GOOGLE_APPLICATION_CREDENTIALS=keys/credentials.json
 VERTEX_API_REGION=<REGION>
 LOG_CONFIG_FILE=logging.cfg.dev.yaml
