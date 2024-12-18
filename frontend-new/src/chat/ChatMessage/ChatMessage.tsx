@@ -3,7 +3,7 @@ import { Box, Typography, styled, alpha, Divider, useTheme } from "@mui/material
 import { IChatMessage } from "src/chat/Chat.types";
 import { getDurationFromNow } from "src/utils/getDurationFromNow/getDurationFromNow";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
-import FeedbackFormButton from "src/feedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
+import FeedbackFormButton from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
 
 export enum ChatMessageFooterType {
   FEEDBACK_FORM_BUTTON = "feedback-form-button",

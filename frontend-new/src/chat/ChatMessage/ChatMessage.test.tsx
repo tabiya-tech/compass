@@ -6,7 +6,7 @@ import { render, screen } from "src/_test_utilities/test-utils";
 import * as GetDurationFromNow from "src/utils/getDurationFromNow/getDurationFromNow";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
-import { DATA_TEST_ID as CHAT_MESSAGE_FOOTER_BUTTON_DATA_TEST_ID } from "src/feedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
+import { DATA_TEST_ID as CHAT_MESSAGE_FOOTER_BUTTON_DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
 import { IChatMessage } from "src/chat/Chat.types";
 
 jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service", () => {
