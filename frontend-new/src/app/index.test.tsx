@@ -1,13 +1,17 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
 
-import App, { SNACKBAR_KEYS } from "./index";
-import { render, screen } from "src/_test_utilities/test-utils";
+import App, { BACKDROP_MINIMUM_DELAY, SNACKBAR_KEYS } from "./index";
+import { render, screen, act, waitFor } from "src/_test_utilities/test-utils";
 import { HashRouter } from "react-router-dom";
 import { unmockBrowserIsOnLine, mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { DEFAULT_SNACKBAR_AUTO_HIDE_DURATION, useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import FirebaseEmailAuthenticationService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import * as FirebaseAuthenticationFactoryModule from "src/auth/services/Authentication.service.factory";
+import userPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import { PersistentStorageService } from "./PersistentStorageService/PersistentStorageService";
+import { Language, UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { DATA_TEST_ID as BACKDROP_DATA_TEST_ID } from "src/theme/Backdrop/Backdrop";
 
 // mock the SocialAuthService
 jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service", () => {
@@ -169,5 +173,190 @@ describe("main compass app test", () => {
       // THEN expect the offline and online notification to not be shown
       expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalled();
     });
+  });
+});
+
+describe("app loading sequence", () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.clearAllMocks();
+    unmockBrowserIsOnLine();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  test("should show backdrop while loading and maintain it for minimum delay after loading completes", async () => {
+    // GIVEN some authenticated user with preferences
+    const mockAuthService = {
+      getUser: jest.fn().mockReturnValue({ id: "123", email: "test@test.com" }),
+      isTokenValid: jest.fn().mockReturnValue({ isValid: true }),
+      logout: jest.fn(),
+    };
+
+    jest.spyOn(FirebaseAuthenticationFactoryModule.default, "getCurrentAuthenticationService")
+      .mockReturnValue(mockAuthService as any);
+
+    jest.spyOn(PersistentStorageService, "getToken")
+      .mockReturnValue("valid-token");
+
+    let resolvePreferences!: (value: UserPreference) => void;
+    const preferencesPromise = new Promise<UserPreference>((resolve) => {
+      resolvePreferences = resolve;
+    });
+
+    const mockPreferences = {
+      user_id: "foo",
+      language: Language.en,
+      sessions: [123],
+      accepted_tc: new Date()
+    };
+
+    jest.spyOn(userPreferencesService.getInstance(), "getUserPreferences")
+      .mockReturnValue(preferencesPromise);
+
+    // WHEN the app is rendered
+    render(
+      <HashRouter>
+        <App />
+      </HashRouter>
+    );
+
+    // THEN expect the backdrop to be shown immediately
+    expect(screen.getByTestId(BACKDROP_DATA_TEST_ID.BACKDROP_CONTAINER)).toBeInTheDocument();
+
+    // WHEN the preferences are resolved
+    resolvePreferences(mockPreferences);
+
+    // THEN the backdrop should still be shown due to minimum delay
+    expect(screen.getByTestId(BACKDROP_DATA_TEST_ID.BACKDROP_CONTAINER)).toBeInTheDocument();
+
+    // WHEN the minimum delay time passes
+    jest.advanceTimersByTime(BACKDROP_MINIMUM_DELAY);
+
+    // THEN the backdrop should be hidden
+    await waitFor(() => {
+      expect(screen.queryByTestId(BACKDROP_DATA_TEST_ID.BACKDROP_CONTAINER)).not.toBeInTheDocument();
+    });
+
+    // AND the router should be rendered with the protected routes
+    expect(screen.getByTestId("hash-router-id")).toBeInTheDocument();
+  });
+
+  test("should maintain backdrop if loading takes longer than minimum delay", async () => {
+    // GIVEN slow loading preferences
+    const mockAuthService = {
+      getUser: jest.fn().mockReturnValue({ id: "123", email: "test@test.com" }),
+      isTokenValid: jest.fn().mockReturnValue({ isValid: true }),
+      logout: jest.fn(),
+    };
+
+    jest.spyOn(FirebaseAuthenticationFactoryModule.default, "getCurrentAuthenticationService")
+      .mockReturnValue(mockAuthService as any);
+
+    jest.spyOn(PersistentStorageService, "getToken")
+      .mockReturnValue("valid-token");
+
+    // Mock a slow preferences load (1 second)
+    const mockPreferences = {
+      user_id: "foo",
+      language: Language.en,
+      sessions: [123],
+      accepted_tc: new Date()
+    };
+
+    jest.spyOn(userPreferencesService.getInstance(), "getUserPreferences")
+      .mockImplementation(() => new Promise(resolve => {
+        setTimeout(() => resolve(mockPreferences), 1000);
+      }));
+
+    // WHEN the app is rendered
+    render(
+      <HashRouter>
+        <App />
+      </HashRouter>
+    );
+
+    // THEN expect the backdrop to be shown immediately
+    expect(screen.getByTestId(BACKDROP_DATA_TEST_ID.BACKDROP_CONTAINER)).toBeInTheDocument();
+
+    // WHEN half the minimum delay passes
+    jest.advanceTimersByTime(BACKDROP_MINIMUM_DELAY / 2);
+
+    // THEN the backdrop should still be shown
+    expect(screen.getByTestId(BACKDROP_DATA_TEST_ID.BACKDROP_CONTAINER)).toBeInTheDocument();
+
+    // WHEN the preferences finally load (after 1 second)
+    jest.advanceTimersByTime(BACKDROP_MINIMUM_DELAY);
+
+    // THEN the backdrop should still be shown for the minimum delay
+    expect(screen.getByTestId(BACKDROP_DATA_TEST_ID.BACKDROP_CONTAINER)).toBeInTheDocument();
+
+    // WHEN the minimum delay after loading passes
+    jest.advanceTimersByTime(BACKDROP_MINIMUM_DELAY);
+
+    // THEN the backdrop should be hidden
+    await waitFor(() => {
+      expect(screen.queryByTestId(BACKDROP_DATA_TEST_ID.BACKDROP_CONTAINER)).not.toBeInTheDocument();
+    });
+  });
+
+  test("should properly clean up on unmount", async () => {
+    // GIVEN mocked services and timers
+    const mockCleanup = jest.fn();
+    const mockAuthService = {
+      getUser: jest.fn().mockReturnValue({ id: "123", email: "test@test.com" }),
+      isTokenValid: jest.fn().mockReturnValue({ isValid: true }),
+      logout: jest.fn(),
+      cleanup: mockCleanup
+    };
+
+    jest.spyOn(FirebaseAuthenticationFactoryModule.default, "getCurrentAuthenticationService")
+      .mockReturnValue(mockAuthService as any);
+
+    jest.spyOn(PersistentStorageService, "getToken")
+      .mockReturnValue("valid-token");
+
+    const mockPreferences = {
+      user_id: "foo",
+      language: Language.en,
+      sessions: [123],
+      accepted_tc: new Date()
+    };
+
+    jest.spyOn(userPreferencesService.getInstance(), "getUserPreferences")
+      .mockResolvedValue(mockPreferences);
+
+    // WHEN the app is rendered
+    const { unmount } = render(
+      <HashRouter>
+        <App />
+      </HashRouter>
+    );
+
+    // AND we wait for the initial loading
+    await waitFor(() => {
+      expect(screen.getByTestId(BACKDROP_DATA_TEST_ID.BACKDROP_CONTAINER)).toBeInTheDocument();
+    });
+
+    // AND we advance timers but not completely
+    act(() => {
+      jest.advanceTimersByTime(BACKDROP_MINIMUM_DELAY / 2);
+    });
+
+    // WHEN the component is unmounted
+    unmount();
+
+    // THEN the cleanup method should have been called
+    expect(mockCleanup).toHaveBeenCalled();
+
+    // AND the timeout should have been cleared (no state updates after unmount)
+    act(() => {
+      jest.advanceTimersByTime(BACKDROP_MINIMUM_DELAY);
+    });
+    
+    // Verify no console errors about setState after unmount
+    expect(console.error).not.toHaveBeenCalled();
   });
 });

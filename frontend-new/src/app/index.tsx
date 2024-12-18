@@ -28,6 +28,7 @@ import { StatusCodes } from "http-status-codes";
 const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouter(createHashRouter);
 
 const uniqueId = "17ccbdb7-1855-44b2-bc68-ef066e5c4e6f";
+export const BACKDROP_MINIMUM_DELAY = 500;
 export const SNACKBAR_KEYS = {
   OFFLINE_ERROR: `offline-error-${uniqueId}`,
   ONLINE_SUCCESS: `online-success-${uniqueId}`,
@@ -102,24 +103,35 @@ const App = () => {
   };
 
   useEffect(() => {
+    let timeout: NodeJS.Timeout;
     const initializeAuth = async () => {
       setLoading(true);
       await loadApplicationState();
-      setTimeout(() => setLoading(false), 500); // delay for half a sec so that the loading transition is smoother for the user and not just a flash
-      return async () => {
-        const currentAuthenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
-        try {
-          console.debug("Cleaning up auth");
-          // Each of the services that implement the AuthenticationService interface will have their own cleanup method
-          // they may use this method to clean up any resources they have allocated on component unmount
-          currentAuthenticationService!.cleanup();
-        } catch (error) {
-          console.error(new AuthenticationError("Error cleaning up auth", error as Error));
-        }
-      };
+      // we want to add an artificial half second delay to the application loading process
+      // since we only disable the loading screen after the application state has been loaded
+      // and loading the application can be quite fast, making the loading screen appear and disappear too quickly
+      await new Promise((resolve) => {
+        timeout = setTimeout(resolve, BACKDROP_MINIMUM_DELAY);
+      });
+      setLoading(false);
     };
 
-    initializeAuth();
+    initializeAuth().then(() => {
+      console.debug("Auth initialized successfully", userPreferencesStateService.getUserPreferences(), AuthenticationStateService.getInstance().getUser());
+    });
+
+    return () => {
+      clearTimeout(timeout);
+      const currentAuthenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
+      try {
+        console.debug("Cleaning up auth");
+        // Each of the services that implement the AuthenticationService interface will have their own cleanup method
+        // they may use this method to clean up any resources they have allocated on component unmount
+        currentAuthenticationService!.cleanup();
+      } catch (error) {
+        console.error(new AuthenticationError("Error cleaning up auth", error as Error));
+      }
+    };
   }, []);
 
   if (loading) return <Backdrop isShown={loading} transparent={true} />;
