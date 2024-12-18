@@ -10,8 +10,8 @@ import ChatMessageField, { DATA_TEST_ID as CHAT_MESSAGE_FIELD_TEST_ID } from "./
 import { DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID } from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
 import { DATA_TEST_ID as EXPERIENCES_DRAWER_CONTAINER_TEST_ID } from "src/experiences//experiencesDrawer/ExperiencesDrawer";
 import { DATA_TEST_ID as CONFIRM_MODAL_TEST_ID } from "src/theme/confirmModalDialog/ConfirmModalDialog";
-import { DATA_TEST_ID as FEEDBACK_FORM_BUTTON_TEST_ID } from "src/feedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
-import { DATA_TEST_ID as FEEDBACK_FORM_TEST_ID } from "src/feedback/feedbackForm/FeedbackForm";
+import { DATA_TEST_ID as FEEDBACK_FORM_BUTTON_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
+import { DATA_TEST_ID as FEEDBACK_FORM_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
 import { HashRouter } from "react-router-dom";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { ConversationMessageSender } from "./ChatService/ChatService.types";
@@ -26,11 +26,11 @@ import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { act } from "@testing-library/react";
 import * as FirebaseAuthenticationServiceFactoryModule from "src/auth/services/Authentication.service.factory";
 import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
-import { DATA_TEST_ID as FEEDBACK_FORM_CONTENT_DATA_TEST_ID } from "src/feedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
-import stepsContent from "src/feedback/feedbackForm/stepsContent";
-import FeedbackService from "src/feedback/feedbackForm/feedbackFormService/feedbackFormService";
+import { DATA_TEST_ID as FEEDBACK_FORM_CONTENT_DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
+import feedbackFormContentSteps from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/feedbackFormContentSteps";
+import OverallFeedbackService from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service";
 import { ChatError, FeedbackError, SessionError } from "src/error/commonErrors";
-import { DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID } from "src/feedback/feedbackForm/components/commentTextField/CommentTextField";
+import { DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/commentTextField/CommentTextField";
 
 // Mock the ChatService module
 jest.mock("src/chat/ChatService/ChatService");
@@ -693,7 +693,7 @@ describe("Chat", () => {
     test("should call handleFeedbackSubmit when the user submits feedback", async () => {
       // mock the sendFeedback method
       const mockSendFeedback = jest.fn();
-      (FeedbackService as jest.Mocked<typeof FeedbackService>).prototype.sendFeedback = mockSendFeedback;
+      (OverallFeedbackService as jest.Mocked<typeof OverallFeedbackService>).prototype.sendFeedback = mockSendFeedback;
 
       // GIVEN a chat component
       render(
@@ -710,7 +710,7 @@ describe("Chat", () => {
       fireEvent.change(input[0], { target: { value: "This is a comment" } });
 
       const submitButton = screen.getByTestId(FEEDBACK_FORM_CONTENT_DATA_TEST_ID.FEEDBACK_FORM_NEXT_BUTTON);
-      for (let i = 0; i < stepsContent.length; i++) {
+      for (let i = 0; i < feedbackFormContentSteps.length; i++) {
         fireEvent.click(submitButton);
       }
 
@@ -721,7 +721,7 @@ describe("Chat", () => {
     test("should log the same error that the service throws when sending feedback fails", async () => {
       // mock the sendFeedback method
       const givenError = new Error("Failed to send feedback");
-      (FeedbackService as jest.Mocked<typeof FeedbackService>).prototype.sendFeedback = jest
+      (OverallFeedbackService as jest.Mocked<typeof OverallFeedbackService>).prototype.sendFeedback = jest
         .fn()
         .mockRejectedValue(givenError);
       // GIVEN a chat component
@@ -739,7 +739,7 @@ describe("Chat", () => {
       fireEvent.change(input[0], { target: { value: "This is a comment" } });
 
       const submitButton = screen.getByTestId(FEEDBACK_FORM_CONTENT_DATA_TEST_ID.FEEDBACK_FORM_NEXT_BUTTON);
-      for (let i = 0; i < stepsContent.length; i++) {
+      for (let i = 0; i < feedbackFormContentSteps.length; i++) {
         fireEvent.click(submitButton);
       }
 

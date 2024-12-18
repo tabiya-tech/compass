@@ -22,7 +22,7 @@ import InactiveBackdrop from "src/theme/Backdrop/InactiveBackdrop";
 import ConfirmModalDialog from "src/theme/confirmModalDialog/ConfirmModalDialog";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
-import FeedbackForm from "src/feedback/feedbackForm/FeedbackForm";
+import FeedbackForm from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
 import { ChatError, SessionError } from "src/error/commonErrors";
 import { ChatMessageFooterType } from "./ChatMessage/ChatMessage";
 
