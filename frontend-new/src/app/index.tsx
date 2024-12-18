@@ -22,7 +22,7 @@ import UserPreferencesService, {
   userPreferencesService,
 } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { AuthenticationError } from "src/error/commonErrors";
-import { ServiceError } from "../error/ServiceError/ServiceError";
+import { ServiceError } from "src/error/ServiceError/ServiceError";
 import { StatusCodes } from "http-status-codes";
 
 // Wrap the createHashRouter function with Sentry to capture errors that occur during router initialization
@@ -108,21 +108,24 @@ const App = () => {
     const initializeAuth = async () => {
       setLoading(true);
       await loadApplicationState();
-      setTimeout(() => setLoading(false), 500); // delay for half a sec so that the loading transition is smoother for the user and not just a flash
-      return async () => {
-        const currentAuthenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
-        try {
-          console.debug("Cleaning up auth");
-          // Each of the services that implement the AuthenticationService interface will have their own cleanup method
-          // they may use this method to clean up any resources they have allocated on component unmount
-          currentAuthenticationService!.cleanup();
-        } catch (error) {
-          console.error(new AuthenticationError("Error cleaning up auth", error as Error));
-        }
-      };
+      setLoading(false);
     };
 
-    initializeAuth();
+    initializeAuth().then(() => {
+      console.debug("Auth initialized successfully", userPreferencesStateService.getUserPreferences(), AuthenticationStateService.getInstance().getUser());
+    });
+
+    return () => {
+      const currentAuthenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
+      try {
+        console.debug("Cleaning up auth");
+        // Each of the services that implement the AuthenticationService interface will have their own cleanup method
+        // they may use this method to clean up any resources they have allocated on component unmount
+        currentAuthenticationService!.cleanup();
+      } catch (error) {
+        console.error(new AuthenticationError("Error cleaning up auth", error as Error));
+      }
+    };
   }, []);
 
   if (loading) return <Backdrop isShown={loading} transparent={true} />;
