@@ -1,17 +1,24 @@
 name: Main CI
 on: push
-#push:
-# branches:
-#   - main
-#pull_request:
-#  types: [ opened, synchronize, reopened ]
+  #push:
+  # branches:
+  #   - main
+  #pull_request:
+  #  types: [ opened, synchronize, reopened ]
 
-  # only one job should run at a time when deploying
+# only one job should run at a time when deploying
 concurrency:
-  group: ${{ github.workflow }}-deploying:${{ github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]') }}
+  group: ${{github.workflow}}-${{ github.ref_name != 'main' && !contains(github.event.head_commit.message, '[pulumi up]') && github.ref_name || 'deploying' }}
   cancel-in-progress: false
 
+
 jobs:
+  ## Echo the group name to see if the concurrency is working
+  #echo-group:
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #    - name: Echo group name
+  #      run: echo ${{github.workflow}}-${{ github.ref_name != 'main' && !contains(github.event.head_commit.message, '[pulumi up]') && github.ref_name || 'deploying' }}
   # Setup envs
   setup-env:
     uses: ./.github/workflows/setup-env.yml
