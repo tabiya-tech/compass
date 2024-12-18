@@ -1,9 +1,5 @@
 import { getServiceErrorFactory, ServiceErrorFactory } from "src/error/ServiceError/ServiceError";
-import {
-  CreateUserPreferencesSpec,
-  UpdateUserPreferencesSpec,
-  UserPreference,
-} from "./userPreferences.types";
+import { CreateUserPreferencesSpec, UpdateUserPreferencesSpec, UserPreference } from "./userPreferences.types";
 import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
 import { getBackendUrl } from "src/envService";

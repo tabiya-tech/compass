@@ -9,7 +9,7 @@ import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
 // mock the primary button component
 jest.mock("src/theme/PrimaryButton/PrimaryButton", () => {
-  return jest.fn().mockImplementation((props) => <div data-testid={props['data-testid']}> {props.children}</div>);
+  return jest.fn().mockImplementation((props) => <div data-testid={props["data-testid"]}> {props.children}</div>);
 });
 
 describe("Secondary Button tests", () => {
@@ -24,9 +24,7 @@ describe("Secondary Button tests", () => {
     const givenTestId = "foo";
     const givenText = "Bar";
     // WHEN the component is rendered
-    render(<SecondaryButton data-testid={givenTestId}>
-      {givenText}
-    </SecondaryButton>);
+    render(<SecondaryButton data-testid={givenTestId}>{givenText}</SecondaryButton>);
 
     // THEN expect no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
@@ -41,10 +39,10 @@ describe("Secondary Button tests", () => {
         variant: "text",
         style: undefined,
         sx: expect.objectContaining({
-          color: expect.any(Function)
+          color: expect.any(Function),
         }),
         disabled: false,
-        children: givenText
+        children: givenText,
       }),
       {}
     );
@@ -60,6 +58,8 @@ describe("Secondary Button tests", () => {
     // GIVEN no children
     // WHEN the component is rendered
     // THEN expect an error to have occurred
-    expect(() => render(<SecondaryButton />)).toThrow(new ComponentError("Children are required for SecondaryButton component"));
+    expect(() => render(<SecondaryButton />)).toThrow(
+      new ComponentError("Children are required for SecondaryButton component")
+    );
   });
 });

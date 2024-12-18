@@ -4,7 +4,11 @@ import { customFetch } from "src/utils/customFetch/customFetch";
 
 import { SensitivePersonalData } from "src/sensitiveData/types";
 import { EncryptionService } from "src/sensitiveData/services/encryptionService/encryption.service";
-import { MaximumAESEncryptedDataSize, MaximumAESEncryptedKeySize, MaximumRSAKeyIdSize } from "src/sensitiveData/config/encryptionConfig";
+import {
+  MaximumAESEncryptedDataSize,
+  MaximumAESEncryptedKeySize,
+  MaximumRSAKeyIdSize,
+} from "src/sensitiveData/config/encryptionConfig";
 import { EncryptedDataTooLarge } from "./errors";
 
 class SensitivePersonalDataService {

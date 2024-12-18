@@ -50,14 +50,16 @@ export const ShownWithComplexBody: Story = {
           onChange={() => {}}
           sx={{ padding: 0, marginTop: 0.5, transform: "scale(1.3)" }}
           inputProps={{ "aria-label": "Checkbox1" }}
-        /> Checked
+        />{" "}
+        Checked
         <br />
         <Checkbox
           checked={false}
           onChange={() => {}}
           sx={{ padding: 0, marginTop: 0.5, transform: "scale(1.3)" }}
           inputProps={{ "aria-label": "Checkbox2" }}
-        /> Unchecked
+        />{" "}
+        Unchecked
         <br />
         <br />
         List of items

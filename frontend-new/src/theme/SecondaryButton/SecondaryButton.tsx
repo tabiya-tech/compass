@@ -19,7 +19,7 @@ const SecondaryButton: React.FC<SecondaryButtonProps> = ({
 }: Readonly<SecondaryButtonProps>) => {
   const isOnline = useContext(IsOnlineContext);
 
-  if(!children) {
+  if (!children) {
     throw new ComponentError("Children are required for SecondaryButton component");
   }
 
@@ -30,7 +30,7 @@ const SecondaryButton: React.FC<SecondaryButtonProps> = ({
       style={style}
       sx={{
         color: (theme) => theme.palette.text.secondary,
-        ...sx
+        ...sx,
       }}
       disabled={Boolean(disabled || (disableWhenOffline && !isOnline))}
       {...props}

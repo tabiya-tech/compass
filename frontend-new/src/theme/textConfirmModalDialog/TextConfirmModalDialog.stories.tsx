@@ -50,7 +50,7 @@ export const ShownWithLongText: Story = {
     isOpen: true,
     cancelButtonText: "Cancel",
     confirmButtonText: "Yes, continue",
-  }
+  },
 };
 
 export const ShownWithManyParagraphs: Story = {
@@ -101,5 +101,5 @@ export const ShownWithManyParagraphs: Story = {
     isOpen: true,
     cancelButtonText: "Cancel",
     confirmButtonText: "Yes, continue",
-  }
+  },
 };

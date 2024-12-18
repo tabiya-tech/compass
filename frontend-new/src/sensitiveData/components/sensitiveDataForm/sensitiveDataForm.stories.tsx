@@ -19,11 +19,11 @@ const meta: Meta<typeof SensitiveDataForm> = {
         method: "POST",
         status: 201,
         response: {
-          data: ""
-        }
-      }
-    ]
-  }
+          data: "",
+        },
+      },
+    ],
+  },
 };
 
 export default meta;
@@ -38,10 +38,10 @@ export const Shown: StoryObj<typeof SensitiveDataForm> = {
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
       sessions_with_feedback: [],
       language: Language.en,
-    })
+    });
     return () => {
       UserPreferencesStateService.getInstance().clearUserPreferences();
-    }
+    };
   },
   args: {},
 };
