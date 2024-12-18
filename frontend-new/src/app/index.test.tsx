@@ -2,12 +2,20 @@
 import "src/_test_utilities/consoleMock";
 
 import App, { SNACKBAR_KEYS } from "./index";
-import { render, screen } from "src/_test_utilities/test-utils";
+import { render, screen, waitFor } from "src/_test_utilities/test-utils";
 import { HashRouter } from "react-router-dom";
 import { unmockBrowserIsOnLine, mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { DEFAULT_SNACKBAR_AUTO_HIDE_DURATION, useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import FirebaseEmailAuthenticationService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import * as FirebaseAuthenticationFactoryModule from "src/auth/services/Authentication.service.factory";
+import userPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import { PersistentStorageService } from "./PersistentStorageService/PersistentStorageService";
+import {
+  Language,
+  SensitivePersonalDataRequirement,
+  UserPreference,
+} from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { DATA_TEST_ID as BACKDROP_DATA_TEST_ID } from "src/theme/Backdrop/Backdrop";
 
 // mock the SocialAuthService
 jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service", () => {
@@ -169,5 +177,116 @@ describe("main compass app test", () => {
       // THEN expect the offline and online notification to not be shown
       expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalled();
     });
+  });
+});
+
+describe("app loading sequence", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    unmockBrowserIsOnLine();
+  });
+
+  test("should show backdrop while loading", async () => {
+    // GIVEN some authenticated user with preferences
+    const mockAuthService = {
+      getUser: jest.fn().mockReturnValue({ id: "123", email: "test@test.com" }),
+      isTokenValid: jest.fn().mockReturnValue({ isValid: true }),
+      logout: jest.fn(),
+    };
+
+    jest.spyOn(FirebaseAuthenticationFactoryModule.default, "getCurrentAuthenticationService")
+      .mockReturnValue(mockAuthService as any);
+
+    jest.spyOn(PersistentStorageService, "getToken")
+      .mockReturnValue("valid-token");
+
+    let resolvePreferences!: (value: UserPreference) => void;
+    const preferencesPromise = new Promise<UserPreference>((resolve) => {
+      resolvePreferences = resolve;
+    });
+
+    const mockPreferences = {
+      user_id: "foo",
+      language: Language.en,
+      sessions: [123],
+      accepted_tc: new Date(),
+      has_sensitive_personal_data: false,
+      sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+    };
+
+    jest.spyOn(userPreferencesService.getInstance(), "getUserPreferences")
+      .mockReturnValue(preferencesPromise);
+
+    // WHEN the app is rendered
+    render(
+      <HashRouter>
+        <App />
+      </HashRouter>
+    );
+
+    // THEN expect the backdrop to be shown immediately
+    expect(screen.getByTestId(BACKDROP_DATA_TEST_ID.BACKDROP_CONTAINER)).toBeInTheDocument();
+
+    // WHEN the preferences are resolved
+    resolvePreferences(mockPreferences);
+
+    // THEN the backdrop should be hidden
+    await waitFor(() => {
+      expect(screen.queryByTestId(BACKDROP_DATA_TEST_ID.BACKDROP_CONTAINER)).not.toBeInTheDocument();
+    });
+
+    // AND the router should be rendered with the protected routes
+    expect(screen.getByTestId("hash-router-id")).toBeInTheDocument();
+  });
+
+  test("should properly clean up on unmount", async () => {
+    // GIVEN mocked services and timers
+    const mockCleanup = jest.fn();
+    const mockAuthService = {
+      getUser: jest.fn().mockReturnValue({ id: "123", email: "test@test.com" }),
+      isTokenValid: jest.fn().mockReturnValue({ isValid: true }),
+      logout: jest.fn(),
+      cleanup: mockCleanup
+    };
+
+    jest.spyOn(FirebaseAuthenticationFactoryModule.default, "getCurrentAuthenticationService")
+      .mockReturnValue(mockAuthService as any);
+
+    jest.spyOn(PersistentStorageService, "getToken")
+      .mockReturnValue("valid-token");
+
+    const mockPreferences = {
+      user_id: "foo",
+      language: Language.en,
+      sessions: [123],
+      accepted_tc: new Date(),
+      has_sensitive_personal_data: false,
+      sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+    };
+
+    jest.spyOn(userPreferencesService.getInstance(), "getUserPreferences")
+      .mockResolvedValue(mockPreferences);
+
+    // WHEN the app is rendered
+    const { unmount } = render(
+      <HashRouter>
+        <App />
+      </HashRouter>
+    );
+
+    // AND we wait for the initial loading
+    await waitFor(() => {
+      expect(screen.getByTestId(BACKDROP_DATA_TEST_ID.BACKDROP_CONTAINER)).toBeInTheDocument();
+    });
+
+    // WHEN the component is unmounted
+    unmount();
+
+    // THEN the cleanup method should have been called
+    expect(mockCleanup).toHaveBeenCalled();
+
+    // AND expect no errors or warning to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
   });
 });
