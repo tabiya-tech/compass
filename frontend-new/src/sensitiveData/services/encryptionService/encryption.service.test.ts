@@ -2,10 +2,13 @@
 import "src/_test_utilities/consoleMock";
 import { webcrypto } from "crypto";
 
-import { getRandomLorem, getRandomString, getTestString, getThreeBytesUTF8Char } from "src/_test_utilities/specialCharacters";
 import {
-  EncryptionService,
-} from "src/sensitiveData/services/encryptionService/encryption.service";
+  getRandomLorem,
+  getRandomString,
+  getTestString,
+  getThreeBytesUTF8Char,
+} from "src/_test_utilities/specialCharacters";
+import { EncryptionService } from "src/sensitiveData/services/encryptionService/encryption.service";
 import {
   decryptWithAES,
   decryptWithRSA,
@@ -24,7 +27,6 @@ import {
 import { formConfig } from "src/sensitiveData/components/sensitiveDataForm/formConfig";
 
 describe("EncryptionService", () => {
-
   beforeAll(() => {
     // The window.crypto is not available in the jest test environment.
     // So we need to mock it.
@@ -67,13 +69,13 @@ describe("EncryptionService", () => {
     const actualEncryptionKey = await decryptWithRSA(
       keyPair.privateKey,
       new Uint8Array(
-        [...atob(encryptedSensitivePersonalData.aes_encryption_key).split("")].map((char) => char.charCodeAt(0)),
-      ),
+        [...atob(encryptedSensitivePersonalData.aes_encryption_key).split("")].map((char) => char.charCodeAt(0))
+      )
     );
 
     const decryptedData = new Uint8Array(
       // @ts-ignore
-      [...atob(encryptedSensitivePersonalData.aes_encrypted_data)].map((char) => char.charCodeAt(0)),
+      [...atob(encryptedSensitivePersonalData.aes_encrypted_data)].map((char) => char.charCodeAt(0))
     );
 
     // 1. differentiate the initialization vector and the encrypted data
@@ -112,8 +114,9 @@ describe("EncryptionService", () => {
 
     // WHEN encrypting the sensitive personal data
     const encryptionService = new EncryptionService();
-    const encryptedSensitivePersonalData = await encryptionService
-      .encryptSensitivePersonalData(givenMaxSensitivePersonalData as SensitivePersonalData);
+    const encryptedSensitivePersonalData = await encryptionService.encryptSensitivePersonalData(
+      givenMaxSensitivePersonalData as SensitivePersonalData
+    );
 
     // THEN the encrypted data should be returned
     expect(encryptedSensitivePersonalData).toBeDefined();

@@ -17,11 +17,10 @@ async function setup(callback: (user: UserEvent) => Promise<void>) {
 
 export async function typeDebouncedInput(element: Element, text: string) {
   await setup(async (user) => {
-    if(!text) return;
+    if (!text) return;
     // replace [ with [[ and { with {{
     // they are reserved characters in the userEvent library
-    const formattedText = text.replaceAll("[", "[[")
-      .replaceAll("{", "{{")
+    const formattedText = text.replaceAll("[", "[[").replaceAll("{", "{{");
     await user.type(element, formattedText);
   });
 }

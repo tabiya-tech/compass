@@ -1,5 +1,6 @@
 const sampleValidSpecialCharacters = "€^°!\"§$%&/()=?`´*+#'-_.,;<>öäü@[]{}|¡“¶¢]≠¿'„…∞~<•±æœ";
-const sampleInternationalCharacters = "αβγδεζηθικλμνξοπρστυφχψωأبجدهوزحطيكلمنسعفصقرشتثخذضظغሀለሐመሠረሰሸቀበተቸኀአከኸወዘዠየደጀገጠጰፈፐፘ一二三四五六七八九十百千万亿";
+const sampleInternationalCharacters =
+  "αβγδεζηθικλμνξοπρστυφχψωأبجدهوزحطيكلمنسعفصقرشتثخذضظغሀለሐመሠረሰሸቀበተቸኀአከኸወዘዠየደጀገጠጰፈፐፘ一二三四五六七八九十百千万亿";
 const THREE_BYTE_UTF8_CHAR = "€";
 export const WHITESPACE = " \n\r\t";
 

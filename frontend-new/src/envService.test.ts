@@ -101,7 +101,9 @@ describe.each([
       // THEN expect it to return an empty string
       expect(apiUrl).toBe("");
       // AND expect an error to have been logged
-      expect(console.error).toHaveBeenCalledWith(new EnvError(`Error loading environment variable ${ENV_KEY}`, expect.any(Error)));
+      expect(console.error).toHaveBeenCalledWith(
+        new EnvError(`Error loading environment variable ${ENV_KEY}`, expect.any(Error))
+      );
     });
   });
 });

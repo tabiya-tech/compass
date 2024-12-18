@@ -36,10 +36,10 @@ describe("Primary Button tests", () => {
     // GIVEN no children
     // WHEN the component is rendered
     // THEN expect an error to be thrown]
-    expect(() => render(
-      <PrimaryButton />)).toThrow(new ComponentError("Children are required for PrimaryButton component"));
+    expect(() => render(<PrimaryButton />)).toThrow(
+      new ComponentError("Children are required for PrimaryButton component")
+    );
   });
-
 
   describe.each([
     [true, { disable: true, disableWhenOffline: true, isOnline: true }],
@@ -63,7 +63,15 @@ describe("Primary Button tests", () => {
       const givenText = "Bar";
 
       // WHEN the component is rendered
-      render(<PrimaryButton disabled={testCase.disable} disableWhenOffline={testCase.disableWhenOffline} data-testid={givenTestId}>{givenText}</PrimaryButton>);
+      render(
+        <PrimaryButton
+          disabled={testCase.disable}
+          disableWhenOffline={testCase.disableWhenOffline}
+          data-testid={givenTestId}
+        >
+          {givenText}
+        </PrimaryButton>
+      );
 
       // THEN expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();
@@ -82,7 +90,11 @@ describe("Primary Button tests", () => {
     const givenText = "Bar";
 
     // WHEN the button is rendered
-    render(<PrimaryButton disableWhenOffline={true} data-testid={givenTestId}>{givenText}</PrimaryButton>);
+    render(
+      <PrimaryButton disableWhenOffline={true} data-testid={givenTestId}>
+        {givenText}
+      </PrimaryButton>
+    );
 
     // THEN expect the button to be enabled
     const primaryButton = screen.getByRole("button");

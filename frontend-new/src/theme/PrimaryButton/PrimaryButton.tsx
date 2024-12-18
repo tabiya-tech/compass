@@ -18,7 +18,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
 }: Readonly<PrimaryButtonProps>) => {
   const isOnline = useContext(IsOnlineContext);
 
-  if(!children) {
+  if (!children) {
     throw new ComponentError("Children are required for PrimaryButton component");
   }
 
@@ -32,7 +32,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
         borderRadius: (theme) => theme.tabiyaRounding.xl,
         paddingY: (theme) => theme.fixedSpacing(theme.tabiyaSpacing.xs),
         paddingX: (theme) => theme.fixedSpacing(theme.tabiyaSpacing.md),
-        ...sx
+        ...sx,
       }}
       disableElevation
       disabled={Boolean(disabled || (disableWhenOffline && !isOnline))}
