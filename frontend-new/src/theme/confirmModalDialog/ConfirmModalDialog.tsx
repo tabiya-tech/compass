@@ -54,10 +54,7 @@ const ConfirmModalDialog: React.FC<ConfirmModalDialogProps> = (props) => {
         {props.content}
       </DialogContent>
       <DialogActions sx={{ padding: 0 }}>
-        <SecondaryButton
-          onClick={props.onCancel}
-          data-testid={DATA_TEST_ID.CONFIRM_MODAL_CANCEL}
-        >
+        <SecondaryButton onClick={props.onCancel} data-testid={DATA_TEST_ID.CONFIRM_MODAL_CANCEL}>
           {props.cancelButtonText}
         </SecondaryButton>
         <PrimaryButton onClick={props.onConfirm} data-testid={DATA_TEST_ID.CONFIRM_MODAL_CONFIRM}>

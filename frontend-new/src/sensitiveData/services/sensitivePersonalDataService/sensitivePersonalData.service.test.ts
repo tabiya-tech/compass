@@ -16,7 +16,7 @@ import { EncryptedDataTooLarge } from "./errors";
 describe("SensitivePersonalDataService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-  })
+  });
 
   describe("createSensitivePersonalData", () => {
     test("should create the correct data to the backend", async () => {
@@ -79,7 +79,9 @@ describe("SensitivePersonalDataService", () => {
       };
 
       // AND the encryption service is mocked to return the given maximum size data.
-      jest.spyOn(EncryptionService.prototype, "encryptSensitivePersonalData").mockResolvedValue(givenEncryptReturnValue);
+      jest
+        .spyOn(EncryptionService.prototype, "encryptSensitivePersonalData")
+        .mockResolvedValue(givenEncryptReturnValue);
 
       // WHEN the createSensitivePersonalData function is called with the given data
       const createSensitivePersonalData = sensitivePersonalDataService.createSensitivePersonalData(
@@ -88,8 +90,7 @@ describe("SensitivePersonalDataService", () => {
       );
 
       // THEN the function should throw an error.
-      await expect(createSensitivePersonalData)
-        .rejects.toThrow(new EncryptedDataTooLarge(givenEncryptReturnValue));
+      await expect(createSensitivePersonalData).rejects.toThrow(new EncryptedDataTooLarge(givenEncryptReturnValue));
 
       // AND fetch should not be called
       expect(customFetch).not.toHaveBeenCalled();

@@ -1,8 +1,5 @@
 import { EncryptionConfig } from "src/sensitiveData/config/encryptionConfig";
-import {
-  AESResult,
-  EncryptedSensitivePersonalData,
-} from "src/sensitiveData/services/encryptionService/types";
+import { AESResult, EncryptedSensitivePersonalData } from "src/sensitiveData/services/encryptionService/types";
 import { getSensitivePersonalDataRSAEncryptionKey, getSensitivePersonalDataRSAEncryptionKeyId } from "src/envService";
 import { SensitivePersonalData } from "src/sensitiveData/types";
 
@@ -42,7 +39,7 @@ export class EncryptionService {
         hash: EncryptionConfig.RSA.KEY_HASH_FN,
       },
       true, // Is extractable
-      ["encrypt"], // used for encryption here
+      ["encrypt"] // used for encryption here
     );
   }
 
@@ -56,7 +53,7 @@ export class EncryptionService {
         length: EncryptionConfig.AES.KEY_LEN,
       },
       true,
-      ["encrypt", "decrypt"],
+      ["encrypt", "decrypt"]
     );
 
     // the length is 12 bytes because we are using AES-GCM, and it is recommended to use 96 bytes = 12 bytes * 8 bits.
@@ -69,7 +66,7 @@ export class EncryptionService {
         tagLength: EncryptionConfig.AES.TAG_LEN,
       },
       cryptoKey,
-      dataBuffer,
+      dataBuffer
     );
 
     const encryptionKey = await this.crypto.subtle.exportKey(EncryptionConfig.AES.FORMAT, cryptoKey);
@@ -97,7 +94,7 @@ export class EncryptionService {
   }
 
   public async encryptSensitivePersonalData(
-    personalData: SensitivePersonalData,
+    personalData: SensitivePersonalData
   ): Promise<EncryptedSensitivePersonalData> {
     // Load the public key and key_id from the environment.
     // AND load the cryptoKey from the public key.
@@ -105,7 +102,6 @@ export class EncryptionService {
 
     const publicKey = getSensitivePersonalDataRSAEncryptionKey();
     const cryptoKey = await this.extractRSAPublicCryptoKey(publicKey);
-
 
     // convert the personal data to a string
     const personalDataString = JSON.stringify(personalData);
@@ -119,13 +115,13 @@ export class EncryptionService {
         name: EncryptionConfig.RSA.ALGORITHM,
       },
       cryptoKey,
-      aesResult.encryptionKey,
+      aesResult.encryptionKey
     );
 
     // construct the response object
     const aes_encrypted_data = this.uint8ArrayToBase64(
       aesResult.initializationVector,
-      new Uint8Array(aesResult.encryptedData),
+      new Uint8Array(aesResult.encryptedData)
     );
 
     const aes_encryption_key = this.uint8ArrayToBase64(new Uint8Array(encryptedKey));

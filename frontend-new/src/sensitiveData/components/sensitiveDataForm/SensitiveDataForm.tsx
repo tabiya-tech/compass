@@ -27,12 +27,9 @@ import AuthenticationServiceFactory from "src/auth/services/Authentication.servi
 import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
 import { EncryptedDataTooLarge } from "src/sensitiveData/services/sensitivePersonalDataService/errors";
-import {
-  sensitivePersonalDataService,
-} from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalData.service";
+import { sensitivePersonalDataService } from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalData.service";
 import TextConfirmModalDialog from "src/theme/textConfirmModalDialog/TextConfirmModalDialog";
 import { DEBOUNCE_TIME, formConfig } from "./formConfig";
-
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d1";
 
@@ -57,10 +54,12 @@ export const DATA_TEST_ID = {
 };
 
 export const ERROR_MESSAGE = {
-  ENCRYPTED_DATA_TOO_LARGE: "The personal data seems to be too large to be saved." +
+  ENCRYPTED_DATA_TOO_LARGE:
+    "The personal data seems to be too large to be saved." +
     "Please try again by entering smaller values for the fields." +
     "If the problem persists, clear your browser's cache and refresh the page.",
-  DEFAULT: "The personal data could not be saved." +
+  DEFAULT:
+    "The personal data could not be saved." +
     "Please try again and if the problem persists, clear your browser's cache and refresh the page.",
 };
 
@@ -125,7 +124,7 @@ const SensitiveDataForm: React.FC = () => {
   const handleFieldChange = <Key extends keyof SensitivePersonalData>(key: Key, target: any) => {
     target.value = target.value.trimStart() as SensitivePersonalData[Key];
 
-    if(formConfig[key]?.maxLength)
+    if (formConfig[key]?.maxLength)
       target.value = target.value.substring(0, formConfig[key].maxLength) as SensitivePersonalData[Key];
 
     sensitiveData.current[key] = target.value;
@@ -152,7 +151,7 @@ const SensitiveDataForm: React.FC = () => {
     try {
       await sensitivePersonalDataService.createSensitivePersonalData(
         sanitize(sensitiveData.current),
-        userPreferences.user_id,
+        userPreferences.user_id
       );
 
       // Update user preferences to indicate that the user has sensitive personal data
@@ -227,7 +226,7 @@ const SensitiveDataForm: React.FC = () => {
                   "data-testid": DATA_TEST_ID.SENSITIVE_DATA_FORM_FIRST_NAME_INPUT,
                 }}
                 required={true}
-                onChange={e => {
+                onChange={(e) => {
                   debouncedHandleFieldChange("first_name", e.target);
                 }}
               />
@@ -241,7 +240,7 @@ const SensitiveDataForm: React.FC = () => {
                   "data-testid": DATA_TEST_ID.SENSITIVE_DATA_FORM_LAST_NAME_INPUT,
                 }}
                 required={true}
-                onChange={e => debouncedHandleFieldChange("last_name", e.target)}
+                onChange={(e) => debouncedHandleFieldChange("last_name", e.target)}
               />
 
               <TextField
@@ -253,7 +252,7 @@ const SensitiveDataForm: React.FC = () => {
                   "data-testid": DATA_TEST_ID.SENSITIVE_DATA_FORM_CONTACT_EMAIL_INPUT,
                 }}
                 required={true}
-                onChange={e => debouncedHandleFieldChange("contact_email", e.target)}
+                onChange={(e) => debouncedHandleFieldChange("contact_email", e.target)}
               />
 
               <TextField
@@ -265,7 +264,7 @@ const SensitiveDataForm: React.FC = () => {
                   "data-testid": DATA_TEST_ID.SENSITIVE_DATA_FORM_PHONE_NUMBER_INPUT,
                 }}
                 required={true}
-                onChange={e => debouncedHandleFieldChange("phone_number", e.target)}
+                onChange={(e) => debouncedHandleFieldChange("phone_number", e.target)}
               />
 
               <TextField
@@ -277,7 +276,7 @@ const SensitiveDataForm: React.FC = () => {
                   "data-testid": DATA_TEST_ID.SENSITIVE_DATA_FORM_ADDRESS_INPUT,
                 }}
                 required={true}
-                onChange={e => debouncedHandleFieldChange("address", e.target)}
+                onChange={(e) => debouncedHandleFieldChange("address", e.target)}
               />
 
               <FormControl fullWidth>
@@ -387,11 +386,9 @@ const SensitiveDataForm: React.FC = () => {
         }}
         onConfirm={handleRejectProvidingSensitiveData}
         cancelButtonText="Cancel"
-        confirmButtonText={"Yes, I'm sure"}/>
-      <Backdrop
-        isShown={isRejecting}
-        message={"Logging you out..."}
+        confirmButtonText={"Yes, I'm sure"}
       />
+      <Backdrop isShown={isRejecting} message={"Logging you out..."} />
     </>
   );
 };
