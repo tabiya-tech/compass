@@ -1,6 +1,8 @@
-import { Button, ButtonProps } from "@mui/material";
+import { ButtonProps } from "@mui/material";
 import React, { useContext } from "react";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
+import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
+import { ComponentError } from "src/error/commonErrors";
 
 interface SecondaryButtonProps extends ButtonProps {
   // Add additional props specific to SecondaryButton Button here
@@ -12,27 +14,29 @@ const SecondaryButton: React.FC<SecondaryButtonProps> = ({
   disabled,
   children,
   disableWhenOffline,
+  sx,
   ...props
 }: Readonly<SecondaryButtonProps>) => {
   const isOnline = useContext(IsOnlineContext);
 
+  if(!children) {
+    throw new ComponentError("Children are required for SecondaryButton component");
+  }
+
   return (
     // props are passed to the component last, so that they can override the default values
-    <Button
+    <PrimaryButton
       variant={"text"}
       style={style}
       sx={{
-        borderRadius: (theme) => theme.tabiyaRounding.xl,
-        paddingY: (theme) => theme.fixedSpacing(theme.tabiyaSpacing.xs),
-        paddingX: (theme) => theme.fixedSpacing(theme.tabiyaSpacing.md),
-        color: (theme) => theme.palette.text.secondary
+        color: (theme) => theme.palette.text.secondary,
+        ...sx
       }}
-      disableElevation
       disabled={Boolean(disabled || (disableWhenOffline && !isOnline))}
       {...props}
     >
       {children ?? "Click here"}
-    </Button>
+    </PrimaryButton>
   );
 };
 

@@ -5,6 +5,7 @@ enum CommonError {
   CHAT_ERROR = "ChatError",
   FEEDBACK_ERROR = "FeedbackError",
   ENV_ERROR = "EnvError",
+  COMPONENT_ERROR = "ComponentError",
 }
 
 /**
@@ -54,6 +55,14 @@ export class EnvError extends Error {
   constructor(message: string, cause?: Error | string) {
     super(message);
     this.name = CommonError.ENV_ERROR;
+    this.cause = cause;
+  }
+}
+
+export class ComponentError extends Error {
+  constructor(message: string, cause?: Error | string) {
+    super(message);
+    this.name = CommonError.COMPONENT_ERROR;
     this.cause = cause;
   }
 }

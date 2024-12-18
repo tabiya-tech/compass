@@ -1,11 +1,11 @@
 import { Meta, StoryObj } from "@storybook/react";
 import ConfirmModalDialog from "src/theme/confirmModalDialog/ConfirmModalDialog";
-import { GoogleIcon } from "../Icons/GoogleIcon";
+import { GoogleIcon } from "src/theme/Icons/GoogleIcon";
 import { Checkbox } from "@mui/material";
 import React from "react";
 
 const meta: Meta<typeof ConfirmModalDialog> = {
-  title: "Components/ConfirmModal",
+  title: "Components/ConfirmModalDialog",
   component: ConfirmModalDialog,
   tags: ["autodocs"],
   argTypes: {

@@ -7,20 +7,7 @@ exports[`Primary Button tests should render the button with default props 1`] = 
   tabindex="0"
   type="button"
 >
-  Click here
-  <span
-    class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-  />
-</button>
-`;
-
-exports[`Primary Button tests should render the button with provided name 1`] = `
-<button
-  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
-  tabindex="0"
-  type="button"
->
-  Foo Bar
+  Bar
   <span
     class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
   />
