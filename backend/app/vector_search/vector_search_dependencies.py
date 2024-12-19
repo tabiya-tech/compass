@@ -17,18 +17,31 @@ from common_libs.environment_settings.constants import EmbeddingConfig
 logger = logging.getLogger(__name__)
 
 # Define a singleton instance of the Google VertexAI embeddings
-_embeddings = GoogleGeckoEmbeddingService()
-
 _embedding_config = EmbeddingConfig()
-
-
-def get_gecko_embeddings() -> GoogleGeckoEmbeddingService:
-    """ Get the Google VertexAI embeddings singleton instance."""
-    return _embeddings
-
 
 # Lock to ensure that the singleton instances are thread-safe
 _lock = asyncio.Lock()
+
+# Define a singleton instance of the Google VertexAI embeddings
+_embeddings_service_singleton = None
+
+
+async def _get_gecko_embeddings() -> GoogleGeckoEmbeddingService:
+    """
+    Get the Google VertexAI embeddings singleton instance.
+    :return: GoogleGeckoEmbeddingService
+    """
+    global _embeddings_service_singleton
+
+    if _embeddings_service_singleton is None:  # initial check to avoid the lock if the instance is already created (lock is expensive)
+        async with _lock:  # before modifying the singleton instance, acquire the lock
+            if _embeddings_service_singleton is None:  # double check after acquiring the lock
+                logger.info("creating a new instance of the Google VertexAI embeddings.")
+                _embeddings_service_singleton = GoogleGeckoEmbeddingService()
+
+    """ Get the Google VertexAI embeddings singleton instance."""
+    return _embeddings_service_singleton
+
 
 _vector_search_settings = VectorSearchSettings()
 
@@ -37,7 +50,7 @@ _skill_search_service_singleton: SimilaritySearchService[SkillEntity] | None = N
 
 
 async def get_skill_search_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_taxonomy_db),
-                                   embedding_model: EmbeddingService = Depends(get_gecko_embeddings)) -> SimilaritySearchService[SkillEntity]:
+                                   embedding_model: EmbeddingService = Depends(_get_gecko_embeddings)) -> SimilaritySearchService[SkillEntity]:
     """ Get the skill search service singleton instance."""
     global _skill_search_service_singleton
     if _skill_search_service_singleton is None:  # initial check
@@ -59,7 +72,7 @@ _occupation_search_service_singleton = None
 
 
 async def get_occupation_search_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_taxonomy_db),
-                                        embedding_model: EmbeddingService = Depends(get_gecko_embeddings)) -> SimilaritySearchService[OccupationEntity]:
+                                        embedding_model: EmbeddingService = Depends(_get_gecko_embeddings)) -> SimilaritySearchService[OccupationEntity]:
     """ Get the occupation search service singleton instance."""
     global _occupation_search_service_singleton
     if _occupation_search_service_singleton is None:  # initial check
@@ -80,7 +93,7 @@ _occupation_skill_search_service_singleton = None
 
 
 async def get_occupation_skill_search_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_taxonomy_db),
-                                              embedding_model: EmbeddingService = Depends(get_gecko_embeddings)) -> (
+                                              embedding_model: EmbeddingService = Depends(_get_gecko_embeddings)) -> (
         SimilaritySearchService)[OccupationSkillEntity]:
     """ Get the occupation search service singleton instance."""
     global _occupation_skill_search_service_singleton
