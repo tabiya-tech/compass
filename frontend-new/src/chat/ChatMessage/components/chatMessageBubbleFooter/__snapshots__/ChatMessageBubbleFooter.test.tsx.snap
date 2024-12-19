@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ChatMessageBubbleFooter should render component with feedback form button 1`] = `
+<div
+  class="MuiBox-root css-1h9gn4j"
+  data-testid="chat-message-bubble-footer-e4f89c2a-8c7d-4a3b-9f1c-d5c9e8f6b3a2"
+>
+  <hr
+    class="MuiDivider-root MuiDivider-fullWidth css-9mgopn-MuiDivider-root"
+    data-testid="chat-message-bubble-footer-divider-e4f89c2a-8c7d-4a3b-9f1c-d5c9e8f6b3a2"
+  />
+  <div
+    class="MuiBox-root css-ckyhk3"
+    data-testid="feedback-form-button-container-41675f8b-257c-4a63-9563-3fe9feb6a850"
+  >
+    <button
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
+      data-testid="feedback-form-button-41675f8b-257c-4a63-9563-3fe9feb6a850"
+      tabindex="0"
+      type="button"
+    >
+      Give feedback
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+  </div>
+</div>
+`;

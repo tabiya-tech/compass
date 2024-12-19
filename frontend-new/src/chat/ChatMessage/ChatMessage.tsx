@@ -1,12 +1,12 @@
 import React from "react";
-import { Box, Typography, styled, alpha, Divider, useTheme } from "@mui/material";
+import { Box, Typography, styled, alpha } from "@mui/material";
 import { IChatMessage } from "src/chat/Chat.types";
 import { getDurationFromNow } from "src/utils/getDurationFromNow/getDurationFromNow";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
-import FeedbackFormButton from "src/feedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
+import ChatMessageBubbleFooter from "./components/chatMessageBubbleFooter/ChatMessageBubbleFooter";
 
 export enum ChatMessageFooterType {
-  FEEDBACK_FORM_BUTTON = "feedback-form-button",
+  FEEDBACK_FORM = "feedback-form",
 }
 
 const uniqueId = "2fbaf2ef-9eab-485a-bd28-b4a164e18b06";
@@ -14,7 +14,6 @@ const uniqueId = "2fbaf2ef-9eab-485a-bd28-b4a164e18b06";
 export const DATA_TEST_ID = {
   CHAT_MESSAGE_CONTAINER: `chat-message-container-${uniqueId}`,
   CHAT_MESSAGE_TIMESTAMP: `chat-message-sent_at-${uniqueId}`,
-  CHAT_MESSAGE_FOOTER_DIVIDER: `chat-message-footer-divider-${uniqueId}`,
 };
 
 const MessageContainer = styled(Box)<{ origin: ConversationMessageSender }>(({ theme, origin }) => ({
@@ -55,34 +54,22 @@ type ChatMessageProps = {
 };
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage, notifyOpenFeedbackForm }) => {
-  const theme = useTheme();
   let duration;
   try {
     duration = getDurationFromNow(new Date(chatMessage.sent_at));
   } catch (e) {
     console.error(new Error("Failed to get message duration", { cause: e }));
   }
-  const getFooterFromType = (type: ChatMessageFooterType) => {
-    switch (type) {
-      case ChatMessageFooterType.FEEDBACK_FORM_BUTTON:
-        return <FeedbackFormButton notifyOpenFeedbackForm={notifyOpenFeedbackForm} />;
-      default:
-        return null;
-    }
-  };
   return (
     <MessageContainer origin={chatMessage.sender} data-testid={DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}>
       <MessageBubble origin={chatMessage.sender}>
         <Typography whiteSpace="pre-line">{chatMessage.message}</Typography>
         {chatMessage.footerType !== undefined && (
-          <Divider
-            sx={{
-              borderTop: `${theme.fixedSpacing(theme.tabiyaSpacing.xxs)} solid ${theme.palette.grey[300]}`,
-            }}
-            data-testid={DATA_TEST_ID.CHAT_MESSAGE_FOOTER_DIVIDER}
+          <ChatMessageBubbleFooter
+            footerType={chatMessage.footerType}
+            notifyOpenFeedbackForm={notifyOpenFeedbackForm}
           />
         )}
-        {chatMessage.footerType !== undefined && getFooterFromType(chatMessage.footerType)}
       </MessageBubble>
       {!chatMessage.isTypingMessage && (
         <TimeStamp data-testid={DATA_TEST_ID.CHAT_MESSAGE_TIMESTAMP} variant="caption">

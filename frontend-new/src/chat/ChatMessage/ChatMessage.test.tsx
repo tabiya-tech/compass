@@ -6,7 +6,7 @@ import { render, screen } from "src/_test_utilities/test-utils";
 import * as GetDurationFromNow from "src/utils/getDurationFromNow/getDurationFromNow";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
-import { DATA_TEST_ID as CHAT_MESSAGE_FOOTER_BUTTON_DATA_TEST_ID } from "src/feedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
+import { DATA_TEST_ID as CHAT_MESSAGE_FOOTER_DATA_TEST_ID } from "src/feedback/feedbackForm/components/feedbackFormButton/FeedbackFormFooter";
 import { IChatMessage } from "src/chat/Chat.types";
 
 jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service", () => {
@@ -82,23 +82,21 @@ describe("render tests", () => {
     expect(screen.queryByTestId(DATA_TEST_ID.CHAT_MESSAGE_TIMESTAMP)).not.toBeInTheDocument();
   });
 
-  test("should render ChatMessageFooter when the footer type is FEEDBACK_FORM_BUTTON", () => {
+  test("should render ChatMessageFooter when a message has a footerType of FEEDBACK_FORM_BUTTON", () => {
     // GIVEN a chat message
     const givenMessage = {
       id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       message: "Hello, I'm Compass",
       sent_at: new Date().toISOString(),
-      footerType: ChatMessageFooterType.FEEDBACK_FORM_BUTTON,
+      footerType: ChatMessageFooterType.FEEDBACK_FORM,
     };
     const givenNotifyOpenFeedbackForm = jest.fn();
 
     // WHEN the component is rendered
     render(<ChatMessage chatMessage={givenMessage} notifyOpenFeedbackForm={givenNotifyOpenFeedbackForm} />);
 
-    // THEN expect the divider to be displayed
-    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FOOTER_DIVIDER)).toBeInTheDocument();
-    // AND the feedback form button to be displayed
-    expect(screen.getByTestId(CHAT_MESSAGE_FOOTER_BUTTON_DATA_TEST_ID.FEEDBACK_FORM_BUTTON)).toBeInTheDocument();
+    // THEN expect the footer container to be displayed
+    expect(screen.getByTestId(CHAT_MESSAGE_FOOTER_DATA_TEST_ID.FEEDBACK_FORM_FOOTER_CONTAINER)).toBeInTheDocument();
   });
 });

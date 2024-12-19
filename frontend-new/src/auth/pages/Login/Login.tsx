@@ -257,7 +257,11 @@ const Login: React.FC = () => {
     isLoading || activeLoginForm === ActiveForm.NONE || ((!email || !password) && !inviteCode);
 
   return (
-    <Container maxWidth="xs" sx={{ height: "100%", padding: theme.fixedSpacing(theme.tabiyaSpacing.lg) }} data-testid={DATA_TEST_ID.LOGIN_CONTAINER}>
+    <Container
+      maxWidth="xs"
+      sx={{ height: "100%", padding: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}
+      data-testid={DATA_TEST_ID.LOGIN_CONTAINER}
+    >
       <Backdrop isShown={isLoading} message={"Logging you in..."} />
       <Box display="flex" flexDirection="column" alignItems="center" justifyContent={"space-evenly"} height={"80%"}>
         <AuthHeader title={"Welcome to Compass!"} subtitle={"Login to your account to continue"} />
