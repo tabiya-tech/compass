@@ -36,6 +36,7 @@ on:
 
 jobs:
   deploy:
+    name: deploy-backend
     runs-on: ubuntu-latest
     environment: ${{ inputs.target-environment }}
     outputs:

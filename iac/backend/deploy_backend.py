@@ -190,6 +190,7 @@ def _get_fully_qualified_image_name(
 
 # Deploy cloud run service
 
+
 # See https://cloud.google.com/run/docs/overview/what-is-cloud-run for more information
 def _deploy_cloud_run_service(
         *,
@@ -288,7 +289,7 @@ def _deploy_cloud_run_service(
 
 # export a function build_and_push_image that will be used in the main pulumi program
 def deploy_backend(
-        project: str,
+        project: str | Output[str],
         location: str,
         environment: str,
         project_number: Output[str],
@@ -305,7 +306,7 @@ def deploy_backend(
     # Get the repository from the organisation/root-project
     repository = _get_repository(basic_config, project_number, env_vars.ROOT_PROJECT_ID)
 
-    # Build and push image to gcr repository
+    # get fully qualified image name
     fully_qualified_image_name = _get_fully_qualified_image_name(
         basic_config,
         repository,
@@ -313,12 +314,33 @@ def deploy_backend(
         environment_type,
         env_vars
     )
-    image = _build_and_push_image(fully_qualified_image_name, [], basic_config)
+
+    # if the environment is prod, we are going to use the test image.
+    image_name = fully_qualified_image_name.apply(lambda value: value.replace("prod", "test"))
+
+    def __get_image(_environment_type: str):
+        """
+        Get the image based on the environment type
+        if the environment type is prod, then get the image from the test environment.
+
+        :param _environment_type: str.
+        :return: Image
+        """
+        if environment_type == "prod":
+            return docker.get_remote_image(
+                name=image_name,
+                opts=pulumi.InvokeOptions(provider=basic_config.provider),
+            )
+        else:
+            return _build_and_push_image(fully_qualified_image_name, [], basic_config)
+
+    # construct the image based on the environment type
+    image = environment_type.apply(__get_image)
 
     # Deploy the image as a cloud run service
     cloud_run = _deploy_cloud_run_service(
         basic_config=basic_config,
-        fully_qualified_image_name=fully_qualified_image_name.apply(lambda value: value),
+        fully_qualified_image_name=image_name,
         backend_env_vars_cfg=env_vars,
         dependencies=[image],
     )

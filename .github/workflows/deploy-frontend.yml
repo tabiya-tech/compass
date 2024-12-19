@@ -27,6 +27,7 @@ on:
 
 jobs:
   deploy:
+    name: deploy-frontend
     runs-on: ubuntu-latest
     environment: ${{ inputs.target-environment }}
     outputs:
