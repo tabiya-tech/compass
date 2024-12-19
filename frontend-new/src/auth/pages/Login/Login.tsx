@@ -73,9 +73,7 @@ const Login: React.FC = () => {
 
   const handleError = useCallback(
     async (error: Error) => {
-      console.log("handleError", error);
       let errorMessage;
-      console.log("login", error);
       if (error instanceof ServiceError) {
         errorMessage = getUserFriendlyErrorMessage(error);
         writeServiceErrorToLog(error, console.error);

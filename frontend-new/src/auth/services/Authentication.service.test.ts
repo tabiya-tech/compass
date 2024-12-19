@@ -2,12 +2,14 @@ import "src/_test_utilities/consoleMock";
 import AuthenticationService, { TokenValidationFailureCause } from "./Authentication.service";
 import { jwtDecode } from "jwt-decode";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import UserPreferencesService, { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { TabiyaUser, Token, TokenHeader } from "src/auth/auth.types";
 import AuthenticationStateService from "./AuthenticationState.service";
 
 import { UserPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import { ServiceError } from "src/error/ServiceError/ServiceError";
+import { StatusCodes } from "http-status-codes";
 
 // Mock jwt-decode
 jest.mock("jwt-decode", () => ({
@@ -128,6 +130,52 @@ describe("AuthenticationService", () => {
 
       // THEN it should throw an error
       await expect(loginPromise).rejects.toThrow("User not found in the token");
+    });
+
+    test("should not throw error when user preferences are not found", async () => {
+      // GIVEN a user exists in the token
+      const givenToken = "test-token";
+      const givenUser = {
+        id: "test-id",
+        name: "Test User",
+        email: "test@example.com",
+      };
+      jest.spyOn(service, "getUser").mockReturnValue(givenUser);
+    
+      // AND user preferences service throws a 404 error
+      const givenError = new ServiceError(
+        UserPreferencesService.serviceName,
+        "getUserPreferences",
+        "GET",
+        "/",
+        StatusCodes.NOT_FOUND,
+        "Not Found",
+        ""
+      );
+      (userPreferencesService.getUserPreferences as jest.Mock).mockRejectedValue(givenError);
+    
+      // WHEN onSuccessfulLogin is called
+      await service.onSuccessfulLogin(givenToken);
+    
+      // THEN the token should be stored
+      expect(PersistentStorageService.setToken).toHaveBeenCalledWith(givenToken);
+    
+      // AND the user should be set in the authentication state
+      expect(AuthenticationStateService.getInstance().setUser).toHaveBeenCalledWith(givenUser);
+    
+      // AND user preferences should have been attempted to be fetched
+      expect(userPreferencesService.getUserPreferences).toHaveBeenCalledWith(givenUser.id);
+    
+      // AND user preferences should not be set since they weren't found
+      expect(service["userPreferencesStateService"].setUserPreferences).not.toHaveBeenCalled();
+    
+      // AND an info message should be logged
+      expect(console.info).toHaveBeenCalledWith(
+        `User has not registered! Preferences could not be found for userId: ${givenUser.id}`
+      );
+
+      // AND the error should not be rethrown
+      expect(console.error).not.toHaveBeenCalled();
     });
   });
 

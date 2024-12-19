@@ -9,6 +9,8 @@ import { TabiyaUser, Token, TokenHeader } from "src/auth/auth.types";
 import { jwtDecode } from "jwt-decode";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { TokenError } from "src/error/commonErrors";
+import { ServiceError } from "src/error/ServiceError/ServiceError";
+import { StatusCodes } from "http-status-codes";
 
 export enum TokenValidationFailureCause {
   TOKEN_EXPIRED = "TOKEN_EXPIRED",
@@ -95,7 +97,20 @@ abstract class AuthenticationService {
     }
     PersistentStorageService.setToken(token);
     this.authenticationStateService.setUser(user);
-    const prefs = await userPreferencesService.getUserPreferences(user.id);
+    let prefs = null;
+    try {
+      prefs = await userPreferencesService.getUserPreferences(user.id);
+    } catch (error) {
+      if (error instanceof ServiceError) {
+        // if the user preferences are not found by user id, but has a valid token, log an info and continue with the prefs as null
+        if (error.statusCode === StatusCodes.NOT_FOUND) {
+          console.info(`User has not registered! Preferences could not be found for userId: ${user.id}`);
+        } else {
+          // rethrow the error if it is not a 404 error
+          throw error;
+        }
+      }
+    }
     if (prefs !== null) {
       // set the local preferences "state" ( for lack of a better word )
       userPreferencesStateService.setUserPreferences(prefs);
