@@ -60,6 +60,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const [newConversationDialog, setNewConversationDialog] = React.useState<boolean>(false);
   const [exploredExperiencesNotification, setExploredExperiencesNotification] = useState<boolean>(false);
   const [isFeedbackFormOpen, setIsFeedbackFormOpen] = useState<boolean>(false);
+  const [isStartingNewConversation, setIsStartingNewConversation] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -372,9 +373,11 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   }, []);
 
   const handleConfirmNewConversation = async () => {
+    setIsStartingNewConversation(true);
     setMessages([]);
     handleNewConversationDialogToggle(false);
     await startNewConversation();
+    setIsStartingNewConversation(false);
   };
 
   const handleFeedbackFormToggle = useCallback((feeedBackFormOpen: boolean) => {
@@ -453,6 +456,9 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
               cancelButtonText="Cancel"
               confirmButtonText="Yes, I'm sure"
             />
+          )}
+          {isStartingNewConversation && (
+            <Backdrop isShown={isStartingNewConversation} message="Starting new conversation, please wait..." />
           )}
           <FeedbackForm
             isOpen={isFeedbackFormOpen}
