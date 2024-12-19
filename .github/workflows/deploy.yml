@@ -1,0 +1,162 @@
+name: deploy
+
+on:
+  workflow_call:
+    inputs:
+      target-environment:
+        description: 'The target environment to deploy to'
+        required: true
+        type: string
+      domain-name:
+        description: 'The domain name'
+        required: true
+        type: string
+      frontend-domain:
+        description: 'The frontend domain'
+        required: true
+        type: string
+      frontend-url:
+        description: 'The frontend URL'
+        required: true
+        type: string
+      frontend-version-info:
+        description: 'The frontend version info'
+        required: true
+        type: string
+      backend-url:
+        description: 'The backend URL'
+        required: true
+        type: string
+      backend-domain:
+        description: 'The backend domain'
+        required: true
+        type: string
+      taxonomy-database-name:
+        description: 'The taxonomy database name'
+        required: true
+        type: string
+      taxonomy-model-id:
+        description: 'The taxonomy model ID'
+        required: true
+        type: string
+      application-database-name:
+        description: 'The application database name'
+        required: true
+        type: string
+      userdata-database-name:
+        description: 'The userdata database name'
+        required: true
+        type: string
+      vertex-api-region:
+        description: 'The vertex API region'
+        required: true
+        type: string
+      sensitive-data-encryption-key:
+        description: 'The sensitive data encryption key'
+        required: true
+        type: string
+      sensitive-data-encryption-key-id:
+        description: 'The sensitive data encryption key ID'
+        required: true
+        type: string
+
+
+jobs:
+  # sets up the organization and deploys the environment.
+  deploy-environment:
+    uses: ./.github/workflows/deploy-environment.yml
+    secrets: inherit
+    with:
+      target-environment: ${{ inputs.target-environment }}
+
+  deploy-auth:
+    uses: ./.github/workflows/deploy-auth.yml
+    needs: [ ]
+    secrets: inherit
+    with:
+      target-environment: ${{ inputs.target-environment }}
+      frontend-domain: ${{ inputs.frontend-domain }}
+
+  deploy-backend:
+    needs: [ deploy-environment ]
+    uses: ./.github/workflows/deploy-backend.yml
+    secrets: inherit
+    with:
+      target-environment: ${{ inputs.target-environment }}
+      backend-url: ${{ inputs.backend-url }}
+      frontend-url: ${{ inputs.frontend-url }}
+      taxonomy-database-name: ${{ inputs.taxonomy-database-name }}
+      taxonomy-model-id: ${{ inputs.taxonomy-model-id }}
+      application-database-name: ${{ inputs.application-database-name }}
+      userdata-database-name: ${{ inputs.userdata-database-name }}
+      vertex-api-region: ${{ inputs.vertex-api-region }}
+
+  smoke-test-backend-api-gateway:
+    needs: [ deploy-backend ]
+    uses: ./.github/workflows/smoke-test-backend-version.yml
+    secrets: inherit
+    with:
+      component: backend
+      expected-version-info: ${{ needs.deploy-backend.outputs.version-info }}
+      component-url: ${{ needs.deploy-backend.outputs.api-gateway-url }}
+      get-version-url: /version
+
+  deploy-frontend:
+    needs: [  deploy-auth, deploy-environment ]
+    uses: ./.github/workflows/deploy-frontend.yml
+    secrets: inherit
+    with:
+      target-environment: ${{ inputs.target-environment }}
+      backend-url: ${{ inputs.backend-url }}
+      identity_platform_client_api_key: ${{ needs.deploy-auth.outputs.identity_platform_client_api_key }}
+      identity_platform_client_firebase_auth_domain: ${{ needs.deploy-auth.outputs.identity_platform_client_firebase_auth_domain }}
+      sensitive-data-encryption-key: ${{ inputs.sensitive-data-encryption-key }}
+      sensitive-data-encryption-key-id: ${{ inputs.sensitive-data-encryption-key-id }}
+
+  smoke-test-frontend-bucket:
+    needs: [ deploy-frontend ]
+    uses: ./.github/workflows/smoke-test-frontend-version.yml
+    secrets: inherit
+    with:
+      component: frontend-new
+      expected-version-info: ${{ inputs.frontend-version-info }}
+      component-url: ${{ needs.deploy-frontend.outputs.frontend-url }}
+
+  deploy-common:
+    needs: [ smoke-test-backend-api-gateway, smoke-test-frontend-bucket ]
+    uses: ./.github/workflows/deploy-common.yml
+    secrets: inherit
+    with:
+      target-environment: ${{ inputs.target-environment }}
+      domain-name: ${{ inputs.domain-name }}
+      frontend-domain: ${{ inputs.frontend-domain }}
+      frontend-url: ${{ inputs.frontend-url }}
+      backend-domain: ${{ inputs.backend-domain }}
+      backend-url: ${{ inputs.backend-url }}
+
+  deploy-aws-ns:
+    needs: [ deploy-common ]
+    uses: ./.github/workflows/deploy-aws-ns.yml
+    secrets: inherit
+    with:
+      target-environment: ${{ inputs.target-environment }}
+      domain-name: ${{ inputs.domain-name }}
+
+  smoke-test-backend:
+    needs: [ deploy-backend, deploy-aws-ns ]
+    uses: ./.github/workflows/smoke-test-backend-version.yml
+    secrets: inherit
+    with:
+      component: backend
+      expected-version-info: ${{ needs.deploy-backend.outputs.version-info }}
+      component-url: ${{ inputs.backend-url }}
+      get-version-url: /version
+
+  smoke-test-frontend:
+    needs: [ deploy-frontend, deploy-aws-ns ]
+    uses: ./.github/workflows/smoke-test-frontend-version.yml
+    secrets: inherit
+    with:
+      component: frontend-new
+      expected-version-info: ${{ inputs.frontend-version-info }}
+      component-url: ${{ inputs.frontend-url }}

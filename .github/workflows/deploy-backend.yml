@@ -35,7 +35,7 @@ on:
         value: ${{ jobs.deploy.outputs.version-info }}
 
 jobs:
-  deploy:
+  deploy-backend:
     runs-on: ubuntu-latest
     environment: ${{ inputs.target-environment }}
     outputs:

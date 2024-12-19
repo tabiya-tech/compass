@@ -8,7 +8,7 @@ from lib.std_pulumi import get_resource_name, ProjectBaseConfig, get_project_bas
 # However, if the pulumi stack is removed (pulumi destroy), this code will fail when the stack is re-created (pulumi up)
 # as the identity platform has already been enabled for the project.
 # The solution is to import the identity platform configs to the pulumi projects with the following command
-# $ pulumi import gcp:identityplatform/config:Config identity-platform-config {{project}}
+# $ pulumi import gcp:identityplatform/config:Config default {{project}}
 # where {{project}} is for example auth-poc-422113 or compass-dev-418218.
 # After the resource has been imported to the pulumi stack, the code is able to update the configs again.
 """
@@ -27,8 +27,9 @@ def _setup_identity_platform(
         _authorized_domains.append("localhost")
         # add more domains here depending on how the application is accessed
 
+    # Use name "default" as we may require to import this from GCP
     default = gcp.identityplatform.Config(
-        get_resource_name(resource="identity-platform", resource_type="config"),
+        "default",
         authorized_domains=_authorized_domains,
         mfa=gcp.identityplatform.ConfigMfaArgs(
             state="DISABLED",
