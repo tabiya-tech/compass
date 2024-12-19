@@ -41,7 +41,8 @@ jobs:
 
   deploy:
     # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
-    if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
+    # TODO: uncomment this line
+    # if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
     uses: ./.github/workflows/deploy.yml
     needs: [ build, setup-env ]
     secrets: inherit

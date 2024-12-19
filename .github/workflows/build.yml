@@ -37,7 +37,7 @@ on:
         type: string
     outputs:
       frontend-version-info:
-        value: ${{ jobs.build-frontend.ouputs.version-info }}
+        value: ${{ jobs.build-frontend.outputs.version-info }}
         description: 'The frontend version info'
 
 jobs:

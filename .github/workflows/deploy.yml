@@ -63,7 +63,7 @@ on:
 
 jobs:
   # sets up the organization and deploys the environment.
-  deploy-environment:
+  environment:
     uses: ./.github/workflows/deploy-environment.yml
     secrets: inherit
     with:
@@ -71,14 +71,14 @@ jobs:
 
   deploy-auth:
     uses: ./.github/workflows/deploy-auth.yml
-    needs: [ ]
+    needs: [ environment ]
     secrets: inherit
     with:
       target-environment: ${{ inputs.target-environment }}
       frontend-domain: ${{ inputs.frontend-domain }}
 
   deploy-backend:
-    needs: [ deploy-environment ]
+    needs: [ environment ]
     uses: ./.github/workflows/deploy-backend.yml
     secrets: inherit
     with:
@@ -102,7 +102,7 @@ jobs:
       get-version-url: /version
 
   deploy-frontend:
-    needs: [  deploy-auth, deploy-environment ]
+    needs: [ deploy-auth, environment ]
     uses: ./.github/workflows/deploy-frontend.yml
     secrets: inherit
     with:
