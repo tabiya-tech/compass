@@ -91,9 +91,9 @@ class UserPreferences(BaseModel):
         use_enum_values = True
 
 
-class GetUsersPreferencesResponse(UserPreferences):
+class UsersPreferencesResponse(UserPreferences):
     """
-    Represents the response for getting the user preferences
+    Represents the response payload for the user preferences REST API
     """
 
     sessions_with_feedback: list[int] = Field(default_factory=list)

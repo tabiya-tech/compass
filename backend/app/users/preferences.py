@@ -14,7 +14,7 @@ from app.users.feedback.service import UserFeedbackService
 from app.users.repositories import UserPreferenceRepository
 from app.users.sessions import generate_new_session_id, SessionsService
 from app.users.types import UserPreferencesUpdateRequest, UserPreferences, \
-    CreateUserPreferencesRequest, UserPreferencesRepositoryUpdateRequest, GetUsersPreferencesResponse
+    CreateUserPreferencesRequest, UserPreferencesRepositoryUpdateRequest, UsersPreferencesResponse
 
 import logging
 
@@ -26,7 +26,7 @@ async def _get_user_preferences(
         user_feedback_service: UserFeedbackService,
         sensitive_personal_data_service: ISensitivePersonalDataService,
         user_id: str,
-        authed_user: UserInfo) -> GetUsersPreferencesResponse:
+        authed_user: UserInfo) -> UsersPreferencesResponse:
     try:
         if user_id != authed_user.user_id:
             raise HTTPException(status_code=403, detail="forbidden")
@@ -55,13 +55,11 @@ async def _get_user_preferences(
             sensitive_personal_data_service.exists_by_user_id(user_id)
         )
 
-        user_preferences = GetUsersPreferencesResponse(
+        return UsersPreferencesResponse(
             **user_preferences.model_dump(),
             has_sensitive_personal_data=has_sensitive_personal_data,
             sessions_with_feedback=sessions_with_feedback
         )
-
-        return user_preferences
     except Exception as e:
         logger.exception(e)
 
@@ -77,7 +75,7 @@ async def _create_user_preferences(
         user_invitation_service: UserInvitationService,
         repository: UserPreferenceRepository,
         preferences: CreateUserPreferencesRequest,
-        authed_user: UserInfo) -> UserPreferences:
+        authed_user: UserInfo) -> UsersPreferencesResponse:
     try:
         if preferences.user_id != authed_user.user_id:
             raise HTTPException(status_code=403, detail="forbidden")
@@ -118,15 +116,18 @@ async def _create_user_preferences(
         sessions = [session_id]
 
         # Create the user preferences
-        created = await repository.insert_user_preference(preferences.user_id, UserPreferences(
+        newly_created = await repository.insert_user_preference(preferences.user_id, UserPreferences(
             language=preferences.language,
             invitation_code=preferences.invitation_code,
             sensitive_personal_data_requirement=invitation.sensitive_personal_data_requirement,
             sessions=sessions
         ))
 
-        return created
-
+        return UsersPreferencesResponse(
+            **newly_created.model_dump(),
+            has_sensitive_personal_data=False,
+            sessions_with_feedback=[]
+        )
     except Exception as e:
         logger.exception(e)
 
@@ -136,8 +137,11 @@ async def _create_user_preferences(
         raise HTTPException(status_code=500, detail="failed to create user preferences")
 
 
-async def _get_new_session(user_repository: UserPreferenceRepository, user_id: str,
-                           authed_user: UserInfo) -> UserPreferences:
+async def _get_new_session(user_repository: UserPreferenceRepository,
+                           user_feedback_service: UserFeedbackService,
+                           sensitive_personal_data_service: ISensitivePersonalDataService,
+                           user_id: str,
+                           authed_user: UserInfo) -> UsersPreferencesResponse:
     """
     Get a new session for the user
     :param user_id:  id of the user
@@ -150,7 +154,19 @@ async def _get_new_session(user_repository: UserPreferenceRepository, user_id: s
             raise HTTPException(status_code=403, detail="forbidden")
 
         session_service = SessionsService(user_repository)
-        return await session_service.new_session(user_id)
+
+        updated_user_preferences, sessions_with_feedback, has_sensitive_personal_data = await asyncio.gather(
+            session_service.new_session(user_id),
+            user_feedback_service.get_user_feedback(user_id),
+            sensitive_personal_data_service.exists_by_user_id(user_id)
+        )
+
+        return UsersPreferencesResponse(
+            **updated_user_preferences.model_dump(),
+            has_sensitive_personal_data=has_sensitive_personal_data,
+            sessions_with_feedback=sessions_with_feedback
+        )
+
     except Exception as e:
         ErrorService.handle(__name__, e)
         raise HTTPException(status_code=500, detail="Oops! something went wrong")
@@ -158,8 +174,10 @@ async def _get_new_session(user_repository: UserPreferenceRepository, user_id: s
 
 async def _update_user_preferences(
         repository: UserPreferenceRepository,
+        user_feedback_service: UserFeedbackService,
+        sensitive_personal_data_service: ISensitivePersonalDataService,
         preferences: UserPreferencesUpdateRequest,
-        authed_user: UserInfo) -> UserPreferences:
+        authed_user: UserInfo) -> UsersPreferencesResponse:
     """
     Update user preferences
     :param repository: UserPreferenceRepository - The user preference repository
@@ -187,13 +205,21 @@ async def _update_user_preferences(
                 detail="accepted terms and conditions can't be updated once accepted"
             )
 
-        # Update the user preferences
-        created = await repository.update_user_preference(preferences.user_id, UserPreferencesRepositoryUpdateRequest(
-            language=preferences.language,
-            accepted_tc=preferences.accepted_tc,
-        ))
+        updated_user_preferences, sessions_with_feedback, has_sensitive_personal_data = await asyncio.gather(
+            repository.update_user_preference(preferences.user_id, UserPreferencesRepositoryUpdateRequest(
+                language=preferences.language,
+                accepted_tc=preferences.accepted_tc,
+            )),
+            user_feedback_service.get_user_feedback(preferences.user_id),
+            sensitive_personal_data_service.exists_by_user_id(preferences.user_id)
+        )
 
-        return created
+        return UsersPreferencesResponse(
+            **updated_user_preferences.model_dump(),
+            has_sensitive_personal_data=has_sensitive_personal_data,
+            sessions_with_feedback=sessions_with_feedback
+        )
+
     except Exception as e:
         ErrorService.handle(__name__, e)
 
@@ -227,7 +253,7 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     # GET /preferences - Get user preferences by user id
     #########################
     @router.get("",
-                response_model=GetUsersPreferencesResponse,
+                response_model=UsersPreferencesResponse,
                 status_code=200,
                 responses={403: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
                 name="get user preferences",
@@ -237,7 +263,7 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
             user_preference_repository: UserPreferenceRepository = Depends(_get_user_preferences_service),
             sensitive_personal_data_service: ISensitivePersonalDataService = Depends(get_sensitive_personal_data_service),
             user_feedback_service: UserFeedbackService = Depends(_get_user_feedback_service)
-    ) -> GetUsersPreferencesResponse:
+    ) -> UsersPreferencesResponse:
         return await _get_user_preferences(
             user_preference_repository,
             user_feedback_service,
@@ -250,7 +276,7 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     # POST /preferences - Add user preferences, this is a one-time operation otherwise it will return 409
     #########################
     @router.post("",
-                 response_model=UserPreferences,
+                 response_model=UsersPreferencesResponse,
                  status_code=201,
                  responses={403: {"model": HTTPErrorResponse}, 409: {"model": HTTPErrorResponse},
                             500: {"model": HTTPErrorResponse}},
@@ -262,7 +288,7 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
                               user_invitation_service: UserInvitationService = Depends(_get_user_invitations_service),
                               user_preference_repository: UserPreferenceRepository = Depends(
                                   _get_user_preferences_service)
-                              ):
+                              ) -> UsersPreferencesResponse:
         return await _create_user_preferences(user_invitation_service, user_preference_repository, body, user_info)
 
     #########################
@@ -271,17 +297,21 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     @router.patch(
         path="",
         status_code=200,
-        response_model=UserPreferences,
+        response_model=UsersPreferencesResponse,
         responses={404: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
         description="Update user preferences",
     )
     async def _update_user_preferences_handler(
             request: UserPreferencesUpdateRequest,
             user_info: UserInfo = Depends(auth.get_user_info()),
-            user_preference_repository: UserPreferenceRepository = Depends(_get_user_preferences_service)
-    ) -> UserPreferences:
+            user_preference_repository: UserPreferenceRepository = Depends(_get_user_preferences_service),
+            sensitive_personal_data_service: ISensitivePersonalDataService = Depends(get_sensitive_personal_data_service),
+            user_feedback_service: UserFeedbackService = Depends(_get_user_feedback_service)
+    ) -> UsersPreferencesResponse:
         return await _update_user_preferences(
             user_preference_repository,
+            user_feedback_service,
+            sensitive_personal_data_service,
             request,
             user_info
         )
@@ -290,14 +320,15 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     # GET /new-session - Get a new session for the user
     #########################
     @router.get("/new-session",
-                response_model=UserPreferences,
+                response_model=UsersPreferencesResponse,
                 status_code=201,
                 responses={403: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
                 description="""Endpoint for starting a new conversation session.""")
     async def _get_new_session_handler(user_id: str, user_info: UserInfo = Depends(auth.get_user_info()),
-                                       user_preference_repository: UserPreferenceRepository = Depends(
-                                           _get_user_preferences_service)
-                                       ):
+                                       user_preference_repository: UserPreferenceRepository = Depends(_get_user_preferences_service),
+                                       sensitive_personal_data_service: ISensitivePersonalDataService = Depends(get_sensitive_personal_data_service),
+                                       user_feedback_service: UserFeedbackService = Depends(_get_user_feedback_service)
+                                       ) -> UsersPreferencesResponse:
         """
         Endpoint for starting a new conversation session.
         The function creates a new session id and adds it to the user sessions on the top of the list.
@@ -305,7 +336,11 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
         :param user_info: UserInfo - The logged-in user information
         :return: UserPreferences - The updated user preferences
         """
-        return await _get_new_session(user_preference_repository, user_id, user_info)
+        return await _get_new_session(user_preference_repository,
+                                      user_feedback_service,
+                                      sensitive_personal_data_service,
+                                      user_id,
+                                      user_info)
 
     #########################
     # Add the router to the users router
