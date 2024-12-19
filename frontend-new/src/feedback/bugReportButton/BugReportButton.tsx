@@ -13,9 +13,9 @@ interface BugReportButtonProps {
 const uniqueId = "31d2b110-8308-4035-90a6-519e89e7f6fa";
 
 export const DATA_TEST_ID = {
-  BUG_REPORT_BUTTON_CONTAINER: `feedback-button-container-${uniqueId}`,
-  BUG_REPORT_BUTTON: `feedback-button-${uniqueId}`,
-  BUG_REPORT_ICON: `feedback-icon-${uniqueId}`,
+  BUG_REPORT_BUTTON_CONTAINER: `bug-report-button-container-${uniqueId}`,
+  BUG_REPORT_BUTTON: `bug-report-button-${uniqueId}`,
+  BUG_REPORT_ICON: `bug-report-icon-${uniqueId}`,
 };
 
 const StyledPrimaryIconButton = styled(PrimaryIconButton)(({ theme }) => ({
@@ -36,20 +36,20 @@ const StyledPrimaryIconButton = styled(PrimaryIconButton)(({ theme }) => ({
 }));
 
 const BugReportButton: React.FC<BugReportButtonProps> = ({ bottomAlign, className }) => {
-  const [feedback, setFeedback] = useState<any>();
+  const [bugReport, setBugReport] = useState<any>();
   const buttonRef = useRef<HTMLDivElement>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
-    setFeedback(Sentry.getFeedback());
+    setBugReport(Sentry.getFeedback());
   }, []);
 
   useEffect(() => {
-    if (feedback && buttonRef.current) {
-      return feedback.attachTo(buttonRef.current);
+    if (bugReport && buttonRef.current) {
+      return bugReport.attachTo(buttonRef.current);
     }
-  }, [feedback]);
+  }, [bugReport]);
 
   return (
     <Box

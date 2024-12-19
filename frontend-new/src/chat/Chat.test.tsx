@@ -24,6 +24,7 @@ import ChatService from "./ChatService/ChatService";
 import ExperienceService from "src/experiences/experiencesDrawer/experienceService/experienceService";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { act } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as FirebaseAuthenticationServiceFactoryModule from "src/auth/services/Authentication.service.factory";
 import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import { DATA_TEST_ID as FEEDBACK_FORM_CONTENT_DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
@@ -113,6 +114,14 @@ jest.mock("src/theme/Backdrop/InactiveBackdrop", () => {
   return {
     __esModule: true,
     default: jest.fn(() => <div data-testid="inactive-backdrop"></div>),
+  };
+});
+
+// mock the Backdrop
+jest.mock("src/theme/Backdrop/Backdrop", () => {
+  return {
+    __esModule: true,
+    Backdrop: jest.fn(() => <div data-testid="backdrop"></div>),
   };
 });
 
@@ -581,7 +590,7 @@ describe("Chat", () => {
 
       // WHEN the new conversation button is clicked
       const newConversationButton = screen.getByTestId(MENU_ITEM_ID.START_NEW_CONVERSATION);
-      fireEvent.click(newConversationButton);
+      await userEvent.click(newConversationButton);
 
       // THEN expect the new conversation dialog to be shown
       expect(screen.getByTestId(CONFIRM_MODAL_TEST_ID.CONFIRM_MODAL)).toBeInTheDocument();
@@ -596,11 +605,11 @@ describe("Chat", () => {
       );
       // AND the new conversation dialog is open
       const newConversationButton = screen.getByTestId(MENU_ITEM_ID.START_NEW_CONVERSATION);
-      fireEvent.click(newConversationButton);
+      await userEvent.click(newConversationButton);
 
       // WHEN the cancel button is clicked
       const cancelButton = screen.getByTestId(CONFIRM_MODAL_TEST_ID.CONFIRM_MODAL_CANCEL);
-      fireEvent.click(cancelButton);
+      await userEvent.click(cancelButton);
 
       // THEN expect the new conversation dialog to be closed
       expect(screen.queryByTestId(CONFIRM_MODAL_TEST_ID.CONFIRM_MODAL)).not.toBeInTheDocument();
@@ -615,14 +624,16 @@ describe("Chat", () => {
       );
       // AND the new conversation dialog is open
       const newConversationButton = screen.getByTestId(MENU_ITEM_ID.START_NEW_CONVERSATION);
-      fireEvent.click(newConversationButton);
+      await userEvent.click(newConversationButton);
 
       // WHEN the confirm button is clicked
       const confirmButton = screen.getByTestId(CONFIRM_MODAL_TEST_ID.CONFIRM_MODAL_CONFIRM);
-      fireEvent.click(confirmButton);
+      await userEvent.click(confirmButton);
 
       // THEN expect the new conversation dialog to be closed
       expect(screen.queryByTestId(CONFIRM_MODAL_TEST_ID.CONFIRM_MODAL)).not.toBeInTheDocument();
+      // AND the backdrop to be shown
+      expect(screen.getByTestId("backdrop")).toBeInTheDocument();
     });
   });
 
