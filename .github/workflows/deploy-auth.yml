@@ -17,7 +17,7 @@ on:
         value: ${{ jobs.deploy.outputs.identity_platform_client_firebase_auth_domain }}
 
 jobs:
-  deploy:
+  deploy-auth:
     runs-on: ubuntu-latest
     environment: ${{ inputs.target-environment }}
     outputs:

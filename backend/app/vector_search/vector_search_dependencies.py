@@ -17,12 +17,23 @@ from common_libs.environment_settings.constants import EmbeddingConfig
 logger = logging.getLogger(__name__)
 
 # Define a singleton instance of the Google VertexAI embeddings
-_embeddings = GoogleGeckoEmbeddingService()
-
 _embedding_config = EmbeddingConfig()
 
 
+_embeddings = None
+
+
 def get_gecko_embeddings() -> GoogleGeckoEmbeddingService:
+    """
+    Get the Google VertexAI embeddings singleton instance.
+    :return: GoogleGeckoEmbeddingService
+    """
+    global _embeddings
+
+    if _embeddings is None:
+        logger.info("creating a new instance of the Google VertexAI embeddings.")
+        _embeddings = GoogleGeckoEmbeddingService()
+
     """ Get the Google VertexAI embeddings singleton instance."""
     return _embeddings
 
