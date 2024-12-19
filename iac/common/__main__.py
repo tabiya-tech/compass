@@ -12,39 +12,31 @@ import pulumi
 from deploy_common import deploy_common
 from dotenv import load_dotenv
 
+from lib.std_pulumi import getenv, getconfig
+
 # Load environment variables from .env file
 load_dotenv()
 
 
 def main():
-    # Get the config values
-    config = pulumi.Config("gcp")
-    project = config.require("project")
-    pulumi.info(f'Using project:{project}')
-    location = config.require("region")
-    pulumi.info(f'Using location:{location}')
     environment = pulumi.get_stack()
-    pulumi.info(f"Using Environment: {environment}")
-    domain_name = os.getenv("DOMAIN_NAME")
-    pulumi.info(f"Using Domain: {domain_name}")
-    if not domain_name:
-        pulumi.error("environment variable DOMAIN_NAME is not set")
-        sys.exit(1)
+    pulumi.info(f"Using Environment:{environment}")
 
-    frontend_domain = os.getenv("FRONTEND_DOMAIN")
-    if not frontend_domain:
-        pulumi.error("environment variable FRONTEND_DOMAIN is not set")
-        sys.exit(1)
-    pulumi.info(f"Frontend Domain: {frontend_domain}")
+    # Get the config values
+    location = getconfig("region", "gcp")
+    pulumi.info(f'Using location:{location}')
+
+    env_reference = pulumi.StackReference(f"tabiya-tech/compass-environment/{environment}")
+    project = env_reference.get_output("project_id")
+
+    domain_name = getenv("DOMAIN_NAME")
+    frontend_domain = getenv("FRONTEND_DOMAIN")
 
     if frontend_domain != domain_name and not frontend_domain.endswith("." + domain_name):
         pulumi.error(f"Frontend domain {frontend_domain} is not conforming to the given domain {domain_name}")
         sys.exit(1)
 
-    frontend_url = os.getenv("FRONTEND_URL")
-    if not frontend_url:
-        pulumi.error("environment variable FRONTEND_URL is not set")
-        sys.exit(1)
+    frontend_url = getenv("FRONTEND_URL")
     pulumi.info(f"Frontend URL: {frontend_url}")
 
     frontend_parsed_url = urlparse(frontend_url)
@@ -52,20 +44,14 @@ def main():
         pulumi.error(f"Frontend URL domain {frontend_url} does not match the given domain {frontend_domain}")
         sys.exit(1)
 
-    backend_domain = os.getenv("BACKEND_DOMAIN")
-    if not backend_domain:
-        pulumi.error("environment variable BACKEND_DOMAIN is not set")
-        sys.exit(1)
+    backend_domain = getenv("BACKEND_DOMAIN")
     pulumi.info(f"Backend Domain: {backend_domain}")
 
     if backend_domain != frontend_domain:
         pulumi.error(f"Backend domain {backend_domain} is not equal to the frontend domain {frontend_domain}")
         sys.exit(1)
 
-    backend_url = os.getenv("BACKEND_URL")
-    if not backend_url:
-        pulumi.error("environment variable BACKEND_URL is not set")
-        sys.exit(1)
+    backend_url = getenv("BACKEND_URL")
     if backend_url == frontend_url:
         pulumi.error("environment variable BACKEND_URL should not be equal to FRONTEND_URL")
         sys.exit(1)

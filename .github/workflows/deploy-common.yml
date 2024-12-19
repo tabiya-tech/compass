@@ -26,7 +26,7 @@ on:
         value: ${{ jobs.deploy.outputs.dns-ns-records }}
 
 jobs:
-  deploy:
+  deploy-common:
     runs-on: ubuntu-latest
     environment: ${{ inputs.target-environment }}
     outputs:
