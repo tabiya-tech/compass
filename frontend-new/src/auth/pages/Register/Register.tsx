@@ -144,7 +144,11 @@ const Register: React.FC = () => {
 
   return (
     <>
-      <Container maxWidth="xs" sx={{ height: "100%", padding: theme.fixedSpacing(theme.tabiyaSpacing.lg) }} data-testid={DATA_TEST_ID.REGISTER_CONTAINER}>
+      <Container
+        maxWidth="xs"
+        sx={{ height: "100%", padding: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}
+        data-testid={DATA_TEST_ID.REGISTER_CONTAINER}
+      >
         <Box
           display="flex"
           flexDirection="column"

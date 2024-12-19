@@ -150,7 +150,11 @@ const Consent: React.FC = () => {
   const dataProtectionAgreementLabel = "Data Protection Agreement";
 
   return (
-    <Container maxWidth="xs" sx={{ height: "100%", padding: theme.fixedSpacing(theme.tabiyaSpacing.lg) }} data-testid={DATA_TEST_ID.CONSENT_CONTAINER}>
+    <Container
+      maxWidth="xs"
+      sx={{ height: "100%", padding: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}
+      data-testid={DATA_TEST_ID.CONSENT_CONTAINER}
+    >
       <Backdrop isShown={isLoggingOut} message={"Logging you out..."} />
       <Box display="flex" flexDirection="column" alignItems="center" justifyContent={"space-evenly"} height={"80%"}>
         <AuthHeader title={"Before we begin..."} subtitle={""} />
@@ -162,8 +166,8 @@ const Consent: React.FC = () => {
           gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
         >
           <Typography variant="body2" gutterBottom data-testid={DATA_TEST_ID.AGREEMENT_BODY}>
-            We created this AI tool for you with care to help you and other young people like you explore their skills and
-            discover new opportunities.
+            We created this AI tool for you with care to help you and other young people like you explore their skills
+            and discover new opportunities.
             <br />
             <br />
             <HighlightedSpan>Please use AI responsibly!</HighlightedSpan>

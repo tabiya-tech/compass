@@ -29,7 +29,7 @@ jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSo
   };
 });
 
-jest.mock("src/feedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton", () => {
+jest.mock("src/feedback/feedbackForm/components/feedbackFormButton/FeedbackFormFooter", () => {
   return {
     __esModule: true,
     default: jest.fn(() => <div data-testid="feedback-form-button"></div>),

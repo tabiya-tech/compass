@@ -90,7 +90,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           "We’d love your feedback on this conversation. It’ll only take 5 minutes and will help us improve your experience",
           new Date().toISOString()
         ),
-        footerType: ChatMessageFooterType.FEEDBACK_FORM_BUTTON,
+        footerType: ChatMessageFooterType.FEEDBACK_FORM,
       });
     }
   }, []);

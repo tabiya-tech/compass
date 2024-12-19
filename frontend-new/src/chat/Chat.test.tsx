@@ -10,7 +10,7 @@ import ChatMessageField, { DATA_TEST_ID as CHAT_MESSAGE_FIELD_TEST_ID } from "./
 import { DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID } from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
 import { DATA_TEST_ID as EXPERIENCES_DRAWER_CONTAINER_TEST_ID } from "src/experiences//experiencesDrawer/ExperiencesDrawer";
 import { DATA_TEST_ID as CONFIRM_MODAL_TEST_ID } from "src/theme/confirmModalDialog/ConfirmModalDialog";
-import { DATA_TEST_ID as FEEDBACK_FORM_BUTTON_TEST_ID } from "src/feedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
+import { DATA_TEST_ID as FEEDBACK_FORM_FOOTER_TEST_ID } from "src/feedback/feedbackForm/components/feedbackFormButton/FeedbackFormFooter";
 import { DATA_TEST_ID as FEEDBACK_FORM_TEST_ID } from "src/feedback/feedbackForm/FeedbackForm";
 import { HashRouter } from "react-router-dom";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -662,7 +662,7 @@ describe("Chat", () => {
       );
 
       // WHEN the feedback button is clicked
-      const feedbackButton = await screen.findByTestId(FEEDBACK_FORM_BUTTON_TEST_ID.FEEDBACK_FORM_BUTTON);
+      const feedbackButton = await screen.findByTestId(FEEDBACK_FORM_FOOTER_TEST_ID.FEEDBACK_FORM_FOOTER_BUTTON);
       fireEvent.click(feedbackButton);
 
       // THEN expect the feedback form to be shown
@@ -677,7 +677,7 @@ describe("Chat", () => {
         </HashRouter>
       );
       // AND the feedback form is open
-      const feedbackButton = await screen.findByTestId(FEEDBACK_FORM_BUTTON_TEST_ID.FEEDBACK_FORM_BUTTON);
+      const feedbackButton = await screen.findByTestId(FEEDBACK_FORM_FOOTER_TEST_ID.FEEDBACK_FORM_FOOTER_BUTTON);
       fireEvent.click(feedbackButton);
 
       // WHEN the user clicks the close button
@@ -702,7 +702,7 @@ describe("Chat", () => {
         </HashRouter>
       );
       // AND the feedback form is open
-      const feedbackButton = await screen.findByTestId(FEEDBACK_FORM_BUTTON_TEST_ID.FEEDBACK_FORM_BUTTON);
+      const feedbackButton = await screen.findByTestId(FEEDBACK_FORM_FOOTER_TEST_ID.FEEDBACK_FORM_FOOTER_BUTTON);
       fireEvent.click(feedbackButton);
 
       // WHEN the user submits the feedback
@@ -731,7 +731,7 @@ describe("Chat", () => {
         </HashRouter>
       );
       // AND the feedback form is open
-      const feedbackButton = await screen.findByTestId(FEEDBACK_FORM_BUTTON_TEST_ID.FEEDBACK_FORM_BUTTON);
+      const feedbackButton = await screen.findByTestId(FEEDBACK_FORM_FOOTER_TEST_ID.FEEDBACK_FORM_FOOTER_BUTTON);
       fireEvent.click(feedbackButton);
 
       // WHEN the user submits the feedback
