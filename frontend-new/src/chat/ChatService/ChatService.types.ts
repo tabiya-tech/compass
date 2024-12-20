@@ -11,7 +11,7 @@ export interface ConversationMessage {
   sender: ConversationMessageSender; // Either 'USER' or 'COMPASS'
 }
 
-export interface ConverstaionResponse {
+export interface ConversationResponse {
   messages: ConversationMessage[];
   conversation_completed: boolean;
   conversation_conducted_at: string | null; // ISO formatted datetime string

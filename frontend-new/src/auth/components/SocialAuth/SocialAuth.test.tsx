@@ -2,7 +2,6 @@ import "src/_test_utilities/consoleMock";
 import React from "react";
 import { render, waitFor, screen } from "src/_test_utilities/test-utils";
 import SocialAuth, { DATA_TEST_ID } from "./SocialAuth";
-import { HashRouter } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import FirebaseSocialAuthenticationService from "src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
@@ -70,13 +69,11 @@ describe("SocialAuth tests", () => {
     const givenIsLoading = false;
     // WHEN the component is rendered
     render(
-      <HashRouter>
-        <SocialAuth
-          postLoginHandler={givenNotifyOnLogin}
-          isLoading={givenIsLoading}
-          notifyOnLoading={givenNotifyOnLoading}
-        />
-      </HashRouter>
+      <SocialAuth
+        postLoginHandler={givenNotifyOnLogin}
+        isLoading={givenIsLoading}
+        notifyOnLoading={givenNotifyOnLoading}
+      />
     );
 
     // THEN expect the component to be in the document
@@ -115,6 +112,7 @@ describe("SocialAuth tests", () => {
         user_id: givenUser.id,
         language: Language.en,
         sessions: [1],
+        sessions_with_feedback: [1],
         accepted_tc: tc,
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
@@ -122,13 +120,11 @@ describe("SocialAuth tests", () => {
 
       // WHEN the component is rendered
       render(
-        <HashRouter>
-          <SocialAuth
-            postLoginHandler={givenNotifyOnLogin}
-            isLoading={givenIsLoading}
-            notifyOnLoading={givenNotifyOnLoading}
-          />
-        </HashRouter>
+        <SocialAuth
+          postLoginHandler={givenNotifyOnLogin}
+          isLoading={givenIsLoading}
+          notifyOnLoading={givenNotifyOnLoading}
+        />
       );
       // AND the login button is clicked
       const loginButton = screen.getByTestId(DATA_TEST_ID.CONTINUE_WITH_GOOGLE_BUTTON);
@@ -158,13 +154,11 @@ describe("SocialAuth tests", () => {
     } as unknown as FirebaseSocialAuthenticationService);
 
     render(
-      <HashRouter>
-        <SocialAuth
-          postLoginHandler={givenNotifyOnLogin}
-          isLoading={givenIsLoading}
-          notifyOnLoading={givenNotifyOnLoading}
-        />
-      </HashRouter>
+      <SocialAuth
+        postLoginHandler={givenNotifyOnLogin}
+        isLoading={givenIsLoading}
+        notifyOnLoading={givenNotifyOnLoading}
+      />
     );
   });
 
@@ -177,13 +171,11 @@ describe("SocialAuth tests", () => {
     mockBrowserIsOnLine(false);
     // WHEN the component is rendered
     render(
-      <HashRouter>
-        <SocialAuth
-          postLoginHandler={givenNotifyOnLogin}
-          isLoading={givenIsLoading}
-          notifyOnLoading={givenNotifyOnLoading}
-        />
-      </HashRouter>
+      <SocialAuth
+        postLoginHandler={givenNotifyOnLogin}
+        isLoading={givenIsLoading}
+        notifyOnLoading={givenNotifyOnLoading}
+      />
     );
 
     // THEN expect the message text to be in the document
@@ -204,13 +196,11 @@ describe("SocialAuth tests", () => {
     } as unknown as FirebaseSocialAuthenticationService);
     // WHEN the component is rendered
     render(
-      <HashRouter>
-        <SocialAuth
-          postLoginHandler={givenNotifyOnLogin}
-          isLoading={givenIsLoading}
-          notifyOnLoading={givenNotifyOnLoading}
-        />
-      </HashRouter>
+      <SocialAuth
+        postLoginHandler={givenNotifyOnLogin}
+        isLoading={givenIsLoading}
+        notifyOnLoading={givenNotifyOnLoading}
+      />
     );
 
     // AND the login button is clicked

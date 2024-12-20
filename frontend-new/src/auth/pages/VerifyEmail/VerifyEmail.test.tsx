@@ -2,7 +2,7 @@ import "src/_test_utilities/consoleMock";
 import React from "react";
 import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
 import VerifyEmail, { DATA_TEST_ID } from "./VerifyEmail";
-import { HashRouter, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { DATA_TEST_ID as AUTH_HEADER_DATA_TEST_ID } from "src/auth/components/AuthHeader/AuthHeader";
 import * as Sentry from "@sentry/react";
 import { DATA_TEST_ID as BUG_REPORT_DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
@@ -56,11 +56,7 @@ describe("Testing Verify Email component", () => {
     (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
 
     // WHEN the component is rendered
-    render(
-      <HashRouter>
-        <VerifyEmail />
-      </HashRouter>
-    );
+    render(<VerifyEmail />);
 
     // THEN expect no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
@@ -84,11 +80,7 @@ describe("Testing Verify Email component", () => {
 
   test("should successfully navigate back to login when the back to login button is pressed", async () => {
     // GIVEN the component is rendered
-    render(
-      <HashRouter>
-        <VerifyEmail />
-      </HashRouter>
-    );
+    render(<VerifyEmail />);
 
     // THEN expect no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();

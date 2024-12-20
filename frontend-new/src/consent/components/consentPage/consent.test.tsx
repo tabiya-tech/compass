@@ -2,7 +2,7 @@ import "src/_test_utilities/consoleMock";
 import React from "react";
 import { userEvent, render, screen, waitFor } from "src/_test_utilities/test-utils";
 import Consent, { DATA_TEST_ID } from "./Consent";
-import { HashRouter, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { TabiyaUser } from "src/auth/auth.types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -71,11 +71,7 @@ describe("Testing Consent Page", () => {
   describe("render tests", () => {
     test("it should show consent screen with both agreements", async () => {
       // WHEN the component is rendered
-      render(
-        <HashRouter>
-          <Consent />
-        </HashRouter>
-      );
+      render(<Consent />);
 
       // THEN expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();
@@ -122,6 +118,7 @@ describe("Testing Consent Page", () => {
           language: Language.en,
           accepted_tc: new Date(),
           sessions: [],
+          sessions_with_feedback: [],
           has_sensitive_personal_data: false,
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
         });
@@ -136,11 +133,7 @@ describe("Testing Consent Page", () => {
         jest.spyOn(authStateService.getInstance(), "getUser").mockImplementation(() => givenUser);
 
         // WHEN the component is rendered
-        render(
-          <HashRouter>
-            <Consent />
-          </HashRouter>
-        );
+        render(<Consent />);
 
         // WHEN the user accepts Data protection Agreement
         const dpaCheckBoxWrapper = screen.getByTestId(DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER);
@@ -186,11 +179,7 @@ describe("Testing Consent Page", () => {
         jest.spyOn(authStateService.getInstance(), "getUser").mockImplementation(() => givenUser);
 
         // WHEN the component is rendered
-        render(
-          <HashRouter>
-            <Consent />
-          </HashRouter>
-        );
+        render(<Consent />);
 
         // THEN expect no errors or warning to have occurred
         expect(console.error).not.toHaveBeenCalled();
@@ -250,11 +239,7 @@ describe("Testing Consent Page", () => {
           throw givenError;
         });
         // WHEN the component is rendered
-        render(
-          <HashRouter>
-            <Consent />
-          </HashRouter>
-        );
+        render(<Consent />);
 
         // AND the user accepts data protection agreement
         const dpaCheckbox = screen
@@ -287,11 +272,7 @@ describe("Testing Consent Page", () => {
         jest.spyOn(authStateService.getInstance(), "getUser").mockImplementation(() => null);
 
         // WHEN the component is rendered
-        render(
-          <HashRouter>
-            <Consent />
-          </HashRouter>
-        );
+        render(<Consent />);
 
         //  the user accepts data protection agreement
         const dpaCheckbox = screen
@@ -328,11 +309,7 @@ describe("Testing Consent Page", () => {
         getCurrentAuthenticationService.mockReturnValue(authenticationService as unknown as AuthenticationService);
 
         // GIVEN Consent Component is rendered
-        render(
-          <HashRouter>
-            <Consent />
-          </HashRouter>
-        );
+        render(<Consent />);
 
         // AND there is a Reject Consent Button.
         const rejectButton = screen.getByTestId(DATA_TEST_ID.REJECT_BUTTON);
@@ -392,11 +369,7 @@ describe("Testing Consent Page", () => {
         });
 
         // WHEN the component is rendered
-        render(
-          <HashRouter>
-            <Consent />
-          </HashRouter>
-        );
+        render(<Consent />);
         // AND the reject button is clicked
         await userEvent.click(screen.getByTestId(DATA_TEST_ID.REJECT_BUTTON));
         // AND the approval model should be displayed
@@ -415,11 +388,7 @@ describe("Testing Consent Page", () => {
 
       test("should not log the user out when the user clicks the cancel button on the approve modal", async () => {
         // GIVEN DPA Component is rendered
-        render(
-          <HashRouter>
-            <Consent />
-          </HashRouter>
-        );
+        render(<Consent />);
 
         // WHEN the user clicks the reject button
         const rejectButton = screen.getByTestId(DATA_TEST_ID.REJECT_BUTTON);
@@ -449,6 +418,7 @@ describe("Testing Consent Page", () => {
           has_sensitive_personal_data: false,
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
           sessions: [],
+          sessions_with_feedback: [],
         });
 
         // AND the authStateService  returns an actual user
@@ -459,11 +429,7 @@ describe("Testing Consent Page", () => {
         });
 
         // WHEN the component is rendered
-        render(
-          <HashRouter>
-            <Consent />
-          </HashRouter>
-        );
+        render(<Consent />);
 
         // AND the user accepts data protection agreement
         const dpaCheckbox = screen
@@ -497,6 +463,7 @@ describe("Testing Consent Page", () => {
           has_sensitive_personal_data: false,
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
           sessions: [],
+          sessions_with_feedback: [],
         });
 
         // AND the authStateService  returns an actual user
@@ -514,14 +481,11 @@ describe("Testing Consent Page", () => {
           has_sensitive_personal_data: false,
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
           sessions: [],
+          sessions_with_feedback: [],
         });
 
         // WHEN the component is rendered
-        render(
-          <HashRouter>
-            <Consent />
-          </HashRouter>
-        );
+        render(<Consent />);
 
         // AND the user accepts data protection agreement
         const dpaCheckbox = screen

@@ -13,8 +13,7 @@ describe("ExperienceService", () => {
 
   test("should construct the service successfully", () => {
     // GIVEN the service is constructed
-    const givenSessionId = 1234;
-    const service = new ExperienceService(givenSessionId);
+    const service = new ExperienceService();
 
     // THEN expect the service to be constructed successfully
     expect(service).toBeDefined();
@@ -23,31 +22,20 @@ describe("ExperienceService", () => {
     expect(service.experiencesEndpointUrl).toEqual(`${givenApiServerUrl}/conversation/experiences`);
   });
 
-  test("should return an instance of service with the correct sessionId", () => {
-    // GIVEN the service is constructed
-    const sessionId = 1234;
-    const service = ExperienceService.getInstance(sessionId);
-
-    // THEN expect the instance of the service to be returned
-    expect(service).toBeInstanceOf(ExperienceService);
-    // AND the service should have the correct sessionId
-    expect(service.getSessionId()).toEqual(sessionId);
-  });
-
   describe("getExperiences", () => {
     test("should fetch the correct URL with GET and the correct headers and payload successfully", async () => {
       // GIVEN the experiences to return
       const givenMockExperiences = { mockExperiences };
       const fetSpy = setupAPIServiceSpy(StatusCodes.OK, givenMockExperiences, "application/json;charset=UTF-8");
 
-      // WHEN the getExperiences function is called
+      // WHEN the getExperiences function is called with a session id
       const givenSessionId = 1234;
-      const service = new ExperienceService(givenSessionId);
-      const experiencesResponse = await service.getExperiences();
+      const service = new ExperienceService();
+      const experiencesResponse = await service.getExperiences(givenSessionId);
 
       // THEN expect to make a GET request with the correct headers and payload
       expect(fetSpy).toHaveBeenCalledWith(
-        `${givenApiServerUrl}/conversation/experiences?session_id=${service.getSessionId()}`,
+        `${givenApiServerUrl}/conversation/experiences?session_id=${givenSessionId}`,
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },
@@ -73,10 +61,10 @@ describe("ExperienceService", () => {
 
       // WHEN the getExperiences function is called
       const givenSessionId = 1234;
-      const service = new ExperienceService(givenSessionId);
+      const service = new ExperienceService();
 
       // THEN expect it to reject with the expected error
-      await expect(service.getExperiences()).rejects.toThrow(givenFetchError);
+      await expect(service.getExperiences(givenSessionId)).rejects.toThrow(givenFetchError);
     });
 
     test.each([
@@ -90,8 +78,8 @@ describe("ExperienceService", () => {
 
         // WHEN the getExperiences function is called
         const givenSessionId = 1234;
-        const service = new ExperienceService(givenSessionId);
-        const actualExperience = service.getExperiences();
+        const service = new ExperienceService();
+        const actualExperience = service.getExperiences(givenSessionId);
 
         // THEN expect it to reject with the error response
         const expectedError = {
@@ -99,7 +87,7 @@ describe("ExperienceService", () => {
             ExperienceService.name,
             "getExperiences",
             "GET",
-            `${givenApiServerUrl}/conversation/experiences?session_id=${service.getSessionId()}`,
+            `${givenApiServerUrl}/conversation/experiences?session_id=${givenSessionId}`,
             StatusCodes.OK,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",

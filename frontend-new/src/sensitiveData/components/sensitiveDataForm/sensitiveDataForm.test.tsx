@@ -1,7 +1,7 @@
 // mute chatty console
 import "src/_test_utilities/consoleMock";
 
-import { HashRouter, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import userEvent, { UserEvent } from "@testing-library/user-event";
 import { render, screen, waitFor } from "src/_test_utilities/test-utils";
@@ -92,6 +92,7 @@ const SAMPLE_USER_PREFERENCES = {
   language: Language.en,
   accepted_tc: new Date(),
   sessions: [],
+  sessions_with_feedback: [],
   sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
   has_sensitive_personal_data: false,
 };
@@ -141,11 +142,7 @@ jest.mock("src/feedback/bugReport/bugReportButton/BugReportButton", () => {
 const useSnackBarSpy = jest.spyOn(NotistackModule, "useSnackbar");
 
 const componentRender = () => {
-  return render(
-    <HashRouter>
-      <SensitiveDataForm />
-    </HashRouter>
-  );
+  return render(<SensitiveDataForm />);
 };
 
 async function fillInput(inputTestId: string, value: string) {

@@ -2,7 +2,6 @@
 import "src/_test_utilities/consoleMock";
 import LoginWithEmailForm, { DATA_TEST_ID } from "./LoginWithEmailForm";
 import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
-import { HashRouter } from "react-router-dom";
 import React from "react";
 
 describe("Testing LoginWithEmailForm component", () => {
@@ -23,16 +22,14 @@ describe("Testing LoginWithEmailForm component", () => {
     const givenIsDisabled = false;
 
     render(
-      <HashRouter>
-        <LoginWithEmailForm
-          email={givenEmailValue}
-          password={givenPasswordValue}
-          notifyOnEmailChanged={givenNotifyOnEmailChange}
-          notifyOnPasswordChanged={givenNotifyOnPasswordChange}
-          notifyOnFocused={givenNotifyOnFocused}
-          isDisabled={givenIsDisabled}
-        />
-      </HashRouter>
+      <LoginWithEmailForm
+        email={givenEmailValue}
+        password={givenPasswordValue}
+        notifyOnEmailChanged={givenNotifyOnEmailChange}
+        notifyOnPasswordChanged={givenNotifyOnPasswordChange}
+        notifyOnFocused={givenNotifyOnFocused}
+        isDisabled={givenIsDisabled}
+      />
     );
 
     // THEN expect no errors or warning to have occurred
@@ -60,16 +57,14 @@ describe("Testing LoginWithEmailForm component", () => {
       const givenIsDisabled = false;
 
       render(
-        <HashRouter>
-          <LoginWithEmailForm
-            email={givenEmailValue}
-            password={givenPasswordValue}
-            notifyOnEmailChanged={givenNotifyOnEmailChange}
-            notifyOnPasswordChanged={givenNotifyOnPasswordChange}
-            notifyOnFocused={givenNotifyOnFocused}
-            isDisabled={givenIsDisabled}
-          />
-        </HashRouter>
+        <LoginWithEmailForm
+          email={givenEmailValue}
+          password={givenPasswordValue}
+          notifyOnEmailChanged={givenNotifyOnEmailChange}
+          notifyOnPasswordChanged={givenNotifyOnPasswordChange}
+          notifyOnFocused={givenNotifyOnFocused}
+          isDisabled={givenIsDisabled}
+        />
       );
 
       // Simulate form input and submission
@@ -91,16 +86,14 @@ describe("Testing LoginWithEmailForm component", () => {
       const givenIsDisabled = false;
 
       render(
-        <HashRouter>
-          <LoginWithEmailForm
-            email={givenEmailValue}
-            password={givenPasswordValue}
-            notifyOnEmailChanged={givenNotifyOnEmailChange}
-            notifyOnPasswordChanged={givenNotifyOnPasswordChange}
-            notifyOnFocused={givenNotifyOnFocused}
-            isDisabled={givenIsDisabled}
-          />
-        </HashRouter>
+        <LoginWithEmailForm
+          email={givenEmailValue}
+          password={givenPasswordValue}
+          notifyOnEmailChanged={givenNotifyOnEmailChange}
+          notifyOnPasswordChanged={givenNotifyOnPasswordChange}
+          notifyOnFocused={givenNotifyOnFocused}
+          isDisabled={givenIsDisabled}
+        />
       );
 
       // Simulate form input and submission
