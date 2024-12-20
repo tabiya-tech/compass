@@ -19,6 +19,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    name: deploy-auth
     environment: ${{ inputs.target-environment }}
     outputs:
       identity_platform_client_api_key: ${{ steps.pulumi.outputs.identity_platform_client_api_key }}
