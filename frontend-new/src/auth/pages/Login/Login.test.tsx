@@ -1,7 +1,6 @@
 import "src/_test_utilities/consoleMock";
 import React from "react";
 import { render, screen, waitFor, fireEvent, act } from "src/_test_utilities/test-utils";
-import { HashRouter } from "react-router-dom";
 import Login, { DATA_TEST_ID } from "./Login";
 import LoginWithEmailForm from "src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm";
 import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm";
@@ -107,12 +106,8 @@ describe("Testing Login component", () => {
     // GIVEN sentry is initialized
     (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
 
-    // WHEN the component is rendered within necessary context providers
-    render(
-      <HashRouter>
-        <Login />
-      </HashRouter>
-    );
+    // GIVEN the component is rendered within necessary context providers
+    render(<Login />);
 
     // THEN expect no errors or warnings to have occurred
     expect(console.error).not.toHaveBeenCalled();
@@ -143,11 +138,7 @@ describe("Testing Login component", () => {
       login: loginMock,
     } as unknown as FirebaseEmailAuthenticationService);
 
-    render(
-      <HashRouter>
-        <Login />
-      </HashRouter>
-    );
+    render(<Login />);
 
     // WHEN the user fills in their email and password
     act(() => {
@@ -173,11 +164,7 @@ describe("Testing Login component", () => {
       login: anonymousLoginMock,
     } as unknown as FirebaseInvitationCodeAuthenticationService);
 
-    render(
-      <HashRouter>
-        <Login />
-      </HashRouter>
-    );
+    render(<Login />);
 
     // WHEN the user fills in their invitation code
     await act(() => {

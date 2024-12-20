@@ -8,24 +8,14 @@ import { Experience } from "src/experiences/experiencesDrawer/experienceService/
 export default class ExperienceService {
   readonly experiencesEndpointUrl: string;
   readonly apiServeUrl: string;
-  private readonly sessionId: number;
 
-  constructor(sessionId: number) {
+  constructor() {
     this.apiServeUrl = getBackendUrl();
     this.experiencesEndpointUrl = `${this.apiServeUrl}/conversation/experiences`;
-    this.sessionId = sessionId;
   }
 
-  static getInstance(sessionId: number): ExperienceService {
-    return new ExperienceService(sessionId);
-  }
-
-  public getSessionId(): number {
-    return this.sessionId;
-  }
-
-  async getExperiences(): Promise<Experience[]> {
-    const constructedExperiencesUrl = `${this.experiencesEndpointUrl}?session_id=${this.getSessionId()}`;
+  async getExperiences(sessionId: number): Promise<Experience[]> {
+    const constructedExperiencesUrl = `${this.experiencesEndpointUrl}?session_id=${sessionId}`;
     const errorFactory = getRestAPIErrorFactory(
       "ExperienceService",
       "getExperiences",

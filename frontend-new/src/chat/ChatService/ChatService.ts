@@ -3,7 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import { customFetch } from "src/utils/customFetch/customFetch";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import { getBackendUrl } from "src/envService";
-import { ConverstaionResponse } from "./ChatService.types";
+import { ConversationResponse } from "./ChatService.types";
 
 export default class ChatService {
   readonly chatEndpointUrl: string;
@@ -31,7 +31,7 @@ export default class ChatService {
     return this.sessionId;
   }
 
-  public async sendMessage(message: string): Promise<ConverstaionResponse> {
+  public async sendMessage(message: string): Promise<ConversationResponse> {
     const serviceName = "ChatService";
     const serviceFunction = "sendMessage";
     const method = "POST";
@@ -56,7 +56,7 @@ export default class ChatService {
 
     const responseBody = await response.text();
 
-    let messageResponse: ConverstaionResponse;
+    let messageResponse: ConversationResponse;
     try {
       messageResponse = JSON.parse(responseBody);
     } catch (e: any) {
@@ -91,7 +91,7 @@ export default class ChatService {
     });
   }
 
-  public async getChatHistory(): Promise<ConverstaionResponse> {
+  public async getChatHistory(): Promise<ConversationResponse> {
     const serviceName = "ChatService";
     const serviceFunction = "getChatHistory";
     const method = "GET";
@@ -109,7 +109,7 @@ export default class ChatService {
 
     const responseBody = await response.text();
 
-    let chatHistory: ConverstaionResponse;
+    let chatHistory: ConversationResponse;
     try {
       chatHistory = JSON.parse(responseBody);
     } catch (e: any) {

@@ -1,84 +1,54 @@
+// silence chatty console\
 import "src/_test_utilities/consoleMock";
-
-import * as ChatListModule from "./ChatList/ChatList";
-import { DATA_TEST_ID as CHAT_LIST_TEST_ID } from "./ChatList/ChatList";
-
-import Chat, { CHECK_INACTIVITY_INTERVAL, DATA_TEST_ID } from "./Chat";
-import { fireEvent, render, screen, waitFor } from "src/_test_utilities/test-utils";
-import { DATA_TEST_ID as CHAT_HEADER_TEST_ID, MENU_ITEM_ID } from "./ChatHeader/ChatHeader";
-import ChatMessageField, { DATA_TEST_ID as CHAT_MESSAGE_FIELD_TEST_ID } from "./ChatMessageField/ChatMessageField";
-import { DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID } from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
-import { DATA_TEST_ID as EXPERIENCES_DRAWER_CONTAINER_TEST_ID } from "src/experiences//experiencesDrawer/ExperiencesDrawer";
-import { DATA_TEST_ID as CONFIRM_MODAL_TEST_ID } from "src/theme/confirmModalDialog/ConfirmModalDialog";
-import { DATA_TEST_ID as FEEDBACK_FORM_BUTTON_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
-import { DATA_TEST_ID as FEEDBACK_FORM_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
-import { HashRouter } from "react-router-dom";
-import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { ConversationMessageSender } from "./ChatService/ChatService.types";
-import {
-  SensitivePersonalDataRequirement,
-  Language,
-} from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import { act } from "react";
+import { render, screen, waitFor } from "src/_test_utilities/test-utils";
+import Chat, { CHECK_INACTIVITY_INTERVAL, DATA_TEST_ID, INACTIVITY_TIMEOUT } from "src/chat/Chat";
+import ChatHeader, { DATA_TEST_ID as CHAT_HEADER_TEST_ID } from "src/chat/ChatHeader/ChatHeader";
+import ChatList, { DATA_TEST_ID as CHAT_LIST_TEST_ID } from "src/chat/ChatList/ChatList";
+import ChatMessageField, {
+  DATA_TEST_ID as CHAT_MESSAGE_FIELD_TEST_ID,
+} from "src/chat/ChatMessageField/ChatMessageField";
 import ChatService from "./ChatService/ChatService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import { ConversationMessageSender, ConversationResponse } from "./ChatService/ChatService.types";
+import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import { ChatError } from "src/error/commonErrors";
+import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import ExperienceService from "src/experiences/experiencesDrawer/experienceService/experienceService";
-import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
-import { act } from "@testing-library/react";
-import * as FirebaseAuthenticationServiceFactoryModule from "src/auth/services/Authentication.service.factory";
-import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
-import { DATA_TEST_ID as FEEDBACK_FORM_CONTENT_DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
-import feedbackFormContentSteps from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/feedbackFormContentSteps";
-import OverallFeedbackService from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service";
-import { ChatError, FeedbackError, SessionError } from "src/error/commonErrors";
-import { DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/commentTextField/CommentTextField";
+import ExperiencesDrawer, {
+  DATA_TEST_ID as EXPERIENCE_DRAWER_TEST_ID,
+} from "src/experiences/experiencesDrawer/ExperiencesDrawer";
+import { WorkType } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
+import { UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import ConfirmModalDialog, {
+  DATA_TEST_ID as CONFIRM_MODAL_DIALOG_DATA_TEST_ID,
+} from "src/theme/confirmModalDialog/ConfirmModalDialog";
+import FeedbackForm, {
+  DATA_TEST_ID as FEEDBACK_FORM_DATA_TEST_ID,
+} from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
+import { ChatMessageFooterType } from "./ChatMessage/ChatMessage";
+import { DATA_TEST_ID as INACTIVE_BACKDROP_DATA_TEST_ID } from "src/theme/Backdrop/InactiveBackdrop";
+import userEvent from "@testing-library/user-event";
 
-// Mock the ChatService module
+// Mock Services ----------
+// Mock the ChatService
 jest.mock("src/chat/ChatService/ChatService");
 
-jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service", () => {
-  return {
-    __esModule: true,
-    default: jest.fn().mockImplementation(() => {
-      return {
-        logout: jest.fn(),
-      };
-    }),
-  };
-});
+// mock the authentication state service
+jest.mock("src/auth/services/AuthenticationState.service");
 
-// mock the ExperienceService module
-jest.mock("src/experiences/experiencesDrawer/experienceService/experienceService", () => {
-  return {
-    __esModule: true,
-    default: {
-      getInstance: jest.fn().mockReturnValue({
-        getExperiences: jest.fn().mockResolvedValue([]),
-      }),
-    },
-  };
-});
+// mock the user preferences state service
+jest.mock("src/userPreferences/UserPreferencesStateService");
 
-jest.mock("src/chat/ChatMessageField/ChatMessageField", () => {
-  const actualModule = jest.requireActual("src/chat/ChatMessageField/ChatMessageField");
-  return {
-    __esModule: true,
-    ...actualModule,
-    default: jest.fn(({ handleSend, message, notifyChange }) => (
-      <div data-testid={actualModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER}>
-        <input
-          data-testid={actualModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD}
-          value={message}
-          onChange={(e) => notifyChange(e.target.value)}
-        />
-        <button data-testid={actualModule.DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON} onClick={handleSend}>
-          Send
-        </button>
-      </div>
-    )),
-  };
-});
+// mock the user preferences service
+jest.mock("src/userPreferences/UserPreferencesService/userPreferences.service");
 
-// mock the snackbar provider
+// mock the experience service
+jest.mock("src/experiences/experiencesDrawer/experienceService/experienceService");
+
+// Mock Components ----------
+// mock the snackbar
 jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   const actual = jest.requireActual("src/theme/SnackbarProvider/SnackbarProvider");
   return {
@@ -91,697 +61,1603 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   };
 });
 
-// mock the ContextMenu
-jest.mock("src/theme/ContextMenu/ContextMenu", () => {
+// mock the ChatHeader component
+jest.mock("src/chat/ChatHeader/ChatHeader", () => {
+  const actual = jest.requireActual("src/chat/ChatHeader/ChatHeader");
+  const mockChatHeader = jest
+    .fn()
+    .mockImplementation(() => <div data-testid={actual.DATA_TEST_ID.CHAT_HEADER_CONTAINER}></div>);
   return {
     __esModule: true,
-    default: jest.fn(({ items }: { items: MenuItemConfig[] }) => (
-      <div data-testid="mock-context-menu">
-        {items.map((item) => (
-          <div key={item.id} data-testid={item.id} onClick={item.action}>
-            {item.text}
-          </div>
-        ))}
-        ;
-      </div>
-    )),
+    default: mockChatHeader,
+    DATA_TEST_ID: actual.DATA_TEST_ID,
   };
 });
 
-// mock the InactiveBackdrop
-jest.mock("src/theme/Backdrop/InactiveBackdrop", () => {
+// mock the ChatList component
+jest.mock("src/chat/ChatList/ChatList", () => {
+  const actual = jest.requireActual("src/chat/ChatList/ChatList");
+  const mockChatList = jest
+    .fn()
+    .mockImplementation(() => <div data-testid={actual.DATA_TEST_ID.CHAT_LIST_CONTAINER}></div>);
   return {
     __esModule: true,
-    default: jest.fn(() => <div data-testid="inactive-backdrop"></div>),
+    default: mockChatList,
+    DATA_TEST_ID: actual.DATA_TEST_ID,
+  };
+});
+
+// mock the ChatMessageField component
+jest.mock("src/chat/ChatMessageField/ChatMessageField", () => {
+  const actual = jest.requireActual("src/chat/ChatMessageField/ChatMessageField");
+  const mockChatMessageField = jest
+    .fn()
+    .mockImplementation(() => <div data-testid={actual.DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER}></div>);
+  return {
+    __esModule: true,
+    default: mockChatMessageField,
+    DATA_TEST_ID: actual.DATA_TEST_ID,
+  };
+});
+
+// mock the ChatHeader component
+jest.mock("src/chat/ChatHeader/ChatHeader", () => {
+  const actual = jest.requireActual("src/chat/ChatHeader/ChatHeader");
+  const mockChatHeader = jest
+    .fn()
+    .mockImplementation(() => <div data-testid={actual.DATA_TEST_ID.CHAT_HEADER_CONTAINER}></div>);
+  return {
+    __esModule: true,
+    default: mockChatHeader,
+    DATA_TEST_ID: actual.DATA_TEST_ID,
+  };
+});
+
+// mock the Experience Drawer
+jest.mock("src/experiences/experiencesDrawer/ExperiencesDrawer", () => {
+  const actual = jest.requireActual("src/experiences/experiencesDrawer/ExperiencesDrawer");
+  const mockExperienceDrawer = jest
+    .fn()
+    .mockImplementation(() => <div data-testid={actual.DATA_TEST_ID.EXPERIENCES_DRAWER_CONTAINER}></div>);
+  return {
+    __esModule: true,
+    default: mockExperienceDrawer,
+    DATA_TEST_ID: actual.DATA_TEST_ID,
+  };
+});
+
+// mock the Feedback Form
+jest.mock("src/feedback/overallFeedback/feedbackForm/FeedbackForm", () => {
+  const actual = jest.requireActual("src/feedback/overallFeedback/feedbackForm/FeedbackForm");
+  const mockOverallFeedbackForm = jest
+    .fn()
+    .mockImplementation(() => <div data-testid={actual.DATA_TEST_ID.FEEDBACK_FORM_DIALOG}></div>);
+  return {
+    __esModule: true,
+    default: mockOverallFeedbackForm,
+    DATA_TEST_ID: actual.DATA_TEST_ID,
+  };
+});
+
+// mock the Confirm Modal Dialog
+jest.mock("src/theme/confirmModalDialog/ConfirmModalDialog", () => {
+  const actual = jest.requireActual("src/theme/confirmModalDialog/ConfirmModalDialog");
+  const mockConfirmModalDialog = jest
+    .fn()
+    .mockImplementation(() => <div data-testid={actual.DATA_TEST_ID.CONFIRM_MODAL}></div>);
+  return {
+    __esModule: true,
+    default: mockConfirmModalDialog,
+    DATA_TEST_ID: actual.DATA_TEST_ID,
+  };
+});
+
+jest.mock("src/theme/Backdrop/InactiveBackdrop", () => {
+  const actual = jest.requireActual("src/theme/Backdrop/InactiveBackdrop");
+  const mockBackdrop = jest
+    .fn()
+    .mockImplementation(() => <div data-testid={actual.DATA_TEST_ID.INACTIVE_BACKDROP_CONTAINER}></div>);
+  return {
+    __esModule: true,
+    default: mockBackdrop,
+    DATA_TEST_ID: actual.DATA_TEST_ID,
   };
 });
 
 describe("Chat", () => {
-  const givenSessionId = 123;
-
+  // ChatService methods to be mocked
   const mockSendMessage = jest.fn();
   const mockGetChatHistory = jest.fn();
 
-  // Mock the ChatList component
-  const ChatList = jest
-    .spyOn(ChatListModule, "default")
-    .mockImplementation(() => <div data-testid={CHAT_LIST_TEST_ID.CHAT_LIST_CONTAINER}></div>);
+  // AuthenticationStateService methods to be mocked
+  const mockGetUser = jest.fn();
+
+  // UserPreferencesStateService methods to be mocked
+  const mockGetActiveSessionId = jest.fn();
+  const mockActiveSessionHasFeedback = jest.fn();
+  const mockSetUserPreferences = jest.fn();
+
+  // UserPreferencesService methods to be mocked
+  const mockGetNewSession = jest.fn();
+  const mockSetUserPreference = jest.fn();
+
+  // ExperienceService methods to be mocked
+  const mockGetExperiences = jest.fn();
 
   beforeEach(() => {
     // Mock the static getInstance method to return an instance with mocked methods
-    (ChatService as jest.Mocked<typeof ChatService>).getInstance = jest.fn().mockReturnValue({
+    jest.spyOn(ChatService, "getInstance").mockReturnValue({
       sendMessage: mockSendMessage,
       getChatHistory: mockGetChatHistory,
-    });
-    // Mock the firebaseAuthenticationServiceManager getFirebaseAuthenticationService to return a mock instance
-    // in this case firebaseEmailAuthenticationService
-    jest
-      .spyOn(FirebaseAuthenticationServiceFactoryModule, "default")
-      .mockReturnValue(FirebaseEmailAuthService.getInstance());
+    } as unknown as ChatService);
+    jest.spyOn(UserPreferencesStateService, "getInstance").mockReturnValue({
+      getActiveSessionId: mockGetActiveSessionId,
+      activeSessionHasFeedback: mockActiveSessionHasFeedback,
+      setUserPreferences: mockSetUserPreferences,
+    } as unknown as UserPreferencesStateService);
+    jest.spyOn(AuthenticationStateService, "getInstance").mockReturnValue({
+      getUser: mockGetUser,
+    } as unknown as AuthenticationStateService);
+    jest.spyOn(UserPreferencesService, "getInstance").mockReturnValue({
+      getNewSession: mockGetNewSession,
+      setUserPreference: mockSetUserPreference,
+    } as unknown as UserPreferencesService);
+    jest.spyOn(ExperienceService.prototype, "getExperiences").mockImplementation(mockGetExperiences);
   });
 
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks();
   });
 
   describe("render tests", () => {
-    test("should render the Chat Component", () => {
-      // GIVEN a chat component
-      // WHEN the chat header is rendered with a router
-      render(
-        <HashRouter>
-          <Chat />
-        </HashRouter>
-      );
-
-      // THEN expect no errors or warning to have occurred
+    test("should render the Chat component with all its children", () => {
+      // GIVEN the Chat component is rendered
+      render(<Chat />);
+      // THEN expect the container to be visible
+      expect(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER)).toBeInTheDocument();
+      // AND expect the chat header to be visible
+      expect(screen.getByTestId(CHAT_HEADER_TEST_ID.CHAT_HEADER_CONTAINER)).toBeInTheDocument();
+      // AND expect the chat list to be visible
+      expect(screen.getByTestId(CHAT_LIST_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
+      // AND expect the chat message field to be visible
+      expect(screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER)).toBeInTheDocument();
+      // AND expect no console errors
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
-
-      // AND the chat container to be visible
-      expect(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER)).toBeInTheDocument();
-      // AND the chat header to be in the document
-      expect(screen.getByTestId(CHAT_HEADER_TEST_ID.CHAT_HEADER_CONTAINER)).toBeInTheDocument();
-      // AND the chat list to be in the document
-      expect(screen.getByTestId(CHAT_LIST_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
-      // AND the chat message field to be in the document
-      expect(screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER)).toBeInTheDocument();
       // AND the component to match the snapshot
       expect(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER)).toMatchSnapshot();
-
-      // AND the ChatMessageField component to be called with the initial props
-      expect(ChatMessageField).toHaveBeenCalledWith(
-        {
-          message: expect.any(String),
-          notifyChange: expect.any(Function),
-          handleSend: expect.any(Function),
-          aiIsTyping: expect.any(Boolean),
-          isChatFinished: expect.any(Boolean),
-        },
-        {}
-      );
-
-      // AND content should match snapshot
-      expect(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER)).toMatchSnapshot();
-    });
-
-    test("should show the backdrop when the user is inactive", async () => {
-      jest.useFakeTimers();
-
-      // GIVEN a chat component
-      render(
-        <HashRouter>
-          <Chat />
-        </HashRouter>
-      );
-
-      // WHEN the user is inactive
-      const input = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD);
-      fireEvent.change(input, { target: { value: "" } });
-      jest.advanceTimersByTime(CHECK_INACTIVITY_INTERVAL);
-
-      // THEN expect the backdrop to be shown
-      await waitFor(() => {
-        expect(screen.getByTestId("inactive-backdrop")).toBeInTheDocument();
-      });
-
-      jest.useRealTimers();
-    });
-
-    test.each([
-      ["mouseDown", () => fireEvent.mouseDown(document)],
-      ["keyDown", () => fireEvent.keyDown(document, { key: "Enter" })],
-    ])("should hide the backdrop when the user %s", async (description, event_callback: () => void) => {
-      jest.useFakeTimers();
-
-      // GIVEN a chat component
-      render(
-        <HashRouter>
-          <Chat />
-        </HashRouter>
-      );
-
-      // WHEN the user is inactive
-      jest.advanceTimersByTime(CHECK_INACTIVITY_INTERVAL);
-      // THEN expect the backdrop to be shown
-      await waitFor(() => {
-        expect(screen.getByTestId("inactive-backdrop")).toBeInTheDocument();
-      });
-
-      // AND WHEN the user interacts with the page
-      act(() => {
-        event_callback();
-      });
-
-      // THEN expect the backdrop to be hidden
-      //await waitFor(() => {
-      expect(screen.queryByTestId("inactive-backdrop")).not.toBeInTheDocument();
-      //});
-
-      jest.useRealTimers();
     });
   });
 
-  describe("test Chat Initialization", () => {
-    test("should initialize chat on mount", async () => {
-      mockGetChatHistory.mockResolvedValueOnce({
-        messages: [
+  describe("chat initialization", () => {
+    describe("should initialize chat for a user with an active session", () => {
+      test("should initialize chat and fetch history on mount when the user has an existing conversation", async () => {
+        // GIVEN a logged-in user
+        const givenUserId = "fooUser";
+        mockGetUser.mockReturnValue({
+          id: givenUserId,
+          name: "Foo User",
+          email: "foo@bar.baz",
+        });
+
+        // AND the user has an active session
+        const givenSessionId = 123;
+        mockGetActiveSessionId.mockReturnValue(givenSessionId);
+
+        // AND a chat service that returns some messages for that session
+        let resolveHistory!: (value: ConversationResponse) => void;
+        const historyPromise = new Promise<ConversationResponse>((resolve) => {
+          resolveHistory = resolve;
+        });
+
+        mockGetChatHistory.mockReturnValue(historyPromise);
+
+        // WHEN the component is rendered
+        render(<Chat />);
+
+        // THEN expect chat service to be initialized with the active session ID
+        expect(ChatService.getInstance).toHaveBeenCalledWith(givenSessionId);
+        // AND expect chat history to be fetched
+        expect(ChatService.getInstance(givenSessionId).getChatHistory).toHaveBeenCalled();
+        // AND the chat list to be called with a message that says that compass is typing
+        expect(ChatList as jest.Mock).toHaveBeenCalledWith(
           {
-            message: "",
-            sent_at: new Date().toISOString(),
-            sender: ConversationMessageSender.USER,
-          },
-          {
-            message: "Hello, I'm Compass",
-            sent_at: new Date().toISOString(),
-            sender: ConversationMessageSender.COMPASS,
-          },
-          {
-            message: "Hi, Compass, I'm foo",
-            sent_at: new Date().toISOString(),
-            sender: ConversationMessageSender.USER,
-          },
-          {
-            message: "Hello foo, would you like to begin your skill exploration session?",
-            sent_at: new Date().toISOString(),
-            sender: ConversationMessageSender.COMPASS,
-          },
-        ],
-        conversation_completed: false,
-      });
-
-      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
-        accepted_tc: new Date(),
-        user_id: "0001",
-        language: Language.en,
-        sessions: [givenSessionId],
-        has_sensitive_personal_data: false,
-        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
-      });
-
-      // GIVEN a chat component
-      // WHEN the chat is rendered with a router.
-      render(
-        <HashRouter>
-          <Chat />
-        </HashRouter>
-      );
-
-      // THEN expect the initial message is added
-      await waitFor(() => {
-        expect(screen.getByTestId(CHAT_LIST_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
-      });
-
-      await waitFor(() => {
-        expect(mockGetChatHistory).toHaveBeenCalled();
-      });
-
-      // AND the ChatList component to be called with the history returned to the initialization
-      await waitFor(() => {
-        expect(ChatList).toHaveBeenNthCalledWith(
-          4,
-          expect.objectContaining({
             messages: [
               {
                 id: expect.any(String),
-                sender: ConversationMessageSender.USER,
-                message: "",
+                message: "Typing...",
                 sent_at: expect.any(String),
-              },
-              {
-                id: expect.any(String),
                 sender: ConversationMessageSender.COMPASS,
-                message: "Hello, I'm Compass",
-                sent_at: expect.any(String),
-                isTypingMessage: false,
-              },
-              {
-                id: expect.any(String),
-                sender: ConversationMessageSender.USER,
-                message: "Hi, Compass, I'm foo",
-                sent_at: expect.any(String),
-              },
-              {
-                id: expect.any(String),
-                sender: ConversationMessageSender.COMPASS,
-                message: "Hello foo, would you like to begin your skill exploration session?",
-                sent_at: expect.any(String),
-                isTypingMessage: false,
+                isTypingMessage: true,
               },
             ],
             notifyOpenFeedbackForm: expect.any(Function),
-          }),
+          },
           {}
         );
-      });
-    });
 
-    test("should show an error message if initialization fails", async () => {
-      // GIVEN a chat component
-      mockGetChatHistory.mockRejectedValueOnce(new Error("Failed to initialize chat"));
+        // AND WHEN the history promise resolves with the given messages
+        const givenMessages: ConversationResponse = {
+          messages: [
+            {
+              message: "Hello, how are you?",
+              sent_at: new Date().toISOString(),
+              sender: ConversationMessageSender.USER,
+            },
+            {
+              message: "I'm good, thank you",
+              sent_at: new Date().toISOString(),
+              sender: ConversationMessageSender.COMPASS,
+            },
+          ],
+          conversation_completed: false,
+          conversation_conducted_at: null,
+          experiences_explored: 0,
+        };
+        act(() => {
+          resolveHistory(givenMessages);
+        });
 
-      // WHEN the chat is rendered with a router and snackbar provider
-      render(
-        <HashRouter>
-          <Chat />
-        </HashRouter>
-      );
-
-      // THEN expect an error message to be shown
-      await waitFor(() => {
-        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-          "An unexpected error occurred. Please try again later.",
-          { variant: "error" }
-        );
-      });
-    });
-  });
-
-  describe("test send message", () => {
-    test("should send a message", async () => {
-      // GIVEN a chat component
-      // First, we need the initialization to succeed
-      mockSendMessage.mockResolvedValueOnce({
-        messages: [
-          {
-            message: "Hello, I'm Compass",
-            sent_at: new Date().toISOString(),
-          },
-        ],
-        conversation_completed: false,
-      });
-
-      // GIVEN a chat component
-      // WHEN a user sends a message with a router
-      render(
-        <HashRouter>
-          <Chat />
-        </HashRouter>
-      );
-
-      const input = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD);
-      const sendButton = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
-
-      fireEvent.change(input, { target: { value: "Test message" } });
-      fireEvent.click(sendButton);
-
-      // THEN expect the message to be sent and the response to be received
-      await waitFor(() => {
-        expect(screen.getByTestId(CHAT_LIST_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
+        // THEN expect messages to be passed to ChatList
+        await waitFor(() => {
+          expect(ChatList as jest.Mock).toHaveBeenCalledWith(
+            {
+              messages: givenMessages.messages.map((message) => ({
+                ...message,
+                id: expect.any(String), // the id is not sent by the server, so its not part of the given messages
+                isTypingMessage: false, // the isTypingMessage is not part of the given messages
+              })),
+              notifyOpenFeedbackForm: expect.any(Function),
+            },
+            {}
+          );
+        });
       });
 
-      expect(mockSendMessage).toHaveBeenCalledWith("Test message");
+      describe("should initialize chat and fetch history on mount and send an empty message when the user has no existing conversation", () => {
+        test("should initialize chat and fetch history on mount and send an empty message when the user has no existing conversation", async () => {
+          // GIVEN a logged-in user
+          const givenUserId = "fooUser";
+          mockGetUser.mockReturnValue({
+            id: givenUserId,
+            name: "Foo User",
+            email: "foo@bar.baz",
+          });
 
-      // AND the ChatList component to be called with the new message
-      await waitFor(() => {
-        expect(ChatList).toHaveBeenCalledWith(
-          expect.objectContaining({
+          // AND the user has an active session
+          const givenSessionId = 123;
+          mockGetActiveSessionId.mockReturnValue(givenSessionId);
+
+          // AND a chat service that returns an empty message list
+          let resolveHistory!: (value: ConversationResponse) => void;
+          const historyPromise = new Promise<ConversationResponse>((resolve) => {
+            resolveHistory = resolve;
+          });
+
+          let resolveSendMessage!: (value: ConversationResponse) => void;
+          const sendMessagePromise = new Promise<ConversationResponse>((resolve) => {
+            resolveSendMessage = resolve;
+          });
+
+          mockGetChatHistory.mockReturnValue(historyPromise);
+          mockSendMessage.mockReturnValue(sendMessagePromise);
+
+          // WHEN the component is mounted
+          render(<Chat />);
+
+          // THEN expect chat service to be initialized with the active session ID
+          expect(ChatService.getInstance).toHaveBeenCalledWith(givenSessionId);
+          // AND expect chat history to be fetched
+          expect(mockGetChatHistory).toHaveBeenCalled();
+
+          // AND expect a typing indicator to be shown
+          expect(ChatList as jest.Mock).toHaveBeenCalledWith(
+            expect.objectContaining({
+              messages: expect.arrayContaining([expect.objectContaining({ isTypingMessage: true })]),
+            }),
+            {}
+          );
+
+          // AND WHEN the getChatHistory promise resolves with an empty message list
+          act(() => {
+            resolveHistory({
+              messages: [],
+              conversation_completed: false,
+              conversation_conducted_at: null,
+              experiences_explored: 0,
+            });
+          });
+
+          // THEN expect an empty first message to be sent to the chat service
+          await waitFor(() => {
+            expect(mockSendMessage).toHaveBeenCalledWith("");
+          });
+
+          // AND WHEN the message is sent
+          const givenSendMessageResponse: ConversationResponse = {
             messages: [
               {
-                id: expect.any(String),
-                sender: ConversationMessageSender.USER,
-                message: "Test message",
-                sent_at: expect.any(String),
-              },
-              {
-                id: expect.any(String),
+                message: "Hello, how are you?", // A RESPONSE FROM THE AI
+                sent_at: new Date().toISOString(),
                 sender: ConversationMessageSender.COMPASS,
-                message: "Hello, I'm Compass",
-                sent_at: expect.any(String),
-                isTypingMessage: false,
               },
             ],
-            notifyOpenFeedbackForm: expect.any(Function),
-          }),
-          {}
-        );
+            conversation_completed: false,
+            conversation_conducted_at: null,
+            experiences_explored: 0,
+          };
+          resolveSendMessage(givenSendMessageResponse);
+
+          // THEN expect the chat list to be updated with the new messages
+          await waitFor(() => {
+            expect(ChatList as jest.Mock).toHaveBeenCalledWith(
+              expect.objectContaining({
+                messages: givenSendMessageResponse.messages.map((message) => ({
+                  ...message,
+                  id: expect.any(String), // the id is not sent by the server, so its not part of the given messages
+                  isTypingMessage: false, // the isTypingMessage is not part of the given messages
+                })),
+              }),
+              {}
+            );
+          });
+        });
+
+        test("should throw an error if sending an empty message fails", async () => {
+          // GIVEN a logged-in user
+          const givenUserId = "fooUser";
+          mockGetUser.mockReturnValue({
+            id: givenUserId,
+            name: "Foo User",
+            email: "foo@bar.baz",
+          });
+
+          // AND the user has an active session
+          const givenSessionId = 123;
+          mockGetActiveSessionId.mockReturnValue(givenSessionId);
+
+          // AND a chat service that returns an empty array of messages given a session id
+          let resolveHistory!: (value: ConversationResponse) => void;
+          const historyPromise = new Promise<ConversationResponse>((resolve) => {
+            resolveHistory = resolve;
+          });
+          mockGetChatHistory.mockReturnValue(historyPromise);
+
+          // AND some preexisting messages
+          const givenMessages: ConversationResponse = {
+            messages: [],
+            conversation_completed: false,
+            conversation_conducted_at: null,
+            experiences_explored: 0,
+          };
+
+          // AND a chat service that fails to send a message
+          let rejectSendMessage!: (error: Error) => void;
+          const sendMessagePromise = new Promise<ConversationResponse>((_, reject) => {
+            rejectSendMessage = reject;
+          });
+          mockSendMessage.mockReturnValue(sendMessagePromise);
+
+          // WHEN the component is mounted
+          render(<Chat />);
+
+          // THEN expect a typing indicator to be shown
+          expect(ChatList as jest.Mock).toHaveBeenCalledWith(
+            expect.objectContaining({
+              messages: expect.arrayContaining([expect.objectContaining({ isTypingMessage: true })]),
+            }),
+            {}
+          );
+
+          // AND WHEN the history promise resolves with the given messages list
+          act(() => {
+            resolveHistory(givenMessages);
+          });
+
+          // AND WHEN the send message promise rejects with a given error
+          const givenError = new Error("Failed to send message");
+          rejectSendMessage(givenError);
+
+          // THEN expect an error to have be logged
+          await waitFor(() => {
+            expect(console.error).toHaveBeenCalledWith(new ChatError("Failed to send message:", givenError));
+          });
+          // AND expect a message to be shown in the chat
+          await waitFor(() => {
+            expect(ChatList as jest.Mock).toHaveBeenCalledWith(
+              expect.objectContaining({
+                messages: [
+                  {
+                    id: expect.any(String),
+                    message: "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
+                    sent_at: expect.any(String),
+                    sender: ConversationMessageSender.COMPASS,
+                    isTypingMessage: false,
+                  },
+                ],
+              }),
+              {}
+            );
+          });
+        });
       });
-    });
 
-    test("should show an error message if sending a message fails", async () => {
-      // WHEN a user sends a message with a router and snackbar provider
-      render(
-        <HashRouter>
-          <Chat />
-        </HashRouter>
-      );
+      test("should show error if fetching history fails", async () => {
+        // GIVEN a logged-in user
+        const givenUserId = "fooUser";
+        mockGetUser.mockReturnValue({
+          id: givenUserId,
+          name: "Foo User",
+          email: "foo@bar.baz",
+        });
 
-      // Ensure initialization is successful
-      await waitFor(() => {
-        expect(mockGetChatHistory).toHaveBeenCalled();
-      });
+        // AND the user has an active session
+        const givenSessionId = 123;
+        mockGetActiveSessionId.mockReturnValue(givenSessionId);
 
-      // Now mock sendMessage to fail for the user message
-      mockSendMessage.mockRejectedValueOnce(new Error("Sending message failed"));
+        // AND a chat service that fails to get chat history
+        let rejectHistory!: (error: Error) => void;
+        const historyPromise = new Promise<ConversationResponse>((_, reject) => {
+          rejectHistory = reject;
+        });
 
-      const input = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD);
-      const sendButton = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
+        mockGetChatHistory.mockReturnValue(historyPromise);
 
-      fireEvent.change(input, { target: { value: "Test message" } });
-      fireEvent.click(sendButton);
+        // WHEN the component is mounted
+        render(<Chat />);
 
-      // THEN expect an error message to be shown in the chat
-      await waitFor(() => {
-        expect(ChatList).toHaveBeenCalledWith(
+        // THEN expect the typing indicator
+        expect(ChatList as jest.Mock).toHaveBeenCalledWith(
           expect.objectContaining({
-            messages: expect.arrayContaining([
-              {
-                id: expect.any(String),
-                sender: ConversationMessageSender.USER,
-                message: "Test message",
-                sent_at: expect.any(String),
-              },
-              {
-                id: expect.any(String),
-                sender: ConversationMessageSender.COMPASS,
-                message: "I'm sorry, Something seems to have gone wrong on my end... Can you repeat that?",
-                sent_at: expect.any(String),
-                isTypingMessage: false,
-              },
-            ]),
-            notifyOpenFeedbackForm: expect.any(Function),
+            messages: expect.arrayContaining([expect.objectContaining({ isTypingMessage: true })]),
+          }),
+          {}
+        );
+
+        // AND WHEN the history promise rejects with a given error
+        const givenError = new Error("Chat service failed to get history");
+        rejectHistory(givenError);
+
+        // THEN expect an error to have be logged
+        await waitFor(() => {
+          expect(console.error).toHaveBeenCalledWith(new ChatError("Failed to initialize chat", givenError));
+        });
+        // AND expect a snackbar notification to be shown
+        await waitFor(() => {
+          expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+            "An unexpected error occurred. Please try again later.",
+            { variant: "error" }
+          );
+        });
+
+        // AND expect no messages to be in the chat
+        expect(ChatList as jest.Mock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            messages: [],
           }),
           {}
         );
       });
     });
-  });
 
-  describe("test user experience drawer", () => {
-    const chatComponent = (
-      <HashRouter>
-        <Chat />
-      </HashRouter>
-    );
+    describe("should initialize chat for a user that does not have an active session", () => {
+      test("should create a new chat session if the active session is not found", async () => {
+        // GIVEN a logged-in user
+        const givenUserId = "fooUser";
+        mockGetUser.mockReturnValue({
+          id: givenUserId,
+          name: "Foo User",
+          email: "foo@bar.baz",
+        });
 
-    test("should open the drawer and fetch experiences when the button is clicked", async () => {
-      // GIVEN the chat component is rendered
-      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
-        accepted_tc: new Date(),
-        user_id: "0001",
-        language: Language.en,
-        sessions: [givenSessionId],
-        has_sensitive_personal_data: false,
-        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+        // AND the user has no active session
+        mockGetActiveSessionId.mockReturnValue(null);
+
+        // AND a chat service that returns an empty array of messages given a session id
+        let resolveHistory!: (value: ConversationResponse) => void;
+        const historyPromise = new Promise<ConversationResponse>((resolve) => {
+          resolveHistory = resolve;
+        });
+
+        let resolveSendMessage!: (value: ConversationResponse) => void;
+        const sendMessagePromise = new Promise<ConversationResponse>((resolve) => {
+          resolveSendMessage = resolve;
+        });
+
+        mockGetChatHistory.mockReturnValue(historyPromise);
+        mockSendMessage.mockReturnValue(sendMessagePromise);
+
+        // AND a user preferences service that creates a new session and returns the id
+        let resolveNewSession!: (value: number) => void;
+        const newSessionPromise = new Promise<number>((resolve) => {
+          resolveNewSession = resolve;
+        });
+        mockGetNewSession.mockReturnValue(newSessionPromise);
+
+        // WHEN the component is mounted
+        render(<Chat />);
+
+        // THEN expect the getNewSession method to be called
+        expect(UserPreferencesService.getInstance().getNewSession).toHaveBeenCalled();
+
+        // AND a typing indicator to be shown
+        expect(ChatList as jest.Mock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            messages: expect.arrayContaining([expect.objectContaining({ isTypingMessage: true })]),
+          }),
+          {}
+        );
+
+        // AND WHEN the new session promise resolves
+        const givenNewSessionId = 456;
+        resolveNewSession(givenNewSessionId);
+        // we have to inform the userPreferences state that the session has changed (since we are mocking the service)
+        mockGetActiveSessionId.mockReturnValue(givenNewSessionId);
+
+        // THEN expect the user preferences state to be updated with the new session id
+        await waitFor(() => {
+          expect(mockSetUserPreferences).toHaveBeenCalledWith(givenNewSessionId);
+        });
+
+        // AND expect the chat history to be fetched for the new session
+        await waitFor(() => {
+          expect(ChatService.getInstance).toHaveBeenCalledWith(givenNewSessionId);
+        });
+        expect(mockGetChatHistory).toHaveBeenCalled();
+        expect(ChatService.getInstance(givenNewSessionId).getChatHistory).toHaveBeenCalled();
+
+        // AND WHEN the history promise resolves with an empty message list
+        const givenMessages: ConversationResponse = {
+          messages: [],
+          conversation_completed: false,
+          conversation_conducted_at: null,
+          experiences_explored: 0,
+        };
+        act(() => {
+          resolveHistory(givenMessages);
+        });
+
+        // THEN expect the chat list to be updated with the new (empty) messages list
+        await waitFor(() => {
+          expect(ChatList as jest.Mock).toHaveBeenCalledWith(expect.objectContaining({ messages: [] }), {});
+        });
+
+        // AND expect an empty message to be sent to the chat service for the new session
+        expect(ChatService.getInstance(givenNewSessionId).sendMessage).toHaveBeenCalledWith("");
+
+        // AND WHEN the send message promise resolves
+        const givenSendMessageResponse: ConversationResponse = {
+          messages: [
+            {
+              message: "Hello, how are you?", // A RESPONSE FROM THE AI
+              sent_at: new Date().toISOString(),
+              sender: ConversationMessageSender.COMPASS,
+            },
+          ],
+          conversation_completed: false,
+          conversation_conducted_at: null,
+          experiences_explored: 0,
+        };
+        resolveSendMessage(givenSendMessageResponse);
+
+        // THEN expect the chat list to be updated with the new messages
+        await waitFor(() => {
+          expect(ChatList as jest.Mock).toHaveBeenCalledWith(
+            expect.objectContaining({
+              messages: givenSendMessageResponse.messages.map((message) => ({
+                ...message,
+                id: expect.any(String), // the id is not sent by the server, so its not part of the given messages
+                isTypingMessage: false, // the isTypingMessage is not part of the given messages
+              })),
+            }),
+            {}
+          );
+        });
       });
-      render(chatComponent);
 
-      // WHEN the experiences button is clicked
-      const experiencesButton = screen.getByTestId(CHAT_HEADER_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES);
-      fireEvent.click(experiencesButton);
-      // AND the drawer is open
-      expect(screen.getByTestId(EXPERIENCES_DRAWER_CONTAINER_TEST_ID.EXPERIENCES_DRAWER_CONTAINER)).toBeInTheDocument();
+      test("should show error if creating a new session fails", async () => {
+        // GIVEN a logged-in user
+        const givenUserId = "fooUser";
+        mockGetUser.mockReturnValue({
+          id: givenUserId,
+          name: "Foo User",
+          email: "foo@bar.baz",
+        });
 
-      // THEN expect the experiences to be fetched
-      expect(ExperienceService.getInstance(1234).getExperiences).toHaveBeenCalled();
-    });
+        // AND the user has no active session
+        mockGetActiveSessionId.mockReturnValue(null);
 
-    test("should shows an error notification if fetching experiences fails", async () => {
-      // Mock the getExperiences function to throw an error
-      const mockedGetExperiences = jest.fn().mockRejectedValue(new Error("Network error"));
-      (ExperienceService.getInstance(1234).getExperiences as jest.Mock).mockImplementation(mockedGetExperiences);
+        // AND a user preferences service that fails to create a new session
+        let rejectNewSession!: (error: Error) => void;
+        const newSessionPromise = new Promise<number>((_, reject) => {
+          rejectNewSession = reject;
+        });
+        mockGetNewSession.mockReturnValue(newSessionPromise);
 
-      // GIVEN the chat component is rendered
-      render(chatComponent);
-      // AND the experiences button is clicked
-      const experiencesButton = screen.getByTestId(CHAT_HEADER_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES);
-      fireEvent.click(experiencesButton);
-      // AND the drawer is open
-      expect(screen.getByTestId(EXPERIENCES_DRAWER_CONTAINER_TEST_ID.EXPERIENCES_DRAWER_CONTAINER)).toBeInTheDocument();
+        // WHEN the component is mounted
+        render(<Chat />);
 
-      // WHEN the experiences fetching fails
-      // THEN expect an error notification to be shown
-      await waitFor(() => {
-        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to retrieve experiences", {
-          variant: "error",
+        // THEN expect a typing indicator to be shown
+        expect(ChatList as jest.Mock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            messages: expect.arrayContaining([expect.objectContaining({ isTypingMessage: true })]),
+          }),
+          {}
+        );
+
+        // THEN expect the getNewSession method to be called
+        expect(UserPreferencesService.getInstance().getNewSession).toHaveBeenCalled();
+
+        // AND WHEN the new session promise rejects with a given error
+        const givenError = new Error("Failed to create new session");
+        act(() => {
+          rejectNewSession(givenError);
+        });
+
+        // THEN expect an error to have be logged
+        await waitFor(() => {
+          expect(console.error).toHaveBeenCalledWith(new ChatError("Failed to create new session", givenError));
+        });
+        // AND expect a snackbar notification to be shown
+        await waitFor(() => {
+          expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to start new conversation", {
+            variant: "error",
+          });
+        });
+
+        // AND expect no messages to be in the chat
+        expect(ChatList as jest.Mock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            messages: [],
+          }),
+          {}
+        );
+      });
+
+      test("should show error if fetching history fails", async () => {
+        // GIVEN a logged-in user
+        const givenUserId = "fooUser";
+        mockGetUser.mockReturnValue({
+          id: givenUserId,
+          name: "Foo User",
+          email: "foo@bar.baz",
+        });
+
+        // AND the user has no active session
+        mockGetActiveSessionId.mockReturnValue(null);
+
+        // AND a user preferences service that creates a new session and returns the id
+        let resolveNewSession!: (value: number) => void;
+        const newSessionPromise = new Promise<number>((resolve) => {
+          resolveNewSession = resolve;
+        });
+        mockGetNewSession.mockReturnValue(newSessionPromise);
+
+        // AND a chat service that fails to get chat history
+        let rejectHistory!: (error: Error) => void;
+        const historyPromise = new Promise<ConversationResponse>((_, reject) => {
+          rejectHistory = reject;
+        });
+        mockGetChatHistory.mockReturnValue(historyPromise);
+
+        // WHEN the component is mounted
+        render(<Chat />);
+
+        // THEN expect a typing indicator to be shown
+        expect(ChatList as jest.Mock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            messages: expect.arrayContaining([expect.objectContaining({ isTypingMessage: true })]),
+          }),
+          {}
+        );
+
+        // AND expect the getNewSession method to be called
+        expect(UserPreferencesService.getInstance().getNewSession).toHaveBeenCalled();
+
+        // AND WHEN the new session promise resolves
+        const givenNewSessionId = 456;
+        resolveNewSession(givenNewSessionId);
+        // we have to inform the userPreferences state that the session has changed (since we are mocking the service)
+        mockGetActiveSessionId.mockReturnValue(givenNewSessionId);
+
+        // AND WHEN the history promise rejects with a given error
+        const givenError = new Error("Failed to get chat history");
+        rejectHistory(givenError);
+
+        // THEN expect an error to have be logged
+        await waitFor(() => {
+          expect(console.error).toHaveBeenCalledWith(new ChatError("Failed to initialize chat", givenError));
+        });
+
+        // AND expect no messages to be in the chat
+        expect(ChatList as jest.Mock).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            messages: [],
+          }),
+          {}
+        );
+      });
+
+      test("should show error if sending message fails", async () => {
+        // GIVEN a logged-in user
+        const givenUserId = "fooUser";
+        mockGetUser.mockReturnValue({
+          id: givenUserId,
+          name: "Foo User",
+          email: "foo@bar.baz",
+        });
+
+        // AND the user has no active session
+        mockGetActiveSessionId.mockReturnValue(null);
+
+        // AND a user preferences service that creates a new session and returns the id
+        let resolveNewSession!: (value: number) => void;
+        const newSessionPromise = new Promise<number>((resolve) => {
+          resolveNewSession = resolve;
+        });
+        mockGetNewSession.mockReturnValue(newSessionPromise);
+
+        // AND a chat service that gets an empty message list
+        let resolveHistory!: (value: ConversationResponse) => void;
+        const historyPromise = new Promise<ConversationResponse>((resolve) => {
+          resolveHistory = resolve;
+        });
+        mockGetChatHistory.mockReturnValue(historyPromise);
+
+        // AND a chat service that fails to send a message
+        let rejectSendMessage!: (error: Error) => void;
+        const sendMessagePromise = new Promise<ConversationResponse>((_, reject) => {
+          rejectSendMessage = reject;
+        });
+        mockSendMessage.mockReturnValue(sendMessagePromise);
+
+        // AND a chat history with no messages
+        const givenMessages: ConversationResponse = {
+          messages: [],
+          conversation_completed: false,
+          conversation_conducted_at: null,
+          experiences_explored: 0,
+        };
+
+        // WHEN the component is mounted
+        render(<Chat />);
+
+        // THEN expect a typing indicator to be shown
+        expect(ChatList as jest.Mock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            messages: expect.arrayContaining([expect.objectContaining({ isTypingMessage: true })]),
+          }),
+          {}
+        );
+
+        // AND expect the getNewSession method to be called
+        expect(UserPreferencesService.getInstance().getNewSession).toHaveBeenCalled();
+
+        // AND WHEN the new session promise resolves
+        const givenNewSessionId = 456;
+        resolveNewSession(givenNewSessionId);
+        // we have to inform the userPreferences state that the session has changed (since we are mocking the service)
+        mockGetActiveSessionId.mockReturnValue(givenNewSessionId);
+
+        // AND WHEN the history promise resolves
+        resolveHistory(givenMessages);
+
+        // THEN expect the chat list to be updated with the new messages
+        await waitFor(() => {
+          expect(ChatList as jest.Mock).toHaveBeenCalledWith(
+            expect.objectContaining({ messages: givenMessages.messages }),
+            {}
+          );
+        });
+
+        // AND WHEN the send message promise rejects with a given error
+        const givenError = new Error("Failed to send message");
+        rejectSendMessage(givenError);
+
+        // THEN expect an error to have be logged
+        await waitFor(() => {
+          expect(console.error).toHaveBeenCalledWith(new ChatError("Failed to send message:", givenError));
+        });
+
+        // AND expect a message to be shown in the chat
+        await waitFor(() => {
+          expect(ChatList as jest.Mock).toHaveBeenCalledWith(
+            expect.objectContaining({
+              messages: [
+                {
+                  id: expect.any(String),
+                  message: "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
+                  sent_at: expect.any(String),
+                  sender: ConversationMessageSender.COMPASS,
+                  isTypingMessage: false,
+                },
+              ],
+            }),
+            {}
+          );
         });
       });
     });
+  });
 
-    test("should throw an error if userPreferences don't have any session", async () => {
-      (console.error as jest.Mock).mockClear();
+  describe("sending a message", () => {
+    test("should send a message successfully", async () => {
+      // GIVEN a user with an active session
+      const givenUserId = "fooUser";
+      mockGetUser.mockReturnValue({
+        id: givenUserId,
+        name: "Foo User",
+        email: "foo@bar.baz",
+      });
+      // AND the user has an active session
+      const givenSessionId = 123;
+      mockGetActiveSessionId.mockReturnValue(givenSessionId);
 
-      // GIVEN getUserPreferences returns a user without any session
-      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
-        accepted_tc: new Date(),
-        user_id: "0001",
-        language: Language.en,
-        sessions: [],
-        has_sensitive_personal_data: false,
-        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+      // AND the user has a previous conversation
+      const givenPreviousConversation: ConversationResponse = {
+        messages: [
+          {
+            message: "Hello, how can I assist you today?",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.COMPASS,
+          },
+          {
+            message: "We can start by exploring your experiences.",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.COMPASS,
+          },
+          {
+            message: "Good, let's start. I was a baker for 10 years.",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.USER,
+          },
+          {
+            message: "Wow, a baker for 10 years! That's a long time. What was your favorite part about it?",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.COMPASS,
+          },
+        ],
+        conversation_completed: false,
+        conversation_conducted_at: null,
+        experiences_explored: 0,
+      };
+      mockGetChatHistory.mockResolvedValue(givenPreviousConversation);
+
+      // AND a chat service that sends a message successfully
+      const givenSendMessageResponse: ConversationResponse = {
+        messages: [
+          {
+            message: "What skills did you learn?",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.COMPASS,
+          },
+          {
+            message: "Are you still doing that?",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.COMPASS,
+          },
+        ],
+        conversation_completed: false,
+        conversation_conducted_at: null,
+        experiences_explored: 0,
+      };
+      let resolveSendMessage!: (value: ConversationResponse) => void;
+      const sendMessagePromise = new Promise<ConversationResponse>((resolve) => {
+        resolveSendMessage = resolve;
+      });
+      mockSendMessage.mockResolvedValue(sendMessagePromise);
+
+      // WHEN the component is mounted
+      render(<Chat />);
+
+      // AND WHEN the types a message
+      const givenMessage = "I loved the smell of the bread and the taste of the cake.";
+      act(() => {
+        (ChatMessageField as jest.Mock).mock.calls.at(-1)[0].notifyChange(givenMessage);
       });
 
-      // WHEN the chat is rendered with a router and snackbar provider
-      render(chatComponent);
-      // AND the experiences button is clicked
-      const experiencesButton = screen.getByTestId(CHAT_HEADER_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES);
-      fireEvent.click(experiencesButton);
-      // AND the drawer is open
-      expect(screen.getByTestId(EXPERIENCES_DRAWER_CONTAINER_TEST_ID.EXPERIENCES_DRAWER_CONTAINER)).toBeInTheDocument();
+      // AND WHEN the user sends the message
+      act(() => {
+        (ChatMessageField as jest.Mock).mock.calls.at(-1)[0].handleSend();
+      });
 
-      // THEN expect an error message to be shown
+      // THEN expect the send message method to be called
+      expect(mockSendMessage).toHaveBeenCalledWith(givenMessage);
+
+      // AND expect the user's message and a typing indicator to be shown in the chat
       await waitFor(() => {
-        expect(console.error).toHaveBeenCalledWith(new ChatError("Failed to retrieve experiences"));
+        expect(ChatList as jest.Mock).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            messages: expect.arrayContaining([
+              expect.objectContaining({ message: givenMessage }),
+              expect.objectContaining({ isTypingMessage: true }),
+            ]),
+          }),
+          {}
+        );
       });
 
-      // AND enqueueSnackbar should be called
+      // AND WHEN the send message promise resolves
+      act(() => {
+        resolveSendMessage(givenSendMessageResponse);
+      });
+
+      // THEN expect the previous conversation and the response from the chat service to be shown in the chat
+      await waitFor(() => {
+        expect(ChatList as jest.Mock).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            messages: expect.arrayContaining([
+              ...givenPreviousConversation.messages.map((message) =>
+                expect.objectContaining({ message: message.message })
+              ),
+              ...givenSendMessageResponse.messages.map((message) =>
+                expect.objectContaining({ message: message.message })
+              ),
+            ]),
+          }),
+          {}
+        );
+      });
+
+      // AND expect that no errors or warnings were logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+
+      // AND expect that the chat input is cleared
+      expect(ChatMessageField as jest.Mock).toHaveBeenLastCalledWith(expect.objectContaining({ message: "" }), {});
+    });
+
+    test("should handle send message error", async () => {
+      // GIVEN a user with an active session
+      const givenUserId = "fooUser";
+      mockGetUser.mockReturnValue({
+        id: givenUserId,
+        name: "Foo User",
+        email: "foo@bar.baz",
+      });
+
+      // AND the user has an active session
+      const givenSessionId = 123;
+      mockGetActiveSessionId.mockReturnValue(givenSessionId);
+
+      // AND the user has a previous conversation
+      const givenPreviousConversation: ConversationResponse = {
+        messages: [
+          {
+            message: "Hello, how can I assist you today?",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.COMPASS,
+          },
+        ],
+        conversation_completed: false,
+        conversation_conducted_at: null,
+        experiences_explored: 0,
+      };
+
+      mockGetChatHistory.mockResolvedValue(givenPreviousConversation);
+
+      // AND a chat service that fails to send a message
+      const givenError = new Error("Failed to send message");
+      mockSendMessage.mockRejectedValue(givenError);
+
+      // WHEN the component is mounted
+      render(<Chat />);
+
+      // AND WHEN the user types a message
+      const givenMessage = "I loved the smell of the bread and the taste of the cake.";
+      act(() => {
+        (ChatMessageField as jest.Mock).mock.calls.at(-1)[0].notifyChange(givenMessage);
+      });
+
+      // AND WHEN the user sends the message
+      act(() => {
+        (ChatMessageField as jest.Mock).mock.calls.at(-1)[0].handleSend();
+      });
+
+      // THEN expect the send message method to be called
+      expect(mockSendMessage).toHaveBeenCalledWith(givenMessage);
+
+      // AND expect an error to have been logged
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith(new ChatError("Failed to send message:", givenError));
+      });
+
+      // AND expect a message to be shown in the chat
+      await waitFor(() => {
+        expect(ChatList as jest.Mock).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            messages: [
+              ...givenPreviousConversation.messages.map((message) => ({
+                ...message,
+                sent_at: expect.any(String),
+                id: expect.any(String),
+                isTypingMessage: false,
+              })),
+              expect.objectContaining({
+                message: "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
+              }),
+            ],
+          }),
+          {}
+        );
+      });
+    });
+  });
+
+  describe("opening experience drawer and fetching experiences", () => {
+    test("should open drawer and fetch experiences", async () => {
+      // GIVEN a user with an active session
+      const givenUserId = "fooUser";
+      mockGetUser.mockReturnValue({
+        id: givenUserId,
+        name: "Foo User",
+        email: "foo@bar.baz",
+      });
+      const givenSessionId = 123;
+      mockGetActiveSessionId.mockReturnValue(givenSessionId);
+      // WHEN the component is rendered
+      render(<Chat />);
+
+      // AND an experience service that returns some experiences
+      const givenExperiences = [
+        {
+          UUID: "1",
+          start_date: "2024-01-01",
+          end_date: "2024-01-01",
+          experience_title: "Experience 1",
+          company: "Company 1",
+          location: "Location 1",
+          work_type: WorkType.SELF_EMPLOYMENT,
+          top_skills: [],
+        },
+      ];
+      mockGetExperiences.mockResolvedValue(givenExperiences);
+
+      // WHEN the experiences button is clicked
+      // we are using the last call to the ChatHeader mock because the first one is the initial call
+      // and a bunch of calls are made when the component is re-rendered,
+      // for example, due to the chat initialization
+      (ChatHeader as jest.Mock).mock.calls.at(-1)[0].notifyOnExperiencesDrawerOpen();
+
+      // THEN expect the drawer to open
+      await waitFor(() => {
+        expect(screen.getByTestId(EXPERIENCE_DRAWER_TEST_ID.EXPERIENCES_DRAWER_CONTAINER)).toBeInTheDocument();
+      });
+
+      // AND expect experiences to be fetched for the active session
+      expect(mockGetExperiences).toHaveBeenCalled();
+
+      // AND expect the experiences to be passed to the drawer
+      await waitFor(() => {
+        expect(ExperiencesDrawer as jest.Mock).toHaveBeenCalledWith(
+          {
+            experiences: givenExperiences,
+            isLoading: false,
+            isOpen: true,
+            conversationConductedAt: null,
+            notifyOnClose: expect.any(Function),
+          },
+          {}
+        );
+      });
+    });
+
+    test("should handle experience fetch error", async () => {
+      // GIVEN a user with an active session
+      const givenUserId = "fooUser";
+      mockGetUser.mockReturnValue({
+        id: givenUserId,
+        name: "Foo User",
+        email: "foo@bar.baz",
+      });
+      const givenSessionId = 123;
+      mockGetActiveSessionId.mockReturnValue(givenSessionId);
+      // AND a failing experience service
+      const givenError = new Error("Failed to fetch experiences");
+      mockGetExperiences.mockRejectedValue(givenError);
+
+      // WHEN the component is mounted
+      render(<Chat />);
+
+      // AND the experiences button is clicked
+      // we are using the last call to the ChatHeader mock because the first one is the initial call
+      // and a bunch of calls are made when the component is re-rendered,
+      // for example, due to the chat initialization
+      (ChatHeader as jest.Mock).mock.calls.at(-1)[0].notifyOnExperiencesDrawerOpen();
+
+      // THEN expect error notification
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith(new ChatError("Failed to retrieve experiences", givenError));
+      });
+      // AND expect a snackbar notification
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to retrieve experiences", {
         variant: "error",
       });
     });
+  });
 
-    test("should close the drawer when the close button is clicked", async () => {
-      // GIVEN the chat component is rendered
-      render(chatComponent);
-      // AND the experiences button is clicked
-      const experiencesButton = screen.getByTestId(CHAT_HEADER_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES);
-      fireEvent.click(experiencesButton);
+  describe("starting a new conversation", () => {
+    test("should start a new conversation", async () => {
+      // GIVEN a user with an active session
+      const givenUserId = "fooUser";
+      mockGetUser.mockReturnValue({
+        id: givenUserId,
+        name: "Foo User",
+        email: "foo@bar.baz",
+      });
+      const givenSessionId = 123;
+      mockGetActiveSessionId.mockReturnValue(givenSessionId);
 
-      // WHEN the close button is clicked
-      const closeButton = screen.getByTestId(EXPERIENCES_DRAWER_HEADER_TEST_ID.EXPERIENCES_DRAWER_HEADER_BUTTON);
-      fireEvent.click(closeButton);
+      // AND a user preferences service that returns a new session id
+      const givenNewSessionId = 456;
+      let resolveNewSession!: (value: UserPreference) => void;
+      const mockNewSessionPromise = new Promise<UserPreference>((resolve) => {
+        resolveNewSession = resolve;
+      });
+      mockGetNewSession.mockReturnValue(mockNewSessionPromise);
 
-      // THEN expect the drawer to be closed
+      // AND a chat service that returns an empty message list for the new session
+      const historyPromise = Promise.resolve({
+        messages: [],
+        conversation_completed: false,
+        conversation_conducted_at: null,
+        experiences_explored: 0,
+      });
+      const givenSendMessageResponse: ConversationResponse = {
+        messages: [
+          {
+            message: "Hello, how can I assist you today?",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.COMPASS,
+          },
+        ],
+        conversation_completed: false,
+        conversation_conducted_at: null,
+        experiences_explored: 0,
+      };
+      const sendMessagePromise = Promise.resolve(givenSendMessageResponse);
+      mockGetChatHistory.mockResolvedValue(historyPromise);
+      mockSendMessage.mockResolvedValue(sendMessagePromise);
+
+      // AND the component is mounted
+      render(<Chat />);
+
+      // WHEN new conversation clicked
+      // we are using the last call to the ChatHeader mock because the first one is the initial call
+      // and a bunch of calls are made when the component is re-rendered,
+      // for example, due to the chat initialization
+      (ChatHeader as jest.Mock).mock.calls.at(-1)[0].startNewConversation();
+
+      // THEN expect confirmation dialog to be shown
+      await waitFor(() => {
+        expect(screen.getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL)).toBeInTheDocument();
+      });
+
+      // WHEN the user confirms
+      // we are using the last call to the ConfirmModalDialog mock because the first one is the initial call
+      // and a bunch of calls are made when the component is re-rendered,
+      // for example, due to the chat initialization
+      (ConfirmModalDialog as jest.Mock).mock.calls.at(-1)[0].onConfirm();
+
+      // THEN expect the new session to be fetched
+      await waitFor(() => {
+        expect(mockGetNewSession).toHaveBeenCalled();
+      });
+      // AND expect the chat to be reset and only show the typing indicator
+      await waitFor(() => {
+        expect(ChatList as jest.Mock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            messages: expect.arrayContaining([expect.objectContaining({ isTypingMessage: true })]),
+          }),
+          {}
+        );
+      });
+      // AND when the new session promise resolves
+      resolveNewSession({ sessions: [givenNewSessionId] } as unknown as UserPreference);
+      // we have to inform the userPreferences state that the session has changed (since we are mocking the service)
+      mockGetActiveSessionId.mockReturnValue(givenNewSessionId);
+
+      // THEN expect the chat service to be initialized with the new session id
+      await waitFor(() => {
+        expect(ChatService.getInstance).toHaveBeenCalledWith(givenNewSessionId);
+      });
+      // AND expect the chat history to be fetched for the new session
+      await waitFor(() => {
+        expect(ChatService.getInstance(givenNewSessionId).getChatHistory).toHaveBeenCalled();
+      });
+      // AND expect an empty message to be sent to the chat service for the new session
+      await waitFor(() => {
+        expect(ChatService.getInstance(givenNewSessionId).sendMessage).toHaveBeenCalledWith("");
+      });
+      // AND expect the chat list to be updated with the response from the chat service
+      await waitFor(() => {
+        expect(ChatList as jest.Mock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            messages: givenSendMessageResponse.messages.map((message) => ({
+              ...message,
+              id: expect.any(String),
+              isTypingMessage: false,
+            })),
+          }),
+          {}
+        );
+      });
+    });
+
+    test("should handle new conversation cancellation", async () => {
+      // GIVEN a user with an active session
+      const givenUserId = "fooUser";
+      mockGetUser.mockReturnValue({
+        id: givenUserId,
+        name: "Foo User",
+        email: "foo@bar.baz",
+      });
+      const givenSessionId = 123;
+      mockGetActiveSessionId.mockReturnValue(givenSessionId);
+      // AND a chat service that returns an existing conversation
+      const givenMessages = [
+        {
+          message: "Hello, how can I assist you today?",
+          sent_at: new Date().toISOString(),
+          sender: ConversationMessageSender.COMPASS,
+        },
+      ];
+      const historyPromise = Promise.resolve({
+        messages: givenMessages,
+        conversation_completed: false,
+        conversation_conducted_at: null,
+        experiences_explored: 0,
+      });
+      mockGetChatHistory.mockResolvedValue(historyPromise);
+
+      // AND the component is mounted
+      render(<Chat />);
+
+      // WHEN new conversation clicked
+      // we are using the last call to the ChatHeader mock because the first one is the initial call
+      // and a bunch of calls are made when the component is re-rendered,
+      // for example, due to the chat initialization
+      (ChatHeader as jest.Mock).mock.calls.at(-1)[0].startNewConversation();
+
+      // THEN expect confirmation dialog to be shown
+      await waitFor(() => {
+        expect(screen.getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL)).toBeInTheDocument();
+      });
+
+      // WHEN user cancels
+      // we are using the last call to the ConfirmModalDialog mock because the first one is the initial call
+      // and a bunch of calls are made when the component is re-rendered,
+      // for example, due to the chat initialization
+      (ConfirmModalDialog as jest.Mock).mock.calls.at(-1)[0].onCancel();
+
+      // THEN expect dialog to close
+      expect(screen.queryByText("Are you sure you want to start a new conversation?")).not.toBeInTheDocument();
+
+      // AND expect chat state to remain unchanged
+      expect(ChatList as jest.Mock).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          messages: givenMessages.map((message) => ({
+            ...message,
+            id: expect.any(String),
+            isTypingMessage: false,
+          })),
+        }),
+        {}
+      );
+    });
+
+    test("should handle new conversation error", async () => {
+      // GIVEN a user with an active session
+      const givenUserId = "fooUser";
+      mockGetUser.mockReturnValue({
+        id: givenUserId,
+        name: "Foo User",
+        email: "foo@bar.baz",
+      });
+      const givenSessionId = 123;
+      mockGetActiveSessionId.mockReturnValue(givenSessionId);
+
+      // AND a chat service that returns an existing conversation
+      const givenMessages = [
+        {
+          message: "Hello, how can I assist you today?",
+          sent_at: new Date().toISOString(),
+          sender: ConversationMessageSender.COMPASS,
+        },
+      ];
+      const historyPromise = Promise.resolve({
+        messages: givenMessages,
+        conversation_completed: false,
+        conversation_conducted_at: null,
+        experiences_explored: 0,
+      });
+      mockGetChatHistory.mockResolvedValue(historyPromise);
+
+      // AND a failing new session service
+      const givenError = new Error("Failed to start new conversation");
+      mockGetNewSession.mockRejectedValue(givenError);
+
+      // AND the component is mounted
+      render(<Chat />);
+
+      // WHEN new conversation clicked
+      (ChatHeader as jest.Mock).mock.calls.at(-1)[0].startNewConversation();
+
+      // THEN expect confirmation dialog to be shown
+      await waitFor(() => {
+        expect(screen.getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL)).toBeInTheDocument();
+      });
+
+      // AND the user confirms
+      // we are using the last call to the ConfirmModalDialog mock because the first one is the initial call
+      // and a bunch of calls are made when the component is re-rendered,
+      // for example, due to the chat initialization
+      (ConfirmModalDialog as jest.Mock).mock.calls.at(-1)[0].onConfirm();
+
+      // THEN expect an error message to be added to the chat list
+      await waitFor(() => {
+        expect(ChatList as jest.Mock).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            messages: expect.arrayContaining([
+              expect.objectContaining({
+                message: "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
+                sender: ConversationMessageSender.COMPASS,
+              }),
+            ]),
+          }),
+          {}
+        );
+      });
+      // AND expect a snackbar notification
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to start new conversation", {
+        variant: "error",
+      });
+      // AND expect the dialog to close
+      expect(screen.queryByText("Are you sure you want to start a new conversation?")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("handling feedback submission", () => {
+    test("should handle feedback submission successfully", async () => {
+      // GIVEN a user with an active session
+      const givenUserId = "fooUser";
+      mockGetUser.mockReturnValue({
+        id: givenUserId,
+        name: "Foo User",
+        email: "foo@bar.baz",
+      });
+      const givenSessionId = 123;
+      mockGetActiveSessionId.mockReturnValue(givenSessionId);
+
+      // AND a chat service with existing messages
+      const givenMessages: ConversationResponse = {
+        messages: [
+          {
+            message: "Hello, how are you?",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.USER,
+          },
+          {
+            message: "I'm good, thank you",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.COMPASS,
+          },
+        ],
+        conversation_completed: true, // Conversation needs to be completed to show feedback
+        conversation_conducted_at: new Date().toISOString(),
+        experiences_explored: 1,
+      };
+      const historyPromise = Promise.resolve(givenMessages);
+      mockGetChatHistory.mockResolvedValue(historyPromise);
+
+      // WHEN the component is mounted
+      render(<Chat />);
+
+      // AND the feedback form is triggered
+      // we are using the last call to the ChatList mock because the first one is the initial call
+      // and a bunch of calls are made when the component is re-rendered,
+      // for example, due to the chat initialization
+      act(() => {
+        (ChatList as jest.Mock).mock.calls.at(-1)[0].notifyOpenFeedbackForm();
+      });
+
+      // THEN expect feedback form to be visible
+      await waitFor(() => {
+        expect(screen.getByTestId(FEEDBACK_FORM_DATA_TEST_ID.FEEDBACK_FORM_DIALOG)).toBeInTheDocument();
+      });
+
+      // AND the user submits feedback
+      // we are using the last call to the FeedbackForm mock because the first one is the initial call
+      // and a bunch of calls are made when the component is re-rendered,
+      // for example, due to the chat initialization
+      act(() => {
+        (FeedbackForm as jest.Mock).mock.calls.at(-1)[0].onFeedbackSubmit();
+      });
+
+      // THEN expect the feedback message to be removed from the chat list
+      await waitFor(() => {
+        expect(ChatList as jest.Mock).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            messages: expect.not.arrayContaining([
+              expect.objectContaining({ footerType: ChatMessageFooterType.FEEDBACK_FORM_BUTTON }),
+            ]),
+          }),
+          {}
+        );
+      });
+
+      // AND expect a thank you message to be added to the chat list
+      await waitFor(() => {
+        expect(ChatList as jest.Mock).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            messages: expect.arrayContaining([
+              expect.objectContaining({
+                message:
+                  "Thank you for taking the time to share your valuable feedback. Your input is important to us.",
+                sender: ConversationMessageSender.COMPASS,
+              }),
+            ]),
+          }),
+          {}
+        );
+      });
+    });
+  });
+
+  describe("handling inactivity backdrop", () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      // Reset the Date.now() mock before each test
+      jest.spyOn(Date, "now").mockImplementation(() => 0);
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+      jest.restoreAllMocks();
+    });
+
+    test("should show inactive backdrop after inactivity timeout", async () => {
+      // GIVEN a user with an active session
+      const givenUserId = "fooUser";
+      mockGetUser.mockReturnValue({
+        id: givenUserId,
+        name: "Foo User",
+        email: "foo@bar.baz",
+      });
+      const givenSessionId = 123;
+      mockGetActiveSessionId.mockReturnValue(givenSessionId);
+
+      // AND a chat service with some messages
+      const givenMessages: ConversationResponse = {
+        messages: [
+          {
+            message: "Hello",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.USER,
+          },
+        ],
+        conversation_completed: false,
+        conversation_conducted_at: null,
+        experiences_explored: 0,
+      };
+      mockGetChatHistory.mockResolvedValue(givenMessages);
+
+      // WHEN the component is mounted
+      render(<Chat />);
+
+      // AND time passes beyond the inactivity timeout
+      act(() => {
+        // Advance Date.now() to simulate time passing
+        jest.spyOn(Date, "now").mockImplementation(() => INACTIVITY_TIMEOUT + 1);
+        // Trigger the check interval
+        jest.advanceTimersByTime(CHECK_INACTIVITY_INTERVAL);
+      });
+
+      // THEN expect the backdrop to be visible
+      await waitFor(() => {
+        expect(screen.getByTestId(INACTIVE_BACKDROP_DATA_TEST_ID.INACTIVE_BACKDROP_CONTAINER)).toBeInTheDocument();
+      });
+    });
+
+    test("should not show inactive backdrop when disableInactivityCheck is true", async () => {
+      // GIVEN a user with an active session
+      const givenUserId = "fooUser";
+      mockGetUser.mockReturnValue({
+        id: givenUserId,
+        name: "Foo User",
+        email: "foo@bar.baz",
+      });
+      const givenSessionId = 123;
+      mockGetActiveSessionId.mockReturnValue(givenSessionId);
+
+      // AND a chat service with some messages
+      const givenMessages: ConversationResponse = {
+        messages: [
+          {
+            message: "Hello",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.USER,
+          },
+        ],
+        conversation_completed: false,
+        conversation_conducted_at: null,
+        experiences_explored: 0,
+      };
+      mockGetChatHistory.mockResolvedValue(givenMessages);
+
+      // WHEN the component is mounted with disableInactivityCheck
+      render(<Chat disableInactivityCheck={true} />);
+
+      // AND time passes beyond the inactivity timeout
+      act(() => {
+        jest.spyOn(Date, "now").mockImplementation(() => INACTIVITY_TIMEOUT + 1);
+        jest.advanceTimersByTime(CHECK_INACTIVITY_INTERVAL);
+      });
+
+      // THEN expect the backdrop to not be visible
       await waitFor(() => {
         expect(
-          screen.queryByTestId(EXPERIENCES_DRAWER_CONTAINER_TEST_ID.EXPERIENCES_DRAWER_CONTAINER)
+          screen.queryByTestId(INACTIVE_BACKDROP_DATA_TEST_ID.INACTIVE_BACKDROP_CONTAINER)
         ).not.toBeInTheDocument();
       });
     });
-  });
 
-  describe("test new conversation dialog", () => {
-    test("should show new conversation dialog when the user clicks on the new conversation button", async () => {
-      // GIVEN a chat component
-      render(
-        <HashRouter>
-          <Chat />
-        </HashRouter>
-      );
+    test.each([
+      ["click", () => userEvent.click(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER))],
+      ["type(foo)", () => userEvent.type(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER), "foo")],
+      ["type(Space)", () => userEvent.type(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER), " ")],
+      ["type(enter)", () => userEvent.type(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER), "\n")],
+    ])("should hide backdrop on %s event", async (_, triggerEvent) => {
+      // GIVEN a user with an active session
+      const givenUserId = "fooUser";
+      mockGetUser.mockReturnValue({
+        id: givenUserId,
+        name: "Foo User",
+        email: "foo@bar.baz",
+      });
+      const givenSessionId = 123;
+      mockGetActiveSessionId.mockReturnValue(givenSessionId);
 
-      // WHEN the new conversation button is clicked
-      const newConversationButton = screen.getByTestId(MENU_ITEM_ID.START_NEW_CONVERSATION);
-      fireEvent.click(newConversationButton);
-
-      // THEN expect the new conversation dialog to be shown
-      expect(screen.getByTestId(CONFIRM_MODAL_TEST_ID.CONFIRM_MODAL)).toBeInTheDocument();
-    });
-
-    test("should close the new conversation dialog when the user clicks on the cancel button", async () => {
-      // GIVEN the chat component is rendered
-      render(
-        <HashRouter>
-          <Chat />
-        </HashRouter>
-      );
-      // AND the new conversation dialog is open
-      const newConversationButton = screen.getByTestId(MENU_ITEM_ID.START_NEW_CONVERSATION);
-      fireEvent.click(newConversationButton);
-
-      // WHEN the cancel button is clicked
-      const cancelButton = screen.getByTestId(CONFIRM_MODAL_TEST_ID.CONFIRM_MODAL_CANCEL);
-      fireEvent.click(cancelButton);
-
-      // THEN expect the new conversation dialog to be closed
-      expect(screen.queryByTestId(CONFIRM_MODAL_TEST_ID.CONFIRM_MODAL)).not.toBeInTheDocument();
-    });
-
-    test("should start new conversation when the user clicks on the confirm button", async () => {
-      // GIVEN the chat component is rendered
-      render(
-        <HashRouter>
-          <Chat />
-        </HashRouter>
-      );
-      // AND the new conversation dialog is open
-      const newConversationButton = screen.getByTestId(MENU_ITEM_ID.START_NEW_CONVERSATION);
-      fireEvent.click(newConversationButton);
-
-      // WHEN the confirm button is clicked
-      const confirmButton = screen.getByTestId(CONFIRM_MODAL_TEST_ID.CONFIRM_MODAL_CONFIRM);
-      fireEvent.click(confirmButton);
-
-      // THEN expect the new conversation dialog to be closed
-      expect(screen.queryByTestId(CONFIRM_MODAL_TEST_ID.CONFIRM_MODAL)).not.toBeInTheDocument();
-    });
-  });
-
-  describe("test feedback form", () => {
-    beforeEach(() => {
-      ChatList.mockRestore();
-
-      // mock the getChatHistory method
-      mockGetChatHistory.mockResolvedValueOnce({
+      // AND a chat service with some messages
+      const givenMessages: ConversationResponse = {
         messages: [
           {
-            message: "This is the feedback message",
+            message: "Hello",
             sent_at: new Date().toISOString(),
-            sender: ConversationMessageSender.COMPASS,
-            isFeedbackMessage: true,
+            sender: ConversationMessageSender.USER,
           },
         ],
-        conversation_completed: true,
+        conversation_completed: false,
+        conversation_conducted_at: null,
+        experiences_explored: 0,
+      };
+      mockGetChatHistory.mockResolvedValue(givenMessages);
+
+      // AND the component is mounted
+      render(<Chat />);
+
+      // AND the backdrop is visible
+      act(() => {
+        jest.spyOn(Date, "now").mockImplementation(() => INACTIVITY_TIMEOUT + 1);
+        jest.advanceTimersByTime(CHECK_INACTIVITY_INTERVAL);
       });
 
-      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
-        accepted_tc: new Date(),
-        user_id: "0001",
-        language: Language.en,
-        sessions: [givenSessionId],
-        has_sensitive_personal_data: false,
-        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
-      });
-    });
-
-    test("should call handleOpenFeedbackForm when the feedback form is open", async () => {
-      // GIVEN a chat component
-      render(
-        <HashRouter>
-          <Chat />
-        </HashRouter>
-      );
-
-      // WHEN the feedback button is clicked
-      const feedbackButton = await screen.findByTestId(FEEDBACK_FORM_BUTTON_TEST_ID.FEEDBACK_FORM_BUTTON);
-      fireEvent.click(feedbackButton);
-
-      // THEN expect the feedback form to be shown
-      expect(screen.getByTestId(FEEDBACK_FORM_TEST_ID.FEEDBACK_FORM_DIALOG)).toBeInTheDocument();
-    });
-
-    test("should call handleCloseFeedbackForm when the feedback form is closed", async () => {
-      // GIVEN a chat component
-      render(
-        <HashRouter>
-          <Chat />
-        </HashRouter>
-      );
-      // AND the feedback form is open
-      const feedbackButton = await screen.findByTestId(FEEDBACK_FORM_BUTTON_TEST_ID.FEEDBACK_FORM_BUTTON);
-      fireEvent.click(feedbackButton);
-
-      // WHEN the user clicks the close button
-      const closeButton = screen.getByTestId(FEEDBACK_FORM_TEST_ID.FEEDBACK_FORM_DIALOG_ICON_BUTTON);
-      fireEvent.click(closeButton);
-
-      // THEN expect feedback form to be closed
       await waitFor(() => {
-        expect(screen.queryByTestId(FEEDBACK_FORM_TEST_ID.FEEDBACK_FORM_DIALOG)).not.toBeInTheDocument();
+        expect(screen.getByTestId(INACTIVE_BACKDROP_DATA_TEST_ID.INACTIVE_BACKDROP_CONTAINER)).toBeInTheDocument();
       });
-    });
 
-    test("should call handleFeedbackSubmit when the user submits feedback", async () => {
-      // mock the sendFeedback method
-      const mockSendFeedback = jest.fn();
-      (OverallFeedbackService as jest.Mocked<typeof OverallFeedbackService>).prototype.sendFeedback = mockSendFeedback;
+      // WHEN the user interacts
+      act(() => {
+        // Reset the mock time to simulate user interaction
+        jest.spyOn(Date, "now").mockImplementation(() => 0);
+        triggerEvent();
+      });
 
-      // GIVEN a chat component
-      render(
-        <HashRouter>
-          <Chat />
-        </HashRouter>
-      );
-      // AND the feedback form is open
-      const feedbackButton = await screen.findByTestId(FEEDBACK_FORM_BUTTON_TEST_ID.FEEDBACK_FORM_BUTTON);
-      fireEvent.click(feedbackButton);
-
-      // WHEN the user submits the feedback
-      const input = screen.getAllByTestId(COMMENT_TEXT_FIELD_TEST_ID.COMMENT_TEXT_FIELD);
-      fireEvent.change(input[0], { target: { value: "This is a comment" } });
-
-      const submitButton = screen.getByTestId(FEEDBACK_FORM_CONTENT_DATA_TEST_ID.FEEDBACK_FORM_NEXT_BUTTON);
-      for (let i = 0; i < feedbackFormContentSteps.length; i++) {
-        fireEvent.click(submitButton);
-      }
-
-      // THEN expect the feedback to be submitted
-      await waitFor(() => expect(mockSendFeedback).toHaveBeenCalled());
-    });
-
-    test("should log the same error that the service throws when sending feedback fails", async () => {
-      // mock the sendFeedback method
-      const givenError = new Error("Failed to send feedback");
-      (OverallFeedbackService as jest.Mocked<typeof OverallFeedbackService>).prototype.sendFeedback = jest
-        .fn()
-        .mockRejectedValue(givenError);
-      // GIVEN a chat component
-      render(
-        <HashRouter>
-          <Chat />
-        </HashRouter>
-      );
-      // AND the feedback form is open
-      const feedbackButton = await screen.findByTestId(FEEDBACK_FORM_BUTTON_TEST_ID.FEEDBACK_FORM_BUTTON);
-      fireEvent.click(feedbackButton);
-
-      // WHEN the user submits the feedback
-      const input = screen.getAllByTestId(COMMENT_TEXT_FIELD_TEST_ID.COMMENT_TEXT_FIELD);
-      fireEvent.change(input[0], { target: { value: "This is a comment" } });
-
-      const submitButton = screen.getByTestId(FEEDBACK_FORM_CONTENT_DATA_TEST_ID.FEEDBACK_FORM_NEXT_BUTTON);
-      for (let i = 0; i < feedbackFormContentSteps.length; i++) {
-        fireEvent.click(submitButton);
-      }
-
-      // THEN expect an error message to be shown
+      // THEN expect the backdrop to be hidden
       await waitFor(() => {
-        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-          "Failed to submit feedback. Please try again later.",
-          { variant: "error" }
-        );
-      });
-      expect(console.error).toHaveBeenCalledWith(new FeedbackError("Failed to submit feedback", givenError));
-    });
-
-    test("should log error when adding a message and there is no user session", async () => {
-      (console.error as jest.Mock).mockClear();
-
-      // GIVEN getUserPreferences returns a user without any session
-      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
-        accepted_tc: new Date(),
-        user_id: "0001",
-        language: Language.en,
-        sessions: [],
-        has_sensitive_personal_data: false,
-        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
-      });
-
-      // WHEN the component is rendered
-      render(
-        <HashRouter>
-          <Chat />
-        </HashRouter>
-      );
-      // AND the user tries to send a message
-      const input = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD);
-      const sendButton = screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
-
-      fireEvent.change(input, { target: { value: "Some message" } });
-      fireEvent.click(sendButton);
-
-      // THEN expect an error message to be logged
-      await waitFor(() => {
-        expect(console.error).toHaveBeenCalledWith(new SessionError("User has no sessions"));
+        expect(
+          screen.queryByTestId(INACTIVE_BACKDROP_DATA_TEST_ID.INACTIVE_BACKDROP_CONTAINER)
+        ).not.toBeInTheDocument();
       });
     });
   });

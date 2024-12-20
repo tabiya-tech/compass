@@ -4,20 +4,22 @@ import "src/_test_utilities/consoleMock";
 import ChatHeader, { DATA_TEST_ID, MENU_ITEM_ID } from "./ChatHeader";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { act, fireEvent, waitFor, within } from "@testing-library/react";
-import { HashRouter, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { testNavigateToPath } from "src/_test_utilities/routeNavigation";
-import ContextMenu from "src/theme/ContextMenu/ContextMenu";
+import ContextMenu, { DATA_TEST_ID as CONTEXT_MENU_DATA_TEST_ID } from "src/theme/ContextMenu/ContextMenu";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { DATA_TEST_ID as ANIMATED_BADGE_DATA_TEST_ID } from "src/theme/AnimatedBadge/AnimatedBadge";
+import userEvent from "@testing-library/user-event";
 
 // mock the ContextMenu
 jest.mock("src/theme/ContextMenu/ContextMenu", () => {
+  const actual = jest.requireActual("src/theme/ContextMenu/ContextMenu");
   return {
     __esModule: true,
     default: jest.fn(({ items }: { items: MenuItemConfig[] }) => (
-      <div data-testid="mock-context-menu">
+      <div data-testid={actual.DATA_TEST_ID.MENU}>
         {items.map((item) => (
           <div key={item.id} data-testid={item.id} onClick={item.action}>
             {item.text}
@@ -26,6 +28,7 @@ jest.mock("src/theme/ContextMenu/ContextMenu", () => {
         ;
       </div>
     )),
+    DATA_TEST_ID: actual.DATA_TEST_ID,
   };
 });
 
@@ -66,16 +69,14 @@ describe("ChatHeader", () => {
     const givenNotifyOnExperiencesDrawerOpen = jest.fn();
     const givenNumberOfExploredExperiences = 1;
     const givenChatHeader = (
-      <HashRouter>
-        <ChatHeader
-          notifyOnLogout={givenNotifyOnLogout}
-          startNewConversation={givenStartNewConversation}
-          notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
-          experiencesExplored={givenNumberOfExploredExperiences}
-          exploredExperiencesNotification={givenExploredExperiencesNotification}
-          setExploredExperiencesNotification={jest.fn()}
-        />
-      </HashRouter>
+      <ChatHeader
+        notifyOnLogout={givenNotifyOnLogout}
+        startNewConversation={givenStartNewConversation}
+        notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+        experiencesExplored={givenNumberOfExploredExperiences}
+        exploredExperiencesNotification={givenExploredExperiencesNotification}
+        setExploredExperiencesNotification={jest.fn()}
+      />
     );
 
     // WHEN the chat header is rendered
@@ -105,6 +106,7 @@ describe("ChatHeader", () => {
     // AND to match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_CONTAINER)).toMatchSnapshot();
   });
+
   describe("chatHeader action tests", () => {
     const givenNotifyOnLogout = jest.fn();
     const givenStartNewConversation = jest.fn();
@@ -125,25 +127,25 @@ describe("ChatHeader", () => {
       // GIVEN a ChatHeader component
       const givenNotifyOnLogout = jest.fn();
       const givenChatHeader = (
-        <HashRouter>
-          <ChatHeader
-            notifyOnLogout={givenNotifyOnLogout}
-            startNewConversation={givenStartNewConversation}
-            notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
-            experiencesExplored={0}
-            exploredExperiencesNotification={true}
-            setExploredExperiencesNotification={jest.fn()}
-          />
-        </HashRouter>
+        <ChatHeader
+          notifyOnLogout={givenNotifyOnLogout}
+          startNewConversation={givenStartNewConversation}
+          notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+          experiencesExplored={0}
+          exploredExperiencesNotification={true}
+          setExploredExperiencesNotification={jest.fn()}
+        />
       );
       // AND the chat header is rendered
       render(givenChatHeader);
 
       // WHEN the user button is clicked
       const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
-      fireEvent.click(userButton);
+      await userEvent.click(userButton);
 
       // THEN expect the context menu to be visible
+      expect(screen.getByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU)).toBeInTheDocument();
+      // AND the context menu to be open and anchored to the user button
       await waitFor(() => {
         expect(ContextMenu).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -159,16 +161,14 @@ describe("ChatHeader", () => {
       // GIVEN a ChatHeader component
       const givenNotifyOnLogout = jest.fn();
       const givenChatHeader = (
-        <HashRouter>
-          <ChatHeader
-            notifyOnLogout={givenNotifyOnLogout}
-            startNewConversation={givenStartNewConversation}
-            notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
-            experiencesExplored={0}
-            exploredExperiencesNotification={true}
-            setExploredExperiencesNotification={jest.fn()}
-          />
-        </HashRouter>
+        <ChatHeader
+          notifyOnLogout={givenNotifyOnLogout}
+          startNewConversation={givenStartNewConversation}
+          notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+          experiencesExplored={0}
+          exploredExperiencesNotification={true}
+          setExploredExperiencesNotification={jest.fn()}
+        />
       );
       // AND the chat header is rendered
       render(givenChatHeader);
@@ -210,16 +210,14 @@ describe("ChatHeader", () => {
       const givenNotifyOnLogout = jest.fn();
       const givenStartNewConversation = jest.fn();
       const givenChatHeader = (
-        <HashRouter>
-          <ChatHeader
-            notifyOnLogout={givenNotifyOnLogout}
-            startNewConversation={givenStartNewConversation}
-            notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
-            experiencesExplored={0}
-            exploredExperiencesNotification={true}
-            setExploredExperiencesNotification={jest.fn()}
-          />
-        </HashRouter>
+        <ChatHeader
+          notifyOnLogout={givenNotifyOnLogout}
+          startNewConversation={givenStartNewConversation}
+          notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+          experiencesExplored={0}
+          exploredExperiencesNotification={true}
+          setExploredExperiencesNotification={jest.fn()}
+        />
       );
 
       // AND the chat header is rendered
@@ -252,16 +250,14 @@ describe("ChatHeader", () => {
       // GIVEN a ChatHeader component
       const givenNotifyOnLogout = jest.fn();
       const givenChatHeader = (
-        <HashRouter>
-          <ChatHeader
-            notifyOnLogout={givenNotifyOnLogout}
-            startNewConversation={givenStartNewConversation}
-            notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
-            experiencesExplored={0}
-            exploredExperiencesNotification={false}
-            setExploredExperiencesNotification={jest.fn()}
-          />
-        </HashRouter>
+        <ChatHeader
+          notifyOnLogout={givenNotifyOnLogout}
+          startNewConversation={givenStartNewConversation}
+          notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+          experiencesExplored={0}
+          exploredExperiencesNotification={false}
+          setExploredExperiencesNotification={jest.fn()}
+        />
       );
       // AND the chat header is rendered
       render(givenChatHeader);
@@ -288,16 +284,14 @@ describe("ChatHeader", () => {
       // GIVEN a ChatHeader component
       const givenNotifyOnExperiencesDrawerOpen = jest.fn();
       const givenChatHeader = (
-        <HashRouter>
-          <ChatHeader
-            notifyOnLogout={jest.fn()}
-            startNewConversation={jest.fn()}
-            notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
-            experiencesExplored={0}
-            exploredExperiencesNotification={true}
-            setExploredExperiencesNotification={jest.fn()}
-          />
-        </HashRouter>
+        <ChatHeader
+          notifyOnLogout={jest.fn()}
+          startNewConversation={jest.fn()}
+          notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+          experiencesExplored={0}
+          exploredExperiencesNotification={true}
+          setExploredExperiencesNotification={jest.fn()}
+        />
       );
       // AND the chat header is rendered
       render(givenChatHeader);
@@ -318,16 +312,14 @@ describe("ChatHeader", () => {
 
       // WHEN the component is rendered
       const givenChatHeader = (
-        <HashRouter>
-          <ChatHeader
-            notifyOnLogout={jest.fn()}
-            startNewConversation={jest.fn()}
-            notifyOnExperiencesDrawerOpen={jest.fn()}
-            experiencesExplored={givenExploredExperiences}
-            exploredExperiencesNotification={givenExploredExperiencesNotification}
-            setExploredExperiencesNotification={jest.fn()}
-          />
-        </HashRouter>
+        <ChatHeader
+          notifyOnLogout={jest.fn()}
+          startNewConversation={jest.fn()}
+          notifyOnExperiencesDrawerOpen={jest.fn()}
+          experiencesExplored={givenExploredExperiences}
+          exploredExperiencesNotification={givenExploredExperiencesNotification}
+          setExploredExperiencesNotification={jest.fn()}
+        />
       );
       render(givenChatHeader);
 
@@ -350,16 +342,14 @@ describe("ChatHeader", () => {
       const givenNotifyOnExperiencesDrawerOpen = jest.fn();
       // AND the component is rendered
       const givenChatHeader = (
-        <HashRouter>
-          <ChatHeader
-            notifyOnLogout={jest.fn()}
-            startNewConversation={jest.fn()}
-            notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
-            experiencesExplored={givenExploredExperiences}
-            exploredExperiencesNotification={givenExploredExperiencesNotification}
-            setExploredExperiencesNotification={jest.fn()}
-          />
-        </HashRouter>
+        <ChatHeader
+          notifyOnLogout={jest.fn()}
+          startNewConversation={jest.fn()}
+          notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+          experiencesExplored={givenExploredExperiences}
+          exploredExperiencesNotification={givenExploredExperiencesNotification}
+          setExploredExperiencesNotification={jest.fn()}
+        />
       );
       render(givenChatHeader);
 
@@ -387,16 +377,14 @@ describe("ChatHeader", () => {
         const givenStartNewConversation = jest.fn();
         const givenNotifyOnExperiencesDrawerOpen = jest.fn();
         const givenChatHeader = (
-          <HashRouter>
-            <ChatHeader
-              notifyOnLogout={givenNotifyOnLogout}
-              startNewConversation={givenStartNewConversation}
-              notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
-              experiencesExplored={0}
-              exploredExperiencesNotification={false}
-              setExploredExperiencesNotification={jest.fn()}
-            />
-          </HashRouter>
+          <ChatHeader
+            notifyOnLogout={givenNotifyOnLogout}
+            startNewConversation={givenStartNewConversation}
+            notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+            experiencesExplored={0}
+            exploredExperiencesNotification={false}
+            setExploredExperiencesNotification={jest.fn()}
+          />
         );
         // AND the chat header is rendered
         render(givenChatHeader);
@@ -432,7 +420,7 @@ describe("ChatHeader", () => {
           );
         });
         // AND the context menu to contain the correct menu items
-        const contextMenu = screen.getByTestId("mock-context-menu");
+        const contextMenu = screen.getByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU);
         expect(contextMenu).toBeInTheDocument();
         expect(screen.getByTestId(MENU_ITEM_ID.START_NEW_CONVERSATION)).toBeInTheDocument();
         expect(screen.getByTestId(MENU_ITEM_ID.SETTINGS_SELECTOR)).toBeInTheDocument();

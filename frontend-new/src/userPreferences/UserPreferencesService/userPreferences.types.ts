@@ -8,7 +8,7 @@ export type UserPreference = {
   language: Language;
   accepted_tc?: Date;
   sessions: number[];
-  sessions_with_feedback?: number[];
+  sessions_with_feedback: number[];
   sensitive_personal_data_requirement: SensitivePersonalDataRequirement;
   has_sensitive_personal_data: boolean;
 };

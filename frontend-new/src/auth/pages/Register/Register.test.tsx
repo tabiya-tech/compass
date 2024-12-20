@@ -1,7 +1,6 @@
 import "src/_test_utilities/consoleMock";
 import React from "react";
 import { render, screen, waitFor, act, fireEvent } from "src/_test_utilities/test-utils";
-import { HashRouter } from "react-router-dom";
 import Register, { DATA_TEST_ID } from "./Register";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import RegisterWithEmailForm from "src/auth/pages/Register/components/RegisterWithEmailForm/RegisterWithEmailForm";
@@ -190,11 +189,7 @@ describe("Testing Register component", () => {
       .spyOn(AuthenticationServiceFactoryModule.default, "getCurrentAuthenticationService")
       .mockReturnValueOnce(FirebaseEmailAuthenticationService.getInstance());
     // WHEN the component is rendered within the AuthContext and Router
-    render(
-      <HashRouter>
-        <Register />
-      </HashRouter>
-    );
+    render(<Register />);
 
     // THEN expect no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
@@ -282,17 +277,14 @@ describe("Testing Register component", () => {
       user_id: "foo-bar-id",
       language: Language.en,
       sessions: [],
+      sessions_with_feedback: [],
       accepted_tc: new Date(),
       has_sensitive_personal_data: false,
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
     });
 
     // WHEN the component is rendered
-    render(
-      <HashRouter>
-        <Register />
-      </HashRouter>
-    );
+    render(<Register />);
     // AND the registration code is set
     fireEvent.change(screen.getByTestId(DATA_TEST_ID.REGISTRATION_CODE_INPUT), {
       target: { value: givenInvitationCode },
@@ -334,12 +326,7 @@ describe("Testing Register component", () => {
       .spyOn(AuthenticationServiceFactoryModule.default, "getCurrentAuthenticationService")
       .mockReturnValue(FirebaseEmailAuthenticationService.getInstance());
     // WHEN the component is rendered
-    render(
-      <HashRouter>
-        <Register />
-      </HashRouter>
-    );
-
+    render(<Register />);
     // AND the registration code is set
     fireEvent.change(screen.getByTestId(DATA_TEST_ID.REGISTRATION_CODE_INPUT), {
       target: { value: givenInvitationCode },

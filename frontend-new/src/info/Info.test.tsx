@@ -2,9 +2,9 @@
 import "src/_test_utilities/consoleMock";
 
 import Info, { DATA_TEST_ID, InfoProps } from "./Info";
-import { act, render, screen } from "src/_test_utilities/test-utils";
+import { act } from "react";
+import { render, screen } from "src/_test_utilities/test-utils";
 import InfoService from "./info.service";
-import { HashRouter } from "react-router-dom";
 import React from "react";
 import { DATA_TEST_ID as BUG_REPORT_DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import * as Sentry from "@sentry/react";
@@ -60,11 +60,7 @@ describe("Testing Info component", () => {
     (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
 
     // WHEN the component is rendered
-    render(
-      <HashRouter>
-        <Info />
-      </HashRouter>
-    );
+    render(<Info />);
     await act(async () => {
       await infoDataPromise;
     });

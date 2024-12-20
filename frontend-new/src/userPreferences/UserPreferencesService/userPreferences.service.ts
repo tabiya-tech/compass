@@ -188,7 +188,7 @@ export default class UserPreferencesService {
     const method = "GET";
     const qualifiedURL = `${this.generateNewSessionEndpointUrl}?user_id=${userId}`;
 
-    const errorFactory = getRestAPIErrorFactory("UserPreferencesService", "getUserPreferences", method, qualifiedURL);
+    const errorFactory = getRestAPIErrorFactory("UserPreferencesService", "getNewSession", method, qualifiedURL);
 
     const response = await customFetch(qualifiedURL, {
       method: method,
