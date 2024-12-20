@@ -54,6 +54,7 @@ describe("UserPreferencesService", () => {
         language: Language.en,
         accepted_tc: new Date(),
         sessions: [1234],
+        sessions_with_feedback: [1234],
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       };
@@ -238,6 +239,7 @@ describe("UserPreferencesService", () => {
         user_id: givenUserPreferences.user_id,
         language: givenUserPreferences.language,
         sessions: [],
+        sessions_with_feedback: [],
         accepted_tc: undefined,
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
@@ -266,6 +268,7 @@ describe("UserPreferencesService", () => {
         user_id: givenUserPreferences.user_id,
         language: givenUserPreferences.language,
         sessions: [],
+        sessions_with_feedback: [],
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
         accepted_tc: undefined,

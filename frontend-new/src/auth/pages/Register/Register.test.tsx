@@ -263,6 +263,7 @@ describe("Testing Register component", () => {
       user_id: "foo-bar-id",
       language: Language.en,
       sessions: [],
+      sessions_with_feedback: [],
       accepted_tc: new Date(),
       has_sensitive_personal_data: false,
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,

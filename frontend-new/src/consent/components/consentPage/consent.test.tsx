@@ -122,6 +122,7 @@ describe("Testing Consent Page", () => {
           language: Language.en,
           accepted_tc: new Date(),
           sessions: [],
+          sessions_with_feedback: [],
           has_sensitive_personal_data: false,
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
         });
@@ -449,6 +450,7 @@ describe("Testing Consent Page", () => {
           has_sensitive_personal_data: false,
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
           sessions: [],
+          sessions_with_feedback: [],
         });
 
         // AND the authStateService  returns an actual user
@@ -497,6 +499,7 @@ describe("Testing Consent Page", () => {
           has_sensitive_personal_data: false,
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
           sessions: [],
+          sessions_with_feedback: [],
         });
 
         // AND the authStateService  returns an actual user
@@ -514,6 +517,7 @@ describe("Testing Consent Page", () => {
           has_sensitive_personal_data: false,
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
           sessions: [],
+          sessions_with_feedback: [],
         });
 
         // WHEN the component is rendered

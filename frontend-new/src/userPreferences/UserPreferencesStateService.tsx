@@ -24,6 +24,18 @@ export class UserPreferencesStateService {
   public clearUserPreferences(): void {
     this.userPreferences = null;
   }
+
+  public getActiveSessionId(): number | null {
+    return this.userPreferences?.sessions.length ? this.userPreferences?.sessions[0] : null;
+  }
+
+  public activeSessionHasFeedback(): boolean {
+    const activeSessionId = this.getActiveSessionId();
+    if (activeSessionId === null) {
+      return false
+    }
+    return this.userPreferences!.sessions_with_feedback.includes(activeSessionId)
+  }
 }
 
 export const userPreferencesStateService = UserPreferencesStateService.getInstance();

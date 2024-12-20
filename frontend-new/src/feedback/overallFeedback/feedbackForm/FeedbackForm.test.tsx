@@ -131,6 +131,7 @@ describe("FeedbackForm", () => {
         user_id: "0001",
         language: Language.en,
         sessions: [],
+        sessions_with_feedback: [],
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       });

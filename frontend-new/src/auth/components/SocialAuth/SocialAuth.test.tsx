@@ -115,6 +115,7 @@ describe("SocialAuth tests", () => {
         user_id: givenUser.id,
         language: Language.en,
         sessions: [1],
+        sessions_with_feedback: [1],
         accepted_tc: tc,
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,

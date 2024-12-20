@@ -89,6 +89,7 @@ const SAMPLE_USER_PREFERENCES = {
   language: Language.en,
   accepted_tc: new Date(),
   sessions: [],
+  sessions_with_feedback: [],
   sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
   has_sensitive_personal_data: false,
 };
