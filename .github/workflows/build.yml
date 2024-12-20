@@ -1,0 +1,55 @@
+name: build
+
+on:
+  workflow_call:
+    inputs:
+      target-environment:
+        required: true
+        type: string
+      frontend-url:
+        required: true
+        type: string
+      backend-url:
+        required: true
+        type: string
+      taxonomy-model-id:
+        required: true
+        type: string
+      taxonomy-database-name:
+        required: true
+        type: string
+      application-database-name:
+        required: true
+        type: string
+      userdata-database-name:
+        required: true
+        type: string
+      vertex-api-region:
+        required: true
+        type: string
+    outputs:
+      frontend-version-info:
+        value: ${{ jobs.build-frontend.outputs.version-info }}
+        description: 'The frontend version info, JSON converted to the string'
+
+jobs:
+  # build frontend, (lints, tests and build)
+  build-frontend:
+    uses: ./.github/workflows/build-frontend.yml
+    secrets: inherit
+    with:
+      target-environment: ${{ inputs.target-environment }}
+
+  # unit test backend
+  test-backend:
+    uses: ./.github/workflows/unit-test-backend.yml
+    secrets: inherit
+    with:
+      target-environment: ${{ inputs.target-environment }}
+      backend-url: ${{ inputs.backend-url }}
+      frontend-url: ${{ inputs.frontend-url }}
+      taxonomy-database-name: ${{ inputs.taxonomy-database-name }}
+      taxonomy-model-id: ${{ inputs.taxonomy-model-id }}
+      application-database-name: ${{ inputs.application-database-name }}
+      userdata-database-name: ${{ inputs.userdata-database-name }}
+      vertex-api-region: ${{ inputs.vertex-api-region }}

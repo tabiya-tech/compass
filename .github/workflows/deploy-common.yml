@@ -28,6 +28,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    name: deploy-common
     environment: ${{ inputs.target-environment }}
     outputs:
       dns-ns-records: ${{ steps.pulumi.outputs.ns-records }}

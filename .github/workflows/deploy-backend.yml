@@ -36,6 +36,7 @@ on:
 
 jobs:
   deploy:
+    name: deploy-backend
     runs-on: ubuntu-latest
     environment: ${{ inputs.target-environment }}
     outputs:
@@ -134,4 +135,5 @@ jobs:
           FRONTEND_URL: ${{ inputs.frontend-url }}
           SENTRY_BACKEND_DSN: ${{ secrets.SENTRY_BACKEND_DSN }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          GCP_ROOT_PROJECT_ID: ${{ secrets.GCP_ROOT_PROJECT_ID }}
           ENABLE_SENTRY: "True" # Enable Sentry for backend
