@@ -3,7 +3,6 @@ import "src/_test_utilities/consoleMock";
 
 import App, { SNACKBAR_KEYS } from "./index";
 import { render, screen, waitFor } from "src/_test_utilities/test-utils";
-import { HashRouter } from "react-router-dom";
 import { unmockBrowserIsOnLine, mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { DEFAULT_SNACKBAR_AUTO_HIDE_DURATION, useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import FirebaseEmailAuthenticationService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
@@ -88,11 +87,7 @@ describe("main compass app test", () => {
 
   test("should render app successfully", () => {
     // WHEN the app is rendered
-    render(
-      <HashRouter>
-        <App />
-      </HashRouter>
-    );
+    render(<App />);
 
     // THEN expect no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
@@ -131,11 +126,7 @@ describe("main compass app test", () => {
     test("should show the online then offline notification when the browser switches from offline->online->offline", async () => {
       // GIVEN that the app is initially rendered while the browser is offline
       mockBrowserIsOnLine(false);
-      render(
-        <HashRouter>
-          <App />
-        </HashRouter>
-      );
+      render(<App />);
 
       // THEN expect the offline notification to be shown
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(expectedMessageOffline, expectedOfflineSnackBar);
@@ -211,17 +202,15 @@ describe("app loading sequence", () => {
       sessions: [123],
       accepted_tc: new Date(),
       has_sensitive_personal_data: false,
+      getActiveSessionId: jest.fn().mockReturnValue(123),
+      sessions_with_feedback: [],
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
     };
 
     jest.spyOn(userPreferencesService.getInstance(), "getUserPreferences").mockReturnValue(preferencesPromise);
 
     // WHEN the app is rendered
-    render(
-      <HashRouter>
-        <App />
-      </HashRouter>
-    );
+    render(<App />);
 
     // THEN expect the backdrop to be shown immediately
     expect(screen.getByTestId(BACKDROP_DATA_TEST_ID.BACKDROP_CONTAINER)).toBeInTheDocument();
@@ -258,6 +247,7 @@ describe("app loading sequence", () => {
       user_id: "foo",
       language: Language.en,
       sessions: [123],
+      sessions_with_feedback: [],
       accepted_tc: new Date(),
       has_sensitive_personal_data: false,
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
@@ -266,11 +256,7 @@ describe("app loading sequence", () => {
     jest.spyOn(userPreferencesService.getInstance(), "getUserPreferences").mockResolvedValue(mockPreferences);
 
     // WHEN the app is rendered
-    const { unmount } = render(
-      <HashRouter>
-        <App />
-      </HashRouter>
-    );
+    const { unmount } = render(<App />);
 
     // AND we wait for the initial loading
     await waitFor(() => {

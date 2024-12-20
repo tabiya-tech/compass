@@ -8,6 +8,7 @@ export const generateUserMessage = (message: string, sent_at: string): IChatMess
     sender: ConversationMessageSender.USER,
     message: message,
     sent_at: sent_at,
+    isTypingMessage: false,
   };
 };
 

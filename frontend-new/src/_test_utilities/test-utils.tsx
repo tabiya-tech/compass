@@ -8,6 +8,7 @@ import applicationTheme, { ThemeMode } from "src/theme/applicationTheme/applicat
 import "src/_test_utilities/firebaseMock";
 import SnackbarProvider from "src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineProvider } from "src/app/isOnlineProvider/IsOnlineProvider";
+import { HashRouter } from "react-router-dom";
 jest.mock("firebase/compat/app", () => {
   return {
     initializeApp: jest.fn(),
@@ -47,7 +48,7 @@ jest.mock("@sentry/react", () => ({
   isInitialized: jest.fn()
 }));
 
-const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
+export const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <IsOnlineProvider>
       <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
@@ -56,9 +57,23 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
     </IsOnlineProvider>
   );
 };
+// Wrap all tests by default in a hash router and all the providers
+// if a specific test does not need the router, it can pass router=false
+const customRender = (
+  ui: ReactElement,
+  options?: Omit<RenderOptions, "wrapper"> & { wrapper?: React.ComponentType }
+) => {
+  const PassedWrapper = options?.wrapper ?? React.Fragment;
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
+    <AllTheProviders>
+      <HashRouter>
+        <PassedWrapper>{children}</PassedWrapper>
+      </HashRouter>
+    </AllTheProviders>
+  );
 
-const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) =>
-  render(ui, { wrapper: AllTheProviders, ...options });
+  return render(ui, { wrapper: wrapper, ...options });
+};
 
 function customRenderHook<T>(
   hook: () => T,
@@ -68,7 +83,9 @@ function customRenderHook<T>(
     const Wrapper = options?.wrapper ?? React.Fragment;
     return (
       <AllTheProviders>
-        <Wrapper>{children}</Wrapper>
+        <HashRouter>
+          <Wrapper>{children}</Wrapper>
+        </HashRouter>
       </AllTheProviders>
     );
   };

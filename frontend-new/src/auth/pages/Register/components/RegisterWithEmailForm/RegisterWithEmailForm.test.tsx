@@ -2,7 +2,6 @@
 import "src/_test_utilities/consoleMock";
 import RegisterWithEmailForm, { DATA_TEST_ID } from "./RegisterWithEmailForm";
 import React from "react";
-import { HashRouter } from "react-router-dom";
 import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
 import { validatePassword } from "src/auth/utils/validatePassword";
 
@@ -40,11 +39,7 @@ describe("Testing Register Email Form component", () => {
 
   test("it should show register form", async () => {
     // WHEN the component is rendered
-    render(
-      <HashRouter>
-        <RegisterWithEmailForm notifyOnRegister={givenNotifyOnRegister} isRegistering={givenIsRegistering} />
-      </HashRouter>
-    );
+    render(<RegisterWithEmailForm notifyOnRegister={givenNotifyOnRegister} isRegistering={givenIsRegistering} />);
 
     // THEN expect no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
@@ -72,11 +67,7 @@ describe("Testing Register Email Form component", () => {
   describe("action tests", () => {
     test("should call notifyOnRegister on form submit", async () => {
       // WHEN the component is rendered
-      render(
-        <HashRouter>
-          <RegisterWithEmailForm notifyOnRegister={givenNotifyOnRegister} isRegistering={givenIsRegistering} />
-        </HashRouter>
-      );
+      render(<RegisterWithEmailForm notifyOnRegister={givenNotifyOnRegister} isRegistering={givenIsRegistering} />);
 
       // AND the register button should not be disabled
       expect(screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON)).not.toBeDisabled();
@@ -116,11 +107,7 @@ describe("Testing Register Email Form component", () => {
       ],
     ])("should not validate the form when the form has an %s", async (_description, givenValue) => {
       // WHEN the component is rendered
-      render(
-        <HashRouter>
-          <RegisterWithEmailForm notifyOnRegister={givenNotifyOnRegister} isRegistering={givenIsRegistering} />
-        </HashRouter>
-      );
+      render(<RegisterWithEmailForm notifyOnRegister={givenNotifyOnRegister} isRegistering={givenIsRegistering} />);
 
       // AND the register button should not be disabled
       expect(screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON)).not.toBeDisabled();
@@ -157,11 +144,7 @@ describe("Testing Register Email Form component", () => {
       const givenPassword = "password";
 
       // WHEN the component is rendered
-      render(
-        <HashRouter>
-          <RegisterWithEmailForm notifyOnRegister={givenNotifyOnRegister} isRegistering={givenIsRegistering} />
-        </HashRouter>
-      );
+      render(<RegisterWithEmailForm notifyOnRegister={givenNotifyOnRegister} isRegistering={givenIsRegistering} />);
 
       // AND the register button should be rendered
       const registerButton = screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON);
@@ -183,11 +166,7 @@ describe("Testing Register Email Form component", () => {
     test("should disable everything if registering is still in progress", () => {
       // GIVEN the component is rendering
       const givenIsRegistering = true;
-      render(
-        <HashRouter>
-          <RegisterWithEmailForm notifyOnRegister={givenNotifyOnRegister} isRegistering={givenIsRegistering} />
-        </HashRouter>
-      );
+      render(<RegisterWithEmailForm notifyOnRegister={givenNotifyOnRegister} isRegistering={givenIsRegistering} />);
 
       // THEN expect all inputs and buttons to be disabled
       expect(screen.getByTestId(DATA_TEST_ID.USERNAME_INPUT)).toBeDisabled();

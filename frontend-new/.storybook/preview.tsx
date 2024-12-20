@@ -1,5 +1,5 @@
 import { CssBaseline, ThemeProvider } from "@mui/material";
-import { BrowserRouter as Router } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
 import { applicationTheme, ThemeMode } from "../src/theme/applicationTheme/applicationTheme";
 // Load fonts
 // The application font are typically loaded in the index.html, index.css or index.tsx file
@@ -71,7 +71,7 @@ export const decorators = [
   const isOnline = context.globals.online;
 
   return (
-    <Router>
+    <HashRouter>
       <IsOnlineContext.Provider value={isOnline}>
         <CssBaseline />
           <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
@@ -82,7 +82,7 @@ export const decorators = [
             </SnackbarProvider>
           </ThemeProvider>
       </IsOnlineContext.Provider>
-    </Router>
+    </HashRouter>
     );
   }
 ];
