@@ -63,7 +63,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const [activeSessionId, setActiveSessionId] = useState<number | null>(
     userPreferencesStateService.getActiveSessionId()
   );
-  const [user_id] = useState<string | null>(authenticationStateService.getInstance().getUser()?.id ?? null);
+  const [current_user_id] = useState<string | null>(authenticationStateService.getInstance().getUser()?.id ?? null);
   const [sessionHasFeedback] = useState<boolean>(userPreferencesStateService.activeSessionHasFeedback());
 
   const navigate = useNavigate();
@@ -103,8 +103,8 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   }, [sessionHasFeedback]);
 
   // Depending on the typing state, add or remove the typing message from the messages list
-  const addOrRemoveTypingMessage = useCallback(() => {
-    if (isTyping) {
+  const addOrRemoveTypingMessage = (userIsTyping: boolean) => {
+    if (userIsTyping) {
       // Only add typing message if it doesn't already exist
       setMessages((prevMessages) => {
         // check if the last message is a typing message
@@ -119,10 +119,10 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       // filter out the typing message
       setMessages((prevMessages) => prevMessages.filter((message) => !message.isTypingMessage));
     }
-  }, [isTyping]);
+  };
 
   // Issue a new session and update the user preferences
-  const issueNewSession = useCallback(async () => {
+  const issueNewSession = useCallback(async (user_id: string |null) => {
     try {
       setMessages([]);
       // If there is no session id, then create a new session
@@ -145,7 +145,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       console.error(new ChatError("Failed to create new session", e as Error), e);
     }
     return null;
-  }, [enqueueSnackbar, user_id]);
+  }, [enqueueSnackbar]);
 
   /**
    * --- Service handlers ---
@@ -231,13 +231,13 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   );
 
   const initializeChat = useCallback(
-    async (currentSessionId: number | null) => {
+    async (user_id: string | null, currentSessionId: number | null) => {
       setIsTyping(true);
       let sessionId: number | null = currentSessionId;
 
       try {
         if (!sessionId) {
-          sessionId = await issueNewSession();
+          sessionId = await issueNewSession(user_id);
           if (!sessionId) {
             console.debug("Failed to issue new session");
             return false;
@@ -268,6 +268,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           }
         } else {
           // if this is the last promise to resolve, we should not set any state before it is resolved
+          // This is the first message to kick off the conversation
           await sendMessage("", sessionId);
         }
 
@@ -320,7 +321,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     try {
       setNewConversationDialog(false);
       setExploredExperiencesNotification(false);
-      await initializeChat(null);
+      await initializeChat(current_user_id, null);
     } catch (e) {
       addMessage(
         generateCompassMessage(
@@ -331,16 +332,13 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       enqueueSnackbar("Failed to start new conversation", { variant: "error" });
       console.error(new ChatError("Failed to start new conversation", e as Error));
     }
-  }, [enqueueSnackbar, initializeChat]);
+  }, [enqueueSnackbar, initializeChat, current_user_id]);
 
   const handleFeedbackSubmit = () => {
     setMessages((prevMessages) => prevMessages.filter((message) => message.footerType === undefined));
     addMessage(generateThankYouMessage());
   };
 
-  const handleFeedbackFormToggle = useCallback((feeedBackFormOpen: boolean) => {
-    setIsFeedbackFormOpen(feeedBackFormOpen);
-  }, []);
 
   /**
    * --- UseEffects ---
@@ -354,12 +352,12 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         return;
       }
       initializationRef.current = true;
-      initializeChat(activeSessionId).then((initialized: boolean) => {
+      initializeChat(current_user_id, activeSessionId).then((initialized: boolean) => {
         console.debug("initializeChat finished", initialized);
         initializationRef.current = initialized;
       });
     },
-    [initializeChat, activeSessionId]
+    [initializeChat, activeSessionId, current_user_id]
   );
 
   // show the user backdrop when the user is inactive for INACTIVITY_TIMEOUT
@@ -402,9 +400,9 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   // add a message when the compass is typing
   useEffect(
     () => {
-      addOrRemoveTypingMessage();
+      addOrRemoveTypingMessage(isTyping);
     },
-    [isTyping, addOrRemoveTypingMessage]
+    [isTyping]
   );
 
   return (
@@ -434,7 +432,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
             <Box sx={{ flex: 1, overflowY: "auto", paddingX: theme.tabiyaSpacing.lg }}>
               <ChatList
                 messages={messages}
-                notifyOpenFeedbackForm={() => handleFeedbackFormToggle(true)}
+                notifyOpenFeedbackForm={() => setIsFeedbackFormOpen(true)}
 
               />
             </Box>
@@ -476,7 +474,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           )}
           <FeedbackForm
             isOpen={isFeedbackFormOpen}
-            notifyOnClose={() => handleFeedbackFormToggle(false)}
+            notifyOnClose={() => setIsFeedbackFormOpen(false)}
             onFeedbackSubmit={handleFeedbackSubmit}
           />
         </>
