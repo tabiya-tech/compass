@@ -4,11 +4,11 @@ export enum ReactionType {
 }
 
 export enum ReactionReason {
-  OFFENSIVE = "offensive",
-  BIASED = "biased",
-  INCORRECT = "incorrect",
-  WRONG_PHRASE = "wrong_phrasing",
-  WRONG_LANGUAGE = "wrong_language"
+  OFFENSIVE = "Offensive",
+  BIASED = "Biased",
+  INCORRECT = "Incorrect",
+  WRONG_PHRASE = "Wrong phrasing",
+  WRONG_LANGUAGE = "Wrong language",
 }
 
 export class Reaction {
