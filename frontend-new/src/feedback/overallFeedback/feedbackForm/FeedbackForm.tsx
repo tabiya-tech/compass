@@ -8,7 +8,7 @@ import OverallFeedbackService from "src/feedback/overallFeedback/overallFeedback
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { FeedbackItem } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { FeedbackError } from "src/error/commonErrors";
 
 export interface FeedbackFormProps {
@@ -45,7 +45,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose, onFe
     setIsSubmitting(true);
     handleClose();
     try {
-      const userPreferences = userPreferencesStateService.getUserPreferences();
+      const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
       if (!userPreferences?.sessions.length) {
         throw new Error("User has no sessions");
       }

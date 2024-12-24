@@ -16,7 +16,7 @@ import {
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import { TabiyaUser } from "src/auth/auth.types";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import * as AuthenticationServiceFactoryModule from "src/auth/services/Authentication.service.factory";
 
 //mock the SocialAuth component
@@ -168,7 +168,7 @@ describe("Testing Register component", () => {
       return { email: givenEmail, name: givenUserName } as TabiyaUser;
     });
     // AND the user preferences state service is mocked to succeed
-    jest.spyOn(userPreferencesStateService, "setUserPreferences");
+    jest.spyOn(UserPreferencesStateService.getInstance(), "setUserPreferences");
     // AND the authentication service factory is mocked to return the email auth service
     jest
       .spyOn(AuthenticationServiceFactoryModule.default, "getCurrentAuthenticationService")

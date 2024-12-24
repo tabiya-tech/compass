@@ -6,7 +6,7 @@ import FirebaseSocialAuthenticationService from "./FirebaseAuthenticationService
 import { AuthenticationServices } from "src/auth/auth.types";
 import stdFirebaseAuthenticationService from "./FirebaseAuthenticationService/StdFirebaseAuthenticationService";
 import AuthenticationStateService from "./AuthenticationState.service";
-import { UserPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 
 /**
  * AuthenticationServiceFactory is responsible for providing the appropriate

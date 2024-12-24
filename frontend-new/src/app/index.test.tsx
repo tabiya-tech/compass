@@ -194,11 +194,11 @@ describe("app loading sequence", () => {
       logout: jest.fn(),
     };
 
-    jest.spyOn(FirebaseAuthenticationFactoryModule.default, "getCurrentAuthenticationService")
+    jest
+      .spyOn(FirebaseAuthenticationFactoryModule.default, "getCurrentAuthenticationService")
       .mockReturnValue(mockAuthService as any);
 
-    jest.spyOn(PersistentStorageService, "getToken")
-      .mockReturnValue("valid-token");
+    jest.spyOn(PersistentStorageService, "getToken").mockReturnValue("valid-token");
 
     let resolvePreferences!: (value: UserPreference) => void;
     const preferencesPromise = new Promise<UserPreference>((resolve) => {
@@ -214,8 +214,7 @@ describe("app loading sequence", () => {
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
     };
 
-    jest.spyOn(userPreferencesService.getInstance(), "getUserPreferences")
-      .mockReturnValue(preferencesPromise);
+    jest.spyOn(userPreferencesService.getInstance(), "getUserPreferences").mockReturnValue(preferencesPromise);
 
     // WHEN the app is rendered
     render(
@@ -246,14 +245,14 @@ describe("app loading sequence", () => {
       getUser: jest.fn().mockReturnValue({ id: "123", email: "test@test.com" }),
       isTokenValid: jest.fn().mockReturnValue({ isValid: true }),
       logout: jest.fn(),
-      cleanup: mockCleanup
+      cleanup: mockCleanup,
     };
 
-    jest.spyOn(FirebaseAuthenticationFactoryModule.default, "getCurrentAuthenticationService")
+    jest
+      .spyOn(FirebaseAuthenticationFactoryModule.default, "getCurrentAuthenticationService")
       .mockReturnValue(mockAuthService as any);
 
-    jest.spyOn(PersistentStorageService, "getToken")
-      .mockReturnValue("valid-token");
+    jest.spyOn(PersistentStorageService, "getToken").mockReturnValue("valid-token");
 
     const mockPreferences = {
       user_id: "foo",
@@ -264,8 +263,7 @@ describe("app loading sequence", () => {
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
     };
 
-    jest.spyOn(userPreferencesService.getInstance(), "getUserPreferences")
-      .mockResolvedValue(mockPreferences);
+    jest.spyOn(userPreferencesService.getInstance(), "getUserPreferences").mockResolvedValue(mockPreferences);
 
     // WHEN the app is rendered
     const { unmount } = render(

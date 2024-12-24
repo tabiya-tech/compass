@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from "@storybook/react";
 
 import SensitiveDataForm from "./SensitiveDataForm";
-import { UserPreferencesStateService } from "../../../userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "../../../userPreferences/UserPreferencesStateService";
 import {
   Language,
   SensitivePersonalDataRequirement,
