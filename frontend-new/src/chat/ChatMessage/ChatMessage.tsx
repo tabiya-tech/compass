@@ -40,7 +40,6 @@ const MessageBubble = styled(Box)<{ origin: ConversationMessageSender }>(({ them
   alignSelf: origin === ConversationMessageSender.USER ? "flex-end" : "flex-start",
   display: "flex",
   flexDirection: "column",
-  gap: theme.fixedSpacing(theme.tabiyaSpacing.sm),
 }));
 
 const TimeStamp = styled(Typography)(({ theme }) => ({
@@ -56,6 +55,7 @@ type ChatMessageProps = {
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage, notifyOpenFeedbackForm }) => {
   const theme = useTheme();
+
   let duration;
   try {
     duration = getDurationFromNow(new Date(chatMessage.sent_at));
@@ -76,9 +76,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ chatMessage, notifyOpenFeedba
         <Typography whiteSpace="pre-line">{chatMessage.message}</Typography>
         {chatMessage.footerType !== undefined && (
           <Divider
-            sx={{
-              borderTop: `${theme.fixedSpacing(theme.tabiyaSpacing.xxs)} solid ${theme.palette.grey[300]}`,
-            }}
+            color={theme.palette.grey[100]}
+            sx={{ marginY: theme.spacing(1) }}
             data-testid={DATA_TEST_ID.CHAT_MESSAGE_FOOTER_DIVIDER}
           />
         )}
