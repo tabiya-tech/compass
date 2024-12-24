@@ -24,7 +24,7 @@ import { Gender, SensitivePersonalData } from "src/sensitiveData/types";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
 import { EncryptedDataTooLarge } from "src/sensitiveData/services/sensitivePersonalDataService/errors";
 import { sensitivePersonalDataService } from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalData.service";
@@ -137,7 +137,7 @@ const SensitiveDataForm: React.FC = () => {
     setIsSavingSensitiveData(true);
     setIsSubmitButtonEnabled(false);
 
-    const userPreferences = userPreferencesStateService.getUserPreferences();
+    const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
 
     if (!userPreferences) {
       // something is not right, we should have user preferences at this point.
@@ -157,7 +157,7 @@ const SensitiveDataForm: React.FC = () => {
       // Update user preferences to indicate that the user has sensitive personal data
       // so that the user is not prompted to provide this information again.
       // We set the state directly because we don't want to go to the server to get the updated the user preferences.
-      userPreferencesStateService.setUserPreferences({
+      UserPreferencesStateService.getInstance().setUserPreferences({
         ...userPreferences,
         has_sensitive_personal_data: true,
       });

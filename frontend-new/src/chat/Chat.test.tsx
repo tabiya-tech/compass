@@ -19,7 +19,7 @@ import {
   SensitivePersonalDataRequirement,
   Language,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import ChatService from "./ChatService/ChatService";
 import ExperienceService from "src/experiences/experiencesDrawer/experienceService/experienceService";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
@@ -270,7 +270,7 @@ describe("Chat", () => {
         conversation_completed: false,
       });
 
-      jest.spyOn(userPreferencesStateService, "getUserPreferences").mockReturnValue({
+      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
         accepted_tc: new Date(),
         user_id: "0001",
         language: Language.en,
@@ -476,7 +476,7 @@ describe("Chat", () => {
 
     test("should open the drawer and fetch experiences when the button is clicked", async () => {
       // GIVEN the chat component is rendered
-      jest.spyOn(userPreferencesStateService, "getUserPreferences").mockReturnValue({
+      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
         accepted_tc: new Date(),
         user_id: "0001",
         language: Language.en,
@@ -522,7 +522,7 @@ describe("Chat", () => {
       (console.error as jest.Mock).mockClear();
 
       // GIVEN getUserPreferences returns a user without any session
-      jest.spyOn(userPreferencesStateService, "getUserPreferences").mockReturnValue({
+      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
         accepted_tc: new Date(),
         user_id: "0001",
         language: Language.en,
@@ -643,7 +643,7 @@ describe("Chat", () => {
         conversation_completed: true,
       });
 
-      jest.spyOn(userPreferencesStateService, "getUserPreferences").mockReturnValue({
+      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
         accepted_tc: new Date(),
         user_id: "0001",
         language: Language.en,
@@ -757,7 +757,7 @@ describe("Chat", () => {
       (console.error as jest.Mock).mockClear();
 
       // GIVEN getUserPreferences returns a user without any session
-      jest.spyOn(userPreferencesStateService, "getUserPreferences").mockReturnValue({
+      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
         accepted_tc: new Date(),
         user_id: "0001",
         language: Language.en,

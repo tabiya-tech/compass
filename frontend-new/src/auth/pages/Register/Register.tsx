@@ -11,7 +11,7 @@ import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
 import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import FirebaseSocialAuthenticationService from "src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
@@ -88,7 +88,7 @@ const Register: React.FC = () => {
   const handlePostLogin = useCallback(async () => {
     try {
       setIsLoading(true);
-      const prefs = userPreferencesStateService.getUserPreferences();
+      const prefs = UserPreferencesStateService.getInstance().getUserPreferences();
       if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
         navigate(routerPaths.CONSENT, { replace: true });
       } else {

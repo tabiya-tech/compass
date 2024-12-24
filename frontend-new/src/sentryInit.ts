@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/react";
 import { getBackendUrl, getSentryDSN } from "./envService";
 import React from "react";
 import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from "react-router-dom";
-import { UserPreferencesStateService } from "./userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "./userPreferences/UserPreferencesStateService";
 import AuthenticationStateService from "./auth/services/AuthenticationState.service";
 
 export function initSentry() {

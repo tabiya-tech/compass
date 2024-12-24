@@ -4,7 +4,7 @@ import * as Sentry from "@sentry/react";
 import { initSentry } from "./sentryInit";
 import { getBackendUrl, getSentryDSN } from "./envService";
 import AuthenticationStateService from "./auth/services/AuthenticationState.service";
-import { UserPreferencesStateService } from "./userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "./userPreferences/UserPreferencesStateService";
 import { TabiyaUser } from "./auth/auth.types";
 import { UserPreference } from "./userPreferences/UserPreferencesService/userPreferences.types";
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { isValid } from "date-fns";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import { SensitivePersonalDataRequirement } from "src/userPreferences/UserPreferencesService/userPreferences.types";
@@ -12,7 +12,7 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const user = authStateService.getInstance().getUser();
-  const userPreferences = userPreferencesStateService.getUserPreferences();
+  const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
   const isAcceptedTCValid = userPreferences?.accepted_tc && isValid(new Date(userPreferences.accepted_tc));
   const targetPath = useLocation().pathname;
 

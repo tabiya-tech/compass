@@ -1,8 +1,5 @@
 import AuthenticationStateService from "./AuthenticationState.service";
-import {
-  userPreferencesStateService,
-  UserPreferencesStateService,
-} from "src/userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { TabiyaUser, Token, TokenHeader } from "src/auth/auth.types";
@@ -113,7 +110,7 @@ abstract class AuthenticationService {
     }
     if (prefs !== null) {
       // set the local preferences "state" ( for lack of a better word )
-      userPreferencesStateService.setUserPreferences(prefs);
+      UserPreferencesStateService.getInstance().setUserPreferences(prefs);
     }
   }
 
@@ -136,7 +133,7 @@ abstract class AuthenticationService {
       invitation_code: registrationCode,
       language: Language.en,
     });
-    userPreferencesStateService.setUserPreferences(prefs);
+    UserPreferencesStateService.getInstance().setUserPreferences(prefs);
   }
 
   /**

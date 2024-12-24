@@ -11,7 +11,7 @@ import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceErro
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { ConversationMessage, ConversationMessageSender } from "./ChatService/ChatService.types";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import ExperiencesDrawer from "src/experiences/experiencesDrawer/ExperiencesDrawer";
@@ -75,7 +75,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
   // Check if the conversation is completed and add a feedback message if it is
   const checkAndAddFeedbackMessage = useCallback((conversationCompleted: boolean) => {
-    const userPreferences = userPreferencesStateService.getUserPreferences();
+    const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
     if (!userPreferences?.sessions.length) {
       console.error(new SessionError("User has no sessions", `user_id: ${userPreferences?.user_id}`));
       return;
@@ -122,7 +122,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     setIsDrawerOpen(true);
     setIsLoading(true);
     try {
-      const userPreferences = userPreferencesStateService.getUserPreferences();
+      const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
       if (!userPreferences?.sessions.length) {
         throw new Error("User has no sessions");
       }
@@ -261,7 +261,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           );
         }
 
-        const userPreferences = userPreferencesStateService.getUserPreferences();
+        const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
         if (userPreferences?.sessions_with_feedback?.includes(session_id)) {
           addMessage(generateThankYouMessage());
         } else {
@@ -287,7 +287,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   );
 
   useEffect(() => {
-    const userPreferences = userPreferencesStateService.getUserPreferences();
+    const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
     if (!userPreferences || initializationRef.current) {
       return;
     }
@@ -299,7 +299,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const handleSend = useCallback(async () => {
     if (currentMessage.trim()) {
       setCurrentMessage("");
-      const userPreferences = userPreferencesStateService.getUserPreferences();
+      const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
       if (!userPreferences?.sessions.length) {
         console.error(new SessionError("User has no sessions", `user_id: ${userPreferences?.user_id}`));
         enqueueSnackbar("Failed to send message", { variant: "error" });
@@ -319,7 +319,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
       let user_preferences = await preferencesService.getNewSession(user?.id);
 
-      userPreferencesStateService.setUserPreferences(user_preferences);
+      UserPreferencesStateService.getInstance().setUserPreferences(user_preferences);
 
       enqueueSnackbar("New conversation started", { variant: "success" });
 

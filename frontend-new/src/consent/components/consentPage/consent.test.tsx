@@ -5,7 +5,7 @@ import Consent, { DATA_TEST_ID } from "./Consent";
 import { HashRouter, useNavigate } from "react-router-dom";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { TabiyaUser } from "src/auth/auth.types";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
@@ -115,7 +115,7 @@ describe("Testing Consent Page", () => {
         mockBrowserIsOnLine(true);
 
         // GIVEN the user preferences state service is mocked to set the user preferences
-        jest.spyOn(userPreferencesStateService, "setUserPreferences").mockImplementation(() => {});
+        jest.spyOn(UserPreferencesStateService.getInstance(), "setUserPreferences").mockImplementation(() => {});
 
         const updateUserPreferences = jest.spyOn(userPreferencesService, "updateUserPreferences").mockResolvedValue({
           user_id: "",
@@ -281,7 +281,7 @@ describe("Testing Consent Page", () => {
 
       test("should redirect user to the login if user is not found", async () => {
         // GIVEN the user preferences state service is mocked to set the user preferences
-        jest.spyOn(userPreferencesStateService, "setUserPreferences").mockImplementation(() => {});
+        jest.spyOn(UserPreferencesStateService.getInstance(), "setUserPreferences").mockImplementation(() => {});
 
         // AND the authStateService is mocked to return null
         jest.spyOn(authStateService.getInstance(), "getUser").mockImplementation(() => null);
@@ -507,7 +507,7 @@ describe("Testing Consent Page", () => {
         });
 
         // AND the user requires sensitive personal data.
-        jest.spyOn(userPreferencesStateService, "getUserPreferences").mockReturnValue({
+        jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
           user_id: "given user id",
           language: Language.en,
           accepted_tc: new Date(),

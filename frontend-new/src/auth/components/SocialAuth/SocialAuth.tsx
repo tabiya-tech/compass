@@ -10,7 +10,7 @@ import { GoogleIcon } from "src/theme/Icons/GoogleIcon";
 import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
 import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
 import authStateService from "src/auth/services/AuthenticationState.service";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import RegistrationCodeFormModal, {
   RegistrationCodeFormModalState,
 } from "src/auth/components/registrationCodeFormModal/RegistrationCodeFormModal";
@@ -105,7 +105,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
           invitation_code: invitation.invitation_code,
           language: Language.en,
         });
-        userPreferencesStateService.setUserPreferences(prefs);
+        UserPreferencesStateService.getInstance().setUserPreferences(prefs);
       } catch (error: any) {
         await handleError(error);
       }
@@ -120,7 +120,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       const firebaseSocialAuthServiceInstance = FirebaseSocialAuthenticationService.getInstance();
       await firebaseSocialAuthServiceInstance.loginWithGoogle();
       // check if the user is already registered
-      const prefs = userPreferencesStateService.getUserPreferences();
+      const prefs = UserPreferencesStateService.getInstance().getUserPreferences();
       // if the user is not registered, create user preferences for the first time
       if (!prefs) {
         // if no registration code was provided, show the registration code form
@@ -130,7 +130,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
         }
         await registerUser(_registrationCode);
       } else {
-        userPreferencesStateService.setUserPreferences(prefs);
+        UserPreferencesStateService.getInstance().setUserPreferences(prefs);
       }
       postLoginHandler();
     } catch (error: any) {

@@ -5,7 +5,7 @@ import FeedbackForm, { DATA_TEST_ID } from "src/feedback/overallFeedback/feedbac
 import { render, screen } from "src/_test_utilities/test-utils";
 import { fireEvent, waitFor } from "@testing-library/react";
 import { DATA_TEST_ID as FEEDBACK_FORM_CONTENT_DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import {
   SensitivePersonalDataRequirement,
@@ -34,11 +34,11 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
 
 // mock the user preferences state service
 jest.mock("src/userPreferences/UserPreferencesStateService", () => ({
-  userPreferencesStateService: {
+  getInstance: jest.fn().mockReturnValue({
     getUserPreferences: jest.fn().mockReturnValue({
       sessions: [1234],
     }),
-  },
+  }),
 }));
 
 describe("FeedbackForm", () => {
@@ -126,7 +126,7 @@ describe("FeedbackForm", () => {
       (console.error as jest.Mock).mockClear();
 
       // GIVEN getUserPreferences returns a user without any session
-      jest.spyOn(userPreferencesStateService, "getUserPreferences").mockReturnValue({
+      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
         accepted_tc: new Date(),
         user_id: "0001",
         language: Language.en,

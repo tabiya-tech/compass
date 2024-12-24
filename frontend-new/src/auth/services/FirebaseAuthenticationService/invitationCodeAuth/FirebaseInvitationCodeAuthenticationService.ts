@@ -11,7 +11,7 @@ import { invitationsService } from "src/auth/services/invitationsService/invitat
 import { InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import AuthenticationService from "src/auth/services/Authentication.service";
 import { formatTokenForLogging } from "src/auth/utils/formatTokenForLogging";
 import { TokenError } from "src/error/commonErrors";
@@ -98,7 +98,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
       invitation_code: invitation.invitation_code,
       language: Language.en,
     });
-    userPreferencesStateService.setUserPreferences(prefs);
+    UserPreferencesStateService.getInstance().setUserPreferences(prefs);
 
     // call the parent class method once the user is successfully logged in
     await super.onSuccessfulLogin(token);

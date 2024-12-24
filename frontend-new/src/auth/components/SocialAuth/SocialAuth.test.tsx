@@ -8,7 +8,7 @@ import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/
 import FirebaseSocialAuthenticationService from "src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
 import { act } from "@testing-library/react";
 import authStateService from "src/auth/services/AuthenticationState.service";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import {
   SensitivePersonalDataRequirement,
   Language,
@@ -111,7 +111,7 @@ describe("SocialAuth tests", () => {
         return givenUser;
       });
       // AND the user preferences exist for the user
-      jest.spyOn(userPreferencesStateService, "getUserPreferences").mockReturnValue({
+      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
         user_id: givenUser.id,
         language: Language.en,
         sessions: [1],
