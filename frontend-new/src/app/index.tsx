@@ -12,7 +12,7 @@ import SensitiveDataForm from "src/sensitiveData/components/sensitiveDataForm/Se
 import ProtectedRoute from "src/app/ProtectedRoute/ProtectedRoute";
 import { routerPaths } from "src/app/routerPaths";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 
 import * as Sentry from "@sentry/react";
@@ -93,7 +93,7 @@ const App = () => {
         return;
       }
       console.debug("User authenticated: Welcome,", user.email);
-      userPreferencesStateService.setUserPreferences(preferences);
+      UserPreferencesStateService.getInstance().setUserPreferences(preferences);
 
       console.debug("User preferences loaded", preferences);
     } catch (error) {
@@ -112,7 +112,11 @@ const App = () => {
     };
 
     initializeAuth().then(() => {
-      console.debug("Auth initialized successfully", userPreferencesStateService.getUserPreferences(), AuthenticationStateService.getInstance().getUser());
+      console.debug(
+        "Auth initialized successfully",
+        UserPreferencesStateService.getInstance().getUserPreferences(),
+        AuthenticationStateService.getInstance().getUser()
+      );
     });
 
     return () => {

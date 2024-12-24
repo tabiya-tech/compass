@@ -13,7 +13,7 @@ import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginW
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
 import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import FirebaseInvitationCodeAuthenticationService from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
@@ -114,7 +114,7 @@ const Login: React.FC = () => {
    */
   const handlePostLogin = useCallback(async () => {
     try {
-      const prefs = userPreferencesStateService.getUserPreferences();
+      const prefs = UserPreferencesStateService.getInstance().getUserPreferences();
       // once the user is logged in, we need to get their preferences from the state and
       // decide, based on the preferences, where to navigate the user
       if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {

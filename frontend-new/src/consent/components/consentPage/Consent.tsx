@@ -12,7 +12,7 @@ import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { useNavigate } from "react-router-dom";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { routerPaths } from "src/app/routerPaths";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
@@ -57,7 +57,7 @@ const Consent: React.FC = () => {
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const userPreferences = userPreferencesStateService.getUserPreferences();
+  const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
 
   /**
    * Persist the user's chosen preferences to the backend
@@ -79,7 +79,7 @@ const Consent: React.FC = () => {
       setIsAccepting(true);
       const prefs = await userPreferencesService.updateUserPreferences(newUserPreferenceSpecs);
 
-      userPreferencesStateService.setUserPreferences({
+      UserPreferencesStateService.getInstance().setUserPreferences({
         ...prefs,
         sensitive_personal_data_requirement: userPreferences?.sensitive_personal_data_requirement!,
       });

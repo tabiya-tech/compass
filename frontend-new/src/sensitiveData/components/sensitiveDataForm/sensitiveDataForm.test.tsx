@@ -16,7 +16,7 @@ import { routerPaths } from "src/app/routerPaths";
 import * as serviceErrorModule from "src/error/ServiceError/ServiceError";
 import { ServiceError } from "src/error/ServiceError/ServiceError";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
-import { userPreferencesStateService } from "src/userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import {
   Language,
   SensitivePersonalDataRequirement,
@@ -169,7 +169,9 @@ describe("Sensitive Data", () => {
 
     (useNavigate as jest.Mock).mockReturnValue(mockNavigate);
 
-    jest.spyOn(userPreferencesStateService, "getUserPreferences").mockReturnValue(SAMPLE_USER_PREFERENCES);
+    jest
+      .spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences")
+      .mockReturnValue(SAMPLE_USER_PREFERENCES);
   });
 
   afterEach(() => {
@@ -471,7 +473,7 @@ describe("Sensitive Data", () => {
     let spyWriteServiceErrorToLog: jest.SpyInstance;
 
     beforeEach(() => {
-      mockSetUserPreferences = jest.spyOn(userPreferencesStateService, "setUserPreferences");
+      mockSetUserPreferences = jest.spyOn(UserPreferencesStateService.getInstance(), "setUserPreferences");
       mockCreateSensitivePersonalData = jest.spyOn(sensitivePersonalDataService, "createSensitivePersonalData");
       spyWriteServiceErrorToLog = jest.spyOn(writeServiceErrorToLogModule, "writeServiceErrorToLog");
     });
@@ -517,7 +519,7 @@ describe("Sensitive Data", () => {
       // THEN userPreferences should be updated
       await waitFor(() => {
         expect(mockSetUserPreferences).toHaveBeenCalledWith({
-          ...userPreferencesStateService.getUserPreferences(),
+          ...UserPreferencesStateService.getInstance().getUserPreferences(),
           has_sensitive_personal_data: true,
         });
       });
@@ -730,7 +732,7 @@ describe("Sensitive Data", () => {
       const user = userEvent.setup();
 
       // GIVEN userPreferences are undefined
-      jest.spyOn(userPreferencesStateService, "getUserPreferences").mockReturnValue(null);
+      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue(null);
 
       // AND given some user sensitive personal data
       const givenData = MINIMUM_SENSITIVE_PERSONAL_DATA;
@@ -775,7 +777,7 @@ describe("Sensitive Data", () => {
       const user = userEvent.setup();
 
       // GIVEN userPreferences are undefined
-      jest.spyOn(userPreferencesStateService, "getUserPreferences").mockReturnValue(null);
+      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue(null);
 
       // AND Component is rendered
       componentRender();

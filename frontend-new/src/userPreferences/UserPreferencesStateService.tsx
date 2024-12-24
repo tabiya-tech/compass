@@ -1,6 +1,6 @@
 import { UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 
-export class UserPreferencesStateService {
+export default class UserPreferencesStateService {
   private static instance: UserPreferencesStateService;
   private userPreferences: UserPreference | null = null;
 
@@ -25,5 +25,3 @@ export class UserPreferencesStateService {
     this.userPreferences = null;
   }
 }
-
-export const userPreferencesStateService = UserPreferencesStateService.getInstance();
