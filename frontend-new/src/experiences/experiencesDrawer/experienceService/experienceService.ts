@@ -1,8 +1,8 @@
 import { getBackendUrl } from "src/envService";
-import { getServiceErrorFactory } from "src/error/ServiceError/ServiceError";
+import { getRestAPIErrorFactory } from "src/error/restAPIError/RestAPIError";
 import { customFetch } from "src/utils/customFetch/customFetch";
 import { StatusCodes } from "http-status-codes";
-import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
+import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import { Experience } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
 
 export default class ExperienceService {
@@ -26,7 +26,7 @@ export default class ExperienceService {
 
   async getExperiences(): Promise<Experience[]> {
     const constructedExperiencesUrl = `${this.experiencesEndpointUrl}?session_id=${this.getSessionId()}`;
-    const errorFactory = getServiceErrorFactory(
+    const errorFactory = getRestAPIErrorFactory(
       "ExperienceService",
       "getExperiences",
       "GET",

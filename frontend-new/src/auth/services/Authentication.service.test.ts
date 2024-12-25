@@ -10,7 +10,7 @@ import { TabiyaUser, Token, TokenHeader } from "src/auth/auth.types";
 import AuthenticationStateService from "./AuthenticationState.service";
 
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
-import { ServiceError } from "src/error/ServiceError/ServiceError";
+import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
 
 // Mock jwt-decode
@@ -145,7 +145,7 @@ describe("AuthenticationService", () => {
       jest.spyOn(service, "getUser").mockReturnValue(givenUser);
 
       // AND user preferences service throws a 404 error
-      const givenError = new ServiceError(
+      const givenError = new RestAPIError(
         UserPreferencesService.serviceName,
         "getUserPreferences",
         "GET",

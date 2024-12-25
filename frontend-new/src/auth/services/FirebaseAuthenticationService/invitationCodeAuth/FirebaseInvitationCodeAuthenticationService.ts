@@ -41,7 +41,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
    * @param {string} code - The invitation code to login with
    * @returns {Promise<string>} The firebase token
    * @throws {FirebaseError} If the firebase authentication fails
-   * @throws {ServiceError} If the invitation code is invalid or has wrong type
+   * @throws {RestAPIError} If the invitation code is invalid or has wrong type
    */
   async login(code: string): Promise<string> {
     const firebaseErrorFactory = getFirebaseErrorFactory(

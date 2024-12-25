@@ -6,8 +6,8 @@ import {
   Language,
   UpdateUserPreferencesSpec,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
-import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
+import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
+import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { useNavigate } from "react-router-dom";
 import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
@@ -84,7 +84,7 @@ const Consent: React.FC = () => {
         sensitive_personal_data_requirement: userPreferences?.sensitive_personal_data_requirement!,
       });
 
-      if ((userPreferences?.sensitive_personal_data_requirement!) === SensitivePersonalDataRequirement.REQUIRED) {
+      if (userPreferences?.sensitive_personal_data_requirement! === SensitivePersonalDataRequirement.REQUIRED) {
         navigate(routerPaths.SENSITIVE_DATA, { replace: true });
       } else {
         navigate(routerPaths.ROOT, { replace: true });
@@ -92,8 +92,8 @@ const Consent: React.FC = () => {
 
       enqueueSnackbar("Agreement Accepted", { variant: "success" });
     } catch (e) {
-      if (e instanceof ServiceError) {
-        writeServiceErrorToLog(e, console.error);
+      if (e instanceof RestAPIError) {
+        writeRestAPIErrorToLog(e, console.error);
         enqueueSnackbar(getUserFriendlyErrorMessage(e), { variant: "error" });
       } else {
         enqueueSnackbar(`Failed to update user preferences: ${(e as Error).message}`, { variant: "error" });

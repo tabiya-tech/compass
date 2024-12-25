@@ -1,7 +1,7 @@
-import { getServiceErrorFactory, ServiceErrorFactory } from "src/error/ServiceError/ServiceError";
+import { getRestAPIErrorFactory, RestAPIErrorFactory } from "src/error/restAPIError/RestAPIError";
 import { CreateUserPreferencesSpec, UpdateUserPreferencesSpec, UserPreference } from "./userPreferences.types";
 import { StatusCodes } from "http-status-codes";
-import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
+import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import { getBackendUrl } from "src/envService";
 import { customFetch } from "src/utils/customFetch/customFetch";
 
@@ -46,7 +46,7 @@ export default class UserPreferencesService {
    * @param errorFactory
    * @private
    */
-  private parseJsonResponse(responseBody: string, userId: string, errorFactory: ServiceErrorFactory): UserPreference {
+  private parseJsonResponse(responseBody: string, userId: string, errorFactory: RestAPIErrorFactory): UserPreference {
     // parse the response body
     let userPreferencesResponse: UserPreference;
     try {
@@ -87,13 +87,13 @@ export default class UserPreferencesService {
    * This is used to create a user profile for the first time.
    * you provide user_id and invitation_code
    * @returns {Promise<UserPreference>} The user preferences object
-   * @throws {ServiceError} If the user preferences are invalid
+   * @throws {RestAPIError} If the user preferences are invalid
    */
   async createUserPreferences(user_preferences: CreateUserPreferencesSpec): Promise<UserPreference> {
     const serviceName = UserPreferencesService.serviceName;
     const serviceFunction = "createUserPreferences";
     const method = "POST";
-    const errorFactory = getServiceErrorFactory(
+    const errorFactory = getRestAPIErrorFactory(
       serviceName,
       serviceFunction,
       method,
@@ -119,13 +119,13 @@ export default class UserPreferencesService {
   /**
    * Creates an entry for the user preferences of a user with an ID
    * @returns {Promise<UserPreference>} The user preferences object
-   * @throws {ServiceError} If the user preferences are invalid
+   * @throws {RestAPIError} If the user preferences are invalid
    */
   async updateUserPreferences(newUserPreferencesSpec: UpdateUserPreferencesSpec): Promise<UserPreference> {
     const serviceName = UserPreferencesService.serviceName;
     const serviceFunction = "updateUserPreferences";
     const method = "PATCH";
-    const errorFactory = getServiceErrorFactory(
+    const errorFactory = getRestAPIErrorFactory(
       serviceName,
       serviceFunction,
       method,
@@ -152,14 +152,14 @@ export default class UserPreferencesService {
   /**
    * Gets the user preferences of a user with an ID
    * @returns {Promise<UserPreference>} The user preferences object
-   * @throws {ServiceError} If the user preferences are invalid or the user does not exist
+   * @throws {RestAPIError} If the user preferences are invalid or the user does not exist
    */
   async getUserPreferences(userId: string): Promise<UserPreference> {
     const serviceName = UserPreferencesService.serviceName;
     const serviceFunction = "getUserPreferences";
     const method = "GET";
     const qualifiedURL = `${this.getUserPreferencesEndpointUrl}?user_id=${userId}`;
-    const errorFactory = getServiceErrorFactory("UserPreferencesService", "getUserPreferences", method, qualifiedURL);
+    const errorFactory = getRestAPIErrorFactory("UserPreferencesService", "getUserPreferences", method, qualifiedURL);
 
     const response = await customFetch(qualifiedURL, {
       method: method,
@@ -180,7 +180,7 @@ export default class UserPreferencesService {
   /**
    * Get a new session ID from the chat service.
    * @returns {Promise<UserPreference>} The user preferences object
-   * @throws {ServiceError} If the user preferences are invalid
+   * @throws {RestAPIError} If the user preferences are invalid
    */
   async getNewSession(userId: string): Promise<UserPreference> {
     const serviceName = UserPreferencesService.serviceName;
@@ -188,7 +188,7 @@ export default class UserPreferencesService {
     const method = "GET";
     const qualifiedURL = `${this.generateNewSessionEndpointUrl}?user_id=${userId}`;
 
-    const errorFactory = getServiceErrorFactory("UserPreferencesService", "getUserPreferences", method, qualifiedURL);
+    const errorFactory = getRestAPIErrorFactory("UserPreferencesService", "getUserPreferences", method, qualifiedURL);
 
     const response = await customFetch(qualifiedURL, {
       method: method,

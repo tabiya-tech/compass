@@ -1,64 +1,22 @@
 import { StatusCodes } from "http-status-codes/";
-import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
+import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 
-export type ServiceErrorObject = {
+export type RestAPIErrorObject = {
   errorCode: ErrorConstants.ErrorCodes;
   message: string;
   details: string;
 };
 
-export type ServiceErrorDetails = string | ServiceErrorObject | object | undefined | null;
+export type RestAPIErrorDetails = string | RestAPIErrorObject | object | undefined | null;
 
-export const USER_FRIENDLY_ERROR_MESSAGES = {
-  REQUEST_TOO_LONG:
-    "The data sent to the service seems to be too large. " +
-    "Please try again with a smaller payload. " +
-    "If the problem persists, clear your browser's cache and refresh the page.",
-  TOO_MANY_REQUESTS: "It looks like you are making too many requests. Please slow down and try again later.",
-  UNEXPECTED_ERROR: "An unexpected error occurred. Please try again later.",
-  SERVER_CONNECTION_ERROR: "Cannot connect to the service. Please check your internet connection or try again later.",
-  RESOURCE_NOT_FOUND: "The requested resource was not found. Please clear your browser's cache and refresh the page.",
-  AUTHENTICATION_FAILURE: "It looks like you not logged in. Please log in to continue.",
-  PERMISSION_DENIED: "It looks like you do not have the necessary permissions. Please log out and log in again.",
-  UNABLE_TO_PROCESS_RESPONSE:
-    "We encountered an issue while processing data. Clear the browser's cache and refresh or try again later.",
-  SERVICE_UNAVAILABLE: "The service is currently unavailable. Please try again later.",
-  DATA_VALIDATION_ERROR:
-    "There seems to be an issue with your request. " +
-    "If you're submitting data, please make sure they're valid and try again. " +
-    "If the problem persists, clear your browser's cache and refresh the page.",
-  EMAIL_NOT_VERIFIED:
-    "The email you are using is registered, but you have not yet verified it. Please verify your email to continue.",
-  USER_NOT_FOUND: "The user you are trying to use does not exist. Please try again with different credentials",
-  UNABLE_TO_PROCESS_REQUEST: "Apologies. Something went wrong while processing your request.",
-};
-
-/**
- * a map of error codes and more user-friendly error messages that can be shown to the user
- * in case of Firebase authentication errors.
- **/
-export const FIREBASE_ERROR_MESSAGES = {
-  "auth/email-already-in-use": "The email address is already in use by another account.",
-  "auth/email-not-verified":
-    "The email you are using is registered, but you have not yet verified it. Please verify your email to continue.",
-  "auth/invalid-credential": "The email/password provided is invalid.",
-  "auth/invalid-email": "The email address is not valid.",
-  "auth/operation-not-allowed": "Email/password accounts are not enabled.",
-  "auth/weak-password": "The password is too weak.",
-  "auth/user-disabled": "The user account has been disabled.",
-  "auth/user-not-found": "There is no user record corresponding to this email.",
-  "auth/wrong-password": "The password is invalid.",
-  "auth/too-many-requests": "We have blocked all requests from this device due to unusual activity. Try again later.",
-};
-
-export class ServiceError extends Error {
+export class RestAPIError extends Error {
   serviceName: string;
   serviceFunction: string;
   method: string;
   path: string;
   statusCode: number;
   errorCode: ErrorConstants.ErrorCodes | string;
-  details: ServiceErrorDetails;
+  details: RestAPIErrorDetails;
 
   constructor(
     serviceName: string,
@@ -68,7 +26,7 @@ export class ServiceError extends Error {
     statusCode: number,
     errorCode: ErrorConstants.ErrorCodes | string,
     message: string,
-    details?: ServiceErrorDetails
+    details?: RestAPIErrorDetails
   ) {
     super(message);
     this.serviceName = serviceName;
@@ -94,38 +52,38 @@ export class ServiceError extends Error {
 }
 
 //factory function
-export type ServiceErrorFactory = (
+export type RestAPIErrorFactory = (
   statusCode: number,
   errorCode: ErrorConstants.ErrorCodes | string,
   message: string,
-  details?: ServiceErrorDetails
-) => ServiceError;
+  details?: RestAPIErrorDetails
+) => RestAPIError;
 
-export function getServiceErrorFactory(
+export function getRestAPIErrorFactory(
   serviceName: string,
   serviceFunction: string,
   method: string,
   path: string
-): ServiceErrorFactory {
+): RestAPIErrorFactory {
   return (
     statusCode: number,
     errorCode: ErrorConstants.ErrorCodes | string,
     message: string,
-    details?: ServiceErrorDetails
-  ): ServiceError => {
-    return new ServiceError(serviceName, serviceFunction, method, path, statusCode, errorCode, message, details);
+    details?: RestAPIErrorDetails
+  ): RestAPIError => {
+    return new RestAPIError(serviceName, serviceFunction, method, path, statusCode, errorCode, message, details);
   };
 }
 
 /**
- * @param {ServiceError} error
+ * @param {RestAPIError} error
  * @returns {string} a user friendly error message
  */
 
-export const getUserFriendlyErrorMessage = (error: ServiceError | Error): string => {
-  if (!(error instanceof ServiceError)) {
-    // in case the error is not a ServiceError, then it is an unexpected error
-    return USER_FRIENDLY_ERROR_MESSAGES.UNEXPECTED_ERROR;
+export const getUserFriendlyErrorMessage = (error: RestAPIError | Error): string => {
+  if (!(error instanceof RestAPIError)) {
+    // in case the error is not a RestAPIError, then it is an unexpected error
+    return ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.UNEXPECTED_ERROR;
   }
   // All the errors can happen due to a bug in the frontend or backend code.
   // In that case, the users can do little about it, but there might be some cases where a workaround is possible.
@@ -152,7 +110,7 @@ export const getUserFriendlyErrorMessage = (error: ServiceError | Error): string
       // - disable browser extensions or
       // - restart or try a different browser or
       // - try again later
-      return USER_FRIENDLY_ERROR_MESSAGES.SERVER_CONNECTION_ERROR;
+      return ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.SERVER_CONNECTION_ERROR;
 
     case ErrorConstants.ErrorCodes.API_ERROR:
       if (error.statusCode >= 300 && error.statusCode < 400) {
@@ -163,7 +121,7 @@ export const getUserFriendlyErrorMessage = (error: ServiceError | Error): string
         // - refresh the page to get the latest version of the app
         // - clear the browser cache to get the latest version of the app
         // - if the problem persists, contact support
-        return USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_RESPONSE;
+        return ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_RESPONSE;
       }
       switch (error.statusCode) {
         case StatusCodes.UNAUTHORIZED:
@@ -173,25 +131,25 @@ export const getUserFriendlyErrorMessage = (error: ServiceError | Error): string
           // - the user's was "logged" out (token expired, user deleted, etc.)
           // What can the user do :
           // - login
-          return USER_FRIENDLY_ERROR_MESSAGES.AUTHENTICATION_FAILURE;
+          return ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.AUTHENTICATION_FAILURE;
         case StatusCodes.FORBIDDEN:
           // The user is not authorized to perform this action.
           // This can happen when:
           // - the user permissions have changed and the UI has not been updated
           // What can the user do:
           // - logout and login again
-          return USER_FRIENDLY_ERROR_MESSAGES.PERMISSION_DENIED;
+          return ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.PERMISSION_DENIED;
         case StatusCodes.NOT_FOUND:
           // This happens when:
           // - the user is using an old version of the app
           // - the resource that the user is trying to access has been deleted
-          return USER_FRIENDLY_ERROR_MESSAGES.RESOURCE_NOT_FOUND;
+          return ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.RESOURCE_NOT_FOUND;
         case StatusCodes.TOO_MANY_REQUESTS:
           // This happens when:
           // - the user is making too many requests in a short time
           // What can the user do:
           // - try again later
-          return USER_FRIENDLY_ERROR_MESSAGES.TOO_MANY_REQUESTS;
+          return ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.TOO_MANY_REQUESTS;
         case StatusCodes.REQUEST_TOO_LONG:
           // This happens when:
           // - the user is sending a payload that exceeds the server's limit
@@ -203,7 +161,7 @@ export const getUserFriendlyErrorMessage = (error: ServiceError | Error): string
           // - try again later
           // - refresh the page to get the latest version of the app
           // - clear the browser cache to get the latest version of the app
-          return USER_FRIENDLY_ERROR_MESSAGES.REQUEST_TOO_LONG;
+          return ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.REQUEST_TOO_LONG;
       }
       if (error.statusCode >= 400 && error.statusCode < 500) {
         // The server could not or not willing to handle the request
@@ -218,7 +176,7 @@ export const getUserFriendlyErrorMessage = (error: ServiceError | Error): string
         // - refresh the page to get the latest version of the app
         // - clear the browser cache to get the latest version of the app
         // - try again later
-        return USER_FRIENDLY_ERROR_MESSAGES.DATA_VALIDATION_ERROR;
+        return ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.DATA_VALIDATION_ERROR;
       }
       if (error.statusCode === 500) {
         // Server encountered an unexpected condition.
@@ -226,7 +184,7 @@ export const getUserFriendlyErrorMessage = (error: ServiceError | Error): string
         // - an unexpected error occurred on the server
         // What can the user do:
         // -  try again later
-        return USER_FRIENDLY_ERROR_MESSAGES.UNEXPECTED_ERROR;
+        return ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.UNEXPECTED_ERROR;
       }
       if (error.statusCode >= 501) {
         // Server encountered an unexpected condition.
@@ -235,7 +193,7 @@ export const getUserFriendlyErrorMessage = (error: ServiceError | Error): string
         // - some part of the infrastructure is down e.g. the gateway, the database, etc.
         // What can the user do:
         // -  try again later
-        return USER_FRIENDLY_ERROR_MESSAGES.SERVICE_UNAVAILABLE;
+        return ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.SERVICE_UNAVAILABLE;
       }
       break;
 
@@ -247,16 +205,16 @@ export const getUserFriendlyErrorMessage = (error: ServiceError | Error): string
       // What can the user do:
       // - refresh the page to get the latest version of the app
       // - clear the browser cache to get the latest version of the app
-      return USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_RESPONSE;
+      return ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_RESPONSE;
     case ErrorConstants.ErrorCodes.FORBIDDEN:
       if (error.statusCode === 422) {
         // we use a forbidden with an unprocessable entity when the invite code is
-        return USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_REQUEST;
+        return ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_REQUEST;
       }
       break;
   }
   // If we get here, then
   // - we messed and don't know what the error is, or
   // - additional error codes where introduced, and we forgot to handle them
-  return USER_FRIENDLY_ERROR_MESSAGES.UNEXPECTED_ERROR;
+  return ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.UNEXPECTED_ERROR;
 };

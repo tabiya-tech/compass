@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // @ts-nocheck
-import { ServiceError } from "src/error/ServiceError/ServiceError";
+import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 
-export function writeServiceErrorToLog(err: ServiceError, logFunction: (msg: any) => void): void {
+export function writeRestAPIErrorToLog(err: RestAPIError, logFunction: (msg: any) => void): void {
   const logMessage = `ServiceError: ${err.serviceName} ${err.serviceFunction} ${err.errorCode} ${err.method} ${err.path} ${err.statusCode}`;
   const obj = {};
   for (const propertyName in err) {

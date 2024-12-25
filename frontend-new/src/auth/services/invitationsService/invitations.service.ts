@@ -1,6 +1,6 @@
-import { getServiceErrorFactory, ServiceError } from "src/error/ServiceError/ServiceError";
+import { getRestAPIErrorFactory, RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
-import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
+import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import { getBackendUrl } from "src/envService";
 import { Invitation } from "./invitations.types";
 
@@ -30,14 +30,14 @@ export default class InvitationsService {
    * Checks the status of an invitation code.
    * @param {string} code - The invitation code to check.
    * @returns {Promise<Invitation>}
-   * @throws {ServiceError} If the invitation code is invalid
+   * @throws {RestAPIError} If the invitation code is invalid
    */
   async checkInvitationCodeStatus(code: string): Promise<Invitation> {
     const serviceName = "InvitationsService";
     const serviceFunction = "checkInvitationCodeStatus";
     const method = "GET";
     const endpointUrl = `${this.invitationStatusEndpointUrl}/check-status?invitation_code=${code}`;
-    const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, endpointUrl);
+    const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, endpointUrl);
     try {
       const response = await fetch(endpointUrl, {
         method: method,
@@ -78,7 +78,7 @@ export default class InvitationsService {
 
       return data;
     } catch (e: unknown) {
-      if (e instanceof ServiceError) {
+      if (e instanceof RestAPIError) {
         // if we threw a service error above, we should simply rethrow that
         throw e;
       } else {

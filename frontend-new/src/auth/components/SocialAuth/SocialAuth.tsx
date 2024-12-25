@@ -7,8 +7,8 @@ import FirebaseSocialAuthenticationService from "src/auth/services/FirebaseAuthe
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
 import { GoogleIcon } from "src/theme/Icons/GoogleIcon";
-import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
-import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
+import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
+import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import RegistrationCodeFormModal, {
@@ -67,9 +67,9 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       // clear the registration code from the state
       setRegistrationCode(registrationCode);
       let errorMessage;
-      if (error instanceof ServiceError) {
+      if (error instanceof RestAPIError) {
         errorMessage = getUserFriendlyErrorMessage(error);
-        writeServiceErrorToLog(error, console.error);
+        writeRestAPIErrorToLog(error, console.error);
       } else if (error instanceof FirebaseError) {
         errorMessage = getUserFriendlyFirebaseErrorMessage(error);
         writeFirebaseErrorToLog(error, console.warn);
