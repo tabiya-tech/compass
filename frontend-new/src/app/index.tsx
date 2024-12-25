@@ -22,7 +22,7 @@ import UserPreferencesService, {
   userPreferencesService,
 } from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { AuthenticationError } from "src/error/commonErrors";
-import { ServiceError } from "src/error/ServiceError/ServiceError";
+import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
 
 // Wrap the createHashRouter function with Sentry to capture errors that occur during router initialization
@@ -71,7 +71,7 @@ const App = () => {
 
       const preferences = await userPreferencesService.getUserPreferences(user.id).catch((error) => {
         console.log(error, "init");
-        if (error instanceof ServiceError) {
+        if (error instanceof RestAPIError) {
           // if the user is not registered, but has a valid token, log an error and continue log the user out
           if (
             error.serviceName === UserPreferencesService.serviceName &&

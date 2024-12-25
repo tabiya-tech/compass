@@ -2,9 +2,9 @@ import "src/_test_utilities/consoleMock";
 
 import UserPreferencesService from "./userPreferences.service";
 import { StatusCodes } from "http-status-codes";
-import { ServiceError } from "src/error/ServiceError/ServiceError";
+import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
-import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
+import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import {
   CreateUserPreferencesSpec,
   SensitivePersonalDataRequirement,
@@ -113,8 +113,8 @@ describe("UserPreferencesService", () => {
         const service = new UserPreferencesService();
 
         // THEN expected it to reject with the error response
-        const expectedError: ServiceError = {
-          ...new ServiceError(
+        const expectedError: RestAPIError = {
+          ...new RestAPIError(
             UserPreferencesService.name,
             "getUserPreferences",
             "GET",
@@ -198,8 +198,8 @@ describe("UserPreferencesService", () => {
 
         // WHEN the updateUserPreferences function is called with the given user preferences
         const service = new UserPreferencesService();
-        const expectedError: ServiceError = {
-          ...new ServiceError(
+        const expectedError: RestAPIError = {
+          ...new RestAPIError(
             UserPreferencesService.name,
             "updateUserPreferences",
             "PATCH",
@@ -305,8 +305,8 @@ describe("UserPreferencesService", () => {
 
         // WHEN the createUserPreferences function is called with the given user preferences
         const service = new UserPreferencesService();
-        const expectedError: ServiceError = {
-          ...new ServiceError(
+        const expectedError: RestAPIError = {
+          ...new RestAPIError(
             UserPreferencesService.name,
             "createUserPreferences",
             "POST",

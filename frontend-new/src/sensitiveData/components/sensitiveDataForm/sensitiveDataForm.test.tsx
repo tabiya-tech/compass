@@ -13,8 +13,8 @@ import { DATA_TEST_ID as BACKDROP_DATA_TEST_IDS } from "src/theme/Backdrop/Backd
 import { DATA_TEST_ID as CONFIRM_MODAL_DATA_TEST_IDS } from "src/theme/confirmModalDialog/ConfirmModalDialog";
 
 import { routerPaths } from "src/app/routerPaths";
-import * as serviceErrorModule from "src/error/ServiceError/ServiceError";
-import { ServiceError } from "src/error/ServiceError/ServiceError";
+import * as restAPIErrorModule from "src/error/restAPIError/RestAPIError";
+import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import {
@@ -24,7 +24,7 @@ import {
 import { Gender, SensitivePersonalData } from "src/sensitiveData/types";
 import { sensitivePersonalDataService } from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalData.service";
 import { EncryptedDataTooLarge } from "src/sensitiveData/services/sensitivePersonalDataService/errors";
-import * as writeServiceErrorToLogModule from "src/error/ServiceError/logger";
+import * as writeRestAPIErrorToLogModule from "src/error/restAPIError/logger";
 import * as NotistackModule from "notistack";
 import { formConfig } from "./formConfig";
 
@@ -470,12 +470,12 @@ describe("Sensitive Data", () => {
   describe("action tests: submit sensitive personal data", () => {
     let mockSetUserPreferences: jest.SpyInstance;
     let mockCreateSensitivePersonalData: jest.SpyInstance;
-    let spyWriteServiceErrorToLog: jest.SpyInstance;
+    let spyWriteRestAPIErrorToLog: jest.SpyInstance;
 
     beforeEach(() => {
       mockSetUserPreferences = jest.spyOn(UserPreferencesStateService.getInstance(), "setUserPreferences");
       mockCreateSensitivePersonalData = jest.spyOn(sensitivePersonalDataService, "createSensitivePersonalData");
-      spyWriteServiceErrorToLog = jest.spyOn(writeServiceErrorToLogModule, "writeServiceErrorToLog");
+      spyWriteRestAPIErrorToLog = jest.spyOn(writeRestAPIErrorToLogModule, "writeRestAPIErrorToLog");
     });
 
     it("should save sensitive personal data successfully and navigate to the root path", async () => {
@@ -540,7 +540,7 @@ describe("Sensitive Data", () => {
       const user = userEvent.setup();
 
       // GIVEN create sensitive personal data will fail
-      const serviceError = new ServiceError("foo", "bar", "foo", "bar", 201, "foo", "foo");
+      const restAPIError = new RestAPIError("foo", "bar", "foo", "bar", 201, "foo", "foo");
       let rejectCreateSensitivePersonalData: (reason?: any) => void = () => {};
       mockCreateSensitivePersonalData.mockReturnValue(
         new Promise((_resolve, reject) => {
@@ -550,7 +550,7 @@ describe("Sensitive Data", () => {
 
       // AND the getUserFriendlyErrorMessage will return some the user-friendly message
       const givenUserFriendlyMessage = "bar";
-      jest.spyOn(serviceErrorModule, "getUserFriendlyErrorMessage").mockReturnValue(givenUserFriendlyMessage);
+      jest.spyOn(restAPIErrorModule, "getUserFriendlyErrorMessage").mockReturnValue(givenUserFriendlyMessage);
 
       // AND given some sensitive personal data
       const givenData = MINIMUM_SENSITIVE_PERSONAL_DATA;
@@ -572,7 +572,7 @@ describe("Sensitive Data", () => {
       expect(screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON_CIRCULAR_PROGRESS)).toBeVisible();
 
       // AND after the create sensitive personal data promise is rejected
-      rejectCreateSensitivePersonalData(serviceError);
+      rejectCreateSensitivePersonalData(restAPIError);
 
       // AND create sensitive personal data should be called with the correct arguments.
       expect(mockCreateSensitivePersonalData).toHaveBeenCalledWith(givenData, givenUserId);
@@ -591,7 +591,7 @@ describe("Sensitive Data", () => {
       expect(mockNavigate).not.toHaveBeenCalled();
 
       // AND error should be logged
-      expect(spyWriteServiceErrorToLog).toHaveBeenCalledWith(serviceError, expect.anything());
+      expect(spyWriteRestAPIErrorToLog).toHaveBeenCalledWith(restAPIError, expect.anything());
 
       // AND the button should be enabled
       await waitFor(() => expect(button).toBeEnabled());

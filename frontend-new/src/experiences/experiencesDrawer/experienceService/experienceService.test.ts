@@ -1,8 +1,8 @@
 import ExperienceService from "src/experiences/experiencesDrawer/experienceService/experienceService";
-import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
+import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 import { StatusCodes } from "http-status-codes";
-import { ServiceError } from "src/error/ServiceError/ServiceError";
+import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { mockExperiences } from "src/experiences/experiencesDrawer/experienceService/_test_utilities/mockExperiencesResponses";
 
 describe("ExperienceService", () => {
@@ -95,7 +95,7 @@ describe("ExperienceService", () => {
 
         // THEN expect it to reject with the error response
         const expectedError = {
-          ...new ServiceError(
+          ...new RestAPIError(
             ExperienceService.name,
             "getExperiences",
             "GET",

@@ -3,7 +3,7 @@ import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import SnackbarProvider, { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { FormLabel, MenuItem, Select, Stack } from "@mui/material";
-import { USER_FRIENDLY_ERROR_MESSAGES } from "src/error/ServiceError/ServiceError";
+import ErrorConstants from "./RestAPIError.constants";
 
 const meta: Meta<typeof SnackbarProvider> = {
   title: "Error/Error",
@@ -29,16 +29,16 @@ const TestErrorDropdown = () => {
 
   const handleSelect = (event: React.MouseEvent<HTMLLIElement>) => {
     // @ts-ignore
-    enqueueSnackbar(USER_FRIENDLY_ERROR_MESSAGES[event.currentTarget.textContent], { variant: "error" });
+    enqueueSnackbar(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES[event.currentTarget.textContent], { variant: "error" });
   };
 
   return (
     <Stack width={"fit-content"}>
       <FormLabel> Choose an error message to display in a notification:</FormLabel>
-      <Select value={Object.values(USER_FRIENDLY_ERROR_MESSAGES)[0]} placeholder={"Select an error message"}>
-        {Object.keys(USER_FRIENDLY_ERROR_MESSAGES).map((key: string) => (
+      <Select value={Object.values(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES)[0]} placeholder={"Select an error message"}>
+        {Object.keys(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES).map((key: string) => (
           // @ts-ignore
-          <MenuItem onClick={handleSelect} key={key} value={USER_FRIENDLY_ERROR_MESSAGES[key]}>
+          <MenuItem onClick={handleSelect} key={key} value={ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES[key]}>
             {key}
           </MenuItem>
         ))}

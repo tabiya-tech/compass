@@ -1,4 +1,4 @@
-import { getServiceErrorFactory } from "src/error/ServiceError/ServiceError";
+import { getRestAPIErrorFactory } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
 import { customFetch } from "src/utils/customFetch/customFetch";
 import { getBackendUrl } from "src/envService";
@@ -6,7 +6,7 @@ import {
   FeedbackItem,
   FeedbackResponse,
 } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
-import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
+import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import InfoService from "src/info/info.service";
 import authStateService from "src/auth/services/AuthenticationState.service";
 
@@ -40,7 +40,7 @@ export default class OverallFeedbackService {
     const serviceFunction = "sendFeedback";
     const method = "POST";
     const feedbackURL = this.feedbackEndpointUrl;
-    const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, feedbackURL);
+    const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, feedbackURL);
 
     const user = authStateService.getInstance().getUser();
     if (!user?.id) {

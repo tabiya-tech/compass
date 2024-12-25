@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
-import { getServiceErrorFactory } from "src/error/ServiceError/ServiceError";
-import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
+import { getRestAPIErrorFactory } from "src/error/restAPIError/RestAPIError";
+import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
 // This function is used to make authenticated fetch requests
@@ -32,7 +32,7 @@ export const customFetch = async (
     ? init.expectedStatusCode
     : [init.expectedStatusCode];
 
-  const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, init.method ?? "Unknown method", apiUrl);
+  const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, init.method ?? "Unknown method", apiUrl);
   let response: Response;
   const token = PersistentStorageService.getToken();
 

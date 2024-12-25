@@ -4,8 +4,8 @@ import { NavLink as RouterNavLink, useLocation, useNavigate } from "react-router
 import { routerPaths } from "src/app/routerPaths";
 import SocialAuth from "src/auth/components/SocialAuth/SocialAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
-import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
+import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
+import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
 import LoginWithEmailForm from "src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
@@ -74,9 +74,9 @@ const Login: React.FC = () => {
   const handleError = useCallback(
     async (error: Error) => {
       let errorMessage;
-      if (error instanceof ServiceError) {
+      if (error instanceof RestAPIError) {
         errorMessage = getUserFriendlyErrorMessage(error);
-        writeServiceErrorToLog(error, console.error);
+        writeRestAPIErrorToLog(error, console.error);
       } else if (error instanceof FirebaseError) {
         errorMessage = getUserFriendlyFirebaseErrorMessage(error);
         writeFirebaseErrorToLog(error, console.warn);
@@ -125,8 +125,8 @@ const Login: React.FC = () => {
       }
     } catch (error) {
       let errorMessage;
-      if (error instanceof ServiceError) {
-        writeServiceErrorToLog(error, console.error);
+      if (error instanceof RestAPIError) {
+        writeRestAPIErrorToLog(error, console.error);
         errorMessage = getUserFriendlyErrorMessage(error);
       } else {
         errorMessage = (error as Error).message;

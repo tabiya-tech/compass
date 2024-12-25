@@ -1,4 +1,4 @@
-import { ServiceErrorDetails } from "src/error/ServiceError/ServiceError";
+import { RestAPIErrorDetails } from "src/error/restAPIError/RestAPIError";
 import {
   FirebaseErrorCodes,
   USER_FRIENDLY_FIREBASE_ERROR_MESSAGES,
@@ -9,7 +9,7 @@ export class FirebaseError extends Error {
   serviceFunction: string;
   method: string;
   errorCode: FirebaseErrorCodes;
-  details: ServiceErrorDetails;
+  details: RestAPIErrorDetails;
 
   constructor(
     serviceName: string,
@@ -17,7 +17,7 @@ export class FirebaseError extends Error {
     method: string,
     errorCode: FirebaseErrorCodes,
     message: string,
-    details?: ServiceErrorDetails
+    details?: RestAPIErrorDetails
   ) {
     super(message);
     this.serviceName = serviceName;
@@ -44,7 +44,7 @@ export class FirebaseError extends Error {
 export type FirebaseErrorFactory = (
   errorCode: FirebaseErrorCodes,
   message: string,
-  details?: ServiceErrorDetails
+  details?: RestAPIErrorDetails
 ) => FirebaseError;
 
 export function getFirebaseErrorFactory(
@@ -53,7 +53,7 @@ export function getFirebaseErrorFactory(
   method: string,
   path: string
 ): FirebaseErrorFactory {
-  return (errorCode: FirebaseErrorCodes, message: string, details?: ServiceErrorDetails): FirebaseError => {
+  return (errorCode: FirebaseErrorCodes, message: string, details?: RestAPIErrorDetails): FirebaseError => {
     return new FirebaseError(serviceName, serviceFunction, method, errorCode, message, details);
   };
 }
