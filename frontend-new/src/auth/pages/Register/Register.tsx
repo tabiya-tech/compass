@@ -9,8 +9,8 @@ import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
 import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
-import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
-import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
+import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
+import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
@@ -59,8 +59,8 @@ const Register: React.FC = () => {
   const handleError = useCallback(
     async (error: Error) => {
       let errorMessage;
-      if (error instanceof ServiceError) {
-        writeServiceErrorToLog(error, console.error);
+      if (error instanceof RestAPIError) {
+        writeRestAPIErrorToLog(error, console.error);
         errorMessage = getUserFriendlyErrorMessage(error);
       } else if (error instanceof FirebaseError) {
         writeFirebaseErrorToLog(error, console.warn);

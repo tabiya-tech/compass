@@ -7,8 +7,8 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Box, useTheme } from "@mui/material";
 import ChatHeader from "./ChatHeader/ChatHeader";
 import ChatMessageField from "./ChatMessageField/ChatMessageField";
-import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
-import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
+import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
+import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -272,8 +272,8 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           await sendMessage("", session_id);
         }
       } catch (e) {
-        if (e instanceof ServiceError) {
-          writeServiceErrorToLog(e, console.error);
+        if (e instanceof RestAPIError) {
+          writeRestAPIErrorToLog(e, console.error);
         } else {
           console.error(new ChatError("Failed to initialize chat", e as Error));
         }

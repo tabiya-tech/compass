@@ -1,9 +1,9 @@
 import { StatusCodes } from "http-status-codes/";
 import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 import { UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import { ServiceError } from "src/error/ServiceError/ServiceError";
+import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import OverallFeedbackService from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service";
-import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
+import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import authStateService from "src/auth/services/AuthenticationState.service";
 
 // mock the user preferences service
@@ -162,7 +162,7 @@ describe("OverallFeedbackService", () => {
 
         // THEN expect it to reject with the expected error
         const expectedError = {
-          ...new ServiceError(
+          ...new RestAPIError(
             "OverallFeedbackService",
             "sendFeedback",
             "POST",

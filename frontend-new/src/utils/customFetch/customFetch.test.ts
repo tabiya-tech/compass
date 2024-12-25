@@ -1,7 +1,7 @@
 import { customFetch } from "./customFetch";
 import { setupFetchSpy } from "src/_test_utilities/fetchSpy";
-import { ServiceError } from "src/error/ServiceError/ServiceError";
-import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
+import { RestAPIError } from "src/error/restAPIError/RestAPIError";
+import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
 describe("Api Service tests", () => {
@@ -92,9 +92,9 @@ describe("Api Service tests", () => {
 
     // THEN expect an error to have been thrown
     expect(error).toBeDefined();
-    expect(error).toBeInstanceOf(ServiceError);
+    expect(error).toBeInstanceOf(RestAPIError);
     expect(error?.message).toBe("fetchWithAuth failed");
-    expect(error as ServiceError).toMatchObject({
+    expect(error as RestAPIError).toMatchObject({
       serviceName: givenServiceName,
       serviceFunction: givenServiceFunction,
       method: givenMethod,
@@ -137,9 +137,9 @@ describe("Api Service tests", () => {
 
     // THEN expect an error to have been thrown
     expect(error).toBeDefined();
-    expect(error).toBeInstanceOf(ServiceError);
+    expect(error).toBeInstanceOf(RestAPIError);
     expect(error?.message).toBe("Response Content-Type should be 'application/json'");
-    expect(error as ServiceError).toMatchObject({
+    expect(error as RestAPIError).toMatchObject({
       serviceName: givenServiceName,
       serviceFunction: givenServiceFunction,
       method: givenMethod,
@@ -208,9 +208,9 @@ describe("Api Service tests", () => {
 
     // THEN expect an error to have been thrown
     expect(error).toBeDefined();
-    expect(error).toBeInstanceOf(ServiceError);
+    expect(error).toBeInstanceOf(RestAPIError);
     expect(error?.message).toBe("fetchWithAuth failed");
-    expect(error as ServiceError).toMatchObject({
+    expect(error as RestAPIError).toMatchObject({
       serviceName: givenServiceName,
       serviceFunction: givenServiceFunction,
       method: givenMethod,

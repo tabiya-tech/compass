@@ -1,9 +1,9 @@
 import "src/_test_utilities/consoleMock";
 import ChatService from "./ChatService";
 import { StatusCodes } from "http-status-codes";
-import { ServiceError } from "src/error/ServiceError/ServiceError";
+import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
-import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
+import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import {
   generateTestChatResponses,
   generateTestHistory,
@@ -117,7 +117,7 @@ describe("ChatService", () => {
 
         // THEN expected it to reject with the error response
         const expectedError = {
-          ...new ServiceError(
+          ...new RestAPIError(
             ChatService.name,
             "sendMessage",
             "POST",
@@ -197,7 +197,7 @@ describe("ChatService", () => {
 
         // THEN expected it to reject with the error response
         const expectedError = {
-          ...new ServiceError(
+          ...new RestAPIError(
             ChatService.name,
             "getChatHistory",
             "GET",

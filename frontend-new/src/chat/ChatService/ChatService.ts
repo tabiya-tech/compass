@@ -1,7 +1,7 @@
-import { getServiceErrorFactory } from "src/error/ServiceError/ServiceError";
+import { getRestAPIErrorFactory } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
 import { customFetch } from "src/utils/customFetch/customFetch";
-import ErrorConstants from "src/error/ServiceError/ServiceError.constants";
+import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import { getBackendUrl } from "src/envService";
 import { ConverstaionResponse } from "./ChatService.types";
 
@@ -36,7 +36,7 @@ export default class ChatService {
     const serviceFunction = "sendMessage";
     const method = "POST";
     const ChatURL = this.chatEndpointUrl;
-    const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, ChatURL);
+    const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, ChatURL);
 
     const response = await customFetch(ChatURL, {
       method: method,
@@ -113,7 +113,7 @@ export default class ChatService {
     try {
       chatHistory = JSON.parse(responseBody);
     } catch (e: any) {
-      const errorFactory = getServiceErrorFactory(serviceName, serviceFunction, method, qualifiedURL);
+      const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, qualifiedURL);
       throw errorFactory(
         response.status,
         ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,

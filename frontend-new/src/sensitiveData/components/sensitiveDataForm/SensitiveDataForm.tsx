@@ -19,13 +19,13 @@ import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
 import { StyledAnchor } from "src/theme/StyledAnchor/StyledAnchor";
-import { writeServiceErrorToLog } from "src/error/ServiceError/logger";
+import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
 import { Gender, SensitivePersonalData } from "src/sensitiveData/types";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
-import { getUserFriendlyErrorMessage, ServiceError } from "src/error/ServiceError/ServiceError";
+import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { EncryptedDataTooLarge } from "src/sensitiveData/services/sensitivePersonalDataService/errors";
 import { sensitivePersonalDataService } from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalData.service";
 import TextConfirmModalDialog from "src/theme/textConfirmModalDialog/TextConfirmModalDialog";
@@ -165,8 +165,8 @@ const SensitiveDataForm: React.FC = () => {
       enqueueSnackbar("Personal data saved successfully and securely.", { variant: "success" });
       navigate(routerPaths.ROOT);
     } catch (e) {
-      if (e instanceof ServiceError) {
-        writeServiceErrorToLog(e, console.error);
+      if (e instanceof RestAPIError) {
+        writeRestAPIErrorToLog(e, console.error);
         enqueueSnackbar(getUserFriendlyErrorMessage(e), { variant: "error" });
       } else if (e instanceof EncryptedDataTooLarge) {
         console.error("Failed to save personal data", e);
