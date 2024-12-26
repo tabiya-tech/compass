@@ -86,8 +86,8 @@ async def _create_user_preferences(
         if invitation.status == InvitationCodeStatus.INVALID:
             raise HTTPException(status_code=400, detail=INVALID_INVITATION_CODE_MESSAGE)
 
-        # an authenticated user can't use an auto-register invitation code
-        if (invitation.invitation_type == InvitationType.AUTO_REGISTER.value
+        # an authenticated user can't use a login invitation code
+        if (invitation.invitation_type == InvitationType.LOGIN.value
                 and authed_user.sign_in_provider != SignInProvider.ANONYMOUS):
             raise HTTPException(status_code=400, detail=INVALID_INVITATION_CODE_MESSAGE)
 

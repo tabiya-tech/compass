@@ -3,7 +3,7 @@ import { render, screen } from "src/_test_utilities/test-utils";
 import userEvent from "@testing-library/user-event";
 import * as Sentry from "@sentry/react";
 
-import RequestInvitationCode, { DATA_TEST_ID as REQUEST_INVITATION_CODE_DATA_TEST_ID } from "./RequestInvitationCode";
+import RequestInvitationCode, { DATA_TEST_ID as REQUEST_INVITATION_CODE_DATA_TEST_ID, UI_TEXT} from "./RequestInvitationCode";
 import { InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import RequestInvitationCodeFormModal, { DATA_TEST_ID as REQUEST_INVITATION_CODE_FORM_MODAL_DATA_TEST_ID } from "src/auth/components/requestInvitationCode/requestInvitationCodeFormModal/RequestInvitationCodeFormModal";
 jest.mock("@sentry/react");
@@ -24,7 +24,7 @@ describe("RequestInvitationCode", () => {
       jest.spyOn(Sentry, "isInitialized").mockReturnValue(false);
 
       // WHEN the component is rendered
-      render(<RequestInvitationCode invitationCodeType={InvitationType.AUTO_REGISTER} />);
+      render(<RequestInvitationCode invitationCodeType={InvitationType.LOGIN} />);
 
       // THEN the link should not render
       expect(screen.queryByTestId(REQUEST_INVITATION_CODE_DATA_TEST_ID.REQUEST_INVITATION_CODE_LINK)).not.toBeInTheDocument();
@@ -37,7 +37,7 @@ describe("RequestInvitationCode", () => {
     jest.spyOn(Sentry, "isInitialized").mockReturnValue(true);
 
     // WHEN the component is rendered
-    render(<RequestInvitationCode invitationCodeType={InvitationType.AUTO_REGISTER} />);
+    render(<RequestInvitationCode invitationCodeType={InvitationType.LOGIN} />);
 
     // THEN the component should render the correct text and link
     expect(screen.getByTestId(`${REQUEST_INVITATION_CODE_DATA_TEST_ID.REQUEST_INVITATION_CODE_LINK}`)).toBeInTheDocument();
@@ -48,7 +48,7 @@ describe("RequestInvitationCode", () => {
     jest.spyOn(Sentry, "isInitialized").mockReturnValue(true);
 
     // WHEN the component is rendered
-    render(<RequestInvitationCode invitationCodeType={InvitationType.AUTO_REGISTER} />);
+    render(<RequestInvitationCode invitationCodeType={InvitationType.LOGIN} />);
 
     // THEN the modal should be opened when the link is clicked
     await userEvent.click(screen.getByTestId(`${REQUEST_INVITATION_CODE_DATA_TEST_ID.REQUEST_INVITATION_CODE_LINK}`));
@@ -65,7 +65,7 @@ describe("RequestInvitationCode", () => {
     // WHEN the component is rendered
     render(
       <RequestInvitationCode 
-        invitationCodeType={InvitationType.AUTO_REGISTER} 
+        invitationCodeType={InvitationType.LOGIN}
         notifyOnModalOpened={mockNotifyOnModalOpened}
       />
     );
@@ -77,17 +77,17 @@ describe("RequestInvitationCode", () => {
     expect(mockNotifyOnModalOpened).toHaveBeenCalledTimes(1);
   });
 
-  test.each([InvitationType.REGISTER, InvitationType.AUTO_REGISTER])("renders the correct text for %s code type", (givenInvitationType: InvitationType) => {
+  test.each([
+    [InvitationType.REGISTER, UI_TEXT.REQUEST_REGISTRATION_CODE],
+    [InvitationType.LOGIN, UI_TEXT.REQUEST_LOGIN_CODE],
+  ])("renders the correct text for %s code type", (givenInvitationType: InvitationType, expectedText: string) => {
     // GIVEN sentry is initialized
     jest.spyOn(Sentry, "isInitialized").mockReturnValue(true);
 
     // WHEN the component is rendered
     render(<RequestInvitationCode invitationCodeType={givenInvitationType} />);
 
-    // THEN the component should render the correct text
-    const expectedText = givenInvitationType === InvitationType.AUTO_REGISTER ? 'login code' : 'registration code'
-    // we want to use a regex since the text has line breaks when not styled
-    const regex = new RegExp(`Don't have a\\s+${expectedText}`, 'i');
-    expect(screen.getByText(regex), ).toBeInTheDocument();
+    // THEN the component should render the expected text
+    expect(screen.getByText(expectedText)).toBeInTheDocument();
   });
 }); 
