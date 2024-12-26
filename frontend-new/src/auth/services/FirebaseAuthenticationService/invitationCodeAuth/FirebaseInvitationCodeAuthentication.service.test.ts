@@ -78,7 +78,7 @@ describe("AuthService class tests", () => {
       // AND the registration code is valid
       (invitationsService.checkInvitationCodeStatus as jest.Mock).mockResolvedValueOnce({
         status: InvitationStatus.VALID,
-        invitation_type: InvitationType.AUTO_REGISTER,
+        invitation_type: InvitationType.LOGIN,
       });
 
       // WHEN the anonymous login is attempted with some code
@@ -100,7 +100,7 @@ describe("AuthService class tests", () => {
       // AND the invitation code is valid
       (invitationsService.checkInvitationCodeStatus as jest.Mock).mockResolvedValueOnce({
         status: InvitationStatus.VALID,
-        invitation_type: InvitationType.AUTO_REGISTER,
+        invitation_type: InvitationType.LOGIN,
       });
 
       // WHEN the anonymous login is attempted
@@ -122,7 +122,7 @@ describe("AuthService class tests", () => {
       // AND the invitation code is valid
       (invitationsService.checkInvitationCodeStatus as jest.Mock).mockResolvedValueOnce({
         status: InvitationStatus.VALID,
-        invitation_type: InvitationType.AUTO_REGISTER,
+        invitation_type: InvitationType.LOGIN,
       });
 
       // WHEN the anonymous login is attempted
@@ -137,7 +137,7 @@ describe("AuthService class tests", () => {
       // GIVEN the invitation code is not valid
       (invitationsService.checkInvitationCodeStatus as jest.Mock).mockResolvedValueOnce({
         status: InvitationStatus.INVALID,
-        invitation_type: InvitationType.AUTO_REGISTER,
+        invitation_type: InvitationType.LOGIN,
       });
 
       // WHEN the anonymous login is attempted
