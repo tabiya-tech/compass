@@ -57,7 +57,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
     if (invitation.status !== InvitationStatus.VALID) {
       throw firebaseErrorFactory(FirebaseErrorCodes.INVALID_INVITATION_CODE, `invalid invitation code: ${code}`);
     }
-    if (invitation.invitation_type !== InvitationType.AUTO_REGISTER) {
+    if (invitation.invitation_type !== InvitationType.LOGIN) {
       throw firebaseErrorFactory(
         FirebaseErrorCodes.INVALID_INVITATION_TYPE,
         `the invitation code is not for login: ${code}`,

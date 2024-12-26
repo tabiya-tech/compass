@@ -327,7 +327,7 @@ describe("AuthService class tests", () => {
       // GIVEN the registration code is not valid
       (invitationsService.checkInvitationCodeStatus as jest.Mock).mockResolvedValueOnce({
         status: InvitationStatus.VALID,
-        invitation_type: InvitationType.AUTO_REGISTER,
+        invitation_type: InvitationType.LOGIN,
       });
 
       // WHEN the registration is attempted

@@ -367,7 +367,7 @@ const Login: React.FC = () => {
             Register
           </CustomLink>
         </Typography>
-        <RequestInvitationCode invitationCodeType={InvitationType.AUTO_REGISTER} />
+        <RequestInvitationCode invitationCodeType={InvitationType.LOGIN} />
       </Box>
       <BugReportButton bottomAlign={true} />
       <Backdrop isShown={isLoading} message={"Logging you in..."} />
