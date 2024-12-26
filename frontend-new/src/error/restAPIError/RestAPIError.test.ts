@@ -1,9 +1,5 @@
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
-import {
-  getRestAPIErrorFactory,
-  RestAPIError,
-  getUserFriendlyErrorMessage,
-} from "src/error/restAPIError/RestAPIError";
+import { getRestAPIErrorFactory, RestAPIError, getUserFriendlyErrorMessage } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
 
 describe("Test the RestAPIError class", () => {
@@ -137,8 +133,14 @@ describe("Test the getUserFriendlyErrorMessage function", () => {
 
     test.each([
       [ErrorConstants.ErrorCodes.FAILED_TO_FETCH, ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.SERVER_CONNECTION_ERROR],
-      [ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY, ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_RESPONSE],
-      [ErrorConstants.ErrorCodes.INVALID_RESPONSE_HEADER, ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_RESPONSE],
+      [
+        ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
+        ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_RESPONSE,
+      ],
+      [
+        ErrorConstants.ErrorCodes.INVALID_RESPONSE_HEADER,
+        ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_RESPONSE,
+      ],
       [ErrorConstants.ErrorCodes.FORBIDDEN, ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.UNEXPECTED_ERROR],
       ["(none of the above)", ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.UNEXPECTED_ERROR],
     ])("Should return correct message for '%s' error code", (errorCode, errorMessage) => {

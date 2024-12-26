@@ -11,20 +11,52 @@ export enum ThemeMode {
   DARK = "dark",
 }
 
-// @ts-ignore
-const _temp_palette = createTheme({
-  palette: {
-    contrastThreshold: 4.5, //WCAG 2.0 (AA) ensure color-contrast is at least 4.5:1
-  },
-}).palette;
+/**
+ * Adds a contrast color to the color object based on the given color using a contrast threshold from the palette
+ * @param color
+ * @param contrastColor
+ */
+const augmentedThemeColor = (color: string, contrastColor?: string) => {
+  // @ts-expect-error - we don't want to define a full palette here, just the contrastThreshold
+  const _temp_palette = createTheme({
+    palette: {
+      contrastThreshold: 4.5, //WCAG 2.0 (AA) ensure color-contrast is at least 4.5:1
+    },
+  }).palette;
 
-const augmentedThemeColor = (color: string, contrastColor?: string) =>
-  _temp_palette.augmentColor({
+  return _temp_palette.augmentColor({
     color: {
       main: color,
       contrastText: contrastColor,
     },
   });
+};
+
+/**
+ * Creates a grey scale palette between the DarkBlue and Gray colors
+ */
+const createGreyScale = () => {
+  const startColor = new Color(TabiyaBasicColors.DarkBlue);
+  const greyAnchor = new Color(TabiyaBasicColors.Gray);
+  const lightColor = new Color("white");
+
+  const mixColor = (color: Color, mix: number) => {
+    return color.mix(greyAnchor, mix, { space: "lab" }).to("srgb").toString({ format: "hex" });
+  };
+  //TODO: discuss and add accent colors (A series)
+  return {
+    900: mixColor(startColor, 0 / 8),
+    800: mixColor(startColor, 1 / 8),
+    700: mixColor(startColor, 2 / 8),
+    600: mixColor(startColor, 3 / 8),
+    500: mixColor(startColor, 4 / 8),
+    400: mixColor(startColor, 5 / 8),
+    300: mixColor(startColor, 6 / 8),
+    200: mixColor(startColor, 7 / 8),
+    100: TabiyaBasicColors.Gray, // The greyAnchor color is [100]
+    50: mixColor(lightColor, 0.5),
+  };
+};
 
 export const TabiyaBasicColors = {
   DarkBlue: "#002147",
@@ -48,28 +80,6 @@ export const TabiyaIconStyles = {
   root: {
     fontSize: "1.5rem",
   },
-};
-
-// Helper function to create the interpolated colors
-const createGreyScale = () => {
-  const startColor = new Color(TabiyaBasicColors.DarkBlue);
-  const greyAnchor = new Color(TabiyaBasicColors.Gray);
-  const lightColor = new Color("white");
-  //TODO: discuss and add accent colors (A series)
-
-  return {
-    ...Object.fromEntries(
-      Array.from({ length: 9 }, (_, i) => [
-        900 - i * 100,
-        startColor
-          .mix(greyAnchor, i / 8, { space: "lab" })
-          .to("srgb")
-          .toString({ format: "hex" }),
-      ])
-    ),
-    100: TabiyaBasicColors.Gray,
-    50: lightColor.mix(greyAnchor, 0.5, { space: "lab" }).to("srgb").toString({ format: "hex" }),
-  };
 };
 
 const lightPalette: PaletteOptions = {

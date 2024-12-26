@@ -35,7 +35,10 @@ const TestErrorDropdown = () => {
   return (
     <Stack width={"fit-content"}>
       <FormLabel> Choose an error message to display in a notification:</FormLabel>
-      <Select value={Object.values(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES)[0]} placeholder={"Select an error message"}>
+      <Select
+        value={Object.values(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES)[0]}
+        placeholder={"Select an error message"}
+      >
         {Object.keys(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES).map((key: string) => (
           // @ts-ignore
           <MenuItem onClick={handleSelect} key={key} value={ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES[key]}>
