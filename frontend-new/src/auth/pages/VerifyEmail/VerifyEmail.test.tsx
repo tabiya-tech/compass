@@ -4,6 +4,8 @@ import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
 import VerifyEmail, { DATA_TEST_ID } from "./VerifyEmail";
 import { HashRouter, useNavigate } from "react-router-dom";
 import { DATA_TEST_ID as AUTH_HEADER_DATA_TEST_ID } from "src/auth/components/AuthHeader/AuthHeader";
+import * as Sentry from "@sentry/react";
+import { DATA_TEST_ID as BUG_REPORT_DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
 
 // mock the router
 jest.mock("react-router-dom", () => {
@@ -30,12 +32,13 @@ jest.mock("src/auth/components/AuthHeader/AuthHeader", () => {
   };
 });
 
-// mock the bugReport component
 jest.mock("src/feedback/bugReport/bugReportButton/BugReportButton", () => {
+  const actual = jest.requireActual("src/feedback/bugReport/bugReportButton/BugReportButton");
   return {
+    ...actual,
     __esModule: true,
     default: jest.fn().mockImplementation(() => {
-      return <div data-testid="bug-report"></div>;
+      return <span data-testid={actual.DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER}></span>;
     }),
   };
 });
@@ -49,6 +52,9 @@ describe("Testing Verify Email component", () => {
   });
 
   test("it should show verification page", async () => {
+    // GIVEN sentry is initialized
+    (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
+
     // WHEN the component is rendered
     render(
       <HashRouter>
@@ -68,6 +74,9 @@ describe("Testing Verify Email component", () => {
 
     // AND the back to login button should be rendered
     expect(screen.getByTestId(DATA_TEST_ID.BACK_TO_LOGIN_BUTTON)).toBeInTheDocument();
+
+    // AND expect the bug report button to be rendered
+    expect(screen.getByTestId(BUG_REPORT_DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER)).toBeInTheDocument();
 
     // AND the component should match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.VERIFY_EMAIL_CONTAINER)).toMatchSnapshot();

@@ -20,7 +20,8 @@ describe("BugReportButton component", () => {
   });
 
   test("should render the bugReport button", () => {
-    // GIVEN a BugReportButton component
+    // GIVEN sentry is initialized
+    (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
     // WHEN the component is rendered
     render(<BugReportButton />);
 
@@ -47,12 +48,11 @@ describe("BugReportButton component", () => {
   test("should render the bugReport icon on mobile devices", () => {
     // Mock useMediaQuery to return true for mobile
     (useMediaQuery as jest.Mock).mockReturnValue(true);
-
-    // GIVEN a BugReportButton component
-    const givenComponent = <BugReportButton />;
+    // GIVEN sentry is initialized
+    (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
 
     // WHEN the component is rendered on a mobile device
-    render(givenComponent);
+    render(<BugReportButton />);
 
     // THEN expect the button container to be in the document
     const buttonContainer = screen.getByTestId(DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER);
@@ -62,12 +62,33 @@ describe("BugReportButton component", () => {
     expect(bugReportIcon).toBeInTheDocument();
   });
 
+  test("should not show anything when Sentry is not initialized", () => {
+    // GIVEN Sentry is not initialized
+    (Sentry.isInitialized as jest.Mock).mockReturnValue(false);
+
+    // WHEN the component is rendered
+    render(<BugReportButton />);
+
+    // THEN expect Sentry.isInitialized to have been called
+    expect(Sentry.isInitialized).toHaveBeenCalled();
+
+    // AND expect the component to render without errors
+    const buttonContainer = screen.queryByTestId(DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER);
+    expect(buttonContainer).not.toBeInTheDocument();
+
+    // AND expect no errors or warnings to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
+  });
+
   test("should attach Sentry bugReport when available", async () => {
     // GIVEN a mock implementation of Sentry.getFeedback
     const mockAttachTo = jest.fn();
     (Sentry.getFeedback as jest.Mock).mockReturnValue({
       attachTo: mockAttachTo,
     });
+    // AND sentry is initialized
+    (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
 
     // WHEN the component is rendered
     render(<BugReportButton />);
@@ -88,6 +109,8 @@ describe("BugReportButton component", () => {
   test("should not attach Sentry bugReport when not available", () => {
     // GIVEN Sentry.getFeedback returns undefined
     (Sentry.getFeedback as jest.Mock).mockReturnValue(undefined);
+    // AND sentry is initialized
+    (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
 
     // WHEN the component is rendered
     render(<BugReportButton />);

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as Sentry from "@sentry/react";
-import { Box, styled, useTheme, useMediaQuery } from "@mui/material";
+import { Box, styled, useMediaQuery, useTheme } from "@mui/material";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import { BugReport } from "@mui/icons-material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
@@ -40,10 +40,17 @@ const BugReportButton: React.FC<BugReportButtonProps> = ({ bottomAlign, classNam
   const buttonRef = useRef<HTMLDivElement>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [sentryEnabled, setSentryEnabled] = useState(false);
 
   useEffect(() => {
-    setBugReport(Sentry.getFeedback());
+    setSentryEnabled(Sentry.isInitialized());
   }, []);
+
+  useEffect(() => {
+    if (sentryEnabled) {
+      setBugReport(Sentry.getFeedback());
+    }
+  }, [sentryEnabled]);
 
   useEffect(() => {
     if (bugReport && buttonRef.current) {
@@ -52,32 +59,34 @@ const BugReportButton: React.FC<BugReportButtonProps> = ({ bottomAlign, classNam
   }, [bugReport]);
 
   return (
-    <Box
-      ref={buttonRef}
-      data-testid={DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER}
-      className={className}
-      sx={{
-        position: bottomAlign ? "fixed" : "auto",
-        bottom: bottomAlign ? theme.spacing(theme.tabiyaSpacing.lg) : "auto",
-        right: bottomAlign ? theme.spacing(theme.tabiyaSpacing.lg) : "auto",
-      }}
-    >
-      {" "}
-      {isMobile ? (
-        <StyledPrimaryIconButton title={"Report a bug."} data-testid={DATA_TEST_ID.BUG_REPORT_BUTTON}>
-          <BugReport data-testid={DATA_TEST_ID.BUG_REPORT_ICON} />
-        </StyledPrimaryIconButton>
-      ) : (
-        <PrimaryButton
-          disableWhenOffline={true}
-          startIcon={<BugReport data-testid={DATA_TEST_ID.BUG_REPORT_ICON} />}
-          title={"Report a bug."}
-          data-testid={DATA_TEST_ID.BUG_REPORT_BUTTON}
-        >
-          Report a bug
-        </PrimaryButton>
-      )}
-    </Box>
+    sentryEnabled && (
+      <Box
+        ref={buttonRef}
+        data-testid={DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER}
+        className={className}
+        sx={{
+          position: bottomAlign ? "fixed" : "auto",
+          bottom: bottomAlign ? theme.spacing(theme.tabiyaSpacing.lg) : "auto",
+          right: bottomAlign ? theme.spacing(theme.tabiyaSpacing.lg) : "auto",
+        }}
+      >
+        {" "}
+        {isMobile ? (
+          <StyledPrimaryIconButton title={"Report a bug."} data-testid={DATA_TEST_ID.BUG_REPORT_BUTTON}>
+            <BugReport data-testid={DATA_TEST_ID.BUG_REPORT_ICON} />
+          </StyledPrimaryIconButton>
+        ) : (
+          <PrimaryButton
+            disableWhenOffline={true}
+            startIcon={<BugReport data-testid={DATA_TEST_ID.BUG_REPORT_ICON} />}
+            title={"Report a bug."}
+            data-testid={DATA_TEST_ID.BUG_REPORT_BUTTON}
+          >
+            Report a bug
+          </PrimaryButton>
+        )}
+      </Box>
+    )
   );
 };
 

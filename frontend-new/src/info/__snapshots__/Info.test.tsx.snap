@@ -149,8 +149,8 @@ exports[`Testing Info component it should show frontend info successfully: versi
       </div>
     </div>
   </div>
-  <div
-    data-testid="bug-report"
+  <span
+    data-testid="bug-report-button-container-31d2b110-8308-4035-90a6-519e89e7f6fa"
   />
 </div>
 `;
