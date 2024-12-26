@@ -27,6 +27,9 @@ import { EncryptedDataTooLarge } from "src/sensitiveData/services/sensitivePerso
 import * as writeRestAPIErrorToLogModule from "src/error/restAPIError/logger";
 import * as NotistackModule from "notistack";
 import { formConfig } from "./formConfig";
+import * as Sentry from "@sentry/react";
+import { DATA_TEST_ID as BUG_REPORT_DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
+import React from "react";
 
 const givenUserId = getTestString(10);
 
@@ -124,6 +127,17 @@ jest.mock("react-router-dom", () => {
   };
 });
 
+jest.mock("src/feedback/bugReport/bugReportButton/BugReportButton", () => {
+  const actual = jest.requireActual("src/feedback/bugReport/bugReportButton/BugReportButton");
+  return {
+    ...actual,
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return <span data-testid={actual.DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER}></span>;
+    }),
+  };
+});
+
 const useSnackBarSpy = jest.spyOn(NotistackModule, "useSnackbar");
 
 const componentRender = () => {
@@ -185,7 +199,10 @@ describe("Sensitive Data", () => {
 
   describe("render tests", () => {
     it("should render the component with all elements", () => {
-      // GIVEN a component is rendered
+      // GIVEN sentry is initialized
+      (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
+
+      // WHEN the component is rendered
       componentRender();
 
       // THEN the component should render without error
@@ -217,6 +234,9 @@ describe("Sensitive Data", () => {
 
       // AND the circle progress should not be rendered
       expect(screen.queryByTestId(DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON_CIRCULAR_PROGRESS)).not.toBeInTheDocument();
+
+      // AND expect the bug report button to be rendered
+      expect(screen.getByTestId(BUG_REPORT_DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER)).toBeInTheDocument();
 
       // AND it should match the snapshot
       expect(screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_CONTAINER)).toMatchSnapshot();

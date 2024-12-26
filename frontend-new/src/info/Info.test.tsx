@@ -5,6 +5,9 @@ import Info, { DATA_TEST_ID, InfoProps } from "./Info";
 import { act, render, screen } from "src/_test_utilities/test-utils";
 import InfoService from "./info.service";
 import { HashRouter } from "react-router-dom";
+import React from "react";
+import { DATA_TEST_ID as BUG_REPORT_DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
+import * as Sentry from "@sentry/react";
 
 // Mock the info service
 jest.mock("./info.service", () => {
@@ -17,10 +20,12 @@ jest.mock("./info.service", () => {
 
 // mock the bugReport component
 jest.mock("src/feedback/bugReport/bugReportButton/BugReportButton", () => {
+  const actual = jest.requireActual("src/feedback/bugReport/bugReportButton/BugReportButton");
   return {
+    ...actual,
     __esModule: true,
     default: jest.fn().mockImplementation(() => {
-      return <div data-testid="bug-report"></div>;
+      return <span data-testid={actual.DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER}></span>;
     }),
   };
 });
@@ -51,6 +56,9 @@ describe("Testing Info component", () => {
       };
     });
 
+    // AND sentry is initialized
+    (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
+
     // WHEN the component is rendered
     render(
       <HashRouter>
@@ -67,6 +75,8 @@ describe("Testing Info component", () => {
     // AND the component should be rendered
     expect(screen.getByTestId(DATA_TEST_ID.INFO_ROOT)).toBeDefined();
     expect(screen.getByTestId(DATA_TEST_ID.INFO_ROOT)).toMatchSnapshot(DATA_TEST_ID.INFO_ROOT);
+    // AND expect the bug report button to be rendered
+    expect(screen.getByTestId(BUG_REPORT_DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER)).toBeInTheDocument();
     // AND the frontend info should be displayed
     expect(screen.getByTestId(DATA_TEST_ID.VERSION_FRONTEND_ROOT)).toBeDefined();
     expect(screen.getByTestId(DATA_TEST_ID.VERSION_FRONTEND_ROOT)).toMatchSnapshot(DATA_TEST_ID.VERSION_FRONTEND_ROOT);

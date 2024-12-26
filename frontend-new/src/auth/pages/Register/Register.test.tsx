@@ -18,6 +18,8 @@ import authStateService from "src/auth/services/AuthenticationState.service";
 import { TabiyaUser } from "src/auth/auth.types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import * as AuthenticationServiceFactoryModule from "src/auth/services/Authentication.service.factory";
+import { DATA_TEST_ID as BUG_REPORT_DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
+import * as Sentry from "@sentry/react";
 
 //mock the SocialAuth component
 jest.mock("src/auth/components/SocialAuth/SocialAuth", () => {
@@ -141,6 +143,17 @@ jest.mock("src/auth/components/AuthHeader/AuthHeader", () => {
   };
 });
 
+jest.mock("src/feedback/bugReport/bugReportButton/BugReportButton", () => {
+  const actual = jest.requireActual("src/feedback/bugReport/bugReportButton/BugReportButton");
+  return {
+    ...actual,
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return <span data-testid={actual.DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER}></span>;
+    }),
+  };
+});
+
 describe("Testing Register component", () => {
   beforeEach(() => {
     // Clear console mocks and mock functions
@@ -155,6 +168,9 @@ describe("Testing Register component", () => {
     const givenUserName = "Foo Bar";
     const givenEmail = "foo@bar.baz";
     const givenPassword = "password";
+
+    // AND sentry is initialized
+    (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
 
     // AND the register method is mocked to succeed
     const registerMock = jest.fn();
@@ -189,6 +205,9 @@ describe("Testing Register component", () => {
 
     // AND the header component should be rendered
     expect(screen.getByTestId(AUTH_HEADER_DATA_TEST_ID.AUTH_HEADER_CONTAINER)).toBeInTheDocument();
+
+    // AND expect the bug report button to be rendered
+    expect(screen.getByTestId(BUG_REPORT_DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER)).toBeInTheDocument();
 
     // AND the form inputs and button should be displayed
     expect(RegisterWithEmailForm).toHaveBeenCalled();

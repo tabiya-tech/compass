@@ -24,8 +24,8 @@ exports[`Testing Verify Email component it should show verification page 1`] = `
       />
     </button>
   </div>
-  <div
-    data-testid="bug-report"
+  <span
+    data-testid="bug-report-button-container-31d2b110-8308-4035-90a6-519e89e7f6fa"
   />
 </div>
 `;

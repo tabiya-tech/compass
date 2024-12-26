@@ -7,6 +7,8 @@ import LoginWithEmailForm from "src/auth/pages/Login/components/LoginWithEmailFo
 import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm";
 import FirebaseEmailAuthenticationService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import FirebaseInvitationCodeAuthenticationService from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
+import * as Sentry from "@sentry/react";
+import { DATA_TEST_ID as BUG_REPORT_DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
 
 jest.mock("src/envService", () => ({
   getFirebaseAPIKey: jest.fn(() => "mock-api-key"),
@@ -84,6 +86,17 @@ jest.mock("./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm", () => 
   };
 });
 
+jest.mock("src/feedback/bugReport/bugReportButton/BugReportButton", () => {
+    const actual = jest.requireActual("src/feedback/bugReport/bugReportButton/BugReportButton");
+    return {
+        ...actual,
+        __esModule: true,
+        default: jest.fn().mockImplementation(() => {
+        return <span data-testid={actual.DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER}></span>;
+        }),
+    };
+});
+
 describe("Testing Login component", () => {
   beforeEach(() => {
     jest.useFakeTimers(); // Use Jest's fake timers
@@ -91,7 +104,10 @@ describe("Testing Login component", () => {
   });
 
   test("it should show login form successfully", async () => {
-    // GIVEN the component is rendered within necessary context providers
+    // GIVEN sentry is initialized
+    (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
+
+    // WHEN the component is rendered within necessary context providers
     render(
       <HashRouter>
         <Login />
@@ -104,12 +120,16 @@ describe("Testing Login component", () => {
 
     // THEN the component should be rendered
     expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toBeInTheDocument();
+    // AND expect the bug report button to be rendered
+    expect(screen.getByTestId(BUG_REPORT_DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER)).toBeInTheDocument();
 
     // THEN the email login form should be displayed
     expect(LoginWithEmailForm).toHaveBeenCalled();
 
     // THEN the invite code login form should be displayed
     expect(LoginWithInviteCodeForm).toHaveBeenCalled();
+    // AND the component should match the snapshot
+    expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toMatchSnapshot();
   });
 
   test("it should handle email login correctly", async () => {
