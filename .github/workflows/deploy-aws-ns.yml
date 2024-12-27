@@ -12,6 +12,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    name: deploy-aws-ns
     environment: ${{ inputs.target-environment }}
     steps:
       - name: Checkout code
