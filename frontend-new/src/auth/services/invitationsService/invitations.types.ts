@@ -13,6 +13,6 @@ export enum InvitationStatus {
 }
 
 export enum InvitationType {
-  AUTO_REGISTER = "AUTO_REGISTER",
+  LOGIN = "LOGIN",
   REGISTER = "REGISTER",
 }

@@ -8,7 +8,7 @@ from app.users.sensitive_personal_data.types import SensitivePersonalDataRequire
 
 
 class InvitationType(Enum):
-    AUTO_REGISTER = "AUTO_REGISTER"
+    LOGIN = "LOGIN"
     """
     This invitation type does not require the user to sign in/sign up.
     It instead signs in the user automatically/anonymously and allows the user to access the application.
