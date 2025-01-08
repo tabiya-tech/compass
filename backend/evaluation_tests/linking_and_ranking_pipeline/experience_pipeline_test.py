@@ -314,7 +314,7 @@ test_cases = [
 
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test
-@pytest.mark.parametrize("test_case", get_test_cases_to_run(get_test_cases_from_jsonl("synthetic_responsibilities.jsonl")), ids=[test_case.name for test_case in get_test_cases_to_run(get_test_cases_from_jsonl("synthetic_responsibilities.jsonl"))])
+@pytest.mark.parametrize("test_case", get_test_cases_to_run(test_cases), ids=[test_case.name for test_case in get_test_cases_to_run(test_cases)])
 async def test_experience_pipeline(test_case: ExperiencePipelineTestCase, get_search_services):
     search_services = await get_search_services
     # When the skill linking tool is called with the given occupation and responsibilities

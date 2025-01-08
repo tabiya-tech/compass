@@ -1,6 +1,6 @@
 import enum
 from textwrap import dedent
-
+    
 class TopLevelDivision(enum.Enum):
     VOLUNTEERING = "volunteering"
     NON_VOLUNTEERING = "non_volunteering"
@@ -161,7 +161,6 @@ class IcatusTerminalNode(enum.Enum):
             return True
         return False
 
-
 LEVEL_TO_PROMPT = [
     dedent("""\
         <System Instructions>
@@ -236,3 +235,21 @@ LEVEL_TO_PROMPT = [
         """)
 
 ]
+
+class IcatusClassificationLevel(enum.Enum):
+    TOP_LEVEL = (TopLevelDivision, 0)
+    FIRST_LEVEL = (IcatusFirstLevelNode, 1)
+    SECOND_LEVEL = (IcatusSecondLevelNode, 2)
+
+    def __new__(cls, level_enum, index):
+        obj = object.__new__(cls)
+        obj._value_ = index
+        obj.level_enum = level_enum
+        obj.index = index
+        return obj
+    
+    def get_prompt(self):
+        return LEVEL_TO_PROMPT[self.value]
+    
+    def get_node_from_code(self, code: str):
+        return self.level_enum(code)

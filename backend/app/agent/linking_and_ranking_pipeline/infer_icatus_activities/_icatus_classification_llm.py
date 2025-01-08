@@ -11,7 +11,7 @@ from app.agent.llm_caller import LLMCaller
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, MODERATE_TEMPERATURE_GENERATION_CONFIG, JSON_GENERATION_CONFIG
 
-from .utils import LEVEL_TO_PROMPT, IcatusFirstLevelNode, IcatusSecondLevelNode, TopLevelDivision
+from .utils import IcatusClassificationLevel, IcatusFirstLevelNode, IcatusSecondLevelNode, TopLevelDivision
 
 class ClassificationLLMResponse(BaseModel):
     icatus_node: TopLevelDivision | IcatusFirstLevelNode | IcatusSecondLevelNode
@@ -41,11 +41,11 @@ def _get_prompt(*,
 
 class _IcatusClassificationLLM:
     def __init__(self,
-                 classification_level: int,
+                 classification_level: IcatusClassificationLevel,
                  logger: logging.Logger):
         self.classification_level = classification_level
         self._llm = GeminiGenerativeLLM(
-            system_instructions=LEVEL_TO_PROMPT[self.classification_level],
+            system_instructions=classification_level.get_prompt(),
             # Even if we are generating a JSON output, we still need to set the generation config to MODERATE_TEMPERATURE_GENERATION_CONFIG
             # as we want to generate a more creative response.
             config=LLMConfig(generation_config=MODERATE_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG)
@@ -75,22 +75,7 @@ class _IcatusClassificationLLM:
         if not llm_response.code:
             self._logger.warning("Failed to classify the experience.")
             raise ValueError("Experience was not classified correctly.")
-        if self.classification_level == 0:
-            self._logger.info(f"The LLM returned the code {llm_response.code} with dependent {llm_response.dependent} and reasoning {llm_response.reasoning}.")
-            return ClassificationLLMResponse(
-                icatus_node=TopLevelDivision(llm_response.code),
+        return ClassificationLLMResponse(
+                icatus_node=self.classification_level.get_node_from_code(llm_response.code),
                 llm_stats=llm_stats
             )
-        elif self.classification_level == 1:
-            self._logger.info(f"The LLM returned the code {llm_response.code} with dependent {llm_response.dependent} with reasoning {llm_response.reasoning}.")
-            return ClassificationLLMResponse(
-                icatus_node=IcatusFirstLevelNode(llm_response.code),
-                llm_stats=llm_stats
-            )
-        elif self.classification_level == 2:
-            self._logger.info(f"The LLM returned the code {llm_response.code} with dependent {llm_response.dependent} with reasoning {llm_response.reasoning}.")
-            return ClassificationLLMResponse(
-                icatus_node=IcatusSecondLevelNode(llm_response.code),
-                llm_stats=llm_stats
-            )
-        raise ValueError("Classification level not supported.")
