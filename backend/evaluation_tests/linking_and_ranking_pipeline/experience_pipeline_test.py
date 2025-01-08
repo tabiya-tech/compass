@@ -285,7 +285,7 @@ test_cases = [
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test("gemini-2.0-flash-001/")
 @pytest.mark.repeat(3)
-@pytest.mark.parametrize("test_case", get_test_cases_to_run(get_test_cases_from_jsonl("synthetic_responsibilities.jsonl")), ids=[test_case.name for test_case in get_test_cases_to_run(get_test_cases_from_jsonl("synthetic_responsibilities.jsonl"))])
+@pytest.mark.parametrize("test_case", get_test_cases_to_run(test_cases), ids=[test_case.name for test_case in get_test_cases_to_run(test_cases)])
 async def test_experience_pipeline(test_case: ExperiencePipelineTestCase, setup_search_services: Awaitable[SearchServices], caplog: pytest.LogCaptureFixture):
     search_services = await setup_search_services
     given_config = ExperiencePipelineConfig()

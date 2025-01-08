@@ -10,6 +10,7 @@ from app.agent.agent_types import LLMStats
 from app.agent.experience.work_type import WorkType
 from app.agent.linking_and_ranking_pipeline.infer_icatus_activities import InferIcatusActivitiesTool
 from app.agent.linking_and_ranking_pipeline.cluster_responsibilities_tool import ClusterResponsibilitiesTool
+from .infer_icatus_activities.utils import IcatusClassificationLevel
 from .infer_occupation_tool import InferOccupationTool
 from .pick_top_skills_tool import PickTopSkillsTool
 from .skill_linking_tool import SkillLinkingTool
@@ -97,6 +98,12 @@ class ExperiencePipelineConfig(BaseModel):
     to the skills associated with the occupations found."
     """
 
+    icatus_classification_level: IcatusClassificationLevel = IcatusClassificationLevel.FIRST_LEVEL
+    """
+    Default is ClassificationLevel.FIRST_LEVEL
+    The classification level to use when inferring the icatus activities from the experience title and responsibilities.
+    """
+
     model_config = ConfigDict(
         extra="forbid"
     )
@@ -144,7 +151,10 @@ class ExperiencePipeline:
         self._search_services = search_services
         self._cluster_responsibilities_tool = ClusterResponsibilitiesTool()
         self._infer_occupations_tool = InferOccupationTool(search_services.occupation_skill_search_service)
-        self._infer_icatus_activities_tool = InferIcatusActivitiesTool(search_services.occupation_skill_search_service)
+        self._infer_icatus_activities_tool = InferIcatusActivitiesTool(
+            search_services.occupation_skill_search_service,
+            classification_level=config.icatus_classification_level
+            )
         self._skills_linking_tool = SkillLinkingTool(search_services.skill_search_service)
         self._top_skills_picker = PickTopSkillsTool()
         self._logger = logging.getLogger(__class__.__name__)
@@ -300,7 +310,7 @@ class ExperiencePipeline:
                                                                                     country_of_interest=country_of_interest,
                                                                                     number_of_titles=config.number_of_occupation_alt_titles,
                                                                                     top_k=config.number_of_occupations_per_cluster,
-                                                                                    top_p=config.number_of_occupations_candidates_per_title
+                                                                                    top_p=config.number_of_occupations_candidates_per_title,
                                                                                     )
         else:
             inferred_occupations_response = await self._infer_occupations_tool.execute(experience_title=experience_title,
