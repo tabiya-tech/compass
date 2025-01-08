@@ -5,6 +5,7 @@ import random
 import pytest
 
 from app.agent.linking_and_ranking_pipeline.infer_icatus_activities import InferIcatusActivitiesTool
+from app.agent.linking_and_ranking_pipeline.infer_icatus_activities.utils import IcatusClassificationLevel
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
 from app.vector_search.esco_search_service import OccupationSkillSearchService
@@ -20,7 +21,7 @@ async def setup_agent_tool():
     settings = VectorSearchSettings()
     embedding_service = GoogleGeckoEmbeddingService()
     search_service = OccupationSkillSearchService(db, embedding_service, settings)
-    tool = InferIcatusActivitiesTool(search_service)
+    tool = InferIcatusActivitiesTool(search_service, classification_level=IcatusClassificationLevel.FIRST_LEVEL)
     return tool
 
 

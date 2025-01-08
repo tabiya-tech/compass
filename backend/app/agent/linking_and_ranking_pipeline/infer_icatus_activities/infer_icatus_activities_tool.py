@@ -7,30 +7,29 @@ from app.countries import Country
 
 from ._icatus_classification_llm import _IcatusClassificationLLM
 from ..infer_occupation_tool._contextualization_llm import _ContextualizationLLM
-from .utils import IcatusTerminalNode, TopLevelDivision
+from .utils import IcatusTerminalNode, TopLevelDivision, IcatusClassificationLevel
 from app.vector_search.esco_search_service import OccupationSkillSearchService
-
-
 
 
 class InferIcatusActivitiesTool:
     def __init__(
             self,
             occupation_skill_search_service: OccupationSkillSearchService,
+            classification_level: IcatusClassificationLevel
     ):
         self._logger = logging.getLogger(self.__class__.__name__)
         self._occupation_skill_search_service = occupation_skill_search_service
         self._infer_occupations_tool = InferOccupationTool(self._occupation_skill_search_service)
-        self.classification_level = 2
+        self.classification_level = classification_level
 
     async def find_occupations(self, nodes: list[IcatusTerminalNode]):
         occupation_data = await asyncio.gather(*(self._occupation_skill_search_service.get_by_esco_code(code=node.code) for node in nodes))
         return occupation_data
     
     def find_terminal_icatus_nodes(self, classification_response):
-        if self.classification_level == 0 and classification_response.icatus_node == TopLevelDivision.VOLUNTEERING: # Volunteering
+        if self.classification_level == IcatusClassificationLevel.TOP_LEVEL and classification_response.icatus_node == TopLevelDivision.VOLUNTEERING: # Volunteering
             return [node for node in IcatusTerminalNode if node.value.startswith("I5")]
-        elif self.classification_level == 0:
+        elif self.classification_level == IcatusClassificationLevel.TOP_LEVEL:
             return [node for node in IcatusTerminalNode if not node.value.startswith("I5")]
         else:
             return classification_response.icatus_node.get_terminal_nodes()
@@ -48,7 +47,7 @@ class InferIcatusActivitiesTool:
 
         # 1. Classify the experience as one of the icatus skills
         icatus_classification_llm = _IcatusClassificationLLM(
-                self.classification_level, 
+                classification_level=self.classification_level, 
                 logger=self._logger
                 )
         classification_response = await icatus_classification_llm.execute(
@@ -59,7 +58,6 @@ class InferIcatusActivitiesTool:
 
         terminal_icatus_nodes = self.find_terminal_icatus_nodes(classification_response)
         icatus_occupations = await self.find_occupations(terminal_icatus_nodes)
-        print([(elem.occupation.code, elem.occupation.preferredLabel) for elem in icatus_occupations])
         contextualization_llm = _ContextualizationLLM(
             country_of_interest=country_of_interest,
             number_of_titles=number_of_titles,
