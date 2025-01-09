@@ -9,7 +9,7 @@ export interface ReactionReasonPopoverProps {
   anchorEl: HTMLElement | null; // It allows the popover to know which element to attach to and appear next to.
   open: boolean;
   onClose: () => void;
-  onReasonSelect: (reason: string) => void;
+  onReasonSelect: (reason: ReactionReason) => void;
 }
 
 const uniqueId = "9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e";
@@ -32,7 +32,7 @@ export const ReactionReasonPopover: React.FC<ReactionReasonPopoverProps> = ({
 }) => {
   const theme = useTheme();
 
-  const handleReasonClick = (reason: string) => {
+  const handleReasonClick = (reason: ReactionReason) => {
     onReasonSelect(reason);
     onClose();
   };
