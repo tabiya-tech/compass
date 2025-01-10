@@ -12,6 +12,7 @@ import {
 } from "src/sensitiveData/config/encryptionConfig";
 import { EncryptionService } from "src/sensitiveData/services/encryptionService/encryption.service";
 import { EncryptedDataTooLarge } from "./errors";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
 describe("SensitivePersonalDataService", () => {
   beforeEach(() => {
@@ -30,12 +31,14 @@ describe("SensitivePersonalDataService", () => {
         .spyOn(EncryptionService.prototype, "encryptSensitivePersonalData")
         .mockResolvedValue(givenEncryptReturnValue);
 
+      const savePersonalDataInLocalStorage = jest.spyOn(PersistentStorageService, "setPersonalInfo");
+
       // AND some sample sensitive personal data
       const givenSensitivePersonalData = {
-        contact_email: "contact_email",
-        first_name: "first_name",
-        last_name: "last_name",
-        phone_number: "phone_number",
+        contactEmail: "contact_email",
+        firstName: "first_name",
+        lastName: "last_name",
+        phoneNumber: "phone_number",
         address: "address",
         gender: Gender.PREFER_NOT_TO_SAY,
       };
@@ -49,8 +52,23 @@ describe("SensitivePersonalDataService", () => {
       // WHEN we create the sensitive personal data
       await sensitivePersonalDataService.createSensitivePersonalData(givenSensitivePersonalData, givenUserId);
 
-      // THEN the encryption service is called with the sensitive personal data.
-      expect(encryptSensitivePersonalData).toHaveBeenCalledWith(givenSensitivePersonalData);
+      // THEN savePersonalDataInLocalStorage should be called with the correct parameters
+      expect(savePersonalDataInLocalStorage).toHaveBeenCalledWith({
+        fullName: givenSensitivePersonalData.firstName + " " + givenSensitivePersonalData.lastName,
+        phoneNumber: givenSensitivePersonalData.phoneNumber,
+        contactEmail: givenSensitivePersonalData.contactEmail,
+        address: givenSensitivePersonalData.address,
+      });
+
+      // AND the encryption service is called with the sensitive personal data.
+      expect(encryptSensitivePersonalData).toHaveBeenCalledWith({
+        first_name: givenSensitivePersonalData.firstName,
+        last_name: givenSensitivePersonalData.lastName,
+        contact_email: givenSensitivePersonalData.contactEmail,
+        phone_number: givenSensitivePersonalData.phoneNumber,
+        address: givenSensitivePersonalData.address,
+        gender: givenSensitivePersonalData.gender
+      });
 
       // AND the custom fetch function is called with the correct parameters.
       expect(customFetch).toHaveBeenCalledWith(`/users/${givenUserId}/sensitive-personal-data`, {
@@ -65,6 +83,50 @@ describe("SensitivePersonalDataService", () => {
         // AND the response got from the encryption service is passed to the custom fetch function.
         body: JSON.stringify(givenEncryptReturnValue),
         expectedContentType: "application/json",
+      });
+    });
+
+    test.each([
+      ["foo", "bar", "foo bar"],
+      ["foo", "", "foo"],
+      ["", "bar", "bar"],
+      ["", "", ""],
+    ])("should format correctly the full name saved in the local storage given the full name is %s and %s", async (firstName, lastName, expectedFullName) => {
+      const givenEncryptReturnValue = {
+        rsa_key_id: "given_key_id",
+        aes_encrypted_data: "given_encrypted_data",
+        aes_encryption_key: "given_encryption_key",
+      };
+
+      jest
+        .spyOn(EncryptionService.prototype, "encryptSensitivePersonalData")
+        .mockResolvedValue(givenEncryptReturnValue);
+      jest.spyOn(CustomFetchModule, "customFetch").mockResolvedValue(new Response());
+
+      const savePersonalDataInLocalStorage = jest.spyOn(PersistentStorageService, "setPersonalInfo");
+
+      // GIVEN some sample sensitive personal data with the given first name and last name.
+      const givenSensitivePersonalData = {
+        contactEmail: "contact_email",
+        firstName: firstName,
+        lastName: lastName,
+        phoneNumber: "phone_number",
+        address: "address",
+        gender: Gender.PREFER_NOT_TO_SAY,
+      };
+
+      // AND some random user id
+      const givenUserId = getRandomLorem(10);
+
+      // WHEN we create the sensitive personal data
+      await sensitivePersonalDataService.createSensitivePersonalData(givenSensitivePersonalData, givenUserId);
+
+      // THEN savePersonalDataInLocalStorage should be called with the full name
+      expect(savePersonalDataInLocalStorage).toHaveBeenCalledWith({
+        fullName: expectedFullName,
+        phoneNumber: givenSensitivePersonalData.phoneNumber,
+        contactEmail: givenSensitivePersonalData.contactEmail,
+        address: givenSensitivePersonalData.address,
       });
     });
 
@@ -86,7 +148,7 @@ describe("SensitivePersonalDataService", () => {
       // WHEN the createSensitivePersonalData function is called with the given data
       const createSensitivePersonalData = sensitivePersonalDataService.createSensitivePersonalData(
         {} as SensitivePersonalData,
-        getRandomString(10)
+        getRandomString(10),
       );
 
       // THEN the function should throw an error.

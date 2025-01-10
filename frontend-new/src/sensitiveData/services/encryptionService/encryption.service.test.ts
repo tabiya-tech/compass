@@ -15,7 +15,7 @@ import {
   exportCryptoPublicKey,
   generateRSACryptoPairKey,
 } from "src/_test_utilities/encryption";
-import { Gender, SensitivePersonalData } from "src/sensitiveData/types";
+import { Gender, SensitivePersonalDataRequest } from "src/sensitiveData/types";
 
 import * as EnvServiceModule from "src/envService";
 import {
@@ -43,7 +43,7 @@ describe("EncryptionService", () => {
 
   test(`should encrypt sensitive data and it is possible to decrypt the data again`, async () => {
     // GIVEN some sensitive personal data
-    const givenRandomData: SensitivePersonalData = {
+    const givenRandomData: SensitivePersonalDataRequest = {
       contact_email: getTestString(100),
       first_name: getThreeBytesUTF8Char(100),
       last_name: getTestString(100),
@@ -94,11 +94,11 @@ describe("EncryptionService", () => {
     // The information can be found here Backend/app/users/sensitive_personal_data/types.py:SensitivePersonalDataBaseModel
 
     // GIVEN a sensitive personal data object with the size on the edge of the maximum size.
-    const givenMaxSensitivePersonalData: SensitivePersonalData = {
-      contact_email: getThreeBytesUTF8Char(formConfig.contact_email.maxLength!),
-      first_name: getThreeBytesUTF8Char(formConfig.first_name.maxLength!),
-      last_name: getThreeBytesUTF8Char(formConfig.last_name.maxLength!),
-      phone_number: getThreeBytesUTF8Char(formConfig.phone_number.maxLength!),
+    const givenMaxSensitivePersonalData: SensitivePersonalDataRequest = {
+      contact_email: getThreeBytesUTF8Char(formConfig.contactEmail.maxLength!),
+      first_name: getThreeBytesUTF8Char(formConfig.firstName.maxLength!),
+      last_name: getThreeBytesUTF8Char(formConfig.lastName.maxLength!),
+      phone_number: getThreeBytesUTF8Char(formConfig.phoneNumber.maxLength!),
       address: getThreeBytesUTF8Char(formConfig.address.maxLength!),
       gender: Gender.PREFER_NOT_TO_SAY, //this is the largest possible value for now
     };
@@ -115,7 +115,7 @@ describe("EncryptionService", () => {
     // WHEN encrypting the sensitive personal data
     const encryptionService = new EncryptionService();
     const encryptedSensitivePersonalData = await encryptionService.encryptSensitivePersonalData(
-      givenMaxSensitivePersonalData as SensitivePersonalData
+      givenMaxSensitivePersonalData as SensitivePersonalDataRequest
     );
 
     // THEN the encrypted data should be returned

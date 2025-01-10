@@ -1,5 +1,5 @@
 import { Invitation } from "src/auth/services/invitationsService/invitations.types";
-import { StoredPersonalInfo } from "../../experiences/experiencesDrawer/experienceService/experiences.types";
+import { StoredPersonalInfo } from "src/sensitiveData/types";
 
 const PERSISTENT_STORAGE_VERSION = "0.0.1";
 export const TOKEN_KEY = `token_${PERSISTENT_STORAGE_VERSION}`;
