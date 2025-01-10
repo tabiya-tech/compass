@@ -10,6 +10,7 @@ import {
   MaximumRSAKeyIdSize,
 } from "src/sensitiveData/config/encryptionConfig";
 import { EncryptedDataTooLarge } from "./errors";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
 class SensitivePersonalDataService {
   private readonly sensitivePersonalDataBaseUrl: string;
@@ -23,7 +24,32 @@ class SensitivePersonalDataService {
    * Creates sensitive personal data for a user.
    */
   async createSensitivePersonalData(personal_data: SensitivePersonalData, user_id: string): Promise<void> {
-    const encryptSensitivePersonalData = await this.encryptionService.encryptSensitivePersonalData(personal_data);
+    // create the name, and add spaces if both names are provided
+    let full_name;
+
+    if (personal_data.firstName && personal_data.lastName) {
+      full_name = personal_data.firstName + " " + personal_data.lastName
+    } else {
+      full_name = personal_data.firstName || personal_data.lastName || ""
+    }
+
+    PersistentStorageService.setPersonalInfo({
+      fullName: full_name,
+      phoneNumber: personal_data.phoneNumber,
+      contactEmail: personal_data.contactEmail,
+      address: personal_data.address,
+    })
+
+    const payload = {
+      first_name: personal_data.firstName,
+      last_name: personal_data.lastName,
+      contact_email: personal_data.contactEmail,
+      phone_number:personal_data.phoneNumber,
+      address: personal_data.address,
+      gender: personal_data.gender
+    }
+
+    const encryptSensitivePersonalData = await this.encryptionService.encryptSensitivePersonalData(payload);
 
     // if for some reason the data to encrypt is too large, we should not proceed.
     // the backend will reject the request if the data is too large.

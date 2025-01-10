@@ -34,55 +34,55 @@ import React from "react";
 const givenUserId = getTestString(10);
 
 const MINIMUM_SENSITIVE_PERSONAL_DATA: SensitivePersonalData = {
-  first_name: getTestString(1),
-  last_name: getTestString(1),
-  contact_email: getTestString(1),
-  phone_number: getTestString(1),
+  firstName: getTestString(1),
+  lastName: getTestString(1),
+  contactEmail: getTestString(1),
+  phoneNumber: getTestString(1),
   address: getTestString(1),
   gender: Gender.MALE,
 };
 
 const MAXIMUM_SENSITIVE_PERSONAL_DATA: SensitivePersonalData = {
-  first_name: getTestString(formConfig.first_name.maxLength!),
-  last_name: getTestString(formConfig.last_name.maxLength!),
-  contact_email: getTestString(formConfig.contact_email.maxLength!),
-  phone_number: getTestString(formConfig.phone_number.maxLength!),
+  firstName: getTestString(formConfig.firstName.maxLength!),
+  lastName: getTestString(formConfig.lastName.maxLength!),
+  contactEmail: getTestString(formConfig.contactEmail.maxLength!),
+  phoneNumber: getTestString(formConfig.phoneNumber.maxLength!),
   address: getTestString(formConfig.address.maxLength!),
   gender: Gender.PREFER_NOT_TO_SAY,
 };
 
 const LARGE_SENSITIVE_PERSONAL_DATA: SensitivePersonalData = {
-  first_name: getTestString(formConfig.first_name.maxLength! + 1),
-  last_name: getTestString(formConfig.last_name.maxLength! + 1),
-  contact_email: getTestString(formConfig.contact_email.maxLength! + 1),
-  phone_number: getTestString(formConfig.phone_number.maxLength! + 1),
+  firstName: getTestString(formConfig.firstName.maxLength! + 1),
+  lastName: getTestString(formConfig.lastName.maxLength! + 1),
+  contactEmail: getTestString(formConfig.contactEmail.maxLength! + 1),
+  phoneNumber: getTestString(formConfig.phoneNumber.maxLength! + 1),
   address: getTestString(formConfig.address.maxLength! + 1),
   gender: Gender.PREFER_NOT_TO_SAY,
 };
 
 const MINIMUM_SENSITIVE_PERSONAL_DATA_WITH_WHITE_SPACES: SensitivePersonalData = {
-  first_name: WHITESPACE + getTestString(1) + WHITESPACE,
-  last_name: WHITESPACE + getTestString(1) + WHITESPACE,
-  contact_email: WHITESPACE + getTestString(1) + WHITESPACE,
-  phone_number: WHITESPACE + getTestString(1) + WHITESPACE,
+  firstName: WHITESPACE + getTestString(1) + WHITESPACE,
+  lastName: WHITESPACE + getTestString(1) + WHITESPACE,
+  contactEmail: WHITESPACE + getTestString(1) + WHITESPACE,
+  phoneNumber: WHITESPACE + getTestString(1) + WHITESPACE,
   address: WHITESPACE + getTestString(1) + WHITESPACE,
   gender: Gender.OTHER,
 };
 
 const MAXIMUM_SENSITIVE_PERSONAL_DATA_WITH_WHITE_SPACES: SensitivePersonalData = {
-  first_name: WHITESPACE + getTestString(formConfig.first_name.maxLength!) + WHITESPACE,
-  last_name: WHITESPACE + getTestString(formConfig.last_name.maxLength!) + WHITESPACE,
-  contact_email: WHITESPACE + getTestString(formConfig.contact_email.maxLength!) + WHITESPACE,
-  phone_number: WHITESPACE + getTestString(formConfig.phone_number.maxLength!) + WHITESPACE,
+  firstName: WHITESPACE + getTestString(formConfig.firstName.maxLength!) + WHITESPACE,
+  lastName: WHITESPACE + getTestString(formConfig.lastName.maxLength!) + WHITESPACE,
+  contactEmail: WHITESPACE + getTestString(formConfig.contactEmail.maxLength!) + WHITESPACE,
+  phoneNumber: WHITESPACE + getTestString(formConfig.phoneNumber.maxLength!) + WHITESPACE,
   address: WHITESPACE + getTestString(formConfig.address.maxLength!) + WHITESPACE,
   gender: Gender.PREFER_NOT_TO_SAY,
 };
 
 const MEDIUM_LENGTH_SENSITIVE_PERSONAL_DATA = {
-  first_name: getRandomString(Math.floor(formConfig.first_name.maxLength! / 2)),
-  last_name: getRandomString(Math.floor(formConfig.last_name.maxLength! / 2)),
-  contact_email: getRandomString(Math.floor(formConfig.contact_email.maxLength! / 2)),
-  phone_number: getRandomString(Math.floor(formConfig.phone_number.maxLength! / 2)),
+  firstName: getRandomString(Math.floor(formConfig.firstName.maxLength! / 2)),
+  lastName: getRandomString(Math.floor(formConfig.lastName.maxLength! / 2)),
+  contactEmail: getRandomString(Math.floor(formConfig.contactEmail.maxLength! / 2)),
+  phoneNumber: getRandomString(Math.floor(formConfig.phoneNumber.maxLength! / 2)),
   address: getRandomString(Math.floor(formConfig.address.maxLength! / 2)),
   gender: Gender.FEMALE,
 };
@@ -151,10 +151,10 @@ async function fillInput(inputTestId: string, value: string) {
 }
 
 async function fillTheForm(user: UserEvent, data: SensitivePersonalData) {
-  await fillInput(DATA_TEST_ID.SENSITIVE_DATA_FORM_FIRST_NAME_INPUT, data.first_name);
-  await fillInput(DATA_TEST_ID.SENSITIVE_DATA_FORM_LAST_NAME_INPUT, data.last_name);
-  await fillInput(DATA_TEST_ID.SENSITIVE_DATA_FORM_CONTACT_EMAIL_INPUT, data.contact_email);
-  await fillInput(DATA_TEST_ID.SENSITIVE_DATA_FORM_PHONE_NUMBER_INPUT, data.phone_number);
+  await fillInput(DATA_TEST_ID.SENSITIVE_DATA_FORM_FIRST_NAME_INPUT, data.firstName);
+  await fillInput(DATA_TEST_ID.SENSITIVE_DATA_FORM_LAST_NAME_INPUT, data.lastName);
+  await fillInput(DATA_TEST_ID.SENSITIVE_DATA_FORM_CONTACT_EMAIL_INPUT, data.contactEmail);
+  await fillInput(DATA_TEST_ID.SENSITIVE_DATA_FORM_PHONE_NUMBER_INPUT, data.phoneNumber);
   await fillInput(DATA_TEST_ID.SENSITIVE_DATA_FORM_ADDRESS_INPUT, data.address);
 
   const genderSelect = screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_FORM_GENDER_INPUT) as HTMLSelectElement;
@@ -251,10 +251,10 @@ describe("Sensitive Data", () => {
     ];
 
     describe.each([
-      ["first_name", defaultInvalidValues],
-      ["last_name", defaultInvalidValues],
-      ["contact_email", defaultInvalidValues],
-      ["phone_number", defaultInvalidValues],
+      ["firstName", defaultInvalidValues],
+      ["lastName", defaultInvalidValues],
+      ["contactEmail", defaultInvalidValues],
+      ["phoneNumber", defaultInvalidValues],
       ["address", defaultInvalidValues],
     ])("should disable the submit button if the user enters invalid data on field %s", (field_name, invalid_values) => {
       test.each(invalid_values)(`should disable when ${field_name} is $test`, async ({ value }) => {
@@ -332,12 +332,12 @@ describe("Sensitive Data", () => {
       // THEN createSensitivePersonalData should be called with the correct arguments.
       expect(createSensitivePersonalData).toHaveBeenCalledWith(
         {
-          first_name: givenSensitivePersonalData.first_name.trim().substring(0, formConfig.first_name.maxLength),
-          last_name: givenSensitivePersonalData.last_name.trim().substring(0, formConfig.last_name.maxLength),
-          contact_email: givenSensitivePersonalData.contact_email
+          firstName: givenSensitivePersonalData.firstName.trim().substring(0, formConfig.firstName.maxLength),
+          lastName: givenSensitivePersonalData.lastName.trim().substring(0, formConfig.lastName.maxLength),
+          contactEmail: givenSensitivePersonalData.contactEmail
             .trim()
-            .substring(0, formConfig.contact_email.maxLength),
-          phone_number: givenSensitivePersonalData.phone_number.trim().substring(0, formConfig.phone_number.maxLength),
+            .substring(0, formConfig.contactEmail.maxLength),
+          phoneNumber: givenSensitivePersonalData.phoneNumber.trim().substring(0, formConfig.phoneNumber.maxLength),
           address: givenSensitivePersonalData.address.trim().substring(0, formConfig.address.maxLength),
           gender: givenSensitivePersonalData.gender,
         },
