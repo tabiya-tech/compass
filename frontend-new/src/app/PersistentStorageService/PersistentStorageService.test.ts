@@ -1,7 +1,7 @@
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { SensitivePersonalDataRequirement } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { Invitation, InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
-import { StoredPersonalInfo } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
+import { StoredPersonalInfo } from "src/sensitiveData/types";
 
 describe("AuthPersistentStorage class tests", () => {
   beforeEach(() => {
@@ -181,9 +181,9 @@ describe("AuthPersistentStorage class tests", () => {
     test("return correct previously set personal info", () => {
       // GIVEN The personal info is stored in the session storage
       const givenPersonalInfo: StoredPersonalInfo = {
-        name: "foo",
-        email: "foo@bar.baz",
-        phone: "1234567890",
+        fullName: "foo",
+        contactEmail: "foo@bar.baz",
+        phoneNumber: "1234567890",
         address: "123 Main St",
       };
       PersistentStorageService.setPersonalInfo(givenPersonalInfo);
@@ -209,9 +209,9 @@ describe("AuthPersistentStorage class tests", () => {
     test("clear personal info", () => {
       // GIVEN The personal info is stored in the session storage
       const givenPersonalInfo: StoredPersonalInfo = {
-        name: "foo",
-        email: "foo@bar.baz",
-        phone: "1234567890",
+        fullName: "foo",
+        contactEmail: "foo@bar.baz",
+        phoneNumber: "1234567890",
         address: "123 Main St",
       };
       PersistentStorageService.setPersonalInfo(givenPersonalInfo);
@@ -227,9 +227,9 @@ describe("AuthPersistentStorage class tests", () => {
     test("set personal info", () => {
       // GIVEN The personal info is not stored in the session storage
       const givenPersonalInfo: StoredPersonalInfo = {
-        name: "foo",
-        email: "foo@bar.baz",
-        phone: "1234567890",
+        fullName: "foo",
+        contactEmail: "foo@bar.baz",
+        phoneNumber: "1234567890",
         address: "123 Main St",
       };
 

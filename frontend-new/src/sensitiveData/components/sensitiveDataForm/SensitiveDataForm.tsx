@@ -69,12 +69,12 @@ const isStringValid = (value: string, max: number) => {
 
 const validateSensitiveData = (data: SensitivePersonalData): Record<keyof SensitivePersonalData, boolean> => {
   return {
-    first_name: isStringValid(data.first_name, formConfig.first_name.maxLength!),
-    last_name: isStringValid(data.last_name, formConfig.last_name.maxLength!),
+    firstName: isStringValid(data.firstName, formConfig.firstName.maxLength!),
+    lastName: isStringValid(data.lastName, formConfig.lastName.maxLength!),
     gender: true,
     address: isStringValid(data.address, formConfig.address.maxLength!),
-    contact_email: isStringValid(data.contact_email, formConfig.contact_email.maxLength!),
-    phone_number: isStringValid(data.phone_number, formConfig.phone_number.maxLength!),
+    contactEmail: isStringValid(data.contactEmail, formConfig.contactEmail.maxLength!),
+    phoneNumber: isStringValid(data.phoneNumber, formConfig.phoneNumber.maxLength!),
   };
 };
 
@@ -95,10 +95,10 @@ function isFormValid(result: ReturnType<typeof validateSensitiveData>): boolean 
  */
 const sanitize = (data: SensitivePersonalData): SensitivePersonalData => ({
   gender: data.gender,
-  first_name: data.first_name.trim(),
-  last_name: data.last_name.trim(),
-  contact_email: data.contact_email.trim(),
-  phone_number: data.phone_number.trim(),
+  firstName: data.firstName.trim(),
+  lastName: data.lastName.trim(),
+  contactEmail: data.contactEmail.trim(),
+  phoneNumber: data.phoneNumber.trim(),
   address: data.address.trim(),
 });
 
@@ -113,10 +113,10 @@ const SensitiveDataForm: React.FC = () => {
   const [isSubmitButtonEnabled, setIsSubmitButtonEnabled] = useState(false);
 
   const sensitiveData = useRef<SensitivePersonalData>({
-    first_name: "",
-    last_name: "",
-    contact_email: "",
-    phone_number: "",
+    firstName: "",
+    lastName: "",
+    contactEmail: "",
+    phoneNumber: "",
     address: "",
     gender: Gender.PREFER_NOT_TO_SAY,
   });
@@ -227,7 +227,7 @@ const SensitiveDataForm: React.FC = () => {
                 }}
                 required={true}
                 onChange={(e) => {
-                  debouncedHandleFieldChange("first_name", e.target);
+                  debouncedHandleFieldChange("firstName", e.target);
                 }}
               />
 
@@ -240,7 +240,7 @@ const SensitiveDataForm: React.FC = () => {
                   "data-testid": DATA_TEST_ID.SENSITIVE_DATA_FORM_LAST_NAME_INPUT,
                 }}
                 required={true}
-                onChange={(e) => debouncedHandleFieldChange("last_name", e.target)}
+                onChange={(e) => debouncedHandleFieldChange("lastName", e.target)}
               />
 
               <TextField
@@ -252,7 +252,7 @@ const SensitiveDataForm: React.FC = () => {
                   "data-testid": DATA_TEST_ID.SENSITIVE_DATA_FORM_CONTACT_EMAIL_INPUT,
                 }}
                 required={true}
-                onChange={(e) => debouncedHandleFieldChange("contact_email", e.target)}
+                onChange={(e) => debouncedHandleFieldChange("contactEmail", e.target)}
               />
 
               <TextField
@@ -264,7 +264,7 @@ const SensitiveDataForm: React.FC = () => {
                   "data-testid": DATA_TEST_ID.SENSITIVE_DATA_FORM_PHONE_NUMBER_INPUT,
                 }}
                 required={true}
-                onChange={(e) => debouncedHandleFieldChange("phone_number", e.target)}
+                onChange={(e) => debouncedHandleFieldChange("phoneNumber", e.target)}
               />
 
               <TextField

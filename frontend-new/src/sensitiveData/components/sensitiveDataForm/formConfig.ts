@@ -5,16 +5,16 @@ type FieldConfig = {
 };
 
 export const formConfig: Record<keyof SensitivePersonalData, FieldConfig> = {
-  first_name: {
+  firstName: {
     maxLength: 32,
   },
-  last_name: {
+  lastName: {
     maxLength: 32,
   },
-  contact_email: {
+  contactEmail: {
     maxLength: 256,
   },
-  phone_number: {
+  phoneNumber: {
     maxLength: 20,
   },
   address: {
