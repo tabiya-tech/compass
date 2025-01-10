@@ -1,0 +1,30 @@
+name: Tabiya Compass Unit Tests
+on:
+  workflow_call:
+    inputs:
+      target-environment:
+        required: true
+        type: string
+jobs:
+  upload-artifacts:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.target-environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: set backend artifact repository
+        uses: google-github-actions/auth@v2.1.2
+        with:
+          credentials_json:
+            ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+
+      - name: authenticate to docker
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev
+
+      - name: build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          push: true
+          tags: ${{ vars.WIP_BACKEND_ARTIFACT_REPOSITORY }}:latest,${{ vars.WIP_BACKEND_ARTIFACT_REPOSITORY }}:${{ github.sha }}

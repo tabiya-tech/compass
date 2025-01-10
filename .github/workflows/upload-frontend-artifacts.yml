@@ -1,0 +1,34 @@
+name: Tabiya Compass Unit Tests
+on:
+  workflow_call:
+    inputs:
+      target-environment:
+        required: true
+        type: string
+jobs:
+  upload-artifacts:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.target-environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: set backend artifact repository
+        uses: google-github-actions/auth@v2.1.2
+        with:
+          project_id: compass-dev-425015
+          credentials_json:
+            ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+      - name: Download frontend build bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend.build.folder
+          path: frontend-new/build/
+      - name: Push frontend build bundle to artifact repository
+        run: |
+          tar -czvf build-v1.0.tar.gz ./frontend-new/build/
+          gcloud artifacts generic upload --package=frontend-build \
+            --repository=compass-frontend \
+            --location=us-central1 \
+            --source=./build-v1.0.tar.gz \
+            --project=compass-dev-425015 \
+            --version=${{ github.sha }}

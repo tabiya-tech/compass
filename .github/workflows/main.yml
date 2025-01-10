@@ -44,6 +44,18 @@ jobs:
     secrets: inherit
     with:
       target-environment: dev
+  upload-backend-artifacts:
+    uses: ./.github/workflows/upload-backend-artifacts.yml
+    secrets: inherit
+    needs: test-backend
+    with:
+      target-environment: dev
+  upload-frontend-artifacts:
+    uses: ./.github/workflows/upload-frontend-artifacts.yml
+    secrets: inherit
+    needs: build-frontend
+    with:
+      target-environment: dev
   deploy-auth:
     # This job will only run if the push event is on the main branch or the commit message contains '[pulumi up]'
     if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))
