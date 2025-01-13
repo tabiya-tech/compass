@@ -8,26 +8,26 @@ import {
 } from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
 
 interface FeedbackFormButtonProps {
-  notifyOpenFeedbackForm: () => void;
+  notifyOnFeedbackFormOpened: () => void;
 }
 
 const uniqueId = "41675f8b-257c-4a63-9563-3fe9feb6a850";
 
 export const DATA_TEST_ID = {
-  FEEDBACK_FORM_BUTTON_CONTAINER: `feedback-form-button-container-${uniqueId}`,
+  CONVERSATION_CONCLUSION_FOOTER_CONTAINER: `feedback-form-button-container-${uniqueId}`,
   FEEDBACK_FORM_BUTTON: `feedback-form-button-${uniqueId}`,
 };
 
-const FeedbackFormButton: React.FC<FeedbackFormButtonProps> = ({ notifyOpenFeedbackForm }) => {
+const ConversationConclusionFooter: React.FC<FeedbackFormButtonProps> = ({ notifyOnFeedbackFormOpened }) => {
   const hasSavedFeedback = useMemo(() => {
     const formAnswers = PersistentStorageService.getItem(STORAGE, FEEDBACK_FORM_ANSWERS_KEY);
     return !!formAnswers;
   }, []);
 
   return (
-    <Box display="flex" justifyContent="end" data-testid={DATA_TEST_ID.FEEDBACK_FORM_BUTTON_CONTAINER}>
+    <Box display="flex" justifyContent="end" data-testid={DATA_TEST_ID.CONVERSATION_CONCLUSION_FOOTER_CONTAINER}>
       <PrimaryButton
-        onClick={notifyOpenFeedbackForm}
+        onClick={notifyOnFeedbackFormOpened}
         disableWhenOffline={true}
         data-testid={DATA_TEST_ID.FEEDBACK_FORM_BUTTON}
       >
@@ -37,4 +37,4 @@ const FeedbackFormButton: React.FC<FeedbackFormButtonProps> = ({ notifyOpenFeedb
   );
 };
 
-export default FeedbackFormButton;
+export default ConversationConclusionFooter;

@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import ChatService from "src/chat/ChatService/ChatService";
-import ChatList from "src/chat/ChatList/ChatList";
+import ChatList from "src/chat/chatList/ChatList";
 import { IChatMessage } from "./Chat.types";
-import { generateCompassMessage, generateUserMessage } from "./util";
+import { generateCompassMessage, generateTypingMessage, generateUserMessage } from "./util";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Box, useTheme } from "@mui/material";
 import ChatHeader from "./ChatHeader/ChatHeader";
@@ -23,7 +23,7 @@ import ConfirmModalDialog from "src/theme/confirmModalDialog/ConfirmModalDialog"
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 import FeedbackForm from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
 import { ChatError } from "src/error/commonErrors";
-import { ChatMessageFooterType } from "./ChatMessage/ChatMessage";
+import { ChatMessageType } from "src/chat/Chat.types"
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
@@ -85,19 +85,19 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     );
   };
 
-  const checkAndAddFeedbackMessage = useCallback(() => {
+  const checkAndAddConversationConclusionMessage = useCallback(() => {
     // Assumes the conversation is completed
     if (sessionHasFeedback) {
       // If the user has already given feedback, adds a thank-you message
       addMessage(generateThankYouMessage());
     } else {
-      // If they haven't asks the user to give feedback
+      // If they haven't, asks the user to give feedback
       addMessage({
         ...generateCompassMessage(
           "We’d love your feedback on this conversation. It’ll only take 5 minutes and will help us improve your experience",
           new Date().toISOString()
         ),
-        footerType: ChatMessageFooterType.FEEDBACK_FORM_BUTTON,
+        type: ChatMessageType.CONVERSATION_CONCLUSION,
       });
     }
   }, [sessionHasFeedback]);
@@ -108,16 +108,16 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       // Only add typing message if it doesn't already exist
       setMessages((prevMessages) => {
         // check if the last message is a typing message
-        const hasTypingMessage = prevMessages[prevMessages.length - 1]?.isTypingMessage;
+        const hasTypingMessage = prevMessages[prevMessages.length - 1]?.type === ChatMessageType.TYPING;
 
         if (!hasTypingMessage) {
-          return [...prevMessages, generateCompassMessage("Typing...", new Date().toISOString(), true)];
+          return [...prevMessages, generateTypingMessage(new Date().toISOString())];
         }
         return prevMessages;
       });
     } else {
       // filter out the typing message
-      setMessages((prevMessages) => prevMessages.filter((message) => !message.isTypingMessage));
+      setMessages((prevMessages) => prevMessages.filter((message) => message.type !== ChatMessageType.TYPING));
     }
   };
 
@@ -216,7 +216,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setConversationConductedAt(response.conversation_conducted_at);
 
         if (conversationCompleted) {
-          checkAndAddFeedbackMessage();
+          checkAndAddConversationConclusionMessage();
         }
       } catch (error) {
         console.error(new ChatError("Failed to send message:", error as Error));
@@ -230,7 +230,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setIsTyping(false);
       }
     },
-    [currentMessage, exploredExperiences, conversationCompleted, checkAndAddFeedbackMessage]
+    [currentMessage, exploredExperiences, conversationCompleted, checkAndAddConversationConclusionMessage]
   );
 
   const initializeChat = useCallback(
@@ -266,7 +266,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
           // If the conversation is completed, check if the user has given feedback
           if (history.conversation_completed) {
-            checkAndAddFeedbackMessage();
+            checkAndAddConversationConclusionMessage();
           }
         } else {
           // if this is the last promise to resolve, we should not set any state before it is resolved
@@ -297,7 +297,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setIsTyping(false);
       }
     },
-    [issueNewSession, checkAndAddFeedbackMessage, sendMessage, enqueueSnackbar]
+    [issueNewSession, checkAndAddConversationConclusionMessage, sendMessage, enqueueSnackbar]
   );
 
   // Resets the text field for the next message
@@ -338,7 +338,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
   const handleFeedbackSubmit = () => {
     setMessages((prevMessages) =>
-      prevMessages.filter((message) => message.footerType !== ChatMessageFooterType.FEEDBACK_FORM_BUTTON)
+      prevMessages.filter((message) => message.type !== ChatMessageType.CONVERSATION_CONCLUSION)
     );
     addMessage(generateThankYouMessage());
   };
@@ -419,7 +419,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
               />
             </Box>
             <Box sx={{ flex: 1, overflowY: "auto", paddingX: theme.tabiyaSpacing.lg }}>
-              <ChatList messages={messages} notifyOpenFeedbackForm={() => setIsFeedbackFormOpen(true)} />
+              <ChatList messages={messages} notifyOnFeedbackFormOpened={() => setIsFeedbackFormOpen(true)} />
             </Box>
             {showBackdrop && <InactiveBackdrop isShown={showBackdrop} />}
             <Box sx={{ flexShrink: 0, padding: theme.tabiyaSpacing.lg, paddingTop: theme.tabiyaSpacing.xs }}>

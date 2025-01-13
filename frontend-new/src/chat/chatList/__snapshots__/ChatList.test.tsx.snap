@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ChatList should render the Chat List 1`] = `
+exports[`ChatList should render the Chat List and show the appropriate message type for each message 1`] = `
 <div
   class="MuiBox-root css-15hfhb0"
   data-testid="chat-list-container-0397ee51-f637-4453-9e2f-5cc8900c9554"
@@ -30,51 +30,15 @@ exports[`ChatList should render the Chat List 1`] = `
       style="opacity: 1; transform: none;"
     >
       <div
-        data-testid="chat-message-container-2fbaf2ef-9eab-485a-bd28-b4a164e18b06"
+        data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
       />
     </li>
-  </ul>
-  <div />
-</div>
-`;
-
-exports[`ChatList should render the Chat List with typing message 1`] = `
-<div
-  class="MuiBox-root css-15hfhb0"
-  data-testid="chat-list-container-0397ee51-f637-4453-9e2f-5cc8900c9554"
-  tabindex="0"
->
-  <ul
-    class="MuiList-root MuiList-padding css-19yauec-MuiList-root"
-  >
     <li
       class="MuiListItem-root MuiListItem-gutters css-108qrq1-MuiListItem-root"
       style="opacity: 1; transform: none;"
     >
       <div
-        data-testid="chat-message-container-2fbaf2ef-9eab-485a-bd28-b4a164e18b06"
-      />
-    </li>
-  </ul>
-  <div />
-</div>
-`;
-
-exports[`ChatList should render the chat list for messages with feedback form 1`] = `
-<div
-  class="MuiBox-root css-15hfhb0"
-  data-testid="chat-list-container-0397ee51-f637-4453-9e2f-5cc8900c9554"
-  tabindex="0"
->
-  <ul
-    class="MuiList-root MuiList-padding css-19yauec-MuiList-root"
-  >
-    <li
-      class="MuiListItem-root MuiListItem-gutters css-108qrq1-MuiListItem-root"
-      style="opacity: 1; transform: none;"
-    >
-      <div
-        data-testid="chat-message-container-2fbaf2ef-9eab-485a-bd28-b4a164e18b06"
+        data-testid="conversation_conclusion_chat-message-container-2fbaf2ef-9eab-485a-bd28-b4a164e18b06"
       />
     </li>
   </ul>
