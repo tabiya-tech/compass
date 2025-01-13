@@ -1,9 +1,12 @@
 import React, { useEffect, useRef } from "react";
-import { IChatMessage } from "src/chat/Chat.types";
+import { ChatMessageType, IChatMessage } from "src/chat/Chat.types";
 import { Box, List, ListItem, useTheme } from "@mui/material";
 import { styled } from "@mui/system";
-import ChatMessage from "src/chat/ChatMessage/ChatMessage";
+import BasicChatMessage from "src/chat/chatMessage/basicChatMessage/BasicChatMessage";
 import { motion, AnimatePresence } from "framer-motion";
+import ConversationConclusionChatMessage
+  from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
+import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 
 const uniqueId = "0397ee51-f637-4453-9e2f-5cc8900c9554";
 export const DATA_TEST_ID = {
@@ -12,7 +15,7 @@ export const DATA_TEST_ID = {
 
 export type ChatListProps = {
   messages: IChatMessage[];
-  notifyOpenFeedbackForm: () => void;
+  notifyOnFeedbackFormOpened: () => void;
 };
 
 const ChatListContainer = styled(Box)(({ theme }) => ({
@@ -28,7 +31,7 @@ const ChatListContainer = styled(Box)(({ theme }) => ({
   },
 }));
 
-const ChatList: React.FC<ChatListProps> = ({ messages, notifyOpenFeedbackForm }) => {
+const ChatList: React.FC<ChatListProps> = ({ messages, notifyOnFeedbackFormOpened }) => {
   const theme = useTheme();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -60,6 +63,24 @@ const ChatList: React.FC<ChatListProps> = ({ messages, notifyOpenFeedbackForm })
     window.addEventListener("resize", resizeChatMessage);
     return () => window.removeEventListener("resize", resizeChatMessage);
   }, []);
+  
+  const getChatMessageFlavorFromType = (chatMessage: IChatMessage)  => {
+    switch (chatMessage.type) {
+      case ChatMessageType.BASIC_CHAT:
+        return <BasicChatMessage chatMessage={chatMessage} />;
+      case ChatMessageType.CONVERSATION_CONCLUSION:
+        return (
+          <ConversationConclusionChatMessage
+            chatMessage={chatMessage}
+            notifyOnFeedbackFormOpened={notifyOnFeedbackFormOpened}
+          />
+        );
+      case ChatMessageType.TYPING:
+        // typing messages don't need to show anything but the message text
+        // no timestamp or reactions will be shown, so we can use the ChatBubble itself
+        return <ChatBubble message={chatMessage.message} sender={chatMessage.sender} />
+    }
+  }
 
   return (
     <ChatListContainer data-testid={DATA_TEST_ID.CHAT_LIST_CONTAINER} tabIndex={0}>
@@ -84,7 +105,7 @@ const ChatList: React.FC<ChatListProps> = ({ messages, notifyOpenFeedbackForm })
               transition={{ duration: 0.3 }}
               sx={{ width: "100%", padding: theme.tabiyaSpacing.xs }}
             >
-              <ChatMessage chatMessage={message} notifyOpenFeedbackForm={notifyOpenFeedbackForm} />
+              { getChatMessageFlavorFromType(message) }
             </ListItem>
           ))}
         </AnimatePresence>

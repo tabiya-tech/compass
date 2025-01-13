@@ -1,12 +1,12 @@
 import { ConversationMessage } from "./ChatService/ChatService.types";
-import { ChatMessageFooterType } from "./ChatMessage/ChatMessage";
+
+export enum ChatMessageType {
+  BASIC_CHAT = "basic_chat",
+  CONVERSATION_CONCLUSION = "conversation_conclusion",
+  TYPING = "typing"
+}
 
 export type IChatMessage = ConversationMessage & {
   id: string;
-  footerType?: ChatMessageFooterType;
-  isTypingMessage?: boolean;
-};
-
-export type TNewSesionResponse = {
-  session_id: number;
+  type: ChatMessageType;
 };

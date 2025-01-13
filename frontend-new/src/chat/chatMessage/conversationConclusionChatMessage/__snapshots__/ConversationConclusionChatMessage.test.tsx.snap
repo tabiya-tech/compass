@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render tests should render the Chat message 1`] = `
+<div
+  class="MuiBox-root css-1c8zvho"
+  data-testid="conversation_conclusion_chat-message-container-2fbaf2ef-9eab-485a-bd28-b4a164e18b06"
+  origin="COMPASS"
+>
+  <div
+    data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+  />
+</div>
+`;

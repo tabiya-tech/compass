@@ -4,9 +4,9 @@ import "src/_test_utilities/consoleMock";
 import { fireEvent } from "@testing-library/react";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { FeedbackItem } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
-import FeedbackFormButton, {
+import ConversationConclusionFooter, {
   DATA_TEST_ID,
-} from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormButton/FeedbackFormButton";
+} from "src/chat/chatMessage/conversationConclusionChatMessage/conversationConclusionFooter/ConversationConclusionFooter";
 
 // mock the PersistentStorageService
 jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => {
@@ -28,7 +28,7 @@ jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => {
 describe("FeedbackFormButton", () => {
   test("should render component successfully", () => {
     // GIVEN a FeedbackFormButton component
-    const givenComponent = <FeedbackFormButton notifyOpenFeedbackForm={jest.fn()} />;
+    const givenComponent = <ConversationConclusionFooter notifyOnFeedbackFormOpened={jest.fn()} />;
 
     // WHEN the component is rendered
     render(givenComponent);
@@ -47,7 +47,7 @@ describe("FeedbackFormButton", () => {
 
   test("should display 'Continue with feedback' when feedback has been saved", () => {
     // GIVEN a FeedbackFormButton component
-    const givenComponent = <FeedbackFormButton notifyOpenFeedbackForm={jest.fn()} />;
+    const givenComponent = <ConversationConclusionFooter notifyOnFeedbackFormOpened={jest.fn()} />;
 
     // WHEN the component is rendered
     render(givenComponent);
@@ -61,7 +61,7 @@ describe("FeedbackFormButton", () => {
   test("should call notifyOpenFeedbackForm when feedback button is clicked", () => {
     // GIVEN a FeedbackFormButton component
     const notifyOpenFeedbackForm = jest.fn();
-    const givenComponent = <FeedbackFormButton notifyOpenFeedbackForm={notifyOpenFeedbackForm} />;
+    const givenComponent = <ConversationConclusionFooter notifyOnFeedbackFormOpened={notifyOpenFeedbackForm} />;
 
     // WHEN the component is rendered
     render(givenComponent);
