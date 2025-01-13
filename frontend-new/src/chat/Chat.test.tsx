@@ -4,7 +4,7 @@ import { act } from "react";
 import { render, screen, waitFor } from "src/_test_utilities/test-utils";
 import Chat, { CHECK_INACTIVITY_INTERVAL, DATA_TEST_ID, INACTIVITY_TIMEOUT } from "src/chat/Chat";
 import ChatHeader, { DATA_TEST_ID as CHAT_HEADER_TEST_ID } from "src/chat/ChatHeader/ChatHeader";
-import ChatList, { DATA_TEST_ID as CHAT_LIST_TEST_ID } from "src/chat/ChatList/ChatList";
+import ChatList, { DATA_TEST_ID as CHAT_LIST_TEST_ID } from "src/chat/chatList/ChatList";
 import ChatMessageField, {
   DATA_TEST_ID as CHAT_MESSAGE_FIELD_TEST_ID,
 } from "src/chat/ChatMessageField/ChatMessageField";
@@ -27,9 +27,9 @@ import ConfirmModalDialog, {
 import FeedbackForm, {
   DATA_TEST_ID as FEEDBACK_FORM_DATA_TEST_ID,
 } from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
-import { ChatMessageFooterType } from "./ChatMessage/ChatMessage";
 import { DATA_TEST_ID as INACTIVE_BACKDROP_DATA_TEST_ID } from "src/theme/Backdrop/InactiveBackdrop";
 import userEvent from "@testing-library/user-event";
+import { ChatMessageType } from "./Chat.types";
 
 // Mock Services ----------
 // Mock the ChatService
@@ -75,8 +75,8 @@ jest.mock("src/chat/ChatHeader/ChatHeader", () => {
 });
 
 // mock the ChatList component
-jest.mock("src/chat/ChatList/ChatList", () => {
-  const actual = jest.requireActual("src/chat/ChatList/ChatList");
+jest.mock("src/chat/chatList/ChatList", () => {
+  const actual = jest.requireActual("src/chat/chatList/ChatList");
   const mockChatList = jest
     .fn()
     .mockImplementation(() => <div data-testid={actual.DATA_TEST_ID.CHAT_LIST_CONTAINER}></div>);
@@ -268,10 +268,10 @@ describe("Chat", () => {
                 message: "Typing...",
                 sent_at: expect.any(String),
                 sender: ConversationMessageSender.COMPASS,
-                isTypingMessage: true,
+                type: ChatMessageType.TYPING,
               },
             ],
-            notifyOpenFeedbackForm: expect.any(Function),
+            notifyOnFeedbackFormOpened: expect.any(Function),
           },
           {}
         );
@@ -300,14 +300,14 @@ describe("Chat", () => {
 
         // THEN expect messages to be passed to ChatList
         await waitFor(() => {
-          expect(ChatList as jest.Mock).toHaveBeenCalledWith(
+          expect(ChatList as jest.Mock).toHaveBeenNthCalledWith(4,
             {
               messages: givenMessages.messages.map((message) => ({
                 ...message,
                 id: expect.any(String), // the id is not sent by the server, so its not part of the given messages
-                isTypingMessage: false, // the isTypingMessage is not part of the given messages
+                type: ChatMessageType.BASIC_CHAT, // the message type is not part of the given messages we get from the backend
               })),
-              notifyOpenFeedbackForm: expect.any(Function),
+              notifyOnFeedbackFormOpened: expect.any(Function),
             },
             {}
           );
@@ -353,7 +353,7 @@ describe("Chat", () => {
           // AND expect a typing indicator to be shown
           expect(ChatList as jest.Mock).toHaveBeenCalledWith(
             expect.objectContaining({
-              messages: expect.arrayContaining([expect.objectContaining({ isTypingMessage: true })]),
+              messages: expect.arrayContaining([expect.objectContaining({ type: ChatMessageType.TYPING })]),
             }),
             {}
           );
@@ -395,7 +395,7 @@ describe("Chat", () => {
                 messages: givenSendMessageResponse.messages.map((message) => ({
                   ...message,
                   id: expect.any(String), // the id is not sent by the server, so its not part of the given messages
-                  isTypingMessage: false, // the isTypingMessage is not part of the given messages
+                  type: ChatMessageType.BASIC_CHAT,  // the message type is not part of the given messages
                 })),
               }),
               {}
@@ -444,7 +444,7 @@ describe("Chat", () => {
           // THEN expect a typing indicator to be shown
           expect(ChatList as jest.Mock).toHaveBeenCalledWith(
             expect.objectContaining({
-              messages: expect.arrayContaining([expect.objectContaining({ isTypingMessage: true })]),
+              messages: expect.arrayContaining([expect.objectContaining({ type: ChatMessageType.TYPING })]),
             }),
             {}
           );
@@ -472,7 +472,7 @@ describe("Chat", () => {
                     message: "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
                     sent_at: expect.any(String),
                     sender: ConversationMessageSender.COMPASS,
-                    isTypingMessage: false,
+                    type: ChatMessageType.BASIC_CHAT,
                   },
                 ],
               }),
@@ -509,7 +509,7 @@ describe("Chat", () => {
         // THEN expect the typing indicator
         expect(ChatList as jest.Mock).toHaveBeenCalledWith(
           expect.objectContaining({
-            messages: expect.arrayContaining([expect.objectContaining({ isTypingMessage: true })]),
+            messages: expect.arrayContaining([expect.objectContaining({ type: ChatMessageType.TYPING })]),
           }),
           {}
         );
@@ -583,7 +583,7 @@ describe("Chat", () => {
         // AND a typing indicator to be shown
         expect(ChatList as jest.Mock).toHaveBeenCalledWith(
           expect.objectContaining({
-            messages: expect.arrayContaining([expect.objectContaining({ isTypingMessage: true })]),
+            messages: expect.arrayContaining([expect.objectContaining({ type: ChatMessageType.TYPING })]),
           }),
           {}
         );
@@ -647,7 +647,7 @@ describe("Chat", () => {
               messages: givenSendMessageResponse.messages.map((message) => ({
                 ...message,
                 id: expect.any(String), // the id is not sent by the server, so its not part of the given messages
-                isTypingMessage: false, // the isTypingMessage is not part of the given messages
+                type: ChatMessageType.BASIC_CHAT,   // the message type is not part of the given messages
               })),
             }),
             {}
@@ -680,7 +680,7 @@ describe("Chat", () => {
         // THEN expect a typing indicator to be shown
         expect(ChatList as jest.Mock).toHaveBeenCalledWith(
           expect.objectContaining({
-            messages: expect.arrayContaining([expect.objectContaining({ isTypingMessage: true })]),
+            messages: expect.arrayContaining([expect.objectContaining({ type: ChatMessageType.TYPING })]),
           }),
           {}
         );
@@ -746,7 +746,7 @@ describe("Chat", () => {
         // THEN expect a typing indicator to be shown
         expect(ChatList as jest.Mock).toHaveBeenCalledWith(
           expect.objectContaining({
-            messages: expect.arrayContaining([expect.objectContaining({ isTypingMessage: true })]),
+            messages: expect.arrayContaining([expect.objectContaining({ type: ChatMessageType.TYPING })]),
           }),
           {}
         );
@@ -825,7 +825,7 @@ describe("Chat", () => {
         // THEN expect a typing indicator to be shown
         expect(ChatList as jest.Mock).toHaveBeenCalledWith(
           expect.objectContaining({
-            messages: expect.arrayContaining([expect.objectContaining({ isTypingMessage: true })]),
+            messages: expect.arrayContaining([expect.objectContaining({ type: ChatMessageType.TYPING })]),
           }),
           {}
         );
@@ -869,7 +869,7 @@ describe("Chat", () => {
                   message: "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
                   sent_at: expect.any(String),
                   sender: ConversationMessageSender.COMPASS,
-                  isTypingMessage: false,
+                  type: ChatMessageType.BASIC_CHAT,
                 },
               ],
             }),
@@ -970,7 +970,7 @@ describe("Chat", () => {
           expect.objectContaining({
             messages: expect.arrayContaining([
               expect.objectContaining({ message: givenMessage }),
-              expect.objectContaining({ isTypingMessage: true }),
+              expect.objectContaining({ type: ChatMessageType.TYPING }),
             ]),
           }),
           {}
@@ -1071,7 +1071,7 @@ describe("Chat", () => {
                 ...message,
                 sent_at: expect.any(String),
                 id: expect.any(String),
-                isTypingMessage: false,
+                type: ChatMessageType.BASIC_CHAT,
               })),
               expect.objectContaining({
                 message: "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
@@ -1247,7 +1247,7 @@ describe("Chat", () => {
       await waitFor(() => {
         expect(ChatList as jest.Mock).toHaveBeenCalledWith(
           expect.objectContaining({
-            messages: expect.arrayContaining([expect.objectContaining({ isTypingMessage: true })]),
+            messages: expect.arrayContaining([expect.objectContaining({ type: ChatMessageType.TYPING })]),
           }),
           {}
         );
@@ -1276,7 +1276,7 @@ describe("Chat", () => {
             messages: givenSendMessageResponse.messages.map((message) => ({
               ...message,
               id: expect.any(String),
-              isTypingMessage: false,
+              type: ChatMessageType.BASIC_CHAT,
             })),
           }),
           {}
@@ -1339,7 +1339,7 @@ describe("Chat", () => {
           messages: givenMessages.map((message) => ({
             ...message,
             id: expect.any(String),
-            isTypingMessage: false,
+            type: ChatMessageType.BASIC_CHAT,
           })),
         }),
         {}
@@ -1458,7 +1458,7 @@ describe("Chat", () => {
       // and a bunch of calls are made when the component is re-rendered,
       // for example, due to the chat initialization
       act(() => {
-        (ChatList as jest.Mock).mock.calls.at(-1)[0].notifyOpenFeedbackForm();
+        (ChatList as jest.Mock).mock.calls.at(-1)[0].notifyOnFeedbackFormOpened();
       });
 
       // THEN expect feedback form to be visible
@@ -1474,12 +1474,12 @@ describe("Chat", () => {
         (FeedbackForm as jest.Mock).mock.calls.at(-1)[0].onFeedbackSubmit();
       });
 
-      // THEN expect the feedback message to be removed from the chat list
+      // THEN expect the conversation conclusion message to be removed from the chat list
       await waitFor(() => {
         expect(ChatList as jest.Mock).toHaveBeenLastCalledWith(
           expect.objectContaining({
             messages: expect.not.arrayContaining([
-              expect.objectContaining({ footerType: ChatMessageFooterType.FEEDBACK_FORM_BUTTON }),
+              expect.objectContaining({ type: ChatMessageType.CONVERSATION_CONCLUSION }),
             ]),
           }),
           {}

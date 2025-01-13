@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render tests should render the Chat message with a timestamp 1`] = `
+<div
+  class="MuiBox-root css-1c8zvho"
+  data-testid="chat-message-container-2fbaf2ef-9eab-485a-bd28-b4a164e18b06"
+  origin="COMPASS"
+>
+  <div
+    data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+  />
+  <div
+    data-testid="chat-message-sent_at-7772f20a-9d0c-4072-b24f-97eca2f43d7b"
+  />
+</div>
+`;
