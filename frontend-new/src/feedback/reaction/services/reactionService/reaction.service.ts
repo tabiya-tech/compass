@@ -1,47 +1,50 @@
 import { customFetch } from "src/utils/customFetch/customFetch";
 import { StatusCodes } from "http-status-codes";
 import { Reaction } from "src/feedback/reaction/reaction.types";
+import { getBackendUrl } from "src/envService";
 
 export class ReactionService {
-  async sendReaction(sessionId:string, messageId: string, reaction: Reaction): Promise<void> {
+  readonly reactionEndpointUrl: string;
+  readonly apiServerUrl: string;
+
+  constructor() {
+    this.apiServerUrl = getBackendUrl();
+    this.reactionEndpointUrl = `${this.apiServerUrl}/conversation`;
+  }
+
+  async sendReaction(sessionId: number, messageId: string, reaction: Reaction): Promise<void> {
     const serviceName = "ReactionService";
     const serviceFunction = "sendReaction";
     const method = "PUT";
 
-    const reactionURL = `/conversation/${sessionId}/messages/${messageId}/reaction`;
-    await customFetch(
-      reactionURL,
-      {
-        method: method,
-        headers: { "Content-Type": "application/json" },
-        body: undefined, // implement body along with the API
-        expectedStatusCode: StatusCodes.OK,
-        serviceName: serviceName,
-        serviceFunction: serviceFunction,
-        failureMessage: `Failed to send reaction for message ${messageId}`,
-        expectedContentType: "application/json",
-      }
-    );
+    const reactionURL = `${this.reactionEndpointUrl}/${sessionId}/messages/${messageId}/reaction`;
+    const body = JSON.stringify({ reaction });
+
+    await customFetch(reactionURL, {
+      method: method,
+      headers: { "Content-Type": "application/json" },
+      body: body,
+      expectedStatusCode: StatusCodes.OK,
+      serviceName: serviceName,
+      serviceFunction: serviceFunction,
+      failureMessage: `Failed to send reaction for message ${messageId}`,
+      expectedContentType: "application/json",
+    });
   }
-  async deleteReaction(sessionId:string, messageId: string): Promise<void> {
+
+  async deleteReaction(sessionId: number, messageId: string): Promise<void> {
     const serviceName = "ReactionService";
     const serviceFunction = "deleteReaction";
     const method = "DELETE";
 
-    const reactionURL = `/conversation/${sessionId}/messages/${messageId}/reaction`;
-    await customFetch(
-      reactionURL,
-      {
-        method: method,
-        headers: { "Content-Type": "application/json" },
-        body: undefined, // implement body along with the API
-        expectedStatusCode: StatusCodes.NO_CONTENT,
-        serviceName: serviceName,
-        serviceFunction: serviceFunction,
-        failureMessage: `Failed to delete reaction for message ${messageId}`,
-        expectedContentType: "application/json",
-      }
-    );
+    const reactionURL = `${this.reactionEndpointUrl}/${sessionId}/messages/${messageId}/reaction`;
+    await customFetch(reactionURL, {
+      method: method,
+      expectedStatusCode: StatusCodes.NO_CONTENT,
+      serviceName: serviceName,
+      serviceFunction: serviceFunction,
+      failureMessage: `Failed to delete reaction for message ${messageId}`,
+    });
   }
 }
 
