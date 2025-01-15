@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field, field_serializer, field_validator
 
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.conversation_memory.conversation_memory_manager import \
-    ConversationMemoryManager
+    ConversationMemoryManager, IConversationMemoryManager
 
 
 class ConversationPhase(Enum):
@@ -63,7 +63,10 @@ class AgentDirectorState(BaseModel):
     def from_document(_doc: Mapping[str, Any]) -> "AgentDirectorState":
         return AgentDirectorState(session_id=_doc["session_id"],
                                   current_phase=_doc["current_phase"],
-                                  conversation_conducted_at=_doc["conversation_conducted_at"])
+                                  # The conversation_conducted_at field was introduced later, so it may not exist in all documents
+                                  # For the documents that don't have this field, we'll default to None,
+                                  # The implication being that the client will have to handle this case.
+                                  conversation_conducted_at=_doc.get("conversation_conducted_at", None))
 
 
 def _parse_data(value: Optional[datetime | str]) -> Optional[datetime]:
@@ -90,7 +93,7 @@ class AbstractAgentDirector(ABC):
     It maintains the state of the conversation which is divided into phases.
     """
 
-    def __init__(self, conversation_manager: ConversationMemoryManager):
+    def __init__(self, conversation_manager: IConversationMemoryManager):
         # Initialize the logger
         self._logger = logging.getLogger(self.__class__.__name__)
 

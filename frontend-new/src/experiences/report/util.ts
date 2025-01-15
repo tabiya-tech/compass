@@ -1,4 +1,4 @@
-import { Experience, Skill, WorkType } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
+import { Experience, Skill, WorkType } from "src/experiences/experienceService/experiences.types";
 
 // Get a list of all unique skills in alphabetical order
 export const getUniqueSkills = (experiences: Experience[]): Skill[] => {

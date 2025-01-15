@@ -2,7 +2,7 @@ import os
 
 from fastapi import FastAPI, APIRouter
 
-from app.poc.poc_routes import add_poc_route_endpoints
+from app.conversations.poc.poc_routes import add_poc_route_endpoints
 from app.users.auth import Authentication
 
 

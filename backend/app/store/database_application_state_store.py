@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from typing import AsyncIterator
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
@@ -57,7 +58,11 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
                         self._logger.info("No state found in the database for component %s with session ID %s", collection_names[i], session_id)
                 return None
 
-            agent_director_state, explore_experiences_director_state, conversation_memory_manager_state, collect_experience_state, skills_explorer_agent_state = results
+            (agent_director_state,
+             explore_experiences_director_state,
+             conversation_memory_manager_state,
+             collect_experience_state,
+             skills_explorer_agent_state) = results
 
             return ApplicationState(session_id=session_id,
                                     agent_director_state=AgentDirectorState.from_document(agent_director_state),
@@ -87,10 +92,14 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
             # Using $eq to prevent NoSQL injection
             await asyncio.gather(
                 self._agent_director_collection.update_one({"session_id": {"$eq": session_id}}, {"$set": state.agent_director_state.model_dump()}, upsert=True),
-                self._explore_experiences_director_state_collection.update_one({"session_id": {"$eq": session_id}}, {"$set": state.explore_experiences_director_state.model_dump()}, upsert=True),
-                self._conversation_memory_manager_state_collection.update_one({"session_id": {"$eq": session_id}}, {"$set": state.conversation_memory_manager_state.model_dump()}, upsert=True),
-                self._collect_experience_state_collection.update_one({"session_id": {"$eq": session_id}}, {"$set": state.collect_experience_state.model_dump()}, upsert=True),
-                self._skills_explorer_agent_state_collection.update_one({"session_id": {"$eq": session_id}}, {"$set": state.skills_explorer_agent_state.model_dump()}, upsert=True)
+                self._explore_experiences_director_state_collection.update_one({"session_id": {"$eq": session_id}},
+                                                                               {"$set": state.explore_experiences_director_state.model_dump()}, upsert=True),
+                self._conversation_memory_manager_state_collection.update_one({"session_id": {"$eq": session_id}},
+                                                                              {"$set": state.conversation_memory_manager_state.model_dump()}, upsert=True),
+                self._collect_experience_state_collection.update_one({"session_id": {"$eq": session_id}}, {"$set": state.collect_experience_state.model_dump()},
+                                                                     upsert=True),
+                self._skills_explorer_agent_state_collection.update_one({"session_id": {"$eq": session_id}},
+                                                                        {"$set": state.skills_explorer_agent_state.model_dump()}, upsert=True)
             )
 
         except Exception as e:  # pylint: disable=broad-except
@@ -113,7 +122,29 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
                 self._skills_explorer_agent_state_collection.delete_one({"session_id": {"$eq": session_id}})
             )
 
-        except Exception as e: # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-except
             # Log the error and raise an exception, so that the caller can handle it
             self._logger.error("Failed to delete application state for session ID %s: %s", session_id, e, exc_info=True)
+            raise
+
+    async def get_all_session_ids(self) -> AsyncIterator[int]:
+        """
+        Stream all application states.
+        Returns an async generator of ApplicationState objects.
+        """
+        try:
+            # Create cursor for streaming conversation memory manager documents
+            cursor = self._conversation_memory_manager_state_collection.find(
+                {}, {'_id': False, 'session_id': True}
+            )
+
+            async for doc in cursor:
+                session_id = doc.get('session_id')
+                if session_id is None:
+                    self._logger.error("Session ID not found in document: %s", doc)
+                    continue
+                yield session_id
+
+        except Exception as e:
+            self._logger.error("Failed to stream application states: %s", e, exc_info=True)
             raise
