@@ -1,4 +1,4 @@
-import { Experience } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
+import { Experience } from "src/experiences/experienceService/experiences.types";
 
 export type ReportProps = {
   name: string;

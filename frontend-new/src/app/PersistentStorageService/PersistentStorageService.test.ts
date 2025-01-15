@@ -1,7 +1,7 @@
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { SensitivePersonalDataRequirement } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { Invitation, InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
-import { StoredPersonalInfo } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
+import { StoredPersonalInfo } from "src/experiences/experienceService/experiences.types";
 
 describe("AuthPersistentStorage class tests", () => {
   beforeEach(() => {

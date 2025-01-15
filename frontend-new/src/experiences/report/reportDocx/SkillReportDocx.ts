@@ -1,5 +1,5 @@
 import { Document, Paragraph, Packer, TextRun, ImageRun, HeadingLevel, AlignmentType, BorderStyle } from "docx";
-import { Experience } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
+import { Experience } from "src/experiences/experienceService/experiences.types";
 import { generateContent } from "src/experiences/report/reportDocx/components/experiencesReportContent/ExperiencesReportContent";
 import { ReportContent } from "src/experiences/report/reportContent";
 import { TabiyaBasicColors } from "src/theme/applicationTheme/applicationTheme";

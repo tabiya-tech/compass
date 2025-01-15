@@ -41,7 +41,7 @@ describe("render tests", () => {
     // GIVEN a basic chat message sent at a given time
     const givenDate = new Date(2024, 6, 25).toISOString();
     const givenMessage: IChatMessage = {
-      id: nanoid(),
+      message_id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       message: "Hello, I'm Compass",
       sent_at: givenDate,

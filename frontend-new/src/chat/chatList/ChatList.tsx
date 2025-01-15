@@ -95,7 +95,7 @@ const ChatList: React.FC<ChatListProps> = ({ messages, notifyOnFeedbackFormOpene
         <AnimatePresence initial={false}>
           {messages.map((message, index) => (
             <ListItem
-              key={message.id}
+              key={message.message_id}
               component={motion.li}
               initial="hidden"
               animate="visible"

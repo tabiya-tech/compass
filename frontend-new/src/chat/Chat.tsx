@@ -15,8 +15,8 @@ import UserPreferencesStateService from "src/userPreferences/UserPreferencesStat
 import { ConversationMessage, ConversationMessageSender } from "./ChatService/ChatService.types";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import ExperiencesDrawer from "src/experiences/experiencesDrawer/ExperiencesDrawer";
-import { Experience } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
-import ExperienceService from "src/experiences/experiencesDrawer/experienceService/experienceService";
+import { Experience } from "src/experiences/experienceService/experiences.types";
+import ExperienceService from "src/experiences/experienceService/experienceService";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import InactiveBackdrop from "src/theme/Backdrop/InactiveBackdrop";
 import ConfirmModalDialog from "src/theme/confirmModalDialog/ConfirmModalDialog";
@@ -25,6 +25,7 @@ import FeedbackForm from "src/feedback/overallFeedback/feedbackForm/FeedbackForm
 import { ChatError } from "src/error/commonErrors";
 import { ChatMessageType } from "src/chat/Chat.types"
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
+import { nanoid } from "nanoid";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -80,6 +81,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
   const generateThankYouMessage = () => {
     return generateCompassMessage(
+      nanoid(),
       "Thank you for taking the time to share your valuable feedback. Your input is important to us.",
       new Date().toISOString()
     );
@@ -94,6 +96,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       // If they haven't, asks the user to give feedback
       addMessage({
         ...generateCompassMessage(
+          nanoid(),
           "We’d love your feedback on this conversation. It’ll only take 5 minutes and will help us improve your experience",
           new Date().toISOString()
         ),
@@ -138,6 +141,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       } catch (e) {
         addMessage(
           generateCompassMessage(
+            nanoid(),
             "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
             new Date().toISOString()
           )
@@ -199,8 +203,8 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
       try {
         // Send the user's message
-        const chatService = ChatService.getInstance(session_id);
-        const response = await chatService.sendMessage(userMessage);
+        const chatService = new ChatService();
+        const response = await chatService.sendMessage(session_id, userMessage);
 
         setExploredExperiences(response.experiences_explored);
 
@@ -209,7 +213,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         }
 
         response.messages.forEach((messageItem) =>
-          addMessage(generateCompassMessage(messageItem.message, messageItem.sent_at))
+          addMessage(generateCompassMessage(messageItem.message_id, messageItem.message, messageItem.sent_at))
         );
 
         setConversationCompleted(response.conversation_completed);
@@ -222,6 +226,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         console.error(new ChatError("Failed to send message:", error as Error));
         addMessage(
           generateCompassMessage(
+            nanoid(),
             "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
             sent_at
           )
@@ -248,16 +253,15 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         }
 
         // Get the chat history
-        const chatService = ChatService.getInstance(sessionId);
-        const history = await chatService.getChatHistory();
+        const chatService = new ChatService();
+        const history = await chatService.getChatHistory(sessionId);
 
         // Set the messages from the chat history
         if (history.messages.length) {
           setMessages(
-            history.messages.map((message: ConversationMessage) =>
-              message.sender === ConversationMessageSender.USER
-                ? generateUserMessage(message.message, message.sent_at)
-                : generateCompassMessage(message.message, message.sent_at)
+            history.messages.map((message: ConversationMessage) => message.sender === ConversationMessageSender.USER
+              ? generateUserMessage(message.message, message.sent_at)
+              : generateCompassMessage(message.message_id, message.message, message.sent_at)
             )
           );
 
@@ -327,6 +331,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     } catch (e) {
       addMessage(
         generateCompassMessage(
+          nanoid(),
           "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
           new Date().toISOString()
         )

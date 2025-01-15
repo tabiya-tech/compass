@@ -10,6 +10,8 @@ class ConversationMessageSender(Enum):
 
 
 class ConversationMessage(BaseModel):
+    message_id: str
+    """The unique id of the message"""
     message: str
     """The message content"""
     sent_at: datetime
@@ -43,8 +45,6 @@ class ConversationResponse(BaseModel):
         extra = "forbid"
 
 class ConversationInput(BaseModel):
-    session_id: int = 1
-    """The user session id"""
     user_input: str
     """The user input"""
 

@@ -2,8 +2,7 @@ from datetime import timezone, datetime
 from typing import List
 
 from app.conversation_memory.conversation_memory_types import ConversationHistory, ConversationContext
-from app.chat.chat_types import ConversationMessage, ConversationMessageSender
-from app.agent.agent_types import AgentType
+from app.conversations.types import ConversationMessage, ConversationMessageSender
 
 
 def filter_conversation_history(history: 'ConversationHistory') -> List[ConversationMessage]:
@@ -17,11 +16,13 @@ def filter_conversation_history(history: 'ConversationHistory') -> List[Conversa
         # remove artificial messages
         if not turn.input.is_artificial:
             messages.append(ConversationMessage(
+                message_id= turn.input.message_id,
                 message=turn.input.message,
                 sent_at=turn.input.sent_at.astimezone(timezone.utc).isoformat(),
                 sender=ConversationMessageSender.USER
             ))
         messages.append(ConversationMessage(
+            message_id= turn.output.message_id,
             message=turn.output.message_for_user,
             sent_at=turn.output.sent_at.astimezone(timezone.utc).isoformat(),
             sender=ConversationMessageSender.COMPASS,
@@ -46,6 +47,7 @@ async def get_messages_from_conversation_manager(context: 'ConversationContext',
     for turn in context.all_history.turns[from_index:]:
         turn.output.sent_at = datetime.now(timezone.utc)
         messages.append(ConversationMessage(
+            message_id=turn.output.message_id,
             message=turn.output.message_for_user,
             sent_at=turn.output.sent_at.astimezone(timezone.utc).isoformat(),
             sender=ConversationMessageSender.COMPASS,
