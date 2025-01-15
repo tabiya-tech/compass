@@ -6,7 +6,7 @@ import ExperiencesDrawerContent, {
   LoadingExperienceDrawerContent,
 } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
 import { render, screen } from "src/_test_utilities/test-utils";
-import { mockExperiences } from "src/experiences/experiencesDrawer/experienceService/_test_utilities/mockExperiencesResponses";
+import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
 import { fireEvent, waitFor } from "@testing-library/react";
 
 describe("ReportDrawerContent", () => {

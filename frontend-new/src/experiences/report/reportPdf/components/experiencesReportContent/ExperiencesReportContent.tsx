@@ -1,6 +1,6 @@
 import React from "react";
 import { Text, View } from "@react-pdf/renderer";
-import { Experience } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
+import { Experience } from "src/experiences/experienceService/experiences.types";
 import styles from "src/experiences/report/reportPdf/styles";
 import { ReportContent } from "src/experiences/report/reportContent";
 

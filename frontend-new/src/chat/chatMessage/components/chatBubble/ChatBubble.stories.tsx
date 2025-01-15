@@ -17,21 +17,21 @@ type Story = StoryObj<typeof ChatBubble>;
 export const FromCompass: Story = {
   args: {
     message: "Hello, how can I help you?",
-    sender: ConversationMessageSender.COMPASS
+    sender: ConversationMessageSender.COMPASS,
   },
 };
 
 export const FromUser: Story = {
   args: {
     message: "Hi there, I am a baker!",
-    sender: ConversationMessageSender.USER
+    sender: ConversationMessageSender.USER,
   },
-}
+};
 
 export const ShownWithFooter: Story = {
   args: {
     message: "Hello, how can I help you?",
     sender: ConversationMessageSender.COMPASS,
-    children: <VisualMock text={"Foo Footer"} />
-  }
-}
+    children: <VisualMock text={"Foo Footer"} />,
+  },
+};
