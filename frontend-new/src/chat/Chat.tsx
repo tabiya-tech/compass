@@ -25,7 +25,6 @@ import FeedbackForm from "src/feedback/overallFeedback/feedbackForm/FeedbackForm
 import { ChatError } from "src/error/commonErrors";
 import { ChatMessageType } from "src/chat/Chat.types"
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
-import { ReactionType } from "src/feedback/reaction/reaction.types";
 import { nanoid } from "nanoid";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
@@ -84,7 +83,8 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     return generateCompassMessage(
       nanoid(),
       "Thank you for taking the time to share your valuable feedback. Your input is important to us.",
-      new Date().toISOString()
+      new Date().toISOString(),
+      null
     );
   };
 
@@ -99,7 +99,8 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         ...generateCompassMessage(
           nanoid(),
           "We’d love your feedback on this conversation. It’ll only take 5 minutes and will help us improve your experience",
-          new Date().toISOString()
+          new Date().toISOString(),
+          null
         ),
         type: ChatMessageType.CONVERSATION_CONCLUSION,
       });
@@ -144,7 +145,8 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           generateCompassMessage(
             nanoid(),
             "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
-            new Date().toISOString()
+            new Date().toISOString(),
+            null
           )
         );
         enqueueSnackbar("Failed to start new conversation", { variant: "error" });
@@ -214,7 +216,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         }
 
         response.messages.forEach((messageItem) =>
-          addMessage(generateCompassMessage(messageItem.message_id, messageItem.message, messageItem.sent_at))
+          addMessage(generateCompassMessage(messageItem.message_id, messageItem.message, messageItem.sent_at, messageItem.reaction))
         );
 
         setConversationCompleted(response.conversation_completed);
@@ -229,7 +231,8 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           generateCompassMessage(
             nanoid(),
             "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
-            sent_at
+            sent_at,
+            null
           )
         );
       } finally {
@@ -262,7 +265,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           setMessages(
             history.messages.map((message: ConversationMessage) => message.sender === ConversationMessageSender.USER
               ? generateUserMessage(message.message, message.sent_at)
-              : generateCompassMessage(message.message_id, message.message, message.sent_at)
+              : generateCompassMessage(message.message_id, message.message, message.sent_at, message.reaction)
             )
           );
 
@@ -334,7 +337,8 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         generateCompassMessage(
           nanoid(),
           "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
-          new Date().toISOString()
+          new Date().toISOString(),
+          null
         )
       );
       enqueueSnackbar("Failed to start new conversation", { variant: "error" });
@@ -400,10 +404,6 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     addOrRemoveTypingMessage(isTyping);
   }, [isTyping]);
 
-  const handleReactionChange = useCallback(async (messageId: string, reaction: ReactionType) => {
-    console.log("handleReactionChange", messageId, reaction);
-  }, []);
-
   return (
     <>
       {isLoggingOut ? (
@@ -429,7 +429,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
               />
             </Box>
             <Box sx={{ flex: 1, overflowY: "auto", paddingX: theme.tabiyaSpacing.lg }}>
-              <ChatList messages={messages} notifyOnFeedbackFormOpened={() => setIsFeedbackFormOpen(true)} notifyReactionChange={handleReactionChange} />
+              <ChatList messages={messages} notifyOnFeedbackFormOpened={() => setIsFeedbackFormOpen(true)} />
             </Box>
             {showBackdrop && <InactiveBackdrop isShown={showBackdrop} />}
             <Box sx={{ flexShrink: 0, padding: theme.tabiyaSpacing.lg, paddingTop: theme.tabiyaSpacing.xs }}>

@@ -17,8 +17,6 @@ export const DATA_TEST_ID = {
 }
 
 const MessageBubble = styled(Box)<{ origin: ConversationMessageSender }>(({ theme, origin }) => ({
-  maxWidth: "80%",
-  minWidth: "30%",
   variants: "outlined",
   wordWrap: "break-word",
   padding: theme.fixedSpacing(theme.tabiyaSpacing.sm),

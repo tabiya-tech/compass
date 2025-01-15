@@ -12,11 +12,11 @@ import ReactionService from "src/feedback/reaction/services/reactionService/reac
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { ReactionError } from "src/error/commonErrors";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
+import { ReactionResponse } from "src/chat/ChatService/ChatService.types";
 
 interface ReactionButtonsProps {
   messageId: string;
-  currentReaction: ReactionType | null;
-  onReactionChange: (messageId: string, reaction: ReactionType | null, reason?: string) => void;
+  currentReaction: ReactionResponse | null;
 }
 
 const uniqueId = "8d4e6f2c-9a3b-4c5d-b1e7-5f9d8a2b3c4e";
@@ -33,8 +33,7 @@ export const DATA_TEST_ID = {
 
 export const ReactionButtons: React.FC<ReactionButtonsProps> = ({
   messageId,
-  currentReaction,
-  onReactionChange
+  currentReaction
 }) => {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
@@ -42,8 +41,8 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [reaction, setReaction] = useState<ReactionType | null>(currentReaction);
-  const [previousReaction, setPreviousReaction] = useState<ReactionType | null>(currentReaction);
+  const [reaction, setReaction] = useState<ReactionType | null>(currentReaction?.kind ?? null);
+  const [previousReaction, setPreviousReaction] = useState<ReactionType | null>(currentReaction?.kind ?? null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeSessionId] = useState<number | null>(
     UserPreferencesStateService.getInstance().getActiveSessionId()
@@ -71,16 +70,14 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({
     setPreviousReaction(reaction); // Save the previous reaction in case of failure
 
     // If the current reaction is "like," deactivate it
-    if (reaction === ReactionType.LIKE) {
+    if (reaction === ReactionType.LIKED) {
       try {
         setReaction(null); // clear the reaction
         await reactionService.deleteReaction(activeSessionId, messageId);
-        onReactionChange(messageId, null);
       } catch (error) {
         console.error(new Error("Failed to remove the like feedback", { cause: error }));
         enqueueSnackbar("Failed to remove the feedback. Please try again.", { variant: "error" });
-        setReaction(ReactionType.LIKE); // Rollback in case of failure
-        onReactionChange(messageId, ReactionType.LIKE);
+        setReaction(ReactionType.LIKED); // Rollback in case of failure
       } finally {
         setIsSubmitting(false);
       }
@@ -88,13 +85,11 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({
     }
 
     // Otherwise, add a "like" reaction
-    setReaction(ReactionType.LIKE);
+    setReaction(ReactionType.LIKED);
     try {
-      await reactionService.sendReaction(activeSessionId, messageId, { kind: ReactionType.LIKE });
-      onReactionChange(messageId, ReactionType.LIKE);
+      await reactionService.sendReaction(activeSessionId, messageId, { kind: ReactionType.LIKED, reason: null });
     } catch (error) {
       setReaction(previousReaction);
-      onReactionChange(messageId, previousReaction);
       console.error(new Error("Failed to submit the like feedback", { cause: error }));
       enqueueSnackbar("Failed to submit the feedback. Please try again.", { variant: "error" });
     } finally {
@@ -116,16 +111,14 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({
     setPreviousReaction(reaction); // Save the previous reaction in case of failure
 
     // If the current reaction is "dislike," deactivate it
-    if (reaction === ReactionType.DISLIKE) {
+    if (reaction === ReactionType.DISLIKED) {
       try {
         setReaction(null); // clear the reaction
         await reactionService.deleteReaction(activeSessionId, messageId);
-        onReactionChange(messageId, null);
       } catch (error) {
         console.error(new Error("Failed to remove the dislike feedback", { cause: error }));
         enqueueSnackbar("Failed to remove the feedback. Please try again.", { variant: "error" });
-        setReaction(ReactionType.DISLIKE); // Rollback in case of failure
-        onReactionChange(messageId, ReactionType.DISLIKE);
+        setReaction(ReactionType.DISLIKED); // Rollback in case of failure;
       } finally {
         setIsSubmitting(false);
       }
@@ -144,18 +137,16 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({
 
     setIsSubmitting(true);
     setPreviousReaction(reaction); // Save the previous reaction in case of failure
-    setReaction(ReactionType.DISLIKE); // Set the reaction
+    setReaction(ReactionType.DISLIKED); // Set the reaction
     handlePopoverClose();
 
     try {
       await reactionService.sendReaction(activeSessionId, messageId, {
-        kind: ReactionType.DISLIKE,
+        kind: ReactionType.DISLIKED,
         reason: reason,
       });
-      onReactionChange(messageId, ReactionType.DISLIKE);
     } catch (error) {
       setReaction(previousReaction); // Rollback in case of failure
-      onReactionChange(messageId, previousReaction);
       console.error(new Error("Failed to submit the dislike feedback", { cause: error }));
       enqueueSnackbar("Failed to submit the feedback. Please try again.", { variant: "error" });
     } finally {
@@ -175,10 +166,19 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({
           title="like"
           disabled={!isOnline}
         >
-          {reaction === ReactionType.LIKE ? (
-            <ThumbUpAltIcon data-testid={DATA_TEST_ID.ICON_LIKE_ACTIVE} sx={{ color: theme.palette.text.secondary }} />
+          {reaction === ReactionType.LIKED ? (
+            <ThumbUpAltIcon 
+              data-testid={DATA_TEST_ID.ICON_LIKE_ACTIVE} 
+              sx={{ 
+                color: theme.palette.text.secondary,
+                fontSize: theme.fixedSpacing(theme.tabiyaSpacing.md)
+              }} 
+            />
           ) : (
-            <ThumbUpOffAltIcon data-testid={DATA_TEST_ID.ICON_LIKE_DEFAULT} />
+            <ThumbUpOffAltIcon 
+              data-testid={DATA_TEST_ID.ICON_LIKE_DEFAULT} 
+              sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.md) }}
+            />
           )}
         </PrimaryIconButton>
 
@@ -191,13 +191,19 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({
           title="dislike"
           disabled={!isOnline}
         >
-          {reaction === ReactionType.DISLIKE ? (
+          {reaction === ReactionType.DISLIKED ? (
             <ThumbDownAltIcon
               data-testid={DATA_TEST_ID.ICON_DISLIKE_ACTIVE}
-              sx={{ color: theme.palette.text.secondary }}
+              sx={{ 
+                color: theme.palette.text.secondary,
+                fontSize: theme.fixedSpacing(theme.tabiyaSpacing.md)
+              }}
             />
           ) : (
-            <ThumbDownOffAltIcon data-testid={DATA_TEST_ID.ICON_DISLIKE_DEFAULT} />
+            <ThumbDownOffAltIcon 
+              data-testid={DATA_TEST_ID.ICON_DISLIKE_DEFAULT} 
+              sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.md) }}
+            />
           )}
         </PrimaryIconButton>
       </Box>

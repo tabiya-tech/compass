@@ -1,8 +1,7 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
 
-import { render, screen } from "src/_test_utilities/test-utils";
-import { waitFor } from "@testing-library/react";
+import { render, screen, act, waitFor } from "src/_test_utilities/test-utils";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { ReactionType } from "src/feedback/reaction/reaction.types";
 import { ReactionService } from "src/feedback/reaction/services/reactionService/reaction.service";
@@ -73,7 +72,6 @@ describe("ReactionButtons", () => {
         <ReactionButtons
           messageId={givenMessageId}
           currentReaction={givenCurrentReaction}
-          onReactionChange={jest.fn()}
         />
       );
 
@@ -83,8 +81,14 @@ describe("ReactionButtons", () => {
     });
 
     test.each([
-      [ReactionType.LIKE, DATA_TEST_ID.BUTTON_LIKE],
-      [ReactionType.DISLIKE, DATA_TEST_ID.BUTTON_DISLIKE],
+      [{
+        id: "456",
+        kind: ReactionType.LIKED
+      }, DATA_TEST_ID.BUTTON_LIKE],
+      [{
+        id: "456",
+        kind: ReactionType.DISLIKED
+      }, DATA_TEST_ID.BUTTON_DISLIKE],
     ])("should render the reaction buttons and show the correct reaction icon for %s", (reaction, iconTestId) => {
       // GIVEN a message id and sessionId
       const givenMessageId = "123";
@@ -96,7 +100,6 @@ describe("ReactionButtons", () => {
         <ReactionButtons
           messageId={givenMessageId}
           currentReaction={reaction}
-          onReactionChange={jest.fn()}
         />
       );
 
@@ -119,13 +122,16 @@ describe("ReactionButtons", () => {
       // GIVEN the component is rendered
       const givenMessageId = "123";
       const givenSessionId = 234;
+      const givenCurrentReaction = {
+        id: "456",
+        kind: ReactionType.LIKED
+      }
       mockGetActiveSessionId.mockReturnValue(givenSessionId);
 
       render(
         <ReactionButtons
           messageId={givenMessageId}
-          currentReaction={ReactionType.LIKE}
-          onReactionChange={jest.fn()}
+          currentReaction={givenCurrentReaction}
         />
       );
 
@@ -161,7 +167,7 @@ describe("ReactionButtons", () => {
       const givenMessageId = "123";
       const givenSessionId = 234;
       mockGetActiveSessionId.mockReturnValue(givenSessionId);
-      const givenOnReactionChange = jest.fn();
+      
 
       // AND a mocked service
       mockSendReaction.mockResolvedValueOnce();
@@ -170,7 +176,6 @@ describe("ReactionButtons", () => {
         <ReactionButtons
           messageId={givenMessageId}
           currentReaction={null}
-          onReactionChange={givenOnReactionChange}
         />
       );
 
@@ -181,9 +186,8 @@ describe("ReactionButtons", () => {
       // THEN expect to update the reaction to LIKE
       expect(screen.getByTestId(DATA_TEST_ID.ICON_LIKE_ACTIVE)).toBeInTheDocument();
       // AND the service to be called with the correct reaction (LIKE)
-      expect(mockSendReaction).toHaveBeenCalledWith(givenSessionId, givenMessageId, { kind: ReactionType.LIKE });
-      // AND onReactionChange function to be called with the updated reaction
-      expect(givenOnReactionChange).toHaveBeenCalledWith(givenMessageId, ReactionType.LIKE);
+      expect(mockSendReaction).toHaveBeenCalledWith(givenSessionId, givenMessageId, { kind: ReactionType.LIKED, reason: null });
+
       // AND no error should be logged
       expect(console.error).not.toHaveBeenCalled();
     });
@@ -193,7 +197,7 @@ describe("ReactionButtons", () => {
       const givenMessageId = "123";
       const givenSessionId = 234;
       mockGetActiveSessionId.mockReturnValue(givenSessionId);
-      const givenOnReactionChange = jest.fn();
+      
       const givenReason = "Not helpful";
       // AND a mocked service
       mockSendReaction.mockResolvedValueOnce();
@@ -202,7 +206,6 @@ describe("ReactionButtons", () => {
         <ReactionButtons
           messageId={givenMessageId}
           currentReaction={null}
-          onReactionChange={givenOnReactionChange}
         />
       );
 
@@ -214,13 +217,9 @@ describe("ReactionButtons", () => {
 
       // THEN expect the service to be called with the dislike reason
       expect(mockSendReaction).toHaveBeenCalledWith(givenSessionId, givenMessageId, {
-        kind: ReactionType.DISLIKE,
+        kind: ReactionType.DISLIKED,
         reason: givenReason,
       });
-      // AND expect the onReactionChange function to be called with the updated reaction
-      await waitFor(() => {
-        expect(givenOnReactionChange).toHaveBeenCalledWith(givenMessageId, ReactionType.DISLIKE);
-      })
     });
 
     test("should handle a failed reaction submission when the like button is clicked", async () => {
@@ -228,7 +227,7 @@ describe("ReactionButtons", () => {
       const givenMessageId = "123";
       const givenSessionId = 234;
       mockGetActiveSessionId.mockReturnValue(givenSessionId);
-      const givenOnReactionChange = jest.fn();
+      
       // AND a mocked service that rejects
       mockSendReaction.mockRejectedValueOnce(new Error("Failed to submit reaction"));
       // AND the component is rendered
@@ -236,7 +235,6 @@ describe("ReactionButtons", () => {
         <ReactionButtons
           messageId={givenMessageId}
           currentReaction={null}
-          onReactionChange={givenOnReactionChange}
         />
       );
 
@@ -245,9 +243,8 @@ describe("ReactionButtons", () => {
       await userEvent.click(likeButton);
 
       // THEN expect the service to be called with the LIKE reaction
-      expect(mockSendReaction).toHaveBeenCalledWith(givenSessionId, givenMessageId, { kind: ReactionType.LIKE });
-      // AND expect the onReactionChange function to be called with the previous reaction
-      expect(givenOnReactionChange).toHaveBeenCalledWith(givenMessageId, null);
+      expect(mockSendReaction).toHaveBeenCalledWith(givenSessionId, givenMessageId, { kind: ReactionType.LIKED, reason: null });
+
       // AND expect an error to be logged
       expect(console.error).toHaveBeenCalledWith(
         new Error("Failed to submit the like feedback", { cause: expect.any(Error) })
@@ -263,7 +260,7 @@ describe("ReactionButtons", () => {
       const givenMessageId = "1234";
       const givenSessionId = 234;
       mockGetActiveSessionId.mockReturnValue(givenSessionId);
-      const givenOnReactionChange = jest.fn();
+      
       const givenReason = "Not helpful";
       // AND a mocked service that rejects
       mockSendReaction.mockRejectedValueOnce(new Error("Failed to submit reaction"));
@@ -273,7 +270,6 @@ describe("ReactionButtons", () => {
         <ReactionButtons
           messageId={givenMessageId}
           currentReaction={null}
-          onReactionChange={givenOnReactionChange}
         />
       );
 
@@ -281,21 +277,22 @@ describe("ReactionButtons", () => {
       const dislikeButton = screen.getByTestId(DATA_TEST_ID.BUTTON_DISLIKE);
       await userEvent.click(dislikeButton);
       // AND a reason is selected in the popover
-      (ReactionReasonPopover as jest.Mock).mock.calls.at(-1)[0].onReasonSelect(givenReason);
+      act(() => {
+        (ReactionReasonPopover as jest.Mock).mock.calls.at(-1)[0].onReasonSelect(givenReason);
+      })
 
       // THEN expect the service to be called with the dislike reason
       expect(mockSendReaction).toHaveBeenCalledWith(givenSessionId, givenMessageId, {
-        kind: ReactionType.DISLIKE,
+        kind: ReactionType.DISLIKED,
         reason: givenReason,
       });
-      // AND expect the onReactionChange function to be called with the previous reaction
-      await waitFor(() => {
-        expect(givenOnReactionChange).toHaveBeenCalledWith(givenMessageId, null);
-      })
+
       // AND expect an error to be logged
-      expect(console.error).toHaveBeenCalledWith(
-        new Error("Failed to submit the dislike feedback", { cause: expect.any(Error) })
-      );
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith(
+          new Error("Failed to submit the dislike feedback", { cause: expect.any(Error) })
+        );
+      })
       // AND expect an error snackbar to be shown
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to submit the feedback. Please try again.", {
         variant: "error",
@@ -307,7 +304,7 @@ describe("ReactionButtons", () => {
       const givenMessageId = "123";
       const givenSessionId = 234;
       mockGetActiveSessionId.mockReturnValue(givenSessionId);
-      const givenOnReactionChange = jest.fn();
+      
       // AND a mocked service that takes time to resolve
       mockSendReaction.mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 1000)));
       // AND the component is rendered
@@ -315,7 +312,6 @@ describe("ReactionButtons", () => {
         <ReactionButtons
           messageId={givenMessageId}
           currentReaction={null}
-          onReactionChange={givenOnReactionChange}
         />
       );
 
@@ -338,7 +334,7 @@ describe("ReactionButtons", () => {
       const givenMessageId = "123";
       const givenSessionId = 234;
       mockGetActiveSessionId.mockReturnValue(givenSessionId);
-      const givenOnReactionChange = jest.fn();
+      
       // AND a mocked sendReaction service
       mockSendReaction.mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 1000)));
       // AND the component is rendered
@@ -346,7 +342,6 @@ describe("ReactionButtons", () => {
         <ReactionButtons
           messageId={givenMessageId}
           currentReaction={null}
-          onReactionChange={givenOnReactionChange}
         />
       );
 
@@ -359,7 +354,7 @@ describe("ReactionButtons", () => {
 
       // THEN expect the service to be called with the dislike reason
       expect(mockSendReaction).toHaveBeenCalledWith(givenSessionId, givenMessageId, {
-        kind: ReactionType.DISLIKE,
+        kind: ReactionType.DISLIKED,
         reason: "Not helpful",
       });
       // AND the dislike button is clicked again while the request is in progress
@@ -373,9 +368,12 @@ describe("ReactionButtons", () => {
       const givenMessageId = "123";
       const givenSessionId = 234;
       mockGetActiveSessionId.mockReturnValue(givenSessionId);
-      const givenOnReactionChange = jest.fn();
-      const previousReaction = ReactionType.LIKE;
+
       // AND the service fails for the new reaction
+      const givenPreviousReaction = {
+        id: "456",
+        kind: ReactionType.LIKED
+      }
       let rejectSendReaction: (value: any) => void = () => {};
       mockSendReaction.mockReturnValue(
         new Promise((_resolve, reject) => {
@@ -387,8 +385,7 @@ describe("ReactionButtons", () => {
       render(
         <ReactionButtons
           messageId={givenMessageId}
-          currentReaction={previousReaction}
-          onReactionChange={givenOnReactionChange}
+          currentReaction={givenPreviousReaction}
         />
       );
 
@@ -405,7 +402,7 @@ describe("ReactionButtons", () => {
       })
       // AND the service to be called with the dislike reaction
       expect(mockSendReaction).toHaveBeenCalledWith(givenSessionId, givenMessageId, {
-        kind: ReactionType.DISLIKE,
+        kind: ReactionType.DISLIKED,
         reason: "Not helpful",
       });
 
@@ -420,8 +417,7 @@ describe("ReactionButtons", () => {
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to submit the feedback. Please try again.", {
         variant: "error",
       });
-      // AND the onReactionChange function should be called with the rolled-back reaction
-      expect(givenOnReactionChange).toHaveBeenCalledWith(givenMessageId, previousReaction);
+
     });
 
     test("should rollback to the previous reaction if the service request fails for like reaction", async () => {
@@ -429,8 +425,11 @@ describe("ReactionButtons", () => {
       const givenMessageId = "123";
       const givenSessionId = 234;
       mockGetActiveSessionId.mockReturnValue(givenSessionId);
-      const givenOnReactionChange = jest.fn();
-      const previousReaction = ReactionType.DISLIKE;
+
+      const givenPreviousReaction = {
+        id: "456",
+        kind: ReactionType.DISLIKED
+      }
       // AND the service fails for the new reaction
       let rejectSendReaction: (value: any) => void = () => {};
       mockSendReaction.mockReturnValue(
@@ -443,8 +442,7 @@ describe("ReactionButtons", () => {
       render(
         <ReactionButtons
           messageId={givenMessageId}
-          currentReaction={previousReaction}
-          onReactionChange={givenOnReactionChange}
+          currentReaction={givenPreviousReaction}
         />
       );
 
@@ -455,9 +453,7 @@ describe("ReactionButtons", () => {
       // THEN expect the like active icon to be displayed
       expect(screen.getByTestId(DATA_TEST_ID.ICON_LIKE_ACTIVE)).toBeInTheDocument();
       // AND the service to be called with the like reaction
-      expect(mockSendReaction).toHaveBeenCalledWith(givenSessionId, givenMessageId, {
-        kind: ReactionType.LIKE,
-      });
+      expect(mockSendReaction).toHaveBeenCalledWith(givenSessionId, givenMessageId, { kind: ReactionType.LIKED, reason: null });
 
       // WHEN the service request fails
       rejectSendReaction(new Error("Failed to submit like reaction"));
@@ -470,19 +466,22 @@ describe("ReactionButtons", () => {
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to submit the feedback. Please try again.", {
         variant: "error",
       });
-      // AND the onReactionChange function should be called with the rolled-back reaction
-      expect(givenOnReactionChange).toHaveBeenCalledWith(givenMessageId, previousReaction);
+
     });
 
     test.each([
-      [ReactionType.LIKE, DATA_TEST_ID.BUTTON_LIKE],
-      [ReactionType.DISLIKE, DATA_TEST_ID.BUTTON_DISLIKE],
+      [ReactionType.LIKED, DATA_TEST_ID.BUTTON_LIKE],
+      [ReactionType.DISLIKED, DATA_TEST_ID.BUTTON_DISLIKE],
     ])("should handle %s reaction removal successfully", async (reaction, buttonTestId) => {
       // GIVEN a message ID, session ID, and onReactionChange function
       const givenMessageId = "123";
       const givenSessionId = 234;
+      const givenCurrentReaction = {
+        id: "456",
+        kind: reaction
+      }
       mockGetActiveSessionId.mockReturnValue(givenSessionId);
-      const givenOnReactionChange = jest.fn();
+      
       // AND a mocked service that resolves
       mockDeleteReaction.mockResolvedValueOnce();
 
@@ -490,8 +489,7 @@ describe("ReactionButtons", () => {
       render(
         <ReactionButtons
           messageId={givenMessageId}
-          currentReaction={reaction}
-          onReactionChange={givenOnReactionChange}
+          currentReaction={givenCurrentReaction}
         />
       );
 
@@ -499,21 +497,21 @@ describe("ReactionButtons", () => {
       const button = screen.getByTestId(buttonTestId);
       await userEvent.click(button);
 
-      // THEN expect the reaction to be removed successfully
-      await waitFor(() => {
-        expect(givenOnReactionChange).toHaveBeenCalledWith(givenMessageId, null);
-      });
     });
 
     test.each([
-      [ReactionType.LIKE, DATA_TEST_ID.BUTTON_LIKE, "Failed to remove the like feedback"],
-      [ReactionType.DISLIKE, DATA_TEST_ID.BUTTON_DISLIKE, "Failed to remove the dislike feedback"],
+      [ReactionType.LIKED, DATA_TEST_ID.BUTTON_LIKE, "Failed to remove the like feedback"],
+      [ReactionType.DISLIKED, DATA_TEST_ID.BUTTON_DISLIKE, "Failed to remove the dislike feedback"],
     ])("should handle %s reaction removal failure", async (reaction, buttonTestId, errorMessage) => {
       // GIVEN a message ID, session ID, and onReactionChange function
       const givenMessageId = "123";
       const givenSessionId = 234;
+      const givenCurrentReaction = {
+        id: "456",
+        kind: reaction
+      }
       mockGetActiveSessionId.mockReturnValue(givenSessionId);
-      const givenOnReactionChange = jest.fn();
+      
       // AND a mocked service that rejects
       mockDeleteReaction.mockRejectedValueOnce(new Error("Failed to remove reaction"));
 
@@ -521,8 +519,7 @@ describe("ReactionButtons", () => {
       render(
         <ReactionButtons
           messageId={givenMessageId}
-          currentReaction={reaction}
-          onReactionChange={givenOnReactionChange}
+          currentReaction={givenCurrentReaction}
         />
       );
 
@@ -530,15 +527,12 @@ describe("ReactionButtons", () => {
       const button = screen.getByTestId(buttonTestId);
       await userEvent.click(button);
 
-      // THEN expect the reaction to roll back to the previous state
-      await waitFor(() => {
-        expect(givenOnReactionChange).toHaveBeenCalledWith(givenMessageId, reaction);
-      });
-
-      // AND expect an error snackbar to be displayed
+      // THEN expect an error snackbar to be displayed
+    await waitFor(() => {
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to remove the feedback. Please try again.", {
         variant: "error",
       });
+    });
     });
   });
 });

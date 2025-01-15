@@ -3,6 +3,7 @@ import { ReactionType } from "src/feedback/reaction/reaction.types";
 import ReactionButtons from "src/feedback/reaction/components/reactionButtons/ReactionButtons";
 import { getBackendUrl } from "src/envService";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import { nanoid } from "nanoid";
 
 const meta: Meta<typeof ReactionButtons> = {
   title: "feedback/Reaction/ReactionButtons",
@@ -34,14 +35,14 @@ type Story = StoryObj<typeof ReactionButtons>;
 
 const mockData = (status: number, deleteStatus: number, delay: number = 0) => [
   {
-    url: getBackendUrl() + "/conversation/1234/messages/001/reaction",
+    url: getBackendUrl() + "/conversations/:session_id/messages/:message_id/reactions",
     method: "PUT",
     status: status,
     response: {},
     delay: delay,
   },
   {
-    url: getBackendUrl() + "/conversation/1234/messages/001/reaction",
+    url: getBackendUrl() + "/conversations/:session_id/messages/:message_id/reactions",
     method: "DELETE",
     status: deleteStatus,
     response: () => {},
@@ -58,7 +59,10 @@ export const Shown: Story = {
 
 export const ShownWithLikeReaction: Story = {
   args: {
-    currentReaction: ReactionType.LIKE,
+    currentReaction: {
+      id: nanoid(),
+      kind: ReactionType.LIKED
+    },
   },
   parameters: {
     mockData: mockData(200, 204),
@@ -67,7 +71,10 @@ export const ShownWithLikeReaction: Story = {
 
 export const ShownWithDislikeReaction: Story = {
   args: {
-    currentReaction: ReactionType.DISLIKE,
+    currentReaction: {
+      id: nanoid(),
+      kind: ReactionType.DISLIKED
+    },
   },
   parameters: {
     mockData: mockData(200, 204),

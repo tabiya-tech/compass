@@ -2,12 +2,13 @@ import React, { useEffect, useRef } from "react";
 import { ChatMessageType, IChatMessage } from "src/chat/Chat.types";
 import { Box, List, ListItem, useTheme } from "@mui/material";
 import { styled } from "@mui/system";
-import BasicChatMessage from "src/chat/chatMessage/basicChatMessage/BasicChatMessage";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import ConversationConclusionChatMessage
   from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
-import { ReactionType } from "src/feedback/reaction/reaction.types";
+import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
+import UserChatMessage from "src/chat/chatMessage/userChatMessage/UserChatMessage";
+import CompassChatMessage from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 
 const uniqueId = "0397ee51-f637-4453-9e2f-5cc8900c9554";
 export const DATA_TEST_ID = {
@@ -17,7 +18,6 @@ export const DATA_TEST_ID = {
 export type ChatListProps = {
   messages: IChatMessage[];
   notifyOnFeedbackFormOpened: () => void;
-  notifyReactionChange: (messageId: string, reaction: ReactionType) => void;
 };
 
 const ChatListContainer = styled(Box)(({ theme }) => ({
@@ -33,7 +33,7 @@ const ChatListContainer = styled(Box)(({ theme }) => ({
   },
 }));
 
-const ChatList: React.FC<ChatListProps> = ({ messages, notifyOnFeedbackFormOpened, notifyReactionChange }) => {
+const ChatList: React.FC<ChatListProps> = ({ messages, notifyOnFeedbackFormOpened }) => {
   const theme = useTheme();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -69,7 +69,11 @@ const ChatList: React.FC<ChatListProps> = ({ messages, notifyOnFeedbackFormOpene
   const getChatMessageFlavorFromType = (chatMessage: IChatMessage)  => {
     switch (chatMessage.type) {
       case ChatMessageType.BASIC_CHAT:
-        return <BasicChatMessage chatMessage={chatMessage} />;
+        if(chatMessage.sender === ConversationMessageSender.USER) {
+          return <UserChatMessage chatMessage={chatMessage} />;
+        } else {
+          return <CompassChatMessage chatMessage={chatMessage} />
+        }
       case ChatMessageType.CONVERSATION_CONCLUSION:
         return (
           <ConversationConclusionChatMessage

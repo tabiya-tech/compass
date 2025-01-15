@@ -1,7 +1,6 @@
 // silence chatty console\
 import "src/_test_utilities/consoleMock";
-import { act } from "react";
-import { render, screen, waitFor } from "src/_test_utilities/test-utils";
+import { render, screen, waitFor, act } from "src/_test_utilities/test-utils";
 import Chat, { CHECK_INACTIVITY_INTERVAL, DATA_TEST_ID, INACTIVITY_TIMEOUT } from "src/chat/Chat";
 import ChatHeader, { DATA_TEST_ID as CHAT_HEADER_TEST_ID } from "src/chat/ChatHeader/ChatHeader";
 import ChatList, { DATA_TEST_ID as CHAT_LIST_TEST_ID } from "src/chat/chatList/ChatList";
@@ -31,6 +30,7 @@ import { DATA_TEST_ID as INACTIVE_BACKDROP_DATA_TEST_ID } from "src/theme/Backdr
 import userEvent from "@testing-library/user-event";
 import { ChatMessageType } from "./Chat.types";
 import { nanoid } from "nanoid";
+import { ReactionType } from "src/feedback/reaction/reaction.types";
 
 // Mock Services ----------
 // Mock the ChatService
@@ -259,6 +259,7 @@ describe("Chat", () => {
                 message: "Typing...",
                 sent_at: expect.any(String),
                 sender: ConversationMessageSender.COMPASS,
+                reaction: null,
                 type: ChatMessageType.TYPING,
               },
             ],
@@ -275,12 +276,17 @@ describe("Chat", () => {
               message: "Hello, how are you?",
               sent_at: new Date().toISOString(),
               sender: ConversationMessageSender.USER,
+              reaction: null
             },
             {
               message_id: nanoid(),
-              message: "I'm good, thank you",
+              message: "Hi, I'm compass",
               sent_at: new Date().toISOString(),
               sender: ConversationMessageSender.COMPASS,
+              reaction: {
+                id: nanoid(),
+                kind: ReactionType.DISLIKED,
+              },
             },
           ],
           conversation_completed: false,
@@ -372,13 +378,16 @@ describe("Chat", () => {
                 message: "Hello, how are you?", // A RESPONSE FROM THE AI
                 sent_at: new Date().toISOString(),
                 sender: ConversationMessageSender.COMPASS,
+                reaction: null
               },
             ],
             conversation_completed: false,
             conversation_conducted_at: null,
             experiences_explored: 0,
           };
-          resolveSendMessage(givenSendMessageResponse);
+          act(() => {
+            resolveSendMessage(givenSendMessageResponse);
+          });
 
           // THEN expect the chat list to be updated with the new messages
           await waitFor(() => {
@@ -465,6 +474,7 @@ describe("Chat", () => {
                     message: "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
                     sent_at: expect.any(String),
                     sender: ConversationMessageSender.COMPASS,
+                    reaction: null,
                     type: ChatMessageType.BASIC_CHAT,
                   },
                 ],
@@ -584,7 +594,9 @@ describe("Chat", () => {
 
         // AND WHEN the new session promise resolves
         const givenNewSessionId = 456;
-        resolveNewSession(givenNewSessionId);
+        act(() => {
+          resolveNewSession(givenNewSessionId);
+        });
         // we have to inform the userPreferences state that the session has changed (since we are mocking the service)
         mockGetActiveSessionId.mockReturnValue(givenNewSessionId);
 
@@ -623,13 +635,16 @@ describe("Chat", () => {
               message: "Hello, how are you?", // A RESPONSE FROM THE AI
               sent_at: new Date().toISOString(),
               sender: ConversationMessageSender.COMPASS,
+              reaction: null
             },
           ],
           conversation_completed: false,
           conversation_conducted_at: null,
           experiences_explored: 0,
         };
-        resolveSendMessage(givenSendMessageResponse);
+        act(() => {
+          resolveSendMessage(givenSendMessageResponse);
+        });
 
         // THEN expect the chat list to be updated with the new messages
         await waitFor(() => {
@@ -747,7 +762,9 @@ describe("Chat", () => {
 
         // AND WHEN the new session promise resolves
         const givenNewSessionId = 456;
-        resolveNewSession(givenNewSessionId);
+        act(() => {
+          resolveNewSession(givenNewSessionId);
+        });
         // we have to inform the userPreferences state that the session has changed (since we are mocking the service)
         mockGetActiveSessionId.mockReturnValue(givenNewSessionId);
 
@@ -827,12 +844,16 @@ describe("Chat", () => {
 
         // AND WHEN the new session promise resolves
         const givenNewSessionId = 456;
-        resolveNewSession(givenNewSessionId);
+        act(() => {
+          resolveNewSession(givenNewSessionId);
+        });
         // we have to inform the userPreferences state that the session has changed (since we are mocking the service)
         mockGetActiveSessionId.mockReturnValue(givenNewSessionId);
 
         // AND WHEN the history promise resolves
-        resolveHistory(givenMessages);
+        act(() => {
+          resolveHistory(givenMessages);
+        });
 
         // THEN expect the chat list to be updated with the new messages
         await waitFor(() => {
@@ -861,6 +882,7 @@ describe("Chat", () => {
                   message: "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
                   sent_at: expect.any(String),
                   sender: ConversationMessageSender.COMPASS,
+                  reaction: null,
                   type: ChatMessageType.BASIC_CHAT,
                 },
               ],
@@ -893,24 +915,31 @@ describe("Chat", () => {
             message: "Hello, how can I assist you today?",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
+            reaction: null
           },
           {
             message_id: nanoid(),
             message: "We can start by exploring your experiences.",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
+            reaction: null
           },
           {
             message_id: nanoid(),
             message: "Good, let's start. I was a baker for 10 years.",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.USER,
+            reaction: null
           },
           {
             message_id: nanoid(),
             message: "Wow, a baker for 10 years! That's a long time. What was your favorite part about it?",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
+            reaction: {
+              id: nanoid(),
+              kind: ReactionType.DISLIKED,
+            },
           },
         ],
         conversation_completed: false,
@@ -927,12 +956,17 @@ describe("Chat", () => {
             message: "What skills did you learn?",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
+            reaction: null
           },
           {
             message_id: nanoid(),
             message: "Are you still doing that?",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
+            reaction: {
+              id: nanoid(),
+              kind: ReactionType.LIKED,
+            },
           },
         ],
         conversation_completed: false,
@@ -1027,6 +1061,10 @@ describe("Chat", () => {
             message: "Hello, how can I assist you today?",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
+            reaction: {
+              id: nanoid(),
+              kind: ReactionType.DISLIKED,
+            },
           },
         ],
         conversation_completed: false,
@@ -1117,7 +1155,9 @@ describe("Chat", () => {
       // we are using the last call to the ChatHeader mock because the first one is the initial call
       // and a bunch of calls are made when the component is re-rendered,
       // for example, due to the chat initialization
-      (ChatHeader as jest.Mock).mock.calls.at(-1)[0].notifyOnExperiencesDrawerOpen();
+      act(() => {
+        (ChatHeader as jest.Mock).mock.calls.at(-1)[0].notifyOnExperiencesDrawerOpen();
+      })
 
       // THEN expect the drawer to open
       await waitFor(() => {
@@ -1163,7 +1203,9 @@ describe("Chat", () => {
       // we are using the last call to the ChatHeader mock because the first one is the initial call
       // and a bunch of calls are made when the component is re-rendered,
       // for example, due to the chat initialization
-      (ChatHeader as jest.Mock).mock.calls.at(-1)[0].notifyOnExperiencesDrawerOpen();
+      act(() => {
+        (ChatHeader as jest.Mock).mock.calls.at(-1)[0].notifyOnExperiencesDrawerOpen();
+      })
 
       // THEN expect error notification
       await waitFor(() => {
@@ -1210,6 +1252,7 @@ describe("Chat", () => {
             message: "Hello, how can I assist you today?",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
+            reaction: null
           },
         ],
         conversation_completed: false,
@@ -1230,7 +1273,9 @@ describe("Chat", () => {
       // we are using the last call to the ChatHeader mock because the first one is the initial call
       // and a bunch of calls are made when the component is re-rendered,
       // for example, due to the chat initialization
-      (ChatHeader as jest.Mock).mock.calls.at(-1)[0].startNewConversation();
+      act(() => {
+        (ChatHeader as jest.Mock).mock.calls.at(-1)[0].startNewConversation();
+      });
 
       // THEN expect confirmation dialog to be shown
       await waitFor(() => {
@@ -1241,7 +1286,9 @@ describe("Chat", () => {
       // we are using the last call to the ConfirmModalDialog mock because the first one is the initial call
       // and a bunch of calls are made when the component is re-rendered,
       // for example, due to the chat initialization
-      (ConfirmModalDialog as jest.Mock).mock.calls.at(-1)[0].onConfirm();
+      act(() => {
+        (ConfirmModalDialog as jest.Mock).mock.calls.at(-1)[0].onConfirm();
+      });
 
       // THEN expect the new session to be fetched
       await waitFor(() => {
@@ -1257,7 +1304,9 @@ describe("Chat", () => {
         );
       });
       // AND when the new session promise resolves
-      resolveNewSession({ sessions: [givenNewSessionId] } as unknown as UserPreference);
+      act(() => {
+        resolveNewSession({ sessions: [givenNewSessionId] } as unknown as UserPreference);
+      });
       // we have to inform the userPreferences state that the session has changed (since we are mocking the service)
       mockGetActiveSessionId.mockReturnValue(givenNewSessionId);
 
@@ -1299,6 +1348,10 @@ describe("Chat", () => {
           message: "Hello, how can I assist you today?",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.COMPASS,
+          reaction: {
+            id: nanoid(),
+            kind: ReactionType.DISLIKED,
+          },
         },
       ];
       const historyPromise = Promise.resolve({
@@ -1316,7 +1369,9 @@ describe("Chat", () => {
       // we are using the last call to the ChatHeader mock because the first one is the initial call
       // and a bunch of calls are made when the component is re-rendered,
       // for example, due to the chat initialization
-      (ChatHeader as jest.Mock).mock.calls.at(-1)[0].startNewConversation();
+      act(() => {
+        (ChatHeader as jest.Mock).mock.calls.at(-1)[0].startNewConversation();
+      });
 
       // THEN expect confirmation dialog to be shown
       await waitFor(() => {
@@ -1327,7 +1382,9 @@ describe("Chat", () => {
       // we are using the last call to the ConfirmModalDialog mock because the first one is the initial call
       // and a bunch of calls are made when the component is re-rendered,
       // for example, due to the chat initialization
-      (ConfirmModalDialog as jest.Mock).mock.calls.at(-1)[0].onCancel();
+      act(() => {
+        (ConfirmModalDialog as jest.Mock).mock.calls.at(-1)[0].onCancel();
+      });
 
       // THEN expect dialog to close
       expect(screen.queryByText("Are you sure you want to start a new conversation?")).not.toBeInTheDocument();
@@ -1363,6 +1420,10 @@ describe("Chat", () => {
           message: "Hello, how can I assist you today?",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.COMPASS,
+          reaction: {
+            id: nanoid(),
+            kind: ReactionType.LIKED,
+          },
         },
       ];
       const historyPromise = Promise.resolve({
@@ -1381,7 +1442,9 @@ describe("Chat", () => {
       render(<Chat />);
 
       // WHEN new conversation clicked
-      (ChatHeader as jest.Mock).mock.calls.at(-1)[0].startNewConversation();
+      act(() => {
+        (ChatHeader as jest.Mock).mock.calls.at(-1)[0].startNewConversation();
+      });
 
       // THEN expect confirmation dialog to be shown
       await waitFor(() => {
@@ -1392,7 +1455,9 @@ describe("Chat", () => {
       // we are using the last call to the ConfirmModalDialog mock because the first one is the initial call
       // and a bunch of calls are made when the component is re-rendered,
       // for example, due to the chat initialization
-      (ConfirmModalDialog as jest.Mock).mock.calls.at(-1)[0].onConfirm();
+      act(() => {
+        (ConfirmModalDialog as jest.Mock).mock.calls.at(-1)[0].onConfirm();
+      });
 
       // THEN expect an error message to be added to the chat list
       await waitFor(() => {
@@ -1437,12 +1502,17 @@ describe("Chat", () => {
             message: "Hello, how are you?",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.USER,
+            reaction: null
           },
           {
             message_id: nanoid(),
             message: "I'm good, thank you",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
+            reaction: {
+              id: nanoid(),
+              kind: ReactionType.DISLIKED,
+            },
           },
         ],
         conversation_completed: true, // Conversation needs to be completed to show feedback
@@ -1537,6 +1607,7 @@ describe("Chat", () => {
             message: "Hello",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.USER,
+            reaction: null
           },
         ],
         conversation_completed: false,
@@ -1582,6 +1653,7 @@ describe("Chat", () => {
             message: "Hello",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.USER,
+            reaction: null
           },
         ],
         conversation_completed: false,
@@ -1632,6 +1704,7 @@ describe("Chat", () => {
             message: "Hello",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.USER,
+            reaction: null
           },
         ],
         conversation_completed: false,

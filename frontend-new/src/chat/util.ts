@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import { ChatMessageType, IChatMessage } from "src/chat/Chat.types";
-import { ConversationMessageSender } from "./ChatService/ChatService.types";
+import { ConversationMessageSender, ReactionResponse } from "./ChatService/ChatService.types";
 
 export const generateUserMessage = (message: string, sent_at: string): IChatMessage => {
   return {
@@ -8,21 +8,24 @@ export const generateUserMessage = (message: string, sent_at: string): IChatMess
     sender: ConversationMessageSender.USER,
     message: message,
     sent_at: sent_at,
-    type: ChatMessageType.BASIC_CHAT
+    type: ChatMessageType.BASIC_CHAT,
+    reaction: null
   };
 };
 
 export const generateCompassMessage = (
   message_id: string,
   message: string,
-  sent_at: string
+  sent_at: string,
+  reaction: ReactionResponse | null
 ): IChatMessage => {
   return {
     message_id: message_id,
     sender: ConversationMessageSender.COMPASS,
     message: message,
     sent_at: sent_at,
-    type: ChatMessageType.BASIC_CHAT
+    type: ChatMessageType.BASIC_CHAT,
+    reaction: reaction
   };
 };
 
@@ -34,6 +37,7 @@ export const generateTypingMessage = (
     sender: ConversationMessageSender.COMPASS,
     message: "Typing...",
     sent_at: sent_at,
-    type: ChatMessageType.TYPING
+    type: ChatMessageType.TYPING,
+    reaction: null
   };
 };

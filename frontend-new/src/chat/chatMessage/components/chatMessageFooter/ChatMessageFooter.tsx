@@ -1,15 +1,28 @@
-import { Typography, styled } from "@mui/material";
+import React from "react";
+import { Box, styled, Typography } from "@mui/material";
 import { getDurationFromNow } from "src/utils/getDurationFromNow/getDurationFromNow";
+import ReactionButtons from "src/feedback/reaction/components/reactionButtons/ReactionButtons";
+import { ReactionResponse } from "src/chat/ChatService/ChatService.types";
 
-const uniqueId = "7772f20a-9d0c-4072-b24f-97eca2f43d7b";
+export enum ChatMessageFooterChildren {
+  TIMESTAMP = "TIMESTAMP",
+  REACTIONS = "REACTIONS",
+}
+
+interface ChatMessageFooterProps {
+  sentAt: string;
+  messageId: string;
+  visibleChildren: ChatMessageFooterChildren[];
+  currentReaction: ReactionResponse | null;
+}
+
+const uniqueId = "8d4e6f2c-9a3b-4c5d-b1e7-5f9d8a2b3c4e";
 
 export const DATA_TEST_ID = {
-  CHAT_MESSAGE_TIMESTAMP: `chat-message-sent_at-${uniqueId}`,
+  CHAT_MESSAGE_FOOTER_CONTAINER: `chat-message-footer-container-${uniqueId}`,
+  CHAT_MESSAGE_FOOTER_TIMESTAMP: `chat-message-footer-timestamp-${uniqueId}`,
+  CHAT_MESSAGE_FOOTER_REACTIONS: `chat-message-footer-reaction-${uniqueId}`,
 };
-
-export interface ChatMessageFooterProps {
-  sentAt: string
-}
 
 const TimeStamp = styled(Typography)(({ theme }) => ({
   fontSize: theme.typography.body2.fontSize,
@@ -17,20 +30,38 @@ const TimeStamp = styled(Typography)(({ theme }) => ({
   marginTop: theme.spacing(theme.tabiyaSpacing.xs),
 }));
 
-
-const ChatMessageFooter: React.FC<ChatMessageFooterProps> = ({ sentAt }) => {
+export const ChatMessageFooter: React.FC<ChatMessageFooterProps> = ({
+  sentAt,
+  messageId,
+  visibleChildren,
+  currentReaction
+}) => {
   let duration;
   try {
     duration = getDurationFromNow(new Date(sentAt));
   } catch (e) {
+    // if a duration cannot be found for some reason, show the date itself
+    duration = new Date(sentAt).toString();
     console.error(new Error("Failed to get message duration", { cause: e }));
   }
 
   return (
-    <TimeStamp data-testid={DATA_TEST_ID.CHAT_MESSAGE_TIMESTAMP} variant="caption">
-      sent {duration}
-    </TimeStamp>
-  )
-}
+    <Box width={"100%"} display="flex" flexDirection={"row"} justifyContent={"space-between"} gap={1} data-testid={DATA_TEST_ID.CHAT_MESSAGE_FOOTER_CONTAINER}>
+      {visibleChildren.includes(ChatMessageFooterChildren.TIMESTAMP) && (
+        <TimeStamp data-testid={DATA_TEST_ID.CHAT_MESSAGE_FOOTER_TIMESTAMP} variant="caption">
+          sent {duration}
+        </TimeStamp>
+      )}
+      {visibleChildren.includes(ChatMessageFooterChildren.REACTIONS) && (
+        <Box data-testid={DATA_TEST_ID.CHAT_MESSAGE_FOOTER_REACTIONS}>
+          <ReactionButtons
+            messageId={messageId}
+            currentReaction={currentReaction}
+          />
+        </Box>
+      )}
+    </Box>
+  );
+};
 
 export default ChatMessageFooter;

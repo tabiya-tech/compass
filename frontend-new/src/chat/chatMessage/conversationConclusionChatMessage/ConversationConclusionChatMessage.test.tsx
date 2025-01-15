@@ -37,6 +37,7 @@ describe("render tests", () => {
       message: "Thanks for having a conversation with me.",
       sent_at: givenDate,
       type: ChatMessageType.CONVERSATION_CONCLUSION, // This component is designed for use with the Conversation conclusion chat type
+      reaction: null // Conversation Conclusion message cant have a reaction
     };
     // AND a callback to notify when the feedback form is opened
     const givenNotifyOnFeedbackFormOpened = jest.fn();

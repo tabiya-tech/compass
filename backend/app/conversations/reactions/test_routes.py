@@ -58,7 +58,7 @@ class TestAddReaction:
 
         # WHEN a PUT request is made with the reaction
         response = client.put(
-            f"/{given_session_id}/messages/{given_message_id}/reaction",
+            f"/{given_session_id}/messages/{given_message_id}/reactions",
             json=given_reaction.model_dump(),
         )
 
@@ -87,7 +87,7 @@ class TestAddReaction:
 
         # WHEN a PUT request is made with the reaction
         response = client.put(
-            f"/{given_session_id}/messages/{given_message_id}/reaction",
+            f"/{given_session_id}/messages/{given_message_id}/reactions",
             json=given_reaction.model_dump(),
         )
 
@@ -116,7 +116,7 @@ class TestAddReaction:
 
         # WHEN a PUT request is made with the reaction
         response = client.put(
-            f"/{given_session_id}/messages/{given_message_id}/reaction",
+            f"/{given_session_id}/messages/{given_message_id}/reactions",
             json=given_reaction,
         )
 
@@ -142,7 +142,7 @@ class TestAddReaction:
 
         # WHEN a PUT request is made with the reaction
         response = client.put(
-            f"/{given_session_id}/messages/{given_message_id}/reaction",
+            f"/{given_session_id}/messages/{given_message_id}/reactions",
             json=given_reaction,
         )
 
@@ -166,7 +166,7 @@ class TestAddReaction:
 
         # WHEN a PUT request is made with the reaction
         response = client.put(
-            f"/{given_session_id}/messages/{given_message_id}/reaction",
+            f"/{given_session_id}/messages/{given_message_id}/reactions",
             json=given_reaction,
         )
 
@@ -189,7 +189,7 @@ class TestDeleteReaction:
 
         # WHEN a DELETE request is made
         response = client.delete(
-            f"/{given_session_id}/messages/{given_message_id}/reaction"
+            f"/{given_session_id}/messages/{given_message_id}/reactions"
         )
 
         # THEN the response is NO CONTENT

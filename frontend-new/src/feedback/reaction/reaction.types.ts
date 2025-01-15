@@ -1,6 +1,6 @@
 export enum ReactionType {
-  LIKE = "like",
-  DISLIKE = "dislike",
+  LIKED = "liked",
+  DISLIKED = "disliked",
 }
 
 export enum ReactionReason {
@@ -22,12 +22,12 @@ export const ReactReasonMessages = {
 export class Reaction {
   constructor(
     public kind: ReactionType,
-    public reason?: ReactionReason
+    public reason: ReactionReason | null
   ) {
-    if (kind === ReactionType.LIKE && reason) {
+    if (kind === ReactionType.LIKED && reason) {
       throw new Error("Like reactions cannot have a reason");
     }
-    if (kind === ReactionType.DISLIKE && !reason) {
+    if (kind === ReactionType.DISLIKED && !reason) {
       throw new Error("Dislike reactions must have a reason");
     }
   }

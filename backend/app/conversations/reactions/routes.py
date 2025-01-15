@@ -35,7 +35,7 @@ def add_reaction_routes(conversation_router: APIRouter):
     logger = logging.getLogger(__name__)
 
     reaction_router = APIRouter(
-        prefix="/{session_id}/messages/{message_id}/reaction"
+        prefix="/{session_id}/messages/{message_id}/reactions"
     )
 
     @reaction_router.put(

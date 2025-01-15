@@ -9,7 +9,7 @@ export class ReactionService {
 
   constructor() {
     this.apiServerUrl = getBackendUrl();
-    this.reactionEndpointUrl = `${this.apiServerUrl}/conversation`;
+    this.reactionEndpointUrl = `${this.apiServerUrl}/conversations`;
   }
 
   async sendReaction(sessionId: number, messageId: string, reaction: Reaction): Promise<void> {
@@ -17,14 +17,14 @@ export class ReactionService {
     const serviceFunction = "sendReaction";
     const method = "PUT";
 
-    const reactionURL = `${this.reactionEndpointUrl}/${sessionId}/messages/${messageId}/reaction`;
-    const body = JSON.stringify({ reaction });
+    const reactionURL = `${this.reactionEndpointUrl}/${sessionId}/messages/${messageId}/reactions`;
+    const body = JSON.stringify({ kind: reaction.kind, reason: reaction.reason && [ reaction.reason ] });
 
     await customFetch(reactionURL, {
       method: method,
       headers: { "Content-Type": "application/json" },
       body: body,
-      expectedStatusCode: StatusCodes.OK,
+      expectedStatusCode: StatusCodes.CREATED,
       serviceName: serviceName,
       serviceFunction: serviceFunction,
       failureMessage: `Failed to send reaction for message ${messageId}`,
@@ -37,7 +37,7 @@ export class ReactionService {
     const serviceFunction = "deleteReaction";
     const method = "DELETE";
 
-    const reactionURL = `${this.reactionEndpointUrl}/${sessionId}/messages/${messageId}/reaction`;
+    const reactionURL = `${this.reactionEndpointUrl}/${sessionId}/messages/${messageId}/reactions`;
     await customFetch(reactionURL, {
       method: method,
       expectedStatusCode: StatusCodes.NO_CONTENT,

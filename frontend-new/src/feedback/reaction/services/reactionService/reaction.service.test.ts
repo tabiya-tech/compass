@@ -7,7 +7,7 @@ describe("ReactionService", () => {
   describe("sendReaction", () => {
     test("should send reaction successfully", async () => {
       // GIVEN a reaction on a message with a given messageId in a session with a given SessionId
-      const givenReaction = { kind: ReactionType.LIKE };
+      const givenReaction = { kind: ReactionType.LIKED, reason: null };
       const givenSessionId = 123;
       const givenMessageId = "456";
 
@@ -20,12 +20,12 @@ describe("ReactionService", () => {
 
       // THEN expect the API to be called correctly
       expect(fetchSpy).toHaveBeenCalledWith(
-        `${reactionService.reactionEndpointUrl}/${givenSessionId}/messages/${givenMessageId}/reaction`,
+        `${reactionService.reactionEndpointUrl}/${givenSessionId}/messages/${givenMessageId}/reactions`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ reaction: givenReaction }),
-          expectedStatusCode: StatusCodes.OK,
+          body: JSON.stringify(givenReaction),
+          expectedStatusCode: StatusCodes.CREATED,
           serviceName: "ReactionService",
           serviceFunction: "sendReaction",
           failureMessage: `Failed to send reaction for message 456`,
@@ -36,7 +36,7 @@ describe("ReactionService", () => {
 
     test("should throw the same error thrown by the customFetch method", async () => {
       // GIVEN a reaction on a message with a given messageId in a session with a given SessionId
-      const givenReaction = { kind: ReactionType.LIKE };
+      const givenReaction = { kind: ReactionType.LIKED, reason: null };
       const givenSessionId = 123;
       const givenMessageId = "456";
 
@@ -76,7 +76,7 @@ describe("ReactionService", () => {
       expect(fetchSpy).toHaveBeenCalled();
       // AND expect the response to match the expected response
       expect(fetchSpy).toHaveBeenCalledWith(
-        `${reactionService.reactionEndpointUrl}/${givenSessionId}/messages/${givenMessageId}/reaction`,
+        `${reactionService.reactionEndpointUrl}/${givenSessionId}/messages/${givenMessageId}/reactions`,
         {
           method: "DELETE",
           expectedStatusCode: StatusCodes.NO_CONTENT,
