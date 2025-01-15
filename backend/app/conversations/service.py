@@ -1,5 +1,5 @@
 """
-This module contains the service layer for the conversation module.
+This module contains the service layer for handling conversations.
 """
 import logging
 from abc import ABC, abstractmethod
@@ -11,6 +11,7 @@ from app.agent.agent_types import AgentInput
 from app.agent.experience import ExperienceEntity
 from app.agent.explore_experiences_agent_director import DiveInPhase
 from app.application_state import ApplicationStateManager
+from app.conversations.reactions.repository import ReactionRepository
 from app.conversations.types import ConversationResponse
 from app.conversations.utils import get_messages_from_conversation_manager, filter_conversation_history
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
@@ -79,13 +80,20 @@ class IConversationService(ABC):
         """
         raise NotImplementedError()
 
+
 class ConversationService(IConversationService):
-    def __init__(self, *, application_state_manager: ApplicationStateManager, agent_director: LLMAgentDirector, conversation_memory_manager: ConversationMemoryManager, user_preference_repository: UserPreferenceRepository):
+    def __init__(self, *, 
+                 application_state_manager: ApplicationStateManager, 
+                 agent_director: LLMAgentDirector, 
+                 conversation_memory_manager: ConversationMemoryManager, 
+                 user_preference_repository: UserPreferenceRepository,
+                 reaction_repository: ReactionRepository):
         self._logger = logging.getLogger(ConversationService.__name__)
         self._agent_director = agent_director
         self._application_state_manager = application_state_manager
         self._conversation_memory_manager = conversation_memory_manager
         self._user_preference_repository = user_preference_repository
+        self._reaction_repository = reaction_repository
 
     async def send(self, user_id: str, session_id: int, user_input: str, clear_memory: bool, filter_pii: bool) -> ConversationResponse:
         # check that the user making the request has the session_id in their user preferences
@@ -98,7 +106,7 @@ class ConversationService(IConversationService):
         if filter_pii:
             user_input = await sensitive_filter.obfuscate(user_input)
 
-            # set the sent_at for the user input
+        # set the sent_at for the user input
         user_input = AgentInput(message=user_input, sent_at=datetime.now(timezone.utc))
 
         # set the state of the agent director, the conversation memory manager and all the agents
@@ -151,7 +159,8 @@ class ConversationService(IConversationService):
         state = await self._application_state_manager.get_state(session_id)
         self._conversation_memory_manager.set_state(state.conversation_memory_manager_state)
         context = await self._conversation_memory_manager.get_conversation_context()
-        messages = filter_conversation_history(context.all_history)
+        reactions_for_session = await self._reaction_repository.get_reactions(session_id)
+        messages = await filter_conversation_history(context.all_history, reactions_for_session)
 
         # Count the number of experiences explored in the conversation
         experiences_explored = 0
