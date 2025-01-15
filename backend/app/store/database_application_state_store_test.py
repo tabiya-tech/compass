@@ -211,3 +211,46 @@ async def test_init_state(database_application_state_store):
     given_actual = await database_application_state_store.get_state(given_session_id)
     # THEN the returned state is None
     assert given_actual is None
+
+
+@pytest.mark.asyncio
+async def test_get_state_for_all_sessions(database_application_state_store):
+    # GIVEN multiple application states saved in the database
+    given_session_ids = [generate_new_session_id() for _ in range(3)]
+    given_states = []
+
+    for session_id in given_session_ids:
+        # Create a state with unique data
+        state = ApplicationState(
+            session_id=session_id,
+            agent_director_state=AgentDirectorState(session_id=session_id),
+            explore_experiences_director_state=ExploreExperiencesAgentDirectorState(session_id=session_id),
+            conversation_memory_manager_state=ConversationMemoryManagerState(session_id=session_id),
+            collect_experience_state=CollectExperiencesAgentState(session_id=session_id),
+            skills_explorer_agent_state=SkillsExplorerAgentState(session_id=session_id)
+        )
+        # Update all state components to have unique data
+        update_agent_director_state(state)
+        update_explore_experiences_director_state(state)
+        update_conversation_memory_manager_state(state)
+        update_collect_experience_state(state)
+        update_skills_explorer_agent_state(state)
+
+        given_states.append(state)
+        # Save the state
+        await database_application_state_store.save_state(state)
+
+    # WHEN get_state_for_all_sessions is called
+    actual_state_ids = []
+    async for state_id in database_application_state_store.get_all_session_ids():
+        actual_state_ids.append(state_id)
+
+    # THEN all saved states are retrieved
+    assert len(actual_state_ids) == len(given_states)
+
+    # AND each retrieved state matches its corresponding saved state
+    # Sort both lists by session_id to ensure consistent comparison
+    given_session_ids.sort()
+    actual_state_ids.sort()
+
+    assert given_session_ids == actual_state_ids

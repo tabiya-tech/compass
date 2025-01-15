@@ -1,0 +1,123 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ReactionReasonPopover render tests should render the reaction reason popover correctly 1`] = `
+<div
+  class="MuiBox-root css-vsmmf2"
+  data-testid="reaction-reason-popover-container-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
+>
+  <div
+    class="MuiBox-root css-69i1ev"
+  >
+    <h6
+      class="MuiTypography-root MuiTypography-subtitle1 css-b9u22t-MuiTypography-root"
+      data-testid="reaction-reason-popover-title-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
+    >
+      Please tell us what the issue is?
+    </h6>
+    <button
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-14ql4g7-MuiButtonBase-root-MuiIconButton-root"
+      data-testid="reaction-reason-popover-close-icon-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
+      tabindex="0"
+      title="close feedback"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+        data-testid="reaction-reason-popover-close-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
+        focusable="false"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+        />
+      </svg>
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+  </div>
+  <div
+    class="MuiBox-root css-17outbb"
+  >
+    <button
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
+      data-testid="reaction-reason-popover-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
+      style="color: rgb(65, 64, 61);"
+      tabindex="0"
+      title="inappropriate-tone"
+      type="button"
+    >
+      Inappropriate Tone
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+    <button
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
+      data-testid="reaction-reason-popover-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
+      style="color: rgb(65, 64, 61);"
+      tabindex="0"
+      title="offensive-language"
+      type="button"
+    >
+      Offensive Language
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+    <button
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
+      data-testid="reaction-reason-popover-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
+      style="color: rgb(65, 64, 61);"
+      tabindex="0"
+      title="biased"
+      type="button"
+    >
+      Biased
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+    <button
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
+      data-testid="reaction-reason-popover-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
+      style="color: rgb(65, 64, 61);"
+      tabindex="0"
+      title="incorrect-information"
+      type="button"
+    >
+      Incorrect Information
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+    <button
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
+      data-testid="reaction-reason-popover-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
+      style="color: rgb(65, 64, 61);"
+      tabindex="0"
+      title="irrelevant"
+      type="button"
+    >
+      Irrelevant
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+    <button
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
+      data-testid="reaction-reason-popover-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
+      style="color: rgb(65, 64, 61);"
+      tabindex="0"
+      title="confusing"
+      type="button"
+    >
+      Confusing
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+  </div>
+</div>
+`;

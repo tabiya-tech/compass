@@ -1,4 +1,4 @@
-import { Experience, Skill, WorkType } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
+import { Experience, Skill, WorkType } from "src/experiences/experienceService/experiences.types";
 import { faker } from "@faker-js/faker";
 import { v4 as uuidv4 } from "uuid";
 import { format } from "date-fns";

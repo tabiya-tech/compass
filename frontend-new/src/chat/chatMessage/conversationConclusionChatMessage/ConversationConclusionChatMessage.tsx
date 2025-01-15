@@ -1,8 +1,7 @@
 import React from "react";
 import { IChatMessage } from "src/chat/Chat.types";
-import { MessageContainer } from "src/chat/chatMessage/basicChatMessage/BasicChatMessage";
-import ConversationConclusionFooter
-  from "src/chat/chatMessage/conversationConclusionChatMessage/conversationConclusionFooter/ConversationConclusionFooter";
+import { MessageContainer } from "src/chat/chatMessage/userChatMessage/UserChatMessage";
+import ConversationConclusionFooter from "src/chat/chatMessage/conversationConclusionChatMessage/conversationConclusionFooter/ConversationConclusionFooter";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { Divider, useTheme } from "@mui/material"
 
@@ -14,7 +13,7 @@ export const DATA_TEST_ID = {
 
 type ConversationConclusionChatMessageProps = {
   chatMessage: IChatMessage;
-  notifyOnFeedbackFormOpened: () => void
+  notifyOnFeedbackFormOpened: () => void;
 };
 
 const ConversationConclusionChatMessage: React.FC<ConversationConclusionChatMessageProps> = ({ chatMessage, notifyOnFeedbackFormOpened }) => {

@@ -7,50 +7,32 @@ import { ConversationResponse } from "./ChatService.types";
 
 export default class ChatService {
   readonly chatEndpointUrl: string;
-  readonly chatHistoryEndpointUrl: string;
   readonly apiServerUrl: string;
-  private readonly sessionId: number;
 
-  constructor(sessionId: number) {
+  constructor() {
     this.apiServerUrl = getBackendUrl();
-    this.chatEndpointUrl = `${this.apiServerUrl}/conversation`;
-    this.chatHistoryEndpointUrl = `${this.apiServerUrl}/conversation/history`;
-    this.sessionId = sessionId;
+    this.chatEndpointUrl = `${this.apiServerUrl}/conversations`;
   }
 
-  /**
-   * Get the singleton instance of the ChatService.
-   * @returns {ChatService} The singleton instance of the ChatService.
-   * @param sessionId The session ID to use for the chat service.
-   */
-  static getInstance(sessionId: number): ChatService {
-    return new ChatService(sessionId);
-  }
-
-  public getSessionId(): number {
-    return this.sessionId;
-  }
-
-  public async sendMessage(message: string): Promise<ConversationResponse> {
+  public async sendMessage(sessionId: number, message: string): Promise<ConversationResponse> {
     const serviceName = "ChatService";
     const serviceFunction = "sendMessage";
     const method = "POST";
-    const ChatURL = this.chatEndpointUrl;
-    const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, ChatURL);
+    const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, this.chatEndpointUrl);
+    const constructedSendMessageURL = `${this.chatEndpointUrl}/${sessionId}/messages`;
 
-    const response = await customFetch(ChatURL, {
+    const response = await customFetch(constructedSendMessageURL, {
       method: method,
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        session_id: this.getSessionId(),
         user_input: message,
       }),
       expectedStatusCode: StatusCodes.CREATED,
       serviceName,
       serviceFunction,
-      failureMessage: `Failed to send message with session id ${this.getSessionId()}`,
+      failureMessage: `Failed to send message with session id ${sessionId}`,
       expectedContentType: "application/json",
     });
 
@@ -74,36 +56,19 @@ export default class ChatService {
     return messageResponse;
   }
 
-  async clearChat(): Promise<void> {
-    const serviceName = "ChatService";
-    const serviceFunction = "clearChat";
-    const method = "GET";
-    const qualifiedURL = `${this.chatEndpointUrl}?user_input=&clear_memory=true&session_id=${this.getSessionId()}`;
-
-    await customFetch(qualifiedURL, {
-      method: method,
-      headers: { "Content-Type": "application/json" },
-      expectedStatusCode: StatusCodes.OK,
-      serviceName,
-      serviceFunction,
-      failureMessage: `Failed to clear chat for session id ${this.getSessionId()}`,
-      expectedContentType: "application/json",
-    });
-  }
-
-  public async getChatHistory(): Promise<ConversationResponse> {
+  public async getChatHistory(sessionId: number): Promise<ConversationResponse> {
     const serviceName = "ChatService";
     const serviceFunction = "getChatHistory";
     const method = "GET";
-    const qualifiedURL = `${this.chatHistoryEndpointUrl}?session_id=${this.getSessionId()}`;
+    const constructedHistoryURL = `${this.chatEndpointUrl}/${sessionId}/messages`;
 
-    const response = await customFetch(qualifiedURL, {
+    const response = await customFetch(constructedHistoryURL, {
       method: method,
       headers: { "Content-Type": "application/json" },
       expectedStatusCode: StatusCodes.OK,
       serviceName,
       serviceFunction,
-      failureMessage: `Failed to get chat history for session id ${this.getSessionId()}`,
+      failureMessage: `Failed to get chat history for session id ${sessionId}`,
       expectedContentType: "application/json",
     });
 
@@ -113,7 +78,7 @@ export default class ChatService {
     try {
       chatHistory = JSON.parse(responseBody);
     } catch (e: any) {
-      const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, qualifiedURL);
+      const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, this.chatEndpointUrl);
       throw errorFactory(
         response.status,
         ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,

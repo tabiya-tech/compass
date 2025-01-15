@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import Chat from "./Chat";
 import { getBackendUrl } from "src/envService";
-import { mockExperiences } from "src/experiences/experiencesDrawer/experienceService/_test_utilities/mockExperiencesResponses";
+import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
 
 const meta: Meta<typeof Chat> = {
   title: "Chat/Chat-Component",
@@ -11,7 +11,7 @@ const meta: Meta<typeof Chat> = {
   parameters: {
     mockData: [
       {
-        url: getBackendUrl() + "/conversation/experiences?session_id=1234",
+        url: getBackendUrl() + "/conversations/:session_id/messages",
         method: "GET",
         status: 200,
         response: mockExperiences,
@@ -24,7 +24,7 @@ export default meta;
 
 type Story = StoryObj<typeof Chat>;
 
-const CONVERSATION_HISTORY_URL = getBackendUrl() + "/conversation/history?session_id=1234";
+const CONVERSATION_HISTORY_URL = getBackendUrl() + "/conversations/:session_id/messages";
 
 export const Shown: Story = {
   args: { showInactiveSessionAlert: false, disableInactivityCheck: true },
