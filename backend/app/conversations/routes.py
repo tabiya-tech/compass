@@ -1,3 +1,6 @@
+"""
+This module contains the routes for the conversation module.
+"""
 import logging
 from http import HTTPStatus
 from typing import List, Annotated
@@ -21,6 +24,9 @@ from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.types import Experience
 from app.users.auth import Authentication, UserInfo
 from app.users.repositories import UserPreferenceRepository
+from app.conversations.reactions.routes import add_reaction_routes
+from app.conversations.reactions.service import ReactionService
+from app.conversations.reactions.repository import ReactionRepository
 
 
 async def get_conversation_service(
@@ -29,8 +35,15 @@ async def get_conversation_service(
         conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager),
         db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)
 ) -> IConversationService:
-    # TODO: should this be a singleton?
-    return ConversationService(agent_director=agent_director, application_state_manager=application_state_manager, conversation_memory_manager=conversation_memory_manager, user_preference_repository=UserPreferenceRepository(db))
+     # TODO: should this be a singleton?
+    return ConversationService(
+        agent_director=agent_director,
+        application_state_manager=application_state_manager,
+        conversation_memory_manager=conversation_memory_manager,
+        user_preference_repository=UserPreferenceRepository(db),
+        reaction_repository=ReactionRepository(db)
+    )
+
 
 def add_conversation_routes(app: FastAPI, authentication: Authentication):
     """
@@ -42,11 +55,11 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
     logger = logging.getLogger(__name__)
 
     conversation_router = APIRouter(
-        prefix="/conversations/{session_id}",
+        prefix="/conversations",
         tags=["conversations"]
     )
 
-    @conversation_router.post(path="/messages",
+    @conversation_router.post(path="/{session_id}/messages",
               status_code=HTTPStatus.CREATED,
               response_model=ConversationResponse,
               responses={
@@ -102,7 +115,7 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
             raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail=UNEXPECTED_FAILURE_MESSAGE)
 
 
-    @conversation_router.get(path="/messages",
+    @conversation_router.get(path="/{session_id}/messages",
              response_model=ConversationResponse,
              responses={
                  HTTPStatus.FORBIDDEN: {"model": HTTPErrorResponse}, # user is not allowed to get the messages of another user's session
@@ -135,7 +148,7 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
             raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Oops! something went wrong")
 
 
-    @conversation_router.get(path="/experiences",
+    @conversation_router.get(path="/{session_id}/experiences",
              response_model=List[Experience],
              responses={
                  HTTPStatus.FORBIDDEN: {"model": HTTPErrorResponse}, # user is not allowed to get the experiences of another user's session
@@ -167,4 +180,11 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
             raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Oops! something went wrong")
 
 
+    ############################################
+    # Add the reaction routes
+    ############################################
+    add_reaction_routes(conversation_router)
+
     app.include_router(conversation_router)
+
+
