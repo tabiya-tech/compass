@@ -2,7 +2,7 @@ import { Meta } from "@storybook/react";
 import ExperiencesDrawerContent, {
   LoadingExperienceDrawerContent,
 } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
-import { generateRandomExperiences } from "src/experiences/experiencesDrawer/experienceService/_test_utilities/mockExperiencesResponses";
+import { generateRandomExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
 
 const meta: Meta<typeof ExperiencesDrawerContent> = {
   title: "Experiences/ExperiencesDrawerContent",

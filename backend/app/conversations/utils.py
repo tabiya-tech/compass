@@ -1,15 +1,28 @@
 from datetime import timezone, datetime
-from typing import List
 
 from app.conversation_memory.conversation_memory_types import ConversationHistory, ConversationContext
-from app.chat.chat_types import ConversationMessage, ConversationMessageSender
-from app.agent.agent_types import AgentType
+from app.conversations.types import ConversationMessage, ConversationMessageSender, MessageReaction
+from app.conversations.reactions.types import Reaction
 
 
-def filter_conversation_history(history: 'ConversationHistory') -> List[ConversationMessage]:
+def _convert_to_message_reaction(reaction: Reaction | None) -> MessageReaction | None:
+    """
+    Converts a Reaction to a MessageReaction.
+
+    :param reaction: Optional[Reaction] - the reaction to convert
+    :return: Optional[MessageReaction] - the converted reaction
+    """
+    if reaction is None:
+        return None
+    
+    return MessageReaction.from_reaction(reaction)
+
+
+async def filter_conversation_history(history: 'ConversationHistory', reactions_for_session: list[Reaction]) -> list[ConversationMessage]:
     """
     Filter the conversation history to only include the messages that were sent by the user and the Compass.
-    :param history:
+    :param history: ConversationHistory - the conversation history
+    :param reactions_for_session: Optional[List[Reaction]] - list of reactions for the session
     :return: List[ConversationMessage]
     """
     messages = []
@@ -17,19 +30,31 @@ def filter_conversation_history(history: 'ConversationHistory') -> List[Conversa
         # remove artificial messages
         if not turn.input.is_artificial:
             messages.append(ConversationMessage(
+                message_id=turn.input.message_id,
                 message=turn.input.message,
                 sent_at=turn.input.sent_at.astimezone(timezone.utc).isoformat(),
                 sender=ConversationMessageSender.USER
             ))
+        
+        # Get reaction for a compass message if it exists (user messages can't have reactions)
+        compass_reaction: Reaction | None = None
+        # Find and remove the reaction from the list once it's assigned to a message
+        for i, reaction in enumerate(reactions_for_session):
+            if turn.output.message_id == reaction.message_id:
+                compass_reaction = reaction
+                reactions_for_session.pop(i)
+                break
         messages.append(ConversationMessage(
+            message_id=turn.output.message_id,
             message=turn.output.message_for_user,
             sent_at=turn.output.sent_at.astimezone(timezone.utc).isoformat(),
             sender=ConversationMessageSender.COMPASS,
+            reaction=_convert_to_message_reaction(compass_reaction)
         ))
     return messages
 
 
-async def get_messages_from_conversation_manager(context: 'ConversationContext', from_index: int) -> List[ConversationMessage]:
+async def get_messages_from_conversation_manager(context: 'ConversationContext', from_index: int) -> list[ConversationMessage]:
     """
     Construct the response to the user from the conversation context.
     :param context:
@@ -46,6 +71,7 @@ async def get_messages_from_conversation_manager(context: 'ConversationContext',
     for turn in context.all_history.turns[from_index:]:
         turn.output.sent_at = datetime.now(timezone.utc)
         messages.append(ConversationMessage(
+            message_id=turn.output.message_id,
             message=turn.output.message_for_user,
             sent_at=turn.output.sent_at.astimezone(timezone.utc).isoformat(),
             sender=ConversationMessageSender.COMPASS,

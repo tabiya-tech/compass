@@ -44,11 +44,12 @@ describe("render tests", () => {
     // GIVEN a basic chat message sent at a given time
     const givenDate = new Date().toISOString();
     const givenMessage: IChatMessage = {
-      id: nanoid(),
+      message_id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       message: "Thanks for having a conversation with me.",
       sent_at: givenDate,
-      type: ChatMessageType.CONVERSATION_CONCLUSION,
+      type: ChatMessageType.CONVERSATION_CONCLUSION, // This component is designed for use with the Conversation conclusion chat type
+      reaction: null, // Conversation Conclusion message cant have a reaction
     };
 
     // WHEN the conversation conclusion chat message is rendered
@@ -74,11 +75,12 @@ describe("render tests", () => {
     // GIVEN a basic chat message sent at a given time
     const givenDate = new Date().toISOString();
     const givenMessage: IChatMessage = {
-      id: nanoid(),
+      message_id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       message: "Thanks for having a conversation with me.",
       sent_at: givenDate,
       type: ChatMessageType.CONVERSATION_CONCLUSION,
+      reaction: null
     };
 
     // WHEN the conversation conclusion chat message is rendered
@@ -96,11 +98,12 @@ describe("render tests", () => {
     // GIVEN a basic chat message sent at a given time
     const givenDate = new Date().toISOString();
     const givenMessage: IChatMessage = {
-      id: nanoid(),
+      message_id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       message: "Thanks for having a conversation with me.",
       sent_at: givenDate,
       type: ChatMessageType.CONVERSATION_CONCLUSION,
+      reaction: null
     };
 
     // WHEN the conversation conclusion chat message is rendered
