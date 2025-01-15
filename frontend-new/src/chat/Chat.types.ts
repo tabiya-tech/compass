@@ -7,6 +7,5 @@ export enum ChatMessageType {
 }
 
 export type IChatMessage = ConversationMessage & {
-  id: string;
   type: ChatMessageType;
 };

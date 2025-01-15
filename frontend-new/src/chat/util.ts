@@ -4,7 +4,7 @@ import { ConversationMessageSender } from "./ChatService/ChatService.types";
 
 export const generateUserMessage = (message: string, sent_at: string): IChatMessage => {
   return {
-    id: nanoid(),
+    message_id: nanoid(),
     sender: ConversationMessageSender.USER,
     message: message,
     sent_at: sent_at,
@@ -13,11 +13,12 @@ export const generateUserMessage = (message: string, sent_at: string): IChatMess
 };
 
 export const generateCompassMessage = (
+  message_id: string,
   message: string,
   sent_at: string
 ): IChatMessage => {
   return {
-    id: nanoid(),
+    message_id: message_id,
     sender: ConversationMessageSender.COMPASS,
     message: message,
     sent_at: sent_at,
@@ -29,7 +30,7 @@ export const generateTypingMessage = (
   sent_at: string,
 ): IChatMessage => {
   return {
-    id: nanoid(),
+    message_id: nanoid(),
     sender: ConversationMessageSender.COMPASS,
     message: "Typing...",
     sent_at: sent_at,

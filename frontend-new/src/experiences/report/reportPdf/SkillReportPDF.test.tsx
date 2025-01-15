@@ -3,7 +3,7 @@ import "src/_test_utilities/consoleMock";
 
 import SkillReportPDF, { DATA_TEST_ID } from "src/experiences/report/reportPdf/SkillReportPDF";
 import { render, screen } from "src/_test_utilities/test-utils";
-import { mockExperiences } from "src/experiences/experiencesDrawer/experienceService/_test_utilities/mockExperiencesResponses";
+import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
 
 describe("Report", () => {
   test("should render Report correctly", () => {

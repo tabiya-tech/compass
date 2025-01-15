@@ -20,7 +20,7 @@ type Story = StoryObj<typeof ConversationConclusionChatMessage>;
 export const AccurateMessage: Story = {
   args: {
     chatMessage: {
-      id: nanoid(),
+      message_id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       sent_at: new Date().toISOString(),
       message:
@@ -34,7 +34,7 @@ export const AccurateMessage: Story = {
 export const LongMessage: Story = {
   args: {
     chatMessage: {
-      id: nanoid(),
+      message_id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       sent_at: new Date().toISOString(),
       message:
@@ -47,7 +47,7 @@ export const LongMessage: Story = {
 export const LongUnBrokenWord: Story = {
   args: {
     chatMessage: {
-      id: nanoid(),
+      message_id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       sent_at: new Date().toISOString(),
       message: "a".repeat(1000),
@@ -59,7 +59,7 @@ export const LongUnBrokenWord: Story = {
 export const SingleLetter: Story = {
   args: {
     chatMessage: {
-      id: nanoid(),
+      message_id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       sent_at: new Date().toISOString(),
       message: "a",
@@ -73,7 +73,7 @@ export const ShownWithDifferentTimestamps: Story = {
     <>
       <ConversationConclusionChatMessage
         chatMessage={{
-          id: nanoid(),
+          message_id: nanoid(),
           sender: ConversationMessageSender.COMPASS,
           sent_at: new Date().toISOString(),
           message: "sent just now",
@@ -83,7 +83,7 @@ export const ShownWithDifferentTimestamps: Story = {
       />
       <ConversationConclusionChatMessage
         chatMessage={{
-          id: nanoid(),
+          message_id: nanoid(),
           sender: ConversationMessageSender.COMPASS,
           sent_at: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
           message: "sent an hour ago",
@@ -93,7 +93,7 @@ export const ShownWithDifferentTimestamps: Story = {
       />
       <ConversationConclusionChatMessage
         chatMessage={{
-          id: nanoid(),
+          message_id: nanoid(),
           sender: ConversationMessageSender.COMPASS,
           sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
           message: "sent yesterday",
@@ -103,7 +103,7 @@ export const ShownWithDifferentTimestamps: Story = {
       />
       <ConversationConclusionChatMessage
         chatMessage={{
-          id: nanoid(),
+          message_id: nanoid(),
           sender: ConversationMessageSender.COMPASS,
           sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
           message: "sent two days ago",
@@ -113,7 +113,7 @@ export const ShownWithDifferentTimestamps: Story = {
       />
       <ConversationConclusionChatMessage
         chatMessage={{
-          id: nanoid(),
+          message_id: nanoid(),
           sender: ConversationMessageSender.COMPASS,
           sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(),
           message: "sent a week ago",
@@ -123,7 +123,7 @@ export const ShownWithDifferentTimestamps: Story = {
       />
       <ConversationConclusionChatMessage
         chatMessage={{
-          id: nanoid(),
+          message_id: nanoid(),
           sender: ConversationMessageSender.COMPASS,
           sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(),
           message: "sent a month ago",
@@ -133,7 +133,7 @@ export const ShownWithDifferentTimestamps: Story = {
       />
       <ConversationConclusionChatMessage
         chatMessage={{
-          id: nanoid(),
+          message_id: nanoid(),
           sender: ConversationMessageSender.COMPASS,
           sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30 * 12).toISOString(),
           message: "sent a year ago",

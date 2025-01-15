@@ -4,7 +4,7 @@ import "src/_test_utilities/consoleMock";
 import ExperiencesDrawer, { DATA_TEST_ID } from "src/experiences/experiencesDrawer/ExperiencesDrawer";
 import { fireEvent } from "@testing-library/react";
 import { render, screen } from "src/_test_utilities/test-utils";
-import { mockExperiences } from "src/experiences/experiencesDrawer/experienceService/_test_utilities/mockExperiencesResponses";
+import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
 import { DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID } from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
 import { DATA_TEST_ID as EXPERIENCES_DRAWER_CONTENT_TEST_ID } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
 

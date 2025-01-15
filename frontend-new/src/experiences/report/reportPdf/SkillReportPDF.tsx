@@ -1,6 +1,6 @@
 import React from "react";
 import { Document, Text, Page, View, Image } from "@react-pdf/renderer";
-import { Experience } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
+import { Experience } from "src/experiences/experienceService/experiences.types";
 import {
   formatDate,
   getBase64Image,

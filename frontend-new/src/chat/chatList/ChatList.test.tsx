@@ -69,28 +69,28 @@ describe("ChatList", () => {
     // GIVEN a message list
     const givenMessages = [
       {
-        id: nanoid(),
+        message_id: nanoid(),
         sender: ConversationMessageSender.USER,
         message: "Hello",
         sent_at: new Date().toISOString(),
         type: ChatMessageType.BASIC_CHAT,
       },
       {
-        id: nanoid(),
+        message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
         message: "Hi",
         sent_at: new Date().toISOString(),
         type: ChatMessageType.BASIC_CHAT,
       },
       {
-        id: nanoid(),
+        message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
         message: "Typing...",
         sent_at: new Date().toString(),
         type: ChatMessageType.TYPING,
       },
       {
-        id: nanoid(),
+        message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
         message: "Thank you for using compass",
         sent_at: new Date().toString(),
