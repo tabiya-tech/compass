@@ -1,0 +1,1 @@
+NO_PERMISSION_FOR_SESSION = "User does not have permission to access this session"

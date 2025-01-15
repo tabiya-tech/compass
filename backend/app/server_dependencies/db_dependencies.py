@@ -1,4 +1,5 @@
 import asyncio
+from enum import unique
 from typing import Optional
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
@@ -145,6 +146,17 @@ class CompassDBProvider:
             await application_db.get_collection(Collections.USER_FEEDBACK).create_index([
                 ("session_id", 1)
             ], unique=True)
+
+            await application_db.get_collection(Collections.REACTIONS).create_index([
+                ("session_id", 1),
+                ("message_id", 1)
+            ], unique=True)
+
+            # Add unique index on message_id for reactions
+            await application_db.get_collection(Collections.REACTIONS).create_index([
+                ("message_id", 1)
+            ], unique=True)
+
             logger.info("Finished creating indexes for the application database")
         except Exception as e:
             logger.exception(e)

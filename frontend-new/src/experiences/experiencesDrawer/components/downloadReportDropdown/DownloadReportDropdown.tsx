@@ -1,5 +1,5 @@
 import React from "react";
-import { Experience } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
+import { Experience } from "src/experiences/experienceService/experiences.types";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import DownloadReportButton from "src/experiences/experiencesDrawer/components/downloadReportButton/DownloadReportButton";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";

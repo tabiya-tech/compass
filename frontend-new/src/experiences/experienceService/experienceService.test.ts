@@ -1,9 +1,9 @@
-import ExperienceService from "src/experiences/experiencesDrawer/experienceService/experienceService";
+import ExperienceService from "src/experiences/experienceService/experienceService";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
-import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
+import { setupAPIServiceSpy, setupFetchSpy } from "src/_test_utilities/fetchSpy";
 import { StatusCodes } from "http-status-codes";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
-import { mockExperiences } from "src/experiences/experiencesDrawer/experienceService/_test_utilities/mockExperiencesResponses";
+import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
 
 describe("ExperienceService", () => {
   let givenApiServerUrl: string = "/path/to/api";
@@ -19,14 +19,14 @@ describe("ExperienceService", () => {
     expect(service).toBeDefined();
 
     // AND the service should have the correct endpoint url
-    expect(service.experiencesEndpointUrl).toEqual(`${givenApiServerUrl}/conversation/experiences`);
+    expect(service.experiencesEndpointUrl).toEqual(`${givenApiServerUrl}/conversations`);
   });
 
   describe("getExperiences", () => {
     test("should fetch the correct URL with GET and the correct headers and payload successfully", async () => {
       // GIVEN the experiences to return
       const givenMockExperiences = { mockExperiences };
-      const fetSpy = setupAPIServiceSpy(StatusCodes.OK, givenMockExperiences, "application/json;charset=UTF-8");
+      const fetSpy = setupFetchSpy(StatusCodes.OK, givenMockExperiences, "application/json;charset=UTF-8");
 
       // WHEN the getExperiences function is called with a session id
       const givenSessionId = 1234;
@@ -34,18 +34,15 @@ describe("ExperienceService", () => {
       const experiencesResponse = await service.getExperiences(givenSessionId);
 
       // THEN expect to make a GET request with the correct headers and payload
-      expect(fetSpy).toHaveBeenCalledWith(
-        `${givenApiServerUrl}/conversation/experiences?session_id=${givenSessionId}`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          expectedStatusCode: StatusCodes.OK,
-          serviceName: "ExperienceService",
-          serviceFunction: "getExperiences",
-          failureMessage: "Failed to retrieve experiences",
-          expectedContentType: "application/json",
-        }
-      );
+      expect(fetSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/conversations/${givenSessionId}/experiences`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        expectedStatusCode: StatusCodes.OK,
+        serviceName: "ExperienceService",
+        serviceFunction: "getExperiences",
+        failureMessage: "Failed to retrieve experiences",
+        expectedContentType: "application/json",
+      });
       // AND to return the correct experiences
       expect(experiencesResponse).toEqual(givenMockExperiences);
     });
@@ -87,7 +84,7 @@ describe("ExperienceService", () => {
             ExperienceService.name,
             "getExperiences",
             "GET",
-            `${givenApiServerUrl}/conversation/experiences?session_id=${givenSessionId}`,
+            `${givenApiServerUrl}/conversations/${givenSessionId}/experiences`,
             StatusCodes.OK,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",

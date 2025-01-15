@@ -1,5 +1,5 @@
 import { Paragraph, TextRun, ImageRun, HeadingLevel, AlignmentType } from "docx";
-import { Experience } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
+import { Experience } from "src/experiences/experienceService/experiences.types";
 import { generateExperience } from "./experiencesReportContent/ExperiencesReportContent";
 import {
   COLORS,
