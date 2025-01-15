@@ -6,7 +6,6 @@ import { render, screen } from "src/_test_utilities/test-utils";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 
 describe("render tests", () => {
-
   test("should render the Chat Bubble without a child if none is passed", () => {
     // GIVEN a message
     const givenMessage: string = "Hello, I'm Compass";
@@ -14,7 +13,7 @@ describe("render tests", () => {
     const givenSender: ConversationMessageSender = ConversationMessageSender.COMPASS;
 
     // WHEN the chat bubble is rendered
-    render(<ChatBubble message={givenMessage} sender={givenSender}/>);
+    render(<ChatBubble message={givenMessage} sender={givenSender} />);
 
     // THEN expect the message container to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER)).toBeInTheDocument();
@@ -31,7 +30,7 @@ describe("render tests", () => {
     // AND a sender
     const givenSender: ConversationMessageSender = ConversationMessageSender.COMPASS;
     // AND a footer
-    const givenFooter = <div data-testid={"foo-footer"}>foo child</div>
+    const givenFooter = <div data-testid={"foo-footer"}>foo child</div>;
 
     // WHEN the chat bubble is rendered
     render(

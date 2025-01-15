@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from pydantic import BaseModel, field_serializer
 from enum import Enum
 from typing import Optional
+from app.conversations.reactions.types import ReactionKind
 
 
 class ConversationMessageSender(Enum):
@@ -9,13 +10,28 @@ class ConversationMessageSender(Enum):
     COMPASS = "COMPASS"
 
 
+class MessageReaction(BaseModel):
+    """
+    Represents a reaction in a message response.
+    """
+    id: str
+    kind: ReactionKind
+
+
 class ConversationMessage(BaseModel):
+    """
+    Represents a message in a conversation.
+    """
+    message_id: str
+    """The unique id of the message"""
     message: str
     """The message content"""
     sent_at: datetime
     """The time the message was sent, in ISO format, in UTC"""
     sender: ConversationMessageSender
     """The sender of the message, either USER or COMPASS"""
+    reaction: Optional[MessageReaction] = None
+    """Optional reaction to the message"""
 
     @field_serializer('sent_at')
     def serialize_sent_at(self, value: datetime) -> str:
@@ -42,9 +58,8 @@ class ConversationResponse(BaseModel):
     class Config:
         extra = "forbid"
 
+
 class ConversationInput(BaseModel):
-    session_id: int = 1
-    """The user session id"""
     user_input: str
     """The user input"""
 

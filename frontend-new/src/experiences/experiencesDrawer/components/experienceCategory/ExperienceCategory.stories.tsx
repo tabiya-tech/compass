@@ -1,6 +1,6 @@
 import { Meta } from "@storybook/react";
 import ExperienceCategory from "src/experiences/experiencesDrawer/components/experienceCategory/ExperienceCategory";
-import { generateRandomExperiences } from "src/experiences/experiencesDrawer/experienceService/_test_utilities/mockExperiencesResponses";
+import { generateRandomExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
 import StoreIcon from "@mui/icons-material/Store";
 
 const meta: Meta<typeof ExperienceCategory> = {

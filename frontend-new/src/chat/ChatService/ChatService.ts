@@ -8,12 +8,10 @@ import { ConversationResponse } from "./ChatService.types";
 export default class ChatService {
   private static instance: ChatService;
   readonly chatEndpointUrl: string;
-  readonly chatHistoryEndpointUrl: string;
   readonly apiServerUrl: string;
   private constructor() {
     this.apiServerUrl = getBackendUrl();
-    this.chatEndpointUrl = `${this.apiServerUrl}/conversation`;
-    this.chatHistoryEndpointUrl = `${this.apiServerUrl}/conversation/history`;
+    this.chatEndpointUrl = `${this.apiServerUrl}/conversations`;
   }
 
   /**
@@ -31,16 +29,15 @@ export default class ChatService {
     const serviceName = "ChatService";
     const serviceFunction = "sendMessage";
     const method = "POST";
-    const ChatURL = this.chatEndpointUrl;
-    const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, ChatURL);
+    const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, this.chatEndpointUrl);
+    const constructedSendMessageURL = `${this.chatEndpointUrl}/${sessionId}/messages`;
 
-    const response = await customFetch(ChatURL, {
+    const response = await customFetch(constructedSendMessageURL, {
       method: method,
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        session_id: sessionId,
         user_input: message,
       }),
       expectedStatusCode: StatusCodes.CREATED,
@@ -74,9 +71,9 @@ export default class ChatService {
     const serviceName = "ChatService";
     const serviceFunction = "getChatHistory";
     const method = "GET";
-    const qualifiedURL = `${this.chatHistoryEndpointUrl}?session_id=${sessionId}`;
+    const constructedHistoryURL = `${this.chatEndpointUrl}/${sessionId}/messages`;
 
-    const response = await customFetch(qualifiedURL, {
+    const response = await customFetch(constructedHistoryURL, {
       method: method,
       headers: { "Content-Type": "application/json" },
       expectedStatusCode: StatusCodes.OK,
@@ -92,7 +89,7 @@ export default class ChatService {
     try {
       chatHistory = JSON.parse(responseBody);
     } catch (e: any) {
-      const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, qualifiedURL);
+      const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, this.chatEndpointUrl);
       throw errorFactory(
         response.status,
         ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,

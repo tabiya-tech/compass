@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Box, Chip, Grid, Popover, Skeleton, Typography, useMediaQuery, useTheme } from "@mui/material";
-import { Experience } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
+import { Experience } from "src/experiences/experienceService/experiences.types";
 import { Theme } from "@mui/material/styles";
 import HelpTip from "src/theme/HelpTip/HelpTip";
 import InfoIcon from "@mui/icons-material/Info";

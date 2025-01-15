@@ -1,12 +1,12 @@
 import { Meta, StoryObj } from "@storybook/react";
 
 import SensitiveDataForm from "./SensitiveDataForm";
-import UserPreferencesStateService from "../../../userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import {
   Language,
   SensitivePersonalDataRequirement,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import { getBackendUrl } from "../../../envService";
+import { getBackendUrl } from "src/envService";
 
 const meta: Meta<typeof SensitiveDataForm> = {
   title: "SensitiveDataForm/SensitiveDataForm",

@@ -12,7 +12,7 @@ import AuthenticationStateService from "src/auth/services/AuthenticationState.se
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { ChatError } from "src/error/commonErrors";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
-import ExperienceService from "src/experiences/experiencesDrawer/experienceService/experienceService";
+import ExperienceService from "src/experiences/experienceService/experienceService";
 import ExperiencesDrawer, { DATA_TEST_ID as EXPERIENCE_DRAWER_TEST_ID } from "src/experiences/experiencesDrawer/ExperiencesDrawer";
 import { WorkType } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
 import { Language, SensitivePersonalDataRequirement, UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
@@ -681,6 +681,8 @@ describe("Chat", () => {
               message: FIXED_MESSAGES_TEXT.PLEASE_REPEAT,
               sent_at: expect.any(String),
               sender: ConversationMessageSender.COMPASS,
+              reaction: null,
+              type: ChatMessageType.BASIC_CHAT,
             },
           ], true,
         );
@@ -729,14 +731,21 @@ describe("Chat", () => {
       const givenSendMessageResponse: ConversationResponse = {
         messages: [
           {
+            message_id: nanoid(),
             message: "008f1449-4d70-4cc0-a876-553c11caad18",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
+            reaction: null,
           },
           {
+            message_id: nanoid(),
             message: "51602db3-cf7f-490e-9ca8-4fae4427de30",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
+            reaction: {
+              id: nanoid(),
+              kind: ReactionType.LIKED,
+            },
           },
         ],
         conversation_completed: false,
@@ -1130,7 +1139,7 @@ describe("Chat", () => {
       // Mock the getChatHistory method a second time for the new session
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockImplementationOnce(mockGetChatHistoryFn);
 
-      // WHEN the user confirms
+      // WHEN the user confirms,
       // we are using the last call to the ConfirmModalDialog mock because the first one is the initial call
       // and a bunch of calls are made when the component is re-rendered,
       // for example, due to the chat initialization
@@ -1180,9 +1189,14 @@ describe("Chat", () => {
       // AND a chat service that returns an existing conversation
       const givenPreviousConversation = getMockConversationResponse([
         {
+          message_id: nanoid(),
           message: "7f3f43fd-a203-4b4a-9f6a-da6dfb301558",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.COMPASS,
+          reaction: {
+            id: nanoid(),
+            kind: ReactionType.DISLIKED,
+          },
         },
       ]);
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenPreviousConversation);
@@ -1216,7 +1230,7 @@ describe("Chat", () => {
       assertMessagesAreShown([
           ...givenPreviousConversation.messages.map((message) => ({
             ...message,
-            id: expect.any(String),
+            message_id: expect.any(String),
             type: ChatMessageType.BASIC_CHAT,
           })),
         ], true,
@@ -1234,9 +1248,14 @@ describe("Chat", () => {
       // AND a chat service that returns an existing conversation
       const givenPreviousConversation = getMockConversationResponse([
         {
+          message_id: nanoid(),
           message: "7a283c09-c4d4-4bf3-a480-1263e4d5282e",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.COMPASS,
+          reaction: {
+            id: nanoid(),
+            kind: ReactionType.LIKED,
+          },
         },
       ]);
 
@@ -1302,14 +1321,21 @@ describe("Chat", () => {
       // AND a chat service with existing messages
       const givenMessages: ConversationResponse = getMockConversationResponse([
         {
+          message_id: nanoid(),
           message: "66a3fd90-2f4a-4aeb-af56-b4f12f73c68d",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.USER,
+          reaction: null,
         },
         {
+          message_id: nanoid(),
           message: "c64b0aae-f19b-49cb-a8e8-2e6f4fd69947",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.COMPASS,
+          reaction: {
+            id: nanoid(),
+            kind: ReactionType.DISLIKED,
+          },
         },
       ]);
 
