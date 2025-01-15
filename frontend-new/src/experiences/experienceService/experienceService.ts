@@ -3,7 +3,7 @@ import { getRestAPIErrorFactory } from "src/error/restAPIError/RestAPIError";
 import { customFetch } from "src/utils/customFetch/customFetch";
 import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
-import { Experience } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
+import { Experience } from "src/experiences/experienceService/experiences.types";
 
 export default class ExperienceService {
   readonly experiencesEndpointUrl: string;
@@ -11,11 +11,11 @@ export default class ExperienceService {
 
   constructor() {
     this.apiServeUrl = getBackendUrl();
-    this.experiencesEndpointUrl = `${this.apiServeUrl}/conversation/experiences`;
+    this.experiencesEndpointUrl = `${this.apiServeUrl}/conversations`;
   }
 
   async getExperiences(sessionId: number): Promise<Experience[]> {
-    const constructedExperiencesUrl = `${this.experiencesEndpointUrl}?session_id=${sessionId}`;
+    const constructedExperiencesUrl = `${this.experiencesEndpointUrl}/${sessionId}/experiences`;
     const errorFactory = getRestAPIErrorFactory(
       "ExperienceService",
       "getExperiences",

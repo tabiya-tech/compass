@@ -1,5 +1,5 @@
 import { Packer } from "docx";
-import { Experience } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
+import { Experience } from "src/experiences/experienceService/experiences.types";
 import { constructSkillReportDocument } from "src/experiences/report/reportDocx/constructSkillReportDocument";
 
 interface SkillReportDocxProps {

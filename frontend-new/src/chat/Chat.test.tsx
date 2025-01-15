@@ -19,11 +19,11 @@ import AuthenticationStateService from "src/auth/services/AuthenticationState.se
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { ChatError } from "src/error/commonErrors";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
-import ExperienceService from "src/experiences/experiencesDrawer/experienceService/experienceService";
+import ExperienceService from "src/experiences/experienceService/experienceService";
 import ExperiencesDrawer, {
   DATA_TEST_ID as EXPERIENCE_DRAWER_TEST_ID,
 } from "src/experiences/experiencesDrawer/ExperiencesDrawer";
-import { WorkType } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
+import { WorkType } from "src/experiences/experienceService/experiences.types";
 import {
   Language,
   SensitivePersonalDataRequirement,
@@ -38,6 +38,9 @@ import { ChatMessageType, IChatMessage } from "./Chat.types";
 import { FIXED_MESSAGES_TEXT } from "./util";
 import { TabiyaUser } from "src/auth/auth.types";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import { nanoid } from "nanoid";
+import { ReactionType } from "src/feedback/reaction/reaction.types";
 
 // Mock Components ----------
 // mock the snackbar
@@ -154,7 +157,7 @@ describe("Chat", () => {
     assertMessagesAreShown(
       givenConversationResponse.messages.map((message) => ({
         ...message,
-        id: expect.any(String), // the id is not sent by the server, so its not part of the given messages
+        message_id: expect.any(String), // the id is not sent by the server, so its not part of the given messages
         type: ChatMessageType.BASIC_CHAT, // the message type is not part of the given messages we get from the backend
       })),
       areLastMessages
@@ -254,14 +257,18 @@ describe("Chat", () => {
       // AND the conversation history has some messages
       const givenChatHistoryResponse: ConversationResponse = getMockConversationResponse([
         {
+          message_id: nanoid(),
           message: "eb0f8640-9d51-4e9b-a5b8-cd660aa1b08b",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.USER,
+          reaction: null
         },
         {
+          message_id: nanoid(),
           message: "f564df06-799f-4e20-9b54-369515c0c222",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.COMPASS,
+          reaction: null
         },
       ]);
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenChatHistoryResponse);
@@ -310,14 +317,18 @@ describe("Chat", () => {
         // AND the conversation history has some messages
         const givenChatHistoryResponse: ConversationResponse = getMockConversationResponse([
           {
+            message_id: nanoid(),
             message: "bcf81460-54de-484a-822f-a96b27378224",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.USER,
+            reaction: null
           },
           {
+            message_id: nanoid(),
             message: "52aea18a-4a0f-44ad-b690-e99ff8e4ddc7",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
+            reaction: null // TODO: ADD REACTION
           },
         ]);
         jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenChatHistoryResponse);
@@ -366,9 +377,11 @@ describe("Chat", () => {
           // AND when a chat message is sent, it returns a message
           const givenSendMessageResponse: ConversationResponse = getMockConversationResponse([
             {
+              message_id: nanoid(),
               message: "004448d3-f97a-484e-94a4-03951ba8b36f", // A RESPONSE FROM THE AI
               sent_at: new Date().toISOString(),
               sender: ConversationMessageSender.COMPASS,
+              reaction: null
             },
           ]);
           jest.spyOn(ChatService.getInstance(), "sendMessage").mockResolvedValue(givenSendMessageResponse);
@@ -431,11 +444,12 @@ describe("Chat", () => {
             expect.objectContaining({
               messages: [
                 {
-                  id: expect.any(String),
+                  message_id: expect.any(String),
                   message: FIXED_MESSAGES_TEXT.PLEASE_REPEAT,
                   sent_at: expect.any(String),
                   sender: ConversationMessageSender.COMPASS,
                   type: ChatMessageType.BASIC_CHAT,
+                  reaction: null
                 },
               ],
             }),
@@ -489,11 +503,12 @@ describe("Chat", () => {
         assertMessagesAreShown(
           [
             {
-              id: expect.any(String),
+              message_id: expect.any(String),
               type: ChatMessageType.BASIC_CHAT,
               message: FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG,
               sent_at: expect.any(String),
               sender: ConversationMessageSender.COMPASS,
+              reaction: null
             },
           ],
           true
@@ -521,14 +536,18 @@ describe("Chat", () => {
         // AND the conversation history has some messages
         const givenChatHistoryResponse: ConversationResponse = getMockConversationResponse([
           {
+            message_id: nanoid(),
             message: "bcf81460-54de-484a-822f-a96b27378224",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.USER,
+            reaction: null
           },
           {
+            message_id: nanoid(),
             message: "52aea18a-4a0f-44ad-b690-e99ff8e4ddc7",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
+            reaction: null
           },
         ]);
         jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenChatHistoryResponse);
@@ -588,9 +607,11 @@ describe("Chat", () => {
         // AND when a chat message is sent, it returns a message
         const givenSendMessageResponse: ConversationResponse = getMockConversationResponse([
           {
+            message_id: nanoid(),
             message: "c9afe141-3655-48d1-b558-cf69123ab803", // A RESPONSE FROM THE AI
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
+            reaction: null
           },
         ]);
         jest.spyOn(ChatService.getInstance(), "sendMessage").mockResolvedValueOnce(givenSendMessageResponse);
@@ -649,11 +670,12 @@ describe("Chat", () => {
         assertMessagesAreShown(
           [
             {
-              id: expect.any(String),
+              message_id: expect.any(String),
               type: ChatMessageType.BASIC_CHAT,
               message: FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG,
               sent_at: expect.any(String),
               sender: ConversationMessageSender.COMPASS,
+              reaction: null
             },
           ],
           true
@@ -709,11 +731,12 @@ describe("Chat", () => {
         assertMessagesAreShown(
           [
             {
-              id: expect.any(String),
+              message_id: expect.any(String),
               type: ChatMessageType.BASIC_CHAT,
               message: FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG,
               sent_at: expect.any(String),
               sender: ConversationMessageSender.COMPASS,
+              reaction: null
             },
           ],
           true
@@ -774,11 +797,12 @@ describe("Chat", () => {
         assertMessagesAreShown(
           [
             {
-              id: expect.any(String),
-              type: ChatMessageType.BASIC_CHAT,
+              message_id: expect.any(String),
               message: FIXED_MESSAGES_TEXT.PLEASE_REPEAT,
               sent_at: expect.any(String),
               sender: ConversationMessageSender.COMPASS,
+              reaction: null,
+              type: ChatMessageType.BASIC_CHAT,
             },
           ],
           true
@@ -808,24 +832,32 @@ describe("Chat", () => {
       // AND the conversation history has some messages
       const givenPreviousConversation: ConversationResponse = getMockConversationResponse([
         {
+          message_id: nanoid(),
           message: "13a7d8b3-dcb8-4e5c-b377-97160eb2b814",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.COMPASS,
+          reaction: null
         },
         {
+          message_id: nanoid(),
           message: "d27b6bf0-f060-4825-aeab-0f1b3d8e274d",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.COMPASS,
+          reaction: null
         },
         {
+          message_id: nanoid(),
           message: "2c69dca6-fc07-4cdb-942c-0021c86ebe94",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.USER,
+          reaction: null
         },
         {
+          message_id: nanoid(),
           message: "1c322d44-a232-494b-95be-af475abe36a8",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.COMPASS,
+          reaction: null
         },
       ]);
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenPreviousConversation);
@@ -833,14 +865,24 @@ describe("Chat", () => {
       const givenSendMessageResponse: ConversationResponse = {
         messages: [
           {
+            message_id: nanoid(),
             message: "008f1449-4d70-4cc0-a876-553c11caad18",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
+            reaction: null,
           },
           {
+            message_id: nanoid(),
             message: "51602db3-cf7f-490e-9ca8-4fae4427de30",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
+            reaction: {
+              id: nanoid(),
+              kind: ReactionType.LIKED, // TODO REVIEW:  even though you can do this, it does not comply to the usecase.
+                                        //  Because your use case now is send message and ai responds message that  has feedback?
+                                        //  I would rather expect to see test cases in the chat init when the user has conversation history with
+                                        //  message that have feedback, instead of random places.
+            },
           },
         ],
         conversation_completed: false,
@@ -879,22 +921,24 @@ describe("Chat", () => {
           [
             ...givenPreviousConversation.messages.map((message) => ({
               ...message,
-              id: expect.any(String),
+              message_id: expect.any(String),
               type: ChatMessageType.BASIC_CHAT,
             })),
             {
-              id: expect.any(String),
-              message: givenMessage,
-              sent_at: expect.any(String),
-              sender: ConversationMessageSender.USER,
-              type: ChatMessageType.BASIC_CHAT,
+              message_id: expect.any(String),
+            message: givenMessage,
+            sent_at: expect.any(String),
+            sender: ConversationMessageSender.USER,
+            type: ChatMessageType.BASIC_CHAT,
+            reaction: null
             },
             {
-              id: expect.any(String),
-              message: FIXED_MESSAGES_TEXT.AI_IS_TYPING,
-              sent_at: expect.any(String),
-              sender: ConversationMessageSender.COMPASS,
-              type: ChatMessageType.TYPING,
+              message_id: expect.any(String),
+            message: FIXED_MESSAGES_TEXT.AI_IS_TYPING,
+            sent_at: expect.any(String),
+            sender: ConversationMessageSender.COMPASS,
+            type: ChatMessageType.TYPING,
+            reaction: null
             },
           ],
           true
@@ -917,19 +961,20 @@ describe("Chat", () => {
           [
             ...givenPreviousConversation.messages.map((message) => ({
               ...message,
-              id: expect.any(String),
+              message_id: expect.any(String),
               type: ChatMessageType.BASIC_CHAT,
             })),
             {
-              id: expect.any(String),
-              message: givenMessage,
-              sent_at: expect.any(String),
-              sender: ConversationMessageSender.USER,
-              type: ChatMessageType.BASIC_CHAT,
+              message_id: expect.any(String),
+            message: givenMessage,
+            sent_at: expect.any(String),
+            sender: ConversationMessageSender.USER,
+            type: ChatMessageType.BASIC_CHAT,
+            reaction: null
             },
             ...givenSendMessageResponse.messages.map((message) => ({
               ...message,
-              id: expect.any(String),
+              message_id: expect.any(String),
               type: ChatMessageType.BASIC_CHAT,
             })),
           ],
@@ -967,24 +1012,32 @@ describe("Chat", () => {
       // AND the conversation history has some messages
       const givenPreviousConversation: ConversationResponse = getMockConversationResponse([
         {
+          message_id: nanoid(),
           message: "e8a727c6-1b49-4800-9925-03ee31f0a7b9",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.COMPASS,
+          reaction: null
         },
         {
+          message_id: nanoid(),
           message: "91ca9c85-d27a-4987-b410-d687d13cbba6",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.COMPASS,
+          reaction: null
         },
         {
+          message_id: nanoid(),
           message: "08731b79-2816-4d9d-9248-89fa6818634c",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.USER,
+          reaction: null
         },
         {
+          message_id: nanoid(),
           message: "b7a59799-16c3-4bc0-bac4-8e8764053fb8",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.COMPASS,
+          reaction: null
         },
       ]);
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenPreviousConversation);
@@ -1023,15 +1076,16 @@ describe("Chat", () => {
             ...givenPreviousConversation.messages.map((message) => ({
               ...message,
               sent_at: expect.any(String),
-              id: expect.any(String),
+              message_id: expect.any(String),
               type: ChatMessageType.BASIC_CHAT,
             })),
             {
-              id: expect.any(String),
-              type: ChatMessageType.BASIC_CHAT,
-              message: FIXED_MESSAGES_TEXT.PLEASE_REPEAT,
-              sent_at: expect.any(String),
-              sender: ConversationMessageSender.COMPASS,
+              message_id: expect.any(String),
+            type: ChatMessageType.BASIC_CHAT,
+            message: FIXED_MESSAGES_TEXT.PLEASE_REPEAT,
+            sent_at: expect.any(String),
+            sender: ConversationMessageSender.COMPASS,
+            reaction: null
             },
           ],
           true
@@ -1064,9 +1118,11 @@ describe("Chat", () => {
       // AND the conversation history has some messages
       const givenPreviousConversation: ConversationResponse = getMockConversationResponse([
         {
+          message_id: nanoid(),
           message: "90dac7d1-d396-4516-9078-00032539d8dc",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.COMPASS,
+          reaction: null
         },
       ]);
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenPreviousConversation);
@@ -1137,9 +1193,11 @@ describe("Chat", () => {
       const givenPreviousConversation: ConversationResponse = {
         messages: [
           {
+            message_id: nanoid(),
             message: "fad1a46e-1be8-43e8-a1d4-461a99322014",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
+            reaction: null
           },
         ],
         conversation_completed: false,
@@ -1202,14 +1260,18 @@ describe("Chat", () => {
       // AND the conversation history has some messages for the current session, but is empty for the new session
       const givenInitialSessionChatHistoryResponse: ConversationResponse = getMockConversationResponse([
         {
+          message_id: nanoid(),
           message: "1584e645-e367-490d-bc5c-c14f41bc0e80",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.COMPASS,
+          reaction: null
         },
         {
+          message_id: nanoid(),
           message: "904a1ceb-2bf0-478a-b28f-fa73c86efdb6",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.USER,
+          reaction: null
         },
       ]);
       const givenNewSessionChatHistoryResponse: ConversationResponse = getMockConversationResponse([]);
@@ -1225,9 +1287,11 @@ describe("Chat", () => {
       // AND the chat service will return a message when a message is sent
       const givenSendMessageResponse: ConversationResponse = getMockConversationResponse([
         {
+          message_id: nanoid(),
           message: "69eb00eb-4d55-44b2-bd47-0245df0ca9cc",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.COMPASS,
+          reaction: null
         },
       ]);
       jest.spyOn(ChatService.getInstance(), "sendMessage").mockResolvedValueOnce(givenSendMessageResponse);
@@ -1257,7 +1321,7 @@ describe("Chat", () => {
       // Mock the getChatHistory method a second time for the new session
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockImplementationOnce(mockGetChatHistoryFn);
 
-      // WHEN the user confirms
+      // WHEN the user confirms,
       // we are using the last call to the ConfirmModalDialog mock because the first one is the initial call
       // and a bunch of calls are made when the component is re-rendered,
       // for example, due to the chat initialization
@@ -1315,9 +1379,14 @@ describe("Chat", () => {
       // AND a chat service that returns an existing conversation
       const givenPreviousConversation = getMockConversationResponse([
         {
+          message_id: nanoid(),
           message: "7f3f43fd-a203-4b4a-9f6a-da6dfb301558",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.COMPASS,
+          reaction: {
+            id: nanoid(),
+            kind: ReactionType.DISLIKED,
+          },
         },
       ]);
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenPreviousConversation);
@@ -1352,7 +1421,7 @@ describe("Chat", () => {
         [
           ...givenPreviousConversation.messages.map((message) => ({
             ...message,
-            id: expect.any(String),
+            message_id: expect.any(String),
             type: ChatMessageType.BASIC_CHAT,
           })),
         ],
@@ -1373,9 +1442,14 @@ describe("Chat", () => {
       // AND a chat service that returns an existing conversation
       const givenPreviousConversation = getMockConversationResponse([
         {
+          message_id: nanoid(),
           message: "7a283c09-c4d4-4bf3-a480-1263e4d5282e",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.COMPASS,
+          reaction: {
+            id: nanoid(),
+            kind: ReactionType.LIKED,
+          },
         },
       ]);
 
@@ -1409,11 +1483,12 @@ describe("Chat", () => {
         assertMessagesAreShown(
           [
             {
-              id: expect.any(String),
+              message_id: expect.any(String),
               type: ChatMessageType.BASIC_CHAT,
               message: FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG,
               sender: ConversationMessageSender.COMPASS,
               sent_at: expect.any(String),
+              reaction: null
             },
           ],
           true
@@ -1459,9 +1534,11 @@ describe("Chat", () => {
       // AND the conversation history has some messages
       const givenMessages: ConversationResponse = getMockConversationResponse([
         {
+          message_id: nanoid(),
           message: "d3b57530-82ed-42b7-8621-95aeec4a60b4",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.USER,
+          reaction: null,
         },
       ]);
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenMessages);
@@ -1505,9 +1582,11 @@ describe("Chat", () => {
       // AND the conversation history has some messages
       const givenMessages: ConversationResponse = getMockConversationResponse([
         {
+          message_id: nanoid(),
           message: "5a7330e5-4f0c-4c1f-8a1c-f86d7ad59530",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.USER,
+          reaction: null,
         },
       ]);
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenMessages);
@@ -1573,9 +1652,11 @@ describe("Chat", () => {
       // AND a chat service with some messages
       const givenMessages: ConversationResponse = getMockConversationResponse([
         {
+          message_id: nanoid(),
           message: "ed1c8727-9716-4e69-8669-d8f6c8f4aabd",
           sent_at: new Date().toISOString(),
           sender: ConversationMessageSender.USER,
+          reaction: null,
         },
       ]);
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenMessages);

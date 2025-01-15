@@ -28,8 +28,7 @@ describe("ChatService", () => {
 
     // AND the service should have the correct endpoint urls
     expect(actualFirstInstance.apiServerUrl).toEqual(givenApiServerUrl);
-    expect(actualFirstInstance.chatEndpointUrl).toEqual(`${givenApiServerUrl}/conversation`);
-    expect(actualFirstInstance.chatHistoryEndpointUrl).toEqual(`${givenApiServerUrl}/conversation/history`);
+    expect(actualFirstInstance.chatEndpointUrl).toEqual(`${givenApiServerUrl}/conversations`);
 
     // AND WHEN the service is constructed again
     const actualSecondInstance = ChatService.getInstance();
@@ -60,10 +59,10 @@ describe("ChatService", () => {
       // THEN expect it to make a GET request
       // AND the headers
       // AND the request payload to contain the given arguments
-      expect(fetchSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/conversation`, {
+      expect(fetchSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/conversations/${givenSessionId}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: givenSessionId, user_input: givenMessage }),
+        body: JSON.stringify({ user_input: givenMessage }),
         expectedStatusCode: StatusCodes.CREATED,
         serviceName: "ChatService",
         serviceFunction: "sendMessage",
@@ -81,7 +80,7 @@ describe("ChatService", () => {
 
     test("on fail to fetch, should reject with the expected service error", async () => {
       const givenMessage = "Hello";
-      // GIVEN fetch rejects with some unknown error
+      // GIVEN fetch rejects with some unknown error for sending a message on a given session
       const givenFetchError = new Error("some error");
       jest.spyOn(require("src/utils/customFetch/customFetch"), "customFetch").mockImplementationOnce(() => {
         return new Promise(() => {
@@ -123,7 +122,7 @@ describe("ChatService", () => {
             ChatService.name,
             "sendMessage",
             "POST",
-            `${givenApiServerUrl}/conversation`,
+            `${givenApiServerUrl}/conversations`,
             StatusCodes.CREATED,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",
@@ -152,18 +151,15 @@ describe("ChatService", () => {
 
       // THEN expect it to make a GET request
       // AND the headers
-      expect(fetchSpy).toHaveBeenCalledWith(
-        `${givenApiServerUrl}/conversation/history?session_id=${givenSessionId}`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          expectedStatusCode: StatusCodes.OK,
-          serviceName: "ChatService",
-          serviceFunction: "getChatHistory",
-          failureMessage: `Failed to get chat history for session id ${givenSessionId}`,
-          expectedContentType: "application/json",
-        },
-      );
+      expect(fetchSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/conversations/${givenSessionId}/messages`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        expectedStatusCode: StatusCodes.OK,
+        serviceName: "ChatService",
+        serviceFunction: "getChatHistory",
+        failureMessage: `Failed to get chat history for session id ${givenSessionId}`,
+        expectedContentType: "application/json",
+      });
 
       // AND returns the history response
       expect(actualHistoryResponse).toEqual(givenTestHistoryResponse);
@@ -174,7 +170,7 @@ describe("ChatService", () => {
     });
 
     test("on fail to fetch, should reject with the expected service error", async () => {
-      // GIVEN fetch rejects with some unknown error
+      // GIVEN fetch rejects with some unknown error when getting the history of a given session
       const givenFetchError = new Error("some error");
       jest.spyOn(require("src/utils/customFetch/customFetch"), "customFetch").mockImplementationOnce(() => {
         return new Promise(() => {
@@ -215,7 +211,7 @@ describe("ChatService", () => {
             ChatService.name,
             "getChatHistory",
             "GET",
-            `${givenApiServerUrl}/conversation/history?session_id=${givenSessionId}`,
+            `${givenApiServerUrl}/conversations`,
             StatusCodes.OK,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",

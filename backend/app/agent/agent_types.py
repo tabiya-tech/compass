@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import Optional
 from datetime import datetime, timezone
+from bson import ObjectId
 
 from pydantic import BaseModel, Field, field_validator, field_serializer
 
@@ -22,6 +23,8 @@ class AgentInput(BaseModel):
     """
     The input to an agent
     """
+    message_id: Optional[str] = Field(default_factory=lambda: str(ObjectId()))
+    """A unique id for the message"""
 
     message: str  # Bad idea, rename
     """The message from the user"""
@@ -76,6 +79,9 @@ class AgentOutput(BaseModel):
     """
     The output of an agent
     """
+    message_id: Optional[str] = Field(default_factory=lambda: str(ObjectId()))
+    """A unique id for the message"""
+
     message_for_user: str
     """The message for the user"""
 

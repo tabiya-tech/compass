@@ -14,6 +14,14 @@ exports[`ChatList should render the Chat List and show the appropriate message t
       style="opacity: 1; transform: none;"
     >
       <div
+        data-testid="chat-message-container-41e9f8a5-be6f-406a-9958-13e9bcc853a9"
+      />
+    </li>
+    <li
+      class="MuiListItem-root MuiListItem-gutters css-108qrq1-MuiListItem-root"
+      style="opacity: 1; transform: none;"
+    >
+      <div
         data-testid="chat-message-container-2fbaf2ef-9eab-485a-bd28-b4a164e18b06"
       />
     </li>
