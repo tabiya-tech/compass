@@ -25,7 +25,6 @@ from app.types import Experience
 from app.users.auth import Authentication, UserInfo
 from app.users.repositories import UserPreferenceRepository
 from app.conversations.reactions.routes import add_reaction_routes
-from app.conversations.reactions.service import ReactionService
 from app.conversations.reactions.repository import ReactionRepository
 
 

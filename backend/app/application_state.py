@@ -75,8 +75,38 @@ class ApplicationStateStore(ABC):
         """
         raise NotImplementedError
 
+class IApplicationStateManager(ABC):
+    """
+    Interface for the application state manager
 
-class ApplicationStateManager:
+    Allows to mock the class in tests
+    """
+
+    @abstractmethod
+    async def get_state(self, session_id: int) -> ApplicationState:
+        """
+        Get the application state for a session
+        If the state does not exist, a new state is created and stored in
+        the store prior to returning it.
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def save_state(self, state: ApplicationState):
+        """
+        Save the application state for a session
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def delete_state(self, session_id: int) -> None:
+        """
+        Delete the application state for a session
+        """
+        raise NotImplementedError()
+
+
+class ApplicationStateManager(IApplicationStateManager):
     """
     The application state manager is responsible for managing the application state.
     it delegates the storage and retrieval of the state to an application state store.
@@ -87,11 +117,6 @@ class ApplicationStateManager:
         self.logger = logging.getLogger(self.__class__.__name__)
 
     async def get_state(self, session_id: int) -> ApplicationState:
-        """
-        Get the application state for a session
-        If the state does not exist, a new state is created and stored in
-        the store prior to returning it.
-        """
         state = await self._store.get_state(session_id)
         if state is None:
             state = ApplicationState(
@@ -107,13 +132,7 @@ class ApplicationStateManager:
         return state
 
     async def save_state(self, state: ApplicationState):
-        """
-        Save the application state for a session
-        """
         return await self._store.save_state(state)
 
     async def delete_state(self, session_id: int) -> None:
-        """
-        Delete the application state for a session
-        """
         return await self._store.delete_state(session_id)

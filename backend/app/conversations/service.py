@@ -10,14 +10,14 @@ from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.agent.agent_types import AgentInput
 from app.agent.experience import ExperienceEntity
 from app.agent.explore_experiences_agent_director import DiveInPhase
-from app.application_state import ApplicationStateManager
-from app.conversations.reactions.repository import ReactionRepository
+from app.application_state import IApplicationStateManager
+from app.conversation_memory.conversation_memory_manager import IConversationMemoryManager
+from app.conversations.reactions.repository import IReactionRepository
 from app.conversations.types import ConversationResponse
 from app.conversations.utils import get_messages_from_conversation_manager, filter_conversation_history
-from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.sensitive_filter import sensitive_filter
 from app.types import Experience, Skill
-from app.users.repositories import UserPreferenceRepository
+from app.users.repositories import IUserPreferenceRepository
 
 
 class UnauthorizedSessionAccessError(Exception):
@@ -83,11 +83,11 @@ class IConversationService(ABC):
 
 class ConversationService(IConversationService):
     def __init__(self, *, 
-                 application_state_manager: ApplicationStateManager, 
+                 application_state_manager: IApplicationStateManager,
                  agent_director: LLMAgentDirector, 
-                 conversation_memory_manager: ConversationMemoryManager, 
-                 user_preference_repository: UserPreferenceRepository,
-                 reaction_repository: ReactionRepository):
+                 conversation_memory_manager: IConversationMemoryManager,
+                 user_preference_repository: IUserPreferenceRepository,
+                 reaction_repository: IReactionRepository):
         self._logger = logging.getLogger(ConversationService.__name__)
         self._agent_director = agent_director
         self._application_state_manager = application_state_manager

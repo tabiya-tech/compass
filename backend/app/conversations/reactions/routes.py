@@ -8,23 +8,22 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends, HTTPException, Path
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from app.application_state import ApplicationStateManager
 from app.constants.errors import HTTPErrorResponse
+from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
+from app.server_dependencies.application_state_dependencies import get_application_state_manager
+from app.server_dependencies.conversation_manager_dependencies import get_conversation_memory_manager
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.conversations.reactions.repository import ReactionRepository
-from app.conversations.reactions.service import ReactionService, IReactionService
+from app.conversations.reactions.service import ReactionService, IReactionService, ReactingToUserMessageError
 from app.conversations.reactions.types import ReactionRequest
 
-# Lock to ensure that the singleton instance is thread-safe
-_reaction_service_lock = asyncio.Lock()
-_reaction_service_singleton: IReactionService | None = None
 
-async def get_reaction_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)) -> IReactionService:
-    global _reaction_service_singleton
-    if _reaction_service_singleton is None:  # initial check to avoid the lock if the singleton instance is already created
-        async with _reaction_service_lock:  # before modifying the singleton instance, acquire the lock
-            if _reaction_service_singleton is None:  # double check after acquiring the lock
-                _reaction_service_singleton = ReactionService(ReactionRepository(db))
-    return _reaction_service_singleton
+async def get_reaction_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db), conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager), application_state_manager: ApplicationStateManager = Depends(get_application_state_manager)) -> IReactionService:
+    return ReactionService(
+        reaction_repository=ReactionRepository(db),
+        conversation_memory_manager=conversation_memory_manager,
+        application_state_manager=application_state_manager)
 
 
 def add_reaction_routes(conversation_router: APIRouter):
@@ -45,6 +44,7 @@ def add_reaction_routes(conversation_router: APIRouter):
         response_model=None,
         description="saves user's reaction to a message",
         responses={
+            HTTPStatus.BAD_REQUEST: {"model": HTTPErrorResponse},  # user is not allowed to react to messages sent by the user, only messages from compass
             HTTPStatus.FORBIDDEN: {"model": HTTPErrorResponse},  # user is not allowed to react to messages in another user's session
             HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse},  # Internal server error, any server error
         },
@@ -57,6 +57,10 @@ def add_reaction_routes(conversation_router: APIRouter):
     ):
         try:
             await service.add(session_id, message_id, reaction)
+        except ReactingToUserMessageError as e:
+            warning_msg = str(e)
+            logger.warning(warning_msg)
+            raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=warning_msg)
         except Exception as e:
             logger.exception(e)
             raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Oops! Something went wrong.")
