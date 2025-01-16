@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field, field_serializer, field_validator
 
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.conversation_memory.conversation_memory_manager import \
-    ConversationMemoryManager
+    ConversationMemoryManager, IConversationMemoryManager
 
 
 class ConversationPhase(Enum):
@@ -90,7 +90,7 @@ class AbstractAgentDirector(ABC):
     It maintains the state of the conversation which is divided into phases.
     """
 
-    def __init__(self, conversation_manager: ConversationMemoryManager):
+    def __init__(self, conversation_manager: IConversationMemoryManager):
         # Initialize the logger
         self._logger = logging.getLogger(self.__class__.__name__)
 

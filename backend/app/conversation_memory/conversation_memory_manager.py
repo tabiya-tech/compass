@@ -1,12 +1,47 @@
 import logging
 
+from abc import ABC, abstractmethod
+
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.conversation_memory.conversation_memory_types import ConversationHistory, \
     ConversationContext, ConversationTurn, ConversationMemoryManagerState
 from app.conversation_memory.summarizer import Summarizer
 
+class IConversationMemoryManager(ABC):
+    """
+    Interface for the conversation memory manager
 
-class ConversationMemoryManager:
+    Allows to mock the class in tests
+    """
+
+    @abstractmethod
+    def set_state(self, state: ConversationMemoryManagerState):
+        """
+        Set the conversation memory manager state
+        :param state: the manager state
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def get_conversation_context(self):
+        """
+        Get the conversation context for a session that has been summarized as needed and should be passed to an agent.
+        :return: The conversation context
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def update_history(self, user_input: AgentInput, agent_output: AgentOutput):
+        """
+        Update the conversation history for a session by appending the user input and agent output to the history.
+        Additionally, the history will be summarized if the to be summarized history window is full
+
+        :param user_input: The user input
+        :param agent_output: The agent output
+        """
+        raise NotImplementedError()
+
+class ConversationMemoryManager(IConversationMemoryManager):
     """
     Manages the conversation history
     """
@@ -19,17 +54,9 @@ class ConversationMemoryManager:
         self._logger = logging.getLogger(self.__class__.__name__)
 
     def set_state(self, state: ConversationMemoryManagerState):
-        """
-        Set the conversation memory manager state
-        :param state: the manager state
-        """
         self._state = state
 
     async def get_conversation_context(self) -> ConversationContext:
-        """
-        Get the conversation context for a session that has been summarized as needed and should be passed to an agent.
-        :return: The conversation context
-        """
         return ConversationContext(
                 all_history=self._state.all_history,
                 history=ConversationHistory(
@@ -39,9 +66,6 @@ class ConversationMemoryManager:
         )
 
     async def _summarize(self):
-        """
-        Update the conversation summary to include the given history input
-        """
         try:
             # Generate the new summary
             self._logger.debug("Summarizing conversation:")
@@ -56,13 +80,6 @@ class ConversationMemoryManager:
             self._logger.error("Error summarizing conversation: %s", e, exc_info=True)
 
     async def update_history(self, user_input: AgentInput, agent_output: AgentOutput) -> None:
-        """
-        Update the conversation history for a session by appending the user input and agent output to the history.
-        Additionally, the history will be summarized if the to be summarized history window is full
-
-        :param user_input: The user input
-        :param agent_output: The agent output
-        """
         count = len(self._state.all_history.turns) + 1
         turn = ConversationTurn(index=count, input=user_input, output=agent_output)
         self._state.all_history.turns.append(turn)
