@@ -6,7 +6,9 @@ import { render, screen } from "src/_test_utilities/test-utils";
 import UserChatMessage, {
   DATA_TEST_ID as USER_CHAT_MESSAGE_DATA_TEST_ID,
 } from "src/chat/chatMessage/userChatMessage/UserChatMessage";
-import CompassChatMessage, { DATA_TEST_ID as COMPASS_CHAT_MESSAGE_DATA_TEST_ID } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
+import CompassChatMessage, {
+  DATA_TEST_ID as COMPASS_CHAT_MESSAGE_DATA_TEST_ID,
+} from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
 import { ChatMessageType } from "src/chat/Chat.types";
@@ -33,7 +35,7 @@ jest.mock("src/chat/chatMessage/compassChatMessage/CompassChatMessage", () => {
     ...originalModule,
     default: jest.fn(() => <div data-testid={originalModule.DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}></div>),
   };
-})
+});
 
 jest.mock("src/chat/chatMessage/components/chatBubble/ChatBubble", () => {
   const originalModule = jest.requireActual("src/chat/chatMessage/components/chatBubble/ChatBubble");
@@ -85,7 +87,7 @@ describe("ChatList", () => {
         message: "Hello",
         sent_at: new Date().toISOString(),
         type: ChatMessageType.BASIC_CHAT,
-        reaction: null
+        reaction: null,
       },
       {
         message_id: nanoid(),
@@ -104,7 +106,7 @@ describe("ChatList", () => {
         message: "Let's explore your experiences!",
         sent_at: new Date().toISOString(),
         type: ChatMessageType.BASIC_CHAT,
-        reaction: null
+        reaction: null,
       },
       {
         message_id: nanoid(),
@@ -112,7 +114,7 @@ describe("ChatList", () => {
         message: "Typing...",
         sent_at: new Date().toString(),
         type: ChatMessageType.TYPING,
-        reaction: null
+        reaction: null,
       },
       {
         message_id: nanoid(),
@@ -120,7 +122,7 @@ describe("ChatList", () => {
         message: "Thank you for using compass",
         sent_at: new Date().toString(),
         type: ChatMessageType.CONVERSATION_CONCLUSION,
-        reaction: null
+        reaction: null,
       },
     ];
     // AND a function to open the feedback form

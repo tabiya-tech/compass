@@ -34,7 +34,7 @@ export const ChatMessageFooter: React.FC<ChatMessageFooterProps> = ({
   sentAt,
   messageId,
   visibleChildren,
-  currentReaction
+  currentReaction,
 }) => {
   let duration;
   try {
@@ -46,7 +46,14 @@ export const ChatMessageFooter: React.FC<ChatMessageFooterProps> = ({
   }
 
   return (
-    <Box width={"100%"} display="flex" flexDirection={"row"} justifyContent={"space-between"} gap={1} data-testid={DATA_TEST_ID.CHAT_MESSAGE_FOOTER_CONTAINER}>
+    <Box
+      width={"100%"}
+      display="flex"
+      flexDirection={"row"}
+      justifyContent={"space-between"}
+      gap={1}
+      data-testid={DATA_TEST_ID.CHAT_MESSAGE_FOOTER_CONTAINER}
+    >
       {visibleChildren.includes(ChatMessageFooterChildren.TIMESTAMP) && (
         <TimeStamp data-testid={DATA_TEST_ID.CHAT_MESSAGE_FOOTER_TIMESTAMP} variant="caption">
           sent {duration}
@@ -54,10 +61,7 @@ export const ChatMessageFooter: React.FC<ChatMessageFooterProps> = ({
       )}
       {visibleChildren.includes(ChatMessageFooterChildren.REACTIONS) && (
         <Box data-testid={DATA_TEST_ID.CHAT_MESSAGE_FOOTER_REACTIONS}>
-          <ReactionButtons
-            messageId={messageId}
-            currentReaction={currentReaction}
-          />
+          <ReactionButtons messageId={messageId} currentReaction={currentReaction} />
         </Box>
       )}
     </Box>

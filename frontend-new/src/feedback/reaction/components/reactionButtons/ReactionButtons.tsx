@@ -31,10 +31,7 @@ export const DATA_TEST_ID = {
   ICON_DISLIKE_ACTIVE: `reaction-icon-dislike-active-${uniqueId}`,
 };
 
-export const ReactionButtons: React.FC<ReactionButtonsProps> = ({
-  messageId,
-  currentReaction
-}) => {
+export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, currentReaction }) => {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
   const isOnline = useContext(IsOnlineContext);
@@ -44,9 +41,7 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({
   const [reaction, setReaction] = useState<ReactionType | null>(currentReaction?.kind ?? null);
   const [previousReaction, setPreviousReaction] = useState<ReactionType | null>(currentReaction?.kind ?? null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [activeSessionId] = useState<number | null>(
-    UserPreferencesStateService.getInstance().getActiveSessionId()
-  );
+  const [activeSessionId] = useState<number | null>(UserPreferencesStateService.getInstance().getActiveSessionId());
   const reactionService = new ReactionService();
 
   // Close the popover
@@ -56,8 +51,8 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({
   };
 
   const handleLikeClick = async () => {
-    if(!activeSessionId){
-      throw new ReactionError("Session id is not available")
+    if (!activeSessionId) {
+      throw new ReactionError("Session id is not available");
     }
 
     // If the user is submitting a request, do nothing
@@ -98,8 +93,8 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({
   };
 
   const handleDislikeClick = async (event: React.MouseEvent<HTMLElement>) => {
-    if(!activeSessionId){
-      throw new ReactionError("Session id is not available")
+    if (!activeSessionId) {
+      throw new ReactionError("Session id is not available");
     }
 
     // If the user is submitting a request, do nothing
@@ -131,8 +126,8 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({
   };
 
   const handleReasonSelect = async (reason: ReactionReason) => {
-    if(!activeSessionId){
-      throw new ReactionError("Session id is not available")
+    if (!activeSessionId) {
+      throw new ReactionError("Session id is not available");
     }
 
     setIsSubmitting(true);
@@ -167,16 +162,16 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({
           disabled={!isOnline}
         >
           {reaction === ReactionType.LIKED ? (
-            <ThumbUpAltIcon 
-              data-testid={DATA_TEST_ID.ICON_LIKE_ACTIVE} 
-              sx={{ 
+            <ThumbUpAltIcon
+              data-testid={DATA_TEST_ID.ICON_LIKE_ACTIVE}
+              sx={{
                 color: theme.palette.text.secondary,
-                fontSize: theme.fixedSpacing(theme.tabiyaSpacing.md)
-              }} 
+                fontSize: theme.fixedSpacing(theme.tabiyaSpacing.md),
+              }}
             />
           ) : (
-            <ThumbUpOffAltIcon 
-              data-testid={DATA_TEST_ID.ICON_LIKE_DEFAULT} 
+            <ThumbUpOffAltIcon
+              data-testid={DATA_TEST_ID.ICON_LIKE_DEFAULT}
               sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.md) }}
             />
           )}
@@ -194,14 +189,14 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({
           {reaction === ReactionType.DISLIKED ? (
             <ThumbDownAltIcon
               data-testid={DATA_TEST_ID.ICON_DISLIKE_ACTIVE}
-              sx={{ 
+              sx={{
                 color: theme.palette.text.secondary,
-                fontSize: theme.fixedSpacing(theme.tabiyaSpacing.md)
+                fontSize: theme.fixedSpacing(theme.tabiyaSpacing.md),
               }}
             />
           ) : (
-            <ThumbDownOffAltIcon 
-              data-testid={DATA_TEST_ID.ICON_DISLIKE_DEFAULT} 
+            <ThumbDownOffAltIcon
+              data-testid={DATA_TEST_ID.ICON_DISLIKE_DEFAULT}
               sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.md) }}
             />
           )}

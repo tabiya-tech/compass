@@ -2,9 +2,9 @@ import { ConversationMessageSender } from "src/chat/ChatService/ChatService.type
 import { Box, Typography, styled, alpha, Divider, useTheme } from "@mui/material";
 
 export interface ChatBubbleProps {
-  message: string,
-  sender: ConversationMessageSender,
-  footer?: React.ReactNode
+  message: string;
+  sender: ConversationMessageSender;
+  footer?: React.ReactNode;
 }
 
 const uniqueId = "6e685eeb-2b54-432a-8b66-8a81633b3981";
@@ -14,7 +14,7 @@ export const DATA_TEST_ID = {
   CHAT_MESSAGE_BUBBLE_MESSAGE_TEXT: `chat-message-bubble-message-text-${uniqueId}`,
   CHAT_MESSAGE_BUBBLE_MESSAGE_DIVIDER: `chat-message-bubble-message-divider-${uniqueId}`,
   CHAT_MESSAGE_BUBBLE_MESSAGE_FOOTER_CONTAINER: `chat-message-bubble-message-footer-container-${uniqueId}`,
-}
+};
 
 const MessageBubble = styled(Box)<{ origin: ConversationMessageSender }>(({ theme, origin }) => ({
   variants: "outlined",
@@ -35,23 +35,21 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ message, sender, footer }) => {
   const theme = useTheme();
   return (
     <MessageBubble origin={sender} data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER}>
-      <Typography whiteSpace="pre-line" data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_TEXT}>{message}</Typography>
-      {
-        footer && (
-          <>
-            <Divider
-              color={theme.palette.grey[100]}
-              sx={{ marginY: theme.spacing(1) }}
-              data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_DIVIDER}
-            />
-            <Box data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_FOOTER_CONTAINER}>
-              {footer}
-            </Box>
-          </>
-        )
-      }
+      <Typography whiteSpace="pre-line" data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_TEXT}>
+        {message}
+      </Typography>
+      {footer && (
+        <>
+          <Divider
+            color={theme.palette.grey[100]}
+            sx={{ marginY: theme.spacing(1) }}
+            data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_DIVIDER}
+          />
+          <Box data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_FOOTER_CONTAINER}>{footer}</Box>
+        </>
+      )}
     </MessageBubble>
-  )
-}
+  );
+};
 
 export default ChatBubble;

@@ -3,8 +3,7 @@ import { ChatMessageType, IChatMessage } from "src/chat/Chat.types";
 import { Box, List, ListItem, useTheme } from "@mui/material";
 import { styled } from "@mui/system";
 import { AnimatePresence, motion } from "framer-motion";
-import ConversationConclusionChatMessage
-  from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
+import ConversationConclusionChatMessage from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import UserChatMessage from "src/chat/chatMessage/userChatMessage/UserChatMessage";
@@ -66,13 +65,13 @@ const ChatList: React.FC<ChatListProps> = ({ messages, notifyOnFeedbackFormOpene
     return () => window.removeEventListener("resize", resizeChatMessage);
   }, []);
 
-  const getChatMessageFlavorFromType = (chatMessage: IChatMessage)  => {
+  const getChatMessageFlavorFromType = (chatMessage: IChatMessage) => {
     switch (chatMessage.type) {
       case ChatMessageType.BASIC_CHAT:
-        if(chatMessage.sender === ConversationMessageSender.USER) {
+        if (chatMessage.sender === ConversationMessageSender.USER) {
           return <UserChatMessage chatMessage={chatMessage} />;
         } else {
-          return <CompassChatMessage chatMessage={chatMessage} />
+          return <CompassChatMessage chatMessage={chatMessage} />;
         }
       case ChatMessageType.CONVERSATION_CONCLUSION:
         return (
@@ -84,9 +83,9 @@ const ChatList: React.FC<ChatListProps> = ({ messages, notifyOnFeedbackFormOpene
       case ChatMessageType.TYPING:
         // typing messages don't need to show anything but the message text
         // no timestamp or reactions will be shown, so we can use the ChatBubble itself
-        return <ChatBubble message={chatMessage.message} sender={chatMessage.sender} />
+        return <ChatBubble message={chatMessage.message} sender={chatMessage.sender} />;
     }
-  }
+  };
 
   return (
     <ChatListContainer data-testid={DATA_TEST_ID.CHAT_LIST_CONTAINER} tabIndex={0}>
@@ -111,7 +110,7 @@ const ChatList: React.FC<ChatListProps> = ({ messages, notifyOnFeedbackFormOpene
               transition={{ duration: 0.3 }}
               sx={{ width: "100%", padding: theme.tabiyaSpacing.xs }}
             >
-              { getChatMessageFlavorFromType(message) }
+              {getChatMessageFlavorFromType(message)}
             </ListItem>
           ))}
         </AnimatePresence>

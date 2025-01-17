@@ -18,7 +18,7 @@ export class ReactionService {
     const method = "PUT";
 
     const reactionURL = `${this.reactionEndpointUrl}/${sessionId}/messages/${messageId}/reactions`;
-    const body = JSON.stringify({ kind: reaction.kind, reason: reaction.reason && [ reaction.reason ] });
+    const body = JSON.stringify({ kind: reaction.kind, reason: reaction.reason && [reaction.reason] });
 
     await customFetch(reactionURL, {
       method: method,

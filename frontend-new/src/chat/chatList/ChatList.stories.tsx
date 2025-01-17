@@ -24,7 +24,7 @@ export const Shown: Story = {
         message: "Hello, how can I help you?",
         sent_at: new Date().toISOString(),
         type: ChatMessageType.BASIC_CHAT,
-        reaction: null
+        reaction: null,
       },
       {
         message_id: nanoid(),
@@ -32,7 +32,7 @@ export const Shown: Story = {
         message: "I need help with something",
         sent_at: new Date().toString(),
         type: ChatMessageType.BASIC_CHAT,
-        reaction: null
+        reaction: null,
       },
     ],
   },
@@ -53,7 +53,7 @@ export const Typing: Story = {
         message: "Hello, how can I help you?",
         sent_at: new Date().toISOString(),
         type: ChatMessageType.BASIC_CHAT,
-        reaction: null
+        reaction: null,
       },
       {
         message_id: nanoid(),
@@ -61,7 +61,7 @@ export const Typing: Story = {
         message: "Typing...",
         sent_at: new Date().toString(),
         type: ChatMessageType.TYPING,
-        reaction: null
+        reaction: null,
       },
     ],
   },
@@ -76,7 +76,7 @@ export const TypingWhenEmpty: Story = {
         message: "Typing...",
         sent_at: new Date().toString(),
         type: ChatMessageType.TYPING,
-        reaction: null
+        reaction: null,
       },
     ],
   },
@@ -90,7 +90,7 @@ export const LongConversation: Story = {
       message: `Message ${i}`,
       sent_at: new Date(Date.now() - i * 1000 * 60 * 60 * 24).toISOString(),
       type: ChatMessageType.BASIC_CHAT,
-      reaction: null
+      reaction: null,
     })),
   },
 };

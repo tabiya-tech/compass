@@ -16,17 +16,17 @@ const meta: Meta<typeof ReactionButtons> = {
     mockData: {
       UserPreferencesStateService: {
         getInstance: () => ({
-          getActiveSessionId: () => 1234
-        })
-      }
-    }
+          getActiveSessionId: () => 1234,
+        }),
+      },
+    },
   },
   decorators: [
     (Story) => {
       UserPreferencesStateService.getInstance().getActiveSessionId = () => 1234;
       return Story();
-    }
-  ]
+    },
+  ],
 };
 
 export default meta;
@@ -61,7 +61,7 @@ export const ShownWithLikeReaction: Story = {
   args: {
     currentReaction: {
       id: nanoid(),
-      kind: ReactionType.LIKED
+      kind: ReactionType.LIKED,
     },
   },
   parameters: {
@@ -73,7 +73,7 @@ export const ShownWithDislikeReaction: Story = {
   args: {
     currentReaction: {
       id: nanoid(),
-      kind: ReactionType.DISLIKED
+      kind: ReactionType.DISLIKED,
     },
   },
   parameters: {

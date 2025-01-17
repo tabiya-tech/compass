@@ -6,7 +6,9 @@ import ChatMessageFooter, {
   ChatMessageFooterChildren,
   DATA_TEST_ID as CHAT_MESSAGE_FOOTER_DATA_TEST_ID,
 } from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooter";
-import ChatBubble, { DATA_TEST_ID  as CHAT_BUBBLE_DATA_TEST_ID } from "src/chat/chatMessage/components/chatBubble/ChatBubble";
+import ChatBubble, {
+  DATA_TEST_ID as CHAT_BUBBLE_DATA_TEST_ID,
+} from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
@@ -18,8 +20,8 @@ jest.mock("src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooter",
     __esModule: true,
     ...originalModule,
     default: jest.fn(() => <div data-testid={originalModule.DATA_TEST_ID.CHAT_MESSAGE_FOOTER_CONTAINER}></div>),
-  }
-})
+  };
+});
 
 jest.mock("src/chat/chatMessage/components/chatBubble/ChatBubble", () => {
   const originalModule = jest.requireActual("src/chat/chatMessage/components/chatBubble/ChatBubble");
@@ -27,8 +29,8 @@ jest.mock("src/chat/chatMessage/components/chatBubble/ChatBubble", () => {
     __esModule: true,
     ...originalModule,
     default: jest.fn(() => <div data-testid={originalModule.DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER}></div>),
-  }
-})
+  };
+});
 
 describe("render tests", () => {
   beforeAll(() => {
@@ -49,10 +51,10 @@ describe("render tests", () => {
       message: "Hello, I'm Compass",
       sent_at: givenDate,
       type: ChatMessageType.BASIC_CHAT, // This component is designed for use with the BASIC chat type,
-      reaction: null // User messages can never have a reaction
+      reaction: null, // User messages can never have a reaction
     };
     // WHEN the user chat message is rendered
-    render(<UserChatMessage chatMessage={givenMessage}/>);
+    render(<UserChatMessage chatMessage={givenMessage} />);
 
     // THEN expect the message container to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_CONTAINER)).toBeInTheDocument();
@@ -68,19 +70,19 @@ describe("render tests", () => {
         sentAt: givenDate,
         messageId: givenMessage.message_id,
         visibleChildren: [ChatMessageFooterChildren.TIMESTAMP],
-        currentReaction: givenMessage.reaction
+        currentReaction: givenMessage.reaction,
       },
       {}
-    )
+    );
     // AND expect the Chat bubble to have been rendered with the expected message
     expect(ChatBubble).toHaveBeenNthCalledWith(
       1,
       {
         message: givenMessage.message,
-        sender: givenMessage.sender
+        sender: givenMessage.sender,
       },
       {}
-    )
+    );
 
     // AND expect the component to match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_CONTAINER)).toMatchSnapshot();

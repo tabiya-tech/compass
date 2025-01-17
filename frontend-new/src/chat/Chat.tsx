@@ -23,7 +23,7 @@ import ConfirmModalDialog from "src/theme/confirmModalDialog/ConfirmModalDialog"
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 import FeedbackForm from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
 import { ChatError } from "src/error/commonErrors";
-import { ChatMessageType } from "src/chat/Chat.types"
+import { ChatMessageType } from "src/chat/Chat.types";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import { nanoid } from "nanoid";
 
@@ -216,7 +216,14 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         }
 
         response.messages.forEach((messageItem) =>
-          addMessage(generateCompassMessage(messageItem.message_id, messageItem.message, messageItem.sent_at, messageItem.reaction))
+          addMessage(
+            generateCompassMessage(
+              messageItem.message_id,
+              messageItem.message,
+              messageItem.sent_at,
+              messageItem.reaction
+            )
+          )
         );
 
         setConversationCompleted(response.conversation_completed);
@@ -263,9 +270,10 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         // Set the messages from the chat history
         if (history.messages.length) {
           setMessages(
-            history.messages.map((message: ConversationMessage) => message.sender === ConversationMessageSender.USER
-              ? generateUserMessage(message.message, message.sent_at)
-              : generateCompassMessage(message.message_id, message.message, message.sent_at, message.reaction)
+            history.messages.map((message: ConversationMessage) =>
+              message.sender === ConversationMessageSender.USER
+                ? generateUserMessage(message.message, message.sent_at)
+                : generateCompassMessage(message.message_id, message.message, message.sent_at, message.reaction)
             )
           );
 

@@ -3,7 +3,9 @@ import { Box, styled } from "@mui/material";
 import { IChatMessage } from "src/chat/Chat.types";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
-import ChatMessageFooter, { ChatMessageFooterChildren } from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooter";
+import ChatMessageFooter, {
+  ChatMessageFooterChildren,
+} from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooter";
 
 const uniqueId = "41e9f8a5-be6f-406a-9958-13e9bcc853a9";
 
@@ -26,7 +28,7 @@ type BasicChatMessageProps = {
 const UserChatMessage: React.FC<BasicChatMessageProps> = ({ chatMessage }) => {
   return (
     <MessageContainer origin={chatMessage.sender} data-testid={DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}>
-      <Box 
+      <Box
         sx={{
           maxWidth: "80%",
           minWidth: "30%",
@@ -35,11 +37,11 @@ const UserChatMessage: React.FC<BasicChatMessageProps> = ({ chatMessage }) => {
         }}
       >
         <ChatBubble message={chatMessage.message} sender={chatMessage.sender} />
-        <ChatMessageFooter 
-          sentAt={chatMessage.sent_at} 
-          messageId={chatMessage.message_id} 
-          currentReaction={chatMessage.reaction} 
-          visibleChildren={[ChatMessageFooterChildren.TIMESTAMP]} 
+        <ChatMessageFooter
+          sentAt={chatMessage.sent_at}
+          messageId={chatMessage.message_id}
+          currentReaction={chatMessage.reaction}
+          visibleChildren={[ChatMessageFooterChildren.TIMESTAMP]}
         />
       </Box>
     </MessageContainer>

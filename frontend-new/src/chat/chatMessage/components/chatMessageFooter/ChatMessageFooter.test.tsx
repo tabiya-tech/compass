@@ -5,13 +5,15 @@ import ChatMessageFooter, { ChatMessageFooterChildren, DATA_TEST_ID } from "./Ch
 import { render, screen } from "src/_test_utilities/test-utils";
 import { getDurationFromNow } from "src/utils/getDurationFromNow/getDurationFromNow";
 import { ReactionType } from "src/feedback/reaction/reaction.types";
-import ReactionButtons, { DATA_TEST_ID as REACTION_BUTTONS_DATA_TEST_ID } from "src/feedback/reaction/components/reactionButtons/ReactionButtons";
+import ReactionButtons, {
+  DATA_TEST_ID as REACTION_BUTTONS_DATA_TEST_ID,
+} from "src/feedback/reaction/components/reactionButtons/ReactionButtons";
 import { ReactionResponse } from "src/chat/ChatService/ChatService.types";
 
 jest.mock("src/utils/getDurationFromNow/getDurationFromNow", () => {
   return {
-    getDurationFromNow: jest.fn()
-  }
+    getDurationFromNow: jest.fn(),
+  };
 });
 
 jest.mock("src/feedback/reaction/components/reactionButtons/ReactionButtons", () => {
@@ -20,9 +22,9 @@ jest.mock("src/feedback/reaction/components/reactionButtons/ReactionButtons", ()
   return {
     __esModule: true,
     ...actual,
-    default: jest.fn().mockImplementation(() => <div data-testid={actual.DATA_TEST_ID.CONTAINER}/>)
-  }
-})
+    default: jest.fn().mockImplementation(() => <div data-testid={actual.DATA_TEST_ID.CONTAINER} />),
+  };
+});
 
 describe("ChatMessageFooter", () => {
   const mockProps = {
@@ -30,7 +32,7 @@ describe("ChatMessageFooter", () => {
     messageId: "test-message-id",
     visibleChildren: [] as ChatMessageFooterChildren[],
     currentReaction: null as ReactionResponse | null,
-    "data-testid": "test-footer"
+    "data-testid": "test-footer",
   };
 
   beforeEach(() => {
@@ -45,10 +47,7 @@ describe("ChatMessageFooter", () => {
       (getDurationFromNow as jest.Mock).mockReturnValueOnce(givenDuration);
 
       // WHEN rendering with TIMESTAMP in visibleChildren
-      render(<ChatMessageFooter 
-        {...mockProps} 
-        visibleChildren={[ChatMessageFooterChildren.TIMESTAMP]} 
-      />);
+      render(<ChatMessageFooter {...mockProps} visibleChildren={[ChatMessageFooterChildren.TIMESTAMP]} />);
 
       // THEN expect the timestamp to be visible
       expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FOOTER_TIMESTAMP)).toBeInTheDocument();
@@ -74,19 +73,23 @@ describe("ChatMessageFooter", () => {
       });
 
       // WHEN rendering with an invalid date
-      render(<ChatMessageFooter 
-        {...mockProps} 
-        sentAt={givenDate.toISOString()}
-        visibleChildren={[ChatMessageFooterChildren.TIMESTAMP]} 
-      />);
+      render(
+        <ChatMessageFooter
+          {...mockProps}
+          sentAt={givenDate.toISOString()}
+          visibleChildren={[ChatMessageFooterChildren.TIMESTAMP]}
+        />
+      );
 
       // THEN expect the timestamp to still be rendered with a string version of the date
       expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FOOTER_TIMESTAMP)).toBeInTheDocument();
       // AND expect it to show "sent" without a duration
-      expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FOOTER_TIMESTAMP)).toHaveTextContent("sent " + givenDate.toString());
+      expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FOOTER_TIMESTAMP)).toHaveTextContent(
+        "sent " + givenDate.toString()
+      );
 
       // AND an error to be logged to the console
-      expect(console.error).toHaveBeenCalledWith(new Error("Failed to get message duration", {cause: givenError}))
+      expect(console.error).toHaveBeenCalledWith(new Error("Failed to get message duration", { cause: givenError }));
     });
   });
 
@@ -94,10 +97,7 @@ describe("ChatMessageFooter", () => {
   describe("reaction rendering", () => {
     test("should render reaction buttons when REACTIONS is in visibleChildren", () => {
       // WHEN rendering with REACTIONS in visibleChildren
-      render(<ChatMessageFooter 
-        {...mockProps} 
-        visibleChildren={[ChatMessageFooterChildren.REACTIONS]} 
-      />);
+      render(<ChatMessageFooter {...mockProps} visibleChildren={[ChatMessageFooterChildren.REACTIONS]} />);
 
       // THEN expect the reactions container to be visible
       expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FOOTER_REACTIONS)).toBeInTheDocument();
@@ -116,27 +116,32 @@ describe("ChatMessageFooter", () => {
       // GIVEN a current reaction
       const currentReaction = {
         id: "foo-reaction-id",
-        kind: ReactionType.LIKED
+        kind: ReactionType.LIKED,
       };
       // AND a message ID
       const messageId = "test-message-id";
 
       // WHEN rendering with reactions
-      render(<ChatMessageFooter 
-        {...mockProps}
-        messageId={messageId}
-        currentReaction={currentReaction}
-        visibleChildren={[ChatMessageFooterChildren.REACTIONS]} 
-      />);
+      render(
+        <ChatMessageFooter
+          {...mockProps}
+          messageId={messageId}
+          currentReaction={currentReaction}
+          visibleChildren={[ChatMessageFooterChildren.REACTIONS]}
+        />
+      );
 
       // THEN expect the reaction buttons to receive the correct props
       const reactionButtons = screen.getByTestId(REACTION_BUTTONS_DATA_TEST_ID.CONTAINER);
       expect(reactionButtons).toBeInTheDocument();
 
-      expect(ReactionButtons).toHaveBeenCalledWith({
-        messageId,
-        currentReaction,
-      }, {});
+      expect(ReactionButtons).toHaveBeenCalledWith(
+        {
+          messageId,
+          currentReaction,
+        },
+        {}
+      );
     });
   });
 
@@ -148,10 +153,12 @@ describe("ChatMessageFooter", () => {
       (getDurationFromNow as jest.Mock).mockReturnValueOnce(givenDuration);
 
       // WHEN rendering with both children visible
-      render(<ChatMessageFooter 
-        {...mockProps} 
-        visibleChildren={[ChatMessageFooterChildren.TIMESTAMP, ChatMessageFooterChildren.REACTIONS]} 
-      />);
+      render(
+        <ChatMessageFooter
+          {...mockProps}
+          visibleChildren={[ChatMessageFooterChildren.TIMESTAMP, ChatMessageFooterChildren.REACTIONS]}
+        />
+      );
 
       // THEN expect both components to be visible
       expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FOOTER_TIMESTAMP)).toBeInTheDocument();

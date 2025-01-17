@@ -7,8 +7,8 @@ export enum ConversationMessageSender {
 }
 
 export interface ReactionResponse {
-  id: string,
-  kind: ReactionType | null
+  id: string;
+  kind: ReactionType | null;
 }
 
 // Type for individual conversation messages
@@ -17,7 +17,7 @@ export interface ConversationMessage {
   message: string;
   sent_at: string; // ISO formatted datetime string
   sender: ConversationMessageSender; // Either 'USER' or 'COMPASS'
-  reaction: ReactionResponse | null
+  reaction: ReactionResponse | null;
 }
 
 export interface ConversationResponse {

@@ -276,7 +276,7 @@ describe("Chat", () => {
               message: "Hello, how are you?",
               sent_at: new Date().toISOString(),
               sender: ConversationMessageSender.USER,
-              reaction: null
+              reaction: null,
             },
             {
               message_id: nanoid(),
@@ -299,7 +299,8 @@ describe("Chat", () => {
 
         // THEN expect messages to be passed to ChatList
         await waitFor(() => {
-          expect(ChatList as jest.Mock).toHaveBeenNthCalledWith(4,
+          expect(ChatList as jest.Mock).toHaveBeenNthCalledWith(
+            4,
             {
               messages: givenMessages.messages.map((message) => ({
                 ...message,
@@ -378,7 +379,7 @@ describe("Chat", () => {
                 message: "Hello, how are you?", // A RESPONSE FROM THE AI
                 sent_at: new Date().toISOString(),
                 sender: ConversationMessageSender.COMPASS,
-                reaction: null
+                reaction: null,
               },
             ],
             conversation_completed: false,
@@ -396,7 +397,7 @@ describe("Chat", () => {
                 messages: givenSendMessageResponse.messages.map((message) => ({
                   ...message,
                   message_id: expect.any(String), // the id is not sent by the server, so its not part of the given messages
-                  type: ChatMessageType.BASIC_CHAT,  // the message type is not part of the given messages
+                  type: ChatMessageType.BASIC_CHAT, // the message type is not part of the given messages
                 })),
               }),
               {}
@@ -625,7 +626,7 @@ describe("Chat", () => {
         });
 
         // AND expect an empty message to be sent to the chat service for the new session
-        expect(sendMessageSpy).toHaveBeenCalledWith(givenNewSessionId, "")
+        expect(sendMessageSpy).toHaveBeenCalledWith(givenNewSessionId, "");
 
         // AND WHEN the send message promise resolves
         const givenSendMessageResponse: ConversationResponse = {
@@ -635,7 +636,7 @@ describe("Chat", () => {
               message: "Hello, how are you?", // A RESPONSE FROM THE AI
               sent_at: new Date().toISOString(),
               sender: ConversationMessageSender.COMPASS,
-              reaction: null
+              reaction: null,
             },
           ],
           conversation_completed: false,
@@ -653,7 +654,7 @@ describe("Chat", () => {
               messages: givenSendMessageResponse.messages.map((message) => ({
                 ...message,
                 message_id: expect.any(String), // the id is not sent by the server, so its not part of the given messages
-                type: ChatMessageType.BASIC_CHAT,   // the message type is not part of the given messages
+                type: ChatMessageType.BASIC_CHAT, // the message type is not part of the given messages
               })),
             }),
             {}
@@ -915,21 +916,21 @@ describe("Chat", () => {
             message: "Hello, how can I assist you today?",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
-            reaction: null
+            reaction: null,
           },
           {
             message_id: nanoid(),
             message: "We can start by exploring your experiences.",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
-            reaction: null
+            reaction: null,
           },
           {
             message_id: nanoid(),
             message: "Good, let's start. I was a baker for 10 years.",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.USER,
-            reaction: null
+            reaction: null,
           },
           {
             message_id: nanoid(),
@@ -956,7 +957,7 @@ describe("Chat", () => {
             message: "What skills did you learn?",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
-            reaction: null
+            reaction: null,
           },
           {
             message_id: nanoid(),
@@ -1157,7 +1158,7 @@ describe("Chat", () => {
       // for example, due to the chat initialization
       act(() => {
         (ChatHeader as jest.Mock).mock.calls.at(-1)[0].notifyOnExperiencesDrawerOpen();
-      })
+      });
 
       // THEN expect the drawer to open
       await waitFor(() => {
@@ -1205,7 +1206,7 @@ describe("Chat", () => {
       // for example, due to the chat initialization
       act(() => {
         (ChatHeader as jest.Mock).mock.calls.at(-1)[0].notifyOnExperiencesDrawerOpen();
-      })
+      });
 
       // THEN expect error notification
       await waitFor(() => {
@@ -1252,7 +1253,7 @@ describe("Chat", () => {
             message: "Hello, how can I assist you today?",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
-            reaction: null
+            reaction: null,
           },
         ],
         conversation_completed: false,
@@ -1313,9 +1314,9 @@ describe("Chat", () => {
       // THEN expect the chat history to be fetched for the new session
       await waitFor(() => {
         expect(getChatHistorySpy).toHaveBeenCalledWith(givenNewSessionId);
-      })
+      });
       // AND expect an empty message to be sent to the chat service for the new session
-      expect(sendMessageSpy).toHaveBeenCalledWith(givenNewSessionId, "")
+      expect(sendMessageSpy).toHaveBeenCalledWith(givenNewSessionId, "");
       // AND expect the chat list to be updated with the response from the chat service
       await waitFor(() => {
         expect(ChatList as jest.Mock).toHaveBeenCalledWith(
@@ -1502,7 +1503,7 @@ describe("Chat", () => {
             message: "Hello, how are you?",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.USER,
-            reaction: null
+            reaction: null,
           },
           {
             message_id: nanoid(),
@@ -1607,7 +1608,7 @@ describe("Chat", () => {
             message: "Hello",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.USER,
-            reaction: null
+            reaction: null,
           },
         ],
         conversation_completed: false,
@@ -1615,7 +1616,6 @@ describe("Chat", () => {
         experiences_explored: 0,
       };
       jest.spyOn(ChatService.prototype, "getChatHistory").mockResolvedValue(givenMessages);
-
 
       // WHEN the component is mounted
       render(<Chat />);
@@ -1653,7 +1653,7 @@ describe("Chat", () => {
             message: "Hello",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.USER,
-            reaction: null
+            reaction: null,
           },
         ],
         conversation_completed: false,
@@ -1661,7 +1661,6 @@ describe("Chat", () => {
         experiences_explored: 0,
       };
       jest.spyOn(ChatService.prototype, "getChatHistory").mockResolvedValue(givenMessages);
-
 
       // WHEN the component is mounted with disableInactivityCheck
       render(<Chat disableInactivityCheck={true} />);
@@ -1704,7 +1703,7 @@ describe("Chat", () => {
             message: "Hello",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.USER,
-            reaction: null
+            reaction: null,
           },
         ],
         conversation_completed: false,

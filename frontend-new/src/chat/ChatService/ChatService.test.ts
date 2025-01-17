@@ -145,18 +145,15 @@ describe("ChatService", () => {
 
       // THEN expect it to make a GET request
       // AND the headers
-      expect(fetchSpy).toHaveBeenCalledWith(
-        `${givenApiServerUrl}/conversations/${givenSessionId}/messages`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          expectedStatusCode: StatusCodes.OK,
-          serviceName: "ChatService",
-          serviceFunction: "getChatHistory",
-          failureMessage: `Failed to get chat history for session id ${givenSessionId}`,
-          expectedContentType: "application/json",
-        }
-      );
+      expect(fetchSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/conversations/${givenSessionId}/messages`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        expectedStatusCode: StatusCodes.OK,
+        serviceName: "ChatService",
+        serviceFunction: "getChatHistory",
+        failureMessage: `Failed to get chat history for session id ${givenSessionId}`,
+        expectedContentType: "application/json",
+      });
 
       // AND returns the history response
       expect(actualHistoryResponse).toEqual(givenTestHistoryResponse);

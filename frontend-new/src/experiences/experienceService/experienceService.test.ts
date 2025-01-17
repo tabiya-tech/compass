@@ -34,18 +34,15 @@ describe("ExperienceService", () => {
       const experiencesResponse = await service.getExperiences(givenSessionId);
 
       // THEN expect to make a GET request with the correct headers and payload
-      expect(fetSpy).toHaveBeenCalledWith(
-        `${givenApiServerUrl}/conversations/${givenSessionId}/experiences`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          expectedStatusCode: StatusCodes.OK,
-          serviceName: "ExperienceService",
-          serviceFunction: "getExperiences",
-          failureMessage: "Failed to retrieve experiences",
-          expectedContentType: "application/json",
-        }
-      );
+      expect(fetSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/conversations/${givenSessionId}/experiences`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        expectedStatusCode: StatusCodes.OK,
+        serviceName: "ExperienceService",
+        serviceFunction: "getExperiences",
+        failureMessage: "Failed to retrieve experiences",
+        expectedContentType: "application/json",
+      });
       // AND to return the correct experiences
       expect(experiencesResponse).toEqual(givenMockExperiences);
     });

@@ -26,11 +26,10 @@ export const AccurateMessage: Story = {
       message:
         "We’d love your feedback on this conversation. It’ll only take 5 minutes and will help us improve your experience",
       type: ChatMessageType.CONVERSATION_CONCLUSION,
-      reaction: null
+      reaction: null,
     },
   },
 };
-
 
 export const LongMessage: Story = {
   args: {
@@ -41,7 +40,7 @@ export const LongMessage: Story = {
       message:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
       type: ChatMessageType.CONVERSATION_CONCLUSION,
-      reaction: null
+      reaction: null,
     },
   },
 };
@@ -54,7 +53,7 @@ export const LongUnBrokenWord: Story = {
       sent_at: new Date().toISOString(),
       message: "a".repeat(1000),
       type: ChatMessageType.BASIC_CHAT,
-      reaction: null
+      reaction: null,
     },
   },
 };
@@ -67,7 +66,7 @@ export const SingleLetter: Story = {
       sent_at: new Date().toISOString(),
       message: "a",
       type: ChatMessageType.BASIC_CHAT,
-      reaction: null
+      reaction: null,
     },
   },
 };
@@ -82,7 +81,7 @@ export const ShownWithDifferentTimestamps: Story = {
           sent_at: new Date().toISOString(),
           message: "sent just now",
           type: ChatMessageType.BASIC_CHAT,
-          reaction: null
+          reaction: null,
         }}
         notifyOnFeedbackFormOpened={action("Feedback Form opened")}
       />
@@ -93,7 +92,7 @@ export const ShownWithDifferentTimestamps: Story = {
           sent_at: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
           message: "sent an hour ago",
           type: ChatMessageType.BASIC_CHAT,
-          reaction: null
+          reaction: null,
         }}
         notifyOnFeedbackFormOpened={action("Feedback Form opened")}
       />
@@ -104,7 +103,7 @@ export const ShownWithDifferentTimestamps: Story = {
           sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
           message: "sent yesterday",
           type: ChatMessageType.BASIC_CHAT,
-          reaction: null
+          reaction: null,
         }}
         notifyOnFeedbackFormOpened={action("Feedback Form opened")}
       />
@@ -115,7 +114,7 @@ export const ShownWithDifferentTimestamps: Story = {
           sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
           message: "sent two days ago",
           type: ChatMessageType.BASIC_CHAT,
-          reaction: null
+          reaction: null,
         }}
         notifyOnFeedbackFormOpened={action("Feedback Form opened")}
       />
@@ -126,7 +125,7 @@ export const ShownWithDifferentTimestamps: Story = {
           sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(),
           message: "sent a week ago",
           type: ChatMessageType.BASIC_CHAT,
-          reaction: null
+          reaction: null,
         }}
         notifyOnFeedbackFormOpened={action("Feedback Form opened")}
       />
@@ -137,7 +136,7 @@ export const ShownWithDifferentTimestamps: Story = {
           sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(),
           message: "sent a month ago",
           type: ChatMessageType.BASIC_CHAT,
-          reaction: null
+          reaction: null,
         }}
         notifyOnFeedbackFormOpened={action("Feedback Form opened")}
       />
@@ -148,7 +147,7 @@ export const ShownWithDifferentTimestamps: Story = {
           sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30 * 12).toISOString(),
           message: "sent a year ago",
           type: ChatMessageType.BASIC_CHAT,
-          reaction: null
+          reaction: null,
         }}
         notifyOnFeedbackFormOpened={action("Feedback Form opened")}
       />
