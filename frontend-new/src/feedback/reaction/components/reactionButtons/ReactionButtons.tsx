@@ -166,13 +166,13 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
               data-testid={DATA_TEST_ID.ICON_LIKE_ACTIVE}
               sx={{
                 color: theme.palette.text.secondary,
-                fontSize: theme.fixedSpacing(theme.tabiyaSpacing.md),
+                fontSize: theme.fixedSpacing(theme.tabiyaSpacing.lg),
               }}
             />
           ) : (
             <ThumbUpOffAltIcon
               data-testid={DATA_TEST_ID.ICON_LIKE_DEFAULT}
-              sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.md) }}
+              sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}
             />
           )}
         </PrimaryIconButton>
@@ -191,13 +191,13 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
               data-testid={DATA_TEST_ID.ICON_DISLIKE_ACTIVE}
               sx={{
                 color: theme.palette.text.secondary,
-                fontSize: theme.fixedSpacing(theme.tabiyaSpacing.md),
+                fontSize: theme.fixedSpacing(theme.tabiyaSpacing.lg),
               }}
             />
           ) : (
             <ThumbDownOffAltIcon
               data-testid={DATA_TEST_ID.ICON_DISLIKE_DEFAULT}
-              sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.md) }}
+              sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}
             />
           )}
         </PrimaryIconButton>

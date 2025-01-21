@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, styled, Typography } from "@mui/material";
+import { Box, styled, Typography, useTheme } from "@mui/material";
 import { getDurationFromNow } from "src/utils/getDurationFromNow/getDurationFromNow";
 import ReactionButtons from "src/feedback/reaction/components/reactionButtons/ReactionButtons";
 import { ReactionResponse } from "src/chat/ChatService/ChatService.types";
@@ -36,6 +36,8 @@ export const ChatMessageFooter: React.FC<ChatMessageFooterProps> = ({
   visibleChildren,
   currentReaction,
 }) => {
+  const theme = useTheme();
+
   let duration;
   try {
     duration = getDurationFromNow(new Date(sentAt));
@@ -45,13 +47,17 @@ export const ChatMessageFooter: React.FC<ChatMessageFooterProps> = ({
     console.error(new Error("Failed to get message duration", { cause: e }));
   }
 
+  const justifyContentValue = visibleChildren.includes(ChatMessageFooterChildren.REACTIONS)
+    ? "space-between"
+    : "flex-end";
+
   return (
     <Box
       width={"100%"}
       display="flex"
       flexDirection={"row"}
-      justifyContent={"space-between"}
-      gap={1}
+      justifyContent={justifyContentValue}
+      gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
       data-testid={DATA_TEST_ID.CHAT_MESSAGE_FOOTER_CONTAINER}
     >
       {visibleChildren.includes(ChatMessageFooterChildren.TIMESTAMP) && (
