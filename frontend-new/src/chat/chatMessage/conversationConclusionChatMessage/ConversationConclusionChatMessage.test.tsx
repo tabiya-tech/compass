@@ -8,6 +8,7 @@ import { render, screen } from "src/_test_utilities/test-utils";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
 import { ChatMessageType, IChatMessage } from "src/chat/Chat.types";
+import { Divider } from "@mui/material";
 
 jest.mock("src/chat/chatMessage/components/chatBubble/ChatBubble", () => {
   const originalModule = jest.requireActual("src/chat/chatMessage/components/chatBubble/ChatBubble");
@@ -51,13 +52,18 @@ describe("render tests", () => {
 
     // AND expect the conversation conclusion footer to be visible
     const call = (ChatBubble as jest.Mock).mock.calls.at(-1)[0];
-    expect(call.footer).toEqual(
-      expect.objectContaining({
+    expect(call.children).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: Divider,
+        }),
+        expect.objectContaining({
         type: ConversationConclusionFooter,
         props: expect.objectContaining({
           notifyOnFeedbackFormOpened: givenNotifyOnFeedbackFormOpened,
         }),
-      })
+      }),
+    ])
     );
 
     // AND expect the Chat bubble to have been rendered with the expected message

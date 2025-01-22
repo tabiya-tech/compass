@@ -5,7 +5,6 @@ import { nanoid } from "nanoid";
 import { ChatMessageType } from "src/chat/Chat.types";
 
 const meta: Meta<typeof BasicChatMessage> = {
-  // REVIEW: Chat/ChatMessage/Basic
   title: "Chat/ChatMessage/Basic",
   component: BasicChatMessage,
   tags: ["autodocs"],
