@@ -2,19 +2,20 @@
 import "src/_test_utilities/consoleMock";
 
 import BasicChatMessage, { DATA_TEST_ID } from "./BasicChatMessage";
-import ChatMessageFooter, { DATA_TEST_ID as CHAT_MESSAGE_FOOTER_DATA_TEST_ID } from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooter";
+import ChatMessageFooter, { DATA_TEST_ID as CHAT_MESSAGE_FOOTER_DATA_TEST_ID } from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import ChatBubble, { DATA_TEST_ID  as CHAT_BUBBLE_DATA_TEST_ID } from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
 import { ChatMessageType, IChatMessage } from "src/chat/Chat.types";
+import Timestamp from "../components/chatMessageFooter/components/timestamp/Timestamp";
 
-jest.mock("src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooter", () => {
-  const originalModule = jest.requireActual("src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooter");
+jest.mock("src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout", () => {
+  const originalModule = jest.requireActual("src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout");
   return {
     __esModule: true,
     ...originalModule,
-    default: jest.fn(() => <div data-testid={originalModule.DATA_TEST_ID.CHAT_MESSAGE_TIMESTAMP}></div>),
+    default: jest.fn(() => <div data-testid={originalModule.DATA_TEST_ID.CHAT_MESSAGE_FOOTER_LAYOUT_CONTAINER}></div>),
   }
 })
 
@@ -24,6 +25,15 @@ jest.mock("src/chat/chatMessage/components/chatBubble/ChatBubble", () => {
     __esModule: true,
     ...originalModule,
     default: jest.fn(() => <div data-testid={originalModule.DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER}></div>),
+  }
+})
+
+jest.mock("src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp", () => {
+  const originalModule = jest.requireActual("src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp");
+  return {
+    __esModule: true,
+    ...originalModule,
+    default: jest.fn(() => <div data-testid={originalModule.DATA_TEST_ID.TIMESTAMP}></div>),
   }
 })
 
@@ -55,17 +65,14 @@ describe("render tests", () => {
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_CONTAINER)).toBeInTheDocument();
     // AND expect the message bubble to be visible
     expect(screen.getByTestId(CHAT_BUBBLE_DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER)).toBeInTheDocument();
-    // AND expect the timestamp to be visible
-    expect(screen.getByTestId(CHAT_MESSAGE_FOOTER_DATA_TEST_ID.CHAT_MESSAGE_TIMESTAMP)).toBeInTheDocument();
+    // AND expect the footer to be visible
+    expect(screen.getByTestId(CHAT_MESSAGE_FOOTER_DATA_TEST_ID.CHAT_MESSAGE_FOOTER_LAYOUT_CONTAINER)).toBeInTheDocument();
 
-    // AND the correct date to have been displayed
-    expect(ChatMessageFooter).toHaveBeenNthCalledWith(
-      1,
-      {
-        sentAt: givenDate
-      },
-      {}
-    )
+    // AND the footer to have been called with a timestamp component
+    const footerCall = (ChatMessageFooter as jest.Mock).mock.calls[0][0];
+    expect(footerCall.children.type).toBe(Timestamp);
+    expect(footerCall.children.props).toEqual({ sentAt: givenDate });
+
     // AND expect the Chat bubble to have been rendered with the expected message
     expect(ChatBubble).toHaveBeenNthCalledWith(
       1,

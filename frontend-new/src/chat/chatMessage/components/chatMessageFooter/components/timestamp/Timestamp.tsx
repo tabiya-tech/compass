@@ -1,10 +1,10 @@
 import { Typography, styled } from "@mui/material";
-import { getDurationFromNow } from "src/utils/getDurationFromNow/getDurationFromNow";
+import { getDurationFromNow } from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/getDurationFromNow/getDurationFromNow";
 
-const uniqueId = "7772f20a-9d0c-4072-b24f-97eca2f43d7b";
+const uniqueId = "c9253326-05ee-4bff-9d43-7852ca78a033";
 
 export const DATA_TEST_ID = {
-  CHAT_MESSAGE_TIMESTAMP: `chat-message-sent_at-${uniqueId}`,
+  TIMESTAMP: `chat-message-timestamp-${uniqueId}`,
 };
 
 export interface ChatMessageFooterProps {
@@ -18,7 +18,7 @@ const TimeStamp = styled(Typography)(({ theme }) => ({
 }));
 
 
-const ChatMessageFooter: React.FC<ChatMessageFooterProps> = ({ sentAt }) => {
+const Timestamp: React.FC<ChatMessageFooterProps> = ({ sentAt }) => {
   let duration;
   try {
     duration = getDurationFromNow(new Date(sentAt));
@@ -27,10 +27,10 @@ const ChatMessageFooter: React.FC<ChatMessageFooterProps> = ({ sentAt }) => {
   }
 
   return (
-    <TimeStamp data-testid={DATA_TEST_ID.CHAT_MESSAGE_TIMESTAMP} variant="caption">
+    <TimeStamp data-testid={DATA_TEST_ID.TIMESTAMP} variant="caption">
       sent {duration}
     </TimeStamp>
   )
 }
 
-export default ChatMessageFooter;
+export default Timestamp;

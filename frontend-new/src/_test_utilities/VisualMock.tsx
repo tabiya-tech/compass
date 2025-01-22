@@ -17,6 +17,7 @@ interface VisualMockProps {
     | "button"
     | "overline";
   text: string;
+  maxWidth?: string;
 }
 
 export const VisualMock = (props: VisualMockProps) => {
@@ -37,6 +38,7 @@ export const VisualMock = (props: VisualMockProps) => {
         // otherwise the component will overflow
         // e.g. height: //`calc(100% - ${2 * borderWidth}px)`,
         height: "100%",
+        maxWidth: props.maxWidth ?? "100%",
         position: "relative",
       }}
     >
