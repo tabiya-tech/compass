@@ -16,11 +16,11 @@ import UserPreferencesStateService from "src/userPreferences/UserPreferencesStat
 import authStateService from "src/auth/services/AuthenticationState.service";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
-import { StyledAnchor } from "src/theme/StyledAnchor/StyledAnchor";
 import { AuthenticationError } from "src/error/commonErrors";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import { Theme } from "@mui/material/styles";
 import ConfirmModalDialog from "src/theme/confirmModalDialog/ConfirmModalDialog";
+import CustomLink from "src/theme/CustomLink/CustomLink";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
@@ -151,6 +151,10 @@ const Consent: React.FC = () => {
   const termsAndConditionsLabel = "Terms and Conditions";
   const dataProtectionAgreementLabel = "Data Protection Agreement";
 
+  const handleExternalNavigationOnNewTab = (url: string) => {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <Container
       maxWidth="xs"
@@ -206,9 +210,9 @@ const Consent: React.FC = () => {
               label={
                 <Typography variant="body2" data-testid={DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_TEXT}>
                   I have read and accept the{" "}
-                  <StyledAnchor href="https://compass.tabiya.org/tc.html" target="_blank" rel="noreferrer">
+                  <CustomLink onClick={() => handleExternalNavigationOnNewTab('https://compass.tabiya.org/consent.html')}>
                     {termsAndConditionsLabel}
-                  </StyledAnchor>{" "}
+                  </CustomLink>{" "}
                   of Compass.
                 </Typography>
               }
@@ -229,9 +233,9 @@ const Consent: React.FC = () => {
               label={
                 <Typography variant="body2" data-testid={DATA_TEST_ID.ACCEPT_CHECKBOX_TEXT}>
                   I have read and accept the{" "}
-                  <StyledAnchor href="https://compass.tabiya.org/consent.html" target="_blank" rel="noreferrer">
+                  <CustomLink onClick={() => handleExternalNavigationOnNewTab('https://compass.tabiya.org/consent.html')}>
                     {dataProtectionAgreementLabel}
-                  </StyledAnchor>{" "}
+                  </CustomLink>{" "}
                   of Compass.
                 </Typography>
               }
@@ -253,9 +257,9 @@ const Consent: React.FC = () => {
             gap: theme.tabiyaSpacing.xl,
           }}
         >
-          <StyledAnchor data-testid={DATA_TEST_ID.REJECT_BUTTON} onClick={() => setShowRejectModal(true)}>
+          <CustomLink data-testid={DATA_TEST_ID.REJECT_BUTTON} onClick={() => setShowRejectModal(true)}>
             No, thank you
-          </StyledAnchor>
+          </CustomLink>
           <PrimaryButton
             fullWidth
             variant="contained"

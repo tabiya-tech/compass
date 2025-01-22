@@ -1,3 +1,4 @@
+import React, { useEffect } from "react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { HashRouter } from "react-router-dom";
 import { applicationTheme, ThemeMode } from "../src/theme/applicationTheme/applicationTheme";
@@ -19,6 +20,7 @@ import "@fontsource/roboto/700.css";
 import type { Preview, StoryFn, StoryObj } from "@storybook/react";
 import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineContext } from "../src/app/isOnlineProvider/IsOnlineProvider";
+import { initSentry } from "../src/sentryInit";
 
 const preview: Preview = {
   parameters: {
@@ -58,6 +60,17 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    sentryEnabled: {
+      name: 'Sentry Enabled',
+      description: 'Enable/disable Sentry error reporting',
+      toolbar: {
+        icon: 'alert',
+        items: [
+          {value: true, title: 'Enabled'},
+          {value: false, title: 'Disabled'},
+        ],
+      },
+    },
   },
   args: {
     online: true,
@@ -66,9 +79,35 @@ const preview: Preview = {
 
 export default preview;
 
+// Store the original SENTRY_FRONTEND_DSN value
+// @ts-ignore
+const ORIGINAL_SENTRY_DSN = window.tabiyaConfig.SENTRY_FRONTEND_DSN;
+let isSentryInitialized = true;
+
 export const decorators = [
-  ( Story: StoryFn, context: { globals: { online: any; }; }) => {
+  ( Story: StoryFn, context: { globals: { online: any; sentryEnabled: boolean; }; }) => {
   const isOnline = context.globals.online;
+  const sentryEnabled = context.globals.sentryEnabled;
+  const prevSentryEnabled = React.useRef(sentryEnabled);
+
+  useEffect(() => {
+    if (prevSentryEnabled.current !== sentryEnabled) {
+      if (sentryEnabled) {
+        // @ts-ignore
+        window.tabiyaConfig.SENTRY_FRONTEND_DSN = ORIGINAL_SENTRY_DSN;
+        initSentry();
+        isSentryInitialized = true;
+      } else {
+        // @ts-ignore
+        window.tabiyaConfig.SENTRY_FRONTEND_DSN = undefined;
+        isSentryInitialized = false;
+        // we have to reload since there is no way to notify the components of this change
+        // it is not a provider and the init happens outside of even the react root.render()
+        window.location.reload();
+      }
+      prevSentryEnabled.current = sentryEnabled;
+    }
+  }, [sentryEnabled]);
 
   return (
     <HashRouter>

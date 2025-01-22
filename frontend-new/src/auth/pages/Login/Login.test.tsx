@@ -8,6 +8,7 @@ import FirebaseEmailAuthenticationService from "src/auth/services/FirebaseAuthen
 import FirebaseInvitationCodeAuthenticationService from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
 import * as Sentry from "@sentry/react";
 import { DATA_TEST_ID as BUG_REPORT_DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
+import { DATA_TEST_ID as REQUEST_INVITATION_CODE_DATA_TEST_ID} from "src/auth/components/requestInvitationCode/RequestInvitationCode";
 
 jest.mock("src/envService", () => ({
   getFirebaseAPIKey: jest.fn(() => "mock-api-key"),
@@ -86,19 +87,32 @@ jest.mock("./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm", () => 
 });
 
 jest.mock("src/feedback/bugReport/bugReportButton/BugReportButton", () => {
-    const actual = jest.requireActual("src/feedback/bugReport/bugReportButton/BugReportButton");
-    return {
-        ...actual,
-        __esModule: true,
-        default: jest.fn().mockImplementation(() => {
-        return <span data-testid={actual.DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER}></span>;
-        }),
-    };
+  const actual = jest.requireActual("src/feedback/bugReport/bugReportButton/BugReportButton");
+  return {
+    ...actual,
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return <span data-testid={actual.DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER}></span>;
+    }),
+  };
+});
+
+// mock the RequestInvitationCode component
+jest.mock("src/auth/components/requestInvitationCode/RequestInvitationCode", () => {
+  const actual = jest.requireActual(
+    "src/auth/components/requestInvitationCode/RequestInvitationCode"
+  );
+  return {
+    ...actual,
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return <span data-testid={actual.DATA_TEST_ID.REQUEST_INVITATION_CODE_LINK}></span>;
+    }),
+  };
 });
 
 describe("Testing Login component", () => {
   beforeEach(() => {
-    jest.useFakeTimers(); // Use Jest's fake timers
     jest.clearAllMocks();
   });
 
@@ -117,6 +131,8 @@ describe("Testing Login component", () => {
     expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toBeInTheDocument();
     // AND expect the bug report button to be rendered
     expect(screen.getByTestId(BUG_REPORT_DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER)).toBeInTheDocument();
+    // AND the request registration code link should be displayed
+    expect(screen.getByTestId(REQUEST_INVITATION_CODE_DATA_TEST_ID.REQUEST_INVITATION_CODE_LINK)).toBeInTheDocument();
 
     // THEN the email login form should be displayed
     expect(LoginWithEmailForm).toHaveBeenCalled();
