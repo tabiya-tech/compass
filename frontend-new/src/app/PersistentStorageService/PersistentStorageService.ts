@@ -1,5 +1,6 @@
 import { Invitation } from "src/auth/services/invitationsService/invitations.types";
 import { StoredPersonalInfo } from "src/sensitiveData/types";
+import { FeedbackItem } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 
 const PERSISTENT_STORAGE_VERSION = "0.0.1";
 export const TOKEN_KEY = `token_${PERSISTENT_STORAGE_VERSION}`;
@@ -9,6 +10,8 @@ export const INVITATION_KEY = `invitation_${PERSISTENT_STORAGE_VERSION}`;
 export const LOGIN_METHOD_KEY = `login_method_${PERSISTENT_STORAGE_VERSION}`;
 
 export const PERSONAL_INFO_KEY = `personal_info_${PERSISTENT_STORAGE_VERSION}`;
+
+export const OVERALL_FEEDBACK_KEY = `overall_feedback_${PERSISTENT_STORAGE_VERSION}`;
 
 /**
  * This class is used to store the tokens in the session storage.
@@ -109,32 +112,29 @@ export class PersistentStorageService {
   static clearPersonalInfo(): void {
     this.storage.removeItem(PERSONAL_INFO_KEY);
   }
+
   /**
-   * Returns the item from the storage
-   * @returns string | null - The item from the storage
-   *
+   * Returns the overall feedback from the storage
+   * @returns FeedbackItem[] - The feedback
    */
-  static getItem(storage: Storage, key: string): string | null {
-    return storage.getItem(key);
+  static getOverallFeedback(): FeedbackItem[] {
+    const item = this.storage.getItem(OVERALL_FEEDBACK_KEY);
+    return item ? JSON.parse(item) : [];
   }
 
   /**
-   * Sets an item in the specified storage.
-   * @param {Storage} storage - The storage object (localStorage or sessionStorage).
-   * @param {string} key - The key of the item to remove.
-   * @param {string} value - The value of the item to set.
+   * Sets the overall feedback in the storage
+   * @param feedback
    */
-  static setItem(storage: Storage, key: string, value: string): void {
-    storage.setItem(key, value);
+  static setOverallFeedback(feedback: FeedbackItem[]): void {
+    this.storage.setItem(OVERALL_FEEDBACK_KEY, JSON.stringify(feedback));
   }
 
   /**
-   * Removes an item from the specified storage.
-   * @param {Storage} storage - The storage object (localStorage or sessionStorage).
-   * @param {string} key - The key of the item to remove.
+   * Clears the overall feedback from the storage
    */
-  static removeItem(storage: Storage, key: string): void {
-    storage.removeItem(key);
+  static clearOverallFeedback(): void {
+    this.storage.removeItem(OVERALL_FEEDBACK_KEY);
   }
 
   /**

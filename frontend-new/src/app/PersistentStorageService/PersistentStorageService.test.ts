@@ -242,42 +242,57 @@ describe("AuthPersistentStorage class tests", () => {
     });
   });
 
-  describe("getItem tests", () => {
-    test("should return correct item from localStorage", () => {
-      // GIVEN an item is stored in localStorage
-      const key = "testKey";
-      const value = "testValue";
-      localStorage.setItem(key, value);
+  describe("overall feedback tests", () => {
+    test("return correct previously set feedback", () => {
+      // GIVEN The overall feedback is stored in the session storage
+      const givenFeedback = [
+        {
+          question_id: "foo",
+          answer: {
+            rating_numeric: 5,
+          },
+          is_answered: true,
+        },
+      ];
+      PersistentStorageService.setOverallFeedback(givenFeedback);
 
-      const retrievedValue = PersistentStorageService.getItem(localStorage, key);
+      // WHEN The overall feedback is retrieved
+      const feedback = PersistentStorageService.getOverallFeedback();
 
-      // THEN the correct value should be returned
-      expect(retrievedValue).toEqual(value);
+      // THEN The overall feedback should be returned
+      expect(feedback).toEqual(givenFeedback);
     });
 
-    test("should set item in localStorage", () => {
-      // GIVEN a key and value
-      const key = "testKey";
-      const value = "testValue";
+    test("return empty array if overall feedback is not set", () => {
+      // GIVEN The overall feedback is not stored in the session storage
+      // Nothing set
 
-      // WHEN the item is set using setItem
-      PersistentStorageService.setItem(localStorage, key, value);
+      // WHEN The feedback is retrieved
+      const feedback = PersistentStorageService.getOverallFeedback();
 
-      // THEN the item should be stored in localStorage
-      expect(localStorage.getItem(key)).toEqual(value);
+      // THEN An empty array should be returned
+      expect(feedback).toEqual([]);
     });
 
-    test("should remove item from localStorage", () => {
-      // GIVEN an item is stored in localStorage
-      const key = "testKey";
-      const value = "testValue";
-      localStorage.setItem(key, value);
+    test("clear overall feedback", () => {
+      // GIVEN The overall feedback is stored in the session storage
+      const givenFeedback = [
+        {
+          question_id: "foo",
+          answer: {
+            rating_numeric: 5,
+          },
+          is_answered: true,
+        },
+      ];
+      PersistentStorageService.setOverallFeedback(givenFeedback);
 
-      // WHEN the item is removed using removeItem
-      PersistentStorageService.removeItem(localStorage, key);
+      // WHEN The overall feedback is cleared
+      PersistentStorageService.clearOverallFeedback();
 
-      // THEN the item should be removed from localStorage
-      expect(localStorage.getItem(key)).toBeNull();
+      // THEN The overall feedback should be cleared (empty array)
+      const feedback = PersistentStorageService.getOverallFeedback();
+      expect(feedback).toEqual([]);
     });
   });
 
