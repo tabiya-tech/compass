@@ -19,6 +19,7 @@ import UserPreferencesStateService from "src/userPreferences/UserPreferencesStat
 import * as AuthenticationServiceFactoryModule from "src/auth/services/Authentication.service.factory";
 import { DATA_TEST_ID as BUG_REPORT_DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import * as Sentry from "@sentry/react";
+import { DATA_TEST_ID as REQUEST_INVITATION_CODE_DATA_TEST_ID} from "src/auth/components/requestInvitationCode/RequestInvitationCode";
 
 //mock the SocialAuth component
 jest.mock("src/auth/components/SocialAuth/SocialAuth", () => {
@@ -153,6 +154,20 @@ jest.mock("src/feedback/bugReport/bugReportButton/BugReportButton", () => {
   };
 });
 
+// mock the RequestInvitationCode component
+jest.mock("src/auth/components/requestInvitationCode/RequestInvitationCode", () => {
+  const actual = jest.requireActual(
+    "src/auth/components/requestInvitationCode/RequestInvitationCode"
+  );
+  return {
+    ...actual,
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return <span data-testid={actual.DATA_TEST_ID.REQUEST_INVITATION_CODE_LINK}></span>;
+    }),
+  };
+});
+
 describe("Testing Register component", () => {
   beforeEach(() => {
     // Clear console mocks and mock functions
@@ -203,6 +218,9 @@ describe("Testing Register component", () => {
 
     // AND expect the bug report button to be rendered
     expect(screen.getByTestId(BUG_REPORT_DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER)).toBeInTheDocument();
+
+    // AND the request registration code link should be displayed
+    expect(screen.getByTestId(REQUEST_INVITATION_CODE_DATA_TEST_ID.REQUEST_INVITATION_CODE_LINK)).toBeInTheDocument();
 
     // AND the form inputs and button should be displayed
     expect(RegisterWithEmailForm).toHaveBeenCalled();

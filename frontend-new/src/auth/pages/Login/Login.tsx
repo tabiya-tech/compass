@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Box, CircularProgress, Container, Divider, styled, Typography, useTheme } from "@mui/material";
-import { NavLink as RouterNavLink, useLocation, useNavigate } from "react-router-dom";
+import { Box, CircularProgress, Container, Divider, Typography, useTheme } from "@mui/material";
+import { useLocation, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import SocialAuth from "src/auth/components/SocialAuth/SocialAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -12,25 +12,21 @@ import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
-import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
+import FirebaseEmailAuthService
+  from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
-import FirebaseInvitationCodeAuthenticationService from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
+import FirebaseInvitationCodeAuthenticationService
+  from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
 import { AuthenticationError } from "src/error/commonErrors";
+import RequestInvitationCode from "src/auth/components/requestInvitationCode/RequestInvitationCode";
+import { InvitationType } from "src/auth/services/invitationsService/invitations.types";
+import CustomLink from "src/theme/CustomLink/CustomLink";
 
 export const INVITATIONS_PARAM_NAME = "invite-code";
 
 const uniqueId = "7ce9ba1f-bde0-48e2-88df-e4f697945cc4";
-
-const StyledNavLink = styled(RouterNavLink)(({ theme }) => ({
-  color: theme.palette.text.textAccent,
-  fontStyle: "italic",
-  textDecoration: "none",
-  "&:hover": {
-    textDecoration: "underline",
-  },
-}));
 
 export const DATA_TEST_ID = {
   LOGIN_CONTAINER: `login-container-${uniqueId}`,
@@ -45,6 +41,7 @@ export const DATA_TEST_ID = {
   FIREBASE_AUTH_CONTAINER: `firebase-auth-container-${uniqueId}`,
   LOGIN_LINK: `login-login-link-${uniqueId}`,
   LANGUAGE_SELECTOR: `login-language-selector-${uniqueId}`,
+  REQUEST_LOGIN_CODE_LINK: `login-request-login-code-link-${uniqueId}`,
 };
 
 enum ActiveForm {
@@ -260,8 +257,14 @@ const Login: React.FC = () => {
       sx={{ height: "100%", padding: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}
       data-testid={DATA_TEST_ID.LOGIN_CONTAINER}
     >
-      <Backdrop isShown={isLoading} message={"Logging you in..."} />
-      <Box display="flex" flexDirection="column" alignItems="center" justifyContent={"space-evenly"} height={"80%"}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent={"space-evenly"}
+        gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
+        width={"100%"}
+      >
         <AuthHeader title={"Welcome to Compass!"} subtitle={"Login to your account to continue"} />
         <Box
           component="form"
@@ -271,7 +274,7 @@ const Login: React.FC = () => {
           flexDirection={"column"}
           textAlign={"center"}
           width={"100%"}
-          gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
+          gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
         >
           <Typography variant="subtitle2" data-testid={DATA_TEST_ID.SUBTITLE}>
             Login using
@@ -328,20 +331,18 @@ const Login: React.FC = () => {
           isLoading={isLoading}
           notifyOnLoading={notifyOnSocialLoading}
         />
-        <Typography variant="body2" mt={2} data-testid={DATA_TEST_ID.LOGIN_LINK}>
+        <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>
           Don't have an account?{" "}
-          <StyledNavLink
-            to={routerPaths.REGISTER}
-            style={{
-              color: theme.palette.text.textAccent,
-              fontStyle: "italic",
-            }}
+          <CustomLink
+            onClick={() => navigate(routerPaths.REGISTER)}
           >
             Register
-          </StyledNavLink>
+          </CustomLink>
         </Typography>
+        <RequestInvitationCode invitationCodeType={InvitationType.AUTO_REGISTER} />
       </Box>
       <BugReportButton bottomAlign={true} />
+      <Backdrop isShown={isLoading} message={"Logging you in..."} />
     </Container>
   );
 };

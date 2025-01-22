@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import "firebaseui/dist/firebaseui.css";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Divider, Typography, useTheme } from "@mui/material";
 import FirebaseSocialAuthenticationService from "src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
@@ -47,6 +47,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
 }) => {
   const isOnline = useContext(IsOnlineContext);
 
+  const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
 
   const [_registrationCode, setRegistrationCode] = useState(registrationCode);
@@ -159,13 +160,25 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       flexDirection="column"
       justifyContent="center"
       alignItems="center"
-      mt={(theme) => theme.tabiyaSpacing.lg}
+      width="100%"
       data-testid={DATA_TEST_ID.FIREBASE_AUTH_CONTAINER}
     >
-      <Typography variant="caption" mt={2} data-testid={DATA_TEST_ID.CONTINUE_WITH_GOOGLE}>
-        Or continue with
-      </Typography>
-      <Box mt={2} width="100%">
+      <Divider
+        textAlign="center"
+        sx={{
+          width: "100%",
+          paddingY: theme.fixedSpacing(theme.tabiyaSpacing.xs),
+        }}
+      >
+        <Typography
+          variant="subtitle2"
+          padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
+          data-testid={DATA_TEST_ID.CONTINUE_WITH_GOOGLE}
+        >
+          Or continue with
+        </Typography>
+      </Divider>
+      <Box width="100%">
         <div data-test_id={DATA_TEST_ID.FIREBASE_AUTH}>
           <Button
             variant="text"
