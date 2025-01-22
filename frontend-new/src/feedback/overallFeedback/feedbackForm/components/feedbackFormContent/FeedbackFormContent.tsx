@@ -27,16 +27,12 @@ export const DATA_TEST_ID = {
   FEEDBACK_FORM_BACK_BUTTON: `feedback-form-back-button-${uniqueId}`,
 };
 
-export const STORAGE = PersistentStorageService.storage;
-export const FEEDBACK_FORM_ANSWERS_KEY = "userFeedbackResponses";
-
 const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit }) => {
   const theme = useTheme();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
   const [activeStep, setActiveStep] = React.useState(0);
   const [answers, setAnswers] = useState<FeedbackItem[]>(() => {
-    const savedAnswers = PersistentStorageService.getItem(STORAGE, FEEDBACK_FORM_ANSWERS_KEY);
-    return savedAnswers ? JSON.parse(savedAnswers) : [];
+    return PersistentStorageService.getOverallFeedback();
   });
 
   const maxSteps = feedbackFormContentSteps.length;
@@ -44,7 +40,7 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
   const handleNext = () => {
     if (activeStep === maxSteps - 1) {
       notifySubmit(answers);
-      PersistentStorageService.removeItem(STORAGE, FEEDBACK_FORM_ANSWERS_KEY);
+      PersistentStorageService.clearOverallFeedback();
       setAnswers([]);
     } else {
       setActiveStep((prev) => prev + 1);
@@ -68,7 +64,7 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
       }
 
       // Save updated answers to persistent storage
-      PersistentStorageService.setItem(STORAGE, FEEDBACK_FORM_ANSWERS_KEY, JSON.stringify(updatedAnswers));
+      PersistentStorageService.setOverallFeedback(updatedAnswers);
 
       return updatedAnswers;
     });
