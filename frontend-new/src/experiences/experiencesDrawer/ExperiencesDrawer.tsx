@@ -71,9 +71,9 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
   const [personalInfo, setPersonalInfo] = useLocalStorage("personalInfo", {
-    name: "",
-    phone: "",
-    email: "",
+    fullName: "",
+    phoneNumber: "",
+    contactEmail: "",
     address: "",
   });
   const [hasTopSkills, setHasTopSkills] = useState(false);
@@ -118,9 +118,9 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
       <Box display="flex" flexDirection="column" gap={2}>
         <Box display="flex" flexDirection="column" gap={1} alignItems="end" justifyContent="flex-end">
           <DownloadReportDropdown
-            name={personalInfo.name}
-            email={personalInfo.email}
-            phone={personalInfo.phone}
+            name={personalInfo.fullName}
+            email={personalInfo.contactEmail}
+            phone={personalInfo.phoneNumber}
             address={personalInfo.address}
             experiences={experiencesWithTopSkills}
             conversationConductedAt={conversationConductedAt!}
@@ -131,20 +131,20 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
           <CustomTextField
             label="Name:"
             placeholder="Enter your name here"
-            value={personalInfo.name}
-            onChange={handleInputChange("name")}
+            value={personalInfo.fullName}
+            onChange={handleInputChange("fullName")}
           />
           <CustomTextField
             label="Email:"
             placeholder="Enter your email here"
-            value={personalInfo.email}
-            onChange={handleInputChange("email")}
+            value={personalInfo.contactEmail}
+            onChange={handleInputChange("contactEmail")}
           />
           <CustomTextField
             label="Phone:"
             placeholder="Enter your phone number here"
-            value={personalInfo.phone}
-            onChange={handleInputChange("phone")}
+            value={personalInfo.phoneNumber}
+            onChange={handleInputChange("phoneNumber")}
           />
           <CustomTextField
             label="Address:"
