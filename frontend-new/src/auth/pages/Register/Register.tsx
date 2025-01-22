@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
-import { Box, Container, Divider, styled, TextField, Typography, useTheme } from "@mui/material";
-import { NavLink as RouterNavLink, useNavigate } from "react-router-dom";
+import { Box, Container, Divider, TextField, Typography, useTheme } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import SocialAuth from "src/auth/components/SocialAuth/SocialAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -8,24 +8,20 @@ import RegisterWithEmailForm from "src/auth/pages/Register/components/RegisterWi
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
-import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
+import FirebaseEmailAuthService
+  from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
-import FirebaseSocialAuthenticationService from "src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
+import FirebaseSocialAuthenticationService
+  from "src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
+import RequestInvitationCode from "src/auth/components/requestInvitationCode/RequestInvitationCode";
+import { InvitationType } from "src/auth/services/invitationsService/invitations.types";
+import CustomLink from "../../../theme/CustomLink/CustomLink";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
-
-const StyledNavLink = styled(RouterNavLink)(({ theme }) => ({
-  color: theme.palette.text.textAccent,
-  fontStyle: "italic",
-  textDecoration: "none",
-  "&:hover": {
-    textDecoration: "underline",
-  },
-}));
 
 export const DATA_TEST_ID = {
   REGISTRATION_CODE_INPUT: `register-registration-code-input-${uniqueId}`,
@@ -43,7 +39,7 @@ export const DATA_TEST_ID = {
   REGISTER_USING: `register-using-${uniqueId}`,
   FIREBASE_AUTH_CONTAINER: `firebase-auth-container-${uniqueId}`,
   LOGIN_LINK: `register-login-link-${uniqueId}`,
-  LANGUAGE_SELECTOR: `register-language-selector-${uniqueId}`,
+  LANGUAGE_SELECTOR: `register-language-selector-${uniqueId}`
 };
 
 const Register: React.FC = () => {
@@ -143,67 +139,61 @@ const Register: React.FC = () => {
   }, []);
 
   return (
-    <>
-      <Container
-        maxWidth="xs"
-        sx={{ height: "100%", padding: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}
-        data-testid={DATA_TEST_ID.REGISTER_CONTAINER}
+    <Container
+      maxWidth="xs"
+      sx={{ height: "100%", padding: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}
+      data-testid={DATA_TEST_ID.REGISTER_CONTAINER}
+    >
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent={"space-evenly"}
+        gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
+        width={"100%"}
       >
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent={"space-evenly"}
-          gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
-          height={"80%"}
-          width={"100%"}
-        >
-          <AuthHeader title={"Welcome to Compass!"} subtitle={"We need some information to get started"} />
-          <Typography variant="subtitle2">Enter your registration code to sign up</Typography>
-          <TextField
-            fullWidth
-            label="Registration code"
-            variant="outlined"
-            required
-            value={registrationCode}
-            onChange={(e) => handleRegistrationCodeChanged(e)}
-            inputProps={{ "data-testid": DATA_TEST_ID.REGISTRATION_CODE_INPUT }}
-          />
-          <Divider textAlign="center" style={{ width: "100%" }}>
-            <Typography variant="subtitle2" padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-              and then continue with
-            </Typography>
-          </Divider>
-          <RegisterWithEmailForm
-            disabled={!registrationCode}
-            notifyOnRegister={handleRegister}
-            isRegistering={isLoading}
-          />
-          <SocialAuth
-            postLoginHandler={handlePostLogin}
-            isLoading={isLoading}
-            disabled={!registrationCode}
-            label={"Sign up with Google"}
-            notifyOnLoading={notifyOnSocialLoading}
-            registrationCode={registrationCode}
-          />
-          <Typography variant="body2" data-testid={DATA_TEST_ID.LOGIN_LINK}>
-            Already have an account?{" "}
-            <StyledNavLink
-              to={routerPaths.LOGIN}
-              style={{
-                color: theme.palette.text.textAccent,
-                fontStyle: "italic",
-              }}
-            >
-              Login
-            </StyledNavLink>
+        <AuthHeader title={"Welcome to Compass!"} subtitle={"We need some information to get started"} />
+        <Typography variant="subtitle2">Enter your registration code to sign up</Typography>
+        <TextField
+          fullWidth
+          label="Registration code"
+          variant="outlined"
+          required
+          value={registrationCode}
+          onChange={(e) => handleRegistrationCodeChanged(e)}
+          inputProps={{ "data-testid": DATA_TEST_ID.REGISTRATION_CODE_INPUT }}
+        />
+        <Divider textAlign="center" style={{ width: "100%" }}>
+          <Typography variant="subtitle2" padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
+            and either continue with
           </Typography>
-        </Box>
-      </Container>
+        </Divider>
+        <RegisterWithEmailForm
+          disabled={!registrationCode}
+          notifyOnRegister={handleRegister}
+          isRegistering={isLoading}
+        />
+        <SocialAuth
+          postLoginHandler={handlePostLogin}
+          isLoading={isLoading}
+          disabled={!registrationCode}
+          label={"Sign up with Google"}
+          notifyOnLoading={notifyOnSocialLoading}
+          registrationCode={registrationCode}
+        />
+        <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>
+          Already have an account?{" "}
+          <CustomLink
+            onClick={() => navigate(routerPaths.LOGIN)}
+          >
+            Login
+          </CustomLink>
+        </Typography>
+        <RequestInvitationCode invitationCodeType={InvitationType.REGISTER} />
+      </Box>
       <BugReportButton bottomAlign={true} />
       <Backdrop isShown={isLoading} message="Registering you..." />
-    </>
+    </Container>
   );
 };
 

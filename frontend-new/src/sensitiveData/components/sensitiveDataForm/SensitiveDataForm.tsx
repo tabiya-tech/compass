@@ -18,7 +18,6 @@ import { routerPaths } from "src/app/routerPaths";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
-import { StyledAnchor } from "src/theme/StyledAnchor/StyledAnchor";
 import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
 import { Gender, SensitivePersonalData } from "src/sensitiveData/types";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -30,6 +29,7 @@ import { EncryptedDataTooLarge } from "src/sensitiveData/services/sensitivePerso
 import { sensitivePersonalDataService } from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalData.service";
 import TextConfirmModalDialog from "src/theme/textConfirmModalDialog/TextConfirmModalDialog";
 import { DEBOUNCE_TIME, formConfig } from "./formConfig";
+import CustomLink from "src/theme/CustomLink/CustomLink";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d1";
 
@@ -332,7 +332,7 @@ const SensitiveDataForm: React.FC = () => {
                 gap: theme.tabiyaSpacing.xl,
               }}
             >
-              <StyledAnchor
+              <CustomLink
                 data-testid={DATA_TEST_ID.SENSITIVE_DATA_REJECT_BUTTON}
                 disabled={isRejecting}
                 onClick={() => {
@@ -340,7 +340,7 @@ const SensitiveDataForm: React.FC = () => {
                 }}
               >
                 No, thank you
-              </StyledAnchor>
+              </CustomLink>
 
               <PrimaryButton
                 fullWidth

@@ -1,10 +1,13 @@
 import React, { useCallback, useState } from "react";
+import * as Sentry from "@sentry/react";
 import Modal from "@mui/material/Modal";
 
 import { Box, CircularProgress, TextField, Typography, useTheme } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import CloseIcon from "@mui/icons-material/Close";
+import RequestInvitationCodeFormModal from "src/auth/components/requestInvitationCode/requestInvitationCodeFormModal/RequestInvitationCodeFormModal";
+import CustomLink from "src/theme/CustomLink/CustomLink";
 
 export enum RegistrationCodeFormModalState {
   SHOW,
@@ -25,6 +28,7 @@ export const DATA_TEST_ID = {
   SUBMIT_BUTTON: `invitation-code-submit-button-${uniqueId}`,
   PROGRESS_ELEMENT: `invitation-code-progress-element-${uniqueId}`,
   CLOSE_ICON: `invitation-code-close-icon-${uniqueId}`,
+  REQUEST_REGISTRATION_CODE_LINK: `invitation-code-request-registration-code-link-${uniqueId}`,
 };
 
 export interface InvitationCodeFormModalProps {
@@ -54,73 +58,100 @@ const style = {
   boxShadow: 24,
   borderRadius: 1,
   p: 4,
+  display: "flex",
+  flexDirection: "column",
 };
 
 const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ modalState, onSuccess, onClose }) => {
   const theme = useTheme();
   const [registrationCode, setRegistrationCode] = useState("");
+  const [isInvitationCodeRequestModalOpen, setIsInvitationCodeRequestModalOpen] = useState<boolean>(false);
 
   const handleAcceptRegistrationCode = useCallback(async () => {
     onSuccess(registrationCode);
   }, [onSuccess, registrationCode]);
 
+  const handleOpenRequestModal = () => {
+    onClose();
+    setIsInvitationCodeRequestModalOpen(true);
+  };
+
+
   return (
-    <Modal
-      open={modalState === RegistrationCodeFormModalState.SHOW || modalState === RegistrationCodeFormModalState.LOADING}
-      onClose={onClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-      data-testid={DATA_TEST_ID.CONTAINER}
-    >
-      <Box sx={style}>
-        <PrimaryIconButton
-          data-testid={DATA_TEST_ID.CLOSE_ICON}
-          title="Close registration code form"
-          onClick={onClose}
-          sx={{
-            position: "absolute",
-            right: 8,
-            top: 8,
-            color: (theme) => theme.palette.grey[500],
-          }}
-        >
-          <CloseIcon />
-        </PrimaryIconButton>
-        <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.MODAL_TITLE}>
-          Registration code
-        </Typography>
-        <Typography variant="body2" gutterBottom data-testid={DATA_TEST_ID.MODAL_SUBTITLE}>
-          Enter your registration code
-        </Typography>
-        <TextField
-          fullWidth
-          label="Registration code"
-          variant="outlined"
-          placeholder={"Enter your registration code"}
-          margin="normal"
-          required
-          onChange={(e) => setRegistrationCode(e.target.value)}
-          inputProps={{ "data-testid": DATA_TEST_ID.INVITATION_CODE_INPUT }}
-        />
-        <PrimaryButton
-          data-testid={DATA_TEST_ID.SUBMIT_BUTTON}
-          fullWidth
-          disableWhenOffline
-          onClick={handleAcceptRegistrationCode}
-          disabled={!registrationCode.length}
-        >
-          {modalState === RegistrationCodeFormModalState.LOADING ? (
-            <CircularProgress
-              sx={{ color: (theme) => theme.palette.info.contrastText }}
-              size={2 * theme.typography.fontSize}
-              data-testid={DATA_TEST_ID.PROGRESS_ELEMENT}
-            />
-          ) : (
-            "Submit"
-          )}
-        </PrimaryButton>
-      </Box>
-    </Modal>
+    <>
+      <Modal
+        open={
+          modalState === RegistrationCodeFormModalState.SHOW || modalState === RegistrationCodeFormModalState.LOADING
+        }
+        onClose={onClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        data-testid={DATA_TEST_ID.CONTAINER}
+      >
+        <Box sx={style}>
+          <PrimaryIconButton
+            data-testid={DATA_TEST_ID.CLOSE_ICON}
+            title="Close registration code form"
+            onClick={onClose}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </PrimaryIconButton>
+          <Typography variant="h4" data-testid={DATA_TEST_ID.MODAL_TITLE}>
+            Registration code
+          </Typography>
+          <Typography variant="body2" data-testid={DATA_TEST_ID.MODAL_SUBTITLE}>
+            Enter your registration code
+          </Typography>
+          <TextField
+            fullWidth
+            label="Registration code"
+            variant="outlined"
+            placeholder={"Enter your registration code"}
+            margin="normal"
+            required
+            onChange={(e) => setRegistrationCode(e.target.value)}
+            inputProps={{ "data-testid": DATA_TEST_ID.INVITATION_CODE_INPUT }}
+          />
+          <PrimaryButton
+            data-testid={DATA_TEST_ID.SUBMIT_BUTTON}
+            fullWidth
+            disableWhenOffline
+            onClick={handleAcceptRegistrationCode}
+            disabled={!registrationCode.length}
+          >
+            {modalState === RegistrationCodeFormModalState.LOADING ? (
+              <CircularProgress
+                sx={{ color: (theme) => theme.palette.info.contrastText }}
+                size={2 * theme.typography.fontSize}
+                data-testid={DATA_TEST_ID.PROGRESS_ELEMENT}
+              />
+            ) : (
+              "Submit"
+            )}
+          </PrimaryButton>
+          { Sentry.isInitialized() && <Typography
+            variant="caption"
+            sx={{
+              textAlign: "center",
+              marginTop: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+            }}
+          >
+            Don't have a registration code?{" "}
+            <CustomLink onClick={handleOpenRequestModal} data-testid={DATA_TEST_ID.REQUEST_REGISTRATION_CODE_LINK}>
+              Reach out
+            </CustomLink>
+          </Typography>
+          }
+        </Box>
+      </Modal>
+      <RequestInvitationCodeFormModal open={isInvitationCodeRequestModalOpen} onClose={() => setIsInvitationCodeRequestModalOpen(false)} />
+    </>
   );
 };
 

@@ -338,7 +338,7 @@ exports[`Sensitive Data render tests should render the component with all elemen
       >
         <a
           aria-disabled="false"
-          class="css-1dwh1c3"
+          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
           data-testid="sensitive-data-reject-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
         >
           No, thank you
