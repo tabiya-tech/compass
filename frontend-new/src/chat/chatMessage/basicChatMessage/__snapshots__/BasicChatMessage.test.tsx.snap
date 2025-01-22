@@ -7,10 +7,18 @@ exports[`render tests should render the Chat message with a timestamp 1`] = `
   origin="COMPASS"
 >
   <div
-    data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
-  />
-  <div
-    data-testid="chat-message-sent_at-7772f20a-9d0c-4072-b24f-97eca2f43d7b"
-  />
+    class="MuiBox-root css-14jedwi"
+  >
+    <div
+      class="MuiBox-root css-8atqhb"
+    >
+      <div
+        data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+      />
+      <div
+        data-testid="chat-message-footer-layout-container-7772f20a-9d0c-4072-b24f-97eca2f43d7b"
+      />
+    </div>
+  </div>
 </div>
 `;

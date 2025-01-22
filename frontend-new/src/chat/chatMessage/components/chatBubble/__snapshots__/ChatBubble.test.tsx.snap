@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`render tests should render the Chat Bubble with a footer if one is passed 1`] = `
+exports[`render tests should render the Chat Bubble with a child if one is passed 1`] = `
 <div
-  class="MuiBox-root css-1ltd7lq"
+  class="MuiBox-root css-1y1uy12"
   data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
   origin="COMPASS"
 >
@@ -12,11 +12,6 @@ exports[`render tests should render the Chat Bubble with a footer if one is pass
   >
     Hello, I'm Compass
   </p>
-  <hr
-    class="MuiDivider-root MuiDivider-fullWidth css-ohsnik-MuiDivider-root"
-    color="#F3F1EE"
-    data-testid="chat-message-bubble-message-divider-6e685eeb-2b54-432a-8b66-8a81633b3981"
-  />
   <div
     class="MuiBox-root css-0"
     data-testid="chat-message-bubble-message-footer-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
@@ -32,7 +27,7 @@ exports[`render tests should render the Chat Bubble with a footer if one is pass
 
 exports[`render tests should render the Chat Bubble without a child if none is passed 1`] = `
 <div
-  class="MuiBox-root css-1ltd7lq"
+  class="MuiBox-root css-1y1uy12"
   data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
   origin="COMPASS"
 >
@@ -42,5 +37,9 @@ exports[`render tests should render the Chat Bubble without a child if none is p
   >
     Hello, I'm Compass
   </p>
+  <div
+    class="MuiBox-root css-0"
+    data-testid="chat-message-bubble-message-footer-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+  />
 </div>
 `;

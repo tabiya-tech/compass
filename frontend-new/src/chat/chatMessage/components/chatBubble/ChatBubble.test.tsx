@@ -25,7 +25,7 @@ describe("render tests", () => {
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER)).toMatchSnapshot();
   });
 
-  test("should render the Chat Bubble with a footer if one is passed", () => {
+  test("should render the Chat Bubble with a child if one is passed", () => {
     // GIVEN a message
     const givenMessage: string = "Hello, I'm Compass";
     // AND a sender
@@ -34,14 +34,16 @@ describe("render tests", () => {
     const givenFooter = <div data-testid={"foo-footer"}>foo child</div>
 
     // WHEN the chat bubble is rendered
-    render(<ChatBubble message={givenMessage} sender={givenSender} footer={givenFooter}/>);
+    render(
+      <ChatBubble message={givenMessage} sender={givenSender}>
+        {givenFooter}
+      </ChatBubble>
+    );
 
     // THEN expect the message container to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER)).toBeInTheDocument();
     // AND expect the message text to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_TEXT)).toBeInTheDocument();
-    // AND expect the divider to be visible
-    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_DIVIDER)).toBeInTheDocument();
     // AND expect the child container to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_FOOTER_CONTAINER)).toBeInTheDocument();
     // AND expect the child to be visible

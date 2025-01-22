@@ -32,6 +32,6 @@ export const ShownWithFooter: Story = {
   args: {
     message: "Hello, how can I help you?",
     sender: ConversationMessageSender.COMPASS,
-    footer: <VisualMock text={"Foo Footer"} />
+    children: <VisualMock text={"Foo Footer"} />
   }
 }
