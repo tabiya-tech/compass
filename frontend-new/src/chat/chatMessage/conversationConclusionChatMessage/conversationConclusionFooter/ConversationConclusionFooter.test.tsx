@@ -20,7 +20,7 @@ jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => {
   return {
     __esModule: true,
     PersistentStorageService: {
-      getItem: jest.fn().mockReturnValue(JSON.stringify([mockUserFeedback])),
+      getOverallFeedback: () => [mockUserFeedback],
     },
   };
 });

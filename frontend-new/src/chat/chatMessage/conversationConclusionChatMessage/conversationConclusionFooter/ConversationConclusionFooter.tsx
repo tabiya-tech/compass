@@ -2,10 +2,6 @@ import React, { useMemo } from "react";
 import { Box } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import {
-  FEEDBACK_FORM_ANSWERS_KEY,
-  STORAGE,
-} from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
 
 interface FeedbackFormButtonProps {
   notifyOnFeedbackFormOpened: () => void;
@@ -20,8 +16,8 @@ export const DATA_TEST_ID = {
 
 const ConversationConclusionFooter: React.FC<FeedbackFormButtonProps> = ({ notifyOnFeedbackFormOpened }) => {
   const hasSavedFeedback = useMemo(() => {
-    const formAnswers = PersistentStorageService.getItem(STORAGE, FEEDBACK_FORM_ANSWERS_KEY);
-    return !!formAnswers;
+    const formAnswers = PersistentStorageService.getOverallFeedback();
+    return formAnswers.length > 0;
   }, []);
 
   return (
