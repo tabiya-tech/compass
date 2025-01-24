@@ -119,7 +119,7 @@ const SkillReportPDF: React.FC<SkillReportProps> = ({
             {renderPersonalInfo(email, ReportContent.IMAGE_URLS.EMAIL_ICON, DATA_TEST_ID.SKILL_REPORT_EMAIL)}
           </View>
           <Text x={0} y={0} style={styles.bodyText} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY_TEXT}>
-            {prettifyText(ReportContent.REPORT_BODY_TEXT(formatDate(conversationConductedAt!)))}
+            {prettifyText(ReportContent.REPORT_BODY_TEXT(formatDate(conversationConductedAt)))}
           </Text>
           <View style={styles.divider} />
           <Text x={0} y={0} style={styles.experiencesTitle} data-testid={DATA_TEST_ID.SKILL_REPORT_EXPERIENCES_TITLE}>
