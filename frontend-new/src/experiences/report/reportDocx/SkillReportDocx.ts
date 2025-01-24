@@ -144,7 +144,7 @@ const SkillReportDocx = async (props: SkillReportDocxProps): Promise<Blob> => {
           new Paragraph({
             children: [
               new TextRun({
-                text: prettifyText(ReportContent.REPORT_BODY_TEXT(formatDate(conversationConductedAt!))),
+                text: prettifyText(ReportContent.REPORT_BODY_TEXT(formatDate(conversationConductedAt))),
                 size: 22,
               }),
             ],
@@ -220,18 +220,7 @@ const SkillReportDocx = async (props: SkillReportDocxProps): Promise<Blob> => {
       },
     ],
   });
-
-  return new Promise((resolve, reject) => {
-    Packer.toBlob(doc).then(
-      (blob) => {
-        resolve(blob);
-      },
-      (error) => {
-        console.log(error);
-        reject(error);
-      }
-    );
-  });
+  return Packer.toBlob(doc);
 };
 
 export default SkillReportDocx;

@@ -13,8 +13,8 @@ export const getUniqueSkills = (experiences: Experience[]): Skill[] => {
   return skillOnly.sort((a, b) => a.preferredLabel.localeCompare(b.preferredLabel));
 };
 
-export const formatDate = (dateString: string): string => {
-  const date = new Date(dateString);
+export const formatDate = (dateString: string | null): string => {
+  const date = dateString ? new Date(dateString) : new Date();
   const options: Intl.DateTimeFormatOptions = { month: "long", day: "2-digit", year: "numeric" };
   return date.toLocaleDateString("en-US", options);
 };
@@ -22,17 +22,17 @@ export const formatDate = (dateString: string): string => {
 // Utility function to group experiences by work type
 export const groupExperiencesByWorkType = (experiences: Experience[]) => {
   const selfEmploymentExperiences = experiences.filter(
-    (experience) => experience.work_type === WorkType.SELF_EMPLOYMENT
+    (experience) => experience.work_type === WorkType.SELF_EMPLOYMENT,
   );
 
   const salaryWorkExperiences = experiences.filter(
-    (experience) => experience.work_type === WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT
+    (experience) => experience.work_type === WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
   );
 
   const unpaidWorkExperiences = experiences.filter((experience) => experience.work_type === WorkType.UNSEEN_UNPAID);
 
   const traineeWorkExperiences = experiences.filter(
-    (experience) => experience.work_type === WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK
+    (experience) => experience.work_type === WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK,
   );
 
   return { selfEmploymentExperiences, salaryWorkExperiences, unpaidWorkExperiences, traineeWorkExperiences };
