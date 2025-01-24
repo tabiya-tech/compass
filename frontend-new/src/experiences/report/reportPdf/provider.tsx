@@ -6,17 +6,23 @@ import { saveAs } from "src/experiences/saveAs";
 
 export class PDFReportDownloadProvider implements IReportFormatProvider {
   async download(props: ReportProps) {
-    const fileName = "compass-skills-report.pdf";
-    const blob = await pdf(
-      <SkillReportPDF
-        name={props.name}
-        email={props.email}
-        phone={props.phone}
-        address={props.address}
-        experiences={props.experiences}
-        conversationConductedAt={props.conversationConductedAt}
-      />
-    ).toBlob();
-    saveAs(blob, fileName);
+    try {
+      const fileName = "compass-skills-report.pdf";
+      const report = pdf(
+        <SkillReportPDF
+          name={props.name}
+          email={props.email}
+          phone={props.phone}
+          address={props.address}
+          experiences={props.experiences}
+          conversationConductedAt={props.conversationConductedAt}
+        />,
+      );
+      // noinspection JSVoidFunctionReturnValueUsed Intellij is wrong here, this is a promise
+      const blob = await report.toBlob();
+      saveAs(blob, fileName);
+    } catch (error) {
+      console.error("Failed to download report", error);
+    }
   }
 }
