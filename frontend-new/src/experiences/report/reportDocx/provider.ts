@@ -5,7 +5,7 @@ import { saveAs } from "src/experiences/saveAs";
 export class DocxReportDownloadProvider implements IReportFormatProvider {
   async download(props: ReportProps) {
     try {
-      const fileName = "compass-skills-report.docx";
+      const fileName = "compass-cv.docx";
       const blob = await SkillReportDocx({
         name: props.name,
         email: props.email,

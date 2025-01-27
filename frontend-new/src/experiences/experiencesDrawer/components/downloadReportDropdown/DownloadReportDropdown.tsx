@@ -19,13 +19,13 @@ interface DownloadReportDropdownProps {
 const uniqueId = "05c29b7a-ebf7-4795-ba23-a284aecad180";
 
 export const MENU_ITEM_ID = {
-  REPORT_PDF: `${uniqueId}-report-pdf`,
-  REPORT_DOCX: `${uniqueId}-report-docx`,
+  PDF: `${uniqueId}-pdf`,
+  DOCX: `${uniqueId}-docx`,
 };
 
 export const MENU_ITEM_TEXT = {
-  REPORT_PDF: "Report PDF",
-  REPORT_DOCX: "Report DOCX",
+  PDF: "PDF",
+  DOCX: "DOCX",
 };
 
 const DownloadReportDropdown: React.FC<DownloadReportDropdownProps> = (props) => {
@@ -45,14 +45,14 @@ const DownloadReportDropdown: React.FC<DownloadReportDropdownProps> = (props) =>
 
   const contextMenuItems: MenuItemConfig[] = [
     {
-      id: MENU_ITEM_ID.REPORT_PDF,
-      text: MENU_ITEM_TEXT.REPORT_PDF,
+      id: MENU_ITEM_ID.PDF,
+      text: MENU_ITEM_TEXT.PDF,
       disabled: false,
       action: () => pdfReportProvider.download(reportProps),
     },
     {
-      id: MENU_ITEM_ID.REPORT_DOCX,
-      text: MENU_ITEM_TEXT.REPORT_DOCX,
+      id: MENU_ITEM_ID.DOCX,
+      text: MENU_ITEM_TEXT.DOCX,
       disabled: false,
       action: () => docxsReportProvider.download(reportProps),
     },
