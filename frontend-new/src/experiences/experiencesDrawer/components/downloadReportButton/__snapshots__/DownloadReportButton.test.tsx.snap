@@ -9,7 +9,7 @@ exports[`DownloadReportButton should render DownloadReportButton correctly when 
     class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-aysw4f-MuiButtonBase-root-MuiIconButton-root"
     data-testid="download-report-button-f5553dac-adb7-440f-9549-c3567b22dc76"
     tabindex="0"
-    title="Download Report"
+    title="Download CV"
     type="button"
   >
     <svg
@@ -26,7 +26,7 @@ exports[`DownloadReportButton should render DownloadReportButton correctly when 
     <span
       class="MuiTypography-root MuiTypography-caption css-ijdyd0-MuiTypography-root"
     >
-      Download
+      Download CV
     </span>
     <span
       class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
@@ -45,7 +45,7 @@ exports[`DownloadReportButton should render DownloadReportButton correctly when 
     data-testid="download-report-button-f5553dac-adb7-440f-9549-c3567b22dc76"
     disabled=""
     tabindex="-1"
-    title="Download Report"
+    title="Download CV"
     type="button"
   >
     <svg
@@ -62,7 +62,7 @@ exports[`DownloadReportButton should render DownloadReportButton correctly when 
     <span
       class="MuiTypography-root MuiTypography-caption css-1jmum30-MuiTypography-root"
     >
-      Download
+      Download CV
     </span>
   </button>
   <div

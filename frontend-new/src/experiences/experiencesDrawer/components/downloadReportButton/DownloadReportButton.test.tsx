@@ -35,8 +35,8 @@ describe("DownloadReportButton", () => {
     expect(downloadReportButton).not.toBeDisabled();
     // AND the download report icon to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.DOWNLOAD_REPORT_ICON)).toBeInTheDocument();
-    // AND the text "Download" to be in the document
-    expect(screen.getByText("Download")).toBeInTheDocument();
+    // AND the text "Download CV" to be in the document
+    expect(screen.getByText("Download CV")).toBeInTheDocument();
     // AND the download report help tip to not be in the document
     expect(screen.queryByTestId(DATA_TEST_ID.DOWNLOAD_REPORT_HELP_TIP)).not.toBeInTheDocument();
     // AND to match the snapshot
@@ -60,8 +60,8 @@ describe("DownloadReportButton", () => {
     expect(downloadReportButton).toBeDisabled();
     // AND the download report icon to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.DOWNLOAD_REPORT_ICON)).toBeInTheDocument();
-    // AND the text "Download" to be in the document
-    expect(screen.getByText("Download")).toBeInTheDocument();
+    // AND the text "Download CV" to be in the document
+    expect(screen.getByText("Download CV")).toBeInTheDocument();
     // AND the download report help tip to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.DOWNLOAD_REPORT_HELP_TIP)).toBeInTheDocument();
     // AND to match the snapshot
