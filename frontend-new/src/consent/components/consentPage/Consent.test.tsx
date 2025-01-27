@@ -100,6 +100,12 @@ describe("Testing Consent Page", () => {
       expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER)).toBeInTheDocument();
       expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_TEXT)).toBeInTheDocument();
 
+      // AND the support container should be rendered
+      expect(screen.getByTestId(DATA_TEST_ID.SUPPORT_CONTAINER)).toBeInTheDocument();
+
+      // AND the Google logo should be rendered
+      expect(screen.getByTestId(DATA_TEST_ID.GOOGLE_LOGO)).toBeInTheDocument();
+
       // AND the component should match the snapshot
       expect(screen.getByTestId(DATA_TEST_ID.CONSENT_CONTAINER)).toMatchSnapshot();
     });
