@@ -28,7 +28,7 @@ const DownloadReportButton: React.FC<DownloadReportButtonProps> = (props) => {
           color: theme.palette.tabiyaBlue.main,
           borderRadius: (theme) => theme.tabiyaRounding.sm,
         }}
-        title="Download Report"
+        title="Download CV"
         disabled={props.disabled}
         onClick={props.notifyOnDownloadPdf}
         data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON}
@@ -41,7 +41,7 @@ const DownloadReportButton: React.FC<DownloadReportButtonProps> = (props) => {
             opacity: props.disabled ? 0.5 : 1,
           }}
         >
-          Download
+          Download CV
         </Typography>
       </IconButton>
       {props.disabled && (
