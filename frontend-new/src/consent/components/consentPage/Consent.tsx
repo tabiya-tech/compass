@@ -42,6 +42,8 @@ export const DATA_TEST_ID = {
   ACCEPT_CHECKBOX_TEXT: `consent-accept-consent-text-${uniqueId}`,
   ACCEPT_TERMS_AND_CONDITIONS_TEXT: `consent-accept-tc-text-${uniqueId}`,
   ACCEPT_TERMS_AND_CONDITIONS_CHECKBOX_CONTAINER: `consent-accept-tc-checkbox-container-${uniqueId}`,
+  SUPPORT_CONTAINER: `consent-support-container-${uniqueId}`,
+  GOOGLE_LOGO: `consent-google-logo-${uniqueId}`,
 };
 
 const Consent: React.FC = () => {
@@ -152,11 +154,17 @@ const Consent: React.FC = () => {
   return (
     <Container
       maxWidth="xs"
-      sx={{ height: "100%", padding: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}
+      sx={{
+        height: "100%",
+        padding: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+        display: "flex",
+        flexDirection: "column",
+        gap: theme.fixedSpacing(theme.tabiyaSpacing.xl),
+      }}
       data-testid={DATA_TEST_ID.CONSENT_CONTAINER}
     >
       <Backdrop isShown={isLoggingOut} message={"Logging you out..."} />
-      <Box display="flex" flexDirection="column" alignItems="center" justifyContent={"space-evenly"} height={"80%"}>
+      <Box display="flex" flexDirection="column" alignItems="center" justifyContent={"space-evenly"}>
         <AuthHeader title={"Before we begin..."} subtitle={""} />
         <Box
           display={"flex"}
@@ -260,6 +268,24 @@ const Consent: React.FC = () => {
             Sure, I am ready
           </PrimaryButton>
         </Box>
+      </Box>
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}
+        sx={{
+          marginTop: "auto",
+        }}
+        data-testid={DATA_TEST_ID.SUPPORT_CONTAINER}
+      >
+        <Typography typography="body1">With support from</Typography>
+        <img
+          src={`${process.env.PUBLIC_URL}/google-logo.svg`}
+          alt="Google.org Logo"
+          height={6 * theme.tabiyaSpacing.xl} // xl wasn't quite big enough, we're going for ~24px
+          data-testid={DATA_TEST_ID.GOOGLE_LOGO}
+        />
       </Box>
       <ConfirmModalDialog
         isOpen={showRejectModal}
