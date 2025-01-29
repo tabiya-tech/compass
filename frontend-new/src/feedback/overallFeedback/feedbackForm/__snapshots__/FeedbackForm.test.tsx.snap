@@ -64,584 +64,592 @@ exports[`FeedbackForm should render component successfully 1`] = `
         data-testid="feedback-form-dialog-content-c6ba52ec-c1de-46ac-950b-f5354c6785ac"
       >
         <div
-          class="MuiBox-root css-11artbl"
+          class="MuiBox-root css-mk4vix"
           data-testid="feedback-form-content-07d1ed9d-6ced-4a24-912a-9b89199df67f"
         >
-          <p
-            class="MuiTypography-root MuiTypography-body1 css-paf3i2-MuiTypography-root"
-            data-testid="feedback-form-content-title-07d1ed9d-6ced-4a24-912a-9b89199df67f"
-          >
-            Overall Satisfaction
-          </p>
           <div
-            class="MuiBox-root css-15bovrc"
-            data-testid="feedback-form-content-questions-07d1ed9d-6ced-4a24-912a-9b89199df67f"
+            class="MuiBox-root css-1inkys2"
           >
             <div
-              class="MuiBox-root css-ifx08d"
-              data-testid="steps-component-3bf900a2-f9fa-4b28-8c20-8bc21570635c"
+              style="position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; opacity: 1; transform: none;"
             >
+              <p
+                class="MuiTypography-root MuiTypography-body1 css-paf3i2-MuiTypography-root"
+                data-testid="feedback-form-content-title-07d1ed9d-6ced-4a24-912a-9b89199df67f"
+              >
+                Overall Satisfaction
+              </p>
               <div
-                class="MuiBox-root css-0"
+                class="MuiBox-root css-16qyt99"
+                data-testid="feedback-form-content-questions-07d1ed9d-6ced-4a24-912a-9b89199df67f"
               >
                 <div
-                  class="MuiBox-root css-yj95vr"
-                  data-testid="custom-rating-container-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                  class="MuiBox-root css-ifx08d"
+                  data-testid="steps-component-3bf900a2-f9fa-4b28-8c20-8bc21570635c"
                 >
                   <div
-                    class="MuiBox-root css-1w00lo4"
+                    class="MuiBox-root css-0"
                   >
-                    <p
-                      class="MuiTypography-root MuiTypography-body1 css-1rdygw0-MuiTypography-root"
-                      data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
-                    >
-                      How easy or difficult was it to interact with Compass and understand its responses?
-                    </p>
                     <div
-                      class="MuiBox-root css-a0ovpn"
+                      class="MuiBox-root css-1821gv5"
+                      data-testid="custom-rating-container-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
                     >
-                      <span
-                        class="MuiRating-root MuiRating-sizeSmall css-cod5a2-MuiRating-root"
-                      >
-                        <label
-                          class="css-dqr9h-MuiRating-label"
-                          for=":r2:"
-                        >
-                          <span
-                            class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                            data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                            value="1"
-                          >
-                            <svg
-                              aria-hidden="true"
-                              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                              data-testid="StarBorderIcon"
-                              focusable="false"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                              />
-                            </svg>
-                          </span>
-                          <span
-                            class="MuiRating-visuallyHidden"
-                          >
-                            1 Star
-                          </span>
-                        </label>
-                        <input
-                          class="MuiRating-visuallyHidden"
-                          id=":r2:"
-                          name="interaction_ease"
-                          type="radio"
-                          value="1"
-                        />
-                        <label
-                          class="css-dqr9h-MuiRating-label"
-                          for=":r3:"
-                        >
-                          <span
-                            class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                            data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                            value="2"
-                          >
-                            <svg
-                              aria-hidden="true"
-                              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                              data-testid="StarBorderIcon"
-                              focusable="false"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                              />
-                            </svg>
-                          </span>
-                          <span
-                            class="MuiRating-visuallyHidden"
-                          >
-                            2 Stars
-                          </span>
-                        </label>
-                        <input
-                          class="MuiRating-visuallyHidden"
-                          id=":r3:"
-                          name="interaction_ease"
-                          type="radio"
-                          value="2"
-                        />
-                        <label
-                          class="css-dqr9h-MuiRating-label"
-                          for=":r4:"
-                        >
-                          <span
-                            class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                            data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                            value="3"
-                          >
-                            <svg
-                              aria-hidden="true"
-                              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                              data-testid="StarBorderIcon"
-                              focusable="false"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                              />
-                            </svg>
-                          </span>
-                          <span
-                            class="MuiRating-visuallyHidden"
-                          >
-                            3 Stars
-                          </span>
-                        </label>
-                        <input
-                          class="MuiRating-visuallyHidden"
-                          id=":r4:"
-                          name="interaction_ease"
-                          type="radio"
-                          value="3"
-                        />
-                        <label
-                          class="css-dqr9h-MuiRating-label"
-                          for=":r5:"
-                        >
-                          <span
-                            class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                            data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                            value="4"
-                          >
-                            <svg
-                              aria-hidden="true"
-                              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                              data-testid="StarBorderIcon"
-                              focusable="false"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                              />
-                            </svg>
-                          </span>
-                          <span
-                            class="MuiRating-visuallyHidden"
-                          >
-                            4 Stars
-                          </span>
-                        </label>
-                        <input
-                          class="MuiRating-visuallyHidden"
-                          id=":r5:"
-                          name="interaction_ease"
-                          type="radio"
-                          value="4"
-                        />
-                        <label
-                          class="css-dqr9h-MuiRating-label"
-                          for=":r6:"
-                        >
-                          <span
-                            class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                            data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                            value="5"
-                          >
-                            <svg
-                              aria-hidden="true"
-                              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                              data-testid="StarBorderIcon"
-                              focusable="false"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                              />
-                            </svg>
-                          </span>
-                          <span
-                            class="MuiRating-visuallyHidden"
-                          >
-                            5 Stars
-                          </span>
-                        </label>
-                        <input
-                          class="MuiRating-visuallyHidden"
-                          id=":r6:"
-                          name="interaction_ease"
-                          type="radio"
-                          value="5"
-                        />
-                        <label
-                          class="css-dqr9h-MuiRating-label"
-                          for=":r7:"
-                        >
-                          <span
-                            class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                            data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                            value="6"
-                          >
-                            <svg
-                              aria-hidden="true"
-                              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                              data-testid="StarBorderIcon"
-                              focusable="false"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                              />
-                            </svg>
-                          </span>
-                          <span
-                            class="MuiRating-visuallyHidden"
-                          >
-                            6 Stars
-                          </span>
-                        </label>
-                        <input
-                          class="MuiRating-visuallyHidden"
-                          id=":r7:"
-                          name="interaction_ease"
-                          type="radio"
-                          value="6"
-                        />
-                        <label
-                          class="css-dqr9h-MuiRating-label"
-                          for=":r8:"
-                        >
-                          <span
-                            class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                            data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                            value="7"
-                          >
-                            <svg
-                              aria-hidden="true"
-                              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                              data-testid="StarBorderIcon"
-                              focusable="false"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                              />
-                            </svg>
-                          </span>
-                          <span
-                            class="MuiRating-visuallyHidden"
-                          >
-                            7 Stars
-                          </span>
-                        </label>
-                        <input
-                          class="MuiRating-visuallyHidden"
-                          id=":r8:"
-                          name="interaction_ease"
-                          type="radio"
-                          value="7"
-                        />
-                        <label
-                          class="MuiRating-label MuiRating-pristine css-dqr9h-MuiRating-label"
-                        >
-                          <input
-                            checked=""
-                            class="MuiRating-visuallyHidden"
-                            id="interaction_ease-empty"
-                            name="interaction_ease"
-                            type="radio"
-                            value=""
-                          />
-                          <span
-                            class="MuiRating-visuallyHidden"
-                          >
-                            Empty
-                          </span>
-                        </label>
-                      </span>
                       <div
-                        class="MuiBox-root css-jyedia"
+                        class="MuiBox-root css-1w00lo4"
                       >
                         <p
-                          class="MuiTypography-root MuiTypography-body2 css-1m7ibp6-MuiTypography-root"
-                          data-testid="custom-rating-low-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                          class="MuiTypography-root MuiTypography-body1 css-1rdygw0-MuiTypography-root"
+                          data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
                         >
-                          Difficult
+                          How easy or difficult was it to interact with Compass and understand its responses?
                         </p>
-                        <p
-                          class="MuiTypography-root MuiTypography-body2 css-1m7ibp6-MuiTypography-root"
-                          data-testid="custom-rating-high-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                        <div
+                          class="MuiBox-root css-a0ovpn"
                         >
-                          Easy
-                        </p>
+                          <span
+                            class="MuiRating-root MuiRating-sizeSmall css-cod5a2-MuiRating-root"
+                          >
+                            <label
+                              class="css-dqr9h-MuiRating-label"
+                              for=":r3:"
+                            >
+                              <span
+                                class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
+                                data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                                value="1"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
+                                  data-testid="StarBorderIcon"
+                                  focusable="false"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
+                                  />
+                                </svg>
+                              </span>
+                              <span
+                                class="MuiRating-visuallyHidden"
+                              >
+                                1 Star
+                              </span>
+                            </label>
+                            <input
+                              class="MuiRating-visuallyHidden"
+                              id=":r3:"
+                              name="interaction_ease"
+                              type="radio"
+                              value="1"
+                            />
+                            <label
+                              class="css-dqr9h-MuiRating-label"
+                              for=":r4:"
+                            >
+                              <span
+                                class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
+                                data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                                value="2"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
+                                  data-testid="StarBorderIcon"
+                                  focusable="false"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
+                                  />
+                                </svg>
+                              </span>
+                              <span
+                                class="MuiRating-visuallyHidden"
+                              >
+                                2 Stars
+                              </span>
+                            </label>
+                            <input
+                              class="MuiRating-visuallyHidden"
+                              id=":r4:"
+                              name="interaction_ease"
+                              type="radio"
+                              value="2"
+                            />
+                            <label
+                              class="css-dqr9h-MuiRating-label"
+                              for=":r5:"
+                            >
+                              <span
+                                class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
+                                data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                                value="3"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
+                                  data-testid="StarBorderIcon"
+                                  focusable="false"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
+                                  />
+                                </svg>
+                              </span>
+                              <span
+                                class="MuiRating-visuallyHidden"
+                              >
+                                3 Stars
+                              </span>
+                            </label>
+                            <input
+                              class="MuiRating-visuallyHidden"
+                              id=":r5:"
+                              name="interaction_ease"
+                              type="radio"
+                              value="3"
+                            />
+                            <label
+                              class="css-dqr9h-MuiRating-label"
+                              for=":r6:"
+                            >
+                              <span
+                                class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
+                                data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                                value="4"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
+                                  data-testid="StarBorderIcon"
+                                  focusable="false"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
+                                  />
+                                </svg>
+                              </span>
+                              <span
+                                class="MuiRating-visuallyHidden"
+                              >
+                                4 Stars
+                              </span>
+                            </label>
+                            <input
+                              class="MuiRating-visuallyHidden"
+                              id=":r6:"
+                              name="interaction_ease"
+                              type="radio"
+                              value="4"
+                            />
+                            <label
+                              class="css-dqr9h-MuiRating-label"
+                              for=":r7:"
+                            >
+                              <span
+                                class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
+                                data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                                value="5"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
+                                  data-testid="StarBorderIcon"
+                                  focusable="false"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
+                                  />
+                                </svg>
+                              </span>
+                              <span
+                                class="MuiRating-visuallyHidden"
+                              >
+                                5 Stars
+                              </span>
+                            </label>
+                            <input
+                              class="MuiRating-visuallyHidden"
+                              id=":r7:"
+                              name="interaction_ease"
+                              type="radio"
+                              value="5"
+                            />
+                            <label
+                              class="css-dqr9h-MuiRating-label"
+                              for=":r8:"
+                            >
+                              <span
+                                class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
+                                data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                                value="6"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
+                                  data-testid="StarBorderIcon"
+                                  focusable="false"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
+                                  />
+                                </svg>
+                              </span>
+                              <span
+                                class="MuiRating-visuallyHidden"
+                              >
+                                6 Stars
+                              </span>
+                            </label>
+                            <input
+                              class="MuiRating-visuallyHidden"
+                              id=":r8:"
+                              name="interaction_ease"
+                              type="radio"
+                              value="6"
+                            />
+                            <label
+                              class="css-dqr9h-MuiRating-label"
+                              for=":r9:"
+                            >
+                              <span
+                                class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
+                                data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                                value="7"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
+                                  data-testid="StarBorderIcon"
+                                  focusable="false"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
+                                  />
+                                </svg>
+                              </span>
+                              <span
+                                class="MuiRating-visuallyHidden"
+                              >
+                                7 Stars
+                              </span>
+                            </label>
+                            <input
+                              class="MuiRating-visuallyHidden"
+                              id=":r9:"
+                              name="interaction_ease"
+                              type="radio"
+                              value="7"
+                            />
+                            <label
+                              class="MuiRating-label MuiRating-pristine css-dqr9h-MuiRating-label"
+                            >
+                              <input
+                                checked=""
+                                class="MuiRating-visuallyHidden"
+                                id="interaction_ease-empty"
+                                name="interaction_ease"
+                                type="radio"
+                                value=""
+                              />
+                              <span
+                                class="MuiRating-visuallyHidden"
+                              >
+                                Empty
+                              </span>
+                            </label>
+                          </span>
+                          <div
+                            class="MuiBox-root css-jyedia"
+                          >
+                            <p
+                              class="MuiTypography-root MuiTypography-body2 css-1m7ibp6-MuiTypography-root"
+                              data-testid="custom-rating-low-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                            >
+                              Difficult
+                            </p>
+                            <p
+                              class="MuiTypography-root MuiTypography-body2 css-1m7ibp6-MuiTypography-root"
+                              data-testid="custom-rating-high-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                            >
+                              Easy
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1cqtlhz-MuiFormControl-root-MuiTextField-root"
+                      >
+                        <div
+                          class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline css-voxow3-MuiInputBase-root-MuiOutlinedInput-root"
+                        >
+                          <textarea
+                            aria-invalid="false"
+                            class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
+                            data-testid="comment-text-field-ab74a074-67f6-4a8a-b2b2-a582d1d56c9c"
+                            id=":ra:"
+                            placeholder="Please explain your rating and share any suggestions for improving the ease of interaction with Compass."
+                            rows="3"
+                            style="height: 0px; overflow: hidden;"
+                          />
+                          <textarea
+                            aria-hidden="true"
+                            class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
+                            readonly=""
+                            style="visibility: hidden; position: absolute; overflow: hidden; height: 0px; top: 0px; left: 0px; transform: translateZ(0); padding-top: 0px; padding-bottom: 0px; width: 100%;"
+                            tabindex="-1"
+                          />
+                          <fieldset
+                            aria-hidden="true"
+                            class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+                          >
+                            <legend
+                              class="css-ihdtdm"
+                            >
+                              <span
+                                class="notranslate"
+                              >
+                                ​
+                              </span>
+                            </legend>
+                          </fieldset>
+                        </div>
                       </div>
                     </div>
                   </div>
                   <div
-                    class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-vg49q3-MuiFormControl-root-MuiTextField-root"
+                    class="MuiBox-root css-0"
                   >
                     <div
-                      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline css-voxow3-MuiInputBase-root-MuiOutlinedInput-root"
+                      class="MuiBox-root css-1821gv5"
+                      data-testid="custom-rating-container-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
                     >
-                      <textarea
-                        aria-invalid="false"
-                        class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
-                        data-testid="comment-text-field-ab74a074-67f6-4a8a-b2b2-a582d1d56c9c"
-                        id=":r9:"
-                        placeholder="Please explain your rating and share any suggestions for improving the ease of interaction with Compass."
-                        rows="3"
-                        style="height: 0px; overflow: hidden;"
-                      />
-                      <textarea
-                        aria-hidden="true"
-                        class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
-                        readonly=""
-                        style="visibility: hidden; position: absolute; overflow: hidden; height: 0px; top: 0px; left: 0px; transform: translateZ(0); padding-top: 0px; padding-bottom: 0px; width: 100%;"
-                        tabindex="-1"
-                      />
-                      <fieldset
-                        aria-hidden="true"
-                        class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
-                      >
-                        <legend
-                          class="css-ihdtdm"
-                        >
-                          <span
-                            class="notranslate"
-                          >
-                            ​
-                          </span>
-                        </legend>
-                      </fieldset>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div
-                class="MuiBox-root css-0"
-              >
-                <div
-                  class="MuiBox-root css-yj95vr"
-                  data-testid="custom-rating-container-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                >
-                  <div
-                    class="MuiBox-root css-1w00lo4"
-                  >
-                    <p
-                      class="MuiTypography-root MuiTypography-body1 css-1rdygw0-MuiTypography-root"
-                      data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
-                    >
-                      How satisfied are you with Compass?
-                    </p>
-                    <div
-                      class="MuiBox-root css-a0ovpn"
-                    >
-                      <span
-                        class="MuiRating-root MuiRating-sizeSmall css-cod5a2-MuiRating-root"
-                      >
-                        <label
-                          class="css-dqr9h-MuiRating-label"
-                          for=":rb:"
-                        >
-                          <span
-                            class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                            data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                            value="1"
-                          >
-                            <svg
-                              aria-hidden="true"
-                              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                              data-testid="StarBorderIcon"
-                              focusable="false"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                              />
-                            </svg>
-                          </span>
-                          <span
-                            class="MuiRating-visuallyHidden"
-                          >
-                            1 Star
-                          </span>
-                        </label>
-                        <input
-                          class="MuiRating-visuallyHidden"
-                          id=":rb:"
-                          name="satisfaction_with_compass"
-                          type="radio"
-                          value="1"
-                        />
-                        <label
-                          class="css-dqr9h-MuiRating-label"
-                          for=":rc:"
-                        >
-                          <span
-                            class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                            data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                            value="2"
-                          >
-                            <svg
-                              aria-hidden="true"
-                              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                              data-testid="StarBorderIcon"
-                              focusable="false"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                              />
-                            </svg>
-                          </span>
-                          <span
-                            class="MuiRating-visuallyHidden"
-                          >
-                            2 Stars
-                          </span>
-                        </label>
-                        <input
-                          class="MuiRating-visuallyHidden"
-                          id=":rc:"
-                          name="satisfaction_with_compass"
-                          type="radio"
-                          value="2"
-                        />
-                        <label
-                          class="css-dqr9h-MuiRating-label"
-                          for=":rd:"
-                        >
-                          <span
-                            class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                            data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                            value="3"
-                          >
-                            <svg
-                              aria-hidden="true"
-                              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                              data-testid="StarBorderIcon"
-                              focusable="false"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                              />
-                            </svg>
-                          </span>
-                          <span
-                            class="MuiRating-visuallyHidden"
-                          >
-                            3 Stars
-                          </span>
-                        </label>
-                        <input
-                          class="MuiRating-visuallyHidden"
-                          id=":rd:"
-                          name="satisfaction_with_compass"
-                          type="radio"
-                          value="3"
-                        />
-                        <label
-                          class="css-dqr9h-MuiRating-label"
-                          for=":re:"
-                        >
-                          <span
-                            class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                            data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                            value="4"
-                          >
-                            <svg
-                              aria-hidden="true"
-                              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                              data-testid="StarBorderIcon"
-                              focusable="false"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                              />
-                            </svg>
-                          </span>
-                          <span
-                            class="MuiRating-visuallyHidden"
-                          >
-                            4 Stars
-                          </span>
-                        </label>
-                        <input
-                          class="MuiRating-visuallyHidden"
-                          id=":re:"
-                          name="satisfaction_with_compass"
-                          type="radio"
-                          value="4"
-                        />
-                        <label
-                          class="css-dqr9h-MuiRating-label"
-                          for=":rf:"
-                        >
-                          <span
-                            class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                            data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                            value="5"
-                          >
-                            <svg
-                              aria-hidden="true"
-                              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                              data-testid="StarBorderIcon"
-                              focusable="false"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                              />
-                            </svg>
-                          </span>
-                          <span
-                            class="MuiRating-visuallyHidden"
-                          >
-                            5 Stars
-                          </span>
-                        </label>
-                        <input
-                          class="MuiRating-visuallyHidden"
-                          id=":rf:"
-                          name="satisfaction_with_compass"
-                          type="radio"
-                          value="5"
-                        />
-                        <label
-                          class="MuiRating-label MuiRating-pristine css-dqr9h-MuiRating-label"
-                        >
-                          <input
-                            checked=""
-                            class="MuiRating-visuallyHidden"
-                            id="satisfaction_with_compass-empty"
-                            name="satisfaction_with_compass"
-                            type="radio"
-                            value=""
-                          />
-                          <span
-                            class="MuiRating-visuallyHidden"
-                          >
-                            Empty
-                          </span>
-                        </label>
-                      </span>
                       <div
-                        class="MuiBox-root css-jyedia"
+                        class="MuiBox-root css-1w00lo4"
                       >
                         <p
-                          class="MuiTypography-root MuiTypography-body2 css-1m7ibp6-MuiTypography-root"
-                          data-testid="custom-rating-low-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                          class="MuiTypography-root MuiTypography-body1 css-1rdygw0-MuiTypography-root"
+                          data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
                         >
-                          Unsatisfied
+                          How satisfied are you with Compass?
                         </p>
-                        <p
-                          class="MuiTypography-root MuiTypography-body2 css-1m7ibp6-MuiTypography-root"
-                          data-testid="custom-rating-high-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                        <div
+                          class="MuiBox-root css-a0ovpn"
                         >
-                          Satisfied
-                        </p>
+                          <span
+                            class="MuiRating-root MuiRating-sizeSmall css-cod5a2-MuiRating-root"
+                          >
+                            <label
+                              class="css-dqr9h-MuiRating-label"
+                              for=":rc:"
+                            >
+                              <span
+                                class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
+                                data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                                value="1"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
+                                  data-testid="StarBorderIcon"
+                                  focusable="false"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
+                                  />
+                                </svg>
+                              </span>
+                              <span
+                                class="MuiRating-visuallyHidden"
+                              >
+                                1 Star
+                              </span>
+                            </label>
+                            <input
+                              class="MuiRating-visuallyHidden"
+                              id=":rc:"
+                              name="satisfaction_with_compass"
+                              type="radio"
+                              value="1"
+                            />
+                            <label
+                              class="css-dqr9h-MuiRating-label"
+                              for=":rd:"
+                            >
+                              <span
+                                class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
+                                data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                                value="2"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
+                                  data-testid="StarBorderIcon"
+                                  focusable="false"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
+                                  />
+                                </svg>
+                              </span>
+                              <span
+                                class="MuiRating-visuallyHidden"
+                              >
+                                2 Stars
+                              </span>
+                            </label>
+                            <input
+                              class="MuiRating-visuallyHidden"
+                              id=":rd:"
+                              name="satisfaction_with_compass"
+                              type="radio"
+                              value="2"
+                            />
+                            <label
+                              class="css-dqr9h-MuiRating-label"
+                              for=":re:"
+                            >
+                              <span
+                                class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
+                                data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                                value="3"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
+                                  data-testid="StarBorderIcon"
+                                  focusable="false"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
+                                  />
+                                </svg>
+                              </span>
+                              <span
+                                class="MuiRating-visuallyHidden"
+                              >
+                                3 Stars
+                              </span>
+                            </label>
+                            <input
+                              class="MuiRating-visuallyHidden"
+                              id=":re:"
+                              name="satisfaction_with_compass"
+                              type="radio"
+                              value="3"
+                            />
+                            <label
+                              class="css-dqr9h-MuiRating-label"
+                              for=":rf:"
+                            >
+                              <span
+                                class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
+                                data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                                value="4"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
+                                  data-testid="StarBorderIcon"
+                                  focusable="false"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
+                                  />
+                                </svg>
+                              </span>
+                              <span
+                                class="MuiRating-visuallyHidden"
+                              >
+                                4 Stars
+                              </span>
+                            </label>
+                            <input
+                              class="MuiRating-visuallyHidden"
+                              id=":rf:"
+                              name="satisfaction_with_compass"
+                              type="radio"
+                              value="4"
+                            />
+                            <label
+                              class="css-dqr9h-MuiRating-label"
+                              for=":rg:"
+                            >
+                              <span
+                                class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
+                                data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                                value="5"
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
+                                  data-testid="StarBorderIcon"
+                                  focusable="false"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
+                                  />
+                                </svg>
+                              </span>
+                              <span
+                                class="MuiRating-visuallyHidden"
+                              >
+                                5 Stars
+                              </span>
+                            </label>
+                            <input
+                              class="MuiRating-visuallyHidden"
+                              id=":rg:"
+                              name="satisfaction_with_compass"
+                              type="radio"
+                              value="5"
+                            />
+                            <label
+                              class="MuiRating-label MuiRating-pristine css-dqr9h-MuiRating-label"
+                            >
+                              <input
+                                checked=""
+                                class="MuiRating-visuallyHidden"
+                                id="satisfaction_with_compass-empty"
+                                name="satisfaction_with_compass"
+                                type="radio"
+                                value=""
+                              />
+                              <span
+                                class="MuiRating-visuallyHidden"
+                              >
+                                Empty
+                              </span>
+                            </label>
+                          </span>
+                          <div
+                            class="MuiBox-root css-jyedia"
+                          >
+                            <p
+                              class="MuiTypography-root MuiTypography-body2 css-1m7ibp6-MuiTypography-root"
+                              data-testid="custom-rating-low-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                            >
+                              Unsatisfied
+                            </p>
+                            <p
+                              class="MuiTypography-root MuiTypography-body2 css-1m7ibp6-MuiTypography-root"
+                              data-testid="custom-rating-high-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                            >
+                              Satisfied
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

@@ -28,7 +28,7 @@ const CommentTextField = React.forwardRef<HTMLInputElement, CommentTextFieldProp
         onChange={onChange}
         inputRef={ref}
         inputProps={{ "data-testid": DATA_TEST_ID.COMMENT_TEXT_FIELD }}
-        sx={{ marginTop: theme.spacing(2) }}
+        sx={{ marginTop: theme.fixedSpacing(theme.tabiyaSpacing.xs) }}
       />
     );
   }
