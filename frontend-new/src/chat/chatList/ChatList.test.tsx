@@ -3,9 +3,12 @@ import "src/_test_utilities/consoleMock";
 
 import ChatList, { DATA_TEST_ID } from "./ChatList";
 import { render, screen } from "src/_test_utilities/test-utils";
-import BasicChatMessage, {
-  DATA_TEST_ID as BASIC_CHAT_MESSAGE_DATA_TEST_ID,
-} from "src/chat/chatMessage/basicChatMessage/BasicChatMessage";
+import UserChatMessage, {
+  DATA_TEST_ID as USER_CHAT_MESSAGE_DATA_TEST_ID,
+} from "src/chat/chatMessage/userChatMessage/UserChatMessage";
+import CompassChatMessage, {
+  DATA_TEST_ID as COMPASS_CHAT_MESSAGE_DATA_TEST_ID,
+} from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
 import { ChatMessageType } from "src/chat/Chat.types";
@@ -13,10 +16,20 @@ import ChatBubble, {
   DATA_TEST_ID as CHAT_BUBBLE_DATA_TEST_ID,
 } from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import ConversationConclusionChatMessage from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
+import { ReactionType } from "src/feedback/reaction/reaction.types";
 
 // mock the chat message component
-jest.mock("src/chat/chatMessage/basicChatMessage/BasicChatMessage", () => {
-  const originalModule = jest.requireActual("src/chat/chatMessage/basicChatMessage/BasicChatMessage");
+jest.mock("src/chat/chatMessage/userChatMessage/UserChatMessage", () => {
+  const originalModule = jest.requireActual("src/chat/chatMessage/userChatMessage/UserChatMessage");
+  return {
+    __esModule: true,
+    ...originalModule,
+    default: jest.fn(() => <div data-testid={originalModule.DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}></div>),
+  };
+});
+
+jest.mock("src/chat/chatMessage/compassChatMessage/CompassChatMessage", () => {
+  const originalModule = jest.requireActual("src/chat/chatMessage/compassChatMessage/CompassChatMessage");
   return {
     __esModule: true,
     ...originalModule,
@@ -69,36 +82,53 @@ describe("ChatList", () => {
     // GIVEN a message list
     const givenMessages = [
       {
-        id: nanoid(),
+        message_id: nanoid(),
         sender: ConversationMessageSender.USER,
         message: "Hello",
         sent_at: new Date().toISOString(),
         type: ChatMessageType.BASIC_CHAT,
+        reaction: null,
       },
       {
-        id: nanoid(),
+        message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
-        message: "Hi",
+        message: "Hi, I'm Compass",
         sent_at: new Date().toISOString(),
         type: ChatMessageType.BASIC_CHAT,
+        reaction: {
+          id: nanoid(),
+          kind: ReactionType.DISLIKED,
+        },
       },
       {
-        id: nanoid(),
+        message_id: nanoid(),
+        sender: ConversationMessageSender.COMPASS,
+        message: "Let's explore your experiences!",
+        sent_at: new Date().toISOString(),
+        type: ChatMessageType.BASIC_CHAT,
+        reaction: null,
+      },
+      {
+        message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
         message: "Typing...",
         sent_at: new Date().toString(),
         type: ChatMessageType.TYPING,
+        reaction: null,
       },
       {
-        id: nanoid(),
+        message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
         message: "Thank you for using compass",
         sent_at: new Date().toString(),
         type: ChatMessageType.CONVERSATION_CONCLUSION,
+        reaction: null,
       },
     ];
     // AND a function to open the feedback form
     const givenNotifyOpenFeedbackForm = jest.fn();
+
+    // AND a function to notify when the reaction changes
 
     // WHEN the chat list is rendered
     render(<ChatList messages={givenMessages} notifyOnFeedbackFormOpened={givenNotifyOpenFeedbackForm} />);
@@ -106,24 +136,40 @@ describe("ChatList", () => {
     // THEN expect the chat list container to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
 
-    // AND expect the Basic Chat message component to be shown for each of the Basic chat messages
-    const basicChatMessages = screen.getAllByTestId(BASIC_CHAT_MESSAGE_DATA_TEST_ID.CHAT_MESSAGE_CONTAINER);
-    expect(basicChatMessages).toHaveLength(2);
-    basicChatMessages.forEach((chatMessage) => {
+    // AND expect the User Chat message component to be shown for each of the User chat messages
+    const userChatMessages = screen.getAllByTestId(USER_CHAT_MESSAGE_DATA_TEST_ID.CHAT_MESSAGE_CONTAINER);
+    expect(userChatMessages).toHaveLength(1);
+    userChatMessages.forEach((chatMessage) => {
       expect(chatMessage).toBeInTheDocument();
     });
-    // THEN expect the Basic Chat message component to be called with the correct messages
-    expect(BasicChatMessage).toHaveBeenNthCalledWith(
+
+    // AND expect the User Chat message component to be called with the correct messages
+    expect(UserChatMessage).toHaveBeenNthCalledWith(
       1,
       {
         chatMessage: givenMessages[0],
       },
       {}
     );
-    expect(BasicChatMessage).toHaveBeenNthCalledWith(
-      2,
+
+    // AND expect the Compass Chat message component to be shown for each of the compass chat messages
+    const compassChatMessages = screen.getAllByTestId(COMPASS_CHAT_MESSAGE_DATA_TEST_ID.CHAT_MESSAGE_CONTAINER);
+    expect(compassChatMessages).toHaveLength(2);
+    compassChatMessages.forEach((chatMessage) => {
+      expect(chatMessage).toBeInTheDocument();
+    });
+    // AND expect the Compass Chat message component to be called with the correct messages
+    expect(CompassChatMessage).toHaveBeenNthCalledWith(
+      1,
       {
         chatMessage: givenMessages[1],
+      },
+      {}
+    );
+    expect(CompassChatMessage).toHaveBeenNthCalledWith(
+      2,
+      {
+        chatMessage: givenMessages[2],
       },
       {}
     );
@@ -136,8 +182,8 @@ describe("ChatList", () => {
     expect(ChatBubble).toHaveBeenNthCalledWith(
       1,
       {
-        message: givenMessages[2].message,
-        sender: givenMessages[2].sender,
+        message: givenMessages[3].message,
+        sender: givenMessages[3].sender,
       },
       {}
     );
@@ -146,7 +192,7 @@ describe("ChatList", () => {
     expect(ConversationConclusionChatMessage).toHaveBeenNthCalledWith(
       1,
       {
-        chatMessage: givenMessages[3],
+        chatMessage: givenMessages[4],
         notifyOnFeedbackFormOpened: givenNotifyOpenFeedbackForm,
       },
       {}

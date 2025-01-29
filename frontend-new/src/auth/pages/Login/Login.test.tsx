@@ -86,14 +86,14 @@ jest.mock("./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm", () => 
 });
 
 jest.mock("src/feedback/bugReport/bugReportButton/BugReportButton", () => {
-    const actual = jest.requireActual("src/feedback/bugReport/bugReportButton/BugReportButton");
-    return {
-        ...actual,
-        __esModule: true,
-        default: jest.fn().mockImplementation(() => {
-        return <span data-testid={actual.DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER}></span>;
-        }),
-    };
+  const actual = jest.requireActual("src/feedback/bugReport/bugReportButton/BugReportButton");
+  return {
+    ...actual,
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return <span data-testid={actual.DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER}></span>;
+    }),
+  };
 });
 
 describe("Testing Login component", () => {

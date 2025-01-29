@@ -1,5 +1,6 @@
 from typing import List, Literal, Any
 
+from pydantic import Field
 from pydantic.main import BaseModel
 
 
@@ -8,7 +9,12 @@ class BaseEntity(BaseModel):
     Represents an entity.
     """
     id: str
-    modelId: str
+    # The modelId field was introduced later, so it may not exist in all documents
+    # For the documents that don't have this field, we'll default to None,
+    # Most likely, there will be no impact  for the conversation, however there is a slight chance that
+    # conversations conducted before the introduction of this field may not be able to be retrieved or completed.
+    # TODO: once all conversations have this field, we can remove this default value https://tabiya-tech.atlassian.net/browse/COM-477
+    modelId: str = Field(default="")
     UUID: str
     preferredLabel: str
     altLabels: List[str]
@@ -22,6 +28,7 @@ class OccupationEntity(BaseEntity):
     """
     code: str
 
+    # TODO: remove it as it is not needed https://tabiya-tech.atlassian.net/browse/COM-476
     def __init__(self, **data: Any):
         super().__init__(**data)
 
@@ -35,6 +42,7 @@ class SkillEntity(BaseEntity):
     """
     skillType: Literal['skill/competence', 'knowledge', 'language', 'attitude', '']
 
+    # TODO: remove it as it is not needed https://tabiya-tech.atlassian.net/browse/COM-476
     def __init__(self, **data: Any):
         super().__init__(**data)
 
@@ -50,6 +58,7 @@ class AssociatedSkillEntity(SkillEntity):
     """
     relationType: Literal['essential', 'optional', '']
 
+    # TODO: remove it as it is not needed https://tabiya-tech.atlassian.net/browse/COM-476
     def __init__(self, **data: Any):
         super().__init__(**data)
 

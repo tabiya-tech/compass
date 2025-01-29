@@ -1,7 +1,7 @@
 import React from "react";
 import { Theme } from "@mui/material/styles";
 import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
-import { Experience } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
+import { Experience } from "src/experiences/experienceService/experiences.types";
 import ExperiencesDrawerContent from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
 
 interface ExperienceCategoryProps {

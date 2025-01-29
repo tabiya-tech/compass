@@ -36,14 +36,13 @@ describe("ChatService", () => {
 
   test("should construct the service successfully", () => {
     // GIVEN the service is constructed
-    const givenSessionId = 1234;
-    const service = new ChatService(givenSessionId);
+    const service = new ChatService();
 
     // THEN expect the service to be constructed successfully
     expect(service).toBeDefined();
 
     // AND the service should have the correct endpoint url
-    expect(service.chatEndpointUrl).toEqual(`${givenApiServerUrl}/conversation`);
+    expect(service.chatEndpointUrl).toEqual(`${givenApiServerUrl}/conversations`);
   });
 
   describe("sendMessage", () => {
@@ -59,21 +58,21 @@ describe("ChatService", () => {
       );
 
       // WHEN the sendMessage function is called with the given arguments
+      const service = new ChatService();
       const givenSessionId = 1234;
-      const service = new ChatService(givenSessionId);
-      const actualMessageResponse = await service.sendMessage(givenMessage);
+      const actualMessageResponse = await service.sendMessage(givenSessionId, givenMessage);
 
       // THEN expect it to make a GET request
       // AND the headers
       // AND the request payload to contain the given arguments
-      expect(fetchSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/conversation`, {
+      expect(fetchSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/conversations/${givenSessionId}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: givenSessionId, user_input: givenMessage }),
+        body: JSON.stringify({ user_input: givenMessage }),
         expectedStatusCode: StatusCodes.CREATED,
         serviceName: "ChatService",
         serviceFunction: "sendMessage",
-        failureMessage: `Failed to send message with session id ${service.getSessionId()}`,
+        failureMessage: `Failed to send message with session id ${givenSessionId}`,
         expectedContentType: "application/json",
       });
 
@@ -83,20 +82,20 @@ describe("ChatService", () => {
 
     test("on fail to fetch, should reject with the expected service error", async () => {
       const givenMessage = "Hello";
-      // GIVEN fetch rejects with some unknown error
+      // GIVEN fetch rejects with some unknown error for sending a message on a given session
       const givenFetchError = new Error("some error");
       jest.spyOn(require("src/utils/customFetch/customFetch"), "customFetch").mockImplementationOnce(() => {
         return new Promise(() => {
           throw givenFetchError;
         });
       });
+      const givenSessionId = 1234;
 
       // WHEN calling sendMessage function
-      const givenSessionId = 1234;
-      const service = new ChatService(givenSessionId);
+      const service = new ChatService();
 
       // THEN expected it to reject with the same error thrown by fetchWithAuth
-      await expect(service.sendMessage(givenMessage)).rejects.toMatchObject(givenFetchError);
+      await expect(service.sendMessage(givenSessionId, givenMessage)).rejects.toMatchObject(givenFetchError);
     });
 
     test.each([
@@ -111,9 +110,9 @@ describe("ChatService", () => {
         setupAPIServiceSpy(StatusCodes.CREATED, givenResponse, "application/json;charset=UTF-8");
 
         // WHEN the sendMessage function is called with the given arguments
+        const service = new ChatService();
         const givenSessionId = 1234;
-        const service = new ChatService(givenSessionId);
-        const sendMessagePromise = service.sendMessage(givenMessage);
+        const sendMessagePromise = service.sendMessage(givenSessionId, givenMessage);
 
         // THEN expected it to reject with the error response
         const expectedError = {
@@ -121,7 +120,7 @@ describe("ChatService", () => {
             ChatService.name,
             "sendMessage",
             "POST",
-            `${givenApiServerUrl}/conversation`,
+            `${givenApiServerUrl}/conversations`,
             StatusCodes.CREATED,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",
@@ -140,44 +139,41 @@ describe("ChatService", () => {
       const givenTestHistoryResponse = generateTestHistory();
       const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, givenTestHistoryResponse, "application/json;charset=UTF-8");
       // WHEN the getChatHistory function is called
+      const service = new ChatService();
       const givenSessionId = 1234;
-      const service = new ChatService(givenSessionId);
-      const actualHistoryResponse = await service.getChatHistory();
+      const actualHistoryResponse = await service.getChatHistory(givenSessionId);
 
       // THEN expect it to make a GET request
       // AND the headers
-      expect(fetchSpy).toHaveBeenCalledWith(
-        `${givenApiServerUrl}/conversation/history?session_id=${service.getSessionId()}`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          expectedStatusCode: StatusCodes.OK,
-          serviceName: "ChatService",
-          serviceFunction: "getChatHistory",
-          failureMessage: `Failed to get chat history for session id ${service.getSessionId()}`,
-          expectedContentType: "application/json",
-        }
-      );
+      expect(fetchSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/conversations/${givenSessionId}/messages`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        expectedStatusCode: StatusCodes.OK,
+        serviceName: "ChatService",
+        serviceFunction: "getChatHistory",
+        failureMessage: `Failed to get chat history for session id ${givenSessionId}`,
+        expectedContentType: "application/json",
+      });
 
       // AND returns the history response
       expect(actualHistoryResponse).toEqual(givenTestHistoryResponse);
     });
 
     test("on fail to fetch, should reject with the expected service error", async () => {
-      // GIVEN fetch rejects with some unknown error
+      // GIVEN fetch rejects with some unknown error when getting the history of a given session
       const givenFetchError = new Error("some error");
       jest.spyOn(require("src/utils/customFetch/customFetch"), "customFetch").mockImplementationOnce(() => {
         return new Promise(() => {
           throw givenFetchError;
         });
       });
+      const givenSessionId = 1234;
 
       // WHEN calling getChatHistory function
-      const givenSessionId = 1234;
-      const service = new ChatService(givenSessionId);
+      const service = new ChatService();
 
       // THEN expected it to reject with the same error thrown by fetchWithAuth
-      await expect(service.getChatHistory()).rejects.toMatchObject(givenFetchError);
+      await expect(service.getChatHistory(givenSessionId)).rejects.toMatchObject(givenFetchError);
     });
 
     test.each([
@@ -191,9 +187,9 @@ describe("ChatService", () => {
         setupAPIServiceSpy(StatusCodes.OK, givenResponse, "application/json;charset=UTF-8");
 
         // WHEN the sendMessage function is called with the given arguments
+        const service = new ChatService();
         const givenSessionId = 1234;
-        const service = new ChatService(givenSessionId);
-        const sendMessagePromise = service.getChatHistory();
+        const sendMessagePromise = service.getChatHistory(givenSessionId);
 
         // THEN expected it to reject with the error response
         const expectedError = {
@@ -201,7 +197,7 @@ describe("ChatService", () => {
             ChatService.name,
             "getChatHistory",
             "GET",
-            `${givenApiServerUrl}/conversation/history?session_id=${service.getSessionId()}`,
+            `${givenApiServerUrl}/conversations`,
             StatusCodes.OK,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",
@@ -212,53 +208,5 @@ describe("ChatService", () => {
         await expect(sendMessagePromise).rejects.toMatchObject(expectedError);
       }
     );
-  });
-
-  describe("clearChat", () => {
-    test("should fetch the correct URL, with GET and the correct headers and payload successfully", async () => {
-      // GIVEN a user ID to clear the chat for
-      const fetchSpy = setupAPIServiceSpy(
-        StatusCodes.OK,
-        "cleared chat successfully",
-        "application/json;charset=UTF-8"
-      );
-
-      // WHEN the clearChat function is called
-      const givenSessionId = 1234;
-      const service = new ChatService(givenSessionId);
-      await service.clearChat();
-
-      // THEN expect it to make a GET request
-      // AND the headers
-      expect(fetchSpy).toHaveBeenCalledWith(
-        `${givenApiServerUrl}/conversation?user_input=&clear_memory=true&session_id=${service.getSessionId()}`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          expectedStatusCode: StatusCodes.OK,
-          serviceName: "ChatService",
-          serviceFunction: "clearChat",
-          failureMessage: `Failed to clear chat for session id ${service.getSessionId()}`,
-          expectedContentType: "application/json",
-        }
-      );
-    });
-
-    test("on fail to fetch, should reject with the expected service error", async () => {
-      // GIVEN fetch rejects with some unknown error
-      const givenFetchError = new Error("some error");
-      jest.spyOn(require("src/utils/customFetch/customFetch"), "customFetch").mockImplementationOnce(() => {
-        return new Promise(() => {
-          throw givenFetchError;
-        });
-      });
-
-      // WHEN calling clearChat function
-      const givenSessionId = 1234;
-      const service = new ChatService(givenSessionId);
-
-      // THEN expected it to reject with the same error thrown by fetchWithAuth
-      await expect(service.clearChat()).rejects.toMatchObject(givenFetchError);
-    });
   });
 });

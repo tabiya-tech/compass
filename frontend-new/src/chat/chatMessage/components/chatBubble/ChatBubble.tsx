@@ -14,9 +14,10 @@ export const DATA_TEST_ID = {
   CHAT_MESSAGE_BUBBLE_CONTAINER: `chat-message-bubble-container-${uniqueId}`,
   CHAT_MESSAGE_BUBBLE_MESSAGE_TEXT: `chat-message-bubble-message-text-${uniqueId}`,
   CHAT_MESSAGE_BUBBLE_MESSAGE_FOOTER_CONTAINER: `chat-message-bubble-message-footer-container-${uniqueId}`,
-}
+};
 
 const MessageBubble = styled(Box)<{ origin: ConversationMessageSender }>(({ theme, origin }) => ({
+  width: "fit-content",
   variants: "outlined",
   wordWrap: "break-word",
   padding: theme.fixedSpacing(theme.tabiyaSpacing.sm),
@@ -39,7 +40,7 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ message, sender, children }) =>
         {children}
       </Box>
     </MessageBubble>
-  )
-}
+  );
+};
 
 export default ChatBubble;

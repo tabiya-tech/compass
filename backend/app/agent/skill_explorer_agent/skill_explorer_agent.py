@@ -35,7 +35,7 @@ class SkillsExplorerAgentState(BaseModel):
     def from_document(_doc: Mapping[str, Any]) -> "SkillsExplorerAgentState":
         return SkillsExplorerAgentState(session_id=_doc["session_id"],
                                         first_time_for_experience=_doc["first_time_for_experience"],
-                                        experiences_explored=_doc["experiences_explored"]                                        )
+                                        experiences_explored=_doc["experiences_explored"])
 
 
 class SkillsExplorerAgent(Agent):
