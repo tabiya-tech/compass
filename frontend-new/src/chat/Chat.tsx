@@ -23,7 +23,7 @@ import ConfirmModalDialog from "src/theme/confirmModalDialog/ConfirmModalDialog"
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 import FeedbackForm from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
 import { ChatError } from "src/error/commonErrors";
-import { ChatMessageType } from "src/chat/Chat.types"
+import { ChatMessageType } from "src/chat/Chat.types";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
@@ -61,7 +61,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const [exploredExperiencesNotification, setExploredExperiencesNotification] = useState<boolean>(false);
   const [isFeedbackFormOpen, setIsFeedbackFormOpen] = useState<boolean>(false);
   const [activeSessionId, setActiveSessionId] = useState<number | null>(
-    UserPreferencesStateService.getInstance().getActiveSessionId()
+    UserPreferencesStateService.getInstance().getActiveSessionId(),
   );
   const [current_user_id] = useState<string | null>(authenticationStateService.getInstance().getUser()?.id ?? null);
   const [sessionHasFeedback] = useState<boolean>(UserPreferencesStateService.getInstance().activeSessionHasFeedback());
@@ -81,7 +81,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const generateThankYouMessage = () => {
     return generateCompassMessage(
       "Thank you for taking the time to share your valuable feedback. Your input is important to us.",
-      new Date().toISOString()
+      new Date().toISOString(),
     );
   };
 
@@ -95,7 +95,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       addMessage({
         ...generateCompassMessage(
           "We’d love your feedback on this conversation. It’ll only take 5 minutes and will help us improve your experience",
-          new Date().toISOString()
+          new Date().toISOString(),
         ),
         type: ChatMessageType.CONVERSATION_CONCLUSION,
       });
@@ -139,40 +139,40 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         addMessage(
           generateCompassMessage(
             "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
-            new Date().toISOString()
-          )
+            new Date().toISOString(),
+          ),
         );
         enqueueSnackbar("Failed to start new conversation", { variant: "error" });
         console.error(new ChatError("Failed to create new session", e as Error));
       }
       return null;
     },
-    [enqueueSnackbar]
+    [enqueueSnackbar],
   );
 
   /**
    * --- Service handlers ---
    */
 
-  // Opens the experiences drawer
-  // Goes to the experience service to get the experiences
+    // Opens the experiences drawer
+    // Goes to the experience service to get the experiences
   const handleOpenExperiencesDrawer = useCallback(async () => {
-    setIsDrawerOpen(true);
-    setIsLoading(true);
-    if (!activeSessionId) {
-      // If there is no session id, we can't get the experiences
-      throw new ChatError("Session id is not available");
-    }
-    try {
-      const experienceService = new ExperienceService();
-      const data = await experienceService.getExperiences(activeSessionId);
-      setExperiences(data);
-      setIsLoading(false);
-    } catch (error) {
-      enqueueSnackbar("Failed to retrieve experiences", { variant: "error" });
-      console.error(new ChatError("Failed to retrieve experiences", error as Error));
-    }
-  }, [enqueueSnackbar, activeSessionId]);
+      setIsDrawerOpen(true);
+      setIsLoading(true);
+      if (!activeSessionId) {
+        // If there is no session id, we can't get the experiences
+        throw new ChatError("Session id is not available");
+      }
+      try {
+        const experienceService = new ExperienceService();
+        const data = await experienceService.getExperiences(activeSessionId);
+        setExperiences(data);
+        setIsLoading(false);
+      } catch (error) {
+        enqueueSnackbar("Failed to retrieve experiences", { variant: "error" });
+        console.error(new ChatError("Failed to retrieve experiences", error as Error));
+      }
+    }, [enqueueSnackbar, activeSessionId]);
 
   // Goes to the authentication service to log the user out
   // Navigates to the login page
@@ -209,7 +209,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         }
 
         response.messages.forEach((messageItem) =>
-          addMessage(generateCompassMessage(messageItem.message, messageItem.sent_at))
+          addMessage(generateCompassMessage(messageItem.message, messageItem.sent_at)),
         );
 
         setConversationCompleted(response.conversation_completed);
@@ -223,14 +223,14 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         addMessage(
           generateCompassMessage(
             "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
-            sent_at
-          )
+            sent_at,
+          ),
         );
       } finally {
         setIsTyping(false);
       }
     },
-    [currentMessage, exploredExperiences, conversationCompleted, checkAndAddConversationConclusionMessage]
+    [currentMessage, exploredExperiences, conversationCompleted, checkAndAddConversationConclusionMessage],
   );
 
   const initializeChat = useCallback(
@@ -257,8 +257,8 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
             history.messages.map((message: ConversationMessage) =>
               message.sender === ConversationMessageSender.USER
                 ? generateUserMessage(message.message, message.sent_at)
-                : generateCompassMessage(message.message, message.sent_at)
-            )
+                : generateCompassMessage(message.message, message.sent_at),
+            ),
           );
 
           setConversationCompleted(history.conversation_completed);
@@ -297,7 +297,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setIsTyping(false);
       }
     },
-    [issueNewSession, checkAndAddConversationConclusionMessage, sendMessage, enqueueSnackbar]
+    [issueNewSession, checkAndAddConversationConclusionMessage, sendMessage, enqueueSnackbar],
   );
 
   // Resets the text field for the next message
@@ -328,8 +328,8 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       addMessage(
         generateCompassMessage(
           "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
-          new Date().toISOString()
-        )
+          new Date().toISOString(),
+        ),
       );
       enqueueSnackbar("Failed to start new conversation", { variant: "error" });
       console.error(new ChatError("Failed to start new conversation", e as Error));
@@ -338,7 +338,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
   const handleFeedbackSubmit = () => {
     setMessages((prevMessages) =>
-      prevMessages.filter((message) => message.type !== ChatMessageType.CONVERSATION_CONCLUSION)
+      prevMessages.filter((message) => message.type !== ChatMessageType.CONVERSATION_CONCLUSION),
     );
     addMessage(generateThankYouMessage());
   };

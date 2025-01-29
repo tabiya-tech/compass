@@ -273,7 +273,7 @@ describe("Chat", () => {
             ],
             notifyOnFeedbackFormOpened: expect.any(Function),
           },
-          {}
+          {},
         );
 
         // AND WHEN the history promise resolves with the given messages
@@ -309,7 +309,7 @@ describe("Chat", () => {
               })),
               notifyOnFeedbackFormOpened: expect.any(Function),
             },
-            {}
+            {},
           );
         });
       });
@@ -355,7 +355,7 @@ describe("Chat", () => {
             expect.objectContaining({
               messages: expect.arrayContaining([expect.objectContaining({ type: ChatMessageType.TYPING })]),
             }),
-            {}
+            {},
           );
 
           // AND WHEN the getChatHistory promise resolves with an empty message list
@@ -398,7 +398,7 @@ describe("Chat", () => {
                   type: ChatMessageType.BASIC_CHAT,  // the message type is not part of the given messages
                 })),
               }),
-              {}
+              {},
             );
           });
         });
@@ -446,7 +446,7 @@ describe("Chat", () => {
             expect.objectContaining({
               messages: expect.arrayContaining([expect.objectContaining({ type: ChatMessageType.TYPING })]),
             }),
-            {}
+            {},
           );
 
           // AND WHEN the history promise resolves with the given messages list
@@ -476,7 +476,7 @@ describe("Chat", () => {
                   },
                 ],
               }),
-              {}
+              {},
             );
           });
         });
@@ -511,7 +511,7 @@ describe("Chat", () => {
           expect.objectContaining({
             messages: expect.arrayContaining([expect.objectContaining({ type: ChatMessageType.TYPING })]),
           }),
-          {}
+          {},
         );
 
         // AND WHEN the history promise rejects with a given error
@@ -526,7 +526,7 @@ describe("Chat", () => {
         await waitFor(() => {
           expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
             "An unexpected error occurred. Please try again later.",
-            { variant: "error" }
+            { variant: "error" },
           );
         });
 
@@ -535,7 +535,7 @@ describe("Chat", () => {
           expect.objectContaining({
             messages: [],
           }),
-          {}
+          {},
         );
       });
     });
@@ -585,7 +585,7 @@ describe("Chat", () => {
           expect.objectContaining({
             messages: expect.arrayContaining([expect.objectContaining({ type: ChatMessageType.TYPING })]),
           }),
-          {}
+          {},
         );
 
         // AND WHEN the new session promise resolves
@@ -650,7 +650,7 @@ describe("Chat", () => {
                 type: ChatMessageType.BASIC_CHAT,   // the message type is not part of the given messages
               })),
             }),
-            {}
+            {},
           );
         });
       });
@@ -682,7 +682,7 @@ describe("Chat", () => {
           expect.objectContaining({
             messages: expect.arrayContaining([expect.objectContaining({ type: ChatMessageType.TYPING })]),
           }),
-          {}
+          {},
         );
 
         // THEN expect the getNewSession method to be called
@@ -710,7 +710,7 @@ describe("Chat", () => {
           expect.objectContaining({
             messages: [],
           }),
-          {}
+          {},
         );
       });
 
@@ -748,7 +748,7 @@ describe("Chat", () => {
           expect.objectContaining({
             messages: expect.arrayContaining([expect.objectContaining({ type: ChatMessageType.TYPING })]),
           }),
-          {}
+          {},
         );
 
         // AND expect the getNewSession method to be called
@@ -774,7 +774,7 @@ describe("Chat", () => {
           expect.objectContaining({
             messages: [],
           }),
-          {}
+          {},
         );
       });
 
@@ -827,7 +827,7 @@ describe("Chat", () => {
           expect.objectContaining({
             messages: expect.arrayContaining([expect.objectContaining({ type: ChatMessageType.TYPING })]),
           }),
-          {}
+          {},
         );
 
         // AND expect the getNewSession method to be called
@@ -846,7 +846,7 @@ describe("Chat", () => {
         await waitFor(() => {
           expect(ChatList as jest.Mock).toHaveBeenCalledWith(
             expect.objectContaining({ messages: givenMessages.messages }),
-            {}
+            {},
           );
         });
 
@@ -873,7 +873,7 @@ describe("Chat", () => {
                 },
               ],
             }),
-            {}
+            {},
           );
         });
       });
@@ -973,7 +973,7 @@ describe("Chat", () => {
               expect.objectContaining({ type: ChatMessageType.TYPING }),
             ]),
           }),
-          {}
+          {},
         );
       });
 
@@ -988,14 +988,14 @@ describe("Chat", () => {
           expect.objectContaining({
             messages: expect.arrayContaining([
               ...givenPreviousConversation.messages.map((message) =>
-                expect.objectContaining({ message: message.message })
+                expect.objectContaining({ message: message.message }),
               ),
               ...givenSendMessageResponse.messages.map((message) =>
-                expect.objectContaining({ message: message.message })
+                expect.objectContaining({ message: message.message }),
               ),
             ]),
           }),
-          {}
+          {},
         );
       });
 
@@ -1078,7 +1078,7 @@ describe("Chat", () => {
               }),
             ],
           }),
-          {}
+          {},
         );
       });
     });
@@ -1137,7 +1137,7 @@ describe("Chat", () => {
             conversationConductedAt: null,
             notifyOnClose: expect.any(Function),
           },
-          {}
+          {},
         );
       });
     });
@@ -1249,7 +1249,7 @@ describe("Chat", () => {
           expect.objectContaining({
             messages: expect.arrayContaining([expect.objectContaining({ type: ChatMessageType.TYPING })]),
           }),
-          {}
+          {},
         );
       });
       // AND when the new session promise resolves
@@ -1279,7 +1279,7 @@ describe("Chat", () => {
               type: ChatMessageType.BASIC_CHAT,
             })),
           }),
-          {}
+          {},
         );
       });
     });
@@ -1342,7 +1342,7 @@ describe("Chat", () => {
             type: ChatMessageType.BASIC_CHAT,
           })),
         }),
-        {}
+        {},
       );
     });
 
@@ -1405,7 +1405,7 @@ describe("Chat", () => {
               }),
             ]),
           }),
-          {}
+          {},
         );
       });
       // AND expect a snackbar notification
@@ -1482,7 +1482,7 @@ describe("Chat", () => {
               expect.objectContaining({ type: ChatMessageType.CONVERSATION_CONCLUSION }),
             ]),
           }),
-          {}
+          {},
         );
       });
 
@@ -1498,7 +1498,7 @@ describe("Chat", () => {
               }),
             ]),
           }),
-          {}
+          {},
         );
       });
     });
@@ -1597,7 +1597,7 @@ describe("Chat", () => {
       // THEN expect the backdrop to not be visible
       await waitFor(() => {
         expect(
-          screen.queryByTestId(INACTIVE_BACKDROP_DATA_TEST_ID.INACTIVE_BACKDROP_CONTAINER)
+          screen.queryByTestId(INACTIVE_BACKDROP_DATA_TEST_ID.INACTIVE_BACKDROP_CONTAINER),
         ).not.toBeInTheDocument();
       });
     });
@@ -1656,7 +1656,7 @@ describe("Chat", () => {
       // THEN expect the backdrop to be hidden
       await waitFor(() => {
         expect(
-          screen.queryByTestId(INACTIVE_BACKDROP_DATA_TEST_ID.INACTIVE_BACKDROP_CONTAINER)
+          screen.queryByTestId(INACTIVE_BACKDROP_DATA_TEST_ID.INACTIVE_BACKDROP_CONTAINER),
         ).not.toBeInTheDocument();
       });
     });
