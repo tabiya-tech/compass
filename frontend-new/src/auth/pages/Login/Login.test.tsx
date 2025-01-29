@@ -184,7 +184,7 @@ describe("Testing Login component", () => {
     render(<Login />);
 
     // WHEN the user fills in their invitation code
-    await act(() => {
+    act(() => {
       (LoginWithInviteCodeForm as jest.Mock).mock.calls[0][0].notifyOnInviteCodeChanged(givenInvitationCode);
     });
 

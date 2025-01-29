@@ -73,7 +73,7 @@ describe("SocialAuth tests", () => {
         postLoginHandler={givenNotifyOnLogin}
         isLoading={givenIsLoading}
         notifyOnLoading={givenNotifyOnLoading}
-      />
+      />,
     );
 
     // THEN expect the component to be in the document
@@ -85,7 +85,7 @@ describe("SocialAuth tests", () => {
     ["not accepted", undefined, routerPaths.CONSENT],
   ])(
     "it should handle successful sign-in for a user who has %s terms and conditions",
-    async (_description: string, tc: Date | undefined, expectedPath: string) => {
+    async (_description: string, tc: Date | undefined, _expectedPath: string) => {
       // GIVEN a SocialAuth component
       const givenNotifyOnLogin = jest.fn();
       const givenIsLoading = false;
@@ -104,7 +104,7 @@ describe("SocialAuth tests", () => {
       } as unknown as FirebaseSocialAuthenticationService);
 
       // AND the AuthProvider updates the user successfully
-      jest.spyOn(authStateService.getInstance(), "setUser").mockImplementation((user: TabiyaUser | null) => {
+      jest.spyOn(authStateService.getInstance(), "setUser").mockImplementation((_user: TabiyaUser | null) => {
         return givenUser;
       });
       // AND the user preferences exist for the user
@@ -124,11 +124,11 @@ describe("SocialAuth tests", () => {
           postLoginHandler={givenNotifyOnLogin}
           isLoading={givenIsLoading}
           notifyOnLoading={givenNotifyOnLoading}
-        />
+        />,
       );
       // AND the login button is clicked
       const loginButton = screen.getByTestId(DATA_TEST_ID.CONTINUE_WITH_GOOGLE_BUTTON);
-      await act(() => {
+      act(() => {
         loginButton.click();
       });
 
@@ -136,7 +136,7 @@ describe("SocialAuth tests", () => {
       await waitFor(() => {
         expect(givenNotifyOnLogin).toHaveBeenCalled();
       });
-    }
+    },
   );
 
   test("should handle sign-in failure", async () => {
@@ -145,7 +145,7 @@ describe("SocialAuth tests", () => {
     const givenIsLoading = false;
     const givenNotifyOnLoading = jest.fn();
     // WHEN the sign-in fails
-    const loginWithGoogleMock = jest.fn().mockImplementation((elementId: string, config: any) => {
+    const loginWithGoogleMock = jest.fn().mockImplementation((_elementId: string, config: any) => {
       config.callbacks.signInFailure(new Error("Sign-in failed"));
     });
     const getFirebaseSocialAuthInstanceSpy = jest.spyOn(FirebaseSocialAuthenticationService, "getInstance");
@@ -158,7 +158,7 @@ describe("SocialAuth tests", () => {
         postLoginHandler={givenNotifyOnLogin}
         isLoading={givenIsLoading}
         notifyOnLoading={givenNotifyOnLoading}
-      />
+      />,
     );
   });
 
@@ -175,7 +175,7 @@ describe("SocialAuth tests", () => {
         postLoginHandler={givenNotifyOnLogin}
         isLoading={givenIsLoading}
         notifyOnLoading={givenNotifyOnLoading}
-      />
+      />,
     );
 
     // THEN expect the message text to be in the document
@@ -200,12 +200,12 @@ describe("SocialAuth tests", () => {
         postLoginHandler={givenNotifyOnLogin}
         isLoading={givenIsLoading}
         notifyOnLoading={givenNotifyOnLoading}
-      />
+      />,
     );
 
     // AND the login button is clicked
     const loginButton = screen.getByTestId(DATA_TEST_ID.CONTINUE_WITH_GOOGLE_BUTTON);
-    await act(() => {
+    act(() => {
       loginButton.click();
     });
 
