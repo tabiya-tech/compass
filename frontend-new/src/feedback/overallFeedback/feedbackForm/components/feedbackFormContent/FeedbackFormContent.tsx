@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
-import { Divider, useMediaQuery } from "@mui/material";
-import { Theme, useTheme } from "@mui/material/styles";
+import { Divider } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import MobileStepper from "@mui/material/MobileStepper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -11,6 +11,10 @@ import StepsComponent from "src/feedback/overallFeedback/feedbackForm/components
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { FeedbackItem } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 import SecondaryButton from "src/theme/SecondaryButton/SecondaryButton";
+import { useSwipeable } from "react-swipeable";
+import { AnimatePresence, motion } from "framer-motion";
+
+export const SLIDE_DURATION = 0.3;
 
 interface FeedbackFormContentProps {
   notifySubmit: (formData: FeedbackItem[]) => void;
@@ -29,11 +33,14 @@ export const DATA_TEST_ID = {
 
 const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit }) => {
   const theme = useTheme();
-  const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
   const [activeStep, setActiveStep] = React.useState(0);
   const [answers, setAnswers] = useState<FeedbackItem[]>(() => {
     return PersistentStorageService.getOverallFeedback();
   });
+  // We want to know the previous step to know the direction of the swipe
+  // if the previous tep is greater than the active step, the swipe is to the left
+  // if the previous step is less than the active step, the swipe is to the right
+  const [prevStep, setPrevStep] = useState(activeStep);
 
   const maxSteps = feedbackFormContentSteps.length;
 
@@ -43,13 +50,30 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
       PersistentStorageService.clearOverallFeedback();
       setAnswers([]);
     } else {
+      setPrevStep(activeStep);
       setActiveStep((prev) => prev + 1);
     }
   };
 
   const handlePrevious = () => {
+    setPrevStep(activeStep);
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
+
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => {
+      const isLastStep = activeStep === maxSteps - 1;
+      if (isLastStep) return; // Do not allow to swipe forward from the last step
+      handleNext();
+    },
+    onSwipedRight: () => {
+      const isFirstStep = activeStep === 0;
+      if (isFirstStep) return; // Do not allow to swipe back from the first step
+      handlePrevious();
+    },
+    trackMouse: true,
+    preventScrollOnSwipe: true,
+  });
 
   const handleAnswerChange = (feedback: FeedbackItem) => {
     setAnswers((prevAnswers) => {
@@ -73,37 +97,94 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
   // Check if there is at least one answer
   const hasAnswers = Object.keys(answers).length > 0;
 
+  // Animation variants
+  const direction = activeStep > prevStep ? 1 : -1;
+  const CONTENT_GAP = 80; // content gap in px
+
+  const variants = {
+    // Animation variants for sliding content:
+    // - When entering: content slides in from left/right with CONTENT_GAP spacing
+    // - When centered: content is at x=0 position
+    // - When exiting: content slides out in opposite direction with CONTENT_GAP spacing
+    // The content gap is used to create a gap between the steps depending on the animation state
+    enter: (direction: number) => ({
+      x: direction > 0 ? `calc(100% + ${CONTENT_GAP}px)` : `calc(-100% - ${CONTENT_GAP}px)`,
+      opacity: 1,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction: number) => ({
+      x: direction < 0 ? `calc(100% + ${CONTENT_GAP}px)` : `calc(-100% - ${CONTENT_GAP}px)`,
+      opacity: 1,
+    }),
+  };
+
   return (
     <Box
       display="flex"
       flexDirection="column"
-      gap={isSmallMobile ? 6 : 3}
+      gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
       height="100%"
+      sx={{ overflowX: "hidden" }}
       data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT}
+      {...swipeHandlers}
     >
-      <Typography
-        fontWeight="bold"
-        color={theme.palette.text.secondary}
-        sx={{ fontSize: theme.typography.h6.fontSize }}
-        data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_TITLE}
-      >
-        {feedbackFormContentSteps[activeStep].label}
-      </Typography>
       <Box
         sx={{
-          overflowY: "auto",
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          gap: isSmallMobile ? theme.spacing(6) : theme.spacing(3),
+          position: "relative",
+          overflow: "hidden",
+          flexGrow: 1,
+          width: "100%",
         }}
-        data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_QUESTIONS}
       >
-        <StepsComponent
-          questions={feedbackFormContentSteps[activeStep].questions}
-          feedbackItems={answers}
-          onChange={handleAnswerChange}
-        />
+        <AnimatePresence initial={false} custom={direction}>
+          <motion.div
+            key={activeStep}
+            custom={direction}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{
+              x: { type: "tween", duration: SLIDE_DURATION, ease: "easeInOut" },
+              opacity: { duration: SLIDE_DURATION },
+            }}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+            }}
+          >
+            <Typography
+              fontWeight="bold"
+              color={theme.palette.text.secondary}
+              sx={{ fontSize: theme.typography.h6.fontSize }}
+              data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_TITLE}
+            >
+              {feedbackFormContentSteps[activeStep].label}
+            </Typography>
+            <Box
+              sx={{
+                overflowY: "auto",
+                flexGrow: 1,
+                display: "flex",
+                flexDirection: "column",
+                gap: theme.fixedSpacing(theme.tabiyaSpacing.md),
+              }}
+              data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_QUESTIONS}
+            >
+              <StepsComponent
+                questions={feedbackFormContentSteps[activeStep].questions}
+                feedbackItems={answers}
+                onChange={handleAnswerChange}
+              />
+            </Box>
+          </motion.div>
+        </AnimatePresence>
       </Box>
       <Divider color="primary" sx={{ height: "0.2rem" }} data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_DIVIDER} />
       <MobileStepper

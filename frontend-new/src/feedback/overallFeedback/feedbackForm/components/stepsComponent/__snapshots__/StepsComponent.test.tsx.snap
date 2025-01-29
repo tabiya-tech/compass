@@ -95,10 +95,10 @@ exports[`StepsComponent should render component successfully 1`] = `
         </label>
       </div>
       <div
-        class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-vg49q3-MuiFormControl-root-MuiTextField-root"
+        class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1cqtlhz-MuiFormControl-root-MuiTextField-root"
       >
         <div
-          class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline css-voxow3-MuiInputBase-root-MuiOutlinedInput-root"
+          class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline css-voxow3-MuiInputBase-root-MuiOutlinedInput-root"
         >
           <textarea
             aria-invalid="false"
@@ -137,7 +137,7 @@ exports[`StepsComponent should render component successfully 1`] = `
     class="MuiBox-root css-0"
   >
     <div
-      class="MuiBox-root css-yj95vr"
+      class="MuiBox-root css-1821gv5"
       data-testid="custom-rating-container-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
     >
       <div
@@ -487,10 +487,10 @@ exports[`StepsComponent should render component successfully 1`] = `
         </label>
       </div>
       <div
-        class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-vg49q3-MuiFormControl-root-MuiTextField-root"
+        class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1cqtlhz-MuiFormControl-root-MuiTextField-root"
       >
         <div
-          class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline css-voxow3-MuiInputBase-root-MuiOutlinedInput-root"
+          class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline css-voxow3-MuiInputBase-root-MuiOutlinedInput-root"
         >
           <textarea
             aria-invalid="false"
