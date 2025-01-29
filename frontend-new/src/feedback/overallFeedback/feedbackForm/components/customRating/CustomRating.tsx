@@ -63,7 +63,7 @@ const CustomRating: React.FC<CustomRatingProps> = ({
     <Box
       display="flex"
       flexDirection="column"
-      gap={theme.spacing(2)}
+      gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
       data-testid={DATA_TEST_ID.CUSTOM_RATING_CONTAINER}
     >
       <Box display="flex" flexDirection="column" gap={theme.tabiyaSpacing.sm}>

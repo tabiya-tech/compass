@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
-import { Divider, useMediaQuery } from "@mui/material";
-import { Theme, useTheme } from "@mui/material/styles";
+import { Divider } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import MobileStepper from "@mui/material/MobileStepper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -11,6 +11,8 @@ import StepsComponent from "src/feedback/overallFeedback/feedbackForm/components
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { FeedbackItem } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 import SecondaryButton from "src/theme/SecondaryButton/SecondaryButton";
+import { useSwipeable } from "react-swipeable";
+import { motion } from "framer-motion";
 
 interface FeedbackFormContentProps {
   notifySubmit: (formData: FeedbackItem[]) => void;
@@ -27,10 +29,15 @@ export const DATA_TEST_ID = {
   FEEDBACK_FORM_BACK_BUTTON: `feedback-form-back-button-${uniqueId}`,
 };
 
+const SWIPE_DIRECTION = {
+  LEFT: "left",
+  RIGHT: "right",
+};
+
 const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit }) => {
   const theme = useTheme();
-  const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
   const [activeStep, setActiveStep] = React.useState(0);
+  const [swipeDirection, setSwipeDirection] = useState(SWIPE_DIRECTION.LEFT);
   const [answers, setAnswers] = useState<FeedbackItem[]>(() => {
     return PersistentStorageService.getOverallFeedback();
   });
@@ -50,6 +57,23 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
   const handlePrevious = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
+
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => {
+      const isLastStep = activeStep === maxSteps - 1;
+      if (isLastStep) return; // Do not allow to swipe forward from the last step
+      setSwipeDirection(SWIPE_DIRECTION.LEFT);
+      handleNext();
+    },
+    onSwipedRight: () => {
+      const isFirstStep = activeStep === 0;
+      if (isFirstStep) return; // Do not allow to swipe back from the first step
+      setSwipeDirection(SWIPE_DIRECTION.RIGHT);
+      handlePrevious();
+    },
+    trackMouse: true,
+    preventScrollOnSwipe: true,
+  });
 
   const handleAnswerChange = (feedback: FeedbackItem) => {
     setAnswers((prevAnswers) => {
@@ -77,34 +101,50 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
     <Box
       display="flex"
       flexDirection="column"
-      gap={isSmallMobile ? 6 : 3}
+      gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
       height="100%"
       data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT}
+      {...swipeHandlers}
     >
-      <Typography
-        fontWeight="bold"
-        color={theme.palette.text.secondary}
-        sx={{ fontSize: theme.typography.h6.fontSize }}
-        data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_TITLE}
-      >
-        {feedbackFormContentSteps[activeStep].label}
-      </Typography>
-      <Box
-        sx={{
-          overflowY: "auto",
-          flex: 1,
+      <motion.div
+        key={activeStep}
+        initial={{ opacity: 0, x: swipeDirection === SWIPE_DIRECTION.LEFT ? 100 : -100 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: swipeDirection === SWIPE_DIRECTION.LEFT ? -100 : 100 }}
+        transition={{ duration: 0.8 }}
+        style={{
           display: "flex",
           flexDirection: "column",
-          gap: isSmallMobile ? theme.spacing(6) : theme.spacing(3),
+          gap: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+          flexGrow: 1,
+          overflow: "hidden"
         }}
-        data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_QUESTIONS}
       >
-        <StepsComponent
-          questions={feedbackFormContentSteps[activeStep].questions}
-          feedbackItems={answers}
-          onChange={handleAnswerChange}
-        />
-      </Box>
+        <Typography
+          fontWeight="bold"
+          color={theme.palette.text.secondary}
+          sx={{ fontSize: theme.typography.h6.fontSize }}
+          data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_TITLE}
+        >
+          {feedbackFormContentSteps[activeStep].label}
+        </Typography>
+        <Box
+          sx={{
+            overflowY: "auto",
+            flexGlow: 1,
+            display: "flex",
+            flexDirection: "column",
+            gap: theme.fixedSpacing(theme.tabiyaSpacing.md),
+          }}
+          data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_QUESTIONS}
+        >
+          <StepsComponent
+            questions={feedbackFormContentSteps[activeStep].questions}
+            feedbackItems={answers}
+            onChange={handleAnswerChange}
+          />
+        </Box>
+      </motion.div>
       <Divider color="primary" sx={{ height: "0.2rem" }} data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_DIVIDER} />
       <MobileStepper
         variant="dots"

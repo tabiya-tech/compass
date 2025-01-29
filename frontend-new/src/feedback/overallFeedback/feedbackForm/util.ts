@@ -2,10 +2,16 @@ import React from "react";
 
 // This function is used to focus on the input field and scroll to it
 export const focusAndScrollToField = (ref: React.RefObject<HTMLInputElement>) => {
-  if (ref.current) {
-    ref.current.focus();
-    // We are making scrollIntoView optional because in Jest (jsdom),
-    // scrollIntoView is not a function since Jest's jsdom does not have a view.
-    ref.current.scrollIntoView?.({ behavior: "smooth" });
-  }
+  if (!ref.current) return;
+
+  ref.current.focus();
+
+  // Using setTimeout to delay refocusing to prevent layout shifts
+  setTimeout(() => {
+    if (!ref.current) return;
+
+    // Scroll to the input field
+    const yOffset = ref.current.getBoundingClientRect().top + window.scrollY - 100;
+    window.scrollTo({ top: yOffset, behavior: "smooth" });
+  }, 300);
 };
