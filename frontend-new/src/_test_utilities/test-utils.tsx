@@ -45,7 +45,7 @@ jest.mock("@sentry/react", () => ({
   getFeedback: jest.fn(),
   withProfiler: (Component: any) => Component,
   wrapCreateBrowserRouter: (Component: any) => Component,
-  isInitialized: jest.fn()
+  isInitialized: jest.fn(),
 }));
 
 export const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
