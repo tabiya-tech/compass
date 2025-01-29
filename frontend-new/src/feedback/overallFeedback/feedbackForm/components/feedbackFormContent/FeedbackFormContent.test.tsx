@@ -1,8 +1,9 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
 
+import React from "react";
 import { render, screen } from "src/_test_utilities/test-utils";
-import { fireEvent } from "@testing-library/react";
+import { act, fireEvent } from "@testing-library/react";
 import { DATA_TEST_ID as CUSTOM_RATING_DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/customRating/CustomRating";
 import { DATA_TEST_ID as YES_NO_DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/yesNoQuestion/YesNoQuestion";
 import FeedbackFormContent, {
@@ -11,6 +12,18 @@ import FeedbackFormContent, {
 import { DATA_TEST_ID as CHECKBOX_DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/checkboxQuestion/CheckboxQuestion";
 import feedbackFormContentSteps from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/feedbackFormContentSteps";
 import { DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/commentTextField/CommentTextField";
+import { useSwipeable } from "react-swipeable";
+
+// mock the swipeable hook
+jest.mock("react-swipeable");
+
+// mock the framer-motion library
+jest.mock("framer-motion", () => ({
+  motion: {
+    div: ({ children, ...props }: { children: React.ReactElement }) => <div {...props}>{children}</div>,
+  },
+  AnimatePresence: ({ children }: { children: React.ReactElement }) => <>{children}</>,
+}));
 
 describe("FeedbackFormContent", () => {
   beforeEach(() => {
@@ -60,6 +73,10 @@ describe("FeedbackFormContent", () => {
       expect(screen.getByTestId(DATA_TEST_ID.FEEDBACK_FORM_CONTENT_TITLE)).toHaveTextContent(
         feedbackFormContentSteps[1].label
       );
+
+      // AND no errors or warnings to be shown
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
     });
 
     test("should call handlePrevious when back button is clicked", () => {
@@ -79,6 +96,10 @@ describe("FeedbackFormContent", () => {
       expect(screen.getByTestId(DATA_TEST_ID.FEEDBACK_FORM_CONTENT_TITLE)).toHaveTextContent(
         feedbackFormContentSteps[0].label
       );
+
+      // AND no errors or warnings to be shown
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
     });
 
     test("should call handleSubmit with exact answer data when answering each step", () => {
@@ -171,6 +192,10 @@ describe("FeedbackFormContent", () => {
         },
         is_answered: true,
       });
+
+      // AND no errors or warnings to be shown
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
     });
 
     test("should call handleAnswerChange when a question is answered", () => {
@@ -188,6 +213,128 @@ describe("FeedbackFormContent", () => {
 
       // THEN expect the answer to be saved
       expect(input).toHaveValue("This is a comment");
+
+      // AND no errors or warnings to be shown
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
+    });
+
+    test("should go to the next step when swiping left", () => {
+      // GIVEN the component is rendered
+      render(<FeedbackFormContent notifySubmit={jest.fn()} />);
+      // AND the swipe handlers
+      const swipeHandlers = (useSwipeable as jest.Mock).mock.calls[0][0];
+
+      // WHEN the component is swiped left
+      act(() => {
+        swipeHandlers.onSwipedLeft();
+      });
+
+      // THEN expect to go to the next step
+      expect(screen.getByTestId(DATA_TEST_ID.FEEDBACK_FORM_CONTENT_TITLE)).toHaveTextContent(
+        feedbackFormContentSteps[1].label
+      );
+
+      // AND WHEN the component is swiped left for again
+      act(() => {
+        swipeHandlers.onSwipedLeft();
+      });
+
+      // THEN expect to go to the next step
+      expect(screen.getByTestId(DATA_TEST_ID.FEEDBACK_FORM_CONTENT_TITLE)).toHaveTextContent(
+        feedbackFormContentSteps[2].label
+      );
+
+      // AND no errors or warnings to be shown
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
+    });
+
+    test("should go to the previous step when swiping right", () => {
+      // GIVEN the component is rendered
+      render(<FeedbackFormContent notifySubmit={jest.fn()} />);
+
+      // WHEN the component is swiped left twice
+      act(() => {
+        (useSwipeable as jest.Mock).mock.calls[0][0].onSwipedLeft();
+        (useSwipeable as jest.Mock).mock.calls[0][0].onSwipedLeft();
+      });
+
+      // THEN expect to go to the third
+      expect(screen.getByTestId(DATA_TEST_ID.FEEDBACK_FORM_CONTENT_TITLE)).toHaveTextContent(
+        feedbackFormContentSteps[2].label
+      );
+
+      // WHEN the component is swiped right
+      act(() => {
+        (useSwipeable as jest.Mock).mock.calls.at(-1)[0].onSwipedRight();
+      });
+
+      // THEN expect to go to the previous step
+      expect(screen.getByTestId(DATA_TEST_ID.FEEDBACK_FORM_CONTENT_TITLE)).toHaveTextContent(
+        feedbackFormContentSteps[1].label
+      );
+
+      // AND WHEN the component is swiped right again
+      act(() => {
+        (useSwipeable as jest.Mock).mock.calls.at(-1)[0].onSwipedRight();
+      });
+
+      // THEN expect to go to the previous step
+      expect(screen.getByTestId(DATA_TEST_ID.FEEDBACK_FORM_CONTENT_TITLE)).toHaveTextContent(
+        feedbackFormContentSteps[0].label
+      );
+
+      // AND no errors or warnings to be shown
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
+    });
+
+    test("should do nothing when swiping right on the first step", () => {
+      // GIVEN the component is rendered
+      render(<FeedbackFormContent notifySubmit={jest.fn()} />);
+
+      // WHEN the component is swiped right on the first step
+      act(() => {
+        (useSwipeable as jest.Mock).mock.calls[0][0].onSwipedRight();
+      });
+
+      // THEN expect to stay on the first step
+      expect(screen.getByTestId(DATA_TEST_ID.FEEDBACK_FORM_CONTENT_TITLE)).toHaveTextContent(
+        feedbackFormContentSteps[0].label
+      );
+    });
+
+    test("should do nothing when swiping left on the last step", () => {
+      // GIVEN the component is rendered
+      render(<FeedbackFormContent notifySubmit={jest.fn()} />);
+
+      // WHEN the component is swiped left to reach the last step
+      act(() => {
+        (useSwipeable as jest.Mock).mock.calls[0][0].onSwipedLeft();
+      });
+      act(() => {
+        (useSwipeable as jest.Mock).mock.calls[1][0].onSwipedLeft();
+      });
+      act(() => {
+        (useSwipeable as jest.Mock).mock.calls[2][0].onSwipedLeft();
+      });
+      // THEN expect to reach the last step
+      const lastStepTitle = feedbackFormContentSteps[3].label;
+      const lastStepTitleElement = screen.getByTestId(DATA_TEST_ID.FEEDBACK_FORM_CONTENT_TITLE);
+      expect(lastStepTitleElement).toHaveTextContent(lastStepTitle);
+
+      // WHEN the component is swiped left on the last step
+      act(() => {
+        (useSwipeable as jest.Mock).mock.calls[3][0].onSwipedLeft();
+      });
+
+      // THEN expect to stay on the last step
+      expect(lastStepTitleElement).toHaveTextContent(lastStepTitle);
+
+      // AND no errors or warnings to be shown
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
     });
   });
 });
