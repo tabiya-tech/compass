@@ -3,12 +3,11 @@ This module contains the repository layer for handling reactions.
 """
 import logging
 from abc import ABC, abstractmethod
-from typing import Optional, List
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.server_dependencies.database_collections import Collections
-from app.conversations.reactions.types import Reaction
+from app.conversations.reactions.types import Reaction, ReactionDocModel
 
 
 class IReactionRepository(ABC):
@@ -19,12 +18,12 @@ class IReactionRepository(ABC):
     """
 
     @abstractmethod
-    async def add(self, reaction: Reaction) -> Optional[str]:
+    async def add(self, reaction: Reaction) -> ReactionDocModel:
         """
         Creates or updates a reaction.
 
         :param reaction: ReactionModel - the reaction to create or update
-        :return: str - the id of the created/updated reaction document id
+        :return: ReactionDocModel - the created/updated reaction document
         """
         raise NotImplementedError()
 
@@ -39,7 +38,7 @@ class IReactionRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def get_reactions(self, session_id: int) -> Optional[List[Reaction]]:
+    async def get_reactions(self, session_id: int) -> list[ReactionDocModel]:
         """
         Gets the full list of reactions for the given session
 
@@ -55,23 +54,23 @@ class ReactionRepository(IReactionRepository):
         self._logger = logging.getLogger(ReactionRepository.__name__)
         self._collection = db.get_collection(Collections.REACTIONS)
 
-    async def add(self, reaction: Reaction) -> Optional[str]:
+    async def add(self, reaction: Reaction) -> ReactionDocModel:
         # Convert the pydantic model to a dictionary
         payload = reaction.model_dump()
 
-        # Use upsert to either create a new document or update an existing one
-        # We use session_id and message_id as the unique key
-        result = await self._collection.update_one(
+        # Use find_one_and_update to get the updated document directly
+        doc = await self._collection.find_one_and_update(
             {
                 "session_id": {"$eq": reaction.session_id},
                 "message_id": {"$eq": reaction.message_id}
             },
             {"$set": payload},
-            upsert=True
+            upsert=True,
+            return_document=True  # Return the document after the update
         )
 
-        # Return the upserted ID if it was an insert, otherwise None
-        return str(result.upserted_id) if result.upserted_id else None
+        # Convert to ReactionDocModel
+        return ReactionDocModel.from_dict(doc)
 
     async def delete(self, session_id: int, message_id: str):
         await self._collection.delete_one({
@@ -79,7 +78,7 @@ class ReactionRepository(IReactionRepository):
             "message_id": {"$eq": message_id}
         })
 
-    async def get_reactions(self, session_id: int) -> Optional[List[Reaction]]:
+    async def get_reactions(self, session_id: int) -> list[ReactionDocModel] | None:
         """
         Gets the full list of reactions for a session
 
@@ -92,6 +91,6 @@ class ReactionRepository(IReactionRepository):
         
         reactions = []
         async for doc in cursor:
-            reactions.append(Reaction.from_dict(doc))
+            reactions.append(ReactionDocModel.from_dict(doc))
             
         return reactions if reactions else None

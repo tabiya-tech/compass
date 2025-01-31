@@ -17,7 +17,7 @@ class TestReactionRequest:
         reaction = ReactionRequest(kind=ReactionKind.LIKED)
         # THEN it should be valid
         assert reaction.kind == ReactionKind.LIKED
-        assert reaction.reason is None
+        assert reaction.reason == []
 
     def test_valid_disliked_reaction(self):
         # GIVEN valid disliked reaction
@@ -67,16 +67,15 @@ class TestReaction:
         # THEN it should be the same as the original reaction
         assert reaction_from_dict == reaction
 
-    def test_from_dict_conversion_with_enum_values(self):
+    def test_from_dict_conversion(self):
         # GIVEN valid reaction data
         # WHEN converting from dictionary
         now = datetime.now(timezone.utc)
-        reaction_dict = {"_id": "123", "message_id": "msg_456", "session_id": 789, "kind": ReactionKind.DISLIKED.value,
-                         "reason": [DislikeReason.INCORRECT_INFORMATION.value], "created_at": now}
+        reaction_dict = {"_id": "123", "message_id": "msg_456", "session_id": 789, "kind": ReactionKind.DISLIKED,
+                         "reason": [DislikeReason.INCORRECT_INFORMATION], "created_at": now}
 
         # THEN reaction should be created correctly
         reaction = Reaction.from_dict(reaction_dict)
-        assert reaction.id == reaction_dict["_id"]
         assert reaction.message_id == reaction_dict["message_id"]
         assert reaction.session_id == reaction_dict["session_id"]
         assert reaction.kind == reaction_dict["kind"]
@@ -91,11 +90,10 @@ class TestReaction:
 
         # THEN reaction should be created correctly
         reaction = Reaction.from_dict(reaction_dict)
-        assert reaction.id == reaction_dict["_id"]
         assert reaction.message_id == reaction_dict["message_id"]
         assert reaction.session_id == reaction_dict["session_id"]
-        assert reaction.kind.name == reaction_dict["kind"]
-        assert [r.name for r in reaction.reason] == reaction_dict["reason"]
+        assert reaction.kind == ReactionKind[reaction_dict["kind"]]
+        assert reaction.reason == [DislikeReason[r] for r in reaction_dict["reason"]]
         assert reaction.created_at == now
 
     def test_created_at_serialization(self):
@@ -118,7 +116,7 @@ class TestReaction:
     def test_reaction_kind_deserialization(self):
         # GIVEN reaction with string kind
         # WHEN creating a reaction with string kind
-        reaction = Reaction(message_id="msg_1", session_id=1, kind=ReactionKind.LIKED.value)
+        reaction = Reaction(message_id="msg_1", session_id=1, kind=ReactionKind.LIKED)
 
         # THEN kind should be deserialized to ReactionKind enum
         assert reaction.kind == ReactionKind.LIKED
@@ -131,6 +129,13 @@ class TestReaction:
         with pytest.raises(ValueError):
             Reaction(message_id="msg_1", session_id=1, kind="not_a_valid_reaction_kind")
 
+    def test_reaction_kind_rejects_enum_value(self):
+        # GIVEN reaction with enum value
+        # WHEN trying to create a reaction with enum value
+        # THEN it should raise a ValueError
+        with pytest.raises(ValueError, match="Invalid reaction kind: 0"):
+            Reaction(message_id="msg_1", session_id=1, kind=0)
+
     def test_valid_liked_reaction_model(self):
         # GIVEN valid liked reaction
         # WHEN creating a liked reaction
@@ -138,7 +143,7 @@ class TestReaction:
 
         # THEN it should be valid
         assert reaction.kind == ReactionKind.LIKED
-        assert reaction.reason is None
+        assert reaction.reason == []
 
     def test_valid_disliked_reaction_model(self):
         # GIVEN valid disliked reaction

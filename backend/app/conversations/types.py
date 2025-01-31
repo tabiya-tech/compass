@@ -1,21 +1,12 @@
 from datetime import datetime, timezone
-from pydantic import BaseModel, field_serializer
+from pydantic import BaseModel, field_serializer, field_validator
 from enum import Enum
-from typing import Optional
-from app.conversations.reactions.types import ReactionKind
+from app.conversations.reactions.types import MessageReaction
 
 
-class ConversationMessageSender(Enum):
-    USER = "USER"
-    COMPASS = "COMPASS"
-
-
-class MessageReaction(BaseModel):
-    """
-    Represents a reaction in a message response.
-    """
-    id: str
-    kind: ReactionKind
+class ConversationMessageSender(int, Enum):
+    USER = 0
+    COMPASS = 1
 
 
 class ConversationMessage(BaseModel):
@@ -30,12 +21,25 @@ class ConversationMessage(BaseModel):
     """The time the message was sent, in ISO format, in UTC"""
     sender: ConversationMessageSender
     """The sender of the message, either USER or COMPASS"""
-    reaction: Optional[MessageReaction] = None
+    reaction: MessageReaction | None = None
     """Optional reaction to the message"""
 
     @field_serializer('sent_at')
     def serialize_sent_at(self, value: datetime) -> str:
         return value.astimezone(timezone.utc).isoformat()
+
+    @field_serializer("sender")
+    def serialize_sender(self, sender: ConversationMessageSender, _info) -> str:
+        return sender.name
+
+    @field_validator("sender", mode='before')
+    def deserialize_sender(cls, value: str | ConversationMessageSender) -> ConversationMessageSender:
+        if isinstance(value, str):
+            return ConversationMessageSender[value]
+        elif isinstance(value, ConversationMessageSender):
+            return value
+        else:
+            raise ValueError(f"Invalid conversation sender: {value}")
 
     class Config:
         extra = "forbid"
@@ -46,13 +50,13 @@ class ConversationResponse(BaseModel):
     """The messages in the conversation"""
     conversation_completed: bool = False
     """Whether the conversation is finished"""
-    conversation_conducted_at: Optional[datetime] = None
+    conversation_conducted_at: datetime | None = None
     """The time the conversation was conducted"""
     experiences_explored: int = 0
     """The number of experiences explored"""
 
     @field_serializer('conversation_conducted_at')
-    def serialize_conversation_conducted_at(self, value: Optional[datetime]) -> Optional[str]:
+    def serialize_conversation_conducted_at(self, value: datetime | None) -> str | None:
         return value.astimezone(timezone.utc).isoformat() if value else None
 
     class Config:

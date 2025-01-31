@@ -1,12 +1,11 @@
 from datetime import timezone, datetime
-from typing import List, Optional
 
 from app.conversation_memory.conversation_memory_types import ConversationHistory, ConversationContext
 from app.conversations.types import ConversationMessage, ConversationMessageSender, MessageReaction
-from app.conversations.reactions.types import Reaction
+from app.conversations.reactions.types import Reaction, ReactionDocModel
 
 
-def _convert_to_message_reaction(reaction: Optional[Reaction]) -> Optional[MessageReaction]:
+def _convert_to_message_reaction(reaction: ReactionDocModel | None) -> MessageReaction | None:
     """
     Converts a Reaction to a MessageReaction.
 
@@ -22,7 +21,7 @@ def _convert_to_message_reaction(reaction: Optional[Reaction]) -> Optional[Messa
     )
 
 
-async def filter_conversation_history(history: 'ConversationHistory', reactions_for_session: Optional[List[Reaction]]) -> List[ConversationMessage]:
+async def filter_conversation_history(history: 'ConversationHistory', reactions_for_session: list[Reaction] | None) -> list[ConversationMessage]:
     """
     Filter the conversation history to only include the messages that were sent by the user and the Compass.
     :param history: ConversationHistory - the conversation history
@@ -41,9 +40,10 @@ async def filter_conversation_history(history: 'ConversationHistory', reactions_
             ))
         
         # Get reaction for a compass message if it exists (user messages can't have reactions)
-        compass_reaction = next((r for r in reactions_for_session or []
-                               if r.message_id == turn.output.message_id), None)
-        
+        compass_reaction: ReactionDocModel | None = None
+        for reaction in reactions_for_session:
+            if turn.output.message_id == reaction.message_id:
+                compass_reaction = reaction
         messages.append(ConversationMessage(
             message_id=turn.output.message_id,
             message=turn.output.message_for_user,
@@ -54,7 +54,7 @@ async def filter_conversation_history(history: 'ConversationHistory', reactions_
     return messages
 
 
-async def get_messages_from_conversation_manager(context: 'ConversationContext', from_index: int) -> List[ConversationMessage]:
+async def get_messages_from_conversation_manager(context: 'ConversationContext', from_index: int) -> list[ConversationMessage]:
     """
     Construct the response to the user from the conversation context.
     :param context:
