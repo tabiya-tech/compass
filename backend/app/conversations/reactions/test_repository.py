@@ -10,10 +10,10 @@ import pytest_mock
 import bson
 
 from app.conversations.reactions.repository import ReactionRepository
-from app.conversations.reactions.types import Reaction, ReactionKind, DislikeReason
+from app.conversations.reactions.types import Reaction, ReactionKind, DislikeReason, ReactionDocModel
 
 
-def normalize_reaction(reaction: Reaction) -> Reaction:
+def normalize_reaction(reaction: Reaction | ReactionDocModel) -> Reaction:
     """
     Normalizes the reaction object by removing the id field.
     """
@@ -27,10 +27,12 @@ async def get_reaction_repository(in_memory_application_database) -> ReactionRep
     return repository
 
 
-def _get_new_reaction(kind: ReactionKind = ReactionKind.LIKED, reason: list[DislikeReason] | None = None) -> Reaction:
+def _get_new_reaction(kind: ReactionKind = ReactionKind.LIKED, reason: list[DislikeReason] = None) -> Reaction:
     """
     Returns a new reaction object with random data for testing purposes.
     """
+    if reason is None:
+        reason = [] if kind == ReactionKind.LIKED else [DislikeReason.INCORRECT_INFORMATION]
     return Reaction(
         session_id=123,
         message_id="message123",
@@ -50,12 +52,16 @@ class TestAdd:
         # WHEN the add method is called
         result = await repository.add(given_reaction)
 
-        # THEN the id is returned as a string
-        assert isinstance(result, str)
+        # THEN the result should be a ReactionDocModel
+        assert isinstance(result, ReactionDocModel)
+        # AND the id should be a string
+        assert isinstance(result.id, str)
+        # AND the id should be a valid ObjectId
+        assert bson.ObjectId.is_valid(result.id)
 
         # AND the reaction can be found in the database with the inserted_id
         actual_reaction = Reaction.from_dict(
-            await repository._collection.find_one({'_id': bson.ObjectId(result)})
+            await repository._collection.find_one({'_id': bson.ObjectId(result.id)})
         )
 
         # AND the saved reaction is equal to the given data
@@ -74,16 +80,21 @@ class TestAdd:
         # WHEN the add method is called
         result = await repository.add(given_reaction)
 
-        # THEN the id is returned as a string
-        assert isinstance(result, str)
+        # THEN the result should be a ReactionDocModel
+        assert isinstance(result, ReactionDocModel)
+        # AND the id should be a string
+        assert isinstance(result.id, str)
+        # AND the id should be a valid ObjectId
+        assert bson.ObjectId.is_valid(result.id)
 
         # AND the reaction can be found in the database with the inserted_id
         actual_reaction = Reaction.from_dict(
-            await repository._collection.find_one({'_id': bson.ObjectId(result)})
+            await repository._collection.find_one({'_id': bson.ObjectId(result.id)})
         )
 
         # AND the saved reaction is equal to the given data
         assert normalize_reaction(actual_reaction) == normalize_reaction(given_reaction)
+
 
 class TestDelete:
     @pytest.mark.asyncio
@@ -92,8 +103,8 @@ class TestDelete:
 
         # GIVEN a reaction exists in the database
         given_reaction = _get_new_reaction()
-        inserted_id = await repository.add(given_reaction)
-        assert inserted_id is not None
+        result = await repository.add(given_reaction)
+        assert result.id is not None
 
         # WHEN the delete method is called
         await repository.delete(given_reaction.session_id, given_reaction.message_id)

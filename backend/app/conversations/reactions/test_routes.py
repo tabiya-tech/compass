@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 from app.conversations.reactions.routes import add_reaction_routes, get_reaction_service, \
     get_user_preferences_repository
 from app.conversations.reactions.service import IReactionService
-from app.conversations.reactions.types import ReactionRequest, ReactionKind, DislikeReason
+from app.conversations.reactions.types import ReactionRequest, ReactionKind, DislikeReason, ReactionDocModel
 from app.users.repositories import IUserPreferenceRepository
 from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest
 from common_libs.test_utilities.mock_auth import MockAuth
@@ -29,48 +29,58 @@ def get_mock_user_preferences(session_id: int):
 @pytest.fixture(scope='function')
 def client_with_mocks() -> TestClientWithMocks:
     # Mock the reaction service
-    class MockReactionService(IReactionService):
-        async def add(self, session_id: int, message_id: str, reaction: ReactionRequest):
-            return None
+    class MockedReactionService(IReactionService):
+        async def add(self, session_id: int, message_id: str, reaction: ReactionRequest) -> ReactionDocModel:
+            return ReactionDocModel(
+                id="mock_doc_id",
+                session_id=session_id,
+                message_id=message_id,
+                kind=reaction.kind,
+                reason=reaction.reason,
+                created_at=datetime.now()
+            )
 
         async def delete(self, session_id: int, message_id: str):
             return None
 
-    _instance_reaction_service = MockReactionService()
+    mocked_reaction_service = MockedReactionService()
 
-    def _mocked_get_reaction_service() -> IReactionService:
-        return _instance_reaction_service
-
-    class MockPreferencesRepository(IUserPreferenceRepository):
-        async def get_user_preference_by_user_id(self, user_id: str):
-            return None
-        async def insert_user_preference(self, user_id: str, user_preference: UserPreferences):
-            return None
-        async def update_user_preference(self, user_id: str, update: UserPreferencesRepositoryUpdateRequest):
+    # Mock the user preferences repository
+    class MockedUserPreferencesRepository(IUserPreferenceRepository):
+        async def get_user_preference_by_user_id(self, user_id: str) -> UserPreferences:
             return None
 
-    _instance_user_preferences = MockPreferencesRepository()
+        async def update_user_preference(self, user_id: str, request: UserPreferencesRepositoryUpdateRequest) -> UserPreferences:
+            return None
 
-    def _mocked_preferences_repository() -> IUserPreferenceRepository:
-        return _instance_user_preferences
+        async def insert_user_preference(self, user_id: str, user_preference: UserPreferences) -> UserPreferences:
+            return None
+
+    mocked_user_preferences_repository = MockedUserPreferencesRepository()
 
     # Set up the FastAPI app with the mocked dependencies
-    api_router = APIRouter()
     app = FastAPI()
 
     # Mock the auth
     _instance_auth = MockAuth()
 
     # Set up the app dependency override
-    app.dependency_overrides[get_reaction_service] = _mocked_get_reaction_service
-    app.dependency_overrides[get_user_preferences_repository] = _mocked_preferences_repository
+    app.dependency_overrides[get_reaction_service] = lambda: mocked_reaction_service
+    app.dependency_overrides[get_user_preferences_repository] = lambda: mocked_user_preferences_repository
+
+    conversation_router = APIRouter(
+        prefix="/conversations/{session_id}",
+        tags=["conversations"]
+    )
 
     # Add the reaction routes to the conversations router
-    add_reaction_routes(api_router, _instance_auth)
-    app.include_router(api_router)
+    add_reaction_routes(conversation_router, _instance_auth)
+    app.include_router(conversation_router)
 
-    yield TestClient(app), _instance_reaction_service, _instance_user_preferences
-    app.dependency_overrides = {}
+    # Create a test client
+    client = TestClient(app)
+
+    return client, mocked_reaction_service, mocked_user_preferences_repository
 
 class TestReactionRoutes:
     @pytest.mark.asyncio
@@ -95,14 +105,19 @@ class TestReactionRoutes:
 
         # WHEN a PUT request is made with the given reaction
         response = client.put(
-            f"/{given_session_id}/messages/{given_message_id}/reactions",
+            f"/conversations/{given_session_id}/messages/{given_message_id}/reactions",
             json=given_reaction.model_dump(),
         )
 
         # THEN the response is CREATED
         assert response.status_code == HTTPStatus.CREATED
-        # AND the response is empty
-        assert response.json() is None
+        # AND the response contains the created reaction
+        response_data = response.json()
+        assert response_data["id"] == "mock_doc_id"
+        assert response_data["session_id"] == given_session_id
+        assert response_data["message_id"] == given_message_id
+        assert response_data["kind"] == given_reaction.kind.name
+        assert [DislikeReason[r].name for r in response_data["reason"]] == [r.name for r in given_reaction.reason]
         # AND the service's add method was called with the correct parameters
         _add_spy.assert_called_once()
         # AND the reaction passed to the service is a ReactionRequest instance (validating model usage)
@@ -128,7 +143,7 @@ class TestReactionRoutes:
 
         # WHEN a PUT request is made with the reaction
         response = client.put(
-            f"/{given_session_id}/messages/{given_message_id}/reactions",
+            f"/conversations/{given_session_id}/messages/{given_message_id}/reactions",
             json=given_reaction.model_dump(),
         )
 
@@ -154,7 +169,7 @@ class TestReactionRoutes:
 
         # WHEN a PUT request is made with the reaction
         response = client.put(
-            f"/{given_session_id}/messages/{given_message_id}/reactions",
+            f"/conversations/{given_session_id}/messages/{given_message_id}/reactions",
             json=given_reaction.model_dump(),
         )
 
@@ -175,7 +190,7 @@ class TestReactionRoutes:
 
         # WHEN a PUT request is made with the reaction
         response = client.put(
-            f"/{given_session_id}/messages/{given_message_id}/reactions",
+            f"/conversations/{given_session_id}/messages/{given_message_id}/reactions",
             json=given_reaction.model_dump(),
         )
 
@@ -195,7 +210,7 @@ class TestReactionRoutes:
 
         # WHEN a PUT request where `session_id` in the path matches the user's `session_id`
         response = client.put(
-            f"/{given_session_id}/messages/{given_message_id}/reactions",
+            f"/conversations/{given_session_id}/messages/{given_message_id}/reactions",
             json=given_invalid_payload,
         )
 
@@ -217,7 +232,7 @@ class TestReactionRoutes:
 
         # WHEN a DELETE request is made
         response = client.delete(
-            f"/{given_session_id}/messages/{given_message_id}/reactions"
+            f"/conversations/{given_session_id}/messages/{given_message_id}/reactions"
         )
 
         # THEN the response is NO_CONTENT
@@ -243,7 +258,7 @@ class TestReactionRoutes:
 
         # WHEN a DELETE request is made
         response = client.delete(
-            f"/{given_session_id}/messages/{given_message_id}/reactions"
+            f"/conversations/{given_session_id}/messages/{given_message_id}/reactions"
         )
 
         # THEN the response is FORBIDDEN
@@ -267,7 +282,7 @@ class TestReactionRoutes:
 
         # WHEN a DELETE request is made
         response = client.delete(
-            f"/{given_session_id}/messages/{given_message_id}/reactions"
+            f"/conversations/{given_session_id}/messages/{given_message_id}/reactions"
         )
 
         # THEN the response is INTERNAL_SERVER_ERROR
@@ -286,7 +301,7 @@ class TestReactionRoutes:
         get_user_preferences_spy.side_effect = Exception("Unexpected error")
 
         # WHEN a DELETE request is made
-        response = client.delete(f"/{given_session_id}/messages/{given_message_id}/reactions")
+        response = client.delete(f"/conversations/{given_session_id}/messages/{given_message_id}/reactions")
 
         # THEN the response is INTERNAL_SERVER_ERROR
         assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR

@@ -15,7 +15,7 @@ from app.conversation_memory.conversation_memory_types import ConversationMemory
     ConversationHistory, ConversationTurn
 from app.conversations.reactions.repository import IReactionRepository
 from app.conversations.reactions.service import ReactionService, ReactingToUserMessageError
-from app.conversations.reactions.types import ReactionRequest, ReactionKind, DislikeReason, Reaction
+from app.conversations.reactions.types import ReactionRequest, ReactionKind, DislikeReason, Reaction, ReactionDocModel
 from common_libs.test_utilities.mock_application_state import get_mock_application_state
 
 
@@ -45,8 +45,15 @@ def get_mock_conversation_context(message_id: str) -> ConversationContext:
 @pytest.fixture(scope='function')
 def _mock_reaction_repository() -> IReactionRepository:
     class MockedReactionRepository(IReactionRepository):
-        async def add(self, reaction: Reaction) -> Optional[str]:
-            return None
+        async def add(self, reaction: Reaction) -> ReactionDocModel:
+            return ReactionDocModel(
+                id="mock_doc_id",
+                message_id=reaction.message_id,
+                session_id=reaction.session_id,
+                kind=reaction.kind,
+                reason=reaction.reason if reaction.reason else [],
+                created_at=datetime.now()
+            )
 
         async def delete(self, session_id: int, message_id: str):
             return None
@@ -113,7 +120,7 @@ class TestAdd:
         service = ReactionService(reaction_repository=_mock_reaction_repository, conversation_memory_manager=_mock_conversation_memory_manager,
                                   application_state_manager=_mock_application_state_manager)
         _add_spy = mocker.spy(_mock_reaction_repository, 'add')
-        await service.add(self._given_session_id, self._given_message_id, given_reaction)
+        result = await service.add(self._given_session_id, self._given_message_id, given_reaction)
 
         # THEN the repository.add should be called only once
         _add_spy.assert_called_once()
@@ -124,7 +131,15 @@ class TestAdd:
         assert actual_reaction.session_id == self._given_session_id
         assert actual_reaction.message_id == self._given_message_id
         assert actual_reaction.kind == given_reaction.kind
-        assert actual_reaction.reason is None
+        assert actual_reaction.reason == []
+
+        # AND the returned document should have the correct values
+        assert isinstance(result, ReactionDocModel)
+        assert result.id == "mock_doc_id"
+        assert result.session_id == self._given_session_id
+        assert result.message_id == self._given_message_id
+        assert result.kind == given_reaction.kind
+        assert result.reason == []
 
     @pytest.mark.asyncio
     async def test_add_disliked_reaction_success(self, _mock_reaction_repository: IReactionRepository,
@@ -145,7 +160,7 @@ class TestAdd:
         service = ReactionService(reaction_repository=_mock_reaction_repository, conversation_memory_manager=_mock_conversation_memory_manager,
                                   application_state_manager=_mock_application_state_manager)
         _add_spy = mocker.spy(_mock_reaction_repository, 'add')
-        await service.add(self._given_session_id, self._given_message_id, given_reaction)
+        result = await service.add(self._given_session_id, self._given_message_id, given_reaction)
 
         # THEN the repository.add should be called only once
         _add_spy.assert_called_once()
@@ -157,6 +172,14 @@ class TestAdd:
         assert actual_reaction.message_id == self._given_message_id
         assert actual_reaction.kind == given_reaction.kind
         assert actual_reaction.reason == given_reaction.reason
+
+        # AND the returned document should have the correct values
+        assert isinstance(result, ReactionDocModel)
+        assert result.id == "mock_doc_id"
+        assert result.session_id == self._given_session_id
+        assert result.message_id == self._given_message_id
+        assert result.kind == given_reaction.kind
+        assert result.reason == given_reaction.reason
 
     @pytest.mark.asyncio
     async def test_add_reaction_to_user_message_raises_error(self, _mock_reaction_repository: IReactionRepository,

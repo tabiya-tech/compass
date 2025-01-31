@@ -12,10 +12,12 @@ from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.application_state import ApplicationStateManager
 from app.constants.errors import HTTPErrorResponse
 from app.context_vars import session_id_ctx_var, user_id_ctx_var
-from app.conversations.types import ConversationResponse, ConversationInput
-from app.conversations.constants import MAX_MESSAGE_LENGTH, UNEXPECTED_FAILURE_MESSAGE
-from app.conversations.service import ConversationAlreadyConcludedError, IConversationService, ConversationService
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
+from app.conversations.constants import MAX_MESSAGE_LENGTH, UNEXPECTED_FAILURE_MESSAGE
+from app.conversations.reactions.repository import ReactionRepository
+from app.conversations.reactions.routes import add_reaction_routes, get_user_preferences_repository
+from app.conversations.service import ConversationAlreadyConcludedError, IConversationService, ConversationService
+from app.conversations.types import ConversationResponse, ConversationInput
 from app.errors.constants import NO_PERMISSION_FOR_SESSION
 from app.errors.errors import UnauthorizedSessionAccessError
 from app.server_dependencies.agent_director_dependencies import get_agent_director
@@ -25,22 +27,20 @@ from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.types import Experience
 from app.users.auth import Authentication, UserInfo
 from app.users.repositories import UserPreferenceRepository
-from app.conversations.reactions.routes import add_reaction_routes, get_user_preferences_repository
-from app.conversations.reactions.repository import ReactionRepository
 
-async def get_conversation_service(
-        agent_director: LLMAgentDirector = Depends(get_agent_director),
-        application_state_manager: ApplicationStateManager = Depends(get_application_state_manager),
-        conversation_memory_manager: ConversationMemoryManager = Depends(get_conversation_memory_manager),
-        db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)
-) -> IConversationService:
-     # TODO: should this be a singleton?
-    return ConversationService(
-        agent_director=agent_director,
-        application_state_manager=application_state_manager,
-        conversation_memory_manager=conversation_memory_manager,
-        reaction_repository=ReactionRepository(db)
-    )
+
+async def get_conversation_service(agent_director: LLMAgentDirector = Depends(get_agent_director),
+                                   application_state_manager: ApplicationStateManager = Depends(
+                                       get_application_state_manager),
+                                   conversation_memory_manager: ConversationMemoryManager = Depends(
+                                       get_conversation_memory_manager),
+                                   db: AsyncIOMotorDatabase = Depends(
+                                       CompassDBProvider.get_application_db)) -> IConversationService:
+    # TODO: should this be a singleton?
+    return ConversationService(agent_director=agent_director, application_state_manager=application_state_manager,
+                               conversation_memory_manager=conversation_memory_manager,
+                               reaction_repository=ReactionRepository(db))
+
 
 async def _get_user_preferences_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)):
     return UserPreferenceRepository(db)
@@ -55,30 +55,24 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
     """
     logger = logging.getLogger(__name__)
 
-    conversation_router = APIRouter(
-        prefix="/conversations",
-        tags=["conversations"]
-    )
+    conversation_router = APIRouter(prefix="/conversations/{session_id}", tags=["conversations"])
 
-    @conversation_router.post(path="/{session_id}/messages",
-              status_code=HTTPStatus.CREATED,
-              response_model=ConversationResponse,
-              responses={
-                  HTTPStatus.BAD_REQUEST: {"model": HTTPErrorResponse}, # user is not allowed to send a message on a session where the conversation is already concluded
-                  HTTPStatus.FORBIDDEN: {"model": HTTPErrorResponse}, # user is not allowed to send a message on another user's session
-                  HTTPStatus.REQUEST_ENTITY_TOO_LARGE: {"model": HTTPErrorResponse}, # user is not allowed to send a message longer than 1000 characters
-                  HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse}}, # Internal server error, any server error
-              description="""The main conversation route used to interact with the agent.""")
-    async def _send_message(
-            request: Request,
-            body: ConversationInput,
-            session_id: Annotated[int, Path(description="The session id for the conversation history.", examples=[123])],
-            clear_memory: bool = False,
-            filter_pii: bool = False,
-            user_info: UserInfo = Depends(authentication.get_user_info()),
-            user_preferences_repository = Depends(get_user_preferences_repository),
-            service: IConversationService = Depends(get_conversation_service)
-    ):
+    @conversation_router.post(path="/messages", status_code=HTTPStatus.CREATED, response_model=ConversationResponse,
+                              responses={HTTPStatus.BAD_REQUEST: {"model": HTTPErrorResponse},
+                                         # user is not allowed to send a message on a session where the conversation is already concluded
+                                         HTTPStatus.FORBIDDEN: {"model": HTTPErrorResponse},
+                                         # user is not allowed to send a message on another user's session
+                                         HTTPStatus.REQUEST_ENTITY_TOO_LARGE: {"model": HTTPErrorResponse},
+                                         # user is not allowed to send a message longer than 1000 characters
+                                         HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse}},
+                              # Internal server error, any server error
+                              description="""The main conversation route used to interact with the agent.""")
+    async def _send_message(request: Request, body: ConversationInput, session_id: Annotated[
+        int, Path(description="The session id for the conversation history.", examples=[123])],
+                            clear_memory: bool = False, filter_pii: bool = False,
+                            user_info: UserInfo = Depends(authentication.get_user_info()),
+                            user_preferences_repository=Depends(get_user_preferences_repository),
+                            service: IConversationService = Depends(get_conversation_service)):
         """
         Endpoint for conducting the conversation with the agent.
         """
@@ -110,30 +104,21 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
             logger.warning(warning_msg)
             raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail=NO_PERMISSION_FOR_SESSION)
         except Exception as e:  # pylint: disable=broad-except
-            logger.exception(
-                "Error for request: %s %s?%s with session id: %s : %s",
-                request.method,
-                request.url.path,
-                request.query_params,
-                session_id,
-                e
-            )
+            logger.exception("Error for request: %s %s?%s with session id: %s : %s", request.method, request.url.path,
+                             request.query_params, session_id, e)
             raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail=UNEXPECTED_FAILURE_MESSAGE)
 
-
-    @conversation_router.get(path="/{session_id}/messages",
-             response_model=ConversationResponse,
-             responses={
-                 HTTPStatus.FORBIDDEN: {"model": HTTPErrorResponse}, # user is not allowed to get the messages of another user's session
-                 HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse} # Internal server error, any server error
-             },
-             description="""Endpoint for retrieving the conversation history.""")
-    async def _get_conversation_history(
-            session_id: Annotated[int, Path(description="The session id for the conversation history.", examples=[123])],
-            user_info: UserInfo = Depends(authentication.get_user_info()),
-            user_preferences_repository = Depends(get_user_preferences_repository),
-            service: ConversationService = Depends(get_conversation_service)
-    ):
+    @conversation_router.get(path="/messages", response_model=ConversationResponse,
+                             responses={HTTPStatus.FORBIDDEN: {"model": HTTPErrorResponse},
+                                        # user is not allowed to get the messages of another user's session
+                                        HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse}
+                                        # Internal server error, any server error
+                                        }, description="""Endpoint for retrieving the conversation history.""")
+    async def _get_conversation_history(session_id: Annotated[
+        int, Path(description="The session id for the conversation history.", examples=[123])],
+                                        user_info: UserInfo = Depends(authentication.get_user_info()),
+                                        user_preferences_repository=Depends(get_user_preferences_repository),
+                                        service: ConversationService = Depends(get_conversation_service)):
         """
         Endpoint for retrieving the conversation history.
         """
@@ -159,19 +144,17 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
             logger.exception(e)
             raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Oops! something went wrong")
 
-
-    @conversation_router.get(path="/{session_id}/experiences",
-             response_model=List[Experience],
-             responses={
-                 HTTPStatus.FORBIDDEN: {"model": HTTPErrorResponse}, # user is not allowed to get the experiences of another user's session
-                 HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse} # Internal server error, any server error
-             },
-             description="""Endpoint for retrieving the experiences of a user.""")
-    async def _get_experiences(session_id: Annotated[int, Path(description="The session id for the conversation history.", examples=[123])],
+    @conversation_router.get(path="/experiences", response_model=List[Experience],
+                             responses={HTTPStatus.FORBIDDEN: {"model": HTTPErrorResponse},
+                                        # user is not allowed to get the experiences of another user's session
+                                        HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse}
+                                        # Internal server error, any server error
+                                        }, description="""Endpoint for retrieving the experiences of a user.""")
+    async def _get_experiences(session_id: Annotated[
+        int, Path(description="The session id for the conversation history.", examples=[123])],
                                user_info: UserInfo = Depends(authentication.get_user_info()),
-                               user_preferences_repository = Depends(get_user_preferences_repository),
-                               service: ConversationService = Depends(get_conversation_service)
-                               ) -> List[Experience]:
+                               user_preferences_repository=Depends(get_user_preferences_repository),
+                               service: ConversationService = Depends(get_conversation_service)) -> List[Experience]:
         """
         Endpoint for retrieving the experiences of a user.
         """
@@ -198,12 +181,9 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
             logger.exception(e)
             raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Oops! something went wrong")
 
-
     ############################################
     # Add the reaction routes
     ############################################
     add_reaction_routes(conversation_router, authentication)
 
     app.include_router(conversation_router)
-
-
