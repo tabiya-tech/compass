@@ -27,7 +27,7 @@ import { PersistentStorageService } from "src/app/PersistentStorageService/Persi
  * the current user's authentication state. It provides a single source of truth
  * for the user's authentication status across the application.
  */
-class AuthenticationStateService {
+export default class AuthenticationStateService {
   private static instance: AuthenticationStateService;
   private user: TabiyaUser | null = null;
 
@@ -74,5 +74,3 @@ class AuthenticationStateService {
     this.setUser(null);
   }
 }
-
-export default AuthenticationStateService;

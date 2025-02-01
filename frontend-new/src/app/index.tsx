@@ -18,9 +18,7 @@ import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import * as Sentry from "@sentry/react";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 import { PersistentStorageService } from "./PersistentStorageService/PersistentStorageService";
-import UserPreferencesService, {
-  userPreferencesService,
-} from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { AuthenticationError } from "src/error/commonErrors";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
@@ -69,7 +67,7 @@ const App = () => {
       console.debug("Valid token found in storage");
       AuthenticationStateService.getInstance().setUser(user);
 
-      const preferences = await userPreferencesService.getUserPreferences(user.id).catch((error) => {
+      const preferences = await UserPreferencesService.getInstance().getUserPreferences(user.id).catch((error) => {
         console.log(error, "init");
         if (error instanceof RestAPIError) {
           // if the user is not registered, but has a valid token, log an error and continue log the user out
@@ -81,8 +79,8 @@ const App = () => {
             console.error(
               new AuthenticationError(
                 `User has not registered! Preferences could not be found for userId: ${user.id}`,
-                error as Error
-              )
+                error as Error,
+              ),
             );
           }
         }
@@ -98,7 +96,7 @@ const App = () => {
       console.debug("User preferences loaded", preferences);
     } catch (error) {
       console.error(
-        new AuthenticationError("Error initializing authentication and user preferences state", error as Error)
+        new AuthenticationError("Error initializing authentication and user preferences state", error as Error),
       );
       await AuthenticationServiceFactory.resetAuthenticationState();
     }
@@ -115,7 +113,7 @@ const App = () => {
       console.debug(
         "Auth initialized successfully",
         UserPreferencesStateService.getInstance().getUserPreferences(),
-        AuthenticationStateService.getInstance().getUser()
+        AuthenticationStateService.getInstance().getUser(),
       );
     });
 

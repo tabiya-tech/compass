@@ -14,7 +14,7 @@ import UserPreferencesStateService from "src/userPreferences/UserPreferencesStat
 import RegistrationCodeFormModal, {
   RegistrationCodeFormModalState,
 } from "src/auth/components/registrationCodeFormModal/RegistrationCodeFormModal";
-import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { invitationsService } from "src/auth/services/invitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
@@ -101,7 +101,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
 
         // create user preferences for the first time.
         // in order to do this, there needs to be a logged-in user in the persistent storage
-        const prefs = await userPreferencesService.createUserPreferences({
+        const prefs = await UserPreferencesService.getInstance().createUserPreferences({
           user_id: _user.id,
           invitation_code: invitation.invitation_code,
           language: Language.en,

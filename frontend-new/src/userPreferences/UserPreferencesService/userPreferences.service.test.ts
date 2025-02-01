@@ -15,15 +15,6 @@ import {
 
 const setupFetchSpy = setupAPIServiceSpy;
 
-// mock the persistent storage service
-jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => {
-  return {
-    __esModule: true,
-    PersistentStorageService: {
-      setUserPreferences: jest.fn(),
-    },
-  };
-});
 
 describe("UserPreferencesService", () => {
   // GIVEN a backend URL is returned by the envService
@@ -32,23 +23,31 @@ describe("UserPreferencesService", () => {
     jest.spyOn(require("src/envService"), "getBackendUrl").mockReturnValue(givenApiServerUrl);
   });
   afterEach(() => {
+    // Reset all mocks to avoid any side effects between tests
     jest.resetAllMocks();
   });
 
-  test("should construct the service successfully", () => {
-    // GIVEN  the service is constructed
-    const service = new UserPreferencesService();
+  test("should get a single instance successfully", () => {
+    // WHEN the service is constructed
+    const actualFirstInstance = UserPreferencesService.getInstance();
 
     // THEN expect the service to be constructed successfully
-    expect(service).toBeDefined();
+    expect(actualFirstInstance).toBeDefined();
 
-    // AND the service should have the correct endpoint url
-    expect(service.getUserPreferencesEndpointUrl).toEqual(`${givenApiServerUrl}/users/preferences`);
+    // AND the service should have the correct endpoint urls
+    expect(actualFirstInstance.apiServerUrl).toEqual(givenApiServerUrl);
+    expect(actualFirstInstance.userPreferencesEndpointUrl).toEqual(`${givenApiServerUrl}/users/preferences`);
+
+    // AND WHEN the service is constructed again
+    const actualSecondInstance = UserPreferencesService.getInstance();
+
+    // THEN expect the second instance to be the same as the first instance
+    expect(actualFirstInstance).toBe(actualSecondInstance);
   });
 
   describe("getUserPreferences", () => {
     test("getUserPreferences should fetch at the correct URL, with GET and the correct headers and payload successfully", async () => {
-      // AND the GET models REST API will respond with OK and some models
+      // GIVEN the GET models REST API will respond with OK and some models
       const givenResponseBody: UserPreference = {
         user_id: "1",
         language: Language.en,
@@ -62,7 +61,7 @@ describe("UserPreferencesService", () => {
       const fetchSpy = setupFetchSpy(StatusCodes.OK, givenResponseBody, "application/json;charset=UTF-8");
 
       // WHEN the getUserPreferences function is called with the given arguments
-      const service = new UserPreferencesService();
+      const service = UserPreferencesService.getInstance();
       const actualUserPreferences = await service.getUserPreferences(givenResponseBody.user_id);
 
       // THEN expect it to make a GET request with correct headers and payload
@@ -78,7 +77,7 @@ describe("UserPreferencesService", () => {
           serviceFunction: "getUserPreferences",
           serviceName: "UserPreferencesService",
           expectedContentType: "application/json",
-        }
+        },
       );
 
       // AND expect it to return the user preferences
@@ -91,7 +90,7 @@ describe("UserPreferencesService", () => {
       jest.spyOn(require("src/utils/customFetch/customFetch"), "customFetch").mockRejectedValue(givenFetchError);
 
       // WHEN calling getUserPreferences function with some user id
-      const service = new UserPreferencesService();
+      const service = UserPreferencesService.getInstance();
 
       // THEN expected it to reject with the error response
 
@@ -106,12 +105,12 @@ describe("UserPreferencesService", () => {
       ["is a string", "foo"],
     ])(
       "on 200, should reject with an error ERROR_CODE.API_ERROR if response %s",
-      async (description, givenResponse) => {
+      async (_description, givenResponse) => {
         // GIVEN the GET invitations REST API will respond with OK and some invalid response
         setupFetchSpy(StatusCodes.OK, givenResponse, "application/json;charset=UTF-8");
 
         // WHEN the getUserPreferences function is called with the given user id
-        const service = new UserPreferencesService();
+        const service = UserPreferencesService.getInstance();
 
         // THEN expected it to reject with the error response
         const expectedError: RestAPIError = {
@@ -123,7 +122,7 @@ describe("UserPreferencesService", () => {
             StatusCodes.UNPROCESSABLE_ENTITY,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",
-            ""
+            "",
           ),
           details: expect.anything(),
         };
@@ -131,7 +130,7 @@ describe("UserPreferencesService", () => {
 
         // THEN expected it to reject with the error response
         await expect(getUserPreferencesCallback).rejects.toMatchObject(expectedError);
-      }
+      },
     );
   });
 
@@ -147,7 +146,7 @@ describe("UserPreferencesService", () => {
       const fetchSpy = setupFetchSpy(StatusCodes.OK, givenUserPreferences, "application/json;charset=UTF-8");
 
       // WHEN the updateUserPreferences function is called with the given arguments
-      const service = new UserPreferencesService();
+      const service = UserPreferencesService.getInstance();
       const actualUserPreferences = await service.updateUserPreferences(givenUserPreferences);
 
       // THEN expect it to make a PATCH request with correct headers and payload
@@ -174,7 +173,7 @@ describe("UserPreferencesService", () => {
       jest.spyOn(require("src/utils/customFetch/customFetch"), "customFetch").mockRejectedValue(givenFetchError);
 
       // WHEN calling updateUserPreferences function with some user preferences
-      const service = new UserPreferencesService();
+      const service = UserPreferencesService.getInstance();
 
       // THEN expected it to reject with the error response
       let updateUserPreferencesCallback = async () =>
@@ -193,12 +192,12 @@ describe("UserPreferencesService", () => {
       ["is a string", "foo"],
     ])(
       "on 200, should reject with an error ERROR_CODE.API_ERROR if response %s",
-      async (description, givenResponse) => {
+      async (_description, givenResponse) => {
         // GIVEN the PATCH invitations REST API will respond with OK and some invalid response
         setupFetchSpy(StatusCodes.OK, givenResponse, "application/json;charset=UTF-8");
 
         // WHEN the updateUserPreferences function is called with the given user preferences
-        const service = new UserPreferencesService();
+        const service = UserPreferencesService.getInstance();
         const expectedError: RestAPIError = {
           ...new RestAPIError(
             UserPreferencesService.name,
@@ -208,7 +207,7 @@ describe("UserPreferencesService", () => {
             StatusCodes.UNPROCESSABLE_ENTITY,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",
-            ""
+            "",
           ),
           details: expect.anything(),
         };
@@ -221,7 +220,7 @@ describe("UserPreferencesService", () => {
 
         // THEN expected it to reject with the error response
         await expect(updateUserPreferencesCallback).rejects.toMatchObject(expectedError);
-      }
+      },
     );
   });
 
@@ -246,7 +245,7 @@ describe("UserPreferencesService", () => {
       };
       const fetchSpy = setupFetchSpy(StatusCodes.CREATED, mockResponseFormBackend, "application/json;charset=UTF-8");
 
-      const service = new UserPreferencesService();
+      const service = UserPreferencesService.getInstance();
       const actualUserPreferences = await service.createUserPreferences(givenUserPreferences);
 
       // THEN expect it to make a POST request with correct headers and payload
@@ -283,7 +282,7 @@ describe("UserPreferencesService", () => {
       jest.spyOn(require("src/utils/customFetch/customFetch"), "customFetch").mockRejectedValue(givenFetchError);
 
       // WHEN calling createUserPreferences function with some user preferences
-      const service = new UserPreferencesService();
+      const service = UserPreferencesService.getInstance();
 
       // THEN expected it to reject with the error response
       let createUserPreferencesCallback = async () =>
@@ -302,12 +301,12 @@ describe("UserPreferencesService", () => {
       ["is a string", "foo"],
     ])(
       "on 201, should reject with an error ERROR_CODE.API_ERROR if response %s",
-      async (description, givenResponse) => {
+      async (_description, givenResponse) => {
         // GIVEN the POST invitations REST API will respond with CREATED and some invalid response
         setupFetchSpy(StatusCodes.CREATED, givenResponse, "application/json;charset=UTF-8");
 
         // WHEN the createUserPreferences function is called with the given user preferences
-        const service = new UserPreferencesService();
+        const service = UserPreferencesService.getInstance();
         const expectedError: RestAPIError = {
           ...new RestAPIError(
             UserPreferencesService.name,
@@ -317,7 +316,7 @@ describe("UserPreferencesService", () => {
             StatusCodes.UNPROCESSABLE_ENTITY,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",
-            ""
+            "",
           ),
           details: expect.anything(),
         };
@@ -330,7 +329,7 @@ describe("UserPreferencesService", () => {
 
         // THEN expected it to reject with the error response
         await expect(createUserPreferencesCallback).rejects.toMatchObject(expectedError);
-      }
+      },
     );
   });
 });

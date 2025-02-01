@@ -4,6 +4,11 @@ import FirebaseEmailAuthenticationService from "src/auth/services/FirebaseAuthen
 import firebase from "firebase/compat/app";
 import { invitationsService } from "src/auth/services/invitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
+import { UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 
 jest.mock("firebase/compat/app", () => {
   return {
@@ -19,15 +24,6 @@ jest.mock("firebase/compat/app", () => {
   };
 });
 
-jest.mock("src/userPreferences/UserPreferencesService/userPreferences.service", () => {
-  return {
-    userPreferencesService: {
-      getUserPreferences: jest.fn(),
-      createUserPreferences: jest.fn(),
-    },
-  };
-});
-
 jest.mock("src/auth/services/invitationsService/invitations.service", () => {
   return {
     invitationsService: {
@@ -36,31 +32,36 @@ jest.mock("src/auth/services/invitationsService/invitations.service", () => {
   };
 });
 
-jest.useFakeTimers();
-
 describe("AuthService class tests", () => {
-  let authService: FirebaseEmailAuthenticationService;
+  const authService: FirebaseEmailAuthenticationService = FirebaseEmailAuthenticationService.getInstance();
 
-  beforeAll(async () => {
-    authService = await FirebaseEmailAuthenticationService.getInstance();
-  });
-
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks();
+    AuthenticationStateService.getInstance().setUser(null);
+    UserPreferencesStateService.getInstance().clearUserPreferences();
+    // Reset all method mocks on the singletons that may have been mocked
+    // As a good practice, we should the mock*Once() methods to avoid side effects between tests
+    // As a precaution, we reset all method mocks to ensure that no side effects are carried over between tests
+    resetAllMethodMocks(UserPreferencesService.getInstance());
+    resetAllMethodMocks(invitationsService);
   });
 
   test("should construct a singleton", async () => {
     // WHEN the singleton is constructed
-    const instance = await FirebaseEmailAuthenticationService.getInstance();
+    const instance = FirebaseEmailAuthenticationService.getInstance();
 
     // THEN the instance should be defined
     expect(instance).toBeDefined();
 
     // AND WHEN the singleton is constructed again
-    const newInstance = await FirebaseEmailAuthenticationService.getInstance();
+    const newInstance = FirebaseEmailAuthenticationService.getInstance();
 
     // THEN the instance should be the same as the first instance
     expect(newInstance).toBe(instance);
+
+    // AND expect no errors or warning to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
   });
 
   describe("login", () => {
@@ -82,11 +83,25 @@ describe("AuthService class tests", () => {
 
       jest.spyOn(authService, "getUser").mockReturnValue(givenUser);
 
+      // AND the user has some preferences
+      const givenUserPreferences: UserPreference = {foo: "bar"} as unknown as UserPreference;
+      jest.spyOn(UserPreferencesService.getInstance(), "getUserPreferences").mockResolvedValueOnce(givenUserPreferences)
+
       // WHEN the login is attempted
       const actualToken = await authService.login(givenEmail, givenPassword);
 
       // AND test should return the token
       expect(actualToken).toEqual(givenTokenResponse);
+
+      // AND the Authentication State should be set
+      expect(AuthenticationStateService.getInstance().getUser()).toEqual(givenUser);
+
+      // AND the UserPreference State should be set
+      expect(UserPreferencesStateService.getInstance().getUserPreferences()).toEqual(givenUserPreferences);
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
 
     test("should throw an error on login failure", async () => {
@@ -120,6 +135,10 @@ describe("AuthService class tests", () => {
 
       // THEN the error callback should be called with Email not verified
       await expect(emailLoginPromise).rejects.toThrow("Email not verified");
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
 
     test("should throw an error when the firebase signIn method fails to return a user", async () => {
@@ -133,6 +152,10 @@ describe("AuthService class tests", () => {
 
       // THEN an error should be thrown
       await expect(emailLoginPromise).rejects.toThrow("User not found");
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
   });
 
@@ -164,12 +187,19 @@ describe("AuthService class tests", () => {
         status: InvitationStatus.VALID,
         invitation_type: InvitationType.REGISTER,
       });
+      // AND the user preferences can be created
+      const givenUserPreferences: UserPreference = {foo: "bar"} as unknown as UserPreference;
+      jest.spyOn(UserPreferencesService.getInstance(), "createUserPreferences").mockResolvedValueOnce(givenUserPreferences);
 
       // WHEN the registration is attempted
       const actualToken = await authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationCode);
 
       // AND registerWithEmail should return the token
       expect(actualToken).toEqual(givenTokenResponse);
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
 
     test("should throw an error on registration failure", async () => {

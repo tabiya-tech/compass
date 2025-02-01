@@ -8,7 +8,7 @@ import { DATA_TEST_ID as AUTH_HEADER_DATA_TEST_ID } from "src/auth/components/Au
 import FirebaseEmailAuthenticationService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import { invitationsService } from "src/auth/services/invitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
-import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import {
   SensitivePersonalDataRequirement,
   Language,
@@ -76,19 +76,6 @@ jest.mock("src/auth/services/Authentication.service.factory", () => {
     __esModule: true,
     default: {
       getCurrentAuthenticationService: jest.fn(),
-    },
-  };
-});
-
-// mock the user preferences service
-jest.mock("src/userPreferences/UserPreferencesService/userPreferences.service", () => {
-  const actual = jest.requireActual("src/userPreferences/UserPreferencesService/userPreferences.service");
-  return {
-    ...actual,
-    __esModule: true,
-    userPreferencesService: {
-      createUserPreferences: jest.fn(),
-      getUserPreferences: jest.fn(),
     },
   };
 });
@@ -206,11 +193,8 @@ describe("Testing Register component", () => {
     // WHEN the component is rendered within the AuthContext and Router
     render(<Register />);
 
-    // THEN expect no errors or warning to have occurred
-    expect(console.error).not.toHaveBeenCalled();
-    expect(console.warn).not.toHaveBeenCalled();
 
-    // AND the component should be rendered
+    // THEN the component should be rendered
     expect(screen.getByTestId(DATA_TEST_ID.REGISTER_CONTAINER)).toBeInTheDocument();
 
     // AND the header component should be rendered
@@ -247,6 +231,10 @@ describe("Testing Register component", () => {
 
     // AND the component should match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.REGISTER_CONTAINER)).toMatchSnapshot();
+
+    // AND expect no errors or warning to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
   });
 
   test("it should show success message on successful registration", async () => {
@@ -291,7 +279,7 @@ describe("Testing Register component", () => {
     } as unknown as FirebaseEmailAuthenticationService);
 
     // AND the user preferences service is mocked to succeed
-    jest.spyOn(userPreferencesService, "createUserPreferences").mockResolvedValue({
+    jest.spyOn(UserPreferencesService.getInstance(), "createUserPreferences").mockResolvedValueOnce({
       user_id: "foo-bar-id",
       language: Language.en,
       sessions: [],
@@ -366,5 +354,10 @@ describe("Testing Register component", () => {
       "Registration Failed: An unexpected error occurred. Please try again later.",
       { variant: "error" }
     );
+    // AND the error should be logged
+    expect(console.error).toHaveBeenCalled();
+
+    // AND expect no warning to have occurred
+    expect(console.warn).not.toHaveBeenCalled();
   });
 });
