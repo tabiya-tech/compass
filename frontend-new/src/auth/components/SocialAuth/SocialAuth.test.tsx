@@ -1,11 +1,10 @@
 import "src/_test_utilities/consoleMock";
 import React from "react";
-import { render, waitFor, screen } from "src/_test_utilities/test-utils";
+import { render, waitFor, screen, userEvent } from "src/_test_utilities/test-utils";
 import SocialAuth, { DATA_TEST_ID } from "./SocialAuth";
 import { routerPaths } from "src/app/routerPaths";
 import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import FirebaseSocialAuthenticationService from "src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
-import { act } from "@testing-library/react";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import {
@@ -78,6 +77,9 @@ describe("SocialAuth tests", () => {
 
     // THEN expect the component to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.CONTINUE_WITH_GOOGLE_BUTTON)).toBeInTheDocument();
+    // AND expect no errors or warning to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
   });
 
   test.each([
@@ -128,14 +130,15 @@ describe("SocialAuth tests", () => {
       );
       // AND the login button is clicked
       const loginButton = screen.getByTestId(DATA_TEST_ID.CONTINUE_WITH_GOOGLE_BUTTON);
-      act(() => {
-        loginButton.click();
-      });
+      await userEvent.click(loginButton);
 
       // THEN expect the user to be redirected to the correct path
       await waitFor(() => {
         expect(givenNotifyOnLogin).toHaveBeenCalled();
       });
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     },
   );
 
@@ -160,6 +163,9 @@ describe("SocialAuth tests", () => {
         notifyOnLoading={givenNotifyOnLoading}
       />,
     );
+    // AND expect no errors or warning to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
   });
 
   test("should show message if browser is not online", () => {
@@ -180,6 +186,9 @@ describe("SocialAuth tests", () => {
 
     // THEN expect the message text to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.FIREBASE_FALLBACK_TEXT)).toBeInTheDocument();
+    // AND expect no errors or warning to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
   });
 
   test("should call notifyOnLoading with true when login button is clicked", async () => {
@@ -193,6 +202,7 @@ describe("SocialAuth tests", () => {
     const getFirebaseSocialAuthInstanceSpy = jest.spyOn(FirebaseSocialAuthenticationService, "getInstance");
     getFirebaseSocialAuthInstanceSpy.mockReturnValue({
       logout: logoutMock,
+      loginWithGoogle: jest.fn(),
     } as unknown as FirebaseSocialAuthenticationService);
     // WHEN the component is rendered
     render(
@@ -205,11 +215,12 @@ describe("SocialAuth tests", () => {
 
     // AND the login button is clicked
     const loginButton = screen.getByTestId(DATA_TEST_ID.CONTINUE_WITH_GOOGLE_BUTTON);
-    act(() => {
-      loginButton.click();
-    });
+    await userEvent.click(loginButton);
 
     // THEN expect notifyOnLoading to have been called with true
     expect(givenNotifyOnLoading).toHaveBeenCalledWith(true);
+    // AND expect no errors or warning to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
   });
 });

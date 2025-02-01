@@ -2,12 +2,19 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import ChatService from "src/chat/ChatService/ChatService";
 import ChatList from "src/chat/chatList/ChatList";
 import { IChatMessage } from "./Chat.types";
-import { generateCompassMessage, generateTypingMessage, generateUserMessage } from "./util";
+import {
+  generateCompassMessage,
+  generateConversationConclusionMessage,
+  generatePleaseRepeatMessage, generateSomethingWentWrongMessage,
+  generateThankYouMessage,
+  generateTypingMessage,
+  generateUserMessage,
+} from "./util";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Box, useTheme } from "@mui/material";
 import ChatHeader from "./ChatHeader/ChatHeader";
 import ChatMessageField from "./ChatMessageField/ChatMessageField";
-import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
+import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -17,7 +24,6 @@ import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import ExperiencesDrawer from "src/experiences/experiencesDrawer/ExperiencesDrawer";
 import { Experience } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
 import ExperienceService from "src/experiences/experiencesDrawer/experienceService/experienceService";
-import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import InactiveBackdrop from "src/theme/Backdrop/InactiveBackdrop";
 import ConfirmModalDialog from "src/theme/confirmModalDialog/ConfirmModalDialog";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
@@ -25,6 +31,7 @@ import FeedbackForm from "src/feedback/overallFeedback/feedbackForm/FeedbackForm
 import { ChatError } from "src/error/commonErrors";
 import { ChatMessageType } from "src/chat/Chat.types";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
+import { issueNewSession } from "./issueNewSession";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -34,6 +41,12 @@ const uniqueId = "b7ea1e82-0002-432d-a768-11bdcd186e1d";
 export const DATA_TEST_ID = {
   CONTAINER: `container-${uniqueId}`,
   CHAT_CONTAINER: `chat-container-${uniqueId}`,
+};
+
+export const NOTIFICATION_MESSAGES_TEXT = {
+  NEW_CONVERSATION_STARTED: "New conversation started",
+  SUCCESSFULLY_LOGGED_OUT: "Successfully logged out",
+  FAILED_TO_START_CONVERSATION: "Failed to start new conversation",
 };
 
 interface ChatProps {
@@ -50,7 +63,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const [exploredExperiences, setExploredExperiences] = useState<number>(0);
   const [conversationConductedAt, setConversationConductedAt] = useState<string | null>(null);
   const [currentMessage, setCurrentMessage] = useState<string>("");
-  const [isTyping, setIsTyping] = useState<boolean>(false);
+  const [isTyping, setIsTyping] = useState<boolean>(false); // TODO rename to aiIsTyping
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [experiences, setExperiences] = React.useState<Experience[]>([]);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
@@ -63,12 +76,13 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const [activeSessionId, setActiveSessionId] = useState<number | null>(
     UserPreferencesStateService.getInstance().getActiveSessionId(),
   );
-  const [current_user_id] = useState<string | null>(authenticationStateService.getInstance().getUser()?.id ?? null);
+  const [currentUserId] = useState<string | null>(authenticationStateService.getInstance().getUser()?.id ?? null);
   const [sessionHasFeedback] = useState<boolean>(UserPreferencesStateService.getInstance().activeSessionHasFeedback());
 
   const navigate = useNavigate();
 
-  const initializationRef = useRef(false);
+  const initializingRef = useRef(false);
+  const [initialized, setInitialized] = useState<boolean>(false);
 
   /**
    * --- Utility functions ---
@@ -78,13 +92,6 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     setMessages((prevMessages) => [...prevMessages, message]);
   };
 
-  const generateThankYouMessage = () => {
-    return generateCompassMessage(
-      "Thank you for taking the time to share your valuable feedback. Your input is important to us.",
-      new Date().toISOString(),
-    );
-  };
-
   const checkAndAddConversationConclusionMessage = useCallback(() => {
     // Assumes the conversation is completed
     if (sessionHasFeedback) {
@@ -92,13 +99,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       addMessage(generateThankYouMessage());
     } else {
       // If they haven't, asks the user to give feedback
-      addMessage({
-        ...generateCompassMessage(
-          "We’d love your feedback on this conversation. It’ll only take 5 minutes and will help us improve your experience",
-          new Date().toISOString(),
-        ),
-        type: ChatMessageType.CONVERSATION_CONCLUSION,
-      });
+      addMessage(generateConversationConclusionMessage());
     }
   }, [sessionHasFeedback]);
 
@@ -120,35 +121,6 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       setMessages((prevMessages) => prevMessages.filter((message) => message.type !== ChatMessageType.TYPING));
     }
   };
-
-  // Issue a new session and update the user preferences
-  const issueNewSession = useCallback(
-    async (user_id: string | null) => {
-      try {
-        setMessages([]);
-        // If there is no session id, then create a new session
-        const preferencesService = UserPreferencesService.getInstance();
-        // expect that the user_id is not null, if so then let the getNewSession function handle it
-        let user_preferences = await preferencesService.getNewSession(user_id!);
-        // Notify the application that the preferences have changed,
-        // otherwise when the chat is renderer, the parent component will not have the latest session
-        UserPreferencesStateService.getInstance().setUserPreferences(user_preferences);
-        enqueueSnackbar("New conversation started", { variant: "success" });
-        return UserPreferencesStateService.getInstance().getActiveSessionId()!;
-      } catch (e) {
-        addMessage(
-          generateCompassMessage(
-            "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
-            new Date().toISOString(),
-          ),
-        );
-        enqueueSnackbar("Failed to start new conversation", { variant: "error" });
-        console.error(new ChatError("Failed to create new session", e as Error));
-      }
-      return null;
-    },
-    [enqueueSnackbar],
-  );
 
   /**
    * --- Service handlers ---
@@ -181,16 +153,14 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     const authenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
     await authenticationService!.logout();
     navigate(routerPaths.LOGIN, { replace: true });
-    enqueueSnackbar("Successfully logged out.", { variant: "success" });
+    enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.SUCCESSFULLY_LOGGED_OUT, { variant: "success" });
     setIsLoggingOut(false);
   }, [enqueueSnackbar, navigate]);
 
   // Goes to the chat service to send a message
   const sendMessage = useCallback(
-    async (userMessage: string, session_id: number) => {
+    async (userMessage: string, sessionId: number) => {
       setIsTyping(true);
-      const sent_at = new Date().toISOString();
-
       if (currentMessage) {
         // optimistically add the user's message for a more responsive feel
         const message = generateUserMessage(currentMessage, new Date().toISOString());
@@ -199,8 +169,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
       try {
         // Send the user's message
-        const chatService = ChatService.getInstance(session_id);
-        const response = await chatService.sendMessage(userMessage);
+        const response = await ChatService.getInstance().sendMessage(sessionId, userMessage);
 
         setExploredExperiences(response.experiences_explored);
 
@@ -214,42 +183,46 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
         setConversationCompleted(response.conversation_completed);
         setConversationConductedAt(response.conversation_conducted_at);
-
-        if (conversationCompleted) {
+        if (response.conversation_completed) {
           checkAndAddConversationConclusionMessage();
         }
       } catch (error) {
         console.error(new ChatError("Failed to send message:", error as Error));
-        addMessage(
-          generateCompassMessage(
-            "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
-            sent_at,
-          ),
-        );
+        addMessage(generatePleaseRepeatMessage());
       } finally {
         setIsTyping(false);
       }
     },
-    [currentMessage, exploredExperiences, conversationCompleted, checkAndAddConversationConclusionMessage],
+    [currentMessage, exploredExperiences, checkAndAddConversationConclusionMessage],
   );
 
   const initializeChat = useCallback(
-    async (user_id: string | null, currentSessionId: number | null) => {
+    async (userId: string | null, currentSessionId: number | null) => {
+      if (userId === null) {
+        // If the user id is not available, then the chat cannot be initialized
+        console.error(new ChatError("Chat cannot be initialized, there is not User id  not available"));
+        return false;
+      }
+
       setIsTyping(true);
       let sessionId: number | null = currentSessionId;
 
       try {
         if (!sessionId) {
-          sessionId = await issueNewSession(user_id);
-          if (!sessionId) {
+          sessionId = await issueNewSession(userId);
+          if (sessionId) {
+            // Clear the messages if a new session is issued
+            //  and add a typing message as the previous one will be removed
+            setMessages([generateTypingMessage(new Date().toISOString())]);
+          } else {
             console.debug("Failed to issue new session");
             return false;
           }
         }
 
         // Get the chat history
-        const chatService = ChatService.getInstance(sessionId);
-        const history = await chatService.getChatHistory();
+        const instance = ChatService.getInstance();
+        const history = await instance.getChatHistory(sessionId);
 
         // Set the messages from the chat history
         if (history.messages.length) {
@@ -289,15 +262,12 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         } else {
           console.error(new ChatError("Failed to initialize chat", e as Error));
         }
-        const errorMessage = getUserFriendlyErrorMessage(e as Error);
-        enqueueSnackbar(errorMessage, { variant: "error" });
-
         return false;
       } finally {
         setIsTyping(false);
       }
     },
-    [issueNewSession, checkAndAddConversationConclusionMessage, sendMessage, enqueueSnackbar],
+    [checkAndAddConversationConclusionMessage, sendMessage],
   );
 
   // Resets the text field for the next message
@@ -320,21 +290,19 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   };
 
   const handleConfirmNewConversation = useCallback(async () => {
-    try {
-      setNewConversationDialog(false);
-      setExploredExperiencesNotification(false);
-      await initializeChat(current_user_id, null);
-    } catch (e) {
-      addMessage(
-        generateCompassMessage(
-          "I'm sorry, Something seems to have gone wrong on my end... Can you try again?",
-          new Date().toISOString(),
-        ),
-      );
-      enqueueSnackbar("Failed to start new conversation", { variant: "error" });
-      console.error(new ChatError("Failed to start new conversation", e as Error));
+    setNewConversationDialog(false);
+    setExploredExperiencesNotification(false);
+    if (await initializeChat(currentUserId, null)) {
+      enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.NEW_CONVERSATION_STARTED, { variant: "success" });
+    } else {
+      // Add a message to the chat saying that something went wrong
+      setMessages([generateSomethingWentWrongMessage()]);
+      // Set the conversation as completed to prevent the user from sending any messages
+      setConversationCompleted(true);
+      // Notify the user that the chat failed to start
+      enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.FAILED_TO_START_CONVERSATION, { variant: "error" });
     }
-  }, [enqueueSnackbar, initializeChat, current_user_id]);
+  }, [enqueueSnackbar, initializeChat, currentUserId]);
 
   const handleFeedbackSubmit = () => {
     setMessages((prevMessages) =>
@@ -349,14 +317,22 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
   // Initialize the chat when the component mounts
   useEffect(() => {
-    if (initializationRef.current) {
+    if (initializingRef.current) {
       return;
     }
-    initializationRef.current = true;
-    initializeChat(current_user_id, activeSessionId).then((initialized: boolean) => {
-      initializationRef.current = initialized;
+    initializingRef.current = true;
+    initializeChat(currentUserId, activeSessionId).then((successful: boolean) => {
+      if (!successful) {
+        // Add a message to the chat saying that something went wrong
+        setMessages([generateSomethingWentWrongMessage()]);
+        // Set the conversation as completed to prevent the user from sending any messages
+        setConversationCompleted(true);
+        // Notify the user that the chat failed to start
+        enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.FAILED_TO_START_CONVERSATION, { variant: "error" });
+      }
+      setInitialized(true);
     });
-  }, [initializeChat, activeSessionId, current_user_id]);
+  }, [enqueueSnackbar, initializeChat, activeSessionId, currentUserId]);
 
   // show the user backdrop when the user is inactive for INACTIVITY_TIMEOUT
   useEffect(() => {
@@ -407,6 +383,15 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
             flexDirection="column"
             position="relative"
             data-testid={DATA_TEST_ID.CHAT_CONTAINER}
+            // The "is-initialized" attribute helps make the component testable.
+            // When the component mounts, an initialization function runs, changing the state and causing a rerender.
+            // Tests need to wait for the component to "settle" after mounting, but they don’t know when that happens.
+            // To check if the component is settled, tests can wait for the "is-initialized" attribute to be true:
+            //   await waitFor(() => {
+            //     expect(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER)).toHaveAttribute("is-initialized", "true");
+            //   });
+            // This technique can solve the "Warning: An update to Chat inside a test was not wrapped in act(...)" warning.
+            is-initialized={`${initialized}`}
           >
             <Box padding={theme.spacing(theme.tabiyaSpacing.xl)}>
               <ChatHeader

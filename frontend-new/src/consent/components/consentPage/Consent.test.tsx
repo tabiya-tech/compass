@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { TabiyaUser } from "src/auth/auth.types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
-import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 import AuthenticationService from "src/auth/services/Authentication.service";
@@ -21,6 +21,8 @@ import * as RestAPIErrorLoggerModule from "src/error/restAPIError/logger";
 import { DATA_TEST_ID as BACKDROP_TEST_ID } from "src/theme/Backdrop/Backdrop";
 import { AuthenticationError } from "src/error/commonErrors";
 import { DATA_TEST_ID as CONFIRM_MODAL_DIALOG_TEST_ID } from "src/theme/confirmModalDialog/ConfirmModalDialog";
+import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
+import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -61,6 +63,13 @@ describe("Testing Consent Page", () => {
     (console.error as jest.Mock).mockClear();
     (console.warn as jest.Mock).mockClear();
     jest.clearAllMocks();
+
+    AuthenticationStateService.getInstance().setUser(null);
+    UserPreferencesStateService.getInstance().clearUserPreferences();
+    // Reset all method mocks on the singletons that may have been mocked
+    // As a good practice, we should the mock*Once() methods to avoid side effects between tests
+    // As a precaution, we reset all method mocks to ensure that no side effects are carried over between tests
+    resetAllMethodMocks(UserPreferencesService.getInstance());
   });
 
   beforeEach(() => {
@@ -119,7 +128,7 @@ describe("Testing Consent Page", () => {
         // GIVEN the user preferences state service is mocked to set the user preferences
         jest.spyOn(UserPreferencesStateService.getInstance(), "setUserPreferences").mockImplementation(() => {});
 
-        const updateUserPreferences = jest.spyOn(userPreferencesService, "updateUserPreferences").mockResolvedValue({
+        const updateUserPreferences = jest.spyOn(UserPreferencesService.getInstance(), "updateUserPreferences").mockResolvedValue({
           user_id: "",
           language: Language.en,
           accepted_tc: new Date(),
@@ -178,7 +187,7 @@ describe("Testing Consent Page", () => {
 
         // AND the user preferences service is mocked to throw an error
         jest
-          .spyOn(userPreferencesService, "updateUserPreferences")
+          .spyOn(UserPreferencesService.getInstance(), "updateUserPreferences")
           .mockRejectedValue(new Error("Failed to update user preferences"));
 
         // AND the authStateService is mocked to return the given user
@@ -417,7 +426,7 @@ describe("Testing Consent Page", () => {
     describe("Redirecting", () => {
       it("should redirect the user to the root page if the user does not require sensitive personal data", async () => {
         // GIVEN the user preferences state service is mocked to set the user preferences
-        jest.spyOn(userPreferencesService, "updateUserPreferences").mockResolvedValue({
+        jest.spyOn(UserPreferencesService.getInstance(), "updateUserPreferences").mockResolvedValue({
           user_id: "given user id",
           language: Language.en,
           accepted_tc: new Date(),
@@ -462,7 +471,7 @@ describe("Testing Consent Page", () => {
 
       it("should redirect the user to the sensitive data page if the user requires sensitive personal data", async () => {
         // GIVEN the user preferences state service is mocked to set the user preferences.
-        jest.spyOn(userPreferencesService, "updateUserPreferences").mockResolvedValue({
+        jest.spyOn(UserPreferencesService.getInstance(), "updateUserPreferences").mockResolvedValue({
           user_id: "given user id",
           language: Language.en,
           accepted_tc: new Date(),

@@ -1,6 +1,6 @@
 import AuthenticationStateService from "./AuthenticationState.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
-import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { TabiyaUser, Token, TokenHeader } from "src/auth/auth.types";
 import { jwtDecode } from "jwt-decode";
@@ -96,17 +96,17 @@ abstract class AuthenticationService {
     this.authenticationStateService.setUser(user);
     let prefs = null;
     try {
-      prefs = await userPreferencesService.getUserPreferences(user.id);
+      prefs = await UserPreferencesService.getInstance().getUserPreferences(user.id);
     } catch (error) {
       if (error instanceof RestAPIError) {
         // if the user preferences are not found by user id, but has a valid token, log an info and continue with the prefs as null
         if (error.statusCode === StatusCodes.NOT_FOUND) {
           console.info(`User has not registered! Preferences could not be found for userId: ${user.id}`);
-        } else {
-          // rethrow the error if it is not a 404 error
-          throw error;
+          return;
         }
       }
+      // rethrow the error if it is not a 404 error
+      throw error;
     }
     if (prefs !== null) {
       // set the local preferences "state" ( for lack of a better word )
@@ -128,7 +128,7 @@ abstract class AuthenticationService {
 
     // create user preferences for the first time.
     // in order to do this, there needs to be a logged-in user in the persistent storage
-    const prefs = await userPreferencesService.createUserPreferences({
+    const prefs = await UserPreferencesService.getInstance().createUserPreferences({
       user_id: user.id,
       invitation_code: registrationCode,
       language: Language.en,
@@ -193,7 +193,7 @@ abstract class AuthenticationService {
           {
             exp: decodedToken.exp,
             currentTime,
-          }
+          },
         );
       }
 
@@ -208,7 +208,7 @@ abstract class AuthenticationService {
           {
             iat: decodedToken.iat,
             currentTime,
-          }
+          },
         );
       }
       console.debug("Token checked. Token is valid");

@@ -9,18 +9,23 @@ export default class UserPreferencesService {
   private static instance: UserPreferencesService;
   static serviceName = "UserPreferencesService";
 
-  readonly updateUserPreferencesEndpointUrl: string;
-  readonly getUserPreferencesEndpointUrl: string;
+  readonly userPreferencesEndpointUrl: string;
   readonly apiServerUrl: string;
-  readonly generateNewSessionEndpointUrl: string;
-  readonly createUserPreferencesEndpointURL: string;
 
-  constructor() {
+  private constructor() {
     this.apiServerUrl = getBackendUrl();
-    this.getUserPreferencesEndpointUrl = `${this.apiServerUrl}/users/preferences`;
-    this.updateUserPreferencesEndpointUrl = `${this.apiServerUrl}/users/preferences`;
-    this.createUserPreferencesEndpointURL = `${this.apiServerUrl}/users/preferences`;
-    this.generateNewSessionEndpointUrl = `${this.apiServerUrl}/users/preferences/new-session`;
+    this.userPreferencesEndpointUrl = `${this.apiServerUrl}/users/preferences`;
+  }
+
+  /**
+   * Get the singleton instance of the UserPreferencesService.
+   * @returns {UserPreferencesService} The singleton instance of the UserPreferencesService.
+   */
+  static getInstance(): UserPreferencesService {
+    if (!UserPreferencesService.instance) {
+      UserPreferencesService.instance = new UserPreferencesService();
+    }
+    return UserPreferencesService.instance;
   }
 
   /**
@@ -72,17 +77,6 @@ export default class UserPreferencesService {
   }
 
   /**
-   * Get the singleton instance of the UserPreferencesService.
-   * @returns {UserPreferencesService} The singleton instance of the UserPreferencesService.
-   */
-  static getInstance(): UserPreferencesService {
-    if (!UserPreferencesService.instance) {
-      UserPreferencesService.instance = new UserPreferencesService();
-    }
-    return UserPreferencesService.instance;
-  }
-
-  /**
    * Creates an entry for the user preferences of a user with an ID.
    * This is used to create a user profile for the first time.
    * you provide user_id and invitation_code
@@ -97,10 +91,10 @@ export default class UserPreferencesService {
       serviceName,
       serviceFunction,
       method,
-      this.createUserPreferencesEndpointURL
+      this.userPreferencesEndpointUrl
     );
     const requestBody = JSON.stringify(user_preferences);
-    const response = await customFetch(this.createUserPreferencesEndpointURL, {
+    const response = await customFetch(this.userPreferencesEndpointUrl, {
       method: method,
       headers: {
         "Content-Type": "application/json",
@@ -129,11 +123,11 @@ export default class UserPreferencesService {
       serviceName,
       serviceFunction,
       method,
-      this.updateUserPreferencesEndpointUrl
+      this.userPreferencesEndpointUrl
     );
 
     const requestBody = JSON.stringify(newUserPreferencesSpec);
-    const response = await customFetch(this.updateUserPreferencesEndpointUrl, {
+    const response = await customFetch(this.userPreferencesEndpointUrl, {
       method: method,
       headers: {
         "Content-Type": "application/json",
@@ -158,7 +152,7 @@ export default class UserPreferencesService {
     const serviceName = UserPreferencesService.serviceName;
     const serviceFunction = "getUserPreferences";
     const method = "GET";
-    const qualifiedURL = `${this.getUserPreferencesEndpointUrl}?user_id=${userId}`;
+    const qualifiedURL = `${this.userPreferencesEndpointUrl}?user_id=${userId}`;
     const errorFactory = getRestAPIErrorFactory("UserPreferencesService", "getUserPreferences", method, qualifiedURL);
 
     const response = await customFetch(qualifiedURL, {
@@ -186,7 +180,7 @@ export default class UserPreferencesService {
     const serviceName = UserPreferencesService.serviceName;
     const serviceFunction = "getNewSession";
     const method = "GET";
-    const qualifiedURL = `${this.generateNewSessionEndpointUrl}?user_id=${userId}`;
+    const qualifiedURL = `${this.userPreferencesEndpointUrl}/new-session?user_id=${userId}`;
 
     const errorFactory = getRestAPIErrorFactory("UserPreferencesService", "getNewSession", method, qualifiedURL);
 
@@ -204,5 +198,3 @@ export default class UserPreferencesService {
     return this.parseJsonResponse(responseBody, userId, errorFactory);
   }
 }
-
-export const userPreferencesService = UserPreferencesService.getInstance();

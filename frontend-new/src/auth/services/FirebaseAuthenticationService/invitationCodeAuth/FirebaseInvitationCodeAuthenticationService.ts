@@ -9,7 +9,7 @@ import { PersistentStorageService } from "src/app/PersistentStorageService/Persi
 import { AuthenticationServices, TabiyaUser } from "src/auth/auth.types";
 import { invitationsService } from "src/auth/services/invitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
-import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import AuthenticationService from "src/auth/services/Authentication.service";
@@ -48,7 +48,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
       "InvitationCodeAuthService",
       "handleInvitationCodeLogin",
       "POST",
-      "signInAnonymously"
+      "signInAnonymously",
     );
     let userCredential;
     let invitation;
@@ -60,7 +60,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
     if (invitation.invitation_type !== InvitationType.AUTO_REGISTER) {
       throw firebaseErrorFactory(
         FirebaseErrorCodes.INVALID_INVITATION_TYPE,
-        `the invitation code is not for login: ${code}`
+        `the invitation code is not for login: ${code}`,
       );
     }
     try {
@@ -86,14 +86,14 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
     if (!_user) {
       throw firebaseErrorFactory(
         FirebaseErrorCodes.USER_NOT_FOUND,
-        `user could not be extracted from token: ...${token.slice(-20)}`
+        `user could not be extracted from token: ...${token.slice(-20)}`,
       );
     }
 
     // create user preferences for the first time.
     // in order to do this, there needs to be a logged in user in the persistent storage
     PersistentStorageService.setToken(token);
-    const prefs = await userPreferencesService.createUserPreferences({
+    const prefs = await UserPreferencesService.getInstance().createUserPreferences({
       user_id: _user.id,
       invitation_code: invitation.invitation_code,
       language: Language.en,
@@ -173,11 +173,11 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
     const { isValid: isValidFirebaseToken, failureCause: firebaseTokenValidationFailureCause } =
       this.stdFirebaseAuthServiceInstance.isFirebaseTokenValid(
         decodedToken as FirebaseToken,
-        FirebaseTokenProvider.ANONYMOUS
+        FirebaseTokenProvider.ANONYMOUS,
       );
     if (!isValidFirebaseToken) {
       console.debug(
-        `token is not a valid firebase token: ${firebaseTokenValidationFailureCause} - ${formatTokenForLogging(token)}`
+        `token is not a valid firebase token: ${firebaseTokenValidationFailureCause} - ${formatTokenForLogging(token)}`,
       );
       return { isValid: false, decodedToken: null, failureCause: firebaseTokenValidationFailureCause! };
     }

@@ -10,7 +10,7 @@ import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIErro
 import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { useNavigate } from "react-router-dom";
-import { userPreferencesService } from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { routerPaths } from "src/app/routerPaths";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import authStateService from "src/auth/services/AuthenticationState.service";
@@ -79,7 +79,7 @@ const Consent: React.FC = () => {
         accepted_tc: new Date(),
       };
       setIsAccepting(true);
-      const prefs = await userPreferencesService.updateUserPreferences(newUserPreferenceSpecs);
+      const prefs = await UserPreferencesService.getInstance().updateUserPreferences(newUserPreferenceSpecs);
 
       UserPreferencesStateService.getInstance().setUserPreferences({
         ...prefs,

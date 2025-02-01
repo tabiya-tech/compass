@@ -2,16 +2,16 @@ import "src/_test_utilities/consoleMock";
 import AuthenticationService, { TokenValidationFailureCause } from "./Authentication.service";
 import { jwtDecode } from "jwt-decode";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import UserPreferencesService, {
-  userPreferencesService,
-} from "src/userPreferences/UserPreferencesService/userPreferences.service";
-import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import { Language, UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { TabiyaUser, Token, TokenHeader } from "src/auth/auth.types";
 import AuthenticationStateService from "./AuthenticationState.service";
 
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
+import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
+import { nanoid } from "nanoid";
 
 // Mock jwt-decode
 jest.mock("jwt-decode", () => ({
@@ -28,33 +28,38 @@ jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => ({
   },
 }));
 
-// Mock userPreferencesService
-jest.mock("src/userPreferences/UserPreferencesService/userPreferences.service", () => ({
-  userPreferencesService: {
-    getUserPreferences: jest.fn(),
-    createUserPreferences: jest.fn(),
-  },
-}));
-
-// Create a child class of AuthenticationService for testing
+// The AuthenticationService class is an abstract class that defines the interface for all authentication services.
+// In this test, we will test only the methods that are not abstract and have a default implementation.
+// For doing that we will create simple test class that extends AuthenticationService and implements the abstract methods.
 class TestAuthenticationService extends AuthenticationService {
   static getInstance(): TestAuthenticationService {
     return new TestAuthenticationService();
   }
+
   refreshToken(): Promise<void> {
-    return Promise.resolve();
+    throw new Error("Method not implemented.");
   }
-  cleanup(): void {}
+
+  cleanup(): void {
+    throw new Error("Method not implemented.");
+  }
+
   logout(): Promise<void> {
-    return Promise.resolve();
+    throw new Error("Method not implemented.");
   }
-  getUser(token: string): TabiyaUser | null {
-    return {
-      id: "test-id",
-      name: "Test User",
-      email: "test@example.com",
-    };
+
+  getUser(_token: string): TabiyaUser | null {
+    throw new Error("Method not implemented.");
   }
+}
+
+function getTestUser(): TabiyaUser {
+  const _id = nanoid();
+  return {
+    id: _id,
+    name: _id + "-name",
+    email: _id + "-email",
+  };
 }
 
 describe("AuthenticationService", () => {
@@ -62,18 +67,25 @@ describe("AuthenticationService", () => {
 
   beforeEach(() => {
     service = TestAuthenticationService.getInstance();
-  });
-
-  afterEach(() => {
     jest.clearAllMocks();
+
+    // Reset the state of all singletons
+    AuthenticationStateService.getInstance().setUser(null);
+    UserPreferencesStateService.getInstance().clearUserPreferences();
+
+    // Reset all method mocks on the singletons that may have been mocked
+    // As a good practice, we should the mock*Once() methods to avoid side effects between tests
+    // As a precaution, we reset all method mocks to ensure that no side effects are carried over between tests
+    resetAllMethodMocks(UserPreferencesService.getInstance());
   });
 
   describe("onSuccessfulLogout", () => {
-    beforeEach(() => {
+
+    test("should clear user data and login method", async () => {
+      // setup mocks
       jest.spyOn(AuthenticationStateService.getInstance(), "clearUser");
       jest.spyOn(UserPreferencesStateService.getInstance(), "clearUserPreferences");
-    });
-    test("should clear user data and login method", async () => {
+      jest.spyOn(PersistentStorageService, "clearLoginMethod");
       // WHEN onSuccessfulLogout is called
       await service.onSuccessfulLogout();
 
@@ -81,7 +93,7 @@ describe("AuthenticationService", () => {
       expect(AuthenticationStateService.getInstance().clearUser).toHaveBeenCalled();
 
       // AND the user preferences state should be cleared
-      expect(service["userPreferencesStateService"].clearUserPreferences).toHaveBeenCalled();
+      expect(UserPreferencesStateService.getInstance().clearUserPreferences).toHaveBeenCalled();
 
       // AND the login method should be cleared from persistent storage
       expect(PersistentStorageService.clearLoginMethod).toHaveBeenCalled();
@@ -89,62 +101,60 @@ describe("AuthenticationService", () => {
   });
 
   describe("onSuccessfulLogin", () => {
-    const givenToken = "test-token";
-    const givenUser = {
-      id: "test-id",
-      name: "Test User",
-      email: "test@example.com",
-    };
-
-    beforeEach(() => {
-      jest.spyOn(AuthenticationStateService.getInstance(), "setUser");
-      jest.spyOn(UserPreferencesStateService.getInstance(), "setUserPreferences");
-    });
 
     test("should set user data and preferences on successful login", async () => {
-      // GIVEN a user exists in the token
-      jest.spyOn(service, "getUser").mockReturnValue(givenUser);
-
-      // AND user preferences exist
-      const givenPrefs = { language: Language.en };
-      (userPreferencesService.getUserPreferences as jest.Mock).mockResolvedValue(givenPrefs);
+      // GIVEN a token from a given user
+      const givenToken = "test-token";
+      const givenUser = getTestUser();
+      jest.spyOn(service, "getUser").mockImplementationOnce((token) => {
+        if (token === givenToken) {
+          return givenUser;
+        }
+        return null;
+      });
+      // AND the given user has some preferences
+      const givenPrefs = { foo: "bar" } as unknown as UserPreference; // UserPreference
+      jest.spyOn(UserPreferencesService.getInstance(), "getUserPreferences").mockResolvedValueOnce(givenPrefs);
 
       // WHEN onSuccessfulLogin is called
       await service.onSuccessfulLogin(givenToken);
 
       // THEN the token should be stored
       expect(PersistentStorageService.setToken).toHaveBeenCalledWith(givenToken);
-
       // AND the user should be set in the authentication state
-      expect(AuthenticationStateService.getInstance().setUser).toHaveBeenCalledWith(givenUser);
+      expect(AuthenticationStateService.getInstance().getUser()).toEqual(givenUser);
+      // AND the user preferences were fetched for given user
+      expect(UserPreferencesService.getInstance().getUserPreferences).toHaveBeenCalledWith(givenUser.id);
+      // AND the user preferences should be set in the state
+      expect(UserPreferencesStateService.getInstance().getUserPreferences()).toEqual(givenPrefs);
 
-      // AND the user preferences should be fetched and set
-      expect(userPreferencesService.getUserPreferences).toHaveBeenCalledWith(givenUser.id);
-      expect(service["userPreferencesStateService"].setUserPreferences).toHaveBeenCalledWith(givenPrefs);
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
 
     test("should throw error when user is not found in token", async () => {
-      // GIVEN no user exists in the token
+      // GIVEN some token that does not contain a user
       jest.spyOn(service, "getUser").mockReturnValue(null);
 
-      // WHEN onSuccessfulLogin is called
-      const loginPromise = service.onSuccessfulLogin(givenToken);
+      // WHEN onSuccessfulLogin is called with the token
+      const loginPromise = service.onSuccessfulLogin("some token");
 
       // THEN it should throw an error
       await expect(loginPromise).rejects.toThrow("User not found in the token");
     });
 
     test("should not throw error when user preferences are not found", async () => {
-      // GIVEN a user exists in the token
+      // GIVEN a token from a given user
       const givenToken = "test-token";
-      const givenUser = {
-        id: "test-id",
-        name: "Test User",
-        email: "test@example.com",
-      };
-      jest.spyOn(service, "getUser").mockReturnValue(givenUser);
-
-      // AND user preferences service throws a 404 error
+      const givenUser = getTestUser();
+      jest.spyOn(service, "getUser").mockImplementationOnce((token) => {
+        if (token === givenToken) {
+          return givenUser;
+        }
+        return null;
+      });
+      // AND getting the user preferences service throws a 404 error
       const givenError = new RestAPIError(
         UserPreferencesService.serviceName,
         "getUserPreferences",
@@ -152,80 +162,99 @@ describe("AuthenticationService", () => {
         "/",
         StatusCodes.NOT_FOUND,
         "Not Found",
-        ""
+        "",
       );
-      (userPreferencesService.getUserPreferences as jest.Mock).mockRejectedValue(givenError);
+      jest.spyOn(UserPreferencesService.getInstance(), "getUserPreferences").mockRejectedValueOnce(givenError);
 
       // WHEN onSuccessfulLogin is called
       await service.onSuccessfulLogin(givenToken);
 
       // THEN the token should be stored
       expect(PersistentStorageService.setToken).toHaveBeenCalledWith(givenToken);
-
       // AND the user should be set in the authentication state
-      expect(AuthenticationStateService.getInstance().setUser).toHaveBeenCalledWith(givenUser);
-
-      // AND user preferences should have been attempted to be fetched
-      expect(userPreferencesService.getUserPreferences).toHaveBeenCalledWith(givenUser.id);
-
+      expect(AuthenticationStateService.getInstance().getUser()).toEqual(givenUser);
+      // AND user preferences were fetched for given user
+      expect(UserPreferencesService.getInstance().getUserPreferences).toHaveBeenCalledWith(givenUser.id);
       // AND user preferences should not be set since they weren't found
-      expect(service["userPreferencesStateService"].setUserPreferences).not.toHaveBeenCalled();
-
+      expect(UserPreferencesStateService.getInstance().getUserPreferences()).toBeNull();
       // AND an info message should be logged
       expect(console.info).toHaveBeenCalledWith(
-        `User has not registered! Preferences could not be found for userId: ${givenUser.id}`
+        `User has not registered! Preferences could not be found for userId: ${givenUser.id}`,
       );
-
-      // AND the error should not be rethrown
+      // AND no error should be logged
       expect(console.error).not.toHaveBeenCalled();
+    });
+
+    test("should throw error when getting user preferences fails", async () => {
+      // GIVEN a token from a given user
+      const givenToken = "test-token";
+      const givenUser = getTestUser();
+      jest.spyOn(service, "getUser").mockImplementationOnce((token) => {
+        if (token === givenToken) {
+          return givenUser;
+        }
+        return null;
+      });
+
+      // AND getting the user preferences throws an error
+      const givenError = new Error("Foo");
+      jest.spyOn(UserPreferencesService.getInstance(), "getUserPreferences").mockRejectedValueOnce(givenError);
+
+      // WHEN onSuccessfulLogin is called with the given token
+      // THEN the error should be thrown
+      await expect(service.onSuccessfulLogin(givenToken)).rejects.toThrow(givenError);
     });
   });
 
   describe("onSuccessfulRegistration", () => {
-    const givenToken = "test-token";
-    const givenRegistrationCode = "test-code";
-    const givenUser = {
-      id: "test-id",
-      name: "Test User",
-      email: "test@example.com",
-    };
-
-    beforeEach(() => {
-      jest.spyOn(AuthenticationStateService.getInstance(), "setUser");
-      jest.spyOn(UserPreferencesStateService.getInstance(), "setUserPreferences");
-    });
 
     test("should set user data and create preferences on successful registration", async () => {
-      // GIVEN a user exists in the token
-      jest.spyOn(service, "getUser").mockReturnValue(givenUser);
+      // GIVEN a registration code
+      const givenRegistrationCode = "test-registration-code";
+      // AND a token from a given user
+      const givenToken = "test-token";
+      const givenUser = getTestUser();
+      jest.spyOn(service, "getUser").mockImplementationOnce((token) => {
+        if (token === givenToken) {
+          return givenUser;
+        }
+        return null;
+      });
 
-      // AND user preferences are created successfully
-      const givenPrefs = { language: Language.en };
-      (userPreferencesService.createUserPreferences as jest.Mock).mockResolvedValue(givenPrefs);
+      // AND some user preferences will be created for the user
+      const givenReturnedPrefs = { foo: "bar" } as unknown as UserPreference;
+      jest.spyOn(UserPreferencesService.getInstance(), "createUserPreferences").mockResolvedValueOnce(givenReturnedPrefs);
 
-      // WHEN onSuccessfulRegistration is called
+      // WHEN onSuccessfulRegistration is called for the given token and registration code
       await service.onSuccessfulRegistration(givenToken, givenRegistrationCode);
 
       // THEN the token should be stored
       expect(PersistentStorageService.setToken).toHaveBeenCalledWith(givenToken);
 
       // AND the user should be set in the authentication state
-      expect(AuthenticationStateService.getInstance().setUser).toHaveBeenCalledWith(givenUser);
+      expect(AuthenticationStateService.getInstance().getUser()).toEqual(givenUser);
 
-      // AND new user preferences should be created
-      expect(userPreferencesService.createUserPreferences).toHaveBeenCalledWith({
+      // AND new user preferences should be created for the user with the registration code
+      expect((UserPreferencesService.getInstance().createUserPreferences)).toHaveBeenCalledWith({
         user_id: givenUser.id,
         invitation_code: givenRegistrationCode,
         language: Language.en,
       });
 
-      // AND the preferences should be set in the state
-      expect(service["userPreferencesStateService"].setUserPreferences).toHaveBeenCalledWith(givenPrefs);
+      // AND the preferences return from the service should be set in the state
+      expect(UserPreferencesStateService.getInstance().getUserPreferences()).toEqual(givenReturnedPrefs);
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
 
     test("should throw error when user is not found in token", async () => {
-      // GIVEN no user exists in the token
+      // GIVEN some token that does not contain a user
+      const givenToken = "test-token";
       jest.spyOn(service, "getUser").mockReturnValue(null);
+      // AND some registration code
+      const givenRegistrationCode = "test-registration-code";
 
       // WHEN onSuccessfulRegistration is called
       const registrationPromise = service.onSuccessfulRegistration(givenToken, givenRegistrationCode);
@@ -236,34 +265,34 @@ describe("AuthenticationService", () => {
   });
 
   describe("onSuccessfulRefresh", () => {
-    const givenToken = "refreshed-token";
-    const givenUser = {
-      id: "test-id",
-      name: "Test User",
-      email: "test@example.com",
-    };
-
-    beforeEach(() => {
-      jest.spyOn(AuthenticationStateService.getInstance(), "setUser");
-      jest.spyOn(UserPreferencesStateService.getInstance(), "setUserPreferences");
-    });
-
     test("should update token and user data on successful refresh", async () => {
-      // GIVEN a user exists in the token
-      jest.spyOn(service, "getUser").mockReturnValue(givenUser);
+      // GIVEN a token from a given user
+      const givenToken = "test-token";
+      const givenUser = getTestUser();
+      jest.spyOn(service, "getUser").mockImplementationOnce((token) => {
+        if (token === givenToken) {
+          return givenUser;
+        }
+        return null;
+      });
 
-      // WHEN onSuccessfulRefresh is called
+      // WHEN onSuccessfulRefresh is called for the given token
       await service.onSuccessfulRefresh(givenToken);
 
-      // THEN the token should be stored
+      // THEN the token should be stored in the persistent storage
       expect(PersistentStorageService.setToken).toHaveBeenCalledWith(givenToken);
 
       // AND the user should be set in the authentication state
-      expect(AuthenticationStateService.getInstance().setUser).toHaveBeenCalledWith(givenUser);
+      expect(AuthenticationStateService.getInstance().getUser()).toEqual(givenUser);
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
 
     test("should throw error when user is not found in token", async () => {
-      // GIVEN no user exists in the token
+      // GIVEN some token that does not contain a user
+      const givenToken = "test-token";
       jest.spyOn(service, "getUser").mockReturnValue(null);
 
       // WHEN onSuccessfulRefresh is called
@@ -302,6 +331,10 @@ describe("AuthenticationService", () => {
       expect(result.isValid).toBe(true);
       expect(result.decodedToken).toBeDefined();
       expect(result.failureCause).toBeUndefined();
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
 
     test.each([
@@ -320,6 +353,10 @@ describe("AuthenticationService", () => {
       expect(result.isValid).toBe(false);
       expect(result.decodedToken).toBeNull();
       expect(result.failureCause).toBe(expectedFailureCause);
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
 
     test.each([
@@ -343,6 +380,10 @@ describe("AuthenticationService", () => {
       expect(result.isValid).toBe(false);
       expect(result.decodedToken).toBeNull();
       expect(result.failureCause).toBe(expectedFailureCause);
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
 
     test("should return false when token decoding fails", () => {
@@ -359,6 +400,11 @@ describe("AuthenticationService", () => {
       expect(result.isValid).toBe(false);
       expect(result.decodedToken).toBeNull();
       expect(result.failureCause).toBe(TokenValidationFailureCause.ERROR_DECODING_TOKEN);
+
+      // AND expect the error to have been logged
+      expect(console.error).toHaveBeenCalled();
+      // AND expect no warning to have occurred
+      expect(console.warn).not.toHaveBeenCalled();
     });
   });
 });
