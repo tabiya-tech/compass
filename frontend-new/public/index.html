@@ -6,8 +6,8 @@
     <meta name="theme-color" content="#fff" />
     <script defer src="%PUBLIC_URL%/data/env.js"></script>
     <meta
-      name="Compass"
-      content="Compass is an AI chatbot designed to assist job-seekers in exploring and discovering their skills."
+      name="description"
+      content="Welcome to Compass! An AI-powered career assistant that helps jobseekers identify and showcase their skills. Join now to create a digital profile and connect with new opportunities."
     />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, interactive-widget=resizes-content" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/compass.svg" />
@@ -26,6 +26,32 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Compass</title>
+
+    <!-- JSON-LD Structured Data for SEO -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Compass by Tabiya",
+        "url": "https://www.tabiya.org/compass",
+        "image": "https://storage.cloud.google.com/compass-dev-bucket-frontend-517e693/logo.svg",
+        "description": "Compass is an AI-powered conversational tool that helps jobseekers discover and articulate their skills. Through natural dialogue, Compass guides users to identify abilities gained through all types of work—formal, informal, and unpaid. It creates standardized digital profiles that can connect to opportunities.",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "All",
+        "license": "https://opensource.org/licenses/MIT",
+        "creator": {
+          "@type": "Organization",
+          "name": "Tabiya",
+          "url": "https://www.tabiya.org/",
+          "logo": "https://frontend-bucket-e23066f.s3.eu-central-1.amazonaws.com/TabiyaLogo.svg"
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      }
+    </script>
   </head>
   <body id="body">
     <noscript>You need to enable JavaScript to run this app.</noscript>
