@@ -22,8 +22,8 @@ import UserPreferencesStateService from "src/userPreferences/UserPreferencesStat
 import { ConversationMessage, ConversationMessageSender } from "./ChatService/ChatService.types";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import ExperiencesDrawer from "src/experiences/experiencesDrawer/ExperiencesDrawer";
-import { Experience } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
-import ExperienceService from "src/experiences/experiencesDrawer/experienceService/experienceService";
+import { Experience } from "src/experiences/experienceService/experiences.types";
+import ExperienceService from "src/experiences/experienceService/experienceService";
 import InactiveBackdrop from "src/theme/Backdrop/InactiveBackdrop";
 import ConfirmModalDialog from "src/theme/confirmModalDialog/ConfirmModalDialog";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
@@ -63,7 +63,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const [exploredExperiences, setExploredExperiences] = useState<number>(0);
   const [conversationConductedAt, setConversationConductedAt] = useState<string | null>(null);
   const [currentMessage, setCurrentMessage] = useState<string>("");
-  const [isTyping, setIsTyping] = useState<boolean>(false); // TODO rename to aiIsTyping
+  const [aiIsTyping, setAiIsTyping] = useState<boolean>(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [experiences, setExperiences] = React.useState<Experience[]>([]);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
@@ -160,7 +160,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   // Goes to the chat service to send a message
   const sendMessage = useCallback(
     async (userMessage: string, sessionId: number) => {
-      setIsTyping(true);
+      setAiIsTyping(true);
       if (currentMessage) {
         // optimistically add the user's message for a more responsive feel
         const message = generateUserMessage(currentMessage, new Date().toISOString());
@@ -178,7 +178,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         }
 
         response.messages.forEach((messageItem) =>
-          addMessage(generateCompassMessage(messageItem.message, messageItem.sent_at)),
+          addMessage(generateCompassMessage(messageItem.message_id, messageItem.message, messageItem.sent_at, messageItem.reaction)),
         );
 
         setConversationCompleted(response.conversation_completed);
@@ -190,7 +190,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         console.error(new ChatError("Failed to send message:", error as Error));
         addMessage(generatePleaseRepeatMessage());
       } finally {
-        setIsTyping(false);
+        setAiIsTyping(false);
       }
     },
     [currentMessage, exploredExperiences, checkAndAddConversationConclusionMessage],
@@ -204,7 +204,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         return false;
       }
 
-      setIsTyping(true);
+      setAiIsTyping(true);
       let sessionId: number | null = currentSessionId;
 
       try {
@@ -230,7 +230,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
             history.messages.map((message: ConversationMessage) =>
               message.sender === ConversationMessageSender.USER
                 ? generateUserMessage(message.message, message.sent_at)
-                : generateCompassMessage(message.message, message.sent_at),
+                : generateCompassMessage(message.message_id, message.message, message.sent_at, message.reaction),
             ),
           );
 
@@ -264,7 +264,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         }
         return false;
       } finally {
-        setIsTyping(false);
+        setAiIsTyping(false);
       }
     },
     [checkAndAddConversationConclusionMessage, sendMessage],
@@ -367,8 +367,8 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
   // add a message when the compass is typing
   useEffect(() => {
-    addOrRemoveTypingMessage(isTyping);
-  }, [isTyping]);
+    addOrRemoveTypingMessage(aiIsTyping);
+  }, [aiIsTyping]);
 
   return (
     <>
@@ -410,7 +410,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
             <Box sx={{ flexShrink: 0, padding: theme.tabiyaSpacing.lg, paddingTop: theme.tabiyaSpacing.xs }}>
               <ChatMessageField
                 handleSend={handleSend}
-                aiIsTyping={isTyping}
+                aiIsTyping={aiIsTyping}
                 isChatFinished={conversationCompleted}
                 message={currentMessage}
                 notifyChange={setCurrentMessage}

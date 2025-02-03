@@ -28,7 +28,7 @@ describe("ChatService", () => {
 
     // AND the service should have the correct endpoint urls
     expect(actualFirstInstance.apiServerUrl).toEqual(givenApiServerUrl);
-    expect(actualFirstInstance.chatEndpointUrl).toEqual(`${givenApiServerUrl}/conversation`);
+    expect(actualFirstInstance.chatEndpointUrl).toEqual(`${givenApiServerUrl}/conversations`);
 
     // AND WHEN the service is constructed again
     const actualSecondInstance = ChatService.getInstance();
