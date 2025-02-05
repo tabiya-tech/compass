@@ -67,7 +67,7 @@ def main():
     # for now api_gateway_config
     deployment_id = get_deployment_id(
         deployment_number=run_number,
-        deploy_version=backend_version)
+        artifacts_version=backend_version)
 
     # Deploy the backend
     deploy_backend(

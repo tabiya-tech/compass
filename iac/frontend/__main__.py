@@ -36,7 +36,12 @@ def main():
     run_number = getenv("DEPLOYMENT_RUN_NUMBER")
 
     # the deployment id, used to know, which source folder to get artifacts from.
-    deployment_id = get_deployment_id(deployment_number=run_number, deploy_version=frontend_version, stack_name=stack_name)
+
+    deployment_id = get_deployment_id(
+        deployment_number=run_number,
+        artifacts_version=frontend_version,
+        stack_name=stack_name
+    )
 
     # Deploy the frontend
     deploy_frontend(

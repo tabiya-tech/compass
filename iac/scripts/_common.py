@@ -5,12 +5,9 @@ import sys
 import yaml
 
 from typing import List, Mapping, Any
-from dataclasses import dataclass
 
 import pulumi.automation as auto
 from google.cloud.secretmanager import SecretManagerServiceClient, AddSecretVersionRequest
-
-from dotenv import dotenv_values
 
 # Determine the absolute path to the 'iac' directory
 iac_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -19,67 +16,22 @@ iac_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, iac_dir)
 
 from environment.env_types import EnvironmentTypes
-from lib.std_pulumi import get_realm_and_env_name_from_stack, save_content_in_file, get_pulumi_stack_outputs
-
-
-@dataclass
-class StackConfigs:
-    realm_name: str
-
-    stack_name: str
-    env_name: str
-    env_type: str
-    deployment_type: str
-
-    environment: Mapping[str, Any]
-    auth: Mapping[str, Any]
-    backend: Mapping[str, Any]
-    frontend: Mapping[str, Any]
-    common: Mapping[str, Any]
-    aws_ns: Mapping[str, Any]
-
-    @staticmethod
-    def from_dict(env_config_dict: dict) -> "StackConfigs":
-        """
-        Creates an Environment Config object from the yml config.
-        If some of the fields in the config dict are not present, it will raise an error.
-
-        :param env_config_dict: The environment configuration dictionary.
-        :return:
-        """
-
-        # Please use ["key"] instead of .get("key") to avoid None values.
-        # So that we ensure keys are available in the config dict, otherwise raise an error.
-
-        _stack_name = env_config_dict["stack_name"]
-        realm_name, env_name = get_realm_and_env_name_from_stack(_stack_name)
-        environment_config = env_config_dict["environment"]["config"]
-
-        return StackConfigs(
-            realm_name=realm_name,
-            stack_name=_stack_name,
-            env_name=env_name,
-            env_type=environment_config["environment_type"],
-            deployment_type=environment_config["deployment_type"],
-            environment=env_config_dict["environment"],
-            auth=env_config_dict["auth"],
-            backend=env_config_dict["backend"],
-            frontend=env_config_dict["frontend"],
-            common=env_config_dict["common"],
-            aws_ns=env_config_dict["aws-ns"]
-        )
+from lib.std_pulumi import get_pulumi_stack_outputs
+from _types import IaCModules, StackConfigs
 
 
 # =======================
 # Pulumi Actions
 # =======================
 
-def run_pulumi_up(stack_name: str, module: str):
+def run_pulumi_up(stack_name: str, module: IaCModules):
     """
-    Run pulumi up for the given stack and workspace.
+    Run pulumi up for the given stack
     """
+
     print(f"Running pulumi up on stack: {stack_name}/{module}")
-    stack_project_path = os.path.join(iac_dir, module)
+
+    stack_project_path = os.path.join(iac_dir, module.value)
 
     stack = auto.create_or_select_stack(
         work_dir=stack_project_path,
@@ -94,67 +46,42 @@ def run_pulumi_up(stack_name: str, module: str):
     return up_results
 
 
-def run_pulumi_destroy(stack_name: str, module: str):
+def run_pulumi_destroy(stack_name: str, module: IaCModules):
     """
-    Run pulumi destroy for the given stack and workspace.
+    Run pulumi destroy for the given stack
     """
 
-    print(f"Running pulumi destroy on stack: {stack_name}/{module}")
-    stack_project_path = os.path.join(iac_dir, module)
+    print(f"Running pulumi destroy on stack: {stack_name}/{module.value}")
+
+    stack_project_path = os.path.join(iac_dir, module.value)
 
     stack = auto.create_or_select_stack(
         work_dir=stack_project_path,
         stack_name=stack_name,
     )
 
-    stack.destroy(
+    destroy_result = stack.destroy(
         color="always",
+        # remove the pulumi stack after destroying it, and delete the local yaml config file.
         remove=True,
         on_output=print,
     )
+
+    return destroy_result
 
 
 # =======================
 # Files Actions
 # =======================
 
-def write_config_to_pulumi_yml_file(*, stack_name: str, module: str, content: Mapping[str, Any]):
+def write_config_to_pulumi_yml_file(*, stack_name: str, module: IaCModules, content: Mapping[str, Any]):
     """
     Write the stack configuration to the pulumi yaml file (Pulumi.{stack_name}.yaml).
     """
-    file_path = os.path.join(iac_dir, module, f"Pulumi.{stack_name}.yaml")
+    file_path = os.path.join(iac_dir, module.value, f"Pulumi.{stack_name}.yaml")
     with open(file_path, "w", encoding="utf-8") as file:
         yaml.dump(content, file, default_flow_style=False, allow_unicode=True)
     print(f"Pulumi config written to file: {file_path}")
-
-
-def upsert_env_file_variable(env_file_path: str, variable_name: str, variable_value: str):
-    """
-    Upsert the variable value in the .env file.
-    """
-
-    current_values = dotenv_values(env_file_path)
-
-    # keep the env file content
-    with open(env_file_path, "r") as file:
-        env_file_content = file.read()
-
-    # if it is the same value do not change anything
-    if current_values.get(variable_name) == variable_value:
-        return
-
-    # if the value is not there, set it
-    if not current_values.get(variable_name):
-        current_values[variable_name] = variable_value
-        with open(env_file_path, "a") as file:
-            file.write(f"{variable_name}={variable_value}\n")
-
-
-    # if the value is different, update it
-    else:
-        env_file_content = env_file_content.replace(f"{variable_name}={current_values[variable_name]}",
-                                                    f"{variable_name}={variable_value}")
-        save_content_in_file(env_file_path, env_file_content)
 
 
 # =======================
@@ -170,15 +97,22 @@ def get_secret_latest_version(secret_name: str) -> str:
     """
     secret_manager_service = SecretManagerServiceClient()
 
-    latest_secret_name = f"{secret_name}/versions/latest"
+    latest_secret_value = f"{secret_name}/versions/latest"
+    print("Getting the latest secret version: ", latest_secret_value)
     secret_value = secret_manager_service.access_secret_version(
-        name=latest_secret_name
+        name=latest_secret_value
     )
 
     return secret_value.payload.data.decode("utf-8")
 
 
-def upload_environment_secrets_to_secret_manager(*, secret_name: str, env_file_path: str):
+def upload_env_file_content_to_sm(*, secret_name: str, env_file_path: str):
+    """
+    Upload the .env file to the secret manager.
+    """
+
+    print(f"uploading the .env file to the secret manager... on secret: {secret_name} from file: {env_file_path}")
+
     # Upload the .env file to the secret manager of the environment's project.
     with open(env_file_path, "r", encoding="utf-8") as file:
         env_file_content = file.read()
@@ -191,16 +125,17 @@ def upload_environment_secrets_to_secret_manager(*, secret_name: str, env_file_p
 
 
 # =======================
-# Environment Stacks Config Actions
+# Environment/Stack Configs Actions
 # =======================
 
 def download_ream_environments_configs(realm_name: str) -> List[StackConfigs]:
     """
-    Download the environments configurations for the realm from the realm's secrets.
+    Download the realm -> environments -> stack configurations.
 
-    :param realm_name: The realm name
-    :return: An array of environment configurations for the environments. If no environment configuration is found, an empty array is returned.
+    :param realm_name: The realm name :return: An array of environment configurations for the environments. If no
+                        environment configuration is found, an empty array is returned.
     """
+    print(f"Downloading the realm {realm_name} environments configurations...")
 
     # get the realm environments configurations from the realm's secrets.
     realm_outputs = get_pulumi_stack_outputs(realm_name, "realm")
@@ -240,9 +175,9 @@ def get_environment_stack_configs_by_env_type(realm_name: str, env_type: str) ->
     """
     Get the environments configurations by environment types from the realm's secrets.
 
-    :param realm_name: The realm name
-    :param env_type:  The environment type to use to filter the environments.
-    :return: An array of environment configurations for the environments. If no environment configuration is found, an empty array is returned.
+    :param realm_name: The realm name :param env_type:  The environment type to use to filter the environments.
+    :return: An array of environment configurations for the environments. If no environment configuration is found,
+             an empty array is returned.
     """
 
     realm_environments_config = download_ream_environments_configs(realm_name)

@@ -56,6 +56,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Parse Git branch Name")
     parser.add_argument("--branch-name", type=str, help="Branch name", required=True)
     parser.add_argument("--module", type=str, help="Module", choices=["be", "fe"], required=True)
+
     args = parser.parse_args()
     frontend_version, backend_version = parse_git_branch_name(args.branch_name)
 

@@ -14,29 +14,33 @@ function write_version_json() {
   cat "$_version_json_filename"
 }
 
-function report() {
+function save_report() {
   local _report_filename=$1
   local _deployable_version=$2
   local _version_json_filename=$3
+
   {
-    echo "## Frontend artifacts preparation summary"
-    echo "**status**: ✅ Successfully uploaded"
-    echo "**version**: \`$_deployable_version\`"
-    echo "**version.json**: "
+    echo "### Frontend artifacts packaging summary on $(date -u +%F' %T.%3N UTC')"
+    echo "**Date**: \`$(date -u +%F' %T.%3N UTC')\`     "
+    echo "**Status**: ✅ Successfully uploaded       "
+    echo "**Version**: \`$_deployable_version\`    "
+    echo "**version.json**:     "
     echo  "\`\`\`json"
     cat "$_version_json_filename"
     echo  "\`\`\`"
-    } >> "$_report_filename"
-  }
+    echo "-------"
+  } >> "$_report_filename"
+}
 
 function upload_frontend_artifacts {
   local _region=$1
   local _project_id=$2
   local _frontend_build_artifact_filename=$3
   local _artifact_version=$4
+
   # First delete the existing version if it exists
-  echo "info: deleting the existing frontend:$artifact_version version"
-  gcloud artifacts versions delete "$artifact_version" \
+  echo "info: deleting the existing frontend:$_artifact_version version"
+  gcloud artifacts versions delete "$_artifact_version" \
     --package=frontend \
     --repository=generic-repository \
     --location="$region" \
@@ -48,7 +52,7 @@ function upload_frontend_artifacts {
   gcloud artifacts generic upload --package=frontend \
     --repository=generic-repository \
     --location="$_region" \
-    --source=./$_frontend_build_artifact_filename \
+    --source=./"$_frontend_build_artifact_filename" \
     --project="$_project_id" \
     --version="$_artifact_version"
   if [ $? -ne 0 ]; then
@@ -77,10 +81,12 @@ EOF
   fi
 }
 
+
 #############################
 # Main script starts here
 #############################
 check_args "$@"
+
 
 #############################
 # Set the variables
@@ -103,19 +109,19 @@ echo "info: setting the report filename to $report_filename"
 
 build_run=$5
 echo "info: setting the build run to $build_run"
-# @IMPORTANT: The filename of the build artifact must match the value used in iac/frontend/prepare_frontend.py:FRONTEND_BUILD_NAME
 
+# @IMPORTANT: The filename of the build artifact must match the value used in iac/frontend/prepare_frontend.py:FRONTEND_BUILD_NAME
 frontend_build_artifact_filename="build.tar.gz"
 echo "info: setting the frontend build artifact filename to $frontend_build_artifact_filename"
-
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" # The directory where the script is located.
-echo "info: setting the script directory to $script_dir"
 
 # get the tag name or branch name
 git_branch_tag_name=$(git describe --exact-match --tags HEAD 2>/dev/null || git rev-parse --abbrev-ref HEAD)
 echo "info: setting the branch/tag name to $git_branch_tag_name"
 
 # parse the git branch name to filter out the invalid characters.
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" # The directory where the script is located.
+echo "info: setting the script directory to $script_dir"
+
 formatted_git_branch_tag_name=$("$script_dir/parse_git_branch_name.py" --branch-name="$git_branch_tag_name" --module=fe)
 echo "info: setting the formatted branch/tag name to $formatted_git_branch_tag_name"
 
@@ -127,6 +133,7 @@ echo "info: setting the artifact version to $artifact_version"
 
 version_json_filename="$source_path/build/data/version.json"
 echo "info: setting the version json filename to $version_json_filename"
+
 
 #############################
 # The pipeline starts here
@@ -155,6 +162,4 @@ upload_frontend_artifacts "$region" "$project_id" "$frontend_build_artifact_file
 rm ./$frontend_build_artifact_filename
 
 # 4. Report the summary
-report "$report_filename" "$artifact_version" "$version_json_filename"
-
-
+save_report "$report_filename" "$artifact_version" "$version_json_filename"
