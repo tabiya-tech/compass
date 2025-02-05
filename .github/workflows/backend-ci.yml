@@ -83,4 +83,4 @@ jobs:
         if: ${{ inputs.upload-artifacts }}
         # TODO: replace with the GCP_ROOT_PROJECT_ID after cleaning up the environments
         run: |
-          ./iac/scripts/build-and-upload-be.sh ${{ vars.ARTIFACT_REGISTRY_REGION }} ${{ vars._GCP_ROOT_PROJECT_ID }} ./backend
+          ./iac/scripts/build-and-upload-be.sh ${{ vars.ARTIFACT_REGISTRY_REGION }} ${{ vars.GCP_REALM_ROOT_PROJECT_ID }} ./backend

@@ -17,7 +17,7 @@ from lib import base64_encode, getenv, get_realm_and_env_name_from_stack, load_d
     get_deployment_id, parse_artifacts_version
 
 current_dir = os.path.join(iac_folder, "frontend")
-FRONTEND_ZIP_FILE_NAME = "build.tar.gz"
+FRONTEND_BUILD_ARTIFACT_FILENAME = "build.tar.gz"  # The actual frontend build artifact filename is specified in the iac/scripts/build-and-upload-fe.sh script
 
 ARTIFACTS_DIR = os.path.join(current_dir, "_tmp", "artifacts")
 DEPLOYMENTS_DIR = os.path.join(current_dir, "_tmp", "deployments")
@@ -82,7 +82,7 @@ def download_frontend_bundle(
             [
                 "tar",
                 "-xf",
-                FRONTEND_ZIP_FILE_NAME,
+                FRONTEND_BUILD_ARTIFACT_FILENAME,
             ],
             cwd=output_dir,
             check=True,
@@ -90,7 +90,7 @@ def download_frontend_bundle(
         )
 
         # clean up: remove the downloaded frontend build bundle.
-        os.remove(os.path.join(output_dir, FRONTEND_ZIP_FILE_NAME))
+        os.remove(os.path.join(output_dir, FRONTEND_BUILD_ARTIFACT_FILENAME))
 
         print("Done downloading the frontend build bundle.")
     except subprocess.CalledProcessError as e:
