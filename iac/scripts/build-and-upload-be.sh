@@ -178,6 +178,7 @@ poetry run -C ./"$source_path"  python3 "./$source_path/scripts/export_api_gatew
 
 # 2. Have a backup of the version json file name.
 cp "$version_json_filename" "$version_json_filename.bak"
+trap "echo info: cleaning up; mv \"$version_json_filename.bak\" \"$version_json_filename\"" EXIT
 
 # 3. Write the version info
 write_version_json "$version_json_filename" "$git_branch_tag_name" "$git_commit_sha" "$build_run"
@@ -192,4 +193,4 @@ upload_backend_config "$region" "$project_id" "$artifact_version" "$source_path"
 save_report "$report_filename" "$artifact_version" "$version_json_filename"
 
 # 7. Restore the version json file
-mv "$version_json_filename.bak" "$version_json_filename"
+#mv "$version_json_filename.bak" "$version_json_filename"
