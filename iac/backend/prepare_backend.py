@@ -14,26 +14,32 @@ current_dir = os.path.join(iac_folder, "backend")
 
 # the GCP API config file name
 # it should match the file name at `backend/scripts/convert_to_openapi2.py`
-GCP_API_GATEWAY_CONFIG_FILE = "api_gateway_config.yaml"
-CONFIGS_DIR = os.path.join(current_dir, "_tmp", "configs")
+api_gateway_config_file_name = "api_gateway_config.yaml"
+base_configuration_dir = os.path.join(current_dir, "_tmp", "configs")
 
 
 def download_backend_config(*,
                             realm_name: str,
                             deployment_number: str,
                             artifacts_version: str) -> None:
-    backend_version = parse_artifacts_version(artifacts_version).backend_version
-    _deployment_id = get_deployment_id(deployment_number=deployment_number, deploy_version=backend_version)
-    output_dir = os.path.join(CONFIGS_DIR, _deployment_id)
+    """
+    Download the backend configurations.
+    1. api gateway config file.
+    """
 
-    os.makedirs(output_dir, exist_ok=False)
-    print(f"Downloading the backend config to {output_dir}")
+    # construct the directory to save the backend config for this deployment.
+    backend_artifacts_version = parse_artifacts_version(artifacts_version).backend_version
+    deployment_id = get_deployment_id(deployment_number=deployment_number, artifacts_version=backend_artifacts_version)
+    backend_config_output_dir = os.path.join(base_configuration_dir, deployment_id)
+    os.makedirs(backend_config_output_dir, exist_ok=False)
 
-    # download the configurations.
     realm_outputs = get_pulumi_stack_outputs(stack_name=realm_name, module="realm")
     generic_repository = realm_outputs["generic_repository"].value
 
+    # download the configurations.
     try:
+        print(f"Downloading the backend config to {backend_config_output_dir}")
+
         subprocess.run(
             [
                 "gcloud",
@@ -45,9 +51,9 @@ def download_backend_config(*,
                 f'--location={generic_repository["location"]}',
                 f'--project={generic_repository["project"]}',
                 "--destination=./",
-                f"--version={backend_version}"
+                f"--version={backend_artifacts_version}"
             ],
-            cwd=output_dir,
+            cwd=backend_config_output_dir,
             check=True,
             text=True
         )

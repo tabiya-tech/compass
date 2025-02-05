@@ -15,9 +15,29 @@ from _common import add_select_environments_arguments, \
     get_environment_stack_config, get_environment_stack_configs_by_env_type, get_secret_latest_version, \
     write_config_to_pulumi_yml_file, StackConfigs
 
+from _types import IaCModules
 from lib import get_pulumi_stack_outputs
+
 from backend.prepare_backend import download_backend_config
 from frontend.prepare_frontend import download_frontend_bundle
+
+
+def _download_artifacts_and_config(_realm_name: str, _artifacts_version: str, _deployment_number: str):
+    """
+    Download the necessary configurations and artifacts.
+    """
+
+    download_frontend_bundle(
+        realm_name=_realm_name,
+        artifacts_version=_artifacts_version,
+        deployment_number=_deployment_number
+    )
+
+    download_backend_config(
+        realm_name=_realm_name,
+        artifacts_version=_artifacts_version,
+        deployment_number=_deployment_number
+    )
 
 
 def _prepare_env_file(stack_name: str, deployment_run_number: str, artifacts_version: str):
@@ -52,98 +72,86 @@ def _prepare_environment_deployment(*,
     # 2. Save the modules yaml configs.
     write_config_to_pulumi_yml_file(
         stack_name=env_config.stack_name,
-        module="auth",
+        module=IaCModules.AUTH,
         content=env_config.auth)
 
     write_config_to_pulumi_yml_file(
         stack_name=env_config.stack_name,
-        module="backend",
+        module=IaCModules.BACKEND,
         content=env_config.backend)
 
     write_config_to_pulumi_yml_file(
         stack_name=env_config.stack_name,
-        module="frontend",
+        module=IaCModules.FRONTEND,
         content=env_config.frontend)
 
     write_config_to_pulumi_yml_file(
         stack_name=env_config.stack_name,
-        module="common",
+        module=IaCModules.COMMON,
         content=env_config.common)
 
     write_config_to_pulumi_yml_file(
         stack_name=env_config.stack_name,
-        module="aws-ns",
+        module=IaCModules.AWS_NS,
         content=env_config.aws_ns)
 
     print(f"Environment deployment prepared: {env_config.stack_name}")
 
 
-def _download_artifacts_and_config(_realm_name: str, _artifacts_version: str, _deployment_number: str):
-    download_frontend_bundle(
-        realm_name=_realm_name,
-        artifacts_version=_artifacts_version,
-        deployment_number=_deployment_number
-    )
-
-    download_backend_config(
-        realm_name=_realm_name,
-        artifacts_version=_artifacts_version,
-        deployment_number=_deployment_number
-    )
-
-
 def _main(args):
     # get all the required stacks to prepare matching the criteria.
-    _realm_name = args.realm_name
-    _env_name = args.env_name
-    _env_type = args.env_type
-
-    _artifacts_version = args.artifacts_version
+    realm_name = args.realm_name
+    environment_name = args.env_name
+    environment_type = args.env_type
+    artifacts_version = args.artifacts_version
 
     # randomly get a deployment number
-    # this is used if we have two parallel deployments.
-    _deployment_number = uuid.uuid4().__str__()
+    # this is used if we have two parallel deployments
+    # and the download artifacts and configurations, needs to be able to differentiate between the two
+    # otherwise it would be very complicated to know if an ongoing download or not.
+    deployment_number = uuid.uuid4().__str__()
 
-    print(f"=== Preparing the deployment of version: {_artifacts_version}, deployment number: {_deployment_number}")
+    print(f"=== Preparing the deployment of version: {artifacts_version}, deployment number: {deployment_number}")
 
     # Flow 1: prepare the deployment of an environment by realm name and environment name
     #          this happens if env_name was provided. (manual preparing)
-    if _env_name is not None:
+    if environment_name is not None:
+        # 1.1 Get the environment stack configuration
         target_environment_config = get_environment_stack_config(
-            realm_name=_realm_name,
-            env_name=_env_name
+            realm_name=realm_name,
+            environment_name=environment_name
         )
 
-        _download_artifacts_and_config(
-            _realm_name,
-            _artifacts_version,
-            _deployment_number)
+        # 1.2 download the artifacts and configurations for the environment
+        _download_artifacts_and_config(realm_name, artifacts_version, deployment_number)
 
+        # 1.3 prepare the deployment of the environment
         _prepare_environment_deployment(
             env_config=target_environment_config,
-            deployment_run_number=_deployment_number,
-            artifacts_version=_artifacts_version)
+            deployment_run_number=deployment_number,
+            artifacts_version=artifacts_version)
 
     # Flow 2: prepare the deployment of environments by realm name and environment type.
     #         This happens in the pipeline when we want to prepare all the environments of a certain type.
-    if _env_type is not None:
+    if environment_type is not None:
+        # 2.1 Get the target environments, all the environments of the given type in the realm.
         target_environments = get_environment_stack_configs_by_env_type(
-            realm_name=_realm_name,
-            env_type=_env_type)
+            realm_name=realm_name,
+            env_type=environment_type)
 
         if len(target_environments) == 0:
-            print(f"No environments found for realm: {_realm_name} and env_type: {_env_type}")
+            print(f"No environments found for realm: {realm_name} and env_type: {environment_type}")
 
-        _download_artifacts_and_config(
-            _realm_name,
-            _artifacts_version,
-            _deployment_number)
+        # 2.2 download the artifacts and configurations for the environments
+        # given that we are deploying one artifact version, the download is done once.
+        _download_artifacts_and_config(realm_name, artifacts_version, deployment_number)
 
+        # 2.3 prepare the deployment of each environment in the target list.
         for env_config in target_environments:
             _prepare_environment_deployment(
                 env_config=env_config,
-                deployment_run_number=_deployment_number,
-                artifacts_version=_artifacts_version)
+                deployment_run_number=deployment_number,
+                artifacts_version=artifacts_version)
 
 
 if __name__ == "__main__":
@@ -154,9 +162,7 @@ if __name__ == "__main__":
     # add the arguments to select multiple environments
     # a) by realm name and environment name
     # b) by realm name and environment type.
-    add_select_environments_arguments(
-        parser=parser
-    )
+    add_select_environments_arguments(parser=parser)
 
     parser.add_argument(
         "--artifacts-version",

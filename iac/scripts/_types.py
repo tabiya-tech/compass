@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 from lib import get_realm_and_env_name_from_stack
 
+
 class IaCModules(Enum):
     """
     Our iac subprojects.
@@ -21,6 +22,18 @@ class IaCModules(Enum):
 
 @dataclass
 class StackConfigs:
+    """
+    Environment Stack Configurations
+    expected map type:
+     - stack_name: str
+       environment: dict: environment configurations
+       auth: dict: auth configurations
+       backend: dict: backend configurations
+       frontend: dict: frontend configurations
+       common: dict: common configurations
+       aws_ns: dict: aws namespace configurations.
+    """
+
     realm_name: str
 
     stack_name: str

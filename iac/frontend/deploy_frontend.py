@@ -3,7 +3,7 @@ import mimetypes
 import pulumi
 import pulumi_gcp as gcp
 
-from frontend.prepare_frontend import DEPLOYMENTS_DIR
+from frontend.prepare_frontend import deployments_dir
 from lib.std_pulumi import ProjectBaseConfig, get_project_base_config, get_resource_name
 
 
@@ -65,7 +65,7 @@ def deploy_frontend(*,
 
     bucket = _create_bucket(basic_config, "frontend")
 
-    frontend_artifacts_dir = os.path.join(DEPLOYMENTS_DIR, deployment_id)
+    frontend_artifacts_dir = os.path.join(deployments_dir, deployment_id)
     _upload_directory_to_bucket(
         basic_config,
         bucket.name,

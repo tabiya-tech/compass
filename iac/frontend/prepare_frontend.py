@@ -13,14 +13,16 @@ iac_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # so that we can import the iac/lib module when we run pulumi from withing the iac/frontend directory.
 sys.path.insert(0, iac_folder)
 
-from lib import base64_encode, getenv, get_realm_and_env_name_from_stack, load_dot_realm_env, get_pulumi_stack_outputs, \
-    get_deployment_id, parse_artifacts_version
+from lib import base64_encode, getenv, get_realm_and_env_name_from_stack, load_dot_realm_env, \
+    get_pulumi_stack_outputs, get_deployment_id, parse_artifacts_version, save_content_in_file
 
+# The actual frontend build artifact filename is specified in the iac/scripts/build-and-upload-fe.sh script.
+frontend_build_artifact_filename = "build.tar.gz"
+
+# the constant directories.
 current_dir = os.path.join(iac_folder, "frontend")
-FRONTEND_BUILD_ARTIFACT_FILENAME = "build.tar.gz"  # The actual frontend build artifact filename is specified in the iac/scripts/build-and-upload-fe.sh script
-
-ARTIFACTS_DIR = os.path.join(current_dir, "_tmp", "artifacts")
-DEPLOYMENTS_DIR = os.path.join(current_dir, "_tmp", "deployments")
+base_artifacts_dir = os.path.join(current_dir, "_tmp", "artifacts")
+deployments_dir = os.path.join(current_dir, "_tmp", "deployments")
 
 
 def _validate_rsa_public_key(pem_key: bytes) -> None:
@@ -39,58 +41,63 @@ def download_frontend_bundle(
         deployment_number: str,
         artifacts_version: str) -> None:
     """
-    Download the frontend build bundle.
+    Download the frontend build bundle given the frontend artifact version.
 
     Args:
         :param realm_name:
         :param deployment_number:
         :param artifacts_version:  The version of the frontend build bundle.
     """
-    frontend_version = parse_artifacts_version(artifacts_version).frontend_version
-    _deployment_id = get_deployment_id(deployment_number=deployment_number, deploy_version=frontend_version)
-
+    # 1. get the place where to save the frontend build bundle.
+    frontend_artifacts_version = parse_artifacts_version(artifacts_version).frontend_version
+    deployment_id = get_deployment_id(deployment_number=deployment_number, artifacts_version=frontend_artifacts_version)
     # artifacts dir, the folder to store the frontend build bundle.
-    output_dir = os.path.join(ARTIFACTS_DIR, _deployment_id)
+    artifacts_destination_dir = os.path.join(base_artifacts_dir, deployment_id)
+    os.makedirs(artifacts_destination_dir, exist_ok=False)
 
-    print(f"Downloading the frontend build bundle... to {output_dir}")
-    os.makedirs(output_dir, exist_ok=False)
-
-    # download the artifacts.
+    # 2. Get the generic repository to download the frontend build bundle.
     realm_outputs = get_pulumi_stack_outputs(stack_name=realm_name, module="realm")
-    generic_repository = realm_outputs["generic_repository"].value
+
+    # the generic repository name is defined in iac/realm/create_realm:_create_repositories method body
+    # if it is not there python will raise `KeyError`, a good thing.
+    realm_generic_repository = realm_outputs["generic_repository"].value
+
+    print(f"Downloading the frontend build bundle... to {artifacts_destination_dir}")
 
     try:
+        # 3. Download the frontend build bundle.
         subprocess.run(
             [
                 "gcloud",
                 "artifacts",
                 "generic",
                 "download",
+                # the package name is defined in
                 "--package=frontend",
-                f'--repository={generic_repository["name"]}',
-                f'--location={generic_repository["location"]}',
-                f'--project={generic_repository["project"]}',
+                f'--repository={realm_generic_repository["name"]}',
+                f'--location={realm_generic_repository["location"]}',
+                f'--project={realm_generic_repository["project"]}',
                 "--destination=./",
-                f'--version={frontend_version}'
+                f'--version={frontend_artifacts_version}'
             ],
-            cwd=output_dir,
+            cwd=artifacts_destination_dir,
             check=True,
             text=True
         )
-
+        # 4. extract the downloaded frontend build bundle.
         subprocess.run(
             [
                 "tar",
                 "-xf",
-                FRONTEND_BUILD_ARTIFACT_FILENAME,
+                frontend_build_artifact_filename,
             ],
-            cwd=output_dir,
+            cwd=artifacts_destination_dir,
             check=True,
             text=True
         )
 
         # clean up: remove the downloaded frontend build bundle.
-        os.remove(os.path.join(output_dir, FRONTEND_BUILD_ARTIFACT_FILENAME))
+        os.remove(os.path.join(artifacts_destination_dir, frontend_build_artifact_filename))
 
         print("Done downloading the frontend build bundle.")
     except subprocess.CalledProcessError as e:
@@ -98,9 +105,10 @@ def download_frontend_bundle(
         raise
 
 
-def _construct_env_js_content(*, deployment_artifacts_dir: str, stack_name: str):
+def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     sentry_frontend_dsn: str = getenv("SENTRY_FRONTEND_DSN")
     sentry_auth_token: str = getenv("SENTRY_AUTH_TOKEN", True)
+
     sensitive_personal_data_rsa_encryption_key: str = getenv("SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY")
     sensitive_personal_data_rsa_encryption_key_id: str = getenv("SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID")
 
@@ -125,35 +133,40 @@ def _construct_env_js_content(*, deployment_artifacts_dir: str, stack_name: str)
     }
 
     env_json_content = f"""window.tabiyaConfig = {json.dumps(frontend_env_json, indent=4)};"""
-    frontend_env_json_file_path = os.path.join(deployment_artifacts_dir, "data", "env.js")
-    with open(frontend_env_json_file_path, "w", encoding="utf-8") as file:
-        file.write(env_json_content)
+    frontend_env_json_file_path = os.path.join(artifacts_dir, "data", "env.js")
+    save_content_in_file(frontend_env_json_file_path, env_json_content)
 
 
 def prepare_frontend(
         *,
-        stack_name: str,
-):
+        stack_name: str):
     """
     Prepare the frontend for deployment.
+     1. Ensures that the artifact is downloaded, otherwise downloads it.
+     2. Copies the downloaded artifact to the stack artifacts dir
+        Specifically for the stack name, otherwise the env.js will be the same for all the stacks.
+     3. Constructs the env.js file for the frontend.
     """
 
     # load the environment variables of the stack.
     load_dot_realm_env(stack_name)
 
+    # Get the path to the frontend build bundle
+    # This is specific to the deployment, and the stack name
+    # because the frontend build bundle is specific to the deployment, and the stack name.
+    # Because the frontend/env.js file is specific to the deployment, and the stack name.
     deployment_number = getenv("DEPLOYMENT_RUN_NUMBER")
     artifacts_version = getenv("ARTIFACTS_VERSION")
-
     frontend_version = parse_artifacts_version(artifacts_version).frontend_version
-    _deployment_id = get_deployment_id(deployment_number=deployment_number, deploy_version=frontend_version)
+    deployment_id = get_deployment_id(deployment_number=deployment_number, artifacts_version=frontend_version)
+
+    # artifacts dir, the folder to store the frontend build bundle.
+    artifacts_dir = os.path.join(base_artifacts_dir, deployment_id)
 
     realm_name, _ = get_realm_and_env_name_from_stack(stack_name)
 
     # get the required environment variables, for the frontend.
-    print(f"preparing frontend for the run: {_deployment_id}-{stack_name}...")
-
-    # artifacts dir, the folder to store the frontend build bundle.
-    artifacts_dir = os.path.join(ARTIFACTS_DIR, _deployment_id)
+    print(f"preparing frontend for the run: {deployment_id}-{stack_name}...")
 
     # If the path (artifacts dir) already exists, skip, otherwise create it and download the frontend build bundle.
     # This should be the same folder for if the frontend deployments are on the same run.
@@ -166,14 +179,19 @@ def prepare_frontend(
 
     # Have a copy of the artifacts for this deployment (the separate stack name),
     # so that we can make necessary changes to the frontend build bundle that are specific to the environment.
-    deployment_id = get_deployment_id(deployment_number=_deployment_id, stack_name=stack_name)
-    deployment_artifacts_dir = os.path.join(DEPLOYMENTS_DIR, deployment_id)
-    shutil.copytree(artifacts_dir, deployment_artifacts_dir, dirs_exist_ok=True)
+    full_deployment_id = get_deployment_id(
+        deployment_number=deployment_number,
+        artifacts_version=frontend_version,
+        stack_name=stack_name)
 
-    # construct the env.js content.
+    # copy the artifacts to the stack artifacts dir, so that we can make necessary changes to the frontend build bundle.
+    stack_artifacts_dir = os.path.join(deployments_dir, full_deployment_id)
+    shutil.copytree(artifacts_dir, stack_artifacts_dir, dirs_exist_ok=True)
+
+    # construct the env.js content for this deployment and stack.
     _construct_env_js_content(
         stack_name=stack_name,
-        deployment_artifacts_dir=deployment_artifacts_dir
+        artifacts_dir=stack_artifacts_dir
     )
 
-    print(f"Done preparing frontend for the run: {_deployment_id}-{stack_name}.")
+    print(f"Done preparing frontend for the run: {deployment_id}-{stack_name}.")

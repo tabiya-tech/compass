@@ -27,6 +27,25 @@ class ProjectBaseConfig:
     provider: gcp.Provider
 
 
+@dataclass
+class ArtifactsVersion:
+    """
+    The artifacts version data class.
+    """
+
+    ref_name: str
+    """branch or tag name"""
+
+    sha: str
+    """commit sha"""
+
+    frontend_version: str
+    """frontend artifacts version <frontend-version>.<sha>"""
+
+    backend_version: str
+    """backend artifacts version <backend-version>.<sha>"""
+
+
 def getstackref(stack_ref: pulumi.StackReference, name: str, secret: bool = False) -> pulumi.Output[Any]:
     """
     Get the stack reference value. Log the value if it is not a secret, otherwise log the secret value as a series of '*'
@@ -150,6 +169,9 @@ def enable_services(provider: gcp.Provider, service_names: list[str], dependenci
         )
         services.append(srv)
 
+    # sort the service names
+    # so that the hashing won't be affected by the order of the service names.
+    service_names.sort()
     triggers_map = {"services": hashlib.md5("".join(service_names).encode('utf-8')).hexdigest()}
     sleep_for_a_while = time.Sleep(
         get_resource_name(resource="sleep-for-2-min-services"),
@@ -211,7 +233,7 @@ def save_content_in_file(file_path: str, content: str):
     """
     Save the content in the file
     """
-    with open(file_path, "w") as file:
+    with open(file_path, "w", encoding="utf-8") as file:
         file.write(content)
 
 
@@ -283,29 +305,23 @@ def get_pulumi_stack_outputs(stack_name: str, module: str) -> Mapping[str, Any]:
     return stack.outputs()
 
 
-def select_remote_stack(stack_name: str, module: str):
-    stack = auto.create_or_select_remote_stack_git_source(
-        stack_name=f"tabiya-tech/compass-{module}/{stack_name}",
-        opts=auto.RemoteWorkspaceOptions(
-            inherit_settings=True
-        )
-    )
-
-    return stack
-
-
 def get_deployment_id(*,
                       deployment_number: str,
-                      deploy_version: Optional[str] = None,
+                      artifacts_version: Optional[str] = None,
                       stack_name: Optional[str] = None):
+    """
+    Get the deployment id based on the deployment number, artifacts version, and stack name.
+    """
+
     deployment_id = deployment_number
 
-    if deploy_version is not None:
-        deployment_id = f"{deploy_version}-{deployment_id}"
+    if artifacts_version is not None:
+        deployment_id = f"{artifacts_version}-{deployment_id}"
 
     if stack_name is not None:
         deployment_id = f"{stack_name}-{deployment_id}"
 
+    print("using deployment id: ", deployment_id)
     return deployment_id
 
 
@@ -322,14 +338,6 @@ def get_ref_name_and_sha_from_artifacts_version(artifacts_version: str) -> tuple
     ref_name, sha = artifacts_version.rsplit(".", 1)
 
     return ref_name, sha
-
-
-@dataclass
-class ArtifactsVersion:
-    ref_name: str
-    sha: str
-    frontend_version: str
-    backend_version: str
 
 
 def parse_artifacts_version(artifacts_version: str):

@@ -29,7 +29,7 @@ jobs:
       #    -> a tag
       #  b) a release has been created.
 
-      upload-artifacts: ${{( github.event_name == 'push' && ( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]') || startsWith(github.ref, 'refs/tags/'))) || (github.event_name == 'release' && startsWith(github.ref, 'refs/tags/')) }}
+      upload-artifacts: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]')) }}
 
   backend-ci:
     uses: ./.github/workflows/backend-ci.yml
@@ -42,7 +42,7 @@ jobs:
       #    -> a tag
       #  b) a release has been created.
 
-      upload-artifacts: ${{ github.event_name == 'push' && (( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]') || startsWith(github.ref, 'refs/tags/')) || github.event_name == 'release' && startsWith(github.ref, 'refs/tags/')) }}
+      upload-artifacts: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]')) }}
 
   deploy:
     needs: [ frontend-ci, backend-ci ]
@@ -53,10 +53,10 @@ jobs:
     #    -> a tag
     #  b) a release has been created.
 
-    if: ${{ github.event_name == 'push' && (( github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]') || startsWith(github.ref, 'refs/tags/')) || github.event_name == 'release' && startsWith(github.ref, 'refs/tags/')) }}
+    if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]')) }}
     uses: ./.github/workflows/deploy.yml
     secrets: inherit
     with:
       # if the event is a release, the env-type is testing environment, otherwise it is dev environment.
-      env-type: ${{ startsWith(github.ref, 'refs/tags/') && 'test' || 'dev'  }}
+      env-type: dev
       artifacts-version: ${{ github.ref_name }}.${{ github.sha }}

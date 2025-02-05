@@ -2,8 +2,8 @@
 
 import os
 
-import argparse
 import sys
+import argparse
 
 # Determine the absolute path to the 'iac' directory
 iac_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -11,8 +11,8 @@ iac_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # so that we can import the iac/lib module when we run pulumi from withing the iac/scripts directory.
 sys.path.insert(0, iac_dir)
 
+from _types import IaCModules
 from frontend.prepare_frontend import prepare_frontend
-
 from _common import StackConfigs, add_select_environments_arguments, \
     get_environment_stack_config, get_environment_stack_configs_by_env_type, run_pulumi_up
 
@@ -20,11 +20,11 @@ from _common import StackConfigs, add_select_environments_arguments, \
 def _deploy_frontend(env_config: StackConfigs):
     # prepare the frontend to be deployed.
     prepare_frontend(stack_name=env_config.stack_name)
-    run_pulumi_up(env_config.stack_name, "frontend")
+    run_pulumi_up(env_config.stack_name, IaCModules.FRONTEND)
 
 
 def _deploy_backend(env_config: StackConfigs):
-    run_pulumi_up(env_config.stack_name, "backend")
+    run_pulumi_up(env_config.stack_name, IaCModules.BACKEND)
 
 
 def _deploy_environment(env_config: StackConfigs):
@@ -33,28 +33,18 @@ def _deploy_environment(env_config: StackConfigs):
     """
 
     print(f"Deploying environment: {env_config.stack_name}")
-    # 1. run pulumi up for the auth, backend, frontend, and common stacks.
-    run_pulumi_up(env_config.stack_name, "auth")
+
+    # 1. run pulumi up for the micro stacks.
+
+    run_pulumi_up(env_config.stack_name, IaCModules.AUTH)
+
     _deploy_frontend(env_config)
+
     _deploy_backend(env_config)
-    run_pulumi_up(env_config.stack_name, "common")
-    run_pulumi_up(env_config.stack_name, "aws-ns")
 
-    # Save the environment to the summary file
-    summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
-    if summary_path:
-        summary = [
-            "environment: " + env_config.stack_name,
-            "---------------------------------",
-        ]
-        try:
-            with open(summary_path, "a") as f:  # 'a' for append
-                f.write("\n".join(summary))
-                f.write("\n")  # Add a newline for good measure
-        except Exception as e:
-            print(f"Error writing to summary file: {e}")
+    run_pulumi_up(env_config.stack_name, IaCModules.COMMON)
 
-    print(f"Done deploying stack: {env_config.stack_name}")
+    run_pulumi_up(env_config.stack_name, IaCModules.AWS_NS)
 
 
 def _main(args):
@@ -68,7 +58,7 @@ def _main(args):
     if _env_name is not None:
         target_environment_config = get_environment_stack_config(
             realm_name=_realm_name,
-            env_name=_env_name)
+            environment_name=_env_name)
 
         _deploy_environment(target_environment_config)
 
@@ -92,8 +82,6 @@ if __name__ == "__main__":
     )
 
     # Add the arguments to select multiple environments
-    add_select_environments_arguments(
-        parser=parser
-    )
+    add_select_environments_arguments(parser=parser)
 
     _main(parser.parse_args())

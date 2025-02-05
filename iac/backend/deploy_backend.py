@@ -7,7 +7,7 @@ import pulumi_gcp as gcp
 
 from pulumi import Output
 
-from backend.prepare_backend import CONFIGS_DIR, GCP_API_GATEWAY_CONFIG_FILE
+from backend.prepare_backend import base_configuration_dir, api_gateway_config_file_name
 from lib.std_pulumi import ProjectBaseConfig, get_resource_name, get_project_base_config, get_file_as_string
 
 
@@ -67,7 +67,7 @@ def _setup_api_gateway(*,
 
     # The GCP API Gateway uses OpenAPI 2.0 yaml files for the configurations.
     # The yaml must be base64 encoded.
-    api_gateway_config_file_path: str = os.path.join(CONFIGS_DIR, deployment_id, GCP_API_GATEWAY_CONFIG_FILE).__str__()
+    api_gateway_config_file_path: str = os.path.join(base_configuration_dir, deployment_id, api_gateway_config_file_name).__str__()
     apigw_config_yml_string = get_file_as_string(api_gateway_config_file_path)
 
     # update the yaml with the correct values
@@ -94,7 +94,7 @@ def _setup_api_gateway(*,
                 document=gcp.apigateway.ApiConfigOpenapiDocumentDocumentArgs(
                     # this is the file name used in the API Gateway
                     # This is typically the path of the file when it is uploaded.
-                    path=GCP_API_GATEWAY_CONFIG_FILE,
+                    path=api_gateway_config_file_name,
                     contents=apigw_config_yaml_b64encoded,
                 ),
             )

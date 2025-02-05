@@ -29,12 +29,12 @@ def run_pulumi_up(stack_name: str, module: IaCModules):
     Run pulumi up for the given stack
     """
 
-    print(f"Running pulumi up on stack: {stack_name}/{module}")
+    print(f"Running pulumi up on stack: {stack_name}/{module.value}")
 
-    stack_project_path = os.path.join(iac_dir, module.value)
+    stack_work_dir = os.path.join(iac_dir, module.value)
 
     stack = auto.create_or_select_stack(
-        work_dir=stack_project_path,
+        work_dir=stack_work_dir,
         stack_name=stack_name,
     )
 
@@ -53,10 +53,10 @@ def run_pulumi_destroy(stack_name: str, module: IaCModules):
 
     print(f"Running pulumi destroy on stack: {stack_name}/{module.value}")
 
-    stack_project_path = os.path.join(iac_dir, module.value)
+    stack_work_dir = os.path.join(iac_dir, module.value)
 
     stack = auto.create_or_select_stack(
-        work_dir=stack_project_path,
+        work_dir=stack_work_dir,
         stack_name=stack_name,
     )
 
@@ -78,10 +78,10 @@ def write_config_to_pulumi_yml_file(*, stack_name: str, module: IaCModules, cont
     """
     Write the stack configuration to the pulumi yaml file (Pulumi.{stack_name}.yaml).
     """
-    file_path = os.path.join(iac_dir, module.value, f"Pulumi.{stack_name}.yaml")
-    with open(file_path, "w", encoding="utf-8") as file:
+    pulumi_yml_file_path = os.path.join(iac_dir, module.value, f"Pulumi.{stack_name}.yaml")
+    with open(pulumi_yml_file_path, "w", encoding="utf-8") as file:
         yaml.dump(content, file, default_flow_style=False, allow_unicode=True)
-    print(f"Pulumi config written to file: {file_path}")
+    print(f"Pulumi config written to file: {pulumi_yml_file_path}")
 
 
 # =======================
@@ -97,10 +97,10 @@ def get_secret_latest_version(secret_name: str) -> str:
     """
     secret_manager_service = SecretManagerServiceClient()
 
-    latest_secret_value = f"{secret_name}/versions/latest"
-    print("Getting the latest secret version: ", latest_secret_value)
+    latest_secret_version_name = f"{secret_name}/versions/latest"
+    print("Getting the latest secret version: ", latest_secret_version_name)
     secret_value = secret_manager_service.access_secret_version(
-        name=latest_secret_value
+        name=latest_secret_version_name
     )
 
     return secret_value.payload.data.decode("utf-8")
@@ -140,49 +140,50 @@ def download_ream_environments_configs(realm_name: str) -> List[StackConfigs]:
     # get the realm environments configurations from the realm's secrets.
     realm_outputs = get_pulumi_stack_outputs(realm_name, "realm")
     stack_config_secret_output = realm_outputs["stack_config_secret"]
-    stack_config_value = get_secret_latest_version(stack_config_secret_output.value)
+    latest_stack_config_value = get_secret_latest_version(stack_config_secret_output.value)
 
     # convert the stack config value to a dictionary.
-    realm_stacks_dict = yaml.safe_load(stack_config_value)
+    realm_stacks_cfgs_dict = yaml.safe_load(latest_stack_config_value)
 
     # Create the stack objects from the realm stacks dict.
     environments = []
-    for stack_dict in realm_stacks_dict["stacks"]:
+    for stack_dict in realm_stacks_cfgs_dict["stacks"]:
         stack = StackConfigs.from_dict(stack_dict)
         environments.append(stack)
 
     return environments
 
 
-def get_environment_stack_config(realm_name: str, env_name: str) -> StackConfigs:
+def get_environment_stack_config(realm_name: str, environment_name: str) -> StackConfigs:
     """
     Get the environment stack configurations for the given environment from the realm's secrets.
 
     :param realm_name: The realm name
-    :param env_name:  The environment name to get the configuration for.
+    :param environment_name:  The environment name to get the configuration for.
     :return: The environment configuration for the environment.
     """
 
-    realm_environments_config = download_ream_environments_configs(realm_name)
-    for environment in realm_environments_config:
-        if environment.env_name == env_name:
+    realm_environments_configs = download_ream_environments_configs(realm_name)
+    for environment in realm_environments_configs:
+        if environment.env_name == environment_name:
             return environment
 
-    raise ValueError(f"No environment config found for the environment {env_name} in the realm {realm_name}.")
+    raise ValueError(f"No environment config found for the environment {environment_name} in the realm {realm_name}.")
 
 
 def get_environment_stack_configs_by_env_type(realm_name: str, env_type: str) -> list[StackConfigs]:
     """
     Get the environments configurations by environment types from the realm's secrets.
 
+    :param env_type: The environment type.
     :param realm_name: The realm name :param env_type:  The environment type to use to filter the environments.
     :return: An array of environment configurations for the environments. If no environment configuration is found,
              an empty array is returned.
     """
 
-    realm_environments_config = download_ream_environments_configs(realm_name)
+    realm_environments_configs = download_ream_environments_configs(realm_name)
     environments = []
-    for environment in realm_environments_config:
+    for environment in realm_environments_configs:
         if environment.env_type == env_type and environment.deployment_type == "auto":
             environments.append(environment)
 

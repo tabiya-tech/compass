@@ -4,7 +4,6 @@ import os
 import sys
 
 import argparse
-import pulumi.automation as auto
 
 # Determine the absolute path to the 'iac' directory
 libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -12,10 +11,11 @@ libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # so that we can import the iac/lib module when we run pulumi from withing the iac/scripts directory.
 sys.path.insert(0, libs_dir)
 
+from _types import IaCModules
 from lib import get_stack_name_from
 from _common import add_select_environment_arguments, get_environment_stack_config, \
     write_config_to_pulumi_yml_file, \
-    upload_environment_secrets_to_secret_manager
+    upload_env_file_content_to_sm, run_pulumi_up
 
 
 def _main(args):
@@ -31,30 +31,26 @@ def _main(args):
     if not os.path.exists(env_file_path):
         raise FileNotFoundError(f"Environment file {env_file_path} does not exist.")
 
-    # Get the stack config from the realm's secrets
-    stack_config = get_environment_stack_config(realm_name=args.realm_name, env_name=args.env_name)
+    # 1. Get the realm's stacks configurations for the given environment.
+    stack_config = get_environment_stack_config(realm_name=args.realm_name, environment_name=args.env_name)
 
-    # Save it to a yaml file, in the environment module.
+    print(f"Setting up the environment:{stack_name} ...")
+    # 2. Write the environment configuration to the respective pulumi.yml file.
     write_config_to_pulumi_yml_file(
         stack_name=stack_name,
-        module="environment",
+        module=IaCModules.ENVIRONMENT,
         content=stack_config.environment
     )
 
-    # Run pulumi up to deploy the environment stack.
-    environment_stack = auto.create_or_select_stack(
+    # 3. Run pulumi up to deploy the environment stack.
+    up_results = run_pulumi_up(
         stack_name=stack_name,
-        work_dir=os.path.join(libs_dir, "environment"),
+        module=IaCModules.ENVIRONMENT
     )
 
-    up_results = environment_stack.up(
-        on_output=print,
-        color="always"
-    )
-
-    # Uploading the .env file to the secret manager.
-    secret_name = up_results.outputs.get("secret_name").value
-    upload_environment_secrets_to_secret_manager(
+    # 4. Uploading the .env file to the secret manager.
+    secret_name = up_results.outputs["secret_name"].value
+    upload_env_file_content_to_sm(
         secret_name=secret_name,
         env_file_path=env_file_path
     )
@@ -75,7 +71,8 @@ if __name__ == "__main__":
         "--env-files-dir",
         type=str,
         required=True,
-        help="The directory that contains the environments files, to be uploaded to the secret manager of the environment's project."
+        help="The directory that contains the environments files, "
+             "to be uploaded to the secret manager of the environment's project."
              " The directory should contain the .env.<REALM_NAME>.<ENV_NAME> file for the environment."
              " It should be an absolute path."
     )

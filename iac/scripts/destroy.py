@@ -5,6 +5,8 @@ import os
 import argparse
 import sys
 
+from _types import IaCModules
+
 # Determine the absolute path to the 'iac' directory
 iac_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add this directory to sys.path,
@@ -25,12 +27,12 @@ def destroy_stack(stack_name: str):
 
     print(f"Destroying stack: {stack_name}")
 
-    run_pulumi_destroy(stack_name=stack_name, module="aws-ns")
-    run_pulumi_destroy(stack_name=stack_name, module="common")
-    run_pulumi_destroy(stack_name=stack_name, module="frontend")
-    run_pulumi_destroy(stack_name=stack_name, module="backend")
-    run_pulumi_destroy(stack_name=stack_name, module="auth")
-    run_pulumi_destroy(stack_name=stack_name, module="environment")
+    run_pulumi_destroy(stack_name=stack_name, module=IaCModules.AWS_NS)
+    run_pulumi_destroy(stack_name=stack_name, module=IaCModules.COMMON)
+    run_pulumi_destroy(stack_name=stack_name, module=IaCModules.FRONTEND)
+    run_pulumi_destroy(stack_name=stack_name, module=IaCModules.BACKEND)
+    run_pulumi_destroy(stack_name=stack_name, module=IaCModules.AUTH)
+    run_pulumi_destroy(stack_name=stack_name, module=IaCModules.AUTH)
 
     print(f"Done destroying stack: {stack_name}")
 
