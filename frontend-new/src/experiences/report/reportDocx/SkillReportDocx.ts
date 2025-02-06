@@ -24,6 +24,92 @@ interface SkillReportDocxProps {
   conversationConductedAt: string | null;
 }
 
+// Create a paragraph with an image
+const createParagraphWithImage = async (text: string, imageUrl: string) => {
+  return new Paragraph({
+    children: [
+      new ImageRun({
+        data: await getBase64Image(imageUrl),
+        transformation: { width: 18, height: 16 },
+      }),
+      new TextRun({
+        text: "\u00A0\u00A0",
+      }),
+      new TextRun({
+        text,
+        color: COLORS.textBlack,
+        size: 24,
+      }),
+    ],
+    alignment: AlignmentType.LEFT,
+    spacing: { after: 50 },
+  });
+};
+
+// Create a paragraph with an image and text
+const createParagraphWithImageAndText = async (text: string, imageUrl: string) => {
+  return new Paragraph({
+    children: [
+      new ImageRun({
+        data: await getBase64Image(imageUrl),
+        transformation: { width: 22, height: 22 },
+      }),
+      new TextRun({
+        text: "\u00A0\u00A0",
+      }),
+      new TextRun({
+        text,
+        bold: true,
+        size: 26,
+        color: COLORS.textBlack,
+      }),
+    ],
+    heading: HeadingLevel.HEADING_6,
+    alignment: AlignmentType.LEFT,
+    spacing: { before: 300 },
+  });
+};
+
+const constructPersonalInformationSection = async (
+  name: string | undefined,
+  address: string | undefined,
+  phone: string | undefined,
+  email: string | undefined
+): Promise<Paragraph[]> => {
+  const sections: Paragraph[] = [];
+
+  if (name) {
+    sections.push(
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: name,
+            color: COLORS.textBlack,
+            bold: true,
+            size: 28,
+          }),
+        ],
+        spacing: { after: 100 },
+      })
+    );
+  }
+
+  if (address) {
+    sections.push(await createParagraphWithImage(address, ReportContent.IMAGE_URLS.LOCATION_ICON));
+  }
+
+  if (phone) {
+    sections.push(await createParagraphWithImage(phone, ReportContent.IMAGE_URLS.PHONE_ICON));
+  }
+
+  if (email) {
+    sections.push(await createParagraphWithImage(email, ReportContent.IMAGE_URLS.EMAIL_ICON));
+  }
+
+  return sections;
+};
+
+
 const SkillReportDocx = async (props: SkillReportDocxProps): Promise<Blob> => {
   const { name, email, phone, address, experiences, conversationConductedAt } = props;
   const header = await HeaderComponent();
@@ -35,53 +121,6 @@ const SkillReportDocx = async (props: SkillReportDocxProps): Promise<Blob> => {
 
   // list of all unique skills
   const skillsList = getUniqueSkills(experiences);
-
-  // Create a paragraph with an image
-  const createParagraphWithImage = async (text: string, imageUrl: string) => {
-    if (!text) return new Paragraph({});
-    return new Paragraph({
-      children: [
-        new ImageRun({
-          data: await getBase64Image(imageUrl),
-          transformation: { width: 18, height: 16 },
-        }),
-        new TextRun({
-          text: "\u00A0\u00A0",
-        }),
-        new TextRun({
-          text,
-          color: COLORS.textBlack,
-          size: 24,
-        }),
-      ],
-      alignment: AlignmentType.LEFT,
-      spacing: { after: 50 },
-    });
-  };
-
-  // Create a paragraph with an image and text
-  const createParagraphWithImageAndText = async (text: string, imageUrl: string) => {
-    return new Paragraph({
-      children: [
-        new ImageRun({
-          data: await getBase64Image(imageUrl),
-          transformation: { width: 22, height: 22 },
-        }),
-        new TextRun({
-          text: "\u00A0\u00A0",
-        }),
-        new TextRun({
-          text,
-          bold: true,
-          size: 26,
-          color: COLORS.textBlack,
-        }),
-      ],
-      heading: HeadingLevel.HEADING_6,
-      alignment: AlignmentType.LEFT,
-      spacing: { before: 300 },
-    });
-  };
 
   const doc = new Document({
     styles: {
@@ -121,25 +160,7 @@ const SkillReportDocx = async (props: SkillReportDocxProps): Promise<Blob> => {
             spacing: { after: 300 },
           }),
 
-          name
-            ? new Paragraph({
-                children: [
-                  new TextRun({
-                    text: name,
-                    color: COLORS.textBlack,
-                    bold: true,
-                    size: 28,
-                  }),
-                ],
-                spacing: { after: 100 },
-              })
-            : new Paragraph(""),
-
-          await createParagraphWithImage(address, ReportContent.IMAGE_URLS.LOCATION_ICON),
-
-          await createParagraphWithImage(phone, ReportContent.IMAGE_URLS.PHONE_ICON),
-
-          await createParagraphWithImage(email, ReportContent.IMAGE_URLS.EMAIL_ICON),
+          ...(await constructPersonalInformationSection(name, address, phone, email)),
 
           new Paragraph({
             children: [

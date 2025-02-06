@@ -105,7 +105,12 @@ const SkillReportPDF: React.FC<SkillReportProps> = ({
           <Text x={0} y={0} style={styles.title} data-testid={DATA_TEST_ID.SKILL_REPORT_TITLE}>
             {ReportContent.SKILLS_REPORT_TITLE}
           </Text>
-          <View style={styles.column}>
+          <View
+            style={{
+              ...styles.column,
+              paddingBottom: name || address || phone || email ? 18 : 0, // Remove padding if there is no personal info
+            }}
+          >
             {name ? (
               <Text x={0} y={0} style={styles.subtitle} data-testid={DATA_TEST_ID.SKILL_REPORT_NAME}>
                 {name}
