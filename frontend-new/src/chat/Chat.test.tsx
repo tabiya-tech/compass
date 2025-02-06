@@ -348,7 +348,7 @@ describe("Chat", () => {
             message: "52aea18a-4a0f-44ad-b690-e99ff8e4ddc7",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
-            reaction: null
+            reaction: null // TODO: ADD REACTION
           },
         ]);
         jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenChatHistoryResponse);
@@ -898,7 +898,10 @@ describe("Chat", () => {
             sender: ConversationMessageSender.COMPASS,
             reaction: {
               id: nanoid(),
-              kind: ReactionType.LIKED,
+              kind: ReactionType.LIKED, // TODO REVIEW:  even though you can do this, it does not comply to the usecase.
+                                        //  Because your use case now is send message and ai responds message that  has feedback?
+                                        //  I would rather expect to see test cases in the chat init when the user has conversation history with
+                                        //  message that have feedback, instead of random places.
             },
           },
         ],
