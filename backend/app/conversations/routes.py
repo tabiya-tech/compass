@@ -83,7 +83,7 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
         # so that it can be accessed by the logger
         # and downstream functions
         session_id_ctx_var.set(session_id)
-        user_id_ctx_var.set(user_info.user_id)
+        user_id_ctx_var.set(user_info)
 
         # Do not allow user input that is too long,
         # as a basic measure to prevent abuse.
@@ -91,10 +91,10 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
             raise HTTPException(status_code=HTTPStatus.REQUEST_ENTITY_TOO_LARGE, detail="Too long user input")
         try:
             # check that the user making the request has the session_id in their user preferences
-            current_user_preferences = await user_preferences_repository.get_user_preference_by_user_id(user_id)
+            current_user_preferences = await user_preferences_repository.get_user_preference_by_user_id("user_id")
             if current_user_preferences is None or session_id not in current_user_preferences.sessions:
                 raise UnauthorizedSessionAccessError(user_id, session_id)
-            return await service.send(user_id, session_id, user_input, clear_memory, filter_pii)
+            return await service.send("user_id", session_id, user_input, clear_memory, filter_pii)
         except ConversationAlreadyConcludedError as e:
             warning_msg = str(e)
             logger.warning(warning_msg)

@@ -93,6 +93,14 @@ def client_with_mocks() -> TestClientWithMocks:
     yield TestClient(app), _instance_conversation_service, _instance_user_preferences_repository, _instance_auth.mocked_user
     app.dependency_overrides = {}
 
+
+# TODO REVIEW: The fact that a useer is authenticated is a given and should not be implicit in the mocked auth,.
+#   There should be test where the user is not authed i.e. it throws some Error
+#   then we expect the error to the thrown and not consumed. Fix it for the routes here and
+#    Add ticket to test auth on every route starting from this one here.
+
+# TODO REVIEW: Assert that operations e.g. service.send is done with the given userid, sessionid. Fix it for the routes here and
+#    Add ticket to check other route test in the code base
 class TestConversationsRoutes:
     @pytest.mark.asyncio
     # ----- _send_message tests -----
@@ -113,6 +121,7 @@ class TestConversationsRoutes:
                     message_id = "foo_id",
                     message = given_user_message.user_input,
                     sender = ConversationMessageSender.USER,
+                    # TODO REVIEW: add ticket to investigate and fix the use of datetime.now().isoformat() instead of datetime.now()
                     sent_at = datetime.now().isoformat()
                 ),
                 ConversationMessage(
