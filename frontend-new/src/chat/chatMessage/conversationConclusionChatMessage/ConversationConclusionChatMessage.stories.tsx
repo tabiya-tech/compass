@@ -10,26 +10,29 @@ const meta: Meta<typeof ConversationConclusionChatMessage> = {
   component: ConversationConclusionChatMessage,
   tags: ["autodocs"],
   argTypes: {},
+  args: {
+    notifyOnFeedbackFormOpen: action("Feedback Form opened"),
+    notifyOnExperiencesDrawerOpen: action("Experiences Drawer opened"),
+    isFeedbackSubmitted: false,
+    isFeedbackStarted: false,
+  },
 };
 
 export default meta;
 
 type Story = StoryObj<typeof ConversationConclusionChatMessage>;
 
-// REVIEW: add notifyOnFeedbackFormOpened on all the stories
 export const AccurateMessage: Story = {
   args: {
     chatMessage: {
       id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       sent_at: new Date().toISOString(),
-      message:
-        "We’d love your feedback on this conversation. It’ll only take 5 minutes and will help us improve your experience",
-      type: ChatMessageType.CONVERSATION_CONCLUSION
+      message: "It was great exploring your skills with you! I hope you found this session helpful. Goodbye!",
+      type: ChatMessageType.CONVERSATION_CONCLUSION,
     },
   },
 };
-
 
 export const LongMessage: Story = {
   args: {
@@ -39,7 +42,7 @@ export const LongMessage: Story = {
       sent_at: new Date().toISOString(),
       message:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-      type: ChatMessageType.CONVERSATION_CONCLUSION
+      type: ChatMessageType.CONVERSATION_CONCLUSION,
     },
   },
 };
@@ -51,7 +54,7 @@ export const LongUnBrokenWord: Story = {
       sender: ConversationMessageSender.COMPASS,
       sent_at: new Date().toISOString(),
       message: "a".repeat(1000),
-      type: ChatMessageType.BASIC_CHAT
+      type: ChatMessageType.CONVERSATION_CONCLUSION,
     },
   },
 };
@@ -63,84 +66,33 @@ export const SingleLetter: Story = {
       sender: ConversationMessageSender.COMPASS,
       sent_at: new Date().toISOString(),
       message: "a",
-      type: ChatMessageType.BASIC_CHAT
+      type: ChatMessageType.CONVERSATION_CONCLUSION,
     },
   },
 };
 
-export const ShownWithDifferentTimestamps: Story = {
-  render: () => (
-    <>
-      <ConversationConclusionChatMessage
-        chatMessage={{
-          id: nanoid(),
-          sender: ConversationMessageSender.COMPASS,
-          sent_at: new Date().toISOString(),
-          message: "sent just now",
-          type: ChatMessageType.BASIC_CHAT
-        }}
-        notifyOnFeedbackFormOpened={action("Feedback Form opened")}
-      />
-      <ConversationConclusionChatMessage
-        chatMessage={{
-          id: nanoid(),
-          sender: ConversationMessageSender.COMPASS,
-          sent_at: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-          message: "sent an hour ago",
-          type: ChatMessageType.BASIC_CHAT
-        }}
-        notifyOnFeedbackFormOpened={action("Feedback Form opened")}
-      />
-      <ConversationConclusionChatMessage
-        chatMessage={{
-          id: nanoid(),
-          sender: ConversationMessageSender.COMPASS,
-          sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-          message: "sent yesterday",
-          type: ChatMessageType.BASIC_CHAT
-        }}
-        notifyOnFeedbackFormOpened={action("Feedback Form opened")}
-      />
-      <ConversationConclusionChatMessage
-        chatMessage={{
-          id: nanoid(),
-          sender: ConversationMessageSender.COMPASS,
-          sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
-          message: "sent two days ago",
-          type: ChatMessageType.BASIC_CHAT
-        }}
-        notifyOnFeedbackFormOpened={action("Feedback Form opened")}
-      />
-      <ConversationConclusionChatMessage
-        chatMessage={{
-          id: nanoid(),
-          sender: ConversationMessageSender.COMPASS,
-          sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(),
-          message: "sent a week ago",
-          type: ChatMessageType.BASIC_CHAT
-        }}
-        notifyOnFeedbackFormOpened={action("Feedback Form opened")}
-      />
-      <ConversationConclusionChatMessage
-        chatMessage={{
-          id: nanoid(),
-          sender: ConversationMessageSender.COMPASS,
-          sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(),
-          message: "sent a month ago",
-          type: ChatMessageType.BASIC_CHAT
-        }}
-        notifyOnFeedbackFormOpened={action("Feedback Form opened")}
-      />
-      <ConversationConclusionChatMessage
-        chatMessage={{
-          id: nanoid(),
-          sender: ConversationMessageSender.COMPASS,
-          sent_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30 * 12).toISOString(),
-          message: "sent a year ago",
-          type: ChatMessageType.BASIC_CHAT
-        }}
-        notifyOnFeedbackFormOpened={action("Feedback Form opened")}
-      />
-    </>
-  ),
+export const FeedbackInProgress: Story = {
+  args: {
+    chatMessage: {
+      id: nanoid(),
+      sender: ConversationMessageSender.COMPASS,
+      sent_at: new Date().toISOString(),
+      message: "It was great exploring your skills with you! I hope you found this session helpful. Goodbye!",
+      type: ChatMessageType.CONVERSATION_CONCLUSION,
+    },
+    isFeedbackStarted: true,
+  },
+};
+
+export const FeedbackSubmitted: Story = {
+  args: {
+    chatMessage: {
+      id: nanoid(),
+      sender: ConversationMessageSender.COMPASS,
+      sent_at: new Date().toISOString(),
+      message: "It was great exploring your skills with you! I hope you found this session helpful. Goodbye!",
+      type: ChatMessageType.CONVERSATION_CONCLUSION,
+    },
+    isFeedbackSubmitted: true,
+  },
 };

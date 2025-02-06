@@ -99,9 +99,19 @@ describe("ChatList", () => {
     ];
     // AND a function to open the feedback form
     const givenNotifyOpenFeedbackForm = jest.fn();
+    // AND a function to open the experiences drawer
+    const givenNotifyOpenExperiencesDrawer = jest.fn();
 
     // WHEN the chat list is rendered
-    render(<ChatList messages={givenMessages} notifyOnFeedbackFormOpened={givenNotifyOpenFeedbackForm} />);
+    render(
+      <ChatList
+        messages={givenMessages}
+        notifyOnFeedbackFormOpen={givenNotifyOpenFeedbackForm}
+        notifyOnExperiencesDrawerOpen={givenNotifyOpenExperiencesDrawer}
+        isFeedbackSubmitted={false}
+        isFeedbackStarted={false}
+      />
+    );
 
     // THEN expect the chat list container to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
@@ -147,7 +157,10 @@ describe("ChatList", () => {
       1,
       {
         chatMessage: givenMessages[3],
-        notifyOnFeedbackFormOpened: givenNotifyOpenFeedbackForm,
+        notifyOnFeedbackFormOpen: givenNotifyOpenFeedbackForm,
+        notifyOnExperiencesDrawerOpen: givenNotifyOpenExperiencesDrawer,
+        isFeedbackSubmitted: false,
+        isFeedbackStarted: false,
       },
       {}
     );
@@ -157,5 +170,41 @@ describe("ChatList", () => {
 
     // AND expect the component to match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_LIST_CONTAINER)).toMatchSnapshot();
+  });
+
+  test("should call resizeChatMessage when the window is resized", () => {
+    // GIVEN a message list
+    const givenMessages = [
+      {
+        id: nanoid(),
+        sender: ConversationMessageSender.USER,
+        message: "Hello",
+        sent_at: new Date().toISOString(),
+        type: ChatMessageType.BASIC_CHAT,
+      },
+      {
+        id: nanoid(),
+        sender: ConversationMessageSender.COMPASS,
+        message: "Hi",
+        sent_at: new Date().toISOString(),
+        type: ChatMessageType.BASIC_CHAT,
+      },
+    ];
+    // AND the chat list is rendered
+    render(
+      <ChatList
+        messages={givenMessages}
+        notifyOnFeedbackFormOpen={jest.fn()}
+        notifyOnExperiencesDrawerOpen={jest.fn()}
+        isFeedbackSubmitted={false}
+        isFeedbackStarted={false}
+      />
+    );
+
+    // WHEN the window is resized
+    window.dispatchEvent(new Event("resize"));
+
+    // THEN expect the scrollIntoView function to be called
+    expect(window.HTMLElement.prototype.scrollIntoView).toHaveBeenCalled();
   });
 });

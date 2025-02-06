@@ -4,9 +4,8 @@ import ChatList from "src/chat/chatList/ChatList";
 import { IChatMessage } from "./Chat.types";
 import {
   generateCompassMessage,
-  generateConversationConclusionMessage,
-  generatePleaseRepeatMessage, generateSomethingWentWrongMessage,
-  generateThankYouMessage,
+  generatePleaseRepeatMessage,
+  generateSomethingWentWrongMessage,
   generateTypingMessage,
   generateUserMessage,
 } from "./util";
@@ -32,6 +31,8 @@ import { ChatError } from "src/error/commonErrors";
 import { ChatMessageType } from "src/chat/Chat.types";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import { issueNewSession } from "./issueNewSession";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import { FeedbackItem } from "../feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -74,10 +75,13 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const [exploredExperiencesNotification, setExploredExperiencesNotification] = useState<boolean>(false);
   const [isFeedbackFormOpen, setIsFeedbackFormOpen] = useState<boolean>(false);
   const [activeSessionId, setActiveSessionId] = useState<number | null>(
-    UserPreferencesStateService.getInstance().getActiveSessionId(),
+    UserPreferencesStateService.getInstance().getActiveSessionId()
   );
   const [currentUserId] = useState<string | null>(authenticationStateService.getInstance().getUser()?.id ?? null);
-  const [sessionHasFeedback] = useState<boolean>(UserPreferencesStateService.getInstance().activeSessionHasFeedback());
+  const [sessionHasFeedback, setSessionHasFeedback] = useState<boolean>(
+    UserPreferencesStateService.getInstance().activeSessionHasFeedback()
+  );
+  const [feedbackData, setFeedbackData] = useState<FeedbackItem[]>(PersistentStorageService.getOverallFeedback());
 
   const navigate = useNavigate();
 
@@ -92,16 +96,41 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     setMessages((prevMessages) => [...prevMessages, message]);
   };
 
+  // When the conversation is concluded, add a message to the chat
   const checkAndAddConversationConclusionMessage = useCallback(() => {
-    // Assumes the conversation is completed
-    if (sessionHasFeedback) {
-      // If the user has already given feedback, adds a thank-you message
-      addMessage(generateThankYouMessage());
-    } else {
-      // If they haven't, asks the user to give feedback
-      addMessage(generateConversationConclusionMessage());
+    setMessages((prevMessages) => {
+      // If there are no messages, return empty array
+      if (prevMessages.length === 0) {
+        return prevMessages;
+      }
+
+      // Get the last message
+      const lastMessage = prevMessages.at(-1)!;
+
+      // Create conclusion message from the last message
+      const conclusionMessage: IChatMessage = {
+        ...lastMessage,
+        type: ChatMessageType.CONVERSATION_CONCLUSION,
+        message: lastMessage.message,
+        sent_at: lastMessage.sent_at,
+        sender: lastMessage.sender,
+        id: lastMessage.id,
+      };
+
+      // Return all messages except last one, plus the conclusion message
+      return [...prevMessages.slice(0, -1), conclusionMessage];
+    });
+  }, []);
+
+  // Check local storage when the form is closed to see if there is saved feedback
+  useEffect(() => {
+    if (!isFeedbackFormOpen) {
+      const updatedFeedbackData = PersistentStorageService.getOverallFeedback();
+      if (JSON.stringify(feedbackData) !== JSON.stringify(updatedFeedbackData)) {
+        setFeedbackData(updatedFeedbackData);
+      }
     }
-  }, [sessionHasFeedback]);
+  }, [isFeedbackFormOpen, feedbackData]);
 
   // Depending on the typing state, add or remove the typing message from the messages list
   const addOrRemoveTypingMessage = (userIsTyping: boolean) => {
@@ -126,25 +155,25 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
    * --- Service handlers ---
    */
 
-    // Opens the experiences drawer
-    // Goes to the experience service to get the experiences
+  // Opens the experiences drawer
+  // Goes to the experience service to get the experiences
   const handleOpenExperiencesDrawer = useCallback(async () => {
-      setIsDrawerOpen(true);
-      setIsLoading(true);
-      if (!activeSessionId) {
-        // If there is no session id, we can't get the experiences
-        throw new ChatError("Session id is not available");
-      }
-      try {
-        const experienceService = new ExperienceService();
-        const data = await experienceService.getExperiences(activeSessionId);
-        setExperiences(data);
-        setIsLoading(false);
-      } catch (error) {
-        enqueueSnackbar("Failed to retrieve experiences", { variant: "error" });
-        console.error(new ChatError("Failed to retrieve experiences", error as Error));
-      }
-    }, [enqueueSnackbar, activeSessionId]);
+    setIsDrawerOpen(true);
+    setIsLoading(true);
+    if (!activeSessionId) {
+      // If there is no session id, we can't get the experiences
+      throw new ChatError("Session id is not available");
+    }
+    try {
+      const experienceService = new ExperienceService();
+      const data = await experienceService.getExperiences(activeSessionId);
+      setExperiences(data);
+      setIsLoading(false);
+    } catch (error) {
+      enqueueSnackbar("Failed to retrieve experiences", { variant: "error" });
+      console.error(new ChatError("Failed to retrieve experiences", error as Error));
+    }
+  }, [enqueueSnackbar, activeSessionId]);
 
   // Goes to the authentication service to log the user out
   // Navigates to the login page
@@ -178,7 +207,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         }
 
         response.messages.forEach((messageItem) =>
-          addMessage(generateCompassMessage(messageItem.message, messageItem.sent_at)),
+          addMessage(generateCompassMessage(messageItem.message, messageItem.sent_at))
         );
 
         setConversationCompleted(response.conversation_completed);
@@ -193,7 +222,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setIsTyping(false);
       }
     },
-    [currentMessage, exploredExperiences, checkAndAddConversationConclusionMessage],
+    [currentMessage, exploredExperiences, checkAndAddConversationConclusionMessage]
   );
 
   const initializeChat = useCallback(
@@ -230,8 +259,8 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
             history.messages.map((message: ConversationMessage) =>
               message.sender === ConversationMessageSender.USER
                 ? generateUserMessage(message.message, message.sent_at)
-                : generateCompassMessage(message.message, message.sent_at),
-            ),
+                : generateCompassMessage(message.message, message.sent_at)
+            )
           );
 
           setConversationCompleted(history.conversation_completed);
@@ -267,7 +296,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setIsTyping(false);
       }
     },
-    [checkAndAddConversationConclusionMessage, sendMessage],
+    [checkAndAddConversationConclusionMessage, sendMessage]
   );
 
   // Resets the text field for the next message
@@ -303,13 +332,6 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.FAILED_TO_START_CONVERSATION, { variant: "error" });
     }
   }, [enqueueSnackbar, initializeChat, currentUserId]);
-
-  const handleFeedbackSubmit = () => {
-    setMessages((prevMessages) =>
-      prevMessages.filter((message) => message.type !== ChatMessageType.CONVERSATION_CONCLUSION),
-    );
-    addMessage(generateThankYouMessage());
-  };
 
   /**
    * --- UseEffects ---
@@ -385,7 +407,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
             data-testid={DATA_TEST_ID.CHAT_CONTAINER}
             // The "is-initialized" attribute helps make the component testable.
             // When the component mounts, an initialization function runs, changing the state and causing a rerender.
-            // Tests need to wait for the component to "settle" after mounting, but they don’t know when that happens.
+            // Tests need to wait for the component to "settle" after mounting, but they don't know when that happens.
             // To check if the component is settled, tests can wait for the "is-initialized" attribute to be true:
             //   await waitFor(() => {
             //     expect(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER)).toHaveAttribute("is-initialized", "true");
@@ -404,7 +426,13 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
               />
             </Box>
             <Box sx={{ flex: 1, overflowY: "auto", paddingX: theme.tabiyaSpacing.lg }}>
-              <ChatList messages={messages} notifyOnFeedbackFormOpened={() => setIsFeedbackFormOpen(true)} />
+              <ChatList
+                messages={messages}
+                notifyOnFeedbackFormOpen={() => setIsFeedbackFormOpen(true)}
+                notifyOnExperiencesDrawerOpen={handleOpenExperiencesDrawer}
+                isFeedbackSubmitted={sessionHasFeedback}
+                isFeedbackStarted={feedbackData.length > 0}
+              />
             </Box>
             {showBackdrop && <InactiveBackdrop isShown={showBackdrop} />}
             <Box sx={{ flexShrink: 0, padding: theme.tabiyaSpacing.lg, paddingTop: theme.tabiyaSpacing.xs }}>
@@ -445,7 +473,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           <FeedbackForm
             isOpen={isFeedbackFormOpen}
             notifyOnClose={() => setIsFeedbackFormOpen(false)}
-            onFeedbackSubmit={handleFeedbackSubmit}
+            onFeedbackSubmit={() => setSessionHasFeedback(true)}
           />
         </>
       )}
