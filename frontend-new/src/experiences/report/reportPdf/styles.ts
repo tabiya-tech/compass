@@ -82,7 +82,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     gap: 4,
     paddingHorizontal: 48,
-    paddingBottom: 18,
   },
   bodyText: {
     fontSize: 11,
