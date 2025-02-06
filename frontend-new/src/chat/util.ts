@@ -9,6 +9,27 @@ export const FIXED_MESSAGES_TEXT = {
   PLEASE_REPEAT: "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
   ASK_FOR_FEEDBACK: "We’d love your feedback on this conversation. It’ll only take 5 minutes and will help us improve your experience",
 };
+// TODO REViEW QUESTION: Why are we issuing a new nanoid on each user message?
+//  The correct way would have been to use the one issued by the backend.
+//  This will allow us in the future to refer to the user messages by id and will unlock capabilties
+//  For newly send message that do not have an id, we should retrieve it in the POST method.
+// TODO REVIEW: now that messages have become more complex, why not change the signature tp
+/*
+generateUserMessage(message: IChatMessage): {
+return {
+    message_id: message.message_id? message.message_id: nanoid(),
+    sender: ConversationMessageSender.USER,
+    message: message.message,
+    sent_at: message.sent_at,
+    type: ChatMessageType.BASIC_CHAT,
+    reaction: null,
+  };
+}
+// AND the same for the generateCompassMessage.
+This will simplify calling the function
+ */
+// TODO REVIEW: now that messages have become more complex tests are missing and should be added.
+// at least for messages from Users and from Compass
 
 export const generateUserMessage = (message: string, sent_at: string): IChatMessage => {
   return {

@@ -151,7 +151,7 @@ class CompassDBProvider:
                 ("session_id", 1),
                 ("message_id", 1)
             ], unique=True)
-
+            # TODO REVIEW: not needed as it is already included in the previous index
             await application_db.get_collection(Collections.REACTIONS).create_index([
                 ("session_id", 1)
             ], unique=True)

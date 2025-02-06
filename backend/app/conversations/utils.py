@@ -41,6 +41,7 @@ async def filter_conversation_history(history: 'ConversationHistory', reactions_
         
         # Get reaction for a compass message if it exists (user messages can't have reactions)
         compass_reaction: ReactionDocModel | None = None
+        # TODO REVIEW: Once a reaction is assigned to a message, it should be removed from the list of reactions
         for reaction in reactions_for_session:
             if turn.output.message_id == reaction.message_id:
                 compass_reaction = reaction
