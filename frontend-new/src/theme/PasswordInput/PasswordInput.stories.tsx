@@ -25,7 +25,6 @@ export const WithCustomLabel: Story = {
 export const WithHelperText: Story = {
   args: {
     label: "Password",
-    helperText: "Must be at least 8 characters long.",
     placeholder: "Enter your password",
   },
 };
@@ -42,7 +41,6 @@ export const ErrorState: Story = {
   args: {
     label: "Password",
     error: true,
-    helperText: "Incorrect password format",
     placeholder: "Enter your password",
   },
 };

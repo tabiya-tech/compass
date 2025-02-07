@@ -10,6 +10,15 @@ import FirebaseInvitationCodeAuthenticationService
 import * as Sentry from "@sentry/react";
 import { DATA_TEST_ID as BUG_REPORT_DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import { DATA_TEST_ID as REQUEST_INVITATION_CODE_DATA_TEST_ID} from "src/auth/components/requestInvitationCode/RequestInvitationCode";
+import { FirebaseError } from "src/error/FirebaseError/firebaseError";
+import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
+import ResendVerificationEmail, { DATA_TEST_ID as RESEND_DATA_TEST_ID } from "src/auth/components/resendVerificationEmail/ResendVerificationEmail"
+import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
+
+// Mock the Firebase service
+jest.mock("src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service", () => ({
+  getInstance: jest.fn(),
+}));
 
 jest.mock("src/envService", () => ({
   getFirebaseAPIKey: jest.fn(() => "mock-api-key"),
@@ -112,9 +121,35 @@ jest.mock("src/auth/components/requestInvitationCode/RequestInvitationCode", () 
   };
 });
 
+jest.mock("src/auth/components/resendVerificationEmail/ResendVerificationEmail", () => {
+  const actual = jest.requireActual("src/auth/components/resendVerificationEmail/ResendVerificationEmail");
+  return {
+    ...actual,
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return <span data-testid={actual.DATA_TEST_ID.CONTAINER}></span>;
+    }),
+  };
+});
+
 describe("Testing Login component", () => {
+  const mockLogin = jest.fn();
+  const mockLogout = jest.fn();
+
+  // Setup before each test
   beforeEach(() => {
+    // Reset all mocks
     jest.clearAllMocks();
+
+    // Mock the Firebase service instance
+    (FirebaseEmailAuthenticationService.getInstance as jest.Mock).mockReturnValue({
+      login: mockLogin,
+      logout: mockLogout,
+    });
+
+    jest.useFakeTimers(); // Use Jest's fake timers
+
+    mockBrowserIsOnLine(true);
   });
 
   test("it should show login form successfully", async () => {
@@ -170,6 +205,9 @@ describe("Testing Login component", () => {
     await waitFor(() => {
       expect(loginMock).toHaveBeenCalledWith(givenEmail, givenPassword);
     });
+    // AND expect no errors or warnings to be logged
+    expect(console.warn).not.toHaveBeenCalled();
+    expect(console.error).not.toHaveBeenCalled();
   });
 
   test("it should handle invitation code login correctly", async () => {
@@ -195,5 +233,90 @@ describe("Testing Login component", () => {
     await waitFor(() => {
       expect(anonymousLoginMock).toHaveBeenCalledWith(givenInvitationCode);
     });
+    // AND expect no errors or warnings to be logged
+    expect(console.warn).not.toHaveBeenCalled();
+    expect(console.error).not.toHaveBeenCalled();
+  });
+
+  test("should show ResendVerificationEmail component when email is not verified", async () => {
+    // GIVEN an email and password
+    const givenEmail = "foo@bar.baz";
+    const givenPassword = "Pa$$word123";
+
+    // AND the email login will fail with EMAIL_NOT_VERIFIED error
+    const loginMock = jest.fn().mockRejectedValue(new FirebaseError(
+      "firebaseEmailAuthenticationService",
+      "login",
+      "POST",
+      FirebaseErrorCodes.EMAIL_NOT_VERIFIED,
+      "Email not verified"
+      )
+    );
+
+    jest.spyOn(FirebaseEmailAuthenticationService, "getInstance").mockReturnValue({
+      login: loginMock,
+      logout: mockLogout,
+    } as unknown as FirebaseEmailAuthenticationService);
+
+    // WHEN the component is rendered
+    render(<Login />);
+
+    // AND the user fills in their email and password
+    act(() => {
+      (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnEmailChanged(givenEmail);
+      (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnPasswordChanged(givenPassword);
+    });
+
+    // AND submits the form
+    fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
+
+    // THEN the ResendVerificationEmail component should be shown
+    await waitFor(() => {
+      expect(screen.getByTestId(RESEND_DATA_TEST_ID.CONTAINER)).toBeInTheDocument();
+    });
+
+    // AND it should be passed the correct props
+    expect(ResendVerificationEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: givenEmail,
+        password: givenPassword,
+      }),
+      expect.any(Object)
+    );
+  });
+
+  test("should enable/disable the login button when the browser online status changes", async () => {
+    // GIVEN the browser is offline
+    mockBrowserIsOnLine(false);
+
+    // AND an email and password
+    const givenEmail = "foo@bar.baz";
+    const givenPassword = "Pa$$word123";
+
+    // WHEN the component is rendered
+    render(<Login />);
+
+     // WHEN the user fills in their email and password
+     act(() => {
+      (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnEmailChanged(givenEmail);
+      (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnPasswordChanged(givenPassword);
+    });
+
+    // THEN the login button should be disabled
+    await waitFor(() => {
+      expect(screen.getByTestId(DATA_TEST_ID.LOGIN_BUTTON)).toBeDisabled();
+    });
+    
+    // AND the browser is online
+    mockBrowserIsOnLine(true);
+
+    // THEN the login button should be enabled
+    await waitFor(() => {
+      expect(screen.getByTestId(DATA_TEST_ID.LOGIN_BUTTON)).toBeEnabled();
+    });
+
+    // AND expect no errors or warnings to be logged
+    expect(console.warn).not.toHaveBeenCalled();
+    expect(console.error).not.toHaveBeenCalled();
   });
 });

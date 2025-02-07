@@ -43,6 +43,7 @@ exports[`Testing LoginWithEmailForm component it should show login form 1`] = `
   </div>
   <div
     class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1pcwqdd-MuiFormControl-root-MuiTextField-root"
+    data-testid="b7499b01-8082-4209-8667-c7d559a70cag-text-field"
   >
     <label
       class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined css-74c2ns-MuiFormLabel-root-MuiInputLabel-root"

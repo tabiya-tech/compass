@@ -9,6 +9,10 @@ import UserPreferencesService from "src/userPreferences/UserPreferencesService/u
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
+import { FirebaseError } from "src/error/FirebaseError/firebaseError";
+import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
+import StdFirebaseAuthenticationService from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
+
 
 jest.mock("firebase/compat/app", () => {
   return {
@@ -20,6 +24,9 @@ jest.mock("firebase/compat/app", () => {
       signInAnonymously: jest.fn(),
       signOut: jest.fn(),
       onAuthStateChanged: jest.fn(),
+      get currentUser() {
+        return jest.fn();
+      },
     }),
   };
 });
@@ -44,6 +51,7 @@ describe("AuthService class tests", () => {
     // As a precaution, we reset all method mocks to ensure that no side effects are carried over between tests
     resetAllMethodMocks(UserPreferencesService.getInstance());
     resetAllMethodMocks(invitationsService);
+    resetAllMethodMocks(StdFirebaseAuthenticationService.getInstance());
   });
 
   test("should construct a singleton", async () => {
@@ -128,13 +136,22 @@ describe("AuthService class tests", () => {
       } as firebase.auth.UserCredential);
 
       // AND the logout method logs the user out
-      jest.spyOn(authService, "logout").mockImplementation(async () => {});
+      jest.spyOn(StdFirebaseAuthenticationService.getInstance(), "logout");
 
       // WHEN the login is attempted
       const emailLoginPromise = authService.login(givenEmail, givenPassword);
 
       // THEN the error callback should be called with Email not verified
-      await expect(emailLoginPromise).rejects.toThrow("Email not verified");
+      await expect(emailLoginPromise).rejects.toThrow(new FirebaseError(
+        "EmailAuthService",
+        "login",
+        "POST",
+        FirebaseErrorCodes.EMAIL_NOT_VERIFIED,
+        "Email not verified"
+      ));
+
+      // AND the user should be logged out
+      expect(StdFirebaseAuthenticationService.getInstance().logout).toHaveBeenCalled();
 
       // AND expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();
@@ -154,6 +171,64 @@ describe("AuthService class tests", () => {
       await expect(emailLoginPromise).rejects.toThrow("User not found");
 
       // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should throw an error when the signInWithEmailAndPassword method fails", async () => {
+      // GIVEN the signInWithEmailAndPassword method fails
+      jest.spyOn(firebase.auth(), "signInWithEmailAndPassword").mockRejectedValue({
+        code: "auth/internal-error",
+        message: "Internal error",
+      });
+
+      // WHEN the login is attempted
+      const emailLoginPromise = authService.login(givenEmail, givenPassword);
+
+      // THEN an error should be thrown
+      await expect(emailLoginPromise).rejects.toThrow(new FirebaseError(
+        "EmailAuthService",
+        "signInWithEmailAndPassword",
+        "POST",
+        FirebaseErrorCodes.INTERNAL_ERROR,
+        "Internal error"
+      ));
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should throw an error is the user's email is not verified when the logout method fails", async () => {
+      // GIVEN the logout method fails
+      jest.spyOn(StdFirebaseAuthenticationService.getInstance(), "logout").mockRejectedValue({
+        code: "auth/internal-error",
+        message: "Internal error",
+      });
+
+      // AND the signInWithEmailAndPassword method returns a user with an unverified email
+      const mockUser = {
+        getIdToken: jest.fn().mockResolvedValue(givenTokenResponse),
+        emailVerified: false,
+      } as Partial<firebase.User>;
+
+      jest.spyOn(firebase.auth(), "signInWithEmailAndPassword").mockResolvedValueOnce({
+        user: mockUser,
+      } as firebase.auth.UserCredential);
+
+      // WHEN the login is attempted
+      const emailLoginPromise = authService.login(givenEmail, givenPassword);
+
+      // THEN an error should be thrown
+      await expect(emailLoginPromise).rejects.toThrow(new FirebaseError(
+        "EmailAuthService",
+        "logout",
+        "POST",
+        FirebaseErrorCodes.INTERNAL_ERROR,
+        "Internal error"
+      ));
+
+      // AND no errors or warnings should be logged
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
     });
@@ -220,6 +295,10 @@ describe("AuthService class tests", () => {
 
       // AND test should throw an error
       await expect(registerCallback()).rejects.toThrow("Internal error");
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
 
     test("should throw an error when the firebase createUserWithEmailAndPassword method fails to return a user", async () => {
@@ -238,6 +317,10 @@ describe("AuthService class tests", () => {
 
       // THEN the registration should throw an error
       await expect(emailLoginPromise).rejects.toThrow("User not found");
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
 
     test("should throw an error when the registration code is not valid", async () => {
@@ -254,6 +337,245 @@ describe("AuthService class tests", () => {
       await expect(emailLoginPromise).rejects.toThrow(
         "the invitation code is not for registration: " + givenRegistrationCode
       );
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("linkAnonymousAccount", () => {
+    const givenEmail = "foo@bar.baz";
+    const givenPassword = "password";
+    const givenUserName = "foo";
+    const givenTokenResponse = "foo";
+
+    test("should successfully link anonymous account with email credentials", async () => {
+      // GIVEN there is an anonymous user logged in
+      const mockUserAfterLinking = {
+        updateProfile: jest.fn().mockResolvedValue(undefined),
+        sendEmailVerification: jest.fn().mockResolvedValue(undefined),
+        getIdToken: jest.fn().mockResolvedValue(givenTokenResponse),
+      };
+
+      const mockAnonymousUser = {
+        isAnonymous: true,
+        linkWithCredential: jest.fn().mockResolvedValue({
+          user: mockUserAfterLinking,
+        }),
+        sendEmailVerification: jest.fn()
+      };
+
+      // AND the user is currently logged in
+      jest.spyOn(firebase.auth(), "currentUser", "get").mockReturnValue(mockAnonymousUser as any);
+
+      // WHEN linking the anonymous account
+      const actualToken = await authService.linkAnonymousAccount(givenEmail, givenPassword, givenUserName);
+
+      // THEN the token should be returned
+      expect(actualToken).toEqual(givenTokenResponse);
+
+      // AND the user profile should be updated
+      expect(mockAnonymousUser.linkWithCredential).toHaveBeenCalled();
+      expect(mockUserAfterLinking.updateProfile).toHaveBeenCalledWith({
+        displayName: givenUserName,
+      });
+
+      // AND email verification should be sent
+      expect(mockUserAfterLinking.sendEmailVerification).toHaveBeenCalled();
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should throw an error when no user is logged in", async () => {
+      // GIVEN no user is logged in
+      jest.spyOn(firebase.auth(), "currentUser", "get").mockReturnValue(null);
+
+      // WHEN linking the anonymous account
+      const linkPromise = authService.linkAnonymousAccount(givenEmail, givenPassword, givenUserName);
+
+      // THEN an error should be thrown
+      await expect(linkPromise).rejects.toThrow("No anonymous user is currently logged in");
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should throw an error when current user is not anonymous", async () => {
+      // GIVEN a non-anonymous user is logged in
+      const mockNonAnonymousUser = {
+        isAnonymous: false,
+      };
+      jest.spyOn(firebase.auth(), "currentUser", "get").mockReturnValue(mockNonAnonymousUser as any);
+
+      // WHEN linking the anonymous account
+      const linkPromise = authService.linkAnonymousAccount(givenEmail, givenPassword, givenUserName);
+
+      // THEN an error should be thrown
+      await expect(linkPromise).rejects.toThrow("Current user is not an anonymous user");
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should throw an error when linking fails", async () => {
+      // GIVEN there is an anonymous user logged in
+      const mockAnonymousUser = {
+        isAnonymous: true,
+        linkWithCredential: jest.fn().mockRejectedValue({
+          code: "auth/internal-error",
+          message: "Internal error",
+        }),
+      };
+      jest.spyOn(firebase.auth(), "currentUser", "get").mockReturnValue(mockAnonymousUser as any);
+
+      // WHEN linking the anonymous account
+      const linkPromise = authService.linkAnonymousAccount(givenEmail, givenPassword, givenUserName);
+
+      // THEN an error should be thrown
+      await expect(linkPromise).rejects.toThrow("Internal error");
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should throw an error when linking returns no user", async () => {
+      // GIVEN there is an anonymous user logged in
+      const mockAnonymousUser = {
+        isAnonymous: true,
+        linkWithCredential: jest.fn().mockResolvedValue({
+          user: null,
+        }),
+      };
+      jest.spyOn(firebase.auth(), "currentUser", "get").mockReturnValue(mockAnonymousUser as any);
+
+      // WHEN linking the anonymous account
+      const linkPromise = authService.linkAnonymousAccount(givenEmail, givenPassword, givenUserName);
+
+      // THEN an error should be thrown
+      await expect(linkPromise).rejects.toThrow("User not found after linking");
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("resendVerificationEmail", () => {
+    test("should successfully resend verification email", async () => {
+      // GIVEN a user with an email and password
+      const givenEmail = "foo@bar.baz";
+      const givenPassword = "password";
+      const mockUser = {
+        sendEmailVerification: jest.fn(),
+        emailVerified: false,
+      };
+      // AND the user can log in, but is not verified
+      jest.spyOn(firebase.auth(), "signInWithEmailAndPassword").mockResolvedValueOnce({
+        user: mockUser,
+      } as unknown as firebase.auth.UserCredential);
+
+      // WHEN resending the verification email
+      await authService.resendVerificationEmail(givenEmail, givenPassword);
+
+      // THEN the user should be logged in with the given email and password
+      expect(firebase.auth().signInWithEmailAndPassword).toHaveBeenCalledWith(givenEmail, givenPassword);
+
+      // AND the verification email should be sent
+      expect(mockUser.sendEmailVerification).toHaveBeenCalled();
+
+      // AND no errors or warnings should be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should throw an error when the user is already verified", async () => {
+      // GIVEN a user with an email and password
+      const givenEmail = "foo@bar.baz";
+      const givenPassword = "password";
+
+      const mockUser = {
+        sendEmailVerification: jest.fn(),
+        emailVerified: true,
+      };
+      // AND the user can log in, and is verified
+      jest.spyOn(firebase.auth(), "signInWithEmailAndPassword").mockResolvedValueOnce({
+        user: mockUser,
+      } as unknown as firebase.auth.UserCredential);
+
+      // WHEN resending the verification email
+      const resendPromise = authService.resendVerificationEmail(givenEmail, givenPassword);
+
+      // THEN the error callback should be called with Email already verified
+      await expect(resendPromise).rejects.toThrow(new FirebaseError(
+        "EmailAuthService",
+        "resendVerificationEmail",
+        "POST",
+        FirebaseErrorCodes.EMAIL_ALREADY_VERIFIED,
+        "Email already verified"
+      ));
+
+      // AND no errors or warnings should be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should throw an error when the user is not found in the credentials", async () => {
+      // GIVEN a user with an email and password
+      const givenEmail = "foo@bar.baz";
+      const givenPassword = "password";
+
+      // AND the firebase signInWithEmailAndPassword method fails to return a user
+      jest.spyOn(firebase.auth(), "signInWithEmailAndPassword").mockResolvedValueOnce({
+        user: null,
+      } as unknown as firebase.auth.UserCredential);
+
+      // WHEN resending the verification email
+      const resendPromise = authService.resendVerificationEmail(givenEmail, givenPassword);
+
+      // THEN the error callback should be called with User not found
+      await expect(resendPromise).rejects.toThrow(new FirebaseError(
+        "EmailAuthService",
+        "signInWithEmailAndPassword",
+        "POST",
+        FirebaseErrorCodes.USER_NOT_FOUND,
+        "User not found"
+      ));
+
+      // AND no errors or warnings should be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should throw an error if the firebase signInWithEmailAndPassword method fails", async () => {
+      // GIVEN a user with an email and password
+      const givenEmail = "foo@bar.baz";
+      const givenPassword = "password";
+
+      // AND the firebase signInWithEmailAndPassword method fails
+      jest.spyOn(firebase.auth(), "signInWithEmailAndPassword").mockRejectedValueOnce({
+        code: "auth/internal-error",
+        message: "Internal error",
+      });
+    
+      // WHEN resending the verification email
+      const resendPromise = authService.resendVerificationEmail(givenEmail, givenPassword);
+
+      // THEN the error callback should be called with Internal error
+      await expect(resendPromise).rejects.toThrow(new FirebaseError(
+        "EmailAuthService",
+        "signInWithEmailAndPassword",
+        "POST",
+        FirebaseErrorCodes.INTERNAL_ERROR,
+        "Internal error"
+      ));
+
+      // AND no errors or warnings should be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
   });
 });
+

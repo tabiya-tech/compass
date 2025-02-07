@@ -14,7 +14,6 @@ export const Shown: StoryObj<typeof LoginWithEmailForm> = {
   args: {
     notifyOnEmailChanged: action("notifyOnEmailChanged"),
     notifyOnPasswordChanged: action("notifyOnPasswordChanged"),
-    notifyOnFocused: action("notifyOnFocused"),
     isDisabled: false,
   },
 };
@@ -23,7 +22,6 @@ export const LoggingIn: StoryObj<typeof LoginWithEmailForm> = {
   args: {
     notifyOnEmailChanged: action("notifyOnEmailChanged"),
     notifyOnPasswordChanged: action("notifyOnPasswordChanged"),
-    notifyOnFocused: action("notifyOnFocused"),
     isDisabled: true,
   },
 };
