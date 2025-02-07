@@ -161,9 +161,11 @@ describe("Chat", () => {
     const fn = areLastMessages ? expect(ChatList as jest.Mock).toHaveBeenLastCalledWith : expect(ChatList as jest.Mock).toHaveBeenCalledWith;
     fn(
       expect.objectContaining({
-        messages: expect.arrayContaining(
-          conversationMessages,
-        ),
+        messages: expect.arrayContaining(conversationMessages.map(msg => ({
+          ...msg,
+          id: expect.any(String)
+        }))),
+        notifyOnFeedbackFormOpened: expect.any(Function)
       }),
       {},
     );
@@ -1374,14 +1376,10 @@ describe("Chat", () => {
   describe("handling inactivity backdrop", () => {
     beforeEach(() => {
       jest.useFakeTimers();
-      console.info("*************");
-      // Reset the Date.now() mock before each test
-      //jest.spyOn(Date, "now").mockImplementation(() => 0);
     });
 
     afterEach(() => {
       jest.useRealTimers();
-      //jest.restoreAllMocks();
     });
 
     test("should show inactive backdrop after inactivity timeout", async () => {

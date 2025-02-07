@@ -16,7 +16,6 @@ export interface LoginFormProps {
   password: string;
   notifyOnEmailChanged: (email: string) => void;
   notifyOnPasswordChanged: (password: string) => void;
-  notifyOnFocused: () => void;
   isDisabled: boolean;
 }
 const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({
@@ -63,6 +62,7 @@ const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({
         value={password}
         onChange={(e) => handlePasswordChange(e)}
         inputProps={{ "data-testid": DATA_TEST_ID.EMAIL_LOGIN_FORM_PASSWORD_INPUT }}
+        shouldValidatePassword={false} // no password validation necessary on login
       />
     </Box>
   );

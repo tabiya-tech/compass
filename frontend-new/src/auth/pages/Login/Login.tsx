@@ -12,6 +12,7 @@ import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
+import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import FirebaseEmailAuthService
   from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -20,6 +21,7 @@ import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportBut
 import FirebaseInvitationCodeAuthenticationService
   from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
 import { AuthenticationError } from "src/error/commonErrors";
+import ResendVerificationEmail from "src/auth/components/resendVerificationEmail/ResendVerificationEmail";
 import RequestInvitationCode from "src/auth/components/requestInvitationCode/RequestInvitationCode";
 import { InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import CustomLink from "src/theme/CustomLink/CustomLink";
@@ -68,18 +70,30 @@ const Login: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
+  const [showResendVerification, setShowResendVerification] = useState(false);
+  const [lastAttemptedEmail, setLastAttemptedEmail] = useState("");
+  const [lastAttemptedPassword, setLastAttemptedPassword] = useState("");
+
   const handleError = useCallback(
     async (error: Error) => {
       let errorMessage;
       if (error instanceof RestAPIError) {
         errorMessage = getUserFriendlyErrorMessage(error);
         writeRestAPIErrorToLog(error, console.error);
+        setShowResendVerification(false);
       } else if (error instanceof FirebaseError) {
         errorMessage = getUserFriendlyFirebaseErrorMessage(error);
         writeFirebaseErrorToLog(error, console.warn);
+        // Show resend verification option if the error is due to unverified email
+        if (error.errorCode === FirebaseErrorCodes.EMAIL_NOT_VERIFIED) {
+          setShowResendVerification(true);
+        } else {
+          setShowResendVerification(false);
+        }
       } else {
         errorMessage = error.message;
         console.error(error);
+        setShowResendVerification(false);
       }
       enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
 
@@ -153,6 +167,10 @@ const Login: React.FC = () => {
         await firebaseEmailAuthServiceInstance.login(email, password);
         await handlePostLogin();
       } catch (error) {
+        // Store the credentials before handling the error
+        setLastAttemptedEmail(email);
+        setLastAttemptedPassword(password);
+        // Now handle the error
         await handleError(error as Error);
       } finally {
         setIsLoading(false);
@@ -244,6 +262,11 @@ const Login: React.FC = () => {
     }
   }, [inviteCodeParam, handleLoginWithInvitationCode, location, navigate]);
 
+  // Reset resend verification state when email or password changes
+  useEffect(() => {
+    setShowResendVerification(false);
+  }, [email, password]);
+
   /* ------------------
    * aggregated states for loading and disabling ui
    */
@@ -300,8 +323,13 @@ const Login: React.FC = () => {
             notifyOnEmailChanged={handleEmailChanged}
             notifyOnPasswordChanged={handlePasswordChanged}
             isDisabled={isLoading}
-            notifyOnFocused={() => {}}
           />
+          {showResendVerification && (
+            <ResendVerificationEmail
+              email={lastAttemptedEmail}
+              password={lastAttemptedPassword}
+            />
+          )}
           <PrimaryButton
             fullWidth
             variant="contained"

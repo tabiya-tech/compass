@@ -12,6 +12,10 @@ import StdFirebaseAuthenticationService, {
 } from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
 import { formatTokenForLogging } from "src/auth/utils/formatTokenForLogging";
 import { TokenError } from "src/error/commonErrors";
+import firebase from "firebase/compat/app";
+import { EmailAuthProvider } from "firebase/auth";
+
+type UserCredential = firebase.auth.UserCredential;
 
 class FirebaseEmailAuthenticationService extends AuthenticationService {
   private static instance: FirebaseEmailAuthenticationService;
@@ -238,6 +242,103 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     }
 
     return { isValid: true, decodedToken: decodedToken as FirebaseToken };
+  }
+
+  /**
+   * Link an anonymous account with email and password credentials
+   * @param {string} email - The user's email address
+   * @param {string} password - The user's password
+   * @param {string} username - The user's username
+   * @returns {Promise<string>} - The firebase token
+   * @throws {FirebaseError} If linking fails or verification email fails
+   */
+  async linkAnonymousAccount(email: string, password: string, username: string): Promise<string> {
+    const firebaseErrorFactory = getFirebaseErrorFactory(
+      "EmailAuthService",
+      "linkAnonymousAccount",
+      "POST",
+      "linkWithCredential"
+    );
+
+    const currentUser = firebaseAuth.currentUser;
+    if (!currentUser) {
+      throw firebaseErrorFactory(FirebaseErrorCodes.USER_NOT_FOUND, "No anonymous user is currently logged in", {});
+    }
+
+    if (!currentUser.isAnonymous) {
+      throw firebaseErrorFactory(FirebaseErrorCodes.INVALID_LOGIN_METHOD, "Current user is not an anonymous user", {});
+    }
+    let userCredential: UserCredential;
+    try {
+      // Create email credential
+      const credential = EmailAuthProvider.credential(email, password);
+
+      // Link anonymous account with email credential
+      userCredential = await currentUser.linkWithCredential(credential);
+    } catch (error) {
+      throw firebaseErrorFactory((error as any).code, (error as any).message);
+    }
+
+    if (!userCredential.user) {
+      throw firebaseErrorFactory(FirebaseErrorCodes.USER_NOT_FOUND, "User not found after linking", {});
+    }
+    try {
+      // Update display name
+      await userCredential.user.updateProfile({ displayName: username });
+
+      // Send verification email
+      await userCredential.user.sendEmailVerification();
+
+      // Get new token after linking
+      const token = await userCredential.user.getIdToken();
+
+      // Update login method
+      PersistentStorageService.setLoginMethod(AuthenticationServices.FIREBASE_EMAIL);
+
+      // Call onSuccessfulLogin to ensure all necessary state is updated
+      await super.onSuccessfulLogin(token);
+
+      return token;
+    } catch (error) {
+      throw firebaseErrorFactory((error as any).code, (error as any).message);
+    }
+  }
+
+  /**
+   * Resend verification email to the user
+   * @param {string} email - The user's email address
+   * @param {string} password - The user's password
+   * @returns {Promise<void>}
+   * @throws {FirebaseError} If sending verification email fails
+   */
+  async resendVerificationEmail(email: string, password: string): Promise<void> {
+    const firebaseErrorFactory = getFirebaseErrorFactory(
+      "EmailAuthService",
+      "resendVerificationEmail",
+      "POST",
+      "signInWithEmailAndPassword"
+    );
+
+    let userCredential;
+    try {
+      userCredential = await firebaseAuth.signInWithEmailAndPassword(email, password);
+    } catch (error) {
+      throw firebaseErrorFactory((error as any).code, (error as any).message);
+    }
+
+    if (!userCredential.user) {
+      throw firebaseErrorFactory(FirebaseErrorCodes.USER_NOT_FOUND, "User not found", {});
+    }
+
+    if (userCredential.user.emailVerified) {
+      throw firebaseErrorFactory(FirebaseErrorCodes.EMAIL_ALREADY_VERIFIED, "Email already verified", {});
+    }
+
+    try {
+      await userCredential.user.sendEmailVerification();
+    } catch (error) {
+      throw firebaseErrorFactory((error as any).code, (error as any).message);
+    }
   }
 }
 

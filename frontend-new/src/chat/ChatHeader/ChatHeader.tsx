@@ -1,4 +1,4 @@
-import React, { SetStateAction, useContext, useState } from "react";
+import React, { SetStateAction, useContext, useState, useMemo } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import { NavLink, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -10,6 +10,9 @@ import AnimatedBadge from "src/theme/AnimatedBadge/AnimatedBadge";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import * as Sentry from "@sentry/react";
+import AnonymousAccountConversionDialog from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
+import authenticationStateService from "src/auth/services/AuthenticationState.service";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 
 export type ChatHeaderProps = {
   notifyOnLogout: () => void;
@@ -36,6 +39,7 @@ export const MENU_ITEM_ID = {
   LOGOUT_BUTTON: `logout-button-${uniqueId}`,
   START_NEW_CONVERSATION: `start-new-conversation-${uniqueId}`,
   REPORT_BUG_BUTTON: `report-bug-button-${uniqueId}`,
+  REGISTER: `register-${uniqueId}`,
 };
 
 export const MENU_ITEM_TEXT = {
@@ -43,6 +47,7 @@ export const MENU_ITEM_TEXT = {
   LOGOUT: "logout",
   START_NEW_CONVERSATION: "start new conversation",
   REPORT_BUG: "report a bug",
+  REGISTER: "register",
 };
 
 const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
@@ -56,15 +61,19 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   const theme = useTheme();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [showConversionDialog, setShowConversionDialog] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   const isOnline = useContext(IsOnlineContext);
+  const user = authenticationStateService.getInstance().getUser();
+  const isAnonymous = !user?.name || !user?.email;
 
   const handleViewExperiences = () => {
     notifyOnExperiencesDrawerOpen();
     setExploredExperiencesNotification(false);
   };
 
-  const contextMenuItems: MenuItemConfig[] = [
+  const contextMenuItems: MenuItemConfig[] = useMemo(() => [
     {
       id: MENU_ITEM_ID.START_NEW_CONVERSATION,
       text: MENU_ITEM_TEXT.START_NEW_CONVERSATION,
@@ -95,21 +104,31 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         }
       },
     },
+    ...(isAnonymous
+      ? [
+          {
+            id: MENU_ITEM_ID.REGISTER,
+            text: MENU_ITEM_TEXT.REGISTER,
+            disabled: !isOnline,
+            action: () => setShowConversionDialog(true),
+          },
+        ]
+      : []),
     {
       id: MENU_ITEM_ID.LOGOUT_BUTTON,
       text: MENU_ITEM_TEXT.LOGOUT,
       disabled: false,
       action: notifyOnLogout,
     },
-  ];
+  ], [isAnonymous, isOnline, navigate, notifyOnLogout, startNewConversation]);
 
   return (
-    <Box
-      display="flex"
-      alignItems="center"
-      justifyContent="space-between"
-      data-testid={DATA_TEST_ID.CHAT_HEADER_CONTAINER}
-    >
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        data-testid={DATA_TEST_ID.CHAT_HEADER_CONTAINER}
+      >
       <NavLink style={{ lineHeight: 0 }} to={routerPaths.ROOT} data-testid={DATA_TEST_ID.CHAT_HEADER_LOGO_LINK}>
         <img
           src={`${process.env.PUBLIC_URL}/compass.svg`}
@@ -117,7 +136,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
           height={12 * theme.tabiyaSpacing.xl} // xl wasn't quite big enough, we're going for ~48px
           data-testid={DATA_TEST_ID.CHAT_HEADER_LOGO}
         />
-      </NavLink>
+          </NavLink>
       <Typography variant="h1">Compass</Typography>
       <Box
         sx={{
@@ -127,37 +146,48 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
           gap: theme.spacing(theme.tabiyaSpacing.xl),
         }}
       >
-        <PrimaryIconButton
+          <PrimaryIconButton
           sx={{
             color: theme.palette.common.black,
           }}
-          onClick={handleViewExperiences}
-          data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES}
+            onClick={handleViewExperiences}
+            data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES}
           title="view experiences"
           disabled={!isOnline}
-        >
+          >
           <AnimatedBadge badgeContent={experiencesExplored} invisible={!exploredExperiencesNotification}>
             <BadgeOutlinedIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_EXPERIENCES} />
-          </AnimatedBadge>
-        </PrimaryIconButton>
-        <PrimaryIconButton
+            </AnimatedBadge>
+          </PrimaryIconButton>
+          <PrimaryIconButton
           sx={{
             color: theme.palette.common.black,
           }}
-          onClick={(event) => setAnchorEl(event.currentTarget)}
-          data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_USER}
+            onClick={(event) => setAnchorEl(event.currentTarget)}
+            data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_USER}
           title="user info"
-        >
-          <PermIdentityIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_USER} />
-        </PrimaryIconButton>
+          >
+            <PermIdentityIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_USER} />
+          </PrimaryIconButton>
+        </Box>
+        <ContextMenu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          notifyOnClose={() => setAnchorEl(null)}
+          items={contextMenuItems}
+        />
+        <AnonymousAccountConversionDialog
+          isOpen={showConversionDialog}
+          onClose={() => setShowConversionDialog(false)}
+          onSuccess={() => {
+            enqueueSnackbar(`Currently logged in as ${authenticationStateService.getInstance().getUser()?.name}. You will need to verify your account before logging in again.`, { 
+              variant: "info",
+              persist: true,
+              autoHideDuration: null
+            });
+          }}
+        />
       </Box>
-      <ContextMenu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        notifyOnClose={() => setAnchorEl(null)}
-        items={contextMenuItems}
-      />
-    </Box>
   );
 };
 

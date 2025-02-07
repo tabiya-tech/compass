@@ -12,6 +12,10 @@ import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { DATA_TEST_ID as ANIMATED_BADGE_DATA_TEST_ID } from "src/theme/AnimatedBadge/AnimatedBadge";
 import userEvent from "@testing-library/user-event";
+import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
+import AnonymousAccountConversionDialog, { DATA_TEST_ID as ANONYMOUS_ACCOUNT_CONVERSION_DIALOG_DATA_TEST_ID } from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
 
 // mock the ContextMenu
 jest.mock("src/theme/ContextMenu/ContextMenu", () => {
@@ -50,6 +54,29 @@ jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSo
       return {
         logout: jest.fn(),
       };
+    }),
+  };
+});
+
+// mock the AnonymousAccountConversionDialog
+jest.mock("src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog", () => {
+  const actual = jest.requireActual("src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog");
+  return {
+    __esModule: true,
+    ...actual,
+    default: jest.fn(() => <div data-testid={actual.DATA_TEST_ID.DIALOG}/>),
+  };
+});
+
+// mock the snackbar provider
+jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
+  const actual = jest.requireActual("src/theme/SnackbarProvider/SnackbarProvider");
+  return {
+    ...actual,
+    __esModule: true,
+    useSnackbar: jest.fn().mockReturnValue({
+      enqueueSnackbar: jest.fn(),
+      closeSnackbar: jest.fn(),
     }),
   };
 });
@@ -427,5 +454,184 @@ describe("ChatHeader", () => {
         expect(screen.getByTestId(MENU_ITEM_ID.LOGOUT_BUTTON)).toBeInTheDocument();
       }
     );
+  });
+
+  describe("register button tests", () => {
+    const mockRegisteredUser = {
+      id: "test-id",
+      name: "Test User",
+      email: "test@example.com",
+    };
+
+    // Anonymous users have no name or email
+    const mockAnonymousUser = {
+      id: "anonymous-id",
+      name: "",
+      email: "",
+    };
+
+    beforeEach(() => {
+      (ContextMenu as jest.Mock).mockClear();
+      resetAllMethodMocks(AuthenticationStateService.getInstance());
+    });
+
+    test("should show register button in menu for anonymous user", async () => {
+      // GIVEN an anonymous user
+      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValueOnce(mockAnonymousUser);
+
+      // AND a ChatHeader component
+      const givenChatHeader = (
+        <ChatHeader
+          notifyOnLogout={jest.fn()}
+          startNewConversation={jest.fn()}
+          notifyOnExperiencesDrawerOpen={jest.fn()}
+          experiencesExplored={0}
+          exploredExperiencesNotification={false}
+          setExploredExperiencesNotification={jest.fn()}
+        />
+      );
+
+      // WHEN the chat header is rendered
+      render(givenChatHeader);
+
+      // AND the user button is clicked
+      const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
+      await userEvent.click(userButton);
+
+      // THEN expect the register button to be visible in the menu
+      await waitFor(() => {
+        expect(ContextMenu).toHaveBeenCalledWith(
+          expect.objectContaining({
+            anchorEl: userButton,
+            open: true,
+            items: expect.arrayContaining([
+              expect.objectContaining({
+                id: MENU_ITEM_ID.REGISTER,
+                text: "register",
+                disabled: expect.any(Boolean),
+              }),
+              expect.anything()
+            ]),
+          }),
+          {}
+        );
+      });
+    });
+
+    test("should not show register button in menu for registered user", async () => {
+      // GIVEN a registered user ( user with a name and email )
+      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValueOnce(mockRegisteredUser);
+
+      // AND a ChatHeader component
+      const givenChatHeader = (
+        <ChatHeader
+          notifyOnLogout={jest.fn()}
+          startNewConversation={jest.fn()}
+          notifyOnExperiencesDrawerOpen={jest.fn()}
+          experiencesExplored={0}
+          exploredExperiencesNotification={false}
+          setExploredExperiencesNotification={jest.fn()}
+        />
+      );
+
+      // WHEN the chat header is rendered
+      render(givenChatHeader);
+
+      // AND the user button is clicked
+      const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
+      await userEvent.click(userButton);
+
+      // THEN expect the register button to not be visible in the menu
+      await waitFor(() => {
+        expect(ContextMenu).toHaveBeenCalledWith(
+          expect.objectContaining({
+            anchorEl: userButton,
+            open: true,
+            items: expect.arrayContaining([
+              expect.not.objectContaining({
+                id: MENU_ITEM_ID.REGISTER,
+                text: "register",
+                disabled: expect.any(Boolean),
+              }),
+            ]),
+          }),
+          {}
+        );
+      });
+    });
+
+    test("should open conversion dialog when register button is clicked", async () => {
+      // GIVEN an anonymous user
+      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValueOnce(mockAnonymousUser);
+
+      // AND a ChatHeader component
+      const givenChatHeader = (
+        <ChatHeader
+          notifyOnLogout={jest.fn()}
+          startNewConversation={jest.fn()}
+          notifyOnExperiencesDrawerOpen={jest.fn()}
+          experiencesExplored={0}
+          exploredExperiencesNotification={false}
+          setExploredExperiencesNotification={jest.fn()}
+        />
+      );
+
+      // WHEN the chat header is rendered
+      render(givenChatHeader);
+
+      // AND the user button is clicked
+      const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
+      await userEvent.click(userButton);
+
+      // AND the register button is clicked
+      const registerMenuItem = screen.getByTestId(MENU_ITEM_ID.REGISTER);
+      await userEvent.click(registerMenuItem);
+
+      // THEN expect the conversion dialog to be opened
+      expect(screen.getByTestId(ANONYMOUS_ACCOUNT_CONVERSION_DIALOG_DATA_TEST_ID.DIALOG)).toBeInTheDocument();
+    });
+
+    test("should show success message when conversion is successful", async () => {
+      // GIVEN an anonymous user
+      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValueOnce(mockAnonymousUser);
+
+      // AND a ChatHeader component
+      const givenChatHeader = (
+        <ChatHeader
+          notifyOnLogout={jest.fn()}
+          startNewConversation={jest.fn()}
+          notifyOnExperiencesDrawerOpen={jest.fn()}
+          experiencesExplored={0}
+          exploredExperiencesNotification={false}
+          setExploredExperiencesNotification={jest.fn()}
+        />
+      );
+
+      // WHEN the chat header is rendered
+      render(givenChatHeader);
+
+      // AND the user button is clicked
+      const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
+      await userEvent.click(userButton);
+
+      // AND the register button is clicked
+      const registerMenuItem = screen.getByTestId(MENU_ITEM_ID.REGISTER);
+      await userEvent.click(registerMenuItem);
+
+      // AND the conversion is successful
+      (AnonymousAccountConversionDialog as jest.Mock).mock.calls[0][0].onSuccess();
+
+      // THEN expect a success message to be shown
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenLastCalledWith(
+        // undefined here since we are not going through the process of registering the user,
+        // so the state is not set, meaning we get the same anonymous user.name
+        `Currently logged in as undefined. You will need to verify your account before logging in again.`,
+        {
+          variant: "info",
+          persist: true,
+          autoHideDuration: null,
+        }
+      );
+    });
   });
 });

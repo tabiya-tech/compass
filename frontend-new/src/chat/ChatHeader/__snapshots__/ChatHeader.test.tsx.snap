@@ -2,7 +2,7 @@
 
 exports[`ChatHeader should render the Chat Header with exploredExperiencesNotification not shown 1`] = `
 <div
-  class="MuiBox-root css-1lekzkb"
+  class="MuiBox-root css-69i1ev"
   data-testid="chat-header-container-7413b63a-887b-4f41-b930-89e9770db12b"
 >
   <a
@@ -110,18 +110,26 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
       report a bug
     </div>
     <div
+      data-testid="register-7413b63a-887b-4f41-b930-89e9770db12b"
+    >
+      register
+    </div>
+    <div
       data-testid="logout-button-7413b63a-887b-4f41-b930-89e9770db12b"
     >
       logout
     </div>
     ;
   </div>
+  <div
+    data-testid="anonymous-account-conversion-dialog-a4b3c2d1-e5f6-4g7h-8i9j-0k1l2m3n4o5p"
+  />
 </div>
 `;
 
 exports[`ChatHeader should render the Chat Header with exploredExperiencesNotification shown 1`] = `
 <div
-  class="MuiBox-root css-1lekzkb"
+  class="MuiBox-root css-69i1ev"
   data-testid="chat-header-container-7413b63a-887b-4f41-b930-89e9770db12b"
 >
   <a
@@ -235,11 +243,19 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
       report a bug
     </div>
     <div
+      data-testid="register-7413b63a-887b-4f41-b930-89e9770db12b"
+    >
+      register
+    </div>
+    <div
       data-testid="logout-button-7413b63a-887b-4f41-b930-89e9770db12b"
     >
       logout
     </div>
     ;
   </div>
+  <div
+    data-testid="anonymous-account-conversion-dialog-a4b3c2d1-e5f6-4g7h-8i9j-0k1l2m3n4o5p"
+  />
 </div>
 `;

@@ -2,8 +2,8 @@
 import "src/_test_utilities/consoleMock";
 import RegisterWithEmailForm, { DATA_TEST_ID } from "./RegisterWithEmailForm";
 import React from "react";
-import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
-import { validatePassword } from "src/auth/utils/validatePassword";
+import { render, screen, fireEvent, act } from "src/_test_utilities/test-utils";
+import PasswordInput, { DATA_TEST_ID as PASSWORD_INPUT_DATA_TEST_ID} from "src/theme/PasswordInput/PasswordInput";
 
 // mock the SocialAuthService
 jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service", () => {
@@ -18,10 +18,22 @@ jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSo
 });
 
 // mock the password validator
-jest.mock("src/auth/utils/validatePassword", () => {
+jest.mock("src/theme/PasswordInput/utils/validatePassword", () => {
   return {
     __esModule: true,
     validatePassword: jest.fn().mockReturnValue(""),
+  };
+});
+
+// mock the password input
+jest.mock("src/theme/PasswordInput/PasswordInput", () => {
+  const actual = jest.requireActual("src/theme/PasswordInput/PasswordInput");
+  return {
+    __esModule: true,
+    ...actual,
+    default: jest.fn().mockImplementation(() => {
+      return <div data-testid={actual.DATA_TEST_ID.TEXT_FIELD} />;
+    }),
   };
 });
 
@@ -52,13 +64,13 @@ describe("Testing Register Email Form component", () => {
     expect(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT)).toBeInTheDocument();
 
     // AND the password input should be rendered
-    expect(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT)).toBeInTheDocument();
+    expect(screen.getByTestId(PASSWORD_INPUT_DATA_TEST_ID.TEXT_FIELD)).toBeInTheDocument();
 
     // AND the register button should be rendered
     expect(screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON)).toBeInTheDocument();
 
-    // AND the register button should not be disabled
-    expect(screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON)).not.toBeDisabled();
+    // AND the register button should be disabled
+    expect(screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON)).toBeDisabled();
 
     // AND the component should match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.FORM)).toMatchSnapshot();
@@ -69,48 +81,46 @@ describe("Testing Register Email Form component", () => {
       // WHEN the component is rendered
       render(<RegisterWithEmailForm notifyOnRegister={givenNotifyOnRegister} isRegistering={givenIsRegistering} />);
 
-      // AND the register button should not be disabled
-      expect(screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON)).not.toBeDisabled();
+      // AND the register button should be disabled
+      expect(screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON)).toBeDisabled();
 
       // AND the register button should be rendered
       const registerButton = screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON);
       expect(registerButton).toBeInTheDocument();
 
       // Simulate form input and submission
-      fireEvent.change(screen.getByTestId(DATA_TEST_ID.USERNAME_INPUT), { target: { value: "Foo Bar" } });
       fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: "foo@bar.baz" } });
-      fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: "Password123$" } });
+
+      act(() => {
+        (PasswordInput as jest.Mock).mock.calls[0][0].onChange({ target: { value: "Password123$" } });
+        (PasswordInput as jest.Mock).mock.calls[0][0].onValidityChange(true);
+      })
 
       // AND the form is submitted
       fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
 
       // THEN expect notifyOnRegister to have been called
-      expect(givenNotifyOnRegister).toHaveBeenCalledWith("Foo Bar", "foo@bar.baz", "Password123$");
+      expect(givenNotifyOnRegister).toHaveBeenCalledWith("foo@bar.baz", "Password123$");
+
+      // AND expect no errors or warnings to be logged
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
     });
 
     test.each([
       [
         "invalid email",
         {
-          name: "Foo Bar",
           email: "invalid-email",
           password: "Password123$",
         },
       ],
-      [
-        "invalid name",
-        {
-          name: "",
-          email: "foo@bar.baz",
-          password: "Password123$",
-        },
-      ],
-    ])("should not validate the form when the form has an %s", async (_description, givenValue) => {
+    ])("should not submit form with %s", async (testCase, givenValue) => {
       // WHEN the component is rendered
       render(<RegisterWithEmailForm notifyOnRegister={givenNotifyOnRegister} isRegistering={givenIsRegistering} />);
 
-      // AND the register button should not be disabled
-      expect(screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON)).not.toBeDisabled();
+      // AND the register button should be disabled
+      expect(screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON)).toBeDisabled();
 
       // Validate the form before submission
       const form = screen.getByTestId(DATA_TEST_ID.FORM);
@@ -121,46 +131,48 @@ describe("Testing Register Email Form component", () => {
       expect(registerButton).toBeInTheDocument();
 
       // Simulate form input and submission
-      fireEvent.change(screen.getByTestId(DATA_TEST_ID.USERNAME_INPUT), { target: { value: givenValue.name } });
       fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: givenValue.email } });
-      fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: givenValue.password } });
+      act(() => {
+        (PasswordInput as jest.Mock).mock.calls[0][0].onChange({ target: { value: "Password123$" } });
+        (PasswordInput as jest.Mock).mock.calls[0][0].onValidityChange(true);
+      })
 
       // AND the form is submitted
       fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
 
       // THEN expect the form to be invalid
       expect(isValid).toBeFalsy();
+
+      // AND expect no errors or warnings to be logged
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
     });
 
     test("should not call notifyOnRegister if the password is invalid", async () => {
-      // GIVEN the password validator will return false for the given password
-      (validatePassword as jest.Mock).mockReturnValue({
-        length: false,
-        lowercase: false,
-        uppercase: false,
-        number: false,
-        specialChar: false,
-      });
-      const givenPassword = "password";
-
       // WHEN the component is rendered
       render(<RegisterWithEmailForm notifyOnRegister={givenNotifyOnRegister} isRegistering={givenIsRegistering} />);
 
       // AND the register button should be rendered
       const registerButton = screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON);
       expect(registerButton).toBeInTheDocument();
-      // AND the register button should not be disabled
-      expect(registerButton).not.toBeDisabled();
+      // AND the register button should be disabled
+      expect(registerButton).toBeDisabled();
 
       // Simulate form input and submission
-      fireEvent.change(screen.getByTestId(DATA_TEST_ID.USERNAME_INPUT), { target: { value: "Foo Bar" } });
       fireEvent.change(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT), { target: { value: "foo@bar.baz" } });
-      fireEvent.change(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT), { target: { value: givenPassword } });
+      act(() => {
+        (PasswordInput as jest.Mock).mock.calls[0][0].onChange({ target: { value: "Password123$" } });
+        (PasswordInput as jest.Mock).mock.calls[0][0].onValidityChange(false); // password is invalid
+      })
 
       // THEN expect notifyOnRegister to not have been called
       expect(givenNotifyOnRegister).not.toHaveBeenCalled();
       // AND the register button should be disabled
       expect(registerButton).toBeDisabled();
+
+      // AND expect no errors or warnings to be logged
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
     });
 
     test("should disable everything if registering is still in progress", () => {
@@ -169,11 +181,20 @@ describe("Testing Register Email Form component", () => {
       render(<RegisterWithEmailForm notifyOnRegister={givenNotifyOnRegister} isRegistering={givenIsRegistering} />);
 
       // THEN expect all inputs and buttons to be disabled
-      expect(screen.getByTestId(DATA_TEST_ID.USERNAME_INPUT)).toBeDisabled();
       expect(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT)).toBeDisabled();
-      expect(screen.getByTestId(DATA_TEST_ID.PASSWORD_INPUT)).toBeDisabled();
       expect(screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON)).toBeDisabled();
       expect(screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON_CIRCULAR_PROGRESS)).toBeInTheDocument();
+
+      expect(PasswordInput).toHaveBeenCalledWith(
+        expect.objectContaining({
+          disabled: true
+        }),
+        expect.anything()
+      );
+
+      // AND expect no errors or warnings to be logged
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
     });
   });
 });
