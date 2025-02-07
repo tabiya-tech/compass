@@ -12,10 +12,12 @@ export enum FirebaseErrorCodes {
   INTERNAL_ERROR = "auth/internal-error",
   TOO_MANY_USERS = "auth/too-many-users",
   POPUP_CLOSED_BY_USER = "auth/popup-closed-by-user",
+  INVALID_LOGIN_METHOD = "auth/invalid-login-method",
   INVALID_REGISTRATION_CODE = "INVALID_REGISTRATION_CODE",
   INVALID_INVITATION_CODE = "INVALID_INVITATION_CODE",
   INVALID_INVITATION_TYPE = "INVALID_INVITATION_TYPE",
   INVALID_REGISTRATION_TYPE = "INVALID_REGISTRATION_TYPE",
+  EMAIL_ALREADY_VERIFIED = "auth/email-already-verified",
 }
 
 /**
@@ -47,4 +49,7 @@ export const USER_FRIENDLY_FIREBASE_ERROR_MESSAGES: Record<FirebaseErrorCodes, s
     "The code you used is for login and not for registration. Please go to the login page.",
   [FirebaseErrorCodes.POPUP_CLOSED_BY_USER]:
     "The Google sign-in popup was closed before completing the sign-in process.",
+  [FirebaseErrorCodes.INVALID_LOGIN_METHOD]:
+    "This operation is not allowed with the current login method.",
+  [FirebaseErrorCodes.EMAIL_ALREADY_VERIFIED]: "The email address is already verified.",
 };

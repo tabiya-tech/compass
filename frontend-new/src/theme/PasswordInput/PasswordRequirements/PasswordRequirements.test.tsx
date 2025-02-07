@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import PasswordRequirements from "src/auth/components/PasswordRequirements/PasswordRequirements";
+import PasswordRequirements from "src/theme/PasswordInput/PasswordRequirements/PasswordRequirements";
 
 describe("PasswordRequirements", () => {
   test("should render all password requirements", () => {
