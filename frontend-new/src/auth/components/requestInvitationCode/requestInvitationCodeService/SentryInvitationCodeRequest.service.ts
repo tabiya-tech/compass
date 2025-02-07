@@ -9,6 +9,12 @@ export function requestInvitationCode(data: InvitationCodeRequestData) {
       name: data.name,
       email: data.email,
       message: `A user has requested an invitation code. Additional information: ${data.message}`,
+      tags: {
+        source: "Request Invitation Code Form",
+        name: data.name
+      }
+    }, {
+      includeReplay: false,
     });
   } catch (e) {
     throw new InvitationError(`Something went wrong while attempting to request new invitation for user with email ${data.email}`, e as Error);

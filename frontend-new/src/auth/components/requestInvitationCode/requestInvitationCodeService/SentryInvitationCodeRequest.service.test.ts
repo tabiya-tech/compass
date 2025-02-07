@@ -19,14 +19,19 @@ describe("requestInvitationCode", () => {
     };
 
     // WHEN requesting an invitation code
-    await requestInvitationCode(requestData);
+    requestInvitationCode(requestData);
 
     // THEN expect Sentry.captureFeedback to be called with the correct data
     expect(Sentry.captureFeedback).toHaveBeenCalledWith({
-      name: requestData.name,
-      email: requestData.email,
-      message: `A user has requested an invitation code. Additional information: ${requestData.message}`,
-    });
+        name: requestData.name,
+        email: requestData.email,
+        message: `A user has requested an invitation code. Additional information: ${requestData.message}`,
+        tags: {
+          source: "Request Invitation Code Form",
+          name: requestData.name,
+        },
+      }, { includeReplay: false },
+    );
   });
 
   it("should throw an error if Sentry.captureFeedback fails", async () => {
