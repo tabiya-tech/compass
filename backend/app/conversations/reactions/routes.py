@@ -9,6 +9,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Path
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from app.context_vars import session_id_ctx_var, user_id_ctx_var
 from app.application_state import ApplicationStateManager
 from app.constants.errors import HTTPErrorResponse
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
@@ -67,7 +68,6 @@ def add_reaction_routes(conversation_router: APIRouter, auth: Authentication):
             user_preferences_repository: IUserPreferenceRepository = Depends(get_user_preferences_repository),
             user_info: UserInfo = Depends(auth.get_user_info())
     ) -> ReactionDocModel:
-        # TODO: REVIEW
         # set the session_id, user_id in the context variable
         # so that it can be accessed by the logger
         # and downstream functions
@@ -109,7 +109,6 @@ def add_reaction_routes(conversation_router: APIRouter, auth: Authentication):
             user_preferences_repository: IUserPreferenceRepository = Depends(get_user_preferences_repository),
             user_info: UserInfo = Depends(auth.get_user_info())
     ):
-        # TODO: REVIEW
         # set the session_id, user_id in the context variable
         # so that it can be accessed by the logger
         # and downstream functions
