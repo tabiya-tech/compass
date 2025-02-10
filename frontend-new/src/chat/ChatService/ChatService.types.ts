@@ -6,6 +6,7 @@ export enum ConversationMessageSender {
   COMPASS = "COMPASS",
 }
 
+// TODO REVIEW MessageReaction
 export interface ReactionResponse {
   id: string;
   kind: ReactionType | null;

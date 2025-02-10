@@ -34,7 +34,7 @@ export const customFetch = async (
 
   const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, init.method ?? "Unknown method", apiUrl);
   let response: Response;
-  const token = PersistentStorageService.getToken();
+  const token = PersistentStorageService.getToken(); // TODO REVIEW: should be fetched from the authentication state provider. PLease add ticket
 
   try {
     const headers = new Headers(init.headers || {});

@@ -34,6 +34,7 @@ jest.mock("src/chat/chatMessage/components/chatBubble/ChatBubble", () => {
 });
 
 describe("render tests", () => {
+  // TODO REVIEW: remove the useFakeTimers and setSystemTime calls
   beforeAll(() => {
     jest.useFakeTimers();
     jest.setSystemTime(new Date(2020, 3, 1));
@@ -93,5 +94,6 @@ describe("render tests", () => {
 
     // AND expect the component to match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_CONTAINER)).toMatchSnapshot();
+    // TODO REVIEW: and no console errors or warnings should have occurred
   });
 });

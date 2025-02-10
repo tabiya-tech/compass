@@ -1,11 +1,10 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
 
-import { render, screen, act, waitFor } from "src/_test_utilities/test-utils";
+import { render, screen, act, waitFor , userEvent } from "src/_test_utilities/test-utils";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { ReactionType } from "src/feedback/reaction/reaction.types";
 import { ReactionService } from "src/feedback/reaction/services/reactionService/reaction.service";
-import userEvent from "@testing-library/user-event";
 import ReactionButtons, { DATA_TEST_ID } from "src/feedback/reaction/components/reactionButtons/ReactionButtons";
 import ReactionReasonPopover, {
   DATA_TEST_ID as REACTION_REASON_POPOVER_DATA_TEST_ID,
@@ -75,6 +74,9 @@ describe("ReactionButtons", () => {
       // THEN expect neither the like nor the dislike button to be active
       expect(screen.getByTestId(DATA_TEST_ID.ICON_LIKE_DEFAULT)).toBeInTheDocument();
       expect(screen.getByTestId(DATA_TEST_ID.ICON_DISLIKE_DEFAULT)).toBeInTheDocument();
+
+      // TODO REVIEW: missing snapshot
+      // TODO REVIEW missing console logs and warnings
     });
 
     test.each([
@@ -116,6 +118,8 @@ describe("ReactionButtons", () => {
       expect(container).toMatchSnapshot();
     });
 
+    // TODO REVIEW: is this a render test or an action test?
+    //   also not sure about his test it is initializing the component with a like and then clicking dislike?
     test("should call the ReactionReasonPopover with the correct parameters", async () => {
       // GIVEN the component is rendered
       const givenMessageId = "123";
@@ -162,6 +166,7 @@ describe("ReactionButtons", () => {
       mockGetActiveSessionId.mockReturnValue(givenSessionId);
 
       // AND a mocked service
+      // TODO REVIEW: AND the reaction will be sent successfully
       mockSendReaction.mockResolvedValueOnce();
       // AND the component is rendered
       render(<ReactionButtons messageId={givenMessageId} currentReaction={null} />);
