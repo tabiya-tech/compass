@@ -1,6 +1,6 @@
 import ReactionService from "src/feedback/reaction/services/reactionService/reaction.service";
 import { ReactionType } from "src/feedback/reaction/reaction.types";
-import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
+import { setupAPIServiceSpy, setupFetchSpy } from "src/_test_utilities/fetchSpy";
 import { StatusCodes } from "http-status-codes";
 
 describe("ReactionService", () => {
@@ -12,7 +12,9 @@ describe("ReactionService", () => {
       const givenMessageId = "456";
 
       // AND the API will return a successful response
-      const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, {}, "application/json;charset=UTF-8");
+      // TODO REVIEW it is should not be StatusCodes.OK but StatusCodes.CREATED
+      //  why is it even working?
+      const fetchSpy = setupFetchSpy(StatusCodes.CREATED, {}, "application/json;charset=UTF-8");
 
       // WHEN sending a reaction
       const reactionService = new ReactionService();
@@ -23,7 +25,7 @@ describe("ReactionService", () => {
         `${reactionService.reactionEndpointUrl}/${givenSessionId}/messages/${givenMessageId}/reactions`,
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: expect.objectContaining({ "Content-Type": "application/json" }),
           body: JSON.stringify(givenReaction),
           expectedStatusCode: StatusCodes.CREATED,
           serviceName: "ReactionService",

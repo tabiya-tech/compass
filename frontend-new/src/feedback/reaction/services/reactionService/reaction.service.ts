@@ -18,6 +18,9 @@ export class ReactionService {
     const method = "PUT";
 
     const reactionURL = `${this.reactionEndpointUrl}/${sessionId}/messages/${messageId}/reactions`;
+    // TODO the request body type is missing here
+    //  it is not clear if the backend expects a list of reasons or a single reason
+    //  also the "cryptic" reaction.reason && [reaction.reason], should be clarified as this imply that the reason is optional
     const body = JSON.stringify({ kind: reaction.kind, reason: reaction.reason && [reaction.reason] });
 
     await customFetch(reactionURL, {

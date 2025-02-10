@@ -52,10 +52,14 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
   };
 
   const handleLikeClick = async () => {
+    // TODO REVIEW: This should be handled by the parent component, or at a use effect?
+    // this should not be checked on every single  function
     if (!activeSessionId) {
       throw new ReactionError("Session id is not available");
     }
 
+    // TODO REVIEW: hmmm is there a better was like deactivating the component while submitting?
+    //  showing a "skeleton" or a spinner? 
     // If the user is submitting a request, do nothing
     if (isSubmitting) {
       enqueueSnackbar("Please wait, your request is being processed.", { variant: "warning" });
@@ -161,7 +165,7 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
           onClick={handleLikeClick}
           data-testid={DATA_TEST_ID.BUTTON_LIKE}
           title="like"
-          disabled={!isOnline}
+          disabled={!isOnline} // TODO REVIEW: isonline tests are missing
         >
           {reaction === ReactionType.LIKED ? (
             <ThumbUpAltIcon

@@ -2,8 +2,7 @@
 import "src/_test_utilities/consoleMock";
 
 import React from "react";
-import { render, screen } from "src/_test_utilities/test-utils";
-import userEvent from "@testing-library/user-event";
+import { render, screen, userEvent} from "src/_test_utilities/test-utils";
 import ReactionReasonPopover, {
   DATA_TEST_ID,
 } from "src/feedback/reaction/components/reactionReasonPopover/ReactionReasonPopover";
@@ -42,6 +41,7 @@ describe("ReactionReasonPopover", () => {
       expect(screen.getByTestId(DATA_TEST_ID.POPOVER)).toBeInTheDocument();
       // AND expect the component to match snapshot
       expect(container).toMatchSnapshot();
+      // TODO REVIEW: and no console errors or warnings should have occurred
     });
   });
 

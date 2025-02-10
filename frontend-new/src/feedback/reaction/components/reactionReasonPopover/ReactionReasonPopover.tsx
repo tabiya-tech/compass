@@ -26,9 +26,9 @@ export const DATA_TEST_ID = {
 export const ReactionReasonPopover: React.FC<ReactionReasonPopoverProps> = ({
   anchorEl,
   open,
-  onClose,
+  onClose, // TODO REVIEW, no reason to hav on ReasonSelect and an on Close function, it should be the same
   onReasonSelect,
-  ...props
+  ...props // TODO REVIEW, no need to spread props as they are not used
 }) => {
   const theme = useTheme();
 
