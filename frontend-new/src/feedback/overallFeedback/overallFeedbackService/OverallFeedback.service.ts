@@ -1,4 +1,4 @@
-import { getRestAPIErrorFactory } from "src/error/restAPIError/RestAPIError";
+import { getRestAPIErrorFactory, RestAPIErrorFactory } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
 import { customFetch } from "src/utils/customFetch/customFetch";
 import { getBackendUrl } from "src/envService";
@@ -29,6 +29,36 @@ export default class OverallFeedbackService {
   static getInstance(sessionId: number): OverallFeedbackService {
     return new OverallFeedbackService(sessionId);
   }
+
+  /**
+   * Parse the JSON response from the backend into a UserPreference object.
+   * @param response
+   * @param userId
+   * @param errorFactory
+   * @private
+   */
+  private async parseJsonResponse(response: Response, userId: string, sessionId: number, errorFactory: RestAPIErrorFactory): Promise<FeedbackResponse> {
+    // parse the response body
+    let feedbackResponse: FeedbackResponse;
+    try {
+      const jsonPayload: FeedbackResponse = JSON.parse(await response.text());
+      feedbackResponse = {
+        user_id: userId,
+        session_id: jsonPayload.session_id,
+        version: jsonPayload.version,
+        feedback: jsonPayload.feedback,
+      };
+    } catch (error) {
+      throw errorFactory(
+        StatusCodes.UNPROCESSABLE_ENTITY,
+        ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
+        "Failed to parse response body",
+        response
+      );
+    }
+    return feedbackResponse;
+  }
+
 
   /**
    * Sends feedback to the backend.
@@ -73,20 +103,6 @@ export default class OverallFeedbackService {
       expectedContentType: "application/json",
     });
 
-    const responseBody = await response.text();
-
-    try {
-      return JSON.parse(responseBody);
-    } catch (e: any) {
-      throw errorFactory(
-        response.status,
-        ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
-        "Response did not contain valid JSON",
-        {
-          responseBody,
-          error: e,
-        }
-      );
-    }
+    return await this.parseJsonResponse(response, payload.user_id, payload.session_id, errorFactory);
   }
 }
