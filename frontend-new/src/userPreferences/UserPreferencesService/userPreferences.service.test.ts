@@ -3,7 +3,7 @@ import "src/_test_utilities/consoleMock";
 import UserPreferencesService from "./userPreferences.service";
 import { StatusCodes } from "http-status-codes";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
-import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
+import { setupAPIServiceSpy, expectCorrectFetchRequest } from "src/_test_utilities/fetchSpy";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import {
   CreateUserPreferencesSpec,
@@ -13,18 +13,17 @@ import {
   UserPreference,
 } from "./userPreferences.types";
 
-const setupFetchSpy = setupAPIServiceSpy;
-
-
 describe("UserPreferencesService", () => {
   // GIVEN a backend URL is returned by the envService
   let givenApiServerUrl: string = "/path/to/api";
   beforeEach(() => {
     jest.spyOn(require("src/envService"), "getBackendUrl").mockReturnValue(givenApiServerUrl);
+    jest.clearAllMocks();
   });
   afterEach(() => {
     // Reset all mocks to avoid any side effects between tests
     jest.resetAllMocks();
+    jest.restoreAllMocks();
   });
 
   test("should get a single instance successfully", () => {
@@ -58,21 +57,21 @@ describe("UserPreferencesService", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       };
 
-      const fetchSpy = setupFetchSpy(StatusCodes.OK, givenResponseBody, "application/json;charset=UTF-8");
+      const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, givenResponseBody, "application/json;charset=UTF-8");
 
       // WHEN the getUserPreferences function is called with the given arguments
       const service = UserPreferencesService.getInstance();
       const actualUserPreferences = await service.getUserPreferences(givenResponseBody.user_id);
 
       // THEN expect it to make a GET request with correct headers and payload
-      expect(fetchSpy).toHaveBeenCalledWith(
+      expectCorrectFetchRequest(fetchSpy,
         `${givenApiServerUrl}/users/preferences?user_id=${givenResponseBody.user_id}`,
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
-          expectedStatusCode: [200],
+          expectedStatusCode: [StatusCodes.OK],
           failureMessage: `Failed to get user preferences for user with id ${givenResponseBody.user_id}`,
           serviceFunction: "getUserPreferences",
           serviceName: "UserPreferencesService",
@@ -107,7 +106,7 @@ describe("UserPreferencesService", () => {
       "on 200, should reject with an error ERROR_CODE.API_ERROR if response %s",
       async (_description, givenResponse) => {
         // GIVEN the GET invitations REST API will respond with OK and some invalid response
-        setupFetchSpy(StatusCodes.OK, givenResponse, "application/json;charset=UTF-8");
+        setupAPIServiceSpy(StatusCodes.OK, {}, "application/json;charset=UTF-8").mockResolvedValueOnce(givenResponse);
 
         // WHEN the getUserPreferences function is called with the given user id
         const service = UserPreferencesService.getInstance();
@@ -143,14 +142,14 @@ describe("UserPreferencesService", () => {
         accepted_tc: new Date(),
       };
 
-      const fetchSpy = setupFetchSpy(StatusCodes.OK, givenUserPreferences, "application/json;charset=UTF-8");
+      const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, givenUserPreferences, "application/json;charset=UTF-8");
 
       // WHEN the updateUserPreferences function is called with the given arguments
       const service = UserPreferencesService.getInstance();
       const actualUserPreferences = await service.updateUserPreferences(givenUserPreferences);
 
       // THEN expect it to make a PATCH request with correct headers and payload
-      expect(fetchSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/users/preferences`, {
+      expectCorrectFetchRequest(fetchSpy,`${givenApiServerUrl}/users/preferences`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -194,7 +193,7 @@ describe("UserPreferencesService", () => {
       "on 200, should reject with an error ERROR_CODE.API_ERROR if response %s",
       async (_description, givenResponse) => {
         // GIVEN the PATCH invitations REST API will respond with OK and some invalid response
-        setupFetchSpy(StatusCodes.OK, givenResponse, "application/json;charset=UTF-8");
+        setupAPIServiceSpy(StatusCodes.OK, {}, "application/json;charset=UTF-8").mockResolvedValueOnce(givenResponse);
 
         // WHEN the updateUserPreferences function is called with the given user preferences
         const service = UserPreferencesService.getInstance();
@@ -243,13 +242,13 @@ describe("UserPreferencesService", () => {
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       };
-      const fetchSpy = setupFetchSpy(StatusCodes.CREATED, mockResponseFormBackend, "application/json;charset=UTF-8");
+      const fetchSpy = setupAPIServiceSpy(StatusCodes.CREATED, mockResponseFormBackend, "application/json;charset=UTF-8");
 
       const service = UserPreferencesService.getInstance();
       const actualUserPreferences = await service.createUserPreferences(givenUserPreferences);
 
       // THEN expect it to make a POST request with correct headers and payload
-      expect(fetchSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/users/preferences`, {
+      expectCorrectFetchRequest(fetchSpy,`${givenApiServerUrl}/users/preferences`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -303,7 +302,7 @@ describe("UserPreferencesService", () => {
       "on 201, should reject with an error ERROR_CODE.API_ERROR if response %s",
       async (_description, givenResponse) => {
         // GIVEN the POST invitations REST API will respond with CREATED and some invalid response
-        setupFetchSpy(StatusCodes.CREATED, givenResponse, "application/json;charset=UTF-8");
+        setupAPIServiceSpy(StatusCodes.CREATED, {}, "application/json;charset=UTF-8").mockResolvedValueOnce(givenResponse);
 
         // WHEN the createUserPreferences function is called with the given user preferences
         const service = UserPreferencesService.getInstance();
