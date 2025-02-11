@@ -1,5 +1,12 @@
 name: Main CI
-on: push
+on:
+  push:
+    branches:
+      - '**'  # Runs on push to any branch
+  release:
+    types: [ created ]  # Runs when a new release is created
+
+
   #push:
   # branches:
   #   - main
@@ -29,7 +36,7 @@ jobs:
       #    -> a tag
       #  b) a release has been created.
 
-      upload-artifacts: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]')) }}
+      upload-artifacts: ${{ (github.event_name == 'push' && (github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))) || (github.event_name == 'release') }}
 
   backend-ci:
     uses: ./.github/workflows/backend-ci.yml
@@ -42,7 +49,7 @@ jobs:
       #    -> a tag
       #  b) a release has been created.
 
-      upload-artifacts: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]')) }}
+      upload-artifacts: ${{ (github.event_name == 'push' && (github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))) || github.event_name == 'release'}}
 
   deploy:
     needs: [ frontend-ci, backend-ci ]
@@ -53,10 +60,21 @@ jobs:
     #    -> a tag
     #  b) a release has been created.
 
-    if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]')) }}
+    if: ${{ (github.event_name == 'push' && (github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))) || github.event_name == 'release' }}
     uses: ./.github/workflows/deploy.yml
     secrets: inherit
     with:
       # if the event is a release, the env-type is testing environment, otherwise it is dev environment.
-      env-type: dev
+      env-type: ${{ (github.event_name == 'release' && 'test') || 'dev'  }}
+      artifacts-version: ${{ github.ref_name }}.${{ github.sha }}
+
+  deploy-prod:
+    needs: [ deploy ]
+    # only deploy to production if:
+    #  a) a release has been created and deployment to test was finished.
+    if: ${{ github.event_name == 'release' }}
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
+    with:
+      env-type: prod
       artifacts-version: ${{ github.ref_name }}.${{ github.sha }}

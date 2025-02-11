@@ -8,7 +8,7 @@ iac_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # so that we can import the iac/lib module when we run pulumi from withing the iac/backend directory.
 sys.path.insert(0, iac_folder)
 
-from lib import get_pulumi_stack_outputs, get_deployment_id, parse_artifacts_version
+from lib import get_pulumi_stack_outputs, construct_artifacts_dir, parse_artifacts_version
 
 current_dir = os.path.join(iac_folder, "backend")
 
@@ -28,9 +28,13 @@ def download_backend_config(*,
     """
 
     # construct the directory to save the backend config for this deployment.
-    backend_artifacts_version = parse_artifacts_version(artifacts_version).backend_version
-    deployment_id = get_deployment_id(deployment_number=deployment_number, artifacts_version=backend_artifacts_version)
-    backend_config_output_dir = os.path.join(base_configuration_dir, deployment_id)
+    docker_tag = parse_artifacts_version(artifacts_version).docker_tag_version
+
+    # the backend config are stored in the generic repository.
+    generic_artifacts_version = parse_artifacts_version(artifacts_version).generic_artifact_version
+
+    config_dir = construct_artifacts_dir(deployment_number=deployment_number, artifacts_version=docker_tag)
+    backend_config_output_dir = os.path.join(base_configuration_dir, config_dir)
     os.makedirs(backend_config_output_dir, exist_ok=False)
 
     realm_outputs = get_pulumi_stack_outputs(stack_name=realm_name, module="realm")
@@ -51,7 +55,7 @@ def download_backend_config(*,
                 f'--location={generic_repository["location"]}',
                 f'--project={generic_repository["project"]}',
                 "--destination=./",
-                f"--version={backend_artifacts_version}"
+                f"--version={generic_artifacts_version}"
             ],
             cwd=backend_config_output_dir,
             check=True,

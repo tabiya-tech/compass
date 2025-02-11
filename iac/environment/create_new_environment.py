@@ -5,7 +5,9 @@ from pulumi_random import RandomInteger
 import pulumi
 import pulumi_gcp as gcp
 import pulumiverse_time as time
-from lib.std_pulumi import enable_services, get_resource_name, int_to_base36
+
+from lib import MAIN_SECRET_VERSION, ENV_VARS_SECRET_ID
+from lib.std_pulumi import enable_services, get_resource_name, int_to_base36, get_formatted_secret_id
 
 from auth import REQUIRED_SERVICES as AUTH_SERVICES
 from backend import REQUIRED_SERVICES as BACKEND_SERVICES
@@ -166,17 +168,16 @@ def create_new_environment(*,
     )
 
     # create the service keys path for environment variables.
-    secret = gcp.secretmanager.Secret(
-        get_resource_name(resource="environment-config", resource_type="secret"),
-        secret_id="environment-config",
+    main_env_config_secret = gcp.secretmanager.Secret(
+        get_resource_name(resource="environment-config_main", resource_type="secret"),
+        secret_id=get_formatted_secret_id(ENV_VARS_SECRET_ID, MAIN_SECRET_VERSION),
         project=project.project_id,
-
         # automatic replication.
         replication={
             "auto": {},
         },
         opts=pulumi.ResourceOptions(provider=environment_gcp_provider, depends_on=services))
 
-    pulumi.export("secret_name", secret.name)
+    pulumi.export("env_vars_secret_main_name", main_env_config_secret.name)
     pulumi.export("project_id", project.id.apply(lambda _id: _id.replace("projects/", "")))
     pulumi.export("project_number", project.number)

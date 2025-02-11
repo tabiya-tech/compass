@@ -14,7 +14,7 @@ iac_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, iac_folder)
 
 from lib import base64_encode, getenv, get_realm_and_env_name_from_stack, load_dot_realm_env, \
-    get_pulumi_stack_outputs, get_deployment_id, parse_artifacts_version, save_content_in_file
+    get_pulumi_stack_outputs, construct_artifacts_dir, parse_artifacts_version, save_content_in_file
 
 # The actual frontend build artifact filename is specified in the iac/scripts/build-and-upload-fe.sh script.
 frontend_build_artifact_filename = "build.tar.gz"
@@ -48,11 +48,13 @@ def download_frontend_bundle(
         :param deployment_number:
         :param artifacts_version:  The version of the frontend build bundle.
     """
-    # 1. get the place where to save the frontend build bundle.
-    frontend_artifacts_version = parse_artifacts_version(artifacts_version).frontend_version
-    deployment_id = get_deployment_id(deployment_number=deployment_number, artifacts_version=frontend_artifacts_version)
+    # 1. get the directory where to save the frontend build bundle.
+    frontend_artifacts_version = parse_artifacts_version(artifacts_version).generic_artifact_version
+    artifacts_dir = construct_artifacts_dir(
+        deployment_number=deployment_number,
+        artifacts_version=frontend_artifacts_version)
     # artifacts dir, the folder to store the frontend build bundle.
-    artifacts_destination_dir = os.path.join(base_artifacts_dir, deployment_id)
+    artifacts_destination_dir = os.path.join(base_artifacts_dir, artifacts_dir)
     os.makedirs(artifacts_destination_dir, exist_ok=False)
 
     # 2. Get the generic repository to download the frontend build bundle.
@@ -157,16 +159,18 @@ def prepare_frontend(
     # Because the frontend/env.js file is specific to the deployment, and the stack name.
     deployment_number = getenv("DEPLOYMENT_RUN_NUMBER")
     artifacts_version = getenv("ARTIFACTS_VERSION")
-    frontend_version = parse_artifacts_version(artifacts_version).frontend_version
-    deployment_id = get_deployment_id(deployment_number=deployment_number, artifacts_version=frontend_version)
+    generic_artifact_version = parse_artifacts_version(artifacts_version).generic_artifact_version
+    artifacts_dir = construct_artifacts_dir(
+        deployment_number=deployment_number,
+        artifacts_version=generic_artifact_version)
 
     # artifacts dir, the folder to store the frontend build bundle.
-    artifacts_dir = os.path.join(base_artifacts_dir, deployment_id)
+    artifacts_dir = os.path.join(base_artifacts_dir, artifacts_dir)
 
     realm_name, _ = get_realm_and_env_name_from_stack(stack_name)
 
     # get the required environment variables, for the frontend.
-    print(f"preparing frontend for the run: {deployment_id}-{stack_name}...")
+    print(f"preparing frontend for the run: {artifacts_dir}-{stack_name}...")
 
     # If the path (artifacts dir) already exists, skip, otherwise create it and download the frontend build bundle.
     # This should be the same folder for if the frontend deployments are on the same run.
@@ -179,13 +183,13 @@ def prepare_frontend(
 
     # Have a copy of the artifacts for this deployment (the separate stack name),
     # so that we can make necessary changes to the frontend build bundle that are specific to the environment.
-    full_deployment_id = get_deployment_id(
+    stack_artifacts_dir = construct_artifacts_dir(
         deployment_number=deployment_number,
-        artifacts_version=frontend_version,
+        artifacts_version=generic_artifact_version,
         stack_name=stack_name)
 
     # copy the artifacts to the stack artifacts dir, so that we can make necessary changes to the frontend build bundle.
-    stack_artifacts_dir = os.path.join(deployments_dir, full_deployment_id)
+    stack_artifacts_dir = os.path.join(deployments_dir, stack_artifacts_dir)
     shutil.copytree(artifacts_dir, stack_artifacts_dir, dirs_exist_ok=True)
 
     # construct the env.js content for this deployment and stack.
@@ -194,4 +198,4 @@ def prepare_frontend(
         artifacts_dir=stack_artifacts_dir
     )
 
-    print(f"Done preparing frontend for the run: {deployment_id}-{stack_name}.")
+    print(f"Done preparing frontend for the run: {artifacts_dir}-{stack_name}.")

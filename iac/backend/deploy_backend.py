@@ -8,7 +8,8 @@ import pulumi_gcp as gcp
 from pulumi import Output
 
 from backend.prepare_backend import base_configuration_dir, api_gateway_config_file_name
-from lib.std_pulumi import ProjectBaseConfig, get_resource_name, get_project_base_config, get_file_as_string
+from lib import ProjectBaseConfig, get_resource_name, get_project_base_config, get_file_as_string
+from scripts.parse_git_branch_name import parse_git_branch_name
 
 
 @dataclass(frozen=True)
@@ -47,7 +48,7 @@ class BackendServiceConfig:
 def _setup_api_gateway(*,
                        basic_config: ProjectBaseConfig,
                        cloudrun: gcp.cloudrunv2.Service,
-                       deployment_id: str,
+                       config_dir: str,
                        dependencies: list[pulumi.Resource]
                        ):
     apigw_service_account = gcp.serviceaccount.Account(
@@ -67,7 +68,11 @@ def _setup_api_gateway(*,
 
     # The GCP API Gateway uses OpenAPI 2.0 yaml files for the configurations.
     # The yaml must be base64 encoded.
-    api_gateway_config_file_path: str = os.path.join(base_configuration_dir, deployment_id, api_gateway_config_file_name).__str__()
+    api_gateway_config_file_path: str = os.path.join(
+        base_configuration_dir,
+        config_dir,
+        api_gateway_config_file_name).__str__()
+
     apigw_config_yml_string = get_file_as_string(api_gateway_config_file_path)
 
     # update the yaml with the correct values
@@ -286,12 +291,13 @@ def deploy_backend(
         backend_service_cfg: BackendServiceConfig,
         docker_repository: pulumi.Output[gcp.artifactregistry.Repository],
         artifacts_version: str,
-        deployment_id: str
+        config_dir: str
 ):
     """
     Deploy the backend infrastructure
     """
     basic_config = get_project_base_config(project=project, location=location)
+    _, docker_tag, _ = parse_git_branch_name(artifacts_version)
 
     # grant the project service account access to the docker repository so that it can pull images
     membership = _grant_docker_repository_access_to_project_service_account(
@@ -304,7 +310,7 @@ def deploy_backend(
     # get fully qualified image name
     fully_qualified_image_name = _get_fully_qualified_image_name(
         docker_repository=docker_repository,
-        tag=artifacts_version
+        tag=docker_tag
     )
 
     # Deploy the image as a cloud run service
@@ -318,6 +324,6 @@ def deploy_backend(
     _api_gateway = _setup_api_gateway(
         basic_config=basic_config,
         cloudrun=cloud_run,
-        deployment_id=deployment_id,
+        config_dir=config_dir,
         dependencies=[cloud_run]
     )

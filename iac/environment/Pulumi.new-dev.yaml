@@ -1,4 +1,0 @@
-config:
-  gcp:region: "us-central1"
-  environment_type: "dev"
-  realm_name: "tabiya-compass"

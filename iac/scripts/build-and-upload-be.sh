@@ -2,14 +2,16 @@
 
 function save_report() {
   local _report_filename=$1
-  local _deployable_version=$2
-  local _version_json_filename=$3
+  local _deployable_generic_tag=$2
+  local _deployable_docker_tag=$3
+  local _version_json_filename=$4
 
   {
     echo "### Backend artifacts packaging summary"
     echo "**Date**: \`$(date -u +%F' %T.%3N UTC')\`     "
     echo "**status**: ✅ Successfully uploaded       "
-    echo "**version**: \`$_deployable_version\`    "
+    echo "**Config version**: \`$_deployable_generic_tag\`    "
+    echo "**Docker version**: \`$_deployable_docker_tag\`    "
     echo "**version.json**:     "
     echo  "\`\`\`json"
     cat "$_version_json_filename"
@@ -153,14 +155,20 @@ echo "info: setting the branch/tag name to $git_branch_tag_name"
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" # The directory where the script is located.
 echo "info: setting the script directory to $script_dir"
 
-formatted_git_branch_tag_name=$("$script_dir/parse_git_branch_name.py" --branch-name="$git_branch_tag_name" --module=be)
-echo "info: setting the formatted branch/tag name to $formatted_git_branch_tag_name"
+formatted_docker_git_branch_tag_name=$("$script_dir/parse_git_branch_name.py" --branch-name="$git_branch_tag_name" --version=docker-tag)
+echo "info: setting the formatted branch/tag name to $formatted_docker_git_branch_tag_name for docker tag"
+
+formatted_generic_artifacts_git_branch_tag_name=$("$script_dir/parse_git_branch_name.py" --branch-name="$git_branch_tag_name" --version=generic-artifacts)
+echo "info: setting the formatted branch/tag name to $formatted_generic_artifacts_git_branch_tag_name for generic artifacts version"
 
 git_commit_sha=$(git rev-parse HEAD)
 echo "info: setting the git commit sha to $git_commit_sha"
 
-artifact_version="$formatted_git_branch_tag_name.$git_commit_sha"
-echo "info: setting the artifact version to $artifact_version"
+docker_artifact_version="$formatted_docker_git_branch_tag_name.$git_commit_sha"
+echo "info: setting the docker artifact version to $docker_artifact_version"
+
+generic_artifact_version="$formatted_generic_artifacts_git_branch_tag_name.$git_commit_sha"
+echo "info: setting the docker artifact version to $docker_artifact_version"
 
 version_json_filename="$source_path/app/version/version.json"
 echo "info: setting the version json filename to $version_json_filename"
@@ -171,26 +179,24 @@ echo "info: setting the version json filename to $version_json_filename"
 # The pipeline starts here
 #############################
 
-echo "info: building and uploading backend:$artifact_version artifacts to $region/$project_id from $source_path"
+echo "info: building and uploading backend:$docker_artifact_version artifacts to $region/$project_id from $source_path"
 
 # 1. Export the API Gateway Configuration
 poetry run -C ./"$source_path"  python3 "./$source_path/scripts/export_api_gateway_config/export_config.py" || exit 1
 
 # 2. Have a backup of the version json file name.
 cp "$version_json_filename" "$version_json_filename.bak"
+# shellcheck disable=SC2064
 trap "echo info: cleaning up; mv \"$version_json_filename.bak\" \"$version_json_filename\"" EXIT
 
 # 3. Write the version info
 write_version_json "$version_json_filename" "$git_branch_tag_name" "$git_commit_sha" "$build_run"
 
 # 4. Build and upload the backend artifacts
-build_and_upload_be_docker_img "$region" "$project_id" "$artifact_version" "$source_path"
+build_and_upload_be_docker_img "$region" "$project_id" "$docker_artifact_version" "$source_path"
 
 # 5. Upload backend config
-upload_backend_config "$region" "$project_id" "$artifact_version" "$source_path" "$api_gateway_config_file_name"
+upload_backend_config "$region" "$project_id" "$generic_artifact_version" "$source_path" "$api_gateway_config_file_name"
 
 # 6. Report the summary
-save_report "$report_filename" "$artifact_version" "$version_json_filename"
-
-# 7. Restore the version json file
-#mv "$version_json_filename.bak" "$version_json_filename"
+save_report "$report_filename" "$generic_artifact_version" "$docker_artifact_version" "$version_json_filename"

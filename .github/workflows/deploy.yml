@@ -13,7 +13,13 @@ on:
           - dev
           - test
           - prod
-
+      env-dir:
+        required: false
+        description: 'The directory where the environment is located'
+        type: string
+        options:
+          - lower
+          - upper
       env-name:
         required: false
         type: string
@@ -39,7 +45,6 @@ on:
         required: true
         type: string
         description: 'The version of the artifacts to deploy'
-
 
 jobs:
   deploy:
@@ -75,8 +80,16 @@ jobs:
       - name: Authenticate to google cloud
         uses: google-github-actions/auth@v2.1.2
         with:
+          # IF
+          #    the env dir is upper OR env_type is prod
+          # THEN
+          #    use the upper envs service account json,
+          # OTHERWISE
+          #    use the lower envs service account json.
+
+          # We are using Boo
           credentials_json:
-            ${{ secrets.GCP_LOWER_ENVS_SERVICE_ACCOUNT_JSON }}
+            ${{ ((inputs.env-dir == 'upper' || inputs.env-type == 'prod') && secrets.GCP_UPPER_ENVS_SERVICE_ACCOUNT_JSON) || secrets.GCP_LOWER_ENVS_SERVICE_ACCOUNT_JSON }}
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
@@ -111,4 +124,4 @@ jobs:
 
       - name: Deploy the infrastructure
         working-directory: iac
-        run: ./scripts/up.py --realm-name ${{ vars.REALM_NAME }} --env-type ${{ inputs.env-type }}
+        run: ./scripts/up.py --realm-name ${{ vars.REALM_NAME }} --env-type ${{ inputs.env-type }} --config-version ${{ inputs.artifacts-version }}

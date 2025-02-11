@@ -59,13 +59,13 @@ def _make_bucket_public(basic_config: ProjectBaseConfig, bucket_name: pulumi.Out
 def deploy_frontend(*,
                     project: pulumi.Output[str],
                     location: str,
-                    deployment_id: str
+                    artifacts_dir: str
                     ):
     basic_config = get_project_base_config(project=project, location=location)
 
     bucket = _create_bucket(basic_config, "frontend")
 
-    frontend_artifacts_dir = os.path.join(deployments_dir, deployment_id)
+    frontend_artifacts_dir = os.path.join(deployments_dir, artifacts_dir)
     _upload_directory_to_bucket(
         basic_config,
         bucket.name,
@@ -77,6 +77,4 @@ def deploy_frontend(*,
     _make_bucket_public(basic_config, bucket.name, [bucket])
 
     pulumi.export('bucket_name', bucket.name)
-    pulumi.export('bucket_url', pulumi.Output.concat("http://", bucket.name, ".storage.googleapis.com/index.html"))
-    pulumi.export('new_ui_url',
-                  pulumi.Output.concat("http://", bucket.name, ".storage.googleapis.com"))
+    pulumi.export('bucket_url', pulumi.Output.concat("http://", bucket.name, ".storage.googleapis.com"))

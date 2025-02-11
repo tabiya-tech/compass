@@ -11,15 +11,14 @@ iac_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # so that we can import the iac/lib module when we run pulumi from withing the iac/scripts directory.
 sys.path.insert(0, iac_folder)
 
-from _common import add_select_environments_arguments, \
-    get_environment_stack_config, get_environment_stack_configs_by_env_type, get_secret_latest_version, \
-    write_config_to_pulumi_yml_file, StackConfigs
-
 from _types import IaCModules
-from lib import get_pulumi_stack_outputs
-
+from lib import get_pulumi_stack_outputs, ENV_VARS_SECRET_ID
 from backend.prepare_backend import download_backend_config
 from frontend.prepare_frontend import download_frontend_bundle
+
+from _common import add_select_environments_arguments, \
+    get_environment_stack_config, get_environment_stack_configs_by_env_type, get_versioned_secret_latest_value, \
+    write_config_to_pulumi_yml_file, StackConfigs
 
 
 def _download_artifacts_and_config(_realm_name: str, _artifacts_version: str, _deployment_number: str):
@@ -42,7 +41,10 @@ def _download_artifacts_and_config(_realm_name: str, _artifacts_version: str, _d
 
 def _prepare_env_file(stack_name: str, deployment_run_number: str, artifacts_version: str):
     environment_outputs = get_pulumi_stack_outputs(stack_name, "environment")
-    env_file_content = get_secret_latest_version(environment_outputs.get("secret_name").value)
+    env_file_content = get_versioned_secret_latest_value(
+        ENV_VARS_SECRET_ID,
+        environment_outputs["project_id"].value,
+        artifacts_version)
 
     # add environment variables to prepare the deployment.
     env_file_content += f"\nARTIFACTS_VERSION={artifacts_version}"
@@ -119,7 +121,8 @@ def _main(args):
         # 1.1 Get the environment stack configuration
         target_environment_config = get_environment_stack_config(
             realm_name=realm_name,
-            environment_name=environment_name
+            environment_name=environment_name,
+            config_version=artifacts_version,
         )
 
         # 1.2 download the artifacts and configurations for the environment
@@ -137,7 +140,8 @@ def _main(args):
         # 2.1 Get the target environments, all the environments of the given type in the realm.
         target_environments = get_environment_stack_configs_by_env_type(
             realm_name=realm_name,
-            env_type=environment_type)
+            env_type=environment_type,
+            config_version=artifacts_version)
 
         if len(target_environments) == 0:
             print(f"No environments found for realm: {realm_name} and env_type: {environment_type}")
@@ -168,6 +172,7 @@ if __name__ == "__main__":
         "--artifacts-version",
         type=str,
         required=True,
-        help="The artifacts version (hash or tag) to deploy")
+        help="The artifacts version (hash or tag) to deploy. "
+             "This will also be useful when we try to know which config to download when preparing the deployment.")
 
     _main(parser.parse_args())

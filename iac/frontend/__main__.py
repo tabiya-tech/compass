@@ -9,9 +9,8 @@ libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, libs_dir)
 
 from deploy_frontend import deploy_frontend
-
-from lib import getconfig, parse_realm_env_name_from_stack, getstackref, load_dot_realm_env, getenv, get_deployment_id, \
-    parse_artifacts_version
+from lib import getconfig, parse_realm_env_name_from_stack, getstackref, load_dot_realm_env, getenv, \
+    construct_artifacts_dir, parse_artifacts_version
 
 
 def main():
@@ -30,16 +29,16 @@ def main():
 
     # the artifacts version of the frontend build to deploy.
     artifacts_version = getenv("ARTIFACTS_VERSION")
-    frontend_version = parse_artifacts_version(artifacts_version).frontend_version
+    generic_artifact_version = parse_artifacts_version(artifacts_version).generic_artifact_version
 
     # the unique identifier of this running deployment.
     run_number = getenv("DEPLOYMENT_RUN_NUMBER")
 
     # the deployment id, used to know, which source folder to get artifacts from.
 
-    deployment_id = get_deployment_id(
+    artifacts_dir = construct_artifacts_dir(
         deployment_number=run_number,
-        artifacts_version=frontend_version,
+        artifacts_version=generic_artifact_version,
         stack_name=stack_name
     )
 
@@ -47,7 +46,7 @@ def main():
     deploy_frontend(
         project=project,
         location=location,
-        deployment_id=deployment_id
+        artifacts_dir=artifacts_dir
     )
 
 

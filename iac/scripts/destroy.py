@@ -5,14 +5,13 @@ import os
 import argparse
 import sys
 
-from _types import IaCModules
-
 # Determine the absolute path to the 'iac' directory
 iac_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add this directory to sys.path,
 # so that we can import the iac/lib module when we run pulumi from withing the iac/scripts directory.
 sys.path.insert(0, iac_dir)
 
+from _types import IaCModules
 from lib import get_stack_name_from
 from _common import add_select_environment_arguments, run_pulumi_destroy
 
@@ -32,13 +31,16 @@ def destroy_stack(stack_name: str):
     run_pulumi_destroy(stack_name=stack_name, module=IaCModules.FRONTEND)
     run_pulumi_destroy(stack_name=stack_name, module=IaCModules.BACKEND)
     run_pulumi_destroy(stack_name=stack_name, module=IaCModules.AUTH)
-    run_pulumi_destroy(stack_name=stack_name, module=IaCModules.AUTH)
+    run_pulumi_destroy(stack_name=stack_name, module=IaCModules.ENVIRONMENT)
 
     print(f"Done destroying stack: {stack_name}")
 
 
 def _main(args):
+    # 1. Get the stack name from the realm name and environment name.
     stack_name = get_stack_name_from(args.realm_name, args.env_name)
+
+    # 2.  Destroy the stack.
     destroy_stack(stack_name)
 
 

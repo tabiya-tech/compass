@@ -20,7 +20,7 @@ function save_report() {
   local _version_json_filename=$3
 
   {
-    echo "### Frontend artifacts packaging summary on $(date -u +%F' %T.%3N UTC')"
+    echo "### Frontend artifacts packaging summary"
     echo "**Date**: \`$(date -u +%F' %T.%3N UTC')\`     "
     echo "**Status**: ✅ Successfully uploaded       "
     echo "**Version**: \`$_deployable_version\`    "
@@ -122,7 +122,7 @@ echo "info: setting the branch/tag name to $git_branch_tag_name"
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" # The directory where the script is located.
 echo "info: setting the script directory to $script_dir"
 
-formatted_git_branch_tag_name=$("$script_dir/parse_git_branch_name.py" --branch-name="$git_branch_tag_name" --module=fe)
+formatted_git_branch_tag_name=$("$script_dir/parse_git_branch_name.py" --branch-name="$git_branch_tag_name" --version=generic-artifacts)
 echo "info: setting the formatted branch/tag name to $formatted_git_branch_tag_name"
 
 git_commit_sha=$(git rev-parse HEAD)
@@ -154,12 +154,15 @@ fi
 # 2. Write the version info
 write_version_json "$version_json_filename" "$git_branch_tag_name" "$git_commit_sha" "$build_run"
 
-# 3. Compress the frontend artifacts and upload them
+# 3. Compress the frontend artifacts
 echo "info: compressing frontend artifacts"
 tar -czf ./$frontend_build_artifact_filename -C "$source_path"/build . || exit 1
-upload_frontend_artifacts "$region" "$project_id" "$frontend_build_artifact_filename" "$artifact_version"
-# cleanup the compressed file
-rm ./$frontend_build_artifact_filename
 
-# 4. Report the summary
+# shellcheck disable=SC2064
+trap "echo info: cleaning up; rm ./$frontend_build_artifact_filename" EXIT
+
+# 4. Upload the frontend artifacts
+upload_frontend_artifacts "$region" "$project_id" "$frontend_build_artifact_filename" "$artifact_version"
+
+# 5. Report the summary
 save_report "$report_filename" "$artifact_version" "$version_json_filename"

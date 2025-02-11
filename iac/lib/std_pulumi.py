@@ -39,19 +39,24 @@ class ArtifactsVersion:
     sha: str
     """commit sha"""
 
-    frontend_version: str
-    """frontend artifacts version <frontend-version>.<sha>"""
+    generic_artifact_version: str
+    """generic artifacts version <generic-artifacts-version>.<sha>"""
 
-    backend_version: str
-    """backend artifacts version <backend-version>.<sha>"""
+    docker_tag_version: str
+    """docker tag version <docker-tag-version>.<sha>"""
+
+    secret_id_version: str
+    """secret id version <secret-id-version>.<sha>"""
 
 
 def getstackref(stack_ref: pulumi.StackReference, name: str, secret: bool = False) -> pulumi.Output[Any]:
     """
-    Get the stack reference value. Log the value if it is not a secret, otherwise log the secret value as a series of '*'
+    Get the stack reference value. Log the value if it is not a secret,
+    otherwise log the secret value as a series of '*'
+
     :param stack_ref: the stack reference
     :param name: the value name
-    :param secret: whether the value is a secret
+    :param secret: whether the value is a secret.
     :return:
     """
     value_output = stack_ref.get_output(name)
@@ -72,12 +77,14 @@ def getstackref(stack_ref: pulumi.StackReference, name: str, secret: bool = Fals
 
 def getconfig(name: str, config: Optional[str] = None, *, secret: bool = False) -> str:
     """
-    Get the configuration value from the pulumi configuration. Log the value if it is not a secret, otherwise log the secret value as a series of '*'
+    Get the configuration value from the pulumi configuration. Log the value if it is not a secret,
+    otherwise log the secret value as a series of '*'
+
     :param name: the configuration name
     :param config: the pulumi configuration namespace
     :param secret: whether the configuration is a secret
     :return: the configuration value
-    :raises ValueError: if the configuration value is not set
+    :raises ValueError: if the configuration value is not set.
     """
 
     value = pulumi.Config(config).require(name)
@@ -202,7 +209,9 @@ def get_realm_and_env_name_from_stack(stack_name: str) -> tuple[str, str]:
     if len(parts) != 2:
         raise ValueError(f"Invalid stack name {stack_name}. It must be in the format realm_name.environment_name")
 
-    # Validate the realm name. This constrain is needed as the environment project name will be based on the realm name and environment name
+    # Validate the realm name. This constrain is needed
+    # as the environment project name will be based on the realm name and environment name.
+
     reg_ex = r"^[a-zA-Z0-9-'\" !]{3,29}$"
     if not re.match(reg_ex, f"{parts[0]}{parts[1]}"):
         raise ValueError(
@@ -305,24 +314,24 @@ def get_pulumi_stack_outputs(stack_name: str, module: str) -> Mapping[str, Any]:
     return stack.outputs()
 
 
-def get_deployment_id(*,
-                      deployment_number: str,
-                      artifacts_version: Optional[str] = None,
-                      stack_name: Optional[str] = None):
+def construct_artifacts_dir(*,
+                            deployment_number: str,
+                            artifacts_version: Optional[str] = None,
+                            stack_name: Optional[str] = None):
     """
-    Get the deployment id based on the deployment number, artifacts version, and stack name.
+    Construct the artifacts directory based on the deployment number, artifacts version, and stack name.
     """
 
-    deployment_id = deployment_number
+    artifacts_dir = deployment_number
 
     if artifacts_version is not None:
-        deployment_id = f"{artifacts_version}-{deployment_id}"
+        artifacts_dir = f"{artifacts_version}-{artifacts_dir}"
 
     if stack_name is not None:
-        deployment_id = f"{stack_name}-{deployment_id}"
+        artifacts_dir = f"{stack_name}-{artifacts_dir}"
 
-    print("using deployment id: ", deployment_id)
-    return deployment_id
+    print("info: using artifacts directory: ", artifacts_dir)
+    return artifacts_dir
 
 
 def get_ref_name_and_sha_from_artifacts_version(artifacts_version: str) -> tuple[str, str]:
@@ -334,6 +343,10 @@ def get_ref_name_and_sha_from_artifacts_version(artifacts_version: str) -> tuple
     :return:
     """
 
+    # if no dot in the artifacts version, then it is just the ref name.
+    if "." not in artifacts_version:
+        return artifacts_version, ""
+
     # start separating from the end because we have known that the sha doesn't contain dots.
     ref_name, sha = artifacts_version.rsplit(".", 1)
 
@@ -342,7 +355,7 @@ def get_ref_name_and_sha_from_artifacts_version(artifacts_version: str) -> tuple
 
 def parse_artifacts_version(artifacts_version: str):
     """
-    Parse the artifacts version to get the ref name, sha, frontend version, and backend version.
+    Parse the artifacts version to get the ref name, sha, generic artifacts version, and docker tag.
 
     :param artifacts_version: The artifacts version to parse.
     :return:
@@ -350,15 +363,33 @@ def parse_artifacts_version(artifacts_version: str):
     # differentiate the ref name and sha from the artifacts version from the user.
     ref_name, sha = get_ref_name_and_sha_from_artifacts_version(artifacts_version)
 
-    # from the branch name parse it to get the frontend and backend version of the ref name.
-    frontend_version, backend_version = parse_git_branch_name(ref_name)
+    # from the branch name parse it to get the
+    # a) generic artifacts version,
+    # b) docker tag name,
+    # c) and the secret id of the ref name.
+    generic_artifact_version, docker_tag_version, secret_id_version = parse_git_branch_name(ref_name)
 
     return ArtifactsVersion(
         ref_name=ref_name,
         sha=sha,
-        # construct back again the frontend artifacts version.
-        frontend_version=f"{frontend_version}.{sha}",
-
-        # construct back again the backend artifacts version.
-        backend_version=f"{backend_version}.{sha}",
+        # construct back again the generic artifacts version.
+        generic_artifact_version=f"{generic_artifact_version}.{sha}",
+        # construct back again the docker tag.
+        docker_tag_version=f"{docker_tag_version}.{sha}",
+        # construct the secret id version.
+        secret_id_version=f"{secret_id_version}.{sha}"
     )
+
+
+def get_formatted_secret_id(secret_id: str, config_version: str):
+    """
+    Gets a well formatted secret ID, accepted by GCP Secret Manager API.
+
+    :param secret_id:
+    :param config_version:
+
+    :return: A valid secret id.
+    """
+    _, _, formatted_secret_id = parse_git_branch_name(config_version)
+
+    return f"{secret_id}_{formatted_secret_id}"

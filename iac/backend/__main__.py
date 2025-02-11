@@ -9,8 +9,8 @@ libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, libs_dir)
 
 from deploy_backend import deploy_backend, BackendServiceConfig
-from lib import getconfig, getstackref, getenv, parse_realm_env_name_from_stack, load_dot_realm_env, get_deployment_id, \
-    parse_artifacts_version
+from lib import getconfig, getstackref, getenv, parse_realm_env_name_from_stack, load_dot_realm_env, \
+    construct_artifacts_dir, parse_artifacts_version
 
 
 def main():
@@ -58,16 +58,17 @@ def main():
 
     # version of the artifacts to deploy
     artifacts_version = getenv("ARTIFACTS_VERSION")
-    backend_version = parse_artifacts_version(artifacts_version).backend_version
+    generic_artifact_version = parse_artifacts_version(artifacts_version).generic_artifact_version
 
     # the key identifier of this deployment, used to identify the deployment.
     run_number = getenv("DEPLOYMENT_RUN_NUMBER")
 
-    # deployment id will be used to know where to find the backend config,
-    # for now api_gateway_config
-    deployment_id = get_deployment_id(
+    # Config artifacts directory name will be used to know where to find the backend config,
+    # for now api_gateway_config.yaml.
+    # Because the backend config are stored in the generic repository, we are using the generic_artifact_version.
+    config_dir = construct_artifacts_dir(
         deployment_number=run_number,
-        artifacts_version=backend_version)
+        artifacts_version=generic_artifact_version)
 
     # Deploy the backend
     deploy_backend(
@@ -77,8 +78,8 @@ def main():
         project_number=project_number,
         backend_service_cfg=backend_service_cfg,
         docker_repository=docker_repository,
-        artifacts_version=backend_version,
-        deployment_id=deployment_id
+        artifacts_version=artifacts_version,
+        config_dir=config_dir
     )
 
 

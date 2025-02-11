@@ -5,7 +5,8 @@ import pulumi
 import pulumi_gcp as gcp
 import pulumiverse_time as time
 import hashlib
-from lib.std_pulumi import enable_services, get_resource_name
+
+from lib import enable_services, get_resource_name, MAIN_SECRET_VERSION, get_formatted_secret_id, STACK_CONFIG_SECRET_ID
 
 protected_from_deletion = False
 
@@ -136,7 +137,7 @@ def _create_repositories(*,
     return docker_repository, generic_repository
 
 
-def _setup_stack_config_secret(
+def _setup_main_stack_config_secret(
         *,
         root_project_id: str,
         developers_group: gcp.cloudidentity.Group,
@@ -150,8 +151,8 @@ def _setup_stack_config_secret(
     """
 
     secret = gcp.secretmanager.Secret(
-        get_resource_name(resource="stack-config", resource_type="secret"),
-        secret_id="stack-config",
+        get_resource_name(resource="stack-config_main", resource_type="secret"),
+        secret_id=get_formatted_secret_id(STACK_CONFIG_SECRET_ID, MAIN_SECRET_VERSION),
         project=root_project_id,
         # automatic replication.
         replication={
@@ -530,19 +531,16 @@ def create_realm(*,
         provider=provider
     )
 
-    stack_config_container = _setup_stack_config_secret(
+    _setup_main_stack_config_secret(
         root_project_id=root_project_id,
-
         admins_group=realm_admins,
         developers_group=realm_developers,
-
         provider=provider,
         dependencies=wait_for_dependencies
     )
 
     pulumi.export("docker_repository", docker_repository)
     pulumi.export("generic_repository", generic_repository)
-    pulumi.export("stack_config_secret", stack_config_container.name)
     pulumi.export("lower_env_folder_id", lower_envs_folder.folder_id)
     pulumi.export("lower_env_identity_projects_folder_id", lower_env_identity_projects_folder_id)
     pulumi.export("upper_env_folder_id", prod_envs_folder.folder_id)
