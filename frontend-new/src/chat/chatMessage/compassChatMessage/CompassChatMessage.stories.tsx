@@ -3,7 +3,7 @@ import CompassChatMessage from "./CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
 import { ChatMessageType } from "src/chat/Chat.types";
-import { ReactionType } from "src/feedback/reaction/reaction.types";
+import { ReactionKind } from "src/chat/reaction/reaction.types";
 import { getBackendUrl } from "src/envService";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 
@@ -184,7 +184,7 @@ export const ShownWithLikeReaction: Story = {
       type: ChatMessageType.BASIC_CHAT,
       reaction: {
         id: nanoid(),
-        kind: ReactionType.LIKED,
+        kind: ReactionKind.LIKED,
       },
     },
   },
@@ -200,7 +200,7 @@ export const ShownWithDislikeReaction: Story = {
       type: ChatMessageType.BASIC_CHAT,
       reaction: {
         id: nanoid(),
-        kind: ReactionType.DISLIKED,
+        kind: ReactionKind.DISLIKED,
       },
     },
   },

@@ -52,7 +52,7 @@ export function expectCorrectFetchRequest(fetchSpy: jest.SpyInstance, expectedUr
   if (actualConfig.body && expectedConfig.body) {
     let actualBody: unknown;
     let expectedBody: unknown;
-    
+
     try {
       actualBody = JSON.parse(JSON.stringify(actualConfig.body));
       expectedBody = JSON.parse(JSON.stringify(expectedConfig.body));

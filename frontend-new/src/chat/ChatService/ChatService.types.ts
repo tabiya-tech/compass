@@ -1,15 +1,13 @@
 // Enum for the sender
-import { ReactionType } from "src/feedback/reaction/reaction.types";
+import { ReactionKind } from "src/chat/reaction/reaction.types";
 
 export enum ConversationMessageSender {
   USER = "USER",
   COMPASS = "COMPASS",
 }
-
-// TODO REVIEW MessageReaction
-export interface ReactionResponse {
+export interface MessageReaction {
   id: string;
-  kind: ReactionType | null;
+  kind: ReactionKind | null;
 }
 
 // Type for individual conversation messages
@@ -18,7 +16,7 @@ export interface ConversationMessage {
   message: string;
   sent_at: string; // ISO formatted datetime string
   sender: ConversationMessageSender; // Either 'USER' or 'COMPASS'
-  reaction: ReactionResponse | null;
+  reaction: MessageReaction | null;
 }
 
 export interface ConversationResponse {

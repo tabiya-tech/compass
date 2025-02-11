@@ -7,7 +7,7 @@ from abc import ABC, abstractmethod
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.server_dependencies.database_collections import Collections
-from app.conversations.reactions.types import Reaction, ReactionDocModel
+from app.conversations.reactions.types import Reaction
 
 
 class IReactionRepository(ABC):
@@ -18,12 +18,12 @@ class IReactionRepository(ABC):
     """
 
     @abstractmethod
-    async def add(self, reaction: Reaction) -> ReactionDocModel:
+    async def add(self, reaction: Reaction) -> Reaction:
         """
         Creates or updates a reaction.
 
         :param reaction: ReactionModel - the reaction to create or update
-        :return: ReactionDocModel - the created/updated reaction document
+        :return: Reaction - the created/updated reaction document
         """
         raise NotImplementedError()
 
@@ -38,7 +38,7 @@ class IReactionRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def get_reactions(self, session_id: int) -> list[ReactionDocModel]:
+    async def get_reactions(self, session_id: int) -> list[Reaction]:
         """
         Gets the full list of reactions for the given session
 
@@ -54,7 +54,7 @@ class ReactionRepository(IReactionRepository):
         self._logger = logging.getLogger(ReactionRepository.__name__)
         self._collection = db.get_collection(Collections.REACTIONS)
 
-    async def add(self, reaction: Reaction) -> ReactionDocModel:
+    async def add(self, reaction: Reaction) -> Reaction:
         # Convert the pydantic model to a dictionary
         payload = reaction.model_dump()
 
@@ -69,8 +69,8 @@ class ReactionRepository(IReactionRepository):
             return_document=True  # Return the document after the update
         )
 
-        # Convert to ReactionDocModel
-        return ReactionDocModel.from_dict(doc)
+        # Convert to Reaction
+        return Reaction.from_dict(doc)
 
     async def delete(self, session_id: int, message_id: str):
         await self._collection.delete_one({
@@ -78,7 +78,7 @@ class ReactionRepository(IReactionRepository):
             "message_id": {"$eq": message_id}
         })
 
-    async def get_reactions(self, session_id: int) -> list[ReactionDocModel] | None:
+    async def get_reactions(self, session_id: int) -> list[Reaction] | None:
         """
         Gets the full list of reactions for a session
 
@@ -91,6 +91,6 @@ class ReactionRepository(IReactionRepository):
         
         reactions = []
         async for doc in cursor:
-            reactions.append(ReactionDocModel.from_dict(doc))
+            reactions.append(Reaction.from_dict(doc))
             
-        return reactions if reactions else None
+        return reactions

@@ -1,40 +1,40 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Box, Popover, Typography, useTheme } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
-import { ReactionReason, ReactReasonMessages } from "src/feedback/reaction/reaction.types";
+import { DislikeReason, DislikeReasonMessages } from "src/chat/reaction/reaction.types";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 
-export interface ReactionReasonPopoverProps {
+export interface DislikeReasonPopoverProps {
   anchorEl: HTMLElement | null; // It allows the popover to know which element to attach to and appear next to.
   open: boolean;
-  onClose: () => void;
-  onReasonSelect: (reason: ReactionReason) => void;
+  onClose: (reasons: DislikeReason[]) => void;
 }
 
 const uniqueId = "9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e";
 
 export const DATA_TEST_ID = {
-  POPOVER: `reaction-reason-popover-${uniqueId}`,
-  CONTAINER: `reaction-reason-popover-container-${uniqueId}`,
-  TITLE: `reaction-reason-popover-title-${uniqueId}`,
-  BUTTON: `reaction-reason-popover-button-${uniqueId}`,
-  CLOSE_ICON: `reaction-reason-popover-close-button-${uniqueId}`,
-  CLOSE_ICON_BUTTON: `reaction-reason-popover-close-icon-button-${uniqueId}`,
+  POPOVER: `dislike-reason-popover-${uniqueId}`,
+  CONTAINER: `dislike-reason-popover-container-${uniqueId}`,
+  TITLE: `dislike-reason-popover-title-${uniqueId}`,
+  BUTTON: `dislike-reason-popover-button-${uniqueId}`,
+  CLOSE_ICON: `dislike-reason-popover-close-button-${uniqueId}`,
+  CLOSE_ICON_BUTTON: `dislike-reason-popover-close-icon-button-${uniqueId}`,
 };
 
-export const ReactionReasonPopover: React.FC<ReactionReasonPopoverProps> = ({
+export const DislikeReasonPopover: React.FC<DislikeReasonPopoverProps> = ({
   anchorEl,
   open,
-  onClose, // TODO REVIEW, no reason to hav on ReasonSelect and an on Close function, it should be the same
-  onReasonSelect,
-  ...props // TODO REVIEW, no need to spread props as they are not used
+  onClose,
+  ...props
 }) => {
   const theme = useTheme();
+  const isOnline = useContext(IsOnlineContext)
 
-  const handleReasonClick = (reason: ReactionReason) => {
-    onReasonSelect(reason);
-    onClose();
+  const handleReasonClick = (reason: DislikeReason) => {
+    // for now, our ui only allows selecting one reason
+    onClose([reason]);
   };
 
   return (
@@ -49,7 +49,7 @@ export const ReactionReasonPopover: React.FC<ReactionReasonPopoverProps> = ({
         vertical: "top",
         horizontal: "center",
       }}
-      onClose={onClose}
+      onClose={() => onClose([])}
       data-testid={DATA_TEST_ID.POPOVER}
     >
       <Box
@@ -65,7 +65,7 @@ export const ReactionReasonPopover: React.FC<ReactionReasonPopoverProps> = ({
             Please tell us what the issue is?
           </Typography>
           <PrimaryIconButton
-            onClick={onClose}
+            onClick={() => onClose([])} // close without selecting a reason
             title="close feedback"
             sx={{ color: theme.palette.text.secondary }}
             data-testid={DATA_TEST_ID.CLOSE_ICON_BUTTON}
@@ -74,15 +74,16 @@ export const ReactionReasonPopover: React.FC<ReactionReasonPopoverProps> = ({
           </PrimaryIconButton>
         </Box>
         <Box display="flex" flexDirection="row" flexWrap="wrap" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-          {Object.values(ReactionReason).map((reason) => (
+          {Object.entries(DislikeReasonMessages).map(([enumValue, message]) => (
             <PrimaryButton
-              key={reason}
-              onClick={() => handleReasonClick(reason)}
-              title={reason}
+              key={enumValue}
+              onClick={() => handleReasonClick(Number(enumValue) as DislikeReason)}
+              title={message}
               style={{ color: theme.palette.text.secondary }}
               data-testid={DATA_TEST_ID.BUTTON}
+              disabled={!isOnline}
             >
-              {ReactReasonMessages[reason]}
+              {message}
             </PrimaryButton>
           ))}
         </Box>
@@ -91,4 +92,4 @@ export const ReactionReasonPopover: React.FC<ReactionReasonPopoverProps> = ({
   );
 };
 
-export default ReactionReasonPopover;
+export default DislikeReasonPopover;

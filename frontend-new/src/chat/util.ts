@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import { ChatMessageType, IChatMessage } from "src/chat/Chat.types";
-import { ConversationMessageSender, ReactionResponse } from "./ChatService/ChatService.types";
+import { ConversationMessageSender, MessageReaction } from "./ChatService/ChatService.types";
 
 export const FIXED_MESSAGES_TEXT = {
   AI_IS_TYPING: "Typing...",
@@ -9,31 +9,10 @@ export const FIXED_MESSAGES_TEXT = {
     "I'm sorry, Something seems to have gone wrong on my end... Can you please refresh the page and try again?",
   PLEASE_REPEAT: "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
 };
-// TODO REViEW QUESTION: Why are we issuing a new nanoid on each user message?
-//  The correct way would have been to use the one issued by the backend.
-//  This will allow us in the future to refer to the user messages by id and will unlock capabilties
-//  For newly send message that do not have an id, we should retrieve it in the POST method.
-// TODO REVIEW: now that messages have become more complex, why not change the signature tp
-/*
-generateUserMessage(message: IChatMessage): {
-return {
-    message_id: message.message_id? message.message_id: nanoid(),
-    sender: ConversationMessageSender.USER,
-    message: message.message,
-    sent_at: message.sent_at,
-    type: ChatMessageType.BASIC_CHAT,
-    reaction: null,
-  };
-}
-// AND the same for the generateCompassMessage.
-This will simplify calling the function
- */
-// TODO REVIEW: now that messages have become more complex tests are missing and should be added.
-// at least for messages from Users and from Compass
 
-export const generateUserMessage = (message: string, sent_at: string): IChatMessage => {
+export const generateUserMessage = (message: string, sent_at: string, message_id?: string): IChatMessage => {
   return {
-    message_id: nanoid(),
+    message_id: message_id ? message_id : nanoid(),
     sender: ConversationMessageSender.USER,
     message: message,
     sent_at: sent_at,
@@ -45,7 +24,7 @@ export const generateUserMessage = (message: string, sent_at: string): IChatMess
 export const generateCompassMessage = (message_id: string,
   message: string,
   sent_at: string,
-  reaction: ReactionResponse | null
+  reaction: MessageReaction | null
 ): IChatMessage => {
   return {
     message_id: message_id,
@@ -57,13 +36,16 @@ export const generateCompassMessage = (message_id: string,
   };
 };
 
-export const generateConversationConclusionMessage = (message: string, sent_at: string): IChatMessage => {
+export const generateErrorMessage = (
+   message: string,
+): IChatMessage => {
   return {
-    id: nanoid(),
+    message_id: nanoid(),
     sender: ConversationMessageSender.COMPASS,
     message: message,
-    sent_at: sent_at,
-    type: ChatMessageType.CONVERSATION_CONCLUSION,
+    sent_at: new Date().toISOString(),
+    type: ChatMessageType.ERROR,
+    reaction: null,
   };
 };
 
@@ -79,19 +61,9 @@ export const generateTypingMessage = (sent_at: string): IChatMessage => {
 };
 
 export const generateSomethingWentWrongMessage = () => {
-  return generateCompassMessage(
-    nanoid(),
-    FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG,
-    new Date().toISOString(),
-    null
-  );
+  return generateErrorMessage(FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG);
 };
 
 export const generatePleaseRepeatMessage = () => {
-  return generateCompassMessage(
-    nanoid(),
-    FIXED_MESSAGES_TEXT.PLEASE_REPEAT,
-    new Date().toISOString(),
-    null
-  );
+  return generateErrorMessage(FIXED_MESSAGES_TEXT.PLEASE_REPEAT);
 };

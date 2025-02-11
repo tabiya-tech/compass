@@ -2,25 +2,24 @@ import * as React from "react";
 import { Meta, type StoryObj } from "@storybook/react";
 import { action } from "@storybook/addon-actions";
 import { Box } from "@mui/material";
-import ReactionReasonPopover, {
-  ReactionReasonPopoverProps,
-} from "src/feedback/reaction/components/reactionReasonPopover/ReactionReasonPopover";
+import DislikeReasonPopover, {
+  DislikeReasonPopoverProps,
+} from "src/chat/reaction/components/reactionReasonPopover/DislikeReasonPopover";
 
-const meta: Meta<typeof ReactionReasonPopover> = {
+const meta: Meta<typeof DislikeReasonPopover> = {
   title: "Feedback/Reaction/ReactionReasonPopover",
-  component: ReactionReasonPopover,
+  component: DislikeReasonPopover,
   tags: ["autodocs"],
   args: {
     onClose: action("onClose"),
-    onReasonSelect: action("onReasonSelect"),
   },
 };
 
 export default meta;
 
-type Story = StoryObj<typeof ReactionReasonPopover>;
+type Story = StoryObj<typeof DislikeReasonPopover>;
 
-const CenteredPopover: React.FC<ReactionReasonPopoverProps> = (args) => {
+const CenteredPopover: React.FC<DislikeReasonPopoverProps> = (args) => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -32,7 +31,7 @@ const CenteredPopover: React.FC<ReactionReasonPopoverProps> = (args) => {
 
   return (
     <Box display="flex" justifyContent="center" alignItems="center" height="10vh" ref={containerRef}>
-      {anchorEl && <ReactionReasonPopover {...args} anchorEl={anchorEl} />}
+      {anchorEl && <DislikeReasonPopover {...args} anchorEl={anchorEl} />}
     </Box>
   );
 };
