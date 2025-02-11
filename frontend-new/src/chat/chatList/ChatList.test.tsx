@@ -16,7 +16,7 @@ import ChatBubble, {
   DATA_TEST_ID as CHAT_BUBBLE_DATA_TEST_ID,
 } from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import ConversationConclusionChatMessage from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
-import { ReactionType } from "src/feedback/reaction/reaction.types";
+import { ReactionKind } from "src/chat/reaction/reaction.types";
 
 // mock the chat message component
 jest.mock("src/chat/chatMessage/userChatMessage/UserChatMessage", () => {
@@ -97,7 +97,7 @@ describe("ChatList", () => {
         type: ChatMessageType.BASIC_CHAT,
         reaction: {
           id: nanoid(),
-          kind: ReactionType.DISLIKED,
+          kind: ReactionKind.DISLIKED,
         },
       },
       {
@@ -222,18 +222,20 @@ describe("ChatList", () => {
     // GIVEN a message list
     const givenMessages = [
       {
-        id: nanoid(),
+        message_id: nanoid(),
         sender: ConversationMessageSender.USER,
         message: "Hello",
         sent_at: new Date().toISOString(),
         type: ChatMessageType.BASIC_CHAT,
+        reaction: null
       },
       {
-        id: nanoid(),
+        message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
         message: "Hi",
         sent_at: new Date().toISOString(),
         type: ChatMessageType.BASIC_CHAT,
+        reaction: null,
       },
     ];
     // AND the chat list is rendered

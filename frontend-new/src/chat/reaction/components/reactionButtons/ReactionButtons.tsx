@@ -1,22 +1,22 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Box, useTheme } from "@mui/material";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { ReactionReason, ReactionType } from "src/feedback/reaction/reaction.types";
+import { DislikeReason, DislikeReaction, LikeReaction, ReactionKind } from "src/chat/reaction/reaction.types";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import ThumbDownAltIcon from "@mui/icons-material/ThumbDownAlt";
 import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import ThumbDownOffAltIcon from "@mui/icons-material/ThumbDownOffAlt";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
-import ReactionReasonPopover from "src/feedback/reaction/components/reactionReasonPopover/ReactionReasonPopover";
-import ReactionService from "src/feedback/reaction/services/reactionService/reaction.service";
+import DislikeReasonPopover from "src/chat/reaction/components/reactionReasonPopover/DislikeReasonPopover";
+import ReactionService from "src/chat/reaction/services/reactionService/reaction.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { ReactionError } from "src/error/commonErrors";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
-import { ReactionResponse } from "src/chat/ChatService/ChatService.types";
+import { MessageReaction } from "src/chat/ChatService/ChatService.types";
 
 interface ReactionButtonsProps {
   messageId: string;
-  currentReaction: ReactionResponse | null;
+  currentReaction: MessageReaction | null;
 }
 
 const uniqueId = "8d4e6f2c-9a3b-4c5d-b1e7-5f9d8a2b3c4e";
@@ -38,31 +38,47 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [reaction, setReaction] = useState<ReactionType | null>(currentReaction?.kind ?? null);
-  const [previousReaction, setPreviousReaction] = useState<ReactionType | null>(currentReaction?.kind ?? null);
+  const [reaction, setReaction] = useState<ReactionKind | null>(currentReaction?.kind ?? null);
+  const [previousReaction, setPreviousReaction] = useState<ReactionKind | null>(currentReaction?.kind ?? null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeSessionId] = useState<number | null>(UserPreferencesStateService.getInstance().getActiveSessionId());
   const reactionService = new ReactionService();
 
-  // Close the popover
-  const handlePopoverClose = () => {
-    setIsSubmitting(false)
-    setIsPopoverOpen(false);
-    setAnchorEl(null);
-  };
-
-  const handleLikeClick = async () => {
-    // TODO REVIEW: This should be handled by the parent component, or at a use effect?
-    // this should not be checked on every single  function
+  useEffect(() => {
+    // We expect to have an active session when this component is used
     if (!activeSessionId) {
       throw new ReactionError("Session id is not available");
     }
+  }, [activeSessionId]);
 
-    // TODO REVIEW: hmmm is there a better was like deactivating the component while submitting?
-    //  showing a "skeleton" or a spinner? 
+  // Close the popover
+  const handlePopoverClose = async (reasons: DislikeReason[]) => {
+    setIsPopoverOpen(false);
+    setAnchorEl(null);
+    
+    if (!reasons.length) {
+      setIsSubmitting(false);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setPreviousReaction(reaction); // Save the previous reaction in case of failure
+    setReaction(ReactionKind.DISLIKED); // Set the reaction
+
+    try {
+      await reactionService.sendReaction(activeSessionId!, messageId, new DislikeReaction(reasons));
+    } catch (error) {
+      setReaction(previousReaction); // Rollback in case of failure
+      console.error(new Error("Failed to submit the dislike feedback", { cause: error }));
+      enqueueSnackbar("Failed to submit the feedback. Please try again.", { variant: "error" });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleLikeClick = async () => {
     // If the user is submitting a request, do nothing
     if (isSubmitting) {
-      enqueueSnackbar("Please wait, your request is being processed.", { variant: "warning" });
       return;
     }
 
@@ -70,14 +86,14 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
     setPreviousReaction(reaction); // Save the previous reaction in case of failure
 
     // If the current reaction is "like," deactivate it
-    if (reaction === ReactionType.LIKED) {
+    if (reaction === ReactionKind.LIKED) {
       try {
         setReaction(null); // clear the reaction
-        await reactionService.deleteReaction(activeSessionId, messageId);
+        await reactionService.deleteReaction(activeSessionId!, messageId);
       } catch (error) {
         console.error(new Error("Failed to remove the like feedback", { cause: error }));
         enqueueSnackbar("Failed to remove the feedback. Please try again.", { variant: "error" });
-        setReaction(ReactionType.LIKED); // Rollback in case of failure
+        setReaction(ReactionKind.LIKED); // Rollback in case of failure
       } finally {
         setIsSubmitting(false);
       }
@@ -85,9 +101,9 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
     }
 
     // Otherwise, add a "like" reaction
-    setReaction(ReactionType.LIKED);
+    setReaction(ReactionKind.LIKED);
     try {
-      await reactionService.sendReaction(activeSessionId, messageId, { kind: ReactionType.LIKED, reason: null });
+      await reactionService.sendReaction(activeSessionId!, messageId, new LikeReaction());
     } catch (error) {
       setReaction(previousReaction);
       console.error(new Error("Failed to submit the like feedback", { cause: error }));
@@ -98,13 +114,8 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
   };
 
   const handleDislikeClick = async (event: React.MouseEvent<HTMLElement>) => {
-    if (!activeSessionId) {
-      throw new ReactionError("Session id is not available");
-    }
-
     // If the user is submitting a request, do nothing
     if (isSubmitting) {
-      enqueueSnackbar("Please wait, your request is being processed.", { variant: "warning" });
       return;
     }
 
@@ -112,14 +123,14 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
     setPreviousReaction(reaction); // Save the previous reaction in case of failure
 
     // If the current reaction is "dislike," deactivate it
-    if (reaction === ReactionType.DISLIKED) {
+    if (reaction === ReactionKind.DISLIKED) {
       try {
         setReaction(null); // clear the reaction
-        await reactionService.deleteReaction(activeSessionId, messageId);
+        await reactionService.deleteReaction(activeSessionId!, messageId);
       } catch (error) {
         console.error(new Error("Failed to remove the dislike feedback", { cause: error }));
         enqueueSnackbar("Failed to remove the feedback. Please try again.", { variant: "error" });
-        setReaction(ReactionType.DISLIKED); // Rollback in case of failure;
+        setReaction(ReactionKind.DISLIKED); // Rollback in case of failure;
       } finally {
         setIsSubmitting(false);
       }
@@ -129,30 +140,7 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
     // If the user clicked dislike but has not yet disliked, show popover
     setAnchorEl(event.currentTarget);
     setIsPopoverOpen(true);
-  };
-
-  const handleReasonSelect = async (reason: ReactionReason) => {
-    if (!activeSessionId) {
-      throw new ReactionError("Session id is not available");
-    }
-
-    setIsSubmitting(true);
-    setPreviousReaction(reaction); // Save the previous reaction in case of failure
-    setReaction(ReactionType.DISLIKED); // Set the reaction
-    handlePopoverClose();
-
-    try {
-      await reactionService.sendReaction(activeSessionId, messageId, {
-        kind: ReactionType.DISLIKED,
-        reason: reason,
-      });
-    } catch (error) {
-      setReaction(previousReaction); // Rollback in case of failure
-      console.error(new Error("Failed to submit the dislike feedback", { cause: error }));
-      enqueueSnackbar("Failed to submit the feedback. Please try again.", { variant: "error" });
-    } finally {
-      setIsSubmitting(false);
-    }
+    setIsSubmitting(false);
   };
 
   return (
@@ -165,9 +153,9 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
           onClick={handleLikeClick}
           data-testid={DATA_TEST_ID.BUTTON_LIKE}
           title="like"
-          disabled={!isOnline} // TODO REVIEW: isonline tests are missing
+          disabled={!isOnline || isSubmitting}
         >
-          {reaction === ReactionType.LIKED ? (
+          {reaction === ReactionKind.LIKED ? (
             <ThumbUpAltIcon
               data-testid={DATA_TEST_ID.ICON_LIKE_ACTIVE}
               sx={{
@@ -190,9 +178,9 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
           onClick={handleDislikeClick}
           data-testid={DATA_TEST_ID.BUTTON_DISLIKE}
           title="dislike"
-          disabled={!isOnline}
+          disabled={!isOnline || isSubmitting}
         >
-          {reaction === ReactionType.DISLIKED ? (
+          {reaction === ReactionKind.DISLIKED ? (
             <ThumbDownAltIcon
               data-testid={DATA_TEST_ID.ICON_DISLIKE_ACTIVE}
               sx={{
@@ -208,11 +196,10 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
           )}
         </PrimaryIconButton>
       </Box>
-      <ReactionReasonPopover
+      <DislikeReasonPopover
         anchorEl={anchorEl}
         open={isPopoverOpen}
         onClose={handlePopoverClose}
-        onReasonSelect={handleReasonSelect}
       />
     </>
   );

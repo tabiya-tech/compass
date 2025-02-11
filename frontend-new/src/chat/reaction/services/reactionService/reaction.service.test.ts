@@ -1,44 +1,52 @@
-import ReactionService from "src/feedback/reaction/services/reactionService/reaction.service";
-import { ReactionType } from "src/feedback/reaction/reaction.types";
-import { setupAPIServiceSpy, setupFetchSpy } from "src/_test_utilities/fetchSpy";
+import "src/_test_utilities/consoleMock";
+import ReactionService from "src/chat/reaction/services/reactionService/reaction.service";
+import { DislikeReaction, DislikeReason, LikeReaction, ReactionKind } from "src/chat/reaction/reaction.types";
+import { expectCorrectFetchRequest, setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 import { StatusCodes } from "http-status-codes";
 
 describe("ReactionService", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  })
   describe("sendReaction", () => {
-    test("should send reaction successfully", async () => {
+    test.each([
+        ["like reaction", new LikeReaction()],
+        ["dislike reaction", new DislikeReaction([DislikeReason.BIASED])]
+    ])("should send %s successfully", async (_description, givenReaction) => {
       // GIVEN a reaction on a message with a given messageId in a session with a given SessionId
-      const givenReaction = { kind: ReactionType.LIKED, reason: null };
       const givenSessionId = 123;
       const givenMessageId = "456";
 
-      // AND the API will return a successful response
-      // TODO REVIEW it is should not be StatusCodes.OK but StatusCodes.CREATED
-      //  why is it even working?
-      const fetchSpy = setupFetchSpy(StatusCodes.CREATED, {}, "application/json;charset=UTF-8");
+      const fetchSpy = setupAPIServiceSpy(StatusCodes.CREATED, {}, "application/json;charset=UTF-8");
 
       // WHEN sending a reaction
       const reactionService = new ReactionService();
       await reactionService.sendReaction(givenSessionId, givenMessageId, givenReaction);
 
       // THEN expect the API to be called correctly
-      expect(fetchSpy).toHaveBeenCalledWith(
-        `${reactionService.reactionEndpointUrl}/${givenSessionId}/messages/${givenMessageId}/reactions`,
-        {
-          method: "PUT",
-          headers: expect.objectContaining({ "Content-Type": "application/json" }),
-          body: JSON.stringify(givenReaction),
-          expectedStatusCode: StatusCodes.CREATED,
-          serviceName: "ReactionService",
-          serviceFunction: "sendReaction",
-          failureMessage: `Failed to send reaction for message 456`,
-          expectedContentType: "application/json",
-        }
-      );
+      expectCorrectFetchRequest(fetchSpy, `${reactionService.reactionEndpointUrl}/${givenSessionId}/messages/${givenMessageId}/reactions`, {
+        method: "PUT",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          ...givenReaction,
+          kind: ReactionKind[givenReaction.kind],
+          // we expect to get the Dislike reason keys instead of values
+          reasons: givenReaction.kind === ReactionKind.DISLIKED ? (givenReaction as DislikeReaction).reasons.map(reason => DislikeReason[reason] as keyof typeof DislikeReason) : [],
+        }),
+        expectedStatusCode: StatusCodes.CREATED,
+        serviceName: "ReactionService",
+        serviceFunction: "sendReaction",
+        failureMessage: `Failed to send reaction for message 456`,
+        expectedContentType: "application/json"
+      });
+      // AND expect no errors or warnings to be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
 
     test("should throw the same error thrown by the customFetch method", async () => {
       // GIVEN a reaction on a message with a given messageId in a session with a given SessionId
-      const givenReaction = { kind: ReactionType.LIKED, reason: null };
+      const givenReaction = new LikeReaction();
       const givenSessionId = 123;
       const givenMessageId = "456";
 
@@ -57,6 +65,9 @@ describe("ReactionService", () => {
       await expect(reactionService.sendReaction(givenSessionId, givenMessageId, givenReaction)).rejects.toThrow(
         givenFetchError
       );
+      // AND expect no errors or warnings to be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
   });
 
@@ -75,18 +86,16 @@ describe("ReactionService", () => {
       await reactionService.deleteReaction(givenSessionId, givenMessageId);
 
       // THEN expect the correct API call to be made
-      expect(fetchSpy).toHaveBeenCalled();
-      // AND expect the response to match the expected response
-      expect(fetchSpy).toHaveBeenCalledWith(
-        `${reactionService.reactionEndpointUrl}/${givenSessionId}/messages/${givenMessageId}/reactions`,
-        {
-          method: "DELETE",
-          expectedStatusCode: StatusCodes.NO_CONTENT,
-          serviceName: "ReactionService",
-          serviceFunction: "deleteReaction",
-          failureMessage: `Failed to delete reaction for message 456`,
-        }
-      );
+      expectCorrectFetchRequest(fetchSpy, `${reactionService.reactionEndpointUrl}/${givenSessionId}/messages/${givenMessageId}/reactions`, {
+        method: "DELETE",
+        expectedStatusCode: StatusCodes.NO_CONTENT,
+        serviceName: "ReactionService",
+        serviceFunction: "deleteReaction",
+        failureMessage: `Failed to delete reaction for message 456`,
+      });
+      // AND expect no errors or warnings to be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
 
     test("should throw the same error thrown by the customFetch method", async () => {
@@ -108,6 +117,9 @@ describe("ReactionService", () => {
 
       // THEN expect the correct error to be thrown
       await expect(reactionService.deleteReaction(givenSessionId, givenMessageId)).rejects.toThrow(givenFetchError);
+      // AND expect no errors or warnings to be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
   });
 });

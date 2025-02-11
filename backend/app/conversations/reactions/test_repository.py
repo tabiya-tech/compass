@@ -3,17 +3,17 @@ Tests for the reaction repository.
 It uses the userdata_mocked database, and tests if repository methods work as expected with actual data.
 """
 from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, Awaitable
 
 import pytest
 import pytest_mock
 import bson
 
 from app.conversations.reactions.repository import ReactionRepository
-from app.conversations.reactions.types import Reaction, ReactionKind, DislikeReason, ReactionDocModel
+from app.conversations.reactions.types import Reaction, ReactionKind, DislikeReason
 
 
-def normalize_reaction(reaction: Reaction | ReactionDocModel) -> Reaction:
+def normalize_reaction(reaction: Reaction) -> Reaction:
     """
     Normalizes the reaction object by removing the id field.
     """
@@ -27,23 +27,21 @@ async def get_reaction_repository(in_memory_application_database) -> ReactionRep
     return repository
 
 
-def _get_new_reaction(kind: ReactionKind = ReactionKind.LIKED, reason: list[DislikeReason] = None) -> Reaction:
+def _get_new_reaction(kind: ReactionKind = ReactionKind.LIKED, reasons: list[DislikeReason] | None = None) -> Reaction:
     """
-    Returns a new reaction object with random data for testing purposes.
+    Creates a new reaction with the given kind and reasons.
     """
-    if reason is None:
-        reason = [] if kind == ReactionKind.LIKED else [DislikeReason.INCORRECT_INFORMATION]
     return Reaction(
-        session_id=123,
         message_id="message123",
+        session_id=123,
         kind=kind,
-        reason=reason
+        reasons=reasons or []
     )
 
 
 class TestAdd:
     @pytest.mark.asyncio
-    async def test_add_liked_reaction_success(self, get_reaction_repository: ReactionRepository):
+    async def test_add_liked_reaction_success(self, get_reaction_repository: Awaitable[ReactionRepository]):
         repository = await get_reaction_repository
 
         # GIVEN a liked reaction
@@ -52,8 +50,8 @@ class TestAdd:
         # WHEN the add method is called
         result = await repository.add(given_reaction)
 
-        # THEN the result should be a ReactionDocModel
-        assert isinstance(result, ReactionDocModel)
+        # THEN the result should be a Reaction
+        assert isinstance(result, Reaction)
         # AND the id should be a string
         assert isinstance(result.id, str)
         # AND the id should be a valid ObjectId
@@ -68,20 +66,20 @@ class TestAdd:
         assert normalize_reaction(actual_reaction) == normalize_reaction(given_reaction)
 
     @pytest.mark.asyncio
-    async def test_add_disliked_reaction_success(self, get_reaction_repository: ReactionRepository):
+    async def test_add_disliked_reaction_success(self, get_reaction_repository: Awaitable[ReactionRepository]):
         repository = await get_reaction_repository
 
         # GIVEN a disliked reaction with reasons
         given_reaction = _get_new_reaction(
             kind=ReactionKind.DISLIKED,
-            reason=[DislikeReason.INCORRECT_INFORMATION, DislikeReason.BIASED]
+            reasons=[DislikeReason.INCORRECT_INFORMATION, DislikeReason.BIASED]
         )
 
         # WHEN the add method is called
         result = await repository.add(given_reaction)
 
-        # THEN the result should be a ReactionDocModel
-        assert isinstance(result, ReactionDocModel)
+        # THEN the result should be a Reaction
+        assert isinstance(result, Reaction)
         # AND the id should be a string
         assert isinstance(result.id, str)
         # AND the id should be a valid ObjectId
@@ -98,7 +96,7 @@ class TestAdd:
 
 class TestDelete:
     @pytest.mark.asyncio
-    async def test_delete_success(self, get_reaction_repository: ReactionRepository):
+    async def test_delete_success(self, get_reaction_repository: Awaitable[ReactionRepository]):
         repository = await get_reaction_repository
 
         # GIVEN a reaction exists in the database
@@ -116,7 +114,7 @@ class TestDelete:
         }) is None
 
     @pytest.mark.asyncio
-    async def test_delete_non_existent(self, get_reaction_repository: ReactionRepository):
+    async def test_delete_non_existent(self, get_reaction_repository: Awaitable[ReactionRepository]):
         repository = await get_reaction_repository
 
         # GIVEN a session id and message id that don't exist
@@ -128,7 +126,7 @@ class TestDelete:
         await repository.delete(given_session_id, given_message_id)
 
     @pytest.mark.asyncio
-    async def test_db_delete_one_throws(self, get_reaction_repository: ReactionRepository, mocker: pytest_mock.MockerFixture):
+    async def test_db_delete_one_throws(self, get_reaction_repository: Awaitable[ReactionRepository], mocker: pytest_mock.MockerFixture):
         repository = await get_reaction_repository
 
         # GIVEN the repository's collection's delete_one function throws a given exception

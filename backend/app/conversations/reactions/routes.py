@@ -20,7 +20,7 @@ from app.server_dependencies.conversation_manager_dependencies import get_conver
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.conversations.reactions.repository import ReactionRepository
 from app.conversations.reactions.service import ReactionService, IReactionService, ReactingToUserMessageError
-from app.conversations.reactions.types import ReactionRequest, ReactionDocModel
+from app.conversations.reactions.types import ReactionRequest, Reaction
 from app.users.auth import UserInfo, Authentication
 from app.users.repositories import IUserPreferenceRepository, UserPreferenceRepository
 
@@ -34,7 +34,7 @@ async def get_reaction_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvi
         application_state_manager=application_state_manager)
 
 
-async def get_user_preferences_repository(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)):
+async def get_user_preferences_repository(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)) -> IUserPreferenceRepository:
     return UserPreferenceRepository(db)
 
 
@@ -52,7 +52,7 @@ def add_reaction_routes(conversation_router: APIRouter, auth: Authentication):
     @reaction_router.put(
         path="/messages/{message_id}/reactions",
         status_code=HTTPStatus.CREATED,
-        response_model=ReactionDocModel,
+        response_model=Reaction,
         description="saves user's reaction to a message",
         responses={
             HTTPStatus.BAD_REQUEST: {"model": HTTPErrorResponse},  # user is not allowed to react to messages sent by the user, only messages from compass
@@ -67,7 +67,7 @@ def add_reaction_routes(conversation_router: APIRouter, auth: Authentication):
             reaction_service: IReactionService = Depends(get_reaction_service),
             user_preferences_repository: IUserPreferenceRepository = Depends(get_user_preferences_repository),
             user_info: UserInfo = Depends(auth.get_user_info())
-    ) -> ReactionDocModel:
+    ) -> Reaction:
         # set the session_id, user_id in the context variable
         # so that it can be accessed by the logger
         # and downstream functions

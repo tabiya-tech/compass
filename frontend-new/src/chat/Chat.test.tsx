@@ -1,6 +1,6 @@
 // silence chatty console\
 import "src/_test_utilities/consoleMock";
-import { render, screen, waitFor, act } from "src/_test_utilities/test-utils";
+import { act, render, screen, waitFor } from "src/_test_utilities/test-utils";
 import Chat, {
   CHECK_INACTIVITY_INTERVAL,
   DATA_TEST_ID,
@@ -43,7 +43,7 @@ import { TabiyaUser } from "src/auth/auth.types";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { nanoid } from "nanoid";
-import { ReactionType } from "src/feedback/reaction/reaction.types";
+import { ReactionKind } from "src/chat/reaction/reaction.types";
 
 // Mock Components ----------
 // mock the snackbar
@@ -188,7 +188,7 @@ describe("Chat", () => {
         messages: expect.arrayContaining(
           conversationMessages.map((msg) => ({
             ...msg,
-            id: expect.any(String),
+            message_id: expect.any(String),
           }))
         ),
         notifyOnFeedbackFormOpen: expect.any(Function),
@@ -348,7 +348,10 @@ describe("Chat", () => {
             message: "52aea18a-4a0f-44ad-b690-e99ff8e4ddc7",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
-            reaction: null // TODO: ADD REACTION
+            reaction: {
+              id: nanoid(),
+              kind: ReactionKind.LIKED
+            }
           },
         ]);
         jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenChatHistoryResponse);
@@ -468,7 +471,7 @@ describe("Chat", () => {
                   message: FIXED_MESSAGES_TEXT.PLEASE_REPEAT,
                   sent_at: expect.any(String),
                   sender: ConversationMessageSender.COMPASS,
-                  type: ChatMessageType.BASIC_CHAT,
+                  type: ChatMessageType.ERROR,
                   reaction: null
                 },
               ],
@@ -524,7 +527,7 @@ describe("Chat", () => {
           [
             {
               message_id: expect.any(String),
-              type: ChatMessageType.BASIC_CHAT,
+              type: ChatMessageType.ERROR,
               message: FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG,
               sent_at: expect.any(String),
               sender: ConversationMessageSender.COMPASS,
@@ -691,7 +694,7 @@ describe("Chat", () => {
           [
             {
               message_id: expect.any(String),
-              type: ChatMessageType.BASIC_CHAT,
+              type: ChatMessageType.ERROR,
               message: FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG,
               sent_at: expect.any(String),
               sender: ConversationMessageSender.COMPASS,
@@ -752,7 +755,7 @@ describe("Chat", () => {
           [
             {
               message_id: expect.any(String),
-              type: ChatMessageType.BASIC_CHAT,
+              type: ChatMessageType.ERROR,
               message: FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG,
               sent_at: expect.any(String),
               sender: ConversationMessageSender.COMPASS,
@@ -822,7 +825,7 @@ describe("Chat", () => {
               sent_at: expect.any(String),
               sender: ConversationMessageSender.COMPASS,
               reaction: null,
-              type: ChatMessageType.BASIC_CHAT,
+              type: ChatMessageType.ERROR,
             },
           ],
           true
@@ -896,13 +899,7 @@ describe("Chat", () => {
             message: "51602db3-cf7f-490e-9ca8-4fae4427de30",
             sent_at: new Date().toISOString(),
             sender: ConversationMessageSender.COMPASS,
-            reaction: {
-              id: nanoid(),
-              kind: ReactionType.LIKED, // TODO REVIEW:  even though you can do this, it does not comply to the usecase.
-                                        //  Because your use case now is send message and ai responds message that  has feedback?
-                                        //  I would rather expect to see test cases in the chat init when the user has conversation history with
-                                        //  message that have feedback, instead of random places.
-            },
+            reaction: null
           },
         ],
         conversation_completed: false,
@@ -1101,7 +1098,7 @@ describe("Chat", () => {
             })),
             {
               message_id: expect.any(String),
-            type: ChatMessageType.BASIC_CHAT,
+            type: ChatMessageType.ERROR,
             message: FIXED_MESSAGES_TEXT.PLEASE_REPEAT,
             sent_at: expect.any(String),
             sender: ConversationMessageSender.COMPASS,
@@ -1405,7 +1402,7 @@ describe("Chat", () => {
           sender: ConversationMessageSender.COMPASS,
           reaction: {
             id: nanoid(),
-            kind: ReactionType.DISLIKED,
+            kind: ReactionKind.DISLIKED,
           },
         },
       ]);
@@ -1468,7 +1465,7 @@ describe("Chat", () => {
           sender: ConversationMessageSender.COMPASS,
           reaction: {
             id: nanoid(),
-            kind: ReactionType.LIKED,
+            kind: ReactionKind.LIKED,
           },
         },
       ]);
@@ -1504,7 +1501,7 @@ describe("Chat", () => {
           [
             {
               message_id: expect.any(String),
-              type: ChatMessageType.BASIC_CHAT,
+              type: ChatMessageType.ERROR,
               message: FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG,
               sender: ConversationMessageSender.COMPASS,
               sent_at: expect.any(String),
@@ -1558,7 +1555,7 @@ describe("Chat", () => {
           sender: ConversationMessageSender.COMPASS,
           reaction: {
             id: nanoid(),
-            kind: ReactionType.DISLIKED,
+            kind: ReactionKind.DISLIKED,
           },
         },
       ]);

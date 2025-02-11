@@ -5,7 +5,7 @@ import { ConversationMessageSender } from "src/chat/ChatService/ChatService.type
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
-import ReactionButtons from "src/feedback/reaction/components/reactionButtons/ReactionButtons";
+import ReactionButtons from "src/chat/reaction/components/reactionButtons/ReactionButtons";
 
 const uniqueId = "2fbaf2ef-9eab-485a-bd28-b4a164e18b06";
 

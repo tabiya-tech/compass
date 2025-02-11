@@ -5,15 +5,13 @@ from unittest.mock import AsyncMock
 
 import pytest
 import pytest_mock
-from fastapi import FastAPI, APIRouter, HTTPException, Depends
-from fastapi.security import HTTPAuthorizationCredentials
+from fastapi import FastAPI, APIRouter
 from fastapi.testclient import TestClient
-from starlette.requests import Request
 
 from app.conversations.reactions.routes import add_reaction_routes, get_reaction_service, \
     get_user_preferences_repository
 from app.conversations.reactions.service import IReactionService
-from app.conversations.reactions.types import ReactionRequest, ReactionKind, DislikeReason, ReactionDocModel
+from app.conversations.reactions.types import ReactionRequest, ReactionKind, DislikeReason, Reaction
 from app.users.repositories import IUserPreferenceRepository
 from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
 from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest
@@ -37,13 +35,13 @@ def get_mock_user_preferences(session_id: int):
 def client_with_mocks() -> Generator[TestClientWithMocks, None, None]:
     # Mock the reaction service
     class MockedReactionService(IReactionService):
-        async def add(self, session_id: int, message_id: str, reaction: ReactionRequest) -> ReactionDocModel:
-            return ReactionDocModel(
+        async def add(self, session_id: int, message_id: str, reaction: ReactionRequest) -> Reaction:
+            return Reaction(
                 id="mock_doc_id",
                 session_id=session_id,
                 message_id=message_id,
                 kind=reaction.kind,
-                reason=reaction.reason,
+                reasons=reaction.reasons,
                 created_at=datetime.now()
             )
 
@@ -55,14 +53,14 @@ def client_with_mocks() -> Generator[TestClientWithMocks, None, None]:
     # Mock the user preferences repository
     class MockedUserPreferencesRepository(IUserPreferenceRepository):
         async def get_user_preference_by_user_id(self, user_id: str) -> UserPreferences:
-            return None
+            raise NotImplementedError()
 
         async def update_user_preference(self, user_id: str,
                                          request: UserPreferencesRepositoryUpdateRequest) -> UserPreferences:
-            return None
+            raise NotImplementedError()
 
         async def insert_user_preference(self, user_id: str, user_preference: UserPreferences) -> UserPreferences:
-            return None
+            raise NotImplementedError()
 
     mocked_user_preferences_repository = MockedUserPreferencesRepository()
 
@@ -100,13 +98,13 @@ def unauthenticated_client_with_mocks() -> Generator[TestClientWithMocks, None, 
 
     # Mock the reaction service
     class MockedReactionService(IReactionService):
-        async def add(self, session_id: int, message_id: str, reaction: ReactionRequest) -> ReactionDocModel:
-            return ReactionDocModel(
+        async def add(self, session_id: int, message_id: str, reaction: ReactionRequest) -> Reaction:
+            return Reaction(
                 id="mock_doc_id",
                 session_id=session_id,
                 message_id=message_id,
                 kind=reaction.kind,
-                reason=reaction.reason,
+                reasons=reaction.reasons,
                 created_at=datetime.now()
             )
 
@@ -120,14 +118,14 @@ def unauthenticated_client_with_mocks() -> Generator[TestClientWithMocks, None, 
     # Mock the user preferences repository
     class MockedUserPreferencesRepository(IUserPreferenceRepository):
         async def get_user_preference_by_user_id(self, user_id: str) -> UserPreferences:
-            return None
+            raise NotImplementedError()
 
         async def update_user_preference(self, user_id: str,
                                          request: UserPreferencesRepositoryUpdateRequest) -> UserPreferences:
-            return None
+            raise NotImplementedError()
 
         async def insert_user_preference(self, user_id: str, user_preference: UserPreferences) -> UserPreferences:
-            return None
+            raise NotImplementedError()
 
     mocked_user_preferences_repository = MockedUserPreferencesRepository()
 
@@ -160,7 +158,7 @@ class TestReactionRoutes:
         "given_reaction",
         [
             ReactionRequest(kind=ReactionKind.LIKED),
-            ReactionRequest(kind=ReactionKind.DISLIKED, reason=[DislikeReason.INCORRECT_INFORMATION]),
+            ReactionRequest(kind=ReactionKind.DISLIKED, reasons=[DislikeReason.INCORRECT_INFORMATION]),
         ],
     )
     async def test_add_reaction_successful(self, client_with_mocks: TestClientWithMocks,
@@ -192,7 +190,7 @@ class TestReactionRoutes:
         assert response_data["session_id"] == given_session_id
         assert response_data["message_id"] == given_message_id
         assert response_data["kind"] == given_reaction.kind.name
-        assert [DislikeReason[r].name for r in response_data["reason"]] == [r.name for r in given_reaction.reason]
+        assert [DislikeReason[r].name for r in response_data["reasons"]] == [r.name for r in given_reaction.reasons]
 
         # AND the user preferences repository was called with the correct user_id
         preferences_spy.assert_called_once_with(mocked_user.user_id)

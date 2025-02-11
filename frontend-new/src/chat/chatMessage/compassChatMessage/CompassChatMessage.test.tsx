@@ -13,7 +13,7 @@ import { ConversationMessageSender } from "src/chat/ChatService/ChatService.type
 import { nanoid } from "nanoid";
 import { ChatMessageType, IChatMessage } from "src/chat/Chat.types";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
-import ReactionButtons from "src/feedback/reaction/components/reactionButtons/ReactionButtons";
+import ReactionButtons from "src/chat/reaction/components/reactionButtons/ReactionButtons";
 
 jest.mock("src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout", () => {
   const originalModule = jest.requireActual("src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout");
@@ -34,16 +34,6 @@ jest.mock("src/chat/chatMessage/components/chatBubble/ChatBubble", () => {
 });
 
 describe("render tests", () => {
-  // TODO REVIEW: remove the useFakeTimers and setSystemTime calls
-  beforeAll(() => {
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date(2020, 3, 1));
-  });
-
-  afterAll(() => {
-    jest.useRealTimers();
-  });
-
   test("should render the Compass Chat message with a timestamp", () => {
     // GIVEN a compass chat message sent at a given time
     const givenDate = new Date(2024, 6, 25).toISOString();
@@ -94,6 +84,8 @@ describe("render tests", () => {
 
     // AND expect the component to match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_CONTAINER)).toMatchSnapshot();
-    // TODO REVIEW: and no console errors or warnings should have occurred
+    // THEN expect no errors or warnings to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
   });
 });

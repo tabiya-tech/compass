@@ -13,43 +13,43 @@ class TestReactionRequest:
 
     def test_valid_liked_reaction(self):
         # GIVEN valid liked reaction
-        # WHEN creating a liked reaction without reason
+        # WHEN creating a liked reaction without reasons
         reaction = ReactionRequest(kind=ReactionKind.LIKED)
         # THEN it should be valid
         assert reaction.kind == ReactionKind.LIKED
-        assert reaction.reason == []
+        assert reaction.reasons == []
 
     def test_valid_disliked_reaction(self):
         # GIVEN valid disliked reaction
         # WHEN creating a disliked reaction with reasons
         reaction = ReactionRequest(kind=ReactionKind.DISLIKED,
-                                   reason=[DislikeReason.INCORRECT_INFORMATION, DislikeReason.BIASED])
+                                   reasons=[DislikeReason.INCORRECT_INFORMATION, DislikeReason.BIASED])
         # THEN it should be valid
         assert reaction.kind == ReactionKind.DISLIKED
-        assert len(reaction.reason) == 2
-        assert DislikeReason.INCORRECT_INFORMATION in reaction.reason
-        assert DislikeReason.BIASED in reaction.reason
+        assert len(reaction.reasons) == 2
+        assert DislikeReason.INCORRECT_INFORMATION in reaction.reasons
+        assert DislikeReason.BIASED in reaction.reasons
 
     def test_invalid_liked_reaction_with_reason(self):
-        # GIVEN invalid liked reaction with reason
-        # WHEN trying to create a liked reaction with reason
+        # GIVEN invalid liked reaction with reasons
+        # WHEN trying to create a liked reaction with reasons
         # THEN it should raise a ValueError
-        with pytest.raises(ValueError, match="Reason can only be set when reaction kind is DISLIKED"):
-            ReactionRequest(kind=ReactionKind.LIKED, reason=[DislikeReason.INCORRECT_INFORMATION])
+        with pytest.raises(ValueError, match="Reasons can only be set when reaction kind is DISLIKED"):
+            ReactionRequest(kind=ReactionKind.LIKED, reasons=[DislikeReason.INCORRECT_INFORMATION])
 
     def test_invalid_disliked_reaction_without_reason(self):
-        # GIVEN invalid disliked reaction without reason
-        # WHEN trying to create a disliked reaction without reason
+        # GIVEN invalid disliked reaction without reasons
+        # WHEN trying to create a disliked reaction without reasons
         # THEN it should raise a ValueError
-        with pytest.raises(ValueError, match="Reason is required when reaction kind is DISLIKED"):
+        with pytest.raises(ValueError, match="Reasons is required when reaction kind is DISLIKED"):
             ReactionRequest(kind=ReactionKind.DISLIKED)
 
     def test_invalid_disliked_reaction_empty_reason(self):
-        # GIVEN invalid disliked reaction with empty reason list
-        # WHEN trying to create a disliked reaction with empty reason list
+        # GIVEN invalid disliked reaction with empty reasons list
+        # WHEN trying to create a disliked reaction with empty reasons list
         # THEN it should raise a ValueError
-        with pytest.raises(ValueError, match="Reason is required when reaction kind is DISLIKED"):
-            ReactionRequest(kind=ReactionKind.DISLIKED, reason=[])
+        with pytest.raises(ValueError, match="Reasons is required when reaction kind is DISLIKED"):
+            ReactionRequest(kind=ReactionKind.DISLIKED, reasons=[])
 
 
 class TestReaction:
@@ -72,28 +72,28 @@ class TestReaction:
         # WHEN converting from dictionary
         now = datetime.now(timezone.utc)
         reaction_dict = {"_id": "123", "message_id": "msg_456", "session_id": 789, "kind": ReactionKind.DISLIKED,
-                         "reason": [DislikeReason.INCORRECT_INFORMATION], "created_at": now}
+                         "reasons": [DislikeReason.INCORRECT_INFORMATION], "created_at": now}
 
         # THEN reaction should be created correctly
         reaction = Reaction.from_dict(reaction_dict)
         assert reaction.message_id == reaction_dict["message_id"]
         assert reaction.session_id == reaction_dict["session_id"]
         assert reaction.kind == reaction_dict["kind"]
-        assert reaction.reason == reaction_dict["reason"]
+        assert reaction.reasons == reaction_dict["reasons"]
         assert reaction.created_at == now
 
     def test_from_dict_conversion_with_enum_names(self):
         # WHEN converting from dictionary
         now = datetime.now(timezone.utc)
         reaction_dict = {"_id": "123", "message_id": "msg_456", "session_id": 789, "kind": ReactionKind.DISLIKED.name,
-                         "reason": [DislikeReason.INCORRECT_INFORMATION.name], "created_at": now}
+                         "reasons": [DislikeReason.INCORRECT_INFORMATION.name], "created_at": now}
 
         # THEN reaction should be created correctly
         reaction = Reaction.from_dict(reaction_dict)
         assert reaction.message_id == reaction_dict["message_id"]
         assert reaction.session_id == reaction_dict["session_id"]
         assert reaction.kind == ReactionKind[reaction_dict["kind"]]
-        assert reaction.reason == [DislikeReason[r] for r in reaction_dict["reason"]]
+        assert reaction.reasons == [DislikeReason[r] for r in reaction_dict["reasons"]]
         assert reaction.created_at == now
 
     def test_created_at_serialization(self):
@@ -143,29 +143,29 @@ class TestReaction:
 
         # THEN it should be valid
         assert reaction.kind == ReactionKind.LIKED
-        assert reaction.reason == []
+        assert reaction.reasons == []
 
     def test_valid_disliked_reaction_model(self):
         # GIVEN valid disliked reaction
-        # WHEN creating a disliked reaction with reason
+        # WHEN creating a disliked reaction with reasons
         reaction = Reaction(message_id="msg_1", session_id=1, kind=ReactionKind.DISLIKED,
-                            reason=[DislikeReason.OFFENSIVE_LANGUAGE])
+                            reasons=[DislikeReason.OFFENSIVE_LANGUAGE])
 
         # THEN it should be valid
         assert reaction.kind == ReactionKind.DISLIKED
-        assert reaction.reason == [DislikeReason.OFFENSIVE_LANGUAGE]
+        assert reaction.reasons == [DislikeReason.OFFENSIVE_LANGUAGE]
 
     def test_invalid_liked_reaction_model_with_reason(self):
-        # GIVEN invalid liked reaction with reason
-        # WHEN trying to create a liked reaction with reason
+        # GIVEN invalid liked reaction with reasons
+        # WHEN trying to create a liked reaction with reasons
         # THEN it should raise a ValueError
-        with pytest.raises(ValueError, match="Reason can only be set when reaction kind is DISLIKED"):
+        with pytest.raises(ValueError, match="Reasons can only be set when reaction kind is DISLIKED"):
             Reaction(message_id="msg_1", session_id=1, kind=ReactionKind.LIKED,
-                     reason=[DislikeReason.INCORRECT_INFORMATION])
+                     reasons=[DislikeReason.INCORRECT_INFORMATION])
 
     def test_invalid_disliked_reaction_model_without_reason(self):
-        # GIVEN invalid disliked reaction without reason
-        # WHEN trying to create a disliked reaction without reason
+        # GIVEN invalid disliked reaction without reasons
+        # WHEN trying to create a disliked reaction without reasons
         # THEN it should raise a ValueError
-        with pytest.raises(ValueError, match="Reason is required when reaction kind is DISLIKED"):
+        with pytest.raises(ValueError, match="Reasons is required when reaction kind is DISLIKED"):
             Reaction(message_id="msg_1", session_id=1, kind=ReactionKind.DISLIKED)

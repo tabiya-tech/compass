@@ -1,6 +1,6 @@
 import { ConversationMessage, ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
-import { ReactionType } from "src/feedback/reaction/reaction.types";
+import { ReactionKind } from "src/chat/reaction/reaction.types";
 
 export const generateTestChatResponses = (): ConversationMessage[] => {
   return [
@@ -37,7 +37,7 @@ export const generateTestHistory = (): ConversationMessage[] => {
       sender: ConversationMessageSender.COMPASS,
       reaction: {
         id: nanoid(),
-        kind: ReactionType.DISLIKED,
+        kind: ReactionKind.DISLIKED,
       },
     },
     {

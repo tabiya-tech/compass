@@ -2,10 +2,10 @@ from datetime import timezone, datetime
 
 from app.conversation_memory.conversation_memory_types import ConversationHistory, ConversationContext
 from app.conversations.types import ConversationMessage, ConversationMessageSender, MessageReaction
-from app.conversations.reactions.types import Reaction, ReactionDocModel
+from app.conversations.reactions.types import Reaction
 
 
-def _convert_to_message_reaction(reaction: ReactionDocModel | None) -> MessageReaction | None:
+def _convert_to_message_reaction(reaction: Reaction | None) -> MessageReaction | None:
     """
     Converts a Reaction to a MessageReaction.
 
@@ -21,7 +21,7 @@ def _convert_to_message_reaction(reaction: ReactionDocModel | None) -> MessageRe
     )
 
 
-async def filter_conversation_history(history: 'ConversationHistory', reactions_for_session: list[Reaction] | None) -> list[ConversationMessage]:
+async def filter_conversation_history(history: 'ConversationHistory', reactions_for_session: list[Reaction]) -> list[ConversationMessage]:
     """
     Filter the conversation history to only include the messages that were sent by the user and the Compass.
     :param history: ConversationHistory - the conversation history
@@ -40,11 +40,13 @@ async def filter_conversation_history(history: 'ConversationHistory', reactions_
             ))
         
         # Get reaction for a compass message if it exists (user messages can't have reactions)
-        compass_reaction: ReactionDocModel | None = None
-        # TODO REVIEW: Once a reaction is assigned to a message, it should be removed from the list of reactions
-        for reaction in reactions_for_session:
+        compass_reaction: Reaction | None = None
+        # Find and remove the reaction from the list once it's assigned to a message
+        for i, reaction in enumerate(reactions_for_session):
             if turn.output.message_id == reaction.message_id:
                 compass_reaction = reaction
+                reactions_for_session.pop(i)
+                break
         messages.append(ConversationMessage(
             message_id=turn.output.message_id,
             message=turn.output.message_for_user,

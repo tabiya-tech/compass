@@ -1,7 +1,11 @@
 import { customFetch } from "src/utils/customFetch/customFetch";
 import { StatusCodes } from "http-status-codes";
-import { Reaction } from "src/feedback/reaction/reaction.types";
+import { DislikeReaction, DislikeReason, LikeReaction, ReactionKind } from "src/chat/reaction/reaction.types";
 import { getBackendUrl } from "src/envService";
+interface ReactionRequest {
+  kind: keyof typeof ReactionKind;
+  reasons?: Array<keyof typeof DislikeReason>;
+}
 
 export class ReactionService {
   readonly reactionEndpointUrl: string;
@@ -12,21 +16,22 @@ export class ReactionService {
     this.reactionEndpointUrl = `${this.apiServerUrl}/conversations`;
   }
 
-  async sendReaction(sessionId: number, messageId: string, reaction: Reaction): Promise<void> {
+  async sendReaction(sessionId: number, messageId: string, reaction: LikeReaction | DislikeReaction): Promise<void> {
     const serviceName = "ReactionService";
     const serviceFunction = "sendReaction";
     const method = "PUT";
 
     const reactionURL = `${this.reactionEndpointUrl}/${sessionId}/messages/${messageId}/reactions`;
-    // TODO the request body type is missing here
-    //  it is not clear if the backend expects a list of reasons or a single reason
-    //  also the "cryptic" reaction.reason && [reaction.reason], should be clarified as this imply that the reason is optional
-    const body = JSON.stringify({ kind: reaction.kind, reason: reaction.reason && [reaction.reason] });
+    
+    const body: ReactionRequest = {
+          kind: ReactionKind[reaction.kind] as keyof typeof ReactionKind,
+          reasons: reaction.reasons.map(reason => DislikeReason[reason] as keyof typeof DislikeReason),
+        };
 
     await customFetch(reactionURL, {
       method: method,
-      headers: { "Content-Type": "application/json" },
-      body: body,
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
       expectedStatusCode: StatusCodes.CREATED,
       serviceName: serviceName,
       serviceFunction: serviceFunction,

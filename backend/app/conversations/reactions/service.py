@@ -7,7 +7,7 @@ from abc import ABC, abstractmethod
 from app.application_state import ApplicationStateManager, IApplicationStateManager
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager, IConversationMemoryManager
 from app.conversations.reactions.repository import IReactionRepository
-from app.conversations.reactions.types import ReactionRequest, Reaction, ReactionDocModel
+from app.conversations.reactions.types import ReactionRequest, Reaction
 
 class ReactingToUserMessageError(Exception):
     """
@@ -23,14 +23,14 @@ class IReactionService(ABC):
     """
 
     @abstractmethod
-    async def add(self, session_id: int, message_id: str, reaction: ReactionRequest) -> ReactionDocModel:
+    async def add(self, session_id: int, message_id: str, reaction: ReactionRequest) -> Reaction:
         """
         Creates or updates a reaction for a message.
 
         :param session_id: the id of the session containing the message
         :param message_id: the id of the message being reacted to
         :param reaction: the reaction details
-        :return: ReactionDocModel - the created or updated reaction
+        :return: Reaction - the created or updated reaction
         """
         raise NotImplementedError()
 
@@ -52,7 +52,7 @@ class ReactionService(IReactionService):
         self._application_state_manager=application_state_manager
         self._logger=logging.getLogger(ReactionService.__name__)
 
-    async def add(self, session_id: int, message_id: str, reaction: ReactionRequest) -> ReactionDocModel:
+    async def add(self, session_id: int, message_id: str, reaction: ReactionRequest) -> Reaction:
         state = await self._application_state_manager.get_state(session_id)
         self._conversation_memory_manager.set_state(state.conversation_memory_manager_state)
 
@@ -65,7 +65,7 @@ class ReactionService(IReactionService):
             session_id=session_id,
             message_id=message_id,
             kind=reaction.kind,
-            reason=reaction.reason
+            reasons=reaction.reasons
         )
         return await self._reaction_repository.add(reaction_model)
 

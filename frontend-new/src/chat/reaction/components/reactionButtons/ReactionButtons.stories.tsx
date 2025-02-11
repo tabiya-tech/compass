@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from "@storybook/react";
-import { ReactionType } from "src/feedback/reaction/reaction.types";
-import ReactionButtons from "src/feedback/reaction/components/reactionButtons/ReactionButtons";
+import { ReactionKind } from "src/chat/reaction/reaction.types";
+import ReactionButtons from "src/chat/reaction/components/reactionButtons/ReactionButtons";
 import { getBackendUrl } from "src/envService";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { nanoid } from "nanoid";
@@ -61,7 +61,7 @@ export const ShownWithLikeReaction: Story = {
   args: {
     currentReaction: {
       id: nanoid(),
-      kind: ReactionType.LIKED,
+      kind: ReactionKind.LIKED,
     },
   },
   parameters: {
@@ -73,7 +73,7 @@ export const ShownWithDislikeReaction: Story = {
   args: {
     currentReaction: {
       id: nanoid(),
-      kind: ReactionType.DISLIKED,
+      kind: ReactionKind.DISLIKED,
     },
   },
   parameters: {
