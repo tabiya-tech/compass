@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes/";
-import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
+import { expectCorrectFetchRequest, setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 import { UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import OverallFeedbackService from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service";
@@ -18,6 +18,7 @@ jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => {
     __esModule: true,
     PersistentStorageService: {
       getUserPreferences: jest.fn().mockReturnValue(JSON.stringify(mockUserPreference)),
+      getToken: jest.fn().mockReturnValue("foo token")
     },
   };
 });
@@ -112,7 +113,7 @@ describe("OverallFeedbackService", () => {
       const actualResponse = await service.sendFeedback(givenFeedbackData);
 
       // THEN expect it to make a POST request with correct headers and payload
-      expect(fetchSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/users/feedback`, {
+      expectCorrectFetchRequest(fetchSpy,`${givenApiServerUrl}/users/feedback`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -153,7 +154,7 @@ describe("OverallFeedbackService", () => {
       "on 201, should reject with an error ERROR_CODE.INVALID_RESPONSE_BODY if response %s",
       async (_description, givenResponse) => {
         // GIVEN fetch resolves with a response that has invalid JSON
-        setupAPIServiceSpy(StatusCodes.CREATED, givenResponse, "application/json;charset=UTF-8");
+        setupAPIServiceSpy(StatusCodes.CREATED, {}, "application/json;charset=UTF-8").mockResolvedValueOnce(givenResponse);
 
         // WHEN the sendFeedback method is called
         const givenSessionId = 1234;
@@ -167,7 +168,7 @@ describe("OverallFeedbackService", () => {
             "sendFeedback",
             "POST",
             `${givenApiServerUrl}/users/feedback`,
-            StatusCodes.CREATED,
+            StatusCodes.UNPROCESSABLE_ENTITY,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",
             ""
