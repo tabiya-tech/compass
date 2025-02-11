@@ -102,6 +102,15 @@ logger.info(f"Frontend URL: {os.getenv('FRONTEND_URL')}")
 if not os.getenv("BACKEND_URL"):
     raise ValueError("Mandatory BACKEND_URL env variable is not set! Please set it to the backend URL as it is "
                      "required to set the CORS policy correctly for the api documentation /docs.")
+
+if not os.getenv("TARGET_ENVIRONMENT_TYPE"):
+    raise ValueError("Mandatory TARGET_ENVIRONMENT_TYPE env variable is not set! Please set it to the target environment type as it is "
+                     "required to set the CORS policy correctly for allowing local development if it is set to 'local' or 'dev'.")
+
+if not os.getenv("TARGET_ENVIRONMENT_NAME"):
+    raise ValueError("Mandatory TARGET_ENVIRONMENT_NAME env variable is not set! Please set it to the target environment name as it is "
+                     "Required by sentry to know on which environment some Sentry Events occured")
+
 logger.info(f"Backend URL: {os.getenv('BACKEND_URL')}")
 
 origins = [
@@ -109,11 +118,11 @@ origins = [
     os.getenv("BACKEND_URL") + "/docs",
 ]
 
-target_env = os.getenv("TARGET_ENVIRONMENT")
-logger.info(f"Target environment: {target_env}")
+target_environment_type = os.getenv("TARGET_ENVIRONMENT_TYPE")
+logger.info(f"Target environment: {target_environment_type}")
 
-if target_env == "dev" or target_env == "local":
-    logger.info(f"Setting CORS to allow all origins for the {target_env} environment.")
+if target_environment_type == "dev" or target_environment_type == "local":
+    logger.info(f"Setting CORS to allow all origins for the {target_environment_type} environment.")
     origins.append("*")
 
 enable_sentry = os.getenv("ENABLE_SENTRY")

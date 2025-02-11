@@ -221,13 +221,15 @@ def _deploy_cloud_run_service(
                     ),
                     image=fully_qualified_image_name,
                     envs=[
-                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="TAXONOMY_MONGODB_URI",
-                                                                       value=backend_service_cfg.taxonomy_mongodb_uri),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="TAXONOMY_MONGODB_URI",
+                            value=backend_service_cfg.taxonomy_mongodb_uri),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="TAXONOMY_DATABASE_NAME",
                             value=backend_service_cfg.taxonomy_database_name),
-                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="TAXONOMY_MODEL_ID",
-                                                                       value=backend_service_cfg.taxonomy_model_id),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="TAXONOMY_MODEL_ID",
+                            value=backend_service_cfg.taxonomy_model_id),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="APPLICATION_MONGODB_URI",
                             value=backend_service_cfg.application_mongodb_uri),
@@ -240,20 +242,27 @@ def _deploy_cloud_run_service(
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="USERDATA_DATABASE_NAME",
                             value=backend_service_cfg.userdata_database_name),
-                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="VERTEX_API_REGION",
-                                                                       value=backend_service_cfg.vertex_api_region),
-                        # TODO: rename to TARGET_ENVIRONMENT_NAME and introduce the TARGET_ENVIRONMENT_TYPE in the backend service
-                        #       TARGET_ENVIRONMENT_TYPE is used by cors TARGET_ENVIRONMENT_NAME is used by sentry
-                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="TARGET_ENVIRONMENT",
-                                                                       value=backend_service_cfg.target_environment_name),
-                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="BACKEND_URL",
-                                                                       value=backend_service_cfg.backend_url),
-                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="FRONTEND_URL",
-                                                                       value=backend_service_cfg.frontend_url),
-                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="SENTRY_BACKEND_DSN",
-                                                                       value=backend_service_cfg.sentry_backend_dsn),
-                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(name="ENABLE_SENTRY",
-                                                                       value=backend_service_cfg.enable_sentry),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="VERTEX_API_REGION",
+                            value=backend_service_cfg.vertex_api_region),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="TARGET_ENVIRONMENT_NAME",
+                            value=backend_service_cfg.target_environment_name),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="TARGET_ENVIRONMENT_TYPE",
+                            value=backend_service_cfg.target_environment_type),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="BACKEND_URL",
+                            value=backend_service_cfg.backend_url),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="FRONTEND_URL",
+                            value=backend_service_cfg.frontend_url),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="SENTRY_BACKEND_DSN",
+                            value=backend_service_cfg.sentry_backend_dsn),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="ENABLE_SENTRY",
+                            value=backend_service_cfg.enable_sentry),
 
                         # Add more environment variables here
                     ],
