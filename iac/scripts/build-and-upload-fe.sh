@@ -49,13 +49,13 @@ function upload_frontend_artifacts {
 
   # Then upload the frontend artifacts
   echo "info: uploading frontend artifacts"
-  gcloud artifacts generic upload --package=frontend \
-    --repository=generic-repository \
-    --location="$_region" \
-    --source=./"$_frontend_build_artifact_filename" \
-    --project="$_project_id" \
-    --version="$_artifact_version"
-  if [ $? -ne 0 ]; then
+
+  if ! gcloud artifacts generic upload --package=frontend \
+           --repository=generic-repository \
+           --location="$_region" \
+           --source=./"$_frontend_build_artifact_filename" \
+           --project="$_project_id" \
+           --version="$_artifact_version"; then
     echo "error: failed to upload frontend artifacts"
     exit 1
   fi
@@ -145,10 +145,11 @@ echo "info: building and uploading frontend:$artifact_version artifacts to $regi
 echo "info: building frontend artifacts"
 yarn --cwd "$source_path" run build || exit 1
 
-echo "info: building frontend artifacts"
-yarn --cwd "$source_path" run sentry:sourcemaps
-if [ $? -ne 0 ]; then
-  echo "warning: failed to upload sourcemaps to sentry"
+if [ -n "$SENTRY_AUTH_TOKEN" ]; then
+  echo "info: uploading sourcemaps to sentry"
+  yarn --cwd "$source_path" run sentry:sourcemaps || exit 1
+else
+  echo "warning: SENTRY_AUTH_TOKEN is not set, skipping uploading sourcemaps to sentry"
 fi
 
 # 2. Write the version info
@@ -156,10 +157,10 @@ write_version_json "$version_json_filename" "$git_branch_tag_name" "$git_commit_
 
 # 3. Compress the frontend artifacts
 echo "info: compressing frontend artifacts"
-tar -czf ./$frontend_build_artifact_filename -C "$source_path"/build . || exit 1
+tar -czf "./$frontend_build_artifact_filename" -C "$source_path"/build . || exit 1
 
 # shellcheck disable=SC2064
-trap "echo info: cleaning up; rm ./$frontend_build_artifact_filename" EXIT
+trap "echo info: cleaning up; rm \"./$frontend_build_artifact_filename\"" EXIT
 
 # 4. Upload the frontend artifacts
 upload_frontend_artifacts "$region" "$project_id" "$frontend_build_artifact_filename" "$artifact_version"

@@ -109,7 +109,7 @@ if not os.getenv("TARGET_ENVIRONMENT_TYPE"):
 
 if not os.getenv("TARGET_ENVIRONMENT_NAME"):
     raise ValueError("Mandatory TARGET_ENVIRONMENT_NAME env variable is not set! Please set it to the target environment name as it is "
-                     "Required by sentry to know on which environment some Sentry Events occured")
+                     "Required by sentry to know on which environment some Sentry Events occurred")
 
 logger.info(f"Backend URL: {os.getenv('BACKEND_URL')}")
 

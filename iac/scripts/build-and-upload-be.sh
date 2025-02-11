@@ -53,8 +53,7 @@ function build_and_upload_be_docker_img() {
   # For now the platform running the image is cloud run, which is linux/amd64
   # @ref: https://cloud.google.com/run/docs/container-contract
   echo "info: building and push the docker image for linux"
-  docker build --platform linux/amd64 -t "$_artifact_name" "$_source_path" --push
-  if [ $? -ne 0 ]; then
+  if ! docker build --platform linux/amd64 -t "$_artifact_name" "$_source_path" --push; then
     echo "error: failed to build and push the backend docker image"
     exit 1
   fi
@@ -78,14 +77,12 @@ function upload_backend_config(){
 
   # Then upload the backend config
   echo "info: uploading backend config"
-  gcloud artifacts generic upload --package=backend-config \
+  if ! gcloud artifacts generic upload --package=backend-config \
       --repository=generic-repository \
       --location="$_region" \
       --source="$_source_path/scripts/export_api_gateway_config/_tmp/$_api_config_file_name" \
       --project="$_project_id" \
-      --version="$_artifact_version"
-
-  if [ $? -ne 0 ]; then
+      --version="$_artifact_version"; then
     echo "error: failed to upload backend configurations"
     exit 1
   fi
@@ -184,8 +181,9 @@ echo "info: building and uploading backend:$docker_artifact_version artifacts to
 # 1. Export the API Gateway Configuration
 poetry run -C ./"$source_path"  python3 "./$source_path/scripts/export_api_gateway_config/export_config.py" || exit 1
 
-# 2. Have a backup of the version json file name.
+# 2. Make a backup of the version json file name and restore it when the script exits
 cp "$version_json_filename" "$version_json_filename.bak"
+
 # shellcheck disable=SC2064
 trap "echo info: cleaning up; mv \"$version_json_filename.bak\" \"$version_json_filename\"" EXIT
 
