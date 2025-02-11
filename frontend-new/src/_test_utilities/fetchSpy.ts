@@ -31,7 +31,7 @@ export function setupAPIServiceSpy(
   return jest.spyOn(require("src/utils/customFetch/customFetch"), "customFetch");
 }
 
-export function expectFetchRequest(fetchSpy: jest.SpyInstance, expectedUrl: string, expectedConfig: ExtendedRequestInit) {
+export function expectCorrectFetchRequest(fetchSpy: jest.SpyInstance, expectedUrl: string, expectedConfig: ExtendedRequestInit) {
   expect(fetchSpy).toHaveBeenCalledTimes(1);
   const [actualUrl, actualConfig] = fetchSpy.mock.calls[0];
   expect(actualUrl).toBe(expectedUrl);
@@ -75,7 +75,7 @@ export function expectFetchRequest(fetchSpy: jest.SpyInstance, expectedUrl: stri
 
   extraProperties.forEach((key) => {
     if (expectedConfig[key] !== undefined) {
-      expect(actualConfig[key]).toBe(expectedConfig[key]);
+      expect(actualConfig[key]).toEqual(expectedConfig[key]);
     }
   });
 }

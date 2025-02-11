@@ -46,16 +46,16 @@ export default class UserPreferencesService {
 
   /**
    * Parse the JSON response from the backend into a UserPreference object.
-   * @param responseBody
+   * @param response
    * @param userId
    * @param errorFactory
    * @private
    */
-  private parseJsonResponse(responseBody: string, userId: string, errorFactory: RestAPIErrorFactory): UserPreference {
+  private async parseJsonResponse(response: Response, userId: string, errorFactory: RestAPIErrorFactory): Promise<UserPreference> {
     // parse the response body
     let userPreferencesResponse: UserPreference;
     try {
-      const jsonPayload: UserPreference = JSON.parse(responseBody);
+      const jsonPayload: UserPreference = JSON.parse(await response.text());
       userPreferencesResponse = {
         user_id: userId,
         language: jsonPayload.language,
@@ -70,7 +70,7 @@ export default class UserPreferencesService {
         StatusCodes.UNPROCESSABLE_ENTITY,
         ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
         "Failed to parse response body",
-        responseBody
+        response
       );
     }
     return userPreferencesResponse;
@@ -106,8 +106,7 @@ export default class UserPreferencesService {
       body: requestBody,
       expectedContentType: "application/json",
     });
-    const responseBody = await response.text();
-    return this.parseJsonResponse(responseBody, user_preferences.user_id, errorFactory);
+    return await this.parseJsonResponse(response, user_preferences.user_id, errorFactory);
   }
 
   /**
@@ -139,8 +138,8 @@ export default class UserPreferencesService {
       body: requestBody,
       expectedContentType: "application/json",
     });
-    const responseBody = await response.text();
-    return this.parseJsonResponse(responseBody, newUserPreferencesSpec.user_id, errorFactory);
+
+    return await this.parseJsonResponse(response, newUserPreferencesSpec.user_id, errorFactory);
   }
 
   /**
@@ -167,8 +166,7 @@ export default class UserPreferencesService {
       expectedContentType: "application/json",
     });
 
-    const responseBody = await response.text();
-    return this.parseJsonResponse(responseBody, userId, errorFactory);
+    return await this.parseJsonResponse(response, userId, errorFactory);
   }
 
   /**
@@ -194,7 +192,6 @@ export default class UserPreferencesService {
       expectedContentType: "application/json",
     });
 
-    const responseBody = await response.text();
-    return this.parseJsonResponse(responseBody, userId, errorFactory);
+    return await this.parseJsonResponse(response, userId, errorFactory);
   }
 }
