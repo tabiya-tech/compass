@@ -167,7 +167,9 @@ if __name__ == "__main__":
     # a) by realm name and environment name
     # b) by realm name and environment type.
     add_select_environments_arguments(parser=parser)
-
+    # TODO change to --branch-name --git-sha
+    #   help="The branch name or git sha of the artifacts to deploy. They are used to form the artifacts version."
+    #   " which is <branch-name>.<git-sha> when some characters have been excaped to comly to naming convetions in the artifacts regiostry"
     parser.add_argument(
         "--artifacts-version",
         type=str,

@@ -130,7 +130,9 @@ if __name__ == "__main__":
              " The directory should contain the .env.<REALM_NAME>.<ENV_NAME> file for the environment."
              " It should be an absolute path."
     )
-
+    # TODO : separate branch name from gitsha
+    #   [--branch-name]  [--git-sha]
+    # help = "The branch name and git sha of the configuration to look for when determining the environment(s) to set up."
     parser.add_argument(
         "--config-version",
         type=str,
