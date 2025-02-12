@@ -6,7 +6,7 @@ import pulumi_gcp as gcp
 import pulumiverse_time as time
 import hashlib
 
-from lib import enable_services, get_resource_name, MAIN_SECRET_VERSION, get_formatted_secret_id, STACK_CONFIG_SECRET_ID
+from lib import enable_services, get_resource_name
 
 protected_from_deletion = False
 
@@ -73,6 +73,8 @@ def _create_repositories(*,
     :return: the created repository
     """
 
+    repo_admin_role = "roles/artifactregistry.repoAdmin"
+
     # Create a repository - a docker repository
     docker_repository = gcp.artifactregistry.Repository(
         get_resource_name(resource="docker", resource_type="repository"),
@@ -89,7 +91,7 @@ def _create_repositories(*,
         project=provider.project,
         location=region,
         repository=docker_repository.name,
-        role="roles/artifactregistry.repoAdmin",
+        role=repo_admin_role,
         member=developers_group.group_key.apply(lambda group: f"group:{group.id}"),
         opts=pulumi.ResourceOptions(provider=provider, depends_on=[docker_repository, developers_group]),
     )
@@ -99,7 +101,7 @@ def _create_repositories(*,
         project=provider.project,
         location=region,
         repository=docker_repository.name,
-        role="roles/artifactregistry.repoAdmin",
+        role=repo_admin_role,
         member=admins_group.group_key.apply(lambda group: f"group:{group.id}"),
         opts=pulumi.ResourceOptions(provider=provider, depends_on=[docker_repository, admins_group]),
     )
@@ -119,7 +121,7 @@ def _create_repositories(*,
         project=provider.project,
         location=region,
         repository=generic_repository.name,
-        role="roles/artifactregistry.repoAdmin",
+        role=repo_admin_role,
         member=developers_group.group_key.apply(lambda group: f"group:{group.id}"),
         opts=pulumi.ResourceOptions(provider=provider, depends_on=[generic_repository, developers_group]),
     )
@@ -129,7 +131,7 @@ def _create_repositories(*,
         project=provider.project,
         location=region,
         repository=generic_repository.name,
-        role="roles/artifactregistry.repoAdmin",
+        role=repo_admin_role,
         member=admins_group.group_key.apply(lambda group: f"group:{group.id}"),
         opts=pulumi.ResourceOptions(provider=provider, depends_on=[generic_repository, admins_group]),
     )
@@ -137,7 +139,7 @@ def _create_repositories(*,
     return docker_repository, generic_repository
 
 
-def _setup_main_stack_config_secret(
+def _create_secrets(
         *,
         root_project_id: str,
         developers_group: gcp.cloudidentity.Group,
@@ -146,13 +148,15 @@ def _setup_main_stack_config_secret(
         dependencies: list[pulumi.Resource],
 ) -> gcp.secretmanager.Secret:
     """
-    Create a secret to store the stack config yaml.
+    Create secrets required by the realm.
+         a) environments config.
+
     And grant the necessary permissions to the developers and admins groups.
     """
 
-    secret = gcp.secretmanager.Secret(
-        get_resource_name(resource="stack-config_main", resource_type="secret"),
-        secret_id=get_formatted_secret_id(STACK_CONFIG_SECRET_ID, MAIN_SECRET_VERSION),
+    environments_config_secret = gcp.secretmanager.Secret(
+        get_resource_name(resource="environments-config", resource_type="secret"),
+        secret_id="environments-config",
         project=root_project_id,
         # automatic replication.
         replication={
@@ -162,21 +166,21 @@ def _setup_main_stack_config_secret(
 
     # allow the developers to only view the secret
     gcp.secretmanager.SecretIamMember(
-        get_resource_name(resource="devs-group-secrets-accessor", resource_type="iam-member"),
-        secret_id=secret.id,
+        get_resource_name(resource="devs-group-environments-config-secret-accessor", resource_type="iam-member"),
+        secret_id=environments_config_secret.id,
         role="roles/secretmanager.secretAccessor",
         member=developers_group.group_key.apply(lambda group: f"group:{group.id}"),
-        opts=pulumi.ResourceOptions(provider=provider, depends_on=[secret, developers_group]))
+        opts=pulumi.ResourceOptions(provider=provider, depends_on=[environments_config_secret, developers_group]))
 
     # allow the admins to admin the secret
     gcp.secretmanager.SecretIamMember(
-        get_resource_name(resource="admins-group-secret-admin", resource_type="iam-member"),
-        secret_id=secret.id,
+        get_resource_name(resource="admins-group-environments-config-secret-admin", resource_type="iam-member"),
+        secret_id=environments_config_secret.id,
         role="roles/secretmanager.admin",
         member=admins_group.group_key.apply(lambda group: f"group:{group.id}"),
-        opts=pulumi.ResourceOptions(provider=provider, depends_on=[secret, admins_group]))
+        opts=pulumi.ResourceOptions(provider=provider, depends_on=[environments_config_secret, admins_group]))
 
-    return secret
+    return environments_config_secret
 
 
 def _create_organizational_base(*,
@@ -449,7 +453,7 @@ def _enable_required_services(*, provider: gcp.Provider) -> time.Sleep:
         "cloudbilling.googleapis.com",
         # Required for enabling the identity toolkit in the environment projects
         "identitytoolkit.googleapis.com",
-        # GCP Secret Manager — Required for storing stack config yaml.
+        # GCP Secret Manager — Required for creating config secrets.
         "secretmanager.googleapis.com"
     ]
 
@@ -531,7 +535,7 @@ def create_realm(*,
         provider=provider
     )
 
-    _setup_main_stack_config_secret(
+    environments_config_secret = _create_secrets(
         root_project_id=root_project_id,
         admins_group=realm_admins,
         developers_group=realm_developers,
@@ -542,6 +546,7 @@ def create_realm(*,
     pulumi.export("docker_repository", docker_repository)
     pulumi.export("generic_repository", generic_repository)
     pulumi.export("lower_env_folder_id", lower_envs_folder.folder_id)
+    pulumi.export("environments_config_secret_name", environments_config_secret.name)
     pulumi.export("lower_env_identity_projects_folder_id", lower_env_identity_projects_folder_id)
     pulumi.export("upper_env_folder_id", prod_envs_folder.folder_id)
     pulumi.export("upper_env_identity_projects_folder_id", upper_env_identity_projects_folder_id)

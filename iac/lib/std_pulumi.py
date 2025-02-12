@@ -393,3 +393,22 @@ def get_formatted_secret_id(secret_id: str, config_version: str):
     _, _, formatted_secret_id = parse_git_branch_name(config_version)
 
     return f"{secret_id}_{formatted_secret_id}"
+
+
+def construct_version_from_branch_and_sha(ref_name: str, sha: str):
+    """
+    Construct the version from the ref name and sha.
+
+    :param ref_name:
+    :param sha:
+    :return:
+    """
+
+    if not ref_name:
+        raise ValueError("ref_name is required")
+
+    version = ref_name
+    if sha:
+        version = f"{version}.{sha}"
+
+    return version

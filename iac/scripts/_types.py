@@ -2,7 +2,8 @@ from enum import Enum
 from typing import Mapping, Any
 from dataclasses import dataclass
 
-from lib import get_realm_and_env_name_from_stack
+from environment.env_types import EnvironmentTypes
+from lib import get_stack_name_from
 
 
 class IaCModules(Enum):
@@ -20,28 +21,58 @@ class IaCModules(Enum):
     AWS_NS = "aws-ns"
 
 
+class DeploymentType(Enum):
+    """
+    Deployment type.
+    """
+
+    AUTO = "auto"
+    """Deployment happens automatically for some events: eg: push to main, release"""
+
+    MANUAL = "manual"
+    """Someone manually has to come and deploy the changes, with a specific version."""
+
+
+@dataclass
+class Environment:
+    """
+    Environment/Deployment
+    """
+
+    realm_name: str
+    environment_name: str
+    environment_type: EnvironmentTypes
+    deployment_type: DeploymentType
+    config: Mapping[str, Any]
+
+    @property
+    def stack_name(self) -> str:
+        """The stack name for the environment"""
+        return get_stack_name_from(self.realm_name, self.environment_name)
+
+    @staticmethod
+    def from_dict(realm_name: str, _dict: dict) -> "Environment":
+        """
+        Creates an Environment object from the Dictionary
+        """
+        environment_config = _dict["config"]
+
+        return Environment(
+            realm_name=realm_name,
+            environment_name=_dict["environment_name"],
+            environment_type=EnvironmentTypes(environment_config["environment_type"]),
+            deployment_type=DeploymentType(_dict["deployment_type"]),
+            config={'config': environment_config}
+        )
+
+
 @dataclass
 class StackConfigs:
     """
     Environment Stack Configurations
-    expected map type:
-     - stack_name: str
-       environment: dict: environment configurations
-       auth: dict: auth configurations
-       backend: dict: backend configurations
-       frontend: dict: frontend configurations
-       common: dict: common configurations
-       aws_ns: dict: aws namespace configurations.
     """
 
-    realm_name: str
-
-    stack_name: str
-    env_name: str
-    env_type: str
-    deployment_type: str
-
-    environment: Mapping[str, Any]
+    environment: Environment
     auth: Mapping[str, Any]
     backend: Mapping[str, Any]
     frontend: Mapping[str, Any]
@@ -49,32 +80,20 @@ class StackConfigs:
     aws_ns: Mapping[str, Any]
 
     @staticmethod
-    def from_dict(env_config_dict: dict) -> "StackConfigs":
+    def from_dict(environment: Environment, _dict: dict) -> "StackConfigs":
         """
         Creates an Environment Config object from the yml config.
         If some of the fields in the config dict are not present, it will raise an error.
-
-        :param env_config_dict: The environment configuration dictionary.
-        :return:
         """
 
         # Please use ["key"] instead of .get("key") to avoid None values.
         # So that we ensure keys are available in the config dict, otherwise raise an error.
 
-        _stack_name = env_config_dict["stack_name"]
-        realm_name, env_name = get_realm_and_env_name_from_stack(_stack_name)
-        environment_config = env_config_dict[IaCModules.ENVIRONMENT.value]["config"]
-
         return StackConfigs(
-            realm_name=realm_name,
-            stack_name=_stack_name,
-            env_name=env_name,
-            env_type=environment_config["environment_type"],
-            deployment_type=environment_config["deployment_type"],
-            environment=env_config_dict[IaCModules.ENVIRONMENT.value],
-            auth=env_config_dict[IaCModules.AUTH.value],
-            backend=env_config_dict[IaCModules.BACKEND.value],
-            frontend=env_config_dict[IaCModules.FRONTEND.value],
-            common=env_config_dict[IaCModules.COMMON.value],
-            aws_ns=env_config_dict[IaCModules.AWS_NS.value]
+            environment=environment,
+            auth=_dict[IaCModules.AUTH.value],
+            backend=_dict[IaCModules.BACKEND.value],
+            frontend=_dict[IaCModules.FRONTEND.value],
+            common=_dict[IaCModules.COMMON.value],
+            aws_ns=_dict[IaCModules.AWS_NS.value]
         )

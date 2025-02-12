@@ -18,7 +18,7 @@ iac_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # so that we can import the iac/lib module when we run pulumi from withing the iac/scripts directory.
 sys.path.insert(0, iac_dir)
 
-from _types import IaCModules, StackConfigs
+from _types import IaCModules, StackConfigs, Environment
 from environment.env_types import EnvironmentTypes
 from lib import get_ref_name_and_sha_from_artifacts_version, MAIN_SECRET_VERSION, get_formatted_secret_id, \
     get_pulumi_stack_outputs
@@ -100,12 +100,11 @@ def _get_secret_value(full_project_name: str, secret_name: str) -> Optional[Acce
     :return:
     """
 
-    secret_manager_service = SecretManagerServiceClient()
-    secret_name = f"{full_project_name}/secrets/{secret_name}/versions/latest"
+    secret_name = f"{full_project_name}/secrets/{secret_name}"
     print('info: getting the secret value:', secret_name)
 
     try:
-        secret_value = secret_manager_service.access_secret_version(name=secret_name)
+        secret_value = _get_latest_secret_value(secret_name)
         return secret_value
     except NotFound as e:
         print(f"Failed to get the secret value: {secret_name}")
@@ -115,6 +114,17 @@ def _get_secret_value(full_project_name: str, secret_name: str) -> Optional[Acce
         print(f"Failed to get the secret value: {secret_name}")
         print("warning: ", e.message)
         return None
+
+
+def _get_latest_secret_value(secret_name: str) -> AccessSecretVersionResponse:
+
+    print("info: getting the latest secret version for the secret:", secret_name)
+
+    secret_manager_service = SecretManagerServiceClient()
+    secret = secret_manager_service.access_secret_version(
+        name=f"{secret_name}/versions/latest"
+    )
+    return secret
 
 
 def get_versioned_secret_latest_value(secret_name: str, project_id: str, artifacts_version: Optional[str]) -> str:
@@ -174,51 +184,47 @@ def get_versioned_secret_latest_value(secret_name: str, project_id: str, artifac
 # Environment/Stack Configs Actions
 # =======================
 
-def download_realm_environments_configs(realm_name: str, config_version: Optional[str]) -> List[StackConfigs]:
+def get_environments_in_realm(realm_name: str) -> List[Environment]:
     """
-    Download the realm -> environments -> stack configurations.
-
-    :param realm_name: The realm name :return: An array of environment configurations for the environments. If no
-                        environment configuration is found, an empty array is returned.
-
-    :param config_version: The config version to use to download the realm environments configurations,
-                           simply same as the artifact version.
-    """
-    print(f"Downloading the realm {realm_name} environments configurations version:{config_version}...")
-
-    # get the realm environments configurations from the realm's secrets.
-    realm_outputs = get_pulumi_stack_outputs(realm_name, "realm")
-    realm_root_project_id = realm_outputs["root_project_id"].value
-    stack_configs = get_versioned_secret_latest_value("stack-config", realm_root_project_id, config_version)
-
-    # convert the stack config value to a dictionary.
-    realm_stacks_cfgs_dict = yaml.safe_load(stack_configs)
-
-    # Create the stack objects from the realm stacks dict.
-    environments = []
-    for stack_dict in realm_stacks_cfgs_dict["stacks"]:
-        stack = StackConfigs.from_dict(stack_dict)
-        environments.append(stack)
-
-    return environments
-
-
-def get_environment_stack_config(realm_name: str, environment_name: str, config_version: Optional[str]) -> StackConfigs:
-    """
-    Get the environment stack configurations for the given environment from the realm's secrets.
+    Gets the environments in a realm.
 
     :param realm_name: The realm name
-    :param environment_name:  The environment name to get the configuration for.
-    :param config_version: The config version to use to download the realm environments configurations,
-    :return: The environment configuration for the environment.
+    :return: An array of environments in the current realm name.
     """
 
-    realm_environments_configs = download_realm_environments_configs(realm_name, config_version)
-    for environment in realm_environments_configs:
-        if environment.env_name == environment_name:
+    print(f"Fetching the environments under the realm:{realm_name}")
+
+    # get the realm environments configurations from the realm's secrets.
+    realm_outputs = get_pulumi_stack_outputs(realm_name, IaCModules.REALM.value)
+    realm_config_secret = realm_outputs["environments_config_secret_name"].value
+    realm_environments_config = _get_latest_secret_value(realm_config_secret)
+    decoded_realm_environments_config = realm_environments_config.payload.data.decode("utf-8")
+
+    # convert the stack config value to a dictionary.
+    realm_environments_config_dict = yaml.safe_load(decoded_realm_environments_config)
+
+    # Create the environments objects from the realm environment config dict
+    # Each environment should have a matching pattern to the "Environments" type.
+
+    realm_environments = []
+    for environment_dict in realm_environments_config_dict["environments"]:
+        environment = Environment.from_dict(realm_name, environment_dict)
+        realm_environments.append(environment)
+
+    return realm_environments
+
+
+def get_realm_environment(realm_name: str, environment_name: str):
+    """
+    Get the environment configuration from the realm's secrets.
+    """
+    environments = get_environments_in_realm(realm_name)
+
+    for environment in environments:
+        if environment.environment_name == environment_name:
             return environment
 
-    raise ValueError(f"No environment config found for the environment {environment_name} in the realm {realm_name}.")
+    raise ValueError(f"No environment config found for the environment:{environment_name} in the realm:{realm_name}.")
 
 
 def get_environment_stack_configs_by_env_type(
@@ -235,7 +241,7 @@ def get_environment_stack_configs_by_env_type(
              an empty array is returned.
     """
 
-    realm_environments_configs = download_realm_environments_configs(realm_name, config_version)
+    realm_environments_configs = get_environments_in_realm(realm_name, config_version)
     environments = []
     for environment in realm_environments_configs:
         if environment.env_type == env_type and environment.deployment_type == "auto":

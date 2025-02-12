@@ -6,7 +6,7 @@ import pulumi
 import pulumi_gcp as gcp
 import pulumiverse_time as time
 
-from lib import MAIN_SECRET_VERSION, ENV_VARS_SECRET_ID
+from lib import MAIN_SECRET_VERSION, ENV_VARS_SECRET_ID, STACK_CONFIG_SECRET_ID
 from lib.std_pulumi import enable_services, get_resource_name, int_to_base36, get_formatted_secret_id
 
 from auth import REQUIRED_SERVICES as AUTH_SERVICES
@@ -167,9 +167,9 @@ def create_new_environment(*,
         dependencies=initial_apis + [sleep_for_a_while]
     )
 
-    # create the service keys path for environment variables.
-    main_env_config_secret = gcp.secretmanager.Secret(
-        get_resource_name(resource="environment-config_main", resource_type="secret"),
+    # create the secret for environment variables, version: (main/default)
+    env_vars_config_main_secret = gcp.secretmanager.Secret(
+        get_resource_name(resource="env-vars-main", resource_type="secret"),
         secret_id=get_formatted_secret_id(ENV_VARS_SECRET_ID, MAIN_SECRET_VERSION),
         project=project.project_id,
         # automatic replication.
@@ -178,6 +178,18 @@ def create_new_environment(*,
         },
         opts=pulumi.ResourceOptions(provider=environment_gcp_provider, depends_on=services))
 
-    pulumi.export("env_vars_secret_main_name", main_env_config_secret.name)
+    # create the secret for stack config, version: (main/default)
+    stack_config_main_secret = gcp.secretmanager.Secret(
+        get_resource_name(resource="stack-config_main", resource_type="secret"),
+        secret_id=get_formatted_secret_id(STACK_CONFIG_SECRET_ID, MAIN_SECRET_VERSION),
+        project=project.project_id,
+        # automatic replication.
+        replication={
+            "auto": {},
+        },
+        opts=pulumi.ResourceOptions(provider=environment_gcp_provider, depends_on=services))
+
+    pulumi.export("env_vars_main_secret_name", env_vars_config_main_secret.name)
+    pulumi.export("stack_config_main_secret_name", stack_config_main_secret.name)
     pulumi.export("project_id", project.id.apply(lambda _id: _id.replace("projects/", "")))
     pulumi.export("project_number", project.number)
