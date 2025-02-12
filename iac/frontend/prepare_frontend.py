@@ -17,7 +17,7 @@ from lib import base64_encode, getenv, get_realm_and_env_name_from_stack, load_d
     get_pulumi_stack_outputs, construct_artifacts_dir, parse_artifacts_version, save_content_in_file
 
 # The actual frontend build artifact filename is specified in the iac/scripts/build-and-upload-fe.sh script.
-frontend_build_artifact_filename = "build.tar.gz"
+frontend_build_artifact_filename = "frontend-build.tar.gz"
 
 # the constant directories.
 current_dir = os.path.join(iac_folder, "frontend")

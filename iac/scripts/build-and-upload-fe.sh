@@ -1,4 +1,16 @@
 #!/usr/bin/env bash
+# comment out the set -x to enable debugging
+# set -x
+
+####################################
+# Import the common functions
+if FALSE; then
+  # IntelliJ Hack. This will never run, but it will make the IDE recognize the functions.
+  # It is needed so that IntelliJ can resolve the common.sh location statically.
+  source "./common.sh"
+fi
+source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
+####################################
 
 function write_version_json() {
   local _version_json_filename=$1
@@ -14,17 +26,18 @@ function write_version_json() {
   cat "$_version_json_filename"
 }
 
+# todo move to common.sh
 function save_report() {
   local _report_filename=$1
   local _deployable_version=$2
   local _version_json_filename=$3
-
+  local _newline='  ' # in markdown, two spaces are needed for a newline
   {
     echo "### Frontend artifacts packaging summary"
-    echo "**Date**: \`$(date -u +%F' %T.%3N UTC')\`     "
-    echo "**Status**: ✅ Successfully uploaded       "
-    echo "**Version**: \`$_deployable_version\`    "
-    echo "**version.json**:     "
+    echo "**Date**: \`$(date -u +%F' %T.%3N UTC')\`$_newline"
+    echo "**Status**: ✅ Successfully uploaded$_newline"
+    echo "**Version**: \`$_deployable_version\`$_newline"
+    echo "**version.json**:$_newline"
     echo  "\`\`\`json"
     cat "$_version_json_filename"
     echo  "\`\`\`"
@@ -32,53 +45,22 @@ function save_report() {
   } >> "$_report_filename"
 }
 
-function upload_file {
-  local _region=$1
-  local _project_id=$2
-  local _artifact_version=$3
-  local _directory_path=$4
-  local _file_name=$5
-
-  local _file_path="$_directory_path/$_file_name"
-
-  echo "info uploading the file $_file_path"
-
-  # First delete the existing version if it exists
-  echo "info: deleting the existing file:$_artifact_version"
-
-  gcloud artifacts files delete "artifacts:$_artifact_version:$_file_name" \
-          --repository=generic-repository \
-          --location="$_region" \
-          --project="$_project_id" \
-          --quiet
-
-  # Then upload the file
-  echo "info: uploading the file: $_file_name"
-
-  if ! gcloud artifacts generic upload --package=artifacts \
-           --repository=generic-repository \
-           --location="$_region" \
-           --source="$_file_path" \
-           --project="$_project_id" \
-           --version="$_artifact_version"; then
-    echo "error: failed to upload the file"
-    exit 1
-  fi
-}
-
 function check_args() {
-  if [ "$#" -ne 5 ]; then
-    echo "Usage: $0 <region> <project_id> <source_path> <report_filename> <build_run>"
+  if [ "$#" -ne 4 ]; then
+    echo "Usage: $0 <region> <project_id> <report_filename> <build_run>"
     cat << EOF
-  Build and Upload the frontend artifacts,
+  Build and Upload the frontend artifacts to the Google Cloud Artifacts Repository.
+  The artifacts are versioned based on the current git branch/tag name and the commit sha.
 
   Requirements:
-    - in the frontend module yarn install is already run.
+    - this script needs to run from the within the git repository.
+    - the intended branch/tag has been checked out.
+    - yarn install has been run in the frontend module.
+
   Arguments:
-    region: The region where the artifacts will be uploaded
+    region: The region where the artifacts will be uploaded.
     project_id: The project id where the artifacts will be uploaded.
                 Typically it is the root project id.
-    source_path: The path to the frontend module source code either relative or absolute path.
     report_filename: The filename of the report file. Typically it is the GITHUB_STEP_SUMMARY when running in GitHub Actions.
     build_run: The build run number. Typically it is the GITHUB_RUN_NUMBER when running in GitHub Actions.
 EOF
@@ -86,12 +68,10 @@ EOF
   fi
 }
 
-
 #############################
 # Main script starts here
 #############################
 check_args "$@"
-
 
 #############################
 # Set the variables
@@ -102,43 +82,39 @@ echo "info: setting the region to $region"
 project_id=$2
 echo "info: setting the project id to $project_id"
 
-source_path=$3
+report_filename="$(realpath "$3")"
+echo "info: setting the report filename to $report_filename"
+
+build_run=$4
+echo "info: setting the build run to $build_run"
+
+if [ -z "$ROOT_PATH" ]; then
+  echo "Error: \$ROOT_PATH is required. Should be set in the common.sh script."
+  exit 1
+fi
+
+source_path="$ROOT_PATH/frontend-new"
 echo "info: setting the source path to $source_path"
 if [ ! -d "$source_path" ]; then
   echo "Error: frontend module path ($source_path) does not exist."
   exit 1
 fi
 
-report_filename=$4
-echo "info: setting the report filename to $report_filename"
-
-build_run=$5
-echo "info: setting the build run to $build_run"
-
 # @IMPORTANT: The filename of the build artifact must match the value used in iac/frontend/prepare_frontend.py:FRONTEND_BUILD_NAME
-frontend_build_artifact_filename="build.tar.gz"
+frontend_build_artifact_filename="frontend-build.tar.gz"
 echo "info: setting the frontend build artifact filename to $frontend_build_artifact_filename"
 
-# get the tag name or branch name
-git_branch_tag_name=$(git describe --exact-match --tags HEAD 2>/dev/null || git rev-parse --abbrev-ref HEAD)
-echo "info: setting the branch/tag name to $git_branch_tag_name"
+git_branch_tag_name="$(get_git_branch_tag_name)"
+echo "info: setting the git branch/tag name to $git_branch_tag_name"
 
-# parse the git branch name to filter out the invalid characters.
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" # The directory where the script is located.
-echo "info: setting the script directory to $script_dir"
-
-formatted_git_branch_tag_name=$("$script_dir/parse_git_branch_name.py" --branch-name="$git_branch_tag_name" --version=generic-artifacts)
-echo "info: setting the formatted branch/tag name to $formatted_git_branch_tag_name"
-
-git_commit_sha=$(git rev-parse HEAD)
+git_commit_sha="$(get_git_sha)"
 echo "info: setting the git commit sha to $git_commit_sha"
 
-artifact_version="$formatted_git_branch_tag_name.$git_commit_sha"
+artifact_version="$(get_generic_artifacts_version)"
 echo "info: setting the artifact version to $artifact_version"
 
 version_json_filename="$source_path/build/data/version.json"
 echo "info: setting the version json filename to $version_json_filename"
-
 
 #############################
 # The pipeline starts here
@@ -168,7 +144,7 @@ tar -czf "./$frontend_build_artifact_filename" -C "$source_path"/build . || exit
 trap "echo info: cleaning up; rm \"./$frontend_build_artifact_filename\"" EXIT
 
 # 4. Upload the frontend artifacts
-upload_file "$region" "$project_id" "$artifact_version" ./ "$frontend_build_artifact_filename"
+upload_file "$region" "$project_id" "$artifact_version" . "$frontend_build_artifact_filename"
 
 # 5. Report the summary
 save_report "$report_filename" "$artifact_version" "$version_json_filename"
