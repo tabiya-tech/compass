@@ -118,10 +118,14 @@ class ReactionRequest(_ReactionBase):
         extra = "forbid"
 
 
+# Refactor
 class MessageReaction(Reaction):
     """
-    Response model for messages; only exposes id and kind.
+    TODO: add ref to the ConversationMessage model
+    Response model for #ConversationMessage... ; only exposes id and kind.
     """
+    id: str
+    kind: ReactionKind
 
     class Config:
         extra = "forbid"

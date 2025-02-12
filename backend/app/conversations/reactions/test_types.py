@@ -1,7 +1,7 @@
 """
 Tests for the reaction types models.
 """
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 import pytest
 
@@ -57,12 +57,13 @@ class TestReaction:
     
     def test_from_dict_conversion_from_model_dump(self):
         # GIVEN valid reaction
-        # WHEN converting from model_dump
+        # TODO id is missing
         reaction = Reaction(message_id="msg_1", session_id=1, kind=ReactionKind.LIKED, created_at=datetime.now(timezone.utc))
+        # WHEN converting from model_dump
         reaction_dict = reaction.model_dump()
         # THEN it should be converted to a dictionary
         assert isinstance(reaction_dict, dict)
-        # AND when we convert it back to a Reaction object
+        # AND WHEN we convert it back to a Reaction object
         reaction_from_dict = Reaction.from_dict(reaction_dict)
         # THEN it should be the same as the original reaction
         assert reaction_from_dict == reaction
@@ -96,10 +97,12 @@ class TestReaction:
         assert reaction.reasons == [DislikeReason[r] for r in reaction_dict["reasons"]]
         assert reaction.created_at == now
 
+    # TODO: Test adjusted
     def test_created_at_serialization(self):
         # GIVEN reaction with created_at
         # WHEN creating a reaction
-        now = datetime.now(timezone.utc)
+
+        now = datetime.now(timezone(timedelta(hours=-5), 'EST'))
         reaction = Reaction(message_id="msg_1", session_id=1, kind=ReactionKind.LIKED, created_at=now)
 
         # THEN created_at should be serialized to ISO format
