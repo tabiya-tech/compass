@@ -59,31 +59,37 @@ function build_and_upload_be_docker_img() {
   fi
 }
 
-function upload_backend_config(){
+
+function upload_file {
   local _region=$1
   local _project_id=$2
   local _artifact_version=$3
-  local _source_path=$4
-  local _api_config_file_name=$5
+  local _directory_path=$4
+  local _file_name=$5
+
+  local _file_path="$_directory_path/$_file_name"
+
+  echo "info uploading the file $_file_path"
 
   # First delete the existing version if it exists
-  echo "info: deleting the existing backend-config:$_artifact_version version"
-  gcloud artifacts versions delete "$_artifact_version" \
-        --package=backend-config \
-        --repository=generic-repository \
-        --location="$_region" \
-        --project="$_project_id" \
-        --quiet
+  echo "info: deleting the existing file:$_artifact_version"
 
-  # Then upload the backend config
-  echo "info: uploading backend config"
-  if ! gcloud artifacts generic upload --package=backend-config \
-      --repository=generic-repository \
-      --location="$_region" \
-      --source="$_source_path/scripts/export_api_gateway_config/_tmp/$_api_config_file_name" \
-      --project="$_project_id" \
-      --version="$_artifact_version"; then
-    echo "error: failed to upload backend configurations"
+  gcloud artifacts files delete "artifacts:$_artifact_version:$_file_name" \
+          --repository=generic-repository \
+          --location="$_region" \
+          --project="$_project_id" \
+          --quiet
+
+  # Then upload the file
+  echo "info: uploading the file: $_file_name"
+
+  if ! gcloud artifacts generic upload --package=artifacts \
+           --repository=generic-repository \
+           --location="$_region" \
+           --source="$_file_path" \
+           --project="$_project_id" \
+           --version="$_artifact_version"; then
+    echo "error: failed to upload the file"
     exit 1
   fi
 }
@@ -194,7 +200,7 @@ write_version_json "$version_json_filename" "$git_branch_tag_name" "$git_commit_
 build_and_upload_be_docker_img "$region" "$project_id" "$docker_artifact_version" "$source_path"
 
 # 5. Upload backend config
-upload_backend_config "$region" "$project_id" "$generic_artifact_version" "$source_path" "$api_gateway_config_file_name"
+upload_file "$region" "$project_id" "$generic_artifact_version" "$source_path/scripts/export_api_gateway_config/_tmp" "$api_gateway_config_file_name"
 
 # 6. Report the summary
 save_report "$report_filename" "$generic_artifact_version" "$docker_artifact_version" "$version_json_filename"

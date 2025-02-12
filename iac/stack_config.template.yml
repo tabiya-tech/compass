@@ -1,0 +1,18 @@
+auth:
+  config:
+    gcp:region: <region>
+backend:
+  config:
+    gcp:region: <region>
+frontend:
+  config:
+    gcp:region: <region>
+    version: <region>
+common:
+  config:
+    gcp:region: <region>
+    version: <region>
+aws-ns:
+  config:
+    aws:region: <region>
+    version: <region>

@@ -32,31 +32,36 @@ function save_report() {
   } >> "$_report_filename"
 }
 
-function upload_frontend_artifacts {
+function upload_file {
   local _region=$1
   local _project_id=$2
-  local _frontend_build_artifact_filename=$3
-  local _artifact_version=$4
+  local _artifact_version=$3
+  local _directory_path=$4
+  local _file_name=$5
+
+  local _file_path="$_directory_path/$_file_name"
+
+  echo "info uploading the file $_file_path"
 
   # First delete the existing version if it exists
-  echo "info: deleting the existing frontend:$_artifact_version version"
-  gcloud artifacts versions delete "$_artifact_version" \
-    --package=frontend \
-    --repository=generic-repository \
-    --location="$region" \
-    --project="$project_id" \
-    --quiet
+  echo "info: deleting the existing file:$_artifact_version"
 
-  # Then upload the frontend artifacts
-  echo "info: uploading frontend artifacts"
+  gcloud artifacts files delete "artifacts:$_artifact_version:$_file_name" \
+          --repository=generic-repository \
+          --location="$_region" \
+          --project="$_project_id" \
+          --quiet
 
-  if ! gcloud artifacts generic upload --package=frontend \
+  # Then upload the file
+  echo "info: uploading the file: $_file_name"
+
+  if ! gcloud artifacts generic upload --package=artifacts \
            --repository=generic-repository \
            --location="$_region" \
-           --source=./"$_frontend_build_artifact_filename" \
+           --source="$_file_path" \
            --project="$_project_id" \
            --version="$_artifact_version"; then
-    echo "error: failed to upload frontend artifacts"
+    echo "error: failed to upload the file"
     exit 1
   fi
 }
@@ -163,7 +168,7 @@ tar -czf "./$frontend_build_artifact_filename" -C "$source_path"/build . || exit
 trap "echo info: cleaning up; rm \"./$frontend_build_artifact_filename\"" EXIT
 
 # 4. Upload the frontend artifacts
-upload_frontend_artifacts "$region" "$project_id" "$frontend_build_artifact_filename" "$artifact_version"
+upload_file "$region" "$project_id" "$artifact_version" ./ "$frontend_build_artifact_filename"
 
 # 5. Report the summary
 save_report "$report_filename" "$artifact_version" "$version_json_filename"
