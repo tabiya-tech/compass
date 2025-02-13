@@ -31,11 +31,13 @@ class MockAuth(Authentication):
         # Ensure the type of credential defaults to a Depends() with an empty lambda function,
         # as the credential is not used in the mocked function. Otherwise, a TypeError
         # will be raised when the route is called using the TestClient
-        def construct_user_info(request: Request, credential: HTTPAuthorizationCredentials = Depends(lambda: None)) -> UserInfo:
+        def construct_user_info(request: Request,
+                                credential: HTTPAuthorizationCredentials = Depends(lambda: None)) -> UserInfo:
             return self.mocked_user
 
         return construct_user_info
-    
+
+
 # Create an unauthenticated mock auth that raises 401
 class UnauthenticatedMockAuth(MockAuth):
     def get_user_info(self):

@@ -2,8 +2,8 @@
 Tests for the reaction repository.
 It uses the userdata_mocked database, and tests if repository methods work as expected with actual data.
 """
-from datetime import datetime
-from typing import Dict, Any, Awaitable
+from typing import Awaitable
+from datetime import datetime, timezone
 
 import pytest
 import pytest_mock
@@ -11,13 +11,18 @@ import bson
 
 from app.conversations.reactions.repository import ReactionRepository
 from app.conversations.reactions.types import Reaction, ReactionKind, DislikeReason
+from common_libs.time_utilities import mongo_date_to_datetime, datetime_to_mongo_date, truncate_microseconds
 
 
-def normalize_reaction(reaction: Reaction) -> Reaction:
+def _assert_reaction_matches(actual_reaction_doc: dict, given_reaction: Reaction):
     """
-    Normalizes the reaction object by removing the id field.
+    Asserts that a MongoDB document matches the given reaction.
     """
-    return Reaction(**reaction.model_dump(exclude={'id'}))
+    assert actual_reaction_doc["message_id"] == given_reaction.message_id
+    assert actual_reaction_doc["session_id"] == given_reaction.session_id
+    assert actual_reaction_doc["kind"] == given_reaction.kind.name
+    assert actual_reaction_doc["reasons"] == [r.name for r in given_reaction.reasons]
+    assert truncate_microseconds(mongo_date_to_datetime(actual_reaction_doc["created_at"])) == truncate_microseconds(given_reaction.created_at)
 
 
 @pytest.fixture(scope="function")
@@ -31,11 +36,17 @@ def _get_new_reaction(kind: ReactionKind = ReactionKind.LIKED, reasons: list[Dis
     """
     Creates a new reaction with the given kind and reasons.
     """
+    # Create a reaction with a UTC datetime that will be consistent with MongoDB's date handling
+    now = datetime.now(timezone.utc)
+    mongo_date = datetime_to_mongo_date(now)
+    created_at = mongo_date_to_datetime(mongo_date)
+    
     return Reaction(
         message_id="message123",
         session_id=123,
         kind=kind,
-        reasons=reasons or []
+        reasons=reasons or [],
+        created_at=created_at
     )
 
 
@@ -58,12 +69,10 @@ class TestAdd:
         assert bson.ObjectId.is_valid(result.id)
 
         # AND the reaction can be found in the database with the inserted_id
-        actual_reaction = Reaction.from_dict(
-            await repository._collection.find_one({'_id': bson.ObjectId(result.id)})
-        )
-
-        # AND the saved reaction is equal to the given data
-        assert normalize_reaction(actual_reaction) == normalize_reaction(given_reaction)
+        doc = await repository._collection.find_one({'_id': bson.ObjectId(result.id)})
+        
+        # AND the saved reaction matches the given data
+        _assert_reaction_matches(doc, given_reaction)
 
     @pytest.mark.asyncio
     async def test_add_disliked_reaction_success(self, get_reaction_repository: Awaitable[ReactionRepository]):
@@ -86,12 +95,30 @@ class TestAdd:
         assert bson.ObjectId.is_valid(result.id)
 
         # AND the reaction can be found in the database with the inserted_id
-        actual_reaction = Reaction.from_dict(
-            await repository._collection.find_one({'_id': bson.ObjectId(result.id)})
-        )
+        doc = await repository._collection.find_one({'_id': bson.ObjectId(result.id)})
+        
+        # AND the saved reaction matches the given data
+        _assert_reaction_matches(doc, given_reaction)
 
-        # AND the saved reaction is equal to the given data
-        assert normalize_reaction(actual_reaction) == normalize_reaction(given_reaction)
+    @pytest.mark.asyncio
+    async def test_db_find_one_and_update_throws(self, get_reaction_repository: Awaitable[ReactionRepository],
+                                                 mocker: pytest_mock.MockerFixture):
+        repository = await get_reaction_repository
+
+        # GIVEN the repository's collection's insert_one function throws a given exception
+        class _GivenError(Exception):
+            pass
+
+        given_error = _GivenError("given error message")
+        _find_one_and_update_spy = mocker.spy(repository._collection, 'find_one_and_update')
+        _find_one_and_update_spy.side_effect = given_error
+
+        # WHEN the add method is called
+        with pytest.raises(_GivenError) as actual_error_info:
+            await repository.add(_get_new_reaction())
+
+        # AND the raised error message should be the same as the given error
+        assert actual_error_info.value == given_error
 
 
 class TestDelete:
@@ -126,7 +153,8 @@ class TestDelete:
         await repository.delete(given_session_id, given_message_id)
 
     @pytest.mark.asyncio
-    async def test_db_delete_one_throws(self, get_reaction_repository: Awaitable[ReactionRepository], mocker: pytest_mock.MockerFixture):
+    async def test_db_delete_one_throws(self, get_reaction_repository: Awaitable[ReactionRepository],
+                                        mocker: pytest_mock.MockerFixture):
         repository = await get_reaction_repository
 
         # GIVEN the repository's collection's delete_one function throws a given exception
@@ -143,4 +171,73 @@ class TestDelete:
             await repository.delete(123, "message123")
 
         # AND the raised error message should be the same as the given error
+        assert actual_error_info.value == given_error
+
+
+class TestGetReactions:
+    @pytest.mark.asyncio
+    async def test_get_reactions_empty_session(self, get_reaction_repository: Awaitable[ReactionRepository]):
+        repository = await get_reaction_repository
+
+        # GIVEN a session id with no reactions
+        given_session_id = 999
+
+        # WHEN get_reactions is called
+        result = await repository.get_reactions(given_session_id)
+
+        # THEN an empty list should be returned
+        assert isinstance(result, list)
+        assert len(result) == 0
+
+    @pytest.mark.asyncio
+    async def test_get_reactions_with_data(self, get_reaction_repository: Awaitable[ReactionRepository]):
+        repository = await get_reaction_repository
+
+        # GIVEN multiple reactions exist for a session
+        given_session_id = 123
+        given_reactions = [
+            _get_new_reaction(),
+            _get_new_reaction(
+                kind=ReactionKind.DISLIKED,
+                reasons=[DislikeReason.INCORRECT_INFORMATION]
+            )
+        ]
+        given_reactions[1].message_id = "message456"  # Set different message_id for second reaction
+        
+        # AND the reactions are added to the database
+        for reaction in given_reactions:
+            await repository.add(reaction)
+
+        # WHEN get_reactions is called
+        result = await repository.get_reactions(given_session_id)
+
+        # THEN we should get back the same number of reactions
+        assert len(result) == len(given_reactions)
+        
+        # AND each reaction should match the corresponding given reaction
+        for i, reaction in enumerate(result):
+            doc = await repository._collection.find_one({
+                'session_id': reaction.session_id,
+                'message_id': reaction.message_id
+            })
+            _assert_reaction_matches(doc, given_reactions[i])
+
+    @pytest.mark.asyncio
+    async def test_get_reactions_db_find_throws(self, get_reaction_repository: Awaitable[ReactionRepository],
+                                              mocker: pytest_mock.MockerFixture):
+        repository = await get_reaction_repository
+
+        # GIVEN the repository's collection's find function throws a given exception
+        class _GivenError(Exception):
+            pass
+
+        given_error = _GivenError("given error message")
+        _find_spy = mocker.spy(repository._collection, 'find')
+        _find_spy.side_effect = given_error
+
+        # WHEN get_reactions is called
+        with pytest.raises(_GivenError) as actual_error_info:
+            await repository.get_reactions(123)
+
+        # THEN the raised error message should be the same as the given error
         assert actual_error_info.value == given_error

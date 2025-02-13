@@ -18,6 +18,7 @@ from app.conversations.utils import get_messages_from_conversation_manager, filt
 from app.sensitive_filter import sensitive_filter
 from app.types import Experience, Skill
 
+
 class ConversationAlreadyConcludedError(Exception):
     """
     Exception raised when there is an attempt to send a message on a conversation that has already concluded
@@ -33,8 +34,10 @@ class IConversationService(ABC):
 
    Allows us to mock the service in tests.
    """
+
     @abstractmethod
-    async def send(self, user_id: str, session_id: int, user_input: str, clear_memory: bool, filter_pii: bool) -> ConversationResponse:
+    async def send(self, user_id: str, session_id: int, user_input: str, clear_memory: bool,
+                   filter_pii: bool) -> ConversationResponse:
         # TODO: discuss filter pii and clear_memory
         """
         Get a message from the user and return a response from Compass, save the message and response into the application state
@@ -72,9 +75,9 @@ class IConversationService(ABC):
 
 
 class ConversationService(IConversationService):
-    def __init__(self, *, 
+    def __init__(self, *,
                  application_state_manager: IApplicationStateManager,
-                 agent_director: LLMAgentDirector, 
+                 agent_director: LLMAgentDirector,
                  conversation_memory_manager: IConversationMemoryManager,
                  reaction_repository: IReactionRepository):
         self._logger = logging.getLogger(ConversationService.__name__)
@@ -83,7 +86,8 @@ class ConversationService(IConversationService):
         self._conversation_memory_manager = conversation_memory_manager
         self._reaction_repository = reaction_repository
 
-    async def send(self, user_id: str, session_id: int, user_input: str, clear_memory: bool, filter_pii: bool) -> ConversationResponse:
+    async def send(self, user_id: str, session_id: int, user_input: str, clear_memory: bool,
+                   filter_pii: bool) -> ConversationResponse:
         if clear_memory:
             await self._application_state_manager.delete_state(session_id)
         if filter_pii:
@@ -103,7 +107,8 @@ class ConversationService(IConversationService):
         self._agent_director.get_explore_experiences_agent().set_state(state.explore_experiences_director_state)
         self._agent_director.get_explore_experiences_agent().get_collect_experiences_agent().set_state(
             state.collect_experience_state)
-        self._agent_director.get_explore_experiences_agent().get_exploring_skills_agent().set_state(state.skills_explorer_agent_state)
+        self._agent_director.get_explore_experiences_agent().get_exploring_skills_agent().set_state(
+            state.skills_explorer_agent_state)
         self._conversation_memory_manager.set_state(state.conversation_memory_manager_state)
 
         # Handle the user input
@@ -165,7 +170,8 @@ class ConversationService(IConversationService):
             """
             UUID is the key for the experiences_state dictionary in the explore_experiences_director_state.
             """
-            experience_details: ExperienceEntity = state.explore_experiences_director_state.experiences_state[uuid].experience
+            experience_details: ExperienceEntity = state.explore_experiences_director_state.experiences_state[
+                uuid].experience
             """
             experience_details is the value for the UUID key in the experiences_state dictionary.
             """

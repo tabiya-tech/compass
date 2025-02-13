@@ -1,8 +1,8 @@
 import { ReactionError } from "src/error/commonErrors";
 
 export enum ReactionKind {
-  LIKED,
-  DISLIKED,
+  LIKED = "LIKED",
+  DISLIKED = "DISLIKED",
 }
 
 export enum DislikeReason {

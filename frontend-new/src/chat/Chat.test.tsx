@@ -38,7 +38,6 @@ import { ChatMessageType, IChatMessage } from "./Chat.types";
 import { FIXED_MESSAGES_TEXT } from "./util";
 import { TabiyaUser } from "src/auth/auth.types";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
-import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { nanoid } from "nanoid";
 import { ReactionKind } from "src/chat/reaction/reaction.types";
 

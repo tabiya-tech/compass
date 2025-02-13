@@ -15,10 +15,7 @@ def _convert_to_message_reaction(reaction: Reaction | None) -> MessageReaction |
     if reaction is None:
         return None
     
-    return MessageReaction(
-        id=reaction.id,
-        kind=reaction.kind
-    )
+    return MessageReaction.from_reaction(reaction)
 
 
 async def filter_conversation_history(history: 'ConversationHistory', reactions_for_session: list[Reaction]) -> list[ConversationMessage]:

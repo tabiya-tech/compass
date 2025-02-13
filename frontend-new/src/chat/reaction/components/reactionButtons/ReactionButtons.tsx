@@ -38,8 +38,7 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [reaction, setReaction] = useState<ReactionKind | null>(currentReaction?.kind ?? null);
-  const [previousReaction, setPreviousReaction] = useState<ReactionKind | null>(currentReaction?.kind ?? null);
+  const [reaction, setReaction] = useState<ReactionKind | null>(() => currentReaction?.kind ?? null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeSessionId] = useState<number | null>(UserPreferencesStateService.getInstance().getActiveSessionId());
   const reactionService = new ReactionService();
@@ -51,7 +50,11 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
     }
   }, [activeSessionId]);
 
-  // Close the popover
+  useEffect(() => {
+    // Update reaction when currentReaction changes
+    setReaction(currentReaction?.kind ?? null);
+  }, [currentReaction]);
+
   const handlePopoverClose = async (reasons: DislikeReason[]) => {
     setIsPopoverOpen(false);
     setAnchorEl(null);
@@ -62,50 +65,50 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
     }
 
     setIsSubmitting(true);
-    setPreviousReaction(reaction); // Save the previous reaction in case of failure
-    setReaction(ReactionKind.DISLIKED); // Set the reaction
+    const currentReaction = reaction;
+    setReaction(ReactionKind.DISLIKED); // Optimistically update UI
 
     try {
       await reactionService.sendReaction(activeSessionId!, messageId, new DislikeReaction(reasons));
     } catch (error) {
-      setReaction(previousReaction); // Rollback in case of failure
+      setReaction(currentReaction); // Rollback to previous state
       console.error(new Error("Failed to submit the dislike feedback", { cause: error }));
       enqueueSnackbar("Failed to submit the feedback. Please try again.", { variant: "error" });
+
+      // if it fails to submit the dislike reaction, we should revert to the previous reaction
+      setReaction(currentReaction);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleLikeClick = async () => {
-    // If the user is submitting a request, do nothing
     if (isSubmitting) {
       return;
     }
 
     setIsSubmitting(true);
-    setPreviousReaction(reaction); // Save the previous reaction in case of failure
+    const currentReaction = reaction;
 
-    // If the current reaction is "like," deactivate it
     if (reaction === ReactionKind.LIKED) {
       try {
-        setReaction(null); // clear the reaction
+        setReaction(null); // Optimistically update UI
         await reactionService.deleteReaction(activeSessionId!, messageId);
       } catch (error) {
+        setReaction(ReactionKind.LIKED); // Rollback to previous state
         console.error(new Error("Failed to remove the like feedback", { cause: error }));
         enqueueSnackbar("Failed to remove the feedback. Please try again.", { variant: "error" });
-        setReaction(ReactionKind.LIKED); // Rollback in case of failure
       } finally {
         setIsSubmitting(false);
       }
       return;
     }
 
-    // Otherwise, add a "like" reaction
-    setReaction(ReactionKind.LIKED);
     try {
+      setReaction(ReactionKind.LIKED); // Optimistically update UI
       await reactionService.sendReaction(activeSessionId!, messageId, new LikeReaction());
     } catch (error) {
-      setReaction(previousReaction);
+      setReaction(currentReaction); // Rollback to previous state
       console.error(new Error("Failed to submit the like feedback", { cause: error }));
       enqueueSnackbar("Failed to submit the feedback. Please try again.", { variant: "error" });
     } finally {
@@ -114,23 +117,18 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
   };
 
   const handleDislikeClick = async (event: React.MouseEvent<HTMLElement>) => {
-    // If the user is submitting a request, do nothing
     if (isSubmitting) {
       return;
     }
 
-    setIsSubmitting(true);
-    setPreviousReaction(reaction); // Save the previous reaction in case of failure
-
-    // If the current reaction is "dislike," deactivate it
     if (reaction === ReactionKind.DISLIKED) {
       try {
-        setReaction(null); // clear the reaction
+        setReaction(null); // Optimistically update UI
         await reactionService.deleteReaction(activeSessionId!, messageId);
       } catch (error) {
+        setReaction(ReactionKind.DISLIKED); // Rollback to previous state
         console.error(new Error("Failed to remove the dislike feedback", { cause: error }));
         enqueueSnackbar("Failed to remove the feedback. Please try again.", { variant: "error" });
-        setReaction(ReactionKind.DISLIKED); // Rollback in case of failure;
       } finally {
         setIsSubmitting(false);
       }

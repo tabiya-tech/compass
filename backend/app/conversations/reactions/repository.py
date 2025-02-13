@@ -3,11 +3,13 @@ This module contains the repository layer for handling reactions.
 """
 import logging
 from abc import ABC, abstractmethod
+from typing import Mapping
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.server_dependencies.database_collections import Collections
-from app.conversations.reactions.types import Reaction
+from app.conversations.reactions.types import Reaction, ReactionKind, DislikeReason
+from common_libs.time_utilities import mongo_date_to_datetime, datetime_to_mongo_date
 
 
 class IReactionRepository(ABC):
@@ -54,9 +56,41 @@ class ReactionRepository(IReactionRepository):
         self._logger = logging.getLogger(ReactionRepository.__name__)
         self._collection = db.get_collection(Collections.REACTIONS)
 
+    @classmethod
+    def _from_db_doc(cls, doc: Mapping) -> Reaction:
+        """
+        Convert a mongodb document to a Reaction object
+        :param doc: The MongoDB document
+        :return: Reaction business object
+        """
+        doc_dict = dict(doc)
+        return Reaction(
+            id=str(doc_dict.pop("_id")) if "_id" in doc_dict else None,
+            message_id=doc_dict.get("message_id"),
+            session_id=doc_dict.get("session_id"),
+            kind=ReactionKind[doc_dict.get("kind")],  # Lookup by name
+            reasons=[DislikeReason[r] for r in doc_dict.get("reasons", [])],  # Convert each reason name to enum
+            created_at=mongo_date_to_datetime(doc_dict.get("created_at"))
+        )
+
+    @classmethod
+    def _to_db_doc(cls, reaction: Reaction) -> Mapping:
+        """
+        Convert a Reaction object to a mongodb document
+        :param reaction: Reaction business object
+        :return: dict the MongoDB document
+        """
+        return {
+            "message_id": reaction.message_id,
+            "session_id": reaction.session_id,
+            "kind": reaction.kind.name,  # Store the name of the enum
+            "reasons": [r.name for r in reaction.reasons],  # Store the names of the enums
+            "created_at": datetime_to_mongo_date(reaction.created_at)
+        }
+
     async def add(self, reaction: Reaction) -> Reaction:
-        # Convert the pydantic model to a dictionary
-        payload = reaction.model_dump()
+        # Convert the reaction to a MongoDB document
+        payload = self._to_db_doc(reaction)
 
         # Use find_one_and_update to get the updated document directly
         doc = await self._collection.find_one_and_update(
@@ -69,8 +103,7 @@ class ReactionRepository(IReactionRepository):
             return_document=True  # Return the document after the update
         )
 
-        # Convert to Reaction
-        return Reaction.from_dict(doc)
+        return self._from_db_doc(doc)
 
     async def delete(self, session_id: int, message_id: str):
         await self._collection.delete_one({
@@ -91,6 +124,6 @@ class ReactionRepository(IReactionRepository):
         
         reactions = []
         async for doc in cursor:
-            reactions.append(Reaction.from_dict(doc))
+            reactions.append(self._from_db_doc(doc))
             
         return reactions

@@ -9,9 +9,9 @@ from fastapi import FastAPI, APIRouter
 from fastapi.testclient import TestClient
 
 from app.conversations.reactions.routes import add_reaction_routes, get_reaction_service, \
-    get_user_preferences_repository
+    get_user_preferences_repository, _ReactionRequest, _ReactionResponse
 from app.conversations.reactions.service import IReactionService
-from app.conversations.reactions.types import ReactionRequest, ReactionKind, DislikeReason, Reaction
+from app.conversations.reactions.types import ReactionKind, Reaction
 from app.users.repositories import IUserPreferenceRepository
 from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
 from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest
@@ -31,15 +31,18 @@ def get_mock_user_preferences(session_id: int):
     )
 
 
-@pytest.fixture(scope='function')
-def client_with_mocks() -> Generator[TestClientWithMocks, None, None]:
+def _create_test_client_with_mocks(auth) -> TestClientWithMocks:
+    """
+    Factory function to create a test client with mocked dependencies
+    """
+
     # Mock the reaction service
     class MockedReactionService(IReactionService):
-        async def add(self, session_id: int, message_id: str, reaction: ReactionRequest) -> Reaction:
+        async def add(self, reaction: Reaction) -> Reaction:
             return Reaction(
                 id="mock_doc_id",
-                session_id=session_id,
-                message_id=message_id,
+                session_id=reaction.session_id,
+                message_id=reaction.message_id,
                 kind=reaction.kind,
                 reasons=reaction.reasons,
                 created_at=datetime.now()
@@ -67,9 +70,6 @@ def client_with_mocks() -> Generator[TestClientWithMocks, None, None]:
     # Set up the FastAPI app with the mocked dependencies
     app = FastAPI()
 
-    # Mock the auth
-    _instance_auth = MockAuth()
-
     # Set up the app dependency override
     app.dependency_overrides[get_reaction_service] = lambda: mocked_reaction_service
     app.dependency_overrides[get_user_preferences_repository] = lambda: mocked_user_preferences_repository
@@ -80,90 +80,54 @@ def client_with_mocks() -> Generator[TestClientWithMocks, None, None]:
     )
 
     # Add the reaction routes to the conversations router
-    add_reaction_routes(conversation_router, _instance_auth)
+    add_reaction_routes(conversation_router, auth)
     app.include_router(conversation_router)
 
     # Create a test client
     client = TestClient(app)
 
-    yield client, mocked_reaction_service, mocked_user_preferences_repository, _instance_auth.mocked_user
+    return client, mocked_reaction_service, mocked_user_preferences_repository, auth.mocked_user
+
+
+@pytest.fixture(scope='function')
+def authenticated_client_with_mocks() -> Generator[TestClientWithMocks, None, None]:
+    """
+    Returns a test client with authenticated mock auth
+    """
+    app = FastAPI()
+    _instance_auth = MockAuth()
+
+    client, service, preferences, user = _create_test_client_with_mocks(_instance_auth)
+    yield client, service, preferences, user
     app.dependency_overrides = {}
 
 
 @pytest.fixture(scope='function')
 def unauthenticated_client_with_mocks() -> Generator[TestClientWithMocks, None, None]:
     """
-    Similar to client_with_mocks but returns an unauthenticated client
+    Returns a test client with unauthenticated mock auth
     """
-
-    # Mock the reaction service
-    class MockedReactionService(IReactionService):
-        async def add(self, session_id: int, message_id: str, reaction: ReactionRequest) -> Reaction:
-            return Reaction(
-                id="mock_doc_id",
-                session_id=session_id,
-                message_id=message_id,
-                kind=reaction.kind,
-                reasons=reaction.reasons,
-                created_at=datetime.now()
-            )
-
-        async def delete(self, session_id: int, message_id: str):
-            return None
-
-    mocked_reaction_service = MockedReactionService()
-
+    app = FastAPI()
     _instance_auth = UnauthenticatedMockAuth()
 
-    # Mock the user preferences repository
-    class MockedUserPreferencesRepository(IUserPreferenceRepository):
-        async def get_user_preference_by_user_id(self, user_id: str) -> UserPreferences:
-            raise NotImplementedError()
-
-        async def update_user_preference(self, user_id: str,
-                                         request: UserPreferencesRepositoryUpdateRequest) -> UserPreferences:
-            raise NotImplementedError()
-
-        async def insert_user_preference(self, user_id: str, user_preference: UserPreferences) -> UserPreferences:
-            raise NotImplementedError()
-
-    mocked_user_preferences_repository = MockedUserPreferencesRepository()
-
-    # Set up the FastAPI app with the mocked dependencies
-    app = FastAPI()
-
-    # Set up the app dependency override
-    app.dependency_overrides[get_reaction_service] = lambda: mocked_reaction_service
-    app.dependency_overrides[get_user_preferences_repository] = lambda: mocked_user_preferences_repository
-
-    conversation_router = APIRouter(
-        prefix="/conversations/{session_id}",
-        tags=["conversations"]
-    )
-
-    # Add the reaction routes to the conversations router
-    add_reaction_routes(conversation_router, _instance_auth)
-    app.include_router(conversation_router)
-
-    # Create a test client
-    client = TestClient(app)
-
-    yield client, mocked_reaction_service, mocked_user_preferences_repository, None
+    client, service, preferences, user = _create_test_client_with_mocks(_instance_auth)
+    yield client, service, preferences, user
     app.dependency_overrides = {}
 
 
 class TestReactionRoutes:
+    # ----- add reaction tests -----
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
         "given_reaction",
         [
-            ReactionRequest(kind=ReactionKind.LIKED),
-            ReactionRequest(kind=ReactionKind.DISLIKED, reasons=[DislikeReason.INCORRECT_INFORMATION]),
+            _ReactionRequest(kind="LIKED"),
+            _ReactionRequest(kind="DISLIKED", reasons=["INCORRECT_INFORMATION"]),
         ],
     )
-    async def test_add_reaction_successful(self, client_with_mocks: TestClientWithMocks,
+    async def test_add_reaction_successful(self, authenticated_client_with_mocks: TestClientWithMocks,
                                            mocker: pytest_mock.MockerFixture, given_reaction):
-        client, mocked_service, mocked_preferences, mocked_user = client_with_mocks
+        client, mocked_service, mocked_preferences, mocked_user = authenticated_client_with_mocks
         # GIVEN a valid session id and message id
         given_session_id = 123
         given_message_id = "message123"
@@ -189,14 +153,26 @@ class TestReactionRoutes:
         assert response_data["id"] == "mock_doc_id"
         assert response_data["session_id"] == given_session_id
         assert response_data["message_id"] == given_message_id
-        assert response_data["kind"] == given_reaction.kind.name
-        assert [DislikeReason[r].name for r in response_data["reasons"]] == [r.name for r in given_reaction.reasons]
+        assert response_data["kind"] == given_reaction.kind
+        if given_reaction.kind == "DISLIKED":
+            assert response_data["reasons"] == given_reaction.reasons
+        else:
+            assert response_data["reasons"] == []
+        # Verify ISO format string
+        assert isinstance(response_data["created_at"], str)
+        datetime.fromisoformat(response_data["created_at"])  # Should not raise error
 
         # AND the user preferences repository was called with the correct user_id
         preferences_spy.assert_called_once_with(mocked_user.user_id)
 
         # AND the service's add method was called with the correct parameters
-        _add_spy.assert_called_once_with(given_session_id, given_message_id, given_reaction)
+        _add_spy.assert_called_once()
+        actual_reaction = _add_spy.call_args[0][0]
+        assert isinstance(actual_reaction, Reaction)
+        assert actual_reaction.session_id == given_session_id
+        assert actual_reaction.message_id == given_message_id
+        assert actual_reaction.kind == ReactionKind[given_reaction.kind]
+        assert [r.name for r in actual_reaction.reasons] == given_reaction.reasons
 
     @pytest.mark.asyncio
     async def test_add_reaction_unauthorized(self, unauthenticated_client_with_mocks: TestClientWithMocks,
@@ -205,7 +181,7 @@ class TestReactionRoutes:
         # GIVEN a valid session id and message id
         given_session_id = 123
         given_message_id = "message123"
-        given_reaction = ReactionRequest(kind=ReactionKind.LIKED)
+        given_reaction = _ReactionRequest(kind="LIKED")
 
         # AND the service's add method is spied on
         _add_spy = mocker.spy(mocked_service, "add")
@@ -222,13 +198,13 @@ class TestReactionRoutes:
         _add_spy.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_add_reaction_forbidden(self, client_with_mocks: TestClientWithMocks,
+    async def test_add_reaction_forbidden(self, authenticated_client_with_mocks: TestClientWithMocks,
                                           mocker: pytest_mock.MockerFixture):
-        client, mocked_service, mocked_preferences, mocked_user = client_with_mocks
+        client, mocked_service, mocked_preferences, mocked_user = authenticated_client_with_mocks
         # GIVEN a valid session id and message id
         given_session_id = 123
         given_message_id = "message123"
-        given_reaction = ReactionRequest(kind=ReactionKind.LIKED)
+        given_reaction = _ReactionRequest(kind="LIKED")
 
         # AND the user doesn't have the given session_id in their sessions array
         mock_user_preferences = get_mock_user_preferences(456)  # Different session ID
@@ -253,13 +229,14 @@ class TestReactionRoutes:
         preferences_spy.assert_called_once_with(mocked_user.user_id)
 
     @pytest.mark.asyncio
-    async def test_add_reaction_service_internal_server_error(self, client_with_mocks: TestClientWithMocks,
+    async def test_add_reaction_service_internal_server_error(self,
+                                                              authenticated_client_with_mocks: TestClientWithMocks,
                                                               mocker: pytest_mock.MockerFixture):
-        client, mocked_service, mocked_preferences, mocked_user = client_with_mocks
+        client, mocked_service, mocked_preferences, mocked_user = authenticated_client_with_mocks
         # GIVEN a valid session id and message id
         given_session_id = 123
         given_message_id = "message123"
-        given_reaction = ReactionRequest(kind=ReactionKind.LIKED)
+        given_reaction = _ReactionRequest(kind="LIKED")
 
         # AND the user has a valid session
         mocked_preferences.get_user_preference_by_user_id = AsyncMock(
@@ -280,19 +257,26 @@ class TestReactionRoutes:
         assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
 
         # AND the service's add method was called with the correct parameters
-        add_spy.assert_called_once_with(given_session_id, given_message_id, given_reaction)
+        add_spy.assert_called_once()
+        actual_reaction = add_spy.call_args[0][0]
+        assert isinstance(actual_reaction, Reaction)
+        assert actual_reaction.session_id == given_session_id
+        assert actual_reaction.message_id == given_message_id
+        assert actual_reaction.kind == ReactionKind[given_reaction.kind]
+        assert not actual_reaction.reasons
 
         # AND the user preferences repository was called with the correct user_id
         preferences_spy.assert_called_once_with(mocked_user.user_id)
 
     @pytest.mark.asyncio
-    async def test_add_reaction_user_preferences_internal_server_error(self, client_with_mocks: TestClientWithMocks,
+    async def test_add_reaction_user_preferences_internal_server_error(self,
+                                                                       authenticated_client_with_mocks: TestClientWithMocks,
                                                                        mocker: pytest_mock.MockerFixture):
-        client, _, mocked_preferences_repository, mocked_user = client_with_mocks
+        client, _, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
         # GIVEN a valid session id and message id
         given_session_id = 123
         given_message_id = "message123"
-        given_reaction = ReactionRequest(kind=ReactionKind.LIKED)
+        given_reaction = _ReactionRequest(kind="LIKED")
 
         # AND a UserPreferencesRepository that will raise an unexpected error
         get_user_preferences_spy = mocker.spy(mocked_preferences_repository, "get_user_preference_by_user_id")
@@ -311,8 +295,8 @@ class TestReactionRoutes:
         get_user_preferences_spy.assert_called_once_with(mocked_user.user_id)
 
     @pytest.mark.asyncio
-    async def test_invalid_payload(self, client_with_mocks: TestClientWithMocks):
-        client, _, mocked_preferences, _ = client_with_mocks
+    async def test_invalid_payload(self, authenticated_client_with_mocks: TestClientWithMocks):
+        client, _, mocked_preferences, _ = authenticated_client_with_mocks
         # GIVEN a valid session id and message id
         given_session_id = 123
         given_message_id = "message123"
@@ -331,10 +315,11 @@ class TestReactionRoutes:
         # THEN the response is UNPROCESSABLE_ENTITY due to ReactionRequest validation
         assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
+    # ----- delete reaction tests -----
     @pytest.mark.asyncio
-    async def test_delete_reaction_successful(self, client_with_mocks: TestClientWithMocks,
+    async def test_delete_reaction_successful(self, authenticated_client_with_mocks: TestClientWithMocks,
                                               mocker: pytest_mock.MockerFixture):
-        client, mocked_service, mocked_preferences, mocked_user = client_with_mocks
+        client, mocked_service, mocked_preferences, mocked_user = authenticated_client_with_mocks
         # GIVEN a valid session id and message id
         given_session_id = 123
         given_message_id = "message123"
@@ -385,9 +370,9 @@ class TestReactionRoutes:
         _delete_spy.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_delete_reaction_forbidden(self, client_with_mocks: TestClientWithMocks,
+    async def test_delete_reaction_forbidden(self, authenticated_client_with_mocks: TestClientWithMocks,
                                              mocker: pytest_mock.MockerFixture):
-        client, mocked_service, mocked_preferences, mocked_user = client_with_mocks
+        client, mocked_service, mocked_preferences, mocked_user = authenticated_client_with_mocks
         # GIVEN a valid session id and message id
         given_session_id = 123
         given_message_id = "message123"
@@ -413,9 +398,10 @@ class TestReactionRoutes:
         preferences_spy.assert_called_once_with(mocked_user.user_id)
 
     @pytest.mark.asyncio
-    async def test_delete_reaction_service_internal_server_error(self, client_with_mocks: TestClientWithMocks,
+    async def test_delete_reaction_service_internal_server_error(self,
+                                                                 authenticated_client_with_mocks: TestClientWithMocks,
                                                                  mocker: pytest_mock.MockerFixture):
-        client, mocked_service, mocked_preferences, mocked_user = client_with_mocks
+        client, mocked_service, mocked_preferences, mocked_user = authenticated_client_with_mocks
         # GIVEN a valid session id and message id
         given_session_id = 123
         given_message_id = "message123"
@@ -444,9 +430,10 @@ class TestReactionRoutes:
         preferences_spy.assert_called_once_with(mocked_user.user_id)
 
     @pytest.mark.asyncio
-    async def test_delete_reaction_user_preferences_internal_server_error(self, client_with_mocks: TestClientWithMocks,
+    async def test_delete_reaction_user_preferences_internal_server_error(self,
+                                                                          authenticated_client_with_mocks: TestClientWithMocks,
                                                                           mocker: pytest_mock.MockerFixture):
-        client, _, mocked_preferences_repository, mocked_user = client_with_mocks
+        client, _, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
         # GIVEN a valid session id and message id
         given_session_id = 123
         given_message_id = "message123"
