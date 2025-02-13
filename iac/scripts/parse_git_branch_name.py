@@ -24,9 +24,8 @@ def filter_invalid_chars_for_artifact_version(input_string: str) -> str:
     # Ensure it starts and ends with a letter or number
     valid_string = re.sub(r"(^[^a-z0-9]+)|([^a-z0-9]+$)", "", valid_string)
 
-    # Trim to 128 characters
-    valid_string = valid_string[:128]
-
+    # Trim to 128 characters starting from the end
+    valid_string = valid_string[-128:]
     return valid_string
 
 
@@ -48,8 +47,8 @@ def filter_invalid_chars_for_docker_tag(input_string: str) -> str:
     # Ensure it doesn't start with a period or hyphen
     valid_string = re.sub(r"^[.-]+", "", valid_string)
 
-    # Trim to 128 characters
-    valid_string = valid_string[:128]
+    # Trim to 128 characters starting from the end
+    valid_string = valid_string[-128:]
 
     return valid_string
 
@@ -72,8 +71,8 @@ def filter_invalid_chars_for_secret_id(input_string: str) -> str:
     # replace invalid characters with an underscore.
     valid_string = re.sub(r"[^a-zA-Z0-9_-]", "_", input_string)
 
-    # Trim to 255 characters
-    valid_string = valid_string[:255]
+    # Trim to 255 characters starting from the end
+    valid_string = valid_string[-255:]
 
     return valid_string
 
