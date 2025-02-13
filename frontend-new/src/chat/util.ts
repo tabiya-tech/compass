@@ -30,6 +30,16 @@ export const generateCompassMessage = (message: string, sent_at: string): IChatM
   };
 };
 
+export const generateConversationConclusionMessage = (message: string, sent_at: string): IChatMessage => {
+  return {
+    id: nanoid(),
+    sender: ConversationMessageSender.COMPASS,
+    message: message,
+    sent_at: sent_at,
+    type: ChatMessageType.CONVERSATION_CONCLUSION,
+  };
+};
+
 export const generateTypingMessage = (sent_at: string): IChatMessage => {
   return {
     id: nanoid(),
