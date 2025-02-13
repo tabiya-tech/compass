@@ -10,7 +10,7 @@ sys.path.insert(0, libs_dir)
 
 from deploy_frontend import deploy_frontend
 from lib import getconfig, parse_realm_env_name_from_stack, getstackref, load_dot_realm_env, getenv, \
-    construct_artifacts_dir, parse_artifacts_version
+    construct_artifacts_dir, format_version_to_comply_with_artifacts_version
 
 
 def main():
@@ -29,7 +29,7 @@ def main():
 
     # the artifacts version of the frontend build to deploy.
     artifacts_version = getenv("ARTIFACTS_VERSION")
-    generic_artifact_version = parse_artifacts_version(artifacts_version).generic_artifact_version
+    generic_artifact_version = format_version_to_comply_with_artifacts_version(artifacts_version)
 
     # the unique identifier of this running deployment.
     run_number = getenv("DEPLOYMENT_RUN_NUMBER")

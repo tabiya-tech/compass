@@ -8,8 +8,8 @@ import pulumi_gcp as gcp
 from pulumi import Output
 
 from backend.prepare_backend import base_configuration_dir, api_gateway_config_file_name
-from lib import ProjectBaseConfig, get_resource_name, get_project_base_config, get_file_as_string
-from scripts.parse_git_branch_name import parse_git_branch_name
+from lib import ProjectBaseConfig, get_resource_name, get_project_base_config, get_file_as_string, \
+    format_version_to_comply_with_docker_tag
 
 
 @dataclass(frozen=True)
@@ -297,7 +297,7 @@ def deploy_backend(
     Deploy the backend infrastructure
     """
     basic_config = get_project_base_config(project=project, location=location)
-    _, docker_tag, _ = parse_git_branch_name(artifacts_version)
+    docker_tag = format_version_to_comply_with_docker_tag(artifacts_version)
 
     # grant the project service account access to the docker repository so that it can pull images
     membership = _grant_docker_repository_access_to_project_service_account(

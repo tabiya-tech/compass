@@ -14,10 +14,9 @@ sys.path.insert(0, iac_dir)
 
 from _types import IaCModules
 from frontend.prepare_frontend import prepare_frontend
-from lib import load_dot_realm_env, getenv, get_ref_name_and_sha_from_artifacts_version, get_pulumi_stack_outputs, \
-    MAIN_SECRET_VERSION
-from _common import StackConfigs, add_select_environments_arguments, \
-    get_environment_stack_config, get_environment_stack_configs_by_env_type, run_pulumi_up
+from lib import load_dot_realm_env, getenv, get_ref_name_and_sha_from_artifacts_version, get_pulumi_stack_outputs
+from _common import add_select_environments_arguments, get_realm_environment_by_env_type, run_pulumi_up, \
+    get_realm_environment
 
 
 def _run_smoke_tests(version_json_url: str):
@@ -36,36 +35,36 @@ def _run_smoke_tests(version_json_url: str):
     print("info: smoke tests passed successfully.")
 
 
-def _deploy_frontend(env_config: StackConfigs):
+def _deploy_frontend(stack_name: str):
     # load the environment variables of the stack.
-    load_dot_realm_env(env_config.stack_name)
+    load_dot_realm_env(stack_name)
 
     # prepare the frontend to be deployed.
-    prepare_frontend(stack_name=env_config.stack_name)
+    prepare_frontend(stack_name=stack_name)
 
     # run pulumi up for the frontend stack.
-    up_results = run_pulumi_up(env_config.stack_name, IaCModules.FRONTEND)
+    up_results = run_pulumi_up(stack_name, IaCModules.FRONTEND)
 
     # run the smoke tests for the frontend.
     bucket_url = up_results.outputs["bucket_url"].value
     _run_smoke_tests(f"{bucket_url}/data/version.json")
 
 
-def _deploy_backend(env_config: StackConfigs):
+def _deploy_backend(stack_name: str):
     # run pulumi up on the backend
-    up_results = run_pulumi_up(env_config.stack_name, IaCModules.BACKEND)
+    up_results = run_pulumi_up(stack_name, IaCModules.BACKEND)
 
     # run the smoke tests for the backend.
     apigateway_url = up_results.outputs["apigateway_url"].value
     _run_smoke_tests(f"{apigateway_url}/version")
 
 
-def _deploy_aws_ns(env_config: StackConfigs):
+def _deploy_aws_ns(stack_name: str):
     # 1. run pulumi up on aws-ns
-    run_pulumi_up(env_config.stack_name, IaCModules.AWS_NS)
+    run_pulumi_up(stack_name, IaCModules.AWS_NS)
 
     # 2. run smoke tests
-    environment_outputs = get_pulumi_stack_outputs(env_config.stack_name, IaCModules.ENVIRONMENT.value)
+    environment_outputs = get_pulumi_stack_outputs(stack_name, IaCModules.ENVIRONMENT.value)
 
     # 2.1 run smoke tests for the backend
     backend_url = environment_outputs["backend_url"].value
@@ -76,29 +75,30 @@ def _deploy_aws_ns(env_config: StackConfigs):
     _run_smoke_tests(f"{frontend_url}/data/version.json")
 
 
-def _deploy_environment(env_config: StackConfigs):
+def _deploy_environment(stack_name: str):
     """
     Deploy the environment:
     """
 
-    print(f"Deploying environment: {env_config.stack_name}")
+    print(f"Deploying environment: {stack_name}")
 
     # 1. run pulumi up for the micro stacks.
+    run_pulumi_up(stack_name, IaCModules.ENVIRONMENT)
 
     # 1.1 Deploy the aut
-    run_pulumi_up(env_config.stack_name, IaCModules.AUTH)
+    run_pulumi_up(stack_name, IaCModules.AUTH)
 
     # 1.2 Deploy the frontend.
-    _deploy_frontend(env_config)
+    _deploy_frontend(stack_name)
 
     # 1.3 Deploy the backend.
-    _deploy_backend(env_config)
+    _deploy_backend(stack_name)
 
     # 1.4 Deploy the common
-    run_pulumi_up(env_config.stack_name, IaCModules.COMMON)
+    run_pulumi_up(stack_name, IaCModules.COMMON)
 
     # 1.5 Deploy the aws-ns
-    _deploy_aws_ns(env_config)
+    # _deploy_aws_ns(stack_name)
 
 
 def _main(args):
@@ -107,32 +107,27 @@ def _main(args):
     env_name = args.env_name
     env_type = args.env_type
 
-    # the configuration version to know when determining the target environments.
-    config_version = args.config_version
-
     # Flow 1: deploy the environment by realm name and environment name
     #          this happens if env_name was provided. (manual preparing)
     if env_name is not None:
-        target_environment_config = get_environment_stack_config(
+        target_environment = get_realm_environment(
             realm_name=realm_name,
-            environment_name=env_name,
-            config_version=config_version)
+            environment_name=env_name)
 
-        _deploy_environment(target_environment_config)
+        _deploy_environment(target_environment.stack_name)
 
     # Flow 2: deploy the environments by realm name and environment type.
     #         This happens in the pipeline when we want to deploy all the environments of a certain type.
     if env_type is not None:
-        target_environments = get_environment_stack_configs_by_env_type(
+        target_environments = get_realm_environment_by_env_type(
             realm_name=realm_name,
-            env_type=env_type,
-            config_version=config_version)
+            env_type=env_type)
 
         if len(target_environments) == 0:
             print(f"No environments found for realm: {realm_name} and env_type: {env_type}")
 
-        for env_config in target_environments:
-            _deploy_environment(env_config)
+        for environment in target_environments:
+            _deploy_environment(environment.stack_name)
 
 
 if __name__ == "__main__":
@@ -142,12 +137,5 @@ if __name__ == "__main__":
 
     # Add the arguments to select multiple environments
     add_select_environments_arguments(parser=parser)
-
-    parser.add_argument(
-        "--config-version",
-        type=str,
-        required=False,
-        default=MAIN_SECRET_VERSION,
-        help="The version of the configuration to look for when determining the target environment(s) to deploy.")
 
     _main(parser.parse_args())

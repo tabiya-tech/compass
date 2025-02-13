@@ -29,7 +29,7 @@ def _upload_file_to_secret_manager(
         version: str,
         file_path: str):
     """
-    Upload the .env file to the secret manager.
+    Upload the file to the secret manager.
     """
 
     secrets_service = SecretManagerServiceClient()
@@ -75,8 +75,7 @@ def _upload_file_to_secret_manager(
 
 def _main(args):
     stack_name = get_stack_name_from(args.realm_name, args.env_name)
-    config_version = construct_version_from_branch_and_sha(args.target_git_branch, args.target_git_sha)
-
+    full_qualified_version = construct_version_from_branch_and_sha(args.target_git_branch, args.target_git_sha)
     # Make sure the environment files directory exists,
     # and the directory contains both the .env and stackconfig files for the environment.
     if not os.path.exists(args.config_files_dir):
@@ -96,6 +95,7 @@ def _main(args):
         environment_name=args.env_name)
 
     print(f"Setting up the environment:{stack_name} ...")
+
     # 2. Write the environment configuration to the respective pulumi.yml file.
     write_config_to_pulumi_yml_file(
         stack_name=stack_name,
@@ -109,14 +109,14 @@ def _main(args):
         module=IaCModules.ENVIRONMENT
     )
 
-    # 4. Uploading the .env file to the secret manage given the configuration version.
+    # 4. Uploading the .env file to the secret manage given the target version.
     project_number = up_results.outputs["project_number"].value
 
     _upload_file_to_secret_manager(
         project_number=project_number,
         secret_name=ENV_VARS_SECRET_ID,
         file_path=env_file_path,
-        version=config_version
+        version=full_qualified_version
     )
 
     # 5. Upload the stack config file to the secret manager.
@@ -124,7 +124,7 @@ def _main(args):
         project_number=project_number,
         secret_name=STACK_CONFIG_SECRET_ID,
         file_path=stack_config_file_path,
-        version=config_version
+        version=full_qualified_version
     )
 
     print(f"Environment setup completed. {stack_name} is ready to use.")
@@ -132,8 +132,10 @@ def _main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Sets up the given environment by deploying the environment stack and uploading "
-                    "configurations to the secret manager."
+        description="Sets up the given environment by "
+                    
+                    " - running pulumi up on the environment stack and "
+                    " - uploading configurations and environment variables to the secret manager."
     )
 
     # add the required arguments to select the environment to set up.
@@ -143,20 +145,23 @@ if __name__ == "__main__":
         "--config-files-dir",
         type=str,
         required=True,
-        help="The directory that contains the configuration files, "
-             "to be uploaded to the secret manager of the environment's project."
-             " The directory should contain the "
-             "  1) .env.<REALM_NAME>.<ENV_NAME> file for the environment."
-             "  2) stack_config.<REALM_NAME>.<ENV_NAME>.yaml"
-             " It should be an absolute path."
+        help="The directory that contains the configuration and environment files,"
+             "to be uploaded to the secret manager of the target environment's project."
+             " - The directory should contain: "
+             
+             "      1) .env.<REALM_NAME>.<ENV_NAME> file containing the environment variables and values."
+             "      2) stack_config.<REALM_NAME>.<ENV_NAME>.yaml Containing the stack config for the pulumi modules."
+             
+             " - It should be an absolute path or the path from the place where you are running script from."
     )
 
-    version_group = parser.add_argument_group(
+    target_version = parser.add_argument_group(
         title="Configuration version",
         description="The inputs will be used to construct the configuration version ie: <branch-name>.<git-sha>. "
-                    "This is the version where the .env file and stack_config.yaml will be uploaded")
+                    "This is the version where the .env file and stack_config.yaml will be uploaded."
+                    "Also some characters will be escaped to comply to naming conventions in the secret manager")
 
-    version_group.add_argument(
+    target_version.add_argument(
         "--target-git-branch",
         type=str,
         required=False,
@@ -164,11 +169,11 @@ if __name__ == "__main__":
         help=f"The target branch name. Default: {MAIN_SECRET_VERSION}"
     )
 
-    version_group.add_argument(
+    target_version.add_argument(
         "--target-git-sha",
         type=str,
         required=False,
-        help="The target git sha or commit sha"
+        help="The target git sha"
     )
 
     _main(parser.parse_args())

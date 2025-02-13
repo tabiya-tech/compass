@@ -2,8 +2,11 @@
 
 import os
 import sys
-import argparse
 import uuid
+import yaml
+import argparse
+
+from dotenv import dotenv_values
 
 # Determine the absolute path to the 'iac' directory
 iac_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -11,20 +14,66 @@ iac_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # so that we can import the iac/lib module when we run pulumi from withing the iac/scripts directory.
 sys.path.insert(0, iac_folder)
 
-from _types import IaCModules
-from lib import get_pulumi_stack_outputs, ENV_VARS_SECRET_ID
+
 from backend.prepare_backend import download_backend_config
 from frontend.prepare_frontend import download_frontend_bundle
 
-from _common import add_select_environments_arguments, \
-    get_environment_stack_config, get_environment_stack_configs_by_env_type, get_versioned_secret_latest_value, \
-    write_config_to_pulumi_yml_file, StackConfigs
+from _types import IaCModules, Environment
+from lib import get_pulumi_stack_outputs, MAIN_SECRET_VERSION, construct_version_from_branch_and_sha, \
+    construct_artifacts_dir, download_generic_artifacts_file, get_file_as_string, \
+    format_version_to_comply_with_artifacts_version
+from _common import add_select_environments_arguments, get_realm_environment_by_env_type, \
+    write_config_to_pulumi_yml_file, get_realm_environment, get_environment_stack_configurations, \
+    get_environment_environment_variables, compare_dict_keys
+
+
+base_templates_dir = os.path.join(iac_folder, "templates")
+templates_dir = os.path.join(iac_folder, "scripts", "_tmp")
+
+
+def _download_templates(*,
+                        realm_name: str,
+                        deployment_number: str,
+                        artifacts_version: str) -> None:
+    """
+    Download the templates necessary for this configuration.
+    """
+    formatted_artifacts_version = format_version_to_comply_with_artifacts_version(artifacts_version)
+    realm_outputs = get_pulumi_stack_outputs(stack_name=realm_name, module="realm")
+    realm_generic_repository = realm_outputs["generic_repository"].value
+
+    current_templates_dir = construct_artifacts_dir(
+        deployment_number=deployment_number,
+        artifacts_version=formatted_artifacts_version)
+
+    # artifacts dir, the folder to store the templates files.
+    artifacts_destination_dir = os.path.join(templates_dir, current_templates_dir)
+    os.makedirs(artifacts_destination_dir, exist_ok=False)
+
+    download_generic_artifacts_file(
+        repository=realm_generic_repository,
+        output_dir=artifacts_destination_dir,
+        version=formatted_artifacts_version,
+        file_name="env.template",
+    )
+
+    download_generic_artifacts_file(
+        repository=realm_generic_repository,
+        output_dir=artifacts_destination_dir,
+        version=formatted_artifacts_version,
+        file_name="stack_config.template.yml",
+    )
 
 
 def _download_artifacts_and_config(_realm_name: str, _artifacts_version: str, _deployment_number: str):
     """
     Download the necessary configurations and artifacts.
     """
+
+    _download_templates(
+        realm_name=_realm_name,
+        artifacts_version=_artifacts_version,
+        deployment_number=_deployment_number)
 
     download_frontend_bundle(
         realm_name=_realm_name,
@@ -40,11 +89,7 @@ def _download_artifacts_and_config(_realm_name: str, _artifacts_version: str, _d
 
 
 def _prepare_env_file(stack_name: str, deployment_run_number: str, artifacts_version: str):
-    environment_outputs = get_pulumi_stack_outputs(stack_name, "environment")
-    env_file_content = get_versioned_secret_latest_value(
-        ENV_VARS_SECRET_ID,
-        environment_outputs["project_id"].value,
-        artifacts_version)
+    env_file_content = get_environment_environment_variables(stack_name, artifacts_version)
 
     # add environment variables to prepare the deployment.
     env_file_content += f"\nARTIFACTS_VERSION={artifacts_version}"
@@ -53,11 +98,14 @@ def _prepare_env_file(stack_name: str, deployment_run_number: str, artifacts_ver
     env_file_path = os.path.join(iac_folder, f".env.{stack_name}")
     with open(env_file_path, "w", encoding="utf-8") as file:
         file.write(env_file_content)
+
     print(f"Environment vars written to file: {env_file_path}")
+
+    return env_file_path
 
 
 def _prepare_environment_deployment(*,
-                                    env_config: StackConfigs,
+                                    environment: Environment,
                                     deployment_run_number: str,
                                     artifacts_version: str):
     """
@@ -66,38 +114,61 @@ def _prepare_environment_deployment(*,
      -> and the .env file for the environment.
     """
 
-    print(f"Preparing environment: {env_config.stack_name}")
+    print(f"Preparing environment: {environment.stack_name}")
 
-    # 1. Get .env file for the environment and save it in the environment files directory.
-    _prepare_env_file(env_config.stack_name, deployment_run_number, artifacts_version)
+    # 1. Download the configs/Environment variables
+    print("1. Downloading the configurations and environment variables")
+    stack_configs = get_environment_stack_configurations(environment, artifacts_version)
+    env_file_path = _prepare_env_file(environment.stack_name, deployment_run_number, artifacts_version)
+
+    # 2. Compare the configs with the templates.
+
+    env_vars_template = dotenv_values(os.path.join(base_templates_dir, "env.template"))
+
+    env_vars_template["DEPLOYMENT_RUN_NUMBER"] = deployment_run_number
+    env_vars_template["ARTIFACTS_VERSION"] = artifacts_version
+
+    stack_config_template_value = get_file_as_string(os.path.join(base_templates_dir, "stack_config.template.yml"))
+    stack_config_template = yaml.safe_load(stack_config_template_value)
+
+    if not compare_dict_keys(stack_config_template, stack_configs.raw_config):
+        raise ValueError("The stack config template does not match the stack config.")
+
+    if not compare_dict_keys(env_vars_template, dotenv_values(env_file_path)):
+        raise ValueError("The env vars template does not match the env vars.")
 
     # 2. Save the modules yaml configs.
     write_config_to_pulumi_yml_file(
-        stack_name=env_config.stack_name,
+        stack_name=environment.stack_name,
+        module=IaCModules.ENVIRONMENT,
+        content=stack_configs.environment.config)
+
+    write_config_to_pulumi_yml_file(
+        stack_name=environment.stack_name,
         module=IaCModules.AUTH,
-        content=env_config.auth)
+        content=stack_configs.auth)
 
     write_config_to_pulumi_yml_file(
-        stack_name=env_config.stack_name,
+        stack_name=environment.stack_name,
         module=IaCModules.BACKEND,
-        content=env_config.backend)
+        content=stack_configs.backend)
 
     write_config_to_pulumi_yml_file(
-        stack_name=env_config.stack_name,
+        stack_name=environment.stack_name,
         module=IaCModules.FRONTEND,
-        content=env_config.frontend)
+        content=stack_configs.frontend)
 
     write_config_to_pulumi_yml_file(
-        stack_name=env_config.stack_name,
+        stack_name=environment.stack_name,
         module=IaCModules.COMMON,
-        content=env_config.common)
+        content=stack_configs.common)
 
     write_config_to_pulumi_yml_file(
-        stack_name=env_config.stack_name,
+        stack_name=environment.stack_name,
         module=IaCModules.AWS_NS,
-        content=env_config.aws_ns)
+        content=stack_configs.aws_ns)
 
-    print(f"Environment deployment prepared: {env_config.stack_name}")
+    print(f"Environment deployment prepared: {environment.stack_name}")
 
 
 def _main(args):
@@ -105,7 +176,8 @@ def _main(args):
     realm_name = args.realm_name
     environment_name = args.env_name
     environment_type = args.env_type
-    artifacts_version = args.artifacts_version
+
+    target_version = construct_version_from_branch_and_sha(args.target_git_branch, args.target_git_sha)
 
     # randomly get a deployment number
     # this is used if we have two parallel deployments
@@ -113,49 +185,46 @@ def _main(args):
     # otherwise it would be very complicated to know if an ongoing download or not.
     deployment_number = uuid.uuid4().__str__()
 
-    print(f"=== Preparing the deployment of version: {artifacts_version}, deployment number: {deployment_number}")
+    print(f"Preparing the deployment of version: {target_version}, deployment number: {deployment_number}")
 
     # Flow 1: prepare the deployment of an environment by realm name and environment name
     #          this happens if env_name was provided. (manual preparing)
     if environment_name is not None:
         # 1.1 Get the environment stack configuration
-        target_environment_config = get_environment_stack_config(
+        target_environment = get_realm_environment(
             realm_name=realm_name,
-            environment_name=environment_name,
-            config_version=artifacts_version,
-        )
+            environment_name=environment_name)
 
         # 1.2 download the artifacts and configurations for the environment
-        _download_artifacts_and_config(realm_name, artifacts_version, deployment_number)
+        _download_artifacts_and_config(realm_name, target_version, deployment_number)
 
         # 1.3 prepare the deployment of the environment
         _prepare_environment_deployment(
-            env_config=target_environment_config,
+            environment=target_environment,
             deployment_run_number=deployment_number,
-            artifacts_version=artifacts_version)
+            artifacts_version=target_version)
 
     # Flow 2: prepare the deployment of environments by realm name and environment type.
     #         This happens in the pipeline when we want to prepare all the environments of a certain type.
     if environment_type is not None:
         # 2.1 Get the target environments, all the environments of the given type in the realm.
-        target_environments = get_environment_stack_configs_by_env_type(
+        target_environments = get_realm_environment_by_env_type(
             realm_name=realm_name,
-            env_type=environment_type,
-            config_version=artifacts_version)
+            env_type=environment_type)
 
         if len(target_environments) == 0:
             print(f"No environments found for realm: {realm_name} and env_type: {environment_type}")
 
         # 2.2 download the artifacts and configurations for the environments
         # given that we are deploying one artifact version, the download is done once.
-        _download_artifacts_and_config(realm_name, artifacts_version, deployment_number)
+        _download_artifacts_and_config(realm_name, target_version, deployment_number)
 
         # 2.3 prepare the deployment of each environment in the target list.
-        for env_config in target_environments:
+        for environment in target_environments:
             _prepare_environment_deployment(
-                env_config=env_config,
+                environment=environment,
                 deployment_run_number=deployment_number,
-                artifacts_version=artifacts_version)
+                artifacts_version=target_version)
 
 
 if __name__ == "__main__":
@@ -167,14 +236,26 @@ if __name__ == "__main__":
     # a) by realm name and environment name
     # b) by realm name and environment type.
     add_select_environments_arguments(parser=parser)
-    # TODO change to --branch-name --git-sha
-    #   help="The branch name or git sha of the artifacts to deploy. They are used to form the artifacts version."
-    #   " which is <branch-name>.<git-sha> when some characters have been excaped to comly to naming convetions in the artifacts regiostry"
-    parser.add_argument(
-        "--artifacts-version",
+
+    version_group = parser.add_argument_group(
+        title="Artifacts/Configuration version",
+        description="The inputs will be used to construct artifacts/config version ie: <branch-name>.<git-sha>. "
+                    "Where some characters have been escaped to comply to naming conventions in the artifacts "
+                    "repositories and secret IDs")
+
+    version_group.add_argument(
+        "--target-git-branch",
         type=str,
         required=True,
-        help="The artifacts version (hash or tag) to deploy. "
-             "This will also be useful when we try to know which config to download when preparing the deployment.")
+        default=MAIN_SECRET_VERSION,
+        help=f"The target branch name. Default: {MAIN_SECRET_VERSION}"
+    )
+
+    version_group.add_argument(
+        "--target-git-sha",
+        type=str,
+        required=True,
+        help="The target git sha"
+    )
 
     _main(parser.parse_args())

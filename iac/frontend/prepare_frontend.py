@@ -14,7 +14,8 @@ iac_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, iac_folder)
 
 from lib import base64_encode, getenv, get_realm_and_env_name_from_stack, load_dot_realm_env, \
-    get_pulumi_stack_outputs, construct_artifacts_dir, parse_artifacts_version, save_content_in_file
+    get_pulumi_stack_outputs, construct_artifacts_dir, save_content_in_file, \
+    download_generic_artifacts_file, format_version_to_comply_with_artifacts_version
 
 # The actual frontend build artifact filename is specified in the iac/scripts/build-and-upload-fe.sh script.
 frontend_build_artifact_filename = "frontend-build.tar.gz"
@@ -49,7 +50,7 @@ def download_frontend_bundle(
         :param artifacts_version:  The version of the frontend build bundle.
     """
     # 1. get the directory where to save the frontend build bundle.
-    frontend_artifacts_version = parse_artifacts_version(artifacts_version).generic_artifact_version
+    frontend_artifacts_version = format_version_to_comply_with_artifacts_version(artifacts_version)
     artifacts_dir = construct_artifacts_dir(
         deployment_number=deployment_number,
         artifacts_version=frontend_artifacts_version)
@@ -68,24 +69,13 @@ def download_frontend_bundle(
 
     try:
         # 3. Download the frontend build bundle.
-        subprocess.run(
-            [
-                "gcloud",
-                "artifacts",
-                "generic",
-                "download",
-                # the package name is defined in
-                "--package=frontend",
-                f'--repository={realm_generic_repository["name"]}',
-                f'--location={realm_generic_repository["location"]}',
-                f'--project={realm_generic_repository["project"]}',
-                "--destination=./",
-                f'--version={frontend_artifacts_version}'
-            ],
-            cwd=artifacts_destination_dir,
-            check=True,
-            text=True
+        download_generic_artifacts_file(
+            repository=realm_generic_repository,
+            version=frontend_artifacts_version,
+            file_name=frontend_build_artifact_filename,
+            output_dir=artifacts_destination_dir
         )
+
         # 4. extract the downloaded frontend build bundle.
         subprocess.run(
             [
@@ -108,8 +98,7 @@ def download_frontend_bundle(
 
 
 def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
-    sentry_frontend_dsn: str = getenv("SENTRY_FRONTEND_DSN")
-    sentry_auth_token: str = getenv("SENTRY_AUTH_TOKEN", True)
+    sentry_frontend_dsn: str = getenv("SENTRY_FRONTEND_DSN", True, False)
 
     sensitive_personal_data_rsa_encryption_key: str = getenv("SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY")
     sensitive_personal_data_rsa_encryption_key_id: str = getenv("SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID")
@@ -126,10 +115,7 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
         "FIREBASE_API_KEY": base64_encode(auth_outputs["identity_platform_client_api_key"].value),
         "FIREBASE_AUTH_DOMAIN": base64_encode(auth_outputs["identity_platform_client_firebase_subdomain"].value),
         "BACKEND_URL": base64_encode(environment_outputs["backend_url"].value),
-
         "SENTRY_FRONTEND_DSN": base64_encode(sentry_frontend_dsn),
-        "SENTRY_AUTH_TOKEN": base64_encode(sentry_auth_token),
-
         "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY": base64_encode(sensitive_personal_data_rsa_encryption_key),
         "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID": base64_encode(sensitive_personal_data_rsa_encryption_key_id),
     }
@@ -159,7 +145,7 @@ def prepare_frontend(
     # Because the frontend/env.js file is specific to the deployment, and the stack name.
     deployment_number = getenv("DEPLOYMENT_RUN_NUMBER")
     artifacts_version = getenv("ARTIFACTS_VERSION")
-    generic_artifact_version = parse_artifacts_version(artifacts_version).generic_artifact_version
+    generic_artifact_version = format_version_to_comply_with_artifacts_version(artifacts_version)
     artifacts_dir = construct_artifacts_dir(
         deployment_number=deployment_number,
         artifacts_version=generic_artifact_version)

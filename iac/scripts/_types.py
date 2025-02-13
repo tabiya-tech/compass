@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import Mapping, Any
 from dataclasses import dataclass
+from functools import cached_property
 
 from environment.env_types import EnvironmentTypes
 from lib import get_stack_name_from
@@ -45,7 +46,7 @@ class Environment:
     deployment_type: DeploymentType
     config: Mapping[str, Any]
 
-    @property
+    @cached_property
     def stack_name(self) -> str:
         """The stack name for the environment"""
         return get_stack_name_from(self.realm_name, self.environment_name)
@@ -79,6 +80,9 @@ class StackConfigs:
     common: Mapping[str, Any]
     aws_ns: Mapping[str, Any]
 
+    raw_config: dict
+    """The raw dictionary(JSON/YML) Configurations for the stack config."""
+
     @staticmethod
     def from_dict(environment: Environment, _dict: dict) -> "StackConfigs":
         """
@@ -95,5 +99,6 @@ class StackConfigs:
             backend=_dict[IaCModules.BACKEND.value],
             frontend=_dict[IaCModules.FRONTEND.value],
             common=_dict[IaCModules.COMMON.value],
-            aws_ns=_dict[IaCModules.AWS_NS.value]
+            aws_ns=_dict[IaCModules.AWS_NS.value],
+            raw_config=_dict
         )

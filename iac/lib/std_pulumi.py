@@ -3,6 +3,7 @@ import os
 import re
 import string
 import hashlib
+import subprocess
 
 import pulumi
 import pulumi_gcp as gcp
@@ -25,28 +26,6 @@ class ProjectBaseConfig:
     project: str | pulumi.Output[str]
     location: str | pulumi.Output[str]
     provider: gcp.Provider
-
-
-@dataclass
-class ArtifactsVersion:
-    """
-    The artifacts version data class.
-    """
-
-    ref_name: str
-    """branch or tag name"""
-
-    sha: str
-    """commit sha"""
-
-    generic_artifact_version: str
-    """generic artifacts version <generic-artifacts-version>.<sha>"""
-
-    docker_tag_version: str
-    """docker tag version <docker-tag-version>.<sha>"""
-
-    secret_id_version: str
-    """secret id version <secret-id-version>.<sha>"""
 
 
 def getstackref(stack_ref: pulumi.StackReference, name: str, secret: bool = False) -> pulumi.Output[Any]:
@@ -104,21 +83,25 @@ def load_dot_realm_env(stack_name: str):
     load_dotenv(dotenv_path=dot_env)
 
 
-def getenv(name: str, secret: bool = False) -> str:
+def getenv(name: str, secret: bool = False, required: bool = True) -> str:
     """
     Get the environment variable. Log the value if it is not a secret, otherwise log the secret value as a series of '*'
     :param name: the environment variable name
     :param secret: whether the environment variable is a secret
+    :param required: whether the environment variable is required
     :return: the environment variable value
     :raises ValueError: if the environment variable is not set
     """
+
     value = os.getenv(name)
-    if not value:
+    if required and not value:
         raise ValueError(f"environment variable {name} is not set")
-    if not secret:
-        pulumi.log.info(f"Using environment variable {name}: {value}")
-    else:
+
+    if secret and value:
         pulumi.log.info(f"Using secret environment variable {name}: {'*' * len(value)}")
+    else:
+        pulumi.log.info(f"Using environment variable {name}: {value}")
+
     return value
 
 
@@ -249,11 +232,13 @@ def save_content_in_file(file_path: str, content: str):
 def base64_encode(_string: Optional[str]) -> str:
     """
     Base64 encode the string
+
     :return:
     """
 
     if not _string:
-        raise ValueError("string to encode is required")
+        print("warning: provided string is empty")
+        return ""
 
     encoded_bytes = base64.b64encode(_string.encode("utf-8"))
     encoded_string = encoded_bytes.decode("utf-8")
@@ -353,32 +338,14 @@ def get_ref_name_and_sha_from_artifacts_version(artifacts_version: str) -> tuple
     return ref_name, sha
 
 
-def parse_artifacts_version(artifacts_version: str):
-    """
-    Parse the artifacts version to get the ref name, sha, generic artifacts version, and docker tag.
+def format_version_to_comply_with_docker_tag(version: str) -> str:
+    _, docker_tag_version, _ = parse_git_branch_name(version)
+    return docker_tag_version
 
-    :param artifacts_version: The artifacts version to parse.
-    :return:
-    """
-    # differentiate the ref name and sha from the artifacts version from the user.
-    ref_name, sha = get_ref_name_and_sha_from_artifacts_version(artifacts_version)
 
-    # from the branch name parse it to get the
-    # a) generic artifacts version,
-    # b) docker tag name,
-    # c) and the secret id of the ref name.
-    generic_artifact_version, docker_tag_version, secret_id_version = parse_git_branch_name(ref_name)
-
-    return ArtifactsVersion(
-        ref_name=ref_name,
-        sha=sha,
-        # construct back again the generic artifacts version.
-        generic_artifact_version=f"{generic_artifact_version}.{sha}",
-        # construct back again the docker tag.
-        docker_tag_version=f"{docker_tag_version}.{sha}",
-        # construct the secret id version.
-        secret_id_version=f"{secret_id_version}.{sha}"
-    )
+def format_version_to_comply_with_artifacts_version(version: str) -> str:
+    artifacts_version, _, _ = parse_git_branch_name(version)
+    return artifacts_version
 
 
 def get_formatted_secret_id(secret_id: str, config_version: str):
@@ -390,6 +357,7 @@ def get_formatted_secret_id(secret_id: str, config_version: str):
 
     :return: A valid secret id.
     """
+
     _, _, formatted_secret_id = parse_git_branch_name(config_version)
 
     return f"{secret_id}_{formatted_secret_id}"
@@ -412,3 +380,32 @@ def construct_version_from_branch_and_sha(ref_name: str, sha: str):
         version = f"{version}.{sha}"
 
     return version
+
+
+def download_generic_artifacts_file(
+        *,
+        repository: dict,
+        file_name: str,
+        version: str,
+        output_dir: str):
+    """
+    Download the generic artifacts file from the repository.
+    """
+
+    subprocess.run(
+        [
+            "gcloud",
+            "artifacts",
+            "files",
+            "download",
+            "--destination=./",
+            f'--repository={repository["name"]}',
+            f'--location={repository["location"]}',
+            f'--project={repository["project"]}',
+            f"--local-filename={file_name}",
+            f'artifacts:{version}:{file_name}'
+        ],
+        cwd=output_dir,
+        check=True,
+        text=True
+    )

@@ -18,10 +18,10 @@ iac_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # so that we can import the iac/lib module when we run pulumi from withing the iac/scripts directory.
 sys.path.insert(0, iac_dir)
 
-from _types import IaCModules, StackConfigs, Environment
+from _types import IaCModules, StackConfigs, Environment, DeploymentType
 from environment.env_types import EnvironmentTypes
 from lib import get_ref_name_and_sha_from_artifacts_version, MAIN_SECRET_VERSION, get_formatted_secret_id, \
-    get_pulumi_stack_outputs
+    get_pulumi_stack_outputs, STACK_CONFIG_SECRET_ID, ENV_VARS_SECRET_ID
 
 
 # =======================
@@ -227,27 +227,44 @@ def get_realm_environment(realm_name: str, environment_name: str):
     raise ValueError(f"No environment config found for the environment:{environment_name} in the realm:{realm_name}.")
 
 
-def get_environment_stack_configs_by_env_type(
+def get_environment_stack_configurations(environment: Environment, version: str) -> StackConfigs:
+    """
+    Gets the stacks configurations for a given environment.
+    """
+
+    environment_stack_outputs = get_pulumi_stack_outputs(environment.stack_name, IaCModules.ENVIRONMENT.value)
+    environment_project_id = environment_stack_outputs["project_id"].value
+    stack_configs = get_versioned_secret_latest_value(STACK_CONFIG_SECRET_ID, environment_project_id, version)
+
+    return StackConfigs.from_dict(environment, yaml.safe_load(stack_configs))
+
+
+def get_environment_environment_variables(stack_name: str, version: str):
+    """
+    Get the environment variables for the given environment.
+    """
+
+    environment_stack_outputs = get_pulumi_stack_outputs(stack_name, IaCModules.ENVIRONMENT.value)
+    environment_project_id = environment_stack_outputs["project_id"].value
+
+    return get_versioned_secret_latest_value(ENV_VARS_SECRET_ID, environment_project_id, version)
+
+
+def get_realm_environment_by_env_type(
         realm_name: str,
-        env_type: str,
-        config_version: str) -> list[StackConfigs]:
+        env_type: EnvironmentTypes) -> list[Environment]:
     """
-    Get the environments configurations by environment types from the realm's secrets.
-
-    :param env_type: The environment type.
-    :param realm_name: The realm name :param env_type:  The environment type to use to filter the environments.
-    :param config_version: The config version to use to download the realm environments configurations,
-    :return: An array of environment configurations for the environments. If no environment configuration is found,
-             an empty array is returned.
+    Get the environments by environment type from the realm's secrets.
     """
 
-    realm_environments_configs = get_environments_in_realm(realm_name, config_version)
-    environments = []
-    for environment in realm_environments_configs:
-        if environment.env_type == env_type and environment.deployment_type == "auto":
-            environments.append(environment)
+    realm_environments = get_environments_in_realm(realm_name)
 
-    return environments
+    target_environments = []
+    for environment in realm_environments:
+        if environment.environment_type == env_type and environment.deployment_type == DeploymentType.AUTO:
+            target_environments.append(environment)
+
+    return target_environments
 
 
 # =======================
@@ -259,14 +276,19 @@ def add_select_environment_arguments(*, parser: argparse.ArgumentParser):
     Adds the arguments to select only one environment on the parser.
     """
 
-    parser.add_argument(
+    group = parser.add_argument_group(
+        title="Select one environment",
+        description="Select the environment to set up by providing the realm name and the environment name."
+    )
+
+    group.add_argument(
         "--realm-name",
         type=str,
         required=True,
         help="The realm name"
     )
 
-    parser.add_argument(
+    group.add_argument(
         '--env-name',
         type=str,
         required=True,
@@ -281,14 +303,20 @@ def add_select_environments_arguments(*, parser: argparse.ArgumentParser):
         b) by environment type.
     """
 
-    parser.add_argument(
+    args_group = parser.add_argument_group(
+        title="Select environment(s)",
+        description="Select the environment(s) to set up by providing the "
+                    "- realm name and "
+                    "- either the environment name or the environment type.")
+
+    args_group.add_argument(
         "--realm-name",
         type=str,
         required=True,
         help="The realm name"
     )
 
-    group = parser.add_mutually_exclusive_group(required=True)
+    group = args_group.add_mutually_exclusive_group(required=True)
     group.add_argument(
         "--env-name",
         type=str,
@@ -299,9 +327,34 @@ def add_select_environments_arguments(*, parser: argparse.ArgumentParser):
 
     group.add_argument(
         "--env-type",
-        type=str,
+        type=EnvironmentTypes,
         default=None,
         nargs="?",  # allows the argument to be provided without a value, and it is set to None.
-        choices=[env_type.value for env_type in EnvironmentTypes],
+        choices=[env_type for env_type in EnvironmentTypes],
         help="The environment type"
     )
+
+
+def compare_dict_keys(dict1: dict, dict2: dict, parent: str = "root"):
+    """
+    Compare the keys of two dictionaries.
+    If the value is also a dict it will compare the keys of the nested dict.
+    """
+
+    try:
+        if dict1.keys() != dict2.keys():
+            # keys in dict 1 that are not in dict 2
+            print(f"Error: Keys in {parent} that are not in dict2: {list(dict1.keys() - dict2.keys())}")
+            # keys in dict 2 that are not in dict 1
+            print(f"Error: Keys in {parent} that are not in dict1: {list(dict2.keys() - dict1.keys())}")
+            return False
+
+        for key in dict1.keys():
+            if isinstance(dict1[key], dict) or isinstance(dict2[key], dict):
+                if not compare_dict_keys(dict1[key], dict2[key], f"{parent}.{key}"):
+                    return False
+
+        return True
+    except Exception as e:
+        print("Error: ", str(e))
+        return False

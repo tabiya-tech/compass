@@ -10,7 +10,7 @@ sys.path.insert(0, libs_dir)
 
 from deploy_backend import deploy_backend, BackendServiceConfig
 from lib import getconfig, getstackref, getenv, parse_realm_env_name_from_stack, load_dot_realm_env, \
-    construct_artifacts_dir, parse_artifacts_version
+    construct_artifacts_dir, format_version_to_comply_with_artifacts_version
 
 
 def main():
@@ -51,14 +51,14 @@ def main():
         target_environment_type=environment_type,
         backend_url=backend_url,
         frontend_url=frontend_url,
-        sentry_backend_dsn=getenv("SENTRY_BACKEND_DSN", True),
+        sentry_backend_dsn=getenv("SENTRY_BACKEND_DSN", True, False),
         enable_sentry=getenv("ENABLE_SENTRY"),
         gcp_oauth_client_id=getenv("GCP_OAUTH_CLIENT_ID"),
     )
 
     # version of the artifacts to deploy
     artifacts_version = getenv("ARTIFACTS_VERSION")
-    generic_artifact_version = parse_artifacts_version(artifacts_version).generic_artifact_version
+    generic_artifact_version = format_version_to_comply_with_artifacts_version(artifacts_version)
 
     # the key identifier of this deployment, used to identify the deployment.
     run_number = getenv("DEPLOYMENT_RUN_NUMBER")

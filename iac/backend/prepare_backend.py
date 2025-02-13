@@ -8,7 +8,8 @@ iac_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # so that we can import the iac/lib module when we run pulumi from withing the iac/backend directory.
 sys.path.insert(0, iac_folder)
 
-from lib import get_pulumi_stack_outputs, construct_artifacts_dir, parse_artifacts_version
+from lib import get_pulumi_stack_outputs, construct_artifacts_dir, download_generic_artifacts_file, \
+    format_version_to_comply_with_docker_tag, format_version_to_comply_with_artifacts_version
 
 current_dir = os.path.join(iac_folder, "backend")
 
@@ -28,38 +29,27 @@ def download_backend_config(*,
     """
 
     # construct the directory to save the backend config for this deployment.
-    docker_tag = parse_artifacts_version(artifacts_version).docker_tag_version
+    docker_tag = format_version_to_comply_with_docker_tag(artifacts_version)
 
     # the backend config are stored in the generic repository.
-    generic_artifacts_version = parse_artifacts_version(artifacts_version).generic_artifact_version
+    generic_artifacts_version = format_version_to_comply_with_artifacts_version(artifacts_version)
 
     config_dir = construct_artifacts_dir(deployment_number=deployment_number, artifacts_version=docker_tag)
     backend_config_output_dir = os.path.join(base_configuration_dir, config_dir)
     os.makedirs(backend_config_output_dir, exist_ok=False)
 
     realm_outputs = get_pulumi_stack_outputs(stack_name=realm_name, module="realm")
-    generic_repository = realm_outputs["generic_repository"].value
+    realm_generic_repository = realm_outputs["generic_repository"].value
 
     # download the configurations.
     try:
         print(f"Downloading the backend config to {backend_config_output_dir}")
 
-        subprocess.run(
-            [
-                "gcloud",
-                "artifacts",
-                "generic",
-                "download",
-                "--package=backend-config",
-                f'--repository={generic_repository["name"]}',
-                f'--location={generic_repository["location"]}',
-                f'--project={generic_repository["project"]}',
-                "--destination=./",
-                f"--version={generic_artifacts_version}"
-            ],
-            cwd=backend_config_output_dir,
-            check=True,
-            text=True
+        download_generic_artifacts_file(
+            repository=realm_generic_repository,
+            version=generic_artifacts_version,
+            file_name=api_gateway_config_file_name,
+            output_dir=backend_config_output_dir
         )
 
         print("Done downloading the backend config bundle.")
