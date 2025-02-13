@@ -8,6 +8,7 @@ import {
   generateSomethingWentWrongMessage,
   generateTypingMessage,
   generateUserMessage,
+  generateConversationConclusionMessage,
 } from "./util";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Box, useTheme } from "@mui/material";
@@ -96,31 +97,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     setMessages((prevMessages) => [...prevMessages, message]);
   };
 
-  // When the conversation is concluded, add a message to the chat
-  const checkAndAddConversationConclusionMessage = useCallback(() => {
-    setMessages((prevMessages) => {
-      // If there are no messages, return empty array
-      if (prevMessages.length === 0) {
-        return prevMessages;
-      }
 
-      // Get the last message
-      const lastMessage = prevMessages.at(-1)!;
-
-      // Create conclusion message from the last message
-      const conclusionMessage: IChatMessage = {
-        ...lastMessage,
-        type: ChatMessageType.CONVERSATION_CONCLUSION,
-        message: lastMessage.message,
-        sent_at: lastMessage.sent_at,
-        sender: lastMessage.sender,
-        id: lastMessage.id,
-      };
-
-      // Return all messages except last one, plus the conclusion message
-      return [...prevMessages.slice(0, -1), conclusionMessage];
-    });
-  }, []);
 
   // Check local storage when the form is closed to see if there is saved feedback
   useEffect(() => {
@@ -206,15 +183,15 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           setExploredExperiencesNotification(true);
         }
 
-        response.messages.forEach((messageItem) =>
-          addMessage(generateCompassMessage(messageItem.message, messageItem.sent_at))
-        );
+        response.messages.forEach((messageItem) => {
+          const message = response.conversation_completed && messageItem === response.messages[response.messages.length - 1]
+            ? generateConversationConclusionMessage(messageItem.message, messageItem.sent_at)
+            : generateCompassMessage(messageItem.message, messageItem.sent_at);
+          addMessage(message);
+        });
 
         setConversationCompleted(response.conversation_completed);
         setConversationConductedAt(response.conversation_conducted_at);
-        if (response.conversation_completed) {
-          checkAndAddConversationConclusionMessage();
-        }
       } catch (error) {
         console.error(new ChatError("Failed to send message:", error as Error));
         addMessage(generatePleaseRepeatMessage());
@@ -222,7 +199,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setIsTyping(false);
       }
     },
-    [currentMessage, exploredExperiences, checkAndAddConversationConclusionMessage]
+    [currentMessage, exploredExperiences]
   );
 
   const initializeChat = useCallback(
@@ -232,7 +209,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         console.error(new ChatError("Chat cannot be initialized, there is not User id  not available"));
         return false;
       }
-
+ 
       setIsTyping(true);
       let sessionId: number | null = currentSessionId;
 
@@ -256,20 +233,20 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         // Set the messages from the chat history
         if (history.messages.length) {
           setMessages(
-            history.messages.map((message: ConversationMessage) =>
-              message.sender === ConversationMessageSender.USER
-                ? generateUserMessage(message.message, message.sent_at)
-                : generateCompassMessage(message.message, message.sent_at)
-            )
+            history.messages.map((message: ConversationMessage) => {
+              if (message.sender === ConversationMessageSender.USER) {
+                return generateUserMessage(message.message, message.sent_at);
+              }
+              // If this is the last message and conversation is completed, make it a conclusion message
+              if (history.conversation_completed && message === history.messages[history.messages.length - 1]) {
+                return generateConversationConclusionMessage(message.message, message.sent_at);
+              }
+              return generateCompassMessage(message.message, message.sent_at);
+            })
           );
 
           setConversationCompleted(history.conversation_completed);
           setConversationConductedAt(history.conversation_conducted_at);
-
-          // If the conversation is completed, check if the user has given feedback
-          if (history.conversation_completed) {
-            checkAndAddConversationConclusionMessage();
-          }
         } else {
           // if this is the last promise to resolve, we should not set any state before it is resolved
           // This is the first message to kick off the conversation
@@ -296,7 +273,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setIsTyping(false);
       }
     },
-    [checkAndAddConversationConclusionMessage, sendMessage]
+    [sendMessage]
   );
 
   // Resets the text field for the next message

@@ -5,7 +5,7 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
 import CustomLink from "src/theme/CustomLink/CustomLink";
-import { IsOnlineContext } from "../../../app/isOnlineProvider/IsOnlineProvider";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 
 const uniqueId = "e8f3b9a2-1d4c-4f5e-9c7b-8d2a6b4e5f3c";
 
@@ -82,7 +82,7 @@ const ResendVerificationEmail: React.FC<ResendVerificationEmailProps> = ({
 
   return (
     <StyledBox data-testid={DATA_TEST_ID.CONTAINER}>
-      <Typography variant="body2" color="textSecondary">
+      <Typography variant="body2" color="error">
         Your email is not verified. Please check your inbox for the verification email.
       </Typography>
       <Box>
