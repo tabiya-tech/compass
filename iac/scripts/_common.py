@@ -21,7 +21,7 @@ sys.path.insert(0, iac_dir)
 from _types import IaCModules, StackConfigs, Environment, DeploymentType
 from environment.env_types import EnvironmentTypes
 from lib import get_ref_name_and_sha_from_artifacts_version, MAIN_SECRET_VERSION, get_formatted_secret_id, \
-    get_pulumi_stack_outputs, STACK_CONFIG_SECRET_ID, ENV_VARS_SECRET_ID
+    get_pulumi_stack_outputs, STACK_CONFIG_SECRET_PREFIX, ENV_VARS_SECRET_PREFIX
 
 
 # =======================
@@ -234,7 +234,7 @@ def get_environment_stack_configurations(environment: Environment, version: str)
 
     environment_stack_outputs = get_pulumi_stack_outputs(environment.stack_name, IaCModules.ENVIRONMENT.value)
     environment_project_id = environment_stack_outputs["project_id"].value
-    stack_configs = get_versioned_secret_latest_value(STACK_CONFIG_SECRET_ID, environment_project_id, version)
+    stack_configs = get_versioned_secret_latest_value(STACK_CONFIG_SECRET_PREFIX, environment_project_id, version)
 
     return StackConfigs.from_dict(environment, yaml.safe_load(stack_configs))
 
@@ -247,7 +247,7 @@ def get_environment_environment_variables(stack_name: str, version: str):
     environment_stack_outputs = get_pulumi_stack_outputs(stack_name, IaCModules.ENVIRONMENT.value)
     environment_project_id = environment_stack_outputs["project_id"].value
 
-    return get_versioned_secret_latest_value(ENV_VARS_SECRET_ID, environment_project_id, version)
+    return get_versioned_secret_latest_value(ENV_VARS_SECRET_PREFIX, environment_project_id, version)
 
 
 def get_realm_environment_by_env_type(

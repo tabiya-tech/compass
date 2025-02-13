@@ -14,8 +14,8 @@ libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, libs_dir)
 
 from _types import IaCModules
-from lib import get_stack_name_from, MAIN_SECRET_VERSION, ENV_VARS_SECRET_ID, get_formatted_secret_id, \
-    construct_version_from_branch_and_sha, STACK_CONFIG_SECRET_ID
+from lib import get_stack_name_from, MAIN_SECRET_VERSION, ENV_VARS_SECRET_PREFIX, get_formatted_secret_id, \
+    construct_version_from_branch_and_sha, STACK_CONFIG_SECRET_PREFIX
 from _common import add_select_environment_arguments, \
     write_config_to_pulumi_yml_file, run_pulumi_up, get_realm_environment
 
@@ -112,7 +112,7 @@ def _main(args):
     project_number = up_results.outputs["project_number"].value
     _upload_file_to_secret_manager(
         project_number=project_number,
-        secret_name=ENV_VARS_SECRET_ID,
+        secret_name=ENV_VARS_SECRET_PREFIX,
         file_path=env_file_path,
         version=full_qualified_version
     )
@@ -120,7 +120,7 @@ def _main(args):
     # 5. Upload the stack config file to the secret manager.
     _upload_file_to_secret_manager(
         project_number=project_number,
-        secret_name=STACK_CONFIG_SECRET_ID,
+        secret_name=STACK_CONFIG_SECRET_PREFIX,
         file_path=stack_config_file_path,
         version=full_qualified_version
     )

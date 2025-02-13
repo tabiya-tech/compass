@@ -98,7 +98,7 @@ def _deploy_environment(stack_name: str):
     run_pulumi_up(stack_name, IaCModules.COMMON)
 
     # 1.5 Deploy the aws-ns
-    # _deploy_aws_ns(stack_name)
+    _deploy_aws_ns(stack_name)
 
 
 def _main(args):

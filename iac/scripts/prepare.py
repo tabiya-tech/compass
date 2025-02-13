@@ -3,6 +3,8 @@
 import os
 import sys
 import uuid
+from textwrap import dedent
+
 import yaml
 import argparse
 
@@ -90,9 +92,13 @@ def _prepare_env_file(stack_name: str, deployment_run_number: str, artifacts_ver
     env_file_content = get_environment_environment_variables(stack_name, artifacts_version)
 
     # add environment variables to prepare the deployment.
-    env_file_content += f"\nARTIFACTS_VERSION={artifacts_version}"
-    env_file_content += f"\nDEPLOYMENT_RUN_NUMBER={deployment_run_number}"
-
+    env_file_content += dedent(f'''\n
+        ######################
+        # Added by prepare.py
+        ######################
+        ARTIFACTS_VERSION={artifacts_version}
+        DEPLOYMENT_RUN_NUMBER={deployment_run_number}
+        ''')
     env_file_path = os.path.join(iac_folder, f".env.{stack_name}")
     with open(env_file_path, "w", encoding="utf-8") as file:
         file.write(env_file_content)

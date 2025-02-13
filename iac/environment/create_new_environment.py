@@ -6,7 +6,7 @@ import pulumi
 import pulumi_gcp as gcp
 import pulumiverse_time as time
 
-from lib import MAIN_SECRET_VERSION, ENV_VARS_SECRET_ID, STACK_CONFIG_SECRET_ID
+from lib import MAIN_SECRET_VERSION, ENV_VARS_SECRET_PREFIX, STACK_CONFIG_SECRET_PREFIX
 from lib.std_pulumi import enable_services, get_resource_name, int_to_base36, get_formatted_secret_id
 
 from auth import REQUIRED_SERVICES as AUTH_SERVICES
@@ -170,7 +170,7 @@ def create_new_environment(*,
     # create the secret for environment variables, version: (main/default)
     env_vars_config_main_secret = gcp.secretmanager.Secret(
         get_resource_name(resource="env-vars-main", resource_type="secret"),
-        secret_id=get_formatted_secret_id(ENV_VARS_SECRET_ID, MAIN_SECRET_VERSION),
+        secret_id=get_formatted_secret_id(ENV_VARS_SECRET_PREFIX, MAIN_SECRET_VERSION),
         project=project.project_id,
         # automatic replication.
         replication={
@@ -181,7 +181,7 @@ def create_new_environment(*,
     # create the secret for stack config, version: (main/default)
     stack_config_main_secret = gcp.secretmanager.Secret(
         get_resource_name(resource="stack-config_main", resource_type="secret"),
-        secret_id=get_formatted_secret_id(STACK_CONFIG_SECRET_ID, MAIN_SECRET_VERSION),
+        secret_id=get_formatted_secret_id(STACK_CONFIG_SECRET_PREFIX, MAIN_SECRET_VERSION),
         project=project.project_id,
         # automatic replication.
         replication={

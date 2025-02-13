@@ -349,11 +349,11 @@ def format_version_to_comply_with_artifacts_version(version: str) -> str:
     return artifacts_version
 
 
-def get_formatted_secret_id(secret_id: str, config_version: str):
+def get_formatted_secret_id(secret_prefix: str, config_version: str):
     """
     Gets a well formatted secret ID, accepted by GCP Secret Manager API.
 
-    :param secret_id:
+    :param secret_prefix:
     :param config_version:
 
     :return: A valid secret id.
@@ -361,7 +361,7 @@ def get_formatted_secret_id(secret_id: str, config_version: str):
 
     formatted_secret_id = filter_invalid_chars_for_secret_id(config_version)
 
-    return f"{secret_id}_{formatted_secret_id}"
+    return f"{secret_prefix}_{formatted_secret_id}"
 
 
 def construct_version_from_branch_and_sha(ref_name: str, sha: str):
