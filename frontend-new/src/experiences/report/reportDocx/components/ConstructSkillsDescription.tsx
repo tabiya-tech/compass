@@ -1,15 +1,14 @@
 import { Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle } from "docx";
-import { Skill } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
+import { Skill, Experience } from "src/experiences/experiencesDrawer/experienceService/experiences.types";
 import { ReportContent } from "src/experiences/report/reportContent";
 import { capitalizeFirstLetter } from "src/experiences/report/reportPdf/components/experiencesReportContent/ExperiencesReportContent";
 import { TabiyaBasicColors } from "src/theme/applicationTheme/applicationTheme";
+import { getUniqueSkills } from "src/experiences/report/util";
 
-interface SkillsDescriptionProps {
-  skillsList: Skill[];
-}
-
-const SkillsDescription = ({ skillsList }: SkillsDescriptionProps) => {
-  return [
+const ConstructSkillsDescription = ( paragraphs: Paragraph[], experiences : Experience[]) => {
+  // get all unique skills from the experiences
+  const skillsList : Skill[] = getUniqueSkills(experiences);
+  paragraphs.push(
     new Paragraph({
       children: [
         new TextRun({
@@ -56,7 +55,7 @@ const SkillsDescription = ({ skillsList }: SkillsDescriptionProps) => {
         spacing: { after: 200 },
       });
     }),
-  ];
+  );
 };
 
-export default SkillsDescription;
+export default ConstructSkillsDescription;

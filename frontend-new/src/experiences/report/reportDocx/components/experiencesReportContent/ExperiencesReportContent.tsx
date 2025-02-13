@@ -4,7 +4,7 @@ import { capitalizeFirstLetter } from "src/experiences/report/reportPdf/componen
 import { ReportContent } from "src/experiences/report/reportContent";
 import { COLORS } from "src/experiences/report/util";
 
-export const generateContent = (experience: Experience) => {
+export const generateExperience = (experience: Experience) : Paragraph[] => {
   const titleParagraph = new Paragraph({
     children: [
       new TextRun({
