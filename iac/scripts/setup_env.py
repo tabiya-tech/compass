@@ -133,7 +133,7 @@ if __name__ == "__main__":
         formatter_class=argparse.RawTextHelpFormatter,
         description="Sets up the given environment by \n"
                     " - running pulumi up on the environment stack and \n"
-                    " - uploading configurations and environment variables to the secret manager."
+                    " - uploading configurations and environment variables to the secrets manager of the environment project."
     )
 
     # add the required arguments to select the environment to set up.
