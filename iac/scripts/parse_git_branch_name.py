@@ -4,24 +4,59 @@ import re
 import argparse
 
 
-def parse_git_branch_name(branch_name: str) -> tuple[str, str, str]:
+def filter_invalid_chars_for_artifact_version(input_string: str) -> str:
     """
-    Process the branch name to return a perfect name that meets the artifact repositories requirements.
+    Format the string to follow the artifact version naming conventions.
 
-    1. Generic artifact version
         a) it must start and end with a letter or number,
         b) can only contain lowercase letters, numbers, hyphens and periods, i.e. [a-z0-9-.] and
         c) cannot exceed a total of 128 characters.
 
         @ref: https://cloud.google.com/artifact-registry/docs/reference/rest/v1/projects.locations.repositories.genericArtifacts/upload
+    """
 
-    2. Docker tag name
+    # Convert to lowercase for generic artifact version naming.
+    valid_string = input_string.lower()
+
+    # Replace invalid characters with hyphen
+    valid_string = re.sub(r"[^a-z0-9-.]", "-", valid_string)
+
+    # Ensure it starts and ends with a letter or number
+    valid_string = re.sub(r"(^[^a-z0-9]+)|([^a-z0-9]+$)", "", valid_string)
+
+    # Trim to 128 characters
+    valid_string = valid_string[:128]
+
+    return valid_string
+
+
+def filter_invalid_chars_for_docker_tag(input_string: str) -> str:
+    """
+    Format the string to follow the docker tag naming conventions.
+
         a) The tag must be valid ASCII
         b) can contain lowercase and uppercase letters, digits, underscores, periods, and hyphens.
         c) It can't start with a period or hyphen
         d) it must be no longer than 128 characters.
 
         @ref: https://docs.docker.com/reference/cli/docker/image/tag/
+    """
+
+    # replace invalid characters with hyphen
+    valid_string = re.sub(r"[^a-zA-Z0-9_.-]", "-", input_string)
+
+    # Ensure it doesn't start with a period or hyphen
+    valid_string = re.sub(r"^[.-]+", "", valid_string)
+
+    # Trim to 128 characters
+    valid_string = valid_string[:128]
+
+    return valid_string
+
+
+def filter_invalid_chars_for_secret_id(input_string: str) -> str:
+    """
+    Format the string to follow secret id naming conventions.
 
     3. Secret version id
         a) it must be a valid ASCII string that contains only
@@ -32,35 +67,15 @@ def parse_git_branch_name(branch_name: str) -> tuple[str, str, str]:
 
         @ref: https://cloud.google.com/secret-manager/docs/reference/rest/v1/projects.secrets/create
 
-    :param branch_name: The branch name to parse
-    :return: the generic artifact version, Docker tag name, secret id version.
     """
 
-    # 1. Process the generic artifact version
-    # Convert to lowercase for generic artifact version naming.
-    _generic_artifact_version = branch_name.lower()
-    # Replace invalid characters with hyphen
-    _generic_artifact_version = re.sub(r"[^a-z0-9-.]", "-", _generic_artifact_version)
-    # Ensure it starts and ends with a letter or number
-    _generic_artifact_version = re.sub(r"(^[^a-z0-9]+)|([^a-z0-9]+$)", "", _generic_artifact_version)
-    # Trim to 128 characters
-    _generic_artifact_version = _generic_artifact_version[:128]
-
-    # 2. Process docker tag version
-    # replace invalid characters with hyphen
-    _docker_tag_version = re.sub(r"[^a-zA-Z0-9_.-]", "-", branch_name)
-    # Ensure it doesn't start with a period or hyphen
-    _docker_tag_version = re.sub(r"^[.-]+", "", _docker_tag_version)
-    # Trim to 128 characters
-    _docker_tag_version = _docker_tag_version[:128]
-
-    # 3. Process the secret id
     # replace invalid characters with an underscore.
-    _secret_id_version = re.sub(r"[^a-zA-Z0-9_-]", "_", branch_name)
-    # Trim to 255 characters
-    _secret_id_version = _secret_id_version[:255]
+    valid_string = re.sub(r"[^a-zA-Z0-9_-]", "_", input_string)
 
-    return _generic_artifact_version, _docker_tag_version, _secret_id_version
+    # Trim to 255 characters
+    valid_string = valid_string[:255]
+
+    return valid_string
 
 
 if __name__ == "__main__":
@@ -78,12 +93,11 @@ if __name__ == "__main__":
         required=True)
 
     args = parser.parse_args()
-    generic_artifact_version, docker_tag_version, secret_id_version = parse_git_branch_name(args.branch_name)
 
     # add the required module in the stdout so that the script can access it.
     if args.version == "generic-artifacts":
-        print(generic_artifact_version)
+        print(filter_invalid_chars_for_artifact_version(args.branch_name))
     elif args.version == "docker-tag":
-        print(docker_tag_version)
+        print(filter_invalid_chars_for_docker_tag(args.branch_name))
     elif args.version == "secret-id":
-        print(secret_id_version)
+        print(filter_invalid_chars_for_secret_id(args.branch_name))

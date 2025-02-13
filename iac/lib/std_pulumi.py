@@ -16,7 +16,8 @@ from typing import Optional, Any, Mapping
 from dotenv import find_dotenv, load_dotenv
 import pulumi.automation as auto
 
-from scripts.parse_git_branch_name import parse_git_branch_name
+from scripts.parse_git_branch_name import filter_invalid_chars_for_secret_id, \
+    filter_invalid_chars_for_artifact_version, filter_invalid_chars_for_docker_tag
 
 iac_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -339,12 +340,12 @@ def get_ref_name_and_sha_from_artifacts_version(artifacts_version: str) -> tuple
 
 
 def format_version_to_comply_with_docker_tag(version: str) -> str:
-    _, docker_tag_version, _ = parse_git_branch_name(version)
+    docker_tag_version = filter_invalid_chars_for_docker_tag(version)
     return docker_tag_version
 
 
 def format_version_to_comply_with_artifacts_version(version: str) -> str:
-    artifacts_version, _, _ = parse_git_branch_name(version)
+    artifacts_version = filter_invalid_chars_for_artifact_version(version)
     return artifacts_version
 
 
@@ -358,7 +359,7 @@ def get_formatted_secret_id(secret_id: str, config_version: str):
     :return: A valid secret id.
     """
 
-    _, _, formatted_secret_id = parse_git_branch_name(config_version)
+    formatted_secret_id = filter_invalid_chars_for_secret_id(config_version)
 
     return f"{secret_id}_{formatted_secret_id}"
 

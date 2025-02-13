@@ -2,9 +2,7 @@
 
 import os
 import sys
-
 import argparse
-
 from google.cloud.secretmanager import SecretManagerServiceClient, AddSecretVersionRequest, GetSecretRequest, \
     CreateSecretRequest, Secret
 from google.api_core.exceptions import NotFound
@@ -36,6 +34,7 @@ def _upload_file_to_secret_manager(
 
     # 1. Construct the valid secret id.
     formatted_secret_id = get_formatted_secret_id(secret_name, version)
+
     secret_name = f"projects/{project_number}/secrets/{formatted_secret_id}"
 
     # 2. Check if the secret exists, otherwise create one if it is not found.
@@ -43,11 +42,10 @@ def _upload_file_to_secret_manager(
         secrets_service.get_secret(request=GetSecretRequest(
             name=secret_name  # type: ignore
         ))
-        print(f"info: secret exists secret_name:{secret_name}.")
+        print(f"warning: secret:{secret_name} already exists exists, skipping creating")
     except NotFound as e:
         # if the secret is not found, create one as part of the setup env script.
         parent = f"projects/{project_number}"
-        print(f"warning: secret:{formatted_secret_id}, message:{e.message}")
         print(f"info: creating the secret in the secret manager parent:{parent} secret_id: {formatted_secret_id}...")
         secrets_service.create_secret(request=CreateSecretRequest(
             parent=parent,  # type: ignore
@@ -59,7 +57,7 @@ def _upload_file_to_secret_manager(
             )
         ))
     except Exception as e:
-        print("error: ", str(e))
+        print(f"error: Failed to create secret {formatted_secret_id} - {str(e)}")
         raise
 
     # Upload the file to the secret manager of the environment's project.
@@ -76,6 +74,7 @@ def _upload_file_to_secret_manager(
 def _main(args):
     stack_name = get_stack_name_from(args.realm_name, args.env_name)
     full_qualified_version = construct_version_from_branch_and_sha(args.target_git_branch, args.target_git_sha)
+
     # Make sure the environment files directory exists,
     # and the directory contains both the .env and stackconfig files for the environment.
     if not os.path.exists(args.config_files_dir):
@@ -111,7 +110,6 @@ def _main(args):
 
     # 4. Uploading the .env file to the secret manage given the target version.
     project_number = up_results.outputs["project_number"].value
-
     _upload_file_to_secret_manager(
         project_number=project_number,
         secret_name=ENV_VARS_SECRET_ID,
@@ -132,9 +130,9 @@ def _main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Sets up the given environment by "
-                    
-                    " - running pulumi up on the environment stack and "
+        formatter_class=argparse.RawTextHelpFormatter,
+        description="Sets up the given environment by \n"
+                    " - running pulumi up on the environment stack and \n"
                     " - uploading configurations and environment variables to the secret manager."
     )
 
@@ -145,20 +143,18 @@ if __name__ == "__main__":
         "--config-files-dir",
         type=str,
         required=True,
-        help="The directory that contains the configuration and environment files,"
-             "to be uploaded to the secret manager of the target environment's project."
-             " - The directory should contain: "
-             
-             "      1) .env.<REALM_NAME>.<ENV_NAME> file containing the environment variables and values."
-             "      2) stack_config.<REALM_NAME>.<ENV_NAME>.yaml Containing the stack config for the pulumi modules."
-             
+        help="The directory that contains the configuration and environment files,\n"
+             "to be uploaded to the secret manager of the target environment's project.\n"
+             " - The directory should contain: \n"
+             "      1) .env.<REALM_NAME>.<ENV_NAME> file containing the environment variables and values.\n"
+             "      2) stack_config.<REALM_NAME>.<ENV_NAME>.yaml Containing the stack config for the pulumi modules.\n"
              " - It should be an absolute path or the path from the place where you are running script from."
     )
 
     target_version = parser.add_argument_group(
         title="Configuration version",
-        description="The inputs will be used to construct the configuration version ie: <branch-name>.<git-sha>. "
-                    "This is the version where the .env file and stack_config.yaml will be uploaded."
+        description="The inputs will be used to construct the configuration version ie: <branch-name>.<git-sha>. \n"
+                    "This is the version where the .env file and stack_config.yaml will be uploaded.\n"
                     "Also some characters will be escaped to comply to naming conventions in the secret manager")
 
     target_version.add_argument(

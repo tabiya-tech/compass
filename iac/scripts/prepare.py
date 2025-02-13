@@ -14,7 +14,6 @@ iac_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # so that we can import the iac/lib module when we run pulumi from withing the iac/scripts directory.
 sys.path.insert(0, iac_folder)
 
-
 from backend.prepare_backend import download_backend_config
 from frontend.prepare_frontend import download_frontend_bundle
 
@@ -25,7 +24,6 @@ from lib import get_pulumi_stack_outputs, MAIN_SECRET_VERSION, construct_version
 from _common import add_select_environments_arguments, get_realm_environment_by_env_type, \
     write_config_to_pulumi_yml_file, get_realm_environment, get_environment_stack_configurations, \
     get_environment_environment_variables, compare_dict_keys
-
 
 base_templates_dir = os.path.join(iac_folder, "templates")
 templates_dir = os.path.join(iac_folder, "scripts", "_tmp")
@@ -114,10 +112,10 @@ def _prepare_environment_deployment(*,
      -> and the .env file for the environment.
     """
 
-    print(f"Preparing environment: {environment.stack_name}")
+    print(f"info: Preparing environment: {environment.stack_name}")
 
     # 1. Download the configs/Environment variables
-    print("1. Downloading the configurations and environment variables")
+    print("info: Downloading the configurations and environment variables")
     stack_configs = get_environment_stack_configurations(environment, artifacts_version)
     env_file_path = _prepare_env_file(environment.stack_name, deployment_run_number, artifacts_version)
 
@@ -133,9 +131,13 @@ def _prepare_environment_deployment(*,
 
     if not compare_dict_keys(stack_config_template, stack_configs.raw_config):
         raise ValueError("The stack config template does not match the stack config.")
+    else:
+        print("info: stack config template matches the stack config.")
 
     if not compare_dict_keys(env_vars_template, dotenv_values(env_file_path)):
         raise ValueError("The env vars template does not match the env vars.")
+    else:
+        print("info: env vars template matches the env vars.")
 
     # 2. Save the modules yaml configs.
     write_config_to_pulumi_yml_file(
@@ -229,6 +231,7 @@ def _main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawTextHelpFormatter,
         description="Prepares deployment of environment(s)"
     )
 
@@ -239,8 +242,8 @@ if __name__ == "__main__":
 
     version_group = parser.add_argument_group(
         title="Artifacts/Configuration version",
-        description="The inputs will be used to construct artifacts/config version ie: <branch-name>.<git-sha>. "
-                    "Where some characters have been escaped to comply to naming conventions in the artifacts "
+        description="- The inputs will be used to construct artifacts/config version ie: <branch-name>.<git-sha>.\n"
+                    "- Where some characters have been escaped to comply to naming conventions in the artifacts "
                     "repositories and secret IDs")
 
     version_group.add_argument(
