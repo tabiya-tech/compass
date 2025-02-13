@@ -30,6 +30,8 @@ import { formConfig } from "./formConfig";
 import * as Sentry from "@sentry/react";
 import { DATA_TEST_ID as BUG_REPORT_DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import React from "react";
+import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
+import { UserPreferenceError } from "src/error/commonErrors";
 
 const givenUserId = getTestString(10);
 
@@ -121,7 +123,7 @@ jest.mock("react-router-dom", () => {
   return {
     ...actual,
     __esModule: true,
-    useNavigate: jest.fn().mockReturnValue(jest.fn()),
+    useNavigate: jest.fn().mockReturnValueOnce(jest.fn()),
     NavLink: jest.fn().mockImplementation(() => {
       return <></>;
     }),
@@ -195,9 +197,22 @@ describe("Sensitive Data", () => {
   });
 
   describe("render tests", () => {
+    beforeEach(() => {
+      resetAllMethodMocks(UserPreferencesStateService.getInstance());
+    });
     it("should render the component with all elements", () => {
       // GIVEN sentry is initialized
       (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
+      // AND the user preferences state service is mocked to return user preferences with PII required
+      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
+        user_id: "given user id",
+        language: Language.en,
+        accepted_tc: new Date(),
+        has_sensitive_personal_data: false,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
+        sessions: [],
+        sessions_with_feedback: [],
+      });
 
       // WHEN the component is rendered
       componentRender();
@@ -334,9 +349,7 @@ describe("Sensitive Data", () => {
         {
           firstName: givenSensitivePersonalData.firstName.trim().substring(0, formConfig.firstName.maxLength),
           lastName: givenSensitivePersonalData.lastName.trim().substring(0, formConfig.lastName.maxLength),
-          contactEmail: givenSensitivePersonalData.contactEmail
-            .trim()
-            .substring(0, formConfig.contactEmail.maxLength),
+          contactEmail: givenSensitivePersonalData.contactEmail.trim().substring(0, formConfig.contactEmail.maxLength),
           phoneNumber: givenSensitivePersonalData.phoneNumber.trim().substring(0, formConfig.phoneNumber.maxLength),
           address: givenSensitivePersonalData.address.trim().substring(0, formConfig.address.maxLength),
           gender: givenSensitivePersonalData.gender,
@@ -347,12 +360,29 @@ describe("Sensitive Data", () => {
   });
 
   describe("action tests: reject providing sensitive user data", () => {
+    beforeEach(() => {
+      // AND the user preferences state service is mocked to return user preferences with PII required
+      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
+        user_id: "given user id",
+        language: Language.en,
+        accepted_tc: new Date(),
+        has_sensitive_personal_data: false,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
+        sessions: [],
+        sessions_with_feedback: [],
+      });
+    });
+
+    afterEach(() => {
+      resetAllMethodMocks(UserPreferencesStateService.getInstance());
+    });
+
     it("should successfully log the user out if the user chooses not to provide sensitive personal data", async () => {
       const user = userEvent.setup();
 
       // GIVEN logout is successful and will resolve
       let resolveLogout: (value: unknown) => void = () => {};
-      mockLogout.mockReturnValue(
+      mockLogout.mockReturnValueOnce(
         new Promise((resolve, _reject) => {
           resolveLogout = resolve;
         })
@@ -366,7 +396,7 @@ describe("Sensitive Data", () => {
       await user.click(rejectButton);
 
       // AND the user approves the action
-      await user.click(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL_CONFIRM));
+      await user.click(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL_CANCEL));
 
       // THEN the button should be disabled
       await waitFor(() => expect(rejectButton).toHaveAttribute("aria-disabled", "true"));
@@ -409,7 +439,7 @@ describe("Sensitive Data", () => {
       expect(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL)).toBeVisible();
 
       // AND the clicks on the cancel button on the confirm dialog.
-      await user.click(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL_CANCEL));
+      await user.click(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL_CONFIRM));
 
       // THEN the approval modal should be closed
       await waitFor(() =>
@@ -432,7 +462,7 @@ describe("Sensitive Data", () => {
       // GIVEN logout throws an error
       const givenLogoutError = new Error("Logout failed");
       let rejectLogout: (reason?: any) => void = () => {};
-      mockLogout.mockReturnValue(
+      mockLogout.mockReturnValueOnce(
         new Promise((_resolve, reject) => {
           rejectLogout = reject;
         })
@@ -446,7 +476,7 @@ describe("Sensitive Data", () => {
       await user.click(rejectButton);
 
       // AND the user approves the action
-      await user.click(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL_CONFIRM));
+      await user.click(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL_CANCEL));
 
       // THEN the button should be disabled
       expect(rejectButton).toHaveAttribute("aria-disabled", "true");
@@ -500,7 +530,7 @@ describe("Sensitive Data", () => {
 
       // GIVEN mockCreateSensitivePersonalData is successful
       let resolveCreateSensitivePersonalData: (value: unknown) => void = () => {};
-      mockCreateSensitivePersonalData.mockReturnValue(
+      mockCreateSensitivePersonalData.mockReturnValueOnce(
         new Promise((resolve, _reject) => {
           resolveCreateSensitivePersonalData = resolve;
         })
@@ -559,7 +589,7 @@ describe("Sensitive Data", () => {
       // GIVEN create sensitive personal data will fail
       const restAPIError = new RestAPIError("foo", "bar", "foo", "bar", 201, "foo", "foo");
       let rejectCreateSensitivePersonalData: (reason?: any) => void = () => {};
-      mockCreateSensitivePersonalData.mockReturnValue(
+      mockCreateSensitivePersonalData.mockReturnValueOnce(
         new Promise((_resolve, reject) => {
           rejectCreateSensitivePersonalData = reject;
         })
@@ -567,7 +597,7 @@ describe("Sensitive Data", () => {
 
       // AND the getUserFriendlyErrorMessage will return some the user-friendly message
       const givenUserFriendlyMessage = "bar";
-      jest.spyOn(restAPIErrorModule, "getUserFriendlyErrorMessage").mockReturnValue(givenUserFriendlyMessage);
+      jest.spyOn(restAPIErrorModule, "getUserFriendlyErrorMessage").mockReturnValueOnce(givenUserFriendlyMessage);
 
       // AND given some sensitive personal data
       const givenData = MINIMUM_SENSITIVE_PERSONAL_DATA;
@@ -629,7 +659,7 @@ describe("Sensitive Data", () => {
       let rejectCreateSensitivePersonalData: (reason?: any) => void = () => {};
       const mockCreateSensitivePersonalData = jest
         .spyOn(sensitivePersonalDataService, "createSensitivePersonalData")
-        .mockReturnValue(
+        .mockReturnValueOnce(
           new Promise((_resolve, reject) => {
             rejectCreateSensitivePersonalData = reject;
           })
@@ -691,7 +721,7 @@ describe("Sensitive Data", () => {
       let rejectCreateSensitivePersonalData: (reason?: any) => void = () => {};
       const mockCreateSensitivePersonalData = jest
         .spyOn(sensitivePersonalDataService, "createSensitivePersonalData")
-        .mockReturnValue(
+        .mockReturnValueOnce(
           new Promise((_resolve, reject) => {
             rejectCreateSensitivePersonalData = reject;
           })
@@ -746,23 +776,12 @@ describe("Sensitive Data", () => {
     });
 
     it("should not proceed if userPreferences is undefined", async () => {
-      const user = userEvent.setup();
-
       // GIVEN userPreferences are undefined
-      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue(null);
-
-      // AND given some user sensitive personal data
-      const givenData = MINIMUM_SENSITIVE_PERSONAL_DATA;
+      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValueOnce(null);
 
       // AND Component is rendered
-      componentRender();
-
-      // AND The form inputs are filled
-      await fillTheForm(user, givenData);
-
-      // WHEN The submit button is clicked
-      const button = screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON);
-      await user.click(button);
+      // It should throw an error
+      expect(() => componentRender()).toThrow(new UserPreferenceError("User preferences not found"));
 
       // AND create sensitive personal data should not be called
       expect(mockCreateSensitivePersonalData).not.toHaveBeenCalled();
@@ -781,22 +800,13 @@ describe("Sensitive Data", () => {
       expect(mockNavigate).not.toHaveBeenCalled();
 
       // AND error: userPreferences is undefined should be logged
-      expect(console.error).toHaveBeenCalledWith(new Error("User preferences not found"));
-
-      // AND the button should be enabled
-      expect(button).toBeEnabled();
-
-      // AND the circle progress should not be displayed
-      expect(screen.queryByTestId(DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON_CIRCULAR_PROGRESS)).not.toBeInTheDocument();
+      expect(console.error).toHaveBeenCalledWith(new UserPreferenceError("User preferences not found"));
     });
 
     it("should handle correctly if the user tries to submit the form if the form is not valid", async () => {
       const user = userEvent.setup();
 
-      // GIVEN userPreferences are undefined
-      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue(null);
-
-      // AND Component is rendered
+      // WHEN the Component is rendered
       componentRender();
 
       // AND the user don't fill the form
@@ -822,6 +832,46 @@ describe("Sensitive Data", () => {
 
       // AND the circle progress should not be displayed
       expect(screen.queryByTestId(DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON_CIRCULAR_PROGRESS)).not.toBeInTheDocument();
+    });
+  });
+
+  describe("action tests: skip button", () => {
+    it("should navigate to the root path when the skip button is clicked", async () => {
+      const user = userEvent.setup();
+
+      // GIVEN the component is rendered
+      componentRender();
+      // AND the skip button is clicked
+      const skipButton = screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_SKIP_BUTTON);
+      await user.click(skipButton);
+      // AND the dialog is open
+      await waitFor(() => expect(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL)).toBeVisible());
+
+      // WHEN the user approves the action
+      await user.click(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL_CANCEL));
+
+      // THEN expect the user should be navigated to the root path
+      expect(mockNavigate).toHaveBeenCalledWith(routerPaths.ROOT);
+    });
+
+    it("should not navigate to the root path when the user cancels the action", async () => {
+      const user = userEvent.setup();
+
+      // GIVEN the component is rendered
+      componentRender();
+      // AND the skip button is clicked
+      const skipButton = screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_SKIP_BUTTON);
+      await user.click(skipButton);
+      // AND the dialog is open
+      await waitFor(() => expect(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL)).toBeVisible());
+
+      // WHEN the user cancels the action
+      await user.click(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL_CONFIRM));
+
+      // THEN expect the user should not be navigated to the root path
+      expect(mockNavigate).not.toHaveBeenCalled();
+      // AND to stay on the same page
+      expect(screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_CONTAINER)).toBeInTheDocument();
     });
   });
 });

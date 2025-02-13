@@ -5,7 +5,7 @@ import ConfirmModalDialog, { ConfirmModalDialogProps } from "src/theme/confirmMo
 
 export interface TextConfirmModalParagraph {
   id: string;
-  text: string;
+  text: React.ReactElement;
 }
 
 export interface TextConfirmModalDialogProps extends Omit<ConfirmModalDialogProps, "content"> {
