@@ -23,6 +23,7 @@ import { AuthenticationError } from "src/error/commonErrors";
 import { DATA_TEST_ID as CONFIRM_MODAL_DIALOG_TEST_ID } from "src/theme/confirmModalDialog/ConfirmModalDialog";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
+import { canAccessPIIPage } from "src/app/ProtectedRoute/util";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -56,6 +57,11 @@ jest.mock("react-router-dom", () => {
     }),
   };
 });
+
+// mock the canAccessPIIPage function
+jest.mock("src/app/ProtectedRoute/util", () => ({
+  canAccessPIIPage: jest.fn(),
+}));
 
 describe("Testing Consent Page", () => {
   beforeEach(() => {
@@ -128,15 +134,17 @@ describe("Testing Consent Page", () => {
         // GIVEN the user preferences state service is mocked to set the user preferences
         jest.spyOn(UserPreferencesStateService.getInstance(), "setUserPreferences").mockImplementation(() => {});
 
-        const updateUserPreferences = jest.spyOn(UserPreferencesService.getInstance(), "updateUserPreferences").mockResolvedValue({
-          user_id: "",
-          language: Language.en,
-          accepted_tc: new Date(),
-          sessions: [],
-          sessions_with_feedback: [],
-          has_sensitive_personal_data: false,
-          sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
-        });
+        const updateUserPreferences = jest
+          .spyOn(UserPreferencesService.getInstance(), "updateUserPreferences")
+          .mockResolvedValue({
+            user_id: "",
+            language: Language.en,
+            accepted_tc: new Date(),
+            sessions: [],
+            sessions_with_feedback: [],
+            has_sensitive_personal_data: false,
+            sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+          });
 
         // AND the authStateService is mocked to return the given user
         const givenUser: TabiyaUser = {
@@ -334,9 +342,9 @@ describe("Testing Consent Page", () => {
         await userEvent.click(rejectButton);
         // AND the approval model should be displayed
         expect(screen.getByTestId(CONFIRM_MODAL_DIALOG_TEST_ID.CONFIRM_MODAL)).toBeInTheDocument();
-        // AND the user clicks the confirm button
-        const confirmButton = screen.getByTestId(CONFIRM_MODAL_DIALOG_TEST_ID.CONFIRM_MODAL_CONFIRM);
-        await userEvent.click(confirmButton);
+        // AND the user clicks the cancel button
+        const cancelButton = screen.getByTestId(CONFIRM_MODAL_DIALOG_TEST_ID.CONFIRM_MODAL_CANCEL);
+        await userEvent.click(cancelButton);
 
         // THEN expect the approval model to be closed
         await waitFor(() => {
@@ -389,9 +397,9 @@ describe("Testing Consent Page", () => {
         await userEvent.click(screen.getByTestId(DATA_TEST_ID.REJECT_BUTTON));
         // AND the approval model should be displayed
         expect(screen.getByTestId(CONFIRM_MODAL_DIALOG_TEST_ID.CONFIRM_MODAL)).toBeInTheDocument();
-        // AND the user clicks the confirm button
-        const confirmButton = screen.getByTestId(CONFIRM_MODAL_DIALOG_TEST_ID.CONFIRM_MODAL_CONFIRM);
-        await userEvent.click(confirmButton);
+        // AND the user clicks the cancel button
+        const cancelButton = screen.getByTestId(CONFIRM_MODAL_DIALOG_TEST_ID.CONFIRM_MODAL_CANCEL);
+        await userEvent.click(cancelButton);
 
         // THEN expect the error to be logged
         await waitFor(() => {
@@ -431,7 +439,7 @@ describe("Testing Consent Page", () => {
           language: Language.en,
           accepted_tc: new Date(),
           has_sensitive_personal_data: false,
-          sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+          sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_AVAILABLE,
           sessions: [],
           sessions_with_feedback: [],
         });
@@ -442,6 +450,9 @@ describe("Testing Consent Page", () => {
           name: "given user name",
           email: "given email",
         });
+
+        // AND the canAccessPIIPage function to return false
+        (canAccessPIIPage as jest.Mock).mockReturnValue(false);
 
         // WHEN the component is rendered
         render(<Consent />);
@@ -498,6 +509,9 @@ describe("Testing Consent Page", () => {
           sessions: [],
           sessions_with_feedback: [],
         });
+
+        // AND canAccessPIIPage function to return true
+        (canAccessPIIPage as jest.Mock).mockReturnValue(true);
 
         // WHEN the component is rendered
         render(<Consent />);

@@ -82,7 +82,7 @@ class UserPreferences(BaseModel):
             sessions=doc.get("sessions"),
             sensitive_personal_data_requirement=doc.get(
                 "sensitive_personal_data_requirement",
-                SensitivePersonalDataRequirement.NOT_REQUIRED
+                SensitivePersonalDataRequirement.NOT_AVAILABLE
             ),
         )
 

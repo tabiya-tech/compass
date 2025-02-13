@@ -91,11 +91,11 @@ class UserInvitation(BaseModel):
             valid_from=_dict.get("valid_from"),
             valid_until=_dict.get("valid_until"),
             invitation_type=_dict.get("invitation_type"),
-            # If the key is not found, default to NOT_REQUIRED
+            # If the key is not found, default to NOT_AVAILABLE
             # for legacy invitation codes
             sensitive_personal_data_requirement=_dict.get(
                 "sensitive_personal_data_requirement",
-                SensitivePersonalDataRequirement.NOT_REQUIRED
+                SensitivePersonalDataRequirement.NOT_AVAILABLE
             )
         )
 

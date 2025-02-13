@@ -15,6 +15,7 @@ class SensitivePersonalDataRequirement(Enum):
 
     REQUIRED = "REQUIRED"
     NOT_REQUIRED = "NOT_REQUIRED"
+    NOT_AVAILABLE = "NOT_AVAILABLE"
 
 
 class SensitivePersonalDataBaseModel(BaseModel):

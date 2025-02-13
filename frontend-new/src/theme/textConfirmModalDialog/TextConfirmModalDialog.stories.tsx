@@ -21,11 +21,11 @@ export const Shown: Story = {
     textParagraphs: [
       {
         id: "001",
-        text: "This is a sample body text for the TextConfirmModalDialog component.",
+        text: <>This is a sample body text for the TextConfirmModalDialog component.</>,
       },
       {
         id: "002",
-        text: "Are you sure you want to proceed?",
+        text: <>Are you sure you want to proceed?</>,
       },
     ],
     isOpen: true,
@@ -40,11 +40,11 @@ export const ShownWithLongText: Story = {
     textParagraphs: [
       {
         id: "001",
-        text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec purus nec nunc.".repeat(10),
+        text: <>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec purus nec nunc.".repeat(10)</>,
       },
       {
         id: "002",
-        text: "Are you sure you want to proceed?",
+        text: <>Are you sure you want to proceed?</>,
       },
     ],
     isOpen: true,
@@ -59,43 +59,43 @@ export const ShownWithManyParagraphs: Story = {
     textParagraphs: [
       {
         id: "001",
-        text: "This is a sample body text for the TextConfirmModalDialog component.",
+        text: <>This is a sample body text for the TextConfirmModalDialog component.</>,
       },
       {
         id: "002",
-        text: "Are you sure you want to proceed?",
+        text: <>Are you sure you want to proceed?</>,
       },
       {
         id: "003",
-        text: "This is a sample body text for the TextConfirmModalDialog component.",
+        text: <>This is a sample body text for the TextConfirmModalDialog component.</>,
       },
       {
         id: "004",
-        text: "Are you sure you want to proceed?",
+        text: <>Are you sure you want to proceed?</>,
       },
       {
         id: "005",
-        text: "This is a sample body text for the TextConfirmModalDialog component.",
+        text: <>This is a sample body text for the TextConfirmModalDialog component.</>,
       },
       {
         id: "006",
-        text: "Are you sure you want to proceed?",
+        text: <>Are you sure you want to proceed?</>,
       },
       {
         id: "007",
-        text: "This is a sample body text for the TextConfirmModalDialog component.",
+        text: <>This is a sample body text for the TextConfirmModalDialog component.</>,
       },
       {
         id: "008",
-        text: "Are you sure you want to proceed?",
+        text: <>Are you sure you want to proceed?</>,
       },
       {
         id: "009",
-        text: "This is a sample body text for the TextConfirmModalDialog component.",
+        text: <>This is a sample body text for the TextConfirmModalDialog component.</>,
       },
       {
         id: "010",
-        text: "Are you sure you want to proceed?",
+        text: <>Are you sure you want to proceed?</>,
       },
     ],
     isOpen: true,

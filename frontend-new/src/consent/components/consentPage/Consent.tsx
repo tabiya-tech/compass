@@ -1,11 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { Box, Container, Checkbox, styled, Typography, useTheme, FormControlLabel, useMediaQuery } from "@mui/material";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import {
-  SensitivePersonalDataRequirement,
-  Language,
-  UpdateUserPreferencesSpec,
-} from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { Language, UpdateUserPreferencesSpec } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
@@ -21,10 +17,11 @@ import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import { Theme } from "@mui/material/styles";
 import ConfirmModalDialog from "src/theme/confirmModalDialog/ConfirmModalDialog";
 import CustomLink from "src/theme/CustomLink/CustomLink";
+import { canAccessPIIPage } from "src/app/ProtectedRoute/util";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
-const HighlightedSpan = styled("span")(({ theme }) => ({
+export const HighlightedSpan = styled("span")(({ theme }) => ({
   backgroundColor: theme.palette.tabiyaYellow.light,
 }));
 
@@ -86,7 +83,7 @@ const Consent: React.FC = () => {
         sensitive_personal_data_requirement: userPreferences?.sensitive_personal_data_requirement!,
       });
 
-      if (userPreferences?.sensitive_personal_data_requirement! === SensitivePersonalDataRequirement.REQUIRED) {
+      if (canAccessPIIPage(userPreferences!)) {
         navigate(routerPaths.SENSITIVE_DATA, { replace: true });
       } else {
         navigate(routerPaths.ROOT, { replace: true });
@@ -152,7 +149,7 @@ const Consent: React.FC = () => {
   const dataProtectionAgreementLabel = "Data Protection Agreement";
 
   const handleExternalNavigationOnNewTab = (url: string) => {
-    window.open(url, '_blank', 'noopener,noreferrer');
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -210,7 +207,9 @@ const Consent: React.FC = () => {
               label={
                 <Typography variant="body2" data-testid={DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_TEXT}>
                   I have read and accept the{" "}
-                  <CustomLink onClick={() => handleExternalNavigationOnNewTab('https://compass.tabiya.org/consent.html')}>
+                  <CustomLink
+                    onClick={() => handleExternalNavigationOnNewTab("https://compass.tabiya.org/consent.html")}
+                  >
                     {termsAndConditionsLabel}
                   </CustomLink>{" "}
                   of Compass.
@@ -233,7 +232,9 @@ const Consent: React.FC = () => {
               label={
                 <Typography variant="body2" data-testid={DATA_TEST_ID.ACCEPT_CHECKBOX_TEXT}>
                   I have read and accept the{" "}
-                  <CustomLink onClick={() => handleExternalNavigationOnNewTab('https://compass.tabiya.org/consent.html')}>
+                  <CustomLink
+                    onClick={() => handleExternalNavigationOnNewTab("https://compass.tabiya.org/consent.html")}
+                  >
                     {dataProtectionAgreementLabel}
                   </CustomLink>{" "}
                   of Compass.
@@ -302,17 +303,17 @@ const Consent: React.FC = () => {
           >
             <Typography>
               We're sorry that you choose not to agree to the Terms & Conditions and the Data Protection Agreement. You
-              will not be able to proceed and will be logged out.
+              will not be able to proceed and will be <HighlightedSpan>logged out.</HighlightedSpan>
             </Typography>
             <Typography>Are you sure you want to exit?</Typography>
           </Box>
         }
-        onCancel={() => {
+        onCancel={handleRejected}
+        onConfirm={() => {
           setShowRejectModal(false);
         }}
-        onConfirm={handleRejected}
-        cancelButtonText="Cancel"
-        confirmButtonText="Yes, I'm sure"
+        cancelButtonText="Yes, exit"
+        confirmButtonText="I want to stay"
       />
     </Container>
   );
