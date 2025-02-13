@@ -97,7 +97,7 @@ jobs:
       - name: Run build and upload script.
         shell: bash
         run: |
-          ./iac/scripts/build-and-upload-fe.sh ${{ vars.ARTIFACT_REGISTRY_REGION }} ${{ vars.GCP_REALM_ROOT_PROJECT_ID }} ./frontend-new $GITHUB_STEP_SUMMARY $GITHUB_RUN_NUMBER
+          ./iac/scripts/build-and-upload-fe.sh ${{ vars.ARTIFACT_REGISTRY_REGION }} ${{ vars.GCP_REALM_ROOT_PROJECT_ID }} $GITHUB_STEP_SUMMARY $GITHUB_RUN_NUMBER
         env:
           # sentry token is required to upload sourcemaps.
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}

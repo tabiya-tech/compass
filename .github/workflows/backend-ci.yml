@@ -82,4 +82,4 @@ jobs:
         shell: bash
         if: ${{ inputs.upload-artifacts }}
         run: |
-          ./iac/scripts/build-and-upload-be.sh ${{ vars.ARTIFACT_REGISTRY_REGION }} ${{ vars.GCP_REALM_ROOT_PROJECT_ID }} ./backend $GITHUB_STEP_SUMMARY $GITHUB_RUN_NUMBER
+          ./iac/scripts/build-and-upload-be.sh ${{ vars.ARTIFACT_REGISTRY_REGION }} ${{ vars.GCP_REALM_ROOT_PROJECT_ID }} $GITHUB_STEP_SUMMARY $GITHUB_RUN_NUMBER
