@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useRef, useState, useEffect } from "react";
 import {
   Box,
   CircularProgress,
@@ -30,6 +30,12 @@ import { sensitivePersonalDataService } from "src/sensitiveData/services/sensiti
 import TextConfirmModalDialog from "src/theme/textConfirmModalDialog/TextConfirmModalDialog";
 import { DEBOUNCE_TIME, formConfig } from "./formConfig";
 import CustomLink from "src/theme/CustomLink/CustomLink";
+import {
+  SensitivePersonalDataRequirement,
+  UserPreference,
+} from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { UserPreferenceError } from "src/error/commonErrors";
+import { HighlightedSpan } from "src/consent/components/consentPage/Consent";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d1";
 
@@ -51,6 +57,7 @@ export const DATA_TEST_ID = {
   SENSITIVE_DATA_FORM_BUTTON: `sensitive-data-form-button-${uniqueId}`,
   SENSITIVE_DATA_FORM_BUTTON_CIRCULAR_PROGRESS: `sensitive-data-form-button-circular-progress-${uniqueId}`,
   SENSITIVE_DATA_REJECT_BUTTON: `sensitive-data-reject-button-${uniqueId}`,
+  SENSITIVE_DATA_SKIP_BUTTON: `sensitive-data-skip-button-${uniqueId}`,
 };
 
 export const ERROR_MESSAGE = {
@@ -110,7 +117,11 @@ const SensitiveDataForm: React.FC = () => {
   const [isSavingSensitiveData, setIsSavingSensitiveData] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
   const [confirmingReject, setConfirmingReject] = useState(false);
+  const [confirmingSkip, setConfirmingSkip] = useState(false);
   const [isSubmitButtonEnabled, setIsSubmitButtonEnabled] = useState(false);
+  const [userPreferences] = useState<UserPreference | null>(
+    UserPreferencesStateService.getInstance().getUserPreferences()
+  );
 
   const sensitiveData = useRef<SensitivePersonalData>({
     firstName: "",
@@ -137,28 +148,17 @@ const SensitiveDataForm: React.FC = () => {
     setIsSavingSensitiveData(true);
     setIsSubmitButtonEnabled(false);
 
-    const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
-
-    if (!userPreferences) {
-      // something is not right, we should have user preferences at this point.
-      console.error(new Error("User preferences not found"));
-      enqueueSnackbar(ERROR_MESSAGE.DEFAULT, { variant: "error" });
-      setIsSavingSensitiveData(false);
-      setIsSubmitButtonEnabled(true);
-      return;
-    }
-
     try {
       await sensitivePersonalDataService.createSensitivePersonalData(
         sanitize(sensitiveData.current),
-        userPreferences.user_id
+        userPreferences!.user_id
       );
 
       // Update user preferences to indicate that the user has sensitive personal data
       // so that the user is not prompted to provide this information again.
       // We set the state directly because we don't want to go to the server to get the updated the user preferences.
       UserPreferencesStateService.getInstance().setUserPreferences({
-        ...userPreferences,
+        ...userPreferences!,
         has_sensitive_personal_data: true,
       });
 
@@ -178,7 +178,7 @@ const SensitiveDataForm: React.FC = () => {
       setIsSavingSensitiveData(false);
       setIsSubmitButtonEnabled(true);
     }
-  }, [enqueueSnackbar, navigate]);
+  }, [enqueueSnackbar, navigate, userPreferences]);
 
   const handleRejectProvidingSensitiveData = useCallback(async () => {
     setIsRejecting(true);
@@ -197,6 +197,25 @@ const SensitiveDataForm: React.FC = () => {
       setIsRejecting(false);
     }
   }, [enqueueSnackbar, navigate]);
+
+  const handleSkipProvidingSensitiveData = () => {
+    setConfirmingSkip(false);
+    // Add the implementation to skip providing sensitive data here.
+    navigate(routerPaths.ROOT);
+  };
+
+  const isPIIRequired =
+    userPreferences?.sensitive_personal_data_requirement === SensitivePersonalDataRequirement.REQUIRED;
+
+  useEffect(() => {
+    // something is not right, we should have user preferences at this point.
+    if (!userPreferences) {
+      const error = new UserPreferenceError("User preferences not found");
+      enqueueSnackbar(ERROR_MESSAGE.DEFAULT, { variant: "error" });
+      console.error(error);
+      throw error;
+    }
+  }, [enqueueSnackbar, userPreferences]);
 
   return (
     <>
@@ -332,15 +351,26 @@ const SensitiveDataForm: React.FC = () => {
                 gap: theme.tabiyaSpacing.xl,
               }}
             >
-              <CustomLink
-                data-testid={DATA_TEST_ID.SENSITIVE_DATA_REJECT_BUTTON}
-                disabled={isRejecting}
-                onClick={() => {
-                  setConfirmingReject(true);
-                }}
-              >
-                No, thank you
-              </CustomLink>
+              {isPIIRequired ? (
+                <CustomLink
+                  data-testid={DATA_TEST_ID.SENSITIVE_DATA_REJECT_BUTTON}
+                  disabled={isRejecting}
+                  onClick={() => {
+                    setConfirmingReject(true);
+                  }}
+                >
+                  No, thank you
+                </CustomLink>
+              ) : (
+                <CustomLink
+                  data-testid={DATA_TEST_ID.SENSITIVE_DATA_SKIP_BUTTON}
+                  onClick={() => {
+                    setConfirmingSkip(true);
+                  }}
+                >
+                  Skip
+                </CustomLink>
+              )}
 
               <PrimaryButton
                 fullWidth
@@ -374,19 +404,50 @@ const SensitiveDataForm: React.FC = () => {
         textParagraphs={[
           {
             id: "1",
-            text: "We're sorry that you chose not to provide your data. You will not be able to proceed and will be logged out.",
+            text: (
+              <>
+                We're sorry that you chose not to provide your data. You will not be able to proceed and will be{" "}
+                <HighlightedSpan>logged out.</HighlightedSpan>
+              </>
+            ),
           },
           {
             id: "2",
-            text: "Are you sure you want to exit?",
+            text: <>Are you sure you want to exit?</>,
           },
         ]}
-        onCancel={() => {
+        onCancel={handleRejectProvidingSensitiveData}
+        onConfirm={() => {
           setConfirmingReject(false);
         }}
-        onConfirm={handleRejectProvidingSensitiveData}
-        cancelButtonText="Cancel"
-        confirmButtonText={"Yes, I'm sure"}
+        cancelButtonText="Yes, exit"
+        confirmButtonText="I want to stay"
+      />
+      <TextConfirmModalDialog
+        isOpen={confirmingSkip}
+        title="Are you sure?"
+        textParagraphs={[
+          {
+            id: "1",
+            text: (
+              <>
+                We're sorry that you chose not to provide your data. Providing it is important to us, but you can
+                continue without it. Keep in mind that{" "}
+                <HighlightedSpan> you will not be able to provide it later.</HighlightedSpan>
+              </>
+            ),
+          },
+          {
+            id: "2",
+            text: <>Are you sure you want to skip?</>,
+          },
+        ]}
+        onCancel={handleSkipProvidingSensitiveData}
+        onConfirm={() => {
+          setConfirmingSkip(false);
+        }}
+        cancelButtonText="Yes, skip"
+        confirmButtonText="No, continue"
       />
       <Backdrop isShown={isRejecting} message={"Logging you out..."} />
     </>

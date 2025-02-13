@@ -1,6 +1,7 @@
 export enum SensitivePersonalDataRequirement {
   REQUIRED = "REQUIRED",
   NOT_REQUIRED = "NOT_REQUIRED",
+  NOT_AVAILABLE = "NOT_AVAILABLE",
 }
 
 export type UserPreference = {
