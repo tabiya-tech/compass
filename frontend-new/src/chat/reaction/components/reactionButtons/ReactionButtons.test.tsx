@@ -273,13 +273,12 @@ describe("ReactionButtons", () => {
         sessions: [givenSessionId]
       } as unknown as UserPreference)
 
-        // AND the service fails for the new reaction
         const givenPreviousReaction = {
           id: "456",
           kind: ReactionKind.LIKED,
         };
         let rejectSendReaction: (value: any) => void = () => {};
-        const sendSpy = jest.spyOn(ReactionService.prototype, "sendReaction").mockReturnValue(
+        const sendSpy = jest.spyOn(ReactionService.prototype, "sendReaction").mockReturnValueOnce(
           new Promise((_resolve, reject) => {
             rejectSendReaction = reject;
           })
@@ -292,7 +291,7 @@ describe("ReactionButtons", () => {
         const dislikeButton = screen.getByTestId(DATA_TEST_ID.BUTTON_DISLIKE);
         await userEvent.click(dislikeButton);
         // AND a reason is selected in the popover
-        const givenReason = DislikeReason.BIASED;
+        const givenReason: string = DislikeReason[DislikeReason.BIASED];
         act(() => {
           (DislikeReasonPopover as jest.Mock).mock.calls.at(-1)[0].onClose([givenReason]);
         });
@@ -302,10 +301,10 @@ describe("ReactionButtons", () => {
           expect(screen.getByTestId(DATA_TEST_ID.ICON_DISLIKE_ACTIVE)).toBeInTheDocument();
         });
         // AND the service to be called with the dislike reaction
-        expect(sendSpy).toHaveBeenCalledWith(givenSessionId, givenMessageId, new DislikeReaction([givenReason]));
+        expect(sendSpy).toHaveBeenCalledWith(givenSessionId, givenMessageId, new DislikeReaction([givenReason as unknown as DislikeReason]));
 
         // WHEN the service request fails
-        act(() => {
+        await act(async () => {
           rejectSendReaction(new Error("Failed to submit dislike reaction"));
         });
 
@@ -537,7 +536,7 @@ describe("ReactionButtons", () => {
         };
         // AND the service fails for the new reaction
         let rejectSendReaction: (value: any) => void = () => {};
-        const sendSpy = jest.spyOn(ReactionService.prototype, "sendReaction").mockReturnValue(
+        const sendSpy = jest.spyOn(ReactionService.prototype, "sendReaction").mockReturnValueOnce(
           new Promise((_resolve, reject) => {
             rejectSendReaction = reject;
           })
@@ -558,7 +557,7 @@ describe("ReactionButtons", () => {
         expect(sendSpy).toHaveBeenCalledWith(givenSessionId, givenMessageId, new LikeReaction());
 
         // WHEN the service request fails
-        act(() => {
+        await act(async () => {
           rejectSendReaction(new Error("Failed to submit like reaction"));
         });
 

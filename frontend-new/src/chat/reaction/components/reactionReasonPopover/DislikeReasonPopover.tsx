@@ -27,7 +27,6 @@ export const DislikeReasonPopover: React.FC<DislikeReasonPopoverProps> = ({
   anchorEl,
   open,
   onClose,
-  ...props
 }) => {
   const theme = useTheme();
   const isOnline = useContext(IsOnlineContext)

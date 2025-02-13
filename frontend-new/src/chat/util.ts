@@ -60,6 +60,21 @@ export const generateTypingMessage = (sent_at: string): IChatMessage => {
   };
 };
 
+export const generateConversationConclusionMessage = (
+  message_id: string,
+  message: string,
+  sent_at: string
+): IChatMessage => {
+  return {
+    message_id: message_id,
+    sender: ConversationMessageSender.COMPASS,
+    message: message,
+    sent_at: sent_at,
+    type: ChatMessageType.CONVERSATION_CONCLUSION,
+    reaction: null,
+  };
+};
+
 export const generateSomethingWentWrongMessage = () => {
   return generateErrorMessage(FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG);
 };

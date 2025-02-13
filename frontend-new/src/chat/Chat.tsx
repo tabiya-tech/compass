@@ -184,7 +184,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
         response.messages.forEach((messageItem) => {
           const message = response.conversation_completed && messageItem === response.messages[response.messages.length - 1]
-            ? generateConversationConclusionMessage(messageItem.message, messageItem.sent_at)
+            ? generateConversationConclusionMessage(messageItem.message_id, messageItem.message, messageItem.sent_at)
             : generateCompassMessage(messageItem.message_id, messageItem.message, messageItem.sent_at, messageItem.reaction);
           addMessage(message);
         });
@@ -238,7 +238,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
               }
               // If this is the last message and conversation is completed, make it a conclusion message
               if (history.conversation_completed && message === history.messages[history.messages.length - 1]) {
-                return generateConversationConclusionMessage(message.message, message.sent_at);
+                return generateConversationConclusionMessage(message.message_id, message.message, message.sent_at);
               }
               return generateCompassMessage(message.message_id, message.message, message.sent_at, message.reaction);
             })

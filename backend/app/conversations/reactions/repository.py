@@ -69,8 +69,10 @@ class ReactionRepository(IReactionRepository):
             return_document=True  # Return the document after the update
         )
 
-        # Convert to Reaction
-        return Reaction.from_dict(doc)
+        # Convert MongoDB _id to id for Reaction model
+        doc_dict = dict(doc)
+        doc_dict["id"] = str(doc_dict.pop("_id"))
+        return Reaction.from_dict(doc_dict)
 
     async def delete(self, session_id: int, message_id: str):
         await self._collection.delete_one({
@@ -91,6 +93,9 @@ class ReactionRepository(IReactionRepository):
         
         reactions = []
         async for doc in cursor:
-            reactions.append(Reaction.from_dict(doc))
+            # Convert MongoDB _id to id for Reaction model
+            doc_dict = dict(doc)
+            doc_dict["id"] = str(doc_dict.pop("_id"))
+            reactions.append(Reaction.from_dict(doc_dict))
             
         return reactions

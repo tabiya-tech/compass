@@ -25,6 +25,22 @@ class ReactionKind(int, Enum):
     DISLIKED = 1
 
 
+def _serialize_kind(self, kind: ReactionKind, _info) -> str:
+        return kind.name
+
+
+def _deserialize_kind(cls, value: str | ReactionKind) -> ReactionKind:
+    try:
+        if isinstance(value, str):
+            return ReactionKind[value]
+        elif isinstance(value, ReactionKind):
+            return value
+        else:
+            raise ValueError(f"Invalid reaction kind: {value}")
+    except (KeyError, ValueError):
+        raise ValueError(f"Invalid reaction kind: {value}")
+
+
 class _ReactionBase(BaseModel):
     """
     A base model that has the validation logic for children classes to inherit.
@@ -44,19 +60,11 @@ class _ReactionBase(BaseModel):
 
     @field_serializer("kind")
     def serialize_kind(self, kind: ReactionKind, _info) -> str:
-        return kind.name
+        return _serialize_kind(self, kind, _info)
 
     @field_validator("kind", mode='before')
     def deserialize_kind(cls, value: str | ReactionKind) -> ReactionKind:
-        try:
-            if isinstance(value, str):
-                return ReactionKind[value]
-            elif isinstance(value, ReactionKind):
-                return value
-            else:
-                raise ValueError(f"Invalid reaction kind: {value}")
-        except (KeyError, ValueError):
-            raise ValueError(f"Invalid reaction kind: {value}")
+        return _deserialize_kind(cls, value)
 
     @field_serializer("reasons")
     def serialize_reason(self, reasons: list[DislikeReason], _info) -> list[str]:
@@ -97,7 +105,7 @@ class Reaction(_ReactionBase):
     @staticmethod
     def from_dict(_dict: Mapping[str, Any]) -> "Reaction":
         return Reaction(
-            id=str(_dict.get("_id")) if "_id" in _dict else None,
+            id=str(_dict.get("id")) if "id" in _dict else None,
             message_id=str(_dict.get("message_id")),
             session_id=int(_dict.get("session_id")),
             kind=_dict.get("kind"),
@@ -119,13 +127,20 @@ class ReactionRequest(_ReactionBase):
 
 
 # Refactor
-class MessageReaction(Reaction):
+class MessageReaction(BaseModel):
     """
-    TODO: add ref to the ConversationMessage model
-    Response model for #ConversationMessage... ; only exposes id and kind.
+    Response model for `ConversationMessage` only exposes id and kind.
     """
     id: str
     kind: ReactionKind
+
+    @field_serializer("kind")
+    def serialize_kind(self, kind: ReactionKind, _info) -> str:
+        return _serialize_kind(self, kind, _info)
+
+    @field_validator("kind", mode='before')
+    def deserialize_kind(cls, value: str | ReactionKind) -> ReactionKind:
+        return _deserialize_kind(cls, value)
 
     class Config:
         extra = "forbid"
