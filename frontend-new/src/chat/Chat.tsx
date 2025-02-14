@@ -27,13 +27,11 @@ import ExperienceService from "src/experiences/experiencesDrawer/experienceServi
 import InactiveBackdrop from "src/theme/Backdrop/InactiveBackdrop";
 import ConfirmModalDialog from "src/theme/confirmModalDialog/ConfirmModalDialog";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
-import FeedbackForm from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
 import { ChatError } from "src/error/commonErrors";
 import { ChatMessageType } from "src/chat/Chat.types";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import { issueNewSession } from "./issueNewSession";
-import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import { FeedbackItem } from "../feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
+import { ChatProvider } from "src/chat/ChatContext";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -74,15 +72,10 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const [lastActivityTime, setLastActivityTime] = React.useState<number>(Date.now());
   const [newConversationDialog, setNewConversationDialog] = React.useState<boolean>(false);
   const [exploredExperiencesNotification, setExploredExperiencesNotification] = useState<boolean>(false);
-  const [isFeedbackFormOpen, setIsFeedbackFormOpen] = useState<boolean>(false);
   const [activeSessionId, setActiveSessionId] = useState<number | null>(
     UserPreferencesStateService.getInstance().getActiveSessionId()
   );
   const [currentUserId] = useState<string | null>(authenticationStateService.getInstance().getUser()?.id ?? null);
-  const [sessionHasFeedback, setSessionHasFeedback] = useState<boolean>(
-    UserPreferencesStateService.getInstance().activeSessionHasFeedback()
-  );
-  const [feedbackData, setFeedbackData] = useState<FeedbackItem[]>(PersistentStorageService.getOverallFeedback());
 
   const navigate = useNavigate();
 
@@ -96,18 +89,6 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const addMessage = (message: IChatMessage) => {
     setMessages((prevMessages) => [...prevMessages, message]);
   };
-
-
-
-  // Check local storage when the form is closed to see if there is saved feedback
-  useEffect(() => {
-    if (!isFeedbackFormOpen) {
-      const updatedFeedbackData = PersistentStorageService.getOverallFeedback();
-      if (JSON.stringify(feedbackData) !== JSON.stringify(updatedFeedbackData)) {
-        setFeedbackData(updatedFeedbackData);
-      }
-    }
-  }, [isFeedbackFormOpen, feedbackData]);
 
   // Depending on the typing state, add or remove the typing message from the messages list
   const addOrRemoveTypingMessage = (userIsTyping: boolean) => {
@@ -374,7 +355,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       {isLoggingOut ? (
         <Backdrop isShown={isLoggingOut} message={"Logging you out, wait a moment..."} />
       ) : (
-        <>
+        <ChatProvider handleOpenExperiencesDrawer={handleOpenExperiencesDrawer}>
           <Box
             width="100%"
             height="100%"
@@ -403,13 +384,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
               />
             </Box>
             <Box sx={{ flex: 1, overflowY: "auto", paddingX: theme.tabiyaSpacing.lg }}>
-              <ChatList
-                messages={messages}
-                notifyOnFeedbackFormOpen={() => setIsFeedbackFormOpen(true)}
-                notifyOnExperiencesDrawerOpen={handleOpenExperiencesDrawer}
-                isFeedbackSubmitted={sessionHasFeedback}
-                isFeedbackStarted={feedbackData.length > 0}
-              />
+              <ChatList messages={messages} />
             </Box>
             {showBackdrop && <InactiveBackdrop isShown={showBackdrop} />}
             <Box sx={{ flexShrink: 0, padding: theme.tabiyaSpacing.lg, paddingTop: theme.tabiyaSpacing.xs }}>
@@ -447,12 +422,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
               confirmButtonText="Yes, I'm sure"
             />
           )}
-          <FeedbackForm
-            isOpen={isFeedbackFormOpen}
-            notifyOnClose={() => setIsFeedbackFormOpen(false)}
-            onFeedbackSubmit={() => setSessionHasFeedback(true)}
-          />
-        </>
+        </ChatProvider>
       )}
     </>
   );

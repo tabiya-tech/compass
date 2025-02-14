@@ -8,6 +8,10 @@ exports[`render tests should render the Chat message 1`] = `
 >
   <div
     data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
-  />
+  >
+    <div
+      data-testid="feedback-form-button-container-41675f8b-257c-4a63-9563-3fe9feb6a850"
+    />
+  </div>
 </div>
 `;

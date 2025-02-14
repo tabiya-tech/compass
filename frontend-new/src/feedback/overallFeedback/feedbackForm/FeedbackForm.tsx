@@ -13,12 +13,18 @@ import { FeedbackError } from "src/error/commonErrors";
 
 export interface FeedbackFormProps {
   isOpen: boolean;
-  notifyOnClose: (event: { name: CloseEventName }) => void;
-  onFeedbackSubmit: () => void;
+  notifyOnClose: (event: FeedbackCloseEvent) => void;
 }
 
-export enum CloseEventName {
+export enum FeedbackStatus {
+  STARTED="STARTED",
+  NOT_STARTED= "NOT_STARTED",
+  SUBMITTED= "SUBMITTED",
+}
+
+export enum FeedbackCloseEvent {
   DISMISS = "DISMISS",
+  SUBMIT = "SUBMIT"
 }
 
 const uniqueId = "c6ba52ec-c1de-46ac-950b-f5354c6785ac";
@@ -31,19 +37,19 @@ export const DATA_TEST_ID = {
   FEEDBACK_FORM_DIALOG_CONTENT: `feedback-form-dialog-content-${uniqueId}`,
 };
 
-const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose, onFeedbackSubmit }) => {
+const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) => {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const handleClose = () => {
-    notifyOnClose({ name: CloseEventName.DISMISS });
+    notifyOnClose(FeedbackCloseEvent.DISMISS);
   };
 
   const handleFeedbackSubmit = async (formData: FeedbackItem[]): Promise<void> => {
     setIsSubmitting(true);
-    handleClose();
+    notifyOnClose(FeedbackCloseEvent.SUBMIT)
     try {
       const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
       if (!userPreferences?.sessions.length) {
@@ -55,7 +61,6 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose, onFe
       await overallFeedbackService.sendFeedback(formData);
 
       enqueueSnackbar("Feedback submitted successfully!", { variant: "success" });
-      onFeedbackSubmit();
     } catch (error) {
       console.error(new FeedbackError("Failed to submit feedback", error as Error));
       enqueueSnackbar("Failed to submit feedback. Please try again later.", { variant: "error" });
