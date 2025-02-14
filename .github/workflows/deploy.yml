@@ -24,11 +24,14 @@ on:
         required: false
         type: string
         description: 'The environment name to deploy'
-
-      artifacts-version:
+      target-git-branch:
         required: true
         type: string
-        description: 'The version of the artifacts to deploy'
+        description: 'The branch name/version to deploy'
+      target-git-sha:
+        required: true
+        type: string
+        description: 'The commit sha to deploy'
 
   workflow_call:
     inputs:
@@ -41,10 +44,14 @@ on:
         required: false
         type: string
         description: 'The environment name to deploy'
-      artifacts-version:
+      target-git-branch:
         required: true
         type: string
-        description: 'The version of the artifacts to deploy'
+        description: 'The branch name/version to deploy'
+      target-git-sha:
+        required: true
+        type: string
+        description: 'The commit sha to deploy'
 
 jobs:
   deploy:
@@ -120,8 +127,8 @@ jobs:
 
       - name: Prepare the deployment(s)
         working-directory: iac
-        run: ./scripts/prepare.py --realm-name ${{ vars.REALM_NAME }} --env-type ${{ inputs.env-type }} --artifacts-version ${{ inputs.artifacts-version }}
+        run: ./scripts/prepare.py --realm-name ${{ vars.REALM_NAME }} --env-type ${{ inputs.env-type }} --target-git-sha ${{ inputs.target-git-sha }} --target-git-branch ${{ inputs.target-git-branch }}
 
       - name: Deploy the infrastructure
         working-directory: iac
-        run: ./scripts/up.py --realm-name ${{ vars.REALM_NAME }} --env-type ${{ inputs.env-type }} --config-version ${{ inputs.artifacts-version }}
+        run: ./scripts/up.py --realm-name ${{ vars.REALM_NAME }} --env-type ${{ inputs.env-type }}

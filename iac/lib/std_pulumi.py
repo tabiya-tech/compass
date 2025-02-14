@@ -16,9 +16,6 @@ from typing import Optional, Any, Mapping
 from dotenv import find_dotenv, load_dotenv
 import pulumi.automation as auto
 
-from scripts.parse_git_branch_name import filter_invalid_chars_for_secret_id, \
-    filter_invalid_chars_for_artifact_version, filter_invalid_chars_for_docker_tag
-
 iac_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 
@@ -302,7 +299,7 @@ def get_pulumi_stack_outputs(stack_name: str, module: str) -> Mapping[str, Any]:
 
 def construct_artifacts_dir(*,
                             deployment_number: str,
-                            artifacts_version: Optional[str] = None,
+                            fully_qualified_version: Optional[str] = None,
                             stack_name: Optional[str] = None):
     """
     Construct the artifacts directory based on the deployment number, artifacts version, and stack name.
@@ -310,77 +307,14 @@ def construct_artifacts_dir(*,
 
     artifacts_dir = deployment_number
 
-    if artifacts_version is not None:
-        artifacts_dir = f"{artifacts_version}-{artifacts_dir}"
+    if fully_qualified_version is not None:
+        artifacts_dir = f"{fully_qualified_version}-{artifacts_dir}"
 
     if stack_name is not None:
         artifacts_dir = f"{stack_name}-{artifacts_dir}"
 
     print("info: using artifacts directory: ", artifacts_dir)
     return artifacts_dir
-
-
-def get_ref_name_and_sha_from_artifacts_version(artifacts_version: str) -> tuple[str, str]:
-    """
-    Get the reference name and sha from the artifacts version,
-    given the format of the artifacts version <ref-name>.<sha>.
-
-    :param artifacts_version:
-    :return:
-    """
-
-    # if no dot in the artifacts version, then it is just the ref name.
-    if "." not in artifacts_version:
-        return artifacts_version, ""
-
-    # start separating from the end because we have known that the sha doesn't contain dots.
-    ref_name, sha = artifacts_version.rsplit(".", 1)
-
-    return ref_name, sha
-
-
-def format_version_to_comply_with_docker_tag(version: str) -> str:
-    docker_tag_version = filter_invalid_chars_for_docker_tag(version)
-    return docker_tag_version
-
-
-def format_version_to_comply_with_artifacts_version(version: str) -> str:
-    artifacts_version = filter_invalid_chars_for_artifact_version(version)
-    return artifacts_version
-
-
-def get_formatted_secret_id(secret_prefix: str, config_version: str):
-    """
-    Gets a well formatted secret ID, accepted by GCP Secret Manager API.
-
-    :param secret_prefix:
-    :param config_version:
-
-    :return: A valid secret id.
-    """
-
-    formatted_secret_id = filter_invalid_chars_for_secret_id(config_version)
-
-    return f"{secret_prefix}_{formatted_secret_id}"
-
-
-def construct_version_from_branch_and_sha(ref_name: str, sha: str):
-    """
-    Construct the version from the ref name and sha.
-
-    :param ref_name:
-    :param sha:
-    :return:
-    """
-
-    if not ref_name:
-        raise ValueError("ref_name is required")
-
-    version = ref_name
-    if sha:
-        version = f"{version}.{sha}"
-
-    return version
 
 
 def download_generic_artifacts_file(

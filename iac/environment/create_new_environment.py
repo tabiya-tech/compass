@@ -7,12 +7,13 @@ import pulumi_gcp as gcp
 import pulumiverse_time as time
 
 from lib import MAIN_SECRET_VERSION, ENV_VARS_SECRET_PREFIX, STACK_CONFIG_SECRET_PREFIX
-from lib.std_pulumi import enable_services, get_resource_name, int_to_base36, get_formatted_secret_id
+from lib.std_pulumi import enable_services, get_resource_name, int_to_base36
 
 from auth import REQUIRED_SERVICES as AUTH_SERVICES
 from backend import REQUIRED_SERVICES as BACKEND_SERVICES
 from common import REQUIRED_SERVICES as COMMON_SERVICES
 from frontend import REQUIRED_SERVICES as FRONTEND_SERVICES
+from scripts.formatters import construct_secret_id
 
 # The services that are required for the environment
 BASE_SERVICES = [
@@ -161,35 +162,11 @@ def create_new_environment(*,
     )
 
     # enable all the required services for the environment
-    services = enable_services(
+    enable_services(
         provider=environment_gcp_provider,
         service_names=SERVICES_TO_ENABLE,
         dependencies=initial_apis + [sleep_for_a_while]
     )
 
-    # create the secret for environment variables, version: (main/default)
-    env_vars_config_main_secret = gcp.secretmanager.Secret(
-        get_resource_name(resource="env-vars-main", resource_type="secret"),
-        secret_id=get_formatted_secret_id(ENV_VARS_SECRET_PREFIX, MAIN_SECRET_VERSION),
-        project=project.project_id,
-        # automatic replication.
-        replication={
-            "auto": {},
-        },
-        opts=pulumi.ResourceOptions(provider=environment_gcp_provider, depends_on=services))
-
-    # create the secret for stack config, version: (main/default)
-    stack_config_main_secret = gcp.secretmanager.Secret(
-        get_resource_name(resource="stack-config_main", resource_type="secret"),
-        secret_id=get_formatted_secret_id(STACK_CONFIG_SECRET_PREFIX, MAIN_SECRET_VERSION),
-        project=project.project_id,
-        # automatic replication.
-        replication={
-            "auto": {},
-        },
-        opts=pulumi.ResourceOptions(provider=environment_gcp_provider, depends_on=services))
-
-    pulumi.export("env_vars_main_secret_name", env_vars_config_main_secret.name)
-    pulumi.export("stack_config_main_secret_name", stack_config_main_secret.name)
     pulumi.export("project_id", project.id.apply(lambda _id: _id.replace("projects/", "")))
     pulumi.export("project_number", project.number)

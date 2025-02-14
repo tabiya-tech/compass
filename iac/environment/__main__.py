@@ -30,7 +30,7 @@ def main():
     # Get realm stack references
     realm_reference = pulumi.StackReference(f"tabiya-tech/compass-organization/{realm_name}")
 
-    billing_account = getstackref(realm_reference, "billing_account_id")
+    billing_account = getstackref(realm_reference, "billing_account_id", True)
     root_project_id = getstackref(realm_reference, "root_project_id")
     docker_repository = getstackref(realm_reference, "docker_repository")
     base_domain_name = getstackref(realm_reference, "base_domain_name")

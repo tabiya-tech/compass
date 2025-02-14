@@ -14,23 +14,25 @@ sys.path.insert(0, iac_dir)
 
 from _types import IaCModules
 from frontend.prepare_frontend import prepare_frontend
-from lib import load_dot_realm_env, getenv, get_ref_name_and_sha_from_artifacts_version, get_pulumi_stack_outputs
+from lib import load_dot_realm_env, getenv, get_pulumi_stack_outputs, Version
 from _common import add_select_environments_arguments, get_realm_environment_by_env_type, run_pulumi_up, \
     get_realm_environment
 
 
 def _run_smoke_tests(version_json_url: str):
-    artifacts_version = getenv("ARTIFACTS_VERSION")
-    print(f"info: running the smoke tests on {version_json_url} and expected version is {artifacts_version}")
+    artifacts_version = Version(
+        git_branch_name=getenv("TARGET_GIT_BRANCH_NAME"),
+        git_sha=getenv("TARGET_GIT_SHA")
+    )
 
-    ref_name, sha = get_ref_name_and_sha_from_artifacts_version(artifacts_version)
+    print(f"info: running the smoke tests on {version_json_url} and expected version is {artifacts_version}")
 
     version_json_response = requests.get(version_json_url)
     assert version_json_response.status_code == 200
 
     version_json = version_json_response.json()
-    assert version_json["sha"] == sha
-    assert version_json["branch"] == ref_name
+    assert version_json["sha"] == artifacts_version.git_sha
+    assert version_json["branch"] == artifacts_version.git_branch_name
 
     print("info: smoke tests passed successfully.")
 

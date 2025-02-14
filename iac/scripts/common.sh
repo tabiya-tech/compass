@@ -19,35 +19,45 @@ function get_git_branch_tag_name() {
 }
 
 function filter_invalid_chars_for_artifact_version {
-  local _text=$1
-  "${SCRIPT_DIR}/parse_git_branch_name.py" --branch-name="$_text" --version=generic-artifacts
+  local _branch_name=$1
+  local _commit_sha=$2
+
+  "${SCRIPT_DIR}/formatters.py" --branch-name="$_branch_name" --git-sha="$_commit_sha" --version=generic-artifacts
 }
 
 function filter_invalid_chars_for_docker_tag {
-  local _text=$1
-  "$SCRIPT_DIR/parse_git_branch_name.py" --branch-name="$_text" --version=docker-tag
+  local _branch_name=$1
+  local _commit_sha=$2
+
+  "$SCRIPT_DIR/formatters.py" --branch-name="$_branch_name" --git-sha="$_commit_sha" --version=docker-tag
 }
 
 function get_docker_tag {
   # get the tag name or branch name
   git_branch_tag_name=$(get_git_branch_tag_name)
   echo "info: setting the branch/tag name to $git_branch_tag_name" > /dev/tty
-  formatted_git_branch_tag_name=$(filter_invalid_chars_for_docker_tag "$git_branch_tag_name")
-  echo "info: setting the formatted branch/tag name to $formatted_git_branch_tag_name for docker tag" > /dev/tty
+
   git_commit_sha=$(get_git_sha)
   echo "info: setting the git commit sha to $git_commit_sha" > /dev/tty
-  echo -n "$formatted_git_branch_tag_name.$git_commit_sha" # this is the return value
+
+  formatted_git_branch_tag_name=$(filter_invalid_chars_for_docker_tag "$git_branch_tag_name" "$git_commit_sha")
+  echo "info: setting the formatted branch/tag name to $formatted_git_branch_tag_name for docker tag" > /dev/tty
+
+  echo -n "$formatted_git_branch_tag_name" # this is the return value
 }
 
 function get_generic_artifacts_version {
   # get the tag name or branch name
-    git_branch_tag_name=$(get_git_branch_tag_name)
-    echo "info: setting the branch/tag name to $git_branch_tag_name" > /dev/tty
-    formatted_git_branch_tag_name=$(filter_invalid_chars_for_artifact_version "$git_branch_tag_name")
-    echo "info: setting the formatted branch/tag name to $formatted_git_branch_tag_name for generic artifact version" > /dev/tty
-    git_commit_sha=$(get_git_sha)
-    echo "info: setting the git commit sha to $git_commit_sha" > /dev/tty
-    echo -n "$formatted_git_branch_tag_name.$git_commit_sha" # this is the return value
+  git_branch_tag_name=$(get_git_branch_tag_name)
+  echo "info: setting the branch/tag name to $git_branch_tag_name" > /dev/tty
+
+  git_commit_sha=$(get_git_sha)
+  echo "info: setting the git commit sha to $git_commit_sha" > /dev/tty
+
+  formatted_git_branch_tag_name=$(filter_invalid_chars_for_artifact_version "$git_branch_tag_name" "$git_commit_sha")
+  echo "info: setting the formatted branch/tag name to $formatted_git_branch_tag_name for generic artifact version" > /dev/tty
+
+  echo -n "$formatted_git_branch_tag_name" # this is the return value
 }
 
 function upload_file {

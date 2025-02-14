@@ -11,6 +11,7 @@ from google.cloud.secretmanager import SecretManagerServiceClient, AccessSecretV
 from google.api_core.exceptions import NotFound, PermissionDenied
 from google.cloud.resourcemanager import ProjectsClient
 
+from scripts.formatters import construct_secret_id
 
 # Determine the absolute path to the 'iac' directory
 iac_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -20,8 +21,8 @@ sys.path.insert(0, iac_dir)
 
 from _types import IaCModules, StackConfigs, Environment, DeploymentType
 from environment.env_types import EnvironmentTypes
-from lib import get_ref_name_and_sha_from_artifacts_version, MAIN_SECRET_VERSION, get_formatted_secret_id, \
-    get_pulumi_stack_outputs, STACK_CONFIG_SECRET_PREFIX, ENV_VARS_SECRET_PREFIX
+from lib import MAIN_SECRET_VERSION, get_pulumi_stack_outputs, STACK_CONFIG_SECRET_PREFIX, \
+    ENV_VARS_SECRET_PREFIX, Version
 
 
 # =======================
@@ -101,8 +102,6 @@ def _get_secret_value(full_project_name: str, secret_name: str) -> Optional[Acce
     """
 
     secret_name = f"{full_project_name}/secrets/{secret_name}"
-    print('info: getting the secret value:', secret_name)
-
     try:
         secret_value = _get_latest_secret_value(secret_name)
         return secret_value
@@ -117,9 +116,6 @@ def _get_secret_value(full_project_name: str, secret_name: str) -> Optional[Acce
 
 
 def _get_latest_secret_value(secret_name: str) -> AccessSecretVersionResponse:
-
-    print("info: getting the latest secret version for the secret:", secret_name)
-
     secret_manager_service = SecretManagerServiceClient()
     secret = secret_manager_service.access_secret_version(
         name=f"{secret_name}/versions/latest"
@@ -127,7 +123,7 @@ def _get_latest_secret_value(secret_name: str) -> AccessSecretVersionResponse:
     return secret
 
 
-def get_versioned_secret_latest_value(secret_name: str, project_id: str, artifacts_version: Optional[str]) -> str:
+def get_versioned_secret_latest_value(secret_name: str, project_id: str, artifacts_version: Version) -> str:
     """
     Get the version of the secret from the secret manager based on the config version.
     This is a special case when we have a versioned secret.
@@ -158,19 +154,30 @@ def get_versioned_secret_latest_value(secret_name: str, project_id: str, artifac
     # Check if the secret exists by using fully the config version.
     # This is the case when the full config version is provided
     # eg: main, <branch_tag_name>, <branch_tag_name>.<sha>.
-    fully_qualified_secret_name = get_formatted_secret_id(secret_name, artifacts_version)
+    fully_qualified_secret_name = construct_secret_id(
+        prefix=secret_name,
+        git_branch_name=artifacts_version.git_branch_name,
+        git_sha=artifacts_version.git_sha
+    )
+
     secret_value = _get_secret_value(project_number.name, fully_qualified_secret_name)
 
     # The next step is to only get the ref name and see if at least we have a secret version for it.
     # Only find for ref name if ref name and sha exists, otherwise we have already done it in the previous step.
-    ref_name, sha = get_ref_name_and_sha_from_artifacts_version(artifacts_version)
-    if ref_name and sha and not secret_value:
-        fully_qualified_secret_name = get_formatted_secret_id(secret_name, ref_name)
+    if artifacts_version.git_branch_name and artifacts_version.git_sha and not secret_value:
+        fully_qualified_secret_name = construct_secret_id(
+            prefix=secret_name,
+            git_branch_name=artifacts_version.git_branch_name,
+        )
         secret_value = _get_secret_value(project_number.name, fully_qualified_secret_name)
 
     # if the ref name is not available, let us get the main version.
     if not secret_value:
-        fully_qualified_secret_name = get_formatted_secret_id(secret_name, MAIN_SECRET_VERSION)
+        fully_qualified_secret_name = construct_secret_id(
+            prefix=secret_name,
+            git_branch_name=MAIN_SECRET_VERSION,
+        )
+
         secret_value = _get_secret_value(project_number.name, fully_qualified_secret_name)
 
         # at this time no secret value for the main version, so we raise an error, to stop the pipeline.
@@ -227,7 +234,7 @@ def get_realm_environment(realm_name: str, environment_name: str):
     raise ValueError(f"No environment config found for the environment:{environment_name} in the realm:{realm_name}.")
 
 
-def get_environment_stack_configurations(environment: Environment, version: str) -> StackConfigs:
+def get_environment_stack_configurations(environment: Environment, version: Version) -> StackConfigs:
     """
     Gets the stacks configurations for a given environment.
     """
@@ -239,7 +246,7 @@ def get_environment_stack_configurations(environment: Environment, version: str)
     return StackConfigs.from_dict(environment, yaml.safe_load(stack_configs))
 
 
-def get_environment_environment_variables(stack_name: str, version: str):
+def get_environment_environment_variables(stack_name: str, version: Version):
     """
     Get the environment variables for the given environment.
     """

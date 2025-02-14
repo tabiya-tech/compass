@@ -2,6 +2,7 @@ import os
 import sys
 import pulumi
 
+
 # Determine the absolute path to the 'iac' directory
 libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add this directory to sys.path,
@@ -9,8 +10,9 @@ libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, libs_dir)
 
 from deploy_frontend import deploy_frontend
+from scripts.formatters import construct_artifacts_version
 from lib import getconfig, parse_realm_env_name_from_stack, getstackref, load_dot_realm_env, getenv, \
-    construct_artifacts_dir, format_version_to_comply_with_artifacts_version
+    construct_artifacts_dir, Version
 
 
 def main():
@@ -28,8 +30,15 @@ def main():
     project = getstackref(env_reference, "project_id")
 
     # the artifacts version of the frontend build to deploy.
-    artifacts_version = getenv("ARTIFACTS_VERSION")
-    generic_artifact_version = format_version_to_comply_with_artifacts_version(artifacts_version)
+    deployable_version = Version(
+        git_branch_name=getenv("TARGET_GIT_BRANCH_NAME"),
+        git_sha=getenv("TARGET_GIT_SHA")
+    )
+
+    generic_artifact_version = construct_artifacts_version(
+        git_branch_name=deployable_version.git_branch_name,
+        git_sha=deployable_version.git_sha
+    )
 
     # the unique identifier of this running deployment.
     run_number = getenv("DEPLOYMENT_RUN_NUMBER")
@@ -38,7 +47,7 @@ def main():
 
     artifacts_dir = construct_artifacts_dir(
         deployment_number=run_number,
-        artifacts_version=generic_artifact_version,
+        fully_qualified_version=generic_artifact_version,
         stack_name=stack_name
     )
 

@@ -3,6 +3,8 @@
 import os
 import sys
 import argparse
+from datetime import date
+
 from google.cloud.secretmanager import SecretManagerServiceClient, AddSecretVersionRequest, GetSecretRequest, \
     CreateSecretRequest, Secret
 from google.api_core.exceptions import NotFound
@@ -14,8 +16,8 @@ libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, libs_dir)
 
 from _types import IaCModules
-from lib import get_stack_name_from, MAIN_SECRET_VERSION, ENV_VARS_SECRET_PREFIX, get_formatted_secret_id, \
-    construct_version_from_branch_and_sha, STACK_CONFIG_SECRET_PREFIX
+from scripts.formatters import construct_secret_id
+from lib import get_stack_name_from, MAIN_SECRET_VERSION, ENV_VARS_SECRET_PREFIX, STACK_CONFIG_SECRET_PREFIX, Version
 from _common import add_select_environment_arguments, \
     write_config_to_pulumi_yml_file, run_pulumi_up, get_realm_environment
 
@@ -23,9 +25,10 @@ from _common import add_select_environment_arguments, \
 def _upload_file_to_secret_manager(
         *,
         project_number: str,
-        secret_name: str,
-        version: str,
-        file_path: str):
+        secret_prefix: str,
+        version: Version,
+        file_path: str,
+        expire_time: str):
     """
     Upload the file to the secret manager.
     """
@@ -33,20 +36,24 @@ def _upload_file_to_secret_manager(
     secrets_service = SecretManagerServiceClient()
 
     # 1. Construct the valid secret id.
-    formatted_secret_id = get_formatted_secret_id(secret_name, version)
+    formatted_secret_id = construct_secret_id(
+        prefix=secret_prefix,
+        git_branch_name=version.git_branch_name,
+        git_sha=version.git_sha
+    )
 
-    secret_name = f"projects/{project_number}/secrets/{formatted_secret_id}"
+    full_qualified_secret_name = f"projects/{project_number}/secrets/{formatted_secret_id}"
 
     # 2. Check if the secret exists, otherwise create one if it is not found.
     try:
         secrets_service.get_secret(request=GetSecretRequest(
-            name=secret_name  # type: ignore
+            name=full_qualified_secret_name  # type: ignore
         ))
-        print(f"warning: secret:{secret_name} already exists exists, skipping creating")
-    except NotFound as e:
+        print(f"warning: secret:{formatted_secret_id} already exists exists, skipping creating")
+    except NotFound as _e:
         # if the secret is not found, create one as part of the setup env script.
         parent = f"projects/{project_number}"
-        print(f"info: creating the secret in the secret manager parent:{parent} secret_id: {formatted_secret_id}...")
+        print(f"info: creating the secret in the secret manager secret_id: {formatted_secret_id}...")
         secrets_service.create_secret(request=CreateSecretRequest(
             parent=parent,  # type: ignore
             secret_id=formatted_secret_id,  # type: ignore
@@ -54,6 +61,7 @@ def _upload_file_to_secret_manager(
                 replication={
                     "automatic": {},
                 },
+                expire_time=expire_time  # type: ignore
             )
         ))
     except Exception as e:
@@ -61,19 +69,26 @@ def _upload_file_to_secret_manager(
         raise
 
     # Upload the file to the secret manager of the environment's project.
-    print(f"uploading the the file file to the secret manager... on secret: {secret_name} from file path: {file_path}")
+    print(f"uploading the the file to the secret manager... "
+          f"secret:{formatted_secret_id} "
+          f"from file path: {file_path}")
+
     with open(file_path, "r", encoding="utf-8") as file:
         env_file_content = file.read()
 
     secrets_service.add_secret_version(request=AddSecretVersionRequest(
-        parent=secret_name,  # type: ignore
+        parent=full_qualified_secret_name,  # type: ignore
         payload={"data": env_file_content.encode("utf-8")}
     ))
 
 
 def _main(args):
     stack_name = get_stack_name_from(args.realm_name, args.env_name)
-    full_qualified_version = construct_version_from_branch_and_sha(args.target_git_branch, args.target_git_sha)
+
+    target_version = Version(
+        git_branch_name=args.target_git_branch,
+        git_sha=args.target_git_sha
+    )
 
     # Make sure the environment files directory exists,
     # and the directory contains both the .env and stackconfig files for the environment.
@@ -110,19 +125,22 @@ def _main(args):
 
     # 4. Uploading the .env file to the secret manage given the target version.
     project_number = up_results.outputs["project_number"].value
+    secrets_expire_time = args.secrets_expire_time
     _upload_file_to_secret_manager(
         project_number=project_number,
-        secret_name=ENV_VARS_SECRET_PREFIX,
+        secret_prefix=ENV_VARS_SECRET_PREFIX,
         file_path=env_file_path,
-        version=full_qualified_version
+        version=target_version,
+        expire_time=secrets_expire_time
     )
 
     # 5. Upload the stack config file to the secret manager.
     _upload_file_to_secret_manager(
         project_number=project_number,
-        secret_name=STACK_CONFIG_SECRET_PREFIX,
+        secret_prefix=STACK_CONFIG_SECRET_PREFIX,
         file_path=stack_config_file_path,
-        version=full_qualified_version
+        version=target_version,
+        expire_time=secrets_expire_time
     )
 
     print(f"Environment setup completed. {stack_name} is ready to use.")
@@ -133,7 +151,7 @@ if __name__ == "__main__":
         formatter_class=argparse.RawTextHelpFormatter,
         description="Sets up the given environment by \n"
                     " - running pulumi up on the environment stack and \n"
-                    " - uploading configurations and environment variables to the secrets manager of the environment project."
+                    " - uploading config and environment variables to the secrets manager of the environment project."
     )
 
     # add the required arguments to select the environment to set up.
@@ -151,13 +169,13 @@ if __name__ == "__main__":
              " - It should be an absolute path or the path from the place where you are running script from."
     )
 
-    target_version = parser.add_argument_group(
+    target_version_group = parser.add_argument_group(
         title="Configuration version",
         description="The inputs will be used to construct the configuration version ie: <branch-name>.<git-sha>. \n"
                     "This is the version where the .env file and stack_config.yaml will be uploaded.\n"
                     "Also some characters will be escaped to comply to naming conventions in the secret manager")
 
-    target_version.add_argument(
+    target_version_group.add_argument(
         "--target-git-branch",
         type=str,
         required=False,
@@ -165,11 +183,20 @@ if __name__ == "__main__":
         help=f"The target branch name. Default: {MAIN_SECRET_VERSION}"
     )
 
-    target_version.add_argument(
+    target_version_group.add_argument(
         "--target-git-sha",
         type=str,
         required=False,
         help="The target git sha"
+    )
+
+    target_version_group.add_argument(
+        "--secrets-expire-time",
+        type=str,
+        required=True,
+        help="Timestamp in UTC when the the secrets is scheduled to expire\n"
+             "Format: RFC 3339, for example 2100-01-01T09:00:00-00:00"
+             "This is set only if the secret does not exist, Otherwise it is ignored."
     )
 
     _main(parser.parse_args())

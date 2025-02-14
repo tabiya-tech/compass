@@ -8,8 +8,8 @@ import pulumi_gcp as gcp
 from pulumi import Output
 
 from backend.prepare_backend import base_configuration_dir, api_gateway_config_file_name
-from lib import ProjectBaseConfig, get_resource_name, get_project_base_config, get_file_as_string, \
-    format_version_to_comply_with_docker_tag
+from lib import ProjectBaseConfig, get_resource_name, get_project_base_config, get_file_as_string, Version
+from scripts.formatters import construct_docker_tag
 
 
 @dataclass(frozen=True)
@@ -37,11 +37,12 @@ class BackendServiceConfig:
 
 """
 # Set up GCP API Gateway.
-# The API Gateway will route the requests to the Compass Cloudrun instance. Additionally, it will verify the incoming JWT tokens
-# and add a new header x-apigateway-api-userinfo that will contain the JWT claims.
+# The API Gateway will route the requests to the Compass Cloudrun instance. Additionally, it will verify the incoming 
+# JWT tokens and add a new header x-apigateway-api-userinfo that will contain the JWT claims.
 # The Compass Cloudrun instance is publicly accessible over internet, otherwise it cannot be behind API Gateway.
-# To prevent direct calls to the Compass Cloudrun instance, the Cloudrun instance will require GCP IAM based authentication.
-# A service account with 'roles/run.invoker' permission is created for the API Gateway which will allow it to call the Cloudrun instance.
+# To prevent direct calls to the Compass Cloudrun instance, the Cloudrun instance will require GCP IAM based 
+# authentication. A service account with 'roles/run.invoker' permission is created for the API Gateway 
+# which will allow it to call the Cloudrun instance.
 """
 
 
@@ -290,14 +291,17 @@ def deploy_backend(
         project_number: Output[str],
         backend_service_cfg: BackendServiceConfig,
         docker_repository: pulumi.Output[gcp.artifactregistry.Repository],
-        artifacts_version: str,
+        deployable_version: Version,
         config_dir: str
 ):
     """
     Deploy the backend infrastructure
     """
     basic_config = get_project_base_config(project=project, location=location)
-    docker_tag = format_version_to_comply_with_docker_tag(artifacts_version)
+    docker_tag = construct_docker_tag(
+        git_branch_name=deployable_version.git_branch_name,
+        git_sha=deployable_version.git_sha
+    )
 
     # grant the project service account access to the docker repository so that it can pull images
     membership = _grant_docker_repository_access_to_project_service_account(

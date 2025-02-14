@@ -2,14 +2,15 @@ import os
 import subprocess
 import sys
 
+from scripts.formatters import construct_artifacts_version
+
 # Determine the absolute path to the 'iac' directory
 iac_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add this directory to sys.path,
 # so that we can import the iac/lib module when we run pulumi from withing the iac/backend directory.
 sys.path.insert(0, iac_folder)
 
-from lib import get_pulumi_stack_outputs, construct_artifacts_dir, download_generic_artifacts_file, \
-    format_version_to_comply_with_docker_tag, format_version_to_comply_with_artifacts_version
+from lib import get_pulumi_stack_outputs, construct_artifacts_dir, download_generic_artifacts_file, Version
 
 current_dir = os.path.join(iac_folder, "backend")
 
@@ -22,19 +23,22 @@ base_configuration_dir = os.path.join(current_dir, "_tmp", "configs")
 def download_backend_config(*,
                             realm_name: str,
                             deployment_number: str,
-                            artifacts_version: str) -> None:
+                            artifacts_version: Version) -> None:
     """
     Download the backend configurations.
     1. api gateway config file.
     """
 
-    # construct the directory to save the backend config for this deployment.
-    docker_tag = format_version_to_comply_with_docker_tag(artifacts_version)
-
     # the backend config are stored in the generic repository.
-    generic_artifacts_version = format_version_to_comply_with_artifacts_version(artifacts_version)
+    generic_artifacts_version = construct_artifacts_version(
+        git_branch_name=artifacts_version.git_branch_name,
+        git_sha=artifacts_version.git_sha
+    )
 
-    config_dir = construct_artifacts_dir(deployment_number=deployment_number, artifacts_version=docker_tag)
+    config_dir = construct_artifacts_dir(
+        deployment_number=deployment_number,
+        fully_qualified_version=generic_artifacts_version)
+
     backend_config_output_dir = os.path.join(base_configuration_dir, config_dir)
     os.makedirs(backend_config_output_dir, exist_ok=False)
 

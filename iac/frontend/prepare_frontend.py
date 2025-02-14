@@ -7,6 +7,8 @@ import subprocess
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 
+from scripts.formatters import construct_artifacts_version
+
 # Determine the absolute path to the 'iac' directory
 iac_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add this directory to sys.path,
@@ -15,7 +17,7 @@ sys.path.insert(0, iac_folder)
 
 from lib import base64_encode, getenv, get_realm_and_env_name_from_stack, load_dot_realm_env, \
     get_pulumi_stack_outputs, construct_artifacts_dir, save_content_in_file, \
-    download_generic_artifacts_file, format_version_to_comply_with_artifacts_version
+    download_generic_artifacts_file, Version
 
 # The actual frontend build artifact filename is specified in the iac/scripts/build-and-upload-fe.sh script.
 frontend_build_artifact_filename = "frontend-build.tar.gz"
@@ -40,7 +42,7 @@ def download_frontend_bundle(
         *,
         realm_name: str,
         deployment_number: str,
-        artifacts_version: str) -> None:
+        artifacts_version: Version) -> None:
     """
     Download the frontend build bundle given the frontend artifact version.
 
@@ -50,10 +52,14 @@ def download_frontend_bundle(
         :param artifacts_version:  The version of the frontend build bundle.
     """
     # 1. get the directory where to save the frontend build bundle.
-    frontend_artifacts_version = format_version_to_comply_with_artifacts_version(artifacts_version)
+    frontend_artifacts_version = construct_artifacts_version(
+        git_branch_name=artifacts_version.git_branch_name,
+        git_sha=artifacts_version.git_sha
+    )
+
     artifacts_dir = construct_artifacts_dir(
         deployment_number=deployment_number,
-        artifacts_version=frontend_artifacts_version)
+        fully_qualified_version=frontend_artifacts_version)
     # artifacts dir, the folder to store the frontend build bundle.
     artifacts_destination_dir = os.path.join(base_artifacts_dir, artifacts_dir)
     os.makedirs(artifacts_destination_dir, exist_ok=False)
@@ -144,11 +150,19 @@ def prepare_frontend(
     # because the frontend build bundle is specific to the deployment, and the stack name.
     # Because the frontend/env.js file is specific to the deployment, and the stack name.
     deployment_number = getenv("DEPLOYMENT_RUN_NUMBER")
-    artifacts_version = getenv("ARTIFACTS_VERSION")
-    generic_artifact_version = format_version_to_comply_with_artifacts_version(artifacts_version)
+    artifacts_version = Version(
+        git_branch_name=getenv("TARGET_GIT_BRANCH_NAME"),
+        git_sha=getenv("TARGET_GIT_SHA")
+    )
+
+    generic_artifact_version = construct_artifacts_version(
+        git_branch_name=artifacts_version.git_branch_name,
+        git_sha=artifacts_version.git_sha
+    )
+
     artifacts_dir = construct_artifacts_dir(
         deployment_number=deployment_number,
-        artifacts_version=generic_artifact_version)
+        fully_qualified_version=generic_artifact_version)
 
     # artifacts dir, the folder to store the frontend build bundle.
     artifacts_dir = os.path.join(base_artifacts_dir, artifacts_dir)
@@ -171,7 +185,7 @@ def prepare_frontend(
     # so that we can make necessary changes to the frontend build bundle that are specific to the environment.
     stack_artifacts_dir = construct_artifacts_dir(
         deployment_number=deployment_number,
-        artifacts_version=generic_artifact_version,
+        fully_qualified_version=generic_artifact_version,
         stack_name=stack_name)
 
     # copy the artifacts to the stack artifacts dir, so that we can make necessary changes to the frontend build bundle.

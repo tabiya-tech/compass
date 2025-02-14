@@ -10,6 +10,7 @@ import argparse
 
 from dotenv import dotenv_values
 
+
 # Determine the absolute path to the 'iac' directory
 iac_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add this directory to sys.path,
@@ -19,10 +20,11 @@ sys.path.insert(0, iac_folder)
 from backend.prepare_backend import download_backend_config
 from frontend.prepare_frontend import download_frontend_bundle
 
+
 from _types import IaCModules, Environment
-from lib import get_pulumi_stack_outputs, MAIN_SECRET_VERSION, construct_version_from_branch_and_sha, \
-    construct_artifacts_dir, download_generic_artifacts_file, get_file_as_string, \
-    format_version_to_comply_with_artifacts_version
+from scripts.formatters import construct_artifacts_version
+from lib import get_pulumi_stack_outputs, MAIN_SECRET_VERSION, construct_artifacts_dir, \
+    download_generic_artifacts_file, get_file_as_string, Version
 from _common import add_select_environments_arguments, get_realm_environment_by_env_type, \
     write_config_to_pulumi_yml_file, get_realm_environment, get_environment_stack_configurations, \
     get_environment_environment_variables, compare_dict_keys
@@ -34,17 +36,21 @@ templates_dir = os.path.join(iac_folder, "scripts", "_tmp")
 def _download_templates(*,
                         realm_name: str,
                         deployment_number: str,
-                        artifacts_version: str) -> None:
+                        version: Version) -> None:
     """
     Download the templates necessary for this configuration.
     """
-    formatted_artifacts_version = format_version_to_comply_with_artifacts_version(artifacts_version)
+    formatted_artifacts_version = construct_artifacts_version(
+        git_branch_name=version.git_branch_name,
+        git_sha=version.git_sha
+    )
+
     realm_outputs = get_pulumi_stack_outputs(stack_name=realm_name, module="realm")
     realm_generic_repository = realm_outputs["generic_repository"].value
 
     current_templates_dir = construct_artifacts_dir(
         deployment_number=deployment_number,
-        artifacts_version=formatted_artifacts_version)
+        fully_qualified_version=formatted_artifacts_version)
 
     # artifacts dir, the folder to store the templates files.
     artifacts_destination_dir = os.path.join(templates_dir, current_templates_dir)
@@ -65,14 +71,14 @@ def _download_templates(*,
     )
 
 
-def _download_artifacts_and_config(_realm_name: str, _artifacts_version: str, _deployment_number: str):
+def _download_artifacts_and_config(_realm_name: str, _artifacts_version: Version, _deployment_number: str):
     """
     Download the necessary configurations and artifacts.
     """
 
     _download_templates(
         realm_name=_realm_name,
-        artifacts_version=_artifacts_version,
+        version=_artifacts_version,
         deployment_number=_deployment_number)
 
     download_frontend_bundle(
@@ -88,7 +94,7 @@ def _download_artifacts_and_config(_realm_name: str, _artifacts_version: str, _d
     )
 
 
-def _prepare_env_file(stack_name: str, deployment_run_number: str, artifacts_version: str):
+def _prepare_env_file(stack_name: str, deployment_run_number: str, artifacts_version: Version):
     env_file_content = get_environment_environment_variables(stack_name, artifacts_version)
 
     # add environment variables to prepare the deployment.
@@ -96,7 +102,8 @@ def _prepare_env_file(stack_name: str, deployment_run_number: str, artifacts_ver
         ######################
         # Added by prepare.py
         ######################
-        ARTIFACTS_VERSION={artifacts_version}
+        TARGET_GIT_BRANCH_NAME={artifacts_version.git_branch_name}
+        TARGET_GIT_SHA={artifacts_version.git_sha}
         DEPLOYMENT_RUN_NUMBER={deployment_run_number}
         ''')
     env_file_path = os.path.join(iac_folder, f".env.{stack_name}")
@@ -111,7 +118,7 @@ def _prepare_env_file(stack_name: str, deployment_run_number: str, artifacts_ver
 def _prepare_environment_deployment(*,
                                     environment: Environment,
                                     deployment_run_number: str,
-                                    artifacts_version: str):
+                                    artifacts_version: Version):
     """
     Prepares the deployment of an environment
      -> creating the required yaml files for the environment in the sub iac-projects,
@@ -130,7 +137,8 @@ def _prepare_environment_deployment(*,
     env_vars_template = dotenv_values(os.path.join(base_templates_dir, "env.template"))
 
     env_vars_template["DEPLOYMENT_RUN_NUMBER"] = deployment_run_number
-    env_vars_template["ARTIFACTS_VERSION"] = artifacts_version
+    env_vars_template["TARGET_GIT_BRANCH_NAME"] = artifacts_version.git_branch_name
+    env_vars_template["TARGET_GIT_SHA"] = artifacts_version.git_sha
 
     stack_config_template_value = get_file_as_string(os.path.join(base_templates_dir, "stack_config.template.yml"))
     stack_config_template = yaml.safe_load(stack_config_template_value)
@@ -185,7 +193,10 @@ def _main(args):
     environment_name = args.env_name
     environment_type = args.env_type
 
-    target_version = construct_version_from_branch_and_sha(args.target_git_branch, args.target_git_sha)
+    target_version = Version(
+        git_branch_name=args.target_git_branch,
+        git_sha=args.target_git_sha
+    )
 
     # randomly get a deployment number
     # this is used if we have two parallel deployments
