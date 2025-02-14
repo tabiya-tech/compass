@@ -14,10 +14,6 @@ export const DATA_TEST_ID = {
 
 export type ChatListProps = {
   messages: IChatMessage[];
-  notifyOnFeedbackFormOpen: () => void;
-  notifyOnExperiencesDrawerOpen: () => void;
-  isFeedbackSubmitted: boolean;
-  isFeedbackStarted: boolean;
 };
 
 const ChatListContainer = styled(Box)(({ theme }) => ({
@@ -35,10 +31,6 @@ const ChatListContainer = styled(Box)(({ theme }) => ({
 
 const ChatList: React.FC<ChatListProps> = ({
   messages,
-  notifyOnFeedbackFormOpen,
-  notifyOnExperiencesDrawerOpen,
-  isFeedbackSubmitted,
-  isFeedbackStarted,
 }) => {
   const theme = useTheme();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -80,10 +72,6 @@ const ChatList: React.FC<ChatListProps> = ({
         return (
           <ConversationConclusionChatMessage
             chatMessage={chatMessage}
-            notifyOnFeedbackFormOpen={notifyOnFeedbackFormOpen}
-            notifyOnExperiencesDrawerOpen={notifyOnExperiencesDrawerOpen}
-            isFeedbackSubmitted={isFeedbackSubmitted}
-            isFeedbackStarted={isFeedbackStarted}
           />
         );
       case ChatMessageType.TYPING:
