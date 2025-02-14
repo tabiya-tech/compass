@@ -9,69 +9,69 @@ on:
         description: 'Whether to upload deployable artifacts'
 
 jobs:
-#  test:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v4
-#
-#      - name: Use Node.js 20.x
-#        uses: actions/setup-node@v4
-#        with:
-#          node-version: 20.x
-#          cache: 'yarn'
-#          cache-dependency-path: frontend-new/yarn.lock
-#
-#      - name: Install node packages
-#        run: yarn install
-#        working-directory: frontend-new
-#
-#      - name: Lint Frontend
-#        run: yarn run lint
-#        working-directory: frontend-new
-#
-#      - name: Compile
-#        run: yarn run compile
-#        working-directory: frontend-new
-#
-#      - name: Test Frontend
-#        run: yarn run test
-#        working-directory: frontend-new
-#
-#  accessibility:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v4
-#
-#      - name: Use Node.js 20.x
-#        uses: actions/setup-node@v4
-#        with:
-#          node-version: 20.x
-#          cache: 'yarn'
-#          cache-dependency-path: frontend-new/yarn.lock
-#
-#      - name: Cache Playwright browsers
-#        uses: actions/cache@v4
-#        with:
-#          path: ~/.cache/ms-playwright
-#          key: playwright-browsers-${{ runner.os }}-v1
-#          restore-keys: playwright-browsers-${{ runner.os }}-
-#
-#      - name: Install dependencies
-#        run: yarn install
-#        working-directory: frontend-new
-#
-#      - name: Accessibility Tests
-#        run: |
-#          npx playwright install --with-deps
-#          yarn run build-storybook && yarn run test:accessibility
-#        working-directory: frontend-new
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'yarn'
+          cache-dependency-path: frontend-new/yarn.lock
+
+      - name: Install node packages
+        run: yarn install
+        working-directory: frontend-new
+
+      - name: Lint Frontend
+        run: yarn run lint
+        working-directory: frontend-new
+
+      - name: Compile
+        run: yarn run compile
+        working-directory: frontend-new
+
+      - name: Test Frontend
+        run: yarn run test
+        working-directory: frontend-new
+
+  accessibility:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'yarn'
+          cache-dependency-path: frontend-new/yarn.lock
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-browsers-${{ runner.os }}-v1
+          restore-keys: playwright-browsers-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: yarn install
+        working-directory: frontend-new
+
+      - name: Accessibility Tests
+        run: |
+          npx playwright install --with-deps
+          yarn run build-storybook && yarn run test:accessibility
+        working-directory: frontend-new
 
   build-and-upload:
     runs-on: ubuntu-latest
     if: ${{ inputs.upload-artifacts }}
-#    needs: [ test, accessibility ]
+    needs: [ test, accessibility ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

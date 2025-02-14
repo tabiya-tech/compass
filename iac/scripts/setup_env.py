@@ -61,7 +61,7 @@ def _upload_file_to_secret_manager(
                 replication={
                     "automatic": {},
                 },
-                expire_time=expire_time  # type: ignore
+                expire_time=None if expire_time.lower() == "never" else expire_time    # type: ignore
             )
         ))
     except Exception as e:
@@ -194,9 +194,10 @@ if __name__ == "__main__":
         "--secrets-expire-time",
         type=str,
         required=True,
-        help="Timestamp in UTC when the the secrets is scheduled to expire\n"
+        help="Timestamp in UTC when the the secrets is scheduled to expire or 'never' if the secret never expires  \n"
+             "If the secret already exists this will be ignored.\n"
              "Format: RFC 3339, for example 2100-01-01T09:00:00-00:00"
-             "This is set only if the secret does not exist, Otherwise it is ignored."
+
     )
 
     _main(parser.parse_args())

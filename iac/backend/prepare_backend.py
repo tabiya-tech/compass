@@ -2,8 +2,6 @@ import os
 import subprocess
 import sys
 
-from scripts.formatters import construct_artifacts_version
-
 # Determine the absolute path to the 'iac' directory
 iac_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add this directory to sys.path,
@@ -11,6 +9,7 @@ iac_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, iac_folder)
 
 from lib import get_pulumi_stack_outputs, construct_artifacts_dir, download_generic_artifacts_file, Version
+from scripts.formatters import construct_artifacts_version
 
 current_dir = os.path.join(iac_folder, "backend")
 

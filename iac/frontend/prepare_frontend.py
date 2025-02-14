@@ -7,8 +7,6 @@ import subprocess
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 
-from scripts.formatters import construct_artifacts_version
-
 # Determine the absolute path to the 'iac' directory
 iac_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add this directory to sys.path,
@@ -18,6 +16,8 @@ sys.path.insert(0, iac_folder)
 from lib import base64_encode, getenv, get_realm_and_env_name_from_stack, load_dot_realm_env, \
     get_pulumi_stack_outputs, construct_artifacts_dir, save_content_in_file, \
     download_generic_artifacts_file, Version
+
+from scripts.formatters import construct_artifacts_version
 
 # The actual frontend build artifact filename is specified in the iac/scripts/build-and-upload-fe.sh script.
 frontend_build_artifact_filename = "frontend-build.tar.gz"

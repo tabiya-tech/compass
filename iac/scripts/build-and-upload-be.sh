@@ -57,6 +57,7 @@ function build_and_upload_be_docker_img() {
   gcloud auth configure-docker "$region-docker.pkg.dev"
 
   # 2. set the artifact label
+  local _artifact_name
   _artifact_name="$_region-docker.pkg.dev/$_project_id/docker-repository/backend:$_artifact_version"
   echo "info: building and uploading the docker image $_artifact_name"
 

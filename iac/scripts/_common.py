@@ -11,8 +11,6 @@ from google.cloud.secretmanager import SecretManagerServiceClient, AccessSecretV
 from google.api_core.exceptions import NotFound, PermissionDenied
 from google.cloud.resourcemanager import ProjectsClient
 
-from scripts.formatters import construct_secret_id
-
 # Determine the absolute path to the 'iac' directory
 iac_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add this directory to sys.path,
@@ -23,6 +21,7 @@ from _types import IaCModules, StackConfigs, Environment, DeploymentType
 from environment.env_types import EnvironmentTypes
 from lib import MAIN_SECRET_VERSION, get_pulumi_stack_outputs, STACK_CONFIG_SECRET_PREFIX, \
     ENV_VARS_SECRET_PREFIX, Version
+from scripts.formatters import construct_secret_id
 
 
 # =======================
