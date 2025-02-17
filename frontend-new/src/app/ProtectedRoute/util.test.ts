@@ -1,15 +1,33 @@
-import { canAccessPIIPage, canAccessChatPage } from "src/app/ProtectedRoute/util";
+import { isAcceptedTCValid, isSensitiveDataValid } from "src/app/ProtectedRoute/util";
 import {
   Language,
   SensitivePersonalDataRequirement,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 
 describe("protected route util", () => {
-  describe("canAccessPIIPage", () => {
-    test("should return false if user has sensitive personal data", () => {
-      // GIVEN a user with sensitive personal data
-      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
+  describe("isSensitiveDataValid", () => {
+    test("should return false if sensitive data is required but user does not have it", () => {
+      // GIVEN a user required to provide sensitive personal data but does not have it
+      const userPreferences = {
+        user_id: "given user id",
+        language: Language.en,
+        accepted_tc: new Date(),
+        has_sensitive_personal_data: false,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
+        sessions: [],
+        sessions_with_feedback: [],
+      };
+
+      // WHEN checking if sensitive data is valid
+      const result = isSensitiveDataValid(userPreferences);
+
+      // THEN the result should be false
+      expect(result).toBe(false);
+    });
+
+    test("should return true if sensitive data is required and user has it", () => {
+      // GIVEN a user required to provide sensitive personal data and has it
+      const userPreferences = {
         user_id: "given user id",
         language: Language.en,
         accepted_tc: new Date(),
@@ -17,18 +35,18 @@ describe("protected route util", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
         sessions: [],
         sessions_with_feedback: [],
-      });
+      };
 
-      // WHEN checking if the user can access the PII page
-      const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
+      // WHEN checking if sensitive data is valid
+      const result = isSensitiveDataValid(userPreferences);
 
-      // THEN the result should be false
-      expect(canAccessPIIPage(userPreferences!)).toBe(false);
+      // THEN the result should be true
+      expect(result).toBe(true);
     });
 
-    test("should return false if the user is not required to provide sensitive personal data", () => {
-      // GIVEN a user that is not required to provide sensitive personal data
-      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
+    test("should return true if sensitive data is not required", () => {
+      // GIVEN a user not required to provide sensitive personal data
+      const userPreferences = {
         user_id: "given user id",
         language: Language.en,
         accepted_tc: new Date(),
@@ -36,77 +54,59 @@ describe("protected route util", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_AVAILABLE,
         sessions: [],
         sessions_with_feedback: [],
-      });
+      };
 
-      // WHEN checking if the user can access the PII page
-      const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
-
-      // THEN the result should be false
-      expect(canAccessPIIPage(userPreferences!)).toBe(false);
-    });
-
-    test("should return true if sensitive personal data is required but user does not have it", () => {
-      // GIVEN a user that is required to provide sensitive personal data but does not have it
-      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
-        user_id: "given user id",
-        language: Language.en,
-        accepted_tc: new Date(),
-        has_sensitive_personal_data: false,
-        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
-        sessions: [],
-        sessions_with_feedback: [],
-      });
-
-      // WHEN checking if the user can access the PII page
-      const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
+      // WHEN checking if sensitive data is valid
+      const result = isSensitiveDataValid(userPreferences);
 
       // THEN the result should be true
-      expect(canAccessPIIPage(userPreferences!)).toBe(true);
+      expect(result).toBe(true);
     });
   });
 
-  describe("canAccessChatPage", () => {
-    test("should return false if sensitive personal data is required and user does not have it", () => {
-      // GIVEN a user that is required to provide sensitive personal data but does not have it
-      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
+  describe("isAcceptedTCValid", () => {
+    test("should return false if accepted_tc is not provided", () => {
+      // GIVEN a user without accepted_tc
+      const userPreferences = {
         user_id: "given user id",
         language: Language.en,
-        accepted_tc: new Date(),
+        accepted_tc: undefined,
         has_sensitive_personal_data: false,
-        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_AVAILABLE,
         sessions: [],
         sessions_with_feedback: [],
-      });
+      };
 
-      // WHEN checking if the user can access the chat page
-      const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
+      // WHEN checking if accepted_tc is valid
+      const result = isAcceptedTCValid(userPreferences);
 
       // THEN the result should be false
-      expect(canAccessChatPage(userPreferences!)).toBe(false);
+      expect(result).toBe(false);
     });
 
-    test("should return true if sensitive personal data is required and user has it", () => {
-      // GIVEN a user that is required to provide sensitive personal data and has it
-      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
+    test("should return false if accepted_tc is invalid", () => {
+      // GIVEN a user with an invalid accepted_tc
+      const userPreferences = {
         user_id: "given user id",
         language: Language.en,
-        accepted_tc: new Date(),
-        has_sensitive_personal_data: true,
-        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
+        accepted_tc: "invalid date",
+        has_sensitive_personal_data: false,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_AVAILABLE,
         sessions: [],
         sessions_with_feedback: [],
-      });
+      };
 
-      // WHEN checking if the user can access the chat page
-      const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
+      // WHEN checking if accepted_tc is valid
+      //@ts-ignore
+      const result = isAcceptedTCValid(userPreferences);
 
-      // THEN the result should be true
-      expect(canAccessChatPage(userPreferences!)).toBe(true);
+      // THEN the result should be false
+      expect(result).toBe(false);
     });
 
-    test("should return true if sensitive personal data is not required", () => {
-      // GIVEN a user that is not required to provide sensitive personal data
-      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
+    test("should return true if accepted_tc is valid", () => {
+      // GIVEN a user with a valid accepted_tc
+      const userPreferences = {
         user_id: "given user id",
         language: Language.en,
         accepted_tc: new Date(),
@@ -114,13 +114,13 @@ describe("protected route util", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_AVAILABLE,
         sessions: [],
         sessions_with_feedback: [],
-      });
+      };
 
-      // WHEN checking if the user can access the chat page
-      const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
+      // WHEN checking if accepted_tc is valid
+      const result = isAcceptedTCValid(userPreferences);
 
       // THEN the result should be true
-      expect(canAccessChatPage(userPreferences!)).toBe(true);
+      expect(result).toBe(true);
     });
   });
 });
