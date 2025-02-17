@@ -19,6 +19,35 @@ class UserInvitationRepository:
     def __init__(self, db: AsyncIOMotorDatabase):
         self._collection = db.get_collection(Collections.USER_INVITATIONS)
 
+    async def upsert_invitation_code(self, invitation: UserInvitation) -> UserInvitation:
+        """
+        Upsert the user invitation object in the database
+
+        :param invitation: UserInvitation the user invitation object
+        :return: UserInvitation the user invitation object.
+        """
+
+        try:
+            _dict = invitation.model_dump()
+
+            _dict.pop("id")  # Remove the id field from the dictionary
+
+            _dict["valid_from"] = _dict["valid_from"].replace(tzinfo=timezone.utc)
+            _dict["valid_until"] = _dict["valid_until"].replace(tzinfo=timezone.utc)
+
+            result = await self._collection.update_one(
+                {"invitation_code": _dict["invitation_code"]},
+                {"$set": _dict},
+                upsert=True
+            )
+
+            _dict["id"] = str(result.upserted_id)
+            return UserInvitation.from_dict(_dict)
+
+        except Exception as e:
+            logger.exception(e)
+            raise e
+
     async def get_valid_invitation_by_code(self, invitation_code: str) -> Optional[UserInvitation]:
         """
         Find a user invitation by the code

@@ -23,6 +23,7 @@ To set up an invitation code, add an entry to the `user_invitations` collection 
   "allowed_usage": 1000,
   "invitation_code": "<e.g., login-01>",
   "invitation_type": "LOGIN or REGISTER",
+  "sensitive_personal_data_requirement": "NOT_AVAILABLE or NOT_REQUIRED or REQUIRED",
   "remaining_usage": 1000,
   "valid_from": {
     "$date": "2020-01-01T00:00:00.000Z"

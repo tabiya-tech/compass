@@ -1,0 +1,20 @@
+[
+  {
+    "allowed_usage": 1,
+    "invitation_code": "login-1",
+    "invitation_type": "LOGIN",
+    "sensitive_personal_data_requirement": "NOT_AVAILABLE",
+    "remaining_usage": 1,
+    "valid_from": "2020-01-01T00:00:00.000Z",
+    "valid_until": "2020-12-31T23:59:59.999Z"
+  },
+  {
+    "allowed_usage": 2,
+    "invitation_code": "login-1",
+    "invitation_type": "LOGIN",
+    "sensitive_personal_data_requirement": "NOT_AVAILABLE",
+    "remaining_usage": 1,
+    "valid_from": "2020-01-01T00:00:00.000Z",
+    "valid_until": "2020-12-31T23:59:59.999Z"
+  }
+]
