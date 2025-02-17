@@ -72,7 +72,7 @@ The server will run on port 3000, and you can preview the application in your br
 
 The application currently uses Firebase for authentication. To read further about the authentication process, please refer to the [Authentication Hierarchy Documentation](authenticationHierarchyDoc.md).
 
-Currently, only invited users can access the application as part of the Authentication and Authorization process. Invitation codes play a key role in this setup. For more details, please refer to this [documentation](invitations.md).
+Currently, only invited users can access the application as part of the Authentication and Authorization process. Invitation codes play a key role in this setup. For more details, please refer to this [documentation](/invitations.md).
 ## Storybook
 
 We use Storybook to test and demonstrate components in the browser. To run Storybook, execute the following command:

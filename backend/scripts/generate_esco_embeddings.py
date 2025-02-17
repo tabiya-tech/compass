@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+import argparse
 import asyncio
 import logging
 import re
@@ -47,8 +50,9 @@ class PlatformCollections(Enum):
     MODEL_INFO = "modelinfos"
 
 
-COMPASS_DB = AsyncIOMotorClient(
-    MONGO_SETTINGS.taxonomy_mongodb_uri, tlsAllowInvalidCertificates=True).get_database(MONGO_SETTINGS.taxonomy_database_name)
+COMPASS_DB = (AsyncIOMotorClient(
+    MONGO_SETTINGS.taxonomy_mongodb_uri, tlsAllowInvalidCertificates=True)
+              .get_database(MONGO_SETTINGS.taxonomy_database_name))
 
 
 class CompassCollections(Enum):
@@ -71,6 +75,11 @@ class EmbeddingContext(BaseModel):
     id_field_name: str
     extra_fields: list[str] = Field(default_factory=list)
     excluded_codes: list[str] = Field(default_factory=list)
+
+
+class Options(BaseModel):
+    generate_embeddings: bool = True
+    generate_indexes: bool = True
 
 
 _OCCUPATIONS_EMBEDDING_CONTEXT = EmbeddingContext(
@@ -241,6 +250,7 @@ async def create_std_indexes(ctx: EmbeddingContext):
 
 
 async def create_vector_search_index(ctx: EmbeddingContext):
+    logger.info(f"creating vector search index for collection:{ctx.destination_collection}")
     vector_index_definition = {
         "fields": [
             {
@@ -281,9 +291,43 @@ async def create_vector_search_index(ctx: EmbeddingContext):
         await COMPASS_DB[ctx.destination_collection].create_search_index(model=search_index_model)
 
 
+async def create_model_info_indexes():
+    logger.info("creating indexes for model info collection")
+
+    # Create the index
+    await upsert_index(
+        COMPASS_DB[CompassCollections.MODEL_INFO.value],
+        {"modelId": 1},
+        name="model_id_index",
+    )
+
+
+async def create_relations_indexes():
+    to_collection = COMPASS_DB[CompassCollections.RELATIONS.value]
+    logger.info("creating indexes of the relations collection")
+
+    await upsert_index(
+        to_collection,
+        {"modelId": 1, "requiringOccupationId": 1},
+        name="requiring_occupation_id_index",
+    )
+
+    await upsert_index(
+        to_collection,
+        {"modelId": 1, "requiredSkillId": 1},
+        name="required_skill_id_index",
+    )
+
+    await upsert_index(
+        to_collection,
+        {"modelId": 1, "source_id": 1},
+        name="model_id_and_source_id_index",
+    )
+
+
 async def create_occupations_indexes():
     # Create the indexes
-    logger.info("[2/2] creating indexes for occupations collection")
+    logger.info("creating indexes for occupations collection")
     await create_std_indexes(_OCCUPATIONS_EMBEDDING_CONTEXT)
     # add an index to searching for a specific occupation code
     await upsert_index(
@@ -296,7 +340,7 @@ async def create_occupations_indexes():
 
 async def create_skills_indexes():
     # Create the indexes
-    logger.info("[2/2] creating indexes for skills collection")
+    logger.info("creating indexes for skills collection")
     await create_std_indexes(_SKILLS_EMBEDDING_CONTEXT)
     await create_vector_search_index(_SKILLS_EMBEDDING_CONTEXT)
 
@@ -341,7 +385,7 @@ async def process_schema(ctx: EmbeddingContext):
     )
 
     # Set the batch size
-    # The batch size is the number of documents to insert in one batch
+    # The batch size is the amount of documents to insert in one batch.
     batch_size = 1000
     cursor = from_collection.find(search_filter).batch_size(batch_size)
     documents = []
@@ -388,13 +432,6 @@ async def copy_model_info():
         {"modelId": ObjectId(model_id)},
         {"$set": from_model_info},
         upsert=True
-    )
-    logger.info("[2/2] creating indexes for model info collection")
-    # Create the index
-    await upsert_index(
-        COMPASS_DB[CompassCollections.MODEL_INFO.value],
-        {"modelId": 1},
-        name="model_id_index",
     )
 
 
@@ -460,57 +497,66 @@ async def copy_relations_collection():
 
     progress.close()
 
-    logger.info("[2/2] creating indexes")
-    await upsert_index(
-        to_collection,
-        {"modelId": 1, "requiringOccupationId": 1},
-        name="requiring_occupation_id_index",
-    )
 
-    await upsert_index(
-        to_collection,
-        {"modelId": 1, "requiredSkillId": 1},
-        name="required_skill_id_index",
-    )
-
-    await upsert_index(
-        to_collection,
-        {"modelId": 1, "source_id": 1},
-        name="model_id_and_source_id_index",
-    )
-
-
-async def main():
+async def main(opts: Options):
     """
     Main function:
     Entry point of the script
     :return:
     """
     logger.info("Starting the main function")
+    logger.info("Using options: "+opts.__str__())
 
     # run the three tasks in parallel
-    await asyncio.gather(
-        # [1/5] Copy the model info
-        copy_model_info(),
+    if opts.generate_embeddings:
+        await asyncio.gather(
+            # [1/5] Copy the model info
+            copy_model_info(),
 
-        # [2/5] Copy the relations collection
-        copy_relations_collection(),
+            # [2/5] Copy the relations collection
+            copy_relations_collection(),
 
-        # [3/5] Process the occupations
-        process_schema(_OCCUPATIONS_EMBEDDING_CONTEXT),
+            # [3/5] Process the occupations
+            process_schema(_OCCUPATIONS_EMBEDDING_CONTEXT),
 
-        # [4/5] Process the skills
-        process_schema(_SKILLS_EMBEDDING_CONTEXT),
-    )
+            # [4/5] Process the skills
+            process_schema(_SKILLS_EMBEDDING_CONTEXT),
+        )
 
     # [5/5] Create the indexes
-    await asyncio.gather(
-        create_occupations_indexes(),
-        create_skills_indexes()
-    )
+    if opts.generate_indexes:
+        await asyncio.gather(
+            create_model_info_indexes(),
+            create_relations_indexes(),
+            create_occupations_indexes(),
+            create_skills_indexes()
+        )
 
     logger.info("Script execution completed")
 
 
 if __name__ == "__main__":
-    asyncio.get_event_loop().run_until_complete(main())
+    parser = argparse.ArgumentParser(description="Generate Taxonomy Embeddings")
+
+    options_group = parser.add_argument_group("Options")
+    options_group.add_argument(
+        "--indexes-only",
+        required=False,
+        action="store_true",
+        help="Create indexes only")
+
+    args = parser.parse_args()
+
+    # Weather the main function will generate embeddings,
+    # if the user said --indexes-only then we will not generate embeddings.
+    generate_embeddings = not args.indexes_only
+
+    # Weather the main function will generate indexes.
+    generate_indexes = True
+
+    _options = Options(
+        generate_embeddings=generate_embeddings,
+        generate_indexes=generate_indexes
+    )
+
+    asyncio.run(main(_options))

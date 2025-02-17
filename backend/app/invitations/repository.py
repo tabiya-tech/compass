@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
-from pymongo import ReturnDocument
+from pymongo import ReturnDocument, UpdateOne
 
 from app.server_dependencies.database_collections import Collections
 from app.invitations.types import UserInvitation
@@ -18,6 +18,28 @@ class UserInvitationRepository:
 
     def __init__(self, db: AsyncIOMotorDatabase):
         self._collection = db.get_collection(Collections.USER_INVITATIONS)
+
+    async def upsert_many_invitation_codes(self, invitations: list[UserInvitation]) -> None:
+        """
+        Upsert many user invitation objects in the database.
+        """
+        try:
+            _dicts = [invitation.model_dump() for invitation in invitations]
+            documents = []
+            for _dict in _dicts:
+                _dict.pop("id")  # Remove the id field from the dictionary
+
+                documents.append(UpdateOne(
+                    {"invitation_code": _dict["invitation_code"]},
+                    {"$set": _dict},
+                    upsert=True
+                ))
+
+            await self._collection.bulk_write(documents)
+
+        except Exception as e:
+            logger.exception(e)
+            raise e
 
     async def get_valid_invitation_by_code(self, invitation_code: str) -> Optional[UserInvitation]:
         """
