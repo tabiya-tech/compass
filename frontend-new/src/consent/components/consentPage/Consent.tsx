@@ -17,7 +17,7 @@ import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import { Theme } from "@mui/material/styles";
 import ConfirmModalDialog from "src/theme/confirmModalDialog/ConfirmModalDialog";
 import CustomLink from "src/theme/CustomLink/CustomLink";
-import { canAccessPIIPage } from "src/app/ProtectedRoute/util";
+import { isSensitiveDataValid } from "src/app/ProtectedRoute/util";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
@@ -83,7 +83,7 @@ const Consent: React.FC = () => {
         sensitive_personal_data_requirement: userPreferences?.sensitive_personal_data_requirement!,
       });
 
-      if (canAccessPIIPage(userPreferences!)) {
+      if (!isSensitiveDataValid(userPreferences!)) {
         navigate(routerPaths.SENSITIVE_DATA, { replace: true });
       } else {
         navigate(routerPaths.ROOT, { replace: true });

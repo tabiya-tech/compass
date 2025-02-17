@@ -13,7 +13,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.asymmetric import rsa, padding as asymmetric_padding
 
-from app.users.sensitive_personal_data.types import SensitivePersonalData
+from app.users.sensitive_personal_data.types import SensitivePersonalData, EncryptedSensitivePersonalData
 from common_libs.test_utilities.random_data import get_random_printable_string
 from app.users.sensitive_personal_data.repository import SensitivePersonalDataRepository
 from scripts.sensitive_data.decrypt_sensitive_personal_data import decrypt_sensitive_data_from_database, \
@@ -63,10 +63,12 @@ def _encrypt_sensitive_test_data(
 
     return SensitivePersonalData(
         user_id=user_id,
-        rsa_key_id=key_id,
-        aes_encryption_key=base64.b64encode(encrypted_aes_key).decode(),
-        aes_encrypted_data=base64.b64encode(iv + aes_encrypted_data + encryptor.tag).decode(),
-        created_at=created_at
+        created_at=created_at,
+        sensitive_personal_data=EncryptedSensitivePersonalData(
+            rsa_key_id=key_id,
+            aes_encryption_key=base64.b64encode(encrypted_aes_key).decode(),
+            aes_encrypted_data=base64.b64encode(iv + aes_encrypted_data + encryptor.tag).decode()
+        )
     )
 
 

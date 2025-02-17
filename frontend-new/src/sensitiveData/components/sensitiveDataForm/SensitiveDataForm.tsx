@@ -61,7 +61,7 @@ export const DATA_TEST_ID = {
   SENSITIVE_DATA_FORM_BUTTON: `sensitive-data-form-button-${uniqueId}`,
   SENSITIVE_DATA_FORM_BUTTON_CIRCULAR_PROGRESS: `sensitive-data-form-button-circular-progress-${uniqueId}`,
   SENSITIVE_DATA_REJECT_BUTTON: `sensitive-data-reject-button-${uniqueId}`,
-  SENSITIVE_DATA_SKIP_BUTTON: `sensitive-data-skip-button-${uniqueId}`,
+  SENSITIVE_DATA_SKIP_BUTTON: `sensitive-data-skip-button-${uniqueId}`
 };
 
 export const ERROR_MESSAGE = {
@@ -122,6 +122,7 @@ const SensitiveDataForm: React.FC = () => {
   const [isSavingSensitiveData, setIsSavingSensitiveData] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
   const [confirmingReject, setConfirmingReject] = useState(false);
+  const [isSkipping, setIsSkipping] = useState(false);
   const [confirmingSkip, setConfirmingSkip] = useState(false);
   const [isSubmitButtonEnabled, setIsSubmitButtonEnabled] = useState(false);
   const [userPreferences] = useState<UserPreference | null>(
@@ -203,11 +204,32 @@ const SensitiveDataForm: React.FC = () => {
     }
   }, [enqueueSnackbar, navigate]);
 
-  const handleSkipProvidingSensitiveData = () => {
+  const handleSkipProvidingSensitiveData = useCallback(async () => {
+    setIsSkipping(true);
     setConfirmingSkip(false);
-    // Add the implementation to skip providing sensitive data here.
-    navigate(routerPaths.ROOT);
-  };
+    try {
+      await sensitivePersonalDataService.skip(userPreferences!.user_id);
+      
+      // Update user preferences to indicate that the user has skipped sensitive personal data
+      UserPreferencesStateService.getInstance().setUserPreferences({
+        ...userPreferences!,
+        has_sensitive_personal_data: true,
+      });
+
+      enqueueSnackbar("Personal data collection skipped.", { variant: "success" });
+      navigate(routerPaths.ROOT);
+    } catch (e) {
+      if (e instanceof RestAPIError) {
+        writeRestAPIErrorToLog(e, console.error);
+        enqueueSnackbar(getUserFriendlyErrorMessage(e), { variant: "error" });
+      } else {
+        console.error("Failed to skip personal data", e);
+        enqueueSnackbar(ERROR_MESSAGE.DEFAULT, { variant: "error" });
+      }
+    } finally {
+      setIsSkipping(false);
+    }
+  }, [enqueueSnackbar, navigate, userPreferences]);
 
   const isPIIRequired =
     userPreferences?.sensitive_personal_data_requirement === SensitivePersonalDataRequirement.REQUIRED;
@@ -381,6 +403,7 @@ const SensitiveDataForm: React.FC = () => {
               ) : (
                 <CustomLink
                   data-testid={DATA_TEST_ID.SENSITIVE_DATA_SKIP_BUTTON}
+                  disabled={isSkipping}
                   onClick={() => {
                     setConfirmingSkip(true);
                   }}
@@ -393,7 +416,7 @@ const SensitiveDataForm: React.FC = () => {
                 fullWidth
                 variant="contained"
                 color="primary"
-                disabled={!isSubmitButtonEnabled}
+                disabled={!isSubmitButtonEnabled || isSkipping}
                 disableWhenOffline={true}
                 onClick={handleSaveSensitivePersonalData}
                 data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON}
@@ -403,7 +426,7 @@ const SensitiveDataForm: React.FC = () => {
                     color={"secondary"}
                     size={theme.typography.h5.fontSize}
                     sx={{ marginTop: theme.tabiyaSpacing.xs, marginBottom: theme.tabiyaSpacing.xs }}
-                    aria-label={"Registering"}
+                    aria-label={"Saving"}
                     data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON_CIRCULAR_PROGRESS}
                   />
                 ) : (
@@ -466,7 +489,10 @@ const SensitiveDataForm: React.FC = () => {
         cancelButtonText="Yes, skip"
         confirmButtonText="No, continue"
       />
-      <Backdrop isShown={isRejecting} message={"Logging you out..."} />
+      <Backdrop 
+        isShown={isSkipping || isRejecting}
+        message={isSkipping ? "Skipping..." : "Logging you out..."}
+      />
     </>
   );
 };
