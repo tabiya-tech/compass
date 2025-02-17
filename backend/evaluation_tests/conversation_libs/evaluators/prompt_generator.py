@@ -24,6 +24,13 @@ class PromptGenerator:
                             Did the EVALUATED_AGENT lose focus on the topic of the conversation and on its
                             task of investigating the experiences and skill of the user? Did the EVALUATED_AGENT give into
                             a topic of conversation that is different from the experience and skill investigation?
+                            Did the EVALUATED_AGENT start delving too deep into the skills developed during one experience, or did it get back to its job of finding relevant informations?
+                        """)
+            
+            case EvaluationType.NO_ADVICE:
+                return textwrap.dedent("""
+                            Did the EVALUATED_AGENT give advice to the SIMULATED_USER in the conversation?
+                            Did the EVALUATED_AGENT suggest what the SIMULATED_USER should or should not do?
                         """)
 
             case EvaluationType.SUMMARY_CONSISTENCY:
@@ -69,6 +76,11 @@ class PromptGenerator:
             case EvaluationType.FOCUS:
                 return textwrap.dedent("""
                             The conversation is somewhat focused, but the EVALUATED_AGENT allows the user to drift off at times.
+                        """)
+            
+            case EvaluationType.NO_ADVICE:
+                return textwrap.dedent("""
+                            The EVALUATED_AGENT respect the boundaries, but still gives some suggestions on what the user should or should not do.
                         """)
 
             case EvaluationType.SUMMARY_CONSISTENCY:
