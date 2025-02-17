@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Mapping, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -35,10 +35,6 @@ class UserInvitation(BaseModel):
     A user invitation object, this class is only used in the backend, we don't expose this in the response,
     The reason is that we don't want to expose the id. and other internal fields like usage status.
     """
-    id: str
-    """
-    Invitation Object Id
-    """
 
     invitation_code: str
     """
@@ -70,42 +66,14 @@ class UserInvitation(BaseModel):
     The type of invitation
     """
 
-    sensitive_personal_data_requirement: SensitivePersonalDataRequirement
+    sensitive_personal_data_requirement: SensitivePersonalDataRequirement = SensitivePersonalDataRequirement.NOT_AVAILABLE
     """
-    Sensitive Personal data requirement for the invitation, whether sensitive personal data required or not for now
+    Sensitive Personal data requirement for the invitation, whether sensitive personal data required or not
     """
-
-    @staticmethod
-    def from_dict(_dict: Mapping[str, any]) -> "UserInvitation":
-        """
-        Create a new UserInvitation object from a dictionary
-        :param _dict: Mapping[str, any]: The dictionary to create the UserInvitation object from
-        :return: UserInvitation: The created UserInvitation object
-        """
-
-        return UserInvitation(
-            id=str(_dict.get("_id")),
-            invitation_code=_dict.get("invitation_code"),
-            remaining_usage=_dict.get("remaining_usage"),
-            allowed_usage=_dict.get("allowed_usage"),
-            valid_from=_dict.get("valid_from"),
-            valid_until=_dict.get("valid_until"),
-            invitation_type=_dict.get("invitation_type"),
-            # If the key is not found, default to NOT_AVAILABLE
-            # for legacy invitation codes
-            sensitive_personal_data_requirement=_dict.get(
-                "sensitive_personal_data_requirement",
-                SensitivePersonalDataRequirement.NOT_AVAILABLE
-            )
-        )
 
     class Config:
-        """
-        Pydantic configuration
-        """
-
+        # Do not allow extra fields
         extra = "forbid"
-        use_enum_values = True
 
 
 class GetInvitationCodeStatusResponse(BaseModel):
