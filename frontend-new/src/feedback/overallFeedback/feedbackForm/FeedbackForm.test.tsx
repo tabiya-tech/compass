@@ -1,7 +1,7 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
 
-import FeedbackForm, { DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
+import FeedbackForm, { DATA_TEST_ID, FeedbackCloseEvent } from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { fireEvent, waitFor } from "@testing-library/react";
 import { DATA_TEST_ID as FEEDBACK_FORM_CONTENT_DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
@@ -44,7 +44,7 @@ jest.mock("src/userPreferences/UserPreferencesStateService", () => ({
 describe("FeedbackForm", () => {
   test("should render component successfully", () => {
     // GIVEN the component
-    const givenFeedbackForm = <FeedbackForm isOpen={true} notifyOnClose={jest.fn()} onFeedbackSubmit={jest.fn()} />;
+    const givenFeedbackForm = <FeedbackForm isOpen={true} notifyOnClose={jest.fn()} />;
 
     // WHEN the component is rendered
     render(givenFeedbackForm);
@@ -71,7 +71,7 @@ describe("FeedbackForm", () => {
     // GIVEN the component
     const mockHandleClose = jest.fn();
     const givenFeedbackForm = (
-      <FeedbackForm isOpen={true} notifyOnClose={mockHandleClose} onFeedbackSubmit={jest.fn()} />
+      <FeedbackForm isOpen={true} notifyOnClose={mockHandleClose} />
     );
     // AND the component is rendered
     render(givenFeedbackForm);
@@ -96,7 +96,7 @@ describe("FeedbackForm", () => {
       // GIVEN the component
       const mockHandleClose = jest.fn();
       const givenFeedbackForm = (
-        <FeedbackForm isOpen={true} notifyOnClose={mockHandleClose} onFeedbackSubmit={jest.fn()} />
+        <FeedbackForm isOpen={true} notifyOnClose={mockHandleClose} />
       );
       // AND the component is rendered
       render(givenFeedbackForm);
@@ -111,9 +111,9 @@ describe("FeedbackForm", () => {
       }
 
       // THEN expect the notifyOnClose to have been called
-      expect(mockHandleClose).toHaveBeenCalled();
+      await waitFor(() => expect(mockHandleClose).toHaveBeenCalledWith(FeedbackCloseEvent.SUBMIT));
       // AND the sendFeedback function to have been called
-      await waitFor(() => expect(mockSendFeedback).toHaveBeenCalled());
+      expect(mockSendFeedback).toHaveBeenCalled();
       // AND the snackbar to have been called
       await waitFor(() =>
         expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Feedback submitted successfully!", {
@@ -137,7 +137,7 @@ describe("FeedbackForm", () => {
       });
 
       // WHEN the component is rendered
-      render(<FeedbackForm isOpen={true} notifyOnClose={jest.fn()} onFeedbackSubmit={jest.fn()} />);
+      render(<FeedbackForm isOpen={true} notifyOnClose={jest.fn()} />);
       // AND there is at least one answer
       const input = screen.getAllByTestId(COMMENT_TEXT_FIELD_TEST_ID.COMMENT_TEXT_FIELD);
       fireEvent.change(input[0], { target: { value: "This is a comment" } });

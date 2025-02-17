@@ -32,16 +32,12 @@ import {
 import ConfirmModalDialog, {
   DATA_TEST_ID as CONFIRM_MODAL_DIALOG_DATA_TEST_ID,
 } from "src/theme/confirmModalDialog/ConfirmModalDialog";
-import FeedbackForm, {
-  DATA_TEST_ID as FEEDBACK_FORM_DATA_TEST_ID,
-} from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
 import { DATA_TEST_ID as INACTIVE_BACKDROP_DATA_TEST_ID } from "src/theme/Backdrop/InactiveBackdrop";
 import userEvent, { UserEvent } from "@testing-library/user-event";
 import { ChatMessageType, IChatMessage } from "./Chat.types";
 import { FIXED_MESSAGES_TEXT } from "./util";
 import { TabiyaUser } from "src/auth/auth.types";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
-import { PersistentStorageService } from "../app/PersistentStorageService/PersistentStorageService";
 
 // Mock Components ----------
 // mock the snackbar
@@ -122,19 +118,6 @@ jest.mock("src/experiences/experiencesDrawer/ExperiencesDrawer", () => {
   };
 });
 
-// mock the Feedback Form
-jest.mock("src/feedback/overallFeedback/feedbackForm/FeedbackForm", () => {
-  const actual = jest.requireActual("src/feedback/overallFeedback/feedbackForm/FeedbackForm");
-  const mockOverallFeedbackForm = jest
-    .fn()
-    .mockImplementation(() => <div data-testid={actual.DATA_TEST_ID.FEEDBACK_FORM_DIALOG}></div>);
-  return {
-    __esModule: true,
-    default: mockOverallFeedbackForm,
-    DATA_TEST_ID: actual.DATA_TEST_ID,
-  };
-});
-
 // mock the Confirm Modal Dialog
 jest.mock("src/theme/confirmModalDialog/ConfirmModalDialog", () => {
   const actual = jest.requireActual("src/theme/confirmModalDialog/ConfirmModalDialog");
@@ -189,10 +172,6 @@ describe("Chat", () => {
             id: expect.any(String),
           }))
         ),
-        notifyOnFeedbackFormOpen: expect.any(Function),
-        notifyOnExperiencesDrawerOpen: expect.any(Function),
-        isFeedbackSubmitted: false,
-        isFeedbackStarted: false,
       }),
       {}
     );
@@ -1455,190 +1434,6 @@ describe("Chat", () => {
       });
       // AND expect the dialog to close
       expect(screen.queryByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL)).not.toBeInTheDocument();
-    });
-  });
-
-  describe("handling feedback form", () => {
-    test("should handle feedback submission successfully", async () => {
-      // GIVEN a user is logged in
-      const givenUser: TabiyaUser = getMockUser();
-      AuthenticationStateService.getInstance().setUser(givenUser);
-      // AND the user has an active session
-      const givenActiveSessionId = 123;
-      UserPreferencesStateService.getInstance().setUserPreferences(
-        getMockUserPreferences(givenUser, givenActiveSessionId)
-      );
-      // AND a chat service with existing messages
-      const givenMessages: ConversationResponse = getMockConversationResponse([
-        {
-          message: "66a3fd90-2f4a-4aeb-af56-b4f12f73c68d",
-          sent_at: new Date().toISOString(),
-          sender: ConversationMessageSender.USER,
-        },
-        {
-          message: "c64b0aae-f19b-49cb-a8e8-2e6f4fd69947",
-          sent_at: new Date().toISOString(),
-          sender: ConversationMessageSender.COMPASS,
-        },
-      ]);
-      jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenMessages);
-      // AND the conversation is completed
-      givenMessages.conversation_completed = true;
-
-      // WHEN the component is mounted
-      render(<Chat />);
-
-      // AND the feedback form is triggered
-      // we are using the last call to the ChatList mock because the first one is the initial call
-      // and a bunch of calls are made when the component is re-rendered,
-      // for example, due to the chat initialization
-      act(() => {
-        (ChatList as jest.Mock).mock.calls.at(-1)[0].notifyOnFeedbackFormOpen();
-      });
-
-      // THEN expect feedback form to be visible
-      await waitFor(() => {
-        expect(screen.getByTestId(FEEDBACK_FORM_DATA_TEST_ID.FEEDBACK_FORM_DIALOG)).toBeInTheDocument();
-      });
-
-      // AND the user submits feedback
-      // we are using the last call to the FeedbackForm mock because the first one is the initial call
-      // and a bunch of calls are made when the component is re-rendered,
-      // for example, due to the chat initialization
-      act(() => {
-        (FeedbackForm as jest.Mock).mock.calls.at(-1)[0].onFeedbackSubmit();
-      });
-
-      // THEN expect the feedback to be submitted
-      expect(ChatList as jest.Mock).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          isFeedbackSubmitted: true,
-        }),
-        {}
-      );
-      // AND no errors or warnings were logged
-      expect(console.error).not.toHaveBeenCalled();
-      expect(console.warn).not.toHaveBeenCalled();
-    });
-
-    test("should show feedback form when conversation is completed and notifyOnFeedbackFormOpen is called", async () => {
-      // GIVEN a user is logged in
-      const givenUser: TabiyaUser = getMockUser();
-      AuthenticationStateService.getInstance().setUser(givenUser);
-      // AND the user has an active session
-      const givenActiveSessionId = 123;
-      UserPreferencesStateService.getInstance().setUserPreferences(
-        getMockUserPreferences(givenUser, givenActiveSessionId)
-      );
-      // AND a chat service with existing messages
-      const givenMessages: ConversationResponse = getMockConversationResponse([
-        {
-          message: "66a3fd90-2f4a-4aeb-af56-b4f12f73c68d",
-          sent_at: new Date().toISOString(),
-          sender: ConversationMessageSender.USER,
-        },
-        {
-          message: "c64b0aae-f19b-49cb-a8e8-2e6f4fd69947",
-          sent_at: new Date().toISOString(),
-          sender: ConversationMessageSender.COMPASS,
-        },
-      ]);
-      jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenMessages);
-      // AND the conversation is completed
-      givenMessages.conversation_completed = true;
-
-      // WHEN the component is mounted
-      render(<Chat />);
-      // AND the feedback form is triggered
-      // we are using the last call to the ChatList mock because the first one is the initial call
-      // and a bunch of calls are made when the component is re-rendered,
-      // for example, due to the chat initialization
-      act(() => {
-        (ChatList as jest.Mock).mock.calls.at(-1)[0].notifyOnFeedbackFormOpen();
-      });
-
-      // THEN expect feedback form to be visible
-      await waitFor(() => {
-        expect(screen.getByTestId(FEEDBACK_FORM_DATA_TEST_ID.FEEDBACK_FORM_DIALOG)).toBeInTheDocument();
-      });
-      // AND no errors or warnings were logged
-      expect(console.error).not.toHaveBeenCalled();
-      expect(console.warn).not.toHaveBeenCalled();
-    });
-
-    test("should close feedback form when notifyOnClose is called", async () => {
-      // GIVEN a user is logged in
-      const givenUser: TabiyaUser = getMockUser();
-      AuthenticationStateService.getInstance().setUser(givenUser);
-      // AND the user has an active session
-      const givenActiveSessionId = 123;
-      UserPreferencesStateService.getInstance().setUserPreferences(getMockUserPreferences(givenUser, givenActiveSessionId));
-
-      // WHEN the component is mounted
-      render(<Chat />);
-
-      // AND the feedback form is triggered
-      // we are using the last call to the ChatList mock because the first one is the initial call
-      // and a bunch of calls are made when the component is re-rendered,
-      // for example, due to the chat initialization
-      act(() => {
-        (ChatList as jest.Mock).mock.calls.at(-1)[0].notifyOnFeedbackFormOpen();
-      });
-
-      // THEN expect feedback form to be visible
-      expect(FeedbackForm).toHaveBeenCalledWith(
-        expect.objectContaining({ isOpen: true }),
-        expect.anything()
-      );
-
-      // WHEN the feedback form is closed
-      act(() => {
-          (FeedbackForm as jest.Mock).mock.calls.at(-1)[0].notifyOnClose();
-      });
-
-      // THEN expect feedback form to be hidden
-      expect(FeedbackForm).toHaveBeenCalledWith(
-        expect.objectContaining({ isOpen: false }),
-        expect.anything()
-      );
-
-      // AND no errors or warnings were logged
-      expect(console.error).not.toHaveBeenCalled();
-      expect(console.warn).not.toHaveBeenCalled();
-    });
-
-    test("should call getOverallFeedback when feedback form is closed", async () => {
-      // GIVEN a user is logged in
-      const givenUser: TabiyaUser = getMockUser();
-      AuthenticationStateService.getInstance().setUser(givenUser);
-      // AND the user has an active session
-      const givenActiveSessionId = 123;
-      UserPreferencesStateService.getInstance().setUserPreferences(getMockUserPreferences(givenUser, givenActiveSessionId));
-      // AND getOverallFeedback returns a feedback
-      jest.spyOn(PersistentStorageService, "getOverallFeedback").mockReturnValueOnce([
-        {
-          question_id: "foo",
-          answer: {
-            rating_numeric: 8,
-          },
-          is_answered: true,
-        },
-      ]);
-
-      // WHEN the component is mounted
-      render(<Chat />);
-      // AND the feedback form is triggered
-      act(() => {
-        (ChatList as jest.Mock).mock.calls.at(-1)[0].notifyOnFeedbackFormOpen();
-      });
-
-      // WHEN the feedback form is closed
-      act(() => {
-        (FeedbackForm as jest.Mock).mock.calls.at(-1)[0].notifyOnClose();
-      });
-
-      // THEN expect getOverallFeedback to be called
-      expect(PersistentStorageService.getOverallFeedback).toHaveBeenCalled();
     });
   });
 

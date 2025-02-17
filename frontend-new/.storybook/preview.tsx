@@ -21,6 +21,7 @@ import type { Preview, StoryFn, StoryObj } from "@storybook/react";
 import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineContext } from "../src/app/isOnlineProvider/IsOnlineProvider";
 import { initSentry } from "../src/sentryInit";
+import { ChatProvider } from "../src/chat/ChatContext";
 
 const preview: Preview = {
   parameters: {
@@ -116,7 +117,9 @@ export const decorators = [
           <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
             <SnackbarProvider>
               <div style={{ height: "100vh" }}>
-                <Story />
+                <ChatProvider handleOpenExperiencesDrawer={() => {}}>
+                  <Story />
+                </ChatProvider>
               </div>
             </SnackbarProvider>
           </ThemeProvider>

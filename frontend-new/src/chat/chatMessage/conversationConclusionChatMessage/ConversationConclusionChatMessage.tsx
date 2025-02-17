@@ -10,20 +10,12 @@ export const DATA_TEST_ID = {
   CONVERSATION_CONCLUSION_CHAT_MESSAGE_CONTAINER: `conversation_conclusion_chat-message-container-${uniqueId}`,
 };
 
-type ConversationConclusionChatMessageProps = {
+interface ConversationConclusionChatMessageProps {
   chatMessage: IChatMessage;
-  notifyOnFeedbackFormOpen: () => void;
-  notifyOnExperiencesDrawerOpen: () => void;
-  isFeedbackSubmitted: boolean;
-  isFeedbackStarted: boolean;
-};
+}
 
 const ConversationConclusionChatMessage: React.FC<ConversationConclusionChatMessageProps> = ({
   chatMessage,
-  notifyOnFeedbackFormOpen,
-  notifyOnExperiencesDrawerOpen,
-  isFeedbackSubmitted,
-  isFeedbackStarted,
 }) => {
   return (
     <MessageContainer
@@ -31,12 +23,7 @@ const ConversationConclusionChatMessage: React.FC<ConversationConclusionChatMess
       data-testid={DATA_TEST_ID.CONVERSATION_CONCLUSION_CHAT_MESSAGE_CONTAINER}
     >
       <ChatBubble message={chatMessage.message} sender={chatMessage.sender}>
-        <ConversationConclusionFooter
-          notifyOnFeedbackFormOpen={notifyOnFeedbackFormOpen}
-          notifyOnExperiencesDrawerOpen={notifyOnExperiencesDrawerOpen}
-          isFeedbackSubmitted={isFeedbackSubmitted}
-          isFeedbackStarted={isFeedbackStarted}
-        />
+        <ConversationConclusionFooter />
       </ChatBubble>
     </MessageContainer>
   );

@@ -1,10 +1,41 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`FeedbackFormButton should render component successfully 1`] = `
-<a
-  class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
-  data-testid="feedback-form-button-41675f8b-257c-4a63-9563-3fe9feb6a850"
+exports[`ConversationConclusionFooter should render component successfully 1`] = `
+<div
+  class="MuiBox-root css-z3t5d1"
+  data-testid="feedback-form-button-container-41675f8b-257c-4a63-9563-3fe9feb6a850"
 >
-  feedback
-</a>
+  <p
+    class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+  >
+    Don't forget to
+     
+    <a
+      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+      data-testid="feedback-form-experiences-drawer-button-41675f8b-257c-4a63-9563-3fe9feb6a850"
+    >
+      <span
+        style="white-space: normal;"
+      >
+        view and download your CV
+      </span>
+    </a>
+    !
+  </p>
+  <p
+    class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+    data-testid="feedback-message-text-41675f8b-257c-4a63-9563-3fe9feb6a850"
+  >
+    We'd love your
+     
+    <a
+      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+      data-testid="feedback-form-button-41675f8b-257c-4a63-9563-3fe9feb6a850"
+    >
+      feedback
+    </a>
+     
+    on this chat. It only takes 5 minutes and helps us improve!
+  </p>
+</div>
 `;

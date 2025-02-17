@@ -13,6 +13,7 @@ import ChatBubble, {
   DATA_TEST_ID as CHAT_BUBBLE_DATA_TEST_ID,
 } from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import ConversationConclusionChatMessage from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
+import { ChatProvider } from "src/chat/ChatContext";
 
 // mock the chat message component
 jest.mock("src/chat/chatMessage/basicChatMessage/BasicChatMessage", () => {
@@ -65,6 +66,8 @@ describe("ChatList", () => {
     jest.clearAllMocks();
   });
 
+  const mockHandleOpenExperiencesDrawer = jest.fn();
+
   test("should render the Chat List and show the appropriate message type for each message", () => {
     // GIVEN a message list
     const givenMessages = [
@@ -97,20 +100,12 @@ describe("ChatList", () => {
         type: ChatMessageType.CONVERSATION_CONCLUSION,
       },
     ];
-    // AND a function to open the feedback form
-    const givenNotifyOpenFeedbackForm = jest.fn();
-    // AND a function to open the experiences drawer
-    const givenNotifyOpenExperiencesDrawer = jest.fn();
 
     // WHEN the chat list is rendered
     render(
-      <ChatList
-        messages={givenMessages}
-        notifyOnFeedbackFormOpen={givenNotifyOpenFeedbackForm}
-        notifyOnExperiencesDrawerOpen={givenNotifyOpenExperiencesDrawer}
-        isFeedbackSubmitted={false}
-        isFeedbackStarted={false}
-      />
+      <ChatProvider handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer}>
+        <ChatList messages={givenMessages} />
+      </ChatProvider>
     );
 
     // THEN expect the chat list container to be visible
@@ -157,10 +152,6 @@ describe("ChatList", () => {
       1,
       {
         chatMessage: givenMessages[3],
-        notifyOnFeedbackFormOpen: givenNotifyOpenFeedbackForm,
-        notifyOnExperiencesDrawerOpen: givenNotifyOpenExperiencesDrawer,
-        isFeedbackSubmitted: false,
-        isFeedbackStarted: false,
       },
       {}
     );
@@ -192,13 +183,7 @@ describe("ChatList", () => {
     ];
     // AND the chat list is rendered
     render(
-      <ChatList
-        messages={givenMessages}
-        notifyOnFeedbackFormOpen={jest.fn()}
-        notifyOnExperiencesDrawerOpen={jest.fn()}
-        isFeedbackSubmitted={false}
-        isFeedbackStarted={false}
-      />
+      <ChatList messages={givenMessages}/>
     );
 
     // WHEN the window is resized

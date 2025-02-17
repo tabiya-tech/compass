@@ -3,19 +3,33 @@ import ConversationConclusionChatMessage from "src/chat/chatMessage/conversation
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { ChatMessageType } from "src/chat/Chat.types";
 import { nanoid } from "nanoid";
-import { action } from "@storybook/addon-actions";
+import { ChatProvider, useChatContext } from "src/chat/ChatContext";
+import { FeedbackStatus } from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
+import { useEffect } from "react";
+
+const withChatContext = (feedbackStatus: FeedbackStatus) => (Story: any) => {
+  const Wrapper = () => {
+    const { setFeedbackStatus } = useChatContext();
+    
+    useEffect(() => {
+      setFeedbackStatus(feedbackStatus);
+    }, [setFeedbackStatus]);
+
+    return <Story />;
+  };
+
+  return (
+    <ChatProvider handleOpenExperiencesDrawer={() => {}}>
+      <Wrapper />
+    </ChatProvider>
+  );
+};
 
 const meta: Meta<typeof ConversationConclusionChatMessage> = {
   title: "Chat/ChatMessage/ConversationConclusion",
   component: ConversationConclusionChatMessage,
   tags: ["autodocs"],
   argTypes: {},
-  args: {
-    notifyOnFeedbackFormOpen: action("Feedback Form opened"),
-    notifyOnExperiencesDrawerOpen: action("Experiences Drawer opened"),
-    isFeedbackSubmitted: false,
-    isFeedbackStarted: false,
-  },
 };
 
 export default meta;
@@ -79,9 +93,9 @@ export const FeedbackInProgress: Story = {
       sent_at: new Date().toISOString(),
       message: "It was great exploring your skills with you! I hope you found this session helpful. Goodbye!",
       type: ChatMessageType.CONVERSATION_CONCLUSION,
-    },
-    isFeedbackStarted: true,
+    }
   },
+  decorators: [withChatContext(FeedbackStatus.STARTED)],
 };
 
 export const FeedbackSubmitted: Story = {
@@ -93,6 +107,6 @@ export const FeedbackSubmitted: Story = {
       message: "It was great exploring your skills with you! I hope you found this session helpful. Goodbye!",
       type: ChatMessageType.CONVERSATION_CONCLUSION,
     },
-    isFeedbackSubmitted: true,
   },
+  decorators: [withChatContext(FeedbackStatus.SUBMITTED)],
 };
