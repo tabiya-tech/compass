@@ -40,10 +40,11 @@ class ISensitivePersonalDataRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def stream(self, batch_size: int = 100) -> AsyncIterator[SensitivePersonalData]:
+    async def stream(self, discard_skipped: bool, batch_size: int = 100) -> AsyncIterator[SensitivePersonalData]:
         """
         Stream all sensitive personal data in batches
 
+        :param discard_skipped: whether skipped sensitive data entries are included in stream
         :param batch_size: batch size
         :return: AsyncIterator[SensitivePersonalData] - the sensitive personal data
         """
@@ -74,7 +75,12 @@ class SensitivePersonalDataRepository(ISensitivePersonalDataRepository):
         # return the inserted document id
         return _insert_results.inserted_id.__str__()
 
-    async def stream(self, batch_size: int = 100) -> AsyncIterator[SensitivePersonalData]:
-        cursor = self._collection.find({}).batch_size(batch_size)
+    async def stream(self, discard_skipped: bool, batch_size: int = 100) -> AsyncIterator[SensitivePersonalData]:
+        query = {}
+        if discard_skipped:
+            query["sensitive_personal_data_skipped"] = {"$eq": False}
+        
+        cursor = self._collection.find(query).sort("user_id", 1).batch_size(batch_size)
+
         async for document in cursor:
             yield SensitivePersonalData.from_dict(document)

@@ -2,19 +2,20 @@ import {
   SensitivePersonalDataRequirement,
   UserPreference,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { isValid } from "date-fns";
 
-export function canAccessPIIPage(userPreferences: UserPreference): boolean {
-  if (userPreferences.has_sensitive_personal_data) {
+export function isSensitiveDataValid(userPreferences: UserPreference): boolean {
+  const isSensitiveDataExpected = userPreferences.sensitive_personal_data_requirement !== SensitivePersonalDataRequirement.NOT_AVAILABLE;
+  const hasSensitiveData = userPreferences.has_sensitive_personal_data;
+
+  return !isSensitiveDataExpected || hasSensitiveData;
+}
+
+export function isAcceptedTCValid(userPreferences: UserPreference): boolean {
+  if (!userPreferences?.accepted_tc) {
     return false;
   }
 
-  return userPreferences.sensitive_personal_data_requirement !== SensitivePersonalDataRequirement.NOT_AVAILABLE;
-}
-
-export function canAccessChatPage(userPreferences: UserPreference): boolean {
-  const isSensitiveDataRequired =
-    userPreferences.sensitive_personal_data_requirement === SensitivePersonalDataRequirement.REQUIRED;
-  const hasNoSensitiveData = !userPreferences.has_sensitive_personal_data;
-
-  return !(isSensitiveDataRequired && hasNoSensitiveData);
+  const acceptedTCDate = new Date(userPreferences.accepted_tc);
+  return isValid(acceptedTCDate);
 }
