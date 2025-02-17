@@ -14,7 +14,7 @@ import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { routerPaths } from "src/app/routerPaths";
 import {
   SensitivePersonalDataRequirement,
-  Language,
+  Language, UserPreference,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import * as RestAPIErrorLoggerModule from "src/error/restAPIError/logger";
@@ -23,7 +23,7 @@ import { AuthenticationError } from "src/error/commonErrors";
 import { DATA_TEST_ID as CONFIRM_MODAL_DIALOG_TEST_ID } from "src/theme/confirmModalDialog/ConfirmModalDialog";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
-import { canAccessPIIPage } from "src/app/ProtectedRoute/util";
+import * as ProtectedRouteUtils from "src/app/ProtectedRoute/util";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -57,11 +57,6 @@ jest.mock("react-router-dom", () => {
     }),
   };
 });
-
-// mock the canAccessPIIPage function
-jest.mock("src/app/ProtectedRoute/util", () => ({
-  canAccessPIIPage: jest.fn(),
-}));
 
 describe("Testing Consent Page", () => {
   beforeEach(() => {
@@ -128,23 +123,28 @@ describe("Testing Consent Page", () => {
 
   describe("action tests", () => {
     describe("accept agreements", () => {
-      test("should successfully accept the agreements", async () => {
+      test.each([
+        [routerPaths.SENSITIVE_DATA, SensitivePersonalDataRequirement.NOT_REQUIRED],
+        [routerPaths.SENSITIVE_DATA, SensitivePersonalDataRequirement.REQUIRED],
+        [routerPaths.ROOT, SensitivePersonalDataRequirement.NOT_AVAILABLE]
+      ])("should successfully accept the agreements and navigate to %s when the sensitive data is %s", async (expectedRoute, givenSensitiveDataRequirement) => {
         mockBrowserIsOnLine(true);
 
         // GIVEN the user preferences state service is mocked to set the user preferences
-        jest.spyOn(UserPreferencesStateService.getInstance(), "setUserPreferences").mockImplementation(() => {});
+        const givenUserPreferences: UserPreference = {
+          user_id: "",
+          language: Language.en,
+          accepted_tc: new Date(),
+          sessions: [],
+          sessions_with_feedback: [],
+          has_sensitive_personal_data: false,
+          sensitive_personal_data_requirement: givenSensitiveDataRequirement,
+        }
+        UserPreferencesStateService.getInstance().setUserPreferences(givenUserPreferences)
 
         const updateUserPreferences = jest
           .spyOn(UserPreferencesService.getInstance(), "updateUserPreferences")
-          .mockResolvedValue({
-            user_id: "",
-            language: Language.en,
-            accepted_tc: new Date(),
-            sessions: [],
-            sessions_with_feedback: [],
-            has_sensitive_personal_data: false,
-            sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
-          });
+          .mockResolvedValue(givenUserPreferences);
 
         // AND the authStateService is mocked to return the given user
         const givenUser: TabiyaUser = {
@@ -181,8 +181,8 @@ describe("Testing Consent Page", () => {
         expect(console.error).not.toHaveBeenCalled();
         expect(console.warn).not.toHaveBeenCalled();
 
-        // AND user should be redirected to root
-        expect(useNavigate()).toHaveBeenCalledWith(routerPaths.ROOT, { replace: true });
+        // AND user should be redirected to the expected route
+        expect(useNavigate()).toHaveBeenCalledWith(expectedRoute, { replace: true });
       });
 
       test("should fail to accept agreements gracefully", async () => {
@@ -452,7 +452,7 @@ describe("Testing Consent Page", () => {
         });
 
         // AND the canAccessPIIPage function to return false
-        (canAccessPIIPage as jest.Mock).mockReturnValue(false);
+        jest.spyOn(ProtectedRouteUtils, "isSensitiveDataValid").mockReturnValue(true);
 
         // WHEN the component is rendered
         render(<Consent />);
@@ -511,7 +511,7 @@ describe("Testing Consent Page", () => {
         });
 
         // AND canAccessPIIPage function to return true
-        (canAccessPIIPage as jest.Mock).mockReturnValue(true);
+        jest.spyOn(ProtectedRouteUtils, "isSensitiveDataValid").mockReturnValue(false);
 
         // WHEN the component is rendered
         render(<Consent />);

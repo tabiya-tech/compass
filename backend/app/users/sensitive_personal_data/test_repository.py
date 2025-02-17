@@ -9,10 +9,9 @@ import pytest
 from datetime import datetime
 
 import pytest_mock
-from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo.errors import DuplicateKeyError
 
-from app.users.sensitive_personal_data.types import SensitivePersonalData
+from app.users.sensitive_personal_data.types import SensitivePersonalData, EncryptedSensitivePersonalData
 from app.users.sensitive_personal_data.repository import SensitivePersonalDataRepository
 from common_libs.test_utilities.random_data import get_random_printable_string
 
@@ -23,10 +22,13 @@ def _get_new_sensitive_personal_data():
     """
     return SensitivePersonalData(
         user_id=get_random_printable_string(10),
-        aes_encryption_key=get_random_printable_string(10),
-        rsa_key_id=get_random_printable_string(20),
-        aes_encrypted_data=get_random_printable_string(100),
-        created_at=datetime.now()
+        created_at=datetime.now(),
+        sensitive_personal_data=EncryptedSensitivePersonalData(
+            rsa_key_id=get_random_printable_string(20),
+            aes_encryption_key=get_random_printable_string(10),
+            aes_encrypted_data=get_random_printable_string(100)
+        ),
+        sensitive_personal_data_skipped=False
     )
 
 
@@ -162,7 +164,7 @@ class TestStream:
             await repository._collection.insert_many(given_sensitive_data)
 
         # WHEN the stream method is called
-        actual_iterator = repository.stream(batch_size=10)
+        actual_iterator = repository.stream(discard_skipped=True, batch_size=10)
 
         # THEN a valid actual_iterator is returned
         assert actual_iterator is not None
@@ -174,7 +176,88 @@ class TestStream:
 
         # AND the retrieved sensitive data should be equal to the given data
         assert len(actual_entities) == given_n
-        assert actual_entities == [SensitivePersonalData.from_dict(data) for data in given_sensitive_data]
+
+        # Sort both lists by user_id for comparison
+        actual_entities.sort(key=lambda x: x.user_id)
+        given_sensitive_data.sort(key=lambda x: x["user_id"])
+        
+        # Compare each entity's fields except for created_at which will be different
+        for actual, expected_dict in zip(actual_entities, given_sensitive_data):
+            expected = SensitivePersonalData.from_dict(expected_dict)
+            assert actual.user_id == expected.user_id
+            assert actual.sensitive_personal_data == expected.sensitive_personal_data
+            assert actual.sensitive_personal_data_skipped == expected.sensitive_personal_data_skipped
+
+    @pytest.mark.asyncio
+    async def test_filters_out_null_and_skipped_sensitive_data(self, get_sensitive_personal_data_repository: Awaitable[SensitivePersonalDataRepository]):
+        repository = await get_sensitive_personal_data_repository
+
+        # GIVEN some sensitive personal data entries with null and non-null sensitive_personal_data
+        given_data_with_sensitive = _get_new_sensitive_personal_data()
+        given_data_without_sensitive = _get_new_sensitive_personal_data()
+        given_data_without_sensitive.sensitive_personal_data = None
+        given_data_without_sensitive.sensitive_personal_data_skipped = True  # Must be True when data is None
+
+        # AND some sensitive data entries that have been skipped
+        given_data_skipped = _get_new_sensitive_personal_data()
+        given_data_skipped.sensitive_personal_data = None
+        given_data_skipped.sensitive_personal_data_skipped = True
+
+        # AND all entries exist in the database
+        await repository._collection.insert_many([
+            given_data_with_sensitive.model_dump(),
+            given_data_without_sensitive.model_dump(),
+            given_data_skipped.model_dump()
+        ])
+
+        # WHEN the stream method is called with discard_skipped=True
+        actual_iterator = repository.stream(discard_skipped=True, batch_size=10)
+
+        # THEN a valid actual_iterator is returned
+        assert actual_iterator is not None
+
+        # AND the actual_iterator can be iterated
+        actual_entities = []
+        async for item in actual_iterator:
+            actual_entities.append(item)
+
+        # AND only the non-null sensitive data should be returned
+        assert len(actual_entities) == 1
+        assert given_data_with_sensitive in actual_entities
+        assert given_data_without_sensitive not in actual_entities
+        assert given_data_skipped not in actual_entities
+
+    @pytest.mark.asyncio
+    async def test_keeps_skipped_sensitive_data(self, get_sensitive_personal_data_repository: Awaitable[SensitivePersonalDataRepository]):
+        repository = await get_sensitive_personal_data_repository
+
+        # GIVEN some sensitive personal data entries with null and non-null sensitive_personal_data
+        given_data_with_sensitive = _get_new_sensitive_personal_data()
+        given_data_without_sensitive = _get_new_sensitive_personal_data()
+        given_data_without_sensitive.sensitive_personal_data = None
+        given_data_without_sensitive.sensitive_personal_data_skipped = True
+
+        # AND all entries exist in the database
+        await repository._collection.insert_many([
+            given_data_with_sensitive.model_dump(),
+            given_data_without_sensitive.model_dump()
+        ])
+
+        # WHEN the stream method is called with discard_skipped=False
+        actual_iterator = repository.stream(discard_skipped=False, batch_size=10)    
+
+        # THEN a valid actual_iterator is returned
+        assert actual_iterator is not None
+
+        # AND the actual_iterator can be iterated
+        actual_entities = []
+        async for item in actual_iterator:
+            actual_entities.append(item)
+
+        # AND the retrieved sensitive data should have both the skipped and non-skipped data
+        assert len(actual_entities) == 2
+        assert given_data_with_sensitive in actual_entities
+        assert given_data_without_sensitive in actual_entities
 
     @pytest.mark.asyncio
     async def test_db_find_throws_an_error(self, get_sensitive_personal_data_repository: Awaitable[SensitivePersonalDataRepository],
@@ -192,7 +275,7 @@ class TestStream:
         # WHEN the stream method is called and the returned iterator is iterated
         # THEN an exception should be raised
         with pytest.raises(_GivenError) as actual_error_info:
-            actual_iterator = repository.stream(batch_size=10)
+            actual_iterator = repository.stream(discard_skipped=True, batch_size=10)
             async for _ in actual_iterator:
                 pytest.fail("This should not be reached")
 

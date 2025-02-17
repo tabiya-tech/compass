@@ -29,7 +29,6 @@ import * as NotistackModule from "notistack";
 import { formConfig } from "./formConfig";
 import * as Sentry from "@sentry/react";
 import { DATA_TEST_ID as BUG_REPORT_DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
-import React from "react";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import { UserPreferenceError } from "src/error/commonErrors";
 
@@ -169,6 +168,7 @@ describe("Sensitive Data", () => {
   const enqueueSnackbarMock = jest.fn();
 
   beforeEach(() => {
+    jest.clearAllMocks();
     // Mock the enqueue snackbar hook
     useSnackBarSpy.mockReturnValue({
       enqueueSnackbar: enqueueSnackbarMock,
@@ -185,10 +185,6 @@ describe("Sensitive Data", () => {
     jest
       .spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences")
       .mockReturnValue(SAMPLE_USER_PREFERENCES);
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
   });
 
   afterAll(() => {
@@ -219,6 +215,7 @@ describe("Sensitive Data", () => {
 
       // THEN the component should render without error
       expect(console.log).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
       expect(console.error).not.toHaveBeenCalled();
 
       // AND the container should be in the document
@@ -299,7 +296,8 @@ describe("Sensitive Data", () => {
         const button = screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON);
         expect(button).toBeDisabled();
 
-        // AND no console errors should be logged
+        // AND no console errors or warnings should be logged
+        expect(console.warn).not.toHaveBeenCalled();
         expect(console.error).not.toHaveBeenCalled();
       });
     });
@@ -338,7 +336,8 @@ describe("Sensitive Data", () => {
       const button = screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON);
       expect(button).toBeEnabled();
 
-      // AND no console errors should be logged
+      // AND no console errors or warnings should be logged
+      expect(console.warn).not.toHaveBeenCalled();
       expect(console.error).not.toHaveBeenCalled();
 
       // AND WHEN the user clicks the submit button, the form should be submitted.
@@ -423,6 +422,10 @@ describe("Sensitive Data", () => {
 
       // AND the progress dialog should be closed
       expect(screen.queryByTestId(BACKDROP_DATA_TEST_IDS.BACKDROP_CONTAINER)).not.toBeVisible();
+
+      // AND no console errors or warnings should be logged
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
     });
 
     it("should not log the user out if the user cancels on the approve dialog", async () => {
@@ -454,6 +457,10 @@ describe("Sensitive Data", () => {
 
       // AND user should not be navigated to log in
       expect(mockNavigate).not.toHaveBeenCalled();
+
+      // AND no console errors or warnings should be logged
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
     });
 
     it("should handle AuthenticationService.logout error correctly", async () => {
@@ -581,6 +588,10 @@ describe("Sensitive Data", () => {
 
       // AND user should be navigated to the root path
       expect(mockNavigate).toHaveBeenCalledWith(routerPaths.ROOT);
+
+      // AND no console errors or warnings should be logged
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
     });
 
     it("should handle service error and display error in snackbar", async () => {
@@ -836,10 +847,29 @@ describe("Sensitive Data", () => {
   });
 
   describe("action tests: skip button", () => {
-    it("should navigate to the root path when the skip button is clicked", async () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    })
+    test("should navigate to the root path when the skip button is clicked", async () => {
       const user = userEvent.setup();
 
-      // GIVEN the component is rendered
+      // GIVEN sensitive personal data is not required
+      const givenUserPreferences = {
+        user_id: givenUserId,
+        language: Language.en,
+        accepted_tc: new Date(),
+        has_sensitive_personal_data: false,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+        sessions: [],
+        sessions_with_feedback: [],
+      };
+      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue(givenUserPreferences);
+
+      // AND skipping sensitive personal data is successful
+      const skipSpy = jest.spyOn(sensitivePersonalDataService, "skip").mockResolvedValueOnce();
+      const setUserPreferencesSpy = jest.spyOn(UserPreferencesStateService.getInstance(), "setUserPreferences");
+
+      // WHEN the component is rendered
       componentRender();
       // AND the skip button is clicked
       const skipButton = screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_SKIP_BUTTON);
@@ -850,14 +880,45 @@ describe("Sensitive Data", () => {
       // WHEN the user approves the action
       await user.click(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL_CANCEL));
 
-      // THEN expect the user should be navigated to the root path
+      // THEN the skip method should be called with the correct user id
+      expect(skipSpy).toHaveBeenCalledWith(givenUserId);
+
+      // AND the user preferences should be updated
+      expect(setUserPreferencesSpy).toHaveBeenCalledWith({
+        ...givenUserPreferences,
+        has_sensitive_personal_data: true,
+      });
+
+      // AND the user should be redirected to the root page
       expect(mockNavigate).toHaveBeenCalledWith(routerPaths.ROOT);
+
+      // AND a success message should be shown
+      expect(enqueueSnackbarMock).toHaveBeenCalledWith("Personal data collection skipped.", { variant: "success" });
+
+      // AND no console errors or warnings should be logged
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
     });
 
-    it("should not navigate to the root path when the user cancels the action", async () => {
+    test("should handle skip error correctly when user confirms", async () => {
       const user = userEvent.setup();
+      // GIVEN sensitive personal data is not required
+      const givenUserPreferences = {
+        user_id: givenUserId,
+        language: Language.en,
+        accepted_tc: new Date(),
+        has_sensitive_personal_data: false,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+        sessions: [],
+        sessions_with_feedback: [],
+      };
+      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue(givenUserPreferences);
 
-      // GIVEN the component is rendered
+      // AND skipping sensitive personal data will throw an error
+      const givenError = new Error("foo");
+      const skipSpy = jest.spyOn(sensitivePersonalDataService, "skip").mockRejectedValueOnce(givenError);
+
+      // WHEN the component is rendered
       componentRender();
       // AND the skip button is clicked
       const skipButton = screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_SKIP_BUTTON);
@@ -865,13 +926,24 @@ describe("Sensitive Data", () => {
       // AND the dialog is open
       await waitFor(() => expect(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL)).toBeVisible());
 
-      // WHEN the user cancels the action
-      await user.click(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL_CONFIRM));
+      // WHEN the user confirms the action
+      await user.click(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL_CANCEL));
 
-      // THEN expect the user should not be navigated to the root path
+      // THEN the skip method should be called
+      expect(skipSpy).toHaveBeenCalledWith(givenUserId);
+
+      // AND the error should be logged
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith("Failed to skip personal data", givenError);
+      });
+
+      // AND the user should not be navigated to the root path
       expect(mockNavigate).not.toHaveBeenCalled();
       // AND to stay on the same page
       expect(screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_CONTAINER)).toBeInTheDocument();
+
+      // AND no console errors or warnings should be logged
+      expect(console.warn).not.toHaveBeenCalled();
     });
   });
 });

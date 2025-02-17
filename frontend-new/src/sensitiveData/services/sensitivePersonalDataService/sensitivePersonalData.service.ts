@@ -12,6 +12,13 @@ import {
 import { EncryptedDataTooLarge } from "./errors";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
+export class SensitivePersonalDataSkipError extends Error {
+  constructor(message: string, public readonly cause?: Error) {
+    super(message);
+    this.name = "SensitivePersonalDataSkipError";
+  }
+}
+
 class SensitivePersonalDataService {
   private readonly sensitivePersonalDataBaseUrl: string;
   private readonly encryptionService = new EncryptionService();
@@ -53,7 +60,6 @@ class SensitivePersonalDataService {
 
     // if for some reason the data to encrypt is too large, we should not proceed.
     // the backend will reject the request if the data is too large.
-
     if (
       encryptSensitivePersonalData.aes_encrypted_data.length > MaximumAESEncryptedDataSize ||
       encryptSensitivePersonalData.aes_encryption_key.length > MaximumAESEncryptedKeySize ||
@@ -71,7 +77,33 @@ class SensitivePersonalDataService {
       serviceName: "SensitivePersonalData",
       serviceFunction: "createSensitivePersonalData",
       failureMessage: `Failed to create sensitive personal data for user with id ${user_id}`,
-      body: JSON.stringify(encryptSensitivePersonalData),
+      body: JSON.stringify({
+        sensitive_personal_data: encryptSensitivePersonalData
+      }),
+      expectedContentType: "application/json",
+    });
+  }
+
+  /**
+   * Skip providing sensitive personal data for a user.
+   * 
+   * @param user_id - The ID of the user skipping sensitive data provision
+   * @throws {SensitivePersonalDataSkipError} If there's an error during the skip operation
+   * @throws {RestAPIError} If the server returns an error response
+   */
+  async skip(user_id: string): Promise<void> {
+    await customFetch(this.sensitivePersonalDataBaseUrl.replace("{user_id}", user_id), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      expectedStatusCode: StatusCodes.CREATED,
+      serviceName: "SensitivePersonalData",
+      serviceFunction: "skip",
+      failureMessage: `Failed to skip sensitive personal data for user with id ${user_id}`,
+      body: JSON.stringify({
+        sensitive_personal_data: null
+      }),
       expectedContentType: "application/json",
     });
   }

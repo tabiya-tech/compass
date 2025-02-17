@@ -81,7 +81,9 @@ describe("SensitivePersonalDataService", () => {
         serviceFunction: "createSensitivePersonalData",
         failureMessage: `Failed to create sensitive personal data for user with id ${givenUserId}`,
         // AND the response got from the encryption service is passed to the custom fetch function.
-        body: JSON.stringify(givenEncryptReturnValue),
+        body: JSON.stringify({
+          sensitive_personal_data: givenEncryptReturnValue
+        }),
         expectedContentType: "application/json",
       });
     });
@@ -156,6 +158,35 @@ describe("SensitivePersonalDataService", () => {
 
       // AND fetch should not be called
       expect(customFetch).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("skip", () => {
+    test("should call the backend with the correct data", async () => {
+      // GIVEN some random user id
+      const givenUserId = getRandomLorem(10);
+
+      // AND the custom fetch function resolves
+      const customFetch = jest.spyOn(CustomFetchModule, "customFetch").mockResolvedValue(new Response());
+
+      // WHEN we skip the sensitive personal data
+      await sensitivePersonalDataService.skip(givenUserId);
+
+      // THEN the custom fetch function is called with the correct parameters
+      expect(customFetch).toHaveBeenCalledWith(`/users/${givenUserId}/sensitive-personal-data`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        expectedStatusCode: 201,
+        serviceName: "SensitivePersonalData",
+        serviceFunction: "skip",
+        failureMessage: `Failed to skip sensitive personal data for user with id ${givenUserId}`,
+        body: JSON.stringify({
+          sensitive_personal_data: null
+        }),
+        expectedContentType: "application/json",
+      });
     });
   });
 });
