@@ -1,11 +1,12 @@
 
 ------ 
 # Deploy a full working test-realm with actual DB and configurations
-- [ ] run embeddings to create the search indexes
+- [ ] (@ANSELME) run embeddings to create the search indexes
   - Add  argument to the generate_esco_embeddings.py script to only generate the indexes for the target database. (0)
-- [ ] change AUTO_REGISTER -> LOGIN for invitation code code type enum and merge origin/fix/rename-AUTO_REGISTER->LOGIN
-
-- [ ] Setup Invitation codes manually ( think about using mongo cli to import a json  file with invitation )
+- [ ] (@APOSTOLOS) change AUTO_REGISTER -> LOGIN for invitation code code type enum and merge origin/fix/rename-AUTO_REGISTER->LOGIN
+- [ ] (@APOSTOLOS/@ANSELME)Setup Invitation codes manually (think about using mongo cli to import a json file with invitation or better extend repository to save invitation and use repo from a script. eventually the config may become part of the env config). Move md file to the top level. (0)
+- [ ] Generate indexes for the  test-realm.test database. (0)
+- [ ] Setup invitation codes for the test-realm.test database. (0)
 - [ ] Deployment of test-realm.test manually.
 - [ ] Deployment of test-realm.dev by pushing with 'pulumi up'
 - [ ] Deployment of the test-realm.demo 
