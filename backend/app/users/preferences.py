@@ -4,8 +4,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.constants.errors import ErrorService, HTTPErrorResponse
-from app.invitations.service import UserInvitationService
-from app.invitations.types import InvitationCodeStatus, InvitationType
+from app.invitations.repository import UserInvitationRepository
+from app.invitations.types import InvitationType
 from app.users.sensitive_personal_data.routes import get_sensitive_personal_data_service
 from app.users.sensitive_personal_data.service import ISensitivePersonalDataService
 from app.server_dependencies.db_dependencies import CompassDBProvider
@@ -72,7 +72,7 @@ INVALID_INVITATION_CODE_MESSAGE = "Invalid invitation code"
 
 
 async def _create_user_preferences(
-        user_invitation_service: UserInvitationService,
+        user_invitation_repository: UserInvitationRepository,
         repository: UserPreferenceRepository,
         preferences: CreateUserPreferencesRequest,
         authed_user: UserInfo) -> UsersPreferencesResponse:
@@ -81,9 +81,9 @@ async def _create_user_preferences(
             raise HTTPException(status_code=403, detail="forbidden")
 
         # validation of invitation code.
-        invitation = await user_invitation_service.get_invitation_status(preferences.invitation_code)
+        invitation = await user_invitation_repository.get_valid_invitation_by_code(preferences.invitation_code)
 
-        if invitation.status == InvitationCodeStatus.INVALID:
+        if invitation is None:
             raise HTTPException(status_code=400, detail=INVALID_INVITATION_CODE_MESSAGE)
 
         # an authenticated user can't use a login invitation code
@@ -106,7 +106,7 @@ async def _create_user_preferences(
             )
 
         # Reduce the invitation code capacity
-        is_reduced = await user_invitation_service.reduce_invitation_code_capacity(preferences.invitation_code)
+        is_reduced = await user_invitation_repository.reduce_capacity(preferences.invitation_code)
 
         if not is_reduced:
             raise HTTPException(status_code=400, detail=INVALID_INVITATION_CODE_MESSAGE)
@@ -228,8 +228,8 @@ async def _get_user_preferences_service(db: AsyncIOMotorDatabase = Depends(Compa
     return UserPreferenceRepository(db)
 
 
-async def _get_user_invitations_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)):
-    return UserInvitationService(db)
+async def _get_user_invitations_repository(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)):
+    return UserInvitationRepository(db)
 
 
 async def _get_user_feedback_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)):
@@ -285,11 +285,11 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
                  )
     async def _create_handler(body: CreateUserPreferencesRequest,
                               user_info: UserInfo = Depends(auth.get_user_info()),
-                              user_invitation_service: UserInvitationService = Depends(_get_user_invitations_service),
+                              user_invitation_repository: UserInvitationRepository = Depends(_get_user_invitations_repository),
                               user_preference_repository: UserPreferenceRepository = Depends(
                                   _get_user_preferences_service)
                               ) -> UsersPreferencesResponse:
-        return await _create_user_preferences(user_invitation_service, user_preference_repository, body, user_info)
+        return await _create_user_preferences(user_invitation_repository, user_preference_repository, body, user_info)
 
     #########################
     # POS /users/preferences - Create a user preferences

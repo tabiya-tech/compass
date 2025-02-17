@@ -1,0 +1,47 @@
+[
+  {
+    "allowed_usage": 1,
+    "invitation_code": "login-1",
+    "invitation_type": "LOGIN",
+    "sensitive_personal_data_requirement": "NOT_AVAILABLE",
+    "remaining_usage": 1,
+    "valid_from": "2025-01-01T00:00:00.000Z",
+    "valid_until": "2025-12-31T23:59:59.000Z"
+  },
+  {
+    "allowed_usage": 2,
+    "invitation_code": "register-1",
+    "invitation_type": "REGISTER",
+    "sensitive_personal_data_requirement": "NOT_AVAILABLE",
+    "remaining_usage": 2,
+    "valid_from": "2025-01-01T00:00:00.000Z",
+    "valid_until": "2025-12-31T23:59:59.000Z"
+  },
+  {
+    "allowed_usage": 1,
+    "invitation_code": "login-2",
+    "invitation_type": "LOGIN",
+    "sensitive_personal_data_requirement": "REQUIRED",
+    "remaining_usage": 1,
+    "valid_from": "2025-01-01T10:40:05.001Z",
+    "valid_until": "2025-12-31T23:59:59.001Z"
+  },
+  {
+    "allowed_usage": 2,
+    "invitation_code": "register-2",
+    "invitation_type": "REGISTER",
+    "sensitive_personal_data_requirement": "NOT_REQUIRED",
+    "remaining_usage": 2,
+    "valid_from": "2025-01-01T00:40:01.132878Z",
+    "valid_until": "2025-12-31T23:51:59.987433Z"
+  },
+  {
+    "allowed_usage": 2,
+    "invitation_code": "register-3",
+    "invitation_type": "REGISTER",
+    "sensitive_personal_data_requirement": "NOT_REQUIRED",
+    "remaining_usage": 2,
+    "valid_from": "2025-01-01T00:40:01.00+10:00",
+    "valid_until": "2025-12-31T23:51:59.00+10:00"
+  }
+]
