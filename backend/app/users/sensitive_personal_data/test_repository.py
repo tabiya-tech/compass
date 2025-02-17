@@ -9,10 +9,9 @@ import pytest
 from datetime import datetime
 
 import pytest_mock
-from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo.errors import DuplicateKeyError
 
-from app.users.sensitive_personal_data.types import SensitivePersonalData
+from app.users.sensitive_personal_data.types import SensitivePersonalData, EncryptedSensitivePersonalData
 from app.users.sensitive_personal_data.repository import SensitivePersonalDataRepository
 from common_libs.test_utilities.random_data import get_random_printable_string
 
@@ -23,10 +22,13 @@ def _get_new_sensitive_personal_data():
     """
     return SensitivePersonalData(
         user_id=get_random_printable_string(10),
-        aes_encryption_key=get_random_printable_string(10),
-        rsa_key_id=get_random_printable_string(20),
-        aes_encrypted_data=get_random_printable_string(100),
-        created_at=datetime.now()
+        created_at=datetime.now(),
+        sensitive_personal_data_skipped=False,
+        sensitive_personal_data=EncryptedSensitivePersonalData(
+            rsa_key_id=get_random_printable_string(20),
+            aes_encryption_key=get_random_printable_string(10),
+            aes_encrypted_data=get_random_printable_string(100)
+        )
     )
 
 

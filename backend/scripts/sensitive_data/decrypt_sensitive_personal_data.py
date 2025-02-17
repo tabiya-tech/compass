@@ -130,8 +130,15 @@ async def _decrypt_sensitive_personal_data(_private_key: RSAPrivateKey, encrypte
 
     # Decrypt the message
     try:
-        cyphertext = base64.b64decode(encrypted_personal_data.aes_encrypted_data)
-        decryption_key = base64.b64decode(encrypted_personal_data.aes_encryption_key)
+        if encrypted_personal_data.sensitive_personal_data_skipped or encrypted_personal_data.sensitive_personal_data is None:
+            return DecryptedPersonalDataModel(
+                user_id=encrypted_personal_data.user_id,
+                created_at=encrypted_personal_data.created_at,
+                error="Sensitive personal data was skipped"
+            )
+
+        cyphertext = base64.b64decode(encrypted_personal_data.sensitive_personal_data.aes_encrypted_data)
+        decryption_key = base64.b64decode(encrypted_personal_data.sensitive_personal_data.aes_encryption_key)
 
         cyphertext_array = [byte for byte in cyphertext]
         decryption_key_array = [byte for byte in decryption_key]
@@ -154,7 +161,7 @@ async def _decrypt_sensitive_personal_data(_private_key: RSAPrivateKey, encrypte
         return DecryptedPersonalDataModel(
             user_id=encrypted_personal_data.user_id,
             error="Error decrypting data: " + str(e),
-            key_id=encrypted_personal_data.rsa_key_id,
+            key_id=encrypted_personal_data.sensitive_personal_data.rsa_key_id if encrypted_personal_data.sensitive_personal_data else None,
             created_at=encrypted_personal_data.created_at
         )
 

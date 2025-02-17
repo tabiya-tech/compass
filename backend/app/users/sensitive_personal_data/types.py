@@ -3,7 +3,7 @@ This module contains the types used for storing sensitive personal data.
 """
 
 from enum import Enum
-from typing import Union, Mapping
+from typing import Union, Mapping, Optional
 from datetime import datetime, timezone
 from pydantic import BaseModel, Field, field_validator, field_serializer
 
@@ -18,7 +18,10 @@ class SensitivePersonalDataRequirement(Enum):
     NOT_AVAILABLE = "NOT_AVAILABLE"
 
 
-class SensitivePersonalDataBaseModel(BaseModel):
+class EncryptedSensitivePersonalData(BaseModel):
+    """
+    Represents the encrypted sensitive personal data.
+    """
     rsa_key_id: str = Field(
         description="The key ID of the RSA key used to encrypt the AES key",
         examples=["key_123"],
@@ -61,7 +64,7 @@ class SensitivePersonalDataBaseModel(BaseModel):
     """
 
 
-class CreateSensitivePersonalDataRequest(SensitivePersonalDataBaseModel):
+class CreateSensitivePersonalDataRequest(EncryptedSensitivePersonalData):
     """
     Represents the request body for creating sensitive personal data.
     """
@@ -70,24 +73,24 @@ class CreateSensitivePersonalDataRequest(SensitivePersonalDataBaseModel):
         """
         Pydantic configuration.
         """
-
         extra = "forbid"
 
 
-class SensitivePersonalData(SensitivePersonalDataBaseModel):
+class SensitivePersonalData(BaseModel):
     """
     The Sensitive personal data document in the database.
     """
 
-    user_id: str
-    """
-    the user id
-    """
-
-    created_at: datetime
-    """
-    the date and time the database entry was created
-    """
+    user_id: str = Field(description="The user id")
+    created_at: datetime = Field(description="The date and time the database entry was created")
+    sensitive_personal_data_skipped: bool = Field(
+        description="Whether the sensitive personal data was skipped",
+        default=False
+    )
+    sensitive_personal_data: Optional[EncryptedSensitivePersonalData] = Field(
+        description="The encrypted sensitive personal data. None if skipped.",
+        default=None
+    )
 
     # Serialize the creation_time datetime to ensure it's stored as UTC
     @field_serializer("created_at")
@@ -118,18 +121,15 @@ class SensitivePersonalData(SensitivePersonalDataBaseModel):
         :return: An instance of `SensitivePersonalData` initialized from the
                  provided dictionary.
         """
-
         return SensitivePersonalData(
             user_id=str(_dict.get("user_id")),
-            aes_encrypted_data=_dict.get("aes_encrypted_data"),
-            rsa_key_id=_dict.get("rsa_key_id"),
-            aes_encryption_key=_dict.get("aes_encryption_key"),
             created_at=_dict.get("created_at"),
+            sensitive_personal_data_skipped=_dict.get("sensitive_personal_data_skipped", False),
+            sensitive_personal_data=_dict.get("sensitive_personal_data")
         )
 
     class Config:
         """
         Pydantic configuration for the SensitivePersonalData class.
         """
-
         extra = "forbid"

@@ -8,8 +8,30 @@ from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequ
 
 logger = logging.getLogger(__name__)
 
+class IUserPreferenceRepository:
+    async def get_user_preference_by_user_id(self, user_id) -> UserPreferences | None:
+        """
+        Get the user preferences by user_id
+        :raises ValueError: if the user preferences are not valid
+        :param user_id: str
+            The user_id to search for
+        """
+        raise NotImplementedError
 
-class UserPreferenceRepository:
+    async def insert_user_preference(self, user_id: str, user_preference: UserPreferences) -> UserPreferences:
+        """
+        Insert a new user preference
+        """
+        raise NotImplementedError
+
+    async def update_user_preference(self, user_id: str, update: UserPreferencesRepositoryUpdateRequest) -> UserPreferences:
+        """
+        Update the user preferences by user_id
+        """
+        raise NotImplementedError
+
+
+class UserPreferenceRepository(IUserPreferenceRepository):
     def __init__(self, db: AsyncIOMotorDatabase):
         self.collection = db.get_collection(Collections.USER_PREFERENCES)
 
