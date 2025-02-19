@@ -4,18 +4,22 @@
 - [x] (@ANSELME) run embeddings to create the search indexes
   - Add argument to the generate_esco_embeddings.py script to only generate the indexes for the target database. (0)
 - [x] Generate indexes for the test-realm.test database. (0)
-- [x] (@APOSTOLOS) change AUTO_REGISTER -> LOGIN for invitation code code type enum and merge origin/fix/rename-AUTO_REGISTER->LOGIN
-- [ ] (@APOSTOLOS/@ANSELME) Setup Invitation codes manually (think about using mongo cli to import a json file with invitation or better extend repository to save invitation and use repo from a script. eventually the config may become part of the env config). Move md file to the top level. (0)
-- [ ] Setup invitation codes for the test-realm.test database. (0)
-- [ ] Deployment of test-realm.test manually.
-- [ ] Do a conversation
-- [ ] Deployment of test-realm.dev by pushing with 'pulumi up'
-- [ ] Deployment of the test-realm.demo (create indexes)
-- [ ] Do a conversation
+- [x] (@APOSTOLOS) change AUTO_REGISTER -> LOGIN for invitation code type enum and merge origin/fix/rename-AUTO_REGISTER->LOGIN
+- [x] (@APOSTOLOS/@ANSELME) Setup Invitation codes manually (think about using mongo cli to import a json file with invitation or better extend repository to save invitation and use repo from a script. eventually the config may become part of the env config). Move md file to the top level. (0)
+- [X] Setup invitation codes for the test-realm.test database. (0)
+- [X] Deployment of test-realm.test manually.
+- [X] Do a conversation
+- [X] Deployment of test-realm.dev2 by pushing with '[pulumi up]'
+  - 
+~~- [ ] Deployment of the test-realm.demo (create indexes)~~
+~~- [ ] Do a conversation~~
 - [ ] Create a release.
+  - [ ] run setup.py for each dev/test/prod auto env 
+  - [ ] tag and push
 -----
 # Deploy to the compass realm.
 - [ ] Replace compass dev with new compass realm.
+  - also clean up all the google project that we do not need anymore!
 - [ ] merge to the main
 - [ ] Test the manual deployment. (0)
     - Checkout should be changed to checkout the provided branch name. to run the right pulumi code.
@@ -34,6 +38,7 @@
     - [ ] Scripts
 - [ ] Think about cloudrun config in stack_config/backend/config (1)
 - [ ] Clean up the environment variables in github. (1)
+- [ ] Sow the actual secret pull for when preparing ( it is not enough to say which was not found) (1)
 - [ ] Log all the values used in the functions, for debug purposes. (1)
 - [ ] Logging should be less verbose and have the right needed information. (1)
     - Replace project number with the project id.
@@ -58,6 +63,7 @@
       , Or the creationTimestamp. (2)
 - [ ] when we deploy a version to an environment, we need to know the previous and run sanity checks. Only deploy if the version is not up. (2)
 ---------------------
+- [ ] if an environment from the stack_config.yml is not setup (e.g. not in pulumi then warn and skip it (3)
 - [ ] upload description.txt (3)
 - [ ] add metadata on the docker image (3)
 - [ ] only specific environments are indexed by search engines. (3)
@@ -77,8 +83,16 @@
 - [ ] Use colored logging (3)
 
 ---------------------
+Up for discussion:
+How to populate data in new deployments e.g. 
+- [ ] Invitation Codes
+- [ ] Embeddings 
+
+How to test copy of the data from the prod to test environments and run tests e.g.
+integration repository/db, rest api, or e2e tests.
 
 
+---------------------
 
 # Older tasks completed
 - [x] On formatters: when transforming the branch name and commit sha to version,  
