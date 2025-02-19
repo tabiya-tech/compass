@@ -81,6 +81,7 @@ abstract class AuthenticationService {
     // clear the login method and personal info from the persistent storage only if the user is successfully logged out
     PersistentStorageService.clearLoginMethod();
     PersistentStorageService.clearPersonalInfo();
+    PersistentStorageService.clearAccountConverted();
   }
 
   /**
