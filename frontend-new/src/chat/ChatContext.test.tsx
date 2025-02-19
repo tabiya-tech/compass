@@ -5,6 +5,8 @@ import { render, screen, renderHook } from "@testing-library/react";
 import { act } from "react-dom/test-utils";
 import { ChatProvider, useChatContext } from "./ChatContext";
 import { FeedbackStatus } from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import userEvent from "@testing-library/user-event";
 
 describe("ChatContext", () => {
   const mockHandleOpenExperiencesDrawer = jest.fn();
@@ -17,12 +19,16 @@ describe("ChatContext", () => {
     test("should render children and provide context values", () => {
       // GIVEN a child component that uses the context
       const TestChild = () => {
-        const { feedbackStatus, handleOpenExperiencesDrawer } = useChatContext();
+        const { feedbackStatus, handleOpenExperiencesDrawer, isAccountConverted, setIsAccountConverted } = useChatContext();
         return (
           <div data-testid="test-child">
             <span data-testid="feedback-status">{feedbackStatus}</span>
+            <span data-testid="account-converted">{isAccountConverted.toString()}</span>
             <button data-testid="drawer-button" onClick={handleOpenExperiencesDrawer}>
               Open Drawer
+            </button>
+            <button data-testid="convert-button" onClick={() => setIsAccountConverted(true)}>
+              Convert Account
             </button>
           </div>
         );
@@ -42,6 +48,43 @@ describe("ChatContext", () => {
       // AND expect the initial feedback status to be NOT_STARTED
       const feedbackStatus = screen.getByTestId("feedback-status");
       expect(feedbackStatus.textContent).toBe(FeedbackStatus.NOT_STARTED);
+
+      // AND expect the initial account converted state to be false
+      const accountConverted = screen.getByTestId("account-converted");
+      expect(accountConverted.textContent).toBe("false");
+    });
+
+    test("should update account converted state and persist it", async () => {
+      // GIVEN a child component that uses the context
+      const TestChild = () => {
+        const { isAccountConverted, setIsAccountConverted } = useChatContext();
+        return (
+          <div data-testid="test-child">
+            <span data-testid="account-converted">{isAccountConverted.toString()}</span>
+            <button data-testid="convert-button" onClick={() => setIsAccountConverted(true)}>
+              Convert Account
+            </button>
+          </div>
+        );
+      };
+
+      // WHEN the provider is rendered with the child
+      render(
+        <ChatProvider handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer}>
+          <TestChild />
+        </ChatProvider>
+      );
+
+      // AND the convert button is clicked
+      const convertButton = screen.getByTestId("convert-button");
+      await userEvent.click(convertButton);
+
+      // THEN expect the account converted state to be updated
+      const accountConverted = screen.getByTestId("account-converted");
+      expect(accountConverted.textContent).toBe("true");
+
+      // AND expect the state to be persisted
+      expect(PersistentStorageService.getAccountConverted()).toBe(true);
     });
   });
 

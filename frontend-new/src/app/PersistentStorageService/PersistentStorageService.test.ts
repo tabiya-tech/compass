@@ -296,6 +296,56 @@ describe("AuthPersistentStorage class tests", () => {
     });
   });
 
+  describe("account conversion tests", () => {
+    test("return correct previously set account conversion", () => {
+      // GIVEN The account conversion is stored in the session storage
+      const givenAccountConversion = true;
+      PersistentStorageService.setAccountConverted(givenAccountConversion);
+
+      // WHEN The account conversion is retrieved
+      const accountConversion = PersistentStorageService.getAccountConverted();
+
+      // THEN The account conversion should be returned
+      expect(accountConversion).toEqual(givenAccountConversion);
+    });
+
+    test("return false if account conversion is not set", () => {
+      // GIVEN The account conversion is not stored in the session storage
+      // Nothing set
+
+      // WHEN The account conversion is retrieved
+      const accountConversion = PersistentStorageService.getAccountConverted();
+
+      // THEN false should be returned
+      expect(accountConversion).toBe(false);
+    });
+
+    test("clear account conversion", () => {
+      // GIVEN The account conversion is stored in the session storage
+      const givenAccountConversion = true;
+      PersistentStorageService.setAccountConverted(givenAccountConversion);
+
+      // WHEN The account conversion is cleared
+      PersistentStorageService.clearAccountConverted();
+
+      // THEN The account conversion should be cleared (default false)
+      const accountConversion = PersistentStorageService.getAccountConverted();
+      expect(accountConversion).toBe(false);
+    });
+
+    test.each([true, false])("set account conversion to %s", (givenAccountConversion) => {
+      // GIVEN The account conversion is not stored in the session storage
+      // Nothing set
+
+      // WHEN The account conversion is set
+      PersistentStorageService.setAccountConverted(givenAccountConversion);
+
+      // THEN The account conversion should be stored
+      const accountConversion = PersistentStorageService.getAccountConverted();
+      expect(accountConversion).toEqual(givenAccountConversion);
+    });
+  });
+
   test("clear all tokens", () => {
     // GIVEN The token is stored in the session storage
     const givenID = "foo";

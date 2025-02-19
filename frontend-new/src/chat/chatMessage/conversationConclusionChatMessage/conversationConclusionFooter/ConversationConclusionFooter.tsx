@@ -9,6 +9,8 @@ import {
   FeedbackItem
 } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import authenticationStateService from "src/auth/services/AuthenticationState.service";
+import AnonymousAccountConversionDialog from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
 
 const uniqueId = "41675f8b-257c-4a63-9563-3fe9feb6a850";
 
@@ -20,6 +22,9 @@ export const DATA_TEST_ID = {
   FEEDBACK_MESSAGE_TEXT: `feedback-message-text-${uniqueId}`,
   FEEDBACK_IN_PROGRESS_MESSAGE: `feedback-in-progress-message-${uniqueId}`,
   THANK_YOU_MESSAGE: `thank-you-message-${uniqueId}`,
+  CREATE_ACCOUNT_LINK: `create-account-link-${uniqueId}`,
+  CREATE_ACCOUNT_MESSAGE: `create-account-message-${uniqueId}`,
+  VERIFICATION_REMINDER_MESSAGE: `verification-reminder-message-${uniqueId}`
 };
 
 const ConversationConclusionFooter: React.FC = () => {
@@ -31,6 +36,11 @@ const ConversationConclusionFooter: React.FC = () => {
     UserPreferencesStateService.getInstance().activeSessionHasFeedback()
   );
   const [isFeedbackFormOpen, setIsFeedbackFormOpen] = useState<boolean>(false);
+  const [showConversionDialog, setShowConversionDialog] = useState<boolean>(false);
+
+  const user = authenticationStateService.getInstance().getUser();
+  const isAnonymous = !user?.name || !user?.email;
+  const { isAccountConverted, setIsAccountConverted } = useChatContext();
 
   // Check local storage when the form is closed to see if there is saved feedback
   useEffect(() => {
@@ -98,6 +108,32 @@ const ConversationConclusionFooter: React.FC = () => {
     }
   }
 
+  const accountMessage = () => {
+
+    console.log("isAnonymous", isAnonymous);
+    console.log("isAccountConverted", isAccountConverted);
+    if (isAnonymous && !isAccountConverted) {
+      return (
+        <Typography variant="body1" data-testid={DATA_TEST_ID.CREATE_ACCOUNT_MESSAGE}>
+          <CustomLink onClick={() => setShowConversionDialog(true)} data-testid={DATA_TEST_ID.CREATE_ACCOUNT_LINK}>
+            Create an account
+          </CustomLink>{" "}
+          to save your conversations and access them anytime in the future.
+        </Typography>
+      );
+    }
+    
+    if (isAccountConverted) {
+      return (
+        <Typography variant="body1" data-testid={DATA_TEST_ID.VERIFICATION_REMINDER_MESSAGE}>
+          A verification email has been sent to your email address. Please verify your account before logging in again.
+        </Typography>
+      );
+    }
+    
+    return null;
+  };
+
   return (
     <>
       <Box
@@ -117,10 +153,18 @@ const ConversationConclusionFooter: React.FC = () => {
         </Typography>
 
         {feedbackMessage}
+        {accountMessage()}
       </Box>
       <FeedbackForm
         isOpen={isFeedbackFormOpen}
         notifyOnClose={handleFeedbackFormClose}
+      />
+      <AnonymousAccountConversionDialog
+        isOpen={showConversionDialog}
+        onClose={() => setShowConversionDialog(false)}
+        onSuccess={() => {
+          setIsAccountConverted(true);
+        }}
       />
     </>
   );
