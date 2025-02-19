@@ -162,4 +162,5 @@ class ExperienceEntity(BaseModel):
         company_part = f", {company}" if company is not None and company != "" else ""
         location_part = f", {location}" if location is not None and location != "" else ""
         work_type_part = f" ({WorkType.work_type_short(WorkType.from_string_key(work_type))})" if work_type is not None and work_type != "" else ""
-        return experience_title + work_type_part + date_part + company_part + location_part + "\n"
+        experience_title_part = experience_title if experience_title is not None else "No title provided yet"
+        return experience_title_part + work_type_part + date_part + company_part + location_part + "\n"
