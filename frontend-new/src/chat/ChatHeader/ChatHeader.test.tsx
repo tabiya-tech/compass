@@ -13,9 +13,19 @@ import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { DATA_TEST_ID as ANIMATED_BADGE_DATA_TEST_ID } from "src/theme/AnimatedBadge/AnimatedBadge";
 import userEvent from "@testing-library/user-event";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
-import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import AnonymousAccountConversionDialog, { DATA_TEST_ID as ANONYMOUS_ACCOUNT_CONVERSION_DIALOG_DATA_TEST_ID } from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
+import { ChatProvider } from "src/chat/ChatContext";
+import { PersistentStorageService } from "../../app/PersistentStorageService/PersistentStorageService";
+
+// Mock PersistentStorageService
+jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => ({
+  PersistentStorageService: {
+    getAccountConverted: jest.fn(),
+    setAccountConverted: jest.fn(),
+    clearAccountConverted: jest.fn()
+  },
+}));
 
 // mock the ContextMenu
 jest.mock("src/theme/ContextMenu/ContextMenu", () => {
@@ -68,18 +78,13 @@ jest.mock("src/auth/components/anonymousAccountConversionDialog/AnonymousAccount
   };
 });
 
-// mock the snackbar provider
-jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
-  const actual = jest.requireActual("src/theme/SnackbarProvider/SnackbarProvider");
-  return {
-    ...actual,
-    __esModule: true,
-    useSnackbar: jest.fn().mockReturnValue({
-      enqueueSnackbar: jest.fn(),
-      closeSnackbar: jest.fn(),
-    }),
-  };
-});
+const renderWithChatProvider = (child: React.ReactNode) => {
+  render(
+    <ChatProvider handleOpenExperiencesDrawer={jest.fn}>
+      {child}
+    </ChatProvider>
+  )
+}
 
 describe("ChatHeader", () => {
   beforeEach(() => {
@@ -107,7 +112,7 @@ describe("ChatHeader", () => {
     );
 
     // WHEN the chat header is rendered
-    render(givenChatHeader);
+    renderWithChatProvider(givenChatHeader);
 
     // THEN expect no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
@@ -139,14 +144,16 @@ describe("ChatHeader", () => {
     const givenStartNewConversation = jest.fn();
     const givenNotifyOnExperiencesDrawerOpen = jest.fn();
     const givenChatHeader = (
-      <ChatHeader
-        notifyOnLogout={givenNotifyOnLogout}
-        startNewConversation={givenStartNewConversation}
-        notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
-        experiencesExplored={0}
-        exploredExperiencesNotification={true}
-        setExploredExperiencesNotification={jest.fn()}
-      />
+      <ChatProvider handleOpenExperiencesDrawer={jest.fn}>
+        <ChatHeader
+          notifyOnLogout={givenNotifyOnLogout}
+          startNewConversation={givenStartNewConversation}
+          notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
+          experiencesExplored={0}
+          exploredExperiencesNotification={true}
+          setExploredExperiencesNotification={jest.fn()}
+        />
+      </ChatProvider>
     );
     testNavigateToPath(givenChatHeader, "Compass logo", DATA_TEST_ID.CHAT_HEADER_LOGO_LINK, routerPaths.ROOT);
 
@@ -164,7 +171,7 @@ describe("ChatHeader", () => {
         />
       );
       // AND the chat header is rendered
-      render(givenChatHeader);
+      renderWithChatProvider(givenChatHeader);
 
       // WHEN the user button is clicked
       const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
@@ -198,7 +205,7 @@ describe("ChatHeader", () => {
         />
       );
       // AND the chat header is rendered
-      render(givenChatHeader);
+      renderWithChatProvider(givenChatHeader);
       // AND the user button is clicked
       const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
       fireEvent.click(userButton);
@@ -248,7 +255,7 @@ describe("ChatHeader", () => {
       );
 
       // AND the chat header is rendered
-      render(givenChatHeader);
+      renderWithChatProvider(givenChatHeader);
 
       // AND the user button is clicked
       const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
@@ -287,7 +294,7 @@ describe("ChatHeader", () => {
         />
       );
       // AND the chat header is rendered
-      render(givenChatHeader);
+      renderWithChatProvider(givenChatHeader);
       // AND the user button is clicked
       const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
       fireEvent.click(userButton);
@@ -321,7 +328,7 @@ describe("ChatHeader", () => {
         />
       );
       // AND the chat header is rendered
-      render(givenChatHeader);
+      renderWithChatProvider(givenChatHeader);
 
       // WHEN the experiences button is clicked
       const experiencesButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES);
@@ -348,7 +355,7 @@ describe("ChatHeader", () => {
           setExploredExperiencesNotification={jest.fn()}
         />
       );
-      render(givenChatHeader);
+      renderWithChatProvider(givenChatHeader);
 
       // THEN expect the notification badge to be shown
       const badge = screen.getByTestId(ANIMATED_BADGE_DATA_TEST_ID.ANIMATED_BADGE);
@@ -378,7 +385,7 @@ describe("ChatHeader", () => {
           setExploredExperiencesNotification={jest.fn()}
         />
       );
-      render(givenChatHeader);
+      renderWithChatProvider(givenChatHeader);
 
       // WHEN the experiences button is clicked
       const experiencesButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES);
@@ -414,7 +421,7 @@ describe("ChatHeader", () => {
           />
         );
         // AND the chat header is rendered
-        render(givenChatHeader);
+        renderWithChatProvider(givenChatHeader);
         // AND the user button is clicked
         const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
         fireEvent.click(userButton);
@@ -492,7 +499,7 @@ describe("ChatHeader", () => {
       );
 
       // WHEN the chat header is rendered
-      render(givenChatHeader);
+      renderWithChatProvider(givenChatHeader);
 
       // AND the user button is clicked
       const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
@@ -535,7 +542,7 @@ describe("ChatHeader", () => {
       );
 
       // WHEN the chat header is rendered
-      render(givenChatHeader);
+      renderWithChatProvider(givenChatHeader);
 
       // AND the user button is clicked
       const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
@@ -577,7 +584,7 @@ describe("ChatHeader", () => {
       );
 
       // WHEN the chat header is rendered
-      render(givenChatHeader);
+      renderWithChatProvider(givenChatHeader);
 
       // AND the user button is clicked
       const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
@@ -591,24 +598,26 @@ describe("ChatHeader", () => {
       expect(screen.getByTestId(ANONYMOUS_ACCOUNT_CONVERSION_DIALOG_DATA_TEST_ID.DIALOG)).toBeInTheDocument();
     });
 
-    test("should show success message when conversion is successful", async () => {
+    test("should show success message and set account converted state when conversion is successful", async () => {
       // GIVEN an anonymous user
       jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValueOnce(mockAnonymousUser);
 
       // AND a ChatHeader component
       const givenChatHeader = (
-        <ChatHeader
-          notifyOnLogout={jest.fn()}
-          startNewConversation={jest.fn()}
-          notifyOnExperiencesDrawerOpen={jest.fn()}
-          experiencesExplored={0}
-          exploredExperiencesNotification={false}
-          setExploredExperiencesNotification={jest.fn()}
-        />
+        <ChatProvider handleOpenExperiencesDrawer={jest.fn()}>
+          <ChatHeader
+            notifyOnLogout={jest.fn()}
+            startNewConversation={jest.fn()}
+            notifyOnExperiencesDrawerOpen={jest.fn()}
+            experiencesExplored={0}
+            exploredExperiencesNotification={false}
+            setExploredExperiencesNotification={jest.fn()}
+          />
+        </ChatProvider>
       );
 
       // WHEN the chat header is rendered
-      render(givenChatHeader);
+      renderWithChatProvider(givenChatHeader);
 
       // AND the user button is clicked
       const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
@@ -621,17 +630,8 @@ describe("ChatHeader", () => {
       // AND the conversion is successful
       (AnonymousAccountConversionDialog as jest.Mock).mock.calls[0][0].onSuccess();
 
-      // THEN expect a success message to be shown
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenLastCalledWith(
-        // undefined here since we are not going through the process of registering the user,
-        // so the state is not set, meaning we get the same anonymous user.name
-        `Currently logged in as undefined. You will need to verify your account before logging in again.`,
-        {
-          variant: "info",
-          persist: true,
-          autoHideDuration: null,
-        }
-      );
+      // THEN expect the account conversion flag to be set
+      expect(PersistentStorageService.setAccountConverted).toHaveBeenCalledWith(true);
     });
   });
 });

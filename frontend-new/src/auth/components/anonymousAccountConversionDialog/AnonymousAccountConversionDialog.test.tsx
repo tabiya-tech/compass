@@ -7,9 +7,23 @@ import { PersistentStorageService } from "src/app/PersistentStorageService/Persi
 import FirebaseEmailAuthenticationService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import PasswordInput from "src/theme/PasswordInput/PasswordInput";
 import React from "react";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 
 jest.mock("src/app/PersistentStorageService/PersistentStorageService");
 jest.mock("src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service");
+// Mock the snackbar provider
+jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
+  const actual = jest.requireActual("src/theme/SnackbarProvider/SnackbarProvider");
+  return {
+    ...actual,
+    __esModule: true,
+    useSnackbar: jest.fn().mockReturnValue({
+      enqueueSnackbar: jest.fn(),
+      closeSnackbar: jest.fn(),
+    }),
+  };
+});
+
 
 // mock the password input
 jest.mock("src/theme/PasswordInput/PasswordInput", () => {
@@ -39,8 +53,6 @@ describe("AnonymousAccountConversionDialog", () => {
     jest.clearAllMocks();
     (FirebaseEmailAuthenticationService.getInstance as jest.Mock).mockReturnValue(mockFirebaseEmailAuthService);
   });
-
-
 
   test("should prefill email field with stored email from PersistentStorageService", () => {
     // GIVEN a stored email
@@ -117,6 +129,14 @@ describe("AnonymousAccountConversionDialog", () => {
     // THEN the service should be called with correct data
     expect(mockFirebaseEmailAuthService.linkAnonymousAccount).toHaveBeenCalledWith(givenEmail, givenPassword, givenEmail);
 
+    // AND the snackbar should show two messages
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenNthCalledWith(1, "Account successfully registered!", { variant: "success" });
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenNthCalledWith(2, `Currently logged in with the email: ${givenEmail}. A verification email has been sent to your email address. Please verify your account before logging in again.`, {
+      variant: "info",
+      persist: true,
+      autoHideDuration: null
+    })
+
     // AND success callbacks should be triggered
     expect(defaultProps.onSuccess).toHaveBeenCalled();
     expect(defaultProps.onClose).toHaveBeenCalled();
@@ -160,7 +180,7 @@ describe("AnonymousAccountConversionDialog", () => {
     await userEvent.click(submitButton);
 
     // THEN an error message should be shown
-    await screen.findByText(errorMessage);
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(errorMessage, { variant: "error" })
 
     // AND the callbacks should not be called
     expect(defaultProps.onSuccess).not.toHaveBeenCalled();
