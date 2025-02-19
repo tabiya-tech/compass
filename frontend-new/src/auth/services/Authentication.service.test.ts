@@ -25,6 +25,7 @@ jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => ({
     clearToken: jest.fn(),
     clearLoginMethod: jest.fn(),
     clearPersonalInfo: jest.fn(),
+    clearAccountConverted: jest.fn()
   },
 }));
 
@@ -86,6 +87,7 @@ describe("AuthenticationService", () => {
       jest.spyOn(AuthenticationStateService.getInstance(), "clearUser");
       jest.spyOn(UserPreferencesStateService.getInstance(), "clearUserPreferences");
       jest.spyOn(PersistentStorageService, "clearLoginMethod");
+      jest.spyOn(PersistentStorageService, "clearAccountConverted");
       // WHEN onSuccessfulLogout is called
       await service.onSuccessfulLogout();
 
@@ -97,6 +99,9 @@ describe("AuthenticationService", () => {
 
       // AND the login method should be cleared from persistent storage
       expect(PersistentStorageService.clearLoginMethod).toHaveBeenCalled();
+
+      // AND the account conversion flag should be cleared from persistent storage
+      expect(PersistentStorageService.clearAccountConverted).toHaveBeenCalled();
     });
   });
 
