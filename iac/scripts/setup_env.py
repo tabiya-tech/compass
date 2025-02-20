@@ -61,7 +61,7 @@ def _upload_file_to_secret_manager(
                 replication={
                     "automatic": {},
                 },
-                expire_time=None if expire_time.lower() == "never" else expire_time    # type: ignore
+                expire_time=None if expire_time.lower() == "never" else expire_time  # type: ignore
             )
         ))
     except Exception as e:
@@ -82,31 +82,36 @@ def _upload_file_to_secret_manager(
     ))
 
 
-def _main(args):
-    stack_name = get_stack_name_from(args.realm_name, args.env_name)
+def _main(*, realm_name: str, env_name: str, target_git_branch: str, target_git_sha: str, config_files_dir: str,
+          secrets_expire_time: str):
+    stack_name = get_stack_name_from(realm_name, env_name)
 
     target_version = Version(
-        git_branch_name=args.target_git_branch,
-        git_sha=args.target_git_sha
+        git_branch_name=target_git_branch,
+        git_sha=target_git_sha
     )
 
     # Make sure the environment files directory exists,
     # and the directory contains both the .env and stackconfig files for the environment.
-    if not os.path.exists(args.config_files_dir):
-        raise FileNotFoundError(f"Environment files directory {args.config_files_dir} does not exist.")
+    if not os.path.exists(config_files_dir):
+        raise FileNotFoundError(f"Environment files directory {config_files_dir} does not exist.")
 
-    env_file_path = os.path.join(args.config_files_dir, f".env.{stack_name}")
+    env_file_path = os.path.join(config_files_dir, f".env.{stack_name}")
     if not os.path.exists(env_file_path):
         raise FileNotFoundError(f"Environment file {env_file_path} does not exist.")
 
-    stack_config_file_path = os.path.join(args.config_files_dir, f"stack_config.{args.realm_name}.{args.env_name}.yaml")
+    stack_config_file_path = os.path.join(config_files_dir, f"stack_config.{realm_name}.{env_name}.yaml")
     if not os.path.exists(stack_config_file_path):
         raise FileNotFoundError(f"Stack config file {stack_config_file_path} does not exist.")
 
     # 1. Get the stack configurations for the given environment.
     environment = get_realm_environment(
-        realm_name=args.realm_name,
-        environment_name=args.env_name)
+        realm_name=realm_name,
+        environment_name=env_name)
+
+    if not environment:
+        print(f"error: Environment {stack_name} not found.")
+        exit(1)
 
     print(f"Setting up the environment:{stack_name} ...")
 
@@ -125,7 +130,6 @@ def _main(args):
 
     # 4. Uploading the .env file to the secret manage given the target version.
     project_number = up_results.outputs["project_number"].value
-    secrets_expire_time = args.secrets_expire_time
     _upload_file_to_secret_manager(
         project_number=project_number,
         secret_prefix=ENV_VARS_SECRET_PREFIX,
@@ -200,4 +204,11 @@ if __name__ == "__main__":
 
     )
 
-    _main(parser.parse_args())
+    args = parser.parse_args()
+    _main(
+        realm_name=args.realm_name,
+        env_name=args.env_name,
+        target_git_branch=args.target_git_branch,
+        target_git_sha=args.target_git_sha,
+        config_files_dir=args.config_files_dir,
+        secrets_expire_time=args.secrets_expire_time)

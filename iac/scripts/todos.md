@@ -15,9 +15,9 @@
 ~~- [ ] Do a conversation~~
 - [X] Deploy a release.
   - [X] tag and push
-  - [ ] Sow the actual secret pulled for when preparing ( it is not enough to say which was not found) (1)
-  - [ ] run setup.py for each dev/test/prod auto env with a release specific env and yaml file. (1)
-  - deploy the release on all the environments and expect them to pick the correct secret files (see logs)
+  - [X] Show the actual secret pulled for when preparing ( it is not enough to say which was not found) (1)
+  - [X] run setup.py for each dev/test/prod auto env with a release specific env and yaml file. (1)
+  - [X] deploy the release on test environments and expect them to pick the correct secret files (see logs)
 
 -----
 # Deploy to the compass realm.

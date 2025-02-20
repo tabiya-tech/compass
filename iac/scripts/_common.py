@@ -223,15 +223,19 @@ def get_environments_in_realm(realm_name: str) -> List[Environment]:
 
 def get_realm_environment(realm_name: str, environment_name: str):
     """
-    Get the environment configuration from the realm's secrets.
+    Get the environment by realm name and environment name.
+    :param realm_name: The realm name
+    :param environment_name: The environment name
+    :return: The environment object if found, otherwise None.
     """
+
     environments = get_environments_in_realm(realm_name)
 
     for environment in environments:
         if environment.environment_name == environment_name:
             return environment
 
-    raise ValueError(f"No environment config found for the environment:{environment_name} in the realm:{realm_name}.")
+    return None
 
 
 def get_environment_stack_configurations(environment: Environment, version: Version) -> StackConfigs:
@@ -257,11 +261,14 @@ def get_environment_environment_variables(stack_name: str, version: Version):
     return get_versioned_secret_latest_value(ENV_VARS_SECRET_PREFIX, environment_project_id, version)
 
 
-def get_realm_environment_by_env_type(
+def _get_realm_environment_by_env_type(
         realm_name: str,
         env_type: EnvironmentTypes) -> list[Environment]:
     """
     Get the environments by environment type from the realm's secrets.
+    :param realm_name: The realm name
+    :param env_type: The environment type
+    :return: The list of environments that match the environment type, if any. Otherwise, an empty list.
     """
 
     realm_environments = get_environments_in_realm(realm_name)
@@ -274,9 +281,45 @@ def get_realm_environment_by_env_type(
     return target_environments
 
 
+def find_environments(*, realm_name: str, environment_name: str | None, environment_type: EnvironmentTypes | None) -> list[Environment]:
+    """
+    Find the environments that match the selection criteria.
+    :param realm_name: The realm name
+    :param environment_name: The environment name
+    :param environment_type: The environment type
+    :return: The list of environments that match the selection criteria, if any. Otherwise, an empty list.
+    """
+
+    # Get the environments that match the selection criteria.
+    targeted_environments: list[Environment] = []
+
+    if environment_name is not None:
+        # Prepare the deployment of an environment by realm name and environment name
+        found_environment = get_realm_environment(
+            realm_name=realm_name,
+            environment_name=environment_name)
+        if found_environment is not None:
+            targeted_environments.append(found_environment)
+        else:
+            print(f"warning: No environment found for realm: {realm_name} and env_name: {environment_name}")
+
+    if environment_type is not None:
+        # Prepare the deployment of environments by realm name and environment type
+        found_environments: list[Environment] = _get_realm_environment_by_env_type(
+            realm_name=realm_name,
+            env_type=environment_type)
+        if len(found_environments) != 0:
+            targeted_environments = targeted_environments + found_environments
+        else:
+            print(f"warning: No environments found for realm: {realm_name} and env_type: {environment_type}")
+
+    return targeted_environments
+
+
 # =======================
 # Adding arguments actions
 # =======================
+
 
 def add_select_environment_arguments(*, parser: argparse.ArgumentParser):
     """
