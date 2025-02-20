@@ -166,7 +166,7 @@ const Consent: React.FC = () => {
     >
       <Backdrop isShown={isLoggingOut} message={"Logging you out..."} />
       <Box display="flex" flexDirection="column" alignItems="center" justifyContent={"space-evenly"}>
-        <AuthHeader title={"Before we begin..."} subtitle={""} />
+        <AuthHeader title={"Before we begin..."} subtitle={<></>} />
         <Box
           display={"flex"}
           flexDirection={"column"}

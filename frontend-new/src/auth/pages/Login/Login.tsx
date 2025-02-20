@@ -288,7 +288,7 @@ const Login: React.FC = () => {
         gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
         width={"100%"}
       >
-        <AuthHeader title={"Welcome to Compass!"} subtitle={"Login to your account to continue"} />
+        <AuthHeader title={"Welcome to Compass!"} subtitle={<>Login to your account to continue</>} />
         <Box
           component="form"
           onSubmit={handleLoginSubmit}
