@@ -47,12 +47,12 @@ def _get_new_invitation():
     )
 
 
-def _prefill_random_invitations(repository: UserInvitationRepository, n: int):
+async def _prefill_random_invitations(repository: UserInvitationRepository, n: int):
     """
     Inserts N random invitations into the database.
     """
     invitations = [_get_new_invitation() for _ in range(n)]
-    repository.upsert_many_invitations(invitations)
+    await repository.upsert_many_invitations(invitations)
 
 
 def _assert_invitation_matches(actual_invitation_code: dict, given_invitation: UserInvitation):
@@ -254,7 +254,7 @@ class TestReduceCapacity:
         repository = await get_user_invitation_data_repository
 
         # GIVEN already N invitations in the database.
-        _prefill_random_invitations(repository, 5)
+        await _prefill_random_invitations(repository, 5)
 
         # AND a given invitation is already saved in the database.
         given_invitation = _get_new_invitation()
@@ -281,7 +281,7 @@ class TestReduceCapacity:
         repository = await get_user_invitation_data_repository
 
         # GIVEN N invitations are prefilled in the database.
-        _prefill_random_invitations(repository, 5)
+        await _prefill_random_invitations(repository, 5)
 
         # AND a given invitation is not saved in the database.
         given_invitation_code = str(uuid.uuid4())
@@ -308,7 +308,7 @@ class TestReduceCapacity:
         repository = await get_user_invitation_data_repository
 
         # Given N invitations are prefilled in the database.
-        _prefill_random_invitations(repository, 5)
+        await _prefill_random_invitations(repository, 5)
 
         # AND a given invalid invitation is saved in the database.
         given_invitation = _get_new_invitation()
