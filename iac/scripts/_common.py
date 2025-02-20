@@ -103,6 +103,7 @@ def _get_secret_value(full_project_name: str, secret_name: str) -> Optional[Acce
     secret_name = f"{full_project_name}/secrets/{secret_name}"
     try:
         secret_value = _get_latest_secret_value(secret_name)
+        print(f"info: Successfully got the secret value: {secret_name}")
         return secret_value
     except NotFound as e:
         print(f"Failed to get the secret value: {secret_name}")

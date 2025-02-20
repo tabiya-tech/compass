@@ -13,9 +13,12 @@
   - 
 ~~- [ ] Deployment of the test-realm.demo (create indexes)~~
 ~~- [ ] Do a conversation~~
-- [ ] Create a release.
-  - [ ] run setup.py for each dev/test/prod auto env 
-  - [ ] tag and push
+- [X] Deploy a release.
+  - [X] tag and push
+  - [ ] Sow the actual secret pulled for when preparing ( it is not enough to say which was not found) (1)
+  - [ ] run setup.py for each dev/test/prod auto env with a release specific env and yaml file. (1)
+  - deploy the release on all the environments and expect them to pick the correct secret files (see logs)
+
 -----
 # Deploy to the compass realm.
 - [ ] Replace compass dev with new compass realm.
@@ -38,7 +41,6 @@
     - [ ] Scripts
 - [ ] Think about cloudrun config in stack_config/backend/config (1)
 - [ ] Clean up the environment variables in github. (1)
-- [ ] Sow the actual secret pull for when preparing ( it is not enough to say which was not found) (1)
 - [ ] Log all the values used in the functions, for debug purposes. (1)
 - [ ] Logging should be less verbose and have the right needed information. (1)
     - Replace project number with the project id.
