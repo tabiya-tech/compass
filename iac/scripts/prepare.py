@@ -193,57 +193,52 @@ def _main(args):
     environment_name = args.env_name
     environment_type = args.env_type
 
+    # Get the environments that match the selection criteria.
+    targeted_environments: list[Environment] = []
+
+    if environment_name is not None:
+        # Prepare the deployment of an environment by realm name and environment name
+        found_environment = get_realm_environment(
+            realm_name=realm_name,
+            environment_name=environment_name)
+        if found_environment is not None:
+            targeted_environments.append(found_environment)
+        else:
+            print(f"warning: No environment found for realm: {realm_name} and env_name: {environment_name}")
+
+    if environment_type is not None:
+        # Prepare the deployment of environments by realm name and environment type
+        found_environments: list[Environment] = get_realm_environment_by_env_type(
+            realm_name=realm_name,
+            env_type=environment_type)
+        if len(targeted_environments) != 0:
+            targeted_environments = targeted_environments + found_environments
+        else:
+            print(f"warning: No environments found for realm: {realm_name} and env_type: {environment_type}")
+
+    if len(targeted_environments) == 0:
+        print(f"error: No environments found for realm: {realm_name}")
+        exit(1)
+
+    # Download the artifacts and configurations for version to be deployed.
     target_version = Version(
         git_branch_name=args.target_git_branch,
         git_sha=args.target_git_sha
     )
-
-    # randomly get a deployment number
-    # this is used if we have two parallel deployments
-    # and the download artifacts and configurations, needs to be able to differentiate between the two
-    # otherwise it would be very complicated to know if an ongoing download or not.
+    # Generate a random deployment id and store it in the environment variables.
+    # This ensures the relevant artifacts and configurations are downloaded
+    # and prepared for the correct deployment run, if different deployments occur concurrently,
     deployment_number = uuid.uuid4().__str__()
 
     print(f"Preparing the deployment of version: {target_version}, deployment number: {deployment_number}")
+    _download_artifacts_and_config(realm_name, target_version, deployment_number)
 
-    # Flow 1: prepare the deployment of an environment by realm name and environment name
-    #          this happens if env_name was provided. (manual preparing)
-    if environment_name is not None:
-        # 1.1 Get the environment stack configuration
-        target_environment = get_realm_environment(
-            realm_name=realm_name,
-            environment_name=environment_name)
-
-        # 1.2 download the artifacts and configurations for the environment
-        _download_artifacts_and_config(realm_name, target_version, deployment_number)
-
-        # 1.3 prepare the deployment of the environment
+    # 2.3 prepare the deployment of each environment in the target list.
+    for environment in targeted_environments:
         _prepare_environment_deployment(
-            environment=target_environment,
+            environment=environment,
             deployment_run_number=deployment_number,
             artifacts_version=target_version)
-
-    # Flow 2: prepare the deployment of environments by realm name and environment type.
-    #         This happens in the pipeline when we want to prepare all the environments of a certain type.
-    if environment_type is not None:
-        # 2.1 Get the target environments, all the environments of the given type in the realm.
-        target_environments = get_realm_environment_by_env_type(
-            realm_name=realm_name,
-            env_type=environment_type)
-
-        if len(target_environments) == 0:
-            print(f"No environments found for realm: {realm_name} and env_type: {environment_type}")
-
-        # 2.2 download the artifacts and configurations for the environments
-        # given that we are deploying one artifact version, the download is done once.
-        _download_artifacts_and_config(realm_name, target_version, deployment_number)
-
-        # 2.3 prepare the deployment of each environment in the target list.
-        for environment in target_environments:
-            _prepare_environment_deployment(
-                environment=environment,
-                deployment_run_number=deployment_number,
-                artifacts_version=target_version)
 
 
 if __name__ == "__main__":
