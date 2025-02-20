@@ -41,6 +41,7 @@ def in_memory_mongo_server():
     in_mem_mongo = Mongod(ctx)
     in_mem_mongo.start()
     yield in_mem_mongo
+    logging.info("Stopping in-memory MongoDB server")
     in_mem_mongo.stop()
 
 
@@ -73,7 +74,7 @@ async def in_memory_userdata_database(in_memory_mongo_server) -> AsyncIOMotorDat
         userdata_db,
         logger=logging.getLogger(__name__)
     )
-
+    logging.info(f"Created userdata database: {userdata_db.name}")
     return userdata_db
 
 
@@ -96,5 +97,5 @@ async def in_memory_application_database(in_memory_mongo_server) -> AsyncIOMotor
         application_db,
         logger=logging.getLogger(__name__)
     )
-
+    logging.info(f"Created application database: {application_db.name}")
     return application_db
