@@ -36,10 +36,10 @@ def _get_new_invitation():
     return UserInvitation(
         invitation_code=str(uuid.uuid4()),  # Generate a random invitation code
         allowed_usage=max_capacity,
-        remaining_usage=max_capacity - random.randint(1, max_capacity),  # nosec B311 # random is used for testing purposes
+        remaining_usage=max_capacity - random.randint(1, max_capacity - 1),  # nosec B311 # random is used for testing purposes
         valid_from=datetime.now().astimezone(tz=random_tz),  # construct a date in the past in the given time zone
         # create a date 1-10 days in the future in the given time zone.
-        valid_until=datetime.now().astimezone(tz=random_tz) + timedelta(days=random.randint(1, 10)),  #nosec B311 # random is used for testing purposes
+        valid_until=datetime.now().astimezone(tz=random_tz) + timedelta(days=random.randint(1, 10)),  # nosec B311 # random is used for testing purposes
         # Generate a random invitation type
         invitation_type=random.choice(list(InvitationType)),  # nosec B311 # random is used for testing purposes
         sensitive_personal_data_requirement=random.choice(list(SensitivePersonalDataRequirement))  # nosec B311 # random is used for testing purposes
