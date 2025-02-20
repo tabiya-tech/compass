@@ -12,7 +12,7 @@ import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import * as Sentry from "@sentry/react";
 import AnonymousAccountConversionDialog from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
-import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import { useChatContext } from "src/chat/ChatContext";
 
 export type ChatHeaderProps = {
   notifyOnLogout: () => void;
@@ -62,11 +62,11 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [showConversionDialog, setShowConversionDialog] = useState(false);
-  const { enqueueSnackbar } = useSnackbar();
 
   const isOnline = useContext(IsOnlineContext);
   const user = authenticationStateService.getInstance().getUser();
   const isAnonymous = !user?.name || !user?.email;
+  const { setIsAccountConverted } = useChatContext();
 
   const handleViewExperiences = () => {
     notifyOnExperiencesDrawerOpen();
@@ -180,11 +180,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
           isOpen={showConversionDialog}
           onClose={() => setShowConversionDialog(false)}
           onSuccess={() => {
-            enqueueSnackbar(`Currently logged in as ${authenticationStateService.getInstance().getUser()?.name}. You will need to verify your account before logging in again.`, { 
-              variant: "info",
-              persist: true,
-              autoHideDuration: null
-            });
+            setIsAccountConverted(true);
           }}
         />
       </Box>

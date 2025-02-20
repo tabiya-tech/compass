@@ -13,6 +13,8 @@ export const PERSONAL_INFO_KEY = `personal_info_${PERSISTENT_STORAGE_VERSION}`;
 
 export const OVERALL_FEEDBACK_KEY = `overall_feedback_${PERSISTENT_STORAGE_VERSION}`;
 
+export const ACCOUNT_CONVERTED_KEY = `account_converted_${PERSISTENT_STORAGE_VERSION}`;
+
 /**
  * This class is used to store the tokens in the session storage.
  *   eg: refresh token
@@ -135,6 +137,29 @@ export class PersistentStorageService {
    */
   static clearOverallFeedback(): void {
     this.storage.removeItem(OVERALL_FEEDBACK_KEY);
+  }
+
+  /**
+   * Returns whether the anonymous account has been converted to a registered account
+   * @returns boolean - Whether the account has been converted
+   */
+  static getAccountConverted(): boolean {
+    return this.storage.getItem(ACCOUNT_CONVERTED_KEY) === "true";
+  }
+
+  /**
+   * Sets whether the anonymous account has been converted to a registered account
+   * @param converted
+   */
+  static setAccountConverted(converted: boolean): void {
+    this.storage.setItem(ACCOUNT_CONVERTED_KEY, converted.toString());
+  }
+
+  /**
+   * Clears the account converted flag from storage
+   */
+  static clearAccountConverted(): void {
+    this.storage.removeItem(ACCOUNT_CONVERTED_KEY);
   }
 
   /**
