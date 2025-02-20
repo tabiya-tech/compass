@@ -329,41 +329,30 @@ poetry run pytest --log-cli-level=DEBUG -v -m "not (smoke_test or evaluation_tes
 
 > Note: See [here](https://docs.pytest.org/en/latest/how-to/logging.html) for more information on logging in pytest.
 
-## ESCO Embedding Generation
+## Generating Embeddings
 
-The script `generate_esco_embeddings.py` is used to generate the embeddings for the ESCO occupations. The script reads
-the ESCO occupations and skills from the Platform Taxonomy MongoDB database and generates the embeddings for the Compass Taxonomy database.
+Use the [generate_taxonomy_embeddings.py](scripts/embeddings/generate_taxonomy_embeddings.py) to generate the embeddings for the taxonomy occupations and
+skills.
 
-For the target database the script uses the environment variables for the mondgo db server and database to connect to, and the vertex API credentials and region
-(see [Environment Variables & Configuration](#environment-variables--configuration)).
+The script reads
+the occupations and skills from the Platform Taxonomy MongoDB database and generates the embeddings for the Compass Taxonomy database.
 
-For the source database the script uses the following environment variables:
+The script requires environment variables, please refer to the [class ScriptSettings](scripts/embeddings/_base_data_settings.py)  for more information.
+The environment variables **must** be run before running the script. Also, the script **must** be authenticated with the Google Cloud SDK and have permissions
+to access the vertex AI Platform API.
 
-```dotenv
-# The URI of the MongoDB instance where the ESCO data is stored
-TABIYA_MONGODB_URI=<MONGODB_URI>
-# The name of the database in the Tabiya MongoDB instance where the ESCO data is stored
-TABIYA_DB_NAME=<ESCO_DATABASE_NAME>
-# The model ID of the ESCO model in the Tabiya database
-TABIYA_MODEL_ID=<ESCO_MODEL_ID>
-```
-
-To run the script use the following command:
+Run the script use the following command to get the help message:
 
 ```shell
- python3 scripts/generate_esco_embeddings.py
+ python3 scripts/embeddings/generate_taxonomy_embeddings.py --help
 ```
-
-Make sure to run it from the `/backend` directory as it contains the necessary environment variables mentioned above.
-
-The script handles retrying, rate limiting, and processes the data in batches. Additionally, if the generation process is interrupted, the script can be re-run,
-and it will continue processing the remaining data from where it left off.
 
 ## Export users feedback
 
 The script `export_feedback.py` is used to export the feedback data from the database to a CSV file.
 
 For the source database the script uses the following environment variables:
+
 ```dotenv
 # The URI of the MongoDB instance where the feedback data is stored
 FEEDBACK_MONGO_URI=<MONGODB_URI>
