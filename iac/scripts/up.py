@@ -6,17 +6,19 @@ import sys
 import argparse
 import requests
 
+
+
 # Determine the absolute path to the 'iac' directory
 iac_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Add this directory to sys.path,
 # so that we can import the iac/lib module when we run pulumi from withing the iac/scripts directory.
 sys.path.insert(0, iac_dir)
 
-from _types import IaCModules
+from environment.env_types import EnvironmentTypes
+from _types import IaCModules, Environment
 from frontend.prepare_frontend import prepare_frontend
 from lib import load_dot_realm_env, getenv, get_pulumi_stack_outputs, Version, clear_dot_env
-from _common import add_select_environments_arguments, get_realm_environment_by_env_type, run_pulumi_up, \
-    get_realm_environment
+from _common import add_select_environments_arguments, run_pulumi_up, find_environments
 
 
 def _run_smoke_tests(version_json_url: str):
@@ -108,33 +110,20 @@ def _deploy_environment(stack_name: str):
         clear_dot_env(stack_name)
 
 
-def _main(args):
-    # get all the required stacks to deploy matching the criteria.
-    realm_name = args.realm_name
-    env_name = args.env_name
-    env_type = args.env_type
+def _main(*, realm_name: str, env_name: str, env_type: EnvironmentTypes):
+    # Get the environments that match the selection criteria.
+    targeted_environments: list[Environment] = find_environments(realm_name=realm_name,
+                                                                 environment_name=env_name,
+                                                                 environment_type=env_type)
 
-    # Flow 1: deploy the environment by realm name and environment name
-    #          this happens if env_name was provided. (manual preparing)
-    if env_name is not None:
-        target_environment = get_realm_environment(
-            realm_name=realm_name,
-            environment_name=env_name)
+    if len(targeted_environments) == 0:
+        print(f"error: No environments found to deploy for the given selection criteria "
+              f"environment_name: {env_name}, environment_type: {env_type} "
+              f"in realm: {realm_name}")
+        exit(1)
 
-        _deploy_environment(target_environment.stack_name)
-
-    # Flow 2: deploy the environments by realm name and environment type.
-    #         This happens in the pipeline when we want to deploy all the environments of a certain type.
-    if env_type is not None:
-        target_environments = get_realm_environment_by_env_type(
-            realm_name=realm_name,
-            env_type=env_type)
-
-        if len(target_environments) == 0:
-            print(f"No environments found for realm: {realm_name} and env_type: {env_type}")
-
-        for environment in target_environments:
-            _deploy_environment(environment.stack_name)
+    for environment in targeted_environments:
+        _deploy_environment(environment.stack_name)
 
 
 if __name__ == "__main__":
@@ -144,5 +133,5 @@ if __name__ == "__main__":
 
     # Add the arguments to select multiple environments
     add_select_environments_arguments(parser=parser)
-
-    _main(parser.parse_args())
+    args = parser.parse_args()
+    _main(realm_name=args.realm_name, env_name=args.env_name, env_type=args.env_type)

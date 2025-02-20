@@ -20,14 +20,13 @@ sys.path.insert(0, iac_folder)
 from backend.prepare_backend import download_backend_config
 from frontend.prepare_frontend import download_frontend_bundle
 
-
+from environment.env_types import EnvironmentTypes
 from _types import IaCModules, Environment
 from scripts.formatters import construct_artifacts_version
 from lib import get_pulumi_stack_outputs, MAIN_SECRET_VERSION, construct_artifacts_dir, \
     download_generic_artifacts_file, get_file_as_string, Version
-from _common import add_select_environments_arguments, get_realm_environment_by_env_type, \
-    write_config_to_pulumi_yml_file, get_realm_environment, get_environment_stack_configurations, \
-    get_environment_environment_variables, compare_dict_keys
+from _common import add_select_environments_arguments, write_config_to_pulumi_yml_file, \
+    get_environment_stack_configurations, get_environment_environment_variables, compare_dict_keys, find_environments
 
 base_templates_dir = os.path.join(iac_folder, "templates")
 templates_dir = os.path.join(iac_folder, "scripts", "_tmp")
@@ -187,43 +186,24 @@ def _prepare_environment_deployment(*,
     print(f"Environment deployment prepared: {environment.stack_name}")
 
 
-def _main(args):
+def _main(*, realm_name: str, env_name: str, env_type: EnvironmentTypes, target_git_branch: str, target_git_sha: str):
     # get all the required stacks to prepare matching the criteria.
-    realm_name = args.realm_name
-    environment_name = args.env_name
-    environment_type = args.env_type
 
     # Get the environments that match the selection criteria.
-    targeted_environments: list[Environment] = []
-
-    if environment_name is not None:
-        # Prepare the deployment of an environment by realm name and environment name
-        found_environment = get_realm_environment(
-            realm_name=realm_name,
-            environment_name=environment_name)
-        if found_environment is not None:
-            targeted_environments.append(found_environment)
-        else:
-            print(f"warning: No environment found for realm: {realm_name} and env_name: {environment_name}")
-
-    if environment_type is not None:
-        # Prepare the deployment of environments by realm name and environment type
-        found_environments: list[Environment] = get_realm_environment_by_env_type(
-            realm_name=realm_name,
-            env_type=environment_type)
-        if len(targeted_environments) != 0:
-            targeted_environments = targeted_environments + found_environments
-        else:
-            print(f"warning: No environments found for realm: {realm_name} and env_type: {environment_type}")
+    targeted_environments: list[Environment] = find_environments(realm_name=realm_name,
+                                                                 environment_name=env_name,
+                                                                 environment_type=env_type)
 
     if len(targeted_environments) == 0:
-        print(f"error: No environments found for realm: {realm_name}")
+        print(f"error: No environments found to prepare for the given selection criteria "
+              f"environment_name: {realm_name}, environment_type: {env_name} "
+              f"in realm: {env_type}")
         exit(1)
 
     # Download the artifacts and configurations for version to be deployed.
     target_version = Version(
-        git_branch_name=args.target_git_branch,
-        git_sha=args.target_git_sha
+        git_branch_name=target_git_branch,
+        git_sha=target_git_sha
     )
     # Generate a random deployment id and store it in the environment variables.
     # This ensures the relevant artifacts and configurations are downloaded
@@ -242,6 +222,7 @@ def _main(args):
 
 
 if __name__ == "__main__":
+    # enable_debugger(5678)
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawTextHelpFormatter,
         description="Prepares deployment of environment(s)"
@@ -272,5 +253,9 @@ if __name__ == "__main__":
         required=True,
         help="The target git sha"
     )
-
-    _main(parser.parse_args())
+    args = parser.parse_args()
+    _main(realm_name=args.realm_name,
+          env_name=args.env_name,
+          env_type=args.env_type,
+          target_git_branch=args.target_git_branch,
+          target_git_sha=args.target_git_sha)

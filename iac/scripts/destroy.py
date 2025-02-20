@@ -36,9 +36,9 @@ def destroy_stack(stack_name: str):
     print(f"Done destroying stack: {stack_name}")
 
 
-def _main(args):
+def _main(*, realm_name: str, env_name: str):
     # 1. Get the stack name from the realm name and environment name.
-    stack_name = get_stack_name_from(args.realm_name, args.env_name)
+    stack_name = get_stack_name_from(realm_name, env_name)
 
     # 2.  Destroy the stack.
     destroy_stack(stack_name)
@@ -52,4 +52,5 @@ if __name__ == "__main__":
     # add the required arguments to select the environment to set up.
     add_select_environment_arguments(parser=parser)
 
-    _main(parser.parse_args())
+    args = parser.parse_args()
+    _main(realm_name=args.realm_name, env_name=args.env_name)
