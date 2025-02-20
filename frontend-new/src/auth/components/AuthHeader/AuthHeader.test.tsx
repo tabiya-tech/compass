@@ -7,7 +7,7 @@ describe("AuthHeader tests", () => {
   test("should render the AuthHeader", () => {
     // GIVEN that the component is rendered
     const givenTitle = "Test title";
-    const givenSubtitle = "Test subtitle";
+    const givenSubtitle = <span>Test subtitle</span>;
     render(<AuthHeader title={givenTitle} subtitle={givenSubtitle} />);
     // THEN expect the component to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.AUTH_HEADER_CONTAINER)).toBeInTheDocument();
@@ -20,7 +20,7 @@ describe("AuthHeader tests", () => {
     // AND expect the subtitle to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.AUTH_HEADER_SUBTITLE)).toBeInTheDocument();
     // AND expect the subtitle to have the correct text
-    expect(screen.getByTestId(DATA_TEST_ID.AUTH_HEADER_SUBTITLE)).toHaveTextContent(givenSubtitle);
+    expect(screen.getByTestId(DATA_TEST_ID.AUTH_HEADER_SUBTITLE)).toHaveTextContent(givenSubtitle.props.children);
     // AND expect the component to match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.AUTH_HEADER_CONTAINER)).toMatchSnapshot();
   });

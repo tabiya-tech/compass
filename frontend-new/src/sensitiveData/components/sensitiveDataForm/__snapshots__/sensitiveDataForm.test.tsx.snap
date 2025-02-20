@@ -6,7 +6,7 @@ exports[`Sensitive Data render tests should render the component with all elemen
   data-testid="sensitive-data-container-ab02918f-d559-47ba-9662-ea6b3a3606d1"
 >
   <div
-    class="MuiBox-root css-1n02jed"
+    class="MuiBox-root css-1jpsogw"
   >
     <div
       class="MuiBox-root css-jwp3xc"
@@ -54,14 +54,44 @@ exports[`Sensitive Data render tests should render the component with all elemen
         class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
-        Please make sure the information you provide is accurate and has no mistakes. Your information cannot be changed after submission.
+        Please double-check your details as you won't be able to update them later.
+         
+        <span
+          class="css-1ty5jm0"
+        >
+          We may use it to contact you about your experience using Compass
+        </span>
+        .
+        <button
+          aria-label="help"
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
+          data-mui-internal-clone-element="true"
+          data-testid="help-icon-4b757f12-fb67-4a59-94b1-b8a2498a7a49"
+          tabindex="0"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+            data-testid="PrivacyTipIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5zm-1 6h2v2h-2zm0 4h2v6h-2z"
+            />
+          </svg>
+          <span
+            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
       </p>
     </div>
     <div
-      class="MuiBox-root css-1hju85g"
+      class="MuiBox-root css-1tcf7lu"
     >
       <div
-        class="MuiBox-root css-1n10a4f"
+        class="MuiBox-root css-yd8sa2"
       >
         <div
           class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1pcwqdd-MuiFormControl-root-MuiTextField-root"
@@ -69,8 +99,8 @@ exports[`Sensitive Data render tests should render the component with all elemen
           <label
             class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-t9prq5-MuiFormLabel-root-MuiInputLabel-root"
             data-shrink="false"
-            for=":r0:"
-            id=":r0:-label"
+            for=":r1:"
+            id=":r1:-label"
           >
             First name
             <span
@@ -88,7 +118,7 @@ exports[`Sensitive Data render tests should render the component with all elemen
               aria-invalid="false"
               class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
               data-testid="sensitive-data-form-first-name-input-ab02918f-d559-47ba-9662-ea6b3a3606d1"
-              id=":r0:"
+              id=":r1:"
               required=""
               type="text"
               value=""
@@ -115,8 +145,8 @@ exports[`Sensitive Data render tests should render the component with all elemen
           <label
             class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-t9prq5-MuiFormLabel-root-MuiInputLabel-root"
             data-shrink="false"
-            for=":r1:"
-            id=":r1:-label"
+            for=":r2:"
+            id=":r2:-label"
           >
             Last name
             <span
@@ -134,7 +164,7 @@ exports[`Sensitive Data render tests should render the component with all elemen
               aria-invalid="false"
               class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
               data-testid="sensitive-data-form-last-name-input-ab02918f-d559-47ba-9662-ea6b3a3606d1"
-              id=":r1:"
+              id=":r2:"
               required=""
               type="text"
               value=""
@@ -161,8 +191,8 @@ exports[`Sensitive Data render tests should render the component with all elemen
           <label
             class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-t9prq5-MuiFormLabel-root-MuiInputLabel-root"
             data-shrink="false"
-            for=":r2:"
-            id=":r2:-label"
+            for=":r3:"
+            id=":r3:-label"
           >
             Contact email
             <span
@@ -180,7 +210,7 @@ exports[`Sensitive Data render tests should render the component with all elemen
               aria-invalid="false"
               class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
               data-testid="sensitive-data-form-contact-email-input-ab02918f-d559-47ba-9662-ea6b3a3606d1"
-              id=":r2:"
+              id=":r3:"
               required=""
               type="email"
               value=""
@@ -207,8 +237,8 @@ exports[`Sensitive Data render tests should render the component with all elemen
           <label
             class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-t9prq5-MuiFormLabel-root-MuiInputLabel-root"
             data-shrink="false"
-            for=":r3:"
-            id=":r3:-label"
+            for=":r4:"
+            id=":r4:-label"
           >
             Phone number
             <span
@@ -226,7 +256,7 @@ exports[`Sensitive Data render tests should render the component with all elemen
               aria-invalid="false"
               class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
               data-testid="sensitive-data-form-phone-number-input-ab02918f-d559-47ba-9662-ea6b3a3606d1"
-              id=":r3:"
+              id=":r4:"
               required=""
               type="text"
               value=""
@@ -253,8 +283,8 @@ exports[`Sensitive Data render tests should render the component with all elemen
           <label
             class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-t9prq5-MuiFormLabel-root-MuiInputLabel-root"
             data-shrink="false"
-            for=":r4:"
-            id=":r4:-label"
+            for=":r5:"
+            id=":r5:-label"
           >
             Address
             <span
@@ -272,7 +302,7 @@ exports[`Sensitive Data render tests should render the component with all elemen
               aria-invalid="false"
               class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
               data-testid="sensitive-data-form-address-input-ab02918f-d559-47ba-9662-ea6b3a3606d1"
-              id=":r4:"
+              id=":r5:"
               required=""
               type="text"
               value=""
