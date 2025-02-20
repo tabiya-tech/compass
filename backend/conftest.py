@@ -1,9 +1,10 @@
 import pytest
 import logging
+import platform
+
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 from app.server_dependencies.db_dependencies import CompassDBProvider
-
 
 @pytest.fixture(scope='session')
 def in_memory_mongo_server():
@@ -16,12 +17,27 @@ def in_memory_mongo_server():
     """
     from pymongo_inmemory import Mongod
     from pymongo_inmemory.context import Context
+
+    # There is a bug in pymongo_inmemory where the for ubuntu and debian it will fallback to mongo v4.0.23
+    # https://github.com/kaizendorks/pymongo_inmemory/issues/115
+    # so for these operating systems we manually set the os_name in the context constructor
+    os_name: str | None = None
+    is_ubuntu = 'ubuntu' in platform.uname().version.lower()
+    is_debian = 'debian' in platform.uname().version.lower()
+    if is_ubuntu:
+        os_name = 'ubuntu'
+    if is_debian:
+        os_name = 'debian'
+    ctx = Context(version="7.0", os_name=os_name)
+    # -----
+
     # After version 6, the storage engine is wiredTiger
     # We need to set this manually as there is an open issue in pymongo_inmemory that
     # incorrectly sets the storage engine to "ephemeralForTest".
     # See https://github.com/kaizendorks/pymongo_inmemory/pull/119
-    ctx = Context(version="7.0")
     ctx.storage_engine = "wiredTiger"
+    # -----
+
     in_mem_mongo = Mongod(ctx)
     in_mem_mongo.start()
     yield in_mem_mongo
