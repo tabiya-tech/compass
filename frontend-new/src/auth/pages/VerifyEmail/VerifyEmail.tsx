@@ -39,7 +39,10 @@ const VerifyEmail: React.FC = () => {
         <AuthHeader
           title={"Thank you for registering to Compass."}
           subtitle={
-            "A verification email has been sent to your email address. To continue, please verify your email address first."
+            <>
+              A verification email has been sent to your email address. To continue, please verify your email address
+              first.
+            </>
           }
         />
         <PrimaryButton

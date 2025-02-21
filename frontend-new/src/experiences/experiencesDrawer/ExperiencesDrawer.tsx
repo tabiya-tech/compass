@@ -99,7 +99,8 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   // Group experiences by work type
   const groupedExperiences = useMemo(() => groupExperiencesByWorkType(experiences), [experiences]);
 
-  const tooltipText = "We don’t save these information. The information you provide will only be used for the report.";
+  const tooltipText =
+    "The fields are prefilled with information you may have provided earlier and are stored securely on your device. Fill in missing details to personalize your CV.";
   return (
     <Drawer
       anchor="right"

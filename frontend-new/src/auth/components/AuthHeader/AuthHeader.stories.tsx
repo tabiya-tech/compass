@@ -12,6 +12,6 @@ export default meta;
 export const Shown: StoryObj<typeof AuthHeader> = {
   args: {
     title: "Test title",
-    subtitle: "Test subtitle",
+    subtitle: <>Test subtitle</>,
   },
 };

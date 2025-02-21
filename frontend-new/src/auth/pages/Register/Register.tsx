@@ -8,15 +8,13 @@ import RegisterWithEmailForm from "src/auth/pages/Register/components/RegisterWi
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
-import FirebaseEmailAuthService
-  from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
+import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
-import FirebaseSocialAuthenticationService
-  from "src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
+import FirebaseSocialAuthenticationService from "src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
 import RequestInvitationCode from "src/auth/components/requestInvitationCode/RequestInvitationCode";
 import { InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import CustomLink from "../../../theme/CustomLink/CustomLink";
@@ -39,7 +37,7 @@ export const DATA_TEST_ID = {
   REGISTER_USING: `register-using-${uniqueId}`,
   FIREBASE_AUTH_CONTAINER: `firebase-auth-container-${uniqueId}`,
   LOGIN_LINK: `register-login-link-${uniqueId}`,
-  LANGUAGE_SELECTOR: `register-language-selector-${uniqueId}`
+  LANGUAGE_SELECTOR: `register-language-selector-${uniqueId}`,
 };
 
 const Register: React.FC = () => {
@@ -152,7 +150,7 @@ const Register: React.FC = () => {
         gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
         width={"100%"}
       >
-        <AuthHeader title={"Welcome to Compass!"} subtitle={"We need some information to get started"} />
+        <AuthHeader title={"Welcome to Compass!"} subtitle={<>We need some information to get started</>} />
         <Typography variant="subtitle2">Enter your registration code to sign up</Typography>
         <TextField
           fullWidth

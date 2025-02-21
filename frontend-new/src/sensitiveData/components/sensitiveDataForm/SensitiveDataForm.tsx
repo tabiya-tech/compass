@@ -8,6 +8,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  useMediaQuery,
   useTheme,
 } from "@mui/material";
 
@@ -36,6 +37,9 @@ import {
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { UserPreferenceError } from "src/error/commonErrors";
 import { HighlightedSpan } from "src/consent/components/consentPage/Consent";
+import { Theme } from "@mui/material/styles";
+import HelpTip from "src/theme/HelpTip/HelpTip";
+import PrivacyTipIcon from "@mui/icons-material/PrivacyTip";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d1";
 
@@ -111,6 +115,7 @@ const sanitize = (data: SensitivePersonalData): SensitivePersonalData => ({
 
 const SensitiveDataForm: React.FC = () => {
   const theme = useTheme();
+  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -226,16 +231,28 @@ const SensitiveDataForm: React.FC = () => {
           alignItems="center"
           gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
           width={"100%"}
+          sx={{
+            paddingX: isMobile ? theme.fixedSpacing(theme.tabiyaSpacing.sm) : theme.spacing(0),
+          }}
         >
           <AuthHeader
             title={"Provide Your Information"}
             subtitle={
-              "Please make sure the information you provide is accurate and has no mistakes. Your information cannot be changed after submission."
+              <>
+                Please double-check your details as you won't be able to update them later.{" "}
+                <HighlightedSpan>We may use it to contact you about your experience using Compass</HighlightedSpan>.
+                <HelpTip icon={<PrivacyTipIcon />}>Your information is encrypted and stored securely.</HelpTip>
+              </>
             }
           />
 
-          <Box width={"100%"} display={"flex"} flexDirection={"column"} gap={theme.tabiyaSpacing.xl}>
-            <Box display="flex" flexDirection="column" gap={theme.tabiyaSpacing.lg}>
+          <Box
+            width={"100%"}
+            display={"flex"}
+            flexDirection={"column"}
+            gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
+          >
+            <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
               <TextField
                 fullWidth
                 type={"text"}

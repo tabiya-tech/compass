@@ -13,7 +13,7 @@ export const DATA_TEST_ID = {
 
 export interface AuthHeaderProps {
   title: string;
-  subtitle: string;
+  subtitle: React.ReactElement;
 }
 
 const AuthHeader: React.FC<Readonly<AuthHeaderProps>> = ({ title, subtitle }) => {
