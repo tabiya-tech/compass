@@ -19,6 +19,7 @@
   - [X] run setup.py for each dev/test/prod auto env with a release specific env and yaml file. (1)
   - [X] deploy the release on test environments and expect them to pick the correct secret files (see logs)
 
+
 -----
 # Deploy to the compass realm.
 - [ ] Replace compass dev with new compass realm.
@@ -40,6 +41,22 @@
 - [ ] merge to the main
 - [ ] Test the manual deployment. (0)
     - Checkout should be changed to checkout the provided branch name. to run the right pulumi code.
+
+---------------------
+
+- [ ] A checklist of the steps to create a realm and set up the first environment.
+- [ ] Create a realm
+  - Root project.
+  - Identity Project.
+
+- [ ] Create an environment
+
+
+
+
+- [ ] Think top down, get everything ready then call the handler functions.
+
+
 ---------------------
 
 # Documentation
@@ -53,6 +70,7 @@
     - [ ] Scripts
 
 
+- [ ] Firebase allowed domains does not work if the environment type is local (an environment type Output is a string)
 - [ ] Think about cloudrun config in stack_config/backend/config (1)
 - [ ] Clean up the environment variables in github. (1)
 - [ ] Clean up the pulumi stacks which are no longer in need.

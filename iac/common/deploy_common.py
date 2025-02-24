@@ -175,6 +175,37 @@ def _setup_loadbalancer(*, basic_config: ProjectBaseConfig,
     )
 
 
+def _setup_auth_subdomain(*,
+                          basic_config: ProjectBaseConfig,
+                          dns_zone: gcp.dns.ManagedZone,
+                          auth_site_url: pulumi.Output[str],
+                          auth_site_id: pulumi.Output[str],
+                          auth_domain: pulumi.Output[str],
+                          frontend_domain: pulumi.Output[str]):
+    auth_hosting_custom_domain = gcp.firebase.HostingCustomDomain(
+        get_resource_name(resource="auth", resource_type="custom-domain"),
+        args=gcp.firebase.HostingCustomDomainArgs(
+            project=basic_config.project,
+            site_id=auth_site_id,
+            custom_domain=auth_domain,
+            redirect_target=frontend_domain,
+            wait_dns_verification=False,  # because the SSL Certificate is not yet created.
+        ),
+        opts=pulumi.ResourceOptions(provider=basic_config.provider, depends_on=[dns_zone]),
+    )
+
+    gcp.dns.RecordSet(
+        get_resource_name(resource="auth", resource_type="record-set"),
+        project=basic_config.project,
+        # Add a dot at the end.
+        name=auth_hosting_custom_domain.custom_domain.apply(lambda s: s + "."),
+        managed_zone=dns_zone.name,
+        type="CNAME",
+        ttl=300,
+        rrdatas=[auth_site_url.apply(lambda s: s + ".")],
+        opts=pulumi.ResourceOptions(provider=basic_config.provider))
+
+
 def _create_dns(*, basic_config: ProjectBaseConfig, domain_name: pulumi.Output[str]) -> gcp.dns.ManagedZone:
     # create sub domain in gcp
     dns_zone = gcp.dns.ManagedZone(get_resource_name(resource="dns", resource_type="zone"),
@@ -196,7 +227,11 @@ def deploy_common(*,
                   frontend_bucket_name: pulumi.Output[str],
 
                   backend_url: pulumi.Output[str],
-                  api_gateway_id: pulumi.Output[str]):
+                  api_gateway_id: pulumi.Output[str],
+
+                  auth_site_url: pulumi.Output[str],
+                  auth_site_id: pulumi.Output[str],
+                  auth_domain: pulumi.Output[str]):
     basic_config = get_project_base_config(project=project, location=location)
 
     # Create the DNS
@@ -212,3 +247,11 @@ def deploy_common(*,
                         frontend_bucket_name=frontend_bucket_name,
                         backend_url=backend_url,
                         api_gateway_id=api_gateway_id)
+
+    # Create the Auth subdomain
+    _setup_auth_subdomain(basic_config=basic_config,
+                          dns_zone=dns_zone,
+                          auth_site_id=auth_site_id,
+                          auth_site_url=auth_site_url,
+                          auth_domain=auth_domain,
+                          frontend_domain=frontend_domain)

@@ -18,7 +18,8 @@ from identity_platform import IdentityPlatform
 def _setup_identity_platform(
         *,
         basic_config: ProjectBaseConfig,
-        environment_type: pulumi.Output[EnvironmentTypes],
+        environment_type: pulumi.Output[str],
+        project_id: pulumi.Output[str],
         frontend_domain: pulumi.Output[str],
         gcp_oauth_client_id: str,
         gcp_oauth_client_secret: str):
@@ -27,7 +28,7 @@ def _setup_identity_platform(
         _frontend_domain = args[0]
         _environment_type = args[1]
         _authorized_domains = [_frontend_domain]
-        if _environment_type == EnvironmentTypes.DEV:
+        if _environment_type == EnvironmentTypes.DEV.value:
             # add more domains here depending on how the application is accessed.
             _authorized_domains.append("localhost")
 
@@ -42,7 +43,8 @@ def _setup_identity_platform(
                 state="DISABLED",
             ),
             sign_in=gcp.identityplatform.ConfigSignInArgs(
-                allow_duplicate_emails=True,
+                # Accounts using the same email will be linked together, Otherwise we can't see the account identifier.
+                allow_duplicate_emails=False,
                 anonymous=gcp.identityplatform.ConfigSignInAnonymousArgs(
                     enabled=True,
                 ),
@@ -58,8 +60,7 @@ def _setup_identity_platform(
                                     )
 
     )
-    pulumi.export("identity_platform_client_api_key", idp_config.client.apply(lambda c: c.get("api_key")))
-    pulumi.export("identity_platform_client_firebase_subdomain", idp_config.client.apply(lambda c: c.get("firebase_subdomain")))
+
     # Enable Google Authentication
     gcp.identityplatform.DefaultSupportedIdpConfig(
         get_resource_name(resource="google-idp", resource_type="config"),
@@ -71,10 +72,22 @@ def _setup_identity_platform(
         opts=pulumi.ResourceOptions(depends_on=[idp_config], provider=basic_config.provider),
     )
 
+    # Firebase Custom Domain.
+    firebase_site = gcp.firebase.HostingSite(
+        get_resource_name(resource="firebase-domain", resource_type="site"),
+        project=project_id,
+        site_id=project_id,
+        # Do not delete the default Firebase hosting site it will be deleted if the IDP is disabled.
+        opts=pulumi.ResourceOptions(provider=basic_config.provider, retain_on_delete=True, depends_on=[idp_config]))
+
+    pulumi.export("identity_platform_client_api_key", idp_config.client.apply(lambda c: c.get("api_key")))
+    pulumi.export("auth_site_url", firebase_site.default_url.apply(lambda s: s.replace("https://", "")))
+    pulumi.export("auth_site_id", firebase_site.site_id)
+
 
 def deploy_auth(*,
                 location: str,
-                environment_type: pulumi.Output[EnvironmentTypes],
+                environment_type: pulumi.Output[str],
                 project: pulumi.Output[str],
                 frontend_domain: pulumi.Output[str],
                 gcp_oauth_client_id: str,
@@ -98,7 +111,8 @@ def deploy_auth(*,
     _setup_identity_platform(
         basic_config=_basic_config,
         environment_type=environment_type,
+        project_id=project,
         frontend_domain=frontend_domain,
         gcp_oauth_client_id=gcp_oauth_client_id,
-        gcp_oauth_client_secret=gcp_oauth_client_secret
+        gcp_oauth_client_secret=gcp_oauth_client_secret,
     )

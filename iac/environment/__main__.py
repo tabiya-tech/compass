@@ -60,6 +60,8 @@ def main():
     pulumi.export("backend_domain", domain_name)
     pulumi.export("backend_url", domain_name.apply(lambda _domain_name: f"https://{_domain_name}/api"))
 
+    pulumi.export("auth_domain", domain_name.apply(lambda _domain_name: f"auth.{_domain_name}"))
+
     create_new_environment(
         realm_name=realm_name,
         region=gcp_region,

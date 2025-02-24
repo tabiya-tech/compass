@@ -30,6 +30,7 @@ def main():
     frontend_domain = getstackref(env_reference, "frontend_domain")
     frontend_url = getstackref(env_reference, "frontend_url")
     backend_url = getstackref(env_reference, "backend_url")
+    auth_domain = getstackref(env_reference, "auth_domain")
 
     # Get stack reference for frontend
     frontend_stack_ref = pulumi.StackReference(f"tabiya-tech/compass-frontend/{stack_name}")
@@ -41,6 +42,11 @@ def main():
     api_gateway_id = getstackref(backend_stack_ref, "apigateway_id")
     api_gateway_id.apply(lambda _id: print(f"Using API gateway id: {_id}"))
 
+    # Get the stack references for the auth.
+    auth_stack_ref = pulumi.StackReference(f"tabiya-tech/compass-auth/{stack_name}")
+    auth_site_url = auth_stack_ref.get_output("auth_site_url")
+    auth_site_id = auth_stack_ref.get_output("auth_site_id")
+
     # Deploy common
     deploy_common(
         project=project,
@@ -50,7 +56,10 @@ def main():
         frontend_bucket_name=frontend_bucket_name,
         frontend_url=frontend_url,
         backend_url=backend_url,
-        api_gateway_id=api_gateway_id)
+        api_gateway_id=api_gateway_id,
+        auth_domain=auth_domain,
+        auth_site_id=auth_site_id,
+        auth_site_url=auth_site_url)
 
 
 if __name__ == "__main__":

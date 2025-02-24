@@ -119,7 +119,7 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     auth_outputs = get_pulumi_stack_outputs(stack_name=stack_name, module="auth")
     frontend_env_json = {
         "FIREBASE_API_KEY": base64_encode(auth_outputs["identity_platform_client_api_key"].value),
-        "FIREBASE_AUTH_DOMAIN": base64_encode(auth_outputs["identity_platform_client_firebase_subdomain"].value),
+        "FIREBASE_AUTH_DOMAIN": base64_encode(environment_outputs["auth_domain"].value),
         "BACKEND_URL": base64_encode(environment_outputs["backend_url"].value),
         "SENTRY_FRONTEND_DSN": base64_encode(sentry_frontend_dsn),
         "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY": base64_encode(sensitive_personal_data_rsa_encryption_key),
