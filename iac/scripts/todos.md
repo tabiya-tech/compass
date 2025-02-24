@@ -32,6 +32,11 @@
      - [ ] Setup new dev environment named dev (dev.compass.tabiya.tech)
      - [ ] Setup new test environment named test (test.compass.tabiya.tech)
      - [ ] Setup new prod environment named demo (demo.compass.tabiya.tech)
+  - Document:
+    - [ ] `iac/README.md`
+    - How to set up
+    - Create Realm
+    - Identity Projects and Folders.
 - [ ] merge to the main
 - [ ] Test the manual deployment. (0)
     - Checkout should be changed to checkout the provided branch name. to run the right pulumi code.
@@ -40,11 +45,8 @@
 # Documentation
 
 - Documentation** (1)
-    - [ ] `iac/README.md`
-        - How to set up
-        - Create Realm
-        - Identity Projects and Folders.
-        - Release Process
+
+    - [ ] Release Process
     - [ ] Lucid
         - Github Pipeline
         - GCP Infrastructure.
