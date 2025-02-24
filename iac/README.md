@@ -13,6 +13,13 @@ Platform (GCP) using Pulumi.
 - [Pulumi CLI](https://www.pulumi.com/docs/install/).
 - [Google Cloud SDK (gcloud)](https://cloud.google.com/sdk/docs/install)
 
+
+### Building and uploading artifacts
+
+- Backend [requisites](../backend/README.md#prerequisites)
+- Frontend [requisites](../frontend-new/README.md#prerequisites)
+
+
 ## Installation
 
 In the iac directory, run the following commands:
@@ -44,203 +51,27 @@ pip install -r requirements.txt
 > deactivate
 > ```
 
-## Running the Pulumi
-
-Before running the code, you need to configure the Google Cloud SDK to use the credentials of the principal that will manage the infrastructure. That principal
-should have the necessary roles to manage the infrastructure in the particular project that we target. Also, you need to authenticate with Docker to push the
-images to the Google Cloud Artifact Registry.
-
-### Authenticate via service account keys (preferred method)
-
-Using the [service account credentials, authenticate with Google Cloud](https://cloud.google.com/sdk/gcloud/reference/auth/activate-service-account) is the way
-preferred when running in a CI/CD environment and the most convenient method for running pulumi locally.
-
-First activate the service account using the following command, as it is required by the docker daemon to authenticate with Google Cloud Artifact Registry:
-
- ```shell
-gcloud auth activate-service-account --key-file=<KEY_FILE>
- ```
-
-Then, add credentials to docker:
-
-```shell
-# add credentials to docker
-# replace <LOCATION> with the location of the Google Cloud Artifact Registry
-gcloud auth configure-docker <LOCATION>-docker.pkg.dev
-```
-
-Finally, use the service account key file to authenticate with Google Cloud when running pulumi.
-For example, assuming that you have to preview the changes, run the following command:
-
- ```shell
-GOOGLE_CREDENTIALS=<KEY_FILE> pulumi preview 
- ```
-
-### Authenticate with Google Cloud (alternative method)
-
-When running the code locally, you can authenticate with Google Cloud using your personal account. 
-
-Besides the service account keys authentication, there
-are [others ways you can authenticate with Google Cloud](https://cloud.google.com/sdk/gcloud/reference/auth).
-
-Even though it is best practice to use service account impersonation when running the code locally, it can be cumbersome to set up and use.
-
-Here is how to authenticate to Google Cloud using service account impersonation.
-
-Initially authenticate with your personal Google Cloud account:
-
- ```shell
- gcloud auth application-default login
- ```
-
-Then, impersonate the service account that has the necessary roles to manage the infrastructure. To impersonate a service account, run the following command:
-
- ```shell
- gcloud config set auth/impersonate_service_account <SERVICE_ACCOUNT_EMAIL>
-```
-
-> Note:
-> When using service account impersonation, your account should be granted access with the `roles/iam.serviceAccountTokenCreator` to that service account. Ask
-> the project owner to grant you that role.
-
-### Environment variables
-
-The deployment requires the following environment variables to be set:
-- `ARTIFACTS_VERSION`: The artifacts version of the application. This is used to tag the Docker images.
-
-- `GCP_OAUTH_CLIENT_ID`: The OAuth client ID used to authenticate the application with Firebase.
-- `GCP_OAUTH_CLIENT_SECRET`: The OAuth client secret used to authenticate the application with Firebase.
-
-- `DOMAIN_NAME`: The domain name of the environment, typically it is `<ENVIRONMENT>.<REALM_NAME>.tabiya.tech`
-- `FRONTEND_DOMAIN` : The domain of the frontend application, typically it is `<ENVIRONMENT>.<REALM_NAME>.tabiya.tech`
-- `FRONTEND_URL`: The URL of the frontend application, typically it is `https://<ENVIRONMENT>.<REALM_NAME>.tabiya.tech`
-- `BACKEND_DOMAIN` : The domain of the backend api, typically it is `<ENVIRONMENT>.<REALM_NAME>.tabiya.tech`, for now should be equal to `FRONTEND_DOMAIN`
-- `BACKEND_URL`: The URL of the backend api, typically it is `https://<ENVIRONMENT>.<REALM_NAME>.tabiya.tech/api`. Should be different than `FRONTEND_URL`
-- 
-- `TAXONOMY_MONGODB_URI`: The URI of the MongoDB Atlas instance where the ESCO taxonomy data is stored.
-- `TAXONOMY_DATABASE_NAME`: The name of mongo db database where the ESCO taxonomy data with the embeddings is stored.
-- `TAXONOMY_MODEL_ID`: The ID of the model used to store the taxonomy data in the database.
-
-- `APPLICATION_MONGODB_URI`: The URI of the MongoDB Atlas instance for the application database.
-- `APPLICATION_DATABASE_NAME`: The name of mongo db database used by the application to store data.
-
-- `USERDATA_MONGODB_URI`: The URI of the MongoDB instance for the user data database.
-- `USERATA_DATABASE_NAME`: The name of the mongo db database used by the application to store user data.
-
-- `VERTEX_API_REGION`: The region of the Vertex API that will be used by the backend.
-
-- `SENTRY_BACKEND_DSN`: The Sentry Data Source Name for error tracking (the backend DSN is for the project used to track backend errors)
-- `ENABLE_SENTRY`: A boolean value that determines whether Sentry error tracking is enabled. Set to `True` to enable Sentry error tracking.
-
-It is recommended to use a `.env` file to set the environment variables. Create a `.env` file in the root directory of the project and add the following
-content:
-
-```shell
-# .env file
-ARTIFACTS_VERSION=<ARTIFACTS_VERSION>
-
-GCP_OAUTH_CLIENT_ID=<GCP_OAUTH_CLIENT_ID>
-GCP_OAUTH_CLIENT_SECRET=<GCP_OAUTH_CLIENT_SECRET>
-
-DOMAIN_NAME=<ENVIRONMENT>.compass.tabiya.tech
-FRONTEND_DOMAIN=<ENVIRONMENT>.compass.tabiya.tech
-FRONTEND_URL=https://<ENVIRONMENT>.compass.tabiya.tech
-BACKEND_DOMAIN=<ENVIRONMENT>.compass.tabiya.tech
-BACKEND_URL=https://<ENVIRONMENT>.compass.tabiya.tech/api
-
-TAXONOMY_MONGODB_URI=<MONGODB_URI>
-TAXONOMY_DATABASE_NAME=<DATABASE_NAME>
-TAXONOMY_MODEL_ID=<MODEL_ID>
-
-APPLICATION_MONGODB_URI=<MONGODB_URI>
-APPLICATION_DATABASE_NAME=<DATABASE_NAME>
-
-USERDATA_MONGODB_URI=<URI_TO_MONGODB>
-USERDATA_DATABASE_NAME=<DATABASE_NAME>
-
-VERTEX_API_REGION=<REGION>
-
-SENTRY_BACKEND_DSN=<SENTRY_BACKEND_DSN>
-ENABLE_SENTRY=<True/False>
-```
-
-Refer to the backend and frontend projects for information on the environment variables.
-
-## Running Pulumi locally
-
-Before running the pulumi code:
-
-1. Activate the virtual environment as instructed in the [Installation](#installation) section.
-2. Set up the [Environment Variables](#environment-variables)
-3. Ensure that the Docker daemon is running locally.
-4. Authenticate with Google Cloud as instructed in [Authenticate via Service Account Keys](#authenticate-via-service-account-keys-preferred-method).
-   ```shell
-    # assuming the service account key file is in a folder named keys in the project's root directory and the key file is named credentials.json
-    gcloud auth activate-service-account --key-file="$(pwd)/keys/credentials.json"
-    # assuming the Google Cloud Artifact Registry is in the us-central1 region
-    gcloud auth configure-docker us-central1-docker.pkg.dev
-   ```
-
-5. Run the pulumi code for the infrastructure part you want to deploy.
-
-For example assuming the `.env` file is in the root directory of the IaC project and the service account key file named `credentials.json` is in a folder named
-`keys` in the project's root directory, to preview the changes for the `backend` infrastructure of the `dev` environment, run the following command:
-Copy pase from `.env.example` to `.env` and replace the values with the correct ones, Conduct the team for necessary values or create them if they are not
-available. Refer to the documentation on how to get the variables.
-
- ```shell
- # for example, to preview the changes for the backend infrastructure of the dev environment
-GOOGLE_CREDENTIALS="$(pwd)/keys/credentials.json" pulumi preview -C backend -s dev
- ```
-
-### Useful links
-
-See the [Pulumi documentation](https://www.pulumi.com/docs/) for more information on how to use Pulumi.
-See the [Pulumi GCP provider documentation](https://www.pulumi.com/docs/reference/clouds/gcp/) for more information on how to use the GCP provider.
-
-You can read more about how to configure pulumi with a Google cloud project in
-python [here](https://www.pulumi.com/ai/answers/15xDqB9xyu6D17Kb297Dfi/configuring-google-cloud-project-with-python)
-
-### Some caveats
-
-There are some caveats to be aware of when using Pulumi to manage the Compass infrastructure in GCP:
-
-- auth: When deploying the auth infrastructure, we enable and configure the Identity Platform API. This API has some limitations, in that it can be enabled in a
-  GCP project, but not disabled.
-  If you write code that disables or deletes the Identity Platform API, pulumi will only remove it from the pulumi state file, but the API will still be enabled
-  in the GCP project. This can lead to unexpected behavior when trying to re-enable the API.
-  You may get the error
-
-> Error creating Config: googleapi: Error 400: INVALID_PROJECT_ID : Identity Platform has already been enabled for this project.
-
-In this case, you will need to manually import the identity platform API configuration into pulumi. This can be done by running the following command:
-
-```shell
-GOOGLE_CREDENTIALS=<KEYFILE> pulumi -C auth -s dev import gcp:identityplatform/config:Config default projects/<GCP_PROJECT_ID>/config
-```
-
-Replace `<GCP_PROJECT_ID>` with the GCP project ID where the Identity Platform API is enabled.
-
-Once the configuration is imported, you can run pulumi commands as usual.
-
-> Note: Don't forget to unprotect the imported resource, since imported resources are protected by default. It is important to do this, since pulumi will not
-> allow you to destroy a protected resource.
-
-- You are going to see a warning requiring you to set `gcp:project`, This is because the project is not set in the `Pulumi.<env>.yaml` file. This is not a
-  problem, because we are using a custom gcp_provider with project set dynamically because the project is created in an environment microtask and passed
-  throughout other subprojects.
 
 ## IaC Codebase Components
+
+### Keywords
+
+- **realm**: The top-level container of the organization's infrastructure for this project (compass).
+- **environment**: A combination between partner and environment. It is a project in the GCP organization that is used to deploy the infrastructure for a specific partner. The name is usually called <realm-name>.<environment-name> eg: `compass.dev`, `compass.partner-a-dev`, `test-realm.dev`
+
+
+### Components
 
 The IaC is divided into seven subprojects and lib folder for re-usable code/functions/types.
 
 - [realm](realm): Sets up the realm.
-- [environment](environment): Sets up the environment's configuration.
-- [auth](auth): Sets up the authentication infrastructure, which is a Firebase project and related DNS Record.
-- [backend](backend): Sets up the backend application's infrastructure. API Gateway, Cloudrun and Docker image for the backend application.
-- [frontend](frontend): Sets up the frontend application's infrastructure, which is a static website hosted on Google Cloud Storage.
+- [environment](environment): Sets up the environment project and enable all the required APIs.
+- [auth](auth): Sets up the authentication infrastructure. (Identity Platform, IDPs, and Firebase).
+- [backend](backend): Sets up the backend application's infrastructure. Cloudrun and API Gateway for the backend application.
+- [frontend](frontend): Sets up the frontend application's infrastructure, a static website hosted on Google Cloud Storage.
+- [common](common): Sets up the foundational infrastructure such as a load balancer, SSL certificate and DNS records for the entire application.
 - [aws-ns](aws-ns): Sets up the AWS name servers for the subdomains. It is used to set up domain delegation for the subdomains.
-- [common](common): Sets up the foundational infrastructure such as DNS records for the entire application.
+
 
 ### The Realm
 
@@ -249,27 +80,22 @@ The realm is the top-level container of the organization's infrastructure for th
 
 The main components of the realm are:
 * Root Folder. The root folder is the top-level folder in the GCP organization where all the resources of the realm are created.
-* Root Project. The root project is at the root folder, it's purpose is to host the service account that will be used to manage the realm.
-* 
+* Root Project. The root project is at the root folder, it's purpose is to host resources that are common to all projects in the realm, -
+  * Service Accounts: Service accounts used to run deployments of environments(Project).
+  * Artifacts Repositories:  Docker and generic repositories for storing images and other artifacts.
+  * Environment Configurations Secret: A secret that contains the configuration for the environments.
+
 * Folders for the environments. There are two types of environments, **_lower_** and **_production_** environments. Lower environments are used for development
   and testing, while production environments are used for production.
-* Projects for the environments.
-* 
-* folder for production environments.
 * organisation groups common role, a role that is common for all groups which are not added by default.
-* compass developers and compass admins groups. These groups are used for granting permissions to the users. (Note: Memberships will be added manually)
-* makes admins owners for all projects (lower and production environments) and developers viewers for all projects (lower and production environments).\ and
-  editors for only lower environments.
-* a common docker registry used by all environments.
-
-The roles/permissions will be inherited from the upper level to the lower level in the hierarchy. Examples:
-
-* a new project (~read `environment`) to the `lower environment` folder.
-  * all users in the `compass.developers` group gains `roles/owner` permissions to the new project.
-  * all users in the `compass.admins` group gains `roles/owner` permissions to the new project.
-* a new project (~read `environment`) to the `production environment` folder.
-  * all users in the `compass.developers` group gains `roles/viewer` permissions to the new project.
-  * all users in the `compass.admins` group gains `roles/owner` permissions to the new project.
+* User Groups: **_Realm developers_** and **_Realm admins_** groups. These groups are used for granting permissions to the users. (Note: Memberships will be added manually)
+  <br /><br />_The roles/permissions will be inherited from the production level to the lower level in the hierarchy. Examples:_
+  * a new project (~read `environment`) to the `lower environment` folder.
+    * all users in the `compass.developers` group gains `roles/owner` permissions to the new project.
+    * all users in the `compass.admins` group gains `roles/owner` permissions to the new project.
+  * a new project (~read `environment`) to the `production environment` folder.
+    * all users in the `compass.developers` group gains `roles/viewer` permissions to the new project.
+    * all users in the `compass.admins` group gains `roles/owner` permissions to the new project.
 
 ### Environment
 
@@ -278,7 +104,7 @@ _"A combination between partner and environment"_
 
 #### What does this micro-stack do?
 
-The `environment` Pulumi micro-stack creates a new project under the target folder in the `tabiya.org` GCP organization. It will then enable a set of base APIs
+The `environment` Pulumi micro-stack creates a new project under the target folder in the root folder under the `tabiya.org` GCP organization. It will then enable a set of base APIs
 for this new project using the `"root project"`. After the project has been created, Pulumi enables a set of required base APIs for the project.\
 \
 The target folder is determined based on the `environment_type` configuration parameter. Check `organization` micro-stack for more information about
@@ -286,11 +112,14 @@ The target folder is determined based on the `environment_type` configuration pa
 \
 After the new `project/environment` has been created, the next micro-stacks can be set up
 
-- auth
-- backend
-- frontend
-- common
-- aws-ns
+```mermaid
+flowchart RL
+    Frontend --idp_client_api_key, \n idp_client_firebase_subdomain--> Auth
+    Common --apigateway_id--> Backend
+    Common --bucket_name--> Frontend
+    Aws-NS --ns-records--> Common
+
+```
 
 ## Create a Realm
 
@@ -381,8 +210,21 @@ Create a service account that will be used to setup the compass realm:
 - Run the following command to create the realm:
 
 ```shell
-  pulumi up -C organization -s <REALM_NAME>
+  pulumi up -C realm -s <REALM_NAME>
 ```
+
+### Step 6. Environments Config
+
+- Create a Yaml File for containing the list of environments under your realm and upload it to the root project secret named `<environments-config>`.
+  The file should be in the following format:
+  ```yaml
+  environments:
+  - environment_name: "<env-name>", # the name of the environment eg: dev, test, prod, partner-a-dev
+    deployment_type: "<deployment type: auto || manual>" # auto will deploy the environment in github pipeline on push or release.
+    config:
+      gcp:region: "<region>" # GCP region where the environment will be created
+      environment_type: "<env-type: dev || test || prod>" # The type of the environment
+  ```
 
 ## Identity project.
 
@@ -407,3 +249,321 @@ The values should be set as the following variables, when deploying the auth mic
 ```
 
 [//]: # (// TODO: Describe all the decisions made and why)
+
+
+
+[//]: # (## Running the Pulumi &#40;TODO: Find how to link with a realm.&#41;)
+
+[//]: # ()
+[//]: # (Before running the code, you need to configure the Google Cloud SDK to use the credentials of the principal that will manage the infrastructure. That principal)
+
+[//]: # (should have the necessary roles to manage the infrastructure in the particular project that we target. Also, you need to authenticate with Docker to push the)
+
+[//]: # (images to the Google Cloud Artifact Registry.)
+
+[//]: # ()
+[//]: # (### Authenticate via service account keys &#40;preferred method&#41;)
+
+[//]: # ()
+[//]: # (Using the [service account credentials, authenticate with Google Cloud]&#40;https://cloud.google.com/sdk/gcloud/reference/auth/activate-service-account&#41; is the way)
+
+[//]: # (preferred when running in a CI/CD environment and the most convenient method for running pulumi locally.)
+
+[//]: # ()
+[//]: # (First activate the service account using the following command, as it is required by the docker daemon to authenticate with Google Cloud Artifact Registry:)
+
+[//]: # ()
+[//]: # ( ```shell)
+
+[//]: # (gcloud auth activate-service-account --key-file=<KEY_FILE>)
+
+[//]: # ( ```)
+
+[//]: # ()
+[//]: # (Then, add credentials to docker:)
+
+[//]: # ()
+[//]: # (```shell)
+
+[//]: # (# add credentials to docker)
+
+[//]: # (# replace <LOCATION> with the location of the Google Cloud Artifact Registry)
+
+[//]: # (gcloud auth configure-docker <LOCATION>-docker.pkg.dev)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (Finally, use the service account key file to authenticate with Google Cloud when running pulumi.)
+
+[//]: # (For example, assuming that you have to preview the changes, run the following command:)
+
+[//]: # ()
+[//]: # ( ```shell)
+
+[//]: # (GOOGLE_CREDENTIALS=<KEY_FILE> pulumi preview )
+
+[//]: # ( ```)
+
+[//]: # ()
+[//]: # (### Authenticate with Google Cloud &#40;alternative method&#41;)
+
+[//]: # ()
+[//]: # (When running the code locally, you can authenticate with Google Cloud using your personal account.)
+
+[//]: # ()
+[//]: # (Besides the service account keys authentication, there)
+
+[//]: # (are [others ways you can authenticate with Google Cloud]&#40;https://cloud.google.com/sdk/gcloud/reference/auth&#41;.)
+
+[//]: # ()
+[//]: # (Even though it is best practice to use service account impersonation when running the code locally, it can be cumbersome to set up and use.)
+
+[//]: # ()
+[//]: # (Here is how to authenticate to Google Cloud using service account impersonation.)
+
+[//]: # ()
+[//]: # (Initially authenticate with your personal Google Cloud account:)
+
+[//]: # ()
+[//]: # ( ```shell)
+
+[//]: # ( gcloud auth application-default login)
+
+[//]: # ( ```)
+
+[//]: # ()
+[//]: # (Then, impersonate the service account that has the necessary roles to manage the infrastructure. To impersonate a service account, run the following command:)
+
+[//]: # ()
+[//]: # ( ```shell)
+
+[//]: # ( gcloud config set auth/impersonate_service_account <SERVICE_ACCOUNT_EMAIL>)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (> Note:)
+
+[//]: # (> When using service account impersonation, your account should be granted access with the `roles/iam.serviceAccountTokenCreator` to that service account. Ask)
+
+[//]: # (> the project owner to grant you that role.)
+
+[//]: # ()
+[//]: # (### Environment variables)
+
+[//]: # ()
+[//]: # (The deployment requires the following environment variables to be set:)
+
+[//]: # (- `ARTIFACTS_VERSION`: The artifacts version of the application. This is used to tag the Docker images.)
+
+[//]: # ()
+[//]: # (- `GCP_OAUTH_CLIENT_ID`: The OAuth client ID used to authenticate the application with Firebase.)
+
+[//]: # (- `GCP_OAUTH_CLIENT_SECRET`: The OAuth client secret used to authenticate the application with Firebase.)
+
+[//]: # ()
+[//]: # (- `DOMAIN_NAME`: The domain name of the environment, typically it is `<ENVIRONMENT>.<REALM_NAME>.tabiya.tech`)
+
+[//]: # (- `FRONTEND_DOMAIN` : The domain of the frontend application, typically it is `<ENVIRONMENT>.<REALM_NAME>.tabiya.tech`)
+
+[//]: # (- `FRONTEND_URL`: The URL of the frontend application, typically it is `https://<ENVIRONMENT>.<REALM_NAME>.tabiya.tech`)
+
+[//]: # (- `BACKEND_DOMAIN` : The domain of the backend api, typically it is `<ENVIRONMENT>.<REALM_NAME>.tabiya.tech`, for now should be equal to `FRONTEND_DOMAIN`)
+
+[//]: # (- `BACKEND_URL`: The URL of the backend api, typically it is `https://<ENVIRONMENT>.<REALM_NAME>.tabiya.tech/api`. Should be different than `FRONTEND_URL`)
+
+[//]: # (-)
+
+[//]: # (- `TAXONOMY_MONGODB_URI`: The URI of the MongoDB Atlas instance where the ESCO taxonomy data is stored.)
+
+[//]: # (- `TAXONOMY_DATABASE_NAME`: The name of mongo db database where the ESCO taxonomy data with the embeddings is stored.)
+
+[//]: # (- `TAXONOMY_MODEL_ID`: The ID of the model used to store the taxonomy data in the database.)
+
+[//]: # ()
+[//]: # (- `APPLICATION_MONGODB_URI`: The URI of the MongoDB Atlas instance for the application database.)
+
+[//]: # (- `APPLICATION_DATABASE_NAME`: The name of mongo db database used by the application to store data.)
+
+[//]: # ()
+[//]: # (- `USERDATA_MONGODB_URI`: The URI of the MongoDB instance for the user data database.)
+
+[//]: # (- `USERATA_DATABASE_NAME`: The name of the mongo db database used by the application to store user data.)
+
+[//]: # ()
+[//]: # (- `VERTEX_API_REGION`: The region of the Vertex API that will be used by the backend.)
+
+[//]: # ()
+[//]: # (- `SENTRY_BACKEND_DSN`: The Sentry Data Source Name for error tracking &#40;the backend DSN is for the project used to track backend errors&#41;)
+
+[//]: # (- `ENABLE_SENTRY`: A boolean value that determines whether Sentry error tracking is enabled. Set to `True` to enable Sentry error tracking.)
+
+[//]: # ()
+[//]: # (It is recommended to use a `.env` file to set the environment variables. Create a `.env` file in the root directory of the project and add the following)
+
+[//]: # (content:)
+
+[//]: # ()
+[//]: # (```shell)
+
+[//]: # (# .env file)
+
+[//]: # (ARTIFACTS_VERSION=<ARTIFACTS_VERSION>)
+
+[//]: # ()
+[//]: # (GCP_OAUTH_CLIENT_ID=<GCP_OAUTH_CLIENT_ID>)
+
+[//]: # (GCP_OAUTH_CLIENT_SECRET=<GCP_OAUTH_CLIENT_SECRET>)
+
+[//]: # ()
+[//]: # (DOMAIN_NAME=<ENVIRONMENT>.compass.tabiya.tech)
+
+[//]: # (FRONTEND_DOMAIN=<ENVIRONMENT>.compass.tabiya.tech)
+
+[//]: # (FRONTEND_URL=https://<ENVIRONMENT>.compass.tabiya.tech)
+
+[//]: # (BACKEND_DOMAIN=<ENVIRONMENT>.compass.tabiya.tech)
+
+[//]: # (BACKEND_URL=https://<ENVIRONMENT>.compass.tabiya.tech/api)
+
+[//]: # ()
+[//]: # (TAXONOMY_MONGODB_URI=<MONGODB_URI>)
+
+[//]: # (TAXONOMY_DATABASE_NAME=<DATABASE_NAME>)
+
+[//]: # (TAXONOMY_MODEL_ID=<MODEL_ID>)
+
+[//]: # ()
+[//]: # (APPLICATION_MONGODB_URI=<MONGODB_URI>)
+
+[//]: # (APPLICATION_DATABASE_NAME=<DATABASE_NAME>)
+
+[//]: # ()
+[//]: # (USERDATA_MONGODB_URI=<URI_TO_MONGODB>)
+
+[//]: # (USERDATA_DATABASE_NAME=<DATABASE_NAME>)
+
+[//]: # ()
+[//]: # (VERTEX_API_REGION=<REGION>)
+
+[//]: # ()
+[//]: # (SENTRY_BACKEND_DSN=<SENTRY_BACKEND_DSN>)
+
+[//]: # (ENABLE_SENTRY=<True/False>)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (Refer to the backend and frontend projects for information on the environment variables.)
+
+[//]: # ()
+[//]: # (## Running Pulumi locally)
+
+[//]: # ()
+[//]: # (Before running the pulumi code:)
+
+[//]: # ()
+[//]: # (1. Activate the virtual environment as instructed in the [Installation]&#40;#installation&#41; section.)
+
+[//]: # (2. Set up the [Environment Variables]&#40;#environment-variables&#41;)
+
+[//]: # (3. Ensure that the Docker daemon is running locally.)
+
+[//]: # (4. Authenticate with Google Cloud as instructed in [Authenticate via Service Account Keys]&#40;#authenticate-via-service-account-keys-preferred-method&#41;.)
+
+[//]: # (   ```shell)
+
+[//]: # (    # assuming the service account key file is in a folder named keys in the project's root directory and the key file is named credentials.json)
+
+[//]: # (    gcloud auth activate-service-account --key-file="$&#40;pwd&#41;/keys/credentials.json")
+
+[//]: # (    # assuming the Google Cloud Artifact Registry is in the us-central1 region)
+
+[//]: # (    gcloud auth configure-docker us-central1-docker.pkg.dev)
+
+[//]: # (   ```)
+
+[//]: # ()
+[//]: # (5. Run the pulumi code for the infrastructure part you want to deploy.)
+
+[//]: # ()
+[//]: # (For example assuming the `.env` file is in the root directory of the IaC project and the service account key file named `credentials.json` is in a folder named)
+
+[//]: # (`keys` in the project's root directory, to preview the changes for the `backend` infrastructure of the `dev` environment, run the following command:)
+
+[//]: # (Copy pase from `.env.example` to `.env` and replace the values with the correct ones, Conduct the team for necessary values or create them if they are not)
+
+[//]: # (available. Refer to the documentation on how to get the variables.)
+
+[//]: # ()
+[//]: # ( ```shell)
+
+[//]: # ( # for example, to preview the changes for the backend infrastructure of the dev environment)
+
+[//]: # (GOOGLE_CREDENTIALS="$&#40;pwd&#41;/keys/credentials.json" pulumi preview -C backend -s dev)
+
+[//]: # ( ```)
+
+[//]: # ()
+[//]: # (### Useful links)
+
+[//]: # ()
+[//]: # (See the [Pulumi documentation]&#40;https://www.pulumi.com/docs/&#41; for more information on how to use Pulumi.)
+
+[//]: # (See the [Pulumi GCP provider documentation]&#40;https://www.pulumi.com/docs/reference/clouds/gcp/&#41; for more information on how to use the GCP provider.)
+
+[//]: # ()
+[//]: # (You can read more about how to configure pulumi with a Google cloud project in)
+
+[//]: # (python [here]&#40;https://www.pulumi.com/ai/answers/15xDqB9xyu6D17Kb297Dfi/configuring-google-cloud-project-with-python&#41;)
+
+[//]: # ()
+[//]: # (### Some caveats)
+
+[//]: # ()
+[//]: # (There are some caveats to be aware of when using Pulumi to manage the Compass infrastructure in GCP:)
+
+[//]: # ()
+[//]: # (- auth: When deploying the auth infrastructure, we enable and configure the Identity Platform API. This API has some limitations, in that it can be enabled in a)
+
+[//]: # (  GCP project, but not disabled.)
+
+[//]: # (  If you write code that disables or deletes the Identity Platform API, pulumi will only remove it from the pulumi state file, but the API will still be enabled)
+
+[//]: # (  in the GCP project. This can lead to unexpected behavior when trying to re-enable the API.)
+
+[//]: # (  You may get the error)
+
+[//]: # ()
+[//]: # (> Error creating Config: googleapi: Error 400: INVALID_PROJECT_ID : Identity Platform has already been enabled for this project.)
+
+[//]: # ()
+[//]: # (In this case, you will need to manually import the identity platform API configuration into pulumi. This can be done by running the following command:)
+
+[//]: # ()
+[//]: # (```shell)
+
+[//]: # (GOOGLE_CREDENTIALS=<KEYFILE> pulumi -C auth -s dev import gcp:identityplatform/config:Config default projects/<GCP_PROJECT_ID>/config)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (Replace `<GCP_PROJECT_ID>` with the GCP project ID where the Identity Platform API is enabled.)
+
+[//]: # ()
+[//]: # (Once the configuration is imported, you can run pulumi commands as usual.)
+
+[//]: # ()
+[//]: # (> Note: Don't forget to unprotect the imported resource, since imported resources are protected by default. It is important to do this, since pulumi will not)
+
+[//]: # (> allow you to destroy a protected resource.)
+
+[//]: # ()
+[//]: # (- You are going to see a warning requiring you to set `gcp:project`, This is because the project is not set in the `Pulumi.<env>.yaml` file. This is not a)
+
+[//]: # (  problem, because we are using a custom gcp_provider with project set dynamically because the project is created in an environment microtask and passed)
+
+[//]: # (  throughout other subprojects.)
+
+[//]: # ()
