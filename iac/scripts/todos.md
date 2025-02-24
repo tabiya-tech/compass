@@ -23,12 +23,22 @@
 # Deploy to the compass realm.
 - [ ] Replace compass dev with new compass realm.
   - also clean up all the google project that we do not need anymore!
+  - Procedure:-
+     - [ ] Destroy all the environments under realm (test-realm)
+       - dev, dev2, test demo, anselme-dev.
+     - [ ] create the realm named compass.
+     - [ ] Setup dev environment named dev2 (dev2.compass.tabiya.tech) (Optional: if we want to maintain zero downtime if we didn't finish in one day)
+     - [ ] Destroy the old Pulumi.dev environment. (Note: We have to do this if we have checked out on main, because we want to destroy the resources created on main)
+     - [ ] Setup new dev environment named dev (dev.compass.tabiya.tech)
+     - [ ] Setup new test environment named test (test.compass.tabiya.tech)
+     - [ ] Setup new prod environment named demo (demo.compass.tabiya.tech)
 - [ ] merge to the main
 - [ ] Test the manual deployment. (0)
     - Checkout should be changed to checkout the provided branch name. to run the right pulumi code.
 ---------------------
 
 # Documentation
+
 - Documentation** (1)
     - [ ] `iac/README.md`
         - How to set up
@@ -39,9 +49,13 @@
         - Github Pipeline
         - GCP Infrastructure.
     - [ ] Scripts
+
+
 - [ ] Think about cloudrun config in stack_config/backend/config (1)
 - [ ] Clean up the environment variables in github. (1)
+- [ ] Clean up the pulumi stacks which are no longer in need.
 - [ ] Log all the values used in the functions, for debug purposes. (1)
+- [ ] use python logging instead of print and fix the todo
 - [ ] Logging should be less verbose and have the right needed information. (1)
     - Replace project number with the project id.
     - Add a separator (Banner) for the steps in a script in the logs (1)
