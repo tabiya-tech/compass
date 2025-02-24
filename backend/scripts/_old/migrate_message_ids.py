@@ -31,6 +31,7 @@ async def migrate_messages(*, mongo_uri: str, database_name: str, hot_run: bool 
         # Counters for reporting
         total_states = 0
         processed_states = 0
+        errored = 0
 
         logger.info(f"Starting migration {'(HOT RUN)' if hot_run else ''}")
 
@@ -50,16 +51,20 @@ async def migrate_messages(*, mongo_uri: str, database_name: str, hot_run: bool 
                     logger.info(f"{action} state for session {session_id}")
 
                 except Exception as e:
+                    errored += 1
                     logger.error(f"Error processing state for session {session_id}: {str(e)}")
                     continue
 
         except Exception as e:
+            errored += 1
             logger.error(f"Error loading state: {str(e)}")
 
         # Log summary
         logger.info(f"Migration {'completed ' if hot_run else ''}simulated!")
         logger.info(f"Total states found: {total_states}")
-        logger.info(f"Successfully processed: {processed_states}")
+        logger.info(f"States processed: {processed_states}")
+        logger.info(f"Errors: {errored}")
+        logger.info(f"Successfully processed: {processed_states - errored}")
 
     except Exception as e:
         logger.error(f"Migration failed: {e}", exc_info=True)
@@ -82,4 +87,4 @@ if __name__ == "__main__":
     _database_name = os.getenv("MIGRATE_APPLICATION_DB_NAME")
     if not _database_name:
         raise ValueError("Missing required environment variable: MIGRATE_APPLICATION_DB_NAME")
-    asyncio.run(migrate_messages(mongo_uri=_mongo_uri, database_name=_database_name, hot_run=args.hot_run))
+    asyncio.run(migrate_messages(mongo_uri=_mongo_uri, database_name=_database_name, hot_run=True))
