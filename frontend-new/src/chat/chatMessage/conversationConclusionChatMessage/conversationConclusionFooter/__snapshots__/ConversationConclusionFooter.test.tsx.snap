@@ -11,6 +11,7 @@ exports[`ConversationConclusionFooter should render component successfully 1`] =
     Don't forget to
      
     <a
+      aria-disabled="false"
       class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
       data-testid="feedback-form-experiences-drawer-button-41675f8b-257c-4a63-9563-3fe9feb6a850"
     >
@@ -29,6 +30,7 @@ exports[`ConversationConclusionFooter should render component successfully 1`] =
     We'd love your
      
     <a
+      aria-disabled="false"
       class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
       data-testid="feedback-form-button-41675f8b-257c-4a63-9563-3fe9feb6a850"
     >
