@@ -263,7 +263,9 @@ const SensitiveDataForm: React.FC = () => {
               <>
                 Please double-check your details as you won't be able to update them later.{" "}
                 <HighlightedSpan>We may use it to contact you about your experience using Compass</HighlightedSpan>.
-                <HelpTip icon={<PrivacyTipIcon />}>Your information is encrypted and stored securely.</HelpTip>
+                <HelpTip icon={<PrivacyTipIcon />}>
+                  Your information is encrypted using state-of-the-art, end-to-end encryption and stored securely.
+                </HelpTip>
               </>
             }
           />
@@ -475,9 +477,9 @@ const SensitiveDataForm: React.FC = () => {
             id: "1",
             text: (
               <>
-                We're sorry that you chose not to provide your data. Providing it is important to us, but you can
-                continue without it. Keep in mind that{" "}
-                <HighlightedSpan> you will not be able to provide it later.</HighlightedSpan>
+                We're sorry that you prefer not to provide your data. Sharing your information helps improve Compass.
+                Please note that if you skip this step,{" "}
+                <HighlightedSpan>you won't be able to provide this information later.</HighlightedSpan>
               </>
             ),
           },
@@ -494,7 +496,7 @@ const SensitiveDataForm: React.FC = () => {
           setConfirmingSkip(false);
         }}
         cancelButtonText="Yes, skip"
-        confirmButtonText="No, continue"
+        confirmButtonText="Share data"
       />
       <Backdrop isShown={isSkipping || isRejecting} message={isSkipping ? "Skipping..." : "Logging you out..."} />
     </>
