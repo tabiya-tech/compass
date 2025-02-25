@@ -457,6 +457,9 @@ const SensitiveDataForm: React.FC = () => {
           },
         ]}
         onCancel={handleRejectProvidingSensitiveData}
+        onDismiss={() => {
+          setConfirmingReject(false);
+        }}
         onConfirm={() => {
           setConfirmingReject(false);
         }}
@@ -483,6 +486,9 @@ const SensitiveDataForm: React.FC = () => {
           },
         ]}
         onCancel={handleSkipProvidingSensitiveData}
+        onDismiss={() => {
+          setConfirmingSkip(false);
+        }}
         onConfirm={() => {
           setConfirmingSkip(false);
         }}

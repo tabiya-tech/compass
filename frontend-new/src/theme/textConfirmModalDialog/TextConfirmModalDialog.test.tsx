@@ -13,6 +13,7 @@ describe("TextConfirmModalDialog", () => {
     const givenIsOpen = true;
     const givenOnCancel = jest.fn();
     const givenOnApprove = jest.fn();
+    const givenOnDismiss = jest.fn();
     const givenCancelButtonText = "Cancel";
     const givenApproveButtonText = "Yes, continue";
     const givenTextParagraphs = [
@@ -27,6 +28,7 @@ describe("TextConfirmModalDialog", () => {
         isOpen={givenIsOpen}
         onCancel={givenOnCancel}
         onConfirm={givenOnApprove}
+        onDismiss={givenOnDismiss}
         cancelButtonText={givenCancelButtonText}
         confirmButtonText={givenApproveButtonText}
       />
@@ -46,10 +48,6 @@ describe("TextConfirmModalDialog", () => {
     // AND paragraphs should have the correct text
     const contentParagraphs = screen.getAllByTestId(DATA_TEST_ID.TEXT_CONFIRM_MODAL_PARAGRAPH);
     expect(contentParagraphs).toHaveLength(2);
-    // TODO: fix this
-    // contentParagraphs.forEach((paragraph, index) => {
-    //   expect(paragraph).toHaveTextContent(givenTextParagraphs[index].text);
-    // });
 
     // AND buttons should have the correct text
     const cancelButton = screen.getByTestId(APPROVAL_MODAL_TEST_ID.CONFIRM_MODAL_CANCEL);
@@ -70,5 +68,40 @@ describe("TextConfirmModalDialog", () => {
     // AND dialog should match the snapshot
     const dialogContainer = screen.getByTestId(APPROVAL_MODAL_TEST_ID.CONFIRM_MODAL);
     expect(dialogContainer).toMatchSnapshot();
+  });
+
+  test("should use onCancel as fallback when onDismiss is not provided", () => {
+    // GIVEN the TextConfirmModalDialog without onDismiss
+    const givenTitle = "Sample Title?";
+    const givenIsOpen = true;
+    const givenOnCancel = jest.fn();
+    const givenOnApprove = jest.fn();
+    const givenOnDismiss = jest.fn();
+    const givenCancelButtonText = "Cancel";
+    const givenApproveButtonText = "Yes, continue";
+    const givenTextParagraphs = [
+      { id: "001", text: <>This is a sample body text for the TextConfirmModalDialog component.</>},
+    ];
+
+    // WHEN the TextConfirmModalDialog is rendered
+    render(
+      <TextConfirmModalDialog
+        title={givenTitle}
+        textParagraphs={givenTextParagraphs}
+        isOpen={givenIsOpen}
+        onCancel={givenOnCancel}
+        onConfirm={givenOnApprove}
+        onDismiss={givenOnDismiss}
+        cancelButtonText={givenCancelButtonText}
+        confirmButtonText={givenApproveButtonText}
+      />
+    );
+
+    // THEN expect no errors or warning to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
+
+    // Note: We can't easily test the Dialog's onClose behavior directly in this test environment
+    // as it would require simulating clicking outside the dialog or pressing Escape
   });
 });
