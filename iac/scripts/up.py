@@ -4,8 +4,10 @@ import os
 
 import sys
 import argparse
-import requests
+import time
+from typing import Optional
 
+import requests
 
 
 # Determine the absolute path to the 'iac' directory
@@ -21,7 +23,7 @@ from lib import load_dot_realm_env, getenv, get_pulumi_stack_outputs, Version, c
 from _common import add_select_environments_arguments, run_pulumi_up, find_environments
 
 
-def _run_smoke_tests(version_json_url: str):
+def _run_smoke_tests(version_json_url: str, max_retries: int = 10):
     artifacts_version = Version(
         git_branch_name=getenv("TARGET_GIT_BRANCH_NAME"),
         git_sha=getenv("TARGET_GIT_SHA")
@@ -29,7 +31,17 @@ def _run_smoke_tests(version_json_url: str):
 
     print(f"info: running the smoke tests on {version_json_url} and expected version is {artifacts_version}")
 
-    version_json_response = requests.get(version_json_url)
+    version_json_response: Optional[requests.Response] = None
+
+    for _i in range(max_retries):
+        try:
+            version_json_response = requests.get(version_json_url)
+            break
+        except requests.exceptions.SSLError:
+            print(f"info: retrying after 10 seconds the request to {version_json_url} due to SSL error.")
+            time.sleep(10)
+
+    assert version_json_response is not None
     assert version_json_response.status_code == 200
 
     version_json = version_json_response.json()
@@ -60,20 +72,20 @@ def _deploy_backend(stack_name: str):
     _run_smoke_tests(f"{apigateway_url}/version")
 
 
-def _deploy_aws_ns(stack_name: str):
-    # 1. run pulumi up on aws-ns
-    run_pulumi_up(stack_name, IaCModules.AWS_NS)
+def _deploy_common(stack_name: str):
+    # 1. run pulumi up on common
+    run_pulumi_up(stack_name, IaCModules.COMMON)
 
     # 2. run smoke tests
     environment_outputs = get_pulumi_stack_outputs(stack_name, IaCModules.ENVIRONMENT.value)
 
     # 2.1 run smoke tests for the backend
     backend_url = environment_outputs["backend_url"].value
-    _run_smoke_tests(f"{backend_url}/version")
+    _run_smoke_tests(f"{backend_url}/version", 30)
 
     # 2.2 run smoke tests for the frontend
     frontend_url = environment_outputs["frontend_url"].value
-    _run_smoke_tests(f"{frontend_url}/data/version.json")
+    _run_smoke_tests(f"{frontend_url}/data/version.json", 30)
 
 
 def _deploy_environment(stack_name: str):
@@ -98,10 +110,8 @@ def _deploy_environment(stack_name: str):
         _deploy_backend(stack_name)
 
         # 1.4 Deploy the common
-        run_pulumi_up(stack_name, IaCModules.COMMON)
+        _deploy_common(stack_name)
 
-        # 1.5 Deploy the aws-ns
-        _deploy_aws_ns(stack_name)
     except Exception as e:
         print(f"Error deploying the environment: {stack_name}")
         raise e

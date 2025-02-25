@@ -26,7 +26,6 @@ def destroy_stack(stack_name: str):
 
     print(f"Destroying stack: {stack_name}")
 
-    run_pulumi_destroy(stack_name=stack_name, module=IaCModules.AWS_NS)
     run_pulumi_destroy(stack_name=stack_name, module=IaCModules.COMMON)
     run_pulumi_destroy(stack_name=stack_name, module=IaCModules.FRONTEND)
     run_pulumi_destroy(stack_name=stack_name, module=IaCModules.BACKEND)

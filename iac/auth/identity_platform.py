@@ -84,6 +84,18 @@ class _Differ:
         # If the client.permissions key is "falsy", the client is "falsy"
         return _Differ._permission_value_is_falsy(v.get("permissions"))
 
+    @staticmethod
+    def _sign_in_values_is_falsy(value: Any) -> bool:
+        if value is None or value == {}:
+            return True
+
+        # Note: This is not a complete check, because ideally we would have to traverse the nested keys and decide.
+        return (
+                _Differ.get_boolean_value_for_diff(value.get("allow_duplicate_emails")) is False and
+                (value.get("anonymous") is None or value.get("anonymous") == {}) and
+                (value.get("email") is None or value.get("email") == {})
+        )
+
     ######################################################################
     # Methods to compare the values of the Identity Platform config
     ######################################################################
@@ -100,6 +112,23 @@ class _Differ:
             return False
         # When both are truthy, compare the values of the permissions
         return _Differ._permissions_equal(old.get("permissions"), new.get("permissions"))
+
+    @staticmethod
+    def sign_in_equal(old: any, new: any) -> bool:
+        # If both falsy, they are equal
+        if _Differ._sign_in_values_is_falsy(old) and _Differ._sign_in_values_is_falsy(new):
+            return True
+
+        # If one is falsy, and the other is not falsy, they are not equal.
+        if _Differ._sign_in_values_is_falsy(old) or _Differ._sign_in_values_is_falsy(new):
+            return False
+
+        # When both are truthy, compare the values
+        return (
+                _Differ.get_boolean_value_for_diff(old.get("allow_duplicate_emails")) == _Differ.get_boolean_value_for_diff(new.get("allow_duplicate_emails")) and
+                old.get("anonymous") == new.get("anonymous") and
+                old.get("email") == new.get("email")
+        )
 
     @staticmethod
     def auto_delete_anonymous_users_equal(old: any, new: any) -> bool:
@@ -365,6 +394,7 @@ def _apply_config(props: dict[str, Any]) -> dict[str, Any]:
     _current_cfg["project"] = _project_id
     # Set the resource name in the response so that it is available in the outputs when deleting the resource
     _current_cfg["resource_name"] = props.get("resource_name")
+
     return _current_cfg
 
 
@@ -432,6 +462,10 @@ class IdentityPlatformProvider(ResourceProvider):
                     break
             elif k == "autodelete_anonymous_users":
                 if not _Differ.auto_delete_anonymous_users_equal(v, _olds.get(k)):
+                    _changes = True
+                    break
+            elif k == "sign_in":
+                if not _Differ.sign_in_equal(v, _olds.get(k)):
                     _changes = True
                     break
             elif v != _olds.get(k):

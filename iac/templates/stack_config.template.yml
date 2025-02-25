@@ -10,6 +10,4 @@ frontend:
 common:
   config:
     gcp:region: <region>
-aws-ns:
-  config:
     aws:region: <region>

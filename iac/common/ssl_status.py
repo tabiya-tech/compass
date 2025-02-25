@@ -1,28 +1,30 @@
+import os
+import sys
 import random
 import time
 from typing import Any, Dict
 import google
 import pulumi
 from googleapiclient import discovery
-from pulumi import Resource
-from pulumi.dynamic import Resource, ResourceProvider, CreateResult, CheckResult, CheckFailure, UpdateResult, DiffResult
+from pulumi.dynamic import Resource, ResourceProvider, CreateResult, CheckResult, CheckFailure
+
+libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+# Add this directory to sys.path,
+# so that we can import the iac/environment module when we run pulumi from withing the iac/environment directory
+sys.path.insert(0, libs_dir)
 
 from lib import int_to_base36
 
 
 def get_credentials() -> Any:
-    # google_credentials = getenv("GOOGLE_CREDENTIALS", True)
-    _credentials, _ = google.auth.load_credentials_from_file(
-        "/Users/apostolos.benisis/sources/ox.ac.uk/compass-copy/iac/keys/test-realm-lower-env-ci-cd-key.json",
-        scopes=["https://www.googleapis.com/auth/cloud-platform"])
-    # _credentials, _ = google.auth.default()
+    _credentials, _ = google.auth.default()
     return _credentials
 
 
-def get_ssl_status_active(project: str, ssl_id: str) -> bool:
+def get_ssl_status_active(project: str, ssl_name: str) -> bool:
     credentials = get_credentials()
     service = discovery.build('compute', 'v1', credentials=credentials)
-    request = service.sslCertificates().get(project=project, sslCertificate=ssl_id)
+    request = service.sslCertificates().get(project=project, sslCertificate=ssl_name)
     response = request.execute()
     return response["managed"]["status"] == "ACTIVE"
 
@@ -52,30 +54,32 @@ class CertificateStatusProvider(ResourceProvider):
         if _project_id is None:
             _failures.append(CheckFailure("project", "project is missing in props"))
 
-        _ssl_id = news.get("ssl_id")
-        if _ssl_id is None:
-            _failures.append(CheckFailure("ssl_id", "ssl_id is missing in props"))
+        _ssl_name = news.get("ssl_name")
+        if _ssl_name is None:
+            _failures.append(CheckFailure("ssl_name", "ssl_name is missing in props"))
 
         return CheckResult(news, _failures)
 
     def create(self, props: dict[str, Any]) -> CreateResult:
-        pulumi.info("Checking the SSL Certificate Status")
+        pulumi.info(f"Checking the SSL Certificate Status ssl_name: {props.get('ssl_name')}")
+
         _project_id = props.get("project")
-        _ssl_id = props.get("ssl_id")
+        _ssl_name = props.get("ssl_name")
 
         status = False
         wait_time = 0
         while not status and wait_time < self.max_wait_secs:
             timestamp = time.time()
-            pulumi.info("Waiting for the SSL Certificate to be active")
-            status = get_ssl_status_active(_project_id, _ssl_id)
-            # sleep for 5 seconds before checking again
+            pulumi.info(f"Waiting for the SSL Certificate to be active, wait time: {round(wait_time)} seconds")
+            status = get_ssl_status_active(_project_id, _ssl_name)
+            # sleep for 1 minute before checking again
             if not status:
-                time.sleep(5)
+                time.sleep(60)
             wait_time += time.time() - timestamp
 
         if not status:
-            pulumi.info("The SSL Certificate is not active")
+            pulumi.error("The SSL Certificate is not active")
+            raise TimeoutError("The SSL Certificate is not active in the specified time")
 
         return CreateResult(id_=_get_id(), outs={"status_active": status})
 
@@ -84,7 +88,8 @@ class CertificateStatus(Resource):
     """
     """
 
-    def __init__(self, name: str, *, project: pulumi.Input[str] | None, ssl_id: pulumi.Input[str], max_wait_secs: int, opts: pulumi.ResourceOptions = None):
+    def __init__(self, name: str, *, project: pulumi.Input[str] | None, ssl_name: pulumi.Input[str], max_wait_secs: int,
+                 opts: pulumi.ResourceOptions = None):
         _project = project
         if _project is None:
             # If the project is not set in the config args, get it from the provider
@@ -98,4 +103,8 @@ class CertificateStatus(Resource):
         # from the configuration arguments, and only if it is present, as it can be updated.
         # Other values are read-only and should not be included in the outputs
 
-        super().__init__(CertificateStatusProvider(max_wait_secs = max_wait_secs), name=name, props={"project": _project, "ssl_id": ssl_id, "status_active": False}, opts=opts)
+        super().__init__(
+            CertificateStatusProvider(max_wait_secs=max_wait_secs),
+            name=name,
+            props={"project": _project, "ssl_name": ssl_name, "status_active": False},
+            opts=opts)

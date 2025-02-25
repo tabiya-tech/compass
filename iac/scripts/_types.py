@@ -19,7 +19,6 @@ class IaCModules(Enum):
     BACKEND = "backend"
     FRONTEND = "frontend"
     COMMON = "common"
-    AWS_NS = "aws-ns"
 
 
 class DeploymentType(Enum):
@@ -78,7 +77,6 @@ class StackConfigs:
     backend: Mapping[str, Any]
     frontend: Mapping[str, Any]
     common: Mapping[str, Any]
-    aws_ns: Mapping[str, Any]
 
     raw_config: dict
     """The raw dictionary(JSON/YML) Configurations for the stack config."""
@@ -99,6 +97,5 @@ class StackConfigs:
             backend=_dict[IaCModules.BACKEND.value],
             frontend=_dict[IaCModules.FRONTEND.value],
             common=_dict[IaCModules.COMMON.value],
-            aws_ns=_dict[IaCModules.AWS_NS.value],
             raw_config=_dict
         )

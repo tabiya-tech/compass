@@ -178,11 +178,6 @@ def _prepare_environment_deployment(*,
         module=IaCModules.COMMON,
         content=stack_configs.common)
 
-    write_config_to_pulumi_yml_file(
-        stack_name=environment.stack_name,
-        module=IaCModules.AWS_NS,
-        content=stack_configs.aws_ns)
-
     print(f"Environment deployment prepared: {environment.stack_name}")
 
 

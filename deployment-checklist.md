@@ -2,53 +2,41 @@
 
 This is a checklist for deploying a new realm and setting up the first environment.
 
-- [ ] I. Create the realm: [here](/README.md#create-a-realm)
-    - [ ] Billing account: [here](/README.md#step-1-organization-and-billing-account)
-    - [ ] Workspace custom role: [here](/README.md#step-2-workspace-custom-role-for-managing-groups)
-    - [ ] Root folder: [here](/README.md#1-root-folder)
-    - [ ] Lower env identity project: [here](/README.md#2-identity-project-folders)
-    - [ ] Upper env identity project: [here](/README.md#2-identity-project-folders)
-    - [ ] Root project: [here](/README.md#step-4-root-project)
-    - [ ] Admin Service Account: [here](/README.md#step-5-admin-service-account)
-    - [ ] Activate the exported service account: [here](/README.md#step-5-admin-service-account)
-    - [ ] Create the realm stack with the name `compass`. [here](/README.md#step-6-pulumi-stack)
-    - [ ] Create the stack config yaml. [here](/README.md#step-7-environment-configuration)
-    ```yaml
-    environments:
-      - environment_name: "dev"
-        deployment_type: "auto"
-        config:
-          gcp:region: "us-central1"
-          environment_type: "dev"
-      - environment_name: "test"
-        deployment_type: "auto"
-        config:
-          gcp:region: "us-central1"
-          environment_type: "test"
-      - environment_name: "demo"
-        deployment_type: "auto"
-        config:
-          gcp:region: "us-central1"
-          environment_type: "prod"
-    ```
+- [x] Set up a working environment. [docs](deployment-procedure.md#step-0-set-up-the-working-environment)
 
-- [ ] II. Identity Project. [here](/README.md#google-identity-project)
-    - [ ] Create the Google identity project [here](/README.md#setting-up-identity-project)
+- [ ] Create Realm.
+  - [ ] Create a GCP Organization and Link the Billing Account [docs](deployment-procedure.md#step-11-create-a-gcp-organization-and-link-the-billing-account)
+  - [ ] Create a Workspace Custom Role. [docs](deployment-procedure.md#step-12-create-a-workspace-custom-role)
+  - [ ] Create a Root Folder. [docs](deployment-procedure.md#step-13-create-a-root-folder)
+  - [ ] Create Identity Project Folders. [docs](deployment-procedure.md#step-14-create-identity-project-folders)
+  - [ ] Create a Root Project. [docs](deployment-procedure.md#step-15-create-a-root-project)
+  - [ ] Create an Admin Service Account. [docs](deployment-procedure.md#step-16-create-an-admin-service-account)
+  - [ ] Activate the Exported Service Account. [docs](deployment-procedure.md#step-17-activate-the-exported-service-account)
+  - [ ] Set up the Realm Stack. [docs](deployment-procedure.md#step-18-set-up-the-realm-stack)
+  - [ ] Create and Upload the Stack Config YAML. [docs](deployment-procedure.md#step-19-create-and-upload-the-stack-config-yaml)
+  - [ ] Setup Sentry. [docs](deployment-procedure.md#step-110-setup-sentry)
 
-- [ ] III. Upload artifacts [here](/README.md#build-and-upload-artifacts)
-    - [ ] Backend [here](/README.md#1-build-and-upload-backend-artifacts)
-    - [ ] Frontend [here](/README.md#2-build-and-upload-frontend-artifacts)
-    - [ ] Templates [here](/README.md#3-upload-templates)
+- [ ] Create an Identity Project.
+  - [ ] Create a Google Project. [docs](deployment-procedure.md#step-21-create-a-google-project)
+  - [ ] Set up OAuth Consent Screen. [docs](deployment-procedure.md#step-22-set-up-oauth-consent-screen)
+  - [ ] Configure Branding. [docs](deployment-procedure.md#step-23-configure-branding)
+  - [ ] Submit for Verification. [docs](deployment-procedure.md#step-24-submit-for-verification)
+  - [ ] Configure Data Access. [docs](deployment-procedure.md#step-25-configure-data-access)
 
-- [ ] Iv. Set up the environment [here](/README.md#environment-deployment)
-    - [ ] Create the OAuth 2.0 Client [here](/README.md#1-oauth-20-client)
-    - [ ] Set up the databases [here](/README.md#2-databases)
-    - [ ] Embeddings [here](/README.md#3-embeddings)
-    - [ ] Invitation Codes [here](/README.md#4-invitation-codes)
-    - [ ] Encryption Keys [here](/README.md#5-encryption-keys)
-    - [ ] Add your environment in the realm config [here](/README.md#6-update-the-realm-environment-configurations)
-    - [ ] Setup sentry [here](/README.md#7-setup-sentry)
-    - [ ] Construct .env and stack_config.yml [here](/README.md#8-construct-env-and-stack-config-yaml)
-    - [ ] Run the setup.py script [here](/README.md#9-run-set-up-env-script)
-    - [ ] Prepare and deploy the environment [here](/README.md#10-prepare-and-deploy-the-environment)
-- [ ] After words consider the actions if it is a new environment [here.](/README.md#11-post-deploy-actions)
+- [ ] Upload Artifacts.
+  - [ ] Build and Upload Backend Artifacts. [docs](deployment-procedure.md#step-31-build-and-upload-backend-artifacts)
+  - [ ] Build and Upload Frontend Artifacts. [docs](deployment-procedure.md#step-32-build-and-upload-frontend-artifacts)
+  - [ ] Upload Templates. [docs](deployment-procedure.md#step-33-upload-templates)
+
+- [ ] Deploy the Environment.
+  - [ ] Authenticate GCP and AWS. [docs](deployment-procedure.md#step-40-authenticate-with-the-service-account-and-aws-profile)
+  - [ ] Create OAuth 2.0 Client. [docs](deployment-procedure.md#step-41-create-oauth-20-client)
+  - [ ] Set up the Databases. [docs](deployment-procedure.md#step-42-set-up-the-databases)
+  - [ ] Generate Embeddings. [docs](deployment-procedure.md#step-43-generate-embeddings)
+  - [ ] Generate Invitation Codes. [docs](deployment-procedure.md#step-44-generate-invitation-codes)
+  - [ ] Generate Encryption Keys. [docs](deployment-procedure.md#step-45-generate-encryption-keys)
+  - [ ] Update the Realm Environment Configurations. [docs](deployment-procedure.md#step-46-update-the-realm-environment-configurations)
+  - [ ] Construct .env and stack_config.yml. [docs](deployment-procedure.md#step-47-construct-env-and-stack_configyml)
+  - [ ] Run the setup.py script. [docs](deployment-procedure.md#step-48-run-the-setuppy-script)
+  - [ ] Prepare and Deploy the Environment. [docs](deployment-procedure.md#step-49-prepare-and-deploy-the-environment)
+  - [ ] Configure the Auth Domains. [docs](deployment-procedure.md#step-410-configure-the-auth-domains)
