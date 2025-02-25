@@ -11,6 +11,7 @@ import { ChatProvider } from "src/chat/ChatContext";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { FeedbackItem } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
+import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 
 // Mock external dependencies
 jest.mock("src/app/PersistentStorageService/PersistentStorageService");
@@ -31,7 +32,7 @@ describe("ConversationConclusionFooter", () => {
   beforeEach(() => {
     // GIVEN clean mocks before each test
     jest.clearAllMocks();
-    
+
     // AND mock storage service
     (PersistentStorageService.getOverallFeedback as jest.Mock).mockReturnValue([]);
     (PersistentStorageService.getAccountConverted as jest.Mock).mockReturnValue(false);
@@ -53,17 +54,17 @@ describe("ConversationConclusionFooter", () => {
     // THEN expect no errors or warnings to have occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
-    
+
     // AND expect the feedback form button container to be displayed
     const actualFeedbackFormButtonContainer = screen.getByTestId(DATA_TEST_ID.CONVERSATION_CONCLUSION_FOOTER_CONTAINER);
     expect(actualFeedbackFormButtonContainer).toBeInTheDocument();
-    
+
     // AND expect the feedback message to be displayed
     expect(screen.getByTestId(DATA_TEST_ID.FEEDBACK_MESSAGE_TEXT)).toBeInTheDocument();
-    
+
     // AND expect the experiences drawer button to be displayed
     expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_BUTTON)).toBeInTheDocument();
-    
+
     // AND expect the component to match the snapshot
     expect(actualFeedbackFormButtonContainer).toMatchSnapshot();
   });
@@ -238,5 +239,96 @@ describe("ConversationConclusionFooter", () => {
 
     // THEN expect the account conversion dialog to be displayed
     expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  describe("CustomLink", () => {
+    test.each([
+      ["give feedback", DATA_TEST_ID.FEEDBACK_FORM_BUTTON],
+      ["view cv", DATA_TEST_ID.EXPERIENCES_DRAWER_BUTTON],
+    ])("should enable/disable %s button when the browser online status changes", async (linkText, testId) => {
+      // GIVEN the browser is offline
+      mockBrowserIsOnLine(false);
+
+      // WHEN the component is rendered
+      renderWithChatProvider();
+
+      // THEN expect the link to be disabled
+      const customLink = screen.getByTestId(testId);
+      expect(customLink).toHaveAttribute("aria-disabled", "true");
+
+      // WHEN the browser goes online
+      mockBrowserIsOnLine(true);
+
+      // THEN expect the link to be enabled
+      expect(customLink).toHaveAttribute("aria-disabled", "false");
+      // AND expect no errors or warnings to be logged
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
+    });
+
+    test("should enable/disable in progress button when the browser online status changes", async () => {
+      // GIVEN the browser is offline
+      mockBrowserIsOnLine(false);
+      // AND the user has started feedback but not submitted
+      const mockFeedbackItems: FeedbackItem[] = [
+        {
+          question_id: "overall_satisfaction",
+          answer: {
+            rating_numeric: 4,
+            comment: "Very helpful conversation!",
+          },
+          is_answered: true,
+        },
+        {
+          question_id: "ui_experience",
+          answer: {
+            rating_numeric: 5,
+          },
+          is_answered: true,
+        },
+      ];
+      (PersistentStorageService.getOverallFeedback as jest.Mock).mockReturnValue(mockFeedbackItems);
+
+      // WHEN the component is rendered
+      renderWithChatProvider();
+
+      // THEN expect the in progress button to be disabled
+      const inProgressButton = screen.getByTestId(DATA_TEST_ID.FEEDBACK_IN_PROGRESS_BUTTON);
+      expect(inProgressButton).toHaveAttribute("aria-disabled", "true");
+
+      // WHEN the browser goes online
+      mockBrowserIsOnLine(true);
+
+      // THEN expect the in progress button to be enabled
+      expect(inProgressButton).toHaveAttribute("aria-disabled", "false");
+      // AND expect no errors or warnings to be logged
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
+    });
+
+    test("should enable/disable create account button when the browser online status changes", async () => {
+      // GIVEN the browser is offline
+      mockBrowserIsOnLine(false);
+      // AND the user is anonymous
+      (authenticationStateService.getInstance as jest.Mock).mockReturnValue({
+        getUser: () => ({ name: null, email: null }),
+      });
+
+      // WHEN the component is rendered
+      renderWithChatProvider();
+
+      // THEN expect the create account button to be disabled
+      const createAccountLink = screen.getByTestId(DATA_TEST_ID.CREATE_ACCOUNT_LINK);
+      expect(createAccountLink).toHaveAttribute("aria-disabled", "true");
+
+      // WHEN the browser goes online
+      mockBrowserIsOnLine(true);
+
+      // THEN expect the create account button to be enabled
+      expect(createAccountLink).toHaveAttribute("aria-disabled", "false");
+      // AND expect no errors or warnings to be logged
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
+    });
   });
 });

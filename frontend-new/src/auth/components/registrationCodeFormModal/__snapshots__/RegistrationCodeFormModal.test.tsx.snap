@@ -117,6 +117,7 @@ exports[`RegistrationCodeFormModal renders correctly when modal is shown and cal
       Don't have a registration code?
        
       <a
+        aria-disabled="false"
         class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
         data-testid="invitation-code-request-registration-code-link-f782907a-6904-482c-b148-3c6682bf7b54"
       >

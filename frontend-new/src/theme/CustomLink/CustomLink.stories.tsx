@@ -2,11 +2,11 @@ import { Meta, StoryObj } from "@storybook/react";
 import CustomLink from "./CustomLink";
 
 const meta: Meta<typeof CustomLink> = {
-    title: "Components/CustomLink",
-    component: CustomLink,
-    tags: ["autodocs"],
-    argTypes: {},
-  };
+  title: "Components/CustomLink",
+  component: CustomLink,
+  tags: ["autodocs"],
+  argTypes: {},
+};
 
 export default meta;
 
@@ -25,4 +25,4 @@ export const Disabled: Story = {
     disabled: true,
     href: "#",
   },
-}
+};

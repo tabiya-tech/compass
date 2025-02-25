@@ -108,6 +108,7 @@ exports[`Testing Login component it should show login form successfully 1`] = `
       Don't have an account?
        
       <a
+        aria-disabled="false"
         class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
       >
         Register

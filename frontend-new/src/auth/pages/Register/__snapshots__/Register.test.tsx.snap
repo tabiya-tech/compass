@@ -90,6 +90,7 @@ exports[`Testing Register component it should show register form successfully 1`
       Already have an account?
        
       <a
+        aria-disabled="false"
         class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
       >
         Login
