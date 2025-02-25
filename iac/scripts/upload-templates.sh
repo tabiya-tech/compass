@@ -4,7 +4,7 @@
 
 ####################################
 # Import the common functions
-if FALSE; then
+if false; then
   # IntelliJ Hack. This will never run, but it will make the IDE recognize the functions.
   # It is needed so that IntelliJ can resolve the common.sh location statically.
   source "./common.sh"
@@ -17,6 +17,10 @@ function check_args() {
     echo "Usage: $0 <region> <project_id>"
     cat << EOF
   Upload templates for this source code version.
+
+  This script uploads the templates to the Google Cloud Artifacts Repository.
+    - env.template file.
+    - stack_config.template.yml file.
 
   Arguments:
     region: The region where the templates will be uploaded

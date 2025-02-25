@@ -79,6 +79,9 @@ function check_args() {
   Build and Upload the backend artifacts,
   The artifacts are versioned based on the current git branch/tag name and the commit sha.
 
+  This script builds the backend Docker image and pushes it to the docker repository.
+  It also exports the API Gateway configuration and uploads it to the GCP Artifact repository.
+
   Requirements:
     - this script needs to run from the within the git repository.
     - the intended branch/tag has been checked out.

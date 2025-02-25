@@ -28,7 +28,7 @@ def main():
     pulumi.info(f'Creating environment:{environment_name} with type:{environment_type} in realm:{realm_name}')
 
     # Get realm stack references
-    realm_reference = pulumi.StackReference(f"tabiya-tech/compass-organization/{realm_name}")
+    realm_reference = pulumi.StackReference(f"tabiya-tech/compass-realm/{realm_name}")
 
     billing_account = getstackref(realm_reference, "billing_account_id", True)
     root_project_id = getstackref(realm_reference, "root_project_id")

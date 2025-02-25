@@ -52,6 +52,8 @@ function check_args() {
   Build and Upload the frontend artifacts to the Google Cloud Artifacts Repository.
   The artifacts are versioned based on the current git branch/tag name and the commit sha.
 
+  This script builds the frontend artifacts, compresses them, and uploads them to the Google Cloud Artifacts Repository.
+
   Requirements:
     - this script needs to run from the within the git repository.
     - the intended branch/tag has been checked out.
