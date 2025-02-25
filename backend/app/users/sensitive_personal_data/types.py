@@ -91,22 +91,6 @@ class SensitivePersonalData(BaseModel):
         description="The encrypted sensitive personal data. None if skipped.",
         default=None
     )
-    sensitive_personal_data_skipped: bool = Field(
-        description="Indicates if the sensitive personal data was explicitly skipped",
-        default=False
-    )
-
-    @model_validator(mode='after')
-    def validate_sensitive_data_skipped_relationship(self) -> 'SensitivePersonalData':
-        """
-        Validates that sensitive_personal_data_skipped is True if and only if sensitive_personal_data is None.
-        This ensures that we can't have a None value without explicitly marking it as skipped.
-        """
-        if self.sensitive_personal_data is None and not self.sensitive_personal_data_skipped:
-            raise ValueError("sensitive_personal_data cannot be None without setting sensitive_personal_data_skipped to True")
-        if self.sensitive_personal_data is not None and self.sensitive_personal_data_skipped:
-            raise ValueError("sensitive_personal_data_skipped cannot be True when sensitive_personal_data is provided")
-        return self
 
     # Serialize the creation_time datetime to ensure it's stored as UTC
     @field_serializer("created_at")
@@ -140,8 +124,7 @@ class SensitivePersonalData(BaseModel):
         return SensitivePersonalData(
             user_id=str(_dict.get("user_id")),
             created_at=_dict.get("created_at"),
-            sensitive_personal_data=_dict.get("sensitive_personal_data"),
-            sensitive_personal_data_skipped=_dict.get("sensitive_personal_data_skipped", False)
+            sensitive_personal_data=_dict.get("sensitive_personal_data")
         )
 
     class Config:

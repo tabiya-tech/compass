@@ -11,6 +11,7 @@ export interface ConfirmModalDialogProps {
   isOpen: boolean;
   onCancel: () => void;
   onConfirm: () => void;
+  onDismiss: () => void;
   cancelButtonText: string;
   confirmButtonText: string;
 }
@@ -32,7 +33,7 @@ const ConfirmModalDialog: React.FC<ConfirmModalDialogProps> = (props) => {
   return (
     <Dialog
       open={props.isOpen}
-      onClose={props.onCancel}
+      onClose={props.onDismiss}
       aria-labelledby="confirm-modal"
       data-testid={DATA_TEST_ID.CONFIRM_MODAL}
       PaperProps={{

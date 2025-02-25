@@ -76,11 +76,10 @@ class SensitivePersonalDataRepository(ISensitivePersonalDataRepository):
         return _insert_results.inserted_id.__str__()
 
     async def stream(self, discard_skipped: bool, batch_size: int = 100) -> AsyncIterator[SensitivePersonalData]:
-        query = {}
-        if discard_skipped:
-            query["sensitive_personal_data_skipped"] = {"$eq": False}
-        
-        cursor = self._collection.find(query).sort("user_id", 1).batch_size(batch_size)
+        cursor = self._collection.find({}).sort("user_id", 1).batch_size(batch_size)
 
         async for document in cursor:
-            yield SensitivePersonalData.from_dict(document)
+            sensitive_data = SensitivePersonalData.from_dict(document)
+            if discard_skipped and sensitive_data.sensitive_personal_data is None:
+                continue
+            yield sensitive_data

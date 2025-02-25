@@ -312,6 +312,9 @@ const Consent: React.FC = () => {
         onConfirm={() => {
           setShowRejectModal(false);
         }}
+        onDismiss={() => {
+          setShowRejectModal(false);
+        }}
         cancelButtonText="Yes, exit"
         confirmButtonText="I want to stay"
       />
