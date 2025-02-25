@@ -13,6 +13,7 @@ import { DATA_TEST_ID as CHECKBOX_DATA_TEST_ID } from "src/feedback/overallFeedb
 import feedbackFormContentSteps from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/feedbackFormContentSteps";
 import { DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/commentTextField/CommentTextField";
 import { useSwipeable } from "react-swipeable";
+import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 
 // mock the swipeable hook
 jest.mock("react-swipeable");
@@ -333,6 +334,36 @@ describe("FeedbackFormContent", () => {
       expect(lastStepTitleElement).toHaveTextContent(lastStepTitle);
 
       // AND no errors or warnings to be shown
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
+    });
+
+    test("should enable/disable the submit button when the browser online status changes", async () => {
+      // GIVEN the browser is offline
+      mockBrowserIsOnLine(false);
+
+      // WHEN the component is rendered
+      render(<FeedbackFormContent notifySubmit={jest.fn()} />);
+      // AND a question is answered
+      const customRating = screen.getAllByTestId(CUSTOM_RATING_DATA_TEST_ID.CUSTOM_RATING_ICON)[7];
+      fireEvent.click(customRating);
+      // AND we are on the last step
+      act(() => {
+        (useSwipeable as jest.Mock).mock.calls[0][0].onSwipedLeft();
+        (useSwipeable as jest.Mock).mock.calls[0][0].onSwipedLeft();
+        (useSwipeable as jest.Mock).mock.calls[0][0].onSwipedLeft();
+      });
+
+      // THEN expect the submit button to be disabled
+      const submitButton = screen.getByTestId(DATA_TEST_ID.FEEDBACK_FORM_NEXT_BUTTON);
+      expect(submitButton).toBeDisabled();
+
+      // WHEN the browser goes online
+      mockBrowserIsOnLine(true);
+
+      // THEN expect the submit button to be enabled
+      expect(submitButton).toBeEnabled();
+      // AND expect no errors or warnings to be logged
       expect(console.warn).not.toHaveBeenCalled();
       expect(console.error).not.toHaveBeenCalled();
     });

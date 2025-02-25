@@ -6,7 +6,10 @@ import { FeedbackItem } from "src/feedback/overallFeedback/overallFeedbackServic
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import { TabiyaUser } from "src/auth/auth.types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
-import { SensitivePersonalDataRequirement, Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import {
+  SensitivePersonalDataRequirement,
+  Language,
+} from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
 // Mock feedback data
@@ -42,27 +45,27 @@ const StorybookWrapper = ({
   PersistentStorageService.setAccountConverted(isAccountConverted);
 
   // Mock the user data on window
-  AuthenticationStateService.getInstance().setUser(isAnonymous ? null : {
-    id: 'test-user',
-    name: "Test User",
-    email: "test@example.com"
-  } as TabiyaUser);
+  AuthenticationStateService.getInstance().setUser(
+    isAnonymous
+      ? null
+      : ({
+          id: "test-user",
+          name: "Test User",
+          email: "test@example.com",
+        } as TabiyaUser)
+  );
 
   // Mock the session feedback on window
   UserPreferencesStateService.getInstance().setUserPreferences({
-    sessions: [ 1 ],
+    sessions: [1],
     user_id: "test-user",
     language: Language.en,
-    sessions_with_feedback: [ hasSubmittedFeedback ? 1 : 0 ],
+    sessions_with_feedback: [hasSubmittedFeedback ? 1 : 0],
     sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
     has_sensitive_personal_data: false,
   });
 
-  return (
-    <ChatProvider handleOpenExperiencesDrawer={() => {}}>
-      {children}
-    </ChatProvider>
-  );
+  return <ChatProvider handleOpenExperiencesDrawer={() => {}}>{children}</ChatProvider>;
 };
 
 const meta = {
@@ -172,15 +175,12 @@ export const AnonymousUserVerificationReminder: Story = {
   },
   decorators: [
     (Story) => (
-      <StorybookWrapper 
-        isAnonymous={true}
-        isAccountConverted={true}
-      >
+      <StorybookWrapper isAnonymous={true} isAccountConverted={true}>
         <Story />
       </StorybookWrapper>
     ),
   ],
-}; 
+};
 
 export const RegisteredUser: Story = {
   parameters: {

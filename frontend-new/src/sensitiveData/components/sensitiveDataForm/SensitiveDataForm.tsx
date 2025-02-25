@@ -61,7 +61,7 @@ export const DATA_TEST_ID = {
   SENSITIVE_DATA_FORM_BUTTON: `sensitive-data-form-button-${uniqueId}`,
   SENSITIVE_DATA_FORM_BUTTON_CIRCULAR_PROGRESS: `sensitive-data-form-button-circular-progress-${uniqueId}`,
   SENSITIVE_DATA_REJECT_BUTTON: `sensitive-data-reject-button-${uniqueId}`,
-  SENSITIVE_DATA_SKIP_BUTTON: `sensitive-data-skip-button-${uniqueId}`
+  SENSITIVE_DATA_SKIP_BUTTON: `sensitive-data-skip-button-${uniqueId}`,
 };
 
 export const ERROR_MESSAGE = {
@@ -209,7 +209,7 @@ const SensitiveDataForm: React.FC = () => {
     setConfirmingSkip(false);
     try {
       await sensitivePersonalDataService.skip(userPreferences!.user_id);
-      
+
       // Update user preferences to indicate that the user has skipped sensitive personal data
       UserPreferencesStateService.getInstance().setUserPreferences({
         ...userPreferences!,
@@ -404,6 +404,7 @@ const SensitiveDataForm: React.FC = () => {
                 <CustomLink
                   data-testid={DATA_TEST_ID.SENSITIVE_DATA_SKIP_BUTTON}
                   disabled={isSkipping}
+                  disableWhenOffline
                   onClick={() => {
                     setConfirmingSkip(true);
                   }}
@@ -489,10 +490,7 @@ const SensitiveDataForm: React.FC = () => {
         cancelButtonText="Yes, skip"
         confirmButtonText="No, continue"
       />
-      <Backdrop 
-        isShown={isSkipping || isRejecting}
-        message={isSkipping ? "Skipping..." : "Logging you out..."}
-      />
+      <Backdrop isShown={isSkipping || isRejecting} message={isSkipping ? "Skipping..." : "Logging you out..."} />
     </>
   );
 };

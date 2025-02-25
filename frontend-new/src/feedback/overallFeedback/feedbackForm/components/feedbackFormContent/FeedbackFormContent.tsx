@@ -196,6 +196,7 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
           <PrimaryButton
             onClick={handleNext}
             disabled={activeStep === maxSteps - 1 && !hasAnswers}
+            disableWhenOffline={activeStep === maxSteps - 1}
             style={{ width: 100 }}
             data-testid={DATA_TEST_ID.FEEDBACK_FORM_NEXT_BUTTON}
           >

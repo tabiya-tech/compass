@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import { FIXED_MESSAGES_TEXT } from "src/chat/util";
-import FeedbackForm, { FeedbackStatus, FeedbackCloseEvent } from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
+import FeedbackForm, {
+  FeedbackStatus,
+  FeedbackCloseEvent,
+} from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
 import { useChatContext } from "src/chat/ChatContext";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
-import {
-  FeedbackItem
-} from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
+import { FeedbackItem } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import AnonymousAccountConversionDialog from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
@@ -24,7 +25,7 @@ export const DATA_TEST_ID = {
   THANK_YOU_MESSAGE: `thank-you-message-${uniqueId}`,
   CREATE_ACCOUNT_LINK: `create-account-link-${uniqueId}`,
   CREATE_ACCOUNT_MESSAGE: `create-account-message-${uniqueId}`,
-  VERIFICATION_REMINDER_MESSAGE: `verification-reminder-message-${uniqueId}`
+  VERIFICATION_REMINDER_MESSAGE: `verification-reminder-message-${uniqueId}`,
 };
 
 const ConversationConclusionFooter: React.FC = () => {
@@ -59,9 +60,9 @@ const ConversationConclusionFooter: React.FC = () => {
   // Update feedback status based on session feedback state
   useEffect(() => {
     if (sessionHasFeedback) {
-      setFeedbackStatus(FeedbackStatus.SUBMITTED)
-    } else if(feedbackData.length > 0) {
-      setFeedbackStatus(FeedbackStatus.STARTED)
+      setFeedbackStatus(FeedbackStatus.SUBMITTED);
+    } else if (feedbackData.length > 0) {
+      setFeedbackStatus(FeedbackStatus.STARTED);
     }
   }, [feedbackData.length, sessionHasFeedback, setFeedbackStatus]);
 
@@ -76,7 +77,11 @@ const ConversationConclusionFooter: React.FC = () => {
       return (
         <Typography variant="body1" data-testid={DATA_TEST_ID.FEEDBACK_IN_PROGRESS_MESSAGE}>
           Please{" "}
-          <CustomLink onClick={() => setIsFeedbackFormOpen(true)} data-testid={DATA_TEST_ID.FEEDBACK_IN_PROGRESS_BUTTON}>
+          <CustomLink
+            onClick={() => setIsFeedbackFormOpen(true)}
+            disableWhenOffline
+            data-testid={DATA_TEST_ID.FEEDBACK_IN_PROGRESS_BUTTON}
+          >
             complete your feedback
           </CustomLink>{" "}
           to help us improve your experience!
@@ -86,14 +91,18 @@ const ConversationConclusionFooter: React.FC = () => {
       return (
         <Typography variant="body1" data-testid={DATA_TEST_ID.FEEDBACK_MESSAGE_TEXT}>
           We'd love your{" "}
-          <CustomLink onClick={() => setIsFeedbackFormOpen(true)} data-testid={DATA_TEST_ID.FEEDBACK_FORM_BUTTON}>
+          <CustomLink
+            onClick={() => setIsFeedbackFormOpen(true)}
+            disableWhenOffline
+            data-testid={DATA_TEST_ID.FEEDBACK_FORM_BUTTON}
+          >
             feedback
           </CustomLink>{" "}
           on this chat. It only takes 5 minutes and helps us improve!
         </Typography>
       );
     }
-  }
+  };
 
   const handleFeedbackFormClose = (closeEvent: FeedbackCloseEvent) => {
     setIsFeedbackFormOpen(false);
@@ -107,20 +116,24 @@ const ConversationConclusionFooter: React.FC = () => {
         setFeedbackStatus(FeedbackStatus.NOT_STARTED);
       }
     }
-  }
+  };
 
   const getAccountMessage = () => {
     if (isAnonymous && !isAccountConverted) {
       return (
         <Typography variant="body1" data-testid={DATA_TEST_ID.CREATE_ACCOUNT_MESSAGE}>
-          <CustomLink onClick={() => setShowConversionDialog(true)} data-testid={DATA_TEST_ID.CREATE_ACCOUNT_LINK}>
+          <CustomLink
+            onClick={() => setShowConversionDialog(true)}
+            disableWhenOffline
+            data-testid={DATA_TEST_ID.CREATE_ACCOUNT_LINK}
+          >
             Create an account
           </CustomLink>{" "}
           to save your conversations and access them anytime in the future.
         </Typography>
       );
     }
-    
+
     if (isAccountConverted) {
       return (
         <Typography variant="body1" data-testid={DATA_TEST_ID.VERIFICATION_REMINDER_MESSAGE}>
@@ -128,7 +141,7 @@ const ConversationConclusionFooter: React.FC = () => {
         </Typography>
       );
     }
-    
+
     return null;
   };
 
@@ -144,7 +157,11 @@ const ConversationConclusionFooter: React.FC = () => {
       >
         <Typography variant="body1">
           Don't forget to{" "}
-          <CustomLink onClick={handleOpenExperiencesDrawer} data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_BUTTON}>
+          <CustomLink
+            onClick={handleOpenExperiencesDrawer}
+            disableWhenOffline
+            data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_BUTTON}
+          >
             <span style={{ whiteSpace: "normal" }}>view and download your CV</span>
           </CustomLink>
           !
@@ -153,10 +170,7 @@ const ConversationConclusionFooter: React.FC = () => {
         {getFeedbackMessage()}
         {getAccountMessage()}
       </Box>
-      <FeedbackForm
-        isOpen={isFeedbackFormOpen}
-        notifyOnClose={handleFeedbackFormClose}
-      />
+      <FeedbackForm isOpen={isFeedbackFormOpen} notifyOnClose={handleFeedbackFormClose} />
       <AnonymousAccountConversionDialog
         isOpen={showConversionDialog}
         onClose={() => setShowConversionDialog(false)}

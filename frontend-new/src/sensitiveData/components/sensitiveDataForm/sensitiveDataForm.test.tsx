@@ -31,6 +31,7 @@ import * as Sentry from "@sentry/react";
 import { DATA_TEST_ID as BUG_REPORT_DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import { UserPreferenceError } from "src/error/commonErrors";
+import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 
 const givenUserId = getTestString(10);
 
@@ -849,7 +850,7 @@ describe("Sensitive Data", () => {
   describe("action tests: skip button", () => {
     beforeEach(() => {
       jest.clearAllMocks();
-    })
+    });
     test("should navigate to the root path when the skip button is clicked", async () => {
       const user = userEvent.setup();
 
@@ -944,6 +945,74 @@ describe("Sensitive Data", () => {
 
       // AND no console errors or warnings should be logged
       expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should stay on the same page when the user cancels the skip action", async () => {
+      const user = userEvent.setup();
+      // GIVEN sensitive personal data is not required
+      const givenUserPreferences = {
+        user_id: givenUserId,
+        language: Language.en,
+        accepted_tc: new Date(),
+        has_sensitive_personal_data: false,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+        sessions: [],
+        sessions_with_feedback: [],
+      };
+      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue(givenUserPreferences);
+      // AND skipping sensitive personal data method
+      const skipSpy = jest.spyOn(sensitivePersonalDataService, "skip");
+
+      // WHEN the component is rendered
+      componentRender();
+      // AND the skip button is clicked
+      const skipButton = screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_SKIP_BUTTON);
+      await user.click(skipButton);
+      // AND the dialog is open
+      await waitFor(() => expect(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL)).toBeVisible());
+      // AND the user cancels the skip action
+      const button = screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL_CONFIRM);
+      await user.click(button);
+
+      // THEN the skip method should not be called
+      expect(skipSpy).not.toHaveBeenCalled();
+      // AND the user should not be navigated to the root path
+      expect(mockNavigate).not.toHaveBeenCalled();
+      // AND no console errors or warnings should be logged
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
+    });
+
+    test("should enable/disable the skip button when the browser online status changes", async () => {
+      // GIVEN the browser is offline
+      mockBrowserIsOnLine(false);
+      // AND the sensitive personal data is not required
+      const givenUserPreferences = {
+        user_id: givenUserId,
+        language: Language.en,
+        accepted_tc: new Date(),
+        has_sensitive_personal_data: false,
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+        sessions: [],
+        sessions_with_feedback: [],
+      };
+      jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue(givenUserPreferences);
+
+      // WHEN the component is rendered
+      componentRender();
+
+      // THEN the skip button should be disabled
+      const skipButton = screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_SKIP_BUTTON);
+      expect(skipButton).toHaveAttribute("aria-disabled", "true");
+
+      // WHEN the browser goes online
+      mockBrowserIsOnLine(true);
+
+      // THEN the skip button should be enabled
+      expect(skipButton).toHaveAttribute("aria-disabled", "false");
+      // AND expect no errors or warnings to be logged
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
     });
   });
 });

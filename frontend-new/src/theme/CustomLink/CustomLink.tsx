@@ -1,10 +1,13 @@
 import { Link, styled, LinkProps } from "@mui/material";
+import { useContext } from "react";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 
 interface CustomLinkProps extends LinkProps {
   disabled?: boolean;
+  disableWhenOffline?: boolean;
 }
 
-const CustomLink = styled(Link)<CustomLinkProps>(({ theme, disabled }) => ({
+const StyledLink = styled(Link)<CustomLinkProps>(({ theme, disabled }) => ({
   color: disabled ? theme.palette.text.disabled : theme.palette.text.primary,
   opacity: disabled ? "0.5" : "1",
   cursor: disabled ? "not-allowed" : "pointer",
@@ -13,14 +16,17 @@ const CustomLink = styled(Link)<CustomLinkProps>(({ theme, disabled }) => ({
   fontWeight: "bold",
   whiteSpace: "nowrap",
   "&:hover": {
-    color: disabled ? theme.palette.text.textAccent : theme.palette.grey["500"]
+    color: disabled ? theme.palette.text.textAccent : theme.palette.grey["500"],
   },
 }));
 
 // Forward the disabled prop to aria-disabled attribute
-const StyledCustomLink = (props: CustomLinkProps) => (
-  <CustomLink {...props} aria-disabled={props.disabled} />
-);
+const CustomLink = (props: CustomLinkProps) => {
+  const isOnline = useContext(IsOnlineContext);
+  const { disableWhenOffline, ...restProps } = props;
+  const isDisabled = Boolean(props.disabled || (disableWhenOffline && !isOnline));
 
-export default StyledCustomLink; 
+  return <StyledLink {...restProps} disabled={isDisabled} aria-disabled={isDisabled} />;
+};
 
+export default CustomLink;
