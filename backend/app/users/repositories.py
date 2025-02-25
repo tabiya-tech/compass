@@ -9,6 +9,7 @@ from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequ
 
 logger = logging.getLogger(__name__)
 
+
 class IUserPreferenceRepository(ABC):
     @abstractmethod
     async def get_user_preference_by_user_id(self, user_id) -> UserPreferences | None:
@@ -34,7 +35,8 @@ class IUserPreferenceRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def update_user_preference(self, user_id: str, update: UserPreferencesRepositoryUpdateRequest) -> UserPreferences:
+    async def update_user_preference(self, user_id: str,
+                                     update: UserPreferencesRepositoryUpdateRequest) -> UserPreferences:
         """
         Update the user preferences by user_id
         :param user_id: str - The user_id to update
@@ -44,6 +46,7 @@ class IUserPreferenceRepository(ABC):
         :raises ValueError: if the user is not found - update failed
         """
         raise NotImplementedError()
+
 
 class UserPreferenceRepository(IUserPreferenceRepository):
     def __init__(self, db: AsyncIOMotorDatabase):
@@ -73,7 +76,8 @@ class UserPreferenceRepository(IUserPreferenceRepository):
             logger.exception(e)
             raise e
 
-    async def update_user_preference(self, user_id: str, update: UserPreferencesRepositoryUpdateRequest) -> UserPreferences:
+    async def update_user_preference(self, user_id: str,
+                                     update: UserPreferencesRepositoryUpdateRequest) -> UserPreferences:
         try:
             payload = update.model_dump(exclude_none=True)
 

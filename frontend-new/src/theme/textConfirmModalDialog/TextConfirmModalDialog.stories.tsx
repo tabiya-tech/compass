@@ -8,6 +8,7 @@ const meta: Meta<typeof TextConfirmModalDialog> = {
   argTypes: {
     onConfirm: { action: "onConfirm" },
     onCancel: { action: "onCancel" },
+    onDismiss: { action: "onDismiss" },
   },
 };
 

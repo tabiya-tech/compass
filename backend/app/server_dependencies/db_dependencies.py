@@ -97,11 +97,6 @@ class CompassDBProvider:
             await userdata_db.get_collection(Collections.SENSITIVE_PERSONAL_DATA).create_index([
                 ("user_id", 1)
             ], unique=True)
-
-            # Create index for sensitive_personal_data_skipped field
-            await userdata_db.get_collection(Collections.SENSITIVE_PERSONAL_DATA).create_index(
-                [("sensitive_personal_data_skipped", 1)]
-            )
             
             logger.info("Finished creating indexes for the userdata database")
         except Exception as e:

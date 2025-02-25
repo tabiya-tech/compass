@@ -27,8 +27,7 @@ def _get_new_sensitive_personal_data():
             rsa_key_id=get_random_printable_string(20),
             aes_encryption_key=get_random_printable_string(10),
             aes_encrypted_data=get_random_printable_string(100)
-        ),
-        sensitive_personal_data_skipped=False
+        )
     )
 
 
@@ -186,7 +185,6 @@ class TestStream:
             expected = SensitivePersonalData.from_dict(expected_dict)
             assert actual.user_id == expected.user_id
             assert actual.sensitive_personal_data == expected.sensitive_personal_data
-            assert actual.sensitive_personal_data_skipped == expected.sensitive_personal_data_skipped
 
     @pytest.mark.asyncio
     async def test_filters_out_null_and_skipped_sensitive_data(self, get_sensitive_personal_data_repository: Awaitable[SensitivePersonalDataRepository]):
@@ -196,12 +194,10 @@ class TestStream:
         given_data_with_sensitive = _get_new_sensitive_personal_data()
         given_data_without_sensitive = _get_new_sensitive_personal_data()
         given_data_without_sensitive.sensitive_personal_data = None
-        given_data_without_sensitive.sensitive_personal_data_skipped = True  # Must be True when data is None
 
         # AND some sensitive data entries that have been skipped
         given_data_skipped = _get_new_sensitive_personal_data()
         given_data_skipped.sensitive_personal_data = None
-        given_data_skipped.sensitive_personal_data_skipped = True
 
         # AND all entries exist in the database
         await repository._collection.insert_many([
@@ -235,7 +231,6 @@ class TestStream:
         given_data_with_sensitive = _get_new_sensitive_personal_data()
         given_data_without_sensitive = _get_new_sensitive_personal_data()
         given_data_without_sensitive.sensitive_personal_data = None
-        given_data_without_sensitive.sensitive_personal_data_skipped = True
 
         # AND all entries exist in the database
         await repository._collection.insert_many([

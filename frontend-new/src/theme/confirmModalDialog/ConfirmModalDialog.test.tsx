@@ -21,6 +21,7 @@ describe("ConfirmModalDialog", () => {
         isOpen={true}
         onCancel={() => {}}
         onConfirm={() => {}}
+        onDismiss={() => {}}
         cancelButtonText="Cancel"
         confirmButtonText="Confirm"
       />

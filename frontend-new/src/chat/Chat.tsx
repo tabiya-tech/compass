@@ -418,6 +418,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
               }
               onCancel={() => setNewConversationDialog(false)}
               onConfirm={handleConfirmNewConversation}
+              onDismiss={() => setNewConversationDialog(false)}
               cancelButtonText="Cancel"
               confirmButtonText="Yes, I'm sure"
             />

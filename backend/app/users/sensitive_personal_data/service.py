@@ -116,11 +116,10 @@ class SensitivePersonalDataService(ISensitivePersonalDataService):
         elif requirement == SensitivePersonalDataRequirement.NOT_AVAILABLE.value:
             raise SensitivePersonalDataNotAvailableError(user_id)
 
-        # Create sensitive personal data with skip=True
+        # Create sensitive personal data with sensitive_personal_data=None
         sensitive_personal_data = SensitivePersonalData(
             user_id=user_id,
             created_at=datetime.now(timezone.utc),
-            sensitive_personal_data=None,
-            sensitive_personal_data_skipped=True
+            sensitive_personal_data=None
         )
         await self._repository.create(sensitive_personal_data)
