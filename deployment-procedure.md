@@ -111,7 +111,7 @@ Create a service account that will be used to set up the realm:
 
 - Create the service account in the realm's root project from the previous step using
   the [gcloud console](https://console.cloud.google.com/iam-admin/serviceaccounts).
-- Using the [admin roles console](https://admin.google.com/ac/roles) of the workspace of the realm's root project, grant the service account the custom role
+- Using the [admin roles console](https://admin.google.com/ac/roles) of the Google Workspace, grant this service account the custom role
   created in [`Step 1.2`](#step-12-create-a-workspace-custom-role)
 - Using the [IAM console](https://console.cloud.google.com/iam-admin/iam) grant the following roles to the service account:
     - At the **organization level** assign the roles:
@@ -133,11 +133,12 @@ Create a service account that will be used to set up the realm:
 
 ### Step 1.7: Activate the Exported Service Account.
 
+[//]: # (TODO: Remove)
+
 Activate the service account using the following commands:
 
 ```shell
-gcloud auth activate-service-account --key-file=<REALM_ADMIN_SA_KEY_PATH>
-export GOOGLE_APPLICATION_CREDENTIALS=<REALM_ADMIN_SA_KEY_PATH>
+export 
 ```
 
 Replace `<REALM_ADMIN_SA_KEY_PATH>` with the actual path to your saved key file from the [previous step](#step-16-create-an-admin-service-account).
@@ -169,7 +170,7 @@ config:
 
 - Deploy the realm by running:
     ```shell
-      pulumi up -C realm -s <REALM_NAME>
+      GOOGLE_APPLICATION_CREDENTIALS=<REALM_ADMIN_SA_KEY_PATH> pulumi up -C realm -s <REALM_NAME>
     ```
 
 ### Step 1.9: Create and Upload the Stack Config YAML.

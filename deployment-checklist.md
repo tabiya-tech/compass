@@ -5,16 +5,16 @@ This is a checklist for deploying a new realm and setting up the first environme
 - [x] Set up a working environment. [docs](deployment-procedure.md#step-0-set-up-the-working-environment)
 
 - [ ] Create Realm.
-  - [ ] Create a GCP Organization and Link the Billing Account [docs](deployment-procedure.md#step-11-create-a-gcp-organization-and-link-the-billing-account)
-  - [ ] Create a Workspace Custom Role. [docs](deployment-procedure.md#step-12-create-a-workspace-custom-role)
-  - [ ] Create a Root Folder. [docs](deployment-procedure.md#step-13-create-a-root-folder)
-  - [ ] Create Identity Project Folders. [docs](deployment-procedure.md#step-14-create-identity-project-folders)
-  - [ ] Create a Root Project. [docs](deployment-procedure.md#step-15-create-a-root-project)
-  - [ ] Create an Admin Service Account. [docs](deployment-procedure.md#step-16-create-an-admin-service-account)
-  - [ ] Activate the Exported Service Account. [docs](deployment-procedure.md#step-17-activate-the-exported-service-account)
-  - [ ] Set up the Realm Stack. [docs](deployment-procedure.md#step-18-set-up-the-realm-stack)
-  - [ ] Create and Upload the Stack Config YAML. [docs](deployment-procedure.md#step-19-create-and-upload-the-stack-config-yaml)
-  - [ ] Setup Sentry. [docs](deployment-procedure.md#step-110-setup-sentry)
+  - [x] Create a GCP Organization and Link the Billing Account [docs](deployment-procedure.md#step-11-create-a-gcp-organization-and-link-the-billing-account)
+  - [x] Create a Workspace Custom Role. [docs](deployment-procedure.md#step-12-create-a-workspace-custom-role)
+  - [x] Create a Root Folder. [docs](deployment-procedure.md#step-13-create-a-root-folder)
+  - [x] Create Identity Project Folders. [docs](deployment-procedure.md#step-14-create-identity-project-folders)
+  - [x] Create a Root Project. [docs](deployment-procedure.md#step-15-create-a-root-project)
+  - [x] Create an Admin Service Account. [docs](deployment-procedure.md#step-16-create-an-admin-service-account)
+  ~~- [ ] Activate the Exported Service Account. [docs](deployment-procedure.md#step-17-activate-the-exported-service-account)~~
+  - [x] Set up the Realm Stack. [docs](deployment-procedure.md#step-18-set-up-the-realm-stack)
+  - [x] Create and Upload the Stack Config YAML. [docs](deployment-procedure.md#step-19-create-and-upload-the-stack-config-yaml)
+  - [x] Setup Sentry. [docs](deployment-procedure.md#step-110-setup-sentry)
 
 - [ ] Create an Identity Project.
   - [ ] Create a Google Project. [docs](deployment-procedure.md#step-21-create-a-google-project)

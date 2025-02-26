@@ -8,7 +8,7 @@ import hashlib
 
 from lib import enable_services, get_resource_name
 
-protected_from_deletion = False
+protected_from_deletion = True
 
 
 def _get_custom_role_valid_name(name: str) -> str:
