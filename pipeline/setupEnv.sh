@@ -13,7 +13,7 @@ echo "Using Base Domain: $base_domain"
 
 
 # Construct the domain name
-domain_name="${environment}.${base_domain}"
+domain_name="${environment}-old.${base_domain}"
 
 # Define the target domain name and URLs
 frontend_url="https://${domain_name}"
