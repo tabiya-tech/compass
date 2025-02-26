@@ -1,0 +1,134 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    # when you want to trigger deployment manually
+    inputs:
+      # env-type and env-name are mutually exclusive
+      env-type:
+        required: false
+        description: 'The environment type to deploy'
+        type: choice
+        options:
+          - dev
+          - test
+          - prod
+      env-dir:
+        required: false
+        description: 'The directory where the environment is located'
+        type: string
+        options:
+          - lower
+          - upper
+      env-name:
+        required: false
+        type: string
+        description: 'The environment name to deploy'
+      target-git-branch:
+        required: true
+        type: string
+        description: 'The branch name/version to deploy'
+      target-git-sha:
+        required: true
+        type: string
+        description: 'The commit sha to deploy'
+
+  workflow_call:
+    inputs:
+      # env-type and env-name are mutually exclusive
+      env-type:
+        required: false
+        type: string
+        description: 'The environment type to deploy'
+      env-name:
+        required: false
+        type: string
+        description: 'The environment name to deploy'
+      target-git-branch:
+        required: true
+        type: string
+        description: 'The branch name/version to deploy'
+      target-git-sha:
+        required: true
+        type: string
+        description: 'The commit sha to deploy'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate the inputs
+        run: |
+          if [[ "${{ inputs.deploy }}" == "true" && "${{ inputs.upload_artifact }}" == "true" ]]; then
+            echo "Error: deploy and upload_artifact cannot be true at the same time."
+            exit 1
+          fi
+          
+          if [[ "${{ inputs.deploy }}" == "false" && "${{ inputs.upload_artifact }}" == "false" ]]; then
+            echo "Error: deploy and upload_artifact cannot be false at the same time."
+            exit 1
+          fi
+
+      # 1. checkout.
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip' # caching pip dependencies
+      - name: Install python packages
+        run: pip install -r requirements.txt
+        working-directory: iac
+
+      # 2. setup google cloud platform.
+
+      - name: Authenticate to google cloud
+        uses: google-github-actions/auth@v2.1.2
+        with:
+          # IF
+          #    the env dir is upper OR env_type is prod
+          # THEN
+          #    use the upper envs service account json,
+          # OTHERWISE
+          #    use the lower envs service account json.
+
+          # We are using Boo
+          credentials_json:
+            ${{ ((inputs.env-dir == 'upper' || inputs.env-type == 'prod') && secrets.GCP_UPPER_ENVS_SERVICE_ACCOUNT_JSON) || secrets.GCP_LOWER_ENVS_SERVICE_ACCOUNT_JSON }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      # 3. setup pulumi.
+
+      - name: Install pulumi
+        id: pulumi
+        uses: pulumi/actions@v5
+      - name: Login to pulumi
+        run: |
+          pulumi login
+          pulumi org set-default tabiya-tech
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+      # 3. setup AWS.
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_DNS_UPDATE_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_DNS_UPDATE_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+          role-duration-seconds: 1200
+          role-session-name: Compass AWS NS
+
+      # 4. run the deployment scripts.
+
+      - name: Prepare the deployment(s)
+        working-directory: iac
+        run: ./scripts/prepare.py --realm-name ${{ vars.REALM_NAME }} --env-type ${{ inputs.env-type }} --target-git-sha ${{ inputs.target-git-sha }} --target-git-branch ${{ inputs.target-git-branch }}
+
+      - name: Deploy the infrastructure
+        working-directory: iac
+        run: ./scripts/up.py --realm-name ${{ vars.REALM_NAME }} --env-type ${{ inputs.env-type }}

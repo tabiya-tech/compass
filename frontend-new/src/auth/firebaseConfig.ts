@@ -5,7 +5,7 @@ import { getFirebaseAPIKey, getFirebaseDomain } from "src/envService";
 // Get the firebase config from the environment variables
 const firebaseConfig = {
   apiKey: getFirebaseAPIKey(),
-  authDomain: getFirebaseDomain() + ".firebaseapp.com",
+  authDomain: getFirebaseDomain()
 };
 
 // Initialize the firebase app if it hasn't been initialized yet
