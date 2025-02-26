@@ -16,7 +16,7 @@ from lib import getconfig, getstackref, getenv, parse_realm_env_name_from_stack,
 
 def main():
     # The environment is the stack name
-    realm_name, environment_name, stack_name = parse_realm_env_name_from_stack()
+    _, environment_name, stack_name = parse_realm_env_name_from_stack()
 
     # Load environment variables
     load_dot_realm_env(stack_name)
@@ -34,9 +34,6 @@ def main():
 
     backend_url = getstackref(env_reference, "backend_url")
     frontend_url = getstackref(env_reference, "frontend_url")
-
-    realm_reference = pulumi.StackReference(f"tabiya-tech/compass-realm/{realm_name}")
-    root_project_id = getstackref(realm_reference, "root_project_id")
 
     # Get backend service configuration
     backend_service_cfg = BackendServiceConfig(
@@ -80,7 +77,6 @@ def main():
 
     # Deploy the backend
     deploy_backend(
-        root_project_id=root_project_id,
         project=project,
         location=location,
         project_number=project_number,

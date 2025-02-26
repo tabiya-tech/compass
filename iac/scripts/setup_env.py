@@ -19,7 +19,7 @@ from _types import IaCModules
 from scripts.formatters import construct_secret_id
 from lib import get_stack_name_from, MAIN_SECRET_VERSION, ENV_VARS_SECRET_PREFIX, STACK_CONFIG_SECRET_PREFIX, Version
 from _common import add_select_environment_arguments, \
-    write_config_to_pulumi_yml_file, run_pulumi_up, get_realm_environment
+    write_config_to_pulumi_yaml_file, run_pulumi_up, get_realm_environment
 
 
 def _upload_file_to_secret_manager(
@@ -115,8 +115,8 @@ def _main(*, realm_name: str, env_name: str, target_git_branch: str, target_git_
 
     print(f"Setting up the environment:{stack_name} ...")
 
-    # 2. Write the environment configuration to the respective pulumi.yml file.
-    write_config_to_pulumi_yml_file(
+    # 2. Write the environment configuration to the respective pulumi.yaml file.
+    write_config_to_pulumi_yaml_file(
         stack_name=stack_name,
         module=IaCModules.ENVIRONMENT,
         content=environment.config

@@ -76,14 +76,14 @@ def run_pulumi_destroy(stack_name: str, module: IaCModules):
 # Files Actions
 # =======================
 
-def write_config_to_pulumi_yml_file(*, stack_name: str, module: IaCModules, content: Mapping[str, Any]):
+def write_config_to_pulumi_yaml_file(*, stack_name: str, module: IaCModules, content: Mapping[str, Any]):
     """
     Write the stack configuration to the pulumi yaml file (Pulumi.{stack_name}.yaml).
     """
-    pulumi_yml_file_path = os.path.join(iac_dir, module.value, f"Pulumi.{stack_name}.yaml")
-    with open(pulumi_yml_file_path, "w", encoding="utf-8") as file:
+    pulumi_yaml_file_path = os.path.join(iac_dir, module.value, f"Pulumi.{stack_name}.yaml")
+    with open(pulumi_yaml_file_path, "w", encoding="utf-8") as file:
         yaml.dump(content, file, default_flow_style=False, allow_unicode=True)
-    print(f"Pulumi config written to file: {pulumi_yml_file_path}")
+    print(f"Pulumi config written to file: {pulumi_yaml_file_path}")
 
 
 # =======================

@@ -143,13 +143,13 @@ def _setup_api_gateway(*,
 def _grant_docker_repository_access_to_project_service_account(
         basic_config: ProjectBaseConfig,
         project_number: pulumi.Output[str],
-        root_project_id: pulumi.Output[str],
+        docker_project_id: pulumi.Output[str],
         docker_repository_name: pulumi.Output[str],
 ) -> gcp.artifactregistry.RepositoryIamMember:
     # allow the current environment to read from the docker repository
     return gcp.artifactregistry.RepositoryIamMember(
         resource_name=get_resource_name(resource="project-sa-repository-reader", resource_type="iam-member"),
-        project=root_project_id,
+        project=docker_project_id,
         location=basic_config.location,
         repository=docker_repository_name,
         role="roles/artifactregistry.reader",
@@ -286,7 +286,6 @@ def _deploy_cloud_run_service(
 def deploy_backend(
         *,
         location: str,
-        root_project_id: Output[str],
         project: str | Output[str],
         project_number: Output[str],
         backend_service_cfg: BackendServiceConfig,
@@ -307,7 +306,7 @@ def deploy_backend(
     membership = _grant_docker_repository_access_to_project_service_account(
         basic_config,
         project_number,
-        root_project_id,
+        docker_repository.apply(lambda repo: repo.get("project")),
         docker_repository.apply(lambda repo: repo.get("name"))
     )
 

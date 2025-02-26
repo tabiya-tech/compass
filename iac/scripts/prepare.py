@@ -25,7 +25,7 @@ from _types import IaCModules, Environment
 from scripts.formatters import construct_artifacts_version
 from lib import get_pulumi_stack_outputs, MAIN_SECRET_VERSION, construct_artifacts_dir, \
     download_generic_artifacts_file, get_file_as_string, Version
-from _common import add_select_environments_arguments, write_config_to_pulumi_yml_file, \
+from _common import add_select_environments_arguments, write_config_to_pulumi_yaml_file, \
     get_environment_stack_configurations, get_environment_environment_variables, compare_dict_keys, find_environments
 
 base_templates_dir = os.path.join(iac_folder, "templates")
@@ -66,7 +66,7 @@ def _download_templates(*,
         repository=realm_generic_repository,
         output_dir=artifacts_destination_dir,
         version=formatted_artifacts_version,
-        file_name="stack_config.template.yml",
+        file_name="stack_config.template.yaml",
     )
 
 
@@ -139,7 +139,7 @@ def _prepare_environment_deployment(*,
     env_vars_template["TARGET_GIT_BRANCH_NAME"] = artifacts_version.git_branch_name
     env_vars_template["TARGET_GIT_SHA"] = artifacts_version.git_sha
 
-    stack_config_template_value = get_file_as_string(os.path.join(base_templates_dir, "stack_config.template.yml"))
+    stack_config_template_value = get_file_as_string(os.path.join(base_templates_dir, "stack_config.template.yaml"))
     stack_config_template = yaml.safe_load(stack_config_template_value)
 
     if not compare_dict_keys(stack_config_template, stack_configs.raw_config):
@@ -153,27 +153,27 @@ def _prepare_environment_deployment(*,
         print("info: env vars template matches the env vars.")
 
     # 2. Save the modules yaml configs.
-    write_config_to_pulumi_yml_file(
+    write_config_to_pulumi_yaml_file(
         stack_name=environment.stack_name,
         module=IaCModules.ENVIRONMENT,
         content=stack_configs.environment.config)
 
-    write_config_to_pulumi_yml_file(
+    write_config_to_pulumi_yaml_file(
         stack_name=environment.stack_name,
         module=IaCModules.AUTH,
         content=stack_configs.auth)
 
-    write_config_to_pulumi_yml_file(
+    write_config_to_pulumi_yaml_file(
         stack_name=environment.stack_name,
         module=IaCModules.BACKEND,
         content=stack_configs.backend)
 
-    write_config_to_pulumi_yml_file(
+    write_config_to_pulumi_yaml_file(
         stack_name=environment.stack_name,
         module=IaCModules.FRONTEND,
         content=stack_configs.frontend)
 
-    write_config_to_pulumi_yml_file(
+    write_config_to_pulumi_yaml_file(
         stack_name=environment.stack_name,
         module=IaCModules.COMMON,
         content=stack_configs.common)

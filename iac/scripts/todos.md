@@ -24,16 +24,8 @@
 # Deploy to the compass realm.
 - [ ] Replace compass dev with new compass realm.
   - also clean up all the google project that we do not need anymore!
-
-  - Procedure:-
-     - [ ] Destroy all the environments under realm (test-realm)
-       - dev, dev2, test demo, anselme-dev.
-     - [ ] create the realm named compass.
-     - [ ] Setup dev environment named dev2 (dev2.compass.tabiya.tech) (Optional: if we want to maintain zero downtime if we didn't finish in one day)
-     - [ ] Destroy the old Pulumi.dev environment. (Note: We have to do this if we have checked out on main, because we want to destroy the resources created on main)
-     - [ ] Setup new dev environment named dev (dev.compass.tabiya.tech)
-     - [ ] Setup new test environment named test (test.compass.tabiya.tech)
-     - [ ] Setup new prod environment named demo (demo.compass.tabiya.tech)
+  - rename everywhere identity project to google auth.
+  - Add the how to authenticate to gcp docs on the deployment-procedure. Add the three ways: using the personal email (you have to set the google quota project.). using service account. Impersonating the service account.
   - Document:
     - [ ] `iac/README.md`
     - How to set up
@@ -86,7 +78,7 @@
 
 ---------------------
 
-
+- [ ] If the domain name has changed, Ensure common works by re-creating necessary resources. (2)
 - [ ] If overwriting a file have a backup and add a log a warning,
   If the backup file already exists, add an incrementing suffix. (2)
 - [ ] If the pipeline fails or finishes successfully remember to delete all the temporarily files created. (2)
@@ -139,3 +131,8 @@ integration repository/db, rest api, or e2e tests.
   we will give secret_id_prefix, branch_name and sha to get a valid secret_id (0)
 - [x] Clean up policy of the secrets (0)
     - when creating a secret specify when it will expire.
+
+
+firebase1._domainkey.dev.compass.tabiya.tech.	CNAME	300 mail-dev-compass-tabiya-tech.dkim1._domainkey.firebasemail.com.
+firebase2._domainkey.dev.compass.tabiya.tech.	CNAME	300  mail-dev-compass-tabiya-tech.dkim2._domainkey.firebasemail.com.
+dev.compass.tabiya.tech.	TXT	300 "v=spf1 include:_spf.firebasemail.com ~all"

@@ -312,7 +312,7 @@ Also, you have to Authenticate with the `AWS_PROFILE` which has access to the AW
 
 ### Step 4.1: Create OAuth 2.0 Client.
 
-1. **Create an OAuth 2.0 Client** in the target **Identity Project** with the following settings:
+1. **Create an OAuth 2.0 Client** in the target **OAuth Project** with the following settings:
     - **Application Type**: Web application
     - **Application Name**: Use the format `<realm-name>-<env-name>-web` for easy identification.
 
@@ -497,3 +497,17 @@ flowchart
 After the environment is deployed, configure the **auth domains** in the **Identity Project**. Refer to this [documentation](https://firebase.google.com/docs/auth/email-custom-domain).
 Remember to update the email templates if necessary.
 
+
+
+
+
+
+## How to
+
+### How to authenticate GCP.
+
+
+- using personal gcloud account.
+  -  set the application default quota project to the root project.
+- using service account.
+- impersonating a service account (an edge case)

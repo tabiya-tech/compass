@@ -20,7 +20,7 @@ function check_args() {
 
   This script uploads the templates to the Google Cloud Artifacts Repository.
     - env.template file.
-    - stack_config.template.yml file.
+    - stack_config.template.yaml file.
 
   Arguments:
     region: The region where the templates will be uploaded
@@ -63,7 +63,7 @@ if [ ! -e "$templates_path/$env_template_file"  ]; then
 fi
 
 # the stack config template file
-stack_config_template_file="stack_config.template.yml"
+stack_config_template_file="stack_config.template.yaml"
 if [ ! -e "$templates_path/$stack_config_template_file"  ]; then
   echo "Error: file ($templates_path/$stack_config_template_file) does not exist."
   exit 1
