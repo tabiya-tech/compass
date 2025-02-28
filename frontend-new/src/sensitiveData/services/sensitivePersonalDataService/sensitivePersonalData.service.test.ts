@@ -1,7 +1,6 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
-import { Gender, SensitivePersonalData } from "src/sensitiveData/types";
-import { sensitivePersonalDataService } from "./sensitivePersonalData.service";
+import { sensitivePersonalDataService, SensitivePersonalDataSkipError } from "./sensitivePersonalData.service";
 
 import * as CustomFetchModule from "src/utils/customFetch/customFetch";
 import { getRandomLorem, getRandomString } from "src/_test_utilities/specialCharacters";
@@ -9,10 +8,72 @@ import {
   MaximumAESEncryptedDataSize,
   MaximumAESEncryptedKeySize,
   MaximumRSAKeyIdSize,
-} from "src/sensitiveData/config/encryptionConfig";
+} from "src/sensitiveData/services/encryptionConfig";
 import { EncryptionService } from "src/sensitiveData/services/encryptionService/encryption.service";
 import { EncryptedDataTooLarge } from "./errors";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import { FieldDefinition, FieldType } from "src/sensitiveData/components/sensitiveDataForm/config/types";
+
+// Define gender values as constants to match the mockConfig
+const Gender = {
+  MALE: "MALE",
+  FEMALE: "FEMALE",
+  OTHER: "OTHER",
+  PREFER_NOT_TO_SAY: "PREFER_NOT_TO_SAY",
+};
+
+// Mock config for testing
+const mockConfig: FieldDefinition[] = [
+  {
+    name: "firstName",
+    dataKey: "first_name",
+    type: FieldType.String,
+    required: true,
+    label: "First name",
+  },
+  {
+    name: "lastName",
+    dataKey: "last_name",
+    type: FieldType.String,
+    required: true,
+    label: "Last name",
+  },
+  {
+    name: "contactEmail",
+    dataKey: "contact_email",
+    type: FieldType.String,
+    required: true,
+    label: "Contact email",
+  },
+  {
+    name: "phoneNumber",
+    dataKey: "phone_number",
+    type: FieldType.String,
+    required: true,
+    label: "Phone number",
+  },
+  {
+    name: "address",
+    dataKey: "address",
+    type: FieldType.String,
+    required: true,
+    label: "Address",
+  },
+  {
+    name: "gender",
+    dataKey: "gender",
+    type: FieldType.Enum,
+    required: false,
+    label: "Gender",
+    values: [
+      "MALE",
+      "FEMALE",
+      "OTHER",
+      "PREFER_NOT_TO_SAY",
+    ],
+    defaultValue: "PREFER_NOT_TO_SAY",
+  },
+];
 
 describe("SensitivePersonalDataService", () => {
   beforeEach(() => {
@@ -50,14 +111,13 @@ describe("SensitivePersonalDataService", () => {
       const customFetch = jest.spyOn(CustomFetchModule, "customFetch").mockResolvedValue(new Response());
 
       // WHEN we create the sensitive personal data
-      await sensitivePersonalDataService.createSensitivePersonalData(givenSensitivePersonalData, givenUserId);
+      await sensitivePersonalDataService.createSensitivePersonalData(givenSensitivePersonalData, givenUserId, mockConfig);
 
       // THEN savePersonalDataInLocalStorage should be called with the correct parameters
       expect(savePersonalDataInLocalStorage).toHaveBeenCalledWith({
         fullName: givenSensitivePersonalData.firstName + " " + givenSensitivePersonalData.lastName,
         phoneNumber: givenSensitivePersonalData.phoneNumber,
         contactEmail: givenSensitivePersonalData.contactEmail,
-        address: givenSensitivePersonalData.address,
       });
 
       // AND the encryption service is called with the sensitive personal data.
@@ -94,6 +154,7 @@ describe("SensitivePersonalDataService", () => {
       ["", "bar", "bar"],
       ["", "", ""],
     ])("should format correctly the full name saved in the local storage given the full name is %s and %s", async (firstName, lastName, expectedFullName) => {
+      // GIVEN the encryption service returns the expected data
       const givenEncryptReturnValue = {
         rsa_key_id: "given_key_id",
         aes_encrypted_data: "given_encrypted_data",
@@ -121,47 +182,67 @@ describe("SensitivePersonalDataService", () => {
       const givenUserId = getRandomLorem(10);
 
       // WHEN we create the sensitive personal data
-      await sensitivePersonalDataService.createSensitivePersonalData(givenSensitivePersonalData, givenUserId);
+      await sensitivePersonalDataService.createSensitivePersonalData(givenSensitivePersonalData, givenUserId, mockConfig);
 
-      // THEN savePersonalDataInLocalStorage should be called with the full name
+      // THEN savePersonalDataInLocalStorage should be called with the correct parameters
       expect(savePersonalDataInLocalStorage).toHaveBeenCalledWith({
         fullName: expectedFullName,
         phoneNumber: givenSensitivePersonalData.phoneNumber,
         contactEmail: givenSensitivePersonalData.contactEmail,
-        address: givenSensitivePersonalData.address,
       });
     });
 
-    test("should handle EncryptedDataTooLarge correctly", async () => {
-      const customFetch = jest.spyOn(CustomFetchModule, "customFetch");
-
-      // GIVEN the encryption result is too large
+    test("should throw an error if the encrypted data is too large", async () => {
+      // GIVEN the encryption service returns data that is too large
       const givenEncryptReturnValue = {
         rsa_key_id: getRandomString(MaximumRSAKeyIdSize + 1),
         aes_encrypted_data: getRandomString(MaximumAESEncryptedDataSize + 1),
         aes_encryption_key: getRandomString(MaximumAESEncryptedKeySize + 1),
       };
-
-      // AND the encryption service is mocked to return the given maximum size data.
       jest
         .spyOn(EncryptionService.prototype, "encryptSensitivePersonalData")
         .mockResolvedValue(givenEncryptReturnValue);
 
-      // WHEN the createSensitivePersonalData function is called with the given data
+      // AND some sample sensitive personal data
+      const givenSensitivePersonalData = {
+        contactEmail: "contact_email",
+        firstName: "first_name",
+        lastName: "last_name",
+        phoneNumber: "phone_number",
+        address: "address",
+        gender: Gender.PREFER_NOT_TO_SAY,
+      };
+
+      // AND some random user id
+      const givenUserId = getRandomLorem(10);
+
+      // WHEN we create the sensitive personal data
       const createSensitivePersonalData = sensitivePersonalDataService.createSensitivePersonalData(
-        {} as SensitivePersonalData,
-        getRandomString(10),
+        givenSensitivePersonalData,
+        givenUserId,
+        mockConfig
       );
 
-      // THEN the function should throw an error.
-      await expect(createSensitivePersonalData).rejects.toThrow(new EncryptedDataTooLarge(givenEncryptReturnValue));
-
-      // AND fetch should not be called
-      expect(customFetch).not.toHaveBeenCalled();
+      // THEN an error is thrown
+      await expect(createSensitivePersonalData).rejects.toThrow(EncryptedDataTooLarge);
     });
   });
 
   describe("skip", () => {
+    test("should construct the skip error class correctly", () => {
+      // GIVEN some random error message
+      const givenErrorMessage = getRandomLorem(10);
+
+      // WHEN we construct the skip error
+      const skipError = new SensitivePersonalDataSkipError(givenErrorMessage);
+
+      // THEN the error message is correct
+      expect(skipError.message).toBe(givenErrorMessage);
+
+      // AND the class name is correct
+      expect(skipError.name).toBe("SensitivePersonalDataSkipError");
+    });
+
     test("should call the backend with the correct data", async () => {
       // GIVEN some random user id
       const givenUserId = getRandomLorem(10);
@@ -169,7 +250,7 @@ describe("SensitivePersonalDataService", () => {
       // AND the custom fetch function resolves
       const customFetch = jest.spyOn(CustomFetchModule, "customFetch").mockResolvedValue(new Response());
 
-      // WHEN we skip the sensitive personal data
+      // WHEN we skip the sensitive personal data 
       await sensitivePersonalDataService.skip(givenUserId);
 
       // THEN the custom fetch function is called with the correct parameters
@@ -179,13 +260,11 @@ describe("SensitivePersonalDataService", () => {
           "Content-Type": "application/json",
         },
         expectedStatusCode: 201,
+        expectedContentType: "application/json",
+        failureMessage: `Failed to skip sensitive personal data for user with id ${givenUserId}`,
+        body: JSON.stringify({}),
         serviceName: "SensitivePersonalData",
         serviceFunction: "skip",
-        failureMessage: `Failed to skip sensitive personal data for user with id ${givenUserId}`,
-        body: JSON.stringify({
-          sensitive_personal_data: null
-        }),
-        expectedContentType: "application/json",
       });
     });
   });

@@ -2,11 +2,11 @@
 
 exports[`YesNoQuestion should render component successfully 1`] = `
 <fieldset
-  class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth css-7h8wka-MuiFormControl-root"
+  class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth css-bxrs44-MuiFormControl-root"
   data-testid="yes-no-question-form-control-9803f91b-499a-41b3-9348-795de9e399a9"
 >
   <legend
-    class="MuiFormLabel-root MuiFormLabel-colorPrimary css-1y0hhg3-MuiFormLabel-root"
+    class="MuiFormLabel-root MuiFormLabel-colorPrimary css-1bbwsov-MuiFormLabel-root"
     data-testid="yes-no-question-form-label-9803f91b-499a-41b3-9348-795de9e399a9"
   >
     <p
@@ -122,7 +122,7 @@ exports[`YesNoQuestion should render component successfully 1`] = `
     </label>
   </div>
   <div
-    class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1cqtlhz-MuiFormControl-root-MuiTextField-root"
+    class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-kker16-MuiFormControl-root-MuiTextField-root"
   >
     <div
       class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline css-voxow3-MuiInputBase-root-MuiOutlinedInput-root"

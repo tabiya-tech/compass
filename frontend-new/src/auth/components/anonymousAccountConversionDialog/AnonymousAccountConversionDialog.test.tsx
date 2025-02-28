@@ -61,7 +61,6 @@ describe("AnonymousAccountConversionDialog", () => {
       fullName: "",
       phoneNumber: "",
       contactEmail: storedEmail,
-      address: "",
     });
 
     // WHEN the dialog is rendered

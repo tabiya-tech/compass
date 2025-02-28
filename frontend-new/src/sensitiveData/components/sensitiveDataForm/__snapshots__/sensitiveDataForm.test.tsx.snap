@@ -1,12 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Sensitive Data render tests should render the component with all elements 1`] = `
+exports[`Sensitive Data Form Form validation should enable submit button when all required fields are valid 1`] = `
 <div
   class="MuiContainer-root MuiContainer-maxWidthXs css-xravbe-MuiContainer-root"
   data-testid="sensitive-data-container-ab02918f-d559-47ba-9662-ea6b3a3606d1"
 >
   <div
-    class="MuiBox-root css-1jpsogw"
+    class="MuiBox-root css-1g6i72"
   >
     <div
       class="MuiBox-root css-jwp3xc"
@@ -94,273 +94,656 @@ exports[`Sensitive Data render tests should render the component with all elemen
         class="MuiBox-root css-yd8sa2"
       >
         <div
-          class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1pcwqdd-MuiFormControl-root-MuiTextField-root"
+          data-testid="sensitive-data-form-field1-input-ab02918f-d559-47ba-9662-ea6b3a3606d1"
         >
-          <label
-            class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-t9prq5-MuiFormLabel-root-MuiInputLabel-root"
-            data-shrink="false"
-            for=":r1:"
-            id=":r1:-label"
-          >
-            First name
-            <span
-              aria-hidden="true"
-              class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-1th3aq5-MuiFormLabel-asterisk"
-            >
-               
-              *
-            </span>
-          </label>
-          <div
-            class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-1vdto9g-MuiInputBase-root-MuiOutlinedInput-root"
-          >
-            <input
-              aria-invalid="false"
-              class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-              data-testid="sensitive-data-form-first-name-input-ab02918f-d559-47ba-9662-ea6b3a3606d1"
-              id=":r1:"
-              required=""
-              type="text"
-              value=""
-            />
-            <fieldset
-              aria-hidden="true"
-              class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
-            >
-              <legend
-                class="css-yjsfm1"
-              >
-                <span>
-                  First name
-                   
-                  *
-                </span>
-              </legend>
-            </fieldset>
-          </div>
+          StringField: 
+          field1
         </div>
         <div
-          class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1pcwqdd-MuiFormControl-root-MuiTextField-root"
+          data-testid="sensitive-data-form-field2-input-ab02918f-d559-47ba-9662-ea6b3a3606d1"
         >
-          <label
-            class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-t9prq5-MuiFormLabel-root-MuiInputLabel-root"
-            data-shrink="false"
-            for=":r2:"
-            id=":r2:-label"
-          >
-            Last name
-            <span
-              aria-hidden="true"
-              class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-1th3aq5-MuiFormLabel-asterisk"
-            >
-               
-              *
-            </span>
-          </label>
-          <div
-            class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-1vdto9g-MuiInputBase-root-MuiOutlinedInput-root"
-          >
-            <input
-              aria-invalid="false"
-              class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-              data-testid="sensitive-data-form-last-name-input-ab02918f-d559-47ba-9662-ea6b3a3606d1"
-              id=":r2:"
-              required=""
-              type="text"
-              value=""
-            />
-            <fieldset
-              aria-hidden="true"
-              class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
-            >
-              <legend
-                class="css-yjsfm1"
-              >
-                <span>
-                  Last name
-                   
-                  *
-                </span>
-              </legend>
-            </fieldset>
-          </div>
+          EnumField: 
+          field2
         </div>
         <div
-          class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1pcwqdd-MuiFormControl-root-MuiTextField-root"
+          data-testid="sensitive-data-form-field3-input-ab02918f-d559-47ba-9662-ea6b3a3606d1"
         >
-          <label
-            class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-t9prq5-MuiFormLabel-root-MuiInputLabel-root"
-            data-shrink="false"
-            for=":r3:"
-            id=":r3:-label"
+          MultipleField: 
+          field3
+        </div>
+      </div>
+      <div
+        class="MuiBox-root css-macbv2"
+      >
+        <a
+          aria-disabled="false"
+          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+          data-testid="sensitive-data-reject-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+        >
+          No, thank you
+        </a>
+        <button
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1jkonhr-MuiButtonBase-root-MuiButton-root"
+          data-testid="sensitive-data-form-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+          tabindex="0"
+          type="button"
+        >
+          Start conversation
+          <span
+            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Sensitive Data Form Rendering fields based on configuration should handle empty configuration gracefully 1`] = `
+<div
+  class="MuiContainer-root MuiContainer-maxWidthXs css-xravbe-MuiContainer-root"
+  data-testid="sensitive-data-container-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+>
+  <div
+    class="MuiBox-root css-1g6i72"
+  >
+    <div
+      class="MuiBox-root css-jwp3xc"
+      data-testid="auth-header-container-40374529-6e2c-49d8-81d7-93f01603a648"
+    >
+      <div
+        class="MuiBox-root css-1vd84sn"
+      >
+        <img
+          alt="Logo"
+          data-testid="auth-header-logo-40374529-6e2c-49d8-81d7-93f01603a648"
+          src="/logo.svg"
+          style="max-width: 60%; margin: 5% 10%;"
+        />
+        <button
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-9hi4fq-MuiButtonBase-root-MuiIconButton-root"
+          data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+          tabindex="0"
+          title="Language Selector"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+            data-testid="LanguageOutlinedIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
           >
-            Contact email
-            <span
-              aria-hidden="true"
-              class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-1th3aq5-MuiFormLabel-asterisk"
-            >
-               
-              *
-            </span>
-          </label>
-          <div
-            class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-1vdto9g-MuiInputBase-root-MuiOutlinedInput-root"
-          >
-            <input
-              aria-invalid="false"
-              class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-              data-testid="sensitive-data-form-contact-email-input-ab02918f-d559-47ba-9662-ea6b3a3606d1"
-              id=":r3:"
-              required=""
-              type="email"
-              value=""
+            <path
+              d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2m6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56M12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96M4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56m2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8M12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96M14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2m.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56M16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2z"
             />
-            <fieldset
-              aria-hidden="true"
-              class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
-            >
-              <legend
-                class="css-yjsfm1"
-              >
-                <span>
-                  Contact email
-                   
-                  *
-                </span>
-              </legend>
-            </fieldset>
-          </div>
+          </svg>
+          <span
+            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
+      </div>
+      <h4
+        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-xvfkrl-MuiTypography-root"
+        data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
+      >
+        Provide Your Information
+      </h4>
+      <p
+        class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
+        data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
+      >
+        Please double-check your details as you won't be able to update them later.
+         
+        <span
+          class="css-1ty5jm0"
+        >
+          We may use it to contact you about your experience using Compass
+        </span>
+        .
+        <button
+          aria-label="help"
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
+          data-mui-internal-clone-element="true"
+          data-testid="help-icon-4b757f12-fb67-4a59-94b1-b8a2498a7a49"
+          tabindex="0"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+            data-testid="PrivacyTipIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5zm-1 6h2v2h-2zm0 4h2v6h-2z"
+            />
+          </svg>
+          <span
+            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
+      </p>
+    </div>
+    <div
+      class="MuiBox-root css-1tcf7lu"
+    >
+      <div
+        class="MuiBox-root css-yd8sa2"
+      />
+      <div
+        class="MuiBox-root css-macbv2"
+      >
+        <a
+          aria-disabled="false"
+          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+          data-testid="sensitive-data-reject-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+        >
+          No, thank you
+        </a>
+        <button
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1jkonhr-MuiButtonBase-root-MuiButton-root"
+          data-testid="sensitive-data-form-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+          tabindex="0"
+          type="button"
+        >
+          Start conversation
+          <span
+            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Sensitive Data Form Rendering fields based on configuration should render a MultipleField when configuration contains a multiple field 1`] = `
+<div
+  class="MuiContainer-root MuiContainer-maxWidthXs css-xravbe-MuiContainer-root"
+  data-testid="sensitive-data-container-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+>
+  <div
+    class="MuiBox-root css-1g6i72"
+  >
+    <div
+      class="MuiBox-root css-jwp3xc"
+      data-testid="auth-header-container-40374529-6e2c-49d8-81d7-93f01603a648"
+    >
+      <div
+        class="MuiBox-root css-1vd84sn"
+      >
+        <img
+          alt="Logo"
+          data-testid="auth-header-logo-40374529-6e2c-49d8-81d7-93f01603a648"
+          src="/logo.svg"
+          style="max-width: 60%; margin: 5% 10%;"
+        />
+        <button
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-9hi4fq-MuiButtonBase-root-MuiIconButton-root"
+          data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+          tabindex="0"
+          title="Language Selector"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+            data-testid="LanguageOutlinedIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2m6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56M12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96M4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56m2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8M12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96M14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2m.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56M16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2z"
+            />
+          </svg>
+          <span
+            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
+      </div>
+      <h4
+        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-xvfkrl-MuiTypography-root"
+        data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
+      >
+        Provide Your Information
+      </h4>
+      <p
+        class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
+        data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
+      >
+        Please double-check your details as you won't be able to update them later.
+         
+        <span
+          class="css-1ty5jm0"
+        >
+          We may use it to contact you about your experience using Compass
+        </span>
+        .
+        <button
+          aria-label="help"
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
+          data-mui-internal-clone-element="true"
+          data-testid="help-icon-4b757f12-fb67-4a59-94b1-b8a2498a7a49"
+          tabindex="0"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+            data-testid="PrivacyTipIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5zm-1 6h2v2h-2zm0 4h2v6h-2z"
+            />
+          </svg>
+          <span
+            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
+      </p>
+    </div>
+    <div
+      class="MuiBox-root css-1tcf7lu"
+    >
+      <div
+        class="MuiBox-root css-yd8sa2"
+      >
+        <div
+          data-testid="sensitive-data-form-field3-input-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+        >
+          MultipleField: 
+          field3
+        </div>
+      </div>
+      <div
+        class="MuiBox-root css-macbv2"
+      >
+        <a
+          aria-disabled="false"
+          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+          data-testid="sensitive-data-reject-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+        >
+          No, thank you
+        </a>
+        <button
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1jkonhr-MuiButtonBase-root-MuiButton-root"
+          data-testid="sensitive-data-form-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+          disabled=""
+          tabindex="-1"
+          type="button"
+        >
+          Start conversation
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Sensitive Data Form Rendering fields based on configuration should render a StringField when configuration contains a string field 1`] = `
+<div
+  class="MuiContainer-root MuiContainer-maxWidthXs css-xravbe-MuiContainer-root"
+  data-testid="sensitive-data-container-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+>
+  <div
+    class="MuiBox-root css-1g6i72"
+  >
+    <div
+      class="MuiBox-root css-jwp3xc"
+      data-testid="auth-header-container-40374529-6e2c-49d8-81d7-93f01603a648"
+    >
+      <div
+        class="MuiBox-root css-1vd84sn"
+      >
+        <img
+          alt="Logo"
+          data-testid="auth-header-logo-40374529-6e2c-49d8-81d7-93f01603a648"
+          src="/logo.svg"
+          style="max-width: 60%; margin: 5% 10%;"
+        />
+        <button
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-9hi4fq-MuiButtonBase-root-MuiIconButton-root"
+          data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+          tabindex="0"
+          title="Language Selector"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+            data-testid="LanguageOutlinedIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2m6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56M12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96M4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56m2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8M12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96M14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2m.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56M16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2z"
+            />
+          </svg>
+          <span
+            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
+      </div>
+      <h4
+        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-xvfkrl-MuiTypography-root"
+        data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
+      >
+        Provide Your Information
+      </h4>
+      <p
+        class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
+        data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
+      >
+        Please double-check your details as you won't be able to update them later.
+         
+        <span
+          class="css-1ty5jm0"
+        >
+          We may use it to contact you about your experience using Compass
+        </span>
+        .
+        <button
+          aria-label="help"
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
+          data-mui-internal-clone-element="true"
+          data-testid="help-icon-4b757f12-fb67-4a59-94b1-b8a2498a7a49"
+          tabindex="0"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+            data-testid="PrivacyTipIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5zm-1 6h2v2h-2zm0 4h2v6h-2z"
+            />
+          </svg>
+          <span
+            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
+      </p>
+    </div>
+    <div
+      class="MuiBox-root css-1tcf7lu"
+    >
+      <div
+        class="MuiBox-root css-yd8sa2"
+      >
+        <div
+          data-testid="sensitive-data-form-field1-input-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+        >
+          StringField: 
+          field1
+        </div>
+      </div>
+      <div
+        class="MuiBox-root css-macbv2"
+      >
+        <a
+          aria-disabled="false"
+          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+          data-testid="sensitive-data-reject-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+        >
+          No, thank you
+        </a>
+        <button
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1jkonhr-MuiButtonBase-root-MuiButton-root"
+          data-testid="sensitive-data-form-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+          disabled=""
+          tabindex="-1"
+          type="button"
+        >
+          Start conversation
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Sensitive Data Form Rendering fields based on configuration should render a complex form with multiple field types 1`] = `
+<div
+  class="MuiContainer-root MuiContainer-maxWidthXs css-xravbe-MuiContainer-root"
+  data-testid="sensitive-data-container-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+>
+  <div
+    class="MuiBox-root css-1g6i72"
+  >
+    <div
+      class="MuiBox-root css-jwp3xc"
+      data-testid="auth-header-container-40374529-6e2c-49d8-81d7-93f01603a648"
+    >
+      <div
+        class="MuiBox-root css-1vd84sn"
+      >
+        <img
+          alt="Logo"
+          data-testid="auth-header-logo-40374529-6e2c-49d8-81d7-93f01603a648"
+          src="/logo.svg"
+          style="max-width: 60%; margin: 5% 10%;"
+        />
+        <button
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-9hi4fq-MuiButtonBase-root-MuiIconButton-root"
+          data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+          tabindex="0"
+          title="Language Selector"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+            data-testid="LanguageOutlinedIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2m6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56M12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96M4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56m2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8M12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96M14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2m.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56M16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2z"
+            />
+          </svg>
+          <span
+            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
+      </div>
+      <h4
+        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-xvfkrl-MuiTypography-root"
+        data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
+      >
+        Provide Your Information
+      </h4>
+      <p
+        class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
+        data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
+      >
+        Please double-check your details as you won't be able to update them later.
+         
+        <span
+          class="css-1ty5jm0"
+        >
+          We may use it to contact you about your experience using Compass
+        </span>
+        .
+        <button
+          aria-label="help"
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
+          data-mui-internal-clone-element="true"
+          data-testid="help-icon-4b757f12-fb67-4a59-94b1-b8a2498a7a49"
+          tabindex="0"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+            data-testid="PrivacyTipIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5zm-1 6h2v2h-2zm0 4h2v6h-2z"
+            />
+          </svg>
+          <span
+            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
+      </p>
+    </div>
+    <div
+      class="MuiBox-root css-1tcf7lu"
+    >
+      <div
+        class="MuiBox-root css-yd8sa2"
+      >
+        <div
+          data-testid="sensitive-data-form-field1-input-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+        >
+          StringField: 
+          field1
         </div>
         <div
-          class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1pcwqdd-MuiFormControl-root-MuiTextField-root"
+          data-testid="sensitive-data-form-field2-input-ab02918f-d559-47ba-9662-ea6b3a3606d1"
         >
-          <label
-            class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-t9prq5-MuiFormLabel-root-MuiInputLabel-root"
-            data-shrink="false"
-            for=":r4:"
-            id=":r4:-label"
-          >
-            Phone number
-            <span
-              aria-hidden="true"
-              class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-1th3aq5-MuiFormLabel-asterisk"
-            >
-               
-              *
-            </span>
-          </label>
-          <div
-            class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-1vdto9g-MuiInputBase-root-MuiOutlinedInput-root"
-          >
-            <input
-              aria-invalid="false"
-              class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-              data-testid="sensitive-data-form-phone-number-input-ab02918f-d559-47ba-9662-ea6b3a3606d1"
-              id=":r4:"
-              required=""
-              type="text"
-              value=""
-            />
-            <fieldset
-              aria-hidden="true"
-              class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
-            >
-              <legend
-                class="css-yjsfm1"
-              >
-                <span>
-                  Phone number
-                   
-                  *
-                </span>
-              </legend>
-            </fieldset>
-          </div>
+          EnumField: 
+          field2
         </div>
         <div
-          class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1pcwqdd-MuiFormControl-root-MuiTextField-root"
+          data-testid="sensitive-data-form-field3-input-ab02918f-d559-47ba-9662-ea6b3a3606d1"
         >
-          <label
-            class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-t9prq5-MuiFormLabel-root-MuiInputLabel-root"
-            data-shrink="false"
-            for=":r5:"
-            id=":r5:-label"
-          >
-            Address
-            <span
-              aria-hidden="true"
-              class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-1th3aq5-MuiFormLabel-asterisk"
-            >
-               
-              *
-            </span>
-          </label>
-          <div
-            class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-1vdto9g-MuiInputBase-root-MuiOutlinedInput-root"
-          >
-            <input
-              aria-invalid="false"
-              class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-              data-testid="sensitive-data-form-address-input-ab02918f-d559-47ba-9662-ea6b3a3606d1"
-              id=":r5:"
-              required=""
-              type="text"
-              value=""
-            />
-            <fieldset
-              aria-hidden="true"
-              class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
-            >
-              <legend
-                class="css-yjsfm1"
-              >
-                <span>
-                  Address
-                   
-                  *
-                </span>
-              </legend>
-            </fieldset>
-          </div>
+          MultipleField: 
+          field3
         </div>
-        <div
-          class="MuiFormControl-root MuiFormControl-fullWidth css-q8hpuo-MuiFormControl-root"
+      </div>
+      <div
+        class="MuiBox-root css-macbv2"
+      >
+        <a
+          aria-disabled="false"
+          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+          data-testid="sensitive-data-reject-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
         >
-          <label
-            class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeMedium MuiInputLabel-outlined css-t9prq5-MuiFormLabel-root-MuiInputLabel-root"
-            data-shrink="false"
-            id="select-label"
+          No, thank you
+        </a>
+        <button
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1jkonhr-MuiButtonBase-root-MuiButton-root"
+          data-testid="sensitive-data-form-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+          disabled=""
+          tabindex="-1"
+          type="button"
+        >
+          Start conversation
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Sensitive Data Form Rendering fields based on configuration should render an EnumField when configuration contains an enum field 1`] = `
+<div
+  class="MuiContainer-root MuiContainer-maxWidthXs css-xravbe-MuiContainer-root"
+  data-testid="sensitive-data-container-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+>
+  <div
+    class="MuiBox-root css-1g6i72"
+  >
+    <div
+      class="MuiBox-root css-jwp3xc"
+      data-testid="auth-header-container-40374529-6e2c-49d8-81d7-93f01603a648"
+    >
+      <div
+        class="MuiBox-root css-1vd84sn"
+      >
+        <img
+          alt="Logo"
+          data-testid="auth-header-logo-40374529-6e2c-49d8-81d7-93f01603a648"
+          src="/logo.svg"
+          style="max-width: 60%; margin: 5% 10%;"
+        />
+        <button
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-9hi4fq-MuiButtonBase-root-MuiIconButton-root"
+          data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+          tabindex="0"
+          title="Language Selector"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+            data-testid="LanguageOutlinedIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
           >
-            Gender
-          </label>
-          <select
-            data-testid="sensitive-data-form-gender-input-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+            <path
+              d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2m6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56M12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96M4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56m2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8M12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96M14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2m.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56M16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2z"
+            />
+          </svg>
+          <span
+            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
+      </div>
+      <h4
+        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-xvfkrl-MuiTypography-root"
+        data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
+      >
+        Provide Your Information
+      </h4>
+      <p
+        class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
+        data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
+      >
+        Please double-check your details as you won't be able to update them later.
+         
+        <span
+          class="css-1ty5jm0"
+        >
+          We may use it to contact you about your experience using Compass
+        </span>
+        .
+        <button
+          aria-label="help"
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
+          data-mui-internal-clone-element="true"
+          data-testid="help-icon-4b757f12-fb67-4a59-94b1-b8a2498a7a49"
+          tabindex="0"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+            data-testid="PrivacyTipIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
           >
-            <option
-              data-testid="sensitive-data-form-gender-input-ab02918f-d559-47ba-9662-ea6b3a3606d1-MALE"
-              value="MALE"
-            >
-              Male
-            </option>
-            <option
-              data-testid="sensitive-data-form-gender-input-ab02918f-d559-47ba-9662-ea6b3a3606d1-FEMALE"
-              value="FEMALE"
-            >
-              Female
-            </option>
-            <option
-              data-testid="sensitive-data-form-gender-input-ab02918f-d559-47ba-9662-ea6b3a3606d1-OTHER"
-              value="OTHER"
-            >
-              Other
-            </option>
-            <option
-              data-testid="sensitive-data-form-gender-input-ab02918f-d559-47ba-9662-ea6b3a3606d1-PREFER_NOT_TO_SAY"
-              value="PREFER_NOT_TO_SAY"
-            >
-              Prefer not to say
-            </option>
-          </select>
+            <path
+              d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5zm-1 6h2v2h-2zm0 4h2v6h-2z"
+            />
+          </svg>
+          <span
+            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
+      </p>
+    </div>
+    <div
+      class="MuiBox-root css-1tcf7lu"
+    >
+      <div
+        class="MuiBox-root css-yd8sa2"
+      >
+        <div
+          data-testid="sensitive-data-form-field2-input-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+        >
+          EnumField: 
+          field2
         </div>
       </div>
       <div

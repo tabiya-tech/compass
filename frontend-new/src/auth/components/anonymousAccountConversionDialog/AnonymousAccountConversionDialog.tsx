@@ -9,6 +9,8 @@ import {
   CircularProgress,
   useTheme,
   styled,
+  useMediaQuery,
+  Theme
 } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
@@ -65,6 +67,8 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
+
+  const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
 
   useEffect(() => {
     const personalInfo = PersistentStorageService.getPersonalInfo();
@@ -123,7 +127,8 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
       onClose={onClose}
       data-testid={DATA_TEST_ID.DIALOG}
       maxWidth="sm"
-      fullWidth
+      fullWidth={true}
+      fullScreen={isSmallMobile}
       PaperProps={{ sx: style }}
     >
       <PrimaryIconButton
