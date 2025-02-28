@@ -1,5 +1,5 @@
 import { webcrypto as crypto } from "crypto";
-import { EncryptionConfig } from "src/sensitiveData/config/encryptionConfig";
+import { EncryptionConfig } from "src/sensitiveData/services/encryptionConfig";
 
 // Constraining the key size to 2048 or 4096 bits for RSA as the backend expect the 4096 in calculating the maximum size of the encrypted key.
 export async function generateRSACryptoPairKey(keySize: 2048 | 4096) {

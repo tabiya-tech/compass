@@ -295,6 +295,10 @@ export const applicationTheme = (theme: ThemeMode) => {
       },
       MuiFormLabel: {
         styleOverrides: {
+          root:({theme}) => ({
+            fontSize: theme.typography.caption.fontSize,
+            marginBottom: 8,
+          }),
           asterisk: {
             color: (activePalette.error as SimplePaletteColorOptions).main, // unclear why typescript complaints about this and we need to cast
           },
@@ -370,6 +374,18 @@ export const applicationTheme = (theme: ThemeMode) => {
           root: {
             fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem), // Adjust label text size
             padding: "0",
+            color: activePalette.text!.secondary,
+            opacity: 0.7,
+          },
+        },
+      },
+      MuiFormControl: {
+        styleOverrides: {
+          root: {
+            '& .MuiInputLabel-root': {
+              color: activePalette.text!.secondary,
+              opacity: 0.7,
+            },
           },
         },
       },
