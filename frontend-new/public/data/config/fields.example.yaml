@@ -1,0 +1,56 @@
+stringFieldName:
+  # Typically, a snake_case version of the field name used as the key in the encrypted data
+  dataKey: string_field_name
+  # STRING types are used for text input fields
+  type: STRING
+  # Required fields are marked with a red asterisk and must be filled in to pass validation
+  required: true
+  # The label is the text that appears next to the input field
+  label: String Field
+  # Validation is used to enforce constraints on the input field
+  # only exists for string fields
+  validation:
+    # A regex pattern to validate the value against. This pattern, for example, allows only unicode letters
+    # ensure that a min and max length is enforced since there is a limit to the number of characters that can be encrypted and stored
+    # For more information, see the following file:
+    # Backend/app/users/sensitive_personal_data/types.py:SensitivePersonalDataBaseModel.aes_encrypted_data
+    pattern: ^[\p{L}]{1,48}$
+    # The error message that appears when the validation fails
+    errorMessage: String Field should contain only letters and be 2-50 characters long
+  # The default value that appears in the input field
+  #-----------------#
+  # Optional fields
+  defaultValue: Default Value
+  # The question text that appears above the input field and is meant for extended context about what the field is asking
+  # the label should be a relatively short description of the field, while the question text can be more detailed
+  questionText: What is the string field?
+  #-----------------#
+enumFieldName:
+  dataKey: enum_field_name
+  # ENUM types are used for dropdown fields
+  type: ENUM
+  required: true
+  label: Enum Field
+  # The values that can be selected in the dropdown, should be a sequence of strings
+  values:
+    - Option 1
+    - Option 2
+  #-----------------#
+  # Optional fields
+  defaultValue: Option 1
+  questionText: What is the enum field?
+  #-----------------#
+multipleSelectFieldName:
+  dataKey: multiple_select_field_name
+  type: MULTIPLE_SELECT
+  required: true
+  label: Multiple Select Field
+  # The values that can be selected in the dropdown, should be a sequence of strings
+  values:
+      - Option 1
+      - Option 2
+  #-----------------#
+  # Optional fields
+  defaultValue:
+      - Option 1
+  questionText: What is the multiple select field?

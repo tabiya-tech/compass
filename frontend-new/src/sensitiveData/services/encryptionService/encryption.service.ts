@@ -1,7 +1,7 @@
-import { EncryptionConfig } from "src/sensitiveData/config/encryptionConfig";
+import { EncryptionConfig } from "src/sensitiveData/services/encryptionConfig";
 import { AESResult, EncryptedSensitivePersonalData } from "src/sensitiveData/services/encryptionService/types";
 import { getSensitivePersonalDataRSAEncryptionKey, getSensitivePersonalDataRSAEncryptionKeyId } from "src/envService";
-import { SensitivePersonalDataRequest } from "src/sensitiveData/types";
+import { SensitivePersonalDataEncryptionPayload } from "src/sensitiveData/types";
 
 function stringToBytes(str: string): Uint8Array {
   const bufView = new Uint8Array(str.length);
@@ -94,7 +94,7 @@ export class EncryptionService {
   }
 
   public async encryptSensitivePersonalData(
-    personalData: SensitivePersonalDataRequest
+    personalData: SensitivePersonalDataEncryptionPayload
   ): Promise<EncryptedSensitivePersonalData> {
     // Load the public key and key_id from the environment.
     // AND load the cryptoKey from the public key.

@@ -8,9 +8,11 @@ import {
   MaximumAESEncryptedDataSize,
   MaximumAESEncryptedKeySize,
   MaximumRSAKeyIdSize,
-} from "src/sensitiveData/config/encryptionConfig";
+} from "src/sensitiveData/services/encryptionConfig";
 import { EncryptedDataTooLarge } from "./errors";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import { FieldDefinition } from "src/sensitiveData/components/sensitiveDataForm/config/types";
+import { toEncryptionPayload } from "../../components/sensitiveDataForm/config/utils";
 
 export class SensitivePersonalDataSkipError extends Error {
   constructor(message: string, public readonly cause?: Error) {
@@ -29,32 +31,33 @@ class SensitivePersonalDataService {
 
   /**
    * Creates sensitive personal data for a user.
+   * 
+   * @param personal_data - The sensitive personal data to save
+   * @param user_id - The ID of the user
+   * @param fields - The field definitions
    */
-  async createSensitivePersonalData(personal_data: SensitivePersonalData, user_id: string): Promise<void> {
-    // create the name, and add spaces if both names are provided
-    let full_name;
-
-    if (personal_data.firstName && personal_data.lastName) {
-      full_name = personal_data.firstName + " " + personal_data.lastName
+  async createSensitivePersonalData(
+    personal_data: SensitivePersonalData, 
+    user_id: string,
+    fields: FieldDefinition[]
+  ): Promise<void> {
+    // Create full name from first and last name if available
+    let fullName = '';
+    if (personal_data['firstName'] && personal_data['lastName']) {
+      fullName = `${personal_data['firstName']} ${personal_data['lastName']}`;
     } else {
-      full_name = personal_data.firstName || personal_data.lastName || ""
+      fullName = (personal_data['firstName'] || personal_data['lastName'] || '') as string;
     }
 
+    // Store personal info for local use
     PersistentStorageService.setPersonalInfo({
-      fullName: full_name,
-      phoneNumber: personal_data.phoneNumber,
-      contactEmail: personal_data.contactEmail,
-      address: personal_data.address,
-    })
+      fullName,
+      phoneNumber: personal_data['phoneNumber'] as string,
+      contactEmail: personal_data['contactEmail'] as string,
+    });
 
-    const payload = {
-      first_name: personal_data.firstName,
-      last_name: personal_data.lastName,
-      contact_email: personal_data.contactEmail,
-      phone_number:personal_data.phoneNumber,
-      address: personal_data.address,
-      gender: personal_data.gender
-    }
+    // Convert frontend model to backend request model
+    const payload = toEncryptionPayload(personal_data, fields);
 
     const encryptSensitivePersonalData = await this.encryptionService.encryptSensitivePersonalData(payload);
 
@@ -101,9 +104,7 @@ class SensitivePersonalDataService {
       serviceName: "SensitivePersonalData",
       serviceFunction: "skip",
       failureMessage: `Failed to skip sensitive personal data for user with id ${user_id}`,
-      body: JSON.stringify({
-        sensitive_personal_data: null
-      }),
+      body: JSON.stringify({}),
       expectedContentType: "application/json",
     });
   }

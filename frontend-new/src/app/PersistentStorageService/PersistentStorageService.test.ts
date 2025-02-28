@@ -184,7 +184,6 @@ describe("AuthPersistentStorage class tests", () => {
         fullName: "foo",
         contactEmail: "foo@bar.baz",
         phoneNumber: "1234567890",
-        address: "123 Main St",
       };
       PersistentStorageService.setPersonalInfo(givenPersonalInfo);
 
@@ -212,7 +211,6 @@ describe("AuthPersistentStorage class tests", () => {
         fullName: "foo",
         contactEmail: "foo@bar.baz",
         phoneNumber: "1234567890",
-        address: "123 Main St",
       };
       PersistentStorageService.setPersonalInfo(givenPersonalInfo);
 
@@ -230,7 +228,6 @@ describe("AuthPersistentStorage class tests", () => {
         fullName: "foo",
         contactEmail: "foo@bar.baz",
         phoneNumber: "1234567890",
-        address: "123 Main St",
       };
 
       // WHEN The personal info is set

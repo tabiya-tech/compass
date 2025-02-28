@@ -2,11 +2,11 @@
 
 exports[`CheckboxQuestion should render component successfully 1`] = `
 <fieldset
-  class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth css-198mkhu-MuiFormControl-root"
+  class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth css-u799rm-MuiFormControl-root"
   data-testid="checkbox-with-textarea-form-control-989402f0-9fda-4400-958c-2d6c7bce9821"
 >
   <legend
-    class="MuiFormLabel-root MuiFormLabel-colorPrimary css-1y0hhg3-MuiFormLabel-root"
+    class="MuiFormLabel-root MuiFormLabel-colorPrimary css-1bbwsov-MuiFormLabel-root"
     data-testid="checkbox-with-textarea-form-label-989402f0-9fda-4400-958c-2d6c7bce9821"
   >
     <p
@@ -155,7 +155,7 @@ exports[`CheckboxQuestion should render component successfully 1`] = `
     </label>
   </div>
   <div
-    class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1cqtlhz-MuiFormControl-root-MuiTextField-root"
+    class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-kker16-MuiFormControl-root-MuiTextField-root"
   >
     <div
       class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline css-voxow3-MuiInputBase-root-MuiOutlinedInput-root"

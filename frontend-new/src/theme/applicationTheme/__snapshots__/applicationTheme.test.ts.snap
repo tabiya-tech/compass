@@ -58,11 +58,22 @@ Object {
         "variant": "h2",
       },
     },
+    "MuiFormControl": Object {
+      "styleOverrides": Object {
+        "root": Object {
+          "& .MuiInputLabel-root": Object {
+            "color": "#41403D",
+            "opacity": 0.7,
+          },
+        },
+      },
+    },
     "MuiFormLabel": Object {
       "styleOverrides": Object {
         "asterisk": Object {
           "color": "#FF5449",
         },
+        "root": [Function],
       },
     },
     "MuiIcon": Object {
@@ -105,7 +116,9 @@ Object {
     "MuiInputLabel": Object {
       "styleOverrides": Object {
         "root": Object {
+          "color": "#41403D",
           "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+          "opacity": 0.7,
           "padding": "0",
         },
       },
@@ -789,11 +802,22 @@ Object {
         "variant": "h2",
       },
     },
+    "MuiFormControl": Object {
+      "styleOverrides": Object {
+        "root": Object {
+          "& .MuiInputLabel-root": Object {
+            "color": "#41403D",
+            "opacity": 0.7,
+          },
+        },
+      },
+    },
     "MuiFormLabel": Object {
       "styleOverrides": Object {
         "asterisk": Object {
           "color": "#FF5449",
         },
+        "root": [Function],
       },
     },
     "MuiIcon": Object {
@@ -836,7 +860,9 @@ Object {
     "MuiInputLabel": Object {
       "styleOverrides": Object {
         "root": Object {
+          "color": "#41403D",
           "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+          "opacity": 0.7,
           "padding": "0",
         },
       },

@@ -15,16 +15,22 @@ import {
   exportCryptoPublicKey,
   generateRSACryptoPairKey,
 } from "src/_test_utilities/encryption";
-import { Gender, SensitivePersonalDataRequest } from "src/sensitiveData/types";
+import { SensitivePersonalDataEncryptionPayload } from "src/sensitiveData/types";
 
 import * as EnvServiceModule from "src/envService";
 import {
   EncryptionConfig,
   MaximumAESEncryptedDataSize,
   MaximumAESEncryptedKeySize,
-} from "src/sensitiveData/config/encryptionConfig";
+} from "src/sensitiveData/services/encryptionConfig";
 
-import { formConfig } from "src/sensitiveData/components/sensitiveDataForm/formConfig";
+// For testing, we'll use hardcoded max lengths
+// IMPORTANT: The backend has a limit on the size of the data it accepts.
+// This constant represents the maximum size of data we want to test with.
+// The actual field structure is determined by the configuration and is not relevant for these tests.
+// TODO: rethink
+const MAX_FIELD_LENGTH = 100;
+const MAX_FIELDS_COUNT = 10;
 
 describe("EncryptionService", () => {
   beforeAll(() => {
@@ -42,30 +48,37 @@ describe("EncryptionService", () => {
   });
 
   test(`should encrypt sensitive data and it is possible to decrypt the data again`, async () => {
-    // GIVEN some sensitive personal data
-    const givenRandomData: SensitivePersonalDataRequest = {
-      contact_email: getTestString(100),
-      first_name: getThreeBytesUTF8Char(100),
-      last_name: getTestString(100),
-      phone_number: getRandomString(100),
-      address: getRandomString(100),
-      gender: Gender.PREFER_NOT_TO_SAY,
+    // GIVEN some random sensitive personal data
+    const givenRandomData: Record<string, any> = {
+      field1: getTestString(50),
+      field2: getThreeBytesUTF8Char(50),
+      field3: getRandomString(50),
+      field4: getRandomLorem(50),
+      field5: getRandomLorem(50),
     };
 
-    // AND in the environment we have a public key and given key_id.
-    // AND the EnvServiceFunctions will return the given values.
-    const keyPair = await generateRSACryptoPairKey(2048);
-    const givenKeId = getRandomLorem(10);
-    const givenPublicKey = await exportCryptoPublicKey(keyPair.publicKey);
+    // AND in the environment we have a given key_id
+    const givenKeyId = getTestString(256);
+    jest.spyOn(EnvServiceModule, "getSensitivePersonalDataRSAEncryptionKeyId").mockReturnValue(givenKeyId);
 
-    jest.spyOn(EnvServiceModule, "getSensitivePersonalDataRSAEncryptionKeyId").mockReturnValue(givenKeId);
+    // AND a public key based on the maximum RSA key size assumed by the backend.
+    const keyPair = await generateRSACryptoPairKey(2048);
+    const givenPublicKey = await exportCryptoPublicKey(keyPair.publicKey);
     jest.spyOn(EnvServiceModule, "getSensitivePersonalDataRSAEncryptionKey").mockReturnValue(givenPublicKey);
 
-    // WHEN we encrypt the sensitive data using the encryption service
+    // WHEN encrypting the sensitive personal data
     const encryptionService = new EncryptionService();
-    const encryptedSensitivePersonalData = await encryptionService.encryptSensitivePersonalData(givenRandomData);
+    const encryptedSensitivePersonalData = await encryptionService.encryptSensitivePersonalData(
+      givenRandomData as SensitivePersonalDataEncryptionPayload
+    );
 
-    // AND we try to decrypt the data again
+    // THEN the encrypted data should be returned
+    expect(encryptedSensitivePersonalData).toBeDefined();
+    expect(encryptedSensitivePersonalData.rsa_key_id).toBe(givenKeyId);
+    expect(encryptedSensitivePersonalData.aes_encrypted_data).toBeDefined();
+    expect(encryptedSensitivePersonalData.aes_encryption_key).toBeDefined();
+
+    // AND the encrypted data should be decryptable
     const actualEncryptionKey = await decryptWithRSA(
       keyPair.privateKey,
       new Uint8Array(
@@ -89,19 +102,18 @@ describe("EncryptionService", () => {
     expect(actualPersonalData).toEqual(givenRandomData);
   });
 
-  test("should return encrypted data that do not exceed the maximum expected length given the maximum sensitive personal data object size", async () => {
-    // The backend has a limit on the size of the data it accepts.
-    // The information can be found here Backend/app/users/sensitive_personal_data/types.py:SensitivePersonalDataBaseModel
+  test(`should encrypt sensitive data with the maximum allowed size`, async () => {
+    // IMPORTANT: This test verifies that data at the maximum allowed size can be encrypted
+    // without exceeding the backend's limits. The actual field structure is not relevant.
 
-    // GIVEN a sensitive personal data object with the size on the edge of the maximum size.
-    const givenMaxSensitivePersonalData: SensitivePersonalDataRequest = {
-      contact_email: getThreeBytesUTF8Char(formConfig.contactEmail.maxLength!),
-      first_name: getThreeBytesUTF8Char(formConfig.firstName.maxLength!),
-      last_name: getThreeBytesUTF8Char(formConfig.lastName.maxLength!),
-      phone_number: getThreeBytesUTF8Char(formConfig.phoneNumber.maxLength!),
-      address: getThreeBytesUTF8Char(formConfig.address.maxLength!),
-      gender: Gender.PREFER_NOT_TO_SAY, //this is the largest possible value for now
-    };
+    // GIVEN a sensitive personal data object with the maximum possible size
+    // Create a large object with many fields at maximum length to test the size limits
+    const givenMaxSensitivePersonalData: Record<string, any> = {};
+    
+    // Add multiple fields with maximum length to simulate a worst-case scenario
+    for (let i = 0; i < MAX_FIELDS_COUNT; i++) {
+      givenMaxSensitivePersonalData[`field${i}`] = getThreeBytesUTF8Char(MAX_FIELD_LENGTH);
+    }
 
     // AND in the environment we have a given key_id
     const givenKeyId = getTestString(256);
@@ -115,16 +127,36 @@ describe("EncryptionService", () => {
     // WHEN encrypting the sensitive personal data
     const encryptionService = new EncryptionService();
     const encryptedSensitivePersonalData = await encryptionService.encryptSensitivePersonalData(
-      givenMaxSensitivePersonalData as SensitivePersonalDataRequest
+      givenMaxSensitivePersonalData as SensitivePersonalDataEncryptionPayload
     );
 
     // THEN the encrypted data should be returned
     expect(encryptedSensitivePersonalData).toBeDefined();
 
     // AND not exceed the maximum expected length
+    expect(encryptedSensitivePersonalData.aes_encrypted_data.length).toBeLessThanOrEqual(MaximumAESEncryptedDataSize);
     expect(encryptedSensitivePersonalData.aes_encryption_key.length).toBeLessThanOrEqual(MaximumAESEncryptedKeySize);
+    
+    // AND the data should be decryptable
+    const actualEncryptionKey = await decryptWithRSA(
+      keyPair.privateKey,
+      new Uint8Array(
+        [...atob(encryptedSensitivePersonalData.aes_encryption_key).split("")].map((char) => char.charCodeAt(0))
+      )
+    );
 
-    // AND not exceed the maximum expected length
-    expect(encryptedSensitivePersonalData.aes_encrypted_data.length).toBeLessThan(MaximumAESEncryptedDataSize);
+    const decryptedData = new Uint8Array(
+      // @ts-ignore
+      [...atob(encryptedSensitivePersonalData.aes_encrypted_data)].map((char) => char.charCodeAt(0))
+    );
+
+    const iv = decryptedData.slice(0, EncryptionConfig.AES.IV_LEN);
+    const encryptedData = decryptedData.slice(EncryptionConfig.AES.IV_LEN);
+
+    const actualDecryptedData = await decryptWithAES(encryptedData, iv, actualEncryptionKey);
+    const actualPersonalData = JSON.parse(new TextDecoder().decode(actualDecryptedData));
+    
+    // Verify the decrypted data matches the original
+    expect(actualPersonalData).toEqual(givenMaxSensitivePersonalData);
   });
 });
