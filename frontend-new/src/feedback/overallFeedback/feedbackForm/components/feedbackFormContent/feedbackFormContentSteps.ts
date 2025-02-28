@@ -20,7 +20,7 @@ const feedbackFormContentSteps: Step[] = [
         questionText: questions["interaction_ease"].question_text,
         lowRatingLabel: "Difficult",
         highRatingLabel: "Easy",
-        maxRating: 7,
+        maxRating: 5,
         placeholder: questions["interaction_ease"].comment_placeholder,
       },
       {
@@ -89,7 +89,7 @@ const feedbackFormContentSteps: Step[] = [
         questionText: questions["recommendation"].question_text,
         lowRatingLabel: "Unlikely",
         highRatingLabel: "Likely",
-        maxRating: 11,
+        maxRating: 5,
       },
       {
         type: QuestionType.Rating,
