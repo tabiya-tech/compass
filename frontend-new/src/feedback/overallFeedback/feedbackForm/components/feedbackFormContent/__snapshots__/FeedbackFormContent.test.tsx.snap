@@ -224,74 +224,6 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                       value="5"
                     />
                     <label
-                      class="css-dqr9h-MuiRating-label"
-                      for=":r6:"
-                    >
-                      <span
-                        class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                        data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                        value="6"
-                      >
-                        <svg
-                          aria-hidden="true"
-                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                          data-testid="StarBorderIcon"
-                          focusable="false"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                          />
-                        </svg>
-                      </span>
-                      <span
-                        class="MuiRating-visuallyHidden"
-                      >
-                        6 Stars
-                      </span>
-                    </label>
-                    <input
-                      class="MuiRating-visuallyHidden"
-                      id=":r6:"
-                      name="interaction_ease"
-                      type="radio"
-                      value="6"
-                    />
-                    <label
-                      class="css-dqr9h-MuiRating-label"
-                      for=":r7:"
-                    >
-                      <span
-                        class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                        data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                        value="7"
-                      >
-                        <svg
-                          aria-hidden="true"
-                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                          data-testid="StarBorderIcon"
-                          focusable="false"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                          />
-                        </svg>
-                      </span>
-                      <span
-                        class="MuiRating-visuallyHidden"
-                      >
-                        7 Stars
-                      </span>
-                    </label>
-                    <input
-                      class="MuiRating-visuallyHidden"
-                      id=":r7:"
-                      name="interaction_ease"
-                      type="radio"
-                      value="7"
-                    />
-                    <label
                       class="MuiRating-label MuiRating-pristine css-dqr9h-MuiRating-label"
                     >
                       <input
@@ -337,7 +269,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                     aria-invalid="false"
                     class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
                     data-testid="comment-text-field-ab74a074-67f6-4a8a-b2b2-a582d1d56c9c"
-                    id=":r8:"
+                    id=":r6:"
                     placeholder="Please explain your rating and share any suggestions for improving the ease of interaction with Compass."
                     rows="3"
                     style="height: 0px; overflow: hidden;"
@@ -391,7 +323,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                   >
                     <label
                       class="css-dqr9h-MuiRating-label"
-                      for=":ra:"
+                      for=":r8:"
                     >
                       <span
                         class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
@@ -418,14 +350,14 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                     </label>
                     <input
                       class="MuiRating-visuallyHidden"
-                      id=":ra:"
+                      id=":r8:"
                       name="satisfaction_with_compass"
                       type="radio"
                       value="1"
                     />
                     <label
                       class="css-dqr9h-MuiRating-label"
-                      for=":rb:"
+                      for=":r9:"
                     >
                       <span
                         class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
@@ -452,14 +384,14 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                     </label>
                     <input
                       class="MuiRating-visuallyHidden"
-                      id=":rb:"
+                      id=":r9:"
                       name="satisfaction_with_compass"
                       type="radio"
                       value="2"
                     />
                     <label
                       class="css-dqr9h-MuiRating-label"
-                      for=":rc:"
+                      for=":ra:"
                     >
                       <span
                         class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
@@ -486,14 +418,14 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                     </label>
                     <input
                       class="MuiRating-visuallyHidden"
-                      id=":rc:"
+                      id=":ra:"
                       name="satisfaction_with_compass"
                       type="radio"
                       value="3"
                     />
                     <label
                       class="css-dqr9h-MuiRating-label"
-                      for=":rd:"
+                      for=":rb:"
                     >
                       <span
                         class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
@@ -520,14 +452,14 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                     </label>
                     <input
                       class="MuiRating-visuallyHidden"
-                      id=":rd:"
+                      id=":rb:"
                       name="satisfaction_with_compass"
                       type="radio"
                       value="4"
                     />
                     <label
                       class="css-dqr9h-MuiRating-label"
-                      for=":re:"
+                      for=":rc:"
                     >
                       <span
                         class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
@@ -554,7 +486,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                     </label>
                     <input
                       class="MuiRating-visuallyHidden"
-                      id=":re:"
+                      id=":rc:"
                       name="satisfaction_with_compass"
                       type="radio"
                       value="5"

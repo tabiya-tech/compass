@@ -1,7 +1,7 @@
 {
   "interaction_ease": {
     "question_text": "How easy or difficult was it to interact with Compass and understand its responses?",
-    "description": "This question is used to measure the Customer Effort Score (CES). The response is on a scale from 1 (Very difficult) to 7 (Very easy).",
+    "description": "This question is used to measure the Customer Effort Score (CES). The response is on a scale from 1 (Very difficult) to 5 (Very easy).",
     "comment_placeholder": "Please explain your rating and share any suggestions for improving the ease of interaction with Compass."
   },
   "clarity_of_skills": {
@@ -44,7 +44,7 @@
   },
   "recommendation": {
     "question_text": "How likely are you to recommend Compass to other job seekers?",
-    "description": "This question is used to measure the Net Promoter Score (NPS). The response is on a scale from 1 (Not at all likely) to 11 (Extremely likely).",
+    "description": "This question is used to measure the Net Promoter Score (NPS). The response is on a scale from 1 (Not at all likely) to 5 (Extremely likely).",
     "comment_placeholder": null
   },
   "additional_feedback": {

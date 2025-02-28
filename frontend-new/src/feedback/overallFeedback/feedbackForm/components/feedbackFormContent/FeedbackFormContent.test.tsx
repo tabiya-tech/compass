@@ -133,7 +133,7 @@ describe("FeedbackFormContent", () => {
       fireEvent.click(nextButton);
 
       // AND on the last step, provide a custom rating comment
-      const customRatingInput = screen.getAllByTestId(CUSTOM_RATING_DATA_TEST_ID.CUSTOM_RATING_ICON)[8];
+      const customRatingInput = screen.getAllByTestId(CUSTOM_RATING_DATA_TEST_ID.CUSTOM_RATING_ICON)[4];
       fireEvent.click(customRatingInput);
 
       // AND submit the form
@@ -188,7 +188,7 @@ describe("FeedbackFormContent", () => {
         answer: {
           comment: "",
           rating_boolean: undefined,
-          rating_numeric: 9,
+          rating_numeric: 5,
           selected_options: undefined,
         },
         is_answered: true,
