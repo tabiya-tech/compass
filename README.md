@@ -1,6 +1,6 @@
 <h1 align="center">
-<img src="https://raw.githubusercontent.com/tabiya-tech/compass-docs/main/.gitbook/assets/compass_logo_web_light.png#gh-dark-mode-only" alt="logo" width=300/>
-<img src="https://raw.githubusercontent.com/tabiya-tech/compass-docs/main/.gitbook/assets/compass_logo_web_dark.png#gh-light-mode-only" alt="logo" width=300/>
+<img src="https://raw.githubusercontent.com/tabiya-tech/docs/refs/heads/main/.gitbook/assets/compass_logo_web_light.png#gh-dark-mode-only" alt="logo" width=300/>
+<img src="https://raw.githubusercontent.com/tabiya-tech/docs/refs/heads/main/.gitbook/assets/compass_logo_web_dark.png#gh-light-mode-only" alt="logo" width=300/>
 </h1>
 
 **Compass by Tabiya** is an AI chatbot designed to assist job-seekers in exploring and discovering their skills.
