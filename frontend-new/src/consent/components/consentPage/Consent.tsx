@@ -146,7 +146,7 @@ const Consent: React.FC = () => {
   };
 
   const termsAndConditionsLabel = "Terms and Conditions";
-  const dataProtectionAgreementLabel = "Data Protection Agreement";
+  const dataProtectionAgreementLabel = "Privacy Policy";
 
   const handleExternalNavigationOnNewTab = (url: string) => {
     window.open(url, "_blank", "noopener,noreferrer");
@@ -208,7 +208,7 @@ const Consent: React.FC = () => {
                 <Typography variant="body2" data-testid={DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_TEXT}>
                   I have read and accept the{" "}
                   <CustomLink
-                    onClick={() => handleExternalNavigationOnNewTab("https://compass.tabiya.org/consent.html")}
+                    onClick={() => handleExternalNavigationOnNewTab("https://www.tabiya.org/compass/terms")}
                   >
                     {termsAndConditionsLabel}
                   </CustomLink>{" "}
@@ -233,7 +233,7 @@ const Consent: React.FC = () => {
                 <Typography variant="body2" data-testid={DATA_TEST_ID.ACCEPT_CHECKBOX_TEXT}>
                   I have read and accept the{" "}
                   <CustomLink
-                    onClick={() => handleExternalNavigationOnNewTab("https://compass.tabiya.org/consent.html")}
+                    onClick={() => handleExternalNavigationOnNewTab("https://www.tabiya.org/compass/privacy")}
                   >
                     {dataProtectionAgreementLabel}
                   </CustomLink>{" "}
