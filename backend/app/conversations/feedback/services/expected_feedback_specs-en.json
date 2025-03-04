@@ -1,0 +1,105 @@
+[
+  {
+    "question_id": "interaction_ease",
+    "question_text": "How easy or difficult was it to interact with Compass and understand its responses?",
+    "description": "This question is used to measure the Customer Effort Score (CES). The response is on a scale from 1 (Very difficult) to 5 (Very easy).",
+    "answer": {
+      "rating_numeric": 1,
+      "rating_boolean": false,
+      "selected_options": {},
+      "comment": "This was very difficult to interact with Compass and understand its responses."
+    }
+  },
+  {
+    "question_id": "clarity_of_skills",
+    "question_text": "Did Compass help you gain a clearer understanding of your skills? If not, why?",
+    "description": "This question aims to measure Perceived Usefulness (PU). The user can answer TRUE (indicating Compass helped) or FALSE (indicating Compass did not help), with an optional text field for additional comments.",
+    "answer": {
+      "rating_numeric": 1,
+      "rating_boolean": false,
+      "selected_options": {},
+      "comment": "Compass did not help me gain a clearer understanding of my skills."
+    }
+  },
+  {
+    "question_id": "satisfaction_with_compass",
+    "question_text": "How satisfied are you with Compass?",
+    "description": "This question is used to measure the Customer Satisfaction Score (CSAT). The response is on a scale from 1 (Very dissatisfied) to 5 (Very satisfied).",
+    "answer": {
+      "rating_numeric": 1,
+      "rating_boolean": null,
+      "selected_options": {}
+    }
+  },
+  {
+    "question_id": "work_experience_accuracy",
+    "question_text": "Were there any aspects of your work experience information identified by Compass that were inaccurate?",
+    "description": "This question to identify specific inaccuracies in the work experience information. The response is an array of selected option keys, with optional additional comments.",
+    "answer": {
+      "rating_numeric": null,
+      "rating_boolean": null,
+      "selected_options": {
+        "experience_title": "Incorrect Experience title",
+        "experience_dates": "Incorrect start/end dates",
+        "experience_location": "Incorrect location",
+        "duplicate_experience": "Duplicate Experiences",
+        "missing_experience": "Missing Experiences"
+      },
+      "comment": "I found the following inaccuracies in my work experience information identified by Compass: ..."
+    }
+  },
+  {
+    "question_id": "incorrect_skills",
+    "question_text": "Are there any skills that Compass incorrectly identified for you?",
+    "description": "This question aims to indentify incorrectly identified skills The user can answer TRUE (indicating incorrect skills) or FALSE (indicating no incorrect skills). In case of TRUE, the user can provide additional comments.",
+    "answer": {
+      "rating_numeric": null,
+      "rating_boolean": true,
+      "selected_options": {},
+      "comment": "Compass incorrectly identified the following skills for me: ..."
+    }
+  },
+  {
+    "question_id": "missing_skills",
+    "question_text": "Are there any skills you have that Compass missed and did not identify?",
+    "description": "This question aims to identify missing skills. Responses should be TRUE (indicating missing skills) or FALSE (indicating no missing skills). In case of TRUE, the user can provide additional comments.",
+    "answer": {
+      "rating_numeric": null,
+      "rating_boolean": true,
+      "selected_options": {},
+      "comment": "I have the following skills that Compass did not identify: ..."
+    }
+  },
+  {
+    "question_id": "perceived_bias",
+    "question_text": "Did you feel that Compass treated you unfairly by making assumptions about your background, language, or other personal characteristics? If so, please describe your experience.",
+    "description": "This question aims to identify perceived bias. Responses should be TRUE (indicating bias) or FALSE (indicating no bias), with an optional text field for additional comments.",
+    "answer": {"rating_numeric": null,
+      "rating_boolean": true,
+      "selected_options": {},
+      "comment": "I felt that Compass treated me unfairly by making assumptions about my background, language, or other personal characteristics. For example, ..."
+    }
+  },
+  {
+    "question_id": "recommendation",
+    "question_text": "How likely are you to recommend Compass to other job seekers?",
+    "description": "This question is used to measure the Net Promoter Score (NPS). The response is on a scale from 1 (Not at all likely) to 5 (Extremely likely).",
+    "answer": {
+      "rating_numeric": 1,
+      "rating_boolean": null,
+      "selected_options": {}
+    }
+  },
+  {
+    "question_id": "additional_feedback",
+    "question_text": "Please share any additional feedback or suggestions you have for improving Compass.",
+    "description": "Used to collect any additional feedback or suggestions for improving Compass from the user. The response is in the form of a text.",
+    "answer": {
+      "rating_numeric": null,
+      "rating_boolean": null,
+      "selected_options": {},
+      "comment": "I have the following feedback or suggestions for improving Compass: ..."
+    }
+  }
+]
+

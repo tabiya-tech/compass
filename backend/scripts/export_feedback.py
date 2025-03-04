@@ -2,6 +2,7 @@ import asyncio
 import csv
 import os
 import traceback
+import json
 from datetime import datetime
 from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -20,6 +21,12 @@ async def export_feedback_to_csv():
                                     tlsAllowInvalidCertificates=True)
         db = client.get_database(database_name)
         collection = db["user_feedback"]
+
+        # Print a sample document to understand the structure
+        sample = await collection.find_one()
+        if sample:
+            print("Sample document structure:")
+            print(json.dumps(sample, indent=2, default=str))
 
         # CSV file headers
         headers = [
@@ -62,18 +69,32 @@ async def export_feedback_to_csv():
             session_id = feedback["session_id"]
             frontend_version = feedback["version"]["frontend"]
             backend_version = feedback["version"]["backend"]
-            feedback_time = feedback["feedback_time"]
+            feedback_time = feedback.get("feedback_time", datetime.now().isoformat())  # Default to current time if not present
 
-            for item in feedback["feedback"]:
+            # Handle both feedback and feedback_items fields
+            feedback_items = feedback.get("feedback", feedback.get("feedback_items", []))
+            for item in feedback_items:
                 question_id = item["question_id"]
                 question_text = item["question_text"]
                 answer = item["answer"]
-                is_answered = item["is_answered"]
-                rating_numeric = answer["rating_numeric"]
-                rating_boolean = answer["rating_boolean"]
-                selected_options = ",".join(answer["selected_options"]) if isinstance(answer["selected_options"], list) else ""
-                comment = answer["comment"]
-                description = item["description"]
+                rating_numeric = answer.get("rating_numeric")
+                rating_boolean = answer.get("rating_boolean")
+                
+                # Format selected_options as key-value pairs
+                selected_options = answer.get("selected_options")
+                if selected_options is None:
+                    selected_options_str = ""
+                elif isinstance(selected_options, dict):
+                    # Convert dict to string of key-value pairs
+                    selected_options_str = "; ".join(f"{k}: {v}" for k, v in selected_options.items())
+                elif isinstance(selected_options, list):
+                    # Handle legacy list format
+                    selected_options_str = "; ".join(selected_options)
+                else:
+                    selected_options_str = ""
+                
+                comment = answer.get("comment", "")
+                description = item.get("description", "")
 
                 writer.writerow([
                     feedback_id,
@@ -82,10 +103,9 @@ async def export_feedback_to_csv():
                     question_id,
                     question_text,
                     description,
-                    is_answered,
                     rating_numeric,
                     rating_boolean,
-                    selected_options,
+                    selected_options_str,
                     comment,
                     frontend_version,
                     backend_version,

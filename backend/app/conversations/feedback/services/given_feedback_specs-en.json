@@ -1,0 +1,87 @@
+[
+  {
+    "question_id": "interaction_ease",
+    "simplified_answer": {
+      "rating_numeric": 1,
+      "rating_boolean": false,
+      "selected_options_keys": [],
+      "comment": "This was very difficult to interact with Compass and understand its responses."
+    }
+  },
+  {
+    "question_id": "clarity_of_skills",
+    "simplified_answer": {
+      "rating_numeric": 1,
+      "rating_boolean": false,
+      "selected_options_keys": [],
+      "comment": "Compass did not help me gain a clearer understanding of my skills."
+    }
+  },
+  {
+    "question_id": "satisfaction_with_compass",
+    "simplified_answer": {
+      "rating_numeric": 1,
+      "rating_boolean": null,
+      "selected_options_keys": []
+    }
+  },
+  {
+    "question_id": "work_experience_accuracy",
+    "simplified_answer": {
+      "rating_numeric": null,
+      "rating_boolean": null,
+      "selected_options_keys": [
+        "experience_title",
+        "experience_dates",
+        "experience_location",
+        "duplicate_experience",
+        "missing_experience"
+      ],
+      "comment": "I found the following inaccuracies in my work experience information identified by Compass: ..."
+    }
+  },
+  {
+    "question_id": "incorrect_skills",
+    "simplified_answer": {
+      "rating_numeric": null,
+      "rating_boolean": true,
+      "selected_options_keys": [],
+      "comment": "Compass incorrectly identified the following skills for me: ..."
+    }
+  },
+  {
+    "question_id": "missing_skills",
+    "simplified_answer": {
+      "rating_numeric": null,
+      "rating_boolean": true,
+      "selected_options_keys": [],
+      "comment": "I have the following skills that Compass did not identify: ..."
+    }
+  },
+  {
+    "question_id": "perceived_bias",
+    "simplified_answer": {
+      "rating_numeric": null,
+      "rating_boolean": true,
+      "selected_options_keys": [],
+      "comment": "I felt that Compass treated me unfairly by making assumptions about my background, language, or other personal characteristics. For example, ..."
+    }
+  },
+  {
+    "question_id": "recommendation",
+    "simplified_answer": {
+      "rating_numeric": 1,
+      "rating_boolean": null,
+      "selected_options_keys": []
+    }
+  },
+  {
+    "question_id": "additional_feedback",
+    "simplified_answer": {
+      "rating_numeric": null,
+      "rating_boolean": null,
+      "selected_options_keys": [],
+      "comment": "I have the following feedback or suggestions for improving Compass: ..."
+    }
+  }
+]

@@ -2,7 +2,7 @@ import React from "react";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import { DetailedQuestion, QuestionType } from "src/feedback/overallFeedback/feedbackForm/feedbackForm.types";
 import {
-  Answer,
+  SimplifiedAnswer,
   FeedbackItem,
 } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 import CustomRating from "src/feedback/overallFeedback/feedbackForm/components/customRating/CustomRating";
@@ -25,16 +25,14 @@ const StepsComponent: React.FC<StepProps> = ({ questions, feedbackItems, onChang
   const theme = useTheme();
   const isSmallMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const getAnswerByQuestionId = (questionId: string): FeedbackItem["answer"] | undefined => {
-    return (feedbackItems || []).find((item: FeedbackItem) => item.question_id === questionId)?.answer;
+  const getAnswerByQuestionId = (questionId: string): SimplifiedAnswer | undefined => {
+    return feedbackItems.find((item: FeedbackItem) => item.question_id === questionId)?.simplified_answer;
   };
 
-  const handleInputChange = (questionId: string, value: Answer) => {
-    const isAnswered = value !== null && value !== undefined && Object.keys(value).length > 0;
+  const handleInputChange = (questionId: string, value: SimplifiedAnswer) => {
     const formattedData: FeedbackItem = {
       question_id: questionId,
-      answer: value,
-      is_answered: isAnswered,
+      simplified_answer: value,
     };
     onChange(formattedData);
   };
@@ -47,64 +45,53 @@ const StepsComponent: React.FC<StepProps> = ({ questions, feedbackItems, onChang
       data-testid={DATA_TEST_ID.STEPS_COMPONENT}
     >
       {questions.map((question) => {
-        const {
-          questionId,
-          type,
-          questionText,
-          options,
-          displayRating,
-          lowRatingLabel,
-          highRatingLabel,
-          showCommentsOn,
-          placeholder,
-        } = question;
-        const answer = getAnswerByQuestionId(questionId) || {};
+        const answer = getAnswerByQuestionId(question.questionId) || {};
 
         return (
-          <Box key={questionId}>
-            {type === QuestionType.Checkbox && (
+          <Box key={question.questionId}>
+            {question.type === QuestionType.Checkbox && (
               <CheckboxQuestion
-                type={type}
-                questionId={questionId}
-                questionText={questionText}
-                options={options || []}
-                selectedOptions={answer.selected_options || []}
+                type={question.type}
+                questionId={question.questionId}
+                questionText={question.questionText}
+                options={question.options || []}
+                selectedOptions={answer.selected_options_keys || []}
                 notifyChange={(selectedOptions, comments) =>
-                  handleInputChange(questionId, { selected_options: selectedOptions, comment: comments })
+                  handleInputChange(question.questionId, { selected_options_keys: selectedOptions, comment: comments })
                 }
                 comments={answer.comment ?? ""}
-                placeholder={placeholder}
+                placeholder={question.placeholder}
               />
             )}
-            {type === QuestionType.Rating && (
+            {question.type === QuestionType.Rating && (
               <CustomRating
-                type={type}
-                questionId={questionId}
-                questionText={questionText}
+                type={question.type}
+                questionId={question.questionId}
+                questionText={question.questionText}
                 ratingValue={answer.rating_numeric ?? null}
-                displayRating={displayRating}
+                displayRating={question.displayRating}
                 notifyChange={(value, comments) =>
-                  handleInputChange(questionId, { rating_numeric: value, comment: comments })
+                  handleInputChange(question.questionId, { rating_numeric: value, comment: comments })
                 }
-                lowRatingLabel={lowRatingLabel ?? ""}
-                highRatingLabel={highRatingLabel ?? ""}
+                lowRatingLabel={question.lowRatingLabel ?? ""}
+                highRatingLabel={question.highRatingLabel ?? ""}
                 comments={answer.comment ?? ""}
                 maxRating={question.maxRating ?? 5}
-                placeholder={placeholder}
+                placeholder={question.placeholder}
               />
             )}
-            {type === QuestionType.YesNo && (
+            {question.type === QuestionType.YesNo && (
               <YesNoQuestion
-                type={type}
-                questionId={questionId}
-                questionText={questionText}
+                type={question.type}
+                questionId={question.questionId}
+                questionText={question.questionText}
                 ratingValue={answer.rating_boolean ?? null}
                 notifyChange={(value, comments) =>
-                  handleInputChange(questionId, { rating_boolean: value, comment: comments })
+                  handleInputChange(question.questionId, { rating_boolean: value, comment: comments })
                 }
-                showCommentsOn={showCommentsOn ?? undefined}
+                showCommentsOn={question.showCommentsOn ?? undefined}
                 comments={answer.comment ?? ""}
-                placeholder={placeholder}
+                placeholder={question.placeholder}
               />
             )}
           </Box>

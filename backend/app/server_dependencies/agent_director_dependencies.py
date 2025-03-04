@@ -2,7 +2,7 @@ from fastapi import Depends
 
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
-from app.server_dependencies.conversation_manager_dependencies import get_conversation_memory_manager
+from .conversation_manager_dependencies import get_conversation_memory_manager
 from app.vector_search.vector_search_dependencies import SearchServices, get_all_search_services
 
 

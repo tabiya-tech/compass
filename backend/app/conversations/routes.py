@@ -14,6 +14,7 @@ from app.constants.errors import HTTPErrorResponse
 from app.context_vars import session_id_ctx_var, user_id_ctx_var
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversations.constants import MAX_MESSAGE_LENGTH, UNEXPECTED_FAILURE_MESSAGE
+from app.conversations.feedback import add_user_feedback_routes
 from app.conversations.reactions.repository import ReactionRepository
 from app.conversations.reactions.routes import add_reaction_routes, get_user_preferences_repository
 from app.conversations.service import ConversationAlreadyConcludedError, IConversationService, ConversationService
@@ -184,5 +185,10 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
     # Add the reaction routes
     ############################################
     add_reaction_routes(conversation_router, authentication)
+
+    ############################################
+    # Add the user feedback routes
+    ############################################
+    add_user_feedback_routes(conversation_router, authentication)
 
     app.include_router(conversation_router)
