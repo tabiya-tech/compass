@@ -22,7 +22,7 @@ describe("issueNewSession", () => {
       language: Language.en,
       accepted_tc : new Date(),
       sessions: [givenNewSessionId],
-      sessions_with_feedback: [givenNewSessionId],
+      user_feedback_answered_questions: {},
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       has_sensitive_personal_data: false,
     };
@@ -53,7 +53,7 @@ describe("issueNewSession", () => {
       language: Language.en,
       accepted_tc : new Date(),
       sessions: [123],
-      sessions_with_feedback: [123],
+      user_feedback_answered_questions: {},
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       has_sensitive_personal_data: false,
     };

@@ -1,5 +1,6 @@
 import { SensitivePersonalDataRequirement, UserPreference, Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 
+export const CUSTOMER_SATISFACTION_KEY = "satisfaction_with_compass"
 
 export default class UserPreferencesStateService {
   private static instance: UserPreferencesStateService;
@@ -48,12 +49,32 @@ export default class UserPreferencesStateService {
     return this.userPreferences?.sessions.length ? this.userPreferences?.sessions[0] : null;
   }
 
-  public activeSessionHasFeedback(): boolean {
+  public activeSessionHasOverallFeedback(): boolean {
     const activeSessionId = this.getActiveSessionId();
     if (activeSessionId === null) {
       return false;
     }
-    return this.userPreferences!.sessions_with_feedback.includes(activeSessionId);
+    const answered_questions = this.userPreferences!.user_feedback_answered_questions
+    if (Object.keys(answered_questions).length === 0) {
+      return false;
+    }
+
+    return answered_questions[activeSessionId].some(
+      (question) => question !== CUSTOMER_SATISFACTION_KEY
+    );
+  }
+  
+  public activeSessionHasCustomerSatisfactionRating(): boolean {
+    const activeSessionId = this.getActiveSessionId();
+    if (activeSessionId === null) {
+      return false;
+    }
+    const answered_questions = this.userPreferences!.user_feedback_answered_questions
+    if (Object.keys(answered_questions).length === 0) {
+      return false;
+    }
+
+    return answered_questions[activeSessionId].includes(CUSTOMER_SATISFACTION_KEY)
   }
 
   private cloneUserPreferences(preferences: UserPreference | null): UserPreference | null {

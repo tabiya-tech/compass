@@ -41,12 +41,12 @@ class IUserFeedbackRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def get_feedback_session_ids(self, user_id: str) -> list[int]:
+    async def get_all_feedback_for_user(self, user_id: str) -> dict[int, Feedback]:
         """
-        Get all the session IDs for the user that has provided feedback.
+        Get all the feedback that a user has provided.
 
         :param user_id: The user ID to get feedback for
-        :return: List of session IDs with feedback
+        :return: Dictionary where keys are session IDs and values are feedback objects
         :raises Exception: If any database error occurs
         """
         raise NotImplementedError()
@@ -159,7 +159,7 @@ class UserFeedbackRepository(IUserFeedbackRepository):
 
             # Use upsert to create or update the document and return the updated document
             result = await self._collection.find_one_and_update(
-                {"session_id": {"$eq": feedback.session_id}},
+                {"session_id": {"$eq": feedback.session_id}, "user_id": {"$eq": feedback.user_id}},
                 {"$set": doc},
                 upsert=True,
                 return_document=ReturnDocument.AFTER
@@ -173,19 +173,27 @@ class UserFeedbackRepository(IUserFeedbackRepository):
             self._logger.exception(e)
             raise
 
-    async def get_feedback_session_ids(self, user_id: str) -> list[int]:
+    async def get_all_feedback_for_user(self, user_id: str) -> dict[int, Feedback]:
         """
-        Get all the session IDs for the user that has provided feedback.
-        :param user_id: str the user ID
-        :return: list[int] the list of session IDs
+        :param user_id:
+        :return:
         """
         try:
-            feedback_sessions = await self._collection.find({"user_id": {"$eq": user_id}}).distinct("session_id")
+            # Get cursor and convert to list of documents
+            cursor = self._collection.find({"user_id": {"$eq": user_id}})
+            feedback_sessions = await cursor.to_list(length=None)
+            
             if not feedback_sessions:
-                logger.warning(f"Feedback for user_id '{user_id}' not found")
-                return []
+                self._logger.warning(f"Feedback for user_id '{user_id}' not found")
+                return {}
 
-            return feedback_sessions
+            # Convert documents to Feedback objects and organize by session_id
+            feedback_by_session = {}
+            for session in feedback_sessions:
+                feedback = self._from_db_doc(session)
+                feedback_by_session[feedback.session_id] = feedback
+
+            return feedback_by_session
         except Exception as e:
-            logger.exception(e)
-            raise e
+            self._logger.exception(e)
+            raise

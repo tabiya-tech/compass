@@ -17,6 +17,7 @@ export interface CustomRatingProps extends BaseQuestion {
   comments?: string;
   displayRating?: boolean;
   maxRating: number;
+  disabled?: boolean;
 }
 
 const uniqueId = "7bb1da6e-bd0f-4edf-bbbb-ff7ade168944";
@@ -38,6 +39,7 @@ const CustomRating: React.FC<CustomRatingProps> = ({
   highRatingLabel,
   comments,
   displayRating = true,
+  disabled,
   maxRating,
   placeholder,
 }) => {
@@ -71,12 +73,14 @@ const CustomRating: React.FC<CustomRatingProps> = ({
         {displayRating && (
           <Box display="flex" flexDirection="column" width="fit-content">
             <Rating
+              data-testid={DATA_TEST_ID.CUSTOM_RATING_FIELD}
               name={questionId}
               value={ratingValue}
               onChange={(_, newValue) => handleRatingChange(newValue)}
               max={maxRating}
               precision={1}
               size="small"
+              disabled={disabled}
               sx={{
                 color: theme.palette.primary.main,
                 "& .MuiSvgIcon-root": {

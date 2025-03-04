@@ -215,7 +215,7 @@ describe("Chat", () => {
       language: Language.en,
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       sessions: givenSessionId !== null ? [givenSessionId] : [],
-      sessions_with_feedback: [],
+      user_feedback_answered_questions: {},
     };
   }
 
@@ -600,7 +600,7 @@ describe("Chat", () => {
           language: Language.en,
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
           sessions: [givenNewSessionId],
-          sessions_with_feedback: [],
+          user_feedback_answered_questions: {},
         };
         jest.spyOn(UserPreferencesService.getInstance(), "getNewSession").mockResolvedValueOnce(givenUserPreferences);
         // AND the conversation history is empty
@@ -710,7 +710,7 @@ describe("Chat", () => {
           accepted_tc: new Date(),
           has_sensitive_personal_data: false,
           sessions: [givenNewSessionId],
-          sessions_with_feedback: [],
+          user_feedback_answered_questions: {},
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
           language: Language.en,
         };
@@ -773,7 +773,7 @@ describe("Chat", () => {
           accepted_tc: new Date(),
           has_sensitive_personal_data: false,
           sessions: [givenNewSessionId],
-          sessions_with_feedback: [],
+          user_feedback_answered_questions: {},
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
         };
         jest.spyOn(UserPreferencesService.getInstance(), "getNewSession").mockResolvedValueOnce(givenUserPreferences);
@@ -1242,7 +1242,7 @@ describe("Chat", () => {
         language: Language.en,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
         sessions: [givenNewSessionId, givenActiveSessionId],
-        sessions_with_feedback: [],
+        user_feedback_answered_questions: {},
       };
       jest.spyOn(UserPreferencesService.getInstance(), "getNewSession").mockResolvedValueOnce(givenUserPreferences);
 
