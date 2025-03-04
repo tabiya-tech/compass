@@ -57,8 +57,8 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
       }
 
       const sessionId = userPreferences.sessions[0];
-      const overallFeedbackService = new OverallFeedbackService(sessionId);
-      await overallFeedbackService.sendFeedback(formData);
+      const overallFeedbackService = OverallFeedbackService.getInstance();
+      await overallFeedbackService.sendFeedback(sessionId, formData);
 
       enqueueSnackbar("Feedback submitted successfully!", { variant: "success" });
     } catch (error) {
@@ -80,7 +80,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
         data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG}
         sx={{
           "& .MuiDialog-paper": {
-            height: "100%",
+            height: isSmallMobile ? "100%" : "85%",
             display: "flex",
             flexDirection: "column",
             gap: theme.spacing(4),

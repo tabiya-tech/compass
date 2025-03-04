@@ -9,7 +9,7 @@ from typing import Any, Dict
 from pathlib import Path
 
 from app.conversations.feedback.repository import IUserFeedbackRepository
-from .types import Feedback, NewFeedbackSpec, FeedbackItem, Version
+from .types import Feedback, NewFeedbackSpec, FeedbackItem, Version, AnsweredQuestions
 from .errors import (
     InvalidQuestionError,
     QuestionsFileError
@@ -57,12 +57,12 @@ class IUserFeedbackService(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def get_user_feedback(self, user_id: str) -> list[int]:
+    async def get_answered_questions(self, user_id: str) -> AnsweredQuestions:
         """
-        Gets all session IDs that have feedback for a user.
+        Gets all feedback entries that a user has provided
 
         :param user_id: The user ID to get feedback for
-        :return: List of session IDs with feedback
+        :return: a key value pair where the key is the session ID and the value is a list of question_ids
         """
         raise NotImplementedError()
 
@@ -115,11 +115,11 @@ class UserFeedbackService(IUserFeedbackService):
         # Use upsert to create or update the feedback
         return await self._user_feedback_repository.upsert_feedback(complete_feedback)
 
-    async def get_user_feedback(self, user_id: str) -> list[int]:
-        """
-        Gets all session IDs that have feedback for a user.
+    async def get_answered_questions(self, user_id: str) -> AnsweredQuestions:
+        feedback_for_sessions : dict[int, Feedback] = await self._user_feedback_repository.get_all_feedback_for_user(user_id)
+        answered_questions = {}
 
-        :param user_id: The user ID to get feedback for
-        :return: List of session IDs with feedback
-        """
-        return await self._user_feedback_repository.get_feedback_session_ids(user_id)
+        for session_id, feedback in feedback_for_sessions.items():
+            answered_questions[session_id] = [item.question_id for item in feedback.feedback_items]
+
+        return answered_questions

@@ -1,8 +1,10 @@
+from dataclasses import field
 from typing import Optional, Mapping
 
 from pydantic import BaseModel, Field
 from datetime import datetime
 
+from app.conversations.feedback.services import AnsweredQuestions
 from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
 
 
@@ -96,9 +98,9 @@ class UsersPreferencesResponse(UserPreferences):
     Represents the response payload for the user preferences REST API
     """
 
-    sessions_with_feedback: list[int] = Field(default_factory=list)
+    user_feedback_answered_questions: AnsweredQuestions = field(default={})
     """
-    The sessions with feedback (ids of the sessions)
+    The feedback questions answered by the user in every session
     """
 
     has_sensitive_personal_data: bool

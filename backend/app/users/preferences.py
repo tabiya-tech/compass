@@ -51,15 +51,15 @@ async def _get_user_preferences(
             )
 
         # Fetch feedback sessions together with if they have sensitive personal data
-        sessions_with_feedback, has_sensitive_personal_data = await asyncio.gather(
-            user_feedback_service.get_user_feedback(user_id),
+        answered_questions, has_sensitive_personal_data = await asyncio.gather(
+            user_feedback_service.get_answered_questions(user_id),
             sensitive_personal_data_service.exists_by_user_id(user_id)
         )
 
         return UsersPreferencesResponse(
             **user_preferences.model_dump(),
             has_sensitive_personal_data=has_sensitive_personal_data,
-            sessions_with_feedback=sessions_with_feedback
+            user_feedback_answered_questions=answered_questions
         )
     except Exception as e:
         logger.exception(e)
@@ -127,7 +127,7 @@ async def _create_user_preferences(
         return UsersPreferencesResponse(
             **newly_created.model_dump(),
             has_sensitive_personal_data=False,
-            sessions_with_feedback=[]
+            user_feedback_answered_questions={}
         )
     except Exception as e:
         logger.exception(e)
@@ -158,14 +158,14 @@ async def _get_new_session(user_repository: UserPreferenceRepository,
 
         updated_user_preferences, sessions_with_feedback, has_sensitive_personal_data = await asyncio.gather(
             session_service.new_session(user_id),
-            user_feedback_service.get_user_feedback(user_id),
+            user_feedback_service.get_answered_questions(user_id),
             sensitive_personal_data_service.exists_by_user_id(user_id)
         )
 
         return UsersPreferencesResponse(
             **updated_user_preferences.model_dump(),
             has_sensitive_personal_data=has_sensitive_personal_data,
-            sessions_with_feedback=sessions_with_feedback
+            user_feedback_answered_questions=sessions_with_feedback
         )
 
     except Exception as e:
@@ -211,14 +211,14 @@ async def _update_user_preferences(
                 language=preferences.language,
                 accepted_tc=preferences.accepted_tc,
             )),
-            user_feedback_service.get_user_feedback(preferences.user_id),
+            user_feedback_service.get_answered_questions(preferences.user_id),
             sensitive_personal_data_service.exists_by_user_id(preferences.user_id)
         )
 
         return UsersPreferencesResponse(
             **updated_user_preferences.model_dump(),
             has_sensitive_personal_data=has_sensitive_personal_data,
-            sessions_with_feedback=sessions_with_feedback
+            user_feedback_answered_questions=sessions_with_feedback
         )
 
     except Exception as e:

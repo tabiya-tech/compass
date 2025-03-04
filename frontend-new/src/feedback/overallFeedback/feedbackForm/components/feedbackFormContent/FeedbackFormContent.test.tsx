@@ -2,8 +2,7 @@
 import "src/_test_utilities/consoleMock";
 
 import React from "react";
-import { render, screen } from "src/_test_utilities/test-utils";
-import { act, fireEvent } from "@testing-library/react";
+import { render, screen, act, fireEvent } from "src/_test_utilities/test-utils";
 import { DATA_TEST_ID as CUSTOM_RATING_DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/customRating/CustomRating";
 import { DATA_TEST_ID as YES_NO_DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/yesNoQuestion/YesNoQuestion";
 import FeedbackFormContent, {
@@ -110,22 +109,15 @@ describe("FeedbackFormContent", () => {
       // AND the component is rendered
       render(givenFeedbackFormContent);
 
-      // WHEN on the first step, answer rating question
-      const starRating = screen.getAllByTestId(CUSTOM_RATING_DATA_TEST_ID.CUSTOM_RATING_ICON)[4];
-      fireEvent.click(starRating);
+      // WHEN on the first step, select a checkbox option
+      const checkboxInput = screen.getAllByTestId(CHECKBOX_DATA_TEST_ID.CHECKBOX_OPTION)[0];
+      fireEvent.click(checkboxInput);
 
       // AND move to next step
       const nextButton = screen.getByTestId(DATA_TEST_ID.FEEDBACK_FORM_NEXT_BUTTON);
       fireEvent.click(nextButton);
 
-      // AND on the second step, select a checkbox option
-      const checkboxInput = screen.getAllByTestId(CHECKBOX_DATA_TEST_ID.CHECKBOX_OPTION)[0];
-      fireEvent.click(checkboxInput);
-
-      // AND move to next step
-      fireEvent.click(nextButton);
-
-      // AND on the third step, answer the yes/no question
+      // AND on the second step, answer the yes/no question
       const yesNoInput = screen.getAllByTestId(YES_NO_DATA_TEST_ID.RADIO_YES)[1];
       fireEvent.click(yesNoInput);
 
@@ -144,44 +136,33 @@ describe("FeedbackFormContent", () => {
 
       // AND expect the exact answer data structure
       const submittedAnswers = mockHandleSubmit.mock.calls[0][0];
-      expect(submittedAnswers).toHaveLength(4);
+      expect(submittedAnswers).toHaveLength(3);
 
-      // First step answer (custom rating)
+      // First step answer (checkbox)
       expect(submittedAnswers[0]).toEqual({
-        question_id: feedbackFormContentSteps[0].questions[0].questionId,
-        simplified_answer: {
-          comment: "",
-          rating_boolean: undefined,
-          rating_numeric: 5,
-          selected_options_keys: undefined,
-        }
-      });
-
-      // Second step answer (checkbox)
-      expect(submittedAnswers[1]).toEqual({
-        question_id: feedbackFormContentSteps[1].questions[1].questionId,
+        question_id: feedbackFormContentSteps[0].questions[1].questionId,
         simplified_answer: {
           comment: "",
           rating_boolean: undefined,
           rating_numeric: undefined,
-          selected_options_keys: [feedbackFormContentSteps[1].questions[1].options![0].key],
-        }
+          selected_options_keys: [feedbackFormContentSteps[0].questions[1].options![0].key],
+        },
       });
 
-      // Third step answer (yes/no)
-      expect(submittedAnswers[2]).toEqual({
-        question_id: feedbackFormContentSteps[2].questions[1].questionId,
+      // Second step answer (yes/no)
+      expect(submittedAnswers[1]).toEqual({
+        question_id: feedbackFormContentSteps[1].questions[1].questionId,
         simplified_answer: {
           comment: "",
           rating_boolean: true,
           rating_numeric: undefined,
           selected_options_keys: undefined,
-        }
+        },
       });
 
       // Last step answer (custom rating)
-      expect(submittedAnswers[3]).toEqual({
-        question_id: feedbackFormContentSteps[3].questions[0].questionId,
+      expect(submittedAnswers[2]).toEqual({
+        question_id: feedbackFormContentSteps[2].questions[0].questionId,
         simplified_answer: {
           comment: "",
           rating_boolean: undefined,
@@ -202,9 +183,8 @@ describe("FeedbackFormContent", () => {
       render(givenFeedbackFormContent);
 
       // WHEN question is answered
-      const customRating = screen.getAllByTestId(CUSTOM_RATING_DATA_TEST_ID.CUSTOM_RATING_ICON)[4];
-      fireEvent.click(customRating);
-
+      const yesNoInput = screen.getByTestId(YES_NO_DATA_TEST_ID.RADIO_YES);
+      fireEvent.click(yesNoInput);
       const input = screen.getByTestId(COMMENT_TEXT_FIELD_TEST_ID.COMMENT_TEXT_FIELD);
       fireEvent.change(input, { target: { value: "This is a comment" } });
 
@@ -313,17 +293,15 @@ describe("FeedbackFormContent", () => {
       act(() => {
         (useSwipeable as jest.Mock).mock.calls[1][0].onSwipedLeft();
       });
-      act(() => {
-        (useSwipeable as jest.Mock).mock.calls[2][0].onSwipedLeft();
-      });
+
       // THEN expect to reach the last step
-      const lastStepTitle = feedbackFormContentSteps[3].label;
+      const lastStepTitle = feedbackFormContentSteps[2].label;
       const lastStepTitleElement = screen.getByTestId(DATA_TEST_ID.FEEDBACK_FORM_CONTENT_TITLE);
       expect(lastStepTitleElement).toHaveTextContent(lastStepTitle);
 
       // WHEN the component is swiped left on the last step
       act(() => {
-        (useSwipeable as jest.Mock).mock.calls[3][0].onSwipedLeft();
+        (useSwipeable as jest.Mock).mock.calls[2][0].onSwipedLeft();
       });
 
       // THEN expect to stay on the last step
@@ -340,15 +318,14 @@ describe("FeedbackFormContent", () => {
 
       // WHEN the component is rendered
       render(<FeedbackFormContent notifySubmit={jest.fn()} />);
-      // AND a question is answered
-      const customRating = screen.getAllByTestId(CUSTOM_RATING_DATA_TEST_ID.CUSTOM_RATING_ICON)[7];
-      fireEvent.click(customRating);
       // AND we are on the last step
       act(() => {
         (useSwipeable as jest.Mock).mock.calls[0][0].onSwipedLeft();
         (useSwipeable as jest.Mock).mock.calls[0][0].onSwipedLeft();
-        (useSwipeable as jest.Mock).mock.calls[0][0].onSwipedLeft();
       });
+      // AND a question is answered
+      const customRating = screen.getAllByTestId(CUSTOM_RATING_DATA_TEST_ID.CUSTOM_RATING_ICON)[4];
+      fireEvent.click(customRating);
 
       // THEN expect the submit button to be disabled
       const submitButton = screen.getByTestId(DATA_TEST_ID.FEEDBACK_FORM_NEXT_BUTTON);

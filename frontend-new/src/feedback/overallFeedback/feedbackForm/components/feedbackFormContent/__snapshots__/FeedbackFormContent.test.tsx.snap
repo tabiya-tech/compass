@@ -6,7 +6,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
   data-testid="feedback-form-content-07d1ed9d-6ced-4a24-912a-9b89199df67f"
 >
   <div
-    class="MuiBox-root css-1inkys2"
+    class="MuiBox-root css-136j4hj"
   >
     <div
       animate="center"
@@ -18,10 +18,10 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
       variants="[object Object]"
     >
       <p
-        class="MuiTypography-root MuiTypography-body1 css-paf3i2-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 MuiTypography-gutterBottom css-18ls10k-MuiTypography-root"
         data-testid="feedback-form-content-title-07d1ed9d-6ced-4a24-912a-9b89199df67f"
       >
-        Overall Satisfaction
+        Bias & Experience Accuracy
       </p>
       <div
         class="MuiBox-root css-16qyt99"
@@ -34,500 +34,348 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
           <div
             class="MuiBox-root css-0"
           >
-            <div
-              class="MuiBox-root css-1821gv5"
-              data-testid="custom-rating-container-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+            <fieldset
+              class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth css-bxrs44-MuiFormControl-root"
+              data-testid="yes-no-question-form-control-9803f91b-499a-41b3-9348-795de9e399a9"
             >
-              <div
-                class="MuiBox-root css-1w00lo4"
+              <legend
+                class="MuiFormLabel-root MuiFormLabel-colorPrimary css-1bbwsov-MuiFormLabel-root"
+                data-testid="yes-no-question-form-label-9803f91b-499a-41b3-9348-795de9e399a9"
               >
                 <p
                   class="MuiTypography-root MuiTypography-body1 css-1rdygw0-MuiTypography-root"
                   data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
                 >
-                  How easy or difficult was it to interact with Compass and understand its responses?
+                  Did you feel that Compass treated you unfairly by making assumptions about your background, language, or other personal characteristics? If so, please describe your experience.
                 </p>
-                <div
-                  class="MuiBox-root css-a0ovpn"
+              </legend>
+              <div
+                aria-label="perceived_bias"
+                class="MuiFormGroup-root MuiFormGroup-row MuiRadioGroup-root MuiRadioGroup-row css-1mle1ow-MuiFormGroup-root"
+                role="radiogroup"
+              >
+                <label
+                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-2mfj4v-MuiFormControlLabel-root"
+                  data-testid="yes-no-question-radio-no-9803f91b-499a-41b3-9348-795de9e399a9"
                 >
                   <span
-                    class="MuiRating-root MuiRating-sizeSmall css-cod5a2-MuiRating-root"
+                    class="MuiButtonBase-root MuiRadio-root MuiRadio-colorPrimary PrivateSwitchBase-root MuiRadio-root MuiRadio-colorPrimary MuiRadio-root MuiRadio-colorPrimary css-1inuqo-MuiButtonBase-root-MuiRadio-root"
                   >
-                    <label
-                      class="css-dqr9h-MuiRating-label"
-                      for=":r1:"
-                    >
-                      <span
-                        class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                        data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                        value="1"
-                      >
-                        <svg
-                          aria-hidden="true"
-                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                          data-testid="StarBorderIcon"
-                          focusable="false"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                          />
-                        </svg>
-                      </span>
-                      <span
-                        class="MuiRating-visuallyHidden"
-                      >
-                        1 Star
-                      </span>
-                    </label>
                     <input
-                      class="MuiRating-visuallyHidden"
-                      id=":r1:"
-                      name="interaction_ease"
+                      class="PrivateSwitchBase-input css-1m9pwf3"
+                      name="perceived_bias"
                       type="radio"
-                      value="1"
+                      value="false"
                     />
-                    <label
-                      class="css-dqr9h-MuiRating-label"
-                      for=":r2:"
+                    <span
+                      class="css-hyxlzm"
                     >
-                      <span
-                        class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                        data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                        value="2"
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-wycp9y-MuiSvgIcon-root"
+                        data-testid="RadioButtonUncheckedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
                       >
-                        <svg
-                          aria-hidden="true"
-                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                          data-testid="StarBorderIcon"
-                          focusable="false"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                          />
-                        </svg>
-                      </span>
-                      <span
-                        class="MuiRating-visuallyHidden"
+                        <path
+                          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"
+                        />
+                      </svg>
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-wyntia-MuiSvgIcon-root"
+                        data-testid="RadioButtonCheckedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
                       >
-                        2 Stars
-                      </span>
-                    </label>
-                    <input
-                      class="MuiRating-visuallyHidden"
-                      id=":r2:"
-                      name="interaction_ease"
-                      type="radio"
-                      value="2"
+                        <path
+                          d="M8.465 8.465C9.37 7.56 10.62 7 12 7C14.76 7 17 9.24 17 12C17 13.38 16.44 14.63 15.535 15.535C14.63 16.44 13.38 17 12 17C9.24 17 7 14.76 7 12C7 10.62 7.56 9.37 8.465 8.465Z"
+                        />
+                      </svg>
+                    </span>
+                    <span
+                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
                     />
-                    <label
-                      class="css-dqr9h-MuiRating-label"
-                      for=":r3:"
-                    >
-                      <span
-                        class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                        data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                        value="3"
-                      >
-                        <svg
-                          aria-hidden="true"
-                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                          data-testid="StarBorderIcon"
-                          focusable="false"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                          />
-                        </svg>
-                      </span>
-                      <span
-                        class="MuiRating-visuallyHidden"
-                      >
-                        3 Stars
-                      </span>
-                    </label>
-                    <input
-                      class="MuiRating-visuallyHidden"
-                      id=":r3:"
-                      name="interaction_ease"
-                      type="radio"
-                      value="3"
-                    />
-                    <label
-                      class="css-dqr9h-MuiRating-label"
-                      for=":r4:"
-                    >
-                      <span
-                        class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                        data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                        value="4"
-                      >
-                        <svg
-                          aria-hidden="true"
-                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                          data-testid="StarBorderIcon"
-                          focusable="false"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                          />
-                        </svg>
-                      </span>
-                      <span
-                        class="MuiRating-visuallyHidden"
-                      >
-                        4 Stars
-                      </span>
-                    </label>
-                    <input
-                      class="MuiRating-visuallyHidden"
-                      id=":r4:"
-                      name="interaction_ease"
-                      type="radio"
-                      value="4"
-                    />
-                    <label
-                      class="css-dqr9h-MuiRating-label"
-                      for=":r5:"
-                    >
-                      <span
-                        class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                        data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                        value="5"
-                      >
-                        <svg
-                          aria-hidden="true"
-                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                          data-testid="StarBorderIcon"
-                          focusable="false"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                          />
-                        </svg>
-                      </span>
-                      <span
-                        class="MuiRating-visuallyHidden"
-                      >
-                        5 Stars
-                      </span>
-                    </label>
-                    <input
-                      class="MuiRating-visuallyHidden"
-                      id=":r5:"
-                      name="interaction_ease"
-                      type="radio"
-                      value="5"
-                    />
-                    <label
-                      class="MuiRating-label MuiRating-pristine css-dqr9h-MuiRating-label"
-                    >
-                      <input
-                        checked=""
-                        class="MuiRating-visuallyHidden"
-                        id="interaction_ease-empty"
-                        name="interaction_ease"
-                        type="radio"
-                        value=""
-                      />
-                      <span
-                        class="MuiRating-visuallyHidden"
-                      >
-                        Empty
-                      </span>
-                    </label>
                   </span>
-                  <div
-                    class="MuiBox-root css-jyedia"
+                  <span
+                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-1czz4sp-MuiTypography-root"
                   >
-                    <p
-                      class="MuiTypography-root MuiTypography-body2 css-1m7ibp6-MuiTypography-root"
-                      data-testid="custom-rating-low-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                    >
-                      Difficult
-                    </p>
-                    <p
-                      class="MuiTypography-root MuiTypography-body2 css-1m7ibp6-MuiTypography-root"
-                      data-testid="custom-rating-high-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                    >
-                      Easy
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div
-                class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-kker16-MuiFormControl-root-MuiTextField-root"
-              >
-                <div
-                  class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline css-voxow3-MuiInputBase-root-MuiOutlinedInput-root"
+                    No
+                  </span>
+                </label>
+                <label
+                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-2mfj4v-MuiFormControlLabel-root"
+                  data-testid="yes-no-question-radio-yes-9803f91b-499a-41b3-9348-795de9e399a9"
                 >
-                  <textarea
-                    aria-invalid="false"
-                    class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
-                    data-testid="comment-text-field-ab74a074-67f6-4a8a-b2b2-a582d1d56c9c"
-                    id=":r6:"
-                    placeholder="Please explain your rating and share any suggestions for improving the ease of interaction with Compass."
-                    rows="3"
-                    style="height: 0px; overflow: hidden;"
-                  />
-                  <textarea
-                    aria-hidden="true"
-                    class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
-                    readonly=""
-                    style="visibility: hidden; position: absolute; overflow: hidden; height: 0px; top: 0px; left: 0px; transform: translateZ(0); padding-top: 0px; padding-bottom: 0px; width: 100%;"
-                    tabindex="-1"
-                  />
-                  <fieldset
-                    aria-hidden="true"
-                    class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+                  <span
+                    class="MuiButtonBase-root MuiRadio-root MuiRadio-colorPrimary PrivateSwitchBase-root MuiRadio-root MuiRadio-colorPrimary MuiRadio-root MuiRadio-colorPrimary css-1inuqo-MuiButtonBase-root-MuiRadio-root"
                   >
-                    <legend
-                      class="css-ihdtdm"
+                    <input
+                      class="PrivateSwitchBase-input css-1m9pwf3"
+                      name="perceived_bias"
+                      type="radio"
+                      value="true"
+                    />
+                    <span
+                      class="css-hyxlzm"
                     >
-                      <span
-                        class="notranslate"
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-wycp9y-MuiSvgIcon-root"
+                        data-testid="RadioButtonUncheckedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
                       >
-                        ​
-                      </span>
-                    </legend>
-                  </fieldset>
-                </div>
+                        <path
+                          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"
+                        />
+                      </svg>
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-wyntia-MuiSvgIcon-root"
+                        data-testid="RadioButtonCheckedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M8.465 8.465C9.37 7.56 10.62 7 12 7C14.76 7 17 9.24 17 12C17 13.38 16.44 14.63 15.535 15.535C14.63 16.44 13.38 17 12 17C9.24 17 7 14.76 7 12C7 10.62 7.56 9.37 8.465 8.465Z"
+                        />
+                      </svg>
+                    </span>
+                    <span
+                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                    />
+                  </span>
+                  <span
+                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-1czz4sp-MuiTypography-root"
+                  >
+                    Yes
+                  </span>
+                </label>
               </div>
-            </div>
+            </fieldset>
           </div>
           <div
             class="MuiBox-root css-0"
           >
-            <div
-              class="MuiBox-root css-1821gv5"
-              data-testid="custom-rating-container-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+            <fieldset
+              class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth css-u799rm-MuiFormControl-root"
+              data-testid="checkbox-with-textarea-form-control-989402f0-9fda-4400-958c-2d6c7bce9821"
             >
-              <div
-                class="MuiBox-root css-1w00lo4"
+              <legend
+                class="MuiFormLabel-root MuiFormLabel-colorPrimary css-1bbwsov-MuiFormLabel-root"
+                data-testid="checkbox-with-textarea-form-label-989402f0-9fda-4400-958c-2d6c7bce9821"
               >
                 <p
                   class="MuiTypography-root MuiTypography-body1 css-1rdygw0-MuiTypography-root"
                   data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
                 >
-                  How satisfied are you with Compass?
+                  Were there any aspects of your work experience information identified by Compass that were inaccurate?
                 </p>
-                <div
-                  class="MuiBox-root css-a0ovpn"
+              </legend>
+              <div
+                class="MuiFormGroup-root css-1aqk0pa-MuiFormGroup-root"
+              >
+                <label
+                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
                 >
                   <span
-                    class="MuiRating-root MuiRating-sizeSmall css-cod5a2-MuiRating-root"
+                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-50zv81-MuiButtonBase-root-MuiCheckbox-root"
+                    data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
                   >
-                    <label
-                      class="css-dqr9h-MuiRating-label"
-                      for=":r8:"
-                    >
-                      <span
-                        class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                        data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                        value="1"
-                      >
-                        <svg
-                          aria-hidden="true"
-                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                          data-testid="StarBorderIcon"
-                          focusable="false"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                          />
-                        </svg>
-                      </span>
-                      <span
-                        class="MuiRating-visuallyHidden"
-                      >
-                        1 Star
-                      </span>
-                    </label>
                     <input
-                      class="MuiRating-visuallyHidden"
-                      id=":r8:"
-                      name="satisfaction_with_compass"
-                      type="radio"
-                      value="1"
+                      class="PrivateSwitchBase-input css-1m9pwf3"
+                      data-indeterminate="false"
+                      type="checkbox"
                     />
-                    <label
-                      class="css-dqr9h-MuiRating-label"
-                      for=":r9:"
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+                      data-testid="CheckBoxOutlineBlankIcon"
+                      focusable="false"
+                      viewBox="0 0 24 24"
                     >
-                      <span
-                        class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                        data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                        value="2"
-                      >
-                        <svg
-                          aria-hidden="true"
-                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                          data-testid="StarBorderIcon"
-                          focusable="false"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                          />
-                        </svg>
-                      </span>
-                      <span
-                        class="MuiRating-visuallyHidden"
-                      >
-                        2 Stars
-                      </span>
-                    </label>
-                    <input
-                      class="MuiRating-visuallyHidden"
-                      id=":r9:"
-                      name="satisfaction_with_compass"
-                      type="radio"
-                      value="2"
-                    />
-                    <label
-                      class="css-dqr9h-MuiRating-label"
-                      for=":ra:"
-                    >
-                      <span
-                        class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                        data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                        value="3"
-                      >
-                        <svg
-                          aria-hidden="true"
-                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                          data-testid="StarBorderIcon"
-                          focusable="false"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                          />
-                        </svg>
-                      </span>
-                      <span
-                        class="MuiRating-visuallyHidden"
-                      >
-                        3 Stars
-                      </span>
-                    </label>
-                    <input
-                      class="MuiRating-visuallyHidden"
-                      id=":ra:"
-                      name="satisfaction_with_compass"
-                      type="radio"
-                      value="3"
-                    />
-                    <label
-                      class="css-dqr9h-MuiRating-label"
-                      for=":rb:"
-                    >
-                      <span
-                        class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                        data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                        value="4"
-                      >
-                        <svg
-                          aria-hidden="true"
-                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                          data-testid="StarBorderIcon"
-                          focusable="false"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                          />
-                        </svg>
-                      </span>
-                      <span
-                        class="MuiRating-visuallyHidden"
-                      >
-                        4 Stars
-                      </span>
-                    </label>
-                    <input
-                      class="MuiRating-visuallyHidden"
-                      id=":rb:"
-                      name="satisfaction_with_compass"
-                      type="radio"
-                      value="4"
-                    />
-                    <label
-                      class="css-dqr9h-MuiRating-label"
-                      for=":rc:"
-                    >
-                      <span
-                        class="MuiRating-icon MuiRating-iconEmpty css-1c99szj-MuiRating-icon"
-                        data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
-                        value="5"
-                      >
-                        <svg
-                          aria-hidden="true"
-                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
-                          data-testid="StarBorderIcon"
-                          focusable="false"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"
-                          />
-                        </svg>
-                      </span>
-                      <span
-                        class="MuiRating-visuallyHidden"
-                      >
-                        5 Stars
-                      </span>
-                    </label>
-                    <input
-                      class="MuiRating-visuallyHidden"
-                      id=":rc:"
-                      name="satisfaction_with_compass"
-                      type="radio"
-                      value="5"
-                    />
-                    <label
-                      class="MuiRating-label MuiRating-pristine css-dqr9h-MuiRating-label"
-                    >
-                      <input
-                        checked=""
-                        class="MuiRating-visuallyHidden"
-                        id="satisfaction_with_compass-empty"
-                        name="satisfaction_with_compass"
-                        type="radio"
-                        value=""
+                      <path
+                        d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
                       />
-                      <span
-                        class="MuiRating-visuallyHidden"
-                      >
-                        Empty
-                      </span>
-                    </label>
+                    </svg>
+                    <span
+                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                    />
                   </span>
-                  <div
-                    class="MuiBox-root css-jyedia"
+                  <span
+                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-1czz4sp-MuiTypography-root"
                   >
-                    <p
-                      class="MuiTypography-root MuiTypography-body2 css-1m7ibp6-MuiTypography-root"
-                      data-testid="custom-rating-low-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                    Incorrect Experience title
+                  </span>
+                </label>
+                <label
+                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
+                >
+                  <span
+                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-50zv81-MuiButtonBase-root-MuiCheckbox-root"
+                    data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
+                  >
+                    <input
+                      class="PrivateSwitchBase-input css-1m9pwf3"
+                      data-indeterminate="false"
+                      type="checkbox"
+                    />
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+                      data-testid="CheckBoxOutlineBlankIcon"
+                      focusable="false"
+                      viewBox="0 0 24 24"
                     >
-                      Unsatisfied
-                    </p>
-                    <p
-                      class="MuiTypography-root MuiTypography-body2 css-1m7ibp6-MuiTypography-root"
-                      data-testid="custom-rating-high-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
+                      <path
+                        d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
+                      />
+                    </svg>
+                    <span
+                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                    />
+                  </span>
+                  <span
+                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-1czz4sp-MuiTypography-root"
+                  >
+                    Incorrect start/end dates
+                  </span>
+                </label>
+                <label
+                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
+                >
+                  <span
+                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-50zv81-MuiButtonBase-root-MuiCheckbox-root"
+                    data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
+                  >
+                    <input
+                      class="PrivateSwitchBase-input css-1m9pwf3"
+                      data-indeterminate="false"
+                      type="checkbox"
+                    />
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+                      data-testid="CheckBoxOutlineBlankIcon"
+                      focusable="false"
+                      viewBox="0 0 24 24"
                     >
-                      Satisfied
-                    </p>
-                  </div>
-                </div>
+                      <path
+                        d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
+                      />
+                    </svg>
+                    <span
+                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                    />
+                  </span>
+                  <span
+                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-1czz4sp-MuiTypography-root"
+                  >
+                    Incorrect location
+                  </span>
+                </label>
+                <label
+                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
+                >
+                  <span
+                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-50zv81-MuiButtonBase-root-MuiCheckbox-root"
+                    data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
+                  >
+                    <input
+                      class="PrivateSwitchBase-input css-1m9pwf3"
+                      data-indeterminate="false"
+                      type="checkbox"
+                    />
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+                      data-testid="CheckBoxOutlineBlankIcon"
+                      focusable="false"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
+                      />
+                    </svg>
+                    <span
+                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                    />
+                  </span>
+                  <span
+                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-1czz4sp-MuiTypography-root"
+                  >
+                    Duplicate Experiences
+                  </span>
+                </label>
+                <label
+                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
+                >
+                  <span
+                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-50zv81-MuiButtonBase-root-MuiCheckbox-root"
+                    data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
+                  >
+                    <input
+                      class="PrivateSwitchBase-input css-1m9pwf3"
+                      data-indeterminate="false"
+                      type="checkbox"
+                    />
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+                      data-testid="CheckBoxOutlineBlankIcon"
+                      focusable="false"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
+                      />
+                    </svg>
+                    <span
+                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                    />
+                  </span>
+                  <span
+                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-1czz4sp-MuiTypography-root"
+                  >
+                    Missing Experiences
+                  </span>
+                </label>
+                <label
+                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
+                >
+                  <span
+                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-50zv81-MuiButtonBase-root-MuiCheckbox-root"
+                    data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
+                  >
+                    <input
+                      class="PrivateSwitchBase-input css-1m9pwf3"
+                      data-indeterminate="false"
+                      type="checkbox"
+                    />
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+                      data-testid="CheckBoxOutlineBlankIcon"
+                      focusable="false"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
+                      />
+                    </svg>
+                    <span
+                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                    />
+                  </span>
+                  <span
+                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-1czz4sp-MuiTypography-root"
+                  >
+                    Other
+                  </span>
+                </label>
               </div>
-            </div>
+            </fieldset>
           </div>
         </div>
       </div>
@@ -555,9 +403,6 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
     >
       <div
         class="MuiMobileStepper-dot MuiMobileStepper-dotActive css-15nuweu-MuiMobileStepper-dot"
-      />
-      <div
-        class="MuiMobileStepper-dot css-114p2tk-MuiMobileStepper-dot"
       />
       <div
         class="MuiMobileStepper-dot css-114p2tk-MuiMobileStepper-dot"

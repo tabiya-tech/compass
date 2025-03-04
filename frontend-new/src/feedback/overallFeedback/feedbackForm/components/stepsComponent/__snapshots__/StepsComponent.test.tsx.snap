@@ -154,6 +154,7 @@ exports[`StepsComponent should render component successfully 1`] = `
         >
           <span
             class="MuiRating-root MuiRating-sizeSmall css-cod5a2-MuiRating-root"
+            data-testid="custom-rating-field-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
           >
             <label
               class="css-dqr9h-MuiRating-label"

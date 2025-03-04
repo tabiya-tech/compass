@@ -3,6 +3,7 @@ import random
 
 from app.conversations.feedback.services.types import Answer, FeedbackItem, Feedback, Version
 from app.conversations.feedback.routes._types import FeedbackItemResponse, FeedbackResponse
+from app.users.sessions import generate_new_session_id
 from common_libs.test_utilities import get_random_printable_string
 
 
@@ -12,7 +13,8 @@ def _get_random_feedback_item() -> FeedbackItem:
         question_text=get_random_printable_string(20),
         description=get_random_printable_string(30),
         answer=Answer(
-            selected_options={get_random_printable_string(10): get_random_printable_string(10) for _ in range(random.randint(1, 5))},  # nosec B311 # random is used for testing purposes
+            selected_options={get_random_printable_string(10): get_random_printable_string(10) for _ in
+                              range(random.randint(1, 5))},  # nosec B311 # random is used for testing purposes,
             rating_numeric=random.randint(1, 5),  # nosec B311 # random is used for testing purposes
             rating_boolean=random.choice([True, False]),  # nosec B311 # random is used for testing purposes
             comment=get_random_printable_string(40)
@@ -23,7 +25,7 @@ def _get_random_feedback_item() -> FeedbackItem:
 def _get_random_feedback() -> Feedback:
     return Feedback(
         id=get_random_printable_string(10),
-        session_id=random.randint(1, 1000),  # nosec B311 # random is used for testing purposes
+        session_id=generate_new_session_id(),
         user_id=get_random_printable_string(10),
         version=Version(
             frontend=get_random_printable_string(10),
