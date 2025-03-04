@@ -248,10 +248,9 @@ describe("AuthPersistentStorage class tests", () => {
       const givenFeedback = [
         {
           question_id: "foo",
-          answer: {
+          simplified_answer: {
             rating_numeric: 5,
           },
-          is_answered: true,
         },
       ];
       PersistentStorageService.setOverallFeedback(givenFeedback);
@@ -279,10 +278,9 @@ describe("AuthPersistentStorage class tests", () => {
       const givenFeedback = [
         {
           question_id: "foo",
-          answer: {
+          simplified_answer: {
             rating_numeric: 5,
-          },
-          is_answered: true,
+          }
         },
       ];
       PersistentStorageService.setOverallFeedback(givenFeedback);

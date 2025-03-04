@@ -1,21 +1,28 @@
 export interface FeedbackResponse {
-  user_id: string;
-  session_id: number;
+  id: string;
+  version: {
+    frontend: string;
+    backend: string;
+  };
+  feedback_items: FeedbackItem[];
+  created_at: string;
+}
+
+export interface FeedbackRequest {
   version: {
     frontend: string;
   };
-  feedback: FeedbackItem[];
+  feedback_items_specs: FeedbackItem[];
 }
 
-export interface Answer {
+export interface SimplifiedAnswer {
   rating_numeric?: number | null;
   rating_boolean?: boolean | null;
-  selected_options?: string[];
+  selected_options_keys?: string[];
   comment?: string;
 }
 
 export interface FeedbackItem {
   question_id: string;
-  answer: Answer;
-  is_answered: boolean;
+  simplified_answer: SimplifiedAnswer;
 }
