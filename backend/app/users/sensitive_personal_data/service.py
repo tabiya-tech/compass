@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 
 from app.users.sensitive_personal_data.repository import ISensitivePersonalDataRepository
-from app.users.sensitive_personal_data.types import CreateSensitivePersonalDataRequest, SensitivePersonalDataRequirement, SensitivePersonalData
+from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement, SensitivePersonalData
 from app.users.repositories import IUserPreferenceRepository
 from app.users.sensitive_personal_data.errors import (
     DuplicateSensitivePersonalDataError,
@@ -34,12 +34,11 @@ class ISensitivePersonalDataService(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def create(self, user_id: str, request_body: CreateSensitivePersonalDataRequest):
+    async def create(self, sensitive_personal_data: SensitivePersonalData):
         """
         Create sensitive personal data. If the sensitive data already exists for the given user id, it will raise a DuplicateSensitivePersonalDataError.
 
-        :param user_id: the user id
-        :param request_body: CreateSensitivePersonalData - the request body
+        :param sensitive_personal_data: SensitivePersonalData - the sensitive personal data
         :return: None - if successful
         :raises DuplicateSensitivePersonalDataError if sensitive personal data already exists for the given user id
         :raises UserPreferencesNotFoundError if user preferences are not found
@@ -76,27 +75,22 @@ class SensitivePersonalDataService(ISensitivePersonalDataService):
         sensitive_user_data = await self._repository.find_by_user_id(user_id)
         return sensitive_user_data is not None
 
-    async def create(self, user_id: str, request_body: CreateSensitivePersonalDataRequest):
-        if await self.exists_by_user_id(user_id):
-            raise DuplicateSensitivePersonalDataError(user_id)
+    async def create(self, sensitive_personal_data: SensitivePersonalData):
+        if await self.exists_by_user_id(sensitive_personal_data.user_id):
+            raise DuplicateSensitivePersonalDataError(sensitive_personal_data.user_id)
 
         # Get user preferences to check sensitive personal data requirement
-        user_preferences = await self._user_preference_repository.get_user_preference_by_user_id(user_id)
+        user_preferences = await self._user_preference_repository.get_user_preference_by_user_id(sensitive_personal_data.user_id)
         if user_preferences is None:
-            raise UserPreferencesNotFoundError(user_id)
+            raise UserPreferencesNotFoundError(sensitive_personal_data.user_id)
 
         requirement = user_preferences.sensitive_personal_data_requirement
 
         # Validate based on invite code pii requirement
         if requirement == SensitivePersonalDataRequirement.NOT_AVAILABLE.value:
-            raise SensitivePersonalDataNotAvailableError(user_id)
+            raise SensitivePersonalDataNotAvailableError(sensitive_personal_data.user_id)
 
         # Create sensitive personal data
-        sensitive_personal_data = SensitivePersonalData(
-            user_id=user_id,
-            created_at=datetime.now(timezone.utc),
-            sensitive_personal_data=request_body.sensitive_personal_data
-        )
         await self._repository.create(sensitive_personal_data)
 
     async def skip(self, user_id: str):
