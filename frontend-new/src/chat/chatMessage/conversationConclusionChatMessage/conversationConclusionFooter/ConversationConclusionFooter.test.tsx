@@ -137,18 +137,16 @@ describe("ConversationConclusionFooter", () => {
     const mockFeedbackItems: FeedbackItem[] = [
       {
         question_id: "overall_satisfaction",
-        answer: {
+        simplified_answer: {
           rating_numeric: 4,
           comment: "Very helpful conversation!",
         },
-        is_answered: true,
       },
       {
         question_id: "ui_experience",
-        answer: {
+        simplified_answer: {
           rating_numeric: 5,
         },
-        is_answered: true,
       },
     ];
     (PersistentStorageService.getOverallFeedback as jest.Mock).mockReturnValue(mockFeedbackItems);
@@ -273,18 +271,16 @@ describe("ConversationConclusionFooter", () => {
       const mockFeedbackItems: FeedbackItem[] = [
         {
           question_id: "overall_satisfaction",
-          answer: {
+          simplified_answer: {
             rating_numeric: 4,
             comment: "Very helpful conversation!",
           },
-          is_answered: true,
         },
         {
           question_id: "ui_experience",
-          answer: {
+          simplified_answer: {
             rating_numeric: 5,
           },
-          is_answered: true,
         },
       ];
       (PersistentStorageService.getOverallFeedback as jest.Mock).mockReturnValue(mockFeedbackItems);

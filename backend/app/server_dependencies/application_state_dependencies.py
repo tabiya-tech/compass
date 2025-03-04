@@ -4,7 +4,7 @@ from fastapi.params import Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.application_state import ApplicationStateManager
-from app.server_dependencies.db_dependencies import CompassDBProvider
+from .db_dependencies import CompassDBProvider
 from app.store.database_application_state_store import DatabaseApplicationStateStore
 
 # Lock to ensure that the singleton instance is thread-safe

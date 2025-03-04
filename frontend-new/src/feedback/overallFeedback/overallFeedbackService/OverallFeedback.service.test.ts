@@ -5,6 +5,7 @@ import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import OverallFeedbackService from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import authStateService from "src/auth/services/AuthenticationState.service";
+import { FeedbackItem, FeedbackRequest, FeedbackResponse } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 
 // mock the user preferences service
 jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => {
@@ -65,7 +66,7 @@ describe("OverallFeedbackService", () => {
     expect(service).toBeDefined();
 
     // AND the service should have the correct endpoint url
-    expect(service.feedbackEndpointUrl).toEqual(`${givenApiServerUrl}/users/feedback`);
+    expect(service.feedbackEndpointUrl).toEqual(`${givenApiServerUrl}/conversations/${givenSessionId}/feedback`);
   });
 
   test("should return a new instance of OverallFeedbackService with the correct sessionId", () => {
@@ -82,44 +83,50 @@ describe("OverallFeedbackService", () => {
   });
 
   describe("sendFeedback", () => {
-    test("should fetch the correct URL, with POST and the correct headers and payload successfully", async () => {
+    test("should fetch the correct URL, with PATCH and the correct headers and payload successfully", async () => {
       // GIVEN feedback data
-      const givenFeedbackData = [
+      const givenFeedbackData: FeedbackItem[] = [
         {
           question_id: "1",
-          answer: {
+          simplified_answer: {
             rating_numeric: 5,
             rating_boolean: false,
-            selected_options: [],
+            selected_options_keys: [],
             comment: "This is a comment",
           },
-          is_answered: true,
         },
       ];
-      // AND the REST API will respond with CREATED status
-      const expectedResponse = {
-        user_id: "001",
-        session_id: 1234,
+      const givenFeedbackRequest : FeedbackRequest = {
         version: {
           frontend: "foo-1234",
         },
-        feedback: givenFeedbackData,
+        feedback_items_specs: givenFeedbackData,
+      }
+      // AND the REST API will respond with CREATED status
+      const expectedResponse: FeedbackResponse = {
+        id: "1234",
+        version: {
+          frontend: "foo-1234",
+          backend: "bar-5678",
+        },
+        feedback_items: givenFeedbackData,
+        created_at: new Date().toISOString(),
       };
-      const fetchSpy = setupAPIServiceSpy(StatusCodes.CREATED, expectedResponse, "application/json;charset=UTF-8");
+      const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, expectedResponse, "application/json;charset=UTF-8");
 
       // WHEN the sendFeedback method is called
       const givenSessionId = 1234;
       const service = new OverallFeedbackService(givenSessionId);
       const actualResponse = await service.sendFeedback(givenFeedbackData);
 
-      // THEN expect it to make a POST request with correct headers and payload
-      expectCorrectFetchRequest(fetchSpy,`${givenApiServerUrl}/users/feedback`, {
-        method: "POST",
+      // THEN expect it to make a PATCH request with correct headers and payload
+      expectCorrectFetchRequest(fetchSpy,`${givenApiServerUrl}/conversations/${givenSessionId}/feedback`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(expectedResponse),
-        expectedStatusCode: StatusCodes.CREATED,
+        body: JSON.stringify(givenFeedbackRequest),
+        expectedStatusCode: StatusCodes.OK,
         serviceName: "OverallFeedbackService",
         serviceFunction: "sendFeedback",
         failureMessage: `Failed to send feedback with session id ${givenSessionId}`,
@@ -151,10 +158,10 @@ describe("OverallFeedbackService", () => {
       ["is a malformed json", "{"],
       ["is a string", "foo"],
     ])(
-      "on 201, should reject with an error ERROR_CODE.INVALID_RESPONSE_BODY if response %s",
+      "on 200, should reject with an error ERROR_CODE.INVALID_RESPONSE_BODY if response %s",
       async (_description, givenResponse) => {
         // GIVEN fetch resolves with a response that has invalid JSON
-        setupAPIServiceSpy(StatusCodes.CREATED, {}, "application/json;charset=UTF-8").mockResolvedValueOnce(givenResponse);
+        setupAPIServiceSpy(StatusCodes.OK, givenResponse, "application/json;charset=UTF-8");
 
         // WHEN the sendFeedback method is called
         const givenSessionId = 1234;
@@ -166,9 +173,9 @@ describe("OverallFeedbackService", () => {
           ...new RestAPIError(
             "OverallFeedbackService",
             "sendFeedback",
-            "POST",
-            `${givenApiServerUrl}/users/feedback`,
-            StatusCodes.UNPROCESSABLE_ENTITY,
+            "PATCH",
+            `${givenApiServerUrl}/conversations/${givenSessionId}/feedback`,
+            StatusCodes.OK,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",
             ""
@@ -185,16 +192,15 @@ describe("OverallFeedbackService", () => {
       jest.spyOn(authStateService.getInstance(), "getUser").mockReturnValue({ id: null });
 
       // GIVEN feedback data
-      const givenFeedbackData = [
+      const givenFeedbackData: FeedbackItem[] = [
         {
           question_id: "1",
-          answer: {
+          simplified_answer: {
             rating_numeric: 5,
             rating_boolean: false,
-            selected_options: [],
+            selected_options_keys: [],
             comment: "This is a comment",
           },
-          is_answered: true,
         },
       ];
 

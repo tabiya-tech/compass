@@ -3,7 +3,6 @@ from fastapi import APIRouter, FastAPI
 from app.users.sensitive_personal_data.routes import add_user_sensitive_personal_data_routes
 from app.users.auth import Authentication
 from app.users.preferences import add_user_preference_routes
-from app.users.feedback.routes import add_user_feedback_routes
 
 """
 This module is responsible for managing all the routes related to the users.
@@ -31,11 +30,6 @@ def add_users_routes(app: FastAPI, authentication: Authentication):
     # Add the sensitive personal data routes
     ############################################
     add_user_sensitive_personal_data_routes(users_router, authentication)
-
-    ############################################
-    # Add the user feedback routes
-    ############################################
-    add_user_feedback_routes(users_router, authentication)
 
     # we can add more routes related to the users management here
 

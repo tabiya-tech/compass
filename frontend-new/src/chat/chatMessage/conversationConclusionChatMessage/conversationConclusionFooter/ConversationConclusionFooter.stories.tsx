@@ -16,11 +16,10 @@ import { PersistentStorageService } from "src/app/PersistentStorageService/Persi
 const mockFeedbackInProgress: FeedbackItem[] = [
   {
     question_id: "overall_satisfaction",
-    answer: {
+    simplified_answer: {
       rating_numeric: 4,
       comment: "Very helpful conversation!",
-    },
-    is_answered: true,
+    }
   },
 ];
 

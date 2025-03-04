@@ -4,7 +4,7 @@ from typing import Optional
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
-from app.server_dependencies.database_collections import Collections
+from .database_collections import Collections
 
 import logging
 

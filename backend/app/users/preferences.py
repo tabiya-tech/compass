@@ -4,13 +4,14 @@ from fastapi import APIRouter, HTTPException, Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.constants.errors import ErrorService, HTTPErrorResponse
+from app.conversations.feedback.repository import UserFeedbackRepository
 from app.invitations.repository import UserInvitationRepository
 from app.invitations.types import InvitationType
 from app.users.sensitive_personal_data.routes import get_sensitive_personal_data_service
 from app.users.sensitive_personal_data.service import ISensitivePersonalDataService
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, UserInfo, SignInProvider
-from app.users.feedback.service import UserFeedbackService
+from app.conversations.feedback.services import UserFeedbackService, IUserFeedbackService
 from app.users.repositories import UserPreferenceRepository
 from app.users.sessions import generate_new_session_id, SessionsService
 from app.users.types import UserPreferencesUpdateRequest, UserPreferences, \
@@ -231,9 +232,20 @@ async def _get_user_preferences_service(db: AsyncIOMotorDatabase = Depends(Compa
 async def _get_user_invitations_repository(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)):
     return UserInvitationRepository(db)
 
+# Lock to ensure that the singleton instance is thread-safe
+_user_feedback_service_lock = asyncio.Lock()
+_user_feedback_service_singleton: IUserFeedbackService | None = None
 
-async def _get_user_feedback_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)):
-    return UserFeedbackService(db)
+
+async def _get_user_feedback_service(application_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)) -> IUserFeedbackService:
+    global _user_feedback_service_singleton
+    if _user_feedback_service_singleton is None:  # initial check to avoid the lock if the singleton instance is already created (lock is expensive)
+        async with _user_feedback_service_lock:  # before modifying the singleton instance, acquire the lock
+            if _user_feedback_service_singleton is None:  # double check after acquiring the lock
+                _user_feedback_service_singleton = UserFeedbackService(
+                    user_feedback_repository=UserFeedbackRepository(application_db)
+                )
+    return _user_feedback_service_singleton
 
 
 def add_user_preference_routes(users_router: APIRouter, auth: Authentication):

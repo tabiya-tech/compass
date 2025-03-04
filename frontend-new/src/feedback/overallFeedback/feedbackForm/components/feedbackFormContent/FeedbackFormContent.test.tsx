@@ -149,49 +149,45 @@ describe("FeedbackFormContent", () => {
       // First step answer (custom rating)
       expect(submittedAnswers[0]).toEqual({
         question_id: feedbackFormContentSteps[0].questions[0].questionId,
-        answer: {
+        simplified_answer: {
           comment: "",
           rating_boolean: undefined,
           rating_numeric: 5,
-          selected_options: undefined,
-        },
-        is_answered: true,
+          selected_options_keys: undefined,
+        }
       });
 
       // Second step answer (checkbox)
       expect(submittedAnswers[1]).toEqual({
         question_id: feedbackFormContentSteps[1].questions[1].questionId,
-        answer: {
+        simplified_answer: {
           comment: "",
           rating_boolean: undefined,
           rating_numeric: undefined,
-          selected_options: [feedbackFormContentSteps[1].questions[1].options![0].key],
-        },
-        is_answered: true,
+          selected_options_keys: [feedbackFormContentSteps[1].questions[1].options![0].key],
+        }
       });
 
       // Third step answer (yes/no)
       expect(submittedAnswers[2]).toEqual({
         question_id: feedbackFormContentSteps[2].questions[1].questionId,
-        answer: {
+        simplified_answer: {
           comment: "",
           rating_boolean: true,
           rating_numeric: undefined,
-          selected_options: undefined,
-        },
-        is_answered: true,
+          selected_options_keys: undefined,
+        }
       });
 
       // Last step answer (custom rating)
       expect(submittedAnswers[3]).toEqual({
         question_id: feedbackFormContentSteps[3].questions[0].questionId,
-        answer: {
+        simplified_answer: {
           comment: "",
           rating_boolean: undefined,
           rating_numeric: 5,
-          selected_options: undefined,
-        },
-        is_answered: true,
+          selected_options_keys: undefined,
+        }
       });
 
       // AND no errors or warnings to be shown
