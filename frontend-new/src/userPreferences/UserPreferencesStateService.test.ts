@@ -17,7 +17,9 @@ function getMockUserPreference(): UserPreference {
     accepted_tc: new Date(),
     // 3 random session ids
     sessions: randomSessions,
-    sessions_with_feedback: [randomSessions[0]],
+    user_feedback_answered_questions: {
+      [randomSessions[0]]: ["question1", "question2"]
+    },
   };
 }
 
@@ -191,7 +193,7 @@ describe("UserPreferencesStateService", () => {
         // GIVEN user preferences with no sessions are set
         const givenPreferences: UserPreference = getMockUserPreference();
         givenPreferences.sessions = [];
-        givenPreferences.sessions_with_feedback = [];
+        givenPreferences.user_feedback_answered_questions = {};
         service.setUserPreferences(givenPreferences);
 
         // WHEN getActiveSessionId is called
@@ -212,41 +214,41 @@ describe("UserPreferencesStateService", () => {
       });
     });
 
-    describe("activeSessionHasFeedback", () => {
-      it("should return true if the active session has feedback", () => {
+    describe("user_feedback_answered_questions methods", () => {
+      it("activeSessionHasOverallFeedback should return true if the active session has feedbackitems", () => {
         // GIVEN user preferences with feedback for the active session are set
         const givenPreferences: UserPreference = getMockUserPreference();
         //guard
-        expect(givenPreferences.sessions_with_feedback).toContain(givenPreferences.sessions[0]);
+        expect(Object.keys(givenPreferences.user_feedback_answered_questions)[0]).toEqual(givenPreferences.sessions[0].toString());
         service.setUserPreferences(givenPreferences);
 
         // WHEN activeSessionHasFeedback is called
-        const actualHasFeedback = service.activeSessionHasFeedback();
+        const actualHasFeedback = service.activeSessionHasOverallFeedback();
 
         // THEN expected true
         expect(actualHasFeedback).toBe(true);
       });
-      it("should return false if the active session does not have feedback", () => {
+      it("activeSessionHasOverallFeedback should return false if the active session does not have feedback", () => {
         // GIVEN user preferences with no feedback for the active session are set
         const givenPreferences: UserPreference = getMockUserPreference();
-        givenPreferences.sessions_with_feedback = [];
+        givenPreferences.user_feedback_answered_questions = {};
         service.setUserPreferences(givenPreferences);
 
         // WHEN activeSessionHasFeedback is called
-        const actualHasFeedback = service.activeSessionHasFeedback();
+        const actualHasFeedback = service.activeSessionHasOverallFeedback();
 
         // THEN expected false
         expect(actualHasFeedback).toBe(false);
       });
-      it("should return false if there is no active session", () => {
+      it("activeSessionHasOverallFeedback should return false if there is no active session", () => {
         // GIVEN user preferences with no sessions are set
         const givenPreferences: UserPreference = getMockUserPreference();
         givenPreferences.sessions = [];
-        givenPreferences.sessions_with_feedback = [];
+        givenPreferences.user_feedback_answered_questions = { };
         service.setUserPreferences(givenPreferences);
 
         // WHEN activeSessionHasFeedback is called
-        const actualHasFeedback = service.activeSessionHasFeedback();
+        const actualHasFeedback = service.activeSessionHasOverallFeedback();
 
         // THEN expected false
         expect(actualHasFeedback).toBe(false);

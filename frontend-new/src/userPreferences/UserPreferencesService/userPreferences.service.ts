@@ -63,7 +63,7 @@ export default class UserPreferencesService {
         sensitive_personal_data_requirement: jsonPayload.sensitive_personal_data_requirement,
         has_sensitive_personal_data: jsonPayload.has_sensitive_personal_data,
         accepted_tc: this.formatAcceptedTC(jsonPayload.accepted_tc),
-        sessions_with_feedback: jsonPayload.sessions_with_feedback,
+        user_feedback_answered_questions: jsonPayload.user_feedback_answered_questions,
       };
     } catch (error) {
       throw errorFactory(

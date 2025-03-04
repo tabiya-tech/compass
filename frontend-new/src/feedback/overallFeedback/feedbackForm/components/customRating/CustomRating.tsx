@@ -17,6 +17,7 @@ export interface CustomRatingProps extends BaseQuestion {
   comments?: string;
   displayRating?: boolean;
   maxRating: number;
+  disabled?: boolean;
 }
 
 const uniqueId = "7bb1da6e-bd0f-4edf-bbbb-ff7ade168944";
@@ -38,6 +39,7 @@ const CustomRating: React.FC<CustomRatingProps> = ({
   highRatingLabel,
   comments,
   displayRating = true,
+  disabled,
   maxRating,
   placeholder,
 }) => {
@@ -77,6 +79,7 @@ const CustomRating: React.FC<CustomRatingProps> = ({
               max={maxRating}
               precision={1}
               size="small"
+              disabled={disabled}
               sx={{
                 color: theme.palette.primary.main,
                 "& .MuiSvgIcon-root": {

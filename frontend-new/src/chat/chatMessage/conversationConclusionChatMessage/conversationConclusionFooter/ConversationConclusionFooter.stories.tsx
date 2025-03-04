@@ -59,7 +59,9 @@ const StorybookWrapper = ({
     sessions: [1],
     user_id: "test-user",
     language: Language.en,
-    sessions_with_feedback: [hasSubmittedFeedback ? 1 : 0],
+    user_feedback_answered_questions: hasSubmittedFeedback ? {
+      1: ["overall_satisfaction"],
+    } : {},
     sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
     has_sensitive_personal_data: false,
   });

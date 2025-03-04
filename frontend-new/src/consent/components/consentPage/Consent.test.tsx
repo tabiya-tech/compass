@@ -136,7 +136,7 @@ describe("Testing Consent Page", () => {
           language: Language.en,
           accepted_tc: new Date(),
           sessions: [],
-          sessions_with_feedback: [],
+          user_feedback_answered_questions: {},
           has_sensitive_personal_data: false,
           sensitive_personal_data_requirement: givenSensitiveDataRequirement,
         }
@@ -441,7 +441,7 @@ describe("Testing Consent Page", () => {
           has_sensitive_personal_data: false,
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_AVAILABLE,
           sessions: [],
-          sessions_with_feedback: [],
+          user_feedback_answered_questions: {},
         });
 
         // AND the authStateService  returns an actual user
@@ -489,7 +489,7 @@ describe("Testing Consent Page", () => {
           has_sensitive_personal_data: false,
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
           sessions: [],
-          sessions_with_feedback: [],
+          user_feedback_answered_questions: {},
         });
 
         // AND the authStateService  returns an actual user
@@ -507,7 +507,7 @@ describe("Testing Consent Page", () => {
           has_sensitive_personal_data: false,
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
           sessions: [],
-          sessions_with_feedback: [],
+          user_feedback_answered_questions: {},
         });
 
         // AND canAccessPIIPage function to return true

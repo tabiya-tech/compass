@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ConversationConclusionFooter should render component successfully 1`] = `
+exports[`ConversationConclusionFooter render tests should render component successfully 1`] = `
 <div
   class="MuiBox-root css-z3t5d1"
   data-testid="feedback-form-button-container-41675f8b-257c-4a63-9563-3fe9feb6a850"
@@ -39,5 +39,8 @@ exports[`ConversationConclusionFooter should render component successfully 1`] =
      
     on this chat. It only takes 5 minutes and helps us improve!
   </p>
+  <div
+    data-testid="customer-satisfaction-rating-container-67447419-12c3-401d-a78f-00b5ea8f8d1f"
+  />
 </div>
 `;

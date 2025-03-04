@@ -3,6 +3,7 @@ Module containing type definitions for the feedback feature.
 """
 from datetime import datetime
 
+from typing import TypeAlias
 from pydantic import BaseModel, Field
 
 from .errors import InvalidOptionError
@@ -264,3 +265,6 @@ class NewFeedbackSpec(BaseModel):
 
     class Config:
         extra = "forbid"
+
+
+AnsweredQuestions: TypeAlias = dict[int, list[str]]

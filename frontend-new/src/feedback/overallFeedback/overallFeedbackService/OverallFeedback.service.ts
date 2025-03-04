@@ -11,36 +11,35 @@ import authStateService from "src/auth/services/AuthenticationState.service";
 import { getRestAPIErrorFactory } from "src/error/restAPIError/RestAPIError";
 
 export default class OverallFeedbackService {
-  readonly feedbackEndpointUrl: string;
   readonly apiServerUrl: string;
-  private readonly sessionId: number;
+  private static instance: OverallFeedbackService;
 
-  constructor(sessionId: number) {
+  private constructor() {
     this.apiServerUrl = getBackendUrl();
-    this.feedbackEndpointUrl = `${this.apiServerUrl}/conversations/${sessionId}/feedback`;
-    this.sessionId = sessionId;
   }
 
   /**
    * Get the singleton instance of the OverallFeedbackService.
    * @returns {OverallFeedbackService} The singleton instance of the OverallFeedbackService.
-   * @param sessionId The session ID to use for the chat service.
    */
-  static getInstance(sessionId: number): OverallFeedbackService {
-    return new OverallFeedbackService(sessionId);
+  static getInstance(): OverallFeedbackService {
+    if (!OverallFeedbackService.instance) {
+      OverallFeedbackService.instance = new OverallFeedbackService();
+    }
+    return OverallFeedbackService.instance;
   }
-
 
   /**
    * Sends feedback to the backend.
+   * @param sessionId The session ID for the conversation to send feedback for
    * @param feedback The feedback object adhering to the FeedbackResponse schema.
    * @returns {Promise<FeedbackResponse>} The response from the backend.
    */
-  public async sendFeedback(feedback: FeedbackItem[]): Promise<FeedbackResponse> {
+  public async sendFeedback(sessionId: number, feedback: FeedbackItem[]): Promise<FeedbackResponse> {
     const serviceName = "OverallFeedbackService";
     const serviceFunction = "sendFeedback";
     const method = "PATCH";
-    const feedbackURL = this.feedbackEndpointUrl;
+    const feedbackURL =  `${this.apiServerUrl}/conversations/${sessionId}/feedback`;
     const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, feedbackURL);
 
     const user = authStateService.getInstance().getUser();
@@ -68,7 +67,7 @@ export default class OverallFeedbackService {
       expectedStatusCode: StatusCodes.OK,
       serviceName,
       serviceFunction,
-      failureMessage: `Failed to send feedback with session id ${this.sessionId}`,
+      failureMessage: `Failed to send feedback with session id ${sessionId}`,
       expectedContentType: "application/json",
     });
 

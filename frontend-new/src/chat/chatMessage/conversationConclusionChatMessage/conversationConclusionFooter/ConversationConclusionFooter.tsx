@@ -12,6 +12,7 @@ import { FeedbackItem } from "src/feedback/overallFeedback/overallFeedbackServic
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import AnonymousAccountConversionDialog from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
+import CustomerSatisfactionRating from "src/feedback/overallFeedback/feedbackForm/components/customerSatisfactionRating/CustomerSatisfaction";
 
 const uniqueId = "41675f8b-257c-4a63-9563-3fe9feb6a850";
 
@@ -34,10 +35,13 @@ const ConversationConclusionFooter: React.FC = () => {
 
   const [feedbackData, setFeedbackData] = useState<FeedbackItem[]>(PersistentStorageService.getOverallFeedback());
   const [sessionHasFeedback, setSessionHasFeedback] = useState<boolean>(
-    UserPreferencesStateService.getInstance().activeSessionHasFeedback()
+    UserPreferencesStateService.getInstance().activeSessionHasOverallFeedback()
   );
   const [isFeedbackFormOpen, setIsFeedbackFormOpen] = useState<boolean>(false);
   const [showConversionDialog, setShowConversionDialog] = useState<boolean>(false);
+  const [hasSubmittedCustomerSatisfactionRating, setHasSubmittedCustomerSatisfactionRating] = useState<boolean>(
+    UserPreferencesStateService.getInstance().activeSessionHasCustomerSatisfactionRating()
+  );
 
   const user = authenticationStateService.getInstance().getUser();
   const isAnonymous = !user?.name || !user?.email;
@@ -66,43 +70,6 @@ const ConversationConclusionFooter: React.FC = () => {
     }
   }, [feedbackData.length, sessionHasFeedback, setFeedbackStatus]);
 
-  const getFeedbackMessage = () => {
-    if (sessionHasFeedback || feedbackStatus === FeedbackStatus.SUBMITTED) {
-      return (
-        <Typography variant="body1" data-testid={DATA_TEST_ID.THANK_YOU_MESSAGE}>
-          {FIXED_MESSAGES_TEXT.THANK_YOU}
-        </Typography>
-      );
-    } else if (feedbackStatus === FeedbackStatus.STARTED) {
-      return (
-        <Typography variant="body1" data-testid={DATA_TEST_ID.FEEDBACK_IN_PROGRESS_MESSAGE}>
-          Please{" "}
-          <CustomLink
-            onClick={() => setIsFeedbackFormOpen(true)}
-            disableWhenOffline
-            data-testid={DATA_TEST_ID.FEEDBACK_IN_PROGRESS_BUTTON}
-          >
-            complete your feedback
-          </CustomLink>{" "}
-          to help us improve your experience!
-        </Typography>
-      );
-    } else {
-      return (
-        <Typography variant="body1" data-testid={DATA_TEST_ID.FEEDBACK_MESSAGE_TEXT}>
-          We'd love your{" "}
-          <CustomLink
-            onClick={() => setIsFeedbackFormOpen(true)}
-            disableWhenOffline
-            data-testid={DATA_TEST_ID.FEEDBACK_FORM_BUTTON}
-          >
-            feedback
-          </CustomLink>{" "}
-          on this chat. It only takes 5 minutes and helps us improve!
-        </Typography>
-      );
-    }
-  };
 
   const handleFeedbackFormClose = (closeEvent: FeedbackCloseEvent) => {
     setIsFeedbackFormOpen(false);
@@ -116,33 +83,6 @@ const ConversationConclusionFooter: React.FC = () => {
         setFeedbackStatus(FeedbackStatus.NOT_STARTED);
       }
     }
-  };
-
-  const getAccountMessage = () => {
-    if (isAnonymous && !isAccountConverted) {
-      return (
-        <Typography variant="body1" data-testid={DATA_TEST_ID.CREATE_ACCOUNT_MESSAGE}>
-          <CustomLink
-            onClick={() => setShowConversionDialog(true)}
-            disableWhenOffline
-            data-testid={DATA_TEST_ID.CREATE_ACCOUNT_LINK}
-          >
-            Create an account
-          </CustomLink>{" "}
-          to save your conversations and access them anytime in the future.
-        </Typography>
-      );
-    }
-
-    if (isAccountConverted) {
-      return (
-        <Typography variant="body1" data-testid={DATA_TEST_ID.VERIFICATION_REMINDER_MESSAGE}>
-          A verification email has been sent to your email address. Please verify your account before logging in again.
-        </Typography>
-      );
-    }
-
-    return null;
   };
 
   return (
@@ -167,8 +107,71 @@ const ConversationConclusionFooter: React.FC = () => {
           !
         </Typography>
 
-        {getFeedbackMessage()}
-        {getAccountMessage()}
+        {/* Show continue feedback if the status is already started */}
+        { (feedbackStatus === FeedbackStatus.STARTED) &&
+          <Typography variant="body1" data-testid={DATA_TEST_ID.FEEDBACK_IN_PROGRESS_MESSAGE}>
+            Please{" "}
+            <CustomLink
+              onClick={() => setIsFeedbackFormOpen(true)}
+              disableWhenOffline
+              data-testid={DATA_TEST_ID.FEEDBACK_IN_PROGRESS_BUTTON}
+            >
+              complete your feedback
+            </CustomLink>{" "}
+            to help us improve your experience!
+          </Typography>
+        }
+
+        { (feedbackStatus === FeedbackStatus.NOT_STARTED) &&
+          <Typography variant="body1" data-testid={DATA_TEST_ID.FEEDBACK_MESSAGE_TEXT}>
+            We'd love your{" "}
+            <CustomLink
+              onClick={() => setIsFeedbackFormOpen(true)}
+              disableWhenOffline
+              data-testid={DATA_TEST_ID.FEEDBACK_FORM_BUTTON}
+            >
+              feedback
+            </CustomLink>{" "}
+            on this chat. It only takes 5 minutes and helps us improve!
+          </Typography>
+        }
+
+        {/* Show thank you message if either the rating or feedback has been submitted */}
+        {
+          (sessionHasFeedback || feedbackStatus === FeedbackStatus.SUBMITTED || hasSubmittedCustomerSatisfactionRating) &&
+          <Typography variant="body1" data-testid={DATA_TEST_ID.THANK_YOU_MESSAGE}>
+              {FIXED_MESSAGES_TEXT.THANK_YOU}
+          </Typography>
+        }
+
+        {/* Show a customer satisfaction rating if it hasn't been submitted yet */}
+        {(!hasSubmittedCustomerSatisfactionRating) &&
+          <CustomerSatisfactionRating
+          notifyOnCustomerSatisfactionRatingSubmitted={() => setHasSubmittedCustomerSatisfactionRating(true)}
+          />
+        }
+
+        {/* Show anonymous user registration link if the user is anonymous and hasn't already converted */}
+        {(isAnonymous && !isAccountConverted) &&
+          <Typography variant="body1" data-testid={DATA_TEST_ID.CREATE_ACCOUNT_MESSAGE}>
+            <CustomLink
+              onClick={() => setShowConversionDialog(true)}
+              disableWhenOffline
+              data-testid={DATA_TEST_ID.CREATE_ACCOUNT_LINK}
+            >
+              Create an account
+            </CustomLink>{" "}
+            to save your conversations and access them anytime in the future.
+          </Typography>
+        }
+
+        {/* Show the verification reminder if the user has already converted their account */}
+        { isAccountConverted &&
+          <Typography variant="body1" data-testid={DATA_TEST_ID.VERIFICATION_REMINDER_MESSAGE}>
+            A verification email has been sent to your email address. Please verify your account before logging in again.
+          </Typography>
+        }
+
       </Box>
       <FeedbackForm isOpen={isFeedbackFormOpen} notifyOnClose={handleFeedbackFormClose} />
       <AnonymousAccountConversionDialog

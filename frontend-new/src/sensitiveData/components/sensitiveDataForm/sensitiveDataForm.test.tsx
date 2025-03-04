@@ -94,7 +94,7 @@ const SAMPLE_USER_PREFERENCES = {
   language: Language.en,
   accepted_tc: new Date(),
   sessions: [],
-  sessions_with_feedback: [],
+  user_feedback_answered_questions: {},
   sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
   has_sensitive_personal_data: false,
 };
@@ -208,7 +208,7 @@ describe("Sensitive Data", () => {
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
         sessions: [],
-        sessions_with_feedback: [],
+        user_feedback_answered_questions: {},
       });
 
       // WHEN the component is rendered
@@ -369,7 +369,7 @@ describe("Sensitive Data", () => {
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
         sessions: [],
-        sessions_with_feedback: [],
+        user_feedback_answered_questions: {},
       });
     });
 
@@ -862,7 +862,7 @@ describe("Sensitive Data", () => {
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
         sessions: [],
-        sessions_with_feedback: [],
+        user_feedback_answered_questions: {},
       };
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue(givenUserPreferences);
 
@@ -911,7 +911,7 @@ describe("Sensitive Data", () => {
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
         sessions: [],
-        sessions_with_feedback: [],
+        user_feedback_answered_questions: {},
       };
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue(givenUserPreferences);
 
@@ -957,7 +957,7 @@ describe("Sensitive Data", () => {
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
         sessions: [],
-        sessions_with_feedback: [],
+        user_feedback_answered_questions: {},
       };
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue(givenUserPreferences);
       // AND skipping sensitive personal data method
@@ -994,7 +994,7 @@ describe("Sensitive Data", () => {
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
         sessions: [],
-        sessions_with_feedback: [],
+        user_feedback_answered_questions: {},
       };
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue(givenUserPreferences);
 

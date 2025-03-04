@@ -4,12 +4,16 @@ export enum SensitivePersonalDataRequirement {
   NOT_AVAILABLE = "NOT_AVAILABLE",
 }
 
+export type AnsweredQuestions = {
+  [questionId: string]: string[];
+}
+
 export type UserPreference = {
   user_id: string;
   language: Language;
   accepted_tc?: Date;
   sessions: number[];
-  sessions_with_feedback: number[];
+  user_feedback_answered_questions: AnsweredQuestions;
   sensitive_personal_data_requirement: SensitivePersonalDataRequirement;
   has_sensitive_personal_data: boolean;
 };

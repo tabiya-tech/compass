@@ -134,7 +134,7 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
       <Box
         sx={{
           position: "relative",
-          overflow: "hidden",
+          overflow: "auto",
           flexGrow: 1,
           width: "100%",
         }}
@@ -161,6 +161,7 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
           >
             <Typography
               fontWeight="bold"
+              gutterBottom
               color={theme.palette.text.secondary}
               sx={{ fontSize: theme.typography.h6.fontSize }}
               data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_TITLE}

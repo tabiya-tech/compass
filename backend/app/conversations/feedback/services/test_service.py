@@ -115,7 +115,7 @@ def _mock_feedback_repository() -> IUserFeedbackRepository:
         async def get_feedback_by_session_id(self, session_id: int) -> Feedback | None:
             raise NotImplementedError()
 
-        async def get_feedback_session_ids(self, user_id: str) -> list[int]:
+        async def get_all_feedback_for_user(self, user_id: str) -> dict[int, Feedback]:
             raise NotImplementedError()
 
     return MockedFeedbackRepository()
@@ -213,32 +213,44 @@ class TestUpsertFeedback:
         assert "interaction_ease" in str(error_info.value)
 
 
-class TestGetUserFeedback:
+class TestGetAnsweredQuestions:
     @pytest.mark.asyncio
-    async def test_get_user_feedback_success(self, _mock_feedback_repository: IUserFeedbackRepository):
+    async def test_get_answered_questions_success(self, _mock_feedback_repository: IUserFeedbackRepository):
         # GIVEN a user ID
         given_user_id = "user123"
 
-        # AND some session IDs in the repository
-        given_session_ids = [123, 456]
-        _mock_feedback_repository.get_feedback_session_ids = AsyncMock(return_value=given_session_ids)
+        # AND some feedback data in the repository
+        given_feedback = {
+            123: _def_feedback(),
+            456: _def_feedback()
+        }
+        _mock_feedback_repository.get_all_feedback_for_user = AsyncMock(return_value=given_feedback)
 
-        # WHEN get_user_feedback is called
-        result = await UserFeedbackService(user_feedback_repository=_mock_feedback_repository).get_user_feedback(given_user_id)
+        # WHEN get_answered_questions is called
+        result = await UserFeedbackService(user_feedback_repository=_mock_feedback_repository).get_answered_questions(given_user_id)
 
-        # THEN the session IDs should be returned
-        assert result == given_session_ids
+        # THEN the question IDs for each session should be returned
+        expected_dict = {}
+        for key in list(given_feedback.keys()):
+            expected_dict[key] = [item.question_id for item in given_feedback[key].feedback_items]
+        assert result == expected_dict
+
+        # AND the repository's get_all_feedback_for_user method was called with the expected user ID
+        _mock_feedback_repository.get_all_feedback_for_user.assert_called_once_with(given_user_id)
 
     @pytest.mark.asyncio
-    async def test_get_user_feedback_no_feedback(self, _mock_feedback_repository: IUserFeedbackRepository):
+    async def test_get_answered_questions_no_feedback(self, _mock_feedback_repository: IUserFeedbackRepository):
         # GIVEN a user ID with no feedback
         given_user_id = "user123"
 
-        # AND no session IDs in the repository
-        _mock_feedback_repository.get_feedback_session_ids = AsyncMock(return_value=[])
+        # AND no feedback in the repository
+        _mock_feedback_repository.get_all_feedback_for_user = AsyncMock(return_value={})
 
-        # WHEN get_user_feedback is called
-        result = await UserFeedbackService(user_feedback_repository=_mock_feedback_repository).get_user_feedback(given_user_id)
+        # WHEN get_answered_questions is called
+        result = await UserFeedbackService(user_feedback_repository=_mock_feedback_repository).get_answered_questions(given_user_id)
 
-        # THEN an empty list should be returned
-        assert result == []
+        # THEN an empty dictionary should be returned
+        assert result == {}
+
+        # AND the repository's get_all_feedback_for_user method was called with the expected user ID
+        _mock_feedback_repository.get_all_feedback_for_user.assert_called_once_with(given_user_id)

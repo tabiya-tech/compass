@@ -77,7 +77,7 @@ def _create_test_client_with_mocks(auth) -> TestClientWithMocks:
         async def upsert_user_feedback(self, user_id: str, session_id: int, feedback: Feedback) -> Feedback:
             raise NotImplementedError()
 
-        async def get_user_feedback(self, user_id: str) -> list[int]:
+        async def get_answered_questions(self, user_id: str) -> list[int]:
             raise NotImplementedError()
 
     mocked_feedback_service = MockedFeedbackService()

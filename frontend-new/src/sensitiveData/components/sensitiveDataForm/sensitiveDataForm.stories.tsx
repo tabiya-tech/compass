@@ -36,7 +36,7 @@ export const Shown: StoryObj<typeof SensitiveDataForm> = {
       accepted_tc: new Date(),
       sessions: [],
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
-      sessions_with_feedback: [],
+      user_feedback_answered_questions: {},
       language: Language.en,
     });
     return () => {
@@ -54,7 +54,7 @@ export const ShownWhenSkipping: StoryObj<typeof SensitiveDataForm> = {
       accepted_tc: new Date(),
       sessions: [],
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
-      sessions_with_feedback: [],
+      user_feedback_answered_questions: {},
       language: Language.en,
     });
     return () => {
