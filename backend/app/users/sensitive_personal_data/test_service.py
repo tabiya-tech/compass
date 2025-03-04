@@ -45,17 +45,13 @@ def _mock_sensitive_personal_data_repository() -> ISensitivePersonalDataReposito
 def _mock_user_preference_repository() -> IUserPreferenceRepository:
     class MockedUserPreferenceRepository(IUserPreferenceRepository):
         async def get_user_preference_by_user_id(self, user_id: str) -> Optional[UserPreferences]:
-            return UserPreferences(
-                sensitive_personal_data_requirement=SensitivePersonalDataRequirement.NOT_REQUIRED
-            )
+            return None
+
+        async def update_user_preference(self, user_id: str, request: UserPreferencesRepositoryUpdateRequest) -> Optional[UserPreferences]:
+            return None
 
         async def insert_user_preference(self, user_id: str, user_preference: UserPreferences) -> UserPreferences:
             return user_preference
-
-        async def update_user_preference(self, user_id: str, update: UserPreferencesRepositoryUpdateRequest) -> UserPreferences:
-            return UserPreferences(
-                sensitive_personal_data_requirement=SensitivePersonalDataRequirement.NOT_REQUIRED
-            )
 
     return MockedUserPreferenceRepository()
 
@@ -82,11 +78,25 @@ class TestCreate:
         # AND a create sensitive personal data request
         given_sensitive_data_request = _get_new_create_sensitive_personal_data_request()
 
+        # AND the user preferences allow sensitive personal data
+        _get_preferences_patched = mocker.patch.object(_mock_user_preference_repository,
+                                                       'get_user_preference_by_user_id')
+        _get_preferences_patched.return_value = UserPreferences(
+            sensitive_personal_data_requirement=SensitivePersonalDataRequirement.NOT_REQUIRED
+        )
+
         # WHEN the create method is called by the given authenticated user with the given user id and sensitive data
         service = SensitivePersonalDataService(_mock_sensitive_personal_data_repository,
                                                _mock_user_preference_repository)
         _create_spy = mocker.spy(_mock_sensitive_personal_data_repository, 'create')
-        await service.create(given_user_id, given_sensitive_data_request)
+        
+        # Create SensitivePersonalData from request
+        sensitive_personal_data = SensitivePersonalData(
+            user_id=given_user_id,
+            created_at=datetime.now(timezone.utc),
+            sensitive_personal_data=given_sensitive_data_request.sensitive_personal_data
+        )
+        await service.create(sensitive_personal_data)
 
         # THEN the repository.create should be called only once
         _create_spy.assert_called_once()
@@ -106,14 +116,14 @@ class TestCreate:
         given_user_id = get_random_printable_string(10)
 
         # AND a create sensitive personal data request
-        given_sensitive_data = _get_new_create_sensitive_personal_data_request()
+        given_sensitive_data_request = _get_new_create_sensitive_personal_data_request()
 
         # AND the repository.find_by_id returns valid sensitive user data for the given user id
         _find_by_user_id_pathed = mocker.patch.object(_mock_sensitive_personal_data_repository, 'find_by_user_id')
         _find_by_user_id_pathed.return_value = SensitivePersonalData(
             user_id=given_user_id,
             created_at=datetime.now(timezone.utc),
-            sensitive_personal_data=given_sensitive_data.sensitive_personal_data
+            sensitive_personal_data=given_sensitive_data_request.sensitive_personal_data
         )
 
         # WHEN the create method is called with the given user id and sensitive data
@@ -121,7 +131,13 @@ class TestCreate:
         with pytest.raises(DuplicateSensitivePersonalDataError) as actual_error_info:
             service = SensitivePersonalDataService(_mock_sensitive_personal_data_repository,
                                                    _mock_user_preference_repository)
-            await service.create(given_user_id, given_sensitive_data)
+            # Create SensitivePersonalData from request
+            sensitive_personal_data = SensitivePersonalData(
+                user_id=given_user_id,
+                created_at=datetime.now(timezone.utc),
+                sensitive_personal_data=given_sensitive_data_request.sensitive_personal_data
+            )
+            await service.create(sensitive_personal_data)
 
         # AND the exception should have the same user id as the given user id
         assert str(actual_error_info.value) == f"Sensitive personal data already exists for user {given_user_id}"
@@ -133,20 +149,31 @@ class TestCreate:
         # GIVEN a user id
         given_user_id = get_random_printable_string(10)
 
-        # AND the user's sensitive personal data is not available due to an invitation code requirement
+        # AND a create sensitive personal data request
+        given_sensitive_data_request = _get_new_create_sensitive_personal_data_request()
+
+        # AND the user's sensitive personal data is not available
         _get_preferences_patched = mocker.patch.object(_mock_user_preference_repository,
                                                        'get_user_preference_by_user_id')
         _get_preferences_patched.return_value = UserPreferences(
             sensitive_personal_data_requirement=SensitivePersonalDataRequirement.NOT_AVAILABLE
         )
 
-        # WHEN the create method is called
-        service = SensitivePersonalDataService(_mock_sensitive_personal_data_repository,
-                                               _mock_user_preference_repository)
-        # THEN a SensitivePersonalDataNotAvailableError should be raised
-        with pytest.raises(SensitivePersonalDataNotAvailableError) as error_info:
-            await service.create(given_user_id, _get_new_create_sensitive_personal_data_request())
-        assert str(error_info.value) == f"Sensitive personal data is not available for user {given_user_id}"
+        # WHEN the create method is called with the given user id and sensitive data
+        # THEN an exception should be raised
+        with pytest.raises(SensitivePersonalDataNotAvailableError) as actual_error_info:
+            service = SensitivePersonalDataService(_mock_sensitive_personal_data_repository,
+                                                   _mock_user_preference_repository)
+            # Create SensitivePersonalData from request
+            sensitive_personal_data = SensitivePersonalData(
+                user_id=given_user_id,
+                created_at=datetime.now(timezone.utc),
+                sensitive_personal_data=given_sensitive_data_request.sensitive_personal_data
+            )
+            await service.create(sensitive_personal_data)
+
+        # AND the exception should have the same user id as the given user id
+        assert str(actual_error_info.value) == f"Sensitive personal data is not available for user {given_user_id}"
 
     @pytest.mark.asyncio
     async def test_user_preferences_not_found(self,
@@ -156,18 +183,29 @@ class TestCreate:
         # GIVEN a user id
         given_user_id = get_random_printable_string(10)
 
+        # AND a create sensitive personal data request
+        given_sensitive_data_request = _get_new_create_sensitive_personal_data_request()
+
         # AND the user preferences are not found
         _get_preferences_patched = mocker.patch.object(_mock_user_preference_repository,
                                                        'get_user_preference_by_user_id')
         _get_preferences_patched.return_value = None
 
-        # WHEN the create method is called
-        service = SensitivePersonalDataService(_mock_sensitive_personal_data_repository,
-                                               _mock_user_preference_repository)
-        # THEN a UserPreferencesNotFoundError should be raised
-        with pytest.raises(UserPreferencesNotFoundError) as error_info:
-            await service.create(given_user_id, _get_new_create_sensitive_personal_data_request())
-        assert str(error_info.value) == f"User preferences not found for user {given_user_id}"
+        # WHEN the create method is called with the given user id and sensitive data
+        # THEN an exception should be raised
+        with pytest.raises(UserPreferencesNotFoundError) as actual_error_info:
+            service = SensitivePersonalDataService(_mock_sensitive_personal_data_repository,
+                                                   _mock_user_preference_repository)
+            # Create SensitivePersonalData from request
+            sensitive_personal_data = SensitivePersonalData(
+                user_id=given_user_id,
+                created_at=datetime.now(timezone.utc),
+                sensitive_personal_data=given_sensitive_data_request.sensitive_personal_data
+            )
+            await service.create(sensitive_personal_data)
+
+        # AND the exception should have the same user id as the given user id
+        assert str(actual_error_info.value) == f"User preferences not found for user {given_user_id}"
 
     @pytest.mark.asyncio
     async def test_repository_throws_an_error(self,
@@ -185,8 +223,14 @@ class TestCreate:
             service = SensitivePersonalDataService(_mock_sensitive_personal_data_repository,
                                                    _mock_user_preference_repository)
             given_user_id = get_random_printable_string(10)
-            given_sensitive_data = _get_new_create_sensitive_personal_data_request()
-            await service.create(given_user_id, given_sensitive_data)
+            given_sensitive_data_request = _get_new_create_sensitive_personal_data_request()
+            # Create SensitivePersonalData from request
+            sensitive_personal_data = SensitivePersonalData(
+                user_id=given_user_id,
+                created_at=datetime.now(timezone.utc),
+                sensitive_personal_data=given_sensitive_data_request.sensitive_personal_data
+            )
+            await service.create(sensitive_personal_data)
 
         # AND the error message should be the same as the given error
         assert str(error_info.value) == str(given_error)
@@ -199,6 +243,13 @@ class TestSkip:
                            mocker: pytest_mock.MockerFixture):
         # GIVEN a user id
         given_user_id = get_random_printable_string(10)
+
+        # AND the user preferences allow skipping sensitive personal data
+        _get_preferences_patched = mocker.patch.object(_mock_user_preference_repository,
+                                                       'get_user_preference_by_user_id')
+        _get_preferences_patched.return_value = UserPreferences(
+            sensitive_personal_data_requirement=SensitivePersonalDataRequirement.NOT_REQUIRED
+        )
 
         # WHEN the skip method is called
         service = SensitivePersonalDataService(_mock_sensitive_personal_data_repository,
@@ -241,7 +292,8 @@ class TestSkip:
             error_info.value) == f"Sensitive personal data is required for user {given_user_id} and cannot be skipped"
 
     @pytest.mark.asyncio
-    async def test_skipping_not_allowed_when_pii_not_available(self, _mock_sensitive_personal_data_repository: ISensitivePersonalDataRepository,
+    async def test_skipping_not_allowed_when_pii_not_available(self,
+                                                               _mock_sensitive_personal_data_repository: ISensitivePersonalDataRepository,
                                                                _mock_user_preference_repository: IUserPreferenceRepository,
                                                                mocker: pytest_mock.MockerFixture):
         # GIVEN a user id
@@ -260,7 +312,8 @@ class TestSkip:
         # THEN a SensitivePersonalDataNotAvailableError should be raised
         with pytest.raises(SensitivePersonalDataNotAvailableError) as error_info:
             await service.skip(given_user_id)
-        assert str(error_info.value) == f"Sensitive personal data is not available for user {given_user_id}"
+        assert str(
+            error_info.value) == f"Sensitive personal data is not available for user {given_user_id}"
 
     @pytest.mark.asyncio
     async def test_user_preferences_not_found(self,
@@ -281,29 +334,28 @@ class TestSkip:
         # THEN a UserPreferencesNotFoundError should be raised
         with pytest.raises(UserPreferencesNotFoundError) as error_info:
             await service.skip(given_user_id)
-        assert str(error_info.value) == f"User preferences not found for user {given_user_id}"
+        assert str(
+            error_info.value) == f"User preferences not found for user {given_user_id}"
 
     @pytest.mark.asyncio
     async def test_repository_throws_an_error(self,
                                               _mock_sensitive_personal_data_repository: ISensitivePersonalDataRepository,
                                               _mock_user_preference_repository: IUserPreferenceRepository,
                                               mocker: pytest_mock.MockerFixture):
-        # GIVEN a user id
-        given_user_id = get_random_printable_string(10)
-
-        # AND the repository.create throws some error
+        # GIVEN the repository.find_by_id throws some error
         given_error = Exception("given error message")
-        _create_patched = mocker.patch.object(_mock_sensitive_personal_data_repository, 'create')
-        _create_patched.side_effect = given_error
+        _find_by_user_id_pathed = mocker.patch.object(_mock_sensitive_personal_data_repository, 'find_by_user_id')
+        _find_by_user_id_pathed.side_effect = given_error
 
-        # WHEN the skip method is called
-        service = SensitivePersonalDataService(_mock_sensitive_personal_data_repository,
-                                               _mock_user_preference_repository)
+        # WHEN the service.skip is called for some random user id
         # THEN an exception should be raised
         with pytest.raises(Exception) as error_info:
+            service = SensitivePersonalDataService(_mock_sensitive_personal_data_repository,
+                                                   _mock_user_preference_repository)
+            given_user_id = get_random_printable_string(10)
             await service.skip(given_user_id)
 
-        # AND the error message should be the same as given
+        # AND the error message should be the same as the given error
         assert str(error_info.value) == str(given_error)
 
 
@@ -333,11 +385,15 @@ class TestExistsByUserId:
         given_user_id = get_random_printable_string(10)
 
         # AND a create sensitive personal data request
-        given_sensitive_data = _get_new_create_sensitive_personal_data_request()
+        given_sensitive_data_request = _get_new_create_sensitive_personal_data_request()
 
         # AND repository.find_by_id returns the given sensitive data
         _find_by_user_id_pathed = mocker.patch.object(_mock_sensitive_personal_data_repository, 'find_by_user_id')
-        _find_by_user_id_pathed.return_value = given_sensitive_data
+        _find_by_user_id_pathed.return_value = SensitivePersonalData(
+            user_id=given_user_id,
+            created_at=datetime.now(timezone.utc),
+            sensitive_personal_data=given_sensitive_data_request.sensitive_personal_data
+        )
 
         # WHEN the exists_by_user_id method is called for the given user id
         service = SensitivePersonalDataService(_mock_sensitive_personal_data_repository,
@@ -362,7 +418,8 @@ class TestExistsByUserId:
         with pytest.raises(Exception) as error_info:
             service = SensitivePersonalDataService(_mock_sensitive_personal_data_repository,
                                                    _mock_user_preference_repository)
-            await service.exists_by_user_id(get_random_printable_string(10))
+            given_user_id = get_random_printable_string(10)
+            await service.exists_by_user_id(given_user_id)
 
-        # AND the error message should be the same as given
+        # AND the error message should be the same as the given error
         assert str(error_info.value) == str(given_error)

@@ -2,6 +2,7 @@
 This module contains tests for the sensitive personal data routes.
 """
 from http import HTTPStatus
+from datetime import datetime, timezone
 
 import pytest
 import pytest_mock
@@ -10,7 +11,8 @@ from fastapi.testclient import TestClient
 
 from app.users.auth import UserInfo
 from app.users.sensitive_personal_data.service import ISensitivePersonalDataService
-from app.users.sensitive_personal_data.types import CreateSensitivePersonalDataRequest
+from app.users.sensitive_personal_data.types import CreateSensitivePersonalDataRequest, SensitivePersonalData, \
+    EncryptedSensitivePersonalData
 from app.users.sensitive_personal_data.routes import add_user_sensitive_personal_data_routes, get_sensitive_personal_data_service
 from app.users.sensitive_personal_data.errors import (
     DuplicateSensitivePersonalDataError,
@@ -30,7 +32,7 @@ def client_with_mocks() -> TestClientWithMocks:
         async def exists_by_user_id(self, user_id: str) -> bool:
             return False
 
-        async def create(self, user_id: str, request_body: CreateSensitivePersonalDataRequest):
+        async def create(self, request_body: SensitivePersonalData):
             return None
 
         async def skip(self, user_id: str):
@@ -65,22 +67,26 @@ class TestHandleSensitivePersonalData:
     async def test_create_success(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
         client, mocked_service, mocked_authed_user = client_with_mocks
         # GIVEN a payload to create sensitive personal data
-        given_sensitive_personal_data = CreateSensitivePersonalDataRequest(
-            sensitive_personal_data={
-                "rsa_key_id": "foo",
-                "aes_encryption_key": "bar",
-                "aes_encrypted_data": "baz"
-            }
+        given_sensitive_personal_data_payload = CreateSensitivePersonalDataRequest(
+            sensitive_personal_data=EncryptedSensitivePersonalData(
+                rsa_key_id="foo",
+                aes_encryption_key="bar",
+                aes_encrypted_data="baz"
+            )
         )
 
         # AND the user is authenticated
         given_user_id = mocked_authed_user.user_id
 
+        # AND datetime.now returns a fixed time
+        fixed_time = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)
+        mocker.patch('app.users.sensitive_personal_data.routes.datetime', new=mocker.Mock(now=lambda tz=None: fixed_time))
+
         # WHEN a POST request where `user_id` in the path matches the authenticated user's `user_id`
         _create_spy = mocker.spy(mocked_service, "create")
         response = client.post(
             f"/{given_user_id}/sensitive-personal-data",
-            json=given_sensitive_personal_data.model_dump(),
+            json=given_sensitive_personal_data_payload.model_dump(),
         )
         # THEN the response is CREATED
         assert response.status_code == HTTPStatus.CREATED
@@ -88,7 +94,12 @@ class TestHandleSensitivePersonalData:
         assert response.json() is None
 
         # AND sensitive_personal_data_service's create method was called with the given user_id and sensitive personal data
-        _create_spy.assert_called_once_with(given_user_id, given_sensitive_personal_data)
+        expected_sensitive_personal_data = SensitivePersonalData(
+            user_id=given_user_id,
+            created_at=fixed_time,
+            sensitive_personal_data=given_sensitive_personal_data_payload.sensitive_personal_data
+        )
+        _create_spy.assert_called_once_with(expected_sensitive_personal_data)
 
     @pytest.mark.asyncio
     async def test_skip_success(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
@@ -120,11 +131,11 @@ class TestHandleSensitivePersonalData:
         client, mocked_service, mocked_authed_user = client_with_mocks
         # GIVEN a payload to create sensitive personal data
         given_sensitive_personal_data = CreateSensitivePersonalDataRequest(
-            sensitive_personal_data={
-                "rsa_key_id": "foo",
-                "aes_encryption_key": "bar",
-                "aes_encrypted_data": "baz"
-            }
+            sensitive_personal_data=EncryptedSensitivePersonalData(
+                rsa_key_id="foo",
+                aes_encryption_key="bar",
+                aes_encrypted_data="baz"
+            )
         )
 
         # AND the user is authenticated
@@ -150,11 +161,11 @@ class TestHandleSensitivePersonalData:
         client, mocked_service, mocked_authed_user = client_with_mocks
         # GIVEN a payload to create sensitive personal data
         given_sensitive_personal_data = CreateSensitivePersonalDataRequest(
-            sensitive_personal_data={
-                "rsa_key_id": "foo",
-                "aes_encryption_key": "bar",
-                "aes_encrypted_data": "baz"
-            }
+            sensitive_personal_data=EncryptedSensitivePersonalData(
+                rsa_key_id="foo",
+                aes_encryption_key="bar",
+                aes_encrypted_data="baz"
+            )
         )
 
         # AND the user is authenticated
@@ -206,11 +217,11 @@ class TestHandleSensitivePersonalData:
         client, mocked_service, mocked_authed_user = client_with_mocks
         # GIVEN a payload to create sensitive personal data
         given_sensitive_personal_data = CreateSensitivePersonalDataRequest(
-            sensitive_personal_data={
-                "rsa_key_id": "foo",
-                "aes_encryption_key": "bar",
-                "aes_encrypted_data": "baz"
-            }
+            sensitive_personal_data=EncryptedSensitivePersonalData(
+                rsa_key_id="foo",
+                aes_encryption_key="bar",
+                aes_encrypted_data="baz"
+            )
         )
 
         # AND the user is authenticated
@@ -236,11 +247,11 @@ class TestHandleSensitivePersonalData:
         client, mocked_service, mocked_authed_user = client_with_mocks
         # GIVEN a payload to create sensitive personal data
         given_sensitive_personal_data = CreateSensitivePersonalDataRequest(
-            sensitive_personal_data={
-                "rsa_key_id": "foo",
-                "aes_encryption_key": "bar",
-                "aes_encrypted_data": "baz"
-            }
+            sensitive_personal_data=EncryptedSensitivePersonalData(
+                rsa_key_id="foo",
+                aes_encryption_key="bar",
+                aes_encrypted_data="baz"
+            )
         )
 
         # AND the user is authenticated

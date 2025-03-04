@@ -3,6 +3,7 @@ This module contains functions to add sensitive personal data routes to the user
 """
 import asyncio
 import logging
+from datetime import datetime, timezone
 from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException, Path
@@ -13,7 +14,7 @@ from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, UserInfo
 from app.users.repositories import UserPreferenceRepository
 from app.users.sensitive_personal_data.repository import SensitivePersonalDataRepository
-from app.users.sensitive_personal_data.types import CreateSensitivePersonalDataRequest
+from app.users.sensitive_personal_data.types import CreateSensitivePersonalDataRequest, SensitivePersonalData
 from app.users.sensitive_personal_data.service import SensitivePersonalDataService, ISensitivePersonalDataService
 from app.users.sensitive_personal_data.errors import (
     DuplicateSensitivePersonalDataError,
@@ -67,7 +68,7 @@ def add_user_sensitive_personal_data_routes(users_router: APIRouter, auth: Authe
         },
     )
     async def _handle_sensitive_personal_data(
-            sensitive_personal_data: CreateSensitivePersonalDataRequest,
+            sensitive_personal_data_payload: CreateSensitivePersonalDataRequest,
             user_id: str = Path(description="the unique identifier of the user", examples=["1"]),
             service: ISensitivePersonalDataService = Depends(get_sensitive_personal_data_service),
             user_info: UserInfo = Depends(auth.get_user_info())
@@ -78,10 +79,16 @@ def add_user_sensitive_personal_data_routes(users_router: APIRouter, auth: Authe
             raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail=warning_msg)
 
         try:
-            if sensitive_personal_data.sensitive_personal_data is None:
+            if sensitive_personal_data_payload.sensitive_personal_data is None:
                 await service.skip(user_id)
             else:
-                await service.create(user_id, sensitive_personal_data)
+                # Create sensitive personal data
+                sensitive_personal_data = SensitivePersonalData(
+                    user_id=user_id,
+                    created_at=datetime.now(timezone.utc),
+                    sensitive_personal_data=sensitive_personal_data_payload.sensitive_personal_data
+                )
+                await service.create(sensitive_personal_data)
         except DuplicateSensitivePersonalDataError as e:
             warning_msg = str(e)
             logger.warning(warning_msg)
