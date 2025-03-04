@@ -15,7 +15,7 @@ describe("protected route util", () => {
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
         sessions: [],
-        sessions_with_feedback: [],
+        user_feedback_answered_questions: {},
       };
 
       // WHEN checking if sensitive data is valid
@@ -34,7 +34,7 @@ describe("protected route util", () => {
         has_sensitive_personal_data: true,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
         sessions: [],
-        sessions_with_feedback: [],
+        user_feedback_answered_questions: {},
       };
 
       // WHEN checking if sensitive data is valid
@@ -53,7 +53,7 @@ describe("protected route util", () => {
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_AVAILABLE,
         sessions: [],
-        sessions_with_feedback: [],
+        user_feedback_answered_questions: {},
       };
 
       // WHEN checking if sensitive data is valid
@@ -74,7 +74,7 @@ describe("protected route util", () => {
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_AVAILABLE,
         sessions: [],
-        sessions_with_feedback: [],
+        user_feedback_answered_questions: {},
       };
 
       // WHEN checking if accepted_tc is valid
@@ -93,7 +93,7 @@ describe("protected route util", () => {
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_AVAILABLE,
         sessions: [],
-        sessions_with_feedback: [],
+        user_feedback_answered_questions: {},
       };
 
       // WHEN checking if accepted_tc is valid
@@ -113,7 +113,7 @@ describe("protected route util", () => {
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_AVAILABLE,
         sessions: [],
-        sessions_with_feedback: [],
+        user_feedback_answered_questions: {},
       };
 
       // WHEN checking if accepted_tc is valid

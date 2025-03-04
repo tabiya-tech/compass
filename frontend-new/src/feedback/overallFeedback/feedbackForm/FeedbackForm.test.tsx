@@ -3,8 +3,8 @@ import "src/_test_utilities/consoleMock";
 
 import FeedbackForm, { DATA_TEST_ID, FeedbackCloseEvent } from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
 import { render, screen } from "src/_test_utilities/test-utils";
-import { fireEvent, waitFor } from "@testing-library/react";
-import { DATA_TEST_ID as FEEDBACK_FORM_CONTENT_DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
+import { act, fireEvent, waitFor } from "@testing-library/react";
+import FeedbackFormContent from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import {
@@ -12,12 +12,8 @@ import {
   Language,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import OverallFeedbackService from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service";
-import feedbackFormContentSteps from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/feedbackFormContentSteps";
 import { FeedbackError } from "src/error/commonErrors";
-import { DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/commentTextField/CommentTextField";
-
-// mock the feedback service
-jest.mock("src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service");
+import { FeedbackResponse } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 
 // mock the snackbar provider
 jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
@@ -40,6 +36,31 @@ jest.mock("src/userPreferences/UserPreferencesStateService", () => ({
     }),
   }),
 }));
+
+// mock the feedback form content
+jest.mock("src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent", () => {
+  const actual = jest.requireActual("src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent");
+  return {
+    ...actual,
+    __esModule: true,
+    default: jest.fn(() => <div data-testid={actual.DATA_TEST_ID.FEEDBACK_FORM_CONTENT}/>),
+  };
+});
+
+const mockFeedbackResponse: FeedbackResponse = {
+  id: "foo",
+  version: {
+    frontend: "foo-frontend",
+    backend: "foo-backend"
+  },
+  feedback_items: [{
+    question_id: "foo-question_id",
+    simplified_answer: {
+      rating_numeric: 5
+    }
+  }],
+  created_at: new Date().toISOString()
+}
 
 describe("FeedbackForm", () => {
   test("should render component successfully", () => {
@@ -70,9 +91,7 @@ describe("FeedbackForm", () => {
   test("should call handleClose when close button is clicked", () => {
     // GIVEN the component
     const mockHandleClose = jest.fn();
-    const givenFeedbackForm = (
-      <FeedbackForm isOpen={true} notifyOnClose={mockHandleClose} />
-    );
+    const givenFeedbackForm = <FeedbackForm isOpen={true} notifyOnClose={mockHandleClose} />;
     // AND the component is rendered
     render(givenFeedbackForm);
 
@@ -93,22 +112,25 @@ describe("FeedbackForm", () => {
     });
 
     test("should call handleFeedbackSubmit when submit button is clicked", async () => {
-      // GIVEN the component
-      const mockHandleClose = jest.fn();
-      const givenFeedbackForm = (
-        <FeedbackForm isOpen={true} notifyOnClose={mockHandleClose} />
-      );
+      // GIVEN the feedback service will successfully send a feedback
+      jest.spyOn(OverallFeedbackService.getInstance(), "sendFeedback").mockResolvedValueOnce(mockFeedbackResponse)
       // AND the component is rendered
+      const mockHandleClose = jest.fn();
+      const givenFeedbackForm = <FeedbackForm isOpen={true} notifyOnClose={mockHandleClose} />;
       render(givenFeedbackForm);
-      // AND there is at least one answer
-      const input = screen.getAllByTestId(COMMENT_TEXT_FIELD_TEST_ID.COMMENT_TEXT_FIELD);
-      fireEvent.change(input[0], { target: { value: "This is a comment" } });
-
-      // WHEN the submit button is clicked
-      const nextButton = screen.getByTestId(FEEDBACK_FORM_CONTENT_DATA_TEST_ID.FEEDBACK_FORM_NEXT_BUTTON);
-      for (let i = 0; i < feedbackFormContentSteps.length; i++) {
-        fireEvent.click(nextButton);
-      }
+      // AND when the submit button is clicked
+      const submitCallback = (FeedbackFormContent as jest.Mock).mock.calls.at(-1)[0].notifySubmit;
+      await act(async () => {
+        submitCallback([
+          {
+            question_id: "foo-question",
+            answer: {
+              comment: "foo-comment"
+            },
+            is_answered: false,
+          }
+        ]);
+      });
 
       // THEN expect the notifyOnClose to have been called
       await waitFor(() => expect(mockHandleClose).toHaveBeenCalledWith(FeedbackCloseEvent.SUBMIT));
@@ -122,7 +144,7 @@ describe("FeedbackForm", () => {
       );
     });
 
-    test("should call handleFeedbackSubmit when submit button is clicked and handle error", async () => {
+    test("should call handleFeedbackSubmit when submit button is clicked and handle nonexistent session", async () => {
       (console.error as jest.Mock).mockClear();
 
       // GIVEN getUserPreferences returns a user without any session
@@ -131,21 +153,26 @@ describe("FeedbackForm", () => {
         user_id: "0001",
         language: Language.en,
         sessions: [],
-        sessions_with_feedback: [],
+        user_feedback_answered_questions: {},
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       });
 
       // WHEN the component is rendered
       render(<FeedbackForm isOpen={true} notifyOnClose={jest.fn()} />);
-      // AND there is at least one answer
-      const input = screen.getAllByTestId(COMMENT_TEXT_FIELD_TEST_ID.COMMENT_TEXT_FIELD);
-      fireEvent.change(input[0], { target: { value: "This is a comment" } });
-      // AND the submit button is clicked
-      const nextButton = screen.getByTestId(FEEDBACK_FORM_CONTENT_DATA_TEST_ID.FEEDBACK_FORM_NEXT_BUTTON);
-      for (let i = 0; i < feedbackFormContentSteps.length; i++) {
-        fireEvent.click(nextButton);
-      }
+      // AND when the submit button is clicked
+      const submitCallback = (FeedbackFormContent as jest.Mock).mock.calls.at(-1)[0].notifySubmit;
+      await act(async () => {
+        submitCallback([
+          {
+            question_id: "foo-question",
+            answer: {
+              comment: "foo-comment"
+            },
+            is_answered: false,
+          }
+        ]);
+      });
 
       // THEN expect an error message to be shown
       await waitFor(() => {

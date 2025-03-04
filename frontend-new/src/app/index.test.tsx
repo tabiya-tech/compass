@@ -208,7 +208,7 @@ describe("index", () => {
         accepted_tc: new Date(),
         has_sensitive_personal_data: false,
         getActiveSessionId: jest.fn().mockReturnValue(123),
-        sessions_with_feedback: [],
+        user_feedback_answered_questions: {},
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       };
 
@@ -241,7 +241,7 @@ describe("index", () => {
         user_id: "foo",
         language: Language.en,
         sessions: [123],
-        sessions_with_feedback: [],
+        user_feedback_answered_questions: {},
         accepted_tc: new Date(),
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,

@@ -13,6 +13,7 @@ import pytest
 import pytest_mock
 
 from app.conversations.feedback.repository import IUserFeedbackRepository
+from app.users.sessions import generate_new_session_id
 from app.version.utils import load_version_info
 from common_libs.test_utilities import get_random_user_id, get_random_printable_string
 from . import SimplifiedAnswer
@@ -50,50 +51,13 @@ def _get_random_answer(question: dict) -> Answer:
         comment=get_random_printable_string(10)
     )
 
-
-def _get_new_feedback_spec(*,
-                           session_id: int | None = None,
-                           user_id: str | None = None,
-                           feedback_items_specs: list[NewFeedbackItemSpec] | None = None
-                           ) -> NewFeedbackSpec:
-    """
-    Returns a new feedback object with random data for testing purposes.
-    If any parameters are provided, they will be used instead of random values.
-
-    Args:
-        session_id: Optional specific session ID to use
-        user_id: Optional specific user ID to use
-        feedback_items_specs: Optional specific feedback items to use
-    """
-    # Generate random session ID if not provided
-    _session_id = session_id if session_id is not None else random.randint(1, 10000)  # nosec B311 # random is used for testing purposes
-    # Generate random user ID if not provided
-    _user_id = user_id if user_id is not None else get_random_user_id()
-
-    random_question_id = random.choice(list(actual_questions_json_file.keys()))  # nosec B311 # random is used for testing purposes
-    random_question: dict[str, Any] = actual_questions_json_file[random_question_id]
-
-    # Use provided feedback items or create a default one
-    _feedback_items = feedback_items_specs if feedback_items_specs is not None else [NewFeedbackItemSpec(
-        question_id=random_question_id,
-        simplified_answer=SimplifiedAnswer.from_answer(_get_random_answer(random_question))
-    )]
-
-    return NewFeedbackSpec(
-        version=NewFeedbackVersionSpec(
-            frontend=get_random_printable_string(5)
-        ),
-        feedback_items_specs=_feedback_items
-    )
-
-
 def _def_feedback() -> Feedback:
     random_question_id = random.choice(list(actual_questions_json.keys()))  # nosec B311 # random is used for testing purposes
     random_question: dict[str, Any] = actual_questions_json[random_question_id]
 
     return Feedback(
         id=str(uuid4()),
-        session_id=random.randint(1, 10000),  # nosec B311 # random is used for testing purposes
+        session_id=generate_new_session_id(),
         user_id=get_random_user_id(),
         version=Version(frontend=get_random_printable_string(4), backend=get_random_printable_string(4)),
         feedback_items=[FeedbackItem(
@@ -115,7 +79,7 @@ def _mock_feedback_repository() -> IUserFeedbackRepository:
         async def get_feedback_by_session_id(self, session_id: int) -> Feedback | None:
             raise NotImplementedError()
 
-        async def get_feedback_session_ids(self, user_id: str) -> list[int]:
+        async def get_all_feedback_for_user(self, user_id: str) -> dict[int, Feedback]:
             raise NotImplementedError()
 
     return MockedFeedbackRepository()
@@ -213,32 +177,44 @@ class TestUpsertFeedback:
         assert "interaction_ease" in str(error_info.value)
 
 
-class TestGetUserFeedback:
+class TestGetAnsweredQuestions:
     @pytest.mark.asyncio
-    async def test_get_user_feedback_success(self, _mock_feedback_repository: IUserFeedbackRepository):
+    async def test_get_answered_questions_success(self, _mock_feedback_repository: IUserFeedbackRepository):
         # GIVEN a user ID
         given_user_id = "user123"
 
-        # AND some session IDs in the repository
-        given_session_ids = [123, 456]
-        _mock_feedback_repository.get_feedback_session_ids = AsyncMock(return_value=given_session_ids)
+        # AND some feedback data in the repository
+        given_feedback = {
+            123: _def_feedback(),
+            456: _def_feedback()
+        }
+        _mock_feedback_repository.get_all_feedback_for_user = AsyncMock(return_value=given_feedback)
 
-        # WHEN get_user_feedback is called
-        result = await UserFeedbackService(user_feedback_repository=_mock_feedback_repository).get_user_feedback(given_user_id)
+        # WHEN get_answered_questions is called
+        result = await UserFeedbackService(user_feedback_repository=_mock_feedback_repository).get_answered_questions(given_user_id)
 
-        # THEN the session IDs should be returned
-        assert result == given_session_ids
+        # THEN the question IDs for each session should be returned
+        expected_dict = {}
+        for key in list(given_feedback.keys()):
+            expected_dict[key] = [item.question_id for item in given_feedback[key].feedback_items]
+        assert result == expected_dict
+
+        # AND the repository's get_all_feedback_for_user method was called with the expected user ID
+        _mock_feedback_repository.get_all_feedback_for_user.assert_called_once_with(given_user_id)
 
     @pytest.mark.asyncio
-    async def test_get_user_feedback_no_feedback(self, _mock_feedback_repository: IUserFeedbackRepository):
+    async def test_get_answered_questions_no_feedback(self, _mock_feedback_repository: IUserFeedbackRepository):
         # GIVEN a user ID with no feedback
         given_user_id = "user123"
 
-        # AND no session IDs in the repository
-        _mock_feedback_repository.get_feedback_session_ids = AsyncMock(return_value=[])
+        # AND no feedback in the repository
+        _mock_feedback_repository.get_all_feedback_for_user = AsyncMock(return_value={})
 
-        # WHEN get_user_feedback is called
-        result = await UserFeedbackService(user_feedback_repository=_mock_feedback_repository).get_user_feedback(given_user_id)
+        # WHEN get_answered_questions is called
+        result = await UserFeedbackService(user_feedback_repository=_mock_feedback_repository).get_answered_questions(given_user_id)
 
-        # THEN an empty list should be returned
-        assert result == []
+        # THEN an empty dictionary should be returned
+        assert result == {}
+
+        # AND the repository's get_all_feedback_for_user method was called with the expected user ID
+        _mock_feedback_repository.get_all_feedback_for_user.assert_called_once_with(given_user_id)

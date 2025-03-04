@@ -12,28 +12,6 @@ interface Step {
 
 const feedbackFormContentSteps: Step[] = [
   {
-    label: "Overall Satisfaction",
-    questions: [
-      {
-        type: QuestionType.Rating,
-        questionId: "interaction_ease",
-        questionText: questions["interaction_ease"].question_text,
-        lowRatingLabel: "Difficult",
-        highRatingLabel: "Easy",
-        maxRating: 5,
-        placeholder: questions["interaction_ease"].comment_placeholder,
-      },
-      {
-        type: QuestionType.Rating,
-        questionId: "satisfaction_with_compass",
-        questionText: questions["satisfaction_with_compass"].question_text,
-        lowRatingLabel: "Unsatisfied",
-        highRatingLabel: "Satisfied",
-        maxRating: 5,
-      },
-    ],
-  },
-  {
     label: "Bias & Experience Accuracy",
     questions: [
       {
@@ -83,6 +61,15 @@ const feedbackFormContentSteps: Step[] = [
   {
     label: "Final feedback",
     questions: [
+      {
+        type: QuestionType.Rating,
+        questionId: "interaction_ease",
+        questionText: questions["interaction_ease"].question_text,
+        lowRatingLabel: "Difficult",
+        highRatingLabel: "Easy",
+        maxRating: 5,
+        placeholder: questions["interaction_ease"].comment_placeholder,
+      },
       {
         type: QuestionType.Rating,
         questionId: "recommendation",

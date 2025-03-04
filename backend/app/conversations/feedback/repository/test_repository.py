@@ -14,6 +14,7 @@ from app.conversations.feedback.repository import UserFeedbackRepository
 from app.conversations.feedback.services import Feedback, FeedbackItem, Answer, Version
 from common_libs.time_utilities import datetime_to_mongo_date, get_now
 from common_libs.test_utilities import get_random_printable_string, get_random_user_id
+from app.users.sessions import generate_new_session_id
 
 
 def _assert_feedback_matches(doc, expected_feedback):
@@ -70,7 +71,7 @@ def _get_feedback_item(*, question_id: str) -> FeedbackItem:
 def _get_feedback(*, with_id: bool, question_ids: list[str]) -> Feedback:
     return Feedback(
         id=str(bson.ObjectId()) if with_id else None,
-        session_id=random.randint(1, 10),  # nosec B311 # random is used for testing purposes
+        session_id=generate_new_session_id(),
         user_id=get_random_user_id(),
         version=Version(frontend="1.0.0", backend="1.0.0"),
         feedback_items=[
@@ -467,6 +468,60 @@ class TestUpsertFeedback:
         _assert_feedback_matches(doc, given_feedback)
 
     @pytest.mark.asyncio
+    async def test_should_update_feedback_for_given_user_and_leave_others_untouched(self, get_feedback_repository: Awaitable[UserFeedbackRepository]):
+        repository = await get_feedback_repository
+
+        # GIVEN a feedback entry to add for a user and session
+        new_feedback = _get_random_feedback(with_id=False, feedback_items_count=2)
+
+        # AND a feedback entry for a different user and session already exists in the database
+        other_feedback = _get_random_feedback(with_id=False, feedback_items_count=2)
+        await repository.upsert_feedback(other_feedback)
+
+        # guard assert that the new feedback and existing feedback are not for the same user
+        assert new_feedback.user_id != other_feedback.user_id
+
+        # WHEN the upsert_feedback method is called with the new feedback
+        result = await repository.upsert_feedback(new_feedback)
+
+        # THEN the result should be a Feedback object
+        assert isinstance(result, Feedback)
+
+        # AND the feedback we find when we query the database with the session_id should match the given feedback
+        doc = await repository._collection.find_one({'session_id': new_feedback.session_id})
+        _assert_feedback_matches(doc, new_feedback)
+
+        # AND the other feedback should be untouched
+        doc = await repository._collection.find_one({'session_id': other_feedback.session_id})
+        _assert_feedback_matches(doc, other_feedback)
+
+    @pytest.mark.asyncio
+    async def test_user_should_fail_to_update_feedback_for_another_user(self, get_feedback_repository: Awaitable[UserFeedbackRepository]):
+        repository = await get_feedback_repository
+
+        # GIVEN a feedback entry for a user and session exists in the database
+        user_1_feedback = _get_random_feedback(with_id=False, feedback_items_count=2)
+        await repository.upsert_feedback(user_1_feedback)
+
+        # AND a new feedback entry for the same session but different user
+        user_2_feedback = _get_random_feedback(with_id=False, feedback_items_count=2)
+        user_2_feedback.session_id = user_1_feedback.session_id  # same session
+        assert user_2_feedback.user_id != user_1_feedback.user_id  # different user
+
+        # WHEN the upsert_feedback method is called with new feedback
+        # THEN an error should occur
+        # Note: The correct filter should return null feedback, triggering an insert attempt.
+        # This will fail with a DuplicateKeyError if the filter is correct.
+        # If the filter only checks for session_id (without the necessary condition),
+        # it may return another user's feedback and overwrite it, which we want to avoid.
+        with pytest.raises(Exception):
+            await repository.upsert_feedback(user_2_feedback)
+
+        # AND the feedback for user 1 should be untouched
+        doc = await repository._collection.find_one({'session_id': user_1_feedback.session_id})
+        _assert_feedback_matches(doc, user_1_feedback)
+
+    @pytest.mark.asyncio
     async def test_db_upsert_throws(self, get_feedback_repository: Awaitable[UserFeedbackRepository],
                                     mocker: pytest_mock.MockerFixture):
         repository = await get_feedback_repository
@@ -542,48 +597,104 @@ class TestGetFeedbackBySessionId:
         assert actual_error_info.value == given_error
 
 
-class TestGetFeedbackSessionIds:
+class TestGetAllFeedbackForUser:
     @pytest.mark.asyncio
-    async def test_get_feedback_session_ids_empty_user(self, get_feedback_repository: Awaitable[UserFeedbackRepository]):
+    async def test_feedback_for_user_with_no_feedback(self, get_feedback_repository: Awaitable[UserFeedbackRepository]):
         repository = await get_feedback_repository
 
         # GIVEN a user id with no feedback
-        given_user_id = "user999"
+        given_user_id = get_random_user_id()
 
-        # WHEN get_feedback_session_ids is called
-        result = await repository.get_feedback_session_ids(given_user_id)
+        # WHEN get_all_feedback_for_user is called
+        result = await repository.get_all_feedback_for_user(given_user_id)
 
-        # THEN an empty list should be returned
-        assert isinstance(result, list)
+        # THEN an empty dict should be returned
+        assert isinstance(result, dict)
         assert len(result) == 0
 
     @pytest.mark.asyncio
-    async def test_get_feedback_session_ids_with_data(self, get_feedback_repository: Awaitable[UserFeedbackRepository]):
+    async def test_feedback_for_user_with_a_session_that_has_feedback(self, get_feedback_repository: Awaitable[UserFeedbackRepository]):
         repository = await get_feedback_repository
 
-        # GIVEN multiple feedback exists for a user
-        given_user_id = "user123"
+        # GIVEN feedback exists for a user in a single session
+        given_user_id = get_random_user_id()
+        given_feedback = _get_random_feedback(with_id=False, feedback_items_count=2)
+        given_feedback.user_id = given_user_id
+
+        # AND the feedback is added to the database
+        await repository.upsert_feedback(given_feedback)
+
+        # WHEN get_all_feedback_for_user is called
+        result = await repository.get_all_feedback_for_user(given_user_id)
+
+        # THEN we should get back a dictionary with one session
+        assert isinstance(result, dict)
+        assert len(result) == 1
+        # AND the session should contain the feedback items
+        assert given_feedback.session_id in result
+        assert isinstance(result[given_feedback.session_id], Feedback)
+        assert len(result[given_feedback.session_id].feedback_items) == 2
+        # AND the feedback items should match
+        assert all(item in given_feedback.feedback_items for item in result[given_feedback.session_id].feedback_items)
+
+    @pytest.mark.asyncio
+    async def test_feedback_for_user_with_multiple_sessions_that_have_feedback(self, get_feedback_repository: Awaitable[UserFeedbackRepository]):
+        repository = await get_feedback_repository
+
+        # GIVEN multiple feedback exists for a user across different sessions
+        given_user_id = get_random_user_id()
         given_feedback_1 = _get_random_feedback(with_id=False, feedback_items_count=2)
-        given_feedback_2 = _get_random_feedback(with_id=False, feedback_items_count=2)
         given_feedback_1.user_id = given_user_id
+        given_feedback_2 = _get_random_feedback(with_id=False, feedback_items_count=3)
         given_feedback_2.user_id = given_user_id
-        given_feedback_2.session_id = 456  # Different session ID
 
         # AND the feedback is added to the database
         await repository.upsert_feedback(given_feedback_1)
         await repository.upsert_feedback(given_feedback_2)
 
-        # WHEN get_feedback_session_ids is called
-        result = await repository.get_feedback_session_ids(given_user_id)
+        # WHEN get_all_feedback_for_user is called
+        result = await repository.get_all_feedback_for_user(given_user_id)
 
-        # THEN we should get back both session IDs
+        # THEN we should get back a dictionary with both sessions
+        assert isinstance(result, dict)
         assert len(result) == 2
+        # AND each session should contain the correct feedback items
         assert given_feedback_1.session_id in result
+        assert isinstance(result[given_feedback_1.session_id], Feedback)
         assert given_feedback_2.session_id in result
+        assert isinstance(result[given_feedback_2.session_id], Feedback)
+        # AND the feedback items should match for each session
+        assert all(item in given_feedback_1.feedback_items for item in result[given_feedback_1.session_id].feedback_items)
+        assert all(item in given_feedback_2.feedback_items for item in result[given_feedback_2.session_id].feedback_items)
 
     @pytest.mark.asyncio
-    async def test_get_feedback_session_ids_db_find_throws(self, get_feedback_repository: Awaitable[UserFeedbackRepository],
-                                                           mocker: pytest_mock.MockerFixture):
+    async def test_get_all_feedback_for_user_ignores_other_users(self, get_feedback_repository: Awaitable[UserFeedbackRepository]):
+        repository = await get_feedback_repository
+
+        # GIVEN feedback exists for two different users
+        given_user_id = get_random_user_id()
+        other_user_id = get_random_user_id()
+        given_feedback = _get_random_feedback(with_id=False, feedback_items_count=2)
+        other_feedback = _get_random_feedback(with_id=False, feedback_items_count=2)
+        given_feedback.user_id = given_user_id
+        other_feedback.user_id = other_user_id
+
+        # AND the feedback is added to the database
+        await repository.upsert_feedback(given_feedback)
+        await repository.upsert_feedback(other_feedback)
+
+        # WHEN get_all_feedback_for_user is called for the given user
+        result = await repository.get_all_feedback_for_user(given_user_id)
+
+        # THEN we should only get back the feedback for the given user
+        assert isinstance(result, dict)
+        assert len(result) == 1
+        assert given_feedback.session_id in result
+        assert other_feedback.session_id not in result
+
+    @pytest.mark.asyncio
+    async def test_get_all_feedback_for_user_db_find_throws(self, get_feedback_repository: Awaitable[UserFeedbackRepository],
+                                                            mocker: pytest_mock.MockerFixture):
         repository = await get_feedback_repository
 
         # GIVEN the repository's collection's find function throws a given exception
@@ -594,17 +705,17 @@ class TestGetFeedbackSessionIds:
         _find_spy = mocker.spy(repository._collection, 'find')
         _find_spy.side_effect = given_error
 
-        # WHEN get_feedback_session_ids is called
+        # WHEN get_all_feedback_for_user is called
         with pytest.raises(_GivenError) as actual_error_info:
-            await repository.get_feedback_session_ids("user123")
+            await repository.get_all_feedback_for_user(get_random_user_id())
 
-        # AND the raised error message should be the same as the given error
+        # THEN the raised error message should be the same as the given error
         assert actual_error_info.value == given_error
 
 
 class TestUniqueIndex:
     @pytest.mark.asyncio
-    async def test_not_allow_more_than_one_feedback_a_session(self, get_feedback_repository: Awaitable[UserFeedbackRepository]):
+    async def test_not_allow_more_than_one_feedback_per_session(self, get_feedback_repository: Awaitable[UserFeedbackRepository]):
         repository = await get_feedback_repository
 
         # GIVEN a new feedback entry for a user and session that does not exist in the database

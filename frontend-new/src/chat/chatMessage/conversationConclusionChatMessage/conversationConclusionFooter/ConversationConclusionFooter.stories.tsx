@@ -5,12 +5,15 @@ import { ChatProvider } from "src/chat/ChatContext";
 import { FeedbackItem } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import { TabiyaUser } from "src/auth/auth.types";
-import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService, {
+  CUSTOMER_SATISFACTION_KEY,
+} from "src/userPreferences/UserPreferencesStateService";
 import {
   SensitivePersonalDataRequirement,
   Language,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import { getBackendUrl } from "src/envService";
 
 // Mock feedback data
 const mockFeedbackInProgress: FeedbackItem[] = [
@@ -29,6 +32,7 @@ interface StorybookWrapperProps {
   isAccountConverted?: boolean;
   isAnonymous?: boolean;
   hasSubmittedFeedback?: boolean;
+  hasSubmittedCustomerSatisfactionRating?: boolean;
 }
 
 // Create a wrapper component that provides the necessary context and mocked values
@@ -38,6 +42,7 @@ const StorybookWrapper = ({
   isAccountConverted = false,
   isAnonymous = false,
   hasSubmittedFeedback = false,
+  hasSubmittedCustomerSatisfactionRating = false,
 }: StorybookWrapperProps) => {
   // Mock the window object with our test data
   PersistentStorageService.setOverallFeedback(feedbackData);
@@ -46,7 +51,9 @@ const StorybookWrapper = ({
   // Mock the user data on window
   AuthenticationStateService.getInstance().setUser(
     isAnonymous
-      ? null
+      ? ({
+          id: "anonymous-user",
+      } as TabiyaUser)
       : ({
           id: "test-user",
           name: "Test User",
@@ -54,12 +61,22 @@ const StorybookWrapper = ({
         } as TabiyaUser)
   );
 
+  const answeredQuestions = [];
+  if (hasSubmittedFeedback) {
+    answeredQuestions.push("overall_satisfaction");
+  }
+  if (hasSubmittedCustomerSatisfactionRating) {
+    answeredQuestions.push(CUSTOMER_SATISFACTION_KEY);
+  }
+
   // Mock the session feedback on window
   UserPreferencesStateService.getInstance().setUserPreferences({
     sessions: [1],
     user_id: "test-user",
     language: Language.en,
-    sessions_with_feedback: [hasSubmittedFeedback ? 1 : 0],
+    user_feedback_answered_questions: {
+      1: answeredQuestions,
+    },
     sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
     has_sensitive_personal_data: false,
   });
@@ -67,11 +84,19 @@ const StorybookWrapper = ({
   return <ChatProvider handleOpenExperiencesDrawer={() => {}}>{children}</ChatProvider>;
 };
 
-const meta = {
+const meta : Meta<typeof ConversationConclusionFooter> = {
   title: "Chat/ConversationConclusionFooter",
   component: ConversationConclusionFooter,
   parameters: {
     layout: "centered",
+    mockData: [
+      {
+        url: getBackendUrl() + "/conversations/:session_id/feedback",
+        method: "PATCH",
+        status: 200,
+        response: mockFeedbackInProgress,
+      },
+    ],
   },
   decorators: [
     (Story) => (
@@ -80,7 +105,8 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof ConversationConclusionFooter>;
+  tags: ["autodocs"],
+};
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -147,6 +173,54 @@ export const FeedbackSubmitted: Story = {
   ],
 };
 
+// Story: Customer satisfaction rating un submitted
+export const CustomerSatisfactionRatingUnsubmitted: Story = {
+  parameters: {
+    docs: {
+      description: "Shows customer satisfaction rating when it has not been submitted",
+    },
+  },
+  decorators: [
+    (Story) => (
+      <StorybookWrapper hasSubmittedCustomerSatisfactionRating={false} >
+        <Story />
+      </StorybookWrapper>
+    ),
+  ],
+};
+
+// Story: Customer satisfaction rating submitted
+export const CustomerSatisfactionRatingSubmitted: Story = {
+  parameters: {
+    docs: {
+      description: "Shows thank you message when customer satisfaction rating has been submitted",
+    },
+  },
+  decorators: [
+    (Story) => (
+      <StorybookWrapper hasSubmittedCustomerSatisfactionRating={true}>
+        <Story />
+      </StorybookWrapper>
+    ),
+  ],
+};
+
+// Story: Both Feedback and Customer satisfaction rating submitted
+export const FeedbackAndCustomerSatisfactionRatingSubmitted: Story = {
+  parameters: {
+    docs: {
+      description: "Shows thank you message when both customer satisfaction rating and feedback have been submitted",
+    },
+  },
+  decorators: [
+    (Story) => (
+      <StorybookWrapper hasSubmittedCustomerSatisfactionRating={true} hasSubmittedFeedback={true}>
+        <Story />
+      </StorybookWrapper>
+    ),
+  ],
+};
+
 // Story: Anonymous user with create account prompt
 export const AnonymousUserCreateAccount: Story = {
   name: "Anonymous User - Create Account",
@@ -181,6 +255,7 @@ export const AnonymousUserVerificationReminder: Story = {
   ],
 };
 
+// Story: Registered user
 export const RegisteredUser: Story = {
   parameters: {
     docs: {

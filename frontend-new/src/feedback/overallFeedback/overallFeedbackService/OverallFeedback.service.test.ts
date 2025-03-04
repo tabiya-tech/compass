@@ -57,29 +57,12 @@ describe("OverallFeedbackService", () => {
     jest.clearAllMocks();
   });
 
-  test("should construct the service successfully", () => {
-    // GIVEN the service
-    const givenSessionId = 1234;
-    const service = new OverallFeedbackService(givenSessionId);
-
-    // THEN expect the service to be constructed successfully
-    expect(service).toBeDefined();
-
-    // AND the service should have the correct endpoint url
-    expect(service.feedbackEndpointUrl).toEqual(`${givenApiServerUrl}/conversations/${givenSessionId}/feedback`);
-  });
-
   test("should return a new instance of OverallFeedbackService with the correct sessionId", () => {
-    // GIVEN a sessionId
-    const sessionId = 1234;
-
     // WHEN calling getInstance
-    const instance = OverallFeedbackService.getInstance(sessionId);
+    const instance = OverallFeedbackService.getInstance();
 
     // THEN expect it to return a new instance of OverallFeedbackService
     expect(instance).toBeInstanceOf(OverallFeedbackService);
-    // AND the instance should have the correct sessionId
-    expect(instance).toHaveProperty("sessionId", sessionId);
   });
 
   describe("sendFeedback", () => {
@@ -116,8 +99,8 @@ describe("OverallFeedbackService", () => {
 
       // WHEN the sendFeedback method is called
       const givenSessionId = 1234;
-      const service = new OverallFeedbackService(givenSessionId);
-      const actualResponse = await service.sendFeedback(givenFeedbackData);
+      const service = OverallFeedbackService.getInstance();
+      const actualResponse = await service.sendFeedback(givenSessionId, givenFeedbackData);
 
       // THEN expect it to make a PATCH request with correct headers and payload
       expectCorrectFetchRequest(fetchSpy,`${givenApiServerUrl}/conversations/${givenSessionId}/feedback`, {
@@ -148,10 +131,10 @@ describe("OverallFeedbackService", () => {
 
       // WHEN calling sendFeedback method
       const givenSessionId = 1234;
-      const service = new OverallFeedbackService(givenSessionId);
+      const service = OverallFeedbackService.getInstance();
 
       // THEN expected it to reject with the same error thrown by fetchWithAuth
-      await expect(service.sendFeedback([])).rejects.toMatchObject(givenFetchError);
+      await expect(service.sendFeedback(givenSessionId, [])).rejects.toMatchObject(givenFetchError);
     });
 
     test.each([
@@ -165,8 +148,8 @@ describe("OverallFeedbackService", () => {
 
         // WHEN the sendFeedback method is called
         const givenSessionId = 1234;
-        const service = new OverallFeedbackService(givenSessionId);
-        const sendFeedbackPromise = service.sendFeedback([]);
+        const service = OverallFeedbackService.getInstance();
+        const sendFeedbackPromise = service.sendFeedback(givenSessionId, []);
 
         // THEN expect it to reject with the expected error
         const expectedError = {
@@ -206,10 +189,10 @@ describe("OverallFeedbackService", () => {
 
       // WHEN the sendFeedback method is called
       const givenSessionId = 1234;
-      const service = new OverallFeedbackService(givenSessionId);
+      const service = OverallFeedbackService.getInstance();
 
       // THEN expect it to throw an error
-      await expect(service.sendFeedback(givenFeedbackData)).rejects.toThrow("User not found");
+      await expect(service.sendFeedback(givenSessionId, givenFeedbackData)).rejects.toThrow("User not found");
     });
   });
 });
