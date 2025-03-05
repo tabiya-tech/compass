@@ -62,7 +62,6 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const [conversationCompleted, setConversationCompleted] = useState<boolean>(false);
   const [exploredExperiences, setExploredExperiences] = useState<number>(0);
   const [conversationConductedAt, setConversationConductedAt] = useState<string | null>(null);
-  const [currentMessage, setCurrentMessage] = useState<string>("");
   const [aiIsTyping, setAiIsTyping] = useState<boolean>(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [experiences, setExperiences] = React.useState<Experience[]>([]);
@@ -73,7 +72,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const [newConversationDialog, setNewConversationDialog] = React.useState<boolean>(false);
   const [exploredExperiencesNotification, setExploredExperiencesNotification] = useState<boolean>(false);
   const [activeSessionId, setActiveSessionId] = useState<number | null>(
-    UserPreferencesStateService.getInstance().getActiveSessionId()
+    UserPreferencesStateService.getInstance().getActiveSessionId(),
   );
   const [currentUserId] = useState<string | null>(authenticationStateService.getInstance().getUser()?.id ?? null);
 
@@ -113,25 +112,25 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
    * --- Service handlers ---
    */
 
-  // Opens the experiences drawer
-  // Goes to the experience service to get the experiences
+    // Opens the experiences drawer
+    // Goes to the experience service to get the experiences
   const handleOpenExperiencesDrawer = useCallback(async () => {
-    setIsDrawerOpen(true);
-    setIsLoading(true);
-    if (!activeSessionId) {
-      // If there is no session id, we can't get the experiences
-      throw new ChatError("Session id is not available");
-    }
-    try {
-      const experienceService = new ExperienceService();
-      const data = await experienceService.getExperiences(activeSessionId);
-      setExperiences(data);
-      setIsLoading(false);
-    } catch (error) {
-      enqueueSnackbar("Failed to retrieve experiences", { variant: "error" });
-      console.error(new ChatError("Failed to retrieve experiences", error as Error));
-    }
-  }, [enqueueSnackbar, activeSessionId]);
+      setIsDrawerOpen(true);
+      setIsLoading(true);
+      if (!activeSessionId) {
+        // If there is no session id, we can't get the experiences
+        throw new ChatError("Session id is not available");
+      }
+      try {
+        const experienceService = new ExperienceService();
+        const data = await experienceService.getExperiences(activeSessionId);
+        setExperiences(data);
+        setIsLoading(false);
+      } catch (error) {
+        enqueueSnackbar("Failed to retrieve experiences", { variant: "error" });
+        console.error(new ChatError("Failed to retrieve experiences", error as Error));
+      }
+    }, [enqueueSnackbar, activeSessionId]);
 
   // Goes to the authentication service to log the user out
   // Navigates to the login page
@@ -148,9 +147,9 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const sendMessage = useCallback(
     async (userMessage: string, sessionId: number) => {
       setAiIsTyping(true);
-      if (currentMessage) {
+      if (userMessage) {
         // optimistically add the user's message for a more responsive feel
-        const message = generateUserMessage(currentMessage, new Date().toISOString());
+        const message = generateUserMessage(userMessage, new Date().toISOString());
         addMessage(message);
       }
 
@@ -180,7 +179,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setAiIsTyping(false);
       }
     },
-    [currentMessage, exploredExperiences]
+    [exploredExperiences],
   );
 
   const initializeChat = useCallback(
@@ -223,7 +222,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
                 return generateConversationConclusionMessage(message.message_id, message.message, message.sent_at);
               }
               return generateCompassMessage(message.message_id, message.message, message.sent_at, message.reaction);
-            })
+            }),
           );
 
           setConversationCompleted(history.conversation_completed);
@@ -254,19 +253,15 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setAiIsTyping(false);
       }
     },
-    [sendMessage]
+    [sendMessage],
   );
 
   // Resets the text field for the next message
   // Optimistically adds the user's message to the messages list
   // Calls the sendMessage function to send the message
-  const handleSend = useCallback(async () => {
-    if (currentMessage.trim()) {
-      setCurrentMessage("");
-
-      await sendMessage(currentMessage, activeSessionId!);
-    }
-  }, [currentMessage, sendMessage, activeSessionId]);
+  const handleSend = useCallback(async (userMessage: string) => {
+    await sendMessage(userMessage, activeSessionId!);
+  }, [sendMessage, activeSessionId]);
 
   /**
    * --- Callbacks for child components ---
@@ -392,8 +387,6 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
                 handleSend={handleSend}
                 aiIsTyping={aiIsTyping}
                 isChatFinished={conversationCompleted}
-                message={currentMessage}
-                notifyChange={setCurrentMessage}
               />
             </Box>
           </Box>
