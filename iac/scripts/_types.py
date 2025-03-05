@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Mapping, Any
+from typing import Mapping, Any, Optional
 from dataclasses import dataclass
 from functools import cached_property
 
@@ -80,11 +80,13 @@ class StackConfigs:
     frontend: Mapping[str, Any]
     common: Mapping[str, Any]
 
+    secret_name: Optional[str]
+
     raw_config: dict
     """The raw dictionary(JSON/YML) Configurations for the stack config."""
 
     @staticmethod
-    def from_dict(environment: Environment, _dict: dict) -> "StackConfigs":
+    def from_dict(environment: Environment, _dict: dict, stack_config_secret_name: Optional[str]) -> "StackConfigs":
         """
         Creates an Environment Config object from the yml config.
         If some of the fields in the config dict are not present, it will raise an error.
@@ -100,5 +102,6 @@ class StackConfigs:
             backend=_dict[IaCModules.BACKEND.value],
             frontend=_dict[IaCModules.FRONTEND.value],
             common=_dict[IaCModules.COMMON.value],
-            raw_config=_dict
+            raw_config=_dict,
+            secret_name=stack_config_secret_name
         )

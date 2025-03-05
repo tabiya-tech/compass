@@ -1,4 +1,5 @@
 import argparse
+import logging
 import os
 import sys
 
@@ -123,7 +124,7 @@ def _get_latest_secret_value(secret_name: str) -> AccessSecretVersionResponse:
     return secret
 
 
-def get_versioned_secret_latest_value(secret_name: str, project_id: str, artifacts_version: Version) -> str:
+def get_versioned_secret_latest_value(secret_name: str, project_id: str, artifacts_version: Version) -> (str, str):
     """
     Get the version of the secret from the secret manager based on the config version.
     This is a special case when we have a versioned secret.
@@ -144,7 +145,8 @@ def get_versioned_secret_latest_value(secret_name: str, project_id: str, artifac
     :param project_id: The project id
     :param artifacts_version: The version of the artifacts.
     :param secret_name: The secret name.
-    :return:
+
+    :return: The secret value and the secret name
     """
 
     projects_service = ProjectsClient()
@@ -184,7 +186,7 @@ def get_versioned_secret_latest_value(secret_name: str, project_id: str, artifac
         if secret_value is None:
             raise ValueError(f"secret projects/{project_id} secrets/{secret_name}.* version/latest does not exist")
 
-    return secret_value.payload.data.decode("utf-8")
+    return secret_value.payload.data.decode("utf-8"), secret_value.name
 
 
 # =======================
@@ -245,12 +247,13 @@ def get_environment_stack_configurations(environment: Environment, version: Vers
 
     environment_stack_outputs = get_pulumi_stack_outputs(environment.stack_name, IaCModules.ENVIRONMENT.value)
     environment_project_id = environment_stack_outputs["project_id"].value
-    stack_configs = get_versioned_secret_latest_value(STACK_CONFIG_SECRET_PREFIX, environment_project_id, version)
+    stack_configs, stack_config_secret_name = get_versioned_secret_latest_value(
+        STACK_CONFIG_SECRET_PREFIX, environment_project_id, version)
 
-    return StackConfigs.from_dict(environment, yaml.safe_load(stack_configs))
+    return StackConfigs.from_dict(environment, yaml.safe_load(stack_configs), stack_config_secret_name)
 
 
-def get_environment_environment_variables(stack_name: str, version: Version):
+def get_environment_environment_variables(stack_name: str, version: Version) -> (str, str):
     """
     Get the environment variables for the given environment.
     """
@@ -258,7 +261,10 @@ def get_environment_environment_variables(stack_name: str, version: Version):
     environment_stack_outputs = get_pulumi_stack_outputs(stack_name, IaCModules.ENVIRONMENT.value)
     environment_project_id = environment_stack_outputs["project_id"].value
 
-    return get_versioned_secret_latest_value(ENV_VARS_SECRET_PREFIX, environment_project_id, version)
+    env_vars, env_vars_secret_path = get_versioned_secret_latest_value(
+        ENV_VARS_SECRET_PREFIX, environment_project_id, version)
+
+    return env_vars, env_vars_secret_path
 
 
 def _get_realm_environment_by_env_type(
@@ -281,7 +287,10 @@ def _get_realm_environment_by_env_type(
     return target_environments
 
 
-def find_environments(*, realm_name: str, environment_name: str | None, environment_type: EnvironmentTypes | None) -> list[Environment]:
+def find_environments(*,
+                      realm_name: str,
+                      environment_name: str | None,
+                      environment_type: EnvironmentTypes | None) -> list[Environment]:
     """
     Find the environments that match the selection criteria.
     :param realm_name: The realm name
