@@ -32,8 +32,8 @@ def main():
     organization_id = getconfig("gcp_organization_id")
     root_folder_id = getconfig("gcp_root_folder_id")
     root_project_id = getconfig("gcp_root_project_id")
-    upper_env_identity_projects_folder_id = getconfig("gcp_upper_env_identity_projects_folder_id")
-    lower_env_identity_projects_folder_id = getconfig("gcp_lower_env_identity_projects_folder_id")
+    upper_env_google_oauth_projects_folder_id = getconfig("gcp_upper_env_google_oauth_projects_folder_id")
+    lower_env_google_oauth_projects_folder_id = getconfig("gcp_lower_env_google_oauth_projects_folder_id")
     base_domain_name = getconfig("base_domain_name")
 
     # Export the realm config so that it can be referenced in downstream stacks.
@@ -53,8 +53,8 @@ def main():
         realm_name=realm_name,
         root_folder_id=root_folder_id,
         root_project_id=root_project_id,
-        upper_env_identity_projects_folder_id=upper_env_identity_projects_folder_id,
-        lower_env_identity_projects_folder_id=lower_env_identity_projects_folder_id,
+        upper_env_google_oauth_projects_folder_id=upper_env_google_oauth_projects_folder_id,
+        lower_env_google_oauth_projects_folder_id=lower_env_google_oauth_projects_folder_id,
         roots_path=libs_dir
     )
 
