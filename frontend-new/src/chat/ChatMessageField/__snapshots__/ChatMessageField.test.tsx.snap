@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ChatMessageField should render ChatMessageField correctly 1`] = `
+exports[`ChatMessageField should render correctly 1`] = `
 <div
   class="MuiBox-root css-acf3dn"
   data-testid="chat-message-field-container-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
@@ -9,7 +9,7 @@ exports[`ChatMessageField should render ChatMessageField correctly 1`] = `
     class="MuiBox-root css-zeiu9o"
   >
     <div
-      class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-r75dsv-MuiFormControl-root-MuiTextField-root"
+      class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-j8f3qx-MuiFormControl-root-MuiTextField-root"
     >
       <div
         class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline MuiInputBase-adornedEnd css-8z051r-MuiInputBase-root-MuiOutlinedInput-root"
@@ -19,12 +19,10 @@ exports[`ChatMessageField should render ChatMessageField correctly 1`] = `
           class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiInputBase-inputAdornedEnd css-f55ppk-MuiInputBase-input-MuiOutlinedInput-input"
           data-testid="chat-message-field-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
           id=":r0:"
-          maxlength="1000"
+          maxlength="1100"
           placeholder="Type your message..."
           style="height: 0px; overflow: hidden;"
-        >
-          foo
-        </textarea>
+        />
         <textarea
           aria-hidden="true"
           class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiInputBase-inputAdornedEnd css-f55ppk-MuiInputBase-input-MuiOutlinedInput-input"
@@ -36,15 +34,16 @@ exports[`ChatMessageField should render ChatMessageField correctly 1`] = `
           class="MuiInputAdornment-root MuiInputAdornment-positionEnd MuiInputAdornment-outlined MuiInputAdornment-sizeMedium css-1laqsz7-MuiInputAdornment-root"
         >
           <button
-            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorError MuiIconButton-sizeMedium css-1fhje8j-MuiButtonBase-root-MuiIconButton-root"
+            class="MuiButtonBase-root Mui-disabled MuiIconButton-root Mui-disabled MuiIconButton-sizeMedium css-1ifbsno-MuiButtonBase-root-MuiIconButton-root"
             data-testid="chat-message-field-button-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
-            tabindex="0"
+            disabled=""
+            tabindex="-1"
             title="send message"
             type="button"
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-ldtitb-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-6v3pcw-MuiSvgIcon-root"
               data-testid="chat-message-field-icon-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
               focusable="false"
               viewBox="0 0 24 24"
@@ -53,9 +52,6 @@ exports[`ChatMessageField should render ChatMessageField correctly 1`] = `
                 d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"
               />
             </svg>
-            <span
-              class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-            />
           </button>
         </div>
         <fieldset

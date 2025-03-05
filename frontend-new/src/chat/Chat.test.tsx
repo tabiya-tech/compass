@@ -901,12 +901,9 @@ describe("Chat", () => {
 
       // AND WHEN the user types a message
       const givenMessage = "I loved the smell of the bread and the taste of the cake.";
-      act(() => {
-        (ChatMessageField as jest.Mock).mock.calls.at(-1)[0].notifyChange(givenMessage);
-      });
       // AND the user sends the message
       act(() => {
-        (ChatMessageField as jest.Mock).mock.calls.at(-1)[0].handleSend();
+        (ChatMessageField as jest.Mock).mock.calls.at(-1)[0].handleSend(givenMessage);
       });
 
       // THEN expect the send message method to be called with the user's message
@@ -987,7 +984,6 @@ describe("Chat", () => {
       await waitFor(() => {
         expect(ChatMessageField as jest.Mock).toHaveBeenLastCalledWith(
           expect.objectContaining({
-            message: "",
             isChatFinished: false,
             aiIsTyping: false,
           }),
@@ -1049,13 +1045,10 @@ describe("Chat", () => {
       await assertChatInitialized();
       // AND WHEN the user types a message
       const givenMessage = "I loved the smell of the bread and the taste of the cake.";
-      act(() => {
-        (ChatMessageField as jest.Mock).mock.calls.at(-1)[0].notifyChange(givenMessage);
-      });
 
       // AND WHEN the user sends the message
       act(() => {
-        (ChatMessageField as jest.Mock).mock.calls.at(-1)[0].handleSend();
+        (ChatMessageField as jest.Mock).mock.calls.at(-1)[0].handleSend(givenMessage);
       });
 
       // THEN expect the send message method to be called

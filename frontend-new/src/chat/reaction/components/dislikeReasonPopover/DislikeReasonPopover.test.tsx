@@ -12,6 +12,7 @@ import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 describe("ReactionReasonPopover", () => {
 
   beforeEach(() => {
+    jest.clearAllMocks();
     mockBrowserIsOnLine(true);
   });
 
