@@ -3,35 +3,32 @@ name: Deploy
 on:
   workflow_dispatch:
     # when you want to trigger deployment manually
+
     inputs:
       # env-type and env-name are mutually exclusive
       env-type:
-        required: false
-        description: 'The environment type to deploy'
+        required: true
+        description: 'The environment type to deploy. This also is used to know which credentials to use.'
         type: choice
         options:
           - dev
           - test
           - prod
-      env-dir:
-        required: false
-        description: 'The directory where the environment is located'
-        type: string
-        options:
-          - lower
-          - upper
+
       env-name:
         required: false
         type: string
-        description: 'The environment name to deploy'
+        description: 'The environment name to deploy. If not specified all environments with the above type will be deployed.'
+
       target-git-branch:
         required: true
         type: string
-        description: 'The branch name/version to deploy'
+        description: 'The target git branch name to deploy'
+
       target-git-sha:
         required: true
         type: string
-        description: 'The commit sha to deploy'
+        description: 'The target git commit sha to deploy'
 
   workflow_call:
     inputs:
@@ -57,27 +54,18 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Validate the inputs
-        run: |
-          if [[ "${{ inputs.deploy }}" == "true" && "${{ inputs.upload_artifact }}" == "true" ]]; then
-            echo "Error: deploy and upload_artifact cannot be true at the same time."
-            exit 1
-          fi
-          
-          if [[ "${{ inputs.deploy }}" == "false" && "${{ inputs.upload_artifact }}" == "false" ]]; then
-            echo "Error: deploy and upload_artifact cannot be false at the same time."
-            exit 1
-          fi
-
       # 1. checkout.
-
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target-git-sha }}
+
       - name: Setup python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip' # caching pip dependencies
+
       - name: Install python packages
         run: pip install -r requirements.txt
         working-directory: iac
@@ -96,7 +84,7 @@ jobs:
 
           # We are using Boo
           credentials_json:
-            ${{ ((inputs.env-dir == 'upper' || inputs.env-type == 'prod') && secrets.GCP_UPPER_ENVS_SERVICE_ACCOUNT_JSON) || secrets.GCP_LOWER_ENVS_SERVICE_ACCOUNT_JSON }}
+            ${{ (inputs.env-type == 'prod' && secrets.GCP_UPPER_ENVS_SERVICE_ACCOUNT_JSON) || secrets.GCP_LOWER_ENVS_SERVICE_ACCOUNT_JSON }}
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
@@ -125,10 +113,23 @@ jobs:
 
       # 4. run the deployment scripts.
 
+      - name: Get Target environment(s) arguments.
+        id: target_environments
+        # Trim the environment name.
+        # If the environment name was provided then use it, otherwise use the environment type.
+        # Construct the arguments that are going to be used in the next steps.
+        run: |
+          ENV_NAME="$(echo '${{ inputs.env-name }}' | xargs)"
+          if [ -n "$ENV_NAME" ]; then
+            echo "args=--env-name $ENV_NAME" >> $GITHUB_OUTPUT
+          else
+            echo "args=--env-type ${{ inputs.env-type }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Prepare the deployment(s)
         working-directory: iac
-        run: ./scripts/prepare.py --realm-name ${{ vars.REALM_NAME }} --env-type ${{ inputs.env-type }} --target-git-sha ${{ inputs.target-git-sha }} --target-git-branch ${{ inputs.target-git-branch }}
+        run: ./scripts/prepare.py --realm-name ${{ vars.REALM_NAME }} ${{ steps.target_environments.outputs.args }} --target-git-sha ${{ inputs.target-git-sha }} --target-git-branch ${{ inputs.target-git-branch }}
 
       - name: Deploy the infrastructure
         working-directory: iac
-        run: ./scripts/up.py --realm-name ${{ vars.REALM_NAME }} --env-type ${{ inputs.env-type }}
+        run: ./scripts/up.py --realm-name ${{ vars.REALM_NAME }} ${{ steps.target_environments.outputs.args }}
