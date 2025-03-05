@@ -82,7 +82,7 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
         # so that it can be accessed by the logger
         # and downstream functions
         session_id_ctx_var.set(session_id)
-        user_id_ctx_var.set(user_info)
+        user_id_ctx_var.set(user_info.user_id)
 
         # Do not allow user input that is too long,
         # as a basic measure to prevent abuse.
