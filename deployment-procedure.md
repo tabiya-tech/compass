@@ -150,8 +150,8 @@ config:
   gcp_root_folder_id: "<root_folder_id>"  # Root folder ID. Use the one from Step 1.3
   gcp_root_project_id: "<root_project_id>"  # Root project ID. Use the one from Step 1.5
   base_domain_name: "<base_domain_name>"  # Base domain (e.g., tabiya.tech). It must be the top level domain.
-  gcp_upper_env_identity_projects_folder_id: "<upper_env_identity_projects_folder_id>"  # Folder ID for upper environment identity projects. Use the one from Step 1.4.
-  gcp_lower_env_identity_projects_folder_id: "<lower_env_identity_projects_folder_id>"  # Folder ID for lower environment identity projects. Use the one from Step 1.4.
+  gcp_upper_env_google_oauth_projects_folder_id: "<upper_env_google_oauth_projects_folder_id>"  # Folder ID for upper environment google oauth projects. Use the one from Step 1.4.
+  gcp_lower_env_google_oauth_projects_folder_id: "<lower_env_google_oauth_projects_folder_id>"  # Folder ID for lower environment google oauth projects. Use the one from Step 1.4.
 ```
 
 > **ATTENTION**: Do not check the `Pulumi.<REALM_NAME>.yaml` file to the repository, as it contains sensitive information.
@@ -195,14 +195,14 @@ Sentry is for now **set up manually**. Follow these steps:
 _______
 
 
-## Step 2: Create an Identity Project.
+## Step 2: Create a Google OAuth Project.
 
-The Identity Project enables Google Sign-In and requires a privacy page, a consent screen, and branding configurations, including logos and app name.
+The Google OAuth enables Google Sign-In and requires a privacy page, a consent screen, and branding configurations, including logos and app name.
 
 
 ### Step 2.1: Create a Google Project.
 
-- **Create a new project** in the [Google Cloud Console](https://console.cloud.google.com/cloud-resource-manager) under the appropriate [identity folder created in step 1.4](#step-14-create-google-oauth-project-folders) based on the environment type. 
+- **Create a new project** in the [Google Cloud Console](https://console.cloud.google.com/cloud-resource-manager) under the appropriate [OAuth Projects folder created in step 1.4](#step-14-create-google-oauth-project-folders) based on the environment type. 
 - Add a random suffix to make it is unpredictable.
 
 
@@ -535,29 +535,6 @@ Set the project to use with the Google Cloud SDK:
 ```shell
 gcloud config set project <PROJECT>
 ```
-
-##### Launch LangServe locally
-
-Start the LangServe server with the following command:
-
-```shell
-python app/server.py
-```
-
-> NOTE:
-> Langchain will infer the project and the credentials from the Google Cloud SDK.
-
-##### Running the Image Locally
-
-To run the image, you'll need to map your local gcloud configuration to the container and set the `PROJECT_ID`
-environment variable.
-
-We also expose port 8080 with the `-p 8080:8080` option.
-
-```shell
-docker run -v ~/.config/gcloud/:/root/.config/gcloud/ -e GCLOUD_PROJECT="$(gcloud config get project)" -p 8080:8080 compass-backend
-```
-
 
 ### How to authenticate AWS.
 

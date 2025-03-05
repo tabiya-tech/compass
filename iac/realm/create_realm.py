@@ -190,8 +190,8 @@ def _create_organizational_base(*,
                                 billing_account_id: str,
                                 realm_name: str,
                                 root_folder_id: str,
-                                upper_env_identity_projects_folder_id: str,
-                                lower_env_identity_projects_folder_id: str,
+                                upper_env_google_oauth_projects_folder_id: str,
+                                lower_env_google_oauth_projects_folder_id: str,
                                 dependencies: list[pulumi.Resource]
                                 ) -> tuple[gcp.organizations.Folder, gcp.organizations.Folder, gcp.cloudidentity.Group, gcp.cloudidentity.Group]:
     """
@@ -302,7 +302,7 @@ def _create_organizational_base(*,
                                   "roles/serviceusage.serviceUsageAdmin"]
     _grant_folder_roles_to_group(folder_id=lower_envs_folder.folder_id, folder_name="lower-env-folder", group_name="devs", group=realm_developers,
                                  roles=lower_env_folder_dev_roles, provider=provider)
-    _grant_folder_roles_to_group(folder_id=lower_env_identity_projects_folder_id, folder_name="lower-env-identity-projects-folder", group_name="devs",
+    _grant_folder_roles_to_group(folder_id=lower_env_google_oauth_projects_folder_id, folder_name="lower-env-identity-projects-folder", group_name="devs",
                                  group=realm_developers,
                                  roles=lower_env_folder_dev_roles, provider=provider)
     gcp.billing.AccountIamMember(
@@ -476,8 +476,8 @@ def create_realm(*,
                  billing_account_id: str,
                  root_folder_id: str,
                  root_project_id: str,
-                 upper_env_identity_projects_folder_id: str,
-                 lower_env_identity_projects_folder_id: str,
+                 upper_env_google_oauth_projects_folder_id: str,
+                 lower_env_google_oauth_projects_folder_id: str,
                  region: str,
                  realm_name: str,
                  roots_path: str
@@ -511,8 +511,8 @@ def create_realm(*,
                                                  customer_id=customer_id,
                                                  billing_account_id=billing_account_id,
                                                  root_folder_id=root_folder_id,
-                                                 upper_env_identity_projects_folder_id=upper_env_identity_projects_folder_id,
-                                                 lower_env_identity_projects_folder_id=lower_env_identity_projects_folder_id,
+                                                 upper_env_google_oauth_projects_folder_id=upper_env_google_oauth_projects_folder_id,
+                                                 lower_env_google_oauth_projects_folder_id=lower_env_google_oauth_projects_folder_id,
                                                  dependencies=wait_for_dependencies,
                                                  provider=provider)
     # Create the service accounts
@@ -547,9 +547,9 @@ def create_realm(*,
     pulumi.export("generic_repository", generic_repository)
     pulumi.export("lower_env_folder_id", lower_envs_folder.folder_id)
     pulumi.export("environments_config_secret_name", environments_config_secret.name)
-    pulumi.export("lower_env_identity_projects_folder_id", lower_env_identity_projects_folder_id)
+    pulumi.export("lower_env_google_oauth_projects_folder_id", lower_env_google_oauth_projects_folder_id)
     pulumi.export("upper_env_folder_id", prod_envs_folder.folder_id)
-    pulumi.export("upper_env_identity_projects_folder_id", upper_env_identity_projects_folder_id)
+    pulumi.export("upper_env_google_oauth_projects_folder_id", upper_env_google_oauth_projects_folder_id)
     pulumi.export("lower_env_service_account", lower_env_service_account)
     pulumi.export("upper_env_service_account", upper_env_service_account)
     pulumi.export("lower_env_service_account_key_file_name", lower_env_service_account_key_file_name)
