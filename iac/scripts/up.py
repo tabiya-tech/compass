@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-
+import datetime
 import os
 
 import sys
 import argparse
 import time
 from typing import Optional
+import pulumi.automation as auto
 
 import requests
 
@@ -88,6 +89,33 @@ def _deploy_common(stack_name: str):
     _run_smoke_tests(f"{frontend_url}/data/version.json", 30)
 
 
+def _tag_the_environment_with_deployment_info(stack_name: str):
+    print(f"Tagging the environment: {stack_name} with the deployment info.")
+
+    stack_path = os.path.join(iac_dir, IaCModules.ENVIRONMENT.value)
+    environment_stack = auto.select_stack(
+        work_dir=stack_path,
+        stack_name=stack_name
+    )
+
+    prepare_time = getenv("PREPARE_TIME")
+    environment_stack.set_tag("prepare_time", prepare_time)
+
+    env_vars_secret_path = getenv("ENV_VARS_SECRETS_PATH")
+    environment_stack.set_tag("env_vars_secrets_path", env_vars_secret_path)
+
+    stack_config_secret_path = getenv("STACK_CONFIG_SECRET_PATH")
+    environment_stack.set_tag("stack_config_secret_path", stack_config_secret_path)
+
+    target_git_branch = getenv("TARGET_GIT_BRANCH_NAME")
+    environment_stack.set_tag("target_git_branch", target_git_branch)
+
+    target_git_sha = getenv("TARGET_GIT_SHA")
+    environment_stack.set_tag("target_git_sha", target_git_sha)
+
+    environment_stack.set_tag("deployment_end_time", datetime.datetime.now(tz=datetime.timezone.utc).isoformat())
+
+
 def _deploy_environment(stack_name: str):
     """
     Deploy the environment:
@@ -114,6 +142,9 @@ def _deploy_environment(stack_name: str):
 
         # 1.5 Deploy the common
         _deploy_common(stack_name)
+
+        # 1.6 set the necessary tags to the pulumi environment, necessary for the deployment report.
+        _tag_the_environment_with_deployment_info(stack_name)
 
     except Exception as e:
         print(f"Error deploying the environment: {stack_name}")

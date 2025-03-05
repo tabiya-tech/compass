@@ -17,7 +17,7 @@ iac_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # so that we can import the iac/lib module when we run pulumi from withing the iac/scripts directory.
 sys.path.insert(0, iac_dir)
 
-from _types import IaCModules, StackConfigs, Environment, DeploymentType
+from _types import IaCModules, StackConfigs, Environment, DeploymentType, Secret
 from environment.env_types import EnvironmentTypes
 from lib import MAIN_SECRET_VERSION, get_pulumi_stack_outputs, STACK_CONFIG_SECRET_PREFIX, \
     ENV_VARS_SECRET_PREFIX, Version
@@ -123,7 +123,7 @@ def _get_latest_secret_value(secret_name: str) -> AccessSecretVersionResponse:
     return secret
 
 
-def get_versioned_secret_latest_value(secret_name: str, project_id: str, artifacts_version: Version) -> str:
+def get_versioned_secret_latest_value(secret_name: str, project_id: str, artifacts_version: Version) -> Secret:
     """
     Get the version of the secret from the secret manager based on the config version.
     This is a special case when we have a versioned secret.
@@ -144,7 +144,8 @@ def get_versioned_secret_latest_value(secret_name: str, project_id: str, artifac
     :param project_id: The project id
     :param artifacts_version: The version of the artifacts.
     :param secret_name: The secret name.
-    :return:
+
+    :return: The secret object
     """
 
     projects_service = ProjectsClient()
@@ -184,7 +185,10 @@ def get_versioned_secret_latest_value(secret_name: str, project_id: str, artifac
         if secret_value is None:
             raise ValueError(f"secret projects/{project_id} secrets/{secret_name}.* version/latest does not exist")
 
-    return secret_value.payload.data.decode("utf-8")
+    return Secret(
+        value=secret_value.payload.data.decode("utf-8"),
+        name=secret_value.name
+    )
 
 
 # =======================
@@ -238,19 +242,20 @@ def get_realm_environment(realm_name: str, environment_name: str):
     return None
 
 
-def get_environment_stack_configurations(environment: Environment, version: Version) -> StackConfigs:
+def get_environment_stack_configurations(stack_name: str, version: Version) -> Secret:
     """
     Gets the stacks configurations for a given environment.
     """
 
-    environment_stack_outputs = get_pulumi_stack_outputs(environment.stack_name, IaCModules.ENVIRONMENT.value)
+    environment_stack_outputs = get_pulumi_stack_outputs(stack_name, IaCModules.ENVIRONMENT.value)
     environment_project_id = environment_stack_outputs["project_id"].value
-    stack_configs = get_versioned_secret_latest_value(STACK_CONFIG_SECRET_PREFIX, environment_project_id, version)
+    stack_configs_secret = get_versioned_secret_latest_value(
+        STACK_CONFIG_SECRET_PREFIX, environment_project_id, version)
 
-    return StackConfigs.from_dict(environment, yaml.safe_load(stack_configs))
+    return stack_configs_secret
 
 
-def get_environment_environment_variables(stack_name: str, version: Version):
+def get_environment_environment_variables(stack_name: str, version: Version) -> Secret:
     """
     Get the environment variables for the given environment.
     """
@@ -258,7 +263,10 @@ def get_environment_environment_variables(stack_name: str, version: Version):
     environment_stack_outputs = get_pulumi_stack_outputs(stack_name, IaCModules.ENVIRONMENT.value)
     environment_project_id = environment_stack_outputs["project_id"].value
 
-    return get_versioned_secret_latest_value(ENV_VARS_SECRET_PREFIX, environment_project_id, version)
+    env_vars_secret = get_versioned_secret_latest_value(
+        ENV_VARS_SECRET_PREFIX, environment_project_id, version)
+
+    return env_vars_secret
 
 
 def _get_realm_environment_by_env_type(
@@ -281,7 +289,10 @@ def _get_realm_environment_by_env_type(
     return target_environments
 
 
-def find_environments(*, realm_name: str, environment_name: str | None, environment_type: EnvironmentTypes | None) -> list[Environment]:
+def find_environments(*,
+                      realm_name: str,
+                      environment_name: str | None,
+                      environment_type: EnvironmentTypes | None) -> list[Environment]:
     """
     Find the environments that match the selection criteria.
     :param realm_name: The realm name

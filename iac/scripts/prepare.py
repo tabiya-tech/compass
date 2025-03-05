@@ -3,6 +3,7 @@
 import os
 import sys
 import uuid
+import datetime
 from textwrap import dedent
 
 import yaml
@@ -21,15 +22,19 @@ from backend.prepare_backend import download_backend_config
 from frontend.prepare_frontend import download_frontend_bundle
 
 from environment.env_types import EnvironmentTypes
-from _types import IaCModules, Environment
+from _types import IaCModules, Environment, StackConfigs
 from scripts.formatters import construct_artifacts_version
 from lib import get_pulumi_stack_outputs, MAIN_SECRET_VERSION, construct_artifacts_dir, \
     download_generic_artifacts_file, get_file_as_string, Version
 from _common import add_select_environments_arguments, write_config_to_pulumi_yaml_file, \
     get_environment_stack_configurations, get_environment_environment_variables, compare_dict_keys, find_environments
 
+
 base_templates_dir = os.path.join(iac_folder, "templates")
 templates_dir = os.path.join(iac_folder, "scripts", "_tmp")
+environment_variables_added_by_the_script = ["DEPLOYMENT_RUN_NUMBER", "TARGET_GIT_BRANCH_NAME",
+                                             "TARGET_GIT_SHA", "PREPARE_TIME", "ENV_VARS_SECRETS_PATH",
+                                             "STACK_CONFIG_SECRET_PATH"]
 
 
 def _download_templates(*,
@@ -93,10 +98,15 @@ def _download_artifacts_and_config(_realm_name: str, _artifacts_version: Version
     )
 
 
-def _prepare_env_file(stack_name: str, deployment_run_number: str, artifacts_version: Version):
-    env_file_content = get_environment_environment_variables(stack_name, artifacts_version)
+def _prepare_env_file(
+        stack_name: str,
+        deployment_run_number: str,
+        artifacts_version: Version):
+    env_file_content_secret = get_environment_environment_variables(stack_name, artifacts_version)
+    stack_configs_secret = get_environment_stack_configurations(stack_name, artifacts_version)
 
     # add environment variables to prepare the deployment.
+    env_file_content = env_file_content_secret.value
     env_file_content += dedent(f'''\n
         ######################
         # Added by prepare.py
@@ -104,6 +114,11 @@ def _prepare_env_file(stack_name: str, deployment_run_number: str, artifacts_ver
         TARGET_GIT_BRANCH_NAME={artifacts_version.git_branch_name}
         TARGET_GIT_SHA={artifacts_version.git_sha}
         DEPLOYMENT_RUN_NUMBER={deployment_run_number}
+        
+        # Configurations used details.
+        PREPARE_TIME={datetime.datetime.now(tz=datetime.timezone.utc).isoformat()}
+        ENV_VARS_SECRETS_PATH={env_file_content_secret.name}
+        STACK_CONFIG_SECRET_PATH={stack_configs_secret.name}
         ''')
     env_file_path = os.path.join(iac_folder, f".env.{stack_name}")
     with open(env_file_path, "w", encoding="utf-8") as file:
@@ -128,16 +143,23 @@ def _prepare_environment_deployment(*,
 
     # 1. Download the configs/Environment variables
     print("info: Downloading the configurations and environment variables")
-    stack_configs = get_environment_stack_configurations(environment, artifacts_version)
-    env_file_path = _prepare_env_file(environment.stack_name, deployment_run_number, artifacts_version)
+    stack_configs_secret = get_environment_stack_configurations(environment.stack_name, artifacts_version)
+    stack_configs = StackConfigs.from_dict(environment, yaml.safe_load(stack_configs_secret.value))
+
+    env_file_path = _prepare_env_file(
+        environment.stack_name,
+        deployment_run_number,
+        artifacts_version,
+    )
 
     # 2. Compare the configs with the templates.
 
     env_vars_template = dotenv_values(os.path.join(base_templates_dir, "env.template"))
 
-    env_vars_template["DEPLOYMENT_RUN_NUMBER"] = deployment_run_number
-    env_vars_template["TARGET_GIT_BRANCH_NAME"] = artifacts_version.git_branch_name
-    env_vars_template["TARGET_GIT_SHA"] = artifacts_version.git_sha
+    # Remove keys that are added by prepare.py
+    env_values = dotenv_values(env_file_path)
+    for key in environment_variables_added_by_the_script:
+        env_values.pop(key)
 
     stack_config_template_value = get_file_as_string(os.path.join(base_templates_dir, "stack_config.template.yaml"))
     stack_config_template = yaml.safe_load(stack_config_template_value)
@@ -147,7 +169,7 @@ def _prepare_environment_deployment(*,
     else:
         print("info: stack config template matches the stack config.")
 
-    if not compare_dict_keys(env_vars_template, dotenv_values(env_file_path)):
+    if not compare_dict_keys(env_vars_template, env_values):
         raise ValueError("The env vars template does not match the env vars.")
     else:
         print("info: env vars template matches the env vars.")

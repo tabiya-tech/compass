@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Mapping, Any
+from typing import Mapping, Any, Optional
 from dataclasses import dataclass
 from functools import cached_property
 
@@ -102,3 +102,16 @@ class StackConfigs:
             common=_dict[IaCModules.COMMON.value],
             raw_config=_dict
         )
+
+
+@dataclass(frozen=True)
+class Secret:
+    """
+    Secret Object
+    """
+
+    name: str
+    """The fully qualified name of the secret, including the version"""
+
+    value: Optional[str]
+    """The value of the secret, the payload"""
