@@ -85,6 +85,7 @@
     "compile": "tsc --noEmit",
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "serve": "npx http-server build",
     "test": "react-scripts test --coverage --watchAll=false",
     "eject": "react-scripts eject",
     "test:smoke": "jest --config jest.smoke.config.js --runInBand test/smoke/*.test.ts",
