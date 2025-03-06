@@ -1,5 +1,7 @@
 import os
 import mimetypes
+import tempfile
+import brotli
 import pulumi
 import pulumi_gcp as gcp
 
@@ -31,14 +33,30 @@ def _upload_directory_to_bucket(basic_config: ProjectBaseConfig, bucket_name: pu
             file_path = os.path.relpath(absolute_file_path, source_dir)
             mime_type, _ = mimetypes.guess_type(absolute_file_path)
             target_name = os.path.join(target_dir, file_path)
-            print(f"Uploading {file_path} as {target_name} with MIME type {mime_type}")
-
+            # add svg
+            use_brotli = mime_type is not None and mime_type.startswith(("text/", "application/javascript", "application/json", "image/svg+xml"))
+            use_brotli = use_brotli or file_path.endswith((".html", ".ttf", ".woff", ".woff2", ".css", ".js", ".json", ".svg"))
+            if use_brotli:
+                # Compress with Brotli
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".br") as temp_file:
+                    with open(absolute_file_path, 'rb') as f_in:
+                        compressed_data = brotli.compress(f_in.read(), quality=11)  # Max compression
+                        temp_file.write(compressed_data)
+                    temp_file_path = temp_file.name
+                source_asset = pulumi.FileAsset(temp_file_path)
+                content_encoding = "br"
+            else:
+                # No compression
+                source_asset = pulumi.FileAsset(absolute_file_path)
+                content_encoding = None
+            pulumi.info(f"Uploading {file_path} as {target_name} with MIME type {mime_type} and encoding {content_encoding}")
             gcp.storage.BucketObject(
                 # Use a unique name for Pulumi resource while preserving the path.
                 get_resource_name(resource=target_name.replace("/", '_'), resource_type="bucket-object"),
                 name=target_name,
                 bucket=bucket_name,
-                source=pulumi.FileAsset(absolute_file_path),
+                source=source_asset,
+                content_encoding=content_encoding,
                 content_type=mime_type,  # Ensure correct MIME type
                 cache_control="no-store" if file_path in do_not_cache else None,  # Do not cache index.html
                 opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider)
