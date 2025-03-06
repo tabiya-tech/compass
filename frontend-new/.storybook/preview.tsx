@@ -2,22 +2,22 @@ import React, { useEffect } from "react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { HashRouter } from "react-router-dom";
 import { applicationTheme, ThemeMode } from "../src/theme/applicationTheme/applicationTheme";
-// Load fonts
-// The application font are typically loaded in the index.html, index.css or index.tsx file
-// The fonts for the storybook are loaded here
-// Since the fonts for the app are downloaded from a CDN in the index.css file
-// we need to load them here as well
-import "../src/index.css";
-// Load the application theme css file here
-import "../src/theme/applicationTheme/application-theme.css";
-// If the application fonts are loaded from the index.tsx file via an import, then the fonts can be loaded here as well
-/*
-import "@fontsource/roboto/300.css";
-import "@fontsource/roboto/400.css";
-import "@fontsource/roboto/500.css";
-import "@fontsource/roboto/700.css";
-*/
-import type { Preview, StoryFn, StoryObj } from "@storybook/react";
+// Loading fonts:
+//  When the application is built, the fonts are loaded in the index.html file
+//  The application font are typically loaded in the index.html but could be loaded from other locations such then index.css or index.tsx.
+//  The index.html file using <link> is preferred because it offers faster loading times.
+//  For storybook fonts are loaded from here.
+//  Any fonts required by the application or by the stories specifically should be loaded by adding an import statement in this file
+import "./preview.css";
+//  If a fonts used by the application is not referenced in the above file, you can alternatively load it here via @fontsource package e.g.:
+//    import "@fontsource/roboto/300.css";
+//    import "@fontsource/roboto/400.css";
+//    import "@fontsource/roboto/500.css";
+//    import "@fontsource/roboto/700.css";
+//  If the font references by the application are not loaded via the above mechanism and they are not found locally on the system,
+//  the browser will use a default font.
+
+import type { Preview, StoryFn } from "@storybook/react";
 import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineContext } from "../src/app/isOnlineProvider/IsOnlineProvider";
 import { initSentry } from "../src/sentryInit";
