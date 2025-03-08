@@ -8,14 +8,6 @@ import SnackbarProvider from "src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineProvider } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { HashRouter } from "react-router-dom";
 
-jest.mock("@sentry/react", () => ({
-  withSentry: (Component: any) => Component,
-  getFeedback: jest.fn(),
-  withProfiler: (Component: any) => Component,
-  wrapCreateBrowserRouter: (Component: any) => Component,
-  isInitialized: jest.fn(),
-}));
-
 export const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <IsOnlineProvider>

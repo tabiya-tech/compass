@@ -27,7 +27,6 @@ import { EncryptedDataTooLarge } from "src/sensitiveData/services/sensitivePerso
 import * as writeRestAPIErrorToLogModule from "src/error/restAPIError/logger";
 import * as NotistackModule from "notistack";
 import { formConfig } from "./formConfig";
-import * as Sentry from "@sentry/react";
 import { DATA_TEST_ID as BUG_REPORT_DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import { UserPreferenceError } from "src/error/commonErrors";
@@ -198,9 +197,7 @@ describe("Sensitive Data", () => {
       resetAllMethodMocks(UserPreferencesStateService.getInstance());
     });
     it("should render the component with all elements", () => {
-      // GIVEN sentry is initialized
-      (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
-      // AND the user preferences state service is mocked to return user preferences with PII required
+      // GIVEN the user preferences state service is mocked to return user preferences with PII required
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
         user_id: "given user id",
         language: Language.en,
