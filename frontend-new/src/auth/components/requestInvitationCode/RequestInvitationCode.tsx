@@ -19,7 +19,7 @@ export const DATA_TEST_ID = {
 export const UI_TEXT = {
   REQUEST_LOGIN_CODE: "Don't have a login code?",
   REQUEST_REGISTRATION_CODE: "Don't have a registration code?",
-  REQUEST_INVITATION_CODE_LINK: " Reach out",
+  REQUEST_INVITATION_CODE_LINK: "Reach out",
 
 };
 const RequestInvitationCode = ({ invitationCodeType, notifyOnModalOpened }: Props) => {
@@ -39,13 +39,12 @@ const RequestInvitationCode = ({ invitationCodeType, notifyOnModalOpened }: Prop
     <>
       <Typography variant="caption" textAlign="center" gutterBottom>
         {invitationCodeType === InvitationType.LOGIN ? UI_TEXT.REQUEST_LOGIN_CODE : UI_TEXT.REQUEST_REGISTRATION_CODE}
+        &nbsp;
         <CustomLink
           disabled={!isOnline}
           onClick={handleModalOpen}
           data-testid={`${DATA_TEST_ID.REQUEST_INVITATION_CODE_LINK}`}
-        >
-          {UI_TEXT.REQUEST_INVITATION_CODE_LINK}
-        </CustomLink>
+        >{UI_TEXT.REQUEST_INVITATION_CODE_LINK}</CustomLink>
       </Typography>
 
       <RequestInvitationCodeFormModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
