@@ -99,40 +99,33 @@ export const extractPersonalInfo = (
   
   // Extract full name
   let fullName = '';
-  
+
   // Check if we have firstName and lastName fields
-  const hasFirstName = availableFields.has('firstName') && typeof sensitiveData['firstName'] === 'string';
-  const hasLastName = availableFields.has('lastName') && typeof sensitiveData['lastName'] === 'string';
-  
-  if (hasFirstName && hasLastName) {
-    // Combine first and last name
-    const firstName = (sensitiveData['firstName'] as string).trim();
-    const lastName = (sensitiveData['lastName'] as string).trim();
-    fullName = `${firstName} ${lastName}`.trim();
-  } else if (hasFirstName) {
-    // Only first name is available
-    fullName = (sensitiveData['firstName'] as string).trim();
-  } else if (hasLastName) {
-    // Only last name is available
-    fullName = (sensitiveData['lastName'] as string).trim();
+  const firstName = availableFields.has('firstName') && typeof sensitiveData['firstName'] === 'string' ? sensitiveData['firstName'].trim() : '';
+  const lastName = availableFields.has('lastName') && typeof sensitiveData['lastName'] === 'string' ? sensitiveData['lastName'].trim() : '';
+  if (firstName && lastName) {
+    fullName = `${firstName} ${lastName}`;
+  } else if (firstName) {
+    fullName = firstName;
+  } else if (lastName) {
+    fullName = lastName;
   } else if (availableFields.has('name') && typeof sensitiveData['name'] === 'string') {
-    // Check if there's a generic "name" field
-    fullName = (sensitiveData['name']).trim();
+    fullName = sensitiveData['name'].trim();
   }
   
   // Extract phone number
   let phoneNumber = '';
   if (availableFields.has('phoneNumber') && typeof sensitiveData['phoneNumber'] === 'string') {
-    phoneNumber = (sensitiveData['phoneNumber']).trim();
+    phoneNumber = sensitiveData['phoneNumber'].trim();
   }
   
   // Extract contact email
   let contactEmail = '';
   if (availableFields.has('contactEmail') && typeof sensitiveData['contactEmail'] === 'string') {
-    contactEmail = (sensitiveData['contactEmail']).trim();
+    contactEmail = sensitiveData['contactEmail'].trim();
   } else if (availableFields.has('email') && typeof sensitiveData['email'] === 'string') {
     // Try alternative field name
-    contactEmail = (sensitiveData['email']).trim();
+    contactEmail = sensitiveData['email'].trim();
   }
   
   return {

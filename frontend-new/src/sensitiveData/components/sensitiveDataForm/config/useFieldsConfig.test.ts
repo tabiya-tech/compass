@@ -1,9 +1,8 @@
 import "src/_test_utilities/consoleMock";
-import { renderHook } from '@testing-library/react-hooks';
-import { useFieldsConfig } from './useFieldsConfig';
-import { FieldType } from './types';
-import * as utils from './utils';
-import { setupFetchSpy } from 'src/_test_utilities/fetchSpy';
+import { renderHook } from "@testing-library/react-hooks";
+import { useFieldsConfig } from "./useFieldsConfig";
+import * as utils from "./utils";
+import { setupFetchSpy } from "src/_test_utilities/fetchSpy";
 
 // Mock the utils functions
 jest.mock('./utils', () => ({

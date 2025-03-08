@@ -13,7 +13,6 @@ const TestComponent = () => {
 };
 
 describe('Fields Configuration Validation', () => {
-  let fetchSpy: jest.SpyInstance;
 
   afterEach(() => {
     jest.restoreAllMocks();
@@ -34,7 +33,7 @@ stringFieldName:
 `;
     
     // WHEN the config is fetched
-    fetchSpy = setupFetchSpy(200, validConfig, "");
+    setupFetchSpy(200, validConfig, "");
 
     // THEN the component should render successfully
     render(<TestComponent />);
@@ -60,7 +59,7 @@ field2:
 `;
 
     // WHEN the config is fetched
-    fetchSpy = setupFetchSpy(200, invalidConfig, "");
+    setupFetchSpy(200, invalidConfig, "");
 
     // THEN the component should show an error about duplicate keys
     render(<TestComponent />);
@@ -84,7 +83,7 @@ enumField:
 `;
 
     // WHEN the config is fetched
-    fetchSpy = setupFetchSpy(200, invalidConfig, "");
+    setupFetchSpy(200, invalidConfig, "");
 
     // THEN the component should show an error about validation not being allowed for ENUM
     render(<TestComponent />);
@@ -103,7 +102,7 @@ stringField:
 `;
 
     // WHEN the config is fetched
-    fetchSpy = setupFetchSpy(200, invalidConfig, "");
+    setupFetchSpy(200, invalidConfig, "");
 
     // THEN the component should show an error about missing required fields
     render(<TestComponent />);
@@ -124,7 +123,7 @@ enumField:
 `;
 
     // WHEN the config is fetched
-    fetchSpy = setupFetchSpy(200, invalidConfig, "");
+    setupFetchSpy(200, invalidConfig, "");
 
     // THEN the component should show an error about missing values
     render(<TestComponent />);
