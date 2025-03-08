@@ -4,41 +4,9 @@ import { render, renderHook, RenderHookOptions, RenderOptions } from "@testing-l
 import { ThemeProvider } from "@mui/material";
 import applicationTheme, { ThemeMode } from "src/theme/applicationTheme/applicationTheme";
 
-// Import the Firebase mock utilities
-import "src/_test_utilities/firebaseMock";
 import SnackbarProvider from "src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineProvider } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { HashRouter } from "react-router-dom";
-jest.mock("firebase/compat/app", () => {
-  return {
-    initializeApp: jest.fn(),
-    auth: jest.fn().mockReturnValue({
-      signOut: jest.fn(),
-      currentUser: {
-        getIdToken: jest.fn(),
-        getTokenResult: jest.fn(),
-      },
-      onAuthStateChanged: jest.fn().mockReturnValue(jest.fn()),
-      signInWithPopup: jest.fn(),
-      GoogleAuthProvider: { PROVIDER_ID: "google.com" },
-    }),
-  };
-});
-
-jest.mock("firebaseui", () => {
-  return {
-    auth: {
-      AuthUI: {
-        start: jest.fn(),
-        getInstance: jest.fn().mockReturnValue({
-          start: jest.fn(),
-          reset: jest.fn(),
-        }),
-        reset: jest.fn(),
-      },
-    },
-  };
-});
 
 jest.mock("@sentry/react", () => ({
   withSentry: (Component: any) => Component,
