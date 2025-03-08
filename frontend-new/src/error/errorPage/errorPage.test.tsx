@@ -1,3 +1,5 @@
+// standard sentry mock
+import "src/_test_utilities/sentryMock"
 import { render, screen } from "src/_test_utilities/test-utils";
 import ErrorPage, { DATA_TEST_ID } from "src/error/errorPage/ErrorPage";
 import React from "react";
