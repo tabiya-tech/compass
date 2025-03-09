@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import pathlib
 import sys
 import os
 
@@ -212,23 +212,29 @@ async def _main():
     with open(private_key_path, "rb") as f:
         _private_key_pem = f.read()
 
-    # create the output directory if it doesn't exist
-    _output_path = args.output_path
-    output_dir = os.path.dirname(_output_path)
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir, exist_ok=True)
+    # Ensure _output_path is a JSON file path
+    _output_path = pathlib.Path(args.output_path)
+    if _output_path.suffix.lower() != ".json":
+        raise ValueError("Output path must be a JSON file with '.json' extension.")
+
+    # Ensure the parent directory exists
+    output_dir = _output_path.parent
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     # connect to the database
     mongo_uri = os.getenv("DECRYPT_SCRIPT_USERDATA_MONGODB_URI")
-    if mongo_uri is None:  # noqa
+    if not mongo_uri:
         raise ValueError("The userdata MongoDB URI is not set in the environment variables (DECRYPT_SCRIPT_USERDATA_MONGODB_URI)")
 
     database_name = os.getenv("DECRYPT_SCRIPT_USERDATA_DB_NAME")
-    if database_name is None:  # noqa
+    if not database_name:
         raise ValueError("The userdata MongoDB database name is not set in the environment variables (DECRYPT_SCRIPT_USERDATA_DB_NAME)")
 
     # Connect to MongoDB
     client = AsyncIOMotorClient(mongo_uri, tlsAllowInvalidCertificates=True)
+    si = await client.server_info()
+    host, port = client.address
+    logger.info(f"Connected to the database {database_name} at {host}:{port} version:{si.get('version', 'Unknown version')}")
     db = client.get_database(database_name)
     repository = SensitivePersonalDataRepository(db=db)
 
@@ -236,7 +242,7 @@ async def _main():
     await decrypt_sensitive_data_from_database(
         private_key_pem=_private_key_pem,
         private_key_password=_private_key_password.encode() if _private_key_password else None,
-        output_path=_output_path,
+        output_path=str(_output_path),
         repository=repository
     )
 
@@ -246,7 +252,8 @@ if __name__ == "__main__":
         sys.exit("This script requires Python 3.11 or higher.")
 
     parser = argparse.ArgumentParser(description="decrypt saved sensitive personal data",
-                                     epilog="The following environment variables are required: DECRYPT_SCRIPT_USERDATA_MONGODB_URI, DECRYPT_SCRIPT_USERDATA_DB_NAME")
+                                     epilog="The following environment variables are required: DECRYPT_SCRIPT_USERDATA_MONGODB_URI, "
+                                            "DECRYPT_SCRIPT_USERDATA_DB_NAME")
 
     parser.add_argument(
         '--private-key-path',
@@ -268,7 +275,7 @@ if __name__ == "__main__":
         '--password',
         type=str,
         required=True,
-        help='private key password',
+        help='The private key password',
         default=None
     )
 
