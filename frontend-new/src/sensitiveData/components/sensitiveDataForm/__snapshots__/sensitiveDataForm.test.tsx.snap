@@ -54,14 +54,8 @@ exports[`Sensitive Data Form Form validation should enable submit button when al
         class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
-        Please double-check your details as you won't be able to update them later.
-         
-        <span
-          class="css-1ty5jm0"
-        >
-          We may use it to contact you about your experience using Compass
-        </span>
-        .
+        We use your data to personalize your experience and may contact you about Compass.
+          Please provide the following information to continue.
         <button
           aria-label="help"
           class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
@@ -193,14 +187,8 @@ exports[`Sensitive Data Form Rendering fields based on configuration should hand
         class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
-        Please double-check your details as you won't be able to update them later.
-         
-        <span
-          class="css-1ty5jm0"
-        >
-          We may use it to contact you about your experience using Compass
-        </span>
-        .
+        We use your data to personalize your experience and may contact you about Compass.
+          Please provide the following information to continue.
         <button
           aria-label="help"
           class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
@@ -313,14 +301,8 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
-        Please double-check your details as you won't be able to update them later.
-         
-        <span
-          class="css-1ty5jm0"
-        >
-          We may use it to contact you about your experience using Compass
-        </span>
-        .
+        We use your data to personalize your experience and may contact you about Compass.
+          Please provide the following information to continue.
         <button
           aria-label="help"
           class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
@@ -438,14 +420,8 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
-        Please double-check your details as you won't be able to update them later.
-         
-        <span
-          class="css-1ty5jm0"
-        >
-          We may use it to contact you about your experience using Compass
-        </span>
-        .
+        We use your data to personalize your experience and may contact you about Compass.
+          Please provide the following information to continue.
         <button
           aria-label="help"
           class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
@@ -563,14 +539,8 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
-        Please double-check your details as you won't be able to update them later.
-         
-        <span
-          class="css-1ty5jm0"
-        >
-          We may use it to contact you about your experience using Compass
-        </span>
-        .
+        We use your data to personalize your experience and may contact you about Compass.
+          Please provide the following information to continue.
         <button
           aria-label="help"
           class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
@@ -700,14 +670,8 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
-        Please double-check your details as you won't be able to update them later.
-         
-        <span
-          class="css-1ty5jm0"
-        >
-          We may use it to contact you about your experience using Compass
-        </span>
-        .
+        We use your data to personalize your experience and may contact you about Compass.
+          Please provide the following information to continue.
         <button
           aria-label="help"
           class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
