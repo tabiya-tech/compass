@@ -162,7 +162,7 @@ const renderField = (
           key={field.name}
           field={field}
           dataTestId={fieldTestId}
-          initialValue={typeof initialData[field.name] === 'string' ? initialData[field.name] as string : field.defaultValue ?? ""}
+          initialValue={typeof initialData[field.name] === "string" ? initialData[field.name] as string : field.defaultValue ?? ""}
           onChange={(value: string, isValid: boolean) => handleFieldChange(field.name, value, isValid)}
         />
       );
@@ -173,7 +173,7 @@ const renderField = (
           key={field.name}
           field={field}
           dataTestId={fieldTestId}
-          initialValue={typeof initialData[field.name] === 'string' ? initialData[field.name] as string : field.defaultValue ?? ""}
+          initialValue={typeof initialData[field.name] === "string" ? initialData[field.name] as string : field.defaultValue ?? ""}
           onChange={(value: string, isValid: boolean) => handleFieldChange(field.name, value, isValid)}
         />
       );
@@ -192,7 +192,7 @@ const SensitiveDataForm: React.FC = () => {
   // Update the DATA_TEST_ID when the configuration is loaded
   useEffect(() => {
     if (!configLoading && !configError) {
-      // we use a global vatiable that is reasigned when the config is loaded
+      // we use a global variable that is resigned when the config is loaded
       // because we want to export the DATA_TEST_ID object and use it in the tests
       Object.assign(DATA_TEST_ID, createDataTestId(fields));
     }
@@ -206,7 +206,7 @@ const SensitiveDataForm: React.FC = () => {
   const [isSubmitButtonEnabled, setIsSubmitButtonEnabled] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
   const [userPreferences] = useState<UserPreference | null>(
-    UserPreferencesStateService.getInstance().getUserPreferences()
+    UserPreferencesStateService.getInstance().getUserPreferences(),
   );
 
   // Initialize with empty data, will be updated when config is loaded
@@ -237,10 +237,10 @@ const SensitiveDataForm: React.FC = () => {
   // Handle field change and validation
   const handleFieldChange = useCallback((key: string, value: string | string[], isValid: boolean) => {
     // Store the value
-    setSensitiveData((prev) => ({ ...prev, [key]: value}));
+    setSensitiveData((prev) => ({ ...prev, [key]: value }));
 
     // Store the validation state
-    setValidationErrors((prev) => ({...prev, [key]: isValid}));
+    setValidationErrors((prev) => ({ ...prev, [key]: isValid }));
   }, []);
 
   useEffect(() => {
@@ -267,7 +267,7 @@ const SensitiveDataForm: React.FC = () => {
       await sensitivePersonalDataService.createSensitivePersonalData(
         sanitize(sensitiveData, fields),
         userPreferences!.user_id,
-        fields
+        fields,
       );
 
       // Update user preferences to indicate that the user has sensitive personal data
@@ -280,7 +280,7 @@ const SensitiveDataForm: React.FC = () => {
 
       // Store personal info for local use using our utility function
       PersistentStorageService.setPersonalInfo(
-        extractPersonalInfo(sensitiveData, fields)
+        extractPersonalInfo(sensitiveData, fields),
       );
 
       enqueueSnackbar("Personal data saved successfully and securely.", { variant: "success" });
@@ -389,9 +389,9 @@ const SensitiveDataForm: React.FC = () => {
           height="100%"
         >
           <Box color="error.main" mb={2}>
-            <Typography 
-              role="heading" 
-              aria-level={1} 
+            <Typography
+              role="heading"
+              aria-level={1}
               data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_ERROR_MESSAGE}
             >
               Failed to load form configuration
@@ -421,15 +421,17 @@ const SensitiveDataForm: React.FC = () => {
           width={"100%"}
           sx={{
             paddingX: isMobile ? theme.fixedSpacing(theme.tabiyaSpacing.sm) : theme.spacing(0),
-            paddingBottom: (theme) => theme.fixedSpacing(theme.tabiyaSpacing.xl)
+            paddingBottom: (theme) => theme.fixedSpacing(theme.tabiyaSpacing.xl),
           }}
         >
           <AuthHeader
             title={"Provide Your Information"}
             subtitle={
               <>
-                Please double-check your details as you won't be able to update them later.{" "}
-                <HighlightedSpan>We may use it to contact you about your experience using Compass</HighlightedSpan>.
+                We use your data to personalize your experience and may contact you about Compass.
+                {
+                  isPIIRequired ? "  Please provide the following information to continue." : "  You can skip this step."
+                }
                 <HelpTip icon={<PrivacyTipIcon />}>
                   Your information is encrypted using state-of-the-art, end-to-end encryption and stored securely.
                 </HelpTip>
