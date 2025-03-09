@@ -496,6 +496,7 @@ const SensitiveDataForm: React.FC = () => {
               >
                 {isSavingSensitiveData ? (
                   <CircularProgress
+                    title={"Saving"}
                     color={"secondary"}
                     size={theme.typography.h5.fontSize}
                     sx={{ marginTop: theme.tabiyaSpacing.xs, marginBottom: theme.tabiyaSpacing.xs }}

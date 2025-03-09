@@ -9,6 +9,7 @@ enum CommonError {
   FEEDBACK_ERROR = "FeedbackError",
   ENV_ERROR = "EnvError",
   COMPONENT_ERROR = "ComponentError",
+  CONFIGURATION_ERROR = "ConfigurationError",
 }
 
 /**
@@ -90,6 +91,14 @@ export class InvitationError extends Error {
   constructor(message: string, cause?: Error | string) {
     super(message);
     this.name = CommonError.INVITATION_ERROR;
+    this.cause = cause;
+  }
+}
+
+export class ConfigurationError extends Error {
+  constructor(message: string, cause?: Error | string) {
+    super(message);
+    this.name = CommonError.CONFIGURATION_ERROR;
     this.cause = cause;
   }
 }

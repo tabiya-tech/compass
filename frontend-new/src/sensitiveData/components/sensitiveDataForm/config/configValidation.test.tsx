@@ -1,7 +1,9 @@
+import "src/_test_utilities/consoleMock";
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { useFieldsConfig } from './useFieldsConfig';
 import { setupFetchSpy } from 'src/_test_utilities/fetchSpy';
+import { ConfigurationError } from "src/error/commonErrors";
 
 // Mock component to test the hook
 const TestComponent = () => {
@@ -15,7 +17,7 @@ const TestComponent = () => {
 describe('Fields Configuration Validation', () => {
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    jest.clearAllMocks();
   });
 
   // GIVEN a valid configuration
@@ -64,8 +66,11 @@ field2:
     // THEN the component should show an error about duplicate keys
     render(<TestComponent />);
     await waitFor(() => {
-      expect(screen.getByText(/Error: Configuration validation failed: Duplicate dataKey/i)).toBeInTheDocument();
+      expect(screen.getByText(/Error: Failed to parse fields configuration/i)).toBeInTheDocument();
     });
+
+    // AND expect an error to be logged to the console
+    expect(console.error).toHaveBeenCalledWith(new ConfigurationError(`Sensitive Data: 1 duplicate dataKeys found in the configuration`));
   });
 
   // GIVEN an invalid configuration with wrong field types
@@ -88,8 +93,11 @@ enumField:
     // THEN the component should show an error about validation not being allowed for ENUM
     render(<TestComponent />);
     await waitFor(() => {
-      expect(screen.getByText(/Error: Configuration validation failed: Field "enumField" of type ENUM must have non-empty values array, Field "enumField" of type ENUM should not have validation property/i)).toBeInTheDocument();
+      expect(screen.getByText(/Error: Failed to parse fields configuration/i)).toBeInTheDocument();
     });
+
+    // AND expect an error to be logged to the console
+    expect(console.error).toHaveBeenCalledWith(new ConfigurationError("SensitiveData: Field values must be an array of strings"));
   });
 
   // GIVEN an invalid configuration with missing required fields
@@ -107,8 +115,11 @@ stringField:
     // THEN the component should show an error about missing required fields
     render(<TestComponent />);
     await waitFor(() => {
-      expect(screen.getByText(/Error: Invalid configuration/i)).toBeInTheDocument();
+      expect(screen.getByText(/Error: Failed to parse fields configuration/i)).toBeInTheDocument();
     });
+
+    // AND expect an error to be logged to the console
+    expect(console.error).toHaveBeenCalledWith(new ConfigurationError("SensitiveData: Field required is required and must be a boolean"));
   });
 
   // GIVEN an invalid configuration with wrong ENUM setup
@@ -128,7 +139,10 @@ enumField:
     // THEN the component should show an error about missing values
     render(<TestComponent />);
     await waitFor(() => {
-      expect(screen.getByText(/Error: Configuration validation failed: Field "enumField" of type ENUM must have non-empty values array/i)).toBeInTheDocument();
+      expect(screen.getByText(/Error: Failed to parse fields configuration/i)).toBeInTheDocument();
     });
+
+    // AND expect an error to be logged to the console
+    expect(console.error).toHaveBeenCalledWith(new ConfigurationError("SensitiveData: Field values must be an array of strings"));
   });
 }); 

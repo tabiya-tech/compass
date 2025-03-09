@@ -1,48 +1,9 @@
 import "src/_test_utilities/consoleMock";
-import { FieldType, FieldsConfig, EnumFieldDefinition, FieldDefinition } from './types';
-import { getAllFields, parseYamlConfig, toEncryptionPayload, createEmptySensitivePersonalData, extractPersonalInfo } from './utils';
+import { FieldType, FieldDefinition } from './types';
+import { toEncryptionPayload, createEmptySensitivePersonalData, extractPersonalInfo } from './utils';
 import { SensitivePersonalData } from 'src/sensitiveData/types';
 
 describe('Config Utilities', () => {
-  // Sample config for testing
-  const sampleConfig: FieldsConfig = {
-    firstName: {
-      name: 'firstName',
-      dataKey: 'firstName',
-      type: FieldType.String,
-      label: 'First Name',
-      required: true,
-      validation: {
-        pattern: '^[A-Za-z\\s]{2,50}$',
-        errorMessage: 'First name should contain only letters and be 2-50 characters long'
-      }
-    },
-    gender: {
-      name: 'gender',
-      dataKey: 'gender',
-      type: FieldType.Enum,
-      label: 'Gender',
-      required: true,
-      values: [
-        'Male',
-        'Female',
-        'Other'
-      ]
-    },
-    skills: {
-      name: 'skills',
-      dataKey: 'skills',
-      type: FieldType.MultipleSelect,
-      label: 'Skills',
-      required: false,
-      values: [
-        'JavaScript',
-        'TypeScript',
-        'React'
-      ]
-    }
-  };
-
   // Sample fields array for testing
   const sampleFields: FieldDefinition[] = [
     {
@@ -74,98 +35,6 @@ describe('Config Utilities', () => {
       values: ['JavaScript', 'TypeScript', 'React']
     }
   ];
-
-  describe('getAllFields', () => {
-    test('should return an empty array for null or undefined config', () => {
-      // GIVEN a null or undefined config
-      const nullConfig = null;
-      const undefinedConfig = undefined;
-      
-      // WHEN getAllFields is called with null
-      const resultNull = getAllFields(nullConfig as unknown as FieldsConfig);
-      
-      // THEN it should return an empty array
-      expect(resultNull).toEqual([]);
-      
-      // WHEN getAllFields is called with undefined
-      const resultUndefined = getAllFields(undefinedConfig as unknown as FieldsConfig);
-      
-      // THEN it should return an empty array
-      expect(resultUndefined).toEqual([]);
-    });
-
-    test('should return all fields from an object-based config', () => {
-      // GIVEN an object-based config
-      const config = sampleConfig;
-      
-      // WHEN getAllFields is called
-      const result = getAllFields(config);
-      
-      // THEN it should return all fields as an array with names included
-      expect(result).toHaveLength(3);
-      expect(result).toEqual([
-        { ...config.firstName, name: 'firstName' },
-        { ...config.gender, name: 'gender' },
-        { ...config.skills, name: 'skills' }
-      ]);
-      
-      // AND each field should have the correct properties
-      expect(result[0].type).toBe(FieldType.String);
-      expect(result[1].type).toBe(FieldType.Enum);
-      expect(result[2].type).toBe(FieldType.MultipleSelect);
-    });
-  });
-
-  describe('parseYamlConfig', () => {
-    test('should parse valid YAML into a FieldsConfig object', () => {
-      // GIVEN a valid YAML string
-      const yamlString = `
-firstName:
-  name: firstName
-  dataKey: firstName
-  type: String
-  label: First Name
-  required: true
-  validation:
-    pattern: '^[A-Za-z\\s]{2,50}$'
-    errorMessage: First name should contain only letters and be 2-50 characters long
-gender:
-  name: gender
-  dataKey: gender
-  type: Enum
-  label: Gender
-  required: true
-  values:
-    - Male
-    - Female
-    - Other
-      `;
-      
-      // WHEN parseYamlConfig is called
-      const result = parseYamlConfig(yamlString);
-      
-      // THEN it should return a FieldsConfig object
-      expect(result).toHaveProperty('firstName');
-      expect(result).toHaveProperty('gender');
-      expect(result.firstName.type).toBe('String');
-      expect(result.gender.type).toBe('Enum');
-      expect((result.gender as EnumFieldDefinition).values).toEqual(['Male', 'Female', 'Other']);
-    });
-
-    test('should throw an error for invalid YAML', () => {
-      // GIVEN an invalid YAML string
-      const invalidYaml = `
-firstName:
-  name: firstName
-  - this is invalid YAML
-  dataKey: firstName
-      `;
-      
-      // WHEN parseYamlConfig is called with invalid YAML
-      // THEN it should throw an error
-      expect(() => parseYamlConfig(invalidYaml)).toThrow('Failed to parse fields configuration');
-    });
-  });
 
   describe('toEncryptionPayload', () => {
     test('should convert SensitivePersonalData to SensitivePersonalDataEncryptionPayload', () => {

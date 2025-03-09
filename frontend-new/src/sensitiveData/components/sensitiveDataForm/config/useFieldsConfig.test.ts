@@ -1,8 +1,14 @@
 import "src/_test_utilities/consoleMock";
 import { renderHook } from "@testing-library/react-hooks";
 import { useFieldsConfig } from "./useFieldsConfig";
-import * as utils from "./utils";
 import { setupFetchSpy } from "src/_test_utilities/fetchSpy";
+import {
+  EnumFieldDefinition,
+  FieldDefinition,
+  FieldType,
+  MultipleSelectFieldDefinition,
+  StringFieldDefinition,
+} from "./types";
 
 // Mock the utils functions
 jest.mock('./utils', () => ({
@@ -13,36 +19,8 @@ jest.mock('./utils', () => ({
 describe('Config Hooks', () => {
   let fetchSpy: jest.SpyInstance;
 
-  const mockYamlText = `
-stringFieldName:
-  dataKey: string_field_name
-  type: STRING
-  required: true
-  label: String Field
-`;
-
-  const mockConfig = {
-    stringFieldName: {
-      dataKey: "string_field_name",
-      type: "STRING",
-      required: true,
-      label: "String Field",
-    },
-  };
-
-  const mockFields = [
-    {
-      dataKey: "string_field_name",
-      type: "STRING",
-      required: true,
-      label: "String Field",
-    }
-  ];
-
   beforeEach(() => {
     jest.clearAllMocks();
-    (utils.parseYamlConfig as jest.Mock).mockReturnValue(mockConfig);
-    (utils.getAllFields as jest.Mock).mockReturnValue(mockFields);
   });
 
   afterEach(() => {
@@ -61,24 +39,66 @@ stringFieldName:
       expect(result.current.error).toBe(null);
     });
 
-    test('should fetch and update config on mount', async () => {
-      // GIVEN a successful fetch response
-      fetchSpy = setupFetchSpy(200, mockYamlText, "");
+    test('should fetch and update config on mount for various fields at the same time', async () => {
+      // GIVEN a successful fetch response with yaml with all required fields for the fields
+      const givenMultipleSelectFieldWithRequiredFields = `
+multipleFieldName:
+  dataKey: multiple_field_name
+  type: MULTIPLE_SELECT
+  required: true
+  label: Multiple select Field
+  values: ["value1", "value2"]
+enumFieldName:
+  dataKey: enum_field_name
+  type: ENUM
+  required: true
+  label: Enum Field
+  values: ["value1", "value2"]
+stringFieldName:
+  dataKey: string_field_name
+  type: STRING
+  required: true
+  label: String Field
+`;
+      fetchSpy = setupFetchSpy(200, givenMultipleSelectFieldWithRequiredFields, "");
 
       // WHEN the hook is mounted
       const { result, waitForNextUpdate } = renderHook(() => useFieldsConfig());
-      
+
       // THEN it should initially be in loading state
       expect(result.current.loading).toBe(true);
-      
+
       // WHEN the fetch completes
       await waitForNextUpdate();
-      
+
       // THEN it should update the state with the result
+      const expectedFieldDefinitions: FieldDefinition[] = [
+        new MultipleSelectFieldDefinition({
+          name: "multipleFieldName",
+          dataKey: "multiple_field_name",
+          type: FieldType.MultipleSelect,
+          required: true,
+          label: "Multiple select Field",
+          values: ["value1", "value2"]
+        }),
+        new EnumFieldDefinition({
+          name: "enumFieldName",
+          dataKey: "enum_field_name",
+          type: FieldType.Enum,
+          required: true,
+          label: "Enum Field",
+          values: ["value1", "value2"]
+        }),
+        new StringFieldDefinition({
+          name: "stringFieldName",
+          dataKey: "string_field_name",
+          type: FieldType.String,
+          required: true,
+          label: "String Field"
+        })
+      ];
       expect(fetchSpy).toHaveBeenCalledWith('/data/config/fields.yaml');
-      expect(utils.parseYamlConfig).toHaveBeenCalledWith(mockYamlText);
-      expect(utils.getAllFields).toHaveBeenCalledWith(mockConfig);
-      expect(result.current.fields).toEqual(mockFields);
+      expect(result.current.fields).toEqual(expect.arrayContaining(expectedFieldDefinitions));
       expect(result.current.loading).toBe(false);
       expect(result.current.error).toBe(null);
     });

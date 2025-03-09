@@ -71,7 +71,6 @@
     "firebase": "^10.12.2",
     "firebaseui": "^6.1.0",
     "framer-motion": "^11.2.11",
-    "js-yaml": "^4.1.0",
     "jwt-decode": "^4.0.0",
     "lodash.debounce": "^4.0.8",
     "notistack": "^3.0.1",
@@ -80,7 +79,8 @@
     "react-router-dom": "^6.23.1",
     "react-scripts": "^5.0.1",
     "react-swipeable": "^7.0.2",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "yaml": "^2.7.0"
   },
   "scripts": {
     "lint": "eslint src --ext .ts --ext .tsx --max-warnings 0",

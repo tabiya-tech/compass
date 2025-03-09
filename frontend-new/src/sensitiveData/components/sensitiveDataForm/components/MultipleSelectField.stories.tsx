@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react';
 import MultipleSelectField from './MultipleSelectField';
-import { MultipleFieldDefinition, FieldType } from 'src/sensitiveData/components/sensitiveDataForm/config/types';
+import { MultipleSelectFieldDefinition, FieldType } from 'src/sensitiveData/components/sensitiveDataForm/config/types';
 import { action } from '@storybook/addon-actions';
 import { Box } from '@mui/material';
 
@@ -31,7 +31,7 @@ export default meta;
 type Story = StoryObj<typeof MultipleSelectField>;
 
 // Define field definitions for the mock config
-const skillsField: MultipleFieldDefinition = {
+const skillsField: MultipleSelectFieldDefinition = {
   name: 'skills',
   dataKey: 'skills',
   type: FieldType.MultipleSelect,
@@ -47,7 +47,7 @@ const skillsField: MultipleFieldDefinition = {
   ]
 };
 
-const languagesField: MultipleFieldDefinition = {
+const languagesField: MultipleSelectFieldDefinition = {
   name: 'languages',
   dataKey: 'languages',
   type: FieldType.MultipleSelect,

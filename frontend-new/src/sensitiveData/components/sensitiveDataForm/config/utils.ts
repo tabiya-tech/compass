@@ -1,36 +1,8 @@
-import yaml from "js-yaml";
-import { FieldDefinition, FieldsConfig, FieldType } from "./types";
+import {
+  FieldDefinition,
+  FieldType
+} from "./types";
 import { SensitivePersonalData, SensitivePersonalDataEncryptionPayload, StoredPersonalInfo } from "src/sensitiveData/types";
-
-/**
- * Get all fields from the configuration
- * @param config The fields configuration
- * @returns Array of field definitions
- */
-export const getAllFields = (config: FieldsConfig): FieldDefinition[] => {
-  if (!config) {
-    return [];
-  }
-    return Object.entries(config).map(([name, field]) => ({
-      ...field,
-      name
-    }));
-};
-
-/**
- * Parses a YAML configuration string into a FieldsConfig object.
- * 
- * @param yamlText - The YAML configuration string
- * @returns The parsed FieldsConfig object
- */ 
-export const parseYamlConfig = (yamlText: string): FieldsConfig => {
-  try {
-    return yaml.load(yamlText) as FieldsConfig;
-  } catch (error) {
-    console.error('Failed to parse fields configuration:', error);
-    throw new Error('Failed to parse fields configuration');
-  }
-}; 
 
 /**
  * Converts sensitive personal data to an encryption payload.
@@ -134,3 +106,12 @@ export const extractPersonalInfo = (
     contactEmail
   };
 };
+
+export function isValidRegex(pattern: string) {
+  try {
+    new RegExp(pattern); // Try constructing a regex
+    return true;
+  } catch (e) {
+    return false;
+  }
+}

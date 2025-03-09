@@ -3,9 +3,9 @@ import '@testing-library/jest-dom';
 import { screen, render, waitFor } from 'src/_test_utilities/test-utils';
 import userEvent from '@testing-library/user-event';
 import MultipleSelectField, { DATA_TEST_ID } from './MultipleSelectField';
-import { FieldType, MultipleFieldDefinition } from '../config/types';
+import { FieldType, MultipleSelectFieldDefinition } from '../config/types';
 
-const getFieldDefinition = () : MultipleFieldDefinition => {
+const getFieldDefinition = () : MultipleSelectFieldDefinition => {
   return {
     name: 'test',
     label: 'Test Label',

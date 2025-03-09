@@ -11,7 +11,7 @@ import {
   OutlinedInput,
   Typography
 } from "@mui/material";
-import { MultipleFieldDefinition } from "src/sensitiveData/components/sensitiveDataForm/config/types";
+import { MultipleSelectFieldDefinition } from "src/sensitiveData/components/sensitiveDataForm/config/types";
 
 export const DATA_TEST_ID = {
   MULTIPLE_SELECT_FIELD: 'multiple-select-field',
@@ -25,7 +25,7 @@ export const DATA_TEST_ID = {
 };
 
 interface MultipleFieldProps {
-  field: MultipleFieldDefinition;
+  field: MultipleSelectFieldDefinition;
   dataTestId: string;
   initialValue?: string[];
   onChange: (values: string[], isValid: boolean) => void;
