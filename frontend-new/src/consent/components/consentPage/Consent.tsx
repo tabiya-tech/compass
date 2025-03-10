@@ -146,7 +146,7 @@ const Consent: React.FC = () => {
   };
 
   const termsAndConditionsLabel = "Terms and Conditions";
-  const dataProtectionAgreementLabel = "Privacy Policy";
+  const dataProtectionAgreementLabel = "Data Protection Agreement";
 
   const handleExternalNavigationOnNewTab = (url: string) => {
     window.open(url, "_blank", "noopener,noreferrer");

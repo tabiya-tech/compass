@@ -25,7 +25,6 @@ export const DATA_TEST_ID = {
   FEEDBACK_IN_PROGRESS_MESSAGE: `feedback-in-progress-message-${uniqueId}`,
   THANK_YOU_FOR_FEEDBACK_MESSAGE: `thank-you-for-feedback-message-${uniqueId}`,
   THANK_YOU_FOR_RATING_MESSAGE: `thank-you-for-rating-message${uniqueId}`,
-  THANK_YOU_FOR_FEEDBACK_AND_RATING_MESSAGE: `thank-you-for-feedback-and-rating-message-${uniqueId}`,
   CREATE_ACCOUNT_LINK: `create-account-link-${uniqueId}`,
   CREATE_ACCOUNT_MESSAGE: `create-account-message-${uniqueId}`,
   VERIFICATION_REMINDER_MESSAGE: `verification-reminder-message-${uniqueId}`,
@@ -100,97 +99,86 @@ const ConversationConclusionFooter: React.FC = () => {
         data-testid={DATA_TEST_ID.CONVERSATION_CONCLUSION_FOOTER_CONTAINER}
       >
         <Typography variant="body1">
-          Don't forget to{" "}
+          You can now{" "}
           <CustomLink
             onClick={handleOpenExperiencesDrawer}
             disableWhenOffline
             data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_BUTTON}
           >
-            <span style={{ whiteSpace: "normal" }}>view and download your CV</span>
+            <span style={{ whiteSpace: "normal" }}>view and download your CV here</span>
           </CustomLink>
-          !
+          .{" "}
+
+          {/* Show anonymous user registration link if the user is anonymous and hasn't already converted */}
+          {(isAnonymous && !isAccountConverted) &&
+            <span data-testid={DATA_TEST_ID.CREATE_ACCOUNT_MESSAGE}>
+              If you would like to explore your skills and experiences in the future, you can{" "}
+              <CustomLink
+                onClick={() => setShowConversionDialog(true)}
+                disableWhenOffline
+                data-testid={DATA_TEST_ID.CREATE_ACCOUNT_LINK}
+              >
+                Create an account
+              </CustomLink>
+            </span>
+          }
+          {/* Show the verification reminder if the user has already converted their account */}
+          { isAccountConverted &&
+            <span data-testid={DATA_TEST_ID.VERIFICATION_REMINDER_MESSAGE}>
+              A verification email has been sent to your email address. Please verify your account before logging in again.
+            </span>
+          }
         </Typography>
 
-        {/* Show continue feedback if the status is already started */}
-        { (feedbackStatus === FeedbackStatus.STARTED) &&
-          <Typography variant="body1" data-testid={DATA_TEST_ID.FEEDBACK_IN_PROGRESS_MESSAGE}>
-            Please{" "}
-            <CustomLink
-              onClick={() => setIsFeedbackFormOpen(true)}
-              disableWhenOffline
-              data-testid={DATA_TEST_ID.FEEDBACK_IN_PROGRESS_BUTTON}
-            >
-              complete your feedback
-            </CustomLink>{" "}
-            to help us improve your experience!
-          </Typography>
-        }
-
-        { (feedbackStatus === FeedbackStatus.NOT_STARTED) &&
-          <Typography variant="body1" data-testid={DATA_TEST_ID.FEEDBACK_MESSAGE_TEXT}>
-            We'd love your{" "}
-            <CustomLink
-              onClick={() => setIsFeedbackFormOpen(true)}
-              disableWhenOffline
-              data-testid={DATA_TEST_ID.FEEDBACK_FORM_BUTTON}
-            >
+        <Typography component={'span'} variant="body1">
+          {(!feedbackSubmitted && !hasSubmittedCustomerSatisfactionRating) && <span>Finally, We'd love to hear your thoughts on compass.</span>}
+          {/* Show a customer satisfaction rating if it hasn't been submitted yet */}
+          {(!hasSubmittedCustomerSatisfactionRating) &&
+            <CustomerSatisfactionRating
+              notifyOnCustomerSatisfactionRatingSubmitted={() => setHasSubmittedCustomerSatisfactionRating(true)}
+            />
+          }
+          {/* Show a thank you message if the rating has been submitted */}
+          {
+            (hasSubmittedCustomerSatisfactionRating && !feedbackSubmitted) &&
+            <span data-testid={DATA_TEST_ID.THANK_YOU_FOR_RATING_MESSAGE}>{" "}{FIXED_MESSAGES_TEXT.THANK_YOU_FOR_RATING}{" "}</span>
+          }
+          {/* Show feedback form if the rating has been submitted */}
+          {
+            (hasSubmittedCustomerSatisfactionRating && feedbackStatus === FeedbackStatus.NOT_STARTED) &&
+            <span data-testid={DATA_TEST_ID.FEEDBACK_MESSAGE_TEXT}>{" "}We'd love your{" "}
+              <CustomLink
+                onClick={() => setIsFeedbackFormOpen(true)}
+                disableWhenOffline
+                data-testid={DATA_TEST_ID.FEEDBACK_FORM_BUTTON}
+              >
               feedback
             </CustomLink>{" "}
-            on this chat. It only takes 5 minutes and helps us improve!
-          </Typography>
-        }
-
-        {/* Show a "thank you for feedback" message when only feedback is submitted */}
-        {feedbackSubmitted && !hasSubmittedCustomerSatisfactionRating  && (
-          <Typography variant="body1" data-testid={DATA_TEST_ID.THANK_YOU_FOR_FEEDBACK_MESSAGE}>
-            {FIXED_MESSAGES_TEXT.THANK_YOU_FOR_FEEDBACK}
-          </Typography>
-        )}
-
-        {/* Show a customer satisfaction rating if it hasn't been submitted yet */}
-        {(!hasSubmittedCustomerSatisfactionRating) &&
-          <CustomerSatisfactionRating
-          notifyOnCustomerSatisfactionRatingSubmitted={() => setHasSubmittedCustomerSatisfactionRating(true)}
-          />
-        }
-
-        {/* Show a "thank you for rating" message when only satisfaction rating is submitted */}
-        {
-          (hasSubmittedCustomerSatisfactionRating && !feedbackSubmitted) &&
-          <Typography variant="body1" data-testid={DATA_TEST_ID.THANK_YOU_FOR_RATING_MESSAGE}>
-            {FIXED_MESSAGES_TEXT.THANK_YOU_FOR_RATING}
-          </Typography>
-        }
-
-        {/* Show thank you message for both if both the rating and feedback has been submitted */}
-        {
-          (feedbackSubmitted && hasSubmittedCustomerSatisfactionRating) &&
-          <Typography variant="body1" data-testid={DATA_TEST_ID.THANK_YOU_FOR_FEEDBACK_AND_RATING_MESSAGE}>
-            {FIXED_MESSAGES_TEXT.THANK_YOU_FOR_FEEDBACK_AND_RATING}
-          </Typography>
-        }
-
-        {/* Show anonymous user registration link if the user is anonymous and hasn't already converted */}
-        {(isAnonymous && !isAccountConverted) &&
-          <Typography variant="body1" data-testid={DATA_TEST_ID.CREATE_ACCOUNT_MESSAGE}>
-            <CustomLink
-              onClick={() => setShowConversionDialog(true)}
-              disableWhenOffline
-              data-testid={DATA_TEST_ID.CREATE_ACCOUNT_LINK}
-            >
-              Create an account
-            </CustomLink>{" "}
-            to save your conversations and access them anytime in the future.
-          </Typography>
-        }
-
-        {/* Show the verification reminder if the user has already converted their account */}
-        { isAccountConverted &&
-          <Typography variant="body1" data-testid={DATA_TEST_ID.VERIFICATION_REMINDER_MESSAGE}>
-            A verification email has been sent to your email address. Please verify your account before logging in again.
-          </Typography>
-        }
-
+              on this chat. It only takes 5 minutes and helps us improve!
+          </span>
+          }
+          {/* Show continue feedback if the status is already started */}
+          {
+            (hasSubmittedCustomerSatisfactionRating && feedbackStatus === FeedbackStatus.STARTED) &&
+            <span data-testid={DATA_TEST_ID.FEEDBACK_IN_PROGRESS_MESSAGE}>
+              Please{" "}
+              <CustomLink
+                onClick={() => setIsFeedbackFormOpen(true)}
+                disableWhenOffline
+                data-testid={DATA_TEST_ID.FEEDBACK_IN_PROGRESS_BUTTON}
+              >
+                complete your feedback
+              </CustomLink>{" "}
+              to help us improve your experience!
+            </span>
+          }
+          {
+            (feedbackSubmitted && hasSubmittedCustomerSatisfactionRating) &&
+            <span data-testid={DATA_TEST_ID.THANK_YOU_FOR_FEEDBACK_MESSAGE}>
+              {FIXED_MESSAGES_TEXT.THANK_YOU_FOR_FEEDBACK}
+            </span>
+          }
+        </Typography>
       </Box>
       <FeedbackForm isOpen={isFeedbackFormOpen} notifyOnClose={handleFeedbackFormClose} />
       <AnonymousAccountConversionDialog
