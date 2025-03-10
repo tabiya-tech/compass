@@ -146,7 +146,7 @@ const Consent: React.FC = () => {
   };
 
   const termsAndConditionsLabel = "Terms and Conditions";
-  const dataProtectionAgreementLabel = "Data Protection Agreement";
+  const privacyPolicyLabel = "Privacy Policy";
 
   const handleExternalNavigationOnNewTab = (url: string) => {
     window.open(url, "_blank", "noopener,noreferrer");
@@ -223,7 +223,7 @@ const Consent: React.FC = () => {
                   checked={isDPAccepted}
                   onChange={handleDPAChange}
                   inputProps={{
-                    "aria-label": dataProtectionAgreementLabel,
+                    "aria-label": privacyPolicyLabel,
                   }}
                   data-testid={DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER}
                 />
@@ -235,7 +235,7 @@ const Consent: React.FC = () => {
                   <CustomLink
                     onClick={() => handleExternalNavigationOnNewTab("https://www.tabiya.org/compass/privacy")}
                   >
-                    {dataProtectionAgreementLabel}
+                    {privacyPolicyLabel}
                   </CustomLink>{" "}
                   of Compass.
                 </Typography>
@@ -302,7 +302,7 @@ const Consent: React.FC = () => {
             gap={isSmallMobile ? theme.tabiyaSpacing.xl : theme.tabiyaSpacing.md}
           >
             <Typography>
-              We're sorry that you choose not to agree to the Terms & Conditions and the Data Protection Agreement. You
+              We're sorry that you choose not to agree to the {termsAndConditionsLabel} and the {privacyPolicyLabel}. You
               will not be able to proceed and will be <HighlightedSpan>logged out.</HighlightedSpan>
             </Typography>
             <Typography>Are you sure you want to exit?</Typography>

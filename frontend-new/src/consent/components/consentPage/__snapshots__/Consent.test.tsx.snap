@@ -308,7 +308,7 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
             data-testid="consent-accept-consent-checkbox-container-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
           >
             <input
-              aria-label="Data Protection Agreement"
+              aria-label="Privacy Policy"
               class="PrivateSwitchBase-input css-1m9pwf3"
               data-indeterminate="false"
               type="checkbox"
@@ -338,7 +338,7 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
               aria-disabled="false"
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
             >
-              Data Protection Agreement
+              Privacy Policy
             </a>
              
             of Compass.
