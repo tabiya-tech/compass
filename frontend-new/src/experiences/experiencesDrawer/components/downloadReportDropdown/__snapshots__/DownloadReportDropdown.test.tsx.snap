@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DownloadReportDropdown should show the download report dropdown when the button is clicked 1`] = `
+<div
+  data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu"
+>
+  <div
+    data-testid="05c29b7a-ebf7-4795-ba23-a284aecad180-pdf"
+  >
+    PDF
+  </div>
+  <div
+    data-testid="05c29b7a-ebf7-4795-ba23-a284aecad180-docx"
+  >
+    DOCX
+  </div>
+</div>
+`;

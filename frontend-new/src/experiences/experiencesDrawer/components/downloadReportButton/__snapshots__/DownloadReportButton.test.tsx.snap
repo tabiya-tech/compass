@@ -70,3 +70,44 @@ exports[`DownloadReportButton should render DownloadReportButton correctly when 
   />
 </div>
 `;
+
+exports[`DownloadReportButton should render DownloadReportButton correctly when isLoading is true 1`] = `
+<div
+  class="MuiBox-root css-0"
+  data-testid="download-report-button-container-f5553dac-adb7-440f-9549-c3567b22dc76"
+>
+  <button
+    class="MuiButtonBase-root Mui-disabled MuiIconButton-root Mui-disabled MuiIconButton-sizeMedium css-aysw4f-MuiButtonBase-root-MuiIconButton-root"
+    data-testid="download-report-button-f5553dac-adb7-440f-9549-c3567b22dc76"
+    disabled=""
+    tabindex="-1"
+    title="Download CV"
+    type="button"
+  >
+    <span
+      class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-1qiplev-MuiCircularProgress-root"
+      data-testid="download-report-progress-icon-f5553dac-adb7-440f-9549-c3567b22dc76"
+      role="progressbar"
+    >
+      <svg
+        class="MuiCircularProgress-svg css-1idz92c-MuiCircularProgress-svg"
+        viewBox="22 22 44 44"
+      >
+        <circle
+          class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-176wh8e-MuiCircularProgress-circle"
+          cx="44"
+          cy="44"
+          fill="none"
+          r="20.2"
+          stroke-width="3.6"
+        />
+      </svg>
+    </span>
+    <span
+      class="MuiTypography-root MuiTypography-caption css-ijdyd0-MuiTypography-root"
+    >
+      Downloading
+    </span>
+  </button>
+</div>
+`;
