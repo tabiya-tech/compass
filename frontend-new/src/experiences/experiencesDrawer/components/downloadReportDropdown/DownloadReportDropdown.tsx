@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import { Experience } from "src/experiences/experienceService/experiences.types";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import DownloadReportButton from "src/experiences/experiencesDrawer/components/downloadReportButton/DownloadReportButton";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { PDFReportDownloadProvider } from "src/experiences/report/reportPdf/provider";
 import { DocxReportDownloadProvider } from "src/experiences/report/reportDocx/provider";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
+import { ReportProps } from "src/experiences/report/types";
 
 interface DownloadReportDropdownProps {
   name: string;
@@ -29,7 +31,9 @@ export const MENU_ITEM_TEXT = {
 };
 
 const DownloadReportDropdown: React.FC<DownloadReportDropdownProps> = (props) => {
+  const isOnline = useContext(IsOnlineContext);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const reportProps = {
     name: props.name,
@@ -43,18 +47,29 @@ const DownloadReportDropdown: React.FC<DownloadReportDropdownProps> = (props) =>
   const docxsReportProvider = new DocxReportDownloadProvider();
   const pdfReportProvider = new PDFReportDownloadProvider();
 
+  const handleDownload = async (downloadProvider: { download: (props: ReportProps) => Promise<void> }) => {
+    setIsLoading(true);
+    try {
+      await downloadProvider.download(reportProps);
+    } catch (error) {
+      console.error("Error downloading report", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const contextMenuItems: MenuItemConfig[] = [
     {
       id: MENU_ITEM_ID.PDF,
       text: MENU_ITEM_TEXT.PDF,
-      disabled: false,
-      action: () => pdfReportProvider.download(reportProps),
+      disabled: !isOnline,
+      action: () => handleDownload(pdfReportProvider),
     },
     {
       id: MENU_ITEM_ID.DOCX,
       text: MENU_ITEM_TEXT.DOCX,
-      disabled: false,
-      action: () => docxsReportProvider.download(reportProps),
+      disabled: !isOnline,
+      action: () => handleDownload(docxsReportProvider),
     },
   ];
 
@@ -63,6 +78,7 @@ const DownloadReportDropdown: React.FC<DownloadReportDropdownProps> = (props) =>
       <DownloadReportButton
         notifyOnDownloadPdf={(event) => setAnchorEl(event.currentTarget)}
         disabled={props.disabled}
+        isLoading={isLoading}
       />
       <ContextMenu
         anchorEl={anchorEl}
