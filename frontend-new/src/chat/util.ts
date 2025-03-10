@@ -6,7 +6,6 @@ export const FIXED_MESSAGES_TEXT = {
   AI_IS_TYPING: "Typing...",
   THANK_YOU_FOR_FEEDBACK: "Thank you for taking the time to share your valuable feedback.",
   THANK_YOU_FOR_RATING: "Thank you for rating Compass.",
-  THANK_YOU_FOR_FEEDBACK_AND_RATING: "Thank you for taking the time to share your valuable feedback and rating Compass.",
   SOMETHING_WENT_WRONG:
     "I'm sorry, Something seems to have gone wrong on my end... Can you please refresh the page and try again?",
   PLEASE_REPEAT: "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",

@@ -73,9 +73,6 @@ describe("ConversationConclusionFooter", () => {
       const actualFeedbackFormButtonContainer = screen.getByTestId(DATA_TEST_ID.CONVERSATION_CONCLUSION_FOOTER_CONTAINER);
       expect(actualFeedbackFormButtonContainer).toBeInTheDocument();
 
-      // AND expect the feedback message to be displayed
-      expect(screen.getByTestId(DATA_TEST_ID.FEEDBACK_MESSAGE_TEXT)).toBeInTheDocument();
-
       // AND expect the experiences drawer button to be displayed
       expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_BUTTON)).toBeInTheDocument();
 
@@ -86,10 +83,26 @@ describe("ConversationConclusionFooter", () => {
 
   describe("feedback", () => {
 
+    test("should not show feedback request if rating is not submitted", () => {
+      // GIVEN the user has not submitted a customer satisfaction rating
+      jest.spyOn(UserPreferencesStateService.getInstance(), "activeSessionHasCustomerSatisfactionRating").mockReturnValueOnce(false);
+
+      // WHEN the component is rendered
+      renderWithChatProvider();
+
+      // THEN expect the feedback message not to be displayed
+      expect(screen.queryByTestId(DATA_TEST_ID.FEEDBACK_MESSAGE_TEXT)).not.toBeInTheDocument();
+      // AND expect the button to give feedback not to be displayed
+      expect(screen.queryByTestId(DATA_TEST_ID.FEEDBACK_FORM_BUTTON)).not.toBeInTheDocument();
+    });
+
     test("should show feedback request message when feedback is not started", () => {
       // GIVEN no feedback has been started
       // AND the user has not submitted feedback before
       jest.spyOn(UserPreferencesStateService.getInstance(), "activeSessionHasOverallFeedback").mockReturnValueOnce(false);
+
+      // AND the user has submitted a customer satisfaction rating
+      jest.spyOn(UserPreferencesStateService.getInstance(), "activeSessionHasCustomerSatisfactionRating").mockReturnValueOnce(true);
 
       // WHEN the component is rendered
       renderWithChatProvider();
@@ -119,6 +132,9 @@ describe("ConversationConclusionFooter", () => {
       ];
       (PersistentStorageService.getOverallFeedback as jest.Mock).mockReturnValue(mockFeedbackItems);
 
+      // AND the user has submitted a customer satisfaction rating
+      jest.spyOn(UserPreferencesStateService.getInstance(), "activeSessionHasCustomerSatisfactionRating").mockReturnValueOnce(true);
+
       // AND the user has not submitted feedback before
       jest.spyOn(UserPreferencesStateService.getInstance(), "activeSessionHasOverallFeedback").mockReturnValueOnce(false);
 
@@ -135,6 +151,9 @@ describe("ConversationConclusionFooter", () => {
       // GIVEN the user has not submitted feedback before
       jest.spyOn(UserPreferencesStateService.getInstance(), "activeSessionHasOverallFeedback").mockReturnValueOnce(false);
 
+      // AND the user has submitted a customer satisfaction rating
+      jest.spyOn(UserPreferencesStateService.getInstance(), "activeSessionHasCustomerSatisfactionRating").mockReturnValueOnce(true);
+
       // WHEN the component is rendered
       renderWithChatProvider();
 
@@ -149,6 +168,9 @@ describe("ConversationConclusionFooter", () => {
     test("should maintain feedback status when form is closed", async () => {
       // GIVEN the user has not submitted feedback before
       jest.spyOn(UserPreferencesStateService.getInstance(), "activeSessionHasOverallFeedback").mockReturnValueOnce(false);
+
+      // AND the user has submitted a customer satisfaction rating
+      jest.spyOn(UserPreferencesStateService.getInstance(), "activeSessionHasCustomerSatisfactionRating").mockReturnValueOnce(true);
 
       // WHEN the component is rendered
       renderWithChatProvider();
@@ -298,6 +320,9 @@ describe("ConversationConclusionFooter", () => {
       // GIVEN the browser is offline
       mockBrowserIsOnLine(false);
 
+      // AND the customer satisfaction rating has been submitted
+      jest.spyOn(UserPreferencesStateService.getInstance(), "activeSessionHasCustomerSatisfactionRating").mockReturnValueOnce(true);
+
       // WHEN the component is rendered
       renderWithChatProvider();
 
@@ -335,6 +360,9 @@ describe("ConversationConclusionFooter", () => {
         },
       ];
       (PersistentStorageService.getOverallFeedback as jest.Mock).mockReturnValue(mockFeedbackItems);
+
+      // AND the customer satisfaction rating has been submitted
+      jest.spyOn(UserPreferencesStateService.getInstance(), "activeSessionHasCustomerSatisfactionRating").mockReturnValueOnce(true);
 
       // WHEN the component is rendered
       renderWithChatProvider();
@@ -380,21 +408,6 @@ describe("ConversationConclusionFooter", () => {
   });
 
   describe("thank you message", () => {
-    test("should show thank you for feedback message when feedback is submitted", () => {
-      // GIVEN feedback has been submitted
-      // AND the user has submitted feedback before
-      jest.spyOn(UserPreferencesStateService.getInstance(), "activeSessionHasOverallFeedback").mockReturnValueOnce(true);
-
-      // WHEN the component is rendered
-      renderWithChatProvider();
-
-      // THEN expect the thank you message to be displayed
-      expect(screen.getByTestId(DATA_TEST_ID.THANK_YOU_FOR_FEEDBACK_MESSAGE)).toBeInTheDocument();
-
-      // AND expect the feedback message not to be displayed
-      expect(screen.queryByTestId(DATA_TEST_ID.FEEDBACK_MESSAGE_TEXT)).not.toBeInTheDocument();
-    });
-
     test("should show thank you for customer satisfaction rating message when rating is submitted", () => {
       // GIVEN the user has already submitted a customer satisfaction rating
       jest.spyOn(UserPreferencesStateService.getInstance(), "activeSessionHasCustomerSatisfactionRating").mockReturnValueOnce(true);
@@ -409,28 +422,22 @@ describe("ConversationConclusionFooter", () => {
       expect(screen.queryByTestId(CUSTOMER_SATISFACTION_RATING_DATA_TEST_ID.CUSTOMER_SATISFACTION_RATING_CONTAINER)).not.toBeInTheDocument();
     });
 
-    test("should display a combined message for both rating and feedback when both are submitted", () => {
-      // GIVEN the user has submitted both feedback and a customer satisfaction rating
+    test("should show thank you for feedback message when feedback and rating are submitted", () => {
+      // GIVEN feedback has been submitted
+      // AND the user has submitted feedback before
       jest.spyOn(UserPreferencesStateService.getInstance(), "activeSessionHasOverallFeedback").mockReturnValueOnce(true);
+
+      // AND the user has submitted a customer satisfaction rating
       jest.spyOn(UserPreferencesStateService.getInstance(), "activeSessionHasCustomerSatisfactionRating").mockReturnValueOnce(true);
 
       // WHEN the component is rendered
       renderWithChatProvider();
 
-      // THEN expect the combined thank you message to be displayed
-      expect(screen.getByTestId(DATA_TEST_ID.THANK_YOU_FOR_FEEDBACK_AND_RATING_MESSAGE)).toBeInTheDocument();
+      // THEN expect the thank you message to be displayed
+      expect(screen.getByTestId(DATA_TEST_ID.THANK_YOU_FOR_FEEDBACK_MESSAGE)).toBeInTheDocument();
 
       // AND expect the feedback message not to be displayed
       expect(screen.queryByTestId(DATA_TEST_ID.FEEDBACK_MESSAGE_TEXT)).not.toBeInTheDocument();
-
-      // AND expect the customer satisfaction rating component not to be displayed
-      expect(screen.queryByTestId(CUSTOMER_SATISFACTION_RATING_DATA_TEST_ID.CUSTOMER_SATISFACTION_RATING_CONTAINER)).not.toBeInTheDocument();
-
-      // AND expect the thank you for feedback message not to be displayed
-      expect(screen.queryByTestId(DATA_TEST_ID.THANK_YOU_FOR_FEEDBACK_MESSAGE)).not.toBeInTheDocument();
-
-      // AND expect the thank you for rating message not to be displayed
-      expect(screen.queryByTestId(DATA_TEST_ID.THANK_YOU_FOR_RATING_MESSAGE)).not.toBeInTheDocument();
     });
   })
 });

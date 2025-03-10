@@ -127,20 +127,23 @@ export const InitialState: Story = {
   ],
 };
 
-export const FeedbackNotStarted: Story = {
+// Story: Customer satisfaction rating submitted
+export const CustomerSatisfactionRatingSubmittedAndFeedbackNotStarted: Story = {
   parameters: {
     docs: {
-      description: "Shows message when user has not started feedback",
+      description: "Shows thank you message when customer satisfaction rating has been submitted",
     },
   },
   decorators: [
     (Story) => (
-      <StorybookWrapper>
+      <StorybookWrapper hasSubmittedCustomerSatisfactionRating={true}>
         <Story />
       </StorybookWrapper>
     ),
   ],
 };
+
+
 // Story: Feedback in progress
 export const FeedbackInProgress: Story = {
   parameters: {
@@ -150,7 +153,7 @@ export const FeedbackInProgress: Story = {
   },
   decorators: [
     (Story) => (
-      <StorybookWrapper feedbackData={mockFeedbackInProgress}>
+      <StorybookWrapper feedbackData={mockFeedbackInProgress} hasSubmittedCustomerSatisfactionRating={true}>
         <Story />
       </StorybookWrapper>
     ),
@@ -166,55 +169,7 @@ export const FeedbackSubmitted: Story = {
   },
   decorators: [
     (Story) => (
-      <StorybookWrapper hasSubmittedFeedback={true}>
-        <Story />
-      </StorybookWrapper>
-    ),
-  ],
-};
-
-// Story: Customer satisfaction rating un submitted
-export const CustomerSatisfactionRatingUnsubmitted: Story = {
-  parameters: {
-    docs: {
-      description: "Shows customer satisfaction rating when it has not been submitted",
-    },
-  },
-  decorators: [
-    (Story) => (
-      <StorybookWrapper hasSubmittedCustomerSatisfactionRating={false} >
-        <Story />
-      </StorybookWrapper>
-    ),
-  ],
-};
-
-// Story: Customer satisfaction rating submitted
-export const CustomerSatisfactionRatingSubmitted: Story = {
-  parameters: {
-    docs: {
-      description: "Shows thank you message when customer satisfaction rating has been submitted",
-    },
-  },
-  decorators: [
-    (Story) => (
-      <StorybookWrapper hasSubmittedCustomerSatisfactionRating={true}>
-        <Story />
-      </StorybookWrapper>
-    ),
-  ],
-};
-
-// Story: Both Feedback and Customer satisfaction rating submitted
-export const FeedbackAndCustomerSatisfactionRatingSubmitted: Story = {
-  parameters: {
-    docs: {
-      description: "Shows thank you message when both customer satisfaction rating and feedback have been submitted",
-    },
-  },
-  decorators: [
-    (Story) => (
-      <StorybookWrapper hasSubmittedCustomerSatisfactionRating={true} hasSubmittedFeedback={true}>
+      <StorybookWrapper hasSubmittedFeedback={true} hasSubmittedCustomerSatisfactionRating={true}>
         <Story />
       </StorybookWrapper>
     ),
