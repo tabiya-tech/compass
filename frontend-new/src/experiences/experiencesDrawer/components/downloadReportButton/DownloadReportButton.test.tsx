@@ -67,4 +67,28 @@ describe("DownloadReportButton", () => {
     // AND to match the snapshot
     expect(downloadReportButtonContainer).toMatchSnapshot();
   });
+
+  test("should render DownloadReportButton correctly when isLoading is true", () => {
+    // GIVEN isLoading is true
+    const givenIsLoading = true;
+
+    // WHEN the component is rendered
+    render(<DownloadReportButton isLoading={givenIsLoading} notifyOnDownloadPdf={jest.fn()} />);
+
+    // THEN expect the download report button container to be in the document
+    const downloadReportButtonContainer = screen.getByTestId(DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON_CONTAINER);
+    expect(downloadReportButtonContainer).toBeInTheDocument();
+    // AND the download report button to be in the document
+    const downloadReportButton = screen.getByTestId(DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON);
+    expect(downloadReportButton).toBeInTheDocument();
+    // AND expect the download report progress icon to be in the document
+    expect(screen.getByTestId(DATA_TEST_ID.DOWNLOAD_REPORT_PROGRESS_ICON)).toBeInTheDocument();
+    // AND the downloading text to be in the document
+    expect(screen.getByText("Downloading")).toBeInTheDocument();
+    // AND expect no errors or warning to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
+    // AND to match the snapshot
+    expect(downloadReportButtonContainer).toMatchSnapshot();
+  });
 });
