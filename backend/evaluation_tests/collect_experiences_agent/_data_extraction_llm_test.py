@@ -2,13 +2,13 @@ import logging
 
 import pytest
 
-from app.agent.agent_types import AgentInput, AgentOutput
+from app.agent.agent_types import AgentInput
 from app.agent.collect_experiences_agent import CollectedData
 from app.agent.collect_experiences_agent._dataextraction_llm import _DataExtractionLLM
-from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory, ConversationTurn
+from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
-
+from evaluation_tests.conversation_libs.utils import _add_turn_to_context
 
 class _TestCaseDataExtraction(CompassTestCase):
     # The GIVEN
@@ -286,17 +286,3 @@ async def test_data_extraction(test_case: _TestCaseDataExtraction):
 
     # AND the collected data should be the expected one
     assert len(collected_data) == test_case.expected_collected_data_count
-
-
-def _add_turn_to_context(user_input: str, agent_output: str, context: ConversationContext):
-    turn: ConversationTurn = ConversationTurn(
-        index=len(context.history.turns),
-        input=AgentInput(message=user_input),
-        output=AgentOutput(message_for_user=agent_output,
-                           finished=False,
-                           agent_response_time_in_sec=0.0,
-                           llm_stats=[]
-                           )
-    )
-    context.history.turns.append(turn)
-    context.all_history.turns.append(turn)

@@ -212,4 +212,64 @@ test_cases = [
         expected_experiences_found_min=1,
         expected_experiences_found_max=1
     ),
+    CollectExperiencesAgentTestCase(
+        name='unexperienced_student_e2e',
+        simulated_user_prompt=dedent("""
+            You are a high-school student without previous work experiences. You live in Nairobi with your parents and your grandmother. 
+            You like to help your neighbours tend their garden. You have a passion for music and dance and would like to pursue it. You also drive
+            and help your grandmother with transportation.
+            """) + kenya_prompt,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)],
+        expected_experiences_found_min=1,
+        expected_experiences_found_max=1
+    ),
+    CollectExperiencesAgentTestCase(
+        name='french_worker_typos_e2e',
+        simulated_user_prompt=dedent("""
+            You are a young person from Paris, France looking for a job. You would like to work in retail and your previous experiences are as follows:
+            1. Delivery job for Uber Eats in Paris, from Janary 2021 to March 2023. This was a paid job with a contract.
+            2. Selling old furniture at the Flea Market of rue Jean Henri Fabre, every Wednesday and Friday. You started in 2019 with your older brother and are still doing it today. This is unformal labor, as you only get 100 euros at the end of the day, without any formal contract.
+            You write with typos.
+            """) + france_prompt,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)],
+        expected_experiences_found_min=2,
+        expected_experiences_found_max=2
+    ),
+    
+    CollectExperiencesAgentTestCase(
+        name='french_worker_infodump_e2e',
+        simulated_user_prompt=dedent("""
+            You are a young person from Paris, France looking for a job. You would like to work in retail and your previous experiences are as follows:
+            1. Delivery job for Uber Eats in Paris, from Janary 2021 to March 2023. This was a paid job with a contract.
+            2. Selling old furniture at the Flea Market of rue Jean Henri Fabre, every Wednesday and Friday. You started in 2019 with your older brother and are still doing it today. This is unformal labor, as you only get 100 euros at the end of the day, without any formal contract.
+            When asked about your experiences, answer with all the information at the same time. Do not add additional information or invent information.
+            """) + france_prompt,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)],
+        expected_experiences_found_min=2,
+        expected_experiences_found_max=2
+    ),
+    CollectExperiencesAgentTestCase(
+        name='single_experience_e2e',
+        simulated_user_prompt=dedent("""
+            You are a trained Dancer from Nairobi and would like to find a new job because the theatre you were working for is now closing.
+            Your only previous experience is only one in the Chandaria Center for Performing Art, where you have been working since 2018 with a full time contract.
+            Do not add additional information or invent information. You have never done volunteering or helped your community.
+            """) + kenya_prompt,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)],
+        expected_experiences_found_min=1,
+        expected_experiences_found_max=1
+    ),
+    CollectExperiencesAgentTestCase(
+        name='single_experience_mistake_e2e',
+        simulated_user_prompt=dedent("""
+            You are a trained Dancer from Nairobi and would like to find a new job because the theatre you were working for is now closing.
+            Your only previous experience is only one in the Chandaria Center for Performing Art, where you have been working since 2018 with a full time contract.
+            Do not add additional information or invent information. You have never done volunteering or helped your community.
+            When first asked about your experience, you mistake the dates and say that you have been working there since 2009. Only when asked about more information,
+            you correct your mistake.
+            """) + france_prompt,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)],
+        expected_experiences_found_min=1,
+        expected_experiences_found_max=1
+    ),
 ]
