@@ -2,12 +2,10 @@ import React, { ReactNode } from "react";
 import { Meta, StoryObj } from "@storybook/react";
 import ConversationConclusionFooter from "./ConversationConclusionFooter";
 import { ChatProvider } from "src/chat/ChatContext";
-import { FeedbackItem } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
+import { FeedbackItem, QUESTION_KEYS } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import { TabiyaUser } from "src/auth/auth.types";
-import UserPreferencesStateService, {
-  CUSTOMER_SATISFACTION_KEY,
-} from "src/userPreferences/UserPreferencesStateService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import {
   SensitivePersonalDataRequirement,
   Language,
@@ -63,10 +61,10 @@ const StorybookWrapper = ({
 
   const answeredQuestions = [];
   if (hasSubmittedFeedback) {
-    answeredQuestions.push("overall_satisfaction");
+    answeredQuestions.push(QUESTION_KEYS.OVERALL_SATISFACTION);
   }
   if (hasSubmittedCustomerSatisfactionRating) {
-    answeredQuestions.push(CUSTOMER_SATISFACTION_KEY);
+    answeredQuestions.push(QUESTION_KEYS.CUSTOMER_SATISFACTION);
   }
 
   // Mock the session feedback on window

@@ -21,15 +21,11 @@ exports[`ConversationConclusionFooter render tests should render component succe
         view and download your CV here
       </span>
     </a>
-    .
-     
+    . 
   </p>
   <span
     class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
   >
-    <span>
-      Finally, We'd love to hear your thoughts on compass.
-    </span>
     <div
       data-testid="customer-satisfaction-rating-container-67447419-12c3-401d-a78f-00b5ea8f8d1f"
     />
