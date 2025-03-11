@@ -1,6 +1,10 @@
 import { useContext, useState } from "react";
-import { FeedbackItem, SimplifiedAnswer } from "../../../overallFeedbackService/OverallFeedback.service.types";
-import { QuestionType } from "../../feedbackForm.types";
+import {
+  QUESTION_KEYS,
+  FeedbackItem,
+  SimplifiedAnswer,
+} from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
+import { QuestionType } from "src/feedback/overallFeedback/feedbackForm/feedbackForm.types";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import CustomRating from "src/feedback/overallFeedback/feedbackForm/components/customRating/CustomRating";
@@ -19,6 +23,11 @@ export const DATA_TEST_ID = {
   CUSTOMER_SATISFACTION_RATING_CONTAINER: `customer-satisfaction-rating-container-${uniqueId}`,
 };
 
+export const UI_TEXT = {
+  CUSTOMER_SATISFACTION_QUESTION_TEXT: "Finally, we'd love to hear your thoughts on your experience so far! " + questions[QUESTION_KEYS.CUSTOMER_SATISFACTION].question_text,
+  RATING_LABEL_LOW: "Unsatisfied",
+  RATING_LABEL_HIGH: "Satisfied",
+}
 const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
                                                                                  notifyOnCustomerSatisfactionRatingSubmitted,
                                                                                }) => {
@@ -61,14 +70,14 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
       <Backdrop isShown={isSubmittingRating} />
       <CustomRating
         type={QuestionType.Rating}
-        questionId="satisfaction_with_compass"
-        questionText={questions["satisfaction_with_compass"].question_text}
+        questionId={QUESTION_KEYS.CUSTOMER_SATISFACTION}
+        questionText={UI_TEXT.CUSTOMER_SATISFACTION_QUESTION_TEXT}
         ratingValue={selectedRating}
         notifyChange={(value, comments) =>
-          handleInputChange("satisfaction_with_compass", { rating_numeric: value, comment: comments })
+          handleInputChange(QUESTION_KEYS.CUSTOMER_SATISFACTION, { rating_numeric: value, comment: comments })
         }
-        lowRatingLabel="Unsatisfied"
-        highRatingLabel="Satisfied"
+        lowRatingLabel={UI_TEXT.RATING_LABEL_LOW}
+        highRatingLabel={UI_TEXT.RATING_LABEL_HIGH}
         maxRating={5}
         disabled={!isOnline || isSubmittingRating}
       />
