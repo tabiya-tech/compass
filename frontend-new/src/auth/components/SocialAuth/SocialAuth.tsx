@@ -1,5 +1,4 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import "firebaseui/dist/firebaseui.css";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { Box, Button, Divider, Typography, useTheme } from "@mui/material";

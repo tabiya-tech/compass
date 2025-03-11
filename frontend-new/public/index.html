@@ -30,10 +30,18 @@
     <!-- Pre-connect for faster font loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
-    <!--  Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet">
-
+    <!--
+    Google Fonts: Inter and IBM Plex Mono
+     We are loading the fonts with the media="print" attribute and changing it to "all" when the font is loaded.
+     We do this to avoid blocking the rendering of the page while the font is being loaded.
+     If javascript is disabled, the font will still load, but the page will be blocked until it is loaded.
+    -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet">
+    </noscript>
     <!-- JSON-LD Structured Data for SEO -->
     <script type="application/ld+json">
       {
@@ -59,10 +67,51 @@
         }
       }
     </script>
+    <style>
+        /*
+          Moved from index.css to inline styles to avoid blocking rendering by loading css as an external file.
+          We could not defer the loading of the css file because react adds it automatically to the head of the document.
+          plus we dont want to defer the css since we dont want to make the body, html 100% height on page load
+        */
+
+        /* The root element for the react app will be added later on the document,
+           suppress the linter error that the selector was not used */
+        /* noinspection ALL */
+        #root,
+        body,
+        html {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        #loading {
+            width: 100%;
+            height: 100%;
+            display: none; /* initially hide the loading screen */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #fff;
+            /*
+            * make sure the loading screen is on top of everything
+            * since this loading is shown on every page load, there cannot be anything
+            * in the app that has a z-index higher than this
+            */
+            z-index: 99999;
+            font-family: Inter, sans-serif;
+        }
+        .compass-logo {
+            height: 60px;
+        }
+    </style>
   </head>
   <body id="body">
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
+    <div id="loading">
+      <p>Loading...</p>
+      <img src="%PUBLIC_URL%/logo.svg" alt="Compass Logo" class="compass-logo" />
+    </div>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
@@ -73,5 +122,57 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+    <script>
+      /**
+       * Show a loading screen while the main.js file is being loaded.
+       * While the screen is visible, the React app will not be mounted.
+       * Once the main.js file is loaded, the loading screen will be hidden, and the React app will be mounted.
+       *
+       * The loading screen should be displayed for a minimum duration (~3 seconds) to prevent it from flashing on and off too quickly.
+       *
+       * To avoid showing the loading screen on high-end clients with fast internet connections,
+       * the application will have a tolerance period (≤1 second). If it starts within this time,
+       * the splash screen will not be shown. Otherwise, the screen will be displayed for the minimum time.
+       */
+
+      const APP_LOAD_TOLERANCE = 500; // the tolerance period in ms to allow the app to start before showing the loading screen
+      const LOADING_SCREEN_MINIMUM_TIME = 3000; // the minimum time in ms to show the loading screen, when it is shown
+
+      let _startTime = 0;
+      let _pageLoaded = false;
+
+      const _tolerance_timer = setTimeout(() => {
+        if(!_pageLoaded) {
+          // should show the loading screen
+          _startTime = Date.now();
+          document.getElementById('loading').style.display = 'flex'
+        }
+      }, APP_LOAD_TOLERANCE)
+
+      window.onload = () => {
+        _pageLoaded=true;
+        let delay = 0; // default to show the app immediately
+        if(_startTime) {
+          const loadingScreenHasBeenShowingFor = Date.now() - _startTime;
+          if(loadingScreenHasBeenShowingFor < LOADING_SCREEN_MINIMUM_TIME) {
+            delay = LOADING_SCREEN_MINIMUM_TIME - loadingScreenHasBeenShowingFor;
+            console.debug(`Loading screen has been showing for ${loadingScreenHasBeenShowingFor}ms and will be shown for an additional ${delay}ms`);
+          } else {
+            console.debug(`Loading screen has been showing for ${loadingScreenHasBeenShowingFor}ms and will be hidden immediately`);
+          }
+        }
+
+        setTimeout(() => {
+          // hide the loading screen
+          clearTimeout(_tolerance_timer); // since the app has started, clear the tolerance timer
+          document.getElementById('loading').style.display = 'none';
+          const root = document.createElement('div');
+          // create root element for the React app
+          // make sure in the index.tsx file, to wait for the root element to be created before mounting the app
+          root.id = 'root';
+          document.body.appendChild(root);
+        }, delay);
+      }
+    </script>
   </body>
 </html>

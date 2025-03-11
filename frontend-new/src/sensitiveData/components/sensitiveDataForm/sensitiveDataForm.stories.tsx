@@ -10,7 +10,7 @@ import { getBackendUrl } from "src/envService";
 import { CONFIG_PATH } from "./config/useFieldsConfig";
 
 const meta: Meta<typeof SensitiveDataForm> = {
-  title: "SensitiveDataForm/SensitiveDataForm",
+  title: "SensitiveData/SensitiveDataForm",
   component: SensitiveDataForm,
   tags: ["autodocs"],
   parameters: {

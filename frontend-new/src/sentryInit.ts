@@ -15,7 +15,8 @@ export function initSentry() {
     environment: getTargetEnvironmentName(),
     integrations: [
       Sentry.browserTracingIntegration(), // performance monitoring by sentry
-      Sentry.replayIntegration(), // This will allow errors logged to Sentry to have a video replay of the user's session
+      // Turn off replay integration to reduce bundle size
+      // Sentry.replayIntegration(), // This will allow errors logged to Sentry to have a video replay of the user's session
       Sentry.feedbackIntegration({
         showBranding: false, // This will hide the Sentry branding
         autoInject: false, // This will disable the automatic injection of the feedback button

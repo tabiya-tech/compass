@@ -1,4 +1,3 @@
-import * as React from "react";
 import { useState } from "react";
 import { Divider } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
@@ -33,7 +32,7 @@ export const DATA_TEST_ID = {
 
 const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit }) => {
   const theme = useTheme();
-  const [activeStep, setActiveStep] = React.useState(0);
+  const [activeStep, setActiveStep] = useState(0);
   const [answers, setAnswers] = useState<FeedbackItem[]>(() => {
     return PersistentStorageService.getOverallFeedback();
   });

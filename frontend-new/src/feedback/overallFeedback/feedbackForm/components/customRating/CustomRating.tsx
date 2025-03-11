@@ -1,5 +1,4 @@
-import * as React from "react";
-import { useRef } from "react";
+import { useState, useRef } from "react";
 import { useMediaQuery, useTheme } from "@mui/material";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -44,7 +43,7 @@ const CustomRating: React.FC<CustomRatingProps> = ({
   placeholder,
 }) => {
   const theme = useTheme();
-  const [commentText, setCommentText] = React.useState(comments ?? "");
+  const [commentText, setCommentText] = useState(comments ?? "");
   const isSmallMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const commentTextFieldRef = useRef<HTMLInputElement>(null);
 

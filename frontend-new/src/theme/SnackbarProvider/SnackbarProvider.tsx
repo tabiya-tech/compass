@@ -8,7 +8,6 @@ import {
 import { IconButton, styled } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { GlobalStyles as InjectStyles } from "@mui/system";
-import * as React from "react";
 
 const uniqueId = "bade4e92-baed-40f8-a098-0e745563e786";
 export const DATA_TEST_ID = {

@@ -40,6 +40,7 @@ import { TabiyaUser } from "src/auth/auth.types";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import { nanoid } from "nanoid";
 import { ReactionKind } from "src/chat/reaction/reaction.types";
+import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
 
 // Mock Components ----------
 // mock the snackbar
@@ -145,19 +146,29 @@ jest.mock("src/theme/Backdrop/InactiveBackdrop", () => {
   };
 });
 
+// mock lazyWithPreload
+jest.mock("src/utils/preloadableComponent/PreloadableComponent", () => {
+  return {
+    __esModule: true,
+    lazyWithPreload: jest.fn(() => ({
+      preload: jest.fn(() => Promise.resolve()),
+    })),
+  };
+});
+
 describe("Chat", () => {
   // ExperienceService methods to be mocked
   const mockGetExperiences = jest.fn();
 
   function assertResponseMessagesAreShown(
     givenConversationResponse: ConversationResponse,
-    areLastMessages: boolean = true
+    areLastMessages: boolean = true,
   ) {
     assertMessagesAreShown(
       givenConversationResponse.messages.map((message) => ({
         ...message,
         message_id: expect.any(String), // the id is not sent by the server, so its not part of the given messages
-        type: ChatMessageType.BASIC_CHAT, // the message type is not part of the given messages we get from the backend
+        type: expect.any(String), // the message type is not part of the given messages we get from the backend
       })),
       areLastMessages
     );
@@ -304,7 +315,7 @@ describe("Chat", () => {
 
   describe("chat initialization", () => {
     describe("should initialize chat for a user with an active session", () => {
-      test("should initialize chat and fetch history on mount when the user has an existing conversation", async () => {
+      test("should initialize chat and fetch history on mount when the user has an existing conversation that is not concluded", async () => {
         // GIVEN a logged-in user
         const givenUser: TabiyaUser = getMockUser();
         AuthenticationStateService.getInstance().setUser(givenUser);
@@ -358,6 +369,79 @@ describe("Chat", () => {
           expect.objectContaining({ isChatFinished: false, aiIsTyping: false }),
           {}
         );
+        // AND expect no errors or warning to have occurred
+        expect(console.error).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalled();
+      });
+
+      test("should initialize chat and fetch history on mount when the user has a concluded existing conversation with experiences", async () => {
+        // GIVEN a logged-in user
+        const givenUser: TabiyaUser = getMockUser();
+        AuthenticationStateService.getInstance().setUser(givenUser);
+        // AND the user has an active session
+        const givenActiveSessionId = 123;
+        UserPreferencesStateService.getInstance().setUserPreferences(
+          getMockUserPreferences(givenUser, givenActiveSessionId)
+        );
+        // AND the conversation history has some messages
+        const givenChatHistoryResponse: ConversationResponse = {
+          messages: [
+            {
+              message_id: nanoid(),
+              message: "bcf81460-54de-484a-822f-a96b27378224",
+              sent_at: new Date().toISOString(),
+              sender: ConversationMessageSender.USER,
+              reaction: null
+            },
+            {
+              message_id: nanoid(),
+              message: "52aea18a-4a0f-44ad-b690-e99ff8e4ddc7",
+              sent_at: new Date().toISOString(),
+              sender: ConversationMessageSender.COMPASS,
+              reaction: null
+            },
+          ],
+          conversation_completed: true, // completed conversation
+          conversation_conducted_at: new Date().toISOString(),
+          experiences_explored: 2,
+        };
+        jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenChatHistoryResponse);
+        // AND when a chat message is sent, it returns some messages and a conversation completed flag
+        jest.spyOn(ChatService.getInstance(), "sendMessage").mockResolvedValueOnce(getMockConversationResponse([]));
+
+        // WHEN the component is rendered
+        render(<Chat />);
+
+        // THEN expect the Chat component to be initialized
+        await assertChatInitialized();
+
+        // AND expect chat history was fetched with the active session ID
+        expect(ChatService.getInstance().getChatHistory).toHaveBeenCalledWith(givenActiveSessionId);
+        // AND the chat list to be called with a message that says that compass is typing
+        assertTypingMessageWasShown();
+        // AND no message to be sent to the chat service
+        expect(ChatService.getInstance().sendMessage).not.toHaveBeenCalled();
+        // AND expect the given history to be currently shown in ChatList
+        assertResponseMessagesAreShown(givenChatHistoryResponse, true);
+        // AND expect a snackbar notification was never shown
+        expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalled();
+        // AND expect input field to have been disabled
+        await waitFor(() => {
+          expect(ChatMessageField as jest.Mock).toHaveBeenLastCalledWith(
+            expect.objectContaining({ isChatFinished: true, aiIsTyping: false }),
+            {}
+          );
+        });
+        // AND expect the experiences notification to be shown
+        expect(ChatHeader as jest.Mock).toHaveBeenLastCalledWith(
+          expect.objectContaining({ experiencesExplored: 2, exploredExperiencesNotification: true }),
+          {}
+        );
+        // AND expect the DownloadReportDropdown to be preloaded
+        await waitFor(() => {
+          expect(lazyWithPreload).toHaveBeenCalledWith(expect.any(Function));
+        });
+        expect((lazyWithPreload as jest.Mock).mock.results[0].value.preload).toHaveBeenCalled();
         // AND expect no errors or warning to have occurred
         expect(console.error).not.toHaveBeenCalled();
         expect(console.warn).not.toHaveBeenCalled();
@@ -822,7 +906,7 @@ describe("Chat", () => {
   });
 
   describe("sending a message", () => {
-    test("should send a message successfully", async () => {
+    test("should send a message successfully and recieve a conversation that is not concluded", async () => {
       // GIVEN a user is logged in
       const givenUser: TabiyaUser = getMockUser();
       AuthenticationStateService.getInstance().setUser(givenUser);
@@ -990,6 +1074,183 @@ describe("Chat", () => {
           {}
         );
       });
+    });
+
+    test("should send a message successfully and recieve a concluded conversation", async () => {
+      // GIVEN a user is logged in
+      const givenUser: TabiyaUser = getMockUser();
+      AuthenticationStateService.getInstance().setUser(givenUser);
+      // AND the user has an active session
+      const givenActiveSessionId = 123;
+      UserPreferencesStateService.getInstance().setUserPreferences(
+        getMockUserPreferences(givenUser, givenActiveSessionId)
+      );
+      // AND the conversation history has some messages
+      const givenPreviousConversation: ConversationResponse = getMockConversationResponse([
+        {
+          message_id: nanoid(),
+          message: "13a7d8b3-dcb8-4e5c-b377-97160eb2b814",
+          sent_at: new Date().toISOString(),
+          sender: ConversationMessageSender.COMPASS,
+          reaction: null
+        },
+        {
+          message_id: nanoid(),
+          message: "d27b6bf0-f060-4825-aeab-0f1b3d8e274d",
+          sent_at: new Date().toISOString(),
+          sender: ConversationMessageSender.COMPASS,
+          reaction: null
+        },
+        {
+          message_id: nanoid(),
+          message: "2c69dca6-fc07-4cdb-942c-0021c86ebe94",
+          sent_at: new Date().toISOString(),
+          sender: ConversationMessageSender.USER,
+          reaction: null
+        },
+        {
+          message_id: nanoid(),
+          message: "1c322d44-a232-494b-95be-af475abe36a8",
+          sent_at: new Date().toISOString(),
+          sender: ConversationMessageSender.COMPASS,
+          reaction: null
+        },
+      ]);
+      jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenPreviousConversation);
+      // AND a chat service that can sends a message successfully
+      const givenSendMessageResponse: ConversationResponse = {
+        messages: [
+          {
+            message_id: nanoid(),
+            message: "008f1449-4d70-4cc0-a876-553c11caad18",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.COMPASS,
+            reaction: null,
+          },
+          {
+            message_id: nanoid(),
+            message: "51602db3-cf7f-490e-9ca8-4fae4427de30",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.COMPASS,
+            reaction: null
+          },
+        ],
+        conversation_completed: true,
+        conversation_conducted_at: new Date().toISOString(),
+        experiences_explored: 3,
+      };
+      let resolveSendMessage!: (value: ConversationResponse) => void;
+      const sendMessagePromise = new Promise<ConversationResponse>((resolve) => {
+        resolveSendMessage = resolve;
+      });
+      jest.spyOn(ChatService.getInstance(), "sendMessage").mockResolvedValueOnce(sendMessagePromise);
+
+      // WHEN the component is mounted
+      render(<Chat />);
+
+      // THEN expect the Chat component to be initialized
+      await assertChatInitialized();
+      // AND the conversation history to be shown in the chat
+      assertResponseMessagesAreShown(givenPreviousConversation, true);
+
+      // AND WHEN the user types a message
+      const givenMessage = "I loved the smell of the bread and the taste of the cake.";
+      // AND the user sends the message
+      act(() => {
+        (ChatMessageField as jest.Mock).mock.calls.at(-1)[0].handleSend(givenMessage);
+      });
+
+      // THEN expect the send message method to be called with the user's message
+      expect(ChatService.getInstance().sendMessage).toHaveBeenCalledWith(givenActiveSessionId, givenMessage);
+      // AND expect the user's message and a typing indicator to be shown in the chat
+      await waitFor(() => {
+        assertMessagesAreShown(
+          [
+            ...givenPreviousConversation.messages.map((message) => ({
+              ...message,
+              message_id: expect.any(String),
+              type: ChatMessageType.BASIC_CHAT,
+            })),
+            {
+              message_id: expect.any(String),
+              message: givenMessage,
+              sent_at: expect.any(String),
+              sender: ConversationMessageSender.USER,
+              type: ChatMessageType.BASIC_CHAT,
+              reaction: null
+            },
+            {
+              message_id: expect.any(String),
+              message: FIXED_MESSAGES_TEXT.AI_IS_TYPING,
+              sent_at: expect.any(String),
+              sender: ConversationMessageSender.COMPASS,
+              type: ChatMessageType.TYPING,
+              reaction: null
+            },
+          ],
+          true
+        );
+      });
+      // AND the input field to be disabled
+      expect(ChatMessageField as jest.Mock).toHaveBeenLastCalledWith(
+        expect.objectContaining({ isChatFinished: false, aiIsTyping: true }),
+        {}
+      );
+
+      // AND WHEN the send message promise resolves
+      act(() => {
+        resolveSendMessage(givenSendMessageResponse);
+      });
+
+      // THEN expect the previous conversation and the response from the chat service to be shown in the chat
+      await waitFor(() => {
+        assertMessagesAreShown(
+          [
+            ...givenPreviousConversation.messages.map((message) => ({
+              ...message,
+              message_id: expect.any(String),
+              type: expect.any(String),
+            })),
+            {
+              message_id: expect.any(String),
+              message: givenMessage,
+              sent_at: expect.any(String),
+              sender: ConversationMessageSender.USER,
+              type: ChatMessageType.BASIC_CHAT,
+              reaction: null
+            },
+            ...givenSendMessageResponse.messages.map((message) => ({
+              ...message,
+              message_id: expect.any(String),
+              type: expect.any(String),
+            })),
+          ],
+          true
+        );
+      });
+      // AND expect input field to have been disabled
+      await waitFor(() => {
+        expect(ChatMessageField as jest.Mock).toHaveBeenLastCalledWith(
+          expect.objectContaining({ isChatFinished: true, aiIsTyping: false }),
+          {}
+        );
+      });
+      // AND expect the experiences notification to be shown
+      expect(ChatHeader as jest.Mock).toHaveBeenLastCalledWith(
+        expect.objectContaining({ experiencesExplored: 3, exploredExperiencesNotification: true }),
+        {}
+      );
+      // AND expect the DownloadReportDropdown to be preloaded
+      await waitFor(() => {
+        expect(lazyWithPreload).toHaveBeenCalledWith(expect.any(Function));
+      });
+      expect((lazyWithPreload as jest.Mock).mock.results[0].value.preload).toHaveBeenCalled();
+
+      // AND expect that no errors or warnings were logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+      // AND no snackbar notification was shown
+      expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalled();
     });
 
     test("should handle send message error", async () => {
