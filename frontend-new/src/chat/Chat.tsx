@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import ChatService from "src/chat/ChatService/ChatService";
 import ChatList from "src/chat/chatList/ChatList";
 import { IChatMessage } from "./Chat.types";
@@ -32,6 +32,7 @@ import { ChatMessageType } from "src/chat/Chat.types";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import { issueNewSession } from "./issueNewSession";
 import { ChatProvider } from "src/chat/ChatContext";
+import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -340,13 +341,27 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     return () => events.forEach((event) => document.removeEventListener(event, resetTimer));
   }, [disableInactivityCheck]);
 
+  // Preload the "Download Report" button when experiences are explored.
+  // The button is loaded lazily, so this is a good opportunity to load it manually.
+  // When the user opens the experience drawer, the button should already be available.
+  // If the component is not loaded for any reason, the user will have to wait for it.
+  useEffect(() => {
+    if (exploredExperiencesNotification) {
+      console.debug("Preloading DownloadReportDropdown");
+      const LazyDownloadReportDropdown = lazyWithPreload(() => import("src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown"));
+      LazyDownloadReportDropdown.preload().then(() => {
+        console.debug("DownloadReportDropdown preloaded");
+      });
+    }
+  }, [exploredExperiencesNotification]);
+
   // add a message when the compass is typing
   useEffect(() => {
     addOrRemoveTypingMessage(aiIsTyping);
   }, [aiIsTyping]);
 
   return (
-    <>
+    <Suspense fallback={<Backdrop isShown={true} transparent={true} />}>
       {isLoggingOut ? (
         <Backdrop isShown={isLoggingOut} message={"Logging you out, wait a moment..."} />
       ) : (
@@ -418,7 +433,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           )}
         </ChatProvider>
       )}
-    </>
+    </Suspense>
   );
 };
 

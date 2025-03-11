@@ -1,12 +1,14 @@
-import React from "react";
+import { ReactNode, useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import { isAcceptedTCValid, isSensitiveDataValid } from "src/app/ProtectedRoute/util";
+import { SensitivePersonalDataRequirement } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
@@ -14,6 +16,32 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
 
   const targetPath = useLocation().pathname;
+
+  // Preload the SensitiveDataForm component if the user has a sensitive data requirement
+  // This is a good opportunity to preload the component since we already know by this point whether the user needs to provide sensitive data
+  // By the time the user navigates to the sensitive data page, the component will be preloaded
+  // if for any reason the component is not preloaded, the user will experience a slight delay when navigating to the sensitive data page
+  useEffect(() => {
+    const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
+    if (
+      userPreferences &&
+      userPreferences.sensitive_personal_data_requirement !== SensitivePersonalDataRequirement.NOT_AVAILABLE &&
+      !userPreferences.has_sensitive_personal_data
+    ) {
+      console.debug("Preloading SensitiveDataForm");
+      const LazyLoadedSensitiveDataForm = lazyWithPreload(
+        () => import("src/sensitiveData/components/sensitiveDataForm/SensitiveDataForm")
+      );
+      LazyLoadedSensitiveDataForm.preload().then(() => {
+        console.debug("SensitiveDataForm preloaded");
+      });
+    }
+    console.debug("Preloading Chat");
+    const LazyLoadedChat = lazyWithPreload(() => import("src/chat/Chat"));
+    LazyLoadedChat.preload().then(() => {
+      console.debug("Chat preloaded");
+    });
+  }, []);
 
   if (targetPath === routerPaths.VERIFY_EMAIL) {
     console.debug("redirecting from /verify --> /verify because no one cares");
@@ -55,14 +83,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     }
   }
 
-  if(targetPath !== routerPaths.CONSENT) {
+  if (targetPath !== routerPaths.CONSENT) {
     if (!isAcceptedTCValid(userPreferences)) {
       console.debug("redirecting from ? --> /dpa because no prefs.accepted");
       return <Navigate to={routerPaths.CONSENT} />;
     }
   }
 
-  if(targetPath !== routerPaths.SENSITIVE_DATA) {
+  if (targetPath !== routerPaths.SENSITIVE_DATA) {
     if (!isSensitiveDataValid(userPreferences)) {
       console.debug("redirecting to /sensitive-data because user needs to provide sensitive data");
       return <Navigate to={routerPaths.SENSITIVE_DATA} />;

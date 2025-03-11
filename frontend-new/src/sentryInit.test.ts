@@ -52,7 +52,6 @@ describe("sentryInit", () => {
   test("should initialize Sentry with correct configuration", () => {
     // GIVEN the necessary configuration values are available
     const mockBrowserTracing = { name: "browserTracing" };
-    const mockReplay = { name: "replay" };
     const mockFeedback = { name: "feedback" };
     const mockConsole = { name: "console" };
     const mockRouter = { name: "router" };
@@ -60,7 +59,6 @@ describe("sentryInit", () => {
     const givenTargetEnvironmentName = "given-target-environment-name";
 
     (Sentry.browserTracingIntegration as jest.Mock).mockReturnValue(mockBrowserTracing);
-    (Sentry.replayIntegration as jest.Mock).mockReturnValue(mockReplay);
     (Sentry.feedbackIntegration as jest.Mock).mockReturnValue(mockFeedback);
     (Sentry.captureConsoleIntegration as jest.Mock).mockReturnValue(mockConsole);
     (Sentry.reactRouterV6BrowserTracingIntegration as jest.Mock).mockReturnValue(mockRouter);
@@ -75,7 +73,6 @@ describe("sentryInit", () => {
       environment: givenTargetEnvironmentName,
       integrations: [
         mockBrowserTracing,
-        mockReplay,
         expect.objectContaining({
           name: "feedback",
         }),

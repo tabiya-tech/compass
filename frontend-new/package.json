@@ -79,10 +79,12 @@
     "react-router-dom": "^6.23.1",
     "react-scripts": "^5.0.1",
     "react-swipeable": "^7.0.2",
+    "source-map-explorer": "^2.5.3",
     "web-vitals": "^2.1.4",
     "yaml": "^2.7.0"
   },
   "scripts": {
+    "analyze": "npx source-map-explorer 'build/static/js/*.js'",
     "lint": "eslint src --ext .ts --ext .tsx --max-warnings 0",
     "clean": "rimraf -I build coverage storybook-static",
     "compile": "tsc --noEmit",

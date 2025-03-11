@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { createHashRouter, RouterProvider } from "react-router-dom";
-import Chat from "src/chat/Chat";
 import Info from "src/info/Info";
 import Login from "src/auth/pages/Login/Login";
 import ErrorPage from "src/error/errorPage/ErrorPage";
 import Register from "src/auth/pages/Register/Register";
 import VerifyEmail from "src/auth/pages/VerifyEmail/VerifyEmail";
 import Consent from "src/consent/components/consentPage/Consent";
-import SensitiveDataForm from "src/sensitiveData/components/sensitiveDataForm/SensitiveDataForm";
 
 import ProtectedRoute from "src/app/ProtectedRoute/ProtectedRoute";
 import { routerPaths } from "src/app/routerPaths";
@@ -22,6 +20,10 @@ import UserPreferencesService from "src/userPreferences/UserPreferencesService/u
 import { AuthenticationError } from "src/error/commonErrors";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
+import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
+
+const LazyLoadedSensitiveDataForm = lazyWithPreload(() => import("src/sensitiveData/components/sensitiveDataForm/SensitiveDataForm"));
+const LazyLoadedChat = lazyWithPreload(() => import("src/chat/Chat"));
 
 // Wrap the createHashRouter function with Sentry to capture errors that occur during router initialization
 const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouter(createHashRouter);
@@ -137,7 +139,7 @@ const App = () => {
       path: routerPaths.ROOT,
       element: (
         <ProtectedRoute key={ProtectedRouteKeys.ROOT}>
-          <Chat />
+          <LazyLoadedChat />
         </ProtectedRoute>
       ),
     },
@@ -185,7 +187,7 @@ const App = () => {
       path: routerPaths.SENSITIVE_DATA,
       element: (
         <ProtectedRoute key={ProtectedRouteKeys.SENSITIVE_DATA}>
-          <SensitiveDataForm />
+          <LazyLoadedSensitiveDataForm />
         </ProtectedRoute>
       ),
     },

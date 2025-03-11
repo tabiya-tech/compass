@@ -55,7 +55,7 @@ exports[`Sensitive Data Form Form validation should enable submit button when al
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
         We use your data to personalize your experience and may contact you about Compass.
-          Please provide the following information to continue.
+         Please provide the following information to continue.
         <button
           aria-label="help"
           class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
@@ -188,7 +188,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should hand
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
         We use your data to personalize your experience and may contact you about Compass.
-          Please provide the following information to continue.
+         Please provide the following information to continue.
         <button
           aria-label="help"
           class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
@@ -302,7 +302,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
         We use your data to personalize your experience and may contact you about Compass.
-          Please provide the following information to continue.
+         Please provide the following information to continue.
         <button
           aria-label="help"
           class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
@@ -421,7 +421,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
         We use your data to personalize your experience and may contact you about Compass.
-          Please provide the following information to continue.
+         Please provide the following information to continue.
         <button
           aria-label="help"
           class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
@@ -540,7 +540,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
         We use your data to personalize your experience and may contact you about Compass.
-          Please provide the following information to continue.
+         Please provide the following information to continue.
         <button
           aria-label="help"
           class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
@@ -671,7 +671,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
         We use your data to personalize your experience and may contact you about Compass.
-          Please provide the following information to continue.
+         Please provide the following information to continue.
         <button
           aria-label="help"
           class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"

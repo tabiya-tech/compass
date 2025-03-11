@@ -120,6 +120,16 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   };
 });
 
+// mock the sensitive data form skeleton
+jest.mock("src/sensitiveData/components/sensitiveDataForm/SensitiveDataFormSkeleton", () => {
+  return {
+    __esModule: true,
+    default: jest.fn(() => {
+      return <div>Loading form...</div>;
+    }),
+  };
+});
+
 // Sample field configurations for testing
 const SAMPLE_STRING_FIELD: FieldDefinition = {
   name: "field1",
@@ -486,8 +496,8 @@ describe("Sensitive Data Form", () => {
       // THEN a loading indicator should be displayed
       expect(screen.getByText("Loading form...")).toBeInTheDocument();
 
-      // AND the container should be in the document
-      expect(screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_CONTAINER)).toBeInTheDocument();
+      // AND the container should not be in the document
+      expect(screen.queryByTestId(DATA_TEST_ID.SENSITIVE_DATA_CONTAINER)).not.toBeInTheDocument();
 
       // AND the approval modal should not be rendered
       expect(screen.queryByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL)).not.toBeInTheDocument();

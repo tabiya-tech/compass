@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/react";
 import { InvitationCodeRequestData } from "./RequestInvitationCode.types";
-import { InvitationError } from "../../../../error/commonErrors";
+import { InvitationError } from "src/error/commonErrors";
 
 export function requestInvitationCode(data: InvitationCodeRequestData) {
   // we currently use sentry to capture user feedback

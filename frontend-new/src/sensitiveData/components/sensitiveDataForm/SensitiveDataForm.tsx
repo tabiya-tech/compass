@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, Suspense } from "react";
 import {
   Box,
   CircularProgress,
@@ -42,6 +42,7 @@ import StringField from "src/sensitiveData/components/sensitiveDataForm/componen
 import EnumField from "src/sensitiveData/components/sensitiveDataForm/components/EnumField";
 import MultipleSelectField from "src/sensitiveData/components/sensitiveDataForm/components/MultipleSelectField";
 import { createEmptySensitivePersonalData, extractPersonalInfo } from "./config/utils";
+import SensitiveDataFormSkeleton from "src/sensitiveData/components/sensitiveDataForm/SensitiveDataFormSkeleton";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d1";
 
@@ -56,6 +57,16 @@ type DataTestIdType = {
   SENSITIVE_DATA_FORM_REFRESH_BUTTON: string;
   [key: string]: string; // Allow for dynamic keys
 };
+
+export const SENSITIVE_DATA_FORM_FIXED_TEXT = {
+  TITLE: "Provide Your Information",
+  SUBTITLE: "We use your data to personalize your experience and may contact you about Compass.",
+  UNSKIPPABLE_SUBTITLE: "Please provide the following information to continue.",
+  SKIPPABLE_SUBTITLE: "You can skip this step.",
+  FAILED_TO_LOAD_CONFIG: "Failed to load form configuration",
+  INVALID_FORM: "Please correct the errors in the form before submitting.",
+  HELP_TIP_TEXT: "Your information is encrypted using state-of-the-art, end-to-end encryption and stored securely.",
+}
 
 // Create a function to generate the DATA_TEST_ID object
 const createDataTestId = (fields: FieldDefinition[]): DataTestIdType => {
@@ -359,24 +370,6 @@ const SensitiveDataForm: React.FC = () => {
     }
   }, [enqueueSnackbar, userPreferences]);
 
-  // Show loading state while configuration is loading
-  if (configLoading) {
-    return (
-      <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.SENSITIVE_DATA_CONTAINER}>
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
-          height="100%"
-        >
-          <CircularProgress color="primary" />
-          <Box mt={2}>Loading form...</Box>
-        </Box>
-      </Container>
-    );
-  }
-
   // Show error state if configuration failed to load
   if (configError) {
     return (
@@ -390,11 +383,9 @@ const SensitiveDataForm: React.FC = () => {
         >
           <Box color="error.main" mb={2}>
             <Typography
-              role="heading"
-              aria-level={1}
               data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_ERROR_MESSAGE}
             >
-              Failed to load form configuration
+              {SENSITIVE_DATA_FORM_FIXED_TEXT.FAILED_TO_LOAD_CONFIG}
             </Typography>
           </Box>
           <PrimaryButton
@@ -411,167 +402,173 @@ const SensitiveDataForm: React.FC = () => {
   }
 
   return (
-    <>
-      <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.SENSITIVE_DATA_CONTAINER}>
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
-          width={"100%"}
-          sx={{
-            paddingX: isMobile ? theme.fixedSpacing(theme.tabiyaSpacing.sm) : theme.spacing(0),
-            paddingBottom: (theme) => theme.fixedSpacing(theme.tabiyaSpacing.xl),
-          }}
-        >
-          <AuthHeader
-            title={"Provide Your Information"}
-            subtitle={
-              <>
-                We use your data to personalize your experience and may contact you about Compass.
-                {
-                  isPIIRequired ? "  Please provide the following information to continue." : "  You can skip this step."
-                }
-                <HelpTip icon={<PrivacyTipIcon />}>
-                  Your information is encrypted using state-of-the-art, end-to-end encryption and stored securely.
-                </HelpTip>
-              </>
-            }
-          />
-
-          <Box
-            width={"100%"}
-            display={"flex"}
-            flexDirection={"column"}
-            gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
-          >
-            <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
-              {/* Dynamically render form fields based on configuration */}
-              {fields.map(field => renderField(
-                field,
-                handleFieldChange,
-                DATA_TEST_ID,
-                sensitiveData,
-              ))}
-            </Box>
-            <Box
+    <Suspense fallback={<SensitiveDataFormSkeleton />}>
+        {configLoading ? (
+          <SensitiveDataFormSkeleton />
+        ) : (
+          <>
+            <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.SENSITIVE_DATA_CONTAINER}>
+              <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
+              width={"100%"}
               sx={{
-                width: "100%",
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                gap: theme.tabiyaSpacing.xl,
+                paddingX: isMobile ? theme.fixedSpacing(theme.tabiyaSpacing.sm) : theme.spacing(0),
+                paddingBottom: (theme) => theme.fixedSpacing(theme.tabiyaSpacing.xl),
               }}
             >
-              {isPIIRequired ? (
-                <CustomLink
-                  data-testid={DATA_TEST_ID.SENSITIVE_DATA_REJECT_BUTTON}
-                  disabled={isRejecting}
-                  onClick={() => {
-                    setConfirmingReject(true);
-                  }}
-                >
-                  No, thank you
-                </CustomLink>
-              ) : (
-                <CustomLink
-                  data-testid={DATA_TEST_ID.SENSITIVE_DATA_SKIP_BUTTON}
-                  disabled={isSkipping}
-                  disableWhenOffline
-                  onClick={() => {
-                    setConfirmingSkip(true);
-                  }}
-                >
-                  Skip
-                </CustomLink>
-              )}
+              <AuthHeader
+                title={SENSITIVE_DATA_FORM_FIXED_TEXT.TITLE}
+                subtitle={
+                  <>
+                    { SENSITIVE_DATA_FORM_FIXED_TEXT.SUBTITLE }
+                    {
+                      isPIIRequired ? " " + SENSITIVE_DATA_FORM_FIXED_TEXT.UNSKIPPABLE_SUBTITLE : " " + SENSITIVE_DATA_FORM_FIXED_TEXT.SKIPPABLE_SUBTITLE
+                    }
+                    <HelpTip icon={<PrivacyTipIcon />}>
+                      {SENSITIVE_DATA_FORM_FIXED_TEXT.HELP_TIP_TEXT}
+                    </HelpTip>
+                  </>
+                }
+              />
 
-              <PrimaryButton
-                fullWidth
-                variant="contained"
-                color="primary"
-                disabled={!isSubmitButtonEnabled || isSkipping}
-                disableWhenOffline={true}
-                onClick={handleSaveSensitivePersonalData}
-                data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON}
+              <Box
+                width={"100%"}
+                display={"flex"}
+                flexDirection={"column"}
+                gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
               >
-                {isSavingSensitiveData ? (
-                  <CircularProgress
-                    title={"Saving"}
-                    color={"secondary"}
-                    size={theme.typography.h5.fontSize}
-                    sx={{ marginTop: theme.tabiyaSpacing.xs, marginBottom: theme.tabiyaSpacing.xs }}
-                    aria-label={"Saving"}
-                    data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON_CIRCULAR_PROGRESS}
-                  />
-                ) : (
-                  "Start conversation"
-                )}
-              </PrimaryButton>
+                <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
+                  {/* Dynamically render form fields based on configuration */}
+                  {fields.map(field => renderField(
+                    field,
+                    handleFieldChange,
+                    DATA_TEST_ID,
+                    sensitiveData,
+                  ))}
+                </Box>
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: theme.tabiyaSpacing.xl,
+                  }}
+                >
+                  {isPIIRequired ? (
+                    <CustomLink
+                      data-testid={DATA_TEST_ID.SENSITIVE_DATA_REJECT_BUTTON}
+                      disabled={isRejecting}
+                      onClick={() => {
+                        setConfirmingReject(true);
+                      }}
+                    >
+                      No, thank you
+                    </CustomLink>
+                  ) : (
+                    <CustomLink
+                      data-testid={DATA_TEST_ID.SENSITIVE_DATA_SKIP_BUTTON}
+                      disabled={isSkipping}
+                      disableWhenOffline
+                      onClick={() => {
+                        setConfirmingSkip(true);
+                      }}
+                    >
+                      Skip
+                    </CustomLink>
+                  )}
+
+                  <PrimaryButton
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    disabled={!isSubmitButtonEnabled || isSkipping}
+                    disableWhenOffline={true}
+                    onClick={handleSaveSensitivePersonalData}
+                    data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON}
+                  >
+                    {isSavingSensitiveData ? (
+                      <CircularProgress
+                        title={"Saving"}
+                        color={"secondary"}
+                        size={theme.typography.h5.fontSize}
+                        sx={{ marginTop: theme.tabiyaSpacing.xs, marginBottom: theme.tabiyaSpacing.xs }}
+                        aria-label={"Saving"}
+                        data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON_CIRCULAR_PROGRESS}
+                      />
+                    ) : (
+                      "Start conversation"
+                    )}
+                  </PrimaryButton>
+                </Box>
+              </Box>
             </Box>
-          </Box>
-        </Box>
-      </Container>
-      <TextConfirmModalDialog
-        isOpen={confirmingReject}
-        title="Are you sure?"
-        textParagraphs={[
-          {
-            id: "1",
-            text: (
-              <>
-                We're sorry that you chose not to provide your data. You will not be able to proceed and will be{" "}
-                <HighlightedSpan>logged out.</HighlightedSpan>
-              </>
-            ),
-          },
-          {
-            id: "2",
-            text: <>Are you sure you want to exit?</>,
-          },
-        ]}
-        onCancel={handleRejectProvidingSensitiveData}
-        onDismiss={() => {
-          setConfirmingReject(false);
-        }}
-        onConfirm={() => {
-          setConfirmingReject(false);
-        }}
-        cancelButtonText="Yes, exit"
-        confirmButtonText="I want to stay"
-      />
-      <TextConfirmModalDialog
-        isOpen={confirmingSkip}
-        title="Are you sure?"
-        textParagraphs={[
-          {
-            id: "1",
-            text: (
-              <>
-                We're sorry that you prefer not to provide your data. Sharing your information helps improve Compass.
-                Please note that if you skip this step,{" "}
-                <HighlightedSpan>you won't be able to provide this information later.</HighlightedSpan>
-              </>
-            ),
-          },
-          {
-            id: "2",
-            text: <>Are you sure you want to skip?</>,
-          },
-        ]}
-        onCancel={handleSkipProvidingSensitiveData}
-        onDismiss={() => {
-          setConfirmingSkip(false);
-        }}
-        onConfirm={() => {
-          setConfirmingSkip(false);
-        }}
-        cancelButtonText="Yes, skip"
-        confirmButtonText="Share data"
-      />
-      <Backdrop isShown={isSkipping || isRejecting} message={isSkipping ? "Skipping..." : "Logging you out..."} />
-    </>
+          </Container>
+          <TextConfirmModalDialog
+            isOpen={confirmingReject}
+            title="Are you sure?"
+            textParagraphs={[
+              {
+                id: "1",
+                text: (
+                  <>
+                    We're sorry that you chose not to provide your data. You will not be able to proceed and will be{" "}
+                    <HighlightedSpan>logged out.</HighlightedSpan>
+                  </>
+                ),
+              },
+              {
+                id: "2",
+                text: <>Are you sure you want to exit?</>,
+              },
+            ]}
+            onCancel={handleRejectProvidingSensitiveData}
+            onDismiss={() => {
+              setConfirmingReject(false);
+            }}
+            onConfirm={() => {
+              setConfirmingReject(false);
+            }}
+            cancelButtonText="Yes, exit"
+            confirmButtonText="I want to stay"
+          />
+          <TextConfirmModalDialog
+            isOpen={confirmingSkip}
+            title="Are you sure?"
+            textParagraphs={[
+              {
+                id: "1",
+                text: (
+                  <>
+                    We're sorry that you prefer not to provide your data. Sharing your information helps improve Compass.
+                    Please note that if you skip this step,{" "}
+                    <HighlightedSpan>you won't be able to provide this information later.</HighlightedSpan>
+                  </>
+                ),
+              },
+              {
+                id: "2",
+                text: <>Are you sure you want to skip?</>,
+              },
+            ]}
+            onCancel={handleSkipProvidingSensitiveData}
+            onDismiss={() => {
+              setConfirmingSkip(false);
+            }}
+            onConfirm={() => {
+              setConfirmingSkip(false);
+              }}
+              cancelButtonText="Yes, skip"
+              confirmButtonText="Share data"
+            />
+        <Backdrop isShown={isSkipping || isRejecting} message={isSkipping ? "Skipping..." : "Logging you out..."} />
+      </>
+      )}
+    </Suspense>
   );
 };
 

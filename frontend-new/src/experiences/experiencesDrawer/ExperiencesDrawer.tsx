@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, Suspense } from "react";
 import { Box, Divider, Drawer, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import ExperiencesDrawerHeader from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
@@ -8,7 +8,6 @@ import { StoredPersonalInfo } from "src/sensitiveData/types";
 import CustomTextField from "src/theme/CustomTextField/CustomTextField";
 import CustomAccordion from "src/theme/CustomAccordion/CustomAccordion";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import DownloadReportDropdown from "src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown";
 import { groupExperiencesByWorkType } from "src/experiences/report/util";
 import { ReportContent } from "src/experiences/report/reportContent";
 import StoreIcon from "@mui/icons-material/Store";
@@ -16,6 +15,9 @@ import WorkIcon from "@mui/icons-material/Work";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import SchoolIcon from "@mui/icons-material/School";
 import ExperienceCategory from "src/experiences/experiencesDrawer/components/experienceCategory/ExperienceCategory";
+import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
+import DownloadReportButton from "./components/downloadReportButton/DownloadReportButton";
+const LazyLoadedDownloadDropdown = lazyWithPreload(() => import("src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown"));
 
 export interface ExperiencesDrawerProps {
   isOpen: boolean;
@@ -60,6 +62,15 @@ const useLocalStorage = (key: string, initialValue: Record<string, string>) => {
   return [value, setValue] as const;
 };
 
+const DisabledDownloadReportButton = () => {
+  return (
+    <DownloadReportButton
+      notifyOnDownloadPdf={() => {}}
+      disabled={true}
+    />
+  )
+}
+
 const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   isOpen,
   isLoading,
@@ -99,6 +110,21 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   // Group experiences by work type
   const groupedExperiences = useMemo(() => groupExperiencesByWorkType(experiences), [experiences]);
 
+  const getDownloadReportDropdown = () => {
+    if(experiences.length){
+      return <LazyLoadedDownloadDropdown
+        name={personalInfo.fullName}
+        email={personalInfo.contactEmail}
+        phone={personalInfo.phoneNumber}
+        address={personalInfo.address}
+        experiences={experiencesWithTopSkills}
+        conversationConductedAt={conversationConductedAt!}
+        disabled={!hasTopSkills}
+      />
+    }
+    return <DisabledDownloadReportButton />
+  }
+
   const tooltipText =
     "The fields are prefilled with information you may have provided earlier and are stored securely on your device. Fill in missing details to personalize your CV.";
   return (
@@ -118,15 +144,9 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
       <ExperiencesDrawerHeader notifyOnClose={handleClose} />
       <Box display="flex" flexDirection="column" gap={2}>
         <Box display="flex" flexDirection="column" gap={1} alignItems="end" justifyContent="flex-end">
-          <DownloadReportDropdown
-            name={personalInfo.fullName}
-            email={personalInfo.contactEmail}
-            phone={personalInfo.phoneNumber}
-            address={personalInfo.address}
-            experiences={experiencesWithTopSkills}
-            conversationConductedAt={conversationConductedAt!}
-            disabled={!hasTopSkills}
-          />
+          <Suspense fallback={<DisabledDownloadReportButton />}>
+            {getDownloadReportDropdown()}
+          </Suspense>
         </Box>
         <CustomAccordion title="Personal Information" tooltipText={tooltipText}>
           <CustomTextField

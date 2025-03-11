@@ -2,6 +2,7 @@
 import "src/_test_utilities/consoleMock";
 
 import { render, screen, within } from "@testing-library/react";
+import { MAX_WAIT_TIME_FOR_ROOT_ELEMENT, ROOT_ELEMENT_POLL_INTERVAL } from "./index";
 
 // mock the react-dom/client
 // Using jest.doMock() so that the render function can be accessed from within the mock
@@ -91,16 +92,42 @@ describe("test the application bootstrapping", () => {
   beforeEach(() => {
     (console.error as jest.Mock).mockClear();
     (console.warn as jest.Mock).mockClear();
+    jest.useFakeTimers();
+    
+    // Clear the entire document body
+    document.body.innerHTML = '';
+    
+    // Reset modules
+    jest.resetModules();
   });
 
-  test("should render the app", () => {
-    jest.isolateModules(() => {
+  afterEach(() => {
+    jest.useRealTimers();
+    // Clean up the DOM
+    document.body.innerHTML = '';
+  });
+
+  test("should render the app when root element is immediately available", () => {
+    jest.isolateModules(async () => {
       const ensureRequiredEnvVarsMock = jest
         .spyOn(require("src/envService"), "ensureRequiredEnvVars")
         .mockImplementation(jest.fn);
 
+      // GIVEN the root element exists in the DOM
+      const mockRootElement = document.createElement('div');
+      mockRootElement.id = 'root';
+      mockRootElement.setAttribute('data-testid', 'root');
+      document.body.appendChild(mockRootElement);
+
       // WHEN the main index module is imported
       require("./index");
+
+      // AND we run all timers to ensure all async operations complete
+      jest.runAllTimers();
+      
+      // AND we wait for any pending promises
+      await Promise.resolve();
+      await Promise.resolve(); // Double flush to ensure all microtasks complete
 
       // THEN expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();
@@ -124,9 +151,99 @@ describe("test the application bootstrapping", () => {
 
       // AND expect the ensureRequiredEnvVars function to have been called
       expect(ensureRequiredEnvVarsMock).toHaveBeenCalled();
-
       // AND expect the compass app to match the snapshot
       expect(compassAppElement).toMatchSnapshot();
+    });
+  });
+
+  test("should render the app after waiting for root element", async () => {
+    jest.isolateModules(async () => {
+      const ensureRequiredEnvVarsMock = jest
+        .spyOn(require("src/envService"), "ensureRequiredEnvVars")
+        .mockImplementation(jest.fn);
+
+      // GIVEN the root element doesn't exist initially
+      const mockRootElement = document.createElement('div');
+      mockRootElement.id = 'root';
+      mockRootElement.setAttribute('data-testid', 'root');
+
+      // WHEN the main index module is imported
+      require("./index");
+
+      // AND we advance time by one polling interval
+      jest.advanceTimersByTime(ROOT_ELEMENT_POLL_INTERVAL);
+
+      // AND we add the root element to the DOM
+      document.body.appendChild(mockRootElement);
+
+      // AND we advance time by another polling interval to trigger the next check
+      jest.advanceTimersByTime(ROOT_ELEMENT_POLL_INTERVAL);
+
+      // AND we run all remaining timers to ensure all async operations complete
+      jest.runAllTimers();
+      
+      // AND we wait for any pending promises
+      await Promise.resolve();
+      await Promise.resolve(); // Double flush to ensure all microtasks complete
+
+      // THEN expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+
+      // AND expect the theme provider to be in the DOM
+      const themeProviderElement = screen.getByTestId("theme-provider-id");
+      expect(themeProviderElement).toBeInTheDocument();
+
+      // AND expect the css baseline to be in the DOM
+      const cssBaselineElement = screen.getByTestId("css-baseline-id");
+      expect(cssBaselineElement).toBeInTheDocument();
+
+      // AND expect the snackbar provider to be in the DOM and to be a child of the theme provider
+      const snackbarProviderElement = within(themeProviderElement).getByTestId("snackbar-provider-id");
+      expect(snackbarProviderElement).toBeInTheDocument();
+
+      // AND expect the compass app to be in the DOM and to be a child of the theme provider
+      const compassAppElement = within(themeProviderElement).getByTestId("compass-app-id");
+      expect(compassAppElement).toBeInTheDocument();
+
+      // AND expect the ensureRequiredEnvVars function to have been called
+      expect(ensureRequiredEnvVarsMock).toHaveBeenCalled();
+    });
+  });
+
+  test("should log error when root element is not found after maximum attempts", async () => {
+    jest.isolateModules(async () => {
+      jest
+        .spyOn(require("src/envService"), "ensureRequiredEnvVars")
+        .mockImplementation(jest.fn);
+
+      // WHEN the main index module is imported
+      require("./index");
+
+      // AND we advance time by the maximum wait time
+      jest.advanceTimersByTime(MAX_WAIT_TIME_FOR_ROOT_ELEMENT);
+
+      // AND we run all remaining timers to ensure all async operations complete
+      jest.runAllTimers();
+      
+      // AND we wait for any pending promises
+      await Promise.resolve();
+      await Promise.resolve(); // Double flush to ensure all microtasks complete
+
+      // THEN expect an error to be logged
+      expect(console.error).toHaveBeenCalledWith(
+        "Failed to initialize React:",
+        expect.any(Error)
+      );
+
+      // AND expect the error message to indicate maximum attempts were reached
+      const errorCall = (console.error as jest.Mock).mock.calls[0];
+      expect(errorCall[1].message).toBe(
+        "Root element not found after maximum attempts"
+      );
+
+      // AND expect no app to be rendered
+      expect(screen.queryByTestId("theme-provider-id")).not.toBeInTheDocument();
     });
   });
 });
