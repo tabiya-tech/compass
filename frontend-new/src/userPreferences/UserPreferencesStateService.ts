@@ -1,6 +1,7 @@
 import { SensitivePersonalDataRequirement, UserPreference, Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-
-export const CUSTOMER_SATISFACTION_KEY = "satisfaction_with_compass"
+import {
+  QUESTION_KEYS,
+} from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 
 export default class UserPreferencesStateService {
   private static instance: UserPreferencesStateService;
@@ -60,7 +61,7 @@ export default class UserPreferencesStateService {
     }
 
     return answered_questions[activeSessionId].some(
-      (question) => question !== CUSTOMER_SATISFACTION_KEY
+      (question) => question !== QUESTION_KEYS.CUSTOMER_SATISFACTION
     );
   }
   
@@ -74,7 +75,7 @@ export default class UserPreferencesStateService {
       return false;
     }
 
-    return answered_questions[activeSessionId].includes(CUSTOMER_SATISFACTION_KEY)
+    return answered_questions[activeSessionId].includes(QUESTION_KEYS.CUSTOMER_SATISFACTION)
   }
 
   private cloneUserPreferences(preferences: UserPreference | null): UserPreference | null {

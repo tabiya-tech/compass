@@ -86,7 +86,7 @@ const ConversationConclusionFooter: React.FC = () => {
     }
   };
 
-  const feedbackSubmitted = (sessionHasFeedback || feedbackStatus === FeedbackStatus.SUBMITTED)
+  const feedbackSubmitted = (sessionHasFeedback || feedbackStatus === FeedbackStatus.SUBMITTED);
 
   return (
     <>
@@ -107,10 +107,8 @@ const ConversationConclusionFooter: React.FC = () => {
           >
             <span style={{ whiteSpace: "normal" }}>view and download your CV here</span>
           </CustomLink>
-          .{" "}
-
-          {/* Show anonymous user registration link if the user is anonymous and hasn't already converted */}
-          {(isAnonymous && !isAccountConverted) &&
+          . {/* Show anonymous user registration link if the user is anonymous and hasn't already converted */}
+          {isAnonymous && !isAccountConverted && (
             <span data-testid={DATA_TEST_ID.CREATE_ACCOUNT_MESSAGE}>
               If you would like to explore your skills and experiences in the future, you can{" "}
               <CustomLink
@@ -121,45 +119,46 @@ const ConversationConclusionFooter: React.FC = () => {
                 Create an account
               </CustomLink>
             </span>
-          }
+          )}
           {/* Show the verification reminder if the user has already converted their account */}
-          { isAccountConverted &&
+          {isAccountConverted && (
             <span data-testid={DATA_TEST_ID.VERIFICATION_REMINDER_MESSAGE}>
-              A verification email has been sent to your email address. Please verify your account before logging in again.
+              A verification email has been sent to your email address. Please verify your account before logging in
+              again.
             </span>
-          }
+          )}
         </Typography>
 
-        <Typography component={'span'} variant="body1">
-          {(!feedbackSubmitted && !hasSubmittedCustomerSatisfactionRating) && <span>Finally, We'd love to hear your thoughts on compass.</span>}
+        <Typography component={"span"} variant="body1">
           {/* Show a customer satisfaction rating if it hasn't been submitted yet */}
-          {(!hasSubmittedCustomerSatisfactionRating) &&
+          {!hasSubmittedCustomerSatisfactionRating && (
             <CustomerSatisfactionRating
               notifyOnCustomerSatisfactionRatingSubmitted={() => setHasSubmittedCustomerSatisfactionRating(true)}
             />
-          }
+          )}
           {/* Show a thank you message if the rating has been submitted */}
-          {
-            (hasSubmittedCustomerSatisfactionRating && !feedbackSubmitted) &&
-            <span data-testid={DATA_TEST_ID.THANK_YOU_FOR_RATING_MESSAGE}>{" "}{FIXED_MESSAGES_TEXT.THANK_YOU_FOR_RATING}{" "}</span>
-          }
+          {hasSubmittedCustomerSatisfactionRating && !feedbackSubmitted && (
+            <span data-testid={DATA_TEST_ID.THANK_YOU_FOR_RATING_MESSAGE}>
+              {" "}
+              {FIXED_MESSAGES_TEXT.THANK_YOU_FOR_RATING}{" "}
+            </span>
+          )}
           {/* Show feedback form if the rating has been submitted */}
-          {
-            (hasSubmittedCustomerSatisfactionRating && feedbackStatus === FeedbackStatus.NOT_STARTED) &&
-            <span data-testid={DATA_TEST_ID.FEEDBACK_MESSAGE_TEXT}>{" "}We'd love your{" "}
-              <CustomLink
-                onClick={() => setIsFeedbackFormOpen(true)}
-                disableWhenOffline
-                data-testid={DATA_TEST_ID.FEEDBACK_FORM_BUTTON}
-              >
-              feedback
-            </CustomLink>{" "}
-              on this chat. It only takes 5 minutes and helps us improve!
-          </span>
+          {hasSubmittedCustomerSatisfactionRating &&
+            feedbackStatus === FeedbackStatus.NOT_STARTED &&
+              <span data-testid={DATA_TEST_ID.FEEDBACK_MESSAGE_TEXT}>{" "}We'd love to get more{" "}
+                <CustomLink
+                  onClick={() => setIsFeedbackFormOpen(true)}
+                  disableWhenOffline
+                  data-testid={DATA_TEST_ID.FEEDBACK_FORM_BUTTON}
+                >
+                feedback
+              </CustomLink>{" "}
+                from you. It only takes 5 minutes and helps us improve!
+            </span>
           }
           {/* Show continue feedback if the status is already started */}
-          {
-            (hasSubmittedCustomerSatisfactionRating && feedbackStatus === FeedbackStatus.STARTED) &&
+          {hasSubmittedCustomerSatisfactionRating && feedbackStatus === FeedbackStatus.STARTED && (
             <span data-testid={DATA_TEST_ID.FEEDBACK_IN_PROGRESS_MESSAGE}>
               Please{" "}
               <CustomLink
@@ -171,13 +170,12 @@ const ConversationConclusionFooter: React.FC = () => {
               </CustomLink>{" "}
               to help us improve your experience!
             </span>
-          }
-          {
-            (feedbackSubmitted && hasSubmittedCustomerSatisfactionRating) &&
+          )}
+          {feedbackSubmitted && hasSubmittedCustomerSatisfactionRating && (
             <span data-testid={DATA_TEST_ID.THANK_YOU_FOR_FEEDBACK_MESSAGE}>
               {FIXED_MESSAGES_TEXT.THANK_YOU_FOR_FEEDBACK}
             </span>
-          }
+          )}
         </Typography>
       </Box>
       <FeedbackForm isOpen={isFeedbackFormOpen} notifyOnClose={handleFeedbackFormClose} />
@@ -193,3 +191,4 @@ const ConversationConclusionFooter: React.FC = () => {
 };
 
 export default ConversationConclusionFooter;
+

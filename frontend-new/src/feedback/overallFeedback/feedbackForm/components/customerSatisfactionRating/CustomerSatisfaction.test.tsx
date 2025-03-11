@@ -3,7 +3,7 @@ import "src/_test_utilities/consoleMock";
 
 import React from "react";
 import { render, screen, act, waitFor} from "src/_test_utilities/test-utils";
-import CustomerSatisfactionRating, { DATA_TEST_ID } from "./CustomerSatisfaction";
+import CustomerSatisfactionRating, { UI_TEXT, DATA_TEST_ID } from "./CustomerSatisfaction";
 import CustomRating, { DATA_TEST_ID as CUSTOM_RATING_DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/customRating/CustomRating";
 import { DATA_TEST_ID as BACKDROP_DATA_TEST_ID } from "src/theme/Backdrop/Backdrop";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -16,7 +16,8 @@ import {
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
-import { FeedbackResponse } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
+import { FeedbackResponse, QUESTION_KEYS } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
+import { QuestionType } from "src/feedback/overallFeedback/feedbackForm/feedbackForm.types";
 
 // mock the snackbar provider
 jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
@@ -90,11 +91,26 @@ describe("CustomerSatisfactionRating", () => {
 
     // THEN the customer satisfaction rating container should be in the document
     expect(screen.getByTestId(DATA_TEST_ID.CUSTOMER_SATISFACTION_RATING_CONTAINER)).toBeInTheDocument();
+
+    // AND the custom rating component should be called with the correct props
+    expect(CustomRating).toHaveBeenCalledWith({
+      questionId: QUESTION_KEYS.CUSTOMER_SATISFACTION,
+      questionText: UI_TEXT.CUSTOMER_SATISFACTION_QUESTION_TEXT,
+      ratingValue: null,
+      notifyChange: expect.any(Function),
+      lowRatingLabel: UI_TEXT.RATING_LABEL_LOW,
+      highRatingLabel: UI_TEXT.RATING_LABEL_HIGH,
+      maxRating: 5,
+      disabled: false,
+      type: QuestionType.Rating
+    }, {});
     // AND the custom rating container to be in the document
     expect(screen.getByTestId(CUSTOM_RATING_DATA_TEST_ID.CUSTOM_RATING_CONTAINER)).toBeInTheDocument();
     // AND expect no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
+    // AND the component to match the snapshot
+    expect(givenCustomerSatisfactionRating).toMatchSnapshot();
   });
 
   test("should submit rating successfully", async () => {
