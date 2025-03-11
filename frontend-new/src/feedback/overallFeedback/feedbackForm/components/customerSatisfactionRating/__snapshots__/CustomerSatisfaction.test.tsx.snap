@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CustomerSatisfactionRating should render component successfully 1`] = `
+<CustomerSatisfactionRating
+  notifyOnCustomerSatisfactionRatingSubmitted={[MockFunction]}
+/>
+`;
