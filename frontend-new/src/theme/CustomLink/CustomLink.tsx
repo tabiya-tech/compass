@@ -9,11 +9,11 @@ interface CustomLinkProps extends LinkProps {
 
 const StyledLink = styled(Link)<CustomLinkProps>(({ theme, disabled }) => ({
   color: disabled ? theme.palette.text.disabled : theme.palette.text.primary,
-  opacity: disabled ? "0.5" : "1",
+  opacity: disabled ? 0.5 : 1,
   cursor: disabled ? "not-allowed" : "pointer",
   textDecoration: "underline",
   pointerEvents: disabled ? "none" : "auto",
-  fontWeight: "bold",
+  fontWeight: disabled ? "normal" : "bold",
   whiteSpace: "nowrap",
   "&:hover": {
     color: disabled ? theme.palette.text.textAccent : theme.palette.grey["500"],
