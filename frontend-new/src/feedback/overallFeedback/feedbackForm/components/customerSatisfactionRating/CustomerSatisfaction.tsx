@@ -29,8 +29,8 @@ export const UI_TEXT = {
   RATING_LABEL_HIGH: "Satisfied",
 }
 const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
-                                                                                 notifyOnCustomerSatisfactionRatingSubmitted,
-                                                                               }) => {
+  notifyOnCustomerSatisfactionRatingSubmitted,
+}) => {
   const { enqueueSnackbar } = useSnackbar();
   const isOnline = useContext(IsOnlineContext);
 
