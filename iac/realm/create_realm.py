@@ -5,10 +5,9 @@ import pulumi
 import pulumi_gcp as gcp
 import pulumiverse_time as time
 import hashlib
+import urllib.parse
 
 from lib import enable_services, get_resource_name
-
-protected_from_deletion = True
 
 
 def _get_custom_role_valid_name(name: str) -> str:
@@ -61,6 +60,7 @@ def _create_repositories(*,
                          region: str,
                          admins_group: gcp.cloudidentity.Group,
                          developers_group: gcp.cloudidentity.Group,
+                         protected_from_deletion: bool,
                          dependencies: list[pulumi.Resource],
                          provider: gcp.Provider
                          ) -> (gcp.artifactregistry.Repository, gcp.artifactregistry.Repository):
@@ -146,6 +146,7 @@ def _create_secrets(
         admins_group: gcp.cloudidentity.Group,
         provider: gcp.Provider,
         dependencies: list[pulumi.Resource],
+        protected_from_deletion: bool,
 ) -> gcp.secretmanager.Secret:
     """
     Create secrets required by the realm.
@@ -162,7 +163,7 @@ def _create_secrets(
         replication={
             "auto": {},
         },
-        opts=pulumi.ResourceOptions(provider=provider, depends_on=dependencies))
+        opts=pulumi.ResourceOptions(provider=provider, protect=protected_from_deletion, depends_on=dependencies))
 
     # allow the developers to only view the secret
     gcp.secretmanager.SecretIamMember(
@@ -192,6 +193,7 @@ def _create_organizational_base(*,
                                 root_folder_id: str,
                                 upper_env_google_oauth_projects_folder_id: str,
                                 lower_env_google_oauth_projects_folder_id: str,
+                                protected_from_deletion: bool,
                                 dependencies: list[pulumi.Resource]
                                 ) -> tuple[gcp.organizations.Folder, gcp.organizations.Folder, gcp.cloudidentity.Group, gcp.cloudidentity.Group]:
     """
@@ -332,6 +334,32 @@ def _create_organizational_base(*,
         member=realm_admins.group_key.apply(lambda group: f"group:{group.id}"),
         opts=pulumi.ResourceOptions(depends_on=[realm_admins], provider=provider)
     )
+
+    # `roles/owner` includes permissions about deleting projects, we still want to retain all the permissions
+    # in this role, and only deny specific permissions on the production folder,
+    # We don't want anyone to delete a project, because it may result into loss of user data.
+    if protected_from_deletion:
+        gcp.iam.DenyPolicy(
+            get_resource_name(resource="realm-members-delete-projects", resource_type="deny-policy"),
+            # convert the folder id into a valid url parsed string
+            # see: https://cloud.google.com/iam/docs/deny-access#create-deny-pol
+            parent=prod_envs_folder.name.apply(
+                lambda folder_id: urllib.parse.quote_plus(f"cloudresourcemanager.googleapis.com/{folder_id}")),
+            rules=[
+                gcp.iam.DenyPolicyRuleArgs(
+                    deny_rule=gcp.iam.DenyPolicyRuleDenyRuleArgs(
+                        denied_principals=[
+                            realm_admins.group_key.apply(lambda group: f"principalSet://goog/group/{group.id}"),
+                            realm_developers.group_key.apply(lambda group: f"principalSet://goog/group/{group.id}"),
+                        ],
+                        denied_permissions=[
+                            "cloudresourcemanager.googleapis.com/projects.delete"
+                        ]
+                    )
+                )
+            ],
+            opts=pulumi.ResourceOptions(provider=provider)
+        )
 
     return lower_envs_folder, prod_envs_folder, realm_developers, realm_admins
 
@@ -480,7 +508,8 @@ def create_realm(*,
                  lower_env_google_oauth_projects_folder_id: str,
                  region: str,
                  realm_name: str,
-                 roots_path: str
+                 roots_path: str,
+                 protected_from_deletion: bool
                  ) -> None:
     # Set the provider to use the root project
     provider = gcp.Provider(
@@ -491,7 +520,7 @@ def create_realm(*,
         # user_project_override=True
     )
 
-    # The initial APIs that must be enabled first in order to enable other GCP APIs
+    # The initial APIs that must be enabled on the root project first to enable other GCP APIs.
     wait_for_services = _enable_required_services(provider=provider)
 
     # Grant the roles that are required to create the organizational base
@@ -514,6 +543,7 @@ def create_realm(*,
                                                  upper_env_google_oauth_projects_folder_id=upper_env_google_oauth_projects_folder_id,
                                                  lower_env_google_oauth_projects_folder_id=lower_env_google_oauth_projects_folder_id,
                                                  dependencies=wait_for_dependencies,
+                                                 protected_from_deletion=protected_from_deletion,
                                                  provider=provider)
     # Create the service accounts
     (lower_env_service_account,
@@ -531,6 +561,7 @@ def create_realm(*,
         region=region,
         admins_group=realm_admins,
         developers_group=realm_developers,
+        protected_from_deletion=protected_from_deletion,
         dependencies=wait_for_dependencies,
         provider=provider
     )
@@ -539,6 +570,7 @@ def create_realm(*,
         root_project_id=root_project_id,
         admins_group=realm_admins,
         developers_group=realm_developers,
+        protected_from_deletion=protected_from_deletion,
         provider=provider,
         dependencies=wait_for_dependencies
     )

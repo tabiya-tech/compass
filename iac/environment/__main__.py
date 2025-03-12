@@ -67,6 +67,7 @@ def main():
         region=gcp_region,
         folder_id=folder_id,
         billing_account=billing_account,
+        environment_type=environment_type,
         environment_name=environment_name
     )
 
