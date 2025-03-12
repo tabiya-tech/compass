@@ -103,14 +103,14 @@ const CustomRating: React.FC<CustomRatingProps> = ({
               <Typography
                 variant="body2"
                 data-testid={DATA_TEST_ID.CUSTOM_RATING_LOW_LABEL}
-                sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.sm * 1.2) }}
+                sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.sm * 1.2), opacity: disabled ? 0.5 : 1 }}
               >
                 {lowRatingLabel}
               </Typography>
               <Typography
                 variant="body2"
                 data-testid={DATA_TEST_ID.CUSTOM_RATING_HIGH_LABEL}
-                sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.sm * 1.2) }}
+                sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.sm * 1.2), opacity: disabled ? 0.5 : 1 }}
               >
                 {highRatingLabel}
               </Typography>
