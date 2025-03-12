@@ -348,13 +348,13 @@ exports[`StepsComponent should render component successfully 1`] = `
             class="MuiBox-root css-jyedia"
           >
             <p
-              class="MuiTypography-root MuiTypography-body2 css-1m7ibp6-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-body2 css-1ucn9pd-MuiTypography-root"
               data-testid="custom-rating-low-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
             >
               Low
             </p>
             <p
-              class="MuiTypography-root MuiTypography-body2 css-1m7ibp6-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-body2 css-1ucn9pd-MuiTypography-root"
               data-testid="custom-rating-high-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
             >
               High
