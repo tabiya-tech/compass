@@ -17,11 +17,11 @@ The IaC is divided into seven subprojects and lib folder for re-usable code/func
 
 - [realm](realm): Sets up the realm.
 - [environment](environment): Sets up the environment project and enable all the required APIs.
+  - [DNS](dns): Sets up the Managed DNS Zone and AWS name servers for the subdomains. It is used to set up domain delegation for the subdomains.
 - [auth](auth): Sets up the authentication infrastructure. (Identity Platform, IDPs, and Firebase).
 - [backend](backend): Sets up the backend application's infrastructure. Cloudrun and API Gateway for the backend application.
 - [frontend](frontend): Sets up the frontend application's infrastructure, a static website hosted on Google Cloud Storage.
 - [common](common): Sets up the foundational infrastructure such as a load balancer, SSL certificate and DNS records for the entire application.
-- [aws-ns](aws-ns): Sets up the AWS name servers for the subdomains. It is used to set up domain delegation for the subdomains.
 
 ## The Realm
 
