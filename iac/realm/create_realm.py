@@ -5,10 +5,9 @@ import pulumi
 import pulumi_gcp as gcp
 import pulumiverse_time as time
 import hashlib
+import urllib.parse
 
 from lib import enable_services, get_resource_name
-
-protected_from_deletion = True
 
 
 def _get_custom_role_valid_name(name: str) -> str:
@@ -61,6 +60,7 @@ def _create_repositories(*,
                          region: str,
                          admins_group: gcp.cloudidentity.Group,
                          developers_group: gcp.cloudidentity.Group,
+                         protected_from_deletion: bool,
                          dependencies: list[pulumi.Resource],
                          provider: gcp.Provider
                          ) -> (gcp.artifactregistry.Repository, gcp.artifactregistry.Repository):
@@ -146,6 +146,7 @@ def _create_secrets(
         admins_group: gcp.cloudidentity.Group,
         provider: gcp.Provider,
         dependencies: list[pulumi.Resource],
+        protected_from_deletion: bool,
 ) -> gcp.secretmanager.Secret:
     """
     Create secrets required by the realm.
@@ -162,7 +163,7 @@ def _create_secrets(
         replication={
             "auto": {},
         },
-        opts=pulumi.ResourceOptions(provider=provider, depends_on=dependencies))
+        opts=pulumi.ResourceOptions(provider=provider, protect=protected_from_deletion, depends_on=dependencies))
 
     # allow the developers to only view the secret
     gcp.secretmanager.SecretIamMember(
@@ -192,6 +193,9 @@ def _create_organizational_base(*,
                                 root_folder_id: str,
                                 upper_env_google_oauth_projects_folder_id: str,
                                 lower_env_google_oauth_projects_folder_id: str,
+                                protected_from_deletion_tag_key: str,
+                                protected_from_deletion_tag_true_value: str,
+                                protected_from_deletion: bool,
                                 dependencies: list[pulumi.Resource]
                                 ) -> tuple[gcp.organizations.Folder, gcp.organizations.Folder, gcp.cloudidentity.Group, gcp.cloudidentity.Group]:
     """
@@ -331,6 +335,61 @@ def _create_organizational_base(*,
         role="roles/billing.user",
         member=realm_admins.group_key.apply(lambda group: f"group:{group.id}"),
         opts=pulumi.ResourceOptions(depends_on=[realm_admins], provider=provider)
+    )
+
+    # Allow the tag value to be used by the realm admins and realm developers.
+    gcp.tags.TagValueIamMember(
+        get_resource_name(resource="realm-admins-tag-value-user", resource_type="iam-member"),
+        tag_value=protected_from_deletion_tag_true_value,
+        role="roles/resourcemanager.tagUser",
+        member=realm_admins.group_key.apply(lambda group: f"group:{group.id}"),
+        opts=pulumi.ResourceOptions(provider=provider))
+
+    gcp.tags.TagValueIamMember(
+        get_resource_name(resource="realm-developers-tag-value-user", resource_type="iam-member"),
+        tag_value=protected_from_deletion_tag_true_value,
+        role="roles/resourcemanager.tagUser",
+        member=realm_developers.group_key.apply(lambda group: f"group:{group.id}"),
+        opts=pulumi.ResourceOptions(provider=provider))
+
+    # if the realm is protected from deletion, protect the root project from deletion.
+    # by adding this tag.
+    if protected_from_deletion:
+        gcp.tags.TagBinding(
+            get_resource_name(resource="realm-root-project-protected", resource_type="tag-binding"),
+            parent=provider.project.apply(lambda _id: f"//cloudresourcemanager.googleapis.com/projects/{_id}"),
+            tag_value=protected_from_deletion_tag_true_value,
+            opts=pulumi.ResourceOptions(
+                provider=provider,
+                depends_on=dependencies,
+                # Delete the existing resource before creating new binding
+                # to avoid conflicts with the existing bindings on the key.
+                delete_before_replace=True))
+
+    # Add a deny policy on projects that have a tag protected from deletion.
+    gcp.iam.DenyPolicy(
+        get_resource_name(resource="realm-projects-deletion", resource_type="deny-policy"),
+        # convert the folder id into a valid url parsed string
+        # see: https://cloud.google.com/iam/docs/deny-access#create-deny-pol
+        parent=urllib.parse.quote_plus(f"cloudresourcemanager.googleapis.com/folders/{root_folder_id}"),
+        rules=[
+            gcp.iam.DenyPolicyRuleArgs(
+                description="Deny deletion of projects with the protected tag on all users",
+                deny_rule=gcp.iam.DenyPolicyRuleDenyRuleArgs(
+                    denial_condition=gcp.iam.DenyPolicyRuleDenyRuleDenialConditionArgs(
+                        title="Deny deletion of projects with the protected tag",
+                        expression=f"resource.matchTagId('{protected_from_deletion_tag_key}', '{protected_from_deletion_tag_true_value}')",
+                    ),
+                    denied_principals=[
+                        "principalSet://goog/public:all"  # Deny to all public users
+                    ],
+                    denied_permissions=[
+                        "cloudresourcemanager.googleapis.com/projects.delete"
+                    ]
+                )
+            )
+        ],
+        opts=pulumi.ResourceOptions(provider=provider)
     )
 
     return lower_envs_folder, prod_envs_folder, realm_developers, realm_admins
@@ -480,7 +539,10 @@ def create_realm(*,
                  lower_env_google_oauth_projects_folder_id: str,
                  region: str,
                  realm_name: str,
-                 roots_path: str
+                 roots_path: str,
+                 protected_from_deletion: bool,
+                 protected_from_deletion_tag_key: str,
+                 protected_from_deletion_tag_true_value: str,
                  ) -> None:
     # Set the provider to use the root project
     provider = gcp.Provider(
@@ -491,7 +553,7 @@ def create_realm(*,
         # user_project_override=True
     )
 
-    # The initial APIs that must be enabled first in order to enable other GCP APIs
+    # The initial APIs that must be enabled on the root project first to enable other GCP APIs.
     wait_for_services = _enable_required_services(provider=provider)
 
     # Grant the roles that are required to create the organizational base
@@ -514,6 +576,9 @@ def create_realm(*,
                                                  upper_env_google_oauth_projects_folder_id=upper_env_google_oauth_projects_folder_id,
                                                  lower_env_google_oauth_projects_folder_id=lower_env_google_oauth_projects_folder_id,
                                                  dependencies=wait_for_dependencies,
+                                                 protected_from_deletion=protected_from_deletion,
+                                                 protected_from_deletion_tag_key=protected_from_deletion_tag_key,
+                                                 protected_from_deletion_tag_true_value=protected_from_deletion_tag_true_value,
                                                  provider=provider)
     # Create the service accounts
     (lower_env_service_account,
@@ -531,6 +596,7 @@ def create_realm(*,
         region=region,
         admins_group=realm_admins,
         developers_group=realm_developers,
+        protected_from_deletion=protected_from_deletion,
         dependencies=wait_for_dependencies,
         provider=provider
     )
@@ -539,6 +605,7 @@ def create_realm(*,
         root_project_id=root_project_id,
         admins_group=realm_admins,
         developers_group=realm_developers,
+        protected_from_deletion=protected_from_deletion,
         provider=provider,
         dependencies=wait_for_dependencies
     )
@@ -547,6 +614,7 @@ def create_realm(*,
     pulumi.export("generic_repository", generic_repository)
     pulumi.export("lower_env_folder_id", lower_envs_folder.folder_id)
     pulumi.export("environments_config_secret_name", environments_config_secret.name)
+    pulumi.export("protected_from_deletion_tag", protected_from_deletion_tag_true_value)
     pulumi.export("lower_env_google_oauth_projects_folder_id", lower_env_google_oauth_projects_folder_id)
     pulumi.export("upper_env_folder_id", prod_envs_folder.folder_id)
     pulumi.export("upper_env_google_oauth_projects_folder_id", upper_env_google_oauth_projects_folder_id)
