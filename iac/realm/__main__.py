@@ -35,6 +35,9 @@ def main():
     upper_env_google_oauth_projects_folder_id = getconfig("gcp_upper_env_google_oauth_projects_folder_id")
     lower_env_google_oauth_projects_folder_id = getconfig("gcp_lower_env_google_oauth_projects_folder_id")
     base_domain_name = getconfig("base_domain_name")
+    protected_from_deletion = getconfig("protected_from_deletion").lower() == "true"
+    protected_from_deletion_tag_key = getconfig("protected_from_deletion_tag_key")
+    protected_from_deletion_tag_true_value = getconfig("protected_from_deletion_tag_true_value")
 
     # Export the realm config so that it can be referenced in downstream stacks.
     pulumi.export("customer_id", customer_id)
@@ -55,7 +58,10 @@ def main():
         root_project_id=root_project_id,
         upper_env_google_oauth_projects_folder_id=upper_env_google_oauth_projects_folder_id,
         lower_env_google_oauth_projects_folder_id=lower_env_google_oauth_projects_folder_id,
-        roots_path=libs_dir
+        roots_path=libs_dir,
+        protected_from_deletion=protected_from_deletion,
+        protected_from_deletion_tag_key=protected_from_deletion_tag_key,
+        protected_from_deletion_tag_true_value=protected_from_deletion_tag_true_value
     )
 
 
