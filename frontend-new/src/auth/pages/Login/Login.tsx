@@ -13,13 +13,11 @@ import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginW
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
-import FirebaseEmailAuthService
-  from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
+import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
-import FirebaseInvitationCodeAuthenticationService
-  from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
+import FirebaseInvitationCodeAuthenticationService from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
 import { AuthenticationError } from "src/error/commonErrors";
 import ResendVerificationEmail from "src/auth/components/resendVerificationEmail/ResendVerificationEmail";
 import RequestInvitationCode from "src/auth/components/requestInvitationCode/RequestInvitationCode";
@@ -80,7 +78,13 @@ const Login: React.FC = () => {
         setShowResendVerification(false);
       } else if (error instanceof FirebaseError) {
         errorMessage = getUserFriendlyFirebaseErrorMessage(error);
-        writeFirebaseErrorToLog(error, console.warn);
+        if (error.errorCode === FirebaseErrorCodes.INVALID_INVITATION_CODE) {
+          // we want to log errors about invalid invitation codes as errors
+          // so that we can track which invitation codes are failing and why
+          writeFirebaseErrorToLog(error, console.error);
+        } else {
+          writeFirebaseErrorToLog(error, console.warn);
+        }
         // Show resend verification option if the error is due to unverified email
         if (error.errorCode === FirebaseErrorCodes.EMAIL_NOT_VERIFIED) {
           setShowResendVerification(true);
@@ -326,10 +330,7 @@ const Login: React.FC = () => {
             isDisabled={isLoading}
           />
           {showResendVerification && (
-            <ResendVerificationEmail
-              email={lastAttemptedEmail}
-              password={lastAttemptedPassword}
-            />
+            <ResendVerificationEmail email={lastAttemptedEmail} password={lastAttemptedPassword} />
           )}
           <PrimaryButton
             fullWidth
@@ -361,12 +362,7 @@ const Login: React.FC = () => {
           notifyOnLoading={notifyOnSocialLoading}
         />
         <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>
-          Don't have an account?{" "}
-          <CustomLink
-            onClick={() => navigate(routerPaths.REGISTER)}
-          >
-            Register
-          </CustomLink>
+          Don't have an account? <CustomLink onClick={() => navigate(routerPaths.REGISTER)}>Register</CustomLink>
         </Typography>
         <RequestInvitationCode invitationCodeType={InvitationType.LOGIN} />
       </Box>

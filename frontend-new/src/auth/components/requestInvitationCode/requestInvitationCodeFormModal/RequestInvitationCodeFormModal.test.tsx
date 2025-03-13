@@ -10,7 +10,7 @@ import RequestInvitationCodeFormModal, {
 } from "src/auth/components/requestInvitationCode/requestInvitationCodeFormModal/RequestInvitationCodeFormModal";
 
 import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
-import { InvitationError } from "src/error/commonErrors";
+import { RequestInvitationCodeError } from "src/error/commonErrors";
 
 // mock the snack bar provider
 jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
@@ -115,7 +115,7 @@ describe("RequestInvitationCodeFormModal", () => {
 
   test("should show a notification and log an error when the invitation code service throws an error", async () => {
     // GIVEN a sentry invitationCode service that fails to capture feedback with an error
-    const givenError = new InvitationError("foo error");
+    const givenError = new RequestInvitationCodeError("foo error");
     const mockRequestInvitationCode = jest.spyOn(SentryInvitationCodeRequestService, "requestInvitationCode").mockImplementation(() => {
       throw givenError;
     });

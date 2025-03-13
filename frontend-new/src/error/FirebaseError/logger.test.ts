@@ -31,23 +31,19 @@ describe("writeFirebaseErrorToLog", () => {
     // WHEN the function is called
     writeFirebaseErrorToLog(givenFireBaseError, mockLogFunction);
 
-    // THEN the log function should be called with a structured message
-    expect(mockLogFunction).toHaveBeenCalledTimes(2);
-
-    // AND log function should be called with the exact error
-    expect(mockLogFunction).toHaveBeenNthCalledWith(1, givenFireBaseError);
+    // THEN the log function should be called once with a structured message
+    expect(mockLogFunction).toHaveBeenCalledTimes(1);
 
     // AND log function should have been called with the message and the error object
-    expect(mockLogFunction).toHaveBeenNthCalledWith(2, "FirebaseError: service function auth/internal-error method", {
+    expect(mockLogFunction).toHaveBeenNthCalledWith(1, `FirebaseError: ${givenMessage}, `, JSON.stringify({
       serviceName: givenService,
       serviceFunction: givenFunction,
       method: givenMethod,
       errorCode: givenErrorCode,
       details: givenDetails,
-      message: givenMessage,
       stack: givenFireBaseError.stack,
       class: FirebaseError.name,
-    });
+    }, null, 2));
   });
 
   it("should call logFunction with ony one time if error is not instance of FirebaseError", () => {
@@ -93,23 +89,19 @@ describe("writeFirebaseErrorToLog", () => {
     // WHEN the function is called
     writeFirebaseErrorToLog(givenFireBaseError, mockLogFunction);
 
-    // THEN the log function should be called with a structured message
-    expect(mockLogFunction).toHaveBeenCalledTimes(2);
-
-    // AND log function should be called with the exact error
-    expect(mockLogFunction).toHaveBeenNthCalledWith(1, givenFireBaseError);
+    // THEN the log function should be called once with a structured message
+    expect(mockLogFunction).toHaveBeenCalledTimes(1);
 
     // AND log function should have been called with the message and the error object
-    expect(mockLogFunction).toHaveBeenNthCalledWith(2, "FirebaseError: service function auth/internal-error method", {
+    expect(mockLogFunction).toHaveBeenNthCalledWith(1, `FirebaseError: ${givenMessage}, `, JSON.stringify({
       serviceName: givenService,
       serviceFunction: givenFunction,
       method: givenMethod,
       errorCode: givenErrorCode,
       details: givenDetails,
-      message: givenMessage,
-      stack: givenFireBaseError.stack,
       customValue: givenCustomValue,
+      stack: givenFireBaseError.stack,
       class: FirebaseError.name,
-    });
+    }, null, 2));
   });
 });

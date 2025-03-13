@@ -87,8 +87,7 @@ exports[`Testing Register component it should show register form successfully 1`
       class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
       data-testid="register-login-link-ab02918f-d559-47ba-9662-ea6b3a3606d0"
     >
-      Already have an account?
-       
+      Already have an account? 
       <a
         aria-disabled="false"
         class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"

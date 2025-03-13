@@ -18,7 +18,7 @@ import FirebaseSocialAuthenticationService from "src/auth/services/FirebaseAuthe
 import RequestInvitationCode from "src/auth/components/requestInvitationCode/RequestInvitationCode";
 import { InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import CustomLink from "src/theme/CustomLink/CustomLink";
-
+import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import { INVITATIONS_PARAM_NAME } from "src/auth/auth.types";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
@@ -79,8 +79,12 @@ const Register: React.FC = () => {
         writeRestAPIErrorToLog(error, console.error);
         errorMessage = getUserFriendlyErrorMessage(error);
       } else if (error instanceof FirebaseError) {
-        writeFirebaseErrorToLog(error, console.warn);
         errorMessage = getUserFriendlyFirebaseErrorMessage(error);
+        if (error.errorCode === FirebaseErrorCodes.INVALID_REGISTRATION_CODE) {
+          writeFirebaseErrorToLog(error, console.error);
+        } else {
+          writeFirebaseErrorToLog(error, console.warn);
+        }
       } else {
         console.error(error);
         errorMessage = error.message;
@@ -202,12 +206,7 @@ const Register: React.FC = () => {
           registrationCode={registrationCode}
         />
         <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>
-          Already have an account?{" "}
-          <CustomLink
-            onClick={() => navigate(routerPaths.LOGIN)}
-          >
-            Login
-          </CustomLink>
+          Already have an account? <CustomLink onClick={() => navigate(routerPaths.LOGIN)}>Login</CustomLink>
         </Typography>
         <RequestInvitationCode invitationCodeType={InvitationType.REGISTER} />
       </Box>
