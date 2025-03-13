@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/react";
 import { InvitationCodeRequestData } from "./RequestInvitationCode.types";
-import { InvitationError } from "src/error/commonErrors";
+import { RequestInvitationCodeError } from "src/error/commonErrors";
 
 export function requestInvitationCode(data: InvitationCodeRequestData) {
   // we currently use sentry to capture user feedback
@@ -17,6 +17,6 @@ export function requestInvitationCode(data: InvitationCodeRequestData) {
       includeReplay: false,
     });
   } catch (e) {
-    throw new InvitationError(`Something went wrong while attempting to request new invitation for user with email ${data.email}`, e as Error);
+    throw new RequestInvitationCodeError(`Something went wrong while attempting to request new invitation for user with email ${data.email}`, e as Error);
   }
 }
