@@ -17,7 +17,8 @@ import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportBut
 import FirebaseSocialAuthenticationService from "src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
 import RequestInvitationCode from "src/auth/components/requestInvitationCode/RequestInvitationCode";
 import { InvitationType } from "src/auth/services/invitationsService/invitations.types";
-import CustomLink from "../../../theme/CustomLink/CustomLink";
+import CustomLink from "src/theme/CustomLink/CustomLink";
+import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -59,6 +60,9 @@ const Register: React.FC = () => {
       } else if (error instanceof FirebaseError) {
         writeFirebaseErrorToLog(error, console.warn);
         errorMessage = getUserFriendlyFirebaseErrorMessage(error);
+        if (error.errorCode === FirebaseErrorCodes.INVALID_REGISTRATION_CODE) {
+          writeFirebaseErrorToLog(error, console.error);
+        }
       } else {
         console.error(error);
         errorMessage = error.message;
@@ -180,12 +184,7 @@ const Register: React.FC = () => {
           registrationCode={registrationCode}
         />
         <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>
-          Already have an account?{" "}
-          <CustomLink
-            onClick={() => navigate(routerPaths.LOGIN)}
-          >
-            Login
-          </CustomLink>
+          Already have an account? <CustomLink onClick={() => navigate(routerPaths.LOGIN)}>Login</CustomLink>
         </Typography>
         <RequestInvitationCode invitationCodeType={InvitationType.REGISTER} />
       </Box>

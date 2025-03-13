@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/react";
 import { requestInvitationCode } from "./SentryInvitationCodeRequest.service";
-import { InvitationError } from "../../../../error/commonErrors";
+import { RequestInvitationCodeError } from "src/error/commonErrors";
 
 jest.mock("@sentry/react");
 
@@ -50,6 +50,6 @@ describe("requestInvitationCode", () => {
 
     // WHEN requesting an invitation code AND it fails
     // THEN expect the error to be thrown
-    expect(() => requestInvitationCode(requestData)).toThrow(new InvitationError(`Something went wrong while attempting to request new invitation for user with email ${requestData.email}`));
+    expect(() => requestInvitationCode(requestData)).toThrow(new RequestInvitationCodeError(`Something went wrong while attempting to request new invitation for user with email ${requestData.email}`));
   });
 }); 

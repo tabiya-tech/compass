@@ -2,7 +2,7 @@ enum CommonError {
   TOKEN_ERROR = "TokenError",
   AUTHENTICATION_ERROR = "AuthenticationError",
   USER_PREFERENCE_ERROR = "UserPreferenceError",
-  INVITATION_ERROR = "InvitationError",
+  REQUEST_INVITATION_CODE_ERROR = "RequestInvitationCodeError",
   SESSION_ERROR = "SessionError",
   CHAT_ERROR = "ChatError",
   REACTION_ERROR = "ReactionError",
@@ -87,10 +87,10 @@ export class ComponentError extends Error {
   }
 }
 
-export class InvitationError extends Error {
+export class RequestInvitationCodeError extends Error {
   constructor(message: string, cause?: Error | string) {
     super(message);
-    this.name = CommonError.INVITATION_ERROR;
+    this.name = CommonError.REQUEST_INVITATION_CODE_ERROR;
     this.cause = cause;
   }
 }
