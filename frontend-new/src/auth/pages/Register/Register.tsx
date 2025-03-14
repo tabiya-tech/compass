@@ -58,10 +58,11 @@ const Register: React.FC = () => {
         writeRestAPIErrorToLog(error, console.error);
         errorMessage = getUserFriendlyErrorMessage(error);
       } else if (error instanceof FirebaseError) {
-        writeFirebaseErrorToLog(error, console.warn);
         errorMessage = getUserFriendlyFirebaseErrorMessage(error);
         if (error.errorCode === FirebaseErrorCodes.INVALID_REGISTRATION_CODE) {
           writeFirebaseErrorToLog(error, console.error);
+        } else {
+          writeFirebaseErrorToLog(error, console.warn);
         }
       } else {
         console.error(error);

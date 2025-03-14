@@ -81,9 +81,12 @@ const Login: React.FC = () => {
         setShowResendVerification(false);
       } else if (error instanceof FirebaseError) {
         errorMessage = getUserFriendlyFirebaseErrorMessage(error);
-        writeFirebaseErrorToLog(error, console.warn);
         if (error.errorCode === FirebaseErrorCodes.INVALID_INVITATION_CODE) {
+          // we want to log errors about invalid invitation codes as errors
+          // so that we can track which invitation codes are failing and why
           writeFirebaseErrorToLog(error, console.error);
+        } else {
+          writeFirebaseErrorToLog(error, console.warn);
         }
         // Show resend verification option if the error is due to unverified email
         if (error.errorCode === FirebaseErrorCodes.EMAIL_NOT_VERIFIED) {

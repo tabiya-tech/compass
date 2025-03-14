@@ -3,11 +3,7 @@
 import { FirebaseError } from "src/error/FirebaseError/firebaseError";
 
 export function writeFirebaseErrorToLog(err: FirebaseError, logFunction: (msg: any) => void): void {
-  const logMessage = `FirebaseError: ${err.serviceName} ${err.serviceFunction} ${err.errorCode} ${err.method}`;
-
-  if (err! instanceof FirebaseError) {
-    logFunction(err);
-  }
+  const logMessage = `FirebaseError: ${err.message}, `;
 
   const obj = {};
   for (const propertyName in err) {
@@ -16,10 +12,13 @@ export function writeFirebaseErrorToLog(err: FirebaseError, logFunction: (msg: a
     }
   }
 
-  obj["message"] = err.message;
+  obj["serviceFunction"] = err.serviceFunction;
+  obj["serviceName"] = err.serviceName;
+  obj["method"] = err.method;
+  obj["errorCode"] = err.errorCode;
   obj["stack"] = err.stack;
   obj["class"] = err.name === "Error" ? err.constructor.name : err.name;
 
   // Log both the error and the structured message
-  logFunction(logMessage, obj);
+  logFunction(logMessage, JSON.stringify(obj, null, 2));
 }
