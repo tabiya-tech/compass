@@ -22,6 +22,7 @@ import * as AuthenticationServiceFactoryModule from "src/auth/services/Authentic
 import { DATA_TEST_ID as BUG_REPORT_DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import * as Sentry from "@sentry/react";
 import { DATA_TEST_ID as REQUEST_INVITATION_CODE_DATA_TEST_ID} from "src/auth/components/requestInvitationCode/RequestInvitationCode";
+import * as ReactRouterDomModule from "react-router-dom";
 
 //mock the SocialAuth component
 jest.mock("src/auth/components/SocialAuth/SocialAuth", () => {
@@ -236,6 +237,25 @@ describe("Testing Register component", () => {
     // AND expect no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
+  });
+
+  test("it should prefill registration code from URL parameter", async () => {
+    // GIVEN an invitation code in the URL
+    const givenInvitationCode = "test-invite-123";
+    const mockLocation = {
+      pathname: "/register",
+      search: `?invite-code=${givenInvitationCode}`,
+    };
+    // @ts-ignore
+    jest.spyOn(ReactRouterDomModule, "useLocation").mockReturnValue(mockLocation);
+
+    // WHEN the component is rendered
+    render(<Register />);
+
+    // THEN the registration code input should be prefilled with the code from the URL
+    await waitFor(() => {
+      expect(screen.getByTestId(DATA_TEST_ID.REGISTRATION_CODE_INPUT)).toHaveValue(givenInvitationCode);
+    });
   });
 
   test("it should show success message on successful registration", async () => {

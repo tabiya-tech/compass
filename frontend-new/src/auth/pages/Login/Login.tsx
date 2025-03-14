@@ -25,8 +25,7 @@ import ResendVerificationEmail from "src/auth/components/resendVerificationEmail
 import RequestInvitationCode from "src/auth/components/requestInvitationCode/RequestInvitationCode";
 import { InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import CustomLink from "src/theme/CustomLink/CustomLink";
-
-export const INVITATIONS_PARAM_NAME = "invite-code";
+import { INVITATIONS_PARAM_NAME } from "src/auth/auth.types";
 
 const uniqueId = "7ce9ba1f-bde0-48e2-88df-e4f697945cc4";
 
@@ -55,8 +54,6 @@ enum ActiveForm {
 const Login: React.FC = () => {
   const theme = useTheme();
   const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const inviteCodeParam = params.get(INVITATIONS_PARAM_NAME);
 
   const [inviteCode, setInviteCode] = useState("");
   const [email, setEmail] = useState("");
@@ -101,7 +98,7 @@ const Login: React.FC = () => {
       const firebaseEmailAuthServiceInstance = FirebaseEmailAuthService.getInstance();
       await firebaseEmailAuthServiceInstance.logout();
     },
-    [enqueueSnackbar]
+    [enqueueSnackbar],
   );
 
   /* ------------------
@@ -142,7 +139,7 @@ const Login: React.FC = () => {
       } else {
         errorMessage = (error as Error).message;
         console.error(
-          new AuthenticationError("An error occurred while trying to get your preferences", error as Error)
+          new AuthenticationError("An error occurred while trying to get your preferences", error as Error),
         );
       }
       enqueueSnackbar(`An error occurred while trying to get your preferences: ${errorMessage}`, {
@@ -176,7 +173,7 @@ const Login: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [handleError, handlePostLogin]
+    [handleError, handlePostLogin],
   );
 
   /**
@@ -197,7 +194,7 @@ const Login: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [enqueueSnackbar, handleError, handlePostLogin]
+    [enqueueSnackbar, handleError, handlePostLogin],
   );
 
   /**
@@ -224,7 +221,7 @@ const Login: React.FC = () => {
         enqueueSnackbar("Please fill in the email and password fields", { variant: "error" });
       }
     },
-    [email, handleLoginWithInvitationCode, handleLoginWithEmail, activeLoginForm, inviteCode, password, enqueueSnackbar]
+    [email, handleLoginWithInvitationCode, handleLoginWithEmail, activeLoginForm, inviteCode, password, enqueueSnackbar],
   );
 
   /* ------------------
@@ -247,8 +244,12 @@ const Login: React.FC = () => {
    * Check if the user was invited with an invitation code in the URL
    */
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const inviteCodeParam = params.get(INVITATIONS_PARAM_NAME);
     if (inviteCodeParam) {
-      handleLoginWithInvitationCode(inviteCodeParam);
+      handleLoginWithInvitationCode(inviteCodeParam).then(() =>
+        console.info("Invitation code login successful: " + inviteCodeParam),
+      );
       // Remove the invite code from the URL
       const newSearchParams = new URLSearchParams(location.search);
       newSearchParams.delete(INVITATIONS_PARAM_NAME);
@@ -257,10 +258,10 @@ const Login: React.FC = () => {
           pathname: location.pathname,
           search: newSearchParams.toString(),
         },
-        { replace: true }
+        { replace: true },
       );
     }
-  }, [inviteCodeParam, handleLoginWithInvitationCode, location, navigate]);
+  }, [handleLoginWithInvitationCode, location, navigate]);
 
   // Reset resend verification state when email or password changes
   useEffect(() => {

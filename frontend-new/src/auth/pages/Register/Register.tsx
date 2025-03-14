@@ -1,6 +1,6 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Box, Container, Divider, TextField, Typography, useTheme } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import SocialAuth from "src/auth/components/SocialAuth/SocialAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -17,7 +17,9 @@ import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportBut
 import FirebaseSocialAuthenticationService from "src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
 import RequestInvitationCode from "src/auth/components/requestInvitationCode/RequestInvitationCode";
 import { InvitationType } from "src/auth/services/invitationsService/invitations.types";
-import CustomLink from "../../../theme/CustomLink/CustomLink";
+import CustomLink from "src/theme/CustomLink/CustomLink";
+
+import { INVITATIONS_PARAM_NAME } from "src/auth/auth.types";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -42,13 +44,33 @@ export const DATA_TEST_ID = {
 
 const Register: React.FC = () => {
   const [registrationCode, setRegistrationCode] = useState<string>("");
-
   const theme = useTheme();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Check for invitation code in URL params when component mounts
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const inviteCodeParam = params.get(INVITATIONS_PARAM_NAME);
+
+    if (inviteCodeParam) {
+      setRegistrationCode(inviteCodeParam);
+      // Remove the invite code from the URL
+      const newSearchParams = new URLSearchParams(location.search);
+      newSearchParams.delete(INVITATIONS_PARAM_NAME);
+      navigate(
+        {
+          pathname: location.pathname,
+          search: newSearchParams.toString(),
+        },
+        { replace: true },
+      );
+    }
+  }, [location, navigate]);
 
   // a state to determine if the user is currently registering with email
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { enqueueSnackbar } = useSnackbar();
-  const navigate = useNavigate();
 
   const handleError = useCallback(
     async (error: Error) => {
@@ -65,7 +87,7 @@ const Register: React.FC = () => {
       }
       enqueueSnackbar(`Registration Failed: ${errorMessage}`, { variant: "error" });
     },
-    [enqueueSnackbar]
+    [enqueueSnackbar],
   );
 
   /* -----------
@@ -126,7 +148,7 @@ const Register: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [navigate, enqueueSnackbar, setIsLoading, registrationCode, handleError]
+    [navigate, enqueueSnackbar, setIsLoading, registrationCode, handleError],
   );
 
   /**
