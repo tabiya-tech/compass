@@ -1,11 +1,13 @@
 import React from "react";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { Box, Typography, styled, alpha } from "@mui/material";
+import { FIXED_MESSAGES_TEXT } from "src/chat/util";
+import TypingIndicator from "src/chat/chatMessage/components/typingIndicator/TypingIndicator";
 
 export interface ChatBubbleProps {
-  message: string,
-  sender: ConversationMessageSender,
-  children?: React.ReactNode,
+  message: string;
+  sender: ConversationMessageSender;
+  children?: React.ReactNode;
 }
 
 const uniqueId = "6e685eeb-2b54-432a-8b66-8a81633b3981";
@@ -33,12 +35,19 @@ const MessageBubble = styled(Box)<{ origin: ConversationMessageSender }>(({ them
 }));
 
 const ChatBubble: React.FC<ChatBubbleProps> = ({ message, sender, children }) => {
+  const isTypingMessage = message === FIXED_MESSAGES_TEXT.AI_IS_TYPING;
+
   return (
     <MessageBubble origin={sender} data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER}>
-      <Typography whiteSpace="pre-line" data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_TEXT}>{message}</Typography>
-      <Box data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_FOOTER_CONTAINER}>
-        {children}
-      </Box>
+      {/*<Typography whiteSpace="pre-line" data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_TEXT}>{message}</Typography>*/}
+      {isTypingMessage ? (
+        <TypingIndicator />
+      ) : (
+        <Typography whiteSpace="pre-line" data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_TEXT}>
+          {message}
+        </Typography>
+      )}
+      <Box data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_FOOTER_CONTAINER}>{children}</Box>
     </MessageBubble>
   );
 };
