@@ -1,0 +1,83 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TypingChatMessage should render the Typing Chat message correctly when ai is thinking 1`] = `
+<div
+  class="MuiBox-root css-1c8zvho"
+  data-testid="typing-chat-message-container-eb14a7aa-b515-4ab9-9829-8110346d9090"
+  origin="COMPASS"
+>
+  <div
+    data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+  >
+    <div
+      class="MuiBox-root css-x1sij0"
+    >
+      <p
+        class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+      >
+        Please wait, I'm thinking
+      </p>
+      <span
+        class="MuiBox-root css-0"
+      >
+        <span
+          class="MuiTypography-root MuiTypography-body1 css-1ahpw8h-MuiTypography-root"
+        >
+          .
+        </span>
+        <span
+          class="MuiTypography-root MuiTypography-body1 css-1q7rfum-MuiTypography-root"
+        >
+          .
+        </span>
+        <span
+          class="MuiTypography-root MuiTypography-body1 css-zu93sq-MuiTypography-root"
+        >
+          .
+        </span>
+      </span>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`TypingChatMessage should render the Typing Chat message correctly when ai is typing 1`] = `
+<div
+  class="MuiBox-root css-1c8zvho"
+  data-testid="typing-chat-message-container-eb14a7aa-b515-4ab9-9829-8110346d9090"
+  origin="COMPASS"
+>
+  <div
+    data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+  >
+    <div
+      class="MuiBox-root css-x1sij0"
+    >
+      <p
+        class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+      >
+        Typing
+      </p>
+      <span
+        class="MuiBox-root css-0"
+      >
+        <span
+          class="MuiTypography-root MuiTypography-body1 css-1ahpw8h-MuiTypography-root"
+        >
+          .
+        </span>
+        <span
+          class="MuiTypography-root MuiTypography-body1 css-1q7rfum-MuiTypography-root"
+        >
+          .
+        </span>
+        <span
+          class="MuiTypography-root MuiTypography-body1 css-zu93sq-MuiTypography-root"
+        >
+          .
+        </span>
+      </span>
+    </div>
+  </div>
+</div>
+`;

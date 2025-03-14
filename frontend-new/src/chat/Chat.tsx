@@ -99,7 +99,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         const hasTypingMessage = prevMessages[prevMessages.length - 1]?.type === ChatMessageType.TYPING;
 
         if (!hasTypingMessage) {
-          return [...prevMessages, generateTypingMessage(new Date().toISOString())];
+          return [...prevMessages, generateTypingMessage()];
         }
         return prevMessages;
       });
@@ -200,7 +200,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           if (sessionId) {
             // Clear the messages if a new session is issued
             //  and add a typing message as the previous one will be removed
-            setMessages([generateTypingMessage(new Date().toISOString())]);
+            setMessages([generateTypingMessage()]);
           } else {
             console.debug("Failed to issue new session");
             return false;
