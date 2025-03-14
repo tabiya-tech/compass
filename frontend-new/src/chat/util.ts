@@ -22,7 +22,8 @@ export const generateUserMessage = (message: string, sent_at: string, message_id
   };
 };
 
-export const generateCompassMessage = (message_id: string,
+export const generateCompassMessage = (
+  message_id: string,
   message: string,
   sent_at: string,
   reaction: MessageReaction | null
@@ -37,9 +38,7 @@ export const generateCompassMessage = (message_id: string,
   };
 };
 
-export const generateErrorMessage = (
-   message: string,
-): IChatMessage => {
+export const generateErrorMessage = (message: string): IChatMessage => {
   return {
     message_id: nanoid(),
     sender: ConversationMessageSender.COMPASS,
@@ -50,12 +49,12 @@ export const generateErrorMessage = (
   };
 };
 
-export const generateTypingMessage = (sent_at: string): IChatMessage => {
+export const generateTypingMessage = (): IChatMessage => {
   return {
     message_id: nanoid(),
     sender: ConversationMessageSender.COMPASS,
     message: FIXED_MESSAGES_TEXT.AI_IS_TYPING,
-    sent_at: sent_at,
+    sent_at: new Date().toISOString(),
     type: ChatMessageType.TYPING,
     reaction: null,
   };

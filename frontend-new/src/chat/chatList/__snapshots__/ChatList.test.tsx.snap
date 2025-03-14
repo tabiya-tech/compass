@@ -38,7 +38,7 @@ exports[`ChatList should render the Chat List and show the appropriate message t
       style="opacity: 1; transform: none;"
     >
       <div
-        data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+        data-testid="typing-chat-message-container-eb14a7aa-b515-4ab9-9829-8110346d9090"
       />
     </li>
     <li

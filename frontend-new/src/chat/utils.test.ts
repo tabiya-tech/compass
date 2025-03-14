@@ -2,12 +2,19 @@ import "src/_test_utilities/consoleMock";
 import { nanoid } from "nanoid";
 import { ChatMessageType } from "src/chat/Chat.types";
 import { ConversationMessageSender } from "./ChatService/ChatService.types";
-import { FIXED_MESSAGES_TEXT, generateCompassMessage, generatePleaseRepeatMessage, generateSomethingWentWrongMessage, generateTypingMessage, generateUserMessage } from "./util";
+import {
+  FIXED_MESSAGES_TEXT,
+  generateCompassMessage,
+  generatePleaseRepeatMessage,
+  generateSomethingWentWrongMessage,
+  generateTypingMessage,
+  generateUserMessage,
+} from "./util";
 import { ReactionKind } from "./reaction/reaction.types";
 
 // Mock nanoid to return a fixed value for testing
 jest.mock("nanoid", () => ({
-  nanoid: jest.fn().mockReturnValue("foo-nanoid")
+  nanoid: jest.fn().mockReturnValue("foo-nanoid"),
 }));
 
 describe("Chat Utils", () => {
@@ -16,7 +23,7 @@ describe("Chat Utils", () => {
     jest.clearAllMocks();
   });
 
-  describe("generateUserMessage", () => {    
+  describe("generateUserMessage", () => {
     test("should generate a user message with the correct structure given no message_id", () => {
       // GIVEN a message string
       const givenMessage = "foo";
@@ -129,20 +136,18 @@ describe("Chat Utils", () => {
 
   describe("generateTypingMessage", () => {
     test("should generate a typing message with the correct structure", () => {
-      // GIVEN a timestamp
-      const givenSentAt = "2024-03-20T12:00:00Z";
-      // AND nanoid returns a specific value
+      // GIVEN a nanoid returns a specific value
       (nanoid as jest.Mock).mockReturnValue("foo-nanoid");
 
       // WHEN generating a typing message
-      const result = generateTypingMessage(givenSentAt);
+      const result = generateTypingMessage();
 
       // THEN expect the message to have the correct structure
       expect(result).toEqual({
         message_id: "foo-nanoid",
         sender: ConversationMessageSender.COMPASS,
         message: FIXED_MESSAGES_TEXT.AI_IS_TYPING,
-        sent_at: givenSentAt,
+        sent_at: new Date().toISOString(),
         type: ChatMessageType.TYPING,
         reaction: null,
       });
