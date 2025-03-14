@@ -12,12 +12,10 @@ import CompassChatMessage, {
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
 import { ChatMessageType } from "src/chat/Chat.types";
-import ChatBubble, {
-  DATA_TEST_ID as CHAT_BUBBLE_DATA_TEST_ID,
-} from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import ConversationConclusionChatMessage from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import { ReactionKind } from "src/chat/reaction/reaction.types";
 import { ChatProvider } from "src/chat/ChatContext";
+import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
 
 // mock the chat message component
 jest.mock("src/chat/chatMessage/userChatMessage/UserChatMessage", () => {
@@ -57,6 +55,15 @@ jest.mock("src/chat/chatMessage/conversationConclusionChatMessage/ConversationCo
     default: jest.fn(() => (
       <div data-testid={originalModule.DATA_TEST_ID.CONVERSATION_CONCLUSION_CHAT_MESSAGE_CONTAINER}></div>
     )),
+  };
+});
+
+jest.mock("src/chat/chatMessage/typingChatMessage/TypingChatMessage", () => {
+  const originalModule = jest.requireActual("src/chat/chatMessage/typingChatMessage/TypingChatMessage");
+  return {
+    __esModule: true,
+    ...originalModule,
+    default: jest.fn(() => <div data-testid={originalModule.DATA_TEST_ID.TYPING_CHAT_MESSAGE_CONTAINER}></div>),
   };
 });
 
@@ -179,19 +186,8 @@ describe("ChatList", () => {
       {}
     );
 
-    // AND expect the Chat Bubble component to be rendered for the typing message
-    expect(screen.getByTestId(CHAT_BUBBLE_DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER)).toBeInTheDocument();
-    // AND the chat bubble to be called with the correct message
-    // --> The chat bubble is called by the other components as well, but since they are being mocked,
-    // and since the typing message is the only one calling the "naked" bubble, we expect it to be the first time it's called
-    expect(ChatBubble).toHaveBeenNthCalledWith(
-      1,
-      {
-        message: givenMessages[3].message,
-        sender: givenMessages[3].sender,
-      },
-      {}
-    );
+    // AND expect the Typing Chat Message component to be rendered for the typing message
+    expect(TypingChatMessage).toHaveBeenNthCalledWith(1, {}, {});
 
     // AND expect the Conversation Conclusion Chat Message component to be rendered for the conversation conclusion message
     expect(ConversationConclusionChatMessage).toHaveBeenNthCalledWith(
@@ -218,7 +214,7 @@ describe("ChatList", () => {
         message: "Hello",
         sent_at: new Date().toISOString(),
         type: ChatMessageType.BASIC_CHAT,
-        reaction: null
+        reaction: null,
       },
       {
         message_id: nanoid(),
@@ -230,9 +226,7 @@ describe("ChatList", () => {
       },
     ];
     // AND the chat list is rendered
-    render(
-      <ChatList messages={givenMessages}/>
-    );
+    render(<ChatList messages={givenMessages} />);
 
     // WHEN the window is resized
     window.dispatchEvent(new Event("resize"));

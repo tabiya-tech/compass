@@ -8,6 +8,7 @@ import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import UserChatMessage from "src/chat/chatMessage/userChatMessage/UserChatMessage";
 import CompassChatMessage from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
+import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
 
 const uniqueId = "0397ee51-f637-4453-9e2f-5cc8900c9554";
 export const DATA_TEST_ID = {
@@ -31,9 +32,7 @@ const ChatListContainer = styled(Box)(({ theme }) => ({
   },
 }));
 
-const ChatList: React.FC<ChatListProps> = ({
-  messages,
-}) => {
+const ChatList: React.FC<ChatListProps> = ({ messages }) => {
   const theme = useTheme();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -75,12 +74,9 @@ const ChatList: React.FC<ChatListProps> = ({
           return <CompassChatMessage chatMessage={chatMessage} />;
         }
       case ChatMessageType.CONVERSATION_CONCLUSION:
-        return (
-          <ConversationConclusionChatMessage
-            chatMessage={chatMessage}
-          />
-        );
+        return <ConversationConclusionChatMessage chatMessage={chatMessage} />;
       case ChatMessageType.TYPING:
+        return <TypingChatMessage />;
       case ChatMessageType.ERROR:
         // typing and error messages don't need to show anything but the message text
         // no timestamp or reactions will be shown, so we can use the ChatBubble itself

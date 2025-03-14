@@ -3,12 +3,19 @@ import ChatList from "./ChatList";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
 import { ChatMessageType } from "src/chat/Chat.types";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 
 const meta: Meta<typeof ChatList> = {
   title: "Chat/ChatList",
   component: ChatList,
   tags: ["autodocs"],
   argTypes: {},
+  decorators: [
+    (Story) => {
+      UserPreferencesStateService.getInstance().getActiveSessionId = () => 1234;
+      return Story();
+    },
+  ],
 };
 
 export default meta;
@@ -58,7 +65,7 @@ export const Typing: Story = {
       {
         message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
-        message: "Typing...",
+        message: "",
         sent_at: new Date().toString(),
         type: ChatMessageType.TYPING,
         reaction: null,
@@ -73,7 +80,7 @@ export const TypingWhenEmpty: Story = {
       {
         message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
-        message: "Typing...",
+        message: "",
         sent_at: new Date().toString(),
         type: ChatMessageType.TYPING,
         reaction: null,
