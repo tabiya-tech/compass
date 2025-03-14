@@ -52,7 +52,7 @@
     </style>
     <text x="324" y="152" class="compass">compass</text>
     <text x="334" y="235">
-        <tspan class="by">by </tspan>
-        <tspan class="tabiya" fill="red">tabiya</tspan>
+        <tspan class="by">by</tspan>
+        <tspan class="tabiya" fill="red">&#160;tabiya</tspan>
     </text>
 </svg>
