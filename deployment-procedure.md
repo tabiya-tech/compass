@@ -118,6 +118,7 @@ Create a service account that will be used to set up the realm:
     - At the **organization level** assign the roles:
         - `Organization Role Administrator (roles/iam.organizationRoleAdmin)`
         - `Billing Account Administrator (roles/billing.admin)`
+        - `Deny Admin (roles/iam.denyAdmin)`
     - At the **realm's root folder level** assign the roles:
         - `Folder Admin (roles/resourcemanager.folderAdmin)`
         - `Service Usage Admin (roles/serviceusage.serviceUsageAdmin)`
@@ -152,6 +153,9 @@ config:
   base_domain_name: "<base_domain_name>"  # Base domain (e.g., tabiya.tech). It must be the top level domain.
   gcp_upper_env_google_oauth_projects_folder_id: "<upper_env_google_oauth_projects_folder_id>"  # Folder ID for upper environment google oauth projects. Use the one from Step 1.4.
   gcp_lower_env_google_oauth_projects_folder_id: "<lower_env_google_oauth_projects_folder_id>"  # Folder ID for lower environment google oauth projects. Use the one from Step 1.4.
+
+  # Keep this value to true in production
+  protected_from_deletion: true  # Set to true to protect the realm important resources from accidental deletion.
 ```
 
 > **ATTENTION**: Do not check the `Pulumi.<REALM_NAME>.yaml` file to the repository, as it contains sensitive information.

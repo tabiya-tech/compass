@@ -6,6 +6,8 @@ import pulumi
 import pulumi_gcp as gcp
 import pulumiverse_time as time
 
+from lib import get_pulumi_stack_outputs
+from environment.env_types import EnvironmentTypes
 from lib.std_pulumi import enable_services, get_resource_name, int_to_base36
 
 from dns import REQUIRED_SERVICES as DNS_SERVICES
@@ -30,7 +32,8 @@ BASE_SERVICES = [
 ]
 
 # merge the required services of all the modules with the base services by retaining only the unique services
-SERVICES_TO_ENABLE = list(set(BASE_SERVICES + DNS_SERVICES + AUTH_SERVICES + BACKEND_SERVICES + COMMON_SERVICES + FRONTEND_SERVICES))
+SERVICES_TO_ENABLE = list(
+    set(BASE_SERVICES + DNS_SERVICES + AUTH_SERVICES + BACKEND_SERVICES + COMMON_SERVICES + FRONTEND_SERVICES))
 
 # The initial APIs that must be enabled first in order to enable other GCP APIs
 _INITIAL_APIS = ["serviceusage.googleapis.com",
@@ -42,13 +45,31 @@ if any(api in SERVICES_TO_ENABLE for api in _INITIAL_APIS):
     raise ValueError("The initial APIs must not be included in the services to enable")
 
 
+def _ensure_immutable_config(*, key: str, value: str):
+    past_outputs = get_pulumi_stack_outputs(stack_name=pulumi.get_stack(), module="environment")
+    locked_key = f"{key}_locked_at"
+    previous_value = past_outputs.get(locked_key)
+
+    if previous_value is not None and previous_value.value != value:
+        raise ValueError(f"Cannot change the value of {key} from {previous_value} to {value}")
+
+    pulumi.export(locked_key, value)
+
+
 def create_new_environment(*,
                            region: str,
                            realm_name: str,
                            folder_id: pulumi.Output[str],
                            billing_account: pulumi.Output[str],
+                           environment_type: EnvironmentTypes,
                            environment_name: str
                            ):
+    # Ensure that the environment name is immutable. This is to prevent, re-creating of the project.
+    _ensure_immutable_config(key="environment-name", value=environment_name)
+
+    # # Ensure that the stack-name is immutable. This is to prevent re-creating of the project.
+    _ensure_immutable_config(key="realm-name", value=realm_name)
+
     # This is the project for the environment.
     # all the required services are enabled on this micro-task project.
     # The project should be created in either the Lower Environments folder or the Prod Folder
@@ -62,14 +83,24 @@ def create_new_environment(*,
                               keepers={
                                   "version": "1"  # Changing this will regenerate the random integer
                               })
-    project_id = random_id.result.apply(lambda _id: f"{project_name}-{int_to_base36(_id)}"[:30])  # convert the random integer to base36 approx 12 characters
+    # convert the random integer to base36 approx 12 characters
+    project_id = random_id.result.apply(lambda _id: f"{project_name}-{int_to_base36(_id)}"[:30])
+
+    is_prod_environment = environment_type == EnvironmentTypes.PROD
     project = gcp.organizations.Project(
-        # we are using the get_resource_name function to generate a unique name for the project
+        # we are using the get_resource_name function to generate a unique name for the project.
         resource_name=get_resource_name(resource="project"),
         name=project_name,
         project_id=project_id,
         folder_id=folder_id,
-        billing_account=billing_account
+        billing_account=billing_account,
+        opts=pulumi.ResourceOptions(
+            # Protect the project if it is a production environment resource from being deleted.
+            protect=is_prod_environment,
+            # If someone manually un-protects the upper project, the GCP `Delete Project` command method will not
+            # be called  for this resource. We don't want to delete this project in GCP no matter what.
+            retain_on_delete=is_prod_environment
+        )
     )
 
     # By default, resources use package-wide configuration
