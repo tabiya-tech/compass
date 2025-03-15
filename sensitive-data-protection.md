@@ -1,20 +1,19 @@
-# Sensitive Data Protection.
+# Sensitive Data Protection
 
-This application stores sensitive personal data, and we have implemented robust measures to protect it. This document outlines how the data is encrypted, the encryption methods used, and the steps to decrypt it when necessary.
+The application stores sensitive personal data, and we have implemented robust measures to protect it. This document outlines how the data is encrypted, the encryption methods used, and the steps to decrypt it when necessary.
 
+## How to set up
 
-## How to set up.
+After cloning the repository, you need to set up the frontend and backend to encrypt and decrypt the data:
 
-After cloning the repository, you need to set up the frontend, and the backend to encrypt and decrypt the data:
+### Create an RSA private/public key pair
 
-### Create an RSA private/public key
-
-Generate a certificate using openssl
+Generate a certificate using OpenSSL
 
 ```bash
-# generate a private key with the 2048 bits (the recommended minimum)
-# you are going to be prompted to provide a password
-# Remember: it has a minimum of 4 characters
+# Generate a private key with 2048 bits (the recommended minimum).
+# You are going to be prompted to provide a password.
+# Remember: It has a minimum of 4 characters.
 openssl genrsa -aes256 -out private-key.pem 2048
 
 # generate a public key from the private key
@@ -22,19 +21,19 @@ openssl rsa -in private-key.pem -pubout -out public-key.pem
 ```
 
 >NOTE:
-> You can use alternative methods like `ssh-kegen` or `GnuPG` to generate the keys, among others._
+> You can use alternative methods like `ssh-keygen` or `GnuPG` to generate the keys, among others.
 
-### Set up the frontend for encryption
+### Set Up the Frontend for Encryption
 
 The public key created in the previous step  must be added to the frontend. 
 
-Refer to this [frontend documentation](frontend-new/README.md#installation) for more information.
+Refer to the [frontend documentation](frontend-new/README.md#installation) for more information.
 
-### Decrypt Sensitive Personal Data
+### Decrypting Sensitive Personal Data
 
 The script [`decrypt_sensitive_personal_data.py`](backend/scripts/sensitive_data/decrypt_sensitive_personal_data.py) is used to decrypt sensitive user data from a MongoDB database.
 
-#### Prerequisites
+#### Prerequisites:
 
 The script requires the following environment variables to be set:
 
@@ -50,7 +49,7 @@ In addition to the environment variables, you will need:
 
 - A private key file (in PEM format).
 - The password used to generate the private key.
-- Output location to save the decrypted data.
+- An output location to save the decrypted data.
 
 #### Usage
 
@@ -63,45 +62,47 @@ python3 decrypt_sensitive_personal_data.py -h
 Ensure all required dependencies and environment variables are properly configured before executing the script.
 
 
-## Implementation
+## Implementation Considerations and Design Decisions
 
 ### Requirements
 
-We needed to:
-1. Ensure data is protected from the user's device.
-2. Safeguard database data even if compromised.
-3. Support encryption for data of any length.
-4. Achieve the maximum speed possible for encryption and decryption.
+We wanted to:
+1. Ensure that user data is protected from:
+   - third-party actors
+   - unauthorized access even within the organization
+   - accidental leaks
+2. Encrypt large payloads of user data.
+3. Efficiently encrypt and decrypt data, even with a large number of users (hundreds of thousands).
 
 ### Solution
 
-We combined RSA and AES:
-- **AES**: Fast and suitable for encrypting large data.
-- **RSA**: Used to encrypt the AES key due to its efficiency with small data.
+We use hybrid RSA and AES encryption:
+- **AES**: Fast and suitable for encrypting large amounts of data.
+- **RSA**: Used to encrypt the AES key, as it is efficient for small data.
 
-### Design
+Here is a **high-level** outline of the process:
 
-1. **Frontend**: Encrypts user data with AES and encrypts the AES key with RSA.
-2. **Backend**: transfers the encrypted data, and the RSA key ID.
-3. **Database**: Stores the encrypted data, the RSA key ID, and the creation time.
-4. **Decrypt Script**: Decrypts the data using the RSA private key.
+- **Frontend**: Encrypts user data with AES and encrypts the AES key with the RSA public key.
+- **Backend**: Retrieves and stores the encrypted data in the database.
+- **Decryption Script**: Reads the data from the database and decrypts it by first decrypting the AES key using the RSA private key, and then decrypting the user data using the AES key.
+
 
 #### Encryption Design Decisions AES
-For the AES the following decisions were made:
+For AES, the following decisions were made:
 - **Key Length**: 256 bits.
-- **Mode**: GCM (Galois/Counter Mode) see [NIST SP 800-38D](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf).
+- **Mode**: GCM (Galois/Counter Mode); see [NIST SP 800-38D](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf).
 - **Initialization Vector (IV)**: 96 bits Randomly generated using the WebCrypto API to ensure enough randomness as suggested in Section 8.2 IV Constructions of the [NIST SP 800-38D](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf).
-- **Tag Length**: 128 bits as it is the maximum length for GCM.
-- By using completely random keys and IVs, the probability of using the same iv, key twice is 1/2^352, much less than the recommended by Section 8 "Uniqueness Requirement on IVs and Keys" of the  [NIST SP 800-38D](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf).
+- **Tag Length**: 128 bits as it is the maximum length for GCM. The authentication tag ensures data integrity (does not protect against key guessing).
+- By using completely random keys and IVs, the probability of using the same IV abd key twice is **2^(-256) × 2^(-96) = 1/2^352**, much lower than the recommendation in Section 8 "Uniqueness Requirement on IVs and Keys" of [NIST SP 800-38D](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf).
 
 #### Encryption Recommendations for RSA
-As the RSA encryption is based on a public private key pair generated by the system's operator, the following recommendations were made:
+As RSA encryption is based on a public-private key pair generated by the system's operator, the following recommendations were made:
 - **Key Length**: 2048 bits.
 - **Padding**: OAEP (Optimal Asymmetric Encryption Padding) as it is the most secure padding scheme for RSA encryption.
 - **Hash Function**: SHA-256 as it is the most secure hash function for OAEP padding.
 - **Public Key**: Used to encrypt the AES key.
 - **Private Key**: Used to decrypt the AES key.
-- **Password**: The private key is password protected to prevent unauthorized access.
+- **Password**: The private key is password-protected to prevent unauthorized access.
 
 ### Sequence Diagrams
 
@@ -125,16 +126,16 @@ sequenceDiagram
     User->>FE: user's personal data
     activate FE
        rect rgb(245, 245, 245)
-           FE ->> crypto: generates a random AES key used
-           FE ->> crypto: generates a random iv (initialization vector) used for AES
-           FE ->> crypto: encrypts user's personal data  with the random key and prepend the iv
-           FE ->> crypto: encrypts the key used for AES  with the RSA public key
+           FE ->> crypto: Generates a random AES key
+           FE ->> crypto: Generates a random IV (Initialization Vector) for AES
+           FE ->> crypto: Encrypts user's personal data with the random key and prepends the IV
+           FE ->> crypto: Encrypts the AES key with the RSA public key
        end
        
        FE  ->> BE: rsa_key_id,<br />aes_encryption_key<br />aes_encrypted_data
    
        activate BE
-           Note right of BE: adds the creation time and the user id
+           Note right of BE: Adds the creation time and the user ID
        
            BE ->> DB: user_id<br />rsa_key_id<br />aes_encryption_key,<br />aes_encrypted_data<br />created_at
    
@@ -145,7 +146,7 @@ sequenceDiagram
            BE ->> FE: Saved
        deactivate BE
        
-       FE ->> User: Saved and protected
+       FE ->> User: Data saved and protected
     deactivate FE
 
 ```
@@ -185,13 +186,15 @@ sequenceDiagram
 
 ### Common Attack Scenarios and Protections
 
+The following table outlines common attack scenarios addressed by the current implementation. It's important to note that additional measures should be implemented in the deployed system, 
+including database and backend systems Role-Based Access Control (RBAC), API protection with end-user authentication, and data encryption in transit and at rest among others.
 
-|   | Attack                              | Description/How                                                                                                                             | Measures taken                                                                                                                                                                                                                                                              |
-|---|-------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 1 | Man-in-the-Middle Attack            | Someone may get in between cloudrun and our database, <br/>either through logs or through getting access to the infrastructure from outside | Data is encrypted on the user's device so in it's journey to the database, it is encrypted and no one can read them                                                                                                                                                         |
-| 2 | Database compromise/ Data leak      | Database's documents or data may be accessed outside                                                                                        | Personal data is saved in the database while encrypted, if data is outside no one can read them without the RSA Private key                                                                                                                                                 |
-| 3 | Brute Force Attack against AES keys | People my try to crack the AES encryption keys so that they can access data                                                                 | We are using AES-256 algorithm to generate a key which is very complicated for brute force attack <br/>We are also using each key for each record, meaning it would be very complicated to get all the data decrypted                                                       |
-| 4 | Dictionary Attack                   | People may try to crack the AES keys using dictionary attacks                                                                               | We are using random strings with 256 bits length AES keys with an Authentication tag, so we are sure that it will almost to impossible to guess our keys even if you guessed the key you would have to guess also the initialization vector same for the authentication tag |
-| 5 | Mistakenly Logged Data              | For some reasons, it may be logged as bug or missed during the review                                                                       | Data comes from users' device already encrypted, so in it's journey to our database, it will already be encrypted.                                                                                                                                                          |
-| 6 | Private key gets leaked             | From one of the authorized people, they may leak accidentally the private key                                                               | Our private key will require a password so that once leaked, another password will be required to get the actual users details                                                                                                                                              |
 
+| #  | Attack                              | Description/How                                                                                                              | Measures Taken                                                                                                                                                                                                                                      |
+|----|-------------------------------------|------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1  | Man-in-the-Middle Attack            | An attacker may intercept communication between Cloud Run and our database, by gaining infrastructure access. | Data is encrypted on the user's device before transmission, ensuring that it remains unreadable during its journey to the database. Additionally, communication between the client and server is encrypted using TLS.|
+| 2  | Database Compromise / Data Leak     | Unauthorized access to database documents or data.                                                                           | Personal data is stored in the database in an encrypted format. Even if the data is exposed, AES-256 encryption ensures that exposed data remains unreadable.                                                                                                     |
+| 3  | Brute Force Attack on AES Keys      | Attackers may attempt to crack AES encryption keys to access data.                                                           | We use the AES-256 algorithm, which is highly resistant to brute force attacks. Additionally, each record has a unique key, reducing the attack success rate.                                                                     |
+| 4  | Dictionary Attack                   | Attackers may attempt to guess AES keys using dictionary attacks.                                                            | We use randomly generated 256-bit AES keys with high entropy additionaly IV is randomly generated per encryption cycle.            |
+| 5  | Unintended Data Logging             | Data may be unintentionally logged due to bugs or missed during reviews.                                                     | Since data is already encrypted on the user's device before transmission, any logged data will remain encrypted and unreadable.                                                                                                                   |
+| 6  | Private Key Leak                    | An authorized person may accidentally leak the private key.                                                                  | The private RSA key is protected by an additional password. Even if leaked, another password is required to decrypt the data.                                                                                                                      |
