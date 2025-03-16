@@ -501,28 +501,39 @@ However, to show the  `%APP_NAME%` in the email templates, for example, in the v
 - Login to the gcloud
 
     ```shell
-    gcloud auth login
+     gcloud auth application-default login
     ```
 
 - set the application default quota project to the root project. [ref.](https://cloud.google.com/sdk/gcloud/reference/auth/application-default/set-quota-project)
     ```shell
-    gcloud config set project <ROOT_PROJECT_ID>
+    gcloud auth application-default set-quota-project <ROOT_PROJECT_ID>
     ```
 
 
-#### Option 2: Using the `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
+#### Option 2: Using a service account.
 
 You can use the service account key file to authenticate with Google Cloud and run the backend.
-This is the most convenient way to run the backend locally, but it is less secure than service account impersonation. It
+This is the most convenient way to run the iac locally, but it is less secure than service account impersonation. It
 is recommended to use this method for development purposes.
 
 > ATTENTION: The service account key file should be kept secure and not shared with others.
 > It should not be committed to the repository.
->
+
 
 To authenticate with the service account key file, set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to the
 path of the service account key file and run the backend.
 
+You need to also authenticate the service account with the Google Cloud SDK:
+
+```shell
+gcloud auth activate-service-account --key-file=<SERVICE_ACCOUNT_KEY_FILE>
+```
+
+To run any command you need to specify the service account key file:
+
+```shell
+GOOGLE_APPLICATION_CREDENTIALS=<SERVICE_ACCOUNT_KEY_FILE> pulumi {command}
+```
 
 #### Option 3: impersonating a service account (an edge case)
 
@@ -543,14 +554,6 @@ service account, run the following command:
 > When using service account impersonation, your account should be granted access with
 > the `roles/iam.serviceAccountTokenCreator` to that service account. Ask the project owner to grant you that role.
 >
-
-##### Set the Google Cloud Project
-
-Set the project to use with the Google Cloud SDK:
-
-```shell
-gcloud config set project <PROJECT>
-```
 
 ### How to authenticate AWS.
 
