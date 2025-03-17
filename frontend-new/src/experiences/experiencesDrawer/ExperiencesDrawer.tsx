@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, Suspense } from "react";
-import { Box, Divider, Drawer, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Divider, Drawer, Skeleton, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import ExperiencesDrawerHeader from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
 import { LoadingExperienceDrawerContent } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
@@ -16,7 +16,6 @@ import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import SchoolIcon from "@mui/icons-material/School";
 import ExperienceCategory from "src/experiences/experiencesDrawer/components/experienceCategory/ExperienceCategory";
 import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
-import DownloadReportButton from "./components/downloadReportButton/DownloadReportButton";
 const LazyLoadedDownloadDropdown = lazyWithPreload(() => import("src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown"));
 
 export interface ExperiencesDrawerProps {
@@ -62,15 +61,6 @@ const useLocalStorage = (key: string, initialValue: Record<string, string>) => {
   return [value, setValue] as const;
 };
 
-const DisabledDownloadReportButton = () => {
-  return (
-    <DownloadReportButton
-      notifyOnDownloadPdf={() => {}}
-      disabled={true}
-    />
-  )
-}
-
 const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   isOpen,
   isLoading,
@@ -110,21 +100,6 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   // Group experiences by work type
   const groupedExperiences = useMemo(() => groupExperiencesByWorkType(experiences), [experiences]);
 
-  const getDownloadReportDropdown = () => {
-    if(experiences.length){
-      return <LazyLoadedDownloadDropdown
-        name={personalInfo.fullName}
-        email={personalInfo.contactEmail}
-        phone={personalInfo.phoneNumber}
-        address={personalInfo.address}
-        experiences={experiencesWithTopSkills}
-        conversationConductedAt={conversationConductedAt!}
-        disabled={!hasTopSkills}
-      />
-    }
-    return <DisabledDownloadReportButton />
-  }
-
   const tooltipText =
     "The fields are prefilled with information you may have provided earlier and are stored securely on your device. Fill in missing details to personalize your CV.";
   return (
@@ -144,8 +119,16 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
       <ExperiencesDrawerHeader notifyOnClose={handleClose} />
       <Box display="flex" flexDirection="column" gap={2}>
         <Box display="flex" flexDirection="column" gap={1} alignItems="end" justifyContent="flex-end">
-          <Suspense fallback={<DisabledDownloadReportButton />}>
-            {getDownloadReportDropdown()}
+          <Suspense fallback={<Skeleton variant="rectangular" height={40} width={theme.spacing(20)} sx={{ borderRadius: 1 }} />}>
+            <LazyLoadedDownloadDropdown
+              name={personalInfo.fullName}
+              email={personalInfo.contactEmail}
+              phone={personalInfo.phoneNumber}
+              address={personalInfo.address}
+              experiences={experiencesWithTopSkills}
+              conversationConductedAt={conversationConductedAt!}
+              disabled={!hasTopSkills}
+            />
           </Suspense>
         </Box>
         <CustomAccordion title="Personal Information" tooltipText={tooltipText}>
@@ -195,7 +178,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
               <Typography variant="h1" textAlign={"center"}>
                 🤷‍♀️
               </Typography>
-              <Typography>We haven’t yet discovered any experiences so far, Let's continue chatting.</Typography>
+              <Typography>We haven't yet discovered any experiences so far, Let's continue chatting.</Typography>
             </Box>
           )}
 
