@@ -1,10 +1,11 @@
 """
 Tests for the feedback service
 """
+import asyncio
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 import random
 from typing import Any
 from uuid import uuid4
@@ -19,9 +20,10 @@ from common_libs.test_utilities import get_random_user_id, get_random_printable_
 from . import SimplifiedAnswer
 from .service import UserFeedbackService
 from .types import Feedback, FeedbackItem, Version, Answer, NewFeedbackSpec, NewFeedbackItemSpec, NewFeedbackVersionSpec
+from app.conversations.feedback.services.service import questions_cache
 from .errors import (
     InvalidQuestionError,
-    InvalidOptionError
+    InvalidOptionError, QuestionsFileError
 )
 
 given_feedback_specs_json_file = Path(__file__).parent / "given_feedback_specs-en.json"
@@ -175,6 +177,66 @@ class TestUpsertFeedback:
         # AND the error should contain both the invalid option and question ID
         assert "invalid_option" in str(error_info.value)
         assert "interaction_ease" in str(error_info.value)
+
+    @pytest.mark.asyncio
+    async def test_upsert_feedback_nonexistent_questions_file(self, _mock_feedback_repository: IUserFeedbackRepository):
+        # GIVEN a feedback object
+        given_feedback_specs = NewFeedbackSpec(
+            feedback_items_specs=[
+                NewFeedbackItemSpec(
+                    question_id="nonexistent_question",
+                    simplified_answer=SimplifiedAnswer(rating_numeric=5),
+                )
+            ],
+            version=NewFeedbackVersionSpec(frontend="foo")
+        )
+
+        # AND no existing feedback for the session
+        _mock_feedback_repository.get_feedback_by_session_id = AsyncMock(return_value=None)
+
+        # AND the questions cache is empty
+        questions_cache.clear()
+
+        # AND loading questions fails with a file not found error
+        with patch('app.conversations.feedback.services.service.load_questions', 
+                  side_effect=QuestionsFileError("Questions file not found")):
+            # WHEN the upsert_feedback method is called
+            # THEN a QuestionsFileError should be raised
+            service = UserFeedbackService(user_feedback_repository=_mock_feedback_repository)
+            with pytest.raises(QuestionsFileError):
+                await service.upsert_user_feedback(get_random_user_id(),
+                                                   random.randint(1, 10000),  #nosec B311 # random is used for testing purposes
+                                                   given_feedback_specs)
+
+    @pytest.mark.asyncio
+    async def test_upsert_feedback_invalid_questions_file(self, _mock_feedback_repository: IUserFeedbackRepository):
+        # GIVEN a feedback object
+        given_feedback_specs = NewFeedbackSpec(
+            feedback_items_specs=[
+                NewFeedbackItemSpec(
+                    question_id="nonexistent_question",
+                    simplified_answer=SimplifiedAnswer(rating_numeric=5),
+                )
+            ],
+            version=NewFeedbackVersionSpec(frontend="foo")
+        )
+
+        # AND no existing feedback for the session
+        _mock_feedback_repository.get_feedback_by_session_id = AsyncMock(return_value=None)
+
+        # AND the questions cache is empty
+        questions_cache.clear()
+
+        # AND loading questions fails with an invalid format error
+        with patch('app.conversations.feedback.services.service.load_questions', 
+                  side_effect=QuestionsFileError("Invalid questions file format")):
+            # WHEN the upsert_feedback method is called
+            # THEN a QuestionsFileError should be raised
+            service = UserFeedbackService(user_feedback_repository=_mock_feedback_repository)
+            with pytest.raises(QuestionsFileError):
+                await service.upsert_user_feedback(get_random_user_id(),
+                                                   random.randint(1, 10000),  #nosec B311 # random is used for testing purposes
+                                                   given_feedback_specs)
 
 
 class TestGetAnsweredQuestions:
