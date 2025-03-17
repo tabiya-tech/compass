@@ -78,6 +78,8 @@ class UserFeedbackService(IUserFeedbackService):
 
     async def upsert_user_feedback(self, user_id: str, session_id: int, feedback_spec: NewFeedbackSpec) -> Feedback:
         questions_data = await load_questions()
+        if not questions_data:
+            raise QuestionsFileError("No questions data available")
         version_data = await load_version_info()
         backend_version = f"{version_data['branch']}-{version_data['buildNumber']}"
 
