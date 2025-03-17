@@ -99,7 +99,7 @@ describe("ExperiencesDrawer", () => {
 
     // THEN expect the text to be in the document
     const noExperiencesText = screen.getByText(
-      "We haven’t yet discovered any experiences so far, Let's continue chatting."
+      "We haven't yet discovered any experiences so far, Let's continue chatting."
     );
     expect(noExperiencesText).toBeInTheDocument();
   });
