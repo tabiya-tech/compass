@@ -125,7 +125,9 @@ const App = () => {
         console.debug("Cleaning up auth");
         // Each of the services that implement the AuthenticationService interface will have their own cleanup method
         // they may use this method to clean up any resources they have allocated on component unmount
-        currentAuthenticationService!.cleanup();
+        // the currentAuthenticationService may be null,
+        // since we're not sure if the user has logged in or not.
+        currentAuthenticationService?.cleanup();
       } catch (error) {
         console.error(new AuthenticationError("Error cleaning up auth", error as Error));
       }
