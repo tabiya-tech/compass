@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as Sentry from "@sentry/react";
-import { Box, styled, useMediaQuery, useTheme } from "@mui/material";
+import { Box, styled, useMediaQuery, Theme } from "@mui/material";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import { BugReport } from "@mui/icons-material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
@@ -38,8 +38,7 @@ const StyledPrimaryIconButton = styled(PrimaryIconButton)(({ theme }) => ({
 const BugReportButton: React.FC<BugReportButtonProps> = ({ bottomAlign, className }) => {
   const [bugReport, setBugReport] = useState<any>();
   const buttonRef = useRef<HTMLDivElement>(null);
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery((theme : Theme) => theme.breakpoints.down("sm"));
   const [sentryEnabled, setSentryEnabled] = useState(false);
 
   useEffect(() => {
@@ -66,8 +65,8 @@ const BugReportButton: React.FC<BugReportButtonProps> = ({ bottomAlign, classNam
         className={className}
         sx={{
           position: bottomAlign ? "fixed" : "auto",
-          bottom: bottomAlign ? theme.spacing(theme.tabiyaSpacing.lg) : "auto",
-          right: bottomAlign ? theme.spacing(theme.tabiyaSpacing.lg) : "auto",
+          bottom: (theme) => bottomAlign ? theme.spacing(theme.tabiyaSpacing.lg) : "auto",
+          right: (theme) => bottomAlign ? theme.spacing(theme.tabiyaSpacing.lg) : "auto",
         }}
       >
         {" "}
