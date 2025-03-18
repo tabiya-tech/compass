@@ -1,7 +1,7 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useMemo } from "react";
 import { Meta, StoryObj } from "@storybook/react";
 import ConversationConclusionFooter from "./ConversationConclusionFooter";
-import { ChatProvider } from "src/chat/ChatContext";
+import { ChatProvider, useChatContext } from "src/chat/ChatContext";
 import { FeedbackItem, QUESTION_KEYS } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import { TabiyaUser } from "src/auth/auth.types";
@@ -12,6 +12,7 @@ import {
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { getBackendUrl } from "src/envService";
+import { FeedbackStatus } from "../../../../feedback/overallFeedback/feedbackForm/FeedbackForm";
 
 // Mock feedback data
 const mockFeedbackInProgress: FeedbackItem[] = [
@@ -79,7 +80,24 @@ const StorybookWrapper = ({
     has_sensitive_personal_data: false,
   });
 
-  return <ChatProvider handleOpenExperiencesDrawer={() => {}}>{children}</ChatProvider>;
+  // we need a wrapper for the children to set the feedback status
+  // since we can only access the setFeedbackStatus function from a child of the ChatProvider
+  const StoryContent = () => {
+    // set the feedbackStatus based on the story state
+    const { setFeedbackStatus } = useChatContext();
+    // memoize so that teh story interactions dont get overridden by this state
+    useMemo(() => {
+      if (hasSubmittedFeedback) {
+        setFeedbackStatus(FeedbackStatus.SUBMITTED);
+      } else if (feedbackData.length > 0) {
+        setFeedbackStatus(FeedbackStatus.STARTED);
+      }
+    }, [setFeedbackStatus]);
+
+    return <>{children}</>;
+  }
+
+  return <ChatProvider handleOpenExperiencesDrawer={() => {}}><StoryContent/></ChatProvider>;
 };
 
 const meta : Meta<typeof ConversationConclusionFooter> = {
