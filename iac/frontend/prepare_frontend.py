@@ -15,7 +15,7 @@ sys.path.insert(0, iac_folder)
 
 from lib import base64_encode, getenv, get_realm_and_env_name_from_stack, \
     get_pulumi_stack_outputs, construct_artifacts_dir, save_content_in_file, \
-    download_generic_artifacts_file, Version
+    download_generic_artifacts_file, Version, get_local_pulumi_configs
 
 from scripts.formatters import construct_artifacts_version
 
@@ -134,6 +134,27 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     save_content_in_file(frontend_env_json_file_path, env_json_content)
 
 
+def _replace_vars_in_index_html(*, index_html_file_path: str, variables: dict):
+    """
+    Replace the environment variables in the index.html file.
+    Environment variables in the index.html are referenced in the format: %ENV_VAR_NAME%
+    :param index_html_file_path:
+    :param variables: The environment variables to replace in the index.html file.
+    :return:
+    """
+
+    print(f"info: replacing variables in index.html: {str(variables)}")
+
+    with open(index_html_file_path, "r") as file:
+        index_html_content = file.read()
+
+    for env_var_name, env_var_value in variables.items():
+        index_html_content = index_html_content.replace(f"%{env_var_name}%", env_var_value)
+
+    with open(index_html_file_path, "w") as file:
+        file.write(index_html_content)
+
+
 def prepare_frontend(
         *,
         stack_name: str):
@@ -167,7 +188,7 @@ def prepare_frontend(
     # artifacts dir, the folder to store the frontend build bundle.
     artifacts_dir = os.path.join(base_artifacts_dir, artifacts_dir)
 
-    realm_name, _ = get_realm_and_env_name_from_stack(stack_name)
+    realm_name, environment_name = get_realm_and_env_name_from_stack(stack_name)
 
     # get the required environment variables, for the frontend.
     print(f"preparing frontend for the run: {artifacts_dir}-{stack_name}...")
@@ -197,5 +218,17 @@ def prepare_frontend(
         stack_name=stack_name,
         artifacts_dir=stack_artifacts_dir
     )
+
+    # replace the variables in index.html.
+    environment_outputs = get_pulumi_stack_outputs(stack_name=stack_name, module="environment")
+    noindex = get_local_pulumi_configs(stack_name, "frontend", "noindex")
+    variables = dict(
+        FRONTEND_URL=environment_outputs.get("frontend_url").value,
+        ENVIRONMENT_NAME=environment_name,
+        # Do not index any page or follow any links on the page if noindex is True.
+        INDEX_CONTENT="noindex, nofollow" if noindex else "all"
+    )
+    _replace_vars_in_index_html(
+        index_html_file_path=os.path.join(stack_artifacts_dir, "index.html"), variables=variables)
 
     print(f"Done preparing frontend for the run: {artifacts_dir}-{stack_name}.")

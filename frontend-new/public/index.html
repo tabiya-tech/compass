@@ -10,6 +10,9 @@
       content="Welcome to Compass! An AI-powered career assistant that helps jobseekers identify and showcase their skills. Join now to create a digital profile and connect with new opportunities."
     />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, interactive-widget=resizes-content" />
+    <!--  This INDEX_CONTENT Will be provided on deployment time, if the deployment(environment) should be indexed  -->
+    <meta name="robots" content="%INDEX_CONTENT%" />
+    <link rel="canonical" href="%FRONEND_URL%"/>
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/compass.svg" />
     <!--
       manifest.json provides metadata used when your web app is installed on a
@@ -47,9 +50,9 @@
       {
         "@context": "https://schema.org",
         "@type": "WebApplication",
-        "name": "Compass by Tabiya",
+        "name": "Compass by Tabiya (%ENVIRONMENT_NAME%)",
         "url": "https://www.tabiya.org/compass",
-        "image": "https://dev.compass.tabiya.tech/logo.svg",
+        "image": "%FRONTEND_URL%/logo.svg",
         "description": "Compass is an AI-powered conversational tool that helps jobseekers discover and articulate their skills. Through natural dialogue, Compass guides users to identify abilities gained through all types of work—formal, informal, and unpaid. It creates standardized digital profiles that can connect to opportunities.",
         "applicationCategory": "BusinessApplication",
         "operatingSystem": "All",
@@ -58,7 +61,7 @@
           "@type": "Organization",
           "name": "Tabiya",
           "url": "https://www.tabiya.org/",
-          "logo": "https://dev.compass.tabiya.tech/compass.svg"
+          "logo": "%FRONTEND_URL%/compass.svg"
         },
         "offers": {
           "@type": "Offer",
