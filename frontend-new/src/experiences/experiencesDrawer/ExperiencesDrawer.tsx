@@ -126,7 +126,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
               phone={personalInfo.phoneNumber}
               address={personalInfo.address}
               experiences={experiencesWithTopSkills}
-              conversationConductedAt={conversationConductedAt!}
+              conversationConductedAt={conversationConductedAt}
               disabled={!hasTopSkills}
             />
           </Suspense>

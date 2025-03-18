@@ -14,7 +14,7 @@ interface DownloadReportDropdownProps {
   phone: string;
   address: string;
   experiences: Experience[];
-  conversationConductedAt: string;
+  conversationConductedAt: string | null;
   disabled?: boolean;
 }
 
@@ -41,7 +41,8 @@ const DownloadReportDropdown: React.FC<DownloadReportDropdownProps> = (props) =>
     phone: props.phone,
     address: props.address,
     experiences: props.experiences,
-    conversationConductedAt: props.conversationConductedAt,
+    // if the conversation conducted at is somehow null, use the current date
+    conversationConductedAt: props.conversationConductedAt ?? new Date().toISOString(),
   };
 
   const docxsReportProvider = new DocxReportDownloadProvider();
