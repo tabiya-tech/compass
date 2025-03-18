@@ -13,6 +13,7 @@ from pathlib import Path
 
 from typing import Optional, Any, Mapping
 
+import yaml
 from dotenv import find_dotenv, load_dotenv, dotenv_values
 import pulumi.automation as auto
 
@@ -454,3 +455,17 @@ def download_generic_artifacts_file(
         check=True,
         text=True
     )
+
+
+def get_local_pulumi_configs(stack_name: str, module: str, config_key: str) -> Any:
+    """
+    Reads local Pulumi.<stack-name.yaml file on the specified module and returns the configurations.
+    """
+    with open(os.path.join(iac_folder, module, f"Pulumi.{stack_name}.yaml"), "r") as file:
+        file_content = yaml.safe_load(file)
+
+    config = file_content.get("config")
+    if config is None or config.get(config_key) is None:
+        raise ValueError(f"Configuration not found in Pulumi.{stack_name}.yaml file")
+
+    return config.get(config_key)
