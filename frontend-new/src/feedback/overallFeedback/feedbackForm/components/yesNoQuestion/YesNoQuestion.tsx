@@ -71,7 +71,7 @@ const YesNoQuestion: React.FC<YesNoQuestionProps> = ({
       component="fieldset"
       fullWidth
       margin="normal"
-      sx={{ display: "flex", flexDirection: "column", gap: 1, margin: 0 }}
+      sx={{ display: "flex", flexDirection: "column", gap: theme.fixedSpacing(theme.tabiyaSpacing.sm), margin: 0 }}
       data-testid={DATA_TEST_ID.FORM_CONTROL}
     >
       <FormLabel component="legend" data-testid={DATA_TEST_ID.FORM_LABEL}>
@@ -86,7 +86,6 @@ const YesNoQuestion: React.FC<YesNoQuestionProps> = ({
         sx={{
           display: "flex",
           gap: theme.fixedSpacing(theme.tabiyaSpacing.lg),
-          marginTop: theme.tabiyaSpacing.md,
         }}
       >
         <FormControlLabel

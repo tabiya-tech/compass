@@ -9,7 +9,7 @@ exports[`StepsComponent should render component successfully 1`] = `
     class="MuiBox-root css-0"
   >
     <fieldset
-      class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth css-u799rm-MuiFormControl-root"
+      class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth css-1m6dh8w-MuiFormControl-root"
       data-testid="checkbox-with-textarea-form-control-989402f0-9fda-4400-958c-2d6c7bce9821"
     >
       <legend
@@ -24,7 +24,7 @@ exports[`StepsComponent should render component successfully 1`] = `
         </p>
       </legend>
       <div
-        class="MuiFormGroup-root css-1aqk0pa-MuiFormGroup-root"
+        class="MuiFormGroup-root css-4ht0cc-MuiFormGroup-root"
       >
         <label
           class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
@@ -95,7 +95,7 @@ exports[`StepsComponent should render component successfully 1`] = `
         </label>
       </div>
       <div
-        class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-kker16-MuiFormControl-root-MuiTextField-root"
+        class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-4c32m-MuiFormControl-root-MuiTextField-root"
       >
         <div
           class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline css-voxow3-MuiInputBase-root-MuiOutlinedInput-root"
@@ -368,7 +368,7 @@ exports[`StepsComponent should render component successfully 1`] = `
     class="MuiBox-root css-0"
   >
     <fieldset
-      class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth css-bxrs44-MuiFormControl-root"
+      class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth css-1dwck73-MuiFormControl-root"
       data-testid="yes-no-question-form-control-9803f91b-499a-41b3-9348-795de9e399a9"
     >
       <legend
@@ -384,7 +384,7 @@ exports[`StepsComponent should render component successfully 1`] = `
       </legend>
       <div
         aria-label="q3"
-        class="MuiFormGroup-root MuiFormGroup-row MuiRadioGroup-root MuiRadioGroup-row css-1mle1ow-MuiFormGroup-root"
+        class="MuiFormGroup-root MuiFormGroup-row MuiRadioGroup-root MuiRadioGroup-row css-106w5h1-MuiFormGroup-root"
         role="radiogroup"
       >
         <label
@@ -488,7 +488,7 @@ exports[`StepsComponent should render component successfully 1`] = `
         </label>
       </div>
       <div
-        class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-kker16-MuiFormControl-root-MuiTextField-root"
+        class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-4c32m-MuiFormControl-root-MuiTextField-root"
       >
         <div
           class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline css-voxow3-MuiInputBase-root-MuiOutlinedInput-root"
