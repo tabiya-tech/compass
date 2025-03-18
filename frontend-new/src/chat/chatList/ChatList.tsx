@@ -78,7 +78,7 @@ const ChatList: React.FC<ChatListProps> = ({ messages }) => {
       case ChatMessageType.TYPING:
         return <TypingChatMessage />;
       case ChatMessageType.ERROR:
-        // typing and error messages don't need to show anything but the message text
+        // error messages don't need to show anything but the message text
         // no timestamp or reactions will be shown, so we can use the ChatBubble itself
         return <ChatBubble message={chatMessage.message} sender={chatMessage.sender} />;
     }
