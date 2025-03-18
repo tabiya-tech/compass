@@ -12,6 +12,9 @@ import CompassChatMessage, {
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
 import { ChatMessageType } from "src/chat/Chat.types";
+import ChatBubble, {
+  DATA_TEST_ID as CHAT_BUBBLE_DATA_TEST_ID,
+} from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import ConversationConclusionChatMessage from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import { ReactionKind } from "src/chat/reaction/reaction.types";
 import { ChatProvider } from "src/chat/ChatContext";
@@ -134,6 +137,14 @@ describe("ChatList", () => {
         type: ChatMessageType.CONVERSATION_CONCLUSION,
         reaction: null,
       },
+      {
+        message_id: nanoid(),
+        sender: ConversationMessageSender.COMPASS,
+        message: "Error message",
+        sent_at: new Date().toString(),
+        type: ChatMessageType.ERROR,
+        reaction: null,
+      }
     ];
 
     // AND a function to notify when the reaction changes
@@ -194,6 +205,20 @@ describe("ChatList", () => {
       1,
       {
         chatMessage: givenMessages[4],
+      },
+      {}
+    );
+
+    // AND expect the Chat Bubble component to be rendered for the error message
+    expect(screen.getByTestId(CHAT_BUBBLE_DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER)).toBeInTheDocument();
+    // AND the chat bubble to be called with the correct message
+    // --> The chat bubble is called by the other components as well, but since they are being mocked,
+    // and since the typing message is the only one calling the "naked" bubble, we expect it to be the first time it's called
+    expect(ChatBubble).toHaveBeenNthCalledWith(
+      1,
+      {
+        message: givenMessages[5].message,
+        sender: givenMessages[5].sender,
       },
       {}
     );
