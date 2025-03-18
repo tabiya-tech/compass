@@ -2,7 +2,7 @@
 
 exports[`FeedbackForm should render component successfully 1`] = `
 <div
-  class="MuiDialog-root MuiModal-root css-p2bl54-MuiModal-root-MuiDialog-root"
+  class="MuiDialog-root MuiModal-root css-ggignx-MuiModal-root-MuiDialog-root"
   data-testid="feedback-form-dialog-c6ba52ec-c1de-46ac-950b-f5354c6785ac"
   role="presentation"
 >
@@ -27,7 +27,7 @@ exports[`FeedbackForm should render component successfully 1`] = `
       role="dialog"
     >
       <div
-        class="MuiTypography-root MuiTypography-h2 MuiDialogTitle-root css-blnnig-MuiTypography-root-MuiDialogTitle-root"
+        class="MuiTypography-root MuiTypography-h2 MuiDialogTitle-root css-jvm7fr-MuiTypography-root-MuiDialogTitle-root"
         id=":r0:"
       >
         <h3
@@ -60,7 +60,7 @@ exports[`FeedbackForm should render component successfully 1`] = `
         </button>
       </div>
       <div
-        class="MuiDialogContent-root css-ypiqx9-MuiDialogContent-root"
+        class="MuiDialogContent-root css-h86owe-MuiDialogContent-root"
         data-testid="feedback-form-dialog-content-c6ba52ec-c1de-46ac-950b-f5354c6785ac"
       >
         <div

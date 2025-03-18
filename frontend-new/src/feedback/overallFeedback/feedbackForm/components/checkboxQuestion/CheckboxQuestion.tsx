@@ -65,7 +65,7 @@ const CheckboxQuestion: React.FC<CheckboxQuestionProps> = ({
       component="fieldset"
       fullWidth
       margin="normal"
-      sx={{ margin: 0, display: "flex", flexDirection: "column", gap: theme.tabiyaSpacing.md }}
+      sx={{ margin: 0, display: "flex", flexDirection: "column", gap: theme.fixedSpacing(theme.tabiyaSpacing.sm) }}
       data-testid={DATA_TEST_ID.FORM_CONTROL}
     >
       <FormLabel component="legend" data-testid={DATA_TEST_ID.FORM_LABEL}>
@@ -76,7 +76,6 @@ const CheckboxQuestion: React.FC<CheckboxQuestionProps> = ({
           display: "flex",
           flexDirection: "column",
           gap: theme.tabiyaSpacing.sm,
-          marginTop: theme.tabiyaSpacing.md,
         }}
       >
         {options?.map((option) => (

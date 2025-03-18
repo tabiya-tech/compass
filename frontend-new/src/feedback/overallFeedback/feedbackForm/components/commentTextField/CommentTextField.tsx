@@ -1,5 +1,5 @@
 import React from "react";
-import { TextField, useTheme } from "@mui/material";
+import { TextField } from "@mui/material";
 
 interface CommentTextFieldProps {
   placeholder?: string;
@@ -15,8 +15,6 @@ export const DATA_TEST_ID = {
 
 const CommentTextField = React.forwardRef<HTMLInputElement, CommentTextFieldProps>(
   ({ placeholder, value, onChange }, ref) => {
-    const theme = useTheme();
-
     return (
       <TextField
         placeholder={placeholder}
@@ -28,7 +26,6 @@ const CommentTextField = React.forwardRef<HTMLInputElement, CommentTextFieldProp
         onChange={onChange}
         inputRef={ref}
         inputProps={{ "data-testid": DATA_TEST_ID.COMMENT_TEXT_FIELD }}
-        sx={{ marginTop: theme.fixedSpacing(theme.tabiyaSpacing.xs) }}
       />
     );
   }

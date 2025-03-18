@@ -124,7 +124,7 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
     <Box
       display="flex"
       flexDirection="column"
-      gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
+      gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
       height="100%"
       sx={{ overflowX: "hidden" }}
       data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT}
@@ -212,7 +212,7 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
             Previous
           </SecondaryButton>
         }
-        sx={{ height: "50px", paddingX: 0 }}
+        sx={{ padding: 0 }}
       />
     </Box>
   );
