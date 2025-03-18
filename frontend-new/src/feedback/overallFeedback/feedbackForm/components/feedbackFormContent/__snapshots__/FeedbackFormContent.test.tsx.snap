@@ -2,7 +2,7 @@
 
 exports[`FeedbackFormContent should render component successfully 1`] = `
 <div
-  class="MuiBox-root css-mk4vix"
+  class="MuiBox-root css-llfxzc"
   data-testid="feedback-form-content-07d1ed9d-6ced-4a24-912a-9b89199df67f"
 >
   <div
@@ -35,7 +35,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
             class="MuiBox-root css-0"
           >
             <fieldset
-              class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth css-bxrs44-MuiFormControl-root"
+              class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth css-1dwck73-MuiFormControl-root"
               data-testid="yes-no-question-form-control-9803f91b-499a-41b3-9348-795de9e399a9"
             >
               <legend
@@ -51,7 +51,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
               </legend>
               <div
                 aria-label="perceived_bias"
-                class="MuiFormGroup-root MuiFormGroup-row MuiRadioGroup-root MuiRadioGroup-row css-1mle1ow-MuiFormGroup-root"
+                class="MuiFormGroup-root MuiFormGroup-row MuiRadioGroup-root MuiRadioGroup-row css-106w5h1-MuiFormGroup-root"
                 role="radiogroup"
               >
                 <label
@@ -159,7 +159,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
             class="MuiBox-root css-0"
           >
             <fieldset
-              class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth css-u799rm-MuiFormControl-root"
+              class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth css-1m6dh8w-MuiFormControl-root"
               data-testid="checkbox-with-textarea-form-control-989402f0-9fda-4400-958c-2d6c7bce9821"
             >
               <legend
@@ -174,7 +174,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                 </p>
               </legend>
               <div
-                class="MuiFormGroup-root css-1aqk0pa-MuiFormGroup-root"
+                class="MuiFormGroup-root css-4ht0cc-MuiFormGroup-root"
               >
                 <label
                   class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
@@ -387,7 +387,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
     data-testid="feedback-form-content-divider-07d1ed9d-6ced-4a24-912a-9b89199df67f"
   />
   <div
-    class="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiMobileStepper-root MuiMobileStepper-positionStatic css-ge39m6-MuiPaper-root-MuiMobileStepper-root"
+    class="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiMobileStepper-root MuiMobileStepper-positionStatic css-ufcsdh-MuiPaper-root-MuiMobileStepper-root"
   >
     <button
       class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-187exs5-MuiButtonBase-root-MuiButton-root"

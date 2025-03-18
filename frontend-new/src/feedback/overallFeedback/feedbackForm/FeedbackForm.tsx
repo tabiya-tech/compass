@@ -17,14 +17,14 @@ export interface FeedbackFormProps {
 }
 
 export enum FeedbackStatus {
-  STARTED="STARTED",
-  NOT_STARTED= "NOT_STARTED",
-  SUBMITTED= "SUBMITTED",
+  STARTED = "STARTED",
+  NOT_STARTED = "NOT_STARTED",
+  SUBMITTED = "SUBMITTED",
 }
 
 export enum FeedbackCloseEvent {
   DISMISS = "DISMISS",
-  SUBMIT = "SUBMIT"
+  SUBMIT = "SUBMIT",
 }
 
 const uniqueId = "c6ba52ec-c1de-46ac-950b-f5354c6785ac";
@@ -49,7 +49,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
 
   const handleFeedbackSubmit = async (formData: FeedbackItem[]): Promise<void> => {
     setIsSubmitting(true);
-    notifyOnClose(FeedbackCloseEvent.SUBMIT)
+    notifyOnClose(FeedbackCloseEvent.SUBMIT);
     try {
       const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
       if (!userPreferences?.sessions.length) {
@@ -83,11 +83,24 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
             height: isSmallMobile ? "100%" : "85%",
             display: "flex",
             flexDirection: "column",
-            gap: theme.spacing(4),
+            gap: isSmallMobile
+              ? theme.fixedSpacing(theme.tabiyaSpacing.md)
+              : theme.fixedSpacing(theme.tabiyaSpacing.lg),
           },
         }}
       >
-        <DialogTitle component="div" sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <DialogTitle
+          component="div"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: isSmallMobile
+              ? theme.fixedSpacing(theme.tabiyaSpacing.sm)
+              : theme.fixedSpacing(theme.tabiyaSpacing.md),
+            paddingBottom: 0
+          }}
+        >
           <Typography variant="h3" data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG_TITLE}>
             Help us improve!
           </Typography>
@@ -100,7 +113,14 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
             <CloseIcon data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG_ICON_BUTTON} />
           </PrimaryIconButton>
         </DialogTitle>
-        <DialogContent data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG_CONTENT}>
+        <DialogContent
+          data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG_CONTENT}
+          sx={{
+            padding: isSmallMobile
+              ? theme.fixedSpacing(theme.tabiyaSpacing.sm)
+              : theme.fixedSpacing(theme.tabiyaSpacing.md),
+          }}
+        >
           <FeedbackFormContent notifySubmit={handleFeedbackSubmit} />
         </DialogContent>
       </Dialog>
