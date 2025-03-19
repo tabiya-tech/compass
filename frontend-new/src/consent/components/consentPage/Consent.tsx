@@ -155,13 +155,7 @@ const Consent: React.FC = () => {
   return (
     <Container
       maxWidth="xs"
-      sx={{
-        height: "100%",
-        padding: theme.fixedSpacing(theme.tabiyaSpacing.lg),
-        display: "flex",
-        flexDirection: "column",
-        gap: theme.fixedSpacing(theme.tabiyaSpacing.xl),
-      }}
+      sx={{ height: "100%", padding: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}
       data-testid={DATA_TEST_ID.CONSENT_CONTAINER}
     >
       <Backdrop isShown={isLoggingOut} message={"Logging you out..."} />
@@ -207,9 +201,7 @@ const Consent: React.FC = () => {
               label={
                 <Typography variant="body2" data-testid={DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_TEXT}>
                   I have read and accept the{" "}
-                  <CustomLink
-                    onClick={() => handleExternalNavigationOnNewTab("https://www.tabiya.org/compass/terms")}
-                  >
+                  <CustomLink onClick={() => handleExternalNavigationOnNewTab("https://www.tabiya.org/compass/terms")}>
                     {termsAndConditionsLabel}
                   </CustomLink>{" "}
                   of Compass.
@@ -273,24 +265,24 @@ const Consent: React.FC = () => {
             Sure, I am ready
           </PrimaryButton>
         </Box>
-      </Box>
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}
-        sx={{
-          marginTop: "auto",
-        }}
-        data-testid={DATA_TEST_ID.SUPPORT_CONTAINER}
-      >
-        <Typography typography="body1">With support from</Typography>
-        <img
-          src={`${process.env.PUBLIC_URL}/google-logo.svg`}
-          alt="Google.org Logo"
-          height={6 * theme.tabiyaSpacing.xl} // xl wasn't quite big enough, we're going for ~24px
-          data-testid={DATA_TEST_ID.GOOGLE_LOGO}
-        />
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}
+          sx={{
+            marginTop: theme.fixedSpacing(theme.tabiyaSpacing.xl),
+          }}
+          data-testid={DATA_TEST_ID.SUPPORT_CONTAINER}
+        >
+          <Typography typography="body1">With support from</Typography>
+          <img
+            src={`${process.env.PUBLIC_URL}/google-logo.svg`}
+            alt="Google.org Logo"
+            height={6 * theme.tabiyaSpacing.xl} // xl wasn't quite big enough, we're going for ~24px
+            data-testid={DATA_TEST_ID.GOOGLE_LOGO}
+          />
+        </Box>
       </Box>
       <ConfirmModalDialog
         isOpen={showRejectModal}
@@ -302,8 +294,8 @@ const Consent: React.FC = () => {
             gap={isSmallMobile ? theme.tabiyaSpacing.xl : theme.tabiyaSpacing.md}
           >
             <Typography>
-              We're sorry that you choose not to agree to the {termsAndConditionsLabel} and the {privacyPolicyLabel}. You
-              will not be able to proceed and will be <HighlightedSpan>logged out.</HighlightedSpan>
+              We're sorry that you choose not to agree to the {termsAndConditionsLabel} and the {privacyPolicyLabel}.
+              You will not be able to proceed and will be <HighlightedSpan>logged out.</HighlightedSpan>
             </Typography>
             <Typography>Are you sure you want to exit?</Typography>
           </Box>

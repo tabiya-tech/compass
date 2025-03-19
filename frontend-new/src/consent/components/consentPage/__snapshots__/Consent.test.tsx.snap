@@ -2,7 +2,7 @@
 
 exports[`Testing Consent Page render tests it should show consent screen with both agreements 1`] = `
 <div
-  class="MuiContainer-root MuiContainer-maxWidthXs css-lwfi0p-MuiContainer-root"
+  class="MuiContainer-root MuiContainer-maxWidthXs css-1ubnw5l-MuiContainer-root"
   data-testid="consent-container-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
 >
   <div
@@ -372,22 +372,22 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
         Sure, I am ready
       </button>
     </div>
-  </div>
-  <div
-    class="MuiBox-root css-1amft4z"
-    data-testid="consent-support-container-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
-  >
-    <p
-      class="MuiTypography-root MuiTypography-body1 css-2fnhl2-MuiTypography-root"
+    <div
+      class="MuiBox-root css-4ubj6j"
+      data-testid="consent-support-container-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
     >
-      With support from
-    </p>
-    <img
-      alt="Google.org Logo"
-      data-testid="consent-google-logo-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
-      height="24"
-      src="/google-logo.svg"
-    />
+      <p
+        class="MuiTypography-root MuiTypography-body1 css-2fnhl2-MuiTypography-root"
+      >
+        With support from
+      </p>
+      <img
+        alt="Google.org Logo"
+        data-testid="consent-google-logo-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
+        height="24"
+        src="/google-logo.svg"
+      />
+    </div>
   </div>
 </div>
 `;
