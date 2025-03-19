@@ -56,9 +56,12 @@ const EnumField: React.FC<EnumFieldProps> = ({ field, dataTestId, initialValue =
 
   // Handle selection change
   const handleChange = (event: SelectChangeEvent<string>) => {
-    const newValue = event.target.value;
-    setValue(newValue);
-    
+    const inputValue = event.target.value;
+    setValue(inputValue);
+
+    // If the input value is "prefer_not_to_say", set it to an empty string
+    const newValue = inputValue === "prefer_not_to_say" ? "" : inputValue;
+
     // Validate and notify parent
     const { isValid, errorMessage } = validate(newValue);
     setError(errorMessage);
@@ -106,7 +109,6 @@ const EnumField: React.FC<EnumFieldProps> = ({ field, dataTestId, initialValue =
           sx={{fontFamily:theme=> theme.typography.caption.fontFamily}} 
           id={`${field.name}-select-label`}
           data-testid={DATA_TEST_ID.ENUM_FIELD_INPUT_LABEL}
-          shrink={!!value}
         >
           {field.label}
         </InputLabel>
@@ -131,12 +133,11 @@ const EnumField: React.FC<EnumFieldProps> = ({ field, dataTestId, initialValue =
             )
           }
         >
-          <MenuItem 
-            value=""
-            data-testid={DATA_TEST_ID.ENUM_FIELD_EMPTY_OPTION}
-          >
-            Prefer not to say
-          </MenuItem>
+          {!field.required && (
+            <MenuItem value="prefer_not_to_say" data-testid={DATA_TEST_ID.ENUM_FIELD_EMPTY_OPTION}>
+              Prefer not to say
+            </MenuItem>
+          )}
           {field.values.map((value, index) => (
             <MenuItem
               key={`${field.dataKey}-${index}`}

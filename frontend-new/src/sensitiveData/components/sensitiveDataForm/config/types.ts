@@ -34,7 +34,7 @@ export class BaseFieldDefinition {
     }
 
     // required is required and must be a boolean
-    if (!attributes.required || typeof attributes.required !== 'boolean') {
+    if (attributes.required === undefined || typeof attributes.required !== 'boolean') {
       throw new ConfigurationError("SensitiveData: Field 'required' is required and must be a boolean");
     }
     // label is required and must be a string
