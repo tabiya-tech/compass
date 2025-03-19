@@ -21,6 +21,8 @@ def setup_env_vars(*, env_vars: dict = None):
     os.environ['TAXONOMY_DATABASE_NAME'] = env_vars.get('TAXONOMY_DATABASE_NAME', "foo")
     os.environ['APPLICATION_MONGODB_URI'] = env_vars.get('APPLICATION_MONGODB_URI', "foo")
     os.environ['APPLICATION_DATABASE_NAME'] = env_vars.get('APPLICATION_DATABASE_NAME', "foo")
+    os.environ['METRICS_MONGODB_URI'] = env_vars.get('METRICS_MONGODB_URI', "foo")
+    os.environ['METRICS_DATABASE_NAME'] = env_vars.get('METRICS_DATABASE_NAME', "foo")
     os.environ['USERDATA_MONGODB_URI'] = env_vars.get('USERDATA_MONGODB_URI', "foo")
     os.environ['USERDATA_DATABASE_NAME'] = env_vars.get('USERDATA_DATABASE_NAME', "foo")
     os.environ['TAXONOMY_MODEL_ID'] = env_vars.get('TAXONOMY_MODEL_ID', "foo")
@@ -33,6 +35,7 @@ def setup_env_vars(*, env_vars: dict = None):
     os.environ['TARGET_ENVIRONMENT_NAME'] = env_vars.get('TARGET_ENVIRONMENT_NAME', "foo")
     os.environ['SENTRY_BACKEND_DSN'] = env_vars.get('SENTRY_BACKEND_DSN', "foo")
     os.environ['ENABLE_SENTRY'] = env_vars.get('ENABLE_SENTRY', "false")
+    os.environ['ENABLE_METRICS'] = env_vars.get('ENABLE_METRICS', "false")
     # Add more environment variables as needed here
 
 
@@ -42,6 +45,8 @@ def teardown_env_vars():
     del os.environ['TAXONOMY_DATABASE_NAME']
     del os.environ['APPLICATION_MONGODB_URI']
     del os.environ['APPLICATION_DATABASE_NAME']
+    del os.environ['METRICS_MONGODB_URI']
+    del os.environ['METRICS_DATABASE_NAME']
     del os.environ['USERDATA_MONGODB_URI']
     del os.environ['USERDATA_DATABASE_NAME']
     del os.environ['TAXONOMY_MODEL_ID']
@@ -54,4 +59,5 @@ def teardown_env_vars():
     del os.environ['TARGET_ENVIRONMENT_NAME']
     del os.environ['SENTRY_BACKEND_DSN']
     del os.environ['ENABLE_SENTRY']
+    del os.environ['ENABLE_METRICS']
     # Add more environment variables as needed here

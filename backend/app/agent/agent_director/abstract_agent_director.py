@@ -7,8 +7,7 @@ from datetime import datetime, timezone
 from pydantic import BaseModel, Field, field_serializer, field_validator
 
 from app.agent.agent_types import AgentInput, AgentOutput
-from app.conversation_memory.conversation_memory_manager import \
-    ConversationMemoryManager, IConversationMemoryManager
+from app.conversation_memory.conversation_memory_manager import IConversationMemoryManager
 
 
 class ConversationPhase(Enum):

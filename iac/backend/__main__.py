@@ -51,6 +51,8 @@ def main():
         taxonomy_model_id=getenv("TAXONOMY_MODEL_ID"),
         application_mongodb_uri=getenv("APPLICATION_MONGODB_URI", True),
         application_database_name=getenv("APPLICATION_DATABASE_NAME"),
+        metrics_mongodb_uri=getenv("METRICS_MONGODB_URI", True),
+        metrics_database_name=getenv("METRICS_DATABASE_NAME"),
         userdata_database_name=getenv("USERDATA_DATABASE_NAME"),
         userdata_mongodb_uri=getenv("USERDATA_MONGODB_URI", True),
         vertex_api_region=getenv("VERTEX_API_REGION", True),
@@ -60,6 +62,7 @@ def main():
         frontend_url=frontend_url,
         sentry_backend_dsn=getenv("SENTRY_BACKEND_DSN", True, False),
         enable_sentry=getenv("ENABLE_SENTRY"),
+        enable_metrics=getenv("ENABLE_METRICS"),
         gcp_oauth_client_id=getenv("GCP_OAUTH_CLIENT_ID"),
 
         cloudrun_max_instance_request_concurrency=cloudrun_max_instance_request_concurrency,
