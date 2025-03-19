@@ -147,7 +147,7 @@ describe("Chat Utils", () => {
         message_id: "foo-nanoid",
         sender: ConversationMessageSender.COMPASS,
         message: FIXED_MESSAGES_TEXT.AI_IS_TYPING,
-        sent_at: new Date().toISOString(),
+        sent_at: expect.any(String),
         type: ChatMessageType.TYPING,
         reaction: null,
       });
