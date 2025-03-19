@@ -9,3 +9,4 @@ class Collections:
     SKILLS_EXPLORER_AGENT_STATE = "skills_explorer_agent_state"
     USER_FEEDBACK = "user_feedback"
     REACTIONS = "reactions"
+    COMPASS_METRICS = "metric_events"

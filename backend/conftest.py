@@ -1,7 +1,7 @@
-import pytest
 import logging
 import platform
 
+import pytest
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 from app.server_dependencies.db_dependencies import CompassDBProvider
@@ -95,6 +95,23 @@ async def in_memory_application_database(in_memory_mongo_server) -> AsyncIOMotor
     return application_db
 
 
+@pytest.fixture(scope='function')
+async def in_memory_metrics_database(in_memory_mongo_server) -> AsyncIOMotorDatabase:
+    """
+    Fixture to create an in-memory metrics database.
+
+    This is a re-usable fixture that can be used across multiple test modules.
+    :param in_memory_mongo_server:  The in-memory MongoDB server.
+    :return:  The mocked =metrics database.
+    """
+    metrics_db = AsyncIOMotorClient(in_memory_mongo_server.connection_string,
+                                    tlsAllowInvalidCertificates=True).get_database(random_db_name())
+
+    await CompassDBProvider.initialize_metrics_mongo_db(metrics_db, logger=logging.getLogger(__name__))
+    logging.info(f"Created metrics database: {metrics_db.name}")
+    return metrics_db
+
+
 @pytest.fixture(scope="function")
 def setup_application_config() -> ApplicationConfig:
     """
@@ -107,7 +124,8 @@ def setup_application_config() -> ApplicationConfig:
             date="foo-date",
             branch="foo-branch",
             buildNumber="foo-build-number",
-            sha="foo-sha"))
+            sha="foo-sha"),
+        enable_metrics=True)
 
     set_application_config(config)
     # guard to ensure the config is set

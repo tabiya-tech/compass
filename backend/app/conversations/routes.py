@@ -21,13 +21,14 @@ from app.conversations.service import ConversationAlreadyConcludedError, IConver
 from app.conversations.types import ConversationResponse, ConversationInput
 from app.errors.constants import NO_PERMISSION_FOR_SESSION
 from app.errors.errors import UnauthorizedSessionAccessError
+from app.metrics.get_metrics_service import get_metrics_service
 from app.server_dependencies.agent_director_dependencies import get_agent_director
 from app.server_dependencies.application_state_dependencies import get_application_state_manager
 from app.server_dependencies.conversation_manager_dependencies import get_conversation_memory_manager
-from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.types import Experience
 from app.users.auth import Authentication, UserInfo
-from app.users.repositories import UserPreferenceRepository
+from app.metrics.service import IMetricsService
+from app.server_dependencies.db_dependencies import CompassDBProvider
 
 
 async def get_conversation_service(agent_director: LLMAgentDirector = Depends(get_agent_director),
@@ -36,14 +37,12 @@ async def get_conversation_service(agent_director: LLMAgentDirector = Depends(ge
                                    conversation_memory_manager: ConversationMemoryManager = Depends(
                                        get_conversation_memory_manager),
                                    db: AsyncIOMotorDatabase = Depends(
-                                       CompassDBProvider.get_application_db)) -> IConversationService:
+                                       CompassDBProvider.get_application_db),
+                                   metrics_service: IMetricsService = Depends(get_metrics_service)) -> IConversationService:
     return ConversationService(agent_director=agent_director, application_state_manager=application_state_manager,
                                conversation_memory_manager=conversation_memory_manager,
-                               reaction_repository=ReactionRepository(db))
-
-
-async def _get_user_preferences_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)):
-    return UserPreferenceRepository(db)
+                               reaction_repository=ReactionRepository(db),
+                               metrics_service=metrics_service)
 
 
 def add_conversation_routes(app: FastAPI, authentication: Authentication):

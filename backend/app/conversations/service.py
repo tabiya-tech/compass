@@ -17,6 +17,8 @@ from app.conversations.types import ConversationResponse
 from app.conversations.utils import get_messages_from_conversation_manager, filter_conversation_history
 from app.sensitive_filter import sensitive_filter
 from app.types import Experience, Skill
+from app.metrics.service import IMetricsService
+from app.metrics.types import  ConversationPhaseEvent
 
 
 class ConversationAlreadyConcludedError(Exception):
@@ -79,12 +81,14 @@ class ConversationService(IConversationService):
                  application_state_manager: IApplicationStateManager,
                  agent_director: LLMAgentDirector,
                  conversation_memory_manager: IConversationMemoryManager,
-                 reaction_repository: IReactionRepository):
+                 reaction_repository: IReactionRepository,
+                 metrics_service: IMetricsService):
         self._logger = logging.getLogger(ConversationService.__name__)
         self._agent_director = agent_director
         self._application_state_manager = application_state_manager
         self._conversation_memory_manager = conversation_memory_manager
         self._reaction_repository = reaction_repository
+        self._metrics_service = metrics_service
 
     async def send(self, user_id: str, session_id: int, user_input: str, clear_memory: bool,
                    filter_pii: bool) -> ConversationResponse:
@@ -131,6 +135,17 @@ class ConversationService(IConversationService):
 
         # save the state, before responding to the user
         await self._application_state_manager.save_state(state)
+
+        # Record conversation phase event if the conversation has ended
+        if state.agent_director_state.current_phase == ConversationPhase.ENDED:
+            await self._metrics_service.record_event(
+                ConversationPhaseEvent(
+                    user_id=user_id,
+                    session_id=session_id,
+                    phase="ENDED"
+                )
+            )
+
         return ConversationResponse(
             messages=response,
             conversation_completed=state.agent_director_state.current_phase == ConversationPhase.ENDED,

@@ -23,6 +23,8 @@ class BackendServiceConfig:
     taxonomy_model_id: str
     application_mongodb_uri: str
     application_database_name: str
+    metrics_mongodb_uri: str
+    metrics_database_name: str
     userdata_mongodb_uri: str
     userdata_database_name: str
     vertex_api_region: str
@@ -32,6 +34,7 @@ class BackendServiceConfig:
     frontend_url: str | pulumi.Output[str]
     sentry_backend_dsn: str
     enable_sentry: str
+    enable_metrics: str
     gcp_oauth_client_id: str
     cloudrun_max_instance_request_concurrency: int
     cloudrun_min_instance_count: int
@@ -259,6 +262,12 @@ def _deploy_cloud_run_service(
                             name="APPLICATION_DATABASE_NAME",
                             value=backend_service_cfg.application_database_name),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="METRICS_MONGODB_URI",
+                            value=backend_service_cfg.metrics_mongodb_uri),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="METRICS_DATABASE_NAME",
+                            value=backend_service_cfg.metrics_database_name),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="USERDATA_MONGODB_URI",
                             value=backend_service_cfg.userdata_mongodb_uri),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
@@ -285,6 +294,9 @@ def _deploy_cloud_run_service(
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="ENABLE_SENTRY",
                             value=backend_service_cfg.enable_sentry),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="ENABLE_METRICS",
+                            value=backend_service_cfg.enable_metrics),
 
                         # Add more environment variables here
                     ],
