@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.server_dependencies.database_collections import Collections
-
+from common_libs.time_utilities import datetime_to_mongo_date, get_now
 from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest
 
 logger = logging.getLogger(__name__)
@@ -69,8 +69,9 @@ class UserPreferenceRepository(IUserPreferenceRepository):
         try:
             payload = user_preference.model_dump()
             payload["user_id"] = user_id
+            payload["created_at"] = datetime_to_mongo_date(get_now())
 
-            _doc = await self.collection.insert_one(payload)
+            await self.collection.insert_one(payload)
             return await self.get_user_preference_by_user_id(user_id=user_id)
         except Exception as e:
             logger.exception(e)
@@ -81,7 +82,7 @@ class UserPreferenceRepository(IUserPreferenceRepository):
         try:
             payload = update.model_dump(exclude_none=True)
 
-            _doc = await self.collection.update_one({"user_id": {"$eq": user_id}}, {"$set": payload})
+            await self.collection.update_one({"user_id": {"$eq": user_id}}, {"$set": payload})
 
             return await self.get_user_preference_by_user_id(user_id=user_id)
         except Exception as e:
