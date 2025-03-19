@@ -544,8 +544,8 @@ const SensitiveDataForm: React.FC = () => {
                 id: "1",
                 text: (
                   <>
-                    We're sorry that you prefer not to provide your data. Sharing your information helps improve Compass.
-                    Please note that if you skip this step,{" "}
+                    We're sorry that you prefer not to provide your data. Providing this information helps Compass
+                    deliver a more personalized experience for you. Please note that if you skip this step,{" "}
                     <HighlightedSpan>you won't be able to provide this information later.</HighlightedSpan>
                   </>
                 ),
