@@ -16,6 +16,8 @@ from contextlib import asynccontextmanager
 
 from app.users.routes import add_users_routes
 from app.conversations.poc import add_poc_routes
+from app.app_config import ApplicationConfig, set_application_config
+from app.version.utils import load_version_info
 
 logger = logging.getLogger(__name__)
 
@@ -131,6 +133,14 @@ if not os.getenv("USERDATA_DATABASE_NAME"):
     raise ValueError("Mandatory USERDATA_DATABASE_NAME environment variable is not set")
 if not os.getenv('TAXONOMY_MODEL_ID'):
     raise ValueError("Mandatory TAXONOMY_MODEL_ID env variable is not set!")
+
+# set global application configuration
+set_application_config(
+    ApplicationConfig(
+        environment_name=os.getenv("TARGET_ENVIRONMENT_NAME"),
+        version_info=load_version_info()
+    )
+)
 
 ############################################
 # Initiate the Authentication Module for the FastAPI app

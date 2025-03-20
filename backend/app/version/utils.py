@@ -1,26 +1,20 @@
-import asyncio
 import json
-import logging
+import os
 
-from fastapi import HTTPException
-from pathlib import Path
-from typing import Dict
-
-logger = logging.getLogger(__name__)
+from app.version.types import Version
 
 
-async def load_version_info() -> Dict[str, str]:
+def load_version_info() -> Version:
     # Determine the absolute path of the directory where the current script resides
-    script_directory = Path(__file__).parent
+    script_directory = os.path.dirname(os.path.abspath(__file__))
 
-    # Construct the absolute path to the JSON file
-    version_file_path = script_directory / 'version.json'
+    # Construct the absolute path to the JSON file, assuming it's in the same directory as the script
+    version_file_path = os.path.join(script_directory, 'version.json')
 
     try:
-        version_data = await asyncio.to_thread(version_file_path.read_text)
-        return json.loads(version_data)
+        with open(version_file_path, 'r', encoding='utf-8') as fp:
+            return Version(**(json.load(fp)))
     except FileNotFoundError:
-        raise HTTPException(status_code=500, detail="Version file not found")
+        raise RuntimeError("Version file not found")
     except Exception as e:
-        logger.exception(e)
-        raise HTTPException(status_code=500, detail="Failed to load version data")
+        raise RuntimeError("Failed to load version data", e)

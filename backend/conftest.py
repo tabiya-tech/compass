@@ -5,6 +5,9 @@ import platform
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 from app.server_dependencies.db_dependencies import CompassDBProvider
+from app.version.types import Version
+from app.app_config import ApplicationConfig, set_application_config, get_application_config
+
 
 @pytest.fixture(scope='session')
 def in_memory_mongo_server():
@@ -18,7 +21,7 @@ def in_memory_mongo_server():
     from pymongo_inmemory import Mongod
     from pymongo_inmemory.context import Context
 
-    # There is a bug in pymongo_inmemory where the for ubuntu and debian it will fallback to mongo v4.0.23
+    # There is a bug in pymongo_inmemory where the for ubuntu and debian it will fall back to mongo v4.0.23
     # https://github.com/kaizendorks/pymongo_inmemory/issues/115
     # so for these operating systems we manually set the os_name in the context constructor
     os_name: str | None = None
@@ -52,7 +55,8 @@ def random_db_name():
     """
     import random
     import string
-    return ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))  # nosec B311 # random is used for testing purposes
+    return ''.join(random.choices(string.ascii_lowercase + string.digits,
+                                  k=10))  # nosec B311 # random is used for testing purposes
 
 
 @pytest.fixture(scope='function')
@@ -65,15 +69,10 @@ async def in_memory_userdata_database(in_memory_mongo_server) -> AsyncIOMotorDat
     :return:  The mocked userdata database.
     """
 
-    userdata_db = AsyncIOMotorClient(
-        in_memory_mongo_server.connection_string,
-        tlsAllowInvalidCertificates=True
-    ).get_database(random_db_name())
+    userdata_db = AsyncIOMotorClient(in_memory_mongo_server.connection_string,
+                                     tlsAllowInvalidCertificates=True).get_database(random_db_name())
 
-    await CompassDBProvider.initialize_userdata_mongo_db(
-        userdata_db,
-        logger=logging.getLogger(__name__)
-    )
+    await CompassDBProvider.initialize_userdata_mongo_db(userdata_db, logger=logging.getLogger(__name__))
     logging.info(f"Created userdata database: {userdata_db.name}")
     return userdata_db
 
@@ -88,14 +87,30 @@ async def in_memory_application_database(in_memory_mongo_server) -> AsyncIOMotor
     :return:  The mocked =application database.
     """
 
-    application_db = AsyncIOMotorClient(
-        in_memory_mongo_server.connection_string,
-        tlsAllowInvalidCertificates=True
-    ).get_database(random_db_name())
+    application_db = AsyncIOMotorClient(in_memory_mongo_server.connection_string,
+                                        tlsAllowInvalidCertificates=True).get_database(random_db_name())
 
-    await CompassDBProvider.initialize_application_mongo_db(
-        application_db,
-        logger=logging.getLogger(__name__)
-    )
+    await CompassDBProvider.initialize_application_mongo_db(application_db, logger=logging.getLogger(__name__))
     logging.info(f"Created application database: {application_db.name}")
     return application_db
+
+
+@pytest.fixture(scope="function")
+def setup_application_config() -> ApplicationConfig:
+    """
+    Fixture to create an application config. For all tests that need to use the application config,
+    they should use this fixture.
+    """
+    config = ApplicationConfig(
+        environment_name="foo",
+        version_info=Version(
+            date="foo-date",
+            branch="foo-branch",
+            buildNumber="foo-build-number",
+            sha="foo-sha"))
+
+    set_application_config(config)
+    # guard to ensure the config is set
+    if get_application_config() != config:
+        raise RuntimeError("Application config not set properly.")
+    return config

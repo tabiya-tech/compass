@@ -9,12 +9,12 @@ from typing import Any, Dict
 from pathlib import Path
 
 from app.conversations.feedback.repository import IUserFeedbackRepository
+from app.app_config import get_application_config
 from .types import Feedback, NewFeedbackSpec, FeedbackItem, Version, AnsweredQuestions
 from .errors import (
     InvalidQuestionError,
     QuestionsFileError
 )
-from app.version.utils import load_version_info
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ class IUserFeedbackService(ABC):
     """Interface for user feedback service operations."""
 
     @abstractmethod
-    async def upsert_user_feedback(self,  user_id: str, session_id: int, feedback: NewFeedbackSpec) -> Feedback:
+    async def upsert_user_feedback(self, user_id: str, session_id: int, feedback: NewFeedbackSpec) -> Feedback:
         """
         Creates or updates user feedback for a session.
 
@@ -80,9 +80,6 @@ class UserFeedbackService(IUserFeedbackService):
         questions_data = await load_questions()
         if not questions_data:
             raise QuestionsFileError("No questions data available")
-        version_data = await load_version_info()
-        backend_version = f"{version_data['branch']}-{version_data['buildNumber']}"
-
         # Construct full feedback items with question text and description
         feedback_items = []
         for item in feedback_spec.feedback_items_specs:
@@ -103,7 +100,7 @@ class UserFeedbackService(IUserFeedbackService):
         # Construct full Version object
         version = Version(
             frontend=feedback_spec.version.frontend,
-            backend=backend_version
+            backend=get_application_config().version_info.to_version_string()
         )
 
         # Create full Feedback object
@@ -118,7 +115,7 @@ class UserFeedbackService(IUserFeedbackService):
         return await self._user_feedback_repository.upsert_feedback(complete_feedback)
 
     async def get_answered_questions(self, user_id: str) -> AnsweredQuestions:
-        feedback_for_sessions : dict[int, Feedback] = await self._user_feedback_repository.get_all_feedback_for_user(user_id)
+        feedback_for_sessions: dict[int, Feedback] = await self._user_feedback_repository.get_all_feedback_for_user(user_id)
         answered_questions = {}
 
         for session_id, feedback in feedback_for_sessions.items():
