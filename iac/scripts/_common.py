@@ -396,26 +396,50 @@ def add_select_environments_arguments(*, parser: argparse.ArgumentParser):
     )
 
 
-def compare_dict_keys(dict1: dict, dict2: dict, parent: str = "root"):
+def compare_to_template(*, template: dict, actual_cfg: dict, parent: str = "root", strict: bool = False) -> bool:
     """
-    Compare the keys of two dictionaries.
-    If the value is also a dict it will compare the keys of the nested dict.
+    Compare the keys of the template dict with the actual_cfg dict.
+
+    - If `actual_cfg` contains extra keys, they are logged as warnings.
+    - If `actual_cfg` is missing keys present in `template`, the function returns `False`.
+    - If a value in `template` is a dictionary, its corresponding value in `actual_cfg` must also be a dictionary.
+    - The function recursively verifies nested dictionaries.
+    - If `strict=True`, the presence of extra keys in `actual_cfg` will cause failure.
+
+    :param template: The template dictionary (expected structure).
+    :param actual_cfg: The actual configuration dictionary.
+    :param parent: The parent key path (used for logging).
+    :param strict: If True, extra keys in `actual_cfg` will cause failure.
+    :return: True if `actual_cfg` matches the template (or is a superset if strict=False), otherwise False.
     """
 
     try:
-        if dict1.keys() != dict2.keys():
-            # keys in dict 1 that are not in dict 2
-            print(f"Error: Keys in {parent} that are not in dict2: {list(dict1.keys() - dict2.keys())}")
-            # keys in dict 2 that are not in dict 1
-            print(f"Error: Keys in {parent} that are not in dict1: {list(dict2.keys() - dict1.keys())}")
-            return False
+        # Check for missing keys
+        for key, value in template.items():
+            if key not in actual_cfg:
+                print(f"Error: {parent}.{key} is missing in the actual configuration.")
+                return False
 
-        for key in dict1.keys():
-            if isinstance(dict1[key], dict) or isinstance(dict2[key], dict):
-                if not compare_dict_keys(dict1[key], dict2[key], f"{parent}.{key}"):
+            if isinstance(value, dict):
+                if not isinstance(actual_cfg[key], dict):
+                    print(f"Error: {parent}.{key} should be a dictionary in actual_cfg but is not.")
+                    return False
+                if not compare_to_template(template=value, actual_cfg=actual_cfg[key], parent=f"{parent}.{key}", strict=strict):
                     return False
 
+        # Check for extra keys if strict mode is enabled
+        if strict:
+            for key in actual_cfg:
+                if key not in template:
+                    print(f"Strict mode Error: {parent}.{key} is not in the template configuration.")
+                    return False
+        else:
+            for key in actual_cfg:
+                if key not in template:
+                    print(f"Warning: {parent}.{key} is not in the template configuration.")
+
         return True
+
     except Exception as e:
-        print("Error: ", str(e))
+        print(f"Unexpected error in compare_to_template: {e}")
         return False
