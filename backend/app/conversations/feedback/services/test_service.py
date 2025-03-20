@@ -15,7 +15,8 @@ import pytest_mock
 
 from app.conversations.feedback.repository import IUserFeedbackRepository
 from app.users.sessions import generate_new_session_id
-from app.version.utils import load_version_info
+
+from app.app_config import ApplicationConfig
 from common_libs.test_utilities import get_random_user_id, get_random_printable_string
 from . import SimplifiedAnswer
 from .service import UserFeedbackService
@@ -71,7 +72,6 @@ def _def_feedback() -> Feedback:
         created_at=datetime.now()
     )
 
-
 @pytest.fixture(scope='function')
 def _mock_feedback_repository() -> IUserFeedbackRepository:
     class MockedFeedbackRepository(IUserFeedbackRepository):
@@ -90,7 +90,7 @@ def _mock_feedback_repository() -> IUserFeedbackRepository:
 class TestUpsertFeedback:
     @pytest.mark.asyncio
     async def test_upsert_feedback_update(self, _mock_feedback_repository: IUserFeedbackRepository,
-                                          mocker: pytest_mock.MockerFixture):
+                                          mocker: pytest_mock.MockerFixture, setup_application_config: ApplicationConfig):
         # GIVEN a feedback specs to upsert
         given_user_id = get_random_user_id()
         given_session_id = random.randint(1, 10000)  # nosec B311 # random is used for testing purposes
@@ -107,18 +107,20 @@ class TestUpsertFeedback:
         fixed_time = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)
         mocker.patch('common_libs.time_utilities._time_utils.datetime', new=mocker.Mock(now=lambda tz=None: fixed_time))
 
+        # AND the backend version is set in the application config
+        given_backend_version = setup_application_config.version_info.to_version_string()
+
         # WHEN the upsert_feedback method is called
         service = UserFeedbackService(user_feedback_repository=_mock_feedback_repository)
         actual_feedback = await service.upsert_user_feedback(given_user_id,
                                                              given_session_id,  #nosec B311 # random is used for testing purposes
                                                              given_feedback_specs)
-        actual_backend_version_info = await load_version_info()
-        expected_backend_version = f"{actual_backend_version_info['branch']}-{actual_backend_version_info['buildNumber']}"
+
         expected_feedback = Feedback(
             id=None,
             session_id=given_session_id,
             user_id=given_user_id,
-            version=Version(frontend=given_feedback_specs.version.frontend, backend=expected_backend_version),
+            version=Version(frontend=given_feedback_specs.version.frontend, backend=given_backend_version),
             feedback_items=[FeedbackItem(**item) for item in expected_feedback_specs_json]
         )
 
