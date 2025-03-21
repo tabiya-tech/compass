@@ -108,6 +108,11 @@ if not enable_sentry:
     raise ValueError("Mandatory ENABLE_SENTRY env variable is not set! Please set it to the either True or False")
 logger.info(f"ENABLE_SENTRY: {os.getenv('ENABLE_SENTRY')}")
 
+metrics_enabled = os.getenv("ENABLE_METRICS")
+if not metrics_enabled:
+    raise ValueError("Mandatory ENABLE_METRICS env variable is not set! Please set it to the either True or False")
+logger.info(f"ENABLE_METRICS: {os.getenv('ENABLE_METRICS')}")
+
 origins = list(set(origins))  # remove duplicates
 logger.info(f"Allowed origins: {origins}")
 
@@ -127,6 +132,10 @@ if not os.getenv('APPLICATION_MONGODB_URI'):
     raise ValueError("Mandatory APPLICATION_MONGODB_URI env variable is not set!")
 if not os.getenv("APPLICATION_DATABASE_NAME"):
     raise ValueError("Mandatory APPLICATION_DATABASE_NAME environment variable is not set")
+if not os.getenv('METRICS_MONGODB_URI'):
+    raise ValueError("Mandatory METRICS_MONGODB_URI env variable is not set!")
+if not os.getenv("METRICS_DATABASE_NAME"):
+    raise ValueError("Mandatory METRICS_DATABASE_NAME environment variable is not set")
 if not os.getenv('USERDATA_MONGODB_URI'):
     raise ValueError("Mandatory USERDATA_MONGODB_URI env variable is not set!")
 if not os.getenv("USERDATA_DATABASE_NAME"):
@@ -138,7 +147,8 @@ if not os.getenv('TAXONOMY_MODEL_ID'):
 set_application_config(
     ApplicationConfig(
         environment_name=os.getenv("TARGET_ENVIRONMENT_NAME"),
-        version_info=load_version_info()
+        version_info=load_version_info(),
+        enable_metrics=metrics_enabled,
     )
 )
 

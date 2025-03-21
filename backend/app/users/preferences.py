@@ -16,7 +16,9 @@ from app.users.repositories import UserPreferenceRepository
 from app.users.sessions import generate_new_session_id, SessionsService
 from app.users.types import UserPreferencesUpdateRequest, UserPreferences, \
     CreateUserPreferencesRequest, UserPreferencesRepositoryUpdateRequest, UsersPreferencesResponse
-
+from app.metrics.service import IMetricsService, MetricsService
+from app.metrics.types import UserAccountCreatedEvent
+from app.metrics.repository import CompassMetricRepository
 import logging
 
 logger = logging.getLogger(__name__)
@@ -71,12 +73,18 @@ async def _get_user_preferences(
 
 INVALID_INVITATION_CODE_MESSAGE = "Invalid invitation code"
 
+# TODO: should be a singleton
+async def _get_metrics_service(metrics_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_metrics_db)) -> IMetricsService:
+    return MetricsService(
+        repository=CompassMetricRepository(db=metrics_db),
+    )
 
 async def _create_user_preferences(
         user_invitation_repository: UserInvitationRepository,
         repository: UserPreferenceRepository,
         preferences: CreateUserPreferencesRequest,
-        authed_user: UserInfo) -> UsersPreferencesResponse:
+        authed_user: UserInfo,
+        metrics_service: IMetricsService = Depends(_get_metrics_service)) -> UsersPreferencesResponse:
     try:
         if preferences.user_id != authed_user.user_id:
             raise HTTPException(status_code=403, detail="forbidden")
@@ -122,6 +130,11 @@ async def _create_user_preferences(
             invitation_code=preferences.invitation_code,
             sensitive_personal_data_requirement=invitation.sensitive_personal_data_requirement,
             sessions=sessions
+        ))
+
+        # Record user account creation metric
+        await metrics_service.record_event(UserAccountCreatedEvent(
+            user_id=preferences.user_id
         ))
 
         return UsersPreferencesResponse(
@@ -225,10 +238,12 @@ async def _update_user_preferences(
         ErrorService.handle(__name__, e)
 
 
+# TODO: should be a singleton
 async def _get_user_preferences_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)):
     return UserPreferenceRepository(db)
 
 
+# TODO: should be a singleton
 async def _get_user_invitations_repository(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)):
     return UserInvitationRepository(db)
 
@@ -299,9 +314,9 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
                               user_info: UserInfo = Depends(auth.get_user_info()),
                               user_invitation_repository: UserInvitationRepository = Depends(_get_user_invitations_repository),
                               user_preference_repository: UserPreferenceRepository = Depends(
-                                  _get_user_preferences_service)
-                              ) -> UsersPreferencesResponse:
-        return await _create_user_preferences(user_invitation_repository, user_preference_repository, body, user_info)
+                                  _get_user_preferences_service),
+                              metrics_service: IMetricsService = Depends(_get_metrics_service)) -> UsersPreferencesResponse:
+        return await _create_user_preferences(user_invitation_repository, user_preference_repository, body, user_info, metrics_service)
 
     #########################
     # POS /users/preferences - Create a user preferences

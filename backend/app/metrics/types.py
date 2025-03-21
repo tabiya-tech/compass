@@ -1,23 +1,21 @@
 from datetime import datetime
 from typing import Literal
 from app.conversations.reactions.types import ReactionKind, DislikeReason
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_serializer
 from app.metrics.constants import EventType
-
+from app.app_config import get_application_config
+from common_libs.time_utilities._time_utils import get_now
+import hashlib
 
 class CompassMetricEvent(BaseModel):
     """
-    id - a unique identifier for the event, typically assigned by the db
-    """
-    id: str | None = None
-    """
     environment_name - the name of the environment the event was recorded in
     """
-    environment_name: str
+    environment_name: str = Field(default_factory=lambda: get_application_config().environment_name)
     """
     version - the version of the application the event was recorded in
     """
-    version: str
+    version: str = Field(default_factory=lambda:get_application_config().version_info.to_version_string())
     """
     event_type - the type of the metric event
     """
@@ -29,11 +27,15 @@ class CompassMetricEvent(BaseModel):
     """
     timestamp - the timestamp of the event
     """
-    timestamp: datetime
+    timestamp: datetime = Field(default_factory=get_now)
     """
     anonymized_user_id - a bson representation of the md5 hash of the user_id for the user whose request triggered the event
     """
     anonymized_user_id: str
+
+    @field_serializer('event_type')
+    def serialize_event_type(self, event_type: EventType) -> int:
+        return event_type.value
 
     class Config:
         extra = "forbid"
@@ -41,15 +43,19 @@ class CompassMetricEvent(BaseModel):
 
 class UserAccountCreatedEvent(CompassMetricEvent):
     """
-    event_type - the type of the event
+    A metric event representing a user account creation.
     """
-    event_type: EventType
 
-    @field_validator("event_type")
-    def validate_event_type(cls, v):
-        if v != EventType.USER_ACCOUNT_CREATED:
-            raise ValueError("event_type must be EventType.USER_ACCOUNT_CREATED")
-        return v
+    def __init__(self, *,
+                 user_id: str):
+        # obfuscate the user_id using md5, and store it as anonymized_user_id
+        # usedForSecurity is set to False to avoid linting error, since we do not need a cryptographically secure hash
+        anonymized_user_id = hashlib.md5(user_id.encode(), usedforsecurity=False).hexdigest()
+        super().__init__(
+            event_type=EventType.USER_ACCOUNT_CREATED,
+            event_type_name = EventType.USER_ACCOUNT_CREATED.name,
+            anonymized_user_id=anonymized_user_id
+        )
 
     class Config:
         extra = "forbid"
@@ -71,38 +77,41 @@ ConversationPhase = Literal["INTRO", "COUNSELING", "CHECKOUT", "ENDED"]
 
 class ConversationPhaseEvent(CompassConversationEvent):
     """
-    event_type - the type of the event
-    """
-    event_type: EventType
-
-    @field_validator("event_type")
-    def validate_event_type(cls, v):
-        if v != EventType.CONVERSATION_PHASE:
-            raise ValueError("event_type must be EventType.CONVERSATION_PHASE")
-        return v
-    """
     phase - the phase of the conversation
     """
     phase: ConversationPhase
 
+    def __init__(self, *,
+                 anonymized_user_id: str,
+                 phase: ConversationPhase,
+                 anonymized_session_id: str):
+        super().__init__(
+            event_type=EventType.CONVERSATION_PHASE,
+            event_type_name = EventType.CONVERSATION_PHASE.name,
+            anonymized_user_id=anonymized_user_id,
+            phase=phase,
+            anonymized_session_id=anonymized_session_id
+        )
     class Config:
         extra = "forbid"
 
 class MessageCreatedEvent(CompassConversationEvent):
     """
-    event_type - the type of the event
-    """
-    event_type: EventType
-
-    @field_validator("event_type")
-    def validate_event_type(cls, v):
-        if v != EventType.MESSAGE_CREATED:
-            raise ValueError("event_type must be EventType.MESSAGE_CREATED")
-        return v
-    """
     message_id - the id of the message
     """
     message_id: str
+
+    def __init__(self, *,
+                 anonymized_user_id: str,
+                 message_id: str,
+                 anonymized_session_id: str):
+        super().__init__(
+            event_type=EventType.MESSAGE_CREATED,
+            event_type_name = EventType.MESSAGE_CREATED.name,
+            anonymized_user_id=anonymized_user_id,
+            message_id=message_id,
+            anonymized_session_id=anonymized_session_id
+        )
 
     class Config:
         extra = "forbid"
@@ -111,38 +120,32 @@ FeedbackType = Literal["NPS", "CSAT", "CES"]
 
 class FeedbackScoreUpdatedEvent(CompassConversationEvent):
     """
-    event_type - the type of the event
-    """
-    event_type: EventType
-
-    @field_validator("event_type")
-    def validate_event_type(cls, v):
-        if v != EventType.FEEDBACK_SCORE_UPDATED:
-            raise ValueError("event_type must be EventType.FEEDBACK_SCORE_UPDATED")
-        return v
-    """
-    type - the type of the feedback
+    type - the type of the feedback score
     """
     type: FeedbackType
     """
-    value - the value of the feedback
+    value - the value of the feedback score
     """
     value: int
+
+    def __init__(self, *,
+                 anonymized_user_id: str,
+                 type: FeedbackType,
+                 value: int,
+                 anonymized_session_id: str):
+        super().__init__(
+            event_type=EventType.FEEDBACK_SCORE_UPDATED,
+            event_type_name = EventType.FEEDBACK_SCORE_UPDATED.name,
+            anonymized_user_id=anonymized_user_id,
+            type=type,
+            value=value,
+            anonymized_session_id=anonymized_session_id
+        )
 
     class Config:
         extra = "forbid"
 
 class MessageReactionCreatedEvent(CompassConversationEvent):
-    """
-    event_type - the type of the event
-    """
-    event_type: EventType
-
-    @field_validator("event_type")
-    def validate_event_type(cls, v):
-        if v != EventType.MESSAGE_REACTION_CREATED:
-            raise ValueError("event_type must be EventType.MESSAGE_REACTION_CREATED")
-        return v
     """
     message_id - the id of the message
     """
@@ -152,9 +155,26 @@ class MessageReactionCreatedEvent(CompassConversationEvent):
     """
     kind: ReactionKind
     """
-    reasons: a list of dislike reasons
+    reasons - the reasons for the reaction
     """
     reasons: list[DislikeReason]
 
+    def __init__(self, *,
+                 anonymized_user_id: str,
+                 message_id: str,
+                 kind: ReactionKind,
+                 reasons: list[DislikeReason],
+                 anonymized_session_id: str):
+        super().__init__(
+            event_type=EventType.MESSAGE_REACTION_CREATED,
+            event_type_name = EventType.MESSAGE_REACTION_CREATED.name,
+            anonymized_user_id=anonymized_user_id,
+            message_id=message_id,
+            kind=kind,
+            reasons=reasons,
+            anonymized_session_id=anonymized_session_id
+        )
+
     class Config:
         extra = "forbid"
+

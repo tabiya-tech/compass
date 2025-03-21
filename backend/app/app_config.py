@@ -13,6 +13,7 @@ class ApplicationConfig(BaseModel):
 
     environment_name: str
     version_info: Version
+    enable_metrics: bool
 
 
 _application_config: ApplicationConfig | None = None

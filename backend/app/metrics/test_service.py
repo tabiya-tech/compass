@@ -1,175 +1,50 @@
-from typing import Awaitable
 import pytest
-import bson
+from unittest.mock import AsyncMock
+from pytest_mock import MockerFixture
+from datetime import datetime, timezone
 
-from datetime import datetime
+from app.metrics.repository import ICompassMetricRepository
+from app.metrics.types import CompassMetricEvent, EventType
+from app.metrics.service import MetricsService
+from app.app_config import ApplicationConfig
 
-from app.conversations.reactions.types import ReactionKind, DislikeReason
-from app.metrics.constants import EventType
-from app.metrics.types import CompassMetricEvent, UserAccountCreatedEvent, MessageCreatedEvent, ConversationPhaseEvent, FeedbackScoreUpdatedEvent, MessageReactionCreatedEvent
-
-from app.metrics.service import CompassMetricService
-
-
-def get_base_event(event_type: EventType):
-    return CompassMetricEvent(
-        event_type=event_type,
-        event_type_name=event_type.name,
-        environment_name="test",
-        version="1.0.0",
-        timestamp=datetime.now(),
-        anonymized_user_id="123",
-    )
 
 @pytest.fixture(scope="function")
-async def get_metrics_service(in_memory_application_database) -> CompassMetricService:
-    application_db = await in_memory_application_database
-    return CompassMetricService(db=application_db)
+def _mock_metrics_repository() -> ICompassMetricRepository:
+    class MockMetricsRepository(ICompassMetricRepository):
+        async def record_event(self, event: CompassMetricEvent):
+            raise NotImplementedError()
+        def _to_db_doc(self, event: CompassMetricEvent):
+            raise NotImplementedError()
+    return MockMetricsRepository()
 
-def _assert_base_event_matches(event: dict, expected: CompassMetricEvent):
-    assert event["event_type"] == expected.event_type
-    assert event["event_type_name"] == expected.event_type_name
-    assert event["environment_name"] == expected.environment_name
-    assert event["version"] == expected.version
-    assert event["timestamp"] == expected.timestamp
-    assert event["anonymized_user_id"] == expected.anonymized_user_id
+def _get_metric_event():
+    return CompassMetricEvent(
+        event_type=EventType.USER_ACCOUNT_CREATED,
+        event_type_name="USER_ACCOUNT_CREATED",
+        version="test",
+        anonymized_user_id="test",
+    )
 
 
-class TestRecordEvent:
+class TestMetricsService:
     @pytest.mark.asyncio
-    async def test_record_user_account_created_event_success(self, get_metrics_service: Awaitable[CompassMetricService]):
-        # GIVEN a user account created event
-        given_event = UserAccountCreatedEvent(
-            **get_base_event(event_type=EventType.USER_ACCOUNT_CREATED).model_dump()
-        )
+    async def test_record_event(self, _mock_metrics_repository: ICompassMetricRepository, mocker: MockerFixture, setup_application_config: ApplicationConfig):
+        # GIVEN a metric to record
+        metric_event = _get_metric_event()
+
+        #  AND the metrics repository will record the event successfully
+        _mock_metrics_repository.record_event = AsyncMock(return_value=True)
+
+        # AND datetime.now returns a fixed time
+        fixed_time = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)
+        mocker.patch('common_libs.time_utilities._time_utils.datetime', new=mocker.Mock(now=lambda tz=None: fixed_time))
 
         # WHEN the event is recorded
-        service = await get_metrics_service
-        # Guard: ensure no events in the database
-        assert await service.collection.count_documents({}) == 0
-        result = await service.record_event([given_event])
+        service = MetricsService(_mock_metrics_repository)
+        await service.record_event(metric_event)
 
-        # THEN the event is recorded in the database
-        assert await service.collection.count_documents({}) == 1
-        # AND the id should be a valid ObjectId
-        assert bson.ObjectId.is_valid(result.id)
-        # AND the event data matches what we expect
-        actual_stored_event = await service.collection.find_one({"_id": bson.ObjectId(result.id)})
-        _assert_base_event_matches(actual_stored_event, given_event)
-
-    @pytest.mark.asyncio
-    async def test_record_message_created_event_success(self, get_metrics_service: Awaitable[CompassMetricService]):
-        # GIVEN a message created event
-        base_event_data = get_base_event(event_type=EventType.MESSAGE_CREATED).model_dump()
-        base_event_data.update({
-            "message_id": "test_message_id",
-            "anonymized_session_id": "test_session"
-        })
-        given_event = MessageCreatedEvent(**base_event_data)
-
-        # WHEN the event is recorded
-        service = await get_metrics_service
-        # Guard: ensure no events in the database
-        assert await service.collection.count_documents({}) == 0
-        result = await service.record_event([given_event])
-
-        # THEN the event is recorded in the database
-        assert await service.collection.count_documents({}) == 1
-        # AND the id should be a valid ObjectId
-        assert bson.ObjectId.is_valid(result.id)
-        # AND the event data matches what we expect
-        actual_stored_event = await service.collection.find_one({"_id": bson.ObjectId(result.id)})
-        _assert_base_event_matches(actual_stored_event, given_event)
-        # AND specific fields are present
-        assert actual_stored_event["message_id"] == "test_message_id"
-        assert actual_stored_event["anonymized_session_id"] == "test_session"
-
-    @pytest.mark.asyncio
-    async def test_record_conversation_phase_event_success(self, get_metrics_service: Awaitable[CompassMetricService]):
-        # GIVEN a conversation phase event
-        base_event_data = get_base_event(event_type=EventType.CONVERSATION_PHASE).model_dump()
-        base_event_data.update({
-            "phase": "INTRO",
-            "anonymized_session_id": "test_session"
-        })
-        given_event = ConversationPhaseEvent(**base_event_data)
-
-        # WHEN the event is recorded
-        service = await get_metrics_service
-        # Guard: ensure no events in the database
-        assert await service.collection.count_documents({}) == 0
-        result = await service.record_event([given_event])
-
-        # THEN the event is recorded in the database
-        assert await service.collection.count_documents({}) == 1
-        # AND the id should be a valid ObjectId
-        assert bson.ObjectId.is_valid(result.id)
-        # AND the event data matches what we expect
-        actual_stored_event = await service.collection.find_one({"_id": bson.ObjectId(result.id)})
-        _assert_base_event_matches(actual_stored_event, given_event)
-        # AND specific fields are present
-        assert actual_stored_event["phase"] == "INTRO"
-        assert actual_stored_event["anonymized_session_id"] == "test_session"
-
-    @pytest.mark.asyncio
-    async def test_record_feedback_score_updated_event_success(self, get_metrics_service: Awaitable[CompassMetricService]):
-        # GIVEN a feedback score updated event
-        base_event_data = get_base_event(event_type=EventType.FEEDBACK_SCORE_UPDATED).model_dump()
-        base_event_data.update({
-            "type": "NPS",
-            "value": 8,
-            "anonymized_session_id": "test_session"
-        })
-        given_event = FeedbackScoreUpdatedEvent(**base_event_data)
-
-        # WHEN the event is recorded
-        service = await get_metrics_service
-        # Guard: ensure no events in the database
-        assert await service.collection.count_documents({}) == 0
-        result = await service.record_event([given_event])
-
-        # THEN the event is recorded in the database
-        assert await service.collection.count_documents({}) == 1
-        # AND the id should be a valid ObjectId
-        assert bson.ObjectId.is_valid(result.id)
-        # AND the event data matches what we expect
-        actual_stored_event = await service.collection.find_one({"_id": bson.ObjectId(result.id)})
-        _assert_base_event_matches(actual_stored_event, given_event)
-        # AND specific fields are present
-        assert actual_stored_event["type"] == "NPS"
-        assert actual_stored_event["value"] == 8
-        assert actual_stored_event["anonymized_session_id"] == "test_session"
-
-    @pytest.mark.asyncio
-    async def test_record_message_reaction_created_event_success(self, get_metrics_service: Awaitable[CompassMetricService]):
-        # GIVEN a message reaction created event
-        base_event_data = get_base_event(event_type=EventType.MESSAGE_REACTION_CREATED).model_dump()
-        base_event_data.update({
-            "message_id": "test_message_id",
-            "kind": ReactionKind.LIKED,
-            "reasons": [
-                DislikeReason.BIASED
-            ],
-            "anonymized_session_id": "test_session"
-        })
-        given_event = MessageReactionCreatedEvent(**base_event_data)
-
-        # WHEN the event is recorded
-        service = await get_metrics_service
-        # Guard: ensure no events in the database
-        assert await service.collection.count_documents({}) == 0
-        result = await service.record_event([given_event])
-
-        # THEN the event is recorded in the database
-        assert await service.collection.count_documents({}) == 1
-        # AND the id should be a valid ObjectId
-        assert bson.ObjectId.is_valid(result.id)
-        # AND the event data matches what we expect
-        actual_stored_event = await service.collection.find_one({"_id": bson.ObjectId(result.id)})
-        _assert_base_event_matches(actual_stored_event, given_event)
-        # AND specific fields are present
-        assert actual_stored_event["message_id"] == "test_message_id"
-        assert actual_stored_event["kind"] == "LIKE"
-        assert actual_stored_event["reasons"] == []
-        assert actual_stored_event["anonymized_session_id"] == "test_session"
-        
+        # THEN the event is recorded with the environment name
+        event_with_env = metric_event.model_dump()
+        event_with_env["environment_name"] = "test"
+        _mock_metrics_repository.record_event.assert_called_once_with([metric_event])

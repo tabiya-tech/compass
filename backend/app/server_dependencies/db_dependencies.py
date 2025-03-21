@@ -1,5 +1,4 @@
 import asyncio
-from enum import unique
 from typing import Optional
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
@@ -77,6 +76,17 @@ def _get_taxonomy_db(mongodb_uri: str, db_name: str) -> AsyncIOMotorDatabase:
     ).get_database(db_name)
 
 
+def _get_metrics_db(mongodb_uri: str, db_name: str) -> AsyncIOMotorDatabase:
+    """
+    Decouples the database creation from the database provider.
+    This allows to mock the database creation in tests, instead of mocking the database provider.
+    """
+    return AsyncIOMotorClient(
+        mongodb_uri,
+        tlsAllowInvalidCertificates=True
+    ).get_database(db_name)
+
+
 class CompassDBProvider:
     """
     Provides the taxonomy and application database instances.
@@ -85,6 +95,7 @@ class CompassDBProvider:
     _application_mongo_db: Optional[AsyncIOMotorDatabase] = None
     _taxonomy_mongo_db: Optional[AsyncIOMotorDatabase] = None
     _userdata_mongo_db: Optional[AsyncIOMotorDatabase] = None
+    _metrics_mongo_db: Optional[AsyncIOMotorDatabase] = None
     _lock = asyncio.Lock()
     _logger = logging.getLogger(__qualname__)
 
@@ -162,6 +173,21 @@ class CompassDBProvider:
         except Exception as e:
             logger.exception(e)
             raise e
+        
+    @staticmethod
+    async def initialize_metrics_mongo_db(metrics_db: AsyncIOMotorDatabase, logger: logging.Logger):
+        """ Initialize the MongoDB database."""
+        try:
+            logger.info("Initializing indexes for the metrics database")
+            # Create the metrics indexes
+            await metrics_db.get_collection(Collections.COMPASS_METRICS).create_index([
+                ("event_type", 1)
+            ])
+
+            logger.info("Finished creating indexes for the metrics database")
+        except Exception as e:
+            logger.exception(e)
+            raise e
 
     @classmethod
     async def get_application_db(cls) -> AsyncIOMotorDatabase:
@@ -207,3 +233,16 @@ class CompassDBProvider:
                     cls._logger.info("Connected to MongoDB database: %s",
                                      await _get_database_connection_info(cls._taxonomy_mongo_db))
         return cls._taxonomy_mongo_db
+
+    @classmethod
+    async def get_metrics_db(cls) -> AsyncIOMotorDatabase:
+        if cls._metrics_mongo_db is None:  # Check if the database instance has been created
+            async with cls._lock:  # Ensure that only one coroutine is creating and initializing the database instance
+                if cls._metrics_mongo_db is None:  # Double-check after acquiring the lock
+                    cls._logger.info("Connecting to Metrics MongoDB")
+                    # Create the database instance
+                    cls._metrics_mongo_db = _get_metrics_db(cls._settings.metrics_mongodb_uri,
+                                                            cls._settings.metrics_database_name)
+                    cls._logger.info("Connected to MongoDB database: %s",
+                                     await _get_database_connection_info(cls._metrics_mongo_db))
+        return cls._metrics_mongo_db
