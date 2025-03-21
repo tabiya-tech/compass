@@ -61,9 +61,6 @@ jobs:
         run: poetry run pylint --exit-zero --recursive=y .
         working-directory: backend
 
-      - name: Copy the template .env.example to .env
-        run: cp backend/.env.example backend/.env
-
       - name: Run unit tests
         shell: bash
         run: poetry run pytest -m 'not (evaluation_test or smoke_test)'

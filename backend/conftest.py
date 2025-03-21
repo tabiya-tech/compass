@@ -125,7 +125,7 @@ def setup_application_config() -> ApplicationConfig:
             branch="foo-branch",
             buildNumber="foo-build-number",
             sha="foo-sha"),
-    enable_metrics=True)
+        enable_metrics=True)
 
     set_application_config(config)
     # guard to ensure the config is set

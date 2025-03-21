@@ -33,12 +33,14 @@ async def lifespan(_app: FastAPI):
 
     application_db = await CompassDBProvider.get_application_db()
     userdata_db = await CompassDBProvider.get_userdata_db()
+    metrics_db = await CompassDBProvider.get_metrics_db()
 
     # Initialize the MongoDB databases
     # run the initialization in parallel
     await asyncio.gather(
         CompassDBProvider.initialize_application_mongo_db(application_db, logger),
-        CompassDBProvider.initialize_userdata_mongo_db(userdata_db, logger)
+        CompassDBProvider.initialize_userdata_mongo_db(userdata_db, logger),
+        CompassDBProvider.initialize_metrics_mongo_db(userdata_db, logger)
     )
 
     yield
@@ -49,6 +51,7 @@ async def lifespan(_app: FastAPI):
     # close the database connections
     application_db.client.close()
     userdata_db.client.close()
+    metrics_db.client.close()
 
 
 # Retrieve the backend URL from the environment variables,
@@ -108,10 +111,12 @@ if not enable_sentry:
     raise ValueError("Mandatory ENABLE_SENTRY env variable is not set! Please set it to the either True or False")
 logger.info(f"ENABLE_SENTRY: {os.getenv('ENABLE_SENTRY')}")
 
-metrics_enabled = os.getenv("ENABLE_METRICS")
-if not metrics_enabled:
+
+_metrics_enabled_str = os.getenv("ENABLE_METRICS")
+if not _metrics_enabled_str:
     raise ValueError("Mandatory ENABLE_METRICS env variable is not set! Please set it to the either True or False")
-logger.info(f"ENABLE_METRICS: {os.getenv('ENABLE_METRICS')}")
+logger.info(f"ENABLE_METRICS: {_metrics_enabled_str}")
+
 
 origins = list(set(origins))  # remove duplicates
 logger.info(f"Allowed origins: {origins}")
@@ -148,7 +153,7 @@ set_application_config(
     ApplicationConfig(
         environment_name=os.getenv("TARGET_ENVIRONMENT_NAME"),
         version_info=load_version_info(),
-        enable_metrics=metrics_enabled,
+        enable_metrics=_metrics_enabled_str.lower() == "true",
     )
 )
 

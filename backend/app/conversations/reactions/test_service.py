@@ -2,7 +2,7 @@
 Tests for the reaction service
 """
 from datetime import datetime, timezone, timedelta
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 import pytest_mock
@@ -167,7 +167,7 @@ class TestAdd:
             return_value=get_mock_application_state(self._given_session_id))
         given_conversation_context = get_mock_conversation_context(self._given_message_id)
         _mock_conversation_memory_manager.get_conversation_context = AsyncMock(return_value=given_conversation_context)
-        _mock_conversation_memory_manager.set_state = AsyncMock(return_value=None)
+        _mock_conversation_memory_manager.set_state = Mock(return_value=None)
         _mock_conversation_memory_manager.is_user_message = AsyncMock(return_value=False)
 
         # AND the repository will add a reaction successfully and return a different reaction
@@ -203,7 +203,7 @@ class TestAdd:
             return_value=get_mock_application_state(self._given_session_id))
         given_conversation_context = get_mock_conversation_context(self._given_message_id)
         _mock_conversation_memory_manager.get_conversation_context = AsyncMock(return_value=given_conversation_context)
-        _mock_conversation_memory_manager.set_state = AsyncMock(return_value=None)
+        _mock_conversation_memory_manager.set_state = Mock(return_value=None)
         _mock_conversation_memory_manager.is_user_message = AsyncMock(return_value=False)
 
         # AND the repository will add a reaction successfully and return a different reaction
@@ -238,7 +238,7 @@ class TestAdd:
         # AND the message with the given message_id is a USER message in the conversation context
         _mock_application_state_manager.get_state = AsyncMock(
             return_value=get_mock_application_state(self._given_session_id))
-        _mock_conversation_memory_manager.set_state = AsyncMock(return_value=None)
+        _mock_conversation_memory_manager.set_state = Mock(return_value=None)
         _mock_conversation_memory_manager.is_user_message = AsyncMock(return_value=True)
 
         # WHEN the add method is called
@@ -267,7 +267,7 @@ class TestAdd:
             return_value=get_mock_application_state(self._given_session_id))
         given_conversation_context = get_mock_conversation_context(self._given_message_id)
         _mock_conversation_memory_manager.get_conversation_context = AsyncMock(return_value=given_conversation_context)
-        _mock_conversation_memory_manager.set_state = AsyncMock(return_value=None)
+        _mock_conversation_memory_manager.set_state = Mock(return_value=None)
         _mock_conversation_memory_manager.is_user_message = AsyncMock(return_value=False)
 
         # WHEN the add method is called

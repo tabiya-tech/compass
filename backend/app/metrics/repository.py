@@ -3,33 +3,38 @@ import logging
 
 from pymongo import InsertOne
 
-from app.metrics.types import CompassMetricEvent
+from app.metrics.types import AbstractCompassMetricEvent
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.server_dependencies.database_collections import Collections
 from common_libs.time_utilities import datetime_to_mongo_date
-from app.app_config import get_application_config
 
-class ICompassMetricRepository(ABC):
+
+class IMetricsRepository(ABC):
     @abstractmethod
-    def record_event(self, event: list[CompassMetricEvent]):
+    def record_event(self, event: list[AbstractCompassMetricEvent]):
+        """
+        Records a number of events in the repository.
+        :param event: The event to record
+        :return:
+        """
         raise NotImplementedError()
 
 
-class CompassMetricRepository(ICompassMetricRepository):
+class MetricsRepository(IMetricsRepository):
     def __init__(self, *, db: AsyncIOMotorDatabase):
         self.db = db
         self.logger = logging.getLogger(self.__class__.__name__)
         self.collection = db.get_collection(Collections.COMPASS_METRICS)
 
     @classmethod
-    def _to_db_doc(cls, event: CompassMetricEvent) -> dict:
+    def _to_db_doc(cls, event: AbstractCompassMetricEvent) -> dict:
         event_dict = event.model_dump()
-        event_dict["environment_name"] = get_application_config().environment_name
         event_dict["timestamp"] = datetime_to_mongo_date(event.timestamp)
+        event_dict["event_type_name"] = event.event_type.name
+        event_dict["event_type"] = event.event_type.value
         return event_dict
 
-
-    async def record_event(self, events: list[CompassMetricEvent]):
+    async def record_event(self, events: list[AbstractCompassMetricEvent]):
         commands = []
         for event in events:
             commands.append(InsertOne(self._to_db_doc(event)))

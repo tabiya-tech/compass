@@ -1,7 +1,7 @@
 from abc import ABC
 import logging
-from app.metrics.types import CompassMetricEvent
-from app.metrics.repository import ICompassMetricRepository
+from app.metrics.types import AbstractCompassMetricEvent
+from app.metrics.repository import IMetricsRepository
 from app.app_config import get_application_config
 
 
@@ -9,9 +9,11 @@ class IMetricsService(ABC):
     """
     Interface for the metrics service.
     """
-    async def record_event(self, event: CompassMetricEvent):
+
+    async def record_event(self, event: AbstractCompassMetricEvent):
         """
-        Record an event.
+        Record an event. This is a fire and forget operation.
+        The caller should not handle exceptions from this service as it will not throw any.
         :param event: The event to record.
         """
         raise NotImplementedError()
@@ -21,15 +23,15 @@ class MetricsService(IMetricsService):
     """
     Implementation of the metrics service.
     """
-    def __init__(self, repository: ICompassMetricRepository):
-        self._metrics_repository = repository
-        self._logger = logging.getLogger(__name__)
 
-    async def record_event(self, event: CompassMetricEvent):
-        # TODO: add buffer to queue events and flush them to the repository
-        if not get_application_config().enable_metrics:
-            self._logger.warning("Metrics collection is disabled. Event will not be recorded.")
-            return
+    def __init__(self, repository: IMetricsRepository):
+        self._metrics_repository = repository
+        self._logger = logging.getLogger(self.__class__.__name__)
+        self.enable_metrics = get_application_config().enable_metrics
+        if not self.enable_metrics:
+            self._logger.warning("Metrics are disabled. Events will not be recorded.")
+
+    async def record_event(self, event: AbstractCompassMetricEvent):
         try:
             await self._metrics_repository.record_event([event])
         except Exception as e:

@@ -1,24 +1,28 @@
 #!/usr/bin/env python3
-
 import os
-import sys
 
 import yaml
 from fastapi.openapi.utils import get_openapi
 
-# Import the FastAPI app after adding the 'app' directory to sys.path
-from app.server import app
-
 
 def export():
+    # Set up the environment variables required for the FastAPI app.
+    # Since the app won't actually be running, we only need to set the environment variables typically used for testing.
+    # This is necessary because the app is initialized at the module level and doesn't currently support passing a configuration.
+    # If these values are not set, the app won't start and will throw an error due to missing required environment variables.
+    from common_libs.test_utilities.setup_env_vars import setup_env_vars, teardown_env_vars
+    setup_env_vars()
+    from app.server import app
+    # Generate the OpenAPI 3.1 schema
     openapi3 = get_openapi(
-        title=app.title,
-        version=app.version,
-        openapi_version=app.openapi_version,
-        description=app.description,
+        title=getattr(app, "title", None),
+        version=getattr(app, "version", None),
+        openapi_version=getattr(app, "openapi_version", None),
+        description=getattr(app, "description", None),
         routes=app.routes
     )
     convert(openapi3)
+    teardown_env_vars()
 
 
 # Simplified OpenAPI 3.1 to OpenAPI 2.0 converter

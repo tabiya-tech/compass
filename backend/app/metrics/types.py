@@ -1,53 +1,70 @@
 import hashlib
 from datetime import datetime
-from typing import Literal
+from typing import Literal, final
 
-from pydantic import BaseModel, Field, root_validator, field_serializer, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 from app.app_config import get_application_config
 from app.conversations.reactions.types import ReactionKind, DislikeReason
 from app.metrics.constants import EventType
-from common_libs.time_utilities._time_utils import get_now
+from common_libs.time_utilities import get_now
 
 
-class CompassMetricEvent(BaseModel):
+class AbstractCompassMetricEvent(BaseModel):
+    """
+    Abstract base class for a metric event. It is not meant to be instantiated directly.
+    """
+    # using the __new__ method to prevent instantiation of the abstract class before the __init__ method is called
+    # this is used in lieu of extending the ABC class since multiple inheritance is not working properly with ABCs
+    # and allows instance creation
+    def __new__(cls, *args, **kwargs):
+        if cls is AbstractCompassMetricEvent:
+            raise TypeError(f"{cls.__name__} is an abstract class and cannot be instantiated directly")
+        return super().__new__(cls)
+
+    environment_name: str = Field(default_factory=lambda: get_application_config().environment_name)
     """
     environment_name - the name of the environment the event was recorded in
     """
-    environment_name: str = Field(default_factory=lambda: get_application_config().environment_name)
+
+    version: str = Field(default_factory=lambda: get_application_config().version_info.to_version_string())
     """
     version - the version of the application the event was recorded in
     """
-    version: str = Field(default_factory=lambda: get_application_config().version_info.to_version_string())
+
+    event_type: EventType
     """
     event_type - the type of the metric event
     """
-    event_type: EventType
-    """
-    event_type_name - the name of the event type
-    """
-    event_type_name: str
+
+    timestamp: datetime = Field(default_factory=get_now)
     """
     timestamp - the timestamp of the event
     """
-    timestamp: datetime = Field(default_factory=get_now)
-
-    @field_serializer('event_type')
-    def serialize_event_type(self, event_type: EventType) -> int:
-        return event_type.value
 
     class Config:
         extra = "forbid"
 
 
-class CompassUserAccountEvent(CompassMetricEvent):
+class AbstractUserAccountEvent(AbstractCompassMetricEvent):
     """
-    anonymized_user_id - a bson representation of the md5 hash of the user_id for the user whose request triggered the event
+    Abstract base class for a metric event representing a user account event. It is not meant to be instantiated directly.
     """
-    anonymized_user_id: str
+    # using the __new__ method to prevent instantiation of the abstract class before the __init__ method is called
+    # this is used in lieu of extending the ABC class since multiple inheritance is not working properly with ABCs
+    # and allows instance creation
+    def __new__(cls, *args, **kwargs):
+        if cls is AbstractUserAccountEvent:
+            raise TypeError(f"{cls.__name__} is an abstract class and cannot be instantiated directly")
+        return super().__new__(cls)
 
-    # a model validator that obfuscates the "user_id" field passed by any children and replaces it with the field "anonymized_user_id"
-    # the "anonymized_user_id" field is a hash of the "user_id" field
+    anonymized_user_id: str
+    """
+    anonymized_user_id - a hex representation of the md5 hash of the user_id for the user whose request triggered the event
+    """
+    # using a model_validator instead of an __init__ to obfuscate user_id without needing to pass extra fields to the parent constructor
+    # because the __init__ method of the parent class would be called before the __init__ method of the child class
+    # and the parent class doesnt know about the user_id field
     @model_validator(mode="before")
     def obfuscate_user_id(cls, values):
         if 'user_id' in values:
@@ -59,29 +76,41 @@ class CompassUserAccountEvent(CompassMetricEvent):
         extra = "forbid"
 
 
-class UserAccountCreatedEvent(CompassUserAccountEvent):
+@final
+class UserAccountCreatedEvent(AbstractUserAccountEvent):
     """
     A metric event representing a user account creation.
     """
+
     def __init__(self, *, user_id: str):
         super().__init__(
             user_id=user_id,
             event_type=EventType.USER_ACCOUNT_CREATED,
-            event_type_name=EventType.USER_ACCOUNT_CREATED.name,
         )
 
     class Config:
         extra = "forbid"
 
 
-class CompassConversationEvent(CompassUserAccountEvent):
+class AbstractConversationEvent(AbstractUserAccountEvent):
     """
-    anonymized_session_id - a bson representation of the md5 hash of the session_id for the session that triggered the event
+    Abstract base class for a metric event representing a conversation event. It is not meant to be instantiated directly.
     """
-    anonymized_session_id: str
+    # using the __new__ method to prevent instantiation of the abstract class before the __init__ method is called
+    # this is used in lieu of extending the ABC class since multiple inheritance is not working properly with ABCs
+    # and allows instance creation
+    def __new__(cls, *args, **kwargs):
+        if cls is AbstractConversationEvent:
+            raise TypeError(f"{cls.__name__} is an abstract class and cannot be instantiated directly")
+        return super().__new__(cls)
 
-    # a model validator that obfuscates the "session_id" field passed by any children and replaces it with the field "anonymized_session_id"
-    # the "anonymized_session_id" field is a hash of the stringified version of the "session_id" field
+    anonymized_session_id: str
+    """
+    anonymized_session_id - a hex representation of the md5 hash of the session_id for the session that triggered the event
+    """
+    # using a model_validator instead of an __init__ to obfuscate session_id without needing to pass extra fields to the parent constructor
+    # because the __init__ method of the parent class would be called before the __init__ method of the child class
+    # and the parent class doesnt know about the session_id field
     @model_validator(mode="before")
     def obfuscate_session_id(cls, values):
         if 'session_id' in values:
@@ -96,18 +125,20 @@ class CompassConversationEvent(CompassUserAccountEvent):
 ConversationPhaseLiteral = Literal["INTRO", "COUNSELING", "CHECKOUT", "ENDED"]
 
 
-class ConversationPhaseEvent(CompassConversationEvent):
+class ConversationPhaseEvent(AbstractConversationEvent):
+    """
+    A metric event representing a change in the phase of a conversation
+    """
+    phase: ConversationPhaseLiteral
     """
     phase - the phase of the conversation
     """
-    phase: ConversationPhaseLiteral
 
     def __init__(self, *, user_id: str, session_id: int, phase: ConversationPhaseLiteral):
         super().__init__(
             user_id=user_id,
             session_id=session_id,
             event_type=EventType.CONVERSATION_PHASE,
-            event_type_name=EventType.CONVERSATION_PHASE.name,
             phase=phase
         )
 
@@ -115,45 +146,49 @@ class ConversationPhaseEvent(CompassConversationEvent):
         extra = "forbid"
 
 
-class MessageCreatedEvent(CompassConversationEvent):
-    """
-    message_id - the id of the message
-    """
-    message_id: str
+FeedbackTypeLiteral = Literal["NPS", "CSAT", "CES"]
 
-    def __init__(self, *, user_id: str, session_id: int, message_id: str):
+
+class FeedbackProvidedEvent(AbstractConversationEvent):
+    """
+    A metric event representing the provision of feedback by a user
+    """
+
+    def __init__(self, *, user_id: str, session_id: int):
         super().__init__(
             user_id=user_id,
             session_id=session_id,
-            event_type=EventType.MESSAGE_CREATED,
-            event_type_name=EventType.MESSAGE_CREATED.name,
-            message_id=message_id
+            event_type=EventType.FEEDBACK_SCORE,
         )
 
     class Config:
         extra = "forbid"
 
 
-FeedbackType = Literal["NPS", "CSAT", "CES"]
+class FeedbackScoreEvent(AbstractConversationEvent):
+    """
+    A metric event representing the update of a feedback score
+    """
 
+    feedback_type: FeedbackTypeLiteral
+    """
+    feedback_type - the type of the feedback score
+    """
 
-class FeedbackScoreUpdatedEvent(CompassConversationEvent):
-    """
-    type - the type of the feedback score
-    """
-    type: FeedbackType
-    """
-    value - the value of the feedback score
-    """
     value: int
+    """
+    value - the value of the feedback used to calculate the score.
+        - For NPS, the value is -1, 0, or 1  for Detractor, Passive, Promoter respectively. In a 1-5 scale 1,2,3 are detractors, 4 passive, 5 promoter.
+        - For CSAT, the value is 0 or 1, with 1 being the of respondents who select the highest 2 options on a 1–5 satisfaction scale and 0 being the rest.
+        - For CES, the value is 0 or 1, with 1 being the of respondents who select the highest 2 options on a 1–5 ease scale and 0 being the rest.
+    """
 
-    def __init__(self, *, user_id: str, session_id: int, type: FeedbackType, value: int):
+    def __init__(self, *, user_id: str, session_id: int, feedback_type: FeedbackTypeLiteral, value: int):
         super().__init__(
             user_id=user_id,
             session_id=session_id,
-            event_type=EventType.FEEDBACK_SCORE_UPDATED,
-            event_type_name=EventType.FEEDBACK_SCORE_UPDATED.name,
-            type=type,
+            event_type=EventType.FEEDBACK_SCORE,
+            feedback_type=feedback_type,
             value=value
         )
 
@@ -161,29 +196,50 @@ class FeedbackScoreUpdatedEvent(CompassConversationEvent):
         extra = "forbid"
 
 
-class MessageReactionCreatedEvent(CompassConversationEvent):
+class MessageCreatedEvent(AbstractConversationEvent):
     """
-    message_id - the id of the message
+    A metric event representing the creation of a message in a conversation
     """
+
+    def __init__(self, *, user_id: str, session_id: int, message_id: str):
+        super().__init__(
+            user_id=user_id,
+            session_id=session_id,
+            event_type=EventType.MESSAGE_CREATED,
+        )
+
+    class Config:
+        extra = "forbid"
+
+
+class MessageReactionCreatedEvent(AbstractConversationEvent):
+    """
+    A metric event representing the creation of a reaction to a message
+    """
+
     message_id: str
+    """
+    message_id - the id of the message, required as newer events should overwrite previous reactions
+    """
+
+    kind: str
     """
     kind - the kind of the reaction
     """
-    kind: ReactionKind
+
+    reasons: list[str]
     """
     reasons - the reasons for the reaction
     """
-    reasons: list[DislikeReason]
 
     def __init__(self, *, user_id: str, session_id: int, message_id: str, kind: ReactionKind, reasons: list[DislikeReason]):
         super().__init__(
             user_id=user_id,
             session_id=session_id,
             event_type=EventType.MESSAGE_REACTION_CREATED,
-            event_type_name=EventType.MESSAGE_REACTION_CREATED.name,
             message_id=message_id,
-            kind=kind,
-            reasons=reasons
+            kind=kind.name,
+            reasons=[reason.name for reason in reasons]
         )
 
     class Config:
