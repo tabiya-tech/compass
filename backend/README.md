@@ -373,6 +373,25 @@ The script requires environment variables. Run the script with the following com
  python3 scripts/embeddings/copy_embeddings.py --help
 ```
 
+## Export & Import conversations
+
+We have scripts for exporting and importing conversations for analysis and later importing like in CI/CD integration tests setup.
+
+1. `export.py`: used for exporting conversations from DataBase/JSON to Markdown/JSON.  
+    For more information run the help command.  
+    `./scripts/export_conversation/export_script.py --help`
+
+2. `import.py`: used for importing conversations from source format (DB/JSON) to target store.  
+    For more information run the help command.  
+   `./scripts/export_conversation/import_script.py --help`
+
+**Possible use cases for these scripts. (Not limited to).**
+
+1. Export a conversation from db to markdown for analysis
+2. Import a conversation from one database(dev) to another database(demo) for demo purposes.
+3. Import a conversation for Integration tests setup.
+4. Export a conversation from db to JSON for conversation state analysis.
+
 ## Export users feedback
 
 The script `export_feedback.py` is used to export the feedback data from the database to a CSV file.
