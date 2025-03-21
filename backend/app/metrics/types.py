@@ -1,11 +1,14 @@
+import hashlib
 from datetime import datetime
 from typing import Literal
-from app.conversations.reactions.types import ReactionKind, DislikeReason
-from pydantic import BaseModel, Field, field_serializer
-from app.metrics.constants import EventType
+
+from pydantic import BaseModel, Field, root_validator, field_serializer, model_validator
+
 from app.app_config import get_application_config
+from app.conversations.reactions.types import ReactionKind, DislikeReason
+from app.metrics.constants import EventType
 from common_libs.time_utilities._time_utils import get_now
-import hashlib
+
 
 class CompassMetricEvent(BaseModel):
     """
@@ -15,7 +18,7 @@ class CompassMetricEvent(BaseModel):
     """
     version - the version of the application the event was recorded in
     """
-    version: str = Field(default_factory=lambda:get_application_config().version_info.to_version_string())
+    version: str = Field(default_factory=lambda: get_application_config().version_info.to_version_string())
     """
     event_type - the type of the metric event
     """
@@ -28,10 +31,6 @@ class CompassMetricEvent(BaseModel):
     timestamp - the timestamp of the event
     """
     timestamp: datetime = Field(default_factory=get_now)
-    """
-    anonymized_user_id - a bson representation of the md5 hash of the user_id for the user whose request triggered the event
-    """
-    anonymized_user_id: str
 
     @field_serializer('event_type')
     def serialize_event_type(self, event_type: EventType) -> int:
@@ -41,59 +40,80 @@ class CompassMetricEvent(BaseModel):
         extra = "forbid"
 
 
-class UserAccountCreatedEvent(CompassMetricEvent):
+class CompassUserAccountEvent(CompassMetricEvent):
+    """
+    anonymized_user_id - a bson representation of the md5 hash of the user_id for the user whose request triggered the event
+    """
+    anonymized_user_id: str
+
+    # a model validator that obfuscates the "user_id" field passed by any children and replaces it with the field "anonymized_user_id"
+    # the "anonymized_user_id" field is a hash of the "user_id" field
+    @model_validator(mode="before")
+    def obfuscate_user_id(cls, values):
+        if 'user_id' in values:
+            values['anonymized_user_id'] = hashlib.md5(values['user_id'].encode(), usedforsecurity=False).hexdigest()
+            del values['user_id']
+        return values
+
+    class Config:
+        extra = "forbid"
+
+
+class UserAccountCreatedEvent(CompassUserAccountEvent):
     """
     A metric event representing a user account creation.
     """
-
-    def __init__(self, *,
-                 user_id: str):
-        # obfuscate the user_id using md5, and store it as anonymized_user_id
-        # usedForSecurity is set to False to avoid linting error, since we do not need a cryptographically secure hash
-        anonymized_user_id = hashlib.md5(user_id.encode(), usedforsecurity=False).hexdigest()
+    def __init__(self, *, user_id: str):
         super().__init__(
+            user_id=user_id,
             event_type=EventType.USER_ACCOUNT_CREATED,
-            event_type_name = EventType.USER_ACCOUNT_CREATED.name,
-            anonymized_user_id=anonymized_user_id
+            event_type_name=EventType.USER_ACCOUNT_CREATED.name,
         )
 
     class Config:
         extra = "forbid"
 
 
-class CompassConversationEvent(CompassMetricEvent):
+class CompassConversationEvent(CompassUserAccountEvent):
     """
     anonymized_session_id - a bson representation of the md5 hash of the session_id for the session that triggered the event
     """
     anonymized_session_id: str
 
+    # a model validator that obfuscates the "session_id" field passed by any children and replaces it with the field "anonymized_session_id"
+    # the "anonymized_session_id" field is a hash of the stringified version of the "session_id" field
+    @model_validator(mode="before")
+    def obfuscate_session_id(cls, values):
+        if 'session_id' in values:
+            values['anonymized_session_id'] = hashlib.md5(str(values['session_id']).encode(), usedforsecurity=False).hexdigest()
+            del values['session_id']
+        return values
+
     class Config:
         extra = "forbid"
 
 
-# we can add more phases as we add more events fot intermediate phases
-ConversationPhase = Literal["INTRO", "COUNSELING", "CHECKOUT", "ENDED"]
+ConversationPhaseLiteral = Literal["INTRO", "COUNSELING", "CHECKOUT", "ENDED"]
 
 
 class ConversationPhaseEvent(CompassConversationEvent):
     """
     phase - the phase of the conversation
     """
-    phase: ConversationPhase
+    phase: ConversationPhaseLiteral
 
-    def __init__(self, *,
-                 anonymized_user_id: str,
-                 phase: ConversationPhase,
-                 anonymized_session_id: str):
+    def __init__(self, *, user_id: str, session_id: int, phase: ConversationPhaseLiteral):
         super().__init__(
+            user_id=user_id,
+            session_id=session_id,
             event_type=EventType.CONVERSATION_PHASE,
-            event_type_name = EventType.CONVERSATION_PHASE.name,
-            anonymized_user_id=anonymized_user_id,
-            phase=phase,
-            anonymized_session_id=anonymized_session_id
+            event_type_name=EventType.CONVERSATION_PHASE.name,
+            phase=phase
         )
+
     class Config:
         extra = "forbid"
+
 
 class MessageCreatedEvent(CompassConversationEvent):
     """
@@ -101,22 +121,21 @@ class MessageCreatedEvent(CompassConversationEvent):
     """
     message_id: str
 
-    def __init__(self, *,
-                 anonymized_user_id: str,
-                 message_id: str,
-                 anonymized_session_id: str):
+    def __init__(self, *, user_id: str, session_id: int, message_id: str):
         super().__init__(
+            user_id=user_id,
+            session_id=session_id,
             event_type=EventType.MESSAGE_CREATED,
-            event_type_name = EventType.MESSAGE_CREATED.name,
-            anonymized_user_id=anonymized_user_id,
-            message_id=message_id,
-            anonymized_session_id=anonymized_session_id
+            event_type_name=EventType.MESSAGE_CREATED.name,
+            message_id=message_id
         )
 
     class Config:
         extra = "forbid"
 
+
 FeedbackType = Literal["NPS", "CSAT", "CES"]
+
 
 class FeedbackScoreUpdatedEvent(CompassConversationEvent):
     """
@@ -128,22 +147,19 @@ class FeedbackScoreUpdatedEvent(CompassConversationEvent):
     """
     value: int
 
-    def __init__(self, *,
-                 anonymized_user_id: str,
-                 type: FeedbackType,
-                 value: int,
-                 anonymized_session_id: str):
+    def __init__(self, *, user_id: str, session_id: int, type: FeedbackType, value: int):
         super().__init__(
+            user_id=user_id,
+            session_id=session_id,
             event_type=EventType.FEEDBACK_SCORE_UPDATED,
-            event_type_name = EventType.FEEDBACK_SCORE_UPDATED.name,
-            anonymized_user_id=anonymized_user_id,
+            event_type_name=EventType.FEEDBACK_SCORE_UPDATED.name,
             type=type,
-            value=value,
-            anonymized_session_id=anonymized_session_id
+            value=value
         )
 
     class Config:
         extra = "forbid"
+
 
 class MessageReactionCreatedEvent(CompassConversationEvent):
     """
@@ -159,22 +175,16 @@ class MessageReactionCreatedEvent(CompassConversationEvent):
     """
     reasons: list[DislikeReason]
 
-    def __init__(self, *,
-                 anonymized_user_id: str,
-                 message_id: str,
-                 kind: ReactionKind,
-                 reasons: list[DislikeReason],
-                 anonymized_session_id: str):
+    def __init__(self, *, user_id: str, session_id: int, message_id: str, kind: ReactionKind, reasons: list[DislikeReason]):
         super().__init__(
+            user_id=user_id,
+            session_id=session_id,
             event_type=EventType.MESSAGE_REACTION_CREATED,
-            event_type_name = EventType.MESSAGE_REACTION_CREATED.name,
-            anonymized_user_id=anonymized_user_id,
+            event_type_name=EventType.MESSAGE_REACTION_CREATED.name,
             message_id=message_id,
             kind=kind,
-            reasons=reasons,
-            anonymized_session_id=anonymized_session_id
+            reasons=reasons
         )
 
     class Config:
         extra = "forbid"
-

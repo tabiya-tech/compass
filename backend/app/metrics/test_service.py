@@ -23,7 +23,6 @@ def _get_metric_event():
         event_type=EventType.USER_ACCOUNT_CREATED,
         event_type_name="USER_ACCOUNT_CREATED",
         version="test",
-        anonymized_user_id="test",
     )
 
 
@@ -44,7 +43,8 @@ class TestMetricsService:
         service = MetricsService(_mock_metrics_repository)
         await service.record_event(metric_event)
 
-        # THEN the event is recorded with the environment name
-        event_with_env = metric_event.model_dump()
-        event_with_env["environment_name"] = "test"
+        # THEN the event is recorded with the correct environment name
+        metric_event.environment_name = setup_application_config.environment_name
+
+        # AND the repository is called with the event
         _mock_metrics_repository.record_event.assert_called_once_with([metric_event])
