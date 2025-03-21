@@ -1,0 +1,1461 @@
+{
+  "session_id": 1,
+  "agent_director_state": {
+    "session_id": 1,
+    "current_phase": "ENDED",
+    "conversation_conducted_at": "2025-04-10T15:50:42.210000Z"
+  },
+  "explore_experiences_director_state": {
+    "session_id": 1,
+    "country_of_user": "UNSPECIFIED",
+    "experiences_state": {
+      "e170edb3-1b87-4f57-bbfb-82fdb6863e74": {
+        "dive_in_phase": "PROCESSED",
+        "experience": {
+          "uuid": "e170edb3-1b87-4f57-bbfb-82fdb6863e74",
+          "experience_title": "Baker",
+          "company": "SampleCompanyA",
+          "location": "SampleCity",
+          "timeline": {
+            "start": "2020/01",
+            "end": "2023/08"
+          },
+          "work_type": "FORMAL_SECTOR_WAGED_EMPLOYMENT",
+          "responsibilities": {
+            "responsibilities": [
+              "I am done",
+              "I bake bread",
+              "I get to work",
+              "I get up",
+              "I get a list of confectionary items to bake from my boss",
+              "I bake croissants occasionally",
+              "I work in the kitchen",
+              "I go home",
+              "I bake cookies"
+            ],
+            "non_responsibilities": [
+              "I do not want to talk about my experience as a baker"
+            ],
+            "other_peoples_responsibilities": []
+          },
+          "esco_occupations": [],
+          "top_skills": [
+            {
+              "id": "",
+              "modelId": "673b3fc9b52651611ad13a80",
+              "UUID": "86c1cd65-5e1e-4018-90cd-a8ef446e4bfc",
+              "preferredLabel": "work according to recipe",
+              "altLabels": [
+                "work according to recipes",
+                "employ according to recipe",
+                "work according to recipe",
+                "working according to recipes",
+                "prepare according to recipe",
+                "conduct according to recipe",
+                "create according to recipe"
+              ],
+              "description": "Perform tasks in food preparation according to recipe or specification in order to preserve the quality of ingredients and to ensure replication accuracy of the recipe. Select the appropriate materials to follow the recipe, taking into account the current situation.",
+              "score": 0.81829833984375,
+              "skillType": "skill/competence"
+            },
+            {
+              "id": "",
+              "modelId": "673b3fc9b52651611ad13a80",
+              "UUID": "5267b318-ce74-4575-abb6-5e1c70165b85",
+              "preferredLabel": "follow production schedule",
+              "altLabels": [
+                "comply with production schedules",
+                "follow production schedules",
+                "comply with workplan",
+                "follow production schedule",
+                "ensure compliance with production schedules",
+                "read production schedules",
+                "consider production schedules",
+                "use production schedules",
+                "respect production schedules",
+                "utilise production schedules",
+                "follow a production schedule",
+                "comply with schedule for production",
+                "comply with production schedule"
+              ],
+              "description": "Follow production schedule taking into account all requirements, times and needs. This schedule outlines what individual commodities must be produced in each time period and encapsulates various concerns like production, staffing, inventory, etc. It is usually linked to manufacturing where the plan indicates when and how much of each product will be demanded. Utilise all the information in the actual implementation of the plan.",
+              "score": 0.7884708046913147,
+              "skillType": "skill/competence"
+            },
+            {
+              "id": "",
+              "modelId": "673b3fc9b52651611ad13a80",
+              "UUID": "afbca0a6-df43-4693-bd5d-6a86c79250ba",
+              "preferredLabel": "prepare bakery products",
+              "altLabels": [
+                "prepare dough products",
+                "bake bread",
+                "cook bakery products",
+                "cook cakes and biscuits",
+                "cook and finish chocolate products",
+                "prepare bakery products",
+                "prepare products of bakery",
+                "prepare bread"
+              ],
+              "description": "Make bakery products such as bread and pasta by preparing dough, using proper techniques, recipes and equipment to achieve ready bakery items, combining with other products if necessary.",
+              "score": 0.8751418590545654,
+              "skillType": "skill/competence"
+            },
+            {
+              "id": "",
+              "modelId": "673b3fc9b52651611ad13a80",
+              "UUID": "295ab92d-ff8b-4c1e-93f2-98f207f6f53e",
+              "preferredLabel": "bake goods",
+              "altLabels": [
+                "bake a good",
+                "bake",
+                "bake products",
+                "baking goods",
+                "bake goods"
+              ],
+              "description": "Perform all tasks for baking such as oven preparation and product loading, until the baked goods are discharged from it.",
+              "score": 0.8446567058563232,
+              "skillType": "skill/competence"
+            },
+            {
+              "id": "",
+              "modelId": "673b3fc9b52651611ad13a80",
+              "UUID": "e492de75-fa50-4d13-9a6c-0c1feb9ac358",
+              "preferredLabel": "follow written instructions",
+              "altLabels": [
+                "follow written instructions",
+                "follow guidebook",
+                "execute tasks in accordance with written instructions",
+                "adhere to written instructions",
+                "perform tasks according to written instructions",
+                "carry out tasks in accordance with written directions",
+                "adhere to written directions",
+                "follow manual",
+                "follow written directions",
+                "complete tasks according to written instructions",
+                "perform procedures according to written directions"
+              ],
+              "description": "Follow written directions in order to perform a task or carry out a step-by-step procedure.",
+              "score": 0.8028810024261475,
+              "skillType": "skill/competence"
+            }
+          ]
+        }
+      },
+      "b6415688-69ae-40a6-b157-b11d39e82097": {
+        "dive_in_phase": "PROCESSED",
+        "experience": {
+          "uuid": "b6415688-69ae-40a6-b157-b11d39e82097",
+          "experience_title": "Professional Guitarist",
+          "company": "SampleCompanyB",
+          "location": "Addis Ababa",
+          "timeline": {
+            "start": "2019",
+            "end": "2020"
+          },
+          "work_type": "FORMAL_SECTOR_WAGED_EMPLOYMENT",
+          "responsibilities": {
+            "responsibilities": [
+              "I played from those",
+              "I read music sheets",
+              "I composed my own music",
+              "I played the music",
+              "I took care of the instruments"
+            ],
+            "non_responsibilities": [
+              "I do not want to talk about my experience as a professional guitarist",
+              "I did not do much else"
+            ],
+            "other_peoples_responsibilities": [
+              "The band played as a group",
+              "the band rehearsed the music"
+            ]
+          },
+          "esco_occupations": [],
+          "top_skills": [
+            {
+              "id": "",
+              "modelId": "673b3fc9b52651611ad13a80",
+              "UUID": "3ca77c57-33d8-474a-8067-6e612d11b8b5",
+              "preferredLabel": "perform live",
+              "altLabels": [
+                "appear live",
+                "perform live",
+                "play live",
+                "performing live"
+              ],
+              "description": "Perform in front of live audiences.",
+              "score": 0.812267005443573,
+              "skillType": "skill/competence"
+            },
+            {
+              "id": "",
+              "modelId": "673b3fc9b52651611ad13a80",
+              "UUID": "ede051e1-8bbf-4134-89a4-98571b206fc0",
+              "preferredLabel": "read musical score",
+              "altLabels": [
+                "read musical score",
+                "interpret musical score",
+                "read musical scores",
+                "understand musical score",
+                "reading musical score"
+              ],
+              "description": "Read the musical score during rehearsal and live performance.",
+              "score": 0.9179655909538269,
+              "skillType": "skill/competence"
+            },
+            {
+              "id": "",
+              "modelId": "673b3fc9b52651611ad13a80",
+              "UUID": "30d2493e-15e4-4091-a13f-d023b730887e",
+              "preferredLabel": "write songs",
+              "altLabels": [
+                "write songs",
+                "create songs",
+                "write song",
+                "compose songs",
+                "writing songs"
+              ],
+              "description": "Write the lyrics or melody for songs.",
+              "score": 0.8559614419937134,
+              "skillType": "skill/competence"
+            },
+            {
+              "id": "",
+              "modelId": "673b3fc9b52651611ad13a80",
+              "UUID": "872d9ea3-976e-4d6c-ab2a-154d8ade0650",
+              "preferredLabel": "musical instruments",
+              "altLabels": [
+                "instruments for music",
+                "music instruments",
+                "musical tools",
+                "music devices",
+                "musical instruments"
+              ],
+              "description": "The different musical instruments, their ranges, timbre, and possible combinations.",
+              "score": 0.8490257263183594,
+              "skillType": "knowledge"
+            },
+            {
+              "id": "",
+              "modelId": "673b3fc9b52651611ad13a80",
+              "UUID": "ce939f2b-cba6-4a79-a1d5-ca7f3b6d898c",
+              "preferredLabel": "maintain musical instruments",
+              "altLabels": [
+                "keep up musical instruments",
+                "oversee musical instruments",
+                "maintaining musical instruments",
+                "maintain music instruments",
+                "keep musical instruments in good condition",
+                "maintain musical instruments"
+              ],
+              "description": "Check and maintain musical instruments.",
+              "score": 0.9018501043319702,
+              "skillType": "skill/competence"
+            }
+          ]
+        }
+      }
+    },
+    "current_experience_uuid": null,
+    "conversation_phase": "DIVE_IN"
+  },
+  "conversation_memory_manager_state": {
+    "session_id": 1,
+    "all_history": {
+      "turns": [
+        {
+          "index": 1,
+          "input": {
+            "message_id": "67f7e6cda6b8f912b339cbea",
+            "message": "(silence)",
+            "is_artificial": true,
+            "sent_at": "2025-04-10T15:42:05.478414+00:00"
+          },
+          "output": {
+            "message_id": "67f7e6d0a6b8f912b339cbeb",
+            "message_for_user": "Welcome! I'm Compass, your skills exploration guide.  Are you ready to begin?",
+            "finished": false,
+            "agent_type": "WELCOME_AGENT",
+            "agent_response_time_in_sec": 2.49,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 1752,
+                "response_token_count": 53,
+                "response_time_in_sec": 2.49
+              }
+            ],
+            "sent_at": "2025-04-10T15:42:08.192618+00:00"
+          }
+        },
+        {
+          "index": 2,
+          "input": {
+            "message_id": "67f7e6dca6b8f912b339cbee",
+            "message": "hi lets start",
+            "is_artificial": false,
+            "sent_at": "2025-04-10T15:42:20.920674+00:00"
+          },
+          "output": {
+            "message_id": "67f7e6dfa6b8f912b339cbef",
+            "message_for_user": "Great, you can now start exploring your work experiences.",
+            "finished": true,
+            "agent_type": "WELCOME_AGENT",
+            "agent_response_time_in_sec": 2.43,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 1774,
+                "response_token_count": 55,
+                "response_time_in_sec": 2.43
+              }
+            ],
+            "sent_at": "2025-04-10T15:42:30.801563+00:00"
+          }
+        },
+        {
+          "index": 3,
+          "input": {
+            "message_id": "67f7e6dfa6b8f912b339cbf0",
+            "message": "(silence)",
+            "is_artificial": true,
+            "sent_at": "2025-04-10T15:42:23.576018+00:00"
+          },
+          "output": {
+            "message_id": "67f7e6e6a6b8f912b339cbf1",
+            "message_for_user": "Okay, great!  We're going to start by getting a general overview of your work experiences.  Don't worry, we'll go into more detail about each one later.  This is just to get a big picture of what you've done. \n\nHave you ever worked for a company or someone else's business for money?  Even if it was just a short-term job or a part-time gig, let me know! \n",
+            "finished": false,
+            "agent_type": "COLLECT_EXPERIENCES_AGENT",
+            "agent_response_time_in_sec": 2.38,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 3284,
+                "response_token_count": 29,
+                "response_time_in_sec": 2.31
+              },
+              {
+                "error": "",
+                "prompt_token_count": 106,
+                "response_token_count": 97,
+                "response_time_in_sec": 2.38
+              }
+            ],
+            "sent_at": "2025-04-10T15:42:30.801591+00:00"
+          }
+        },
+        {
+          "index": 4,
+          "input": {
+            "message_id": "67f7e721a6b8f912b339cbf4",
+            "message": "I was a baker. In addis ababa. A bakeruy named etsub bakery. I started in january 2020 and stopped in august 2023. It was a paid job",
+            "is_artificial": false,
+            "sent_at": "2025-04-10T15:43:29.748383+00:00"
+          },
+          "output": {
+            "message_id": "67f7e72ba6b8f912b339cbf5",
+            "message_for_user": "Okay, so you were a baker at Etsub Bakery in Addis Ababa.  That's great!  So, you started in January 2020 and worked until August 2023.  And it was a paid job.  \n\nGot it, can you tell me what kind of work was it? Was it a full-time job, a part-time job, or something else?",
+            "finished": false,
+            "agent_type": "COLLECT_EXPERIENCES_AGENT",
+            "agent_response_time_in_sec": 2.88,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 3324,
+                "response_token_count": 477,
+                "response_time_in_sec": 4.47
+              },
+              {
+                "error": "",
+                "prompt_token_count": 3348,
+                "response_token_count": 88,
+                "response_time_in_sec": 2.88
+              }
+            ],
+            "sent_at": "2025-04-10T15:43:42.254978+00:00"
+          }
+        },
+        {
+          "index": 5,
+          "input": {
+            "message_id": "67f7e735a6b8f912b339cbf6",
+            "message": "it was full time",
+            "is_artificial": false,
+            "sent_at": "2025-04-10T15:43:49.634481+00:00"
+          },
+          "output": {
+            "message_id": "67f7e73ea6b8f912b339cbf7",
+            "message_for_user": "Okay, so you were a full-time baker at Etsub Bakery in SampleCity.  You started in January 2020 and worked until August 2023.  \n\nCool, do you have any other experiences working for a company or someone else's business for money?",
+            "finished": false,
+            "agent_type": "COLLECT_EXPERIENCES_AGENT",
+            "agent_response_time_in_sec": 2.74,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 3700,
+                "response_token_count": 259,
+                "response_time_in_sec": 3.28
+              },
+              {
+                "error": "",
+                "prompt_token_count": 3442,
+                "response_token_count": 64,
+                "response_time_in_sec": 2.74
+              }
+            ],
+            "sent_at": "2025-04-10T15:44:00.695853+00:00"
+          }
+        },
+        {
+          "index": 6,
+          "input": {
+            "message_id": "67f7e745a6b8f912b339cbf8",
+            "message": "yes I was a professional guitarist. It was from 2019 to 2020 and it was in samplecity. I was paid, ful time and the band name was led zeppelin",
+            "is_artificial": false,
+            "sent_at": "2025-04-10T15:44:05.131253+00:00"
+          },
+          "output": {
+            "message_id": "67f7e74ea6b8f912b339cbf9",
+            "message_for_user": "Okay, so you were a professional guitarist in a band called Led Zeppelin in SampleCity.  You started in 2019 and worked until 2020.  It was a full-time paid job. \n\nDo you have any other experiences working for a company or someone else's business for money?",
+            "finished": false,
+            "agent_type": "COLLECT_EXPERIENCES_AGENT",
+            "agent_response_time_in_sec": 2.37,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 3792,
+                "response_token_count": 506,
+                "response_time_in_sec": 4.22
+              },
+              {
+                "error": "",
+                "prompt_token_count": 3630,
+                "response_token_count": 69,
+                "response_time_in_sec": 2.37
+              }
+            ],
+            "sent_at": "2025-04-10T15:44:16.526578+00:00"
+          }
+        },
+        {
+          "index": 7,
+          "input": {
+            "message_id": "67f7e774a6b8f912b339cbfa",
+            "message": "no I dont do that",
+            "is_artificial": false,
+            "sent_at": "2025-04-10T15:44:52.968602+00:00"
+          },
+          "output": {
+            "message_id": "67f7e77fa6b8f912b339cbfd",
+            "message_for_user": "Okay, so we've covered your experiences working for a company or someone else's business for money.  Now, I'd love to know, have you ever done any work for yourself, like running your own business or doing freelance or contract work?",
+            "finished": false,
+            "agent_type": "COLLECT_EXPERIENCES_AGENT",
+            "agent_response_time_in_sec": 2.48,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 3900,
+                "response_token_count": 88,
+                "response_time_in_sec": 2.94
+              },
+              {
+                "error": "",
+                "prompt_token_count": 3470,
+                "response_token_count": 55,
+                "response_time_in_sec": 2.48
+              }
+            ],
+            "sent_at": "2025-04-10T15:45:06.267074+00:00"
+          }
+        },
+        {
+          "index": 8,
+          "input": {
+            "message_id": "67f7e78da6b8f912b339cbfe",
+            "message": "no I dont do that",
+            "is_artificial": false,
+            "sent_at": "2025-04-10T15:45:17.095961+00:00"
+          },
+          "output": {
+            "message_id": "67f7e797a6b8f912b339cc01",
+            "message_for_user": "Okay, let's move on to a different type of work.  Can you tell me about any experiences you've had working as an unpaid trainee for a company or organization?",
+            "finished": false,
+            "agent_type": "COLLECT_EXPERIENCES_AGENT",
+            "agent_response_time_in_sec": 2.68,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 3863,
+                "response_token_count": 81,
+                "response_time_in_sec": 2.64
+              },
+              {
+                "error": "",
+                "prompt_token_count": 3453,
+                "response_token_count": 39,
+                "response_time_in_sec": 2.68
+              }
+            ],
+            "sent_at": "2025-04-10T15:45:29.708492+00:00"
+          }
+        },
+        {
+          "index": 9,
+          "input": {
+            "message_id": "67f7e79fa6b8f912b339cc02",
+            "message": "no I dont do that",
+            "is_artificial": false,
+            "sent_at": "2025-04-10T15:45:35.040888+00:00"
+          },
+          "output": {
+            "message_id": "67f7e7a9a6b8f912b339cc05",
+            "message_for_user": "Okay, let's switch gears a bit.  Tell me, have you ever done any unpaid work for the community, like volunteering, or helping out friends or family?",
+            "finished": false,
+            "agent_type": "COLLECT_EXPERIENCES_AGENT",
+            "agent_response_time_in_sec": 2.33,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 3794,
+                "response_token_count": 72,
+                "response_time_in_sec": 2.85
+              },
+              {
+                "error": "",
+                "prompt_token_count": 3477,
+                "response_token_count": 37,
+                "response_time_in_sec": 2.33
+              }
+            ],
+            "sent_at": "2025-04-10T15:45:48.395324+00:00"
+          }
+        },
+        {
+          "index": 10,
+          "input": {
+            "message_id": "67f7e7b3a6b8f912b339cc06",
+            "message": "no I dont do that",
+            "is_artificial": false,
+            "sent_at": "2025-04-10T15:45:55.056322+00:00"
+          },
+          "output": {
+            "message_id": "67f7e7bda6b8f912b339cc09",
+            "message_for_user": "Let's recap the information we have collected so far:\n\n\u2022 Baker (Waged Employment), 2020/01 - 2023/08, Etsub Bakery, SampleCity\n\n\u2022 Professional Guitarist (Waged Employment), 2019 - 2020, Led Zeppelin, SampleCity\n\nIs there anything you would like to add or change? If you think one of the experiences seems to be duplicated, you can ask me to remove it.",
+            "finished": false,
+            "agent_type": "COLLECT_EXPERIENCES_AGENT",
+            "agent_response_time_in_sec": 2.84,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 3773,
+                "response_token_count": 88,
+                "response_time_in_sec": 2.69
+              },
+              {
+                "error": "",
+                "prompt_token_count": 3105,
+                "response_token_count": 106,
+                "response_time_in_sec": 2.84
+              }
+            ],
+            "sent_at": "2025-04-10T15:46:08.037391+00:00"
+          }
+        },
+        {
+          "index": 11,
+          "input": {
+            "message_id": "67f7e7c6a6b8f912b339cc0a",
+            "message": "looks good",
+            "is_artificial": false,
+            "sent_at": "2025-04-10T15:46:14.723809+00:00"
+          },
+          "output": {
+            "message_id": "67f7e7cea6b8f912b339cc0b",
+            "message_for_user": "Thank you for sharing your experiences. Let's move on to the next step.",
+            "finished": true,
+            "agent_type": "COLLECT_EXPERIENCES_AGENT",
+            "agent_response_time_in_sec": 2.52,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 3824,
+                "response_token_count": 29,
+                "response_time_in_sec": 2.63
+              },
+              {
+                "error": "",
+                "prompt_token_count": 3146,
+                "response_token_count": 11,
+                "response_time_in_sec": 2.52
+              }
+            ],
+            "sent_at": "2025-04-10T15:46:29.018010+00:00"
+          }
+        },
+        {
+          "index": 12,
+          "input": {
+            "message_id": "67f7e7d1a6b8f912b339cc0d",
+            "message": "(silence)",
+            "is_artificial": true,
+            "sent_at": "2025-04-10T15:46:25.361689+00:00"
+          },
+          "output": {
+            "message_id": "67f7e7d3a6b8f912b339cc0e",
+            "message_for_user": "Okay, cool! So, let's talk about your experience as a baker. \n\nWe're going to explore what that was like for you. I'll ask you some questions, and I want you to try and be as descriptive as possible in your answers. The more you tell me about your experience, the better we can understand it. \n\nSo, tell me, what was a typical day at work like for you?",
+            "finished": false,
+            "agent_type": "EXPLORE_SKILLS_AGENT",
+            "agent_response_time_in_sec": 2.64,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 564,
+                "response_token_count": 92,
+                "response_time_in_sec": 2.64
+              }
+            ],
+            "sent_at": "2025-04-10T15:46:29.018091+00:00"
+          }
+        },
+        {
+          "index": 13,
+          "input": {
+            "message_id": "67f7e7daa6b8f912b339cc10",
+            "message": "I get up. Get to work. I get a list of confectionary items to bake from my boss. I work in the kitchen until I am done and then I go home",
+            "is_artificial": false,
+            "sent_at": "2025-04-10T15:46:34.652906+00:00"
+          },
+          "output": {
+            "message_id": "67f7e7e4a6b8f912b339cc11",
+            "message_for_user": "That's a good start. Can you tell me a little more about what you do in the kitchen? What are some of the tasks you do each day?",
+            "finished": false,
+            "agent_type": "EXPLORE_SKILLS_AGENT",
+            "agent_response_time_in_sec": 2.17,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 1176,
+                "response_token_count": 99,
+                "response_time_in_sec": 2.53
+              },
+              {
+                "error": "",
+                "prompt_token_count": 932,
+                "response_token_count": 120,
+                "response_time_in_sec": 2.6
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1920,
+                "response_token_count": 35,
+                "response_time_in_sec": 2.17
+              }
+            ],
+            "sent_at": "2025-04-10T15:46:47.206696+00:00"
+          }
+        },
+        {
+          "index": 14,
+          "input": {
+            "message_id": "67f7e7eba6b8f912b339cc12",
+            "message": "I bake bread, cookies. The occasional croissant",
+            "is_artificial": false,
+            "sent_at": "2025-04-10T15:46:51.639572+00:00"
+          },
+          "output": {
+            "message_id": "67f7e7f5a6b8f912b339cc13",
+            "message_for_user": "Okay, so you bake a variety of things.  Can you tell me a little more about how you decide what to bake each day?",
+            "finished": false,
+            "agent_type": "EXPLORE_SKILLS_AGENT",
+            "agent_response_time_in_sec": 2.4,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 1126,
+                "response_token_count": 44,
+                "response_time_in_sec": 2.38
+              },
+              {
+                "error": "",
+                "prompt_token_count": 902,
+                "response_token_count": 66,
+                "response_time_in_sec": 2.18
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1870,
+                "response_token_count": 30,
+                "response_time_in_sec": 2.4
+              }
+            ],
+            "sent_at": "2025-04-10T15:47:04.202053+00:00"
+          }
+        },
+        {
+          "index": 15,
+          "input": {
+            "message_id": "67f7e7fca6b8f912b339cc14",
+            "message": "I dont want to talk about this anymore. Can we move on?",
+            "is_artificial": false,
+            "sent_at": "2025-04-10T15:47:08.578060+00:00"
+          },
+          "output": {
+            "message_id": "67f7e806a6b8f912b339cc15",
+            "message_for_user": "Thank you for sharing these details! I have all the information I need.",
+            "finished": true,
+            "agent_type": "EXPLORE_SKILLS_AGENT",
+            "agent_response_time_in_sec": 2.31,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 1120,
+                "response_token_count": 56,
+                "response_time_in_sec": 2.43
+              },
+              {
+                "error": "",
+                "prompt_token_count": 914,
+                "response_token_count": 70,
+                "response_time_in_sec": 2.45
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1865,
+                "response_token_count": 33,
+                "response_time_in_sec": 2.31
+              }
+            ],
+            "sent_at": "2025-04-10T15:48:21.999317+00:00"
+          }
+        },
+        {
+          "index": 16,
+          "input": {
+            "message_id": "67f7e840a6b8f912b339cc17",
+            "message": "(silence)",
+            "is_artificial": true,
+            "sent_at": "2025-04-10T15:48:16.206474+00:00"
+          },
+          "output": {
+            "message_id": "67f7e840a6b8f912b339cc16",
+            "message_for_user": "After examining the information you provided, I identified the following skills:\n\u2022 work according to recipe\n\u2022 follow production schedule\n\u2022 prepare bakery products\n\u2022 bake goods\n\u2022 follow written instructions\n",
+            "finished": false,
+            "agent_type": "EXPLORE_EXPERIENCES_AGENT",
+            "agent_response_time_in_sec": 53.99,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 325,
+                "response_token_count": 173,
+                "response_time_in_sec": 2.69
+              },
+              {
+                "error": "",
+                "prompt_token_count": 404,
+                "response_token_count": 91,
+                "response_time_in_sec": 2.79
+              },
+              {
+                "error": "",
+                "prompt_token_count": 7360,
+                "response_token_count": 592,
+                "response_time_in_sec": 6.52
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1187,
+                "response_token_count": 190,
+                "response_time_in_sec": 3.08
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1161,
+                "response_token_count": 204,
+                "response_time_in_sec": 3.33
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1155,
+                "response_token_count": 206,
+                "response_time_in_sec": 3.32
+              },
+              {
+                "error": "",
+                "prompt_token_count": 675,
+                "response_token_count": 101,
+                "response_time_in_sec": 2.6
+              },
+              {
+                "error": "",
+                "prompt_token_count": 386,
+                "response_token_count": 161,
+                "response_time_in_sec": 2.89
+              },
+              {
+                "error": "",
+                "prompt_token_count": 7082,
+                "response_token_count": 968,
+                "response_time_in_sec": 11.11
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1127,
+                "response_token_count": 238,
+                "response_time_in_sec": 1.74
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1206,
+                "response_token_count": 183,
+                "response_time_in_sec": 2.31
+              },
+              {
+                "error": "",
+                "prompt_token_count": 591,
+                "response_token_count": 70,
+                "response_time_in_sec": 1.79
+              },
+              {
+                "error": "",
+                "prompt_token_count": 386,
+                "response_token_count": 124,
+                "response_time_in_sec": 2.74
+              },
+              {
+                "error": "",
+                "prompt_token_count": 7115,
+                "response_token_count": 659,
+                "response_time_in_sec": 5.21
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1179,
+                "response_token_count": 185,
+                "response_time_in_sec": 3.22
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1186,
+                "response_token_count": 230,
+                "response_time_in_sec": 3.43
+              },
+              {
+                "error": "",
+                "prompt_token_count": 628,
+                "response_token_count": 86,
+                "response_time_in_sec": 1.08
+              },
+              {
+                "error": "",
+                "prompt_token_count": 382,
+                "response_token_count": 125,
+                "response_time_in_sec": 2.88
+              },
+              {
+                "error": "",
+                "prompt_token_count": 5799,
+                "response_token_count": 643,
+                "response_time_in_sec": 8.44
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1195,
+                "response_token_count": 194,
+                "response_time_in_sec": 3.26
+              },
+              {
+                "error": "",
+                "prompt_token_count": 616,
+                "response_token_count": 72,
+                "response_time_in_sec": 0.97
+              },
+              {
+                "error": "",
+                "prompt_token_count": 381,
+                "response_token_count": 119,
+                "response_time_in_sec": 2.82
+              },
+              {
+                "error": "",
+                "prompt_token_count": 7824,
+                "response_token_count": 1090,
+                "response_time_in_sec": 10.75
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1057,
+                "response_token_count": 177,
+                "response_time_in_sec": 3.13
+              },
+              {
+                "error": "",
+                "prompt_token_count": 460,
+                "response_token_count": 82,
+                "response_time_in_sec": 1.1
+              }
+            ],
+            "sent_at": "2025-04-10T15:48:21.999353+00:00"
+          }
+        },
+        {
+          "index": 17,
+          "input": {
+            "message_id": "67f7e842a6b8f912b339cc18",
+            "message": "(silence)",
+            "is_artificial": true,
+            "sent_at": "2025-04-10T15:48:18.153410+00:00"
+          },
+          "output": {
+            "message_id": "67f7e844a6b8f912b339cc19",
+            "message_for_user": "Okay, let's dive into your experience as a professional guitarist. \n\nWe're going to explore this part of your life in more detail. I'll be asking you some questions, and it would be really helpful if you could try to be as descriptive as possible in your answers. The more you tell me about your experience, the better we can understand it. \n\nSo, tell me, what was a typical day like when you were working as a guitarist?",
+            "finished": false,
+            "agent_type": "EXPLORE_SKILLS_AGENT",
+            "agent_response_time_in_sec": 2.69,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 650,
+                "response_token_count": 99,
+                "response_time_in_sec": 2.69
+              }
+            ],
+            "sent_at": "2025-04-10T15:48:21.999364+00:00"
+          }
+        },
+        {
+          "index": 18,
+          "input": {
+            "message_id": "67f7e860a6b8f912b339cc1a",
+            "message": "I played what the band rehearsed. we played as a group. I read music sheets and played from those. ocasionally composed my own music",
+            "is_artificial": false,
+            "sent_at": "2025-04-10T15:48:48.886315+00:00"
+          },
+          "output": {
+            "message_id": "67f7e86ba6b8f912b339cc1b",
+            "message_for_user": "That's great! So you were part of a band, and you played what the band rehearsed. That's a really important part of being a musician, working together as a team. \n\nCan you tell me more about what else you did at work?  What other tasks were part of your day as a guitarist?",
+            "finished": false,
+            "agent_type": "EXPLORE_SKILLS_AGENT",
+            "agent_response_time_in_sec": 2.6,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 1203,
+                "response_token_count": 84,
+                "response_time_in_sec": 2.55
+              },
+              {
+                "error": "",
+                "prompt_token_count": 926,
+                "response_token_count": 115,
+                "response_time_in_sec": 2.63
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1957,
+                "response_token_count": 70,
+                "response_time_in_sec": 2.6
+              }
+            ],
+            "sent_at": "2025-04-10T15:49:02.731462+00:00"
+          }
+        },
+        {
+          "index": 19,
+          "input": {
+            "message_id": "67f7e877a6b8f912b339cc1c",
+            "message": "nothing much else. took care of instruments",
+            "is_artificial": false,
+            "sent_at": "2025-04-10T15:49:11.038685+00:00"
+          },
+          "output": {
+            "message_id": "67f7e881a6b8f912b339cc1d",
+            "message_for_user": "Okay, so taking care of your instruments was also part of your responsibilities. That's important to keep your equipment in good shape. \n\nI'm curious, what did you do to take care of your instruments?",
+            "finished": false,
+            "agent_type": "EXPLORE_SKILLS_AGENT",
+            "agent_response_time_in_sec": 2.49,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 1255,
+                "response_token_count": 45,
+                "response_time_in_sec": 2.36
+              },
+              {
+                "error": "",
+                "prompt_token_count": 905,
+                "response_token_count": 65,
+                "response_time_in_sec": 2.18
+              },
+              {
+                "error": "",
+                "prompt_token_count": 2008,
+                "response_token_count": 48,
+                "response_time_in_sec": 2.49
+              }
+            ],
+            "sent_at": "2025-04-10T15:49:24.040252+00:00"
+          }
+        },
+        {
+          "index": 20,
+          "input": {
+            "message_id": "67f7e890a6b8f912b339cc1e",
+            "message": "I dont want to talk about this anymore. Can we move on?",
+            "is_artificial": false,
+            "sent_at": "2025-04-10T15:49:36.971641+00:00"
+          },
+          "output": {
+            "message_id": "67f7e89ba6b8f912b339cc1f",
+            "message_for_user": "Thank you for sharing these details! I have all the information I need.",
+            "finished": true,
+            "agent_type": "EXPLORE_SKILLS_AGENT",
+            "agent_response_time_in_sec": 2.44,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 1305,
+                "response_token_count": 57,
+                "response_time_in_sec": 2.38
+              },
+              {
+                "error": "",
+                "prompt_token_count": 915,
+                "response_token_count": 72,
+                "response_time_in_sec": 2.19
+              },
+              {
+                "error": "",
+                "prompt_token_count": 2058,
+                "response_token_count": 39,
+                "response_time_in_sec": 2.44
+              }
+            ],
+            "sent_at": "2025-04-10T15:50:42.210082+00:00"
+          }
+        },
+        {
+          "index": 21,
+          "input": {
+            "message_id": "67f7e8cba6b8f912b339cc21",
+            "message": "(silence)",
+            "is_artificial": true,
+            "sent_at": "2025-04-10T15:50:35.567962+00:00"
+          },
+          "output": {
+            "message_id": "67f7e8cba6b8f912b339cc20",
+            "message_for_user": "After examining the information you provided, I identified the following skills:\n\u2022 perform live\n\u2022 read musical score\n\u2022 write songs\n\u2022 musical instruments\n\u2022 maintain musical instruments\n",
+            "finished": false,
+            "agent_type": "EXPLORE_EXPERIENCES_AGENT",
+            "agent_response_time_in_sec": 45.85,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 382,
+                "response_token_count": 80,
+                "response_time_in_sec": 2.33
+              },
+              {
+                "error": "",
+                "prompt_token_count": 6694,
+                "response_token_count": 451,
+                "response_time_in_sec": 4.09
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1043,
+                "response_token_count": 185,
+                "response_time_in_sec": 3.02
+              },
+              {
+                "error": "",
+                "prompt_token_count": 546,
+                "response_token_count": 74,
+                "response_time_in_sec": 2.49
+              },
+              {
+                "error": "",
+                "prompt_token_count": 382,
+                "response_token_count": 92,
+                "response_time_in_sec": 2.79
+              },
+              {
+                "error": "",
+                "prompt_token_count": 6719,
+                "response_token_count": 465,
+                "response_time_in_sec": 5.83
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1082,
+                "response_token_count": 186,
+                "response_time_in_sec": 2.28
+              },
+              {
+                "error": "",
+                "prompt_token_count": 534,
+                "response_token_count": 70,
+                "response_time_in_sec": 1.82
+              },
+              {
+                "error": "",
+                "prompt_token_count": 383,
+                "response_token_count": 207,
+                "response_time_in_sec": 2.95
+              },
+              {
+                "error": "",
+                "prompt_token_count": 7067,
+                "response_token_count": 565,
+                "response_time_in_sec": 9.69
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1051,
+                "response_token_count": 187,
+                "response_time_in_sec": 2.01
+              },
+              {
+                "error": "",
+                "prompt_token_count": 555,
+                "response_token_count": 65,
+                "response_time_in_sec": 0.93
+              },
+              {
+                "error": "",
+                "prompt_token_count": 382,
+                "response_token_count": 194,
+                "response_time_in_sec": 2.85
+              },
+              {
+                "error": "",
+                "prompt_token_count": 7564,
+                "response_token_count": 519,
+                "response_time_in_sec": 10.87
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1047,
+                "response_token_count": 152,
+                "response_time_in_sec": 1.35
+              },
+              {
+                "error": "",
+                "prompt_token_count": 458,
+                "response_token_count": 76,
+                "response_time_in_sec": 1.0
+              },
+              {
+                "error": "",
+                "prompt_token_count": 384,
+                "response_token_count": 127,
+                "response_time_in_sec": 2.62
+              },
+              {
+                "error": "",
+                "prompt_token_count": 5393,
+                "response_token_count": 453,
+                "response_time_in_sec": 7.53
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1060,
+                "response_token_count": 209,
+                "response_time_in_sec": 2.47
+              },
+              {
+                "error": "",
+                "prompt_token_count": 582,
+                "response_token_count": 76,
+                "response_time_in_sec": 0.96
+              }
+            ],
+            "sent_at": "2025-04-10T15:50:42.210144+00:00"
+          }
+        },
+        {
+          "index": 22,
+          "input": {
+            "message_id": "67f7e8cda6b8f912b339cc23",
+            "message": "(silence)",
+            "is_artificial": true,
+            "sent_at": "2025-04-10T15:50:37.843935+00:00"
+          },
+          "output": {
+            "message_id": "67f7e8d0a6b8f912b339cc24",
+            "message_for_user": "Based on our conversation, I've identified the following skills: \"work according to recipe\", \"follow production schedule\", \"prepare bakery products\", \"bake goods\", \"follow written instructions\", \"perform live\", \"read musical score\", \"write songs\", \"musical instruments\", \"maintain musical instruments\". It was great getting to know you! Goodbye.",
+            "finished": true,
+            "agent_type": "FAREWELL_AGENT",
+            "agent_response_time_in_sec": 2.44,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 1029,
+                "response_token_count": 116,
+                "response_time_in_sec": 2.44
+              }
+            ],
+            "sent_at": "2025-04-10T15:50:42.210165+00:00"
+          }
+        }
+      ]
+    },
+    "unsummarized_history": {
+      "turns": [
+        {
+          "index": 20,
+          "input": {
+            "message_id": "67f7e890a6b8f912b339cc1e",
+            "message": "I dont want to talk about this anymore. Can we move on?",
+            "is_artificial": false,
+            "sent_at": "2025-04-10T15:49:36.971641+00:00"
+          },
+          "output": {
+            "message_id": "67f7e89ba6b8f912b339cc1f",
+            "message_for_user": "Thank you for sharing these details! I have all the information I need.",
+            "finished": true,
+            "agent_type": "EXPLORE_SKILLS_AGENT",
+            "agent_response_time_in_sec": 2.44,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 1305,
+                "response_token_count": 57,
+                "response_time_in_sec": 2.38
+              },
+              {
+                "error": "",
+                "prompt_token_count": 915,
+                "response_token_count": 72,
+                "response_time_in_sec": 2.19
+              },
+              {
+                "error": "",
+                "prompt_token_count": 2058,
+                "response_token_count": 39,
+                "response_time_in_sec": 2.44
+              }
+            ],
+            "sent_at": "2025-04-10T15:50:42.210082+00:00"
+          }
+        },
+        {
+          "index": 21,
+          "input": {
+            "message_id": "67f7e8cba6b8f912b339cc21",
+            "message": "(silence)",
+            "is_artificial": true,
+            "sent_at": "2025-04-10T15:50:35.567962+00:00"
+          },
+          "output": {
+            "message_id": "67f7e8cba6b8f912b339cc20",
+            "message_for_user": "After examining the information you provided, I identified the following skills:\n\u2022 perform live\n\u2022 read musical score\n\u2022 write songs\n\u2022 musical instruments\n\u2022 maintain musical instruments\n",
+            "finished": false,
+            "agent_type": "EXPLORE_EXPERIENCES_AGENT",
+            "agent_response_time_in_sec": 45.85,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 382,
+                "response_token_count": 80,
+                "response_time_in_sec": 2.33
+              },
+              {
+                "error": "",
+                "prompt_token_count": 6694,
+                "response_token_count": 451,
+                "response_time_in_sec": 4.09
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1043,
+                "response_token_count": 185,
+                "response_time_in_sec": 3.02
+              },
+              {
+                "error": "",
+                "prompt_token_count": 546,
+                "response_token_count": 74,
+                "response_time_in_sec": 2.49
+              },
+              {
+                "error": "",
+                "prompt_token_count": 382,
+                "response_token_count": 92,
+                "response_time_in_sec": 2.79
+              },
+              {
+                "error": "",
+                "prompt_token_count": 6719,
+                "response_token_count": 465,
+                "response_time_in_sec": 5.83
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1082,
+                "response_token_count": 186,
+                "response_time_in_sec": 2.28
+              },
+              {
+                "error": "",
+                "prompt_token_count": 534,
+                "response_token_count": 70,
+                "response_time_in_sec": 1.82
+              },
+              {
+                "error": "",
+                "prompt_token_count": 383,
+                "response_token_count": 207,
+                "response_time_in_sec": 2.95
+              },
+              {
+                "error": "",
+                "prompt_token_count": 7067,
+                "response_token_count": 565,
+                "response_time_in_sec": 9.69
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1051,
+                "response_token_count": 187,
+                "response_time_in_sec": 2.01
+              },
+              {
+                "error": "",
+                "prompt_token_count": 555,
+                "response_token_count": 65,
+                "response_time_in_sec": 0.93
+              },
+              {
+                "error": "",
+                "prompt_token_count": 382,
+                "response_token_count": 194,
+                "response_time_in_sec": 2.85
+              },
+              {
+                "error": "",
+                "prompt_token_count": 7564,
+                "response_token_count": 519,
+                "response_time_in_sec": 10.87
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1047,
+                "response_token_count": 152,
+                "response_time_in_sec": 1.35
+              },
+              {
+                "error": "",
+                "prompt_token_count": 458,
+                "response_token_count": 76,
+                "response_time_in_sec": 1.0
+              },
+              {
+                "error": "",
+                "prompt_token_count": 384,
+                "response_token_count": 127,
+                "response_time_in_sec": 2.62
+              },
+              {
+                "error": "",
+                "prompt_token_count": 5393,
+                "response_token_count": 453,
+                "response_time_in_sec": 7.53
+              },
+              {
+                "error": "",
+                "prompt_token_count": 1060,
+                "response_token_count": 209,
+                "response_time_in_sec": 2.47
+              },
+              {
+                "error": "",
+                "prompt_token_count": 582,
+                "response_token_count": 76,
+                "response_time_in_sec": 0.96
+              }
+            ],
+            "sent_at": "2025-04-10T15:50:42.210144+00:00"
+          }
+        },
+        {
+          "index": 22,
+          "input": {
+            "message_id": "67f7e8cda6b8f912b339cc23",
+            "message": "(silence)",
+            "is_artificial": true,
+            "sent_at": "2025-04-10T15:50:37.843935+00:00"
+          },
+          "output": {
+            "message_id": "67f7e8d0a6b8f912b339cc24",
+            "message_for_user": "Based on our conversation, I've identified the following skills: \"work according to recipe\", \"follow production schedule\", \"prepare bakery products\", \"bake goods\", \"follow written instructions\", \"perform live\", \"read musical score\", \"write songs\", \"musical instruments\", \"maintain musical instruments\". It was great getting to know you! Goodbye.",
+            "finished": true,
+            "agent_type": "FAREWELL_AGENT",
+            "agent_response_time_in_sec": 2.44,
+            "llm_stats": [
+              {
+                "error": "",
+                "prompt_token_count": 1029,
+                "response_token_count": 116,
+                "response_time_in_sec": 2.44
+              }
+            ],
+            "sent_at": "2025-04-10T15:50:42.210165+00:00"
+          }
+        }
+      ]
+    },
+    "to_be_summarized_history": {
+      "turns": []
+    },
+    "summary": "I told you I was a full-time baker and a professional guitarist. You asked me about my work experience, and I confirmed that I had no other paid work experience. We then discussed my experience as a baker in more detail. You asked me to describe a typical day at work, and I told you I get up, go to work, get a list of confectionary items to bake from my boss, work in the kitchen until I am done, and then go home. You asked me to tell you more about what I do in the kitchen. I told you I bake bread, cookies, and the occasional croissant. You asked me how I decide what to bake each day. I then decided I didn't want to talk about this anymore and asked to move on. You acknowledged my request and said you had all the information you needed. You then identified the following skills based on my responses: work according to recipe, follow production schedule, prepare bakery products, bake goods, and follow written instructions. You then asked me to describe a typical day as a professional guitarist. I told you I played what the band rehearsed, played as a group, read music sheets and played from those, and occasionally composed my own music. You acknowledged that this is an important part of being a musician, working together as a team. You then asked me to tell you more about what else I did at work. I told you I took care of my instruments. You asked me to tell you more about how I took care of my instruments. \n"
+  },
+  "collect_experience_state": {
+    "session_id": 1,
+    "country_of_user": "UNSPECIFIED",
+    "collected_data": [
+      {
+        "index": 0,
+        "defined_at_turn_number": 4,
+        "experience_title": "Baker",
+        "company": "SampleCompanyA",
+        "location": "SampleCity",
+        "start_date": "2020/01",
+        "end_date": "2023/08",
+        "paid_work": true,
+        "work_type": "FORMAL_SECTOR_WAGED_EMPLOYMENT"
+      },
+      {
+        "index": 1,
+        "defined_at_turn_number": 6,
+        "experience_title": "Professional Guitarist",
+        "company": "SampleCompanyB",
+        "location": "SampleCity",
+        "start_date": "2019",
+        "end_date": "2020",
+        "paid_work": true,
+        "work_type": "FORMAL_SECTOR_WAGED_EMPLOYMENT"
+      }
+    ],
+    "unexplored_types": [],
+    "explored_types": [
+      "FORMAL_SECTOR_WAGED_EMPLOYMENT",
+      "SELF_EMPLOYMENT",
+      "FORMAL_SECTOR_UNPAID_TRAINEE_WORK",
+      "UNSEEN_UNPAID"
+    ],
+    "first_time_visit": false
+  },
+  "skills_explorer_agent_state": {
+    "session_id": 1,
+    "country_of_user": "UNSPECIFIED",
+    "first_time_for_experience": {
+      "e170edb3-1b87-4f57-bbfb-82fdb6863e74": false,
+      "b6415688-69ae-40a6-b157-b11d39e82097": false
+    },
+    "experiences_explored": [
+      "Baker (), 2020/01 - 2023/08, Etsub Bakery, SampleCity\n",
+      "Professional Guitarist (), 2019 - 2020, Led Zeppelin, SampleCity\n"
+    ]
+  }
+}

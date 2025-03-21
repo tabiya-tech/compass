@@ -1,0 +1,22 @@
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  default:
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+handlers:
+  console:
+    (): logging.StreamHandler
+    formatter: default
+    stream: ext://sys.stdout
+
+#loggers:
+#  JSONApplicationStateStore:
+#    level: DEBUG
+#    handlers: [console]
+#    propagate: false
+
+root:
+  level: INFO
+  handlers: [console]
