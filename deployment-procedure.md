@@ -118,6 +118,8 @@ Create a service account that will be used to set up the realm:
     - At the **organization level** assign the roles:
         - `Organization Role Administrator (roles/iam.organizationRoleAdmin)`
         - `Billing Account Administrator (roles/billing.admin)`
+        - `Deny Admin (roles/iam.denyAdmin)`
+        - `Tag Administrator (roles/resourcemanager.tagAdmin)`
     - At the **realm's root folder level** assign the roles:
         - `Folder Admin (roles/resourcemanager.folderAdmin)`
         - `Service Usage Admin (roles/serviceusage.serviceUsageAdmin)`
@@ -152,6 +154,12 @@ config:
   base_domain_name: "<base_domain_name>"  # Base domain (e.g., tabiya.tech). It must be the top level domain.
   gcp_upper_env_google_oauth_projects_folder_id: "<upper_env_google_oauth_projects_folder_id>"  # Folder ID for upper environment google oauth projects. Use the one from Step 1.4.
   gcp_lower_env_google_oauth_projects_folder_id: "<lower_env_google_oauth_projects_folder_id>"  # Folder ID for lower environment google oauth projects. Use the one from Step 1.4.
+
+  # Keep this value to true in production
+  protected_from_deletion: true  # Set to true to protect the realm important resources from accidental deletion.
+
+  protected_from_deletion_tag_key: tagKeys/123 # Tag key for the protected_from_deletion tag. Use the one from Step of tags.
+  protected_from_deletion_tag_true_value: tagValues/123 # Tag value for the protected_from_deletion tag. Use the one from Step of tags. The true value.
 ```
 
 > **ATTENTION**: Do not check the `Pulumi.<REALM_NAME>.yaml` file to the repository, as it contains sensitive information.
@@ -173,6 +181,7 @@ config:
        config:
          gcp:region: "<region>"  # GCP region for the environment
          environment_type: "<dev | test | prod>"  # Environment type
+         protected_from_deletion: "<true | false>" # Set to true to protect the environment from accidental deletion.
    ```  
 
 ### Step 1.9: Setup Sentry.
@@ -374,7 +383,7 @@ Refer to the [Invitation Codes README](/invitations.md) for instructions on impo
 
 ### Step 4.5: Generate Encryption Keys.
 
-Refer to the [Encryption Keys README](/sensitive-data-protection.md#create-an-rsa-privatepublic-key) for instructions on generating RSA encryption keys.
+Refer to the [Encryption Keys README](/sensitive-data-protection.md#create-an-rsa-privatepublic-key-pair) for instructions on generating RSA encryption keys.
 
 - **Private Key**: Must be kept secure and not shared.
 - **Public Key**: Used to encrypt sensitive data.
@@ -539,3 +548,38 @@ gcloud config set project <PROJECT>
 ### How to authenticate AWS.
 
 - For authenticating to the AWS please refer to this [pulumi documentation.](https://www.pulumi.com/registry/packages/aws/installation-configuration/)
+
+
+-----
+
+### Protect an environment from Deletion.
+
+To protect an environment from deletion tag the project with the `protect_from_deletion` tag. The tag is defined in [the step of creating tags,](#protected-from-deletion)
+
+## Google Cloud Platform Organization Setup (One time)
+
+Our infrastructure is deployed on Google Cloud Platform (GCP) under an organization. Before deploying our infrastructure, a few initial setups are required.
+
+### Tags
+
+Tags are used to identify and manage resources within the organization. We will use tags to categorize and enforce policies on resources.
+
+### Protected From Deletion
+
+To prevent accidental deletion of critical resources (such as production projects), create a tag specifically for this purpose.
+
+#### Tag Details:
+
+- **Name:** `protect_from_deletion` (or another relevant name of your choice)
+- **Description:** Use this tag to protect projects from accidental deletions.
+- **Values:**
+    - `true`
+        - **Short Name:** `true`
+        - **Description:** When this tag is applied, all principals (`public:all`) will be denied the `projects.delete` permission (`cloudresourcemanager.googleapis.com/projects.delete`).
+
+
+#### **Implementation:**
+
+- The tag **must** be created at the **organization level** to ensure it can be applied across all projects.
+- This setup is a **one-time configuration** for the organization.
+
