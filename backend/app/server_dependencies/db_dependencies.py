@@ -1,5 +1,4 @@
 import asyncio
-from enum import unique
 from typing import Optional
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
@@ -9,8 +8,6 @@ from .database_collections import Collections
 import logging
 
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
-
-logger = logging.getLogger(__name__)
 
 
 async def _get_database_connection_info(database: AsyncIOMotorDatabase) -> str:
@@ -89,12 +86,17 @@ class CompassDBProvider:
     """
     Provides the taxonomy and application database instances.
     """
-    _settings = MongoDbSettings()
     _application_mongo_db: Optional[AsyncIOMotorDatabase] = None
     _taxonomy_mongo_db: Optional[AsyncIOMotorDatabase] = None
     _userdata_mongo_db: Optional[AsyncIOMotorDatabase] = None
     _lock = asyncio.Lock()
     _logger = logging.getLogger(__qualname__)
+
+    @staticmethod
+    def _get_settings() -> MongoDbSettings:
+        # Deffer reading the settings until the first time they are needed
+        # Otherwise, the settings will be read at import time which can cause issues with unset environment variables during testing
+        return MongoDbSettings()
 
     @staticmethod
     async def initialize_userdata_mongo_db(userdata_db: AsyncIOMotorDatabase, logger: logging.Logger):
@@ -105,7 +107,7 @@ class CompassDBProvider:
             await userdata_db.get_collection(Collections.SENSITIVE_PERSONAL_DATA).create_index([
                 ("user_id", 1)
             ], unique=True)
-            
+
             logger.info("Finished creating indexes for the userdata database")
         except Exception as e:
             logger.exception(e)
@@ -178,8 +180,8 @@ class CompassDBProvider:
                 if cls._application_mongo_db is None:  # Double-check after acquiring the lock
                     cls._logger.info("Connecting to Application MongoDB")
                     # Create the database instance
-                    cls._application_mongo_db = _get_application_db(cls._settings.application_mongodb_uri,
-                                                                    cls._settings.application_database_name)
+                    cls._application_mongo_db = _get_application_db(cls._get_settings().application_mongodb_uri,
+                                                                    cls._get_settings().application_database_name)
                     cls._logger.info("Connected to Application MongoDB database: %s",
                                      await _get_database_connection_info(cls._application_mongo_db))
                     if not await check_mongo_health(cls._application_mongo_db.client):
@@ -200,8 +202,8 @@ class CompassDBProvider:
                     cls._logger.info("Connecting to Userdata MongoDB")
                     # Create the database instance
                     cls._userdata_mongo_db = _get_userdata_db(
-                        cls._settings.userdata_mongodb_uri,
-                        cls._settings.userdata_database_name
+                        cls._get_settings().userdata_mongodb_uri,
+                        cls._get_settings().userdata_database_name
                     )
                     cls._logger.info("Connected to Userdata MongoDB database: %s",
                                      await _get_database_connection_info(cls._userdata_mongo_db))
@@ -217,8 +219,8 @@ class CompassDBProvider:
                 if cls._taxonomy_mongo_db is None:  # Double-check after acquiring the lock
                     cls._logger.info("Connecting to Taxonomy MongoDB")
                     # Create the database instance
-                    cls._taxonomy_mongo_db = _get_taxonomy_db(cls._settings.taxonomy_mongodb_uri,
-                                                              cls._settings.taxonomy_database_name)
+                    cls._taxonomy_mongo_db = _get_taxonomy_db(cls._get_settings().taxonomy_mongodb_uri,
+                                                              cls._get_settings().taxonomy_database_name)
                     cls._logger.info("Connected to MongoDB database: %s",
                                      await _get_database_connection_info(cls._taxonomy_mongo_db))
                     if not await check_mongo_health(cls._taxonomy_mongo_db.client):

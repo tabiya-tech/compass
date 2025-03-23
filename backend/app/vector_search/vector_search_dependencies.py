@@ -43,8 +43,6 @@ async def _get_gecko_embeddings() -> GoogleGeckoEmbeddingService:
     return _embeddings_service_singleton
 
 
-_vector_search_settings = VectorSearchSettings()
-
 # Define a singleton instance of the skill search service
 _skill_search_service_singleton: SimilaritySearchService[SkillEntity] | None = None
 
@@ -62,6 +60,7 @@ async def get_skill_search_service(db: AsyncIOMotorDatabase = Depends(CompassDBP
                     index_name=_embedding_config.embedding_index,
                     embedding_key=_embedding_config.embedding_key,
                 )
+                _vector_search_settings = VectorSearchSettings()
                 _skill_search_service_singleton = SkillSearchService(db, embedding_model, skill_vector_search_config, _vector_search_settings)
 
     return _skill_search_service_singleton
@@ -84,6 +83,7 @@ async def get_occupation_search_service(db: AsyncIOMotorDatabase = Depends(Compa
                     index_name=_embedding_config.embedding_index,
                     embedding_key=_embedding_config.embedding_key,
                 )
+                _vector_search_settings = VectorSearchSettings()
                 _occupation_search_service_singleton = OccupationSearchService(db, embedding_model, occupation_vector_search_config, _vector_search_settings)
 
     return _occupation_search_service_singleton
@@ -101,6 +101,7 @@ async def get_occupation_skill_search_service(db: AsyncIOMotorDatabase = Depends
         async with _lock:  # before modifying the singleton instance, acquire the lock
             if _occupation_skill_search_service_singleton is None:  # double check after acquiring the lock
                 logger.info("Creating a new instance of the occupation search service.")
+                _vector_search_settings = VectorSearchSettings()
                 _occupation_skill_search_service_singleton = OccupationSkillSearchService(db, embedding_model, _vector_search_settings)
 
     return _occupation_skill_search_service_singleton

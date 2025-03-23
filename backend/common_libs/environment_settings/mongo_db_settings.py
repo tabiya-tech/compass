@@ -1,9 +1,10 @@
-from pydantic import Field
 from pydantic_settings import BaseSettings
 
 
 class MongoDbSettings(BaseSettings):
-    """ Settings for the MongoDB database. """
+    """
+    Settings for the MongoDB database.
+    """
 
     application_mongodb_uri: str
     """
@@ -34,4 +35,3 @@ class MongoDbSettings(BaseSettings):
     """
     The name of the taxonomy database
     """
-
