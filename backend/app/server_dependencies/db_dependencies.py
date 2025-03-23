@@ -77,6 +77,14 @@ def _get_taxonomy_db(mongodb_uri: str, db_name: str) -> AsyncIOMotorDatabase:
     ).get_database(db_name)
 
 
+async def check_mongo_health(client: AsyncIOMotorClient) -> bool:
+    try:
+        result = await client.admin.command("ping")
+        return result.get("ok") == 1.0
+    except Exception:
+        return False
+
+
 class CompassDBProvider:
     """
     Provides the taxonomy and application database instances.
@@ -174,6 +182,10 @@ class CompassDBProvider:
                                                                     cls._settings.application_database_name)
                     cls._logger.info("Connected to Application MongoDB database: %s",
                                      await _get_database_connection_info(cls._application_mongo_db))
+                    if not await check_mongo_health(cls._application_mongo_db.client):
+                        raise RuntimeError("MongoDB health check failed for Application database")
+                    cls._logger.info("Successfully pinged Application MongoDB")
+
         return cls._application_mongo_db
 
     @classmethod
@@ -193,6 +205,9 @@ class CompassDBProvider:
                     )
                     cls._logger.info("Connected to Userdata MongoDB database: %s",
                                      await _get_database_connection_info(cls._userdata_mongo_db))
+                    if not await check_mongo_health(cls._userdata_mongo_db.client):
+                        raise RuntimeError("MongoDB health check failed for Userdata database")
+                    cls._logger.info("Successfully pinged Userdata MongoDB")
         return cls._userdata_mongo_db
 
     @classmethod
@@ -206,4 +221,7 @@ class CompassDBProvider:
                                                               cls._settings.taxonomy_database_name)
                     cls._logger.info("Connected to MongoDB database: %s",
                                      await _get_database_connection_info(cls._taxonomy_mongo_db))
+                    if not await check_mongo_health(cls._taxonomy_mongo_db.client):
+                        raise RuntimeError("MongoDB health check failed for Taxonomy database")
+                    cls._logger.info("Successfully pinged Taxonomy MongoDB")
         return cls._taxonomy_mongo_db
