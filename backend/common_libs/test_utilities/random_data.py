@@ -6,6 +6,10 @@ import string
 import random
 
 
+def get_random_session_id():
+    return random.randint(0, (1 << 48) - 1)  # nosec B311 # random number for a test session
+
+
 def get_random_printable_string(length: int):
     """
     Generate a random string of a given length

@@ -46,7 +46,7 @@ def setup_agent_director(setup_search_services) -> tuple[
         Coroutine[None, None, None]
     ]
 ]:
-    session_id = session_id = random.randint(10 ** 9, 10 ** 10 - 1)  # nosec B311 # random number for a test session
+    session_id = get_random_session_id()
     # The conversation manager for this test
     conversation_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
     conversation_manager.set_state(state=ConversationMemoryManagerState(session_id=session_id))
