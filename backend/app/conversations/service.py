@@ -102,6 +102,8 @@ class ConversationService(IConversationService):
 
         # set the state of the agent director, the conversation memory manager and all the agents
         state = await self._application_state_manager.get_state(session_id)
+        # get the previous state of the experiences before any changes happen to compare for transitions
+        previous_experiences_state = state.explore_experiences_director_state.experiences_state
 
         # Check if the conversation has ended
         if state.agent_director_state.current_phase == ConversationPhase.ENDED:
@@ -125,6 +127,7 @@ class ConversationService(IConversationService):
         response = await get_messages_from_conversation_manager(context, from_index=current_index)
         # get the date when the conversation was conducted
         state.agent_director_state.conversation_conducted_at = datetime.now(timezone.utc)
+
         # Count for number of experiences explored in the conversation
         experiences_explored = 0
 
@@ -132,6 +135,16 @@ class ConversationService(IConversationService):
             # Check if the experience has been processed and has top skills
             if exp.dive_in_phase == DiveInPhase.PROCESSED and len(exp.experience.top_skills) > 0:
                 experiences_explored += 1
+                # Check if this experience just transitioned to PROCESSED
+                previous_exp_state = previous_experiences_state.get()
+                if previous_exp_state and previous_exp_state.dive_in_phase != DiveInPhase.PROCESSED:
+                    await self._metrics_service.record_event(
+                        ConversationPhaseEvent(
+                            user_id=user_id,
+                            session_id=session_id,
+                            phase="EXPERIENCE_EXPLORED"
+                        )
+                    )
 
         # save the state, before responding to the user
         await self._application_state_manager.save_state(state)

@@ -47,6 +47,26 @@ class MetricsRepository(IMetricsRepository):
                     {"$set": self._to_db_doc(event)},
                     upsert=True
                 ))
+            elif event.event_type == EventType.MESSAGE_REACTION_CREATED:
+                #  A message reaction can be updated multiple times, so we should upsert it
+                commands.append(UpdateOne(
+                    {
+                        "anonymized_session_id": {
+                            "$eq": event.anonymized_session_id
+                        },
+                        "anonymized_user_id": {
+                            "$eq": event.anonymized_user_id
+                        },
+                        "event_type": {
+                            "$eq": EventType.MESSAGE_REACTION_CREATED.value
+                        },
+                        "message_id": {
+                            "$eq": event.message_id
+                        }
+                    },
+                    {"$set": self._to_db_doc(event)},
+                    upsert=True
+                ))
             else:
                 commands.append(InsertOne(self._to_db_doc(event)))
         return await self.collection.bulk_write(commands)
