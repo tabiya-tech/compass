@@ -122,7 +122,7 @@ class AbstractConversationEvent(AbstractUserAccountEvent):
         extra = "forbid"
 
 
-ConversationPhaseLiteral = Literal["INTRO", "COUNSELING", "CHECKOUT", "ENDED"]
+ConversationPhaseLiteral = Literal["INTRO", "COUNSELING", "CHECKOUT", "ENDED", "EXPERIENCE_EXPLORED"]
 
 
 class ConversationPhaseEvent(AbstractConversationEvent):

@@ -144,6 +144,7 @@ class TestRecordEvent:
             get_conversation_phase_event("COUNSELING"),
             get_conversation_phase_event("CHECKOUT"),
             get_conversation_phase_event("ENDED"),
+            get_conversation_phase_event("EXPERIENCE_EXPLORED"),
             get_feedback_provided_event(),
             get_feedback_score_event("NPS"),
             get_feedback_score_event("CSAT"),
