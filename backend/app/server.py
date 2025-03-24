@@ -113,7 +113,7 @@ async def lifespan(_app: FastAPI):
     await asyncio.gather(
         CompassDBProvider.initialize_application_mongo_db(application_db, logger),
         CompassDBProvider.initialize_userdata_mongo_db(userdata_db, logger),
-        CompassDBProvider.initialize_metrics_mongo_db(userdata_db, logger)
+        CompassDBProvider.initialize_metrics_mongo_db(metrics_db, logger)
     )
 
     yield
