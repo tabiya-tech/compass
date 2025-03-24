@@ -158,7 +158,7 @@ class FeedbackProvidedEvent(AbstractConversationEvent):
         super().__init__(
             user_id=user_id,
             session_id=session_id,
-            event_type=EventType.FEEDBACK_SCORE,
+            event_type=EventType.FEEDBACK_PROVIDED,
         )
 
     class Config:
@@ -201,7 +201,7 @@ class MessageCreatedEvent(AbstractConversationEvent):
     A metric event representing the creation of a message in a conversation
     """
 
-    def __init__(self, *, user_id: str, session_id: int, message_id: str):
+    def __init__(self, *, user_id: str, session_id: int):
         super().__init__(
             user_id=user_id,
             session_id=session_id,
