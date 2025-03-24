@@ -10,6 +10,8 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Path
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from app.metrics.get_metrics_service import get_metrics_service
+from app.metrics.service import IMetricsService
 from app.context_vars import session_id_ctx_var, user_id_ctx_var
 from app.application_state import ApplicationStateManager
 from app.constants.errors import HTTPErrorResponse
@@ -30,6 +32,7 @@ logger = logging.getLogger(__name__)
 # This service cannot be a singleton since it has state that should not be shared
 # across requests (application_state_manager state and conversation_memory_manager_state)
 async def get_reaction_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db),
+                               metrics_service: IMetricsService = Depends(get_metrics_service),
                              conversation_memory_manager: ConversationMemoryManager = Depends(
                                  get_conversation_memory_manager),
                              application_state_manager: ApplicationStateManager = Depends(
@@ -37,7 +40,9 @@ async def get_reaction_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvi
     return ReactionService(
         reaction_repository=ReactionRepository(db),
         conversation_memory_manager=conversation_memory_manager,
-        application_state_manager=application_state_manager)
+        application_state_manager=application_state_manager,
+        metrics_service=metrics_service
+    )
 
 
 async def get_user_preferences_repository(
@@ -170,7 +175,7 @@ def add_reaction_routes(conversation_router: APIRouter, auth: Authentication):
                 raise UnauthorizedSessionAccessError(user_info.user_id, session_id)
 
             reaction = reaction_request.to_reaction(message_id=message_id, session_id=session_id)
-            added_reaction = await reaction_service.add(reaction)
+            added_reaction = await reaction_service.add(reaction, user_info.user_id)
             return _ReactionResponse.from_reaction(added_reaction)
         except ReactingToUserMessageError as e:
             warning_msg = str(e)

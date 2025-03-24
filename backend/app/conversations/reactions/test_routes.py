@@ -9,7 +9,7 @@ from fastapi import FastAPI, APIRouter
 from fastapi.testclient import TestClient
 
 from app.conversations.reactions.routes import add_reaction_routes, get_reaction_service, \
-    get_user_preferences_repository, _ReactionRequest, _ReactionResponse
+    get_user_preferences_repository, _ReactionRequest
 from app.conversations.reactions.service import IReactionService
 from app.conversations.reactions.types import ReactionKind, DislikeReason, Reaction
 from app.users.repositories import IUserPreferenceRepository
@@ -38,7 +38,7 @@ def _create_test_client_with_mocks(auth) -> TestClientWithMocks:
 
     # Mock the reaction service
     class MockedReactionService(IReactionService):
-        async def add(self, reaction: Reaction) -> Reaction:
+        async def add(self, reaction: Reaction, user_id: str) -> Reaction:
             return Reaction(
                 id="mock_doc_id",
                 session_id=reaction.session_id,
@@ -149,7 +149,6 @@ class TestReactionRoutes:
         # THEN the response is CREATED
         assert response.status_code == HTTPStatus.CREATED
 
-
         # AND the response contains the created reaction
         response_data = response.json()
         assert response_data["session_id"] == given_session_id
@@ -173,6 +172,9 @@ class TestReactionRoutes:
         assert actual_reaction.session_id == given_session_id
         assert actual_reaction.message_id == given_message_id
         assert actual_reaction.kind == ReactionKind(given_reaction.kind)
+
+        assert _add_spy.call_args[0][1] == mocked_user.user_id
+
         assert [r for r in actual_reaction.reasons] == given_reaction.reasons
 
     @pytest.mark.asyncio

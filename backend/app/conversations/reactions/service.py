@@ -8,6 +8,8 @@ from app.application_state import IApplicationStateManager
 from app.conversation_memory.conversation_memory_manager import IConversationMemoryManager
 from app.conversations.reactions.repository import IReactionRepository
 from app.conversations.reactions.types import Reaction
+from app.metrics.service import IMetricsService
+from app.metrics.types import MessageReactionCreatedEvent
 
 
 class ReactingToUserMessageError(Exception):
@@ -22,11 +24,12 @@ class IReactionService(ABC):
     """Interface for managing reactions to messages."""
 
     @abstractmethod
-    async def add(self, reaction: Reaction) -> Reaction:
+    async def add(self, reaction: Reaction, user_id: str) -> Reaction:
         """
         Creates or updates a reaction to a message.
 
         :param reaction: The reaction to store
+        :param user_id: The id of the user who created the reaction
         :return: The stored reaction
         :raises ReactingToUserMessageError: If attempting to react to a user message
         :raises Exception: If any other error occurs
@@ -50,16 +53,19 @@ class ReactionService(IReactionService):
     
     def __init__(self, *, reaction_repository: IReactionRepository,
                  conversation_memory_manager: IConversationMemoryManager,
-                 application_state_manager: IApplicationStateManager):
+                 application_state_manager: IApplicationStateManager,
+                 metrics_service: IMetricsService):
         self._reaction_repository = reaction_repository
         self._conversation_memory_manager = conversation_memory_manager
         self._application_state_manager = application_state_manager
+        self._metrics_service = metrics_service
         self._logger = logging.getLogger(ReactionService.__name__)
 
-    async def add(self, reaction: Reaction) -> Reaction:
+    async def add(self, reaction: Reaction, user_id: str) -> Reaction:
         """
         Creates or updates a reaction to a message.
 
+        :param user_id: The user id who made the reaction
         :param reaction: The reaction to store
         :return: The stored reaction
         :raises ReactingToUserMessageError: If attempting to react to a user message
@@ -71,8 +77,23 @@ class ReactionService(IReactionService):
         if await self._conversation_memory_manager.is_user_message(reaction.message_id):
             raise ReactingToUserMessageError(reaction.message_id)
 
-        return await self._reaction_repository.add(reaction)
+        stored_reaction = await self._reaction_repository.add(reaction)
 
+        # Record the reaction metric event after the reaction has been success stored
+        # as we don't want to record the event if the reaction was not stored
+        await self._metrics_service.record_event(
+            MessageReactionCreatedEvent(
+                user_id=user_id,
+                session_id=reaction.session_id,
+                message_id=reaction.message_id,
+                kind=reaction.kind,
+                reasons=reaction.reasons or []
+            )
+        )
+
+        return stored_reaction
+
+    # TODO: deal with deleted reaction metrics
     async def delete(self, session_id: int, message_id: str):
         """
         Removes a reaction from a message.

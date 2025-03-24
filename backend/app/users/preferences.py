@@ -248,13 +248,14 @@ _user_feedback_service_lock = asyncio.Lock()
 _user_feedback_service_singleton: IUserFeedbackService | None = None
 
 
-async def _get_user_feedback_service(application_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)) -> IUserFeedbackService:
+async def _get_user_feedback_service(application_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db), metrics_service = Depends(get_metrics_service)) -> IUserFeedbackService:
     global _user_feedback_service_singleton
     if _user_feedback_service_singleton is None:  # initial check to avoid the lock if the singleton instance is already created (lock is expensive)
         async with _user_feedback_service_lock:  # before modifying the singleton instance, acquire the lock
             if _user_feedback_service_singleton is None:  # double check after acquiring the lock
                 _user_feedback_service_singleton = UserFeedbackService(
-                    user_feedback_repository=UserFeedbackRepository(application_db)
+                    user_feedback_repository=UserFeedbackRepository(application_db),
+                    metrics_service=metrics_service
                 )
     return _user_feedback_service_singleton
 
