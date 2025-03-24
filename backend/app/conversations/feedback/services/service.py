@@ -10,6 +10,8 @@ from pathlib import Path
 
 from app.conversations.feedback.repository import IUserFeedbackRepository
 from app.app_config import get_application_config
+from app.metrics.service import IMetricsService
+from app.metrics.types import FeedbackProvidedEvent, FeedbackScoreEvent
 from .types import Feedback, NewFeedbackSpec, FeedbackItem, Version, AnsweredQuestions
 from .errors import (
     InvalidQuestionError,
@@ -72,9 +74,10 @@ class UserFeedbackService(IUserFeedbackService):
     The UserFeedbackService class provides the business logic for the user feedback routes
     """
 
-    def __init__(self, user_feedback_repository: IUserFeedbackRepository):
+    def __init__(self, user_feedback_repository: IUserFeedbackRepository, metrics_service: IMetricsService):
         self._logger = logging.getLogger(self.__class__.__name__)
         self._user_feedback_repository: IUserFeedbackRepository = user_feedback_repository
+        self._metrics_service: IMetricsService = metrics_service
 
     async def upsert_user_feedback(self, user_id: str, session_id: int, feedback_spec: NewFeedbackSpec) -> Feedback:
         questions_data = await load_questions()
@@ -112,7 +115,17 @@ class UserFeedbackService(IUserFeedbackService):
         )
 
         # Use upsert to create or update the feedback
-        return await self._user_feedback_repository.upsert_feedback(complete_feedback)
+        saved_feedback = await self._user_feedback_repository.upsert_feedback(complete_feedback)
+
+        # Record feedback provided event
+        await self._metrics_service.record_event(
+            FeedbackProvidedEvent(
+                user_id=user_id,
+                session_id=session_id
+            )
+        )
+
+        return saved_feedback
 
     async def get_answered_questions(self, user_id: str) -> AnsweredQuestions:
         feedback_for_sessions: dict[int, Feedback] = await self._user_feedback_repository.get_all_feedback_for_user(user_id)

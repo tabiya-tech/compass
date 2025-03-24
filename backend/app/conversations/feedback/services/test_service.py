@@ -15,6 +15,8 @@ import pytest_mock
 
 from app.conversations.feedback.repository import IUserFeedbackRepository
 from app.users.sessions import generate_new_session_id
+from app.metrics.types import FeedbackProvidedEvent, FeedbackScoreEvent
+from app.metrics.constants import EventType
 
 from app.app_config import ApplicationConfig
 from common_libs.test_utilities import get_random_user_id, get_random_printable_string
@@ -26,6 +28,7 @@ from .errors import (
     InvalidQuestionError,
     InvalidOptionError, QuestionsFileError
 )
+from app.metrics.service import IMetricsService
 
 given_feedback_specs_json_file = Path(__file__).parent / "given_feedback_specs-en.json"
 given_feedback_item_specs_json = json.loads(given_feedback_specs_json_file.read_text())
@@ -54,8 +57,10 @@ def _get_random_answer(question: dict) -> Answer:
         comment=get_random_printable_string(10)
     )
 
+
 def _def_feedback() -> Feedback:
-    random_question_id = random.choice(list(actual_questions_json.keys()))  # nosec B311 # random is used for testing purposes
+    random_question_id = random.choice(
+        list(actual_questions_json.keys()))  # nosec B311 # random is used for testing purposes
     random_question: dict[str, Any] = actual_questions_json[random_question_id]
 
     return Feedback(
@@ -72,6 +77,7 @@ def _def_feedback() -> Feedback:
         created_at=datetime.now()
     )
 
+
 @pytest.fixture(scope='function')
 def _mock_feedback_repository() -> IUserFeedbackRepository:
     class MockedFeedbackRepository(IUserFeedbackRepository):
@@ -87,10 +93,25 @@ def _mock_feedback_repository() -> IUserFeedbackRepository:
     return MockedFeedbackRepository()
 
 
+@pytest.fixture
+def _mock_metrics_service() -> IMetricsService:
+    """
+    Returns a mock metrics service
+    """
+
+    class MockedMetricsService(IMetricsService):
+        async def record_event(self, event):
+            raise NotImplementedError()
+
+    return MockedMetricsService()
+
+
 class TestUpsertFeedback:
     @pytest.mark.asyncio
     async def test_upsert_feedback_update(self, _mock_feedback_repository: IUserFeedbackRepository,
-                                          mocker: pytest_mock.MockerFixture, setup_application_config: ApplicationConfig):
+                                          _mock_metrics_service: IMetricsService,
+                                          mocker: pytest_mock.MockerFixture,
+                                          setup_application_config: ApplicationConfig):
         # GIVEN a feedback specs to upsert
         given_user_id = get_random_user_id()
         given_session_id = random.randint(1, 10000)  # nosec B311 # random is used for testing purposes
@@ -103,6 +124,9 @@ class TestUpsertFeedback:
         given_returned_feedback = _def_feedback()
         _mock_feedback_repository.upsert_feedback = AsyncMock(return_value=given_returned_feedback)
 
+        # AND the metrics service will record the event successfully
+        _mock_metrics_service.record_event = AsyncMock()
+
         # AND datetime.now returns a fixed time
         fixed_time = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)
         mocker.patch('common_libs.time_utilities._time_utils.datetime', new=mocker.Mock(now=lambda tz=None: fixed_time))
@@ -111,9 +135,13 @@ class TestUpsertFeedback:
         given_backend_version = setup_application_config.version_info.to_version_string()
 
         # WHEN the upsert_feedback method is called
-        service = UserFeedbackService(user_feedback_repository=_mock_feedback_repository)
+        service = UserFeedbackService(
+            user_feedback_repository=_mock_feedback_repository,
+            metrics_service=_mock_metrics_service
+        )
         actual_feedback = await service.upsert_user_feedback(given_user_id,
-                                                             given_session_id,  #nosec B311 # random is used for testing purposes
+                                                             given_session_id,
+                                                             #nosec B311 # random is used for testing purposes
                                                              given_feedback_specs)
 
         expected_feedback = Feedback(
@@ -130,7 +158,8 @@ class TestUpsertFeedback:
         assert actual_feedback == given_returned_feedback
 
     @pytest.mark.asyncio
-    async def test_upsert_feedback_invalid_question(self, _mock_feedback_repository: IUserFeedbackRepository):
+    async def test_upsert_feedback_invalid_question(self, _mock_feedback_repository: IUserFeedbackRepository,
+                                                    _mock_metrics_service: IMetricsService):
         # GIVEN a feedback object with an invalid question ID
         given_feedback_specs = NewFeedbackSpec(
             feedback_items_specs=[
@@ -147,17 +176,22 @@ class TestUpsertFeedback:
 
         # WHEN the upsert_feedback method is called
         # THEN an InvalidQuestionError should be raised
-        service = UserFeedbackService(user_feedback_repository=_mock_feedback_repository)
+        service = UserFeedbackService(
+            user_feedback_repository=_mock_feedback_repository,
+            metrics_service=_mock_metrics_service
+        )
         with pytest.raises(InvalidQuestionError) as error_info:
             await service.upsert_user_feedback(get_random_user_id(),
-                                               random.randint(1, 10000),  #nosec B311 # random is used for testing purposes
+                                               random.randint(1, 10000),
+                                               #nosec B311 # random is used for testing purposes
                                                given_feedback_specs)
 
         # AND the error should contain the invalid question ID
         assert "invalid_question" in str(error_info.value)
 
     @pytest.mark.asyncio
-    async def test_upsert_feedback_invalid_option(self, _mock_feedback_repository: IUserFeedbackRepository):
+    async def test_upsert_feedback_invalid_option(self, _mock_feedback_repository: IUserFeedbackRepository,
+                                                  _mock_metrics_service: IMetricsService):
         # GIVEN a feedback object with an invalid option
         given_feedback_specs = NewFeedbackSpec(
             feedback_items_specs=[NewFeedbackItemSpec(**item) for item in given_feedback_item_specs_json],
@@ -170,10 +204,14 @@ class TestUpsertFeedback:
 
         # WHEN the upsert_feedback method is called
         # THEN an InvalidOptionError should be raised
-        service = UserFeedbackService(user_feedback_repository=_mock_feedback_repository)
+        service = UserFeedbackService(
+            user_feedback_repository=_mock_feedback_repository,
+            metrics_service=_mock_metrics_service
+        )
         with pytest.raises(InvalidOptionError) as error_info:
             await service.upsert_user_feedback(get_random_user_id(),
-                                               random.randint(1, 10000),  #nosec B311 # random is used for testing purposes
+                                               random.randint(1, 10000),
+                                               #nosec B311 # random is used for testing purposes
                                                given_feedback_specs)
 
         # AND the error should contain both the invalid option and question ID
@@ -181,7 +219,8 @@ class TestUpsertFeedback:
         assert "interaction_ease" in str(error_info.value)
 
     @pytest.mark.asyncio
-    async def test_upsert_feedback_nonexistent_questions_file(self, _mock_feedback_repository: IUserFeedbackRepository):
+    async def test_upsert_feedback_nonexistent_questions_file(self, _mock_feedback_repository: IUserFeedbackRepository,
+                                                              _mock_metrics_service: IMetricsService):
         # GIVEN a feedback object
         given_feedback_specs = NewFeedbackSpec(
             feedback_items_specs=[
@@ -200,18 +239,23 @@ class TestUpsertFeedback:
         questions_cache.clear()
 
         # AND loading questions fails with a file not found error
-        with patch('app.conversations.feedback.services.service.load_questions', 
-                  side_effect=QuestionsFileError("Questions file not found")):
+        with patch('app.conversations.feedback.services.service.load_questions',
+                   side_effect=QuestionsFileError("Questions file not found")):
             # WHEN the upsert_feedback method is called
             # THEN a QuestionsFileError should be raised
-            service = UserFeedbackService(user_feedback_repository=_mock_feedback_repository)
+            service = UserFeedbackService(
+                user_feedback_repository=_mock_feedback_repository,
+                metrics_service=_mock_metrics_service
+            )
             with pytest.raises(QuestionsFileError):
                 await service.upsert_user_feedback(get_random_user_id(),
-                                                   random.randint(1, 10000),  #nosec B311 # random is used for testing purposes
+                                                   random.randint(1, 10000),
+                                                   #nosec B311 # random is used for testing purposes
                                                    given_feedback_specs)
 
     @pytest.mark.asyncio
-    async def test_upsert_feedback_invalid_questions_file(self, _mock_feedback_repository: IUserFeedbackRepository):
+    async def test_upsert_feedback_invalid_questions_file(self, _mock_feedback_repository: IUserFeedbackRepository,
+                                                          _mock_metrics_service: IMetricsService):
         # GIVEN a feedback object
         given_feedback_specs = NewFeedbackSpec(
             feedback_items_specs=[
@@ -230,20 +274,25 @@ class TestUpsertFeedback:
         questions_cache.clear()
 
         # AND loading questions fails with an invalid format error
-        with patch('app.conversations.feedback.services.service.load_questions', 
-                  side_effect=QuestionsFileError("Invalid questions file format")):
+        with patch('app.conversations.feedback.services.service.load_questions',
+                   side_effect=QuestionsFileError("Invalid questions file format")):
             # WHEN the upsert_feedback method is called
             # THEN a QuestionsFileError should be raised
-            service = UserFeedbackService(user_feedback_repository=_mock_feedback_repository)
+            service = UserFeedbackService(
+                user_feedback_repository=_mock_feedback_repository,
+                metrics_service=_mock_metrics_service
+            )
             with pytest.raises(QuestionsFileError):
                 await service.upsert_user_feedback(get_random_user_id(),
-                                                   random.randint(1, 10000),  #nosec B311 # random is used for testing purposes
+                                                   random.randint(1, 10000),
+                                                   #nosec B311 # random is used for testing purposes
                                                    given_feedback_specs)
 
 
 class TestGetAnsweredQuestions:
     @pytest.mark.asyncio
-    async def test_get_answered_questions_success(self, _mock_feedback_repository: IUserFeedbackRepository):
+    async def test_get_answered_questions_success(self, _mock_feedback_repository: IUserFeedbackRepository,
+                                                  _mock_metrics_service: IMetricsService):
         # GIVEN a user ID
         given_user_id = "user123"
 
@@ -255,7 +304,11 @@ class TestGetAnsweredQuestions:
         _mock_feedback_repository.get_all_feedback_for_user = AsyncMock(return_value=given_feedback)
 
         # WHEN get_answered_questions is called
-        result = await UserFeedbackService(user_feedback_repository=_mock_feedback_repository).get_answered_questions(given_user_id)
+        service = UserFeedbackService(
+            user_feedback_repository=_mock_feedback_repository,
+            metrics_service=_mock_metrics_service
+        )
+        result = await service.get_answered_questions(given_user_id)
 
         # THEN the question IDs for each session should be returned
         expected_dict = {}
@@ -267,7 +320,8 @@ class TestGetAnsweredQuestions:
         _mock_feedback_repository.get_all_feedback_for_user.assert_called_once_with(given_user_id)
 
     @pytest.mark.asyncio
-    async def test_get_answered_questions_no_feedback(self, _mock_feedback_repository: IUserFeedbackRepository):
+    async def test_get_answered_questions_no_feedback(self, _mock_feedback_repository: IUserFeedbackRepository,
+                                                      _mock_metrics_service: IMetricsService):
         # GIVEN a user ID with no feedback
         given_user_id = "user123"
 
@@ -275,10 +329,57 @@ class TestGetAnsweredQuestions:
         _mock_feedback_repository.get_all_feedback_for_user = AsyncMock(return_value={})
 
         # WHEN get_answered_questions is called
-        result = await UserFeedbackService(user_feedback_repository=_mock_feedback_repository).get_answered_questions(given_user_id)
+        service = UserFeedbackService(
+            user_feedback_repository=_mock_feedback_repository,
+            metrics_service=_mock_metrics_service
+        )
+        result = await service.get_answered_questions(given_user_id)
 
         # THEN an empty dictionary should be returned
         assert result == {}
 
         # AND the repository's get_all_feedback_for_user method was called with the expected user ID
         _mock_feedback_repository.get_all_feedback_for_user.assert_called_once_with(given_user_id)
+
+
+class TestMetricsRecording:
+    @pytest.mark.asyncio
+    async def test_record_feedback_provided_event(self, _mock_feedback_repository: IUserFeedbackRepository,
+                                                  _mock_metrics_service: IMetricsService,
+                                                  setup_application_config: ApplicationConfig):
+        # GIVEN a feedback specs to upsert
+        given_user_id = get_random_user_id()
+        given_session_id = random.randint(1, 10000)  # nosec B311 # random is used for testing purposes
+        given_feedback_specs = NewFeedbackSpec(
+            feedback_items_specs=[
+                NewFeedbackItemSpec(
+                    question_id="clarity_of_skills",
+                    simplified_answer=SimplifiedAnswer(rating_boolean=True),
+                ),  # will record a FeedbackProvidedEvent but not a FeedbackScoreEvent
+                NewFeedbackItemSpec(
+                    question_id="work_experience_accuracy",
+                    simplified_answer=SimplifiedAnswer(selected_options_keys=["experience_title"]),
+                ),  # will record a FeedbackProvidedEvent and a FeedbackScoreEvent
+            ],
+            version=NewFeedbackVersionSpec(frontend="foo")
+        )
+
+        # AND the repository will update the feedback successfully
+        given_returned_feedback = _def_feedback()
+        _mock_feedback_repository.upsert_feedback = AsyncMock(return_value=given_returned_feedback)
+
+        # AND the metrics service will record the event successfully
+        _mock_metrics_service.record_event = AsyncMock()
+
+        # WHEN the upsert_feedback method is called
+        service = UserFeedbackService(
+            user_feedback_repository=_mock_feedback_repository,
+            metrics_service=_mock_metrics_service
+        )
+        await service.upsert_user_feedback(given_user_id, given_session_id, given_feedback_specs)
+
+        # THEN the metrics service should be called with a FeedbackProvidedEvent
+        _mock_metrics_service.record_event.assert_called_once()
+        event = _mock_metrics_service.record_event.call_args[0][0]
+        assert isinstance(event, FeedbackProvidedEvent)
+        assert event.event_type == EventType.FEEDBACK_PROVIDED

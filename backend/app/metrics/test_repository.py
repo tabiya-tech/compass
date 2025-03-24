@@ -1,5 +1,6 @@
 import random
 from typing import Awaitable, Dict, Any
+from unittest.mock import AsyncMock
 import pytest
 
 from app.conversations.reactions.types import ReactionKind, DislikeReason
@@ -73,7 +74,8 @@ def _assert_metric_event_matches(given_event_dict: Dict[str, Any], actual_stored
     for field, value in given_event_dict.items():
         if field == "timestamp":
             # Special case for timestamp which needs to be converted from MongoDB format
-            assert truncate_microseconds(mongo_date_to_datetime(actual_stored_event[field])) == truncate_microseconds(value)
+            assert truncate_microseconds(mongo_date_to_datetime(actual_stored_event[field])) == truncate_microseconds(
+                value)
         elif field == "event_type":
             # Special case for event_type whose int value is stored in the database
             assert actual_stored_event[field] == value.value
@@ -165,3 +167,106 @@ class TestRecordEvent:
         for actual_stored_event, given_event in zip(actual_stored_events, given_events):
             given_event_dict = given_event.model_dump()
             _assert_metric_event_matches(given_event_dict, actual_stored_event)
+
+    @pytest.mark.asyncio
+    async def test_upsert_feedback_provided_event_success(
+            self,
+            get_metrics_repository: Awaitable[MetricsRepository],
+            setup_application_config: ApplicationConfig
+    ):
+        # GIVEN a feedback provided event
+        given_event = get_feedback_provided_event()
+        repository = await get_metrics_repository
+
+        # WHEN the event is recorded
+        await repository.record_event([given_event])
+
+        # THEN the event is recorded in the database
+        assert await repository.collection.count_documents({}) == 1
+
+        # AND the event data matches what we expect
+        actual_stored_event = await repository.collection.find_one({})
+        _assert_metric_event_matches(given_event.model_dump(), actual_stored_event)
+
+        # WHEN the event is recorded  for the same session and user
+        given_second_event = get_feedback_provided_event()
+        given_second_event.anonymized_user_id = given_event.anonymized_user_id
+        given_second_event.anonymized_session_id = given_event.anonymized_session_id
+        await repository.record_event([given_second_event])
+
+        # guard: ensure the two events are not identical
+        assert given_event.model_dump() != given_second_event.model_dump()
+
+        # THEN the event is not recorded again
+        assert await repository.collection.count_documents({}) == 1
+
+        # AND the event data matches what we expect
+        actual_second_stored_event = await repository.collection.find_one({})
+        _assert_metric_event_matches(given_second_event.model_dump(), actual_second_stored_event)
+
+
+    @pytest.mark.asyncio
+    async def test_record_multiple_feedback_provided_event_for_different_users(
+            self,
+            get_metrics_repository: Awaitable[MetricsRepository],
+            setup_application_config: ApplicationConfig
+    ):
+        # GIVEN a list of feedback provided events for different users
+        given_events = [
+            get_feedback_provided_event(),
+            get_feedback_provided_event()
+        ]
+        repository = await get_metrics_repository
+
+        # WHEN the events are recorded
+        await repository.record_event(given_events)
+
+        # THEN the events are recorded in the database
+        assert await repository.collection.count_documents({}) == len(given_events)
+
+        # AND the event data matches what we expect
+        actual_stored_events = await repository.collection.find({}).to_list(length=len(given_events))
+        for actual_stored_event, given_event in zip(actual_stored_events, given_events):
+            given_event_dict = given_event.model_dump()
+            _assert_metric_event_matches(given_event_dict, actual_stored_event)
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "given_event_generator",
+        [
+            lambda: get_user_account_created_event(),
+            lambda: get_conversation_phase_event("ENDED"),
+            lambda: get_feedback_score_event("NPS"),
+            lambda: get_feedback_provided_event(),
+            lambda: get_message_created_event(),
+            lambda: get_message_reaction_created_event()
+        ],
+        ids=[
+            "UserAccountCreatedEvent",
+            "ConversationPhaseEvent",
+            "FeedbackScoreEvent",
+            "FeedbackProvidedEvent",
+            "MessageCreatedEvent",
+            "MessageReactionCreatedEvent"
+        ]
+    )
+    async def test_record_event_database_bulk_write_failure(
+            self,
+            get_metrics_repository: Awaitable[MetricsRepository],
+            setup_application_config: ApplicationConfig,
+            given_event_generator
+    ):
+        # GIVEN an event of a specific type
+        repository = await get_metrics_repository
+        given_event = given_event_generator()
+
+        # AND the database will raise an exception
+        repository.collection.bulk_write = AsyncMock(side_effect=Exception("Database error"))
+
+        # WHEN the event is recorded
+        # THEN the repository raises an exception
+        with pytest.raises(Exception):
+            await repository.record_event([given_event])
+
+        # THEN the event is not recorded in the database
+        assert await repository.collection.count_documents({}) == 0

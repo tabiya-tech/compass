@@ -194,6 +194,12 @@ class CompassDBProvider:
             await metrics_db.get_collection(Collections.COMPASS_METRICS).create_index([
                 ("event_type", 1)
             ])
+            # Create sparse index on anonymized_session_id and anonymized_user_id
+            await metrics_db.get_collection(Collections.COMPASS_METRICS).create_index([
+                ("anonymized_session_id", 1),
+                ("anonymized_user_id", 1),
+                ("event_type", 1)
+            ], sparse=True)
 
             logger.info("Finished creating indexes for the metrics database")
         except Exception as e:
