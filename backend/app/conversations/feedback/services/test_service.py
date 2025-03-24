@@ -1,7 +1,6 @@
 """
 Tests for the feedback service
 """
-import asyncio
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,7 +18,7 @@ from app.metrics.types import FeedbackProvidedEvent, FeedbackScoreEvent
 from app.metrics.constants import EventType
 
 from app.app_config import ApplicationConfig
-from common_libs.test_utilities import get_random_user_id, get_random_printable_string
+from common_libs.test_utilities import get_random_user_id, get_random_printable_string, get_random_session_id
 from . import SimplifiedAnswer
 from .service import UserFeedbackService
 from .types import Feedback, FeedbackItem, Version, Answer, NewFeedbackSpec, NewFeedbackItemSpec, NewFeedbackVersionSpec
@@ -141,7 +140,6 @@ class TestUpsertFeedback:
         )
         actual_feedback = await service.upsert_user_feedback(given_user_id,
                                                              given_session_id,
-                                                             #nosec B311 # random is used for testing purposes
                                                              given_feedback_specs)
 
         expected_feedback = Feedback(
@@ -182,8 +180,7 @@ class TestUpsertFeedback:
         )
         with pytest.raises(InvalidQuestionError) as error_info:
             await service.upsert_user_feedback(get_random_user_id(),
-                                               random.randint(1, 10000),
-                                               #nosec B311 # random is used for testing purposes
+                                               random.randint(1, 10000),  #nosec B311 # random is used for testing purposes
                                                given_feedback_specs)
 
         # AND the error should contain the invalid question ID
@@ -210,8 +207,7 @@ class TestUpsertFeedback:
         )
         with pytest.raises(InvalidOptionError) as error_info:
             await service.upsert_user_feedback(get_random_user_id(),
-                                               random.randint(1, 10000),
-                                               #nosec B311 # random is used for testing purposes
+                                               get_random_session_id(),
                                                given_feedback_specs)
 
         # AND the error should contain both the invalid option and question ID
@@ -249,8 +245,7 @@ class TestUpsertFeedback:
             )
             with pytest.raises(QuestionsFileError):
                 await service.upsert_user_feedback(get_random_user_id(),
-                                                   random.randint(1, 10000),
-                                                   #nosec B311 # random is used for testing purposes
+                                                   random.randint(1, 10000),  #nosec B311 # random is used for testing purposes
                                                    given_feedback_specs)
 
     @pytest.mark.asyncio
@@ -284,8 +279,7 @@ class TestUpsertFeedback:
             )
             with pytest.raises(QuestionsFileError):
                 await service.upsert_user_feedback(get_random_user_id(),
-                                                   random.randint(1, 10000),
-                                                   #nosec B311 # random is used for testing purposes
+                                                   random.randint(1, 10000),  #nosec B311 # random is used for testing purposes
                                                    given_feedback_specs)
 
 
@@ -383,3 +377,136 @@ class TestMetricsRecording:
         event = _mock_metrics_service.record_event.call_args[0][0]
         assert isinstance(event, FeedbackProvidedEvent)
         assert event.event_type == EventType.FEEDBACK_PROVIDED
+
+    @pytest.mark.parametrize("feedback_type,question_id,answer,expected_score", [
+        # NPS tests
+        ("NPS", "recommendation", "1", -1),  # Detractor
+        ("NPS", "recommendation", "2", -1),  # Detractor
+        ("NPS", "recommendation", "3", -1),  # Detractor
+        ("NPS", "recommendation", "4", 0),  # Passive
+        ("NPS", "recommendation", "5", 1),  # Promoter
+
+        # CSAT tests
+        ("CSAT", "satisfaction_with_compass", "1", 0),  # Low satisfaction
+        ("CSAT", "satisfaction_with_compass", "2", 0),  # Low satisfaction
+        ("CSAT", "satisfaction_with_compass", "3", 0),  # Low satisfaction
+        ("CSAT", "satisfaction_with_compass", "4", 1),  # High satisfaction
+        ("CSAT", "satisfaction_with_compass", "5", 1),  # High satisfaction
+
+        # CES tests
+        ("CES", "interaction_ease", "1", 0),  # Low ease
+        ("CES", "interaction_ease", "2", 0),  # Low ease
+        ("CES", "interaction_ease", "3", 0),  # Low ease
+        ("CES", "interaction_ease", "4", 1),  # High ease
+        ("CES", "interaction_ease", "5", 1),  # High ease
+    ], ids=["NPS with score 1",
+            "NPS with score 2",
+            "NPS with score 3",
+            "NPS with score 4",
+            "NPS with score 5",
+            "CSAT with score 1",
+            "CSAT with score 2",
+            "CSAT with score 3",
+            "CSAT with score 4",
+            "CSAT with score 5",
+            "CES with score 1", "CES with score 2", "CES with score 3", "CES with score 4", "CES with score 5"])
+    @pytest.mark.asyncio
+    async def test_record_feedback_score_events(self, _mock_feedback_repository: IUserFeedbackRepository,
+                                                _mock_metrics_service: IMetricsService,
+                                                feedback_type: str, question_id: str, answer: str, expected_score: int,
+                                                setup_application_config: ApplicationConfig):
+        # GIVEN a feedback specs with a specific question type
+        given_user_id = get_random_user_id()
+        given_session_id = random.randint(1, 10000)  # nosec B311 # random is used for testing purposes
+        given_feedback_specs = NewFeedbackSpec(
+            feedback_items_specs=[
+                NewFeedbackItemSpec(
+                    question_id=question_id,
+                    simplified_answer=SimplifiedAnswer(rating_numeric=int(answer)),
+                )
+            ],
+            version=NewFeedbackVersionSpec(frontend="foo")
+        )
+
+        # AND the repository will update the feedback successfully
+        given_returned_feedback = _def_feedback()
+        _mock_feedback_repository.upsert_feedback = AsyncMock(return_value=given_returned_feedback)
+
+        # AND the metrics service will record the event successfully
+        _mock_metrics_service.record_event = AsyncMock()
+
+        # WHEN the upsert_feedback method is called
+        service = UserFeedbackService(
+            user_feedback_repository=_mock_feedback_repository,
+            metrics_service=_mock_metrics_service
+        )
+        await service.upsert_user_feedback(given_user_id, given_session_id, given_feedback_specs)
+
+        # THEN the metrics service should be called with both FeedbackProvidedEvent and FeedbackScoreEvent
+        assert _mock_metrics_service.record_event.call_count == 2
+
+        # AND the FeedbackScoreEvent should have the correct properties
+        score_event = _mock_metrics_service.record_event.call_args_list[1][0][0]
+        assert isinstance(score_event, FeedbackScoreEvent)
+        assert score_event.value == expected_score
+        assert score_event.event_type == EventType.FEEDBACK_SCORE
+        assert score_event.feedback_type == feedback_type
+
+    @pytest.mark.asyncio
+    async def test_record_multiple_feedback_score_events(self, _mock_feedback_repository: IUserFeedbackRepository,
+                                                         _mock_metrics_service: IMetricsService,
+                                                         setup_application_config: ApplicationConfig):
+        # GIVEN feedback specs with multiple question types
+        given_user_id = get_random_user_id()
+        given_session_id = random.randint(1, 10000)  # nosec B311 # random is used for testing purposes
+        given_feedback_specs = NewFeedbackSpec(
+            feedback_items_specs=[
+                NewFeedbackItemSpec(
+                    question_id="recommendation",
+                    simplified_answer=SimplifiedAnswer(rating_numeric=5),
+                ),
+                NewFeedbackItemSpec(
+                    question_id="satisfaction_with_compass",
+                    simplified_answer=SimplifiedAnswer(rating_numeric=4),
+                ),
+                NewFeedbackItemSpec(
+                    question_id="interaction_ease",
+                    simplified_answer=SimplifiedAnswer(rating_numeric=3),
+                ),
+            ],
+            version=NewFeedbackVersionSpec(frontend="foo")
+        )
+
+        # AND the repository will update the feedback successfully
+        given_returned_feedback = _def_feedback()
+        _mock_feedback_repository.upsert_feedback = AsyncMock(return_value=given_returned_feedback)
+
+        # AND the metrics service is mocked
+        _mock_metrics_service.record_event = AsyncMock()
+
+        # WHEN the upsert_feedback method is called
+        service = UserFeedbackService(
+            user_feedback_repository=_mock_feedback_repository,
+            metrics_service=_mock_metrics_service
+        )
+        await service.upsert_user_feedback(given_user_id, given_session_id, given_feedback_specs)
+
+        # THEN the metrics service should be called with all expected events
+        assert _mock_metrics_service.record_event.call_count == 4  # 1 FeedbackProvidedEvent + 3 FeedbackScoreEvents
+
+        # AND each FeedbackScoreEvent should have the correct properties
+        score_events = [call[0][0] for call in _mock_metrics_service.record_event.call_args_list[1:]]
+        assert all(isinstance(event, FeedbackScoreEvent) for event in score_events)
+
+        # AND the events should have the correct feedback types and values
+        feedback_types = {event.feedback_type for event in score_events}
+        assert feedback_types == {"NPS", "CSAT", "CES"}
+
+        # AND the values should be correct
+        for event in score_events:
+            if event.feedback_type == "NPS":
+                assert event.value == 1  # Promoter (5)
+            elif event.feedback_type == "CSAT":
+                assert event.value == 1  # High satisfaction (4)
+            elif event.feedback_type == "CES":
+                assert event.value == 0  # Low ease (3)
