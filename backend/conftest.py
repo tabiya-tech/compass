@@ -1,5 +1,6 @@
 import logging
 import platform
+from typing import Generator, Any
 
 import pytest
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
@@ -113,7 +114,7 @@ async def in_memory_metrics_database(in_memory_mongo_server) -> AsyncIOMotorData
 
 
 @pytest.fixture(scope="function")
-def setup_application_config() -> ApplicationConfig:
+def setup_application_config() -> Generator[ApplicationConfig, Any, None]:
     """
     Fixture to create an application config. For all tests that need to use the application config,
     they should use this fixture.
@@ -131,4 +132,5 @@ def setup_application_config() -> ApplicationConfig:
     # guard to ensure the config is set
     if get_application_config() != config:
         raise RuntimeError("Application config not set properly.")
-    return config
+    yield config
+    set_application_config(None)
