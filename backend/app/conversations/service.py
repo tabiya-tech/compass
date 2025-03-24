@@ -18,7 +18,7 @@ from app.conversations.utils import get_messages_from_conversation_manager, filt
 from app.sensitive_filter import sensitive_filter
 from app.types import Experience, Skill
 from app.metrics.service import IMetricsService
-from app.metrics.types import  ConversationPhaseEvent
+from app.metrics.types import ConversationPhaseEvent, ConversationPhaseLiteral, MessageCreatedEvent
 
 
 class ConversationAlreadyConcludedError(Exception):
@@ -158,6 +158,14 @@ class ConversationService(IConversationService):
                     phase="ENDED"
                 )
             )
+
+        # before responding to the user, record the message created event
+        await self._metrics_service.record_event(
+            MessageCreatedEvent(
+                user_id=user_id,
+                session_id=session_id
+            )
+        )
 
         return ConversationResponse(
             messages=response,
