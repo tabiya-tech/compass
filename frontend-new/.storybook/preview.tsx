@@ -80,9 +80,9 @@ const preview: Preview = {
 
 export default preview;
 
-// Store the original SENTRY_FRONTEND_DSN value
+// Store the original FRONTEND_SENTRY_DSN value
 // @ts-ignore
-const ORIGINAL_SENTRY_DSN = window.tabiyaConfig.SENTRY_FRONTEND_DSN;
+const ORIGINAL_SENTRY_DSN = window.tabiyaConfig.FRONTEND_SENTRY_DSN;
 let isSentryInitialized = true;
 
 export const decorators = [
@@ -95,12 +95,12 @@ export const decorators = [
     if (prevSentryEnabled.current !== sentryEnabled) {
       if (sentryEnabled) {
         // @ts-ignore
-        window.tabiyaConfig.SENTRY_FRONTEND_DSN = ORIGINAL_SENTRY_DSN;
+        window.tabiyaConfig.FRONTEND_SENTRY_DSN = ORIGINAL_SENTRY_DSN;
         initSentry();
         isSentryInitialized = true;
       } else {
         // @ts-ignore
-        window.tabiyaConfig.SENTRY_FRONTEND_DSN = undefined;
+        window.tabiyaConfig.FRONTEND_SENTRY_DSN = undefined;
         isSentryInitialized = false;
         // we have to reload since there is no way to notify the components of this change
         // it is not a provider and the init happens outside of even the react root.render()

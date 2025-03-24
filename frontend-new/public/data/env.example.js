@@ -6,7 +6,10 @@ window.tabiyaConfig = {
   "TARGET_ENVIRONMENT_NAME": btoa("local"),
   // The SENTRY_DSN variable is picked up by the Sentry SDK.
   // It's used for error tracking.
-  "SENTRY_FRONTEND_DSN": btoa("https://foo@bar.sentry.io/baz"),
+  "FRONTEND_ENABLE_SENTRY": btoa("False"),
+  "FRONTEND_SENTRY_DSN": btoa("https://foo@bar.sentry.io/baz"),
+  // The FRONTEND_ENABLE_METRICS variable is picked up by the Metrics SDK.
+  "FRONTEND_ENABLE_METRICS": btoa("False"),
   // The SENTRY_AUTH_TOKEN variable is picked up by the Sentry Build Plugin.
   // It's used for authentication when uploading source maps.
   "SENTRY_AUTH_TOKEN":btoa("Some Auth Token"),

@@ -93,16 +93,16 @@ log_config_file = os.getenv("LOG_CONFIG_FILE", "logging.cfg.yaml")
 _setup_config(_get_configuration_filename(log_config_file))
 logging.debug("Logging initialized")
 
-# Sentry should only be initialized if the environment variable ENABLE_SENTRY is set to true
+# Sentry should only be initialized if the environment variable BACKEND_ENABLE_SENTRY is set to true
 # This environment will be set to false for local development or the CI/CD pipeline
 # because the sentry initialization breaks the unit tests (specifically the ones that use the fastapi test client)
-if os.getenv("ENABLE_SENTRY") == "True":
-    backend_dsn = os.getenv("SENTRY_BACKEND_DSN")
+if os.getenv("BACKEND_ENABLE_SENTRY") == "True":
+    sentry_dsn = os.getenv("BACKEND_SENTRY_DSN")
     target_environment_name = os.getenv("TARGET_ENVIRONMENT_NAME")
 
-    if backend_dsn:
-        init_sentry(backend_dsn, target_environment_name)
+    if sentry_dsn:
+        init_sentry(sentry_dsn, target_environment_name)
     else:
-        logging.warning("SENTRY_BACKEND_DSN environment variable is not set. Sentry will not be initialized")
+        logging.warning("BACKEND_SENTRY_DSN environment variable is not set. Sentry will not be initialized")
 else:
-    logging.warning("ENABLE_SENTRY environment variable is not set to True.  Sentry will not be initialized")
+    logging.warning("BACKEND_ENABLE_SENTRY environment variable is not set to True.  Sentry will not be initialized")

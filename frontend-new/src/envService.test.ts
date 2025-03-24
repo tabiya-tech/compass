@@ -34,7 +34,7 @@ describe.each([
   ["FIREBASE_API_KEY", getFirebaseAPIKey],
   ["FIREBASE_AUTH_DOMAIN", getFirebaseDomain],
   ["BACKEND_URL", getBackendUrl],
-  ["SENTRY_FRONTEND_DSN", getSentryDSN],
+  ["FRONTEND_SENTRY_DSN", getSentryDSN],
   ["SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY", getSensitivePersonalDataRSAEncryptionKey],
   ["SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID", getSensitivePersonalDataRSAEncryptionKeyId],
   ["TARGET_ENVIRONMENT_NAME", getTargetEnvironmentName],

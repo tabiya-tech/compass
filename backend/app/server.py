@@ -53,10 +53,10 @@ if not os.getenv("TARGET_ENVIRONMENT_NAME"):
     raise ValueError("Mandatory TARGET_ENVIRONMENT_NAME env variable is not set! Please set it to the target environment name as it is "
                      "Required by sentry to know on which environment some Sentry Events occurred")
 
-enable_sentry = os.getenv("ENABLE_SENTRY")
+enable_sentry = os.getenv("BACKEND_ENABLE_SENTRY")
 if not enable_sentry:
-    raise ValueError("Mandatory ENABLE_SENTRY env variable is not set! Please set it to the either True or False")
-logger.info(f"ENABLE_SENTRY: {os.getenv('ENABLE_SENTRY')}")
+    raise ValueError("Mandatory BACKEND_ENABLE_SENTRY env variable is not set! Please set it to the either True or False")
+logger.info(f"BACKEND_ENABLE_SENTRY: {os.getenv('BACKEND_ENABLE_SENTRY')}")
 
 _metrics_enabled_str = os.getenv("BACKEND_ENABLE_METRICS")
 if not _metrics_enabled_str:

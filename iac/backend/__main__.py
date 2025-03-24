@@ -60,8 +60,8 @@ def main():
         target_environment_type=environment_type,
         backend_url=backend_url,
         frontend_url=frontend_url,
-        sentry_backend_dsn=getenv("SENTRY_BACKEND_DSN", True, False),
-        enable_sentry=getenv("ENABLE_SENTRY"),
+        sentry_dsn=getenv("BACKEND_SENTRY_DSN", True, False),
+        enable_sentry=getenv("BACKEND_ENABLE_SENTRY"),
         enable_metrics=getenv("BACKEND_ENABLE_METRICS"),
         gcp_oauth_client_id=getenv("GCP_OAUTH_CLIENT_ID"),
 

@@ -159,8 +159,8 @@ The backend uses the following environment variables:
 - `LOG_CONFIG_FILE`: (Optional) See the [Logging](#logging) section for more information. If not set defaults to `logging.cfg.yaml`.
 - `BACKEND_URL`: The URL of the backend. It is used to correctly configure Swagger UI and the CORS policy.
 - `FRONTEND_URL`: The URL of the frontend. It is used to set the CORS policy.
-- `ENABLE_SENTRY`: Set to `True` to enable Sentry error tracking. Set to `False`to disable locally or on CI/CD pipeline so that the unit tests can run successfully.
-- `SENTRY_BACKEND_DSN`: (optional) The Sentry Data Source Name used to track backend errors.
+- `BACKEND_ENABLE_SENTRY`: Set to `True` to enable Sentry error tracking. Set to `False`to disable locally or on CI/CD pipeline so that the unit tests can run successfully.
+- `BACKEND_SENTRY_DSN`: (optional) The Sentry Data Source Name used to track backend errors.
 - `TARGET_ENVIRONMENT`: (optional) The target environment where the backend is running. When set to `dev` or `local`, CORS will be set to allow all origins.
   > Note: The `FRONTEND_URL` should be set irrespective of the `TARGET_ENVIRONMENT` value.
 
@@ -179,13 +179,17 @@ APPLICATION_MONGODB_URI=<URI_TO_MONGODB>
 APPLICATION_DATABASE_NAME=<APPLICATION_DATABASE_NAME>
 USERDATA_MONGODB_URI=<URI_TO_MONGODB>
 USERDATA_DATABASE_NAME=<USERDATA_DATABASE_NAME>
+METRICS_MONGODB_URI=<URI_TO_MONGODB>
+METRICS_DATABASE_NAME=<METRICS_DATABASE_NAME>
 VERTEX_API_REGION=<REGION>
 LOG_CONFIG_FILE=<YAML_FILE>
 BACKEND_URL=<URL>
 FRONTEND_URL=<URL>
-TARGET_ENVIRONMENT=<ENVIRONMENT>
-ENABLE_SENTRY=False|True
-SENTRY_BACKEND_DSN=<SENTRY_DSN>
+TARGET_ENVIRONMENT_NAME=<TARGET_ENVIRONMENT_NAME>
+TARGET_ENVIRONMENT_TYPE=<TARGET_ENVIRONMENT_TYPE>
+BACKEND_ENABLE_METRICS=False|True
+BACKEND_ENABLE_SENTRY=False|True
+BACKEND_SENTRY_DSN=<BACKEND_SENTRY_DSN>
 ```
 
 > ATTENTION: The .env file should be kept secure and not shared with others as it contains sensitive information.
@@ -256,6 +260,8 @@ APPLICATION_MONGODB_URI=mongodb://localhost:27017
 APPLICATION_DATABASE_NAME=_compass-application-local
 USERDATA_MONGODB_URI=mongodb://localhost:27017
 USERDATA_DATABASE_NAME=_compass-users-local
+METRICS_MONGODB_URI=mongodb://localhost:27017
+METRICS_DATABASE_NAME=<METRICS_DATABASE_NAME>
 GOOGLE_APPLICATION_CREDENTIALS=keys/credentials.json
 VERTEX_API_REGION=<REGION>
 LOG_CONFIG_FILE=logging.cfg.dev.yaml
@@ -263,9 +269,11 @@ LOG_CONFIG_FILE=logging.cfg.dev.yaml
 BACKEND_URL=*
 # allow all origins
 FRONTEND_URL=*
+BACKEND_ENABLE_METRICS=False|True
 # will add CORS policy to allow all origins
-TARGET_ENVIRONMENT=local
-ENABLE_SENTRY=False
+TARGET_ENVIRONMENT_NAME=local
+TARGET_ENVIRONMENT_TYPE=local
+BACKEND_ENABLE_SENTRY=False
 ```
 
 Run the image using the following command:
