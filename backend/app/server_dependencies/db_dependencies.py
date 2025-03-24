@@ -190,10 +190,17 @@ class CompassDBProvider:
         """ Initialize the MongoDB database."""
         try:
             logger.info("Initializing indexes for the metrics database")
-            # Create the metrics indexes
+
+            # This compound index covers 3 types of queries:
+            # - queries that filter by event_type (for most events)
+            # - queries that filter by event_type, anonymized_user_id, and anonymized_session_id (for upserting FeedbackProvided events)
+            # - queries that filter by event_type, anonymized_user_id, anonymized_session_id and message_id (for upserting Reaction events)
             await metrics_db.get_collection(Collections.COMPASS_METRICS).create_index([
-                ("event_type", 1)
-            ])
+                ("event_type", 1),
+                ("anonymized_user_id", 1),
+                ("anonymized_session_id", 1),
+                ("message_id", 1)
+            ], sparse=True)
 
             logger.info("Finished creating indexes for the metrics database")
         except Exception as e:

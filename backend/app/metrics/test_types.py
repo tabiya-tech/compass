@@ -2,6 +2,7 @@
 Tests for the metric type models.
 """
 import random
+from typing import cast
 
 from app.app_config import ApplicationConfig, set_application_config
 import pytest
@@ -16,8 +17,8 @@ from app.metrics.types import (
     ConversationPhaseEvent,
     MessageCreatedEvent,
     FeedbackProvidedEvent,
-    FeedbackScoreEvent,
-    MessageReactionCreatedEvent,
+    FeedbackRatingValueEvent,
+    MessageReactionCreatedEvent, MessageCreatedEventSourceLiteral,
 )
 from app.conversations.reactions.types import ReactionKind, DislikeReason
 from app.metrics.constants import EventType
@@ -242,7 +243,7 @@ class TestFeedbackProvidedEvent:
                 extra_field=given_extra_field)  # type:ignore
 
 
-class TestFeedbackScoreEvent:
+class TestFeedbackRatingValueEvent:
     def test_fields_are_set_correctly(self, setup_application_config: ApplicationConfig,
                                       mocker: pytest_mock.MockerFixture):
         # datetime.now returns a fixed time
@@ -256,11 +257,11 @@ class TestFeedbackScoreEvent:
         given_user_id = get_random_user_id()
 
         # WHEN creating an instance of the event
-        actual_event = FeedbackScoreEvent(feedback_type=given_feedback_type, value=given_value,  # type:ignore
-                                          session_id=given_session_id, user_id=given_user_id)
+        actual_event = FeedbackRatingValueEvent(feedback_type=given_feedback_type, value=given_value,  # type:ignore
+                                                session_id=given_session_id, user_id=given_user_id)
 
         # THEN the basic event fields should be set correctly
-        assert_basic_event_fields_are_set(actual_event, EventType.FEEDBACK_SCORE, setup_application_config, fixed_time)
+        assert_basic_event_fields_are_set(actual_event, EventType.FEEDBACK_RATING_VALUE, setup_application_config, fixed_time)
 
         # AND the feedback type should be set correctly
         assert actual_event.feedback_type == given_feedback_type
@@ -282,7 +283,7 @@ class TestFeedbackScoreEvent:
 
         # WHEN creating an instance of the event
         with pytest.raises(ValidationError, match="Input should be 'NPS', 'CSAT' or 'CES'"):
-            FeedbackScoreEvent(
+            FeedbackRatingValueEvent(
                 feedback_type=given_invalid_feedback_type,  # type:ignore
                 value=1,
                 session_id=get_random_session_id(),
@@ -301,13 +302,20 @@ class TestFeedbackScoreEvent:
         # WHEN creating an instance of the event
         # THEN it should raise a TypeError indicating that the extra field is not allowed.
         with pytest.raises(TypeError, match="got an unexpected keyword argument 'extra_field'"):
-            FeedbackScoreEvent(feedback_type=given_feedback_type, value=given_value, session_id=given_session_id,
-                               user_id=given_user_id, extra_field=given_extra_field)  # type:ignore
+            FeedbackRatingValueEvent(feedback_type=given_feedback_type, value=given_value, session_id=given_session_id,
+                                     user_id=given_user_id, extra_field=given_extra_field)  # type:ignore
 
 
 class TestMessageCreatedEvent:
+    @pytest.mark.parametrize(
+        "given_source",
+        [
+            "USER",
+            "COMPASS"
+        ],
+    )
     def test_fields_are_set_correctly(self, setup_application_config: ApplicationConfig,
-                                      mocker: pytest_mock.MockerFixture):
+                                      mocker: pytest_mock.MockerFixture, given_source):
         # datetime.now returns a fixed time
         fixed_time = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)
         mocker.patch('common_libs.time_utilities._time_utils.datetime', new=mocker.Mock(now=lambda tz=None: fixed_time))
@@ -317,7 +325,8 @@ class TestMessageCreatedEvent:
         given_user_id = get_random_user_id()
 
         # WHEN creating an instance of the event
-        actual_event = MessageCreatedEvent(session_id=given_session_id, user_id=given_user_id)
+        actual_event = MessageCreatedEvent(session_id=given_session_id, user_id=given_user_id,
+                                           message_source=cast(MessageCreatedEventSourceLiteral, given_source))
 
         # THEN the fields should be set correctly
         assert_basic_event_fields_are_set(actual_event, EventType.MESSAGE_CREATED, setup_application_config, fixed_time)
@@ -329,6 +338,15 @@ class TestMessageCreatedEvent:
         # AND the user id should be anonymized
         assert actual_event.anonymized_user_id is not None
         assert actual_event.anonymized_user_id != given_user_id
+
+    def test_should_raise_validation_error_if_source_is_not_valid(self, setup_application_config: ApplicationConfig):
+        # GIVEN an invalid source
+        given_invalid_source = "INVALID"
+
+        # WHEN creating an instance of the event
+        with pytest.raises(ValidationError, match="Input should be 'USER' or 'COMPASS'"):
+            MessageCreatedEvent(session_id=get_random_session_id(), user_id=get_random_user_id(),
+                                message_source=cast(MessageCreatedEventSourceLiteral, given_invalid_source))
 
     def test_extra_fields_are_not_allowed(self, setup_application_config: ApplicationConfig):
         # GIVEN all required fields

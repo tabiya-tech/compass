@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 import logging
 
-from pymongo import InsertOne
+from pymongo import InsertOne, UpdateOne
 
 from app.metrics.types import AbstractCompassMetricEvent
+from app.metrics.constants import EventType
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.server_dependencies.database_collections import Collections
 from common_libs.time_utilities import datetime_to_mongo_date
@@ -37,5 +38,33 @@ class MetricsRepository(IMetricsRepository):
     async def record_event(self, events: list[AbstractCompassMetricEvent]):
         commands = []
         for event in events:
-            commands.append(InsertOne(self._to_db_doc(event)))
+            if event.event_type == EventType.FEEDBACK_PROVIDED:
+                #  There can only be one feedback provided event per session, if one already exists we should update it
+                commands.append(UpdateOne(
+                    {
+                        "event_type": {"$eq": EventType.FEEDBACK_PROVIDED.value},
+                        "anonymized_user_id": {"$eq": event.anonymized_user_id},
+                        "anonymized_session_id": {"$eq": event.anonymized_session_id}
+                    },
+                    {
+                        "$set": self._to_db_doc(event)
+                    },
+                    upsert=True
+                ))
+            elif event.event_type == EventType.MESSAGE_REACTION_CREATED:
+                #  A message reaction can be updated multiple times, so we should upsert it
+                commands.append(UpdateOne(
+                    {
+                        "event_type": {"$eq": EventType.MESSAGE_REACTION_CREATED.value},
+                        "anonymized_user_id": {"$eq": event.anonymized_user_id},
+                        "anonymized_session_id": {"$eq": event.anonymized_session_id},
+                        "message_id": {"$eq": event.message_id}
+                    },
+                    {
+                        "$set": self._to_db_doc(event)
+                    },
+                    upsert=True
+                ))
+            else:
+                commands.append(InsertOne(self._to_db_doc(event)))
         return await self.collection.bulk_write(commands)

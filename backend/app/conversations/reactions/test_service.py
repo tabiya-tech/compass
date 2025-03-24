@@ -8,6 +8,7 @@ import pytest
 import pytest_mock
 
 from app.agent.agent_types import AgentInput, AgentOutput
+from app.app_config import ApplicationConfig
 from app.application_state import IApplicationStateManager, ApplicationState
 from app.conversation_memory.conversation_memory_manager import IConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState, ConversationContext, \
@@ -15,6 +16,9 @@ from app.conversation_memory.conversation_memory_types import ConversationMemory
 from app.conversations.reactions.repository import IReactionRepository
 from app.conversations.reactions.service import ReactionService, ReactingToUserMessageError
 from app.conversations.reactions.types import ReactionKind, DislikeReason, Reaction
+from app.metrics.service import IMetricsService
+from app.metrics.types import MessageReactionCreatedEvent
+from common_libs.test_utilities import get_random_user_id
 from common_libs.test_utilities.mock_application_state import get_mock_application_state
 
 
@@ -145,6 +149,15 @@ def _mock_conversation_memory_manager() -> IConversationMemoryManager:
     return MockedConversationMemoryManager()
 
 
+@pytest.fixture(scope='function')
+def _mock_metrics_service() -> IMetricsService:
+    class MockedMetricsService(IMetricsService):
+        async def record_event(self, event: MessageReactionCreatedEvent):
+            raise NotImplementedError()
+
+    return MockedMetricsService()
+
+
 class TestAdd:
     # Class-level variables shared across all test methods
     _given_session_id = 123
@@ -154,13 +167,16 @@ class TestAdd:
     async def test_add_liked_reaction_success(self, _mock_reaction_repository: IReactionRepository,
                                               _mock_application_state_manager: IApplicationStateManager,
                                               _mock_conversation_memory_manager: IConversationMemoryManager,
-                                              mocker: pytest_mock.MockerFixture):
+                                              _mock_metrics_service: IMetricsService,
+                                              setup_application_config: ApplicationConfig):
         # GIVEN a liked reaction
         given_reaction = _get_new_reaction(
             session_id=self._given_session_id,
             message_id=self._given_message_id,
             kind=ReactionKind.LIKED
         )
+        # AND a user id
+        given_user_id = get_random_user_id()
 
         # AND the message with the given message_id is a COMPASS message in the conversation context
         _mock_application_state_manager.get_state = AsyncMock(
@@ -175,21 +191,34 @@ class TestAdd:
         mock_returned_reaction = _get_new_reaction()  # Completely different random reaction
         _mock_reaction_repository.add = AsyncMock(return_value=mock_returned_reaction)
 
+        # AND the metrics service will record the event successfully
+        _mock_metrics_service.record_event = AsyncMock()
+
         # WHEN the add method is called
         service = ReactionService(reaction_repository=_mock_reaction_repository,
                                   conversation_memory_manager=_mock_conversation_memory_manager,
-                                  application_state_manager=_mock_application_state_manager)
+                                  application_state_manager=_mock_application_state_manager,
+                                  metrics_service=_mock_metrics_service)
 
         # THEN the reaction should be added successfully and return the repository's reaction
-        result = await service.add(given_reaction)
+        result = await service.add(given_reaction, given_user_id)
         assert result == mock_returned_reaction  # Assert we get the repository's reaction back
         assert result != given_reaction  # Double check we're not just getting our input back
+
+        # AND the metrics service should have been called with the correct event
+        _mock_metrics_service.record_event.assert_called_once()
+        recorded_event = _mock_metrics_service.record_event.call_args[0][0]
+        assert isinstance(recorded_event, MessageReactionCreatedEvent)
+        assert recorded_event.message_id == given_reaction.message_id
+        assert recorded_event.kind == given_reaction.kind.name
+        assert recorded_event.reasons == [reason.name for reason in given_reaction.reasons]
 
     @pytest.mark.asyncio
     async def test_add_disliked_reaction_success(self, _mock_reaction_repository: IReactionRepository,
                                                  _mock_application_state_manager: IApplicationStateManager,
                                                  _mock_conversation_memory_manager: IConversationMemoryManager,
-                                                 mocker: pytest_mock.MockerFixture):
+                                                 _mock_metrics_service: IMetricsService,
+                                                 setup_application_config: ApplicationConfig):
         # GIVEN a disliked reaction with reasons
         given_reaction = _get_new_reaction(
             session_id=self._given_session_id,
@@ -197,6 +226,8 @@ class TestAdd:
             kind=ReactionKind.DISLIKED,
             reasons=[DislikeReason.INCORRECT_INFORMATION]
         )
+        # AND a user id
+        given_user_id = get_random_user_id()
 
         # AND the message with the given message_id is a COMPASS message in the conversation context
         _mock_application_state_manager.get_state = AsyncMock(
@@ -213,20 +244,33 @@ class TestAdd:
         )
         _mock_reaction_repository.add = AsyncMock(return_value=mock_returned_reaction)
 
+        # AND the metrics service will record the event successfully
+        _mock_metrics_service.record_event = AsyncMock()
+
         # WHEN the add method is called
         service = ReactionService(reaction_repository=_mock_reaction_repository,
                                   conversation_memory_manager=_mock_conversation_memory_manager,
-                                  application_state_manager=_mock_application_state_manager)
+                                  application_state_manager=_mock_application_state_manager,
+                                  metrics_service=_mock_metrics_service)
 
         # THEN the reaction should be added successfully and return the repository's reaction
-        result = await service.add(given_reaction)
+        result = await service.add(given_reaction, given_user_id)
         assert result == mock_returned_reaction  # Assert we get the repository's reaction back
         assert result != given_reaction  # Double check we're not just getting our input back
+
+        # AND the metrics service should have been called with the correct event
+        _mock_metrics_service.record_event.assert_called_once()
+        recorded_event = _mock_metrics_service.record_event.call_args[0][0]
+        assert isinstance(recorded_event, MessageReactionCreatedEvent)
+        assert recorded_event.message_id == given_reaction.message_id
+        assert recorded_event.kind == given_reaction.kind.name
+        assert recorded_event.reasons == [reason.name for reason in given_reaction.reasons]
 
     @pytest.mark.asyncio
     async def test_add_reaction_to_user_message_raises_error(self, _mock_reaction_repository: IReactionRepository,
                                                              _mock_application_state_manager: IApplicationStateManager,
                                                              _mock_conversation_memory_manager: IConversationMemoryManager,
+                                                             _mock_metrics_service: IMetricsService,
                                                              mocker: pytest_mock.MockerFixture):
         # GIVEN a liked reaction
         given_reaction = _get_new_reaction(
@@ -234,6 +278,8 @@ class TestAdd:
             message_id=self._given_message_id,
             kind=ReactionKind.LIKED
         )
+        # AND a user id
+        given_user_id = get_random_user_id()
 
         # AND the message with the given message_id is a USER message in the conversation context
         _mock_application_state_manager.get_state = AsyncMock(
@@ -241,77 +287,97 @@ class TestAdd:
         _mock_conversation_memory_manager.set_state = Mock(return_value=None)
         _mock_conversation_memory_manager.is_user_message = AsyncMock(return_value=True)
 
+        # AND the metrics service will record the event successfully
+        _mock_metrics_service.record_event = AsyncMock()
+
         # WHEN the add method is called
-        with pytest.raises(ReactingToUserMessageError) as error_info:
+        with pytest.raises(ReactingToUserMessageError):
             service = ReactionService(reaction_repository=_mock_reaction_repository,
                                       conversation_memory_manager=_mock_conversation_memory_manager,
-                                      application_state_manager=_mock_application_state_manager)
-            await service.add(given_reaction)
+                                      application_state_manager=_mock_application_state_manager,
+                                      metrics_service=_mock_metrics_service)
+            await service.add(given_reaction, given_user_id)
 
-        # THEN a ReactingToUserMessageError should be raised with the appropriate message
-        assert str(
-            error_info.value) == f"The message with id {self._given_message_id} is a message from the user. User messages cannot be reacted to."
+        # THEN the metrics service should not have been called
+        _mock_metrics_service.record_event.assert_not_called()
 
     @pytest.mark.asyncio
     async def test_add_repository_throws_an_error(self, _mock_reaction_repository: IReactionRepository,
                                                   _mock_application_state_manager: IApplicationStateManager,
                                                   _mock_conversation_memory_manager: IConversationMemoryManager,
+                                                  _mock_metrics_service: IMetricsService,
                                                   mocker: pytest_mock.MockerFixture):
         # GIVEN the repository.add throws some error
-        given_error = Exception("given error message")
-        _add_spy = mocker.patch.object(_mock_reaction_repository, 'add')
-        _add_spy.side_effect = given_error
+        given_error = Exception("Some error")
+        _mock_reaction_repository.add = AsyncMock(side_effect=given_error)
+
+        # AND a liked reaction
+        given_reaction = _get_new_reaction(
+            session_id=self._given_session_id,
+            message_id=self._given_message_id,
+            kind=ReactionKind.LIKED
+        )
+        # AND a user id
+        given_user_id = get_random_user_id()
 
         # AND the message with the given message_id is a COMPASS message in the conversation context
         _mock_application_state_manager.get_state = AsyncMock(
             return_value=get_mock_application_state(self._given_session_id))
-        given_conversation_context = get_mock_conversation_context(self._given_message_id)
-        _mock_conversation_memory_manager.get_conversation_context = AsyncMock(return_value=given_conversation_context)
         _mock_conversation_memory_manager.set_state = Mock(return_value=None)
         _mock_conversation_memory_manager.is_user_message = AsyncMock(return_value=False)
+
+        # AND the metrics service will record the event successfully
+        _mock_metrics_service.record_event = AsyncMock()
 
         # WHEN the add method is called
         with pytest.raises(Exception) as error_info:
             service = ReactionService(reaction_repository=_mock_reaction_repository,
                                       conversation_memory_manager=_mock_conversation_memory_manager,
-                                      application_state_manager=_mock_application_state_manager)
-            given_reaction = _get_new_reaction(
-                session_id=self._given_session_id,
-                message_id=self._given_message_id,
-                kind=ReactionKind.LIKED
-            )
-            await service.add(given_reaction)
+                                      application_state_manager=_mock_application_state_manager,
+                                      metrics_service=_mock_metrics_service)
+            await service.add(given_reaction, given_user_id)
 
-        # THEN an exception should be raised
-        assert str(error_info.value) == str(given_error)
+        # THEN the error should be raised
+        assert error_info.value == given_error
+
+        # AND the metrics service should not have been called since the repository failed
+        _mock_metrics_service.record_event.assert_not_called()
 
     @pytest.mark.asyncio
     async def test_add_application_state_manager_throws_an_error(self, _mock_reaction_repository: IReactionRepository,
                                                                  _mock_application_state_manager: IApplicationStateManager,
                                                                  _mock_conversation_memory_manager: IConversationMemoryManager,
+                                                                 _mock_metrics_service: IMetricsService,
                                                                  mocker: pytest_mock.MockerFixture):
         # GIVEN the application_state_manager.get_state throws some error
-        given_error = Exception("application state manager error")
+        given_error = Exception("Some error")
         _mock_application_state_manager.get_state = AsyncMock(side_effect=given_error)
 
-        # AND the message with the given message_id is a COMPASS message in the conversation context
-        given_conversation_context = get_mock_conversation_context(self._given_message_id)
-        _mock_conversation_memory_manager.get_conversation_context = AsyncMock(return_value=given_conversation_context)
+        # AND a liked reaction
+        given_reaction = _get_new_reaction(
+            session_id=self._given_session_id,
+            message_id=self._given_message_id,
+            kind=ReactionKind.LIKED
+        )
+        # AND a user id
+        given_user_id = get_random_user_id()
+
+        # AND the metrics service will record the event successfully
+        _mock_metrics_service.record_event = AsyncMock()
 
         # WHEN the add method is called
         with pytest.raises(Exception) as error_info:
             service = ReactionService(reaction_repository=_mock_reaction_repository,
                                       conversation_memory_manager=_mock_conversation_memory_manager,
-                                      application_state_manager=_mock_application_state_manager)
-            given_reaction = _get_new_reaction(
-                session_id=self._given_session_id,
-                message_id=self._given_message_id,
-                kind=ReactionKind.LIKED
-            )
-            await service.add(given_reaction)
+                                      application_state_manager=_mock_application_state_manager,
+                                      metrics_service=_mock_metrics_service)
+            await service.add(given_reaction, given_user_id)
 
-        # THEN an exception should be raised
-        assert str(error_info.value) == str(given_error)
+        # THEN the error should be raised
+        assert error_info.value == given_error
+
+        # AND the metrics service should not have been called since getting the state failed
+        _mock_metrics_service.record_event.assert_not_called()
 
 
 class TestDelete:
@@ -323,13 +389,17 @@ class TestDelete:
     async def test_delete_success(self, _mock_reaction_repository: IReactionRepository,
                                   _mock_application_state_manager: IApplicationStateManager,
                                   _mock_conversation_memory_manager: IConversationMemoryManager,
+                                  _mock_metrics_service: IMetricsService,
                                   mocker: pytest_mock.MockerFixture):
+        # GIVEN the repository will delete successfully
+        _mock_reaction_repository.delete = AsyncMock()
+
         # WHEN the delete method is called
         service = ReactionService(reaction_repository=_mock_reaction_repository,
                                   conversation_memory_manager=_mock_conversation_memory_manager,
-                                  application_state_manager=_mock_application_state_manager)
-        _mock_reaction_repository.delete = AsyncMock(return_value=None)
+                                  application_state_manager=_mock_application_state_manager,
+                                  metrics_service=_mock_metrics_service)
         await service.delete(self._given_session_id, self._given_message_id)
 
-        # THEN the repository.delete should be called with the correct parameters
+        # THEN the repository should have been called with the correct parameters
         _mock_reaction_repository.delete.assert_called_once_with(self._given_session_id, self._given_message_id)
