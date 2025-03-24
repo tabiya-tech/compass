@@ -1,0 +1,338 @@
+"""
+Tests for the metric type models.
+"""
+import random
+
+from app.app_config import ApplicationConfig
+import pytest
+import pytest_mock
+from datetime import datetime, timezone
+from pydantic import ValidationError
+from app.metrics.types import (
+    AbstractCompassMetricEvent,
+    AbstractUserAccountEvent,
+    AbstractConversationEvent,
+    UserAccountCreatedEvent,
+    ConversationPhaseEvent,
+    MessageCreatedEvent,
+    FeedbackProvidedEvent,
+    FeedbackScoreEvent,
+    MessageReactionCreatedEvent,
+)
+from app.conversations.reactions.types import ReactionKind, DislikeReason
+from app.metrics.constants import EventType
+from common_libs.test_utilities import get_random_user_id, get_random_session_id
+
+
+def assert_basic_event_fields_are_set(event: AbstractCompassMetricEvent, expected_event_type: EventType,
+                                      application_config: ApplicationConfig, expected_timestamp: datetime):
+    assert event.environment_name == application_config.environment_name
+    assert event.version == application_config.version_info.to_version_string()
+    assert event.event_type == expected_event_type
+    assert event.timestamp == expected_timestamp
+
+
+class TestAbstractClasses:
+    @pytest.mark.parametrize("cls", [
+        AbstractCompassMetricEvent,
+        AbstractUserAccountEvent,
+        AbstractConversationEvent,
+    ])
+    def test_abstract_class_cannot_be_instantiated(self, cls, setup_application_config: ApplicationConfig):
+        # GIVEN Abstract Event class
+        abstract_event_class = cls
+
+        # WHEN instantiating the class
+        # THEN it should raise a TypeError.
+        # AND the error message should indicate that the class is an abstract class.
+        with pytest.raises(TypeError, match=f"{cls.__name__} is an abstract class and cannot be instantiated directly"):
+            abstract_event_class()
+
+
+class TestUserAccountCreatedEvent:
+    def test_fields_are_set_correctly(self, setup_application_config: ApplicationConfig,
+                                      mocker: pytest_mock.MockerFixture):
+        # datetime.now returns a fixed time
+        fixed_time = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)
+        mocker.patch('common_libs.time_utilities._time_utils.datetime', new=mocker.Mock(now=lambda tz=None: fixed_time))
+
+        # GIVEN a user id
+        given_user_id = get_random_user_id()
+
+        # WHEN creating an instance of the user account created event
+        actual_event = UserAccountCreatedEvent(user_id=given_user_id)
+
+        # THEN the basic event fields should be set correctly
+        assert_basic_event_fields_are_set(
+            actual_event, EventType.USER_ACCOUNT_CREATED, setup_application_config, fixed_time)
+
+        # AND the user_id should be present and anonymized
+        assert actual_event.anonymized_user_id is not None
+        assert actual_event.anonymized_user_id != given_user_id
+
+    def test_extra_fields_are_not_allowed(self, setup_application_config: ApplicationConfig):
+        # GIVEN a user id
+        given_user_id = get_random_user_id()
+
+        # AND an extra field
+        given_extra_field = "extra_field"
+
+        # WHEN creating an instance of the event
+        # THEN it should raise a TypeError indicating that the extra field is not allowed.
+        with pytest.raises(TypeError, match="got an unexpected keyword argument 'extra_field'"):
+            UserAccountCreatedEvent(user_id=given_user_id, extra_field=given_extra_field)  # type:ignore
+
+
+class TestConversationPhaseEvent:
+    def test_fields_are_set_correctly(self, setup_application_config: ApplicationConfig,
+                                      mocker: pytest_mock.MockerFixture):
+        # datetime.now returns a fixed time
+        fixed_time = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)
+        mocker.patch('common_libs.time_utilities._time_utils.datetime', new=mocker.Mock(now=lambda tz=None: fixed_time))
+
+        # GIVEN a conversation phase, session id and user id
+        given_conversation_phase = "INTRO"
+        given_session_id = get_random_session_id()
+        given_user_id = get_random_user_id()
+
+        # WHEN creating an instance of the event
+        actual_event = ConversationPhaseEvent(phase=given_conversation_phase,  # type:ignore
+                                              session_id=given_session_id,
+                                              user_id=given_user_id)
+
+        # THEN the basic event fields should be set
+        assert_basic_event_fields_are_set(actual_event, EventType.CONVERSATION_PHASE, setup_application_config,
+                                          fixed_time)
+
+        # AND the conversation phase should be set correctly
+        assert actual_event.phase == given_conversation_phase
+
+        # AND the session id should be anonymized
+        assert actual_event.anonymized_session_id is not None
+        assert actual_event.anonymized_session_id != given_session_id
+
+        # AND the user id should be anonymized
+        assert actual_event.anonymized_user_id is not None
+        assert actual_event.anonymized_user_id != given_user_id
+
+    def test_extra_fields_are_not_allowed(self, setup_application_config: ApplicationConfig):
+        # GIVEN all required fields
+        given_session_id = get_random_session_id()
+        given_user_id = get_random_user_id()
+        given_conversation_phase = "INTRO"
+
+        # AND an extra field
+        given_extra_field = "extra_field"
+
+        # WHEN creating an instance of the event
+        # THEN it should raise a TypeError indicating that the extra field is not allowed.
+        with pytest.raises(TypeError, match="got an unexpected keyword argument 'extra_field'"):
+            ConversationPhaseEvent(phase=given_conversation_phase, session_id=given_session_id, user_id=given_user_id,
+                                   extra_field=given_extra_field)  # type:ignore
+
+
+class TestFeedbackProvidedEvent:
+    def test_fields_are_set_correctly(self, setup_application_config: ApplicationConfig,
+                                      mocker: pytest_mock.MockerFixture):
+        # datetime.now returns a fixed time
+        fixed_time = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)
+        mocker.patch('common_libs.time_utilities._time_utils.datetime', new=mocker.Mock(now=lambda tz=None: fixed_time))
+
+        # GIVEN a session id and user id
+        given_session_id = get_random_session_id()
+        given_user_id = get_random_user_id()
+
+        # WHEN creating an instance of the event
+        actual_event = FeedbackProvidedEvent(session_id=given_session_id, user_id=given_user_id)
+
+        # THEN the basic event fields should be set correctly
+        assert_basic_event_fields_are_set(actual_event, EventType.FEEDBACK_PROVIDED, setup_application_config,
+                                          fixed_time)
+
+        # AND the session id should be anonymized
+        assert actual_event.anonymized_session_id is not None
+        assert actual_event.anonymized_session_id != given_session_id
+
+        # AND the user id should be anonymized
+        assert actual_event.anonymized_user_id is not None
+        assert actual_event.anonymized_user_id != given_user_id
+
+    def test_extra_fields_are_not_allowed(self, setup_application_config: ApplicationConfig):
+        # GIVEN all required fields
+        given_session_id = get_random_session_id()
+        given_user_id = get_random_user_id()
+
+        # AND an extra field
+        given_extra_field = "extra_field"
+
+        # WHEN creating an instance of the event
+        # THEN it should raise a TypeError indicating that the extra field is not allowed.
+        with pytest.raises(TypeError, match="got an unexpected keyword argument 'extra_field'"):
+            FeedbackProvidedEvent(
+                session_id=given_session_id,
+                user_id=given_user_id,
+                extra_field=given_extra_field)  # type:ignore
+
+
+class TestFeedbackScoreEvent:
+    def test_fields_are_set_correctly(self, setup_application_config: ApplicationConfig,
+                                      mocker: pytest_mock.MockerFixture):
+        # datetime.now returns a fixed time
+        fixed_time = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)
+        mocker.patch('common_libs.time_utilities._time_utils.datetime', new=mocker.Mock(now=lambda tz=None: fixed_time))
+
+        # GIVEN a feedback type, value and session id and user id
+        given_feedback_type = random.choice(["NPS", "CSAT", "CES"])  # nosec B311 # random is used for testing purposes
+        given_value = random.choice([-1, 0, 1])  # nosec B311 # random is used for testing purposes
+        given_session_id = get_random_session_id()
+        given_user_id = get_random_user_id()
+
+        # WHEN creating an instance of the event
+        actual_event = FeedbackScoreEvent(feedback_type=given_feedback_type, value=given_value,  # type:ignore
+                                          session_id=given_session_id, user_id=given_user_id)
+
+        # THEN the basic event fields should be set correctly
+        assert_basic_event_fields_are_set(actual_event, EventType.FEEDBACK_SCORE, setup_application_config, fixed_time)
+
+        # AND the feedback type should be set correctly
+        assert actual_event.feedback_type == given_feedback_type
+
+        # AND the value should be set correctly
+        assert actual_event.value == given_value
+
+        # AND the session id should be anonymized
+        assert actual_event.anonymized_session_id is not None
+        assert actual_event.anonymized_session_id != given_session_id
+
+        # AND the user id should be anonymized
+        assert actual_event.anonymized_user_id is not None
+        assert actual_event.anonymized_user_id != given_user_id
+
+    def test_invalid_feedback_type_raises_validation_error(self, setup_application_config: ApplicationConfig):
+        # GIVEN an invalid feedback type
+        given_invalid_feedback_type = "INVALID"
+
+        # WHEN creating an instance of the event
+        with pytest.raises(ValidationError, match="Input should be 'NPS', 'CSAT' or 'CES'"):
+            FeedbackScoreEvent(
+                feedback_type=given_invalid_feedback_type,  # type:ignore
+                value=1,
+                session_id=get_random_session_id(),
+                user_id=get_random_user_id())
+
+    def test_extra_fields_are_not_allowed(self, setup_application_config: ApplicationConfig):
+        # GIVEN all required fields
+        given_session_id = get_random_session_id()
+        given_user_id = get_random_user_id()
+        given_feedback_type = "NPS"
+        given_value = 1
+
+        # AND an extra field
+        given_extra_field = "extra_field"
+
+        # WHEN creating an instance of the event
+        # THEN it should raise a TypeError indicating that the extra field is not allowed.
+        with pytest.raises(TypeError, match="got an unexpected keyword argument 'extra_field'"):
+            FeedbackScoreEvent(feedback_type=given_feedback_type, value=given_value, session_id=given_session_id,
+                               user_id=given_user_id, extra_field=given_extra_field)  # type:ignore
+
+
+class TestMessageCreatedEvent:
+    def test_fields_are_set_correctly(self, setup_application_config: ApplicationConfig,
+                                      mocker: pytest_mock.MockerFixture):
+        # datetime.now returns a fixed time
+        fixed_time = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)
+        mocker.patch('common_libs.time_utilities._time_utils.datetime', new=mocker.Mock(now=lambda tz=None: fixed_time))
+
+        # GIVEN a session id and user id
+        given_session_id = get_random_session_id()
+        given_user_id = get_random_user_id()
+
+        # WHEN creating an instance of the event
+        actual_event = MessageCreatedEvent(session_id=given_session_id, user_id=given_user_id)
+
+        # THEN the fields should be set correctly
+        assert_basic_event_fields_are_set(actual_event, EventType.MESSAGE_CREATED, setup_application_config, fixed_time)
+
+        # AND the session id should be anonymized
+        assert actual_event.anonymized_session_id is not None
+        assert actual_event.anonymized_session_id != given_session_id
+
+        # AND the user id should be anonymized
+        assert actual_event.anonymized_user_id is not None
+        assert actual_event.anonymized_user_id != given_user_id
+
+    def test_extra_fields_are_not_allowed(self, setup_application_config: ApplicationConfig):
+        # GIVEN all required fields
+        given_session_id = get_random_session_id()
+        given_user_id = get_random_user_id()
+
+        # AND an extra field
+        given_extra_field = "extra_field"
+
+        # WHEN creating an instance of the event
+        # THEN it should raise a TypeError indicating that the extra field is not allowed.
+        with pytest.raises(TypeError, match="got an unexpected keyword argument 'extra_field'"):
+            MessageCreatedEvent(
+                session_id=given_session_id,
+                user_id=given_user_id,
+                extra_field=given_extra_field)  # type:ignore
+
+
+class TestMessageReactionCreatedEvent:
+    def test_fields_are_set_correctly(self, setup_application_config: ApplicationConfig,
+                                      mocker: pytest_mock.MockerFixture):
+        # datetime.now returns a fixed time
+        fixed_time = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)
+        mocker.patch('common_libs.time_utilities._time_utils.datetime', new=mocker.Mock(now=lambda tz=None: fixed_time))
+
+        # GIVEN a message id, a random reaction kind, reasons, session id and user id
+        given_message_id = "message_1"
+        given_reaction_kind = random.choice(list(ReactionKind))  # nosec B311 # random is used for testing purposes
+        given_reasons = random.choices(list(DislikeReason), k=random.randint(1, len(DislikeReason)))  # nosec B311 # random is used for testing purposes
+        given_session_id = get_random_session_id()
+        given_user_id = get_random_user_id()
+
+        # WHEN creating an instance of the event
+        actual_event = MessageReactionCreatedEvent(message_id=given_message_id, kind=given_reaction_kind,
+                                                   reasons=given_reasons, session_id=given_session_id,
+                                                   user_id=given_user_id)
+
+        # THEN the basic event fields should be set correctly
+        assert_basic_event_fields_are_set(actual_event, EventType.MESSAGE_REACTION_CREATED, setup_application_config,
+                                          fixed_time)
+
+        # AND the message id should set correctly
+        assert actual_event.message_id == given_message_id
+
+        # AND the reaction kind should set correctly
+        assert actual_event.kind == given_reaction_kind.name
+
+        # AND the reasons should set correctly
+        assert actual_event.reasons == [reason.name for reason in given_reasons]
+
+        # AND the session id should be anonymized
+        assert actual_event.anonymized_session_id is not None
+        assert actual_event.anonymized_session_id != given_session_id
+
+        # AND the user id should be anonymized
+        assert actual_event.anonymized_user_id is not None
+        assert actual_event.anonymized_user_id != given_user_id
+
+    def test_extra_fields_are_not_allowed(self, setup_application_config: ApplicationConfig):
+        # GIVEN all required fields
+        given_session_id = 123
+        given_user_id = get_random_user_id()
+        given_message_id = "message_1"
+        given_reaction_kind = random.choice(list(ReactionKind))  # nosec B311 # random is used for testing purposes
+        given_reasons = random.choices(list(DislikeReason), k=random.randint(1, len(DislikeReason)))  # nosec B311 # random is used for testing purposes
+
+        # AND an extra field
+        given_extra_field = "extra_field"
+
+        # WHEN creating an instance of the event
+        # THEN it should raise a TypeError indicating that the extra field is not allowed.
+        with pytest.raises(TypeError, match="got an unexpected keyword argument 'extra_field'"):
+            MessageReactionCreatedEvent(message_id=given_message_id, kind=given_reaction_kind, reasons=given_reasons,
+                                        session_id=given_session_id, user_id=given_user_id,
+                                        extra_field=given_extra_field)  # type:ignore

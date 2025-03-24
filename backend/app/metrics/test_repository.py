@@ -45,8 +45,7 @@ def get_feedback_provided_event():
 def get_message_created_event():
     return MessageCreatedEvent(
         user_id=get_random_user_id(),
-        session_id=get_random_session_id(),
-        message_id=get_random_printable_string(16)
+        session_id=get_random_session_id()
     )
 
 
