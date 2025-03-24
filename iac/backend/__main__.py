@@ -62,7 +62,7 @@ def main():
         frontend_url=frontend_url,
         sentry_backend_dsn=getenv("SENTRY_BACKEND_DSN", True, False),
         enable_sentry=getenv("ENABLE_SENTRY"),
-        enable_metrics=getenv("ENABLE_METRICS"),
+        enable_metrics=getenv("BACKEND_ENABLE_METRICS"),
         gcp_oauth_client_id=getenv("GCP_OAUTH_CLIENT_ID"),
 
         cloudrun_max_instance_request_concurrency=cloudrun_max_instance_request_concurrency,

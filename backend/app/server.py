@@ -58,10 +58,10 @@ if not enable_sentry:
     raise ValueError("Mandatory ENABLE_SENTRY env variable is not set! Please set it to the either True or False")
 logger.info(f"ENABLE_SENTRY: {os.getenv('ENABLE_SENTRY')}")
 
-_metrics_enabled_str = os.getenv("ENABLE_METRICS")
+_metrics_enabled_str = os.getenv("BACKEND_ENABLE_METRICS")
 if not _metrics_enabled_str:
-    raise ValueError("Mandatory ENABLE_METRICS env variable is not set! Please set it to the either True or False")
-logger.info(f"ENABLE_METRICS: {_metrics_enabled_str}")
+    raise ValueError("Mandatory BACKEND_ENABLE_METRICS env variable is not set! Please set it to the either True or False")
+logger.info(f"BACKEND_ENABLE_METRICS: {_metrics_enabled_str}")
 
 # Check mandatory environment variables and raise an early exception if they are not set
 if not os.getenv('TAXONOMY_MONGODB_URI'):

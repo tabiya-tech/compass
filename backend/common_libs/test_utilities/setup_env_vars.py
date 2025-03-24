@@ -35,7 +35,7 @@ def setup_env_vars(*, env_vars: dict = None):
     os.environ['TARGET_ENVIRONMENT_NAME'] = env_vars.get('TARGET_ENVIRONMENT_NAME', "foo")
     os.environ['SENTRY_BACKEND_DSN'] = env_vars.get('SENTRY_BACKEND_DSN', "foo")
     os.environ['ENABLE_SENTRY'] = env_vars.get('ENABLE_SENTRY', "false")
-    os.environ['ENABLE_METRICS'] = env_vars.get('ENABLE_METRICS', "false")
+    os.environ['BACKEND_ENABLE_METRICS'] = env_vars.get('BACKEND_ENABLE_METRICS', "false")
     # Add more environment variables as needed here
 
 
@@ -59,5 +59,5 @@ def teardown_env_vars():
     del os.environ['TARGET_ENVIRONMENT_NAME']
     del os.environ['SENTRY_BACKEND_DSN']
     del os.environ['ENABLE_SENTRY']
-    del os.environ['ENABLE_METRICS']
+    del os.environ['BACKEND_ENABLE_METRICS']
     # Add more environment variables as needed here
