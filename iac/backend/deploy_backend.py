@@ -295,7 +295,7 @@ def _deploy_cloud_run_service(
                             name="ENABLE_SENTRY",
                             value=backend_service_cfg.enable_sentry),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
-                            name="ENABLE_METRICS",
+                            name="BACKEND_ENABLE_METRICS",
                             value=backend_service_cfg.enable_metrics),
 
                         # Add more environment variables here
