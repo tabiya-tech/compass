@@ -516,7 +516,8 @@ const SensitiveDataForm: React.FC = () => {
                 id: "1",
                 text: (
                   <>
-                    We're sorry that you chose not to provide your data. You will not be able to proceed and will be{" "}
+                    We're sorry that you chose not to provide your data. Providing this information helps Compass
+                    deliver a more personalized experience for you. You will not be able to proceed and will be{" "}
                     <HighlightedSpan>logged out.</HighlightedSpan>
                   </>
                 ),
