@@ -24,7 +24,6 @@ export const DATA_TEST_ID = {
   ENUM_FIELD_QUESTION_TEXT: `enum-field-question-text-${uniqueId}`,
   ENUM_FIELD_FORM_CONTROL: `enum-field-form-control-${uniqueId}`,
   ENUM_FIELD_MENU_ITEM: `enum-field-menu-item-${uniqueId}`,
-  ENUM_FIELD_EMPTY_OPTION: `enum-field-empty-option-${uniqueId}`,
 }
 
 interface EnumFieldProps {
@@ -56,11 +55,8 @@ const EnumField: React.FC<EnumFieldProps> = ({ field, dataTestId, initialValue =
 
   // Handle selection change
   const handleChange = (event: SelectChangeEvent<string>) => {
-    const inputValue = event.target.value;
-    setValue(inputValue);
-
-    // If the input value is "prefer_not_to_say", set it to an empty string
-    const newValue = inputValue === "prefer_not_to_say" ? "" : inputValue;
+    const newValue = event.target.value;
+    setValue(newValue);
 
     // Validate and notify parent
     const { isValid, errorMessage } = validate(newValue);
@@ -119,11 +115,14 @@ const EnumField: React.FC<EnumFieldProps> = ({ field, dataTestId, initialValue =
           label={field.label}
           data-testid={DATA_TEST_ID.ENUM_FIELD_SELECT}
           onChange={handleChange}
+          // when the field is not required and has a value, remove the dropdown icon
+          // else return undefined since the IconButton defaults to ArrowDropDownIcon
+          IconComponent={!field.required && value !== "" ? () => null : undefined}
           endAdornment={
             !field.required && value !== '' && (
               <IconButton 
                 size="small" 
-                sx={{ marginRight: 2 }}
+                sx={{ padding: 0 }}
                 onClick={handleClear}
                 aria-label="clear selection"
                 data-testid={DATA_TEST_ID.ENUM_FIELD_CLEAR_BUTTON}
@@ -133,11 +132,6 @@ const EnumField: React.FC<EnumFieldProps> = ({ field, dataTestId, initialValue =
             )
           }
         >
-          {!field.required && (
-            <MenuItem value="prefer_not_to_say" data-testid={DATA_TEST_ID.ENUM_FIELD_EMPTY_OPTION}>
-              Prefer not to say
-            </MenuItem>
-          )}
           {field.values.map((value, index) => (
             <MenuItem
               key={`${field.dataKey}-${index}`}
