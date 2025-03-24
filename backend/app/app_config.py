@@ -30,7 +30,7 @@ def get_application_config() -> ApplicationConfig:
     return _application_config
 
 
-def set_application_config(cfg: ApplicationConfig) -> None:
+def set_application_config(cfg: ApplicationConfig | None) -> None:
     """
     Set the application configuration. This should be called once at the start of the application.
     :param cfg:

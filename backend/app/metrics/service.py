@@ -24,15 +24,17 @@ class MetricsService(IMetricsService):
     Implementation of the metrics service.
     """
 
-    def __init__(self, repository: IMetricsRepository):
+    def __init__(self, repository: IMetricsRepository, enable_metrics: bool = True):
         self._metrics_repository = repository
         self._logger = logging.getLogger(self.__class__.__name__)
-        self.enable_metrics = get_application_config().enable_metrics
+        self.enable_metrics = enable_metrics
         if not self.enable_metrics:
             self._logger.warning("Metrics are disabled. Events will not be recorded.")
 
     async def record_event(self, event: AbstractCompassMetricEvent):
         try:
+            if not self.enable_metrics:
+                return
             await self._metrics_repository.record_event([event])
         except Exception as e:
             # Errors are swallowed and logged since we want the event service to be fire and forget and therefore cannot fail

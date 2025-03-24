@@ -36,6 +36,7 @@ def _get_metric_event() -> AbstractCompassMetricEvent:
 
 
 class TestMetricsService:
+
     @pytest.mark.asyncio
     async def test_record_event(self, _mock_metrics_repository: IMetricsRepository, setup_application_config: ApplicationConfig):
         # GIVEN a metric to record
@@ -44,8 +45,8 @@ class TestMetricsService:
         #  AND the metrics repository will record the event successfully
         _mock_metrics_repository.record_event = AsyncMock(return_value=True)
 
-        # WHEN the event is recorded
-        service = MetricsService(_mock_metrics_repository)
+        # WHEN the event is recorded with metrics enabled
+        service = MetricsService(_mock_metrics_repository, True)
         await service.record_event(given_metric_event)
 
         # THEN the repository is called with the event
@@ -62,8 +63,8 @@ class TestMetricsService:
         given_exception = Exception("foo error")
         _mock_metrics_repository.record_event = AsyncMock(side_effect=given_exception)
 
-        # WHEN the event is recorded
-        service = MetricsService(_mock_metrics_repository)
+        # WHEN the event is recorded with metrics enabled
+        service = MetricsService(_mock_metrics_repository, True)
         await service.record_event(metric_event)  # no exception is thrown
 
         # THEN the repository was called with the event
@@ -71,3 +72,23 @@ class TestMetricsService:
 
         # AND the error is logged
         assert str(given_exception) in caplog.text
+
+    @pytest.mark.asyncio
+    async def test_should_not_record_event_when_metrics_disabled(self, _mock_metrics_repository: IMetricsRepository,
+                                                                 setup_application_config: ApplicationConfig,
+                                                                 caplog: pytest.LogCaptureFixture):
+        # GIVEN a metric to record
+        metric_event = _get_metric_event()
+
+        #  AND the metrics repository will record the event successfully if called
+        _mock_metrics_repository.record_event = AsyncMock(return_value=True)
+
+        # WHEN the event is recorded with metrics disabled
+        service = MetricsService(_mock_metrics_repository, False)
+        await service.record_event(metric_event)
+
+        # THEN the repository is not called
+        _mock_metrics_repository.record_event.assert_not_called()
+
+        # AND a warning is logged
+        assert "Metrics are disabled. Events will not be recorded." in caplog.text
