@@ -26,6 +26,7 @@ class AgentDirectorState(BaseModel):
     """
     session_id: int
     current_phase: ConversationPhase = Field(default=ConversationPhase.INTRO)
+    previous_phase: Optional[ConversationPhase] = None
     conversation_conducted_at: Optional[datetime] = None
 
     class Config:
@@ -38,6 +39,9 @@ class AgentDirectorState(BaseModel):
     def __setattr__(self, key, value):
         if key == "conversation_conducted_at":
             value = _parse_data(value)
+        elif key == "current_phase":
+            # Update previous_phase when current_phase changes
+            self.previous_phase = getattr(self, "current_phase", None)
         super().__setattr__(key, value)
 
     # use a field serializer to serialize the current_phase
@@ -46,9 +50,21 @@ class AgentDirectorState(BaseModel):
     def serialize_current_phase(self, current_phase: ConversationPhase, _info):
         return current_phase.name
 
+    # use a field serializer to serialize the previous_phase
+    @field_serializer("previous_phase")
+    def serialize_previous_phase(self, previous_phase: Optional[ConversationPhase], _info):
+        return previous_phase.name if previous_phase is not None else None
+
     # Deserialize the current_phase from the enum name
     @field_validator("current_phase", mode='before')
     def deserialize_current_phase(cls, value: str | ConversationPhase) -> ConversationPhase:
+        if isinstance(value, str):
+            return ConversationPhase[value]
+        return value
+
+    # Deserialize the previous_phase from the enum name
+    @field_validator("previous_phase", mode='before')
+    def deserialize_previous_phase(cls, value: Optional[str | ConversationPhase]) -> Optional[ConversationPhase]:
         if isinstance(value, str):
             return ConversationPhase[value]
         return value
@@ -62,6 +78,7 @@ class AgentDirectorState(BaseModel):
     def from_document(_doc: Mapping[str, Any]) -> "AgentDirectorState":
         return AgentDirectorState(session_id=_doc["session_id"],
                                   current_phase=_doc["current_phase"],
+                                  previous_phase=_doc.get("previous_phase"),
                                   # The conversation_conducted_at field was introduced later, so it may not exist in all documents
                                   # For the documents that don't have this field, we'll default to None,
                                   # The implication being that the client will have to handle this case.

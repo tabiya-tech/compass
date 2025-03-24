@@ -4,6 +4,7 @@ This module contains the service layer for handling conversations.
 import logging
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
+from typing import cast
 
 from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
@@ -18,7 +19,7 @@ from app.conversations.utils import get_messages_from_conversation_manager, filt
 from app.sensitive_filter import sensitive_filter
 from app.types import Experience, Skill
 from app.metrics.service import IMetricsService
-from app.metrics.types import  ConversationPhaseEvent
+from app.metrics.types import ConversationPhaseEvent, ConversationPhaseLiteral
 
 
 class ConversationAlreadyConcludedError(Exception):
@@ -133,18 +134,20 @@ class ConversationService(IConversationService):
             if exp.dive_in_phase == DiveInPhase.PROCESSED and len(exp.experience.top_skills) > 0:
                 experiences_explored += 1
 
-        # save the state, before responding to the user
-        await self._application_state_manager.save_state(state)
-
-        # Record conversation phase event if the conversation has ended
-        if state.agent_director_state.current_phase == ConversationPhase.ENDED:
+        # if the phase has changed, record a phase change event
+        if state.agent_director_state.previous_phase != state.agent_director_state.current_phase:
             await self._metrics_service.record_event(
                 ConversationPhaseEvent(
                     user_id=user_id,
                     session_id=session_id,
-                    phase="ENDED"
+                    phase=cast(ConversationPhaseLiteral, state.agent_director_state.current_phase.name)
                 )
             )
+
+        # Record previous phase so that next time we can check if the phase has changed
+        state.agent_director_state.previous_phase = state.agent_director_state.current_phase
+        # save the state, before responding to the user
+        await self._application_state_manager.save_state(state)
 
         return ConversationResponse(
             messages=response,
