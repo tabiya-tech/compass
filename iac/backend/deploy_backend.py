@@ -32,7 +32,7 @@ class BackendServiceConfig:
     target_environment_type: str | pulumi.Output[str]
     backend_url: str | pulumi.Output[str]
     frontend_url: str | pulumi.Output[str]
-    sentry_backend_dsn: str
+    sentry_dsn: str
     enable_sentry: str
     enable_metrics: str
     gcp_oauth_client_id: str
@@ -289,10 +289,10 @@ def _deploy_cloud_run_service(
                             name="FRONTEND_URL",
                             value=backend_service_cfg.frontend_url),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
-                            name="SENTRY_BACKEND_DSN",
-                            value=backend_service_cfg.sentry_backend_dsn),
+                            name="BACKEND_SENTRY_DSN",
+                            value=backend_service_cfg.sentry_dsn),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
-                            name="ENABLE_SENTRY",
+                            name="BACKEND_ENABLE_SENTRY",
                             value=backend_service_cfg.enable_sentry),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="BACKEND_ENABLE_METRICS",

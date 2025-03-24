@@ -187,9 +187,9 @@ Sentry is for now **set up manually**. Follow these steps:
 4. **Store them in the `.env` file**:
     ```dotenv
     # DSN for the frontend Sentry project  
-    SENTRY_FRONTEND_DSN=<dsn>
+    FRONTEND_SENTRY_DSN=<dsn>
     # DSN for the backend Sentry project
-    SENTRY_BACKEND_DSN=<dsn>
+    BACKEND_SENTRY_DSN=<dsn>
     ```
 
 _______
@@ -407,7 +407,8 @@ Here are some additional fields.
 # Region where the Vertex API is deployed  
 VERTEX_API_REGION=<region>
 # Enable or disable Sentry for this environment
-ENABLE_SENTRY=<True/False>
+BACKEND_ENABLE_SENTRY=<True/False>
+FRONTEND_ENABLE_SENTRY=<True/False>
 ```  
 
 - **For the final `.env` file structure**, refer to the [env.template](/iac/templates/env.template).
