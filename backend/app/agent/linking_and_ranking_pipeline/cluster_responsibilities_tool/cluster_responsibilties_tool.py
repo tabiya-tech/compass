@@ -145,6 +145,15 @@ class ClusterResponsibilitiesTool:
             # Call the LLM to cluster the responsibilities
             prompt = _get_prompt(_responsibilities, _number_of_clusters)
             llm_response, llm_stats = await self._llm_caller.call_llm(llm=self._llm, llm_input=prompt, logger=self._logger)
+            if not llm_response:
+                # This may happen if the LLM fails to return a JSON object
+                # Instead of completely failing, we log a warning and return the input responsibilities in each of the requested clusters
+                self._logger.warning("The LLM did not return any output and the responsibilities will be returned as a single cluster")
+                return ClusterResponsibilitiesResponse(
+                    clusters=[Cluster(cluster_name=f"Cluster {i}", responsibilities=_responsibilities) for i in range(_number_of_clusters)],
+                    llm_stats=llm_stats
+                )
+
             if self._logger.isEnabledFor(logging.INFO):
                 self._logger.info("LLM Response: %s", llm_response)
             # log a warning if the number of clusters returned is different from the requested number of clusters

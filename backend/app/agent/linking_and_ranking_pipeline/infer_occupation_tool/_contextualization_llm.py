@@ -135,6 +135,14 @@ class _ContextualizationLLM:
             llm_input=prompt,
             logger=self._logger
         )
+        if not llm_response:
+            # This may happen if the LLM fails to return a JSON object
+            # Instead of completely failing, we log a warning and return the input title
+            self._logger.warning("The LLM did not return any output and the contextual titles will be the same as the input title")
+            return ContextualizationLLMResponse(
+                contextual_titles=[experience_title],
+                llm_stats=llm_stats
+            )
 
         # strip the contextual titles from leading and trailing whitespaces and
         contextual_titles = [

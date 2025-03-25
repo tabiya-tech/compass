@@ -54,6 +54,12 @@ class _ResponsibilitiesExtractionLLM:
                                                                 llm_input=_ResponsibilitiesExtractionLLM._extraction_prompt_template(
                                                                     context=context, last_user_input=last_user_input),
                                                                 logger=self.logger)
+        if not llm_output:
+            # This may happen if the LLM fails to return a JSON object
+            # Instead of completely failing, we log a warning and return the input title
+            self.logger.warning("The LLM did not return any output and the responsibilities will be empty")
+            return ResponsibilitiesData(responsibilities=[], non_responsibilities=[], other_peoples_responsibilities=[]), llm_stats
+
         self.logger.debug("LLM output: %s", llm_output.model_dump())
         return ResponsibilitiesData(
             responsibilities=llm_output.responsibilities,
