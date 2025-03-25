@@ -76,7 +76,7 @@ class _SentenceDecompositionLLM:
             Place each sub-sentence in a separate JSON string in the 'decomposed_sentences' list.
         # 'resolved_pronouns' instructions
             Replace all pronouns (expect the ones that refer to the user), in the 'decomposed_sentences' with what they point to.
-            Review the <User's Last Input> and the <Conversation History>to identify the specific part they refer to and substitute the pronoun with the part.
+            Review the <User's Last Input> and the <Conversation History> to identify the specific part they refer to and substitute the pronoun with the part.
             
             In the <User's Last Input> and the <Conversation History> you and I refer to the user and the model respectively depending on the context.
             In the output, 'I' should be used to refer to the user.

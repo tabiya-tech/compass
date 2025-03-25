@@ -150,7 +150,7 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
             #JSON Output instructions
                 Your response must always be a JSON object with the following schema:
                 {
-        "reasoning": Why the {entity_types_plural} where selected as most relevant based onj the 'Job Titles' and 'Responsibilities',
+                    "reasoning": Why the {entity_types_plural} where selected as most relevant based on the given 'Job Titles' and 'Responsibilities',
                     "most_relevant": The most relevant {entity_type_singular} titles, an array of a json strings 
                     "remaining": The remaining {entity_types_plural}, an array of a json strings
                 }
