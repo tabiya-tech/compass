@@ -8,6 +8,7 @@ from app.agent.skill_explorer_agent import SkillsExplorerAgentState
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
+from common_libs.test_utilities import get_random_session_id
 from .skills_explorer_agent_executor import SkillsExplorerAgentExecutor, SkillsExplorerAgentGetConversationContextExecutor, \
     SkillsExplorerAgentIsFinished
 from .skills_explorer_test_cases import SkillsExplorerAgentTestCase, test_cases
@@ -28,14 +29,17 @@ async def test_skills_explorer_agent_simulated_user(max_iterations: int, test_ca
     """
     print(f"Running test case {test_case.name}")
 
-    session_id = hash(test_case.name) % 10 ** 10
+    session_id = get_random_session_id()
     output_folder = os.path.join(os.getcwd(), 'test_output/skills_explorer_agent/simulated_user/', test_case.name)
 
     # The conversation manager for this test
     conversation_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
     conversation_manager.set_state(state=ConversationMemoryManagerState(session_id=session_id))
     execute_evaluated_agent = SkillsExplorerAgentExecutor(conversation_manager=conversation_manager,
-                                                          state=SkillsExplorerAgentState(session_id=session_id),
+                                                          state=SkillsExplorerAgentState(
+                                                              session_id=session_id,
+                                                              country_of_user=test_case.country_of_user,
+                                                          ),
                                                           experience=test_case.given_experience)
 
     # Run the conversation test

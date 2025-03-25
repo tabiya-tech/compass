@@ -1,6 +1,6 @@
-from typing import Optional, Mapping, Any
+from typing import Mapping, Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_serializer, field_validator
 
 from app.agent.agent import Agent
 from app.agent.agent_types import AgentType
@@ -9,13 +9,23 @@ from ._conversation_llm import _ConversationLLM
 from app.agent.experience.experience_entity import ExperienceEntity, ResponsibilitiesData
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from ._responsibilities_extraction_tool import _ResponsibilitiesExtractionTool
+from app.countries import Country
 
 
 class SkillsExplorerAgentState(BaseModel):
     """
-    The state of the agent director
+    The state of the Skills Explorer Agent.
     """
+
     session_id: int
+    """
+    The session ID of the user.
+    """
+
+    country_of_user: Country = Field(default=Country.UNSPECIFIED)
+    """
+    The country of the user.
+    """
 
     first_time_for_experience: dict[str, bool] = Field(default_factory=dict)
     """
@@ -31,9 +41,21 @@ class SkillsExplorerAgentState(BaseModel):
     class Config:
         extra = "forbid"
 
+    @field_serializer("country_of_user")
+    def serialize_country_of_user(self, country_of_user: Country, _info):
+        return country_of_user.name
+
+    @field_validator("country_of_user", mode='before')
+    def deserialize_country_of_user(cls, value: str | Country) -> Country:
+        if isinstance(value, str):
+            return Country[value]
+        return value
+
     @staticmethod
     def from_document(_doc: Mapping[str, Any]) -> "SkillsExplorerAgentState":
         return SkillsExplorerAgentState(session_id=_doc["session_id"],
+                                        # For backward compatibility with old documents that don't have the country_of_user field, set it to UNSPECIFIED
+                                        country_of_user=_doc.get("country_of_user", Country.UNSPECIFIED),
                                         first_time_for_experience=_doc["first_time_for_experience"],
                                         experiences_explored=_doc["experiences_explored"])
 
@@ -72,7 +94,8 @@ class SkillsExplorerAgent(Agent):
         existing_responsibilities.non_responsibilities = non_responsibilities
         existing_responsibilities.other_peoples_responsibilities = other_peoples_responsibilities
 
-    async def execute(self, user_input: AgentInput,
+    async def execute(self, *,
+                      user_input: AgentInput,
                       context: ConversationContext
                       ) -> AgentOutput:
 
@@ -108,7 +131,9 @@ class SkillsExplorerAgent(Agent):
         conversion_llm = _ConversationLLM()
         conversation_llm_output = await conversion_llm.execute(experiences_explored=self.state.experiences_explored,
                                                                first_time_for_experience=_first_time_for_experience,
-                                                               user_input=user_input, context=context,
+                                                               user_input=user_input,
+                                                               country_of_user=self.state.country_of_user,
+                                                               context=context,
                                                                experience_title=self.experience_entity.experience_title,
                                                                work_type=self.experience_entity.work_type,
                                                                logger=self.logger)

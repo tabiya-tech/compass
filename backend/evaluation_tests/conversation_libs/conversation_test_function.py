@@ -11,6 +11,7 @@ from tqdm import tqdm
 
 from app.conversation_memory.save_conversation_context import save_conversation_context_to_json, \
     save_conversation_context_to_markdown
+from app.countries import Country
 from common_libs.llm.chat_models import GeminiChatLLM
 from common_libs.llm.models_utils import LLMConfig, LLMInput, MEDIUM_TEMPERATURE_GENERATION_CONFIG
 from evaluation_tests.compass_test_case import CompassTestCase
@@ -50,6 +51,11 @@ class EvaluationTestCase(CompassTestCase):
     evaluations: list[Evaluation]
     """
     The evaluations to be run.
+    """
+
+    country_of_user: Country = Country.UNSPECIFIED
+    """
+    The country of the user.
     """
 
 

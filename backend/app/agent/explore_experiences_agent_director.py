@@ -74,7 +74,16 @@ class ExploreExperiencesAgentDirectorState(BaseModel):
     """
     Stores the user-specific state for this agent. Managed centrally.
     """
+
     session_id: int
+    """
+    The session ID of the user.
+    """
+
+    country_of_user: Country = Field(default=Country.UNSPECIFIED)
+    """
+    The country of the user.
+    """
 
     experiences_state: dict[str, ExperienceState] = Field(default_factory=dict)
     """
@@ -95,6 +104,16 @@ class ExploreExperiencesAgentDirectorState(BaseModel):
     class Config:
         extra = "forbid"
 
+    @field_serializer("country_of_user")
+    def serialize_country_of_user(self, country_of_user: Country, _info):
+        return country_of_user.name
+
+    @field_validator("country_of_user", mode='before')
+    def deserialize_country_of_user(cls, value: str | Country) -> Country:
+        if isinstance(value, str):
+            return Country[value]
+        return value
+
     # use a field serializer to serialize the conversation_phase
     # we use the name of the Enum instead of the value because that makes the code less brittle
     @field_serializer("conversation_phase")
@@ -112,6 +131,8 @@ class ExploreExperiencesAgentDirectorState(BaseModel):
     def from_document(_doc: Mapping[str, Any]) -> "ExploreExperiencesAgentDirectorState":
         return ExploreExperiencesAgentDirectorState(
             session_id=_doc["session_id"],
+            # For backward compatibility with old documents that don't have the country_of_user field, set it to UNSPECIFIED
+            country_of_user=_doc.get("country_of_user", Country.UNSPECIFIED),
             experiences_state=_doc["experiences_state"],
             current_experience_uuid=_doc["current_experience_uuid"],
             conversation_phase=_doc["conversation_phase"])
@@ -135,7 +156,9 @@ class ExploreExperiencesAgentDirector(Agent):
     This is a stateful agent.
     """
 
-    async def _dive_into_experiences(self, user_input: AgentInput, context: ConversationContext,
+    async def _dive_into_experiences(self, *,
+                                     user_input: AgentInput,
+                                     context: ConversationContext,
                                      state: ExploreExperiencesAgentDirectorState) -> AgentOutput:
 
         current_experience: ExperienceState
@@ -174,7 +197,7 @@ class ExploreExperiencesAgentDirector(Agent):
                 user_input = AgentInput(message="", is_artificial=True)
             # The agent will explore the skills for the experience and update the experience entity
             self._exploring_skills_agent.set_experience(current_experience.experience)
-            agent_output: AgentOutput = await self._exploring_skills_agent.execute(user_input, context)
+            agent_output: AgentOutput = await self._exploring_skills_agent.execute(user_input=user_input, context=context)
             # Update the conversation history
             await self._conversation_manager.update_history(user_input, agent_output)
             # get the context again after updating the history
@@ -190,7 +213,9 @@ class ExploreExperiencesAgentDirector(Agent):
             if current_experience.experience.responsibilities.responsibilities:
                 # Infer the occupations for the experience and update the experience entity
                 # , then link the skills and rank them
-                agent_output = await self._link_and_rank(current_experience.experience)
+                agent_output = await self._link_and_rank(
+                    country_of_user=state.country_of_user,
+                    current_experience=current_experience.experience)
                 await self._conversation_manager.update_history(AgentInput(
                     message="(silence)",
                     is_artificial=True
@@ -234,7 +259,10 @@ class ExploreExperiencesAgentDirector(Agent):
                 )
 
             # Otherwise, we have more experiences to process
-            return await self._dive_into_experiences(user_input, context, state)
+            return await self._dive_into_experiences(user_input=user_input, context=context, state=state)
+
+        # This should never happen, as the phase DiveInPhase.PROCESSED is handled directly after the LINKING_RANKING phase
+        self.logger.warning("ExploreExperiencesAgentDirector: Unknown sub-phase")
 
     async def execute(self, user_input: AgentInput, context: ConversationContext) -> AgentOutput:
         if self._state is None:
@@ -278,7 +306,7 @@ class ExploreExperiencesAgentDirector(Agent):
 
             # The conversation history is handled in dive_into_experiences method,
             # as there is another transition between sub-phases happening there
-            agent_output = await self._dive_into_experiences(user_input, context, state)
+            agent_output = await self._dive_into_experiences(user_input=user_input, context=context, state=state)
             return agent_output
 
         # Should never happen
@@ -309,7 +337,10 @@ class ExploreExperiencesAgentDirector(Agent):
     def get_exploring_skills_agent(self) -> SkillsExplorerAgent:
         return self._exploring_skills_agent
 
-    async def _link_and_rank(self, current_experience: ExperienceEntity) -> AgentOutput:
+    async def _link_and_rank(self, *,
+                             country_of_user: Country,
+                             current_experience: ExperienceEntity
+                             ) -> AgentOutput:
         start = time.time()
         pipeline = ExperiencePipeline(
             config=ExperiencePipelineConfig(),
@@ -319,7 +350,10 @@ class ExploreExperiencesAgentDirector(Agent):
             experience_title=current_experience.experience_title,
             company_name=current_experience.company,
             work_type=current_experience.work_type,
-            country_of_interest=Country.SOUTH_AFRICA,  # TODO: get the country from the state
+            # Currently, the country of interest is the same as the user's country.
+            # In the future, we may want to change this so that each experience has its own country of interest,
+            # for example, if the user has worked in multiple countries.
+            country_of_interest=country_of_user,
             responsibilities=current_experience.responsibilities.responsibilities
         )
         current_experience.top_skills = pipline_result.top_skills

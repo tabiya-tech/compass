@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, APIRouter, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from app.conversations.routes import add_conversation_routes
+from app.countries import Country, get_country_from_string
 from app.invitations import add_user_invitations_routes
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, ApiKeyAuth
@@ -65,6 +66,12 @@ if not _metrics_enabled_str:
     raise ValueError("Mandatory BACKEND_ENABLE_METRICS env variable is not set! Please set it to the either True or False")
 logger.info(f"BACKEND_ENABLE_METRICS: {_metrics_enabled_str}")
 
+_default_country_of_user_str = os.getenv("DEFAULT_COUNTRY_OF_USER")
+logger.info(f"DEFAULT_COUNTRY_OF_USER: {_default_country_of_user_str}")
+if not _default_country_of_user_str:
+    logger.warning("DEFAULT_COUNTRY_OF_USER environment variable is not set! Defaulting to 'Unspecified'")
+    _default_country_of_user_str = Country.UNSPECIFIED.value
+
 # Check mandatory environment variables and raise an early exception if they are not set
 if not os.getenv('TAXONOMY_MONGODB_URI'):
     raise ValueError("Mandatory TAXONOMY_MONGODB_URI env variable is not set!")
@@ -91,6 +98,7 @@ set_application_config(
         environment_name=os.getenv("TARGET_ENVIRONMENT_NAME"),
         version_info=load_version_info(),
         enable_metrics=_metrics_enabled_str.lower() == "true",
+        default_country_of_user=get_country_from_string(_default_country_of_user_str)
     )
 )
 

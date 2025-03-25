@@ -1,6 +1,7 @@
 from textwrap import dedent
 from typing import Any
 
+from app.countries import Country
 from evaluation_tests.conversation_libs.conversation_test_function import EvaluationTestCase, Evaluation
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import EvaluationType
 
@@ -33,6 +34,7 @@ france_prompt = system_instruction_prompt + dedent("""
 class CollectExperiencesAgentTestCase(EvaluationTestCase):
     expected_experiences_found_min: int
     expected_experiences_found_max: int
+    country_of_user: Country = Country.UNSPECIFIED
 
     def __init__(self, *, name: str, simulated_user_prompt: str, evaluations: list[Evaluation],
                  expected_experiences_found_min: int, expected_experiences_found_max: int, **data: Any):
@@ -66,7 +68,8 @@ test_cases = [
             """) + kenya_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
         expected_experiences_found_min=1,
-        expected_experiences_found_max=1
+        expected_experiences_found_max=1,
+        country_of_user=Country.KENYA
     ),
     CollectExperiencesAgentTestCase(
         name='university_of_oxford_manager',
@@ -93,7 +96,8 @@ test_cases = [
             """) + sa_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
         expected_experiences_found_min=0,
-        expected_experiences_found_max=0
+        expected_experiences_found_max=0,
+        country_of_user=Country.UNSPECIFIED
     ),
     CollectExperiencesAgentTestCase(
         name='experiences_of_all_kinds',
@@ -115,7 +119,8 @@ test_cases = [
             """) + sa_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
         expected_experiences_found_min=7,
-        expected_experiences_found_max=7
+        expected_experiences_found_max=7,
+        country_of_user=Country.UNSPECIFIED
     ),
     CollectExperiencesAgentTestCase(
         name='experiences_of_all_kinds_all_at_once',
@@ -136,7 +141,8 @@ test_cases = [
             """) + sa_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
         expected_experiences_found_min=7,
-        expected_experiences_found_max=7
+        expected_experiences_found_max=7,
+        country_of_user=Country.UNSPECIFIED
     ),
     CollectExperiencesAgentTestCase(
         name='withholding_student_e2e',
@@ -149,7 +155,8 @@ test_cases = [
             """) + sa_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
         expected_experiences_found_min=3,
-        expected_experiences_found_max=3
+        expected_experiences_found_max=3,
+        country_of_user=Country.SOUTH_AFRICA
     ),
     CollectExperiencesAgentTestCase(
         name='un_experienced_student_e2e',
@@ -161,7 +168,8 @@ test_cases = [
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
         # The simulated user seems to report 3 experiences (help parent, drove grandma, helped neighbors)
         expected_experiences_found_min=2,
-        expected_experiences_found_max=3
+        expected_experiences_found_max=3,
+        country_of_user=Country.KENYA
     ),
     CollectExperiencesAgentTestCase(
         name='french_worker_typos_e2e',
@@ -173,7 +181,8 @@ test_cases = [
             """) + france_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
         expected_experiences_found_min=2,
-        expected_experiences_found_max=3
+        expected_experiences_found_max=3,
+        country_of_user=Country.FRANCE
     ),
     CollectExperiencesAgentTestCase(
         name='french_worker_infodump_e2e',
@@ -185,8 +194,8 @@ test_cases = [
             """) + france_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
         expected_experiences_found_min=2,
-        expected_experiences_found_max=3
-
+        expected_experiences_found_max=3,
+        country_of_user=Country.FRANCE
     ),
     CollectExperiencesAgentTestCase(
         name='single_experience_e2e',
@@ -197,7 +206,8 @@ test_cases = [
             """) + kenya_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
         expected_experiences_found_min=1,
-        expected_experiences_found_max=1
+        expected_experiences_found_max=1,
+        country_of_user=Country.KENYA
     ),
     CollectExperiencesAgentTestCase(
         name='single_experience_mistake_e2e',
@@ -210,6 +220,7 @@ test_cases = [
             """) + france_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
         expected_experiences_found_min=1,
-        expected_experiences_found_max=1
+        expected_experiences_found_max=1,
+        country_of_user=Country.KENYA
     ),
 ]

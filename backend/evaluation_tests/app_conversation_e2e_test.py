@@ -74,6 +74,8 @@ def current_test_case(request) -> EvaluationTestCase:
 def app_setup_and_teardown(current_test_case: EvaluationTestCase) -> Generator[FastAPI, Any, None]:
     setup_env_vars(env_vars={
         'VERTEX_API_REGION': 'us-central1',
+        'DEFAULT_COUNTRY_OF_USER': current_test_case.country_of_user.value,
+        # Set the path to the credentials file otherwise the app will not be able to authenticate with the GCP services
         'GOOGLE_APPLICATION_CREDENTIALS': os.getenv('GOOGLE_APPLICATION_CREDENTIALS'),
         # Set the taxonomy db env vars as they required for this test
         'TAXONOMY_MONGODB_URI': os.getenv('TAXONOMY_MONGODB_URI'),

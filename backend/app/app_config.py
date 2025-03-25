@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+from app.countries import Country
 from app.version.types import Version
 
 
@@ -12,8 +13,24 @@ class ApplicationConfig(BaseModel):
     """
 
     environment_name: str
+    """
+    The name of the environment the application is running in.
+    """
+
     version_info: Version
+    """
+    The version information of the application.
+    """
+
     enable_metrics: bool
+    """
+    A flag to enable or disable metrics.
+    """
+
+    default_country_of_user: Country
+    """
+    The default country of the user.
+    """
 
 
 _application_config: ApplicationConfig | None = None

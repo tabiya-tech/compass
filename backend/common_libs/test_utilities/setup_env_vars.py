@@ -76,6 +76,7 @@ This module ensures:
 
 import os
 from contextlib import contextmanager
+from app.countries import Country
 
 # local variable to store the original environment variables
 _original_env_vars = {}
@@ -114,6 +115,7 @@ def setup_env_vars(*, env_vars: dict[str, str] = None):
         'BACKEND_SENTRY_DSN': "foo",
         'BACKEND_ENABLE_SENTRY': "false",
         'BACKEND_ENABLE_METRICS': "false",
+        'DEFAULT_COUNTRY_OF_USER': Country.UNSPECIFIED.value,
         # Add more environment variables as needed here
     }
 

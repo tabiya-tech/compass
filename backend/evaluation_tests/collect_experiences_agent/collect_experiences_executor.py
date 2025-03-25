@@ -2,6 +2,7 @@ from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.collect_experiences_agent import CollectExperiencesAgent, CollectExperiencesAgentState
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationContext
+from app.countries import Country
 
 
 class CollectExperiencesAgentExecutor:
@@ -9,9 +10,9 @@ class CollectExperiencesAgentExecutor:
     Executes the Collect Experiences agent
     """
 
-    def __init__(self, conversation_manager: ConversationMemoryManager, session_id: int):
+    def __init__(self, conversation_manager: ConversationMemoryManager, session_id: int, country_of_user: Country):
         self._agent = CollectExperiencesAgent()
-        self._agent.set_state(CollectExperiencesAgentState(session_id=session_id))
+        self._agent.set_state(CollectExperiencesAgentState(session_id=session_id,country_of_user=country_of_user))
         self._conversation_manager = conversation_manager
 
     def get_experiences(self):

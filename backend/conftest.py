@@ -5,6 +5,7 @@ from typing import Generator, Any
 import pytest
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
+from app.countries import Country
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.version.types import Version
 from app.app_config import ApplicationConfig, set_application_config, get_application_config
@@ -126,6 +127,7 @@ def setup_application_config() -> Generator[ApplicationConfig, Any, None]:
             branch="foo-branch",
             buildNumber="foo-build-number",
             sha="foo-sha"),
+        default_country_of_user=Country.UNSPECIFIED,
         enable_metrics=True)
 
     set_application_config(config)

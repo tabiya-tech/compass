@@ -7,6 +7,7 @@ from _pytest.logging import LogCaptureFixture
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
+from common_libs.test_utilities import get_random_session_id
 from evaluation_tests.collect_experiences_agent.collect_experiences_executor import CollectExperiencesAgentExecutor, \
     CollectExperienceAgentGetConversationContextExecutor, CollectExperienceAgentIsFinished
 from evaluation_tests.collect_experiences_agent.collect_experiences_test_cases import test_cases, \
@@ -28,14 +29,15 @@ async def test_collect_experiences_agent_simulated_user(test_case: CollectExperi
     """
     print(f"Running test case {test_case.name}")
 
-    session_id = hash(test_case.name) % 10 ** 10
+    session_id = get_random_session_id()
     output_folder = os.path.join(os.getcwd(), 'test_output/collect_experiences/simulated_user/', test_case.name)
 
     # The conversation manager for this test
     conversation_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
     conversation_manager.set_state(state=ConversationMemoryManagerState(session_id=session_id))
     execute_evaluated_agent = CollectExperiencesAgentExecutor(conversation_manager=conversation_manager,
-                                                              session_id=session_id)
+                                                              session_id=session_id,
+                                                              country_of_user=test_case.country_of_user)
     max_iterations = 50
     # Run the conversation test
     config = ConversationTestConfig(
