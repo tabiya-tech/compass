@@ -88,7 +88,7 @@ class _DataExtractionLLM:
         # remove the property defined_at_turn_number
         _data = []
         for _d in collected_experience_data_so_far:
-            d = _d.dict()
+            d = _d.model_dump()
             del d["defined_at_turn_number"]
             _data.append(d)
 
@@ -427,7 +427,7 @@ def find_duplicate(item: CollectedData, items: list[CollectedData]) -> int:
 
 
 def format_history_for_prompt(collected_experience_data_so_far: list[CollectedData],
-                              context: ConversationContext) -> str:
+                              context: ConversationContext) -> str | None:
     _output: str = ""
     if context.summary != "":
         _output += f"{ConversationHistoryFormatter.USER}: '{ConversationHistoryFormatter.SUMMARY_TITLE}\n{context.summary}'"

@@ -47,7 +47,7 @@ class _SentenceDecompositionLLM:
                                                                 llm_input=_SentenceDecompositionLLM._extraction_prompt_template(
                                                                     context=context, last_user_input=last_user_input),
                                                                 logger=self.logger)
-        self.logger.debug("LLM output: %s", llm_output.dict())
+        self.logger.debug("LLM output: %s", llm_output.model_dump())
         return llm_output, llm_stats
 
     @staticmethod
