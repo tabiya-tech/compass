@@ -6,6 +6,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.application_state import ApplicationStateManager
 from .db_dependencies import CompassDBProvider
 from app.store.database_application_state_store import DatabaseApplicationStateStore
+from ..app_config import get_application_config
 
 # Lock to ensure that the singleton instance is thread-safe
 _application_state_manager_lock = asyncio.Lock()
@@ -17,5 +18,7 @@ async def get_application_state_manager(db: AsyncIOMotorDatabase = Depends(Compa
     if _application_state_manager_singleton is None:  # initial check to avoid the lock if the singleton instance is already created (lock is expensive)
         async with _application_state_manager_lock:  # before modifying the singleton instance, acquire the lock
             if _application_state_manager_singleton is None:  # double check after acquiring the lock
-                _application_state_manager_singleton = ApplicationStateManager(DatabaseApplicationStateStore(db))
+                _application_state_manager_singleton = ApplicationStateManager(store=DatabaseApplicationStateStore(db),
+                                                                               default_country_of_user=get_application_config().default_country_of_user
+                                                                               )
     return _application_state_manager_singleton

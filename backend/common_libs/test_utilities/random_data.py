@@ -6,6 +6,7 @@ import string
 import random
 
 from app.app_config import ApplicationConfig
+from app.countries import Country
 from app.version.types import Version
 
 
@@ -66,4 +67,5 @@ def get_random_application_config() -> ApplicationConfig:
         version_info=get_random_version(),
         environment_name=get_random_printable_string(10),
         enable_metrics=random.choice([True, False]),
+        default_country_of_user=random.choice([c for c in Country]),
     )

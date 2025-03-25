@@ -1,5 +1,6 @@
 from textwrap import dedent
 
+from app.countries import Country
 from evaluation_tests.conversation_libs.conversation_test_function import EvaluationTestCase, Evaluation
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import EvaluationType
 
@@ -30,6 +31,18 @@ france_prompt = system_instruction_prompt + dedent("""
 
 test_cases = [
     EvaluationTestCase(
+        country_of_user=Country.UNSPECIFIED,
+        conversation_rounds=100,
+        name='minimal_user_e2e',
+        simulated_user_prompt=dedent("""
+            You're a Gen Y living alone. You have one year of experience in a job as shoe salesperson. 
+            You are have never had another job experience beside the shoe salesperson job. Also never
+            did any internship, never run your own business, never volunteered, never did any freelance work.
+            """) + system_instruction_prompt,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
+    ),
+    EvaluationTestCase(
+        country_of_user=Country.SOUTH_AFRICA,
         conversation_rounds=100,
         name='genZ_student_e2e',
         simulated_user_prompt=dedent("""
@@ -41,6 +54,7 @@ test_cases = [
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
     ),
     EvaluationTestCase(
+        country_of_user=Country.SOUTH_AFRICA,
         conversation_rounds=100,
         name='mechanical_engineer_e2e',
         simulated_user_prompt=dedent("""
@@ -52,6 +66,7 @@ test_cases = [
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
     ),
     EvaluationTestCase(
+        country_of_user=Country.SOUTH_AFRICA,
         conversation_rounds=100,
         name='minimum_wage_worker_e2e',
         simulated_user_prompt=dedent("""
@@ -64,6 +79,7 @@ test_cases = [
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
     ),
     EvaluationTestCase(
+        country_of_user=Country.KENYA,
         conversation_rounds=100,
         name='dancer_e2e',
         simulated_user_prompt=dedent("""
@@ -76,6 +92,7 @@ test_cases = [
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
     ),
     EvaluationTestCase(
+        country_of_user=Country.KENYA,
         conversation_rounds=100,
         name='creative_writer_e2e',
         simulated_user_prompt=dedent("""
@@ -87,6 +104,18 @@ test_cases = [
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
     ),
     EvaluationTestCase(
+        country_of_user=Country.KENYA,
+        conversation_rounds=100,
+        name='matatu_conductor_e2e',
+        simulated_user_prompt=dedent("""
+            You're a Gen Y living alone. You work as a Matatu conductor. A matatu conductor is a person who collects 
+            fares from passengers in a matatu, a type of public transport. You have never had another job experience,
+            never did any internship, never run your own business, never volunteered, never did any freelance work.
+            """) + kenya_prompt,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
+    ),
+    EvaluationTestCase(
+        country_of_user=Country.FRANCE,
         conversation_rounds=100,
         name='management_dropout_e2e',
         simulated_user_prompt=dedent("""
@@ -97,6 +126,7 @@ test_cases = [
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
     ),
     EvaluationTestCase(
+        country_of_user=Country.FRANCE,
         conversation_rounds=100,
         name='garden_worker_e2e',
         simulated_user_prompt=dedent("""

@@ -17,14 +17,14 @@ class ApplicationState(BaseModel):
     This is an aggregation of the states of the different components of the application.
     """
     session_id: int
-    country_of_interest: Country = Country.UNSPECIFIED
     agent_director_state: AgentDirectorState
     explore_experiences_director_state: ExploreExperiencesAgentDirectorState
     conversation_memory_manager_state: ConversationMemoryManagerState
     collect_experience_state: CollectExperiencesAgentState
     skills_explorer_agent_state: SkillsExplorerAgentState
 
-    def __init__(self, *, session_id: int,
+    def __init__(self, *,
+                 session_id: int,
                  agent_director_state: AgentDirectorState,
                  explore_experiences_director_state: ExploreExperiencesAgentDirectorState,
                  conversation_memory_manager_state: ConversationMemoryManagerState,
@@ -128,20 +128,26 @@ class ApplicationStateManager(IApplicationStateManager):
     it delegates the storage and retrieval of the state to an application state store.
     """
 
-    def __init__(self, store: ApplicationStateStore):
+    def __init__(self, *,
+                 store: ApplicationStateStore,
+                 default_country_of_user: Country = Country.UNSPECIFIED):
         self._store = store
+        self._default_country_of_user = default_country_of_user
         self.logger = logging.getLogger(self.__class__.__name__)
 
     async def get_state(self, session_id: int) -> ApplicationState:
         state = await self._store.get_state(session_id)
         if state is None:
+            # When creating a new state, use the default country of the user
+            # Eventually, we may want to use the country of the user from the user's profile, but for now, we just use the default.
+            # The default country, is typically be deployment-specific
             state = ApplicationState(
                 session_id=session_id,
                 agent_director_state=AgentDirectorState(session_id=session_id),
-                explore_experiences_director_state=ExploreExperiencesAgentDirectorState(session_id=session_id),
+                explore_experiences_director_state=ExploreExperiencesAgentDirectorState(session_id=session_id, country_of_user=self._default_country_of_user),
                 conversation_memory_manager_state=ConversationMemoryManagerState(session_id=session_id),
-                collect_experience_state=CollectExperiencesAgentState(session_id=session_id),
-                skills_explorer_agent_state=SkillsExplorerAgentState(session_id=session_id)
+                collect_experience_state=CollectExperiencesAgentState(session_id=session_id, country_of_user=self._default_country_of_user),
+                skills_explorer_agent_state=SkillsExplorerAgentState(session_id=session_id, country_of_user=self._default_country_of_user)
             )
             logging.info("Creating a new application state for session ID %s", session_id)
             await self._store.save_state(state)

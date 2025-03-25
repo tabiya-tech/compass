@@ -21,7 +21,7 @@ class SkillsExplorerAgentExecutor:
         Executes the agent
         """
         context = await self._conversation_manager.get_conversation_context()
-        agent_output = await self._agent.execute(agent_input, context)
+        agent_output = await self._agent.execute(user_input=agent_input, context=context)
         await self._conversation_manager.update_history(agent_input, agent_output)
         return agent_output
 

@@ -3,6 +3,7 @@ from typing import Any
 
 from app.agent.experience.experience_entity import ExperienceEntity
 from app.agent.experience.work_type import WorkType
+from app.countries import Country
 from evaluation_tests.conversation_libs.conversation_test_function import EvaluationTestCase, Evaluation
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import EvaluationType
 from app.agent.experience.timeline import Timeline
@@ -36,6 +37,7 @@ france_prompt = system_instruction_prompt + dedent("""
 class SkillsExplorerAgentTestCase(EvaluationTestCase):
     given_experience: ExperienceEntity
     expected_responsibilities: list[str]
+    country_of_user: Country
 
     def __init__(self, *, name: str, simulated_user_prompt: str, evaluations: list[Evaluation],
                  given_experience: ExperienceEntity, expected_responsibilities: list[str], **data: Any):
@@ -46,6 +48,7 @@ class SkillsExplorerAgentTestCase(EvaluationTestCase):
 
 test_cases = [
     SkillsExplorerAgentTestCase(
+        conversation_rounds=10,
         name='university_of_oxford_manager',
         simulated_user_prompt=dedent("""
             You are a person without any personal background.
@@ -69,9 +72,11 @@ test_cases = [
             ),
             work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT
         ),
+        country_of_user=Country.UNSPECIFIED,
         expected_responsibilities=[],
     ),
     SkillsExplorerAgentTestCase(
+        conversation_rounds=10,
         name='cook_at_a_restaurant',
         simulated_user_prompt=dedent("""
             You are a person without any personal background.
@@ -93,10 +98,11 @@ test_cases = [
             ),
             work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT
         ),
+        country_of_user=Country.KENYA,
         expected_responsibilities=[],
     ),
     SkillsExplorerAgentTestCase(
-        skip_force='skip',
+        conversation_rounds=10,
         name='caregiving_for_elderly',
         simulated_user_prompt=dedent("""
             You are a person without any personal background.
@@ -119,6 +125,7 @@ test_cases = [
             ),
             work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT
         ),
+        country_of_user=Country.SOUTH_AFRICA,
         expected_responsibilities=[],
     ),
 ]

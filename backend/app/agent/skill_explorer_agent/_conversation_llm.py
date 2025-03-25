@@ -9,6 +9,7 @@ from app.agent.prompt_template.agent_prompt_template import STD_AGENT_CHARACTER,
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
+from app.countries import Country
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import MODERATE_TEMPERATURE_GENERATION_CONFIG, LLMConfig, LLMResponse
 
@@ -21,6 +22,7 @@ class _ConversationLLM:
                       experiences_explored: list[str],
                       first_time_for_experience: bool,
                       user_input: AgentInput,
+                      country_of_user: Country,
                       context: ConversationContext,
                       experience_title,
                       work_type: WorkType,
@@ -47,7 +49,7 @@ class _ConversationLLM:
             # and if the user message is passed then it confuses the model it generates a response about the previous experiences
             # To work around  an artificial message needs to be generated like "I am ready to share my experience as a ...", but
             # It just complicates things.
-            # The experiences explored seems to mitigate the issue of the model generating a response about the previous experiences
+            # The experiences explored seems to mitigate the issue of the model generating a response about the previous experiences,
             # but now they are not needed, we are still keeping them for now as they may become useful in the future.
 
             llm = GeminiGenerativeLLM(
@@ -56,6 +58,7 @@ class _ConversationLLM:
                 ))
             llm_response = await llm.generate_content(
                 llm_input=_ConversationLLM.create_first_time_generative_prompt(
+                    country_of_user=country_of_user,
                     experiences_explored=experiences_explored,
                     experience_title=experience_title,
                     work_type=work_type)
@@ -65,7 +68,7 @@ class _ConversationLLM:
 
             llm = GeminiGenerativeLLM(
                 system_instructions=_ConversationLLM._create_conversation_system_instructions(
-                    first_time_for_experience=first_time_for_experience,
+                    country_of_user=country_of_user,
                     experience_title=experience_title,
                     work_type=work_type),
                 config=LLMConfig(
@@ -100,12 +103,12 @@ class _ConversationLLM:
 
     @staticmethod
     def _create_conversation_system_instructions(*,
-                                                 first_time_for_experience: bool,
+                                                 country_of_user: Country,
                                                  experience_title: str,
                                                  work_type: WorkType) -> str:
         system_instructions_template = dedent("""\
         #Role
-            You are a conversation partner helping me, a young person living in South Africa,
+            You are a conversation partner helping me, a young person{country_of_user_segment},
             reflect on my experience as '{experience_title}' '{work_type}'.
             
             I have already shared basic information about this experience and now are in the process 
@@ -124,7 +127,7 @@ class _ConversationLLM:
             (a) Questions you must ask me to gather the details of my experience:
                 - Can you describe a typical day at your work?
                 - What else do you do at work?
-                - Can describe the typical tasks you do at work?
+                - Can you describe the typical tasks you do at work?
                 - What are the most important things you need to do at work?
                 - How do you decide what task to do first each day?
 
@@ -187,6 +190,7 @@ class _ConversationLLM:
 
         return replace_placeholders_with_indent(
             system_instructions_template,
+            country_of_user_segment=_get_country_of_user_segment(country_of_user),
             agent_character=STD_AGENT_CHARACTER,
             language_style=STD_LANGUAGE_STYLE,
             experience_title=experience_title,
@@ -194,12 +198,14 @@ class _ConversationLLM:
         )
 
     @staticmethod
-    def create_first_time_generative_prompt(experiences_explored: list[str],
+    def create_first_time_generative_prompt(*,
+                                            country_of_user: Country,
+                                            experiences_explored: list[str],
                                             experience_title: str,
                                             work_type: WorkType) -> str:
         prompt_template = dedent("""\
         #Role
-            You are an interviewer helping me, a young person living in South Africa,
+            You are an interviewer helping me, a young person{country_of_user_segment},
             reflect on my experience as '{experience_title}' '{work_type}'. I have already shared very basic information about this experience.
             {experiences_explored_instructions}
             Let's now begin the process and help me reflect on the experience as '{experience_title}' in nore detail.
@@ -230,8 +236,15 @@ class _ConversationLLM:
                 experiences_explored="\n".join(experiences_explored)
             )
         return replace_placeholders_with_indent(prompt_template,
+                                                country_of_user_segment=_get_country_of_user_segment(country_of_user),
                                                 experiences_explored_instructions=experiences_explored_instructions,
                                                 experience_title=experience_title,
                                                 work_type=WorkType.work_type_short(work_type),
                                                 language_style=STD_LANGUAGE_STYLE,
                                                 )
+
+
+def _get_country_of_user_segment(country_of_user: Country) -> str:
+    if country_of_user == Country.UNSPECIFIED:
+        return ""
+    return f" living in {country_of_user.value}"

@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.agent.agent_types import AgentOutput, AgentInput
+from app.app_config import ApplicationConfig, get_application_config
 from app.context_vars import session_id_ctx_var
 from app.conversation_memory.conversation_memory_types import ConversationContext
 import logging
@@ -79,12 +80,13 @@ _application_state_manager_singleton: ApplicationStateManager | None = None
 
 
 # instance of the application state manager using an in-memory store
-async def _get_application_state_manager() -> ApplicationStateManager:
+async def _get_application_state_manager(app_config: ApplicationConfig = Depends(get_application_config)) -> ApplicationStateManager:
     global _application_state_manager_singleton
     if _application_state_manager_singleton is None:  # initial check to avoid the lock if the singleton instance is already created (lock is expensive)
         async with _application_state_manager_lock:  # before modifying the singleton instance, acquire the lock
             if _application_state_manager_singleton is None:  # double check after acquiring the lock
-                _application_state_manager_singleton = ApplicationStateManager(store=InMemoryApplicationStateStore(),)
+                _application_state_manager_singleton = ApplicationStateManager(store=InMemoryApplicationStateStore(),
+                                                                               default_country_of_user=app_config.default_country_of_user)
 
     return _application_state_manager_singleton
 
@@ -129,7 +131,7 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
         # Do not allow user input that is too long,
         # as a basic measure to prevent abuse.
         if len(user_input) > 1000:
-            raise HTTPException(status_code=413, detail="To long user input")
+            raise HTTPException(status_code=413, detail="Too long user input")
 
         try:
             if clear_memory:
@@ -189,7 +191,7 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
         # Do not allow user input that is too long,
         # as a basic measure to prevent abuse.
         if len(user_input) > 1000:
-            raise HTTPException(status_code=413, detail="To long user input")
+            raise HTTPException(status_code=413, detail="Too long user input")
 
         try:
             if clear_memory:
@@ -261,7 +263,7 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
         # Do not allow user input that is too long,
         # as a basic measure to prevent abuse.
         if len(user_input) > 1000:
-            raise HTTPException(status_code=413, detail="To long user input")
+            raise HTTPException(status_code=413, detail="Too long user input")
 
         try:
             if clear_memory:

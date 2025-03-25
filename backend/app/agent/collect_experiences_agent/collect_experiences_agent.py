@@ -1,6 +1,6 @@
 from typing import Optional, Mapping, Any
 
-from pydantic import BaseModel,  Field, field_serializer, field_validator
+from pydantic import BaseModel, Field, field_serializer, field_validator
 
 from app.agent.agent import Agent
 from app.agent.agent_types import AgentType
@@ -12,13 +12,23 @@ from app.agent.experience.experience_entity import ExperienceEntity
 from app.agent.experience.timeline import Timeline
 from app.agent.experience.work_type import WorkType
 from app.conversation_memory.conversation_memory_types import ConversationContext
+from app.countries import Country
 
 
 class CollectExperiencesAgentState(BaseModel):
     """
     Stores the user-specific state for this agent. Managed centrally.
     """
+
     session_id: int
+    """
+    The session id of the conversation.
+    """
+
+    country_of_user: Country = Field(default=Country.UNSPECIFIED)
+    """
+    The country of the user.
+    """
 
     collected_data: list[CollectedData] = Field(default_factory=list)
     """
@@ -48,6 +58,16 @@ class CollectExperiencesAgentState(BaseModel):
         Disallow extra fields in the model
         """
         extra = "forbid"
+
+    @field_serializer("country_of_user")
+    def serialize_country_of_user(self, country_of_user: Country, _info):
+        return country_of_user.name
+
+    @field_validator("country_of_user", mode='before')
+    def deserialize_country_of_user(cls, value: str | Country) -> Country:
+        if isinstance(value, str):
+            return Country[value]
+        return value
 
     # use a field serializer to serialize the explored_types
     # we use the name of the Enum instead of the value because that makes the code less brittle
@@ -84,6 +104,8 @@ class CollectExperiencesAgentState(BaseModel):
     @staticmethod
     def from_document(_doc: Mapping[str, Any]) -> "CollectExperiencesAgentState":
         return CollectExperiencesAgentState(session_id=_doc["session_id"],
+                                            # For backward compatibility with old documents that don't have the country_of_user field, set it to UNSPECIFIED
+                                            country_of_user=_doc.get("country_of_user", Country.UNSPECIFIED),
                                             collected_data=_doc["collected_data"],
                                             unexplored_types=_doc["unexplored_types"],
                                             explored_types=_doc["explored_types"],
@@ -138,6 +160,7 @@ class CollectExperiencesAgent(Agent):
         conversation_llm_output = await conversion_llm.execute(first_time_visit=self._state.first_time_visit,
                                                                context=context,
                                                                user_input=user_input,
+                                                               country_of_user=self._state.country_of_user,
                                                                collected_data=collected_data,
                                                                last_referenced_experience_index=last_referenced_experience_index,
                                                                exploring_type=exploring_type,
@@ -160,6 +183,7 @@ class CollectExperiencesAgent(Agent):
             conversation_llm_output = await conversion_llm.execute(first_time_visit=self._state.first_time_visit,
                                                                    context=context,
                                                                    user_input=AgentInput(message=transition_message, is_artificial=True),
+                                                                   country_of_user=self._state.country_of_user,
                                                                    collected_data=collected_data,
                                                                    last_referenced_experience_index=last_referenced_experience_index,
                                                                    exploring_type=exploring_type,

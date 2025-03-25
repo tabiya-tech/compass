@@ -11,6 +11,7 @@ from app.agent.prompt_template.agent_prompt_template import STD_AGENT_CHARACTER,
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
+from app.countries import Country
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import MODERATE_TEMPERATURE_GENERATION_CONFIG, LLMConfig, LLMResponse
 
@@ -27,6 +28,7 @@ class _ConversationLLM:
     async def execute(*,
                       first_time_visit: bool,
                       user_input: AgentInput,
+                      country_of_user: Country,
                       context: ConversationContext,
                       collected_data: list[CollectedData],
                       exploring_type: WorkType,
@@ -37,12 +39,13 @@ class _ConversationLLM:
         """
         Converses with the user and asks probing questions to collect experiences.
         :param first_time_visit: If this is the first time the user visits the agent during the conversation
-        :param collected_data:
         :param user_input: The user input.
+        :param country_of_user: The country of the user.
         :param context: The conversation context.
+        :param collected_data:
         :param exploring_type: The type of work experience the agent is exploring.
-        :param unexplored_types: The types of work experiences that have not been explored yet.
-        :param explored_types: The types of work experiences that have been explored.
+        :param unexplored_types: The types of work experience that have not been explored yet.
+        :param explored_types: The types of work experience that have been explored.
         :param last_referenced_experience_index: The index of the last referenced experience in the collected data.
         :param logger: The logger.
         :return: The agent output with the next message for the user and finished flag
@@ -70,11 +73,14 @@ class _ConversationLLM:
                     generation_config=MODERATE_TEMPERATURE_GENERATION_CONFIG
                 ))
             llm_response = await llm.generate_content(
-                llm_input=_ConversationLLM._get_first_time_generative_prompt(exploring_type=exploring_type),
+                llm_input=_ConversationLLM._get_first_time_generative_prompt(
+                    country_of_user=country_of_user,
+                    exploring_type=exploring_type),
             )
         else:
             llm = GeminiGenerativeLLM(
-                system_instructions=_ConversationLLM._get_system_instructions(collected_data=collected_data,
+                system_instructions=_ConversationLLM._get_system_instructions(country_of_user=country_of_user,
+                                                                              collected_data=collected_data,
                                                                               exploring_type=exploring_type,
                                                                               unexplored_types=unexplored_types,
                                                                               explored_types=explored_types,
@@ -122,6 +128,7 @@ class _ConversationLLM:
 
     @staticmethod
     def _get_system_instructions(*,
+                                 country_of_user: Country,
                                  collected_data: list[CollectedData],
                                  exploring_type: WorkType,
                                  unexplored_types: list[WorkType],
@@ -130,7 +137,7 @@ class _ConversationLLM:
                                  ) -> str:
         system_instructions_template = dedent("""\
             #Role
-                You are a counselor working for an employment agency helping me, a young person living in South Africa, 
+                You are a counselor working for an employment agency helping me, a young person{country_of_user_segment}, 
                 outline my work experiences.
                 
             {language_style}
@@ -260,6 +267,7 @@ class _ConversationLLM:
             """)
 
         return replace_placeholders_with_indent(system_instructions_template,
+                                                country_of_user_segment=_get_country_of_user_segment(country_of_user),
                                                 agent_character=STD_AGENT_CHARACTER,
                                                 language_style=STD_LANGUAGE_STYLE,
                                                 exploring_type_instructions=_get_explore_experiences_instructions(
@@ -284,21 +292,26 @@ class _ConversationLLM:
                                                 )
 
     @staticmethod
-    def _get_first_time_generative_prompt(exploring_type: WorkType):
+    def _get_first_time_generative_prompt(*,
+                                          country_of_user: Country,
+                                          exploring_type: WorkType):
+        # Ideally, we want to include the language style in the prompt.
+        # However, doing so seems to break the prompt.
+        # So we're excluding it for now until we find a solution.
         first_time_generative_prompt = dedent("""\
                 #Role
-                    You are a counselor working for an employment agency helping me, a young person living in South Africa, 
+                    You are a counselor working for an employment agency helping me, a young person{country_of_user_segment}, 
                     outline my work experiences.
                     
-                {language_style}
-                
                 Respond with something similar to this:
                     Explain that during this step you will only gather basic information about all my experiences, 
                     later we will move to the next step and explore each experience separately in detail.
                     <add new line to separate the section>
                     {question_to_ask}.  
                 """)
-        return replace_placeholders_with_indent(first_time_generative_prompt, question_to_ask=_ask_experience_type_question(exploring_type))
+        return replace_placeholders_with_indent(first_time_generative_prompt,
+                                                country_of_user_segment=_get_country_of_user_segment(country_of_user),
+                                                question_to_ask=_ask_experience_type_question(exploring_type))
 
 
 def _transition_instructions(*,
@@ -586,3 +599,9 @@ def _get_summary_of_experiences(collected_data: list[CollectedData]) -> str:
             end_date=experience.end_date,
             company=experience.company) + "\n"
     return summary
+
+
+def _get_country_of_user_segment(country_of_user: Country) -> str:
+    if country_of_user == Country.UNSPECIFIED:
+        return ""
+    return f" living in {country_of_user.value}"
