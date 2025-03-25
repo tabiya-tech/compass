@@ -11,11 +11,10 @@ from common_libs.test_utilities.setup_env_vars import setup_env_vars, teardown_e
 class TestServer:
     # on test startup we need to set up the env variables
     # on cleanup we need to remove the env variables
-
-    def setup_method(self):
+    @pytest.fixture(scope="function")
+    def setup_env(self):
         setup_env_vars()
-
-    def teardown_method(self):
+        yield
         teardown_env_vars()
 
     @pytest.mark.asyncio
@@ -24,6 +23,7 @@ class TestServer:
                              in_memory_application_database: Awaitable[AsyncIOMotorDatabase],
                              in_memory_metrics_database: Awaitable[AsyncIOMotorDatabase],
                              mocker: pytest_mock.MockFixture,
+                             setup_env: None
                              ):
         """
         Integration test for the backend server application.
