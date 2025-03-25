@@ -18,6 +18,11 @@ interface DownloadReportDropdownProps {
   disabled?: boolean;
 }
 
+export enum CVFormat {
+  PDF = "PDF",
+  DOCX = "DOCX",
+}
+
 const uniqueId = "05c29b7a-ebf7-4795-ba23-a284aecad180";
 
 export const MENU_ITEM_ID = {
