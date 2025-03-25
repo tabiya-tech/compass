@@ -2,7 +2,7 @@
 import "src/_test_utilities/consoleMock";
 
 import React from "react";
-import DownloadReportDropdown, { MENU_ITEM_ID } from "./DownloadReportDropdown";
+import DownloadReportDropdown, { CVFormat, MENU_ITEM_ID } from "./DownloadReportDropdown";
 import { DATA_TEST_ID as DOWNLOAD_BUTTON_DATA_TEST_ID } from "src/experiences/experiencesDrawer/components/downloadReportButton/DownloadReportButton";
 import { DATA_TEST_ID as CONTEXT_MENU_DATA_TEST_ID } from "src/theme/ContextMenu/ContextMenu";
 import userEvent from "@testing-library/user-event";
@@ -12,6 +12,13 @@ import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { PDFReportDownloadProvider } from "src/experiences/report/reportPdf/provider";
 import { DocxReportDownloadProvider } from "src/experiences/report/reportDocx/provider";
 import { waitFor } from "@testing-library/react";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
+import { TabiyaUser } from "src/auth/auth.types";
+import MetricsService from "src/metrics/metricsService";
+import { EventType } from "src/metrics/types";
+import { MetricsError } from "src/error/commonErrors";
+import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 
 // mock the DownloadReportButton
 jest.mock("src/experiences/experiencesDrawer/components/downloadReportButton/DownloadReportButton", () => {
@@ -82,6 +89,14 @@ describe("DownloadReportDropdown", () => {
     experiences: mockExperiences,
   };
 
+  beforeEach(() => {
+    // Reset all method mocks on the singletons that may have been mocked
+    // As a good practice, we should the mock*Once() methods to avoid side effects between tests
+    // As a precaution, we reset all method mocks to ensure that no side effects are carried over between tests
+    resetAllMethodMocks(UserPreferencesStateService.getInstance());
+    resetAllMethodMocks(AuthenticationStateService.getInstance());
+  })
+
   test("should show the download report dropdown when the button is clicked", async () => {
     // GIVEN the component is rendered
     render(<DownloadReportDropdown {...mockData} />);
@@ -123,35 +138,40 @@ describe("DownloadReportDropdown", () => {
     expect(console.warn).not.toHaveBeenCalled();
   });
 
-  test("should call the pdfReportProvider when the PDF option is clicked", async () => {
-    // GIVEN the component is rendered
+  test.each(
+    [
+      [CVFormat.PDF, MENU_ITEM_ID.PDF, PDFReportDownloadProvider],
+      [CVFormat.DOCX, MENU_ITEM_ID.DOCX, DocxReportDownloadProvider],
+  ]
+  )("should call the appropriate provider when the %s option is clicked", async ( givenFormat: CVFormat, givenMenuItem: string, expectedProvider) => {
+    // GIVEN there is an active session and user
+    const givenSessionId = 123;
+    jest.spyOn(UserPreferencesStateService.getInstance(), "getActiveSessionId").mockReturnValueOnce(givenSessionId);
+    const givenUserId = "foo-id";
+    jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValueOnce({ id: givenUserId } as TabiyaUser);
+
+    // AND the metrics service will successfully send the event
+    jest.spyOn(MetricsService.getInstance(), "sendMetricsEvent").mockReturnValueOnce();
+
+    // AND the component is rendered
     render(<DownloadReportDropdown {...mockData} />);
     // AND the dropdown is shown
     const downloadReportButton = screen.getByTestId(DOWNLOAD_BUTTON_DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON_CONTAINER);
     await userEvent.click(downloadReportButton);
 
-    // WHEN the PDF option is clicked
-    await userEvent.click(screen.getByTestId(MENU_ITEM_ID.PDF));
+    // WHEN the given option is clicked
+    await userEvent.click(screen.getByTestId(givenMenuItem));
 
-    // THEN expect the pdfReportProvider should be called
-    expect(PDFReportDownloadProvider).toHaveBeenCalled();
-    // AND no errors or warnings to have occurred
-    expect(console.error).not.toHaveBeenCalled();
-    expect(console.warn).not.toHaveBeenCalled();
-  });
-
-  test("should call the docxsReportProvider when the DOCX option is clicked", async () => {
-    // GIVEN the component is rendered
-    render(<DownloadReportDropdown {...mockData} />);
-    // AND the dropdown is shown
-    const downloadReportButton = screen.getByTestId(DOWNLOAD_BUTTON_DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON_CONTAINER);
-    await userEvent.click(downloadReportButton);
-
-    // WHEN the DOCX option is clicked
-    await userEvent.click(screen.getByTestId(MENU_ITEM_ID.DOCX));
-
-    // THEN expect the docxsReportProvider should be called
-    expect(DocxReportDownloadProvider).toHaveBeenCalled();
+    // THEN expect the expected provider should be called
+    expect(expectedProvider).toHaveBeenCalled();
+    // AND the metrics event should be sent
+    expect(MetricsService.getInstance().sendMetricsEvent).toHaveBeenCalledWith({
+      event_type: EventType.CV_DOWNLOADED,
+      cv_format: givenFormat,
+      user_id: givenUserId,
+      session_id: givenSessionId,
+      timestamp: expect.any(String),
+    });
     // AND no errors or warnings to have occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
@@ -174,5 +194,37 @@ describe("DownloadReportDropdown", () => {
 
     // THEN expect the error to be thrown
     expect(console.error).toHaveBeenCalledWith("Error downloading report", mockError);
+  });
+
+  test("should handle when user_id is not available", async () => {
+    // GIVEN the user_id is not available
+    jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValueOnce(null);
+    // AND the component is rendered
+    render(<DownloadReportDropdown {...mockData} />);
+    // AND the dropdown is shown
+    const downloadReportButton = screen.getByTestId(DOWNLOAD_BUTTON_DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON_CONTAINER);
+    await userEvent.click(downloadReportButton);
+
+    // WHEN the PDF option is clicked
+    await userEvent.click(screen.getByTestId(MENU_ITEM_ID.PDF));
+
+    // THEN expect the error to be thrown
+    expect(console.error).toHaveBeenCalledWith(new MetricsError(`Unable to send CVDownload metrics: User id: undefined, Session id: undefined`));
+  });
+
+  test("should handle when session_id is not available", async () => {
+    // GIVEN the session_id is not available
+    jest.spyOn(UserPreferencesStateService.getInstance(), "getActiveSessionId").mockReturnValueOnce(null);
+    // AND the component is rendered
+    render(<DownloadReportDropdown {...mockData} />);
+    // AND the dropdown is shown
+    const downloadReportButton = screen.getByTestId(DOWNLOAD_BUTTON_DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON_CONTAINER);
+    await userEvent.click(downloadReportButton);
+
+    // WHEN the PDF option is clicked
+    await userEvent.click(screen.getByTestId(MENU_ITEM_ID.PDF));
+
+    // THEN expect the error to be thrown
+    expect(console.error).toHaveBeenCalledWith(new MetricsError(`Unable to send CVDownload metrics: User id: undefined, Session id: undefined`));
   });
 });
