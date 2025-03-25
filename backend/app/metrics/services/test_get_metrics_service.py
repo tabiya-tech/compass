@@ -4,14 +4,14 @@ import pytest
 import pytest_mock
 
 from common_libs.test_utilities import get_random_application_config
-from app.metrics.get_metrics_service import get_metrics_service
+from app.metrics.services.get_metrics_service import get_metrics_service
 
 
 @pytest.mark.asyncio
 class TestGetMetricsService:
     def teardown_method(self):
-        import app.metrics.get_metrics_service
-        app.metrics.get_metrics_service._metrics_service_singleton = None
+        import app.metrics.services.get_metrics_service
+        app.metrics.services.get_metrics_service._metrics_service_singleton = None
 
     async def test_get_metrics_service_concurrent_calls(self, mocker: pytest_mock.MockFixture):
         # GIVEN random in-memory metrics database

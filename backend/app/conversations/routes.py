@@ -21,13 +21,13 @@ from app.conversations.service import ConversationAlreadyConcludedError, IConver
 from app.conversations.types import ConversationResponse, ConversationInput
 from app.errors.constants import NO_PERMISSION_FOR_SESSION
 from app.errors.errors import UnauthorizedSessionAccessError
-from app.metrics.get_metrics_service import get_metrics_service
+from app.metrics.services.get_metrics_service import get_metrics_service
 from app.server_dependencies.agent_director_dependencies import get_agent_director
 from app.server_dependencies.application_state_dependencies import get_application_state_manager
 from app.server_dependencies.conversation_manager_dependencies import get_conversation_memory_manager
 from app.types import Experience
 from app.users.auth import Authentication, UserInfo
-from app.metrics.service import IMetricsService
+from app.metrics.services.service import IMetricsService
 from app.server_dependencies.db_dependencies import CompassDBProvider
 
 

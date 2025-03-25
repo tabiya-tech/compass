@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.conversations.routes import add_conversation_routes
 from app.countries import Country, get_country_from_string
 from app.invitations import add_user_invitations_routes
+from app.metrics.routes.routes import add_metrics_routes
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, ApiKeyAuth
 from app.vector_search.occupation_search_routes import add_occupation_search_routes
@@ -210,6 +211,11 @@ search_router = APIRouter(dependencies=[Depends(api_key_auth)], tags=["Search"])
 add_occupation_search_routes(search_router)
 add_skill_search_routes(search_router)
 app.include_router(search_router)
+
+############################################
+# Add metrics routes
+############################################
+add_metrics_routes(app)
 
 ############################################
 # Add POC chat routes
