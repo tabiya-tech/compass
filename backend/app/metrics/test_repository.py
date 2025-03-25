@@ -6,7 +6,7 @@ import pytest
 from app.conversations.reactions.types import ReactionKind, DislikeReason
 from app.metrics.types import ConversationPhaseLiteral, ConversationPhaseEvent, UserAccountCreatedEvent, \
     MessageReactionCreatedEvent, MessageCreatedEvent, \
-    FeedbackProvidedEvent, FeedbackTypeLiteral, FeedbackScoreEvent
+    FeedbackProvidedEvent, FeedbackTypeLiteral, FeedbackScoreEvent, MessageCreatedEventSourceLiteral
 from common_libs.test_utilities import get_random_user_id, get_random_session_id, get_random_printable_string
 from common_libs.time_utilities import mongo_date_to_datetime, truncate_microseconds
 
@@ -44,10 +44,11 @@ def get_feedback_provided_event():
     )
 
 
-def get_message_created_event():
+def get_message_created_event(event_source: MessageCreatedEventSourceLiteral):
     return MessageCreatedEvent(
         user_id=get_random_user_id(),
-        session_id=get_random_session_id()
+        session_id=get_random_session_id(),
+        message_source=event_source
     )
 
 
@@ -93,7 +94,7 @@ class TestRecordEvent:
             lambda: get_conversation_phase_event("ENDED"),
             lambda: get_feedback_provided_event(),
             lambda: get_feedback_score_event("NPS"),
-            lambda: get_message_created_event(),
+            lambda: get_message_created_event("USER"),
             lambda: get_message_reaction_created_event()
         ],
         ids=[
@@ -149,7 +150,8 @@ class TestRecordEvent:
             get_feedback_score_event("NPS"),
             get_feedback_score_event("CSAT"),
             get_feedback_score_event("CES"),
-            get_message_created_event(),
+            get_message_created_event("USER"),
+            get_message_created_event("COMPASS"),
             get_message_reaction_created_event()
 
         ]
@@ -178,7 +180,7 @@ class TestRecordEvent:
             lambda: get_conversation_phase_event("ENDED"),
             lambda: get_feedback_score_event("NPS"),
             lambda: get_feedback_provided_event(),
-            lambda: get_message_created_event(),
+            lambda: get_message_created_event("COMPASS"),
             lambda: get_message_reaction_created_event()
         ],
         ids=[

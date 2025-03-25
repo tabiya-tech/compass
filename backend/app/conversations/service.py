@@ -4,6 +4,7 @@ This module contains the service layer for handling conversations.
 import logging
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
+from typing import cast
 
 from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
@@ -18,7 +19,7 @@ from app.conversations.utils import get_messages_from_conversation_manager, filt
 from app.sensitive_filter import sensitive_filter
 from app.types import Experience, Skill
 from app.metrics.service import IMetricsService
-from app.metrics.types import ConversationPhaseEvent, ConversationPhaseLiteral, MessageCreatedEvent
+from app.metrics.types import ConversationPhaseEvent, MessageCreatedEvent, MessageCreatedEventSourceLiteral
 
 
 class ConversationAlreadyConcludedError(Exception):
@@ -158,14 +159,23 @@ class ConversationService(IConversationService):
                     phase="ENDED"
                 )
             )
-
-        # before responding to the user, record the message created event
+        # Record the event for the user message
         await self._metrics_service.record_event(
             MessageCreatedEvent(
                 user_id=user_id,
-                session_id=session_id
+                session_id=session_id,
+                message_source="USER"
             )
         )
+        # before responding to the user, record a message created event for each message in the response
+        for _ in response:
+            await self._metrics_service.record_event(
+                MessageCreatedEvent(
+                    user_id=user_id,
+                    session_id=session_id,
+                    message_source="COMPASS"
+                )
+            )
 
         return ConversationResponse(
             messages=response,
