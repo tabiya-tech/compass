@@ -102,6 +102,9 @@ def _setup_api_gateway(*,
 
         # replace the backend api gateway timeout.
         .replace("__API_GATEWAY_TIMEOUT__", backend_service_cfg.api_gateway_timeout)
+
+        # replace the environment name in the api gateway config
+        .replace("__ENVIRONMENT_NAME__", backend_service_cfg.target_environment_name)
     )
 
     apigw_config_yaml_b64encoded = apigw_config_yaml.apply(lambda yaml: base64.b64encode(yaml.encode()).decode())
