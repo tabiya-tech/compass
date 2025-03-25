@@ -10,7 +10,7 @@ from pathlib import Path
 
 from app.conversations.feedback.repository import IUserFeedbackRepository
 from app.app_config import get_application_config
-from app.metrics.service import IMetricsService
+from app.metrics.services.service import IMetricsService
 from app.metrics.types import FeedbackProvidedEvent, FeedbackRatingValueEvent, FeedbackTypeLiteral
 from .types import Feedback, NewFeedbackSpec, FeedbackItem, Version, AnsweredQuestions
 from .errors import (

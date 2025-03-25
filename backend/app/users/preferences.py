@@ -7,7 +7,7 @@ from app.constants.errors import ErrorService, HTTPErrorResponse
 from app.conversations.feedback.repository import UserFeedbackRepository
 from app.invitations.repository import UserInvitationRepository
 from app.invitations.types import InvitationType
-from app.metrics.get_metrics_service import get_metrics_service
+from app.metrics.services.get_metrics_service import get_metrics_service
 from app.users.sensitive_personal_data.routes import get_sensitive_personal_data_service
 from app.users.sensitive_personal_data.service import ISensitivePersonalDataService
 from app.server_dependencies.db_dependencies import CompassDBProvider
@@ -17,7 +17,7 @@ from app.users.repositories import UserPreferenceRepository
 from app.users.sessions import generate_new_session_id, SessionsService
 from app.users.types import UserPreferencesUpdateRequest, UserPreferences, \
     CreateUserPreferencesRequest, UserPreferencesRepositoryUpdateRequest, UsersPreferencesResponse
-from app.metrics.service import IMetricsService
+from app.metrics.services.service import IMetricsService
 from app.metrics.types import UserAccountCreatedEvent
 import logging
 

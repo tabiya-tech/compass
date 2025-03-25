@@ -1,9 +1,9 @@
 import pytest
 from unittest.mock import AsyncMock
 
-from app.metrics.repository import IMetricsRepository
+from app.metrics.repository.repository import IMetricsRepository
 from app.metrics.types import AbstractCompassMetricEvent, EventType
-from app.metrics.service import MetricsService
+from app.metrics.services.service import MetricsService
 from app.app_config import ApplicationConfig
 
 

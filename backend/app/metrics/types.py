@@ -1,5 +1,5 @@
 import hashlib
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Literal, final
 
 from pydantic import BaseModel, Field, model_validator
@@ -252,6 +252,146 @@ class MessageReactionCreatedEvent(AbstractConversationEvent):
             message_id=message_id,
             kind=kind.name,
             reasons=[reason.name for reason in reasons]
+        )
+
+    class Config:
+        extra = "forbid"
+
+
+"""
+------- Frontend only metrics -------
+"""
+
+CVFormatLiteral = Literal["PDF", "DOCX"]
+
+
+class CVDownloadedEvent(AbstractConversationEvent):
+    """
+    A Frontend only metric event representing the download of a CV
+    """
+    cv_format: CVFormatLiteral
+    """
+    format - the format of the CV
+    """
+    timestamp: datetime
+    """
+    timestamp - an iso string representing the timestamp of the event
+    """
+
+    def __init__(self, *, user_id: str, session_id: int, cv_format: CVFormatLiteral, timestamp: str):
+        super().__init__(
+            user_id=user_id,
+            session_id=session_id,
+            event_type=EventType.CV_DOWNLOADED,
+            cv_format=cv_format,
+            timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc)
+        )
+
+    class Config:
+        extra = "forbid"
+
+
+class DemographicsEvent(AbstractUserAccountEvent):
+    """
+    A Frontend only metric event representing the demographics of a user
+    """
+    age: str
+    """
+    age - the age of the user
+    """
+    gender: str
+    """
+    gender - the gender of the user
+    """
+    education: str
+    """
+    education - the education of the user
+    """
+    employment_status: str
+    """
+    employment_status - the employment status of the user
+    """
+
+    def __init__(self, *, user_id: str, age: int, gender: str, education: str, employment_status: str):
+        super().__init__(
+            user_id=user_id,
+            event_type=EventType.DEMOGRAPHICS,
+            age=age,
+            gender=gender,
+            education=education,
+            employment_status=employment_status
+        )
+
+    class Config:
+        extra = "forbid"
+
+
+class UserLocationEvent(AbstractUserAccountEvent):
+    """
+    A Frontend only metric event representing the location of a user
+    """
+    coordinates: tuple[float, float]
+    """
+    coordinates - the coordinates of the user (latitude, longitude)
+    """
+    ip_address: str
+
+    def __init__(self, *, user_id: str, coordinates: tuple[float, float], ip_address: str):
+        super().__init__(
+            user_id=user_id,
+            event_type=EventType.USER_LOCATION,
+            coordinates=coordinates,
+            ip_address=ip_address
+        )
+
+    class Config:
+        extra = "forbid"
+
+
+class DeviceSpecificationEvent(AbstractUserAccountEvent):
+    """
+    A Frontend only metric event representing the device specification of a user
+    """
+    device_type: str
+    """
+    device_type - the type of device the user is using, laptop, desktop, tablet, mobile...
+    """
+    os_type: str
+    """
+    os _type- the operating system of the device the user is using
+    """
+    browser_type: str
+    """
+    browser_type - the browser the user is using
+    """
+
+    def __init__(self, *, user_id: str, device_type: str, os_type: str, browser_type: str):
+        super().__init__(
+            user_id=user_id,
+            event_type=EventType.DEVICE_SPECIFICATION,
+            device_type=device_type,
+            os_type=os_type,
+            browser_type=browser_type,
+        )
+
+    class Config:
+        extra = "forbid"
+
+
+class NetworkInformationEvent(AbstractUserAccountEvent):
+    """
+    A Frontend only metric event representing the network information of a user
+    """
+    effective_connection_type: str
+    """
+    effective_connection_type - the network classification of the user's connection: 2g, 3g, 4g, 5g...
+    """
+
+    def __init__(self, *, user_id: str, effective_connection_type: str):
+        super().__init__(
+            user_id=user_id,
+            event_type=EventType.NETWORK_INFORMATION,
+            effective_connection_type=effective_connection_type,
         )
 
     class Config:
