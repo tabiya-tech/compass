@@ -8,8 +8,8 @@ from typing import Optional, Callable, Any
 import jwt
 
 from pydantic import BaseModel
-from fastapi import Depends, Request, HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, Request, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, APIKeyHeader
 
 logger = logging.getLogger(__name__)
 
@@ -156,14 +156,14 @@ class Authentication:
                     # from the API Gateway.
                     auth_info_b64 = request.headers.get('x-apigateway-api-userinfo')
                     if not auth_info_b64:
-                        raise HTTPException(status_code=401, detail="forbidden")
+                        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="forbidden")
 
                     # The user info is encoded as base 64 string by the api-gateway
                     token_info = _decode_user_info_api_gateway(auth_info_b64)
                 else:
                     # When running locally, use the jwt token from Authorization header.
                     if not credentials:
-                        raise HTTPException(status_code=401, detail="Unauthorized, missing credentials")
+                        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized, missing credentials")
                     # Decode the token without verifying the signature as we are running locally.
                     token_info = jwt.decode(credentials, options={"verify_signature": False})
                 # decoded credentials.
@@ -175,6 +175,18 @@ class Authentication:
                 # Log as warning as it is not clear if this is due to an unauthenticated request or some other "internal" reason.
                 # Do not include any stack trace to avoid performance issues.
                 logger.warning("Error while getting user info: %s - %s", e.__class__.__name__, e)
-                raise HTTPException(status_code=401, detail="Unauthorized")
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
 
         return construct_user_info
+
+
+class ApiKeyAuth:
+    """
+    This class is used to api calls using API keys in the header.
+    see https://cloud.google.com/endpoints/docs/openapi/authentication-method for more details.
+    """
+    async def __call__(self, api_key: str = Depends(APIKeyHeader(scheme_name="gcp_api_key", name="x-api-key", auto_error=True))):
+        # Currently, there's not much to do here as the API Gateway validates the key.
+        # Additionally, since APIKeyHeader is used with auto_error=True, it will raise an exception if the header key is missing.
+        # In the future, the key can be checked against roles and permissions.
+        return api_key

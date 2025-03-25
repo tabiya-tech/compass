@@ -1,8 +1,8 @@
 # openapi2-functions.yaml
 swagger: '2.0'
 info:
-  title: Compass API Gateway Config
-  description: Compass API Gateway Config
+  title: Compass Backend API
+  description: The backend api for the Compass application
   version: 1.0.0
 schemes:
   - https
@@ -27,7 +27,13 @@ x-google-backend:
   address: "__BACKEND_URI__"
   deadline: "__API_GATEWAY_TIMEOUT__" # timeout as the cloud run container may take a while to start, and some requests may take a while to process. Reference: https://cloud.google.com/endpoints/docs/openapi/openapi-extensions#deadline
 securityDefinitions:
+  gcp_api_key:
+    # Read https://cloud.google.com/endpoints/docs/openapi/restricting-api-access-with-api-keys for more information
+    "type": apiKey
+    "name": "x-api-key"
+    "in": "header"
   firebase:
+    # Read https://cloud.google.com/endpoints/docs/openapi/authenticating-users-firebase
     authorizationUrl: ""
     flow: "implicit"
     type: "oauth2"
