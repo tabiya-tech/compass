@@ -6,8 +6,8 @@ import logging
 from http import HTTPStatus
 from typing import Annotated
 
-from app.metrics.get_metrics_service import get_metrics_service
-from app.metrics.service import IMetricsService
+from app.metrics.services.get_metrics_service import get_metrics_service
+from app.metrics.services.service import IMetricsService
 from fastapi import APIRouter, Depends, HTTPException, Request, Path
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pydantic import Field

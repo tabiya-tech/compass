@@ -16,7 +16,7 @@ from app.conversation_memory.conversation_memory_types import ConversationMemory
 from app.conversations.reactions.repository import IReactionRepository
 from app.conversations.reactions.service import ReactionService, ReactingToUserMessageError
 from app.conversations.reactions.types import ReactionKind, DislikeReason, Reaction
-from app.metrics.service import IMetricsService
+from app.metrics.services.service import IMetricsService
 from app.metrics.types import MessageReactionCreatedEvent
 from common_libs.test_utilities import get_random_user_id
 from common_libs.test_utilities.mock_application_state import get_mock_application_state

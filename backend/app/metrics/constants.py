@@ -10,3 +10,11 @@ class EventType(Enum):
     FEEDBACK_RATING_VALUE = 100004
     MESSAGE_CREATED = 100005
     MESSAGE_REACTION_CREATED = 100006
+
+    # Frontend events
+    # As a convention, all events created on the frontend should start with 20000
+    CV_DOWNLOADED = 200001
+    DEMOGRAPHICS = 200002
+    USER_LOCATION = 200003
+    DEVICE_SPECIFICATION = 200004
+    NETWORK_INFORMATION = 200005

@@ -8,7 +8,7 @@ from app.application_state import IApplicationStateManager
 from app.conversation_memory.conversation_memory_manager import IConversationMemoryManager
 from app.conversations.reactions.repository import IReactionRepository
 from app.conversations.reactions.types import Reaction
-from app.metrics.service import IMetricsService
+from app.metrics.services.service import IMetricsService
 from app.metrics.types import MessageReactionCreatedEvent
 
 
