@@ -10,7 +10,7 @@ from app.metrics.types import ConversationPhaseLiteral, ConversationPhaseEvent, 
 from common_libs.test_utilities import get_random_user_id, get_random_session_id, get_random_printable_string
 from common_libs.time_utilities import mongo_date_to_datetime, truncate_microseconds
 
-from app.metrics.repository import MetricsRepository
+from app.metrics.repository.repository import MetricsRepository
 
 from app.app_config import ApplicationConfig
 

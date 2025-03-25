@@ -4,8 +4,8 @@ from fastapi import Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.app_config import get_application_config, ApplicationConfig
-from app.metrics.repository import MetricsRepository
-from app.metrics.service import IMetricsService, MetricsService
+from app.metrics.repository.repository import MetricsRepository
+from app.metrics.services.service import IMetricsService, MetricsService
 from app.server_dependencies.db_dependencies import CompassDBProvider
 
 # Lock to ensure that the singleton instance is thread-safe

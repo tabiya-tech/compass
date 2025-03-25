@@ -17,7 +17,7 @@ from app.conversations.types import ConversationResponse
 from app.conversations.utils import get_messages_from_conversation_manager, filter_conversation_history, get_total_explored_experiences, cast_conversation_phase_to_metrics_event_phase, get_messages_metric_events_to_record
 from app.sensitive_filter import sensitive_filter
 from app.types import Experience, Skill
-from app.metrics.service import IMetricsService
+from app.metrics.services.service import IMetricsService
 from app.metrics.types import ConversationPhaseEvent, AbstractCompassMetricEvent
 
 

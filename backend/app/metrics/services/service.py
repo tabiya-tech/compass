@@ -1,8 +1,7 @@
 from abc import ABC
 import logging
 from app.metrics.types import AbstractCompassMetricEvent
-from app.metrics.repository import IMetricsRepository
-from app.app_config import get_application_config
+from app.metrics.repository.repository import IMetricsRepository
 
 
 class IMetricsService(ABC):
