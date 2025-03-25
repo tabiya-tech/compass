@@ -3,7 +3,7 @@ Tests for the metric type models.
 """
 import random
 
-from app.app_config import ApplicationConfig
+from app.app_config import ApplicationConfig, set_application_config
 import pytest
 import pytest_mock
 from datetime import datetime, timezone
@@ -21,7 +21,7 @@ from app.metrics.types import (
 )
 from app.conversations.reactions.types import ReactionKind, DislikeReason
 from app.metrics.constants import EventType
-from common_libs.test_utilities import get_random_user_id, get_random_session_id
+from common_libs.test_utilities import get_random_user_id, get_random_session_id, get_random_application_config
 
 
 def assert_basic_event_fields_are_set(event: AbstractCompassMetricEvent, expected_event_type: EventType,
@@ -47,6 +47,74 @@ class TestAbstractClasses:
         # AND the error message should indicate that the class is an abstract class.
         with pytest.raises(TypeError, match=f"{cls.__name__} is an abstract class and cannot be instantiated directly"):
             abstract_event_class()
+
+
+class TestDefaultValues:
+    def test_optional_values_are_not_passed(self, mocker):
+        # GIVEN a Sample foo event.
+        class _FooEvent(AbstractCompassMetricEvent):
+            pass
+
+        # AND sample application config is created
+        given_application_config = get_random_application_config()
+        set_application_config(given_application_config)
+
+        # AND get_now will return a fixed time
+        fixed_time = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)
+        mocker.patch('common_libs.time_utilities._time_utils.datetime', new=mocker.Mock(now=lambda tz=None: fixed_time))
+
+        # AND a random event_type
+        given_event_type = random.choice(list(EventType))  # nosec B311 # random is used for testing purposes
+
+        # WHEN an instance is only created with the required fields.
+        given_event = _FooEvent(
+            event_type=given_event_type  # type: ignore
+        )
+
+        # THEN the default values should be taken from application config object
+        assert given_event.environment_name == given_application_config.environment_name
+        assert given_event.version == given_application_config.version_info.to_version_string()
+
+        # AND given_event timestamp will be the fixed time
+        assert given_event.timestamp == fixed_time
+
+        # AND event_type should be set correctly
+        assert given_event.event_type == given_event_type
+
+    def test_optional_values_are_passed(self, mocker):
+        # GIVEN a Sample foo event.
+        class _FooEvent(AbstractCompassMetricEvent):
+            pass
+
+        # AND sample application config is created
+        given_application_config = get_random_application_config()
+        set_application_config(given_application_config)
+
+        # AND get_now will return a fixed time
+        fixed_time = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)
+        mocker.patch('common_libs.time_utilities._time_utils.datetime', new=mocker.Mock(now=lambda tz=None: fixed_time))
+
+        # AND a random event_type
+        given_event_type = random.choice(list(EventType))  # nosec B311 # random is used for testing purposes
+
+        # AND a random environment name
+        given_environment_name = "random_environment_name"
+
+        # AND a random version
+        given_version = "given-random-version"
+        # AND another random time
+        given_timestamp = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)
+
+        # WHEN an instance is created with all the fields.
+        given_event = _FooEvent(event_type=given_event_type, environment_name=given_environment_name,  # type: ignore
+                                version=given_version, timestamp=given_timestamp)  # type: ignore
+
+        # THEN the default values should be taken from application config object
+        assert given_event.environment_name == given_environment_name
+        assert given_event.version == given_version
+
+        # AND given event timestamp will be the fixed time
+        assert given_event.timestamp == given_timestamp
 
 
 class TestUserAccountCreatedEvent:
@@ -289,7 +357,8 @@ class TestMessageReactionCreatedEvent:
         # GIVEN a message id, a random reaction kind, reasons, session id and user id
         given_message_id = "message_1"
         given_reaction_kind = random.choice(list(ReactionKind))  # nosec B311 # random is used for testing purposes
-        given_reasons = random.choices(list(DislikeReason), k=random.randint(1, len(DislikeReason)))  # nosec B311 # random is used for testing purposes
+        given_reasons = random.choices(list(DislikeReason), k=random.randint(1,
+                                                                             len(DislikeReason)))  # nosec B311 # random is used for testing purposes
         given_session_id = get_random_session_id()
         given_user_id = get_random_user_id()
 
@@ -325,7 +394,8 @@ class TestMessageReactionCreatedEvent:
         given_user_id = get_random_user_id()
         given_message_id = "message_1"
         given_reaction_kind = random.choice(list(ReactionKind))  # nosec B311 # random is used for testing purposes
-        given_reasons = random.choices(list(DislikeReason), k=random.randint(1, len(DislikeReason)))  # nosec B311 # random is used for testing purposes
+        given_reasons = random.choices(list(DislikeReason), k=random.randint(1,
+                                                                             len(DislikeReason)))  # nosec B311 # random is used for testing purposes
 
         # AND an extra field
         given_extra_field = "extra_field"
