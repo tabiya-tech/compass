@@ -10,19 +10,18 @@ def export():
     # Since the app won't actually be running, we only need to set the environment variables typically used for testing.
     # This is necessary because the app is initialized at the module level and doesn't currently support passing a configuration.
     # If these values are not set, the app won't start and will throw an error due to missing required environment variables.
-    from common_libs.test_utilities.setup_env_vars import setup_env_vars, teardown_env_vars
-    setup_env_vars()
-    from app.server import app
-    # Generate the OpenAPI 3.1 schema
-    openapi3 = get_openapi(
-        title=getattr(app, "title", None),
-        version=getattr(app, "version", None),
-        openapi_version=getattr(app, "openapi_version", None),
-        description=getattr(app, "description", None),
-        routes=app.routes
-    )
-    convert(openapi3)
-    teardown_env_vars()
+    from common_libs.test_utilities.setup_env_vars import env_context
+    with env_context():
+        from app.server import app
+        # Generate the OpenAPI 3.1 schema
+        openapi3 = get_openapi(
+            title=getattr(app, "title", None),
+            version=getattr(app, "version", None),
+            openapi_version=getattr(app, "openapi_version", None),
+            description=getattr(app, "description", None),
+            routes=app.routes
+        )
+        convert(openapi3)
 
 
 # Simplified OpenAPI 3.1 to OpenAPI 2.0 converter
