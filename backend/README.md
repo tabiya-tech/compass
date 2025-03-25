@@ -155,16 +155,19 @@ The backend uses the following environment variables:
 - `APPLICATION_DATABASE_NAME`: The name of mongo db database used by the application to store data.
 - `USERDATA_MONGODB_URI`: The URI of the MongoDB instance for the user data database.
 - `USERDATA_DATABASE_NAME`: The name of the mongo db database used by the application to store user data.
+- `METRICS_MONGODB_URI`: The URI of the MongoDB instance for the metrics database.
+- `METRICS_DATABASE_NAME`: The name of the mongo db database used by the application to store metrics data.
 - `VERTEX_API_REGION`: (optional) The region of the Vertex API to use. If not set defaults to `us-central1`.
 - `LOG_CONFIG_FILE`: (Optional) See the [Logging](#logging) section for more information. If not set defaults to `logging.cfg.yaml`.
 - `BACKEND_URL`: The URL of the backend. It is used to correctly configure Swagger UI and the CORS policy.
 - `FRONTEND_URL`: The URL of the frontend. It is used to set the CORS policy.
+- `BACKEND_ENABLE_METRICS`: Set to `True` to enable metrics tracking.
 - `BACKEND_ENABLE_SENTRY`: Set to `True` to enable Sentry error tracking. Set to `False`to disable locally or on CI/CD pipeline so that the unit tests can run successfully.
 - `BACKEND_SENTRY_DSN`: (optional) The Sentry Data Source Name used to track backend errors.
 - `TARGET_ENVIRONMENT`: (optional) The target environment where the backend is running. When set to `dev` or `local`, CORS will be set to allow all origins.
   > Note: The `FRONTEND_URL` should be set irrespective of the `TARGET_ENVIRONMENT` value.
 
->
+
 
 The backend supports the use of a `.env` file to set the environment variables. Create a `.env` file in the root
 directory of the backend project and set the environment variables as follows:
@@ -269,11 +272,12 @@ LOG_CONFIG_FILE=logging.cfg.dev.yaml
 BACKEND_URL=*
 # allow all origins
 FRONTEND_URL=*
-BACKEND_ENABLE_METRICS=False|True
+BACKEND_ENABLE_METRICS=False
 # will add CORS policy to allow all origins
 TARGET_ENVIRONMENT_NAME=local
 TARGET_ENVIRONMENT_TYPE=local
 BACKEND_ENABLE_SENTRY=False
+BACKEND_SENTRY_DSN=<BACKEND_SENTRY_DSN>
 ```
 
 Run the image using the following command:
