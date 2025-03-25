@@ -1,7 +1,7 @@
 # openapi2-functions.yaml
 swagger: '2.0'
 info:
-  title: Compass Backend API
+  title: Compass Backend API __ENVIRONMENT_NAME__
   description: The backend api for the Compass application
   version: 1.0.0
 schemes:
