@@ -2,7 +2,7 @@
 
 exports[`FeedbackForm should render component successfully 1`] = `
 <div
-  class="MuiDialog-root MuiModal-root css-ggignx-MuiModal-root-MuiDialog-root"
+  class="MuiDialog-root MuiModal-root css-1hldcek-MuiModal-root-MuiDialog-root"
   data-testid="feedback-form-dialog-c6ba52ec-c1de-46ac-950b-f5354c6785ac"
   role="presentation"
 >

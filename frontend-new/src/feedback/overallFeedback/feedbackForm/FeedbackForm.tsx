@@ -1,6 +1,5 @@
 import React from "react";
-import { Dialog, DialogContent, DialogTitle, Typography, useMediaQuery, useTheme } from "@mui/material";
-import { Theme } from "@mui/material/styles";
+import { Dialog, DialogContent, DialogTitle, Typography, useTheme } from "@mui/material";
 import FeedbackFormContent from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import CloseIcon from "@mui/icons-material/Close";
@@ -10,6 +9,7 @@ import { FeedbackItem } from "src/feedback/overallFeedback/overallFeedbackServic
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { FeedbackError } from "src/error/commonErrors";
+import { useIsSmallOrShortScreen } from "src/feedback/overallFeedback/feedbackForm/useIsSmallOrShortScreen";
 
 export interface FeedbackFormProps {
   isOpen: boolean;
@@ -40,7 +40,7 @@ export const DATA_TEST_ID = {
 const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) => {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
-  const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
+  const isSmallOrShortScreen = useIsSmallOrShortScreen();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const handleClose = () => {
@@ -76,16 +76,15 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
         onClose={handleClose}
         maxWidth="sm"
         fullWidth={true}
-        fullScreen={isSmallMobile}
+        fullScreen={isSmallOrShortScreen}
         data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG}
         sx={{
           "& .MuiDialog-paper": {
-            height: isSmallMobile ? "100%" : "85%",
+            height: isSmallOrShortScreen ? "100%" : "85%",
             display: "flex",
             flexDirection: "column",
-            gap: isSmallMobile
-              ? theme.fixedSpacing(theme.tabiyaSpacing.md)
-              : theme.fixedSpacing(theme.tabiyaSpacing.lg),
+            gap: theme.fixedSpacing(isSmallOrShortScreen ? theme.tabiyaSpacing.sm : theme.tabiyaSpacing.lg),
+            margin: 0,
           },
         }}
       >
@@ -95,10 +94,11 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: isSmallMobile
-              ? theme.fixedSpacing(theme.tabiyaSpacing.sm)
-              : theme.fixedSpacing(theme.tabiyaSpacing.md),
-            paddingBottom: 0
+            padding:
+              isSmallOrShortScreen
+                ? theme.fixedSpacing(theme.tabiyaSpacing.sm)
+                : theme.fixedSpacing(theme.tabiyaSpacing.md),
+            paddingBottom: 0,
           }}
         >
           <Typography variant="h3" data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG_TITLE}>
@@ -116,9 +116,10 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
         <DialogContent
           data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG_CONTENT}
           sx={{
-            padding: isSmallMobile
-              ? theme.fixedSpacing(theme.tabiyaSpacing.sm)
-              : theme.fixedSpacing(theme.tabiyaSpacing.md),
+            padding:
+              isSmallOrShortScreen
+                ? theme.fixedSpacing(theme.tabiyaSpacing.sm)
+                : theme.fixedSpacing(theme.tabiyaSpacing.md),
           }}
         >
           <FeedbackFormContent notifySubmit={handleFeedbackSubmit} />

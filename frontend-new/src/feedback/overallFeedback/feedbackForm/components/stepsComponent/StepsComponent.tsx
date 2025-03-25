@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { Box } from "@mui/material";
 import { DetailedQuestion, QuestionType } from "src/feedback/overallFeedback/feedbackForm/feedbackForm.types";
 import {
   SimplifiedAnswer,
@@ -8,6 +8,7 @@ import {
 import CustomRating from "src/feedback/overallFeedback/feedbackForm/components/customRating/CustomRating";
 import YesNoQuestion from "src/feedback/overallFeedback/feedbackForm/components/yesNoQuestion/YesNoQuestion";
 import CheckboxQuestion from "src/feedback/overallFeedback/feedbackForm/components/checkboxQuestion/CheckboxQuestion";
+import { useIsSmallOrShortScreen } from "src/feedback/overallFeedback/feedbackForm/useIsSmallOrShortScreen";
 
 interface StepProps {
   questions: DetailedQuestion[];
@@ -22,8 +23,7 @@ export const DATA_TEST_ID = {
 };
 
 const StepsComponent: React.FC<StepProps> = ({ questions, feedbackItems, onChange }) => {
-  const theme = useTheme();
-  const isSmallMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isSmallOrShortScreen = useIsSmallOrShortScreen()
 
   const getAnswerByQuestionId = (questionId: string): SimplifiedAnswer | undefined => {
     return feedbackItems.find((item: FeedbackItem) => item.question_id === questionId)?.simplified_answer;
@@ -41,7 +41,7 @@ const StepsComponent: React.FC<StepProps> = ({ questions, feedbackItems, onChang
     <Box
       display="flex"
       flexDirection="column"
-      gap={(theme) => (isSmallMobile ? theme.tabiyaSpacing.xl * 3 : theme.tabiyaSpacing.xl * 1.2)}
+      gap={(theme) => (isSmallOrShortScreen ? theme.tabiyaSpacing.xl * 3 : theme.tabiyaSpacing.xl * 1.2)}
       data-testid={DATA_TEST_ID.STEPS_COMPONENT}
     >
       {questions.map((question) => {
