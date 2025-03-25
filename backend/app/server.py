@@ -4,12 +4,14 @@ import os
 
 from dotenv import load_dotenv
 
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from app.conversations.routes import add_conversation_routes
 from app.invitations import add_user_invitations_routes
 from app.server_dependencies.db_dependencies import CompassDBProvider
-from app.users.auth import Authentication
+from app.users.auth import Authentication, ApiKeyAuth
+from app.vector_search.occupation_search_routes import add_occupation_search_routes
+from app.vector_search.skill_search_routes import add_skill_search_routes
 from app.version.version_routes import add_version_routes
 
 from contextlib import asynccontextmanager
@@ -190,6 +192,16 @@ add_users_routes(app, auth)
 # Add the user invitations routes
 ############################################
 add_user_invitations_routes(app)
+
+
+############################################
+# Add routes relevant for esco search
+############################################
+api_key_auth = ApiKeyAuth()
+search_router = APIRouter(dependencies=[Depends(api_key_auth)], tags=["Search"])
+add_occupation_search_routes(search_router)
+add_skill_search_routes(search_router)
+app.include_router(search_router)
 
 ############################################
 # Add POC chat routes

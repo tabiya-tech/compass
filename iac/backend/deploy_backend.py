@@ -149,6 +149,13 @@ def _setup_api_gateway(*,
         member=apigw_service_account.email.apply(lambda email: f"serviceAccount:{email}"),
         opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
     )
+    # Enable the private service access for the API Gateway
+    gcp.projects.Service(
+        get_resource_name(resource="compass-backend-api", resource_type="service"),
+        project=basic_config.project,
+        service=apigw_api.managed_service,
+        opts=pulumi.ResourceOptions(depends_on=[api_gateway], provider=basic_config.provider)
+    )
 
     pulumi.export("apigateway_url", api_gateway.default_hostname.apply(lambda hostname: f"https://{hostname}"))
     pulumi.export("apigateway_id", api_gateway.gateway_id)
