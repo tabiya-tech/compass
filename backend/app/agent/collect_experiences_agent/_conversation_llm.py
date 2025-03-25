@@ -357,7 +357,7 @@ def _get_collected_experience_data(collected_data: list[CollectedData]) -> str:
     if len(collected_data) == 0:
         return _NO_EXPERIENCE_COLLECTED
 
-    all_experiences = ",".join([_data.json() for _data in collected_data])
+    all_experiences = ",".join([_data.model_dump_json() for _data in collected_data])
 
     return dedent(f"""[{all_experiences}]
     The values null, "" can be interpreted as follows:
@@ -369,7 +369,7 @@ def _get_collected_experience_data(collected_data: list[CollectedData]) -> str:
 def _get_last_referenced_experience(collected_data: list[CollectedData], last_referenced_experience_index: int) -> str:
     if last_referenced_experience_index < 0 or last_referenced_experience_index >= len(collected_data):
         return _NO_EXPERIENCE_COLLECTED
-    experience = collected_data[last_referenced_experience_index].json()
+    experience = collected_data[last_referenced_experience_index].model_dump_json()
     return dedent(f"""{experience}
     The values null, "" can be interpreted as follows:
     null, You did not provide the information and I did not explicitly ask for it yet. 

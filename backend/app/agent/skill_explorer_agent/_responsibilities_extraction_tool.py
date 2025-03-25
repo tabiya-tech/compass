@@ -25,7 +25,7 @@ class _ResponsibilitiesExtractionTool:
         last_user_input = user_input.message.strip()  # Remove leading and trailing whitespaces
         sentence_decomposition_output, sentence_decomposition_stats = await self._sentence_decomposition_llm.execute(
             last_user_input=last_user_input, context=context)
-        self.logger.debug("Sentence decomposition output: %s", sentence_decomposition_output.dict())
+        self.logger.debug("Sentence decomposition output: %s", sentence_decomposition_output.model_dump())
         if len(sentence_decomposition_output.resolved_pronouns) == 0:
             self.logger.debug("No resolved pronouns found in the user's input. Skipping responsibilities extraction.")
             return ResponsibilitiesData(
