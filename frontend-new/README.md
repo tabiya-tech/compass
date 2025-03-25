@@ -51,6 +51,8 @@ To develop this application locally, follow these steps:
      - `BACKEND_URL`: The URL of the backend API
      - `TARGET_ENVIRONMENT_NAME`: The name of the environment (e.g. "dev", "test", "demo", ....)
      - `FRONTEND_SENTRY_DSN`: The Sentry Data Source Name for error tracking (the frontend DSN is for the project used to track frontend errors)
+     - `FRONTEND_ENABLE_SENTRY`: A boolean value to enable or disable Sentry error tracking
+     - `FRONTEND_ENABLE_METRICS`: A boolean value to enable or disable metrics tracking
      - `SENTRY_AUTH_TOKEN`: The Sentry authentication token, used to upload source maps
      - `SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY`: The RSA public key used to encrypt sensitive personal data. It is in the [PEM](https://www.rfc-editor.org/rfc/rfc7468) format.
      - `SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID`: The ID of the RSA public key. This is used to identify the key used to encrypt the sensitive personal data as it may be rotated over time.

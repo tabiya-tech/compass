@@ -359,6 +359,17 @@ This application uses **MongoDB** for data storage.
         TAXONOMY_MODEL_ID=<model-id>
         ```
 
+4. **Metrics Data**:
+    - Set up a **MongoDB cluster** or **local instance** for metrics data.
+    - **Store Credentials in `.env`**:  
+      Save the connection details in the `.env` file:
+        ```dotenv
+        # MongoDB connection string for metrics data 
+        METRICS_MONGODB_URI=<connection-string>
+        # Database name for metrics data
+        METRICS_DATABASE_NAME=<database-name>
+        ```
+
 ### Step 4.3: Generate Embeddings.
 
 
@@ -374,7 +385,7 @@ Refer to the [Invitation Codes README](/invitations.md) for instructions on impo
 
 ### Step 4.5: Generate Encryption Keys.
 
-Refer to the [Encryption Keys README](/sensitive-data-protection.md#create-an-rsa-privatepublic-key) for instructions on generating RSA encryption keys.
+Refer to the [Encryption Keys README](/sensitive-data-protection.md#create-an-rsa-privatepublic-key-pair) for instructions on generating RSA encryption keys.
 
 - **Private Key**: Must be kept secure and not shared.
 - **Public Key**: Used to encrypt sensitive data.
@@ -409,6 +420,10 @@ VERTEX_API_REGION=<region>
 # Enable or disable Sentry for this environment
 BACKEND_ENABLE_SENTRY=<True/False>
 FRONTEND_ENABLE_SENTRY=<True/False>
+
+# Enable or Disable Metrics for this environment.
+BACKEND_ENABLE_METRICS=<True/False>
+FRONTEND_ENABLE_METRICS=<True/False>
 ```  
 
 - **For the final `.env` file structure**, refer to the [env.template](/iac/templates/env.template).
