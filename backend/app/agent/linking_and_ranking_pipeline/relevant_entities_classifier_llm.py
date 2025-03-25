@@ -68,12 +68,22 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
             entities_to_classify=entities_to_classify,
             top_k=top_k)
         llm_output, llm_stats = await self._llm_caller.call_llm(llm=self._llm, llm_input=prompt, logger=self._logger)
+        if not llm_output:
+            # This may happen if the LLM fails to return a JSON object
+            # Instead of completely failing, we will return all the entities as relevant. This is suboptimal but better than failing
+            self._logger.warning(
+                f"The RelevantEntitiesClassifier could not return any {self._entity_types_plural}. Setting all {self._entity_types_plural} as relevant.")
+            return RelevantEntityClassifierOutput(
+                most_relevant=entities_to_classify,
+                remaining=[],
+                llm_stats=llm_stats)
 
         # log a warning if the two lists are disjoint and the union is the original list
         diff_len = len(llm_output.most_relevant) + len(llm_output.remaining) - len(entities_to_classify)
         if diff_len != 0:
             self._logger.warning(
-                f"The list of {self._entity_types_plural} returned by the LLM is the same as the original list of {self._entity_types_plural}. There is a difference of %d {self._entity_types_plural}.",
+                f"The list of {self._entity_types_plural} returned by the LLM is the same as the original list of {self._entity_types_plural}. "
+                f"There is a difference of %d {self._entity_types_plural}.",
                 diff_len)
 
         if len(set(llm_output.most_relevant).intersection(set(llm_output.remaining))) != 0:
@@ -102,7 +112,7 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
             self._logger.warning(f"The LLM returned %d most relevant {self._entity_types_plural} instead of the requested %d.", len(most_relevant_entities),
                                  top_k)
 
-        most_relevant_entities = most_relevant_entities[:top_k] # Get the top_k most relevant entities
+        most_relevant_entities = most_relevant_entities[:top_k]  # Get the top_k most relevant entities
         if self._logger.isEnabledFor(logging.INFO):
             self._logger.info(f"For job titles: '%s'  and responsibilities: '%s'  relevant {self._entity_types_plural} response is: %s",
                               json.dumps(job_titles),

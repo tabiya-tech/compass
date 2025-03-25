@@ -70,6 +70,16 @@ class PickOneSkillTool:
             skills=skills)
         llm_output, llm_stats = await self._llm_caller.call_llm(llm=self._llm, llm_input=prompt, logger=self._logger)
 
+        if not llm_output:
+            # This may happen if the LLM fails to return a JSON object
+            # Instead of completely failing, we log a warning and return None
+            self._logger.warning("The LLM did not return any output and the picked skill will be None")
+            return PickOneSkillOutput(
+                picked_skill=None,
+                remaining_skills=skills,
+                llm_stats=llm_stats
+            )
+
         # log a warning if the two lists are disjoint and the union is the original list
         diff_len = len(llm_output.remaining_skills) + 1 - len(skills)
         if diff_len != 0:

@@ -108,6 +108,12 @@ class _DataExtractionLLM:
                                                                        user_message=user_input.message),
                                                                    logger=self.logger)
 
+        if not response_data:
+            # This may happen if the LLM fails to return a JSON object
+            # Instead of completely failing, we log a warning and return None
+            self.logger.warning("The LLM did not return any output and the extracted experience data will be None")
+            return -1, llm_stats
+
         if not response_data.collected_experience_data:
             self.logger.debug("No experience data was extracted.")
             return -1, llm_stats
