@@ -10,6 +10,7 @@ enum CommonError {
   ENV_ERROR = "EnvError",
   COMPONENT_ERROR = "ComponentError",
   CONFIGURATION_ERROR = "ConfigurationError",
+  METRICS_ERROR = "MetricsError",
 }
 
 /**
@@ -99,6 +100,14 @@ export class ConfigurationError extends Error {
   constructor(message: string, cause?: Error | string) {
     super(message);
     this.name = CommonError.CONFIGURATION_ERROR;
+    this.cause = cause;
+  }
+}
+
+export class MetricsError extends Error {
+  constructor(message: string, cause?: Error | string) {
+    super(message);
+    this.name = CommonError.METRICS_ERROR;
     this.cause = cause;
   }
 }

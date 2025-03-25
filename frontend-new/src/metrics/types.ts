@@ -19,6 +19,7 @@ export interface CVDownloadedEvent extends BaseMetricsEvent {
   session_id: number;
   event_type: EventType.CV_DOWNLOADED;
   cv_format: CVFormat;
+  timestamp: string;
 }
 
 export interface DemographicsEvent extends BaseMetricsEvent {
