@@ -1,12 +1,18 @@
 import { getBackendUrl } from "src/envService";
 import { MetricsEventUnion } from "src/metrics/types";
 
+export const METRICS_FLUSH_INTERVAL_MS = 15000; // 15 seconds
+
 export default class MetricsService {
   readonly apiServerUrl: string;
-  private static instance: MetricsService;
+  private static instance: MetricsService | null;
+  private _eventBuffer: MetricsEventUnion[] = [];
+  private _flushInterval: NodeJS.Timeout | null = null;
 
   private constructor() {
     this.apiServerUrl = getBackendUrl();
+    // Start the flush interval immediately after the service is created
+    this.startFlushInterval();
   }
 
   /**
@@ -21,28 +27,77 @@ export default class MetricsService {
   }
 
   /**
-   * Sends a metrics event to the backend.
+   * Starts the interval that periodically flushes the event buffer
+   */
+  private startFlushInterval(): void {
+    if (this._flushInterval === null) {
+      this._flushInterval = setInterval(() => {
+        void this.flushEvents();
+      }, METRICS_FLUSH_INTERVAL_MS);
+    }
+  }
+
+  /**
+   * Stops the interval that periodically flushes the event buffer
+   */
+  private stopFlushInterval(): void {
+    if (this._flushInterval !== null) {
+      console.debug("Stopping metrics flush interval");
+      clearInterval(this._flushInterval);
+      this._flushInterval = null;
+    }
+  }
+
+  /**
+   * Adds a metrics event to the buffer. The event will be sent in the next flush.
    * @param event The metrics event to send
-   * @returns {Promise<void>}
    */
   public async sendMetricsEvent(event: MetricsEventUnion): Promise<void> {
-    const metricsURL = `${this.apiServerUrl}/metrics`;
+    console.debug("Adding metrics event to buffer:", event.event_type);
+    this._eventBuffer.push(event);
+  }
+
+  /**
+   * Flushes all buffered events to the backend
+   * @returns {Promise<void>}
+   */
+  private async flushEvents(): Promise<void> {
+    if (this._eventBuffer.length === 0) {
+      return;
+    }
+
+    console.debug(`Flushing ${this._eventBuffer.length} metrics events`);
+    // Encrypt the payload using user token details.
+    const payload = encryptEventsPayload(this._eventBuffer, PersistentStorageService.getToken()!)
 
     try {
-      const response = await fetch(metricsURL, {
+      const response = await fetch(`${this.apiServerUrl}/metrics`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(event),
+        body: JSON.stringify(this._eventBuffer),
       });
 
       if (!response.ok) {
-        console.error("Failed to send metrics event:", await response.text());
+        console.error("Failed to send metrics events:", await response.text());
       }
     } catch (error) {
-      // We don't want metrics failures to affect the user experience
-      console.error("Error sending metrics event:", error);
+      console.error("Error sending metrics events:", error);
+    } finally {
+      // Clear the buffer regardless of the outcome
+      this._eventBuffer = [];
     }
+  }
+
+  /**
+   * Cleans up the service, stopping the flush interval
+   * should be called by the consumer of this service when the service is no longer needed
+   */
+  public dispose(): void {
+    this.stopFlushInterval();
+    // we set the instance to null here to allow the service to be re-initialized
+    // next time getInstance is called a new instance will be created with a new flush interval
+    MetricsService.instance = null;
   }
 }
