@@ -42,6 +42,7 @@ describe("MetricsService", () => {
         cv_format: CVFormat.PDF,
         session_id: 123,
         user_id: "456",
+        timestamp: new Date().toISOString(),
       };
 
       const givenEvent2: CVDownloadedEvent = {
@@ -49,6 +50,7 @@ describe("MetricsService", () => {
         cv_format: CVFormat.DOCX,
         session_id: 124,
         user_id: "456",
+        timestamp: new Date().toISOString(),
       };
 
       // AND a successful response from the API
@@ -93,6 +95,7 @@ describe("MetricsService", () => {
         cv_format: CVFormat.PDF,
         session_id: 123,
         user_id: "456",
+        timestamp: new Date().toISOString(),
       };
 
       // AND fetch will fail
@@ -121,6 +124,7 @@ describe("MetricsService", () => {
         cv_format: CVFormat.PDF,
         session_id: 123,
         user_id: "456",
+        timestamp: new Date().toISOString(),
       };
 
       // AND an unsuccessful response from the API
@@ -147,6 +151,7 @@ describe("MetricsService", () => {
         cv_format: CVFormat.DOCX,
         session_id: 124,
         user_id: "456",
+        timestamp: new Date().toISOString(),
       };
 
       // AND a successful response for the next call

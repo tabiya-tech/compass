@@ -7,6 +7,11 @@ import { PDFReportDownloadProvider } from "src/experiences/report/reportPdf/prov
 import { DocxReportDownloadProvider } from "src/experiences/report/reportDocx/provider";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { ReportProps } from "src/experiences/report/types";
+import MetricsService from "src/metrics/metricsService";
+import { EventType } from "src/metrics/types";
+import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
+import { MetricsError } from "src/error/commonErrors";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 
 interface DownloadReportDropdownProps {
   name: string;
@@ -53,7 +58,7 @@ const DownloadReportDropdown: React.FC<DownloadReportDropdownProps> = (props) =>
   const docxsReportProvider = new DocxReportDownloadProvider();
   const pdfReportProvider = new PDFReportDownloadProvider();
 
-  const handleDownload = async (downloadProvider: { download: (props: ReportProps) => Promise<void> }) => {
+  const handleDownload = async (downloadProvider: { download: (props: ReportProps) => Promise<void> }, downloadFormat: CVFormat) => {
     setIsLoading(true);
     try {
       await downloadProvider.download(reportProps);
@@ -61,6 +66,22 @@ const DownloadReportDropdown: React.FC<DownloadReportDropdownProps> = (props) =>
       console.error("Error downloading report", error);
     } finally {
       setIsLoading(false);
+      const user_id = AuthenticationStateService.getInstance().getUser()?.id;
+      const session_id = UserPreferencesStateService.getInstance().getActiveSessionId();
+
+      if(user_id && session_id) {
+        MetricsService.getInstance().sendMetricsEvent({
+              event_type: EventType.CV_DOWNLOADED,
+              cv_format: downloadFormat,
+              // the user id is required for the metrics event but is possibly null
+              user_id: user_id,
+              session_id: session_id,
+              timestamp: new Date().toISOString(),
+            }
+        )
+      } else {
+        console.error(new MetricsError(`Unable to send CVDownload metrics: User id: ${user_id}, Session id: ${session_id}`));
+      }
     }
   };
 
@@ -69,13 +90,13 @@ const DownloadReportDropdown: React.FC<DownloadReportDropdownProps> = (props) =>
       id: MENU_ITEM_ID.PDF,
       text: MENU_ITEM_TEXT.PDF,
       disabled: !isOnline,
-      action: () => handleDownload(pdfReportProvider),
+      action: () => handleDownload(pdfReportProvider, CVFormat.PDF),
     },
     {
       id: MENU_ITEM_ID.DOCX,
       text: MENU_ITEM_TEXT.DOCX,
       disabled: !isOnline,
-      action: () => handleDownload(docxsReportProvider),
+      action: () => handleDownload(docxsReportProvider, CVFormat.DOCX),
     },
   ];
 
