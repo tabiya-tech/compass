@@ -101,7 +101,7 @@ def add_metrics_routes(app_router: FastAPI):
             try:
                 event = _construct_metric_event(metrics_request)
                 events.append(event)
-            except ValueError as e:
+            except (ValueError, TypeError) as e:
                 logger.exception(e)
                 construction_errors.append(str(e))
         

@@ -332,16 +332,19 @@ class UserLocationEvent(AbstractUserAccountEvent):
     """
     coordinates: tuple[float, float]
     """
-    coordinates - the coordinates of the user (latitude, longitude)
+    coordinates - the coordinates of the user
     """
-    ip_address: str
+    timestamp: datetime
+    """
+    timestamp - an iso string representing the timestamp of the event
+    """
 
-    def __init__(self, *, user_id: str, coordinates: tuple[float, float], ip_address: str):
+    def __init__(self, *, user_id: str, coordinates: tuple[float, float], timestamp: str):
         super().__init__(
             user_id=user_id,
             event_type=EventType.USER_LOCATION,
             coordinates=coordinates,
-            ip_address=ip_address
+            timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc)
         )
 
     class Config:
@@ -364,14 +367,19 @@ class DeviceSpecificationEvent(AbstractUserAccountEvent):
     """
     browser_type - the browser the user is using
     """
+    timestamp: datetime
+    """
+    timestamp - an iso string representing the timestamp of the event
+    """
 
-    def __init__(self, *, user_id: str, device_type: str, os_type: str, browser_type: str):
+    def __init__(self, *, user_id: str, device_type: str, os_type: str, browser_type: str, timestamp: str):
         super().__init__(
             user_id=user_id,
             event_type=EventType.DEVICE_SPECIFICATION,
             device_type=device_type,
             os_type=os_type,
             browser_type=browser_type,
+            timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc)
         )
 
     class Config:

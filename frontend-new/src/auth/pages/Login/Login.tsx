@@ -24,6 +24,10 @@ import RequestInvitationCode from "src/auth/components/requestInvitationCode/Req
 import { InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import { INVITATIONS_PARAM_NAME } from "src/auth/auth.types";
+import MetricsService from "src/metrics/metricsService";
+import { DeviceSpecificationEvent, EventType, UserLocationEvent } from "src/metrics/types";
+import { browserName, deviceType, osName } from "react-device-detect";
+import { getCoordinates } from "src/metrics/utils/getUserLocation";
 
 const uniqueId = "7ce9ba1f-bde0-48e2-88df-e4f697945cc4";
 
@@ -132,6 +136,30 @@ const Login: React.FC = () => {
       if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
         navigate(routerPaths.CONSENT, { replace: true });
       } else {
+        // if the user has preferences, we can record some metrics about their device and location
+        // if not the user will be redirected to the consent page to set their preferences
+        // and once they accept the terms and conditions, the metrics will be recorded
+        const deviceEvent: DeviceSpecificationEvent = {
+          event_type: EventType.DEVICE_SPECIFICATION,
+          user_id: prefs.user_id,
+          browser_type: browserName,
+          device_type: deviceType,
+          os_type: osName,
+          timestamp: new Date().toISOString(),
+        };
+        MetricsService.getInstance().sendMetricsEvent(deviceEvent);
+
+        // Get user's location if they allow it
+        const coordinates = await getCoordinates();
+        const locationEvent: UserLocationEvent = {
+          event_type: EventType.USER_LOCATION,
+          user_id: prefs.user_id,
+          coordinates: coordinates,
+          timestamp: new Date().toISOString(),
+        };
+        MetricsService.getInstance().sendMetricsEvent(locationEvent);
+
+        // and then navigate the user to the root page
         navigate(routerPaths.ROOT, { replace: true });
         enqueueSnackbar("Welcome back!", { variant: "success" });
       }

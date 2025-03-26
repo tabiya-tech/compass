@@ -37,13 +37,14 @@ export interface DeviceSpecificationEvent extends BaseMetricsEvent {
   device_type: string;
   os_type: string;
   browser_type: string;
+  timestamp: string;
 }
 
 export interface UserLocationEvent extends BaseMetricsEvent {
   user_id: string;
   event_type: EventType.USER_LOCATION;
   coordinates: [number, number];
-  ip_address: string;
+  timestamp: string;
 }
 
 export interface NetworkInformationEvent extends BaseMetricsEvent {
