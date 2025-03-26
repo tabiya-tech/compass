@@ -52,8 +52,16 @@ class _AppChatExecutor:
         async with AsyncClient(app=self._app, base_url="http://test") as ac:
             response = await ac.get('/poc/conversation', params={'user_input': agent_input.message,
                                                                  'session_id': self._session_id})
+        if response.is_error:
+            logger.error(f"Error in response: {response.text}", exc_info=True)
+            raise Exception(f"Error in response: {response.text}")
 
-        return AgentOutput.model_validate(response.json()['last'])
+        try:
+            json = response.json()
+            return AgentOutput.model_validate(json['last'])
+        except Exception as e:
+            logger.error(f"Error in response: {response.text}", exc_info=True)
+            raise e
 
 
 class _AppChatIsFinished:
@@ -77,7 +85,7 @@ def app_setup_and_teardown(current_test_case: EvaluationTestCase) -> Generator[F
         'DEFAULT_COUNTRY_OF_USER': current_test_case.country_of_user.value,
         # Set the path to the credentials file otherwise the app will not be able to authenticate with the GCP services
         'GOOGLE_APPLICATION_CREDENTIALS': os.getenv('GOOGLE_APPLICATION_CREDENTIALS'),
-        # Set the taxonomy db env vars as they required for this test
+        # Set the taxonomy db env vars as they required for this test for the search service
         'TAXONOMY_MONGODB_URI': os.getenv('TAXONOMY_MONGODB_URI'),
         'TAXONOMY_DATABASE_NAME': os.getenv('TAXONOMY_DATABASE_NAME'),
         'TAXONOMY_MODEL_ID': os.getenv('TAXONOMY_MODEL_ID')

@@ -130,7 +130,7 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
 
         # Do not allow user input that is too long,
         # as a basic measure to prevent abuse.
-        if len(user_input) > 1000:
+        if len(user_input) > 2000:
             raise HTTPException(status_code=413, detail="Too long user input")
 
         try:
