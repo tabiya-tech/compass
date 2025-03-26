@@ -223,4 +223,19 @@ test_cases = [
         expected_experiences_found_max=1,
         country_of_user=Country.KENYA
     ),
+    CollectExperiencesAgentTestCase(
+        skip_force="force",
+        name='hobbyist_e2e',
+        simulated_user_prompt=dedent("""
+            You have a single hobby, blogging about your travels. You have been doing this since 2018 and have a small following.
+            You do not do this professionally and have never made money from it. You do not have any other work experiences 
+            of any kind neither have you volunteered or helped your community or family or friends.
+            When asked you will not disclose that it is a hobby, but you will not lie about it being a job either.
+            Let your conversation partner initially believe that you are a professional blogger and then explain it is a hobby and not a job.
+            """),
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
+        expected_experiences_found_min=1,
+        expected_experiences_found_max=1,
+        country_of_user=Country.UNSPECIFIED
+    ),
 ]
