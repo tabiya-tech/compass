@@ -12,7 +12,7 @@ from fastapi.testclient import TestClient
 from tqdm import tqdm
 import logging.config
 
-from app.agent.agent_types import AgentOutput, AgentInput
+from app.agent.agent_types import AgentOutput, AgentInput, AgentType
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from evaluation_tests.conversation_libs import conversation_generator
 from evaluation_tests.conversation_libs.conversation_test_function import EvaluationTestCase, LLMSimulatedUser
@@ -70,7 +70,7 @@ class _AppChatIsFinished:
         """
         Checks if the application chat route is finished
         """
-        return agent_output.finished and agent_output.agent_type is None
+        return agent_output.finished and agent_output.agent_type is AgentType.FAREWELL_AGENT
 
 
 @pytest.fixture(scope="function")
