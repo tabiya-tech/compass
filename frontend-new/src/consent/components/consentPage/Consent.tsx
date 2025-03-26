@@ -18,6 +18,10 @@ import { Theme } from "@mui/material/styles";
 import ConfirmModalDialog from "src/theme/confirmModalDialog/ConfirmModalDialog";
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import { isSensitiveDataValid } from "src/app/ProtectedRoute/util";
+import metricsService from "src/metrics/metricsService";
+import { DeviceSpecificationEvent, EventType, UserLocationEvent } from "src/metrics/types";
+import { browserName, deviceType, osName } from "react-device-detect";
+import { getUserLocation } from "src/metrics/utils/getUserLocation";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
@@ -87,6 +91,33 @@ const Consent: React.FC = () => {
         navigate(routerPaths.SENSITIVE_DATA, { replace: true });
       } else {
         navigate(routerPaths.ROOT, { replace: true });
+      }
+
+      // once the user has accepted the terms and conditions, send the device specifications, location to the metrics service
+      try {
+        const deviceEvent: DeviceSpecificationEvent = {
+          event_type: EventType.DEVICE_SPECIFICATION,
+          user_id: prefs.user_id,
+          browser_type: browserName,
+          device_type: deviceType,
+          os_type: osName,
+        };
+        void metricsService.getInstance().sendMetricsEvent(deviceEvent);
+      } catch (error) {
+        console.error("Failed to get device specifications:", error);
+      }
+
+      // Get user's location if they allow it
+      try {
+        const locationData = await getUserLocation();
+        const locationEvent: UserLocationEvent = {
+          event_type: EventType.USER_LOCATION,
+          user_id: prefs.user_id,
+          ...locationData
+        };
+        void metricsService.getInstance().sendMetricsEvent(locationEvent);
+      } catch (error) {
+        console.error("Failed to get user location:", error);
       }
 
       enqueueSnackbar("Agreement Accepted", { variant: "success" });

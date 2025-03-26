@@ -24,12 +24,22 @@ import { DATA_TEST_ID as CONFIRM_MODAL_DIALOG_TEST_ID } from "src/theme/confirmM
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import * as ProtectedRouteUtils from "src/app/ProtectedRoute/util";
+import MetricsService from "src/metrics/metricsService";
+import { EventType } from "src/metrics/types";
+import * as UserLocationUtils from "src/metrics/utils/getUserLocation";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
   getFirebaseAPIKey: jest.fn(() => "mock-api-key"),
   getFirebaseDomain: jest.fn(() => "mock-auth-domain"),
   getBackendUrl: jest.fn(() => "mock-backend-url"),
+}));
+
+// mock react-device-detect
+jest.mock("react-device-detect", () => ({
+  browserName: "foo",
+  deviceType: "bar",
+  osName: "baz"
 }));
 
 // mock the snack bar provider
@@ -71,6 +81,7 @@ describe("Testing Consent Page", () => {
     // As a good practice, we should the mock*Once() methods to avoid side effects between tests
     // As a precaution, we reset all method mocks to ensure that no side effects are carried over between tests
     resetAllMethodMocks(UserPreferencesService.getInstance());
+    resetAllMethodMocks(MetricsService.getInstance());
   });
 
   beforeEach(() => {
@@ -132,7 +143,7 @@ describe("Testing Consent Page", () => {
 
         // GIVEN the user preferences state service is mocked to set the user preferences
         const givenUserPreferences: UserPreference = {
-          user_id: "",
+          user_id: "foo-id",
           language: Language.en,
           accepted_tc: new Date(),
           sessions: [],
@@ -154,11 +165,19 @@ describe("Testing Consent Page", () => {
         };
 
         jest.spyOn(authStateService.getInstance(), "getUser").mockImplementation(() => givenUser);
+        const givenIP = "foo-ip";
+        const givenCoordinates: [number, number] = [123, 456];
+        jest.spyOn(UserLocationUtils, "getUserLocation").mockResolvedValueOnce({
+          ip_address: givenIP,
+          coordinates: givenCoordinates,
+        });
+
+        jest.spyOn(MetricsService.getInstance(), "sendMetricsEvent").mockResolvedValue();
 
         // WHEN the component is rendered
         render(<Consent />);
 
-        // WHEN the user accepts Data protection Agreement
+        // AND WHEN the user accepts Data protection Agreement
         const dpaCheckBoxWrapper = screen.getByTestId(DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER);
         expect(dpaCheckBoxWrapper).toBeInTheDocument();
         const dpaCheckbox = dpaCheckBoxWrapper.getElementsByTagName("input")[0] as HTMLInputElement;
@@ -180,6 +199,27 @@ describe("Testing Consent Page", () => {
         // AND no errors should be logged
         expect(console.error).not.toHaveBeenCalled();
         expect(console.warn).not.toHaveBeenCalled();
+
+        // AND device metrics should have been recorded
+        expect(MetricsService.getInstance().sendMetricsEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            event_type: EventType.DEVICE_SPECIFICATION,
+            user_id: givenUserPreferences.user_id,
+            browser_type: "foo", // from mock at the top of the file
+            device_type: "bar", // from mock at the top of the file
+            os_type: "baz", // from mock at the top of the file
+          })
+        );
+
+        // AND location metrics should have been recorded
+        expect(MetricsService.getInstance().sendMetricsEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            event_type: EventType.USER_LOCATION,
+            user_id: givenUserPreferences.user_id,
+            ip_address: givenIP,
+            coordinates: givenCoordinates,
+          })
+        );
 
         // AND user should be redirected to the expected route
         expect(useNavigate()).toHaveBeenCalledWith(expectedRoute, { replace: true });

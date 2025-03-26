@@ -24,6 +24,10 @@ import RequestInvitationCode from "src/auth/components/requestInvitationCode/Req
 import { InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import { INVITATIONS_PARAM_NAME } from "src/auth/auth.types";
+import metricsService from "src/metrics/metricsService";
+import { DeviceSpecificationEvent, EventType, UserLocationEvent } from "src/metrics/types";
+import { browserName, deviceType, osName } from "react-device-detect";
+import { getUserLocation } from "src/metrics/utils/getUserLocation";
 
 const uniqueId = "7ce9ba1f-bde0-48e2-88df-e4f697945cc4";
 
@@ -134,6 +138,35 @@ const Login: React.FC = () => {
       } else {
         navigate(routerPaths.ROOT, { replace: true });
         enqueueSnackbar("Welcome back!", { variant: "success" });
+
+        // if the user has preferences, we can record some metrics about their device and location
+        // if not the user will be redirected to the consent page to set their preferences
+        // and once they accept the terms and conditions, the metrics will be recorded
+        try {
+          const deviceEvent: DeviceSpecificationEvent = {
+            event_type: EventType.DEVICE_SPECIFICATION,
+            user_id: prefs.user_id,
+            browser_type: browserName,
+            device_type: deviceType,
+            os_type: osName,
+          };
+          void metricsService.getInstance().sendMetricsEvent(deviceEvent);
+        } catch (error) {
+          console.error("Failed to get device specifications:", error);
+        }
+
+        // Get user's location if they allow it
+        try {
+          const locationData = await getUserLocation();
+          const locationEvent: UserLocationEvent = {
+            event_type: EventType.USER_LOCATION,
+            user_id: prefs.user_id,
+            ...locationData
+          };
+          void metricsService.getInstance().sendMetricsEvent(locationEvent);
+        } catch (error) {
+          console.error("Failed to get user location:", error);
+        }
       }
     } catch (error) {
       let errorMessage;
