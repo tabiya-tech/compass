@@ -15,23 +15,23 @@ exports[`TypingChatMessage should render the Typing Chat message correctly when 
       <p
         class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
       >
-        Please wait, I'm thinking
+        Typing
       </p>
       <span
-        class="MuiBox-root css-0"
+        class="MuiBox-root css-sz63p1"
       >
         <span
-          class="MuiTypography-root MuiTypography-body1 css-1ahpw8h-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-18f2if6-MuiTypography-root"
         >
           .
         </span>
         <span
-          class="MuiTypography-root MuiTypography-body1 css-1q7rfum-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-1dvtvwe-MuiTypography-root"
         >
           .
         </span>
         <span
-          class="MuiTypography-root MuiTypography-body1 css-zu93sq-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-4a4pgt-MuiTypography-root"
         >
           .
         </span>
@@ -59,20 +59,20 @@ exports[`TypingChatMessage should render the Typing Chat message correctly when 
         Typing
       </p>
       <span
-        class="MuiBox-root css-0"
+        class="MuiBox-root css-sz63p1"
       >
         <span
-          class="MuiTypography-root MuiTypography-body1 css-1ahpw8h-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-18f2if6-MuiTypography-root"
         >
           .
         </span>
         <span
-          class="MuiTypography-root MuiTypography-body1 css-1q7rfum-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-1dvtvwe-MuiTypography-root"
         >
           .
         </span>
         <span
-          class="MuiTypography-root MuiTypography-body1 css-zu93sq-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-4a4pgt-MuiTypography-root"
         >
           .
         </span>
