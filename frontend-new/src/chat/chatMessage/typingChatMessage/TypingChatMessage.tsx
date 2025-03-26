@@ -3,6 +3,7 @@ import { Box, Typography, keyframes } from "@mui/material";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/userChatMessage/UserChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
+import { AnimatePresence, motion } from "framer-motion";
 
 const uniqueId = "eb14a7aa-b515-4ab9-9829-8110346d9090";
 
@@ -22,9 +23,20 @@ export interface TypingChatMessageProps {
 }
 
 const dotAnimation = keyframes`
-  0%, 100% { transform: translateY(0); opacity: 0.5; }
-  50% { transform: translateY(-2px); opacity: 1; }
+    0%, 100% {
+        transform: translateY(+0.5px);
+        opacity: 0.5;
+    }
+    50% {
+        transform: translateY(-1px);
+        opacity: 1;
+    }
 `;
+
+const textVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0 },
+};
 
 const TypingChatMessage: React.FC<TypingChatMessageProps> = ({ waitBeforeThinking = WAIT_BEFORE_THINKING }) => {
   const [displayText, setDisplayText] = useState(UI_TEXT.TYPING);
@@ -41,33 +53,44 @@ const TypingChatMessage: React.FC<TypingChatMessageProps> = ({ waitBeforeThinkin
   }, [waitBeforeThinking]);
 
   return (
-    <MessageContainer
-      origin={ConversationMessageSender.COMPASS}
-      data-testid={DATA_TEST_ID.TYPING_CHAT_MESSAGE_CONTAINER}
-    >
-      <ChatBubble message="" sender={ConversationMessageSender.COMPASS}>
-        <Box display="flex" alignItems="baseline">
-          <Typography>{displayText}</Typography>
-          <Box component="span">
-            {[0, 1, 2].map((i) => (
-              <Typography
-                key={i}
-                component="span"
-                sx={{
-                  display: "inline-block",
-                  fontSize: "1.5rem",
-                  lineHeight: 0,
-                  animation: `${dotAnimation} 0.8s infinite ease-in-out`,
-                  animationDelay: `${i * 0.2}s`,
-                }}
-              >
-                .
-              </Typography>
-            ))}
-          </Box>
-        </Box>
-      </ChatBubble>
-    </MessageContainer>
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.div
+        key={displayText}
+        initial="hidden"
+        animate="visible"
+        exit="hidden"
+        variants={textVariants}
+        transition={{ duration: 0.3 }}
+      >
+        <MessageContainer
+          origin={ConversationMessageSender.COMPASS}
+          data-testid={DATA_TEST_ID.TYPING_CHAT_MESSAGE_CONTAINER}
+        >
+          <ChatBubble message="" sender={ConversationMessageSender.COMPASS}>
+            <Box display="flex" alignItems="baseline">
+              <Typography>{displayText}</Typography>
+              <Box component="span" paddingLeft={"1px"}>
+                {[0, 1, 2].map((i) => (
+                  <Typography
+                    key={i}
+                    component="span"
+                    sx={{
+                      display: "inline-block",
+                      fontSize: "1.5rem",
+                      lineHeight: 0,
+                      animation: `${dotAnimation} 1.3s infinite ease-in-out`,
+                      animationDelay: `${i * 0.2}s`,
+                    }}
+                  >
+                    .
+                  </Typography>
+                ))}
+              </Box>
+            </Box>
+          </ChatBubble>
+        </MessageContainer>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

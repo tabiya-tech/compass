@@ -17,6 +17,16 @@ jest.mock("src/chat/chatMessage/components/chatBubble/ChatBubble", () => {
   };
 });
 
+// mock framer-motion
+jest.mock("framer-motion", () => {
+  return {
+    AnimatePresence: jest.fn(({ children }) => <>{children}</>),
+    motion: {
+      div: jest.fn(({ children, ...props }) => <div {...props}>{children}</div>),
+    },
+  };
+});
+
 describe("TypingChatMessage", () => {
   beforeEach(() => {
     jest.useFakeTimers();
