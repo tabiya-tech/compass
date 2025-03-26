@@ -19,9 +19,7 @@ from app.server_dependencies.application_state_dependencies import get_applicati
 from app.server_dependencies.conversation_manager_dependencies import get_conversation_memory_manager
 from app.users.auth import Authentication
 from app.vector_search.similarity_search_service import SimilaritySearchService
-from app.vector_search.vector_search_dependencies import get_occupation_skill_search_service, get_all_search_services, SearchServices
-from app.vector_search.occupation_search_routes import add_occupation_search_routes
-from app.vector_search.skill_search_routes import add_skill_search_routes
+from app.vector_search.vector_search_dependencies import get_occupation_skill_search_service
 
 
 class ConversationResponse(BaseModel):
@@ -75,9 +73,8 @@ class ConversationResponse(BaseModel):
 
 def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
     """
-    Add all routes related to user preferences to the users router.
-    :param users_router: APIRouter: The router to add the user preferences routes to.
-        This route contains all endpoints related to users module on the platform
+    Add all routes related to the proof of concept to the router.
+    :param poc_router: APIRouter: The router to add the poc routes to.
     :param auth: Authentication: The authentication instance to use for the routes.
     """
 
@@ -88,13 +85,6 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
     HTTPBearer(auto_error=False, scheme_name="JWT_auth")
     HTTPBearer(scheme_name="firebase")
     HTTPBearer(scheme_name="google")
-
-    ############################################
-    # Add routes relevant for esco search
-    ############################################
-
-    add_occupation_search_routes(router)
-    add_skill_search_routes(router)
 
     ############################################
     # Add routes relevant for pii filtering
