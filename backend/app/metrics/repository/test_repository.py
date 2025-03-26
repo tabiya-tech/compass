@@ -7,7 +7,7 @@ from app.conversations.reactions.types import ReactionKind, DislikeReason
 from app.metrics.types import ConversationPhaseLiteral, ConversationPhaseEvent, UserAccountCreatedEvent, \
     MessageReactionCreatedEvent, MessageCreatedEvent, \
     FeedbackProvidedEvent, FeedbackTypeLiteral, FeedbackRatingValueEvent, MessageCreatedEventSourceLiteral, \
-    CVFormatLiteral, CVDownloadedEvent
+    CVFormatLiteral, CVDownloadedEvent, DeviceSpecificationEvent, UserLocationEvent
 from common_libs.test_utilities import get_random_user_id, get_random_session_id, get_random_printable_string
 from common_libs.time_utilities import mongo_date_to_datetime, truncate_microseconds, get_now
 
@@ -78,6 +78,22 @@ def get_cv_downloaded_event(cv_format: CVFormatLiteral):
         timestamp=get_now().isoformat()
     )
 
+def get_device_specification_event():
+    return DeviceSpecificationEvent(
+        user_id=get_random_user_id(),
+        device_type=get_random_printable_string(10),
+        os_type=get_random_printable_string(10),
+        browser_type=get_random_printable_string(10),
+        timestamp=get_now().isoformat()
+    )
+
+def get_user_location_event():
+    return UserLocationEvent(
+        user_id=get_random_user_id(),
+        coordinates=(random.uniform(-90.0, 90.0), random.uniform(-180.0, 180.0)), # nosec B311 # random coordinates
+        timestamp=get_now().isoformat()
+    )
+
 
 def _assert_metric_event_matches(given_event_dict: Dict[str, Any], actual_stored_event: Dict[str, Any]) -> None:
     # Remove MongoDB _id if present
@@ -106,7 +122,8 @@ class TestRecordEvent:
             lambda: get_feedback_rating_value_event("NPS"),
             lambda: get_message_created_event("USER"),
             lambda: get_message_reaction_created_event(),
-            lambda: get_cv_downloaded_event("PDF")
+            lambda: get_cv_downloaded_event("PDF"),
+            lambda: get_device_specification_event()
         ],
         ids=[
             "UserAccountCreatedEvent",
@@ -115,7 +132,8 @@ class TestRecordEvent:
             "FeedbackRatingValueEvent",
             "MessageCreatedEvent",
             "MessageReactionCreatedEvent",
-            "CVDownloadedEvent"
+            "CVDownloadedEvent",
+            "DeviceSpecificationEvent"
         ]
     )
     async def test_record_single_event_success(
@@ -166,7 +184,8 @@ class TestRecordEvent:
             get_message_created_event("COMPASS"),
             get_message_reaction_created_event(),
             get_cv_downloaded_event("PDF"),
-            get_cv_downloaded_event("DOCX")
+            get_cv_downloaded_event("DOCX"),
+            get_device_specification_event()
         ]
         repository = await get_metrics_repository
 
@@ -195,7 +214,8 @@ class TestRecordEvent:
             lambda: get_feedback_provided_event(),
             lambda: get_message_created_event("COMPASS"),
             lambda: get_message_reaction_created_event(),
-            lambda: get_cv_downloaded_event("PDF")
+            lambda: get_cv_downloaded_event("PDF"),
+            lambda: get_device_specification_event()
         ],
         ids=[
             "UserAccountCreatedEvent",
@@ -204,7 +224,8 @@ class TestRecordEvent:
             "FeedbackProvidedEvent",
             "MessageCreatedEvent",
             "MessageReactionCreatedEvent",
-            "CVDownloadedEvent"
+            "CVDownloadedEvent",
+            "DeviceSpecificationEvent"
         ]
     )
     async def test_record_event_database_bulk_write_failure(

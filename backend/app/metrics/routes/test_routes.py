@@ -59,7 +59,8 @@ def get_device_specification_request() -> dict:
         "user_id": get_random_user_id(),
         "device_type": get_random_printable_string(10),
         "os_type": get_random_printable_string(10),
-        "browser_type": get_random_printable_string(10)
+        "browser_type": get_random_printable_string(10),
+        "timestamp": datetime.now().isoformat()
     }
 
 
@@ -79,7 +80,7 @@ def get_user_location_request() -> dict:
         "event_type": EventType.USER_LOCATION.value,
         "user_id": get_random_user_id(),
         "coordinates": (random.uniform(-90.0, 90.0), random.uniform(-180.0, 180.0)), # nosec B311 # random is used for testing purposes
-        "ip_address": get_random_printable_string(10)
+        "timestamp": datetime.now().isoformat()
     }
 
 
