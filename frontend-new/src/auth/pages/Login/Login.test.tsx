@@ -16,6 +16,35 @@ import { FirebaseError } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import ResendVerificationEmail, { DATA_TEST_ID as RESEND_DATA_TEST_ID } from "src/auth/components/resendVerificationEmail/ResendVerificationEmail"
 import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
+import { useNavigate } from "react-router-dom";
+import MetricsService from "src/metrics/metricsService";
+import * as UserLocationUtils from "src/metrics/utils/getUserLocation";
+import { EventType } from "src/metrics/types";
+import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
+import { routerPaths } from "src/app/routerPaths";
+import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import { UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+
+// mock the router
+jest.mock("react-router-dom", () => {
+  const actual = jest.requireActual("react-router-dom");
+  return {
+    ...actual,
+    __esModule: true,
+    useNavigate: jest.fn().mockReturnValue(jest.fn()),
+    NavLink: jest.fn().mockImplementation(() => {
+      return <></>;
+    }),
+  };
+});
+
+// mock react-device-detect
+jest.mock("react-device-detect", () => ({
+  browserName: "foo",
+  deviceType: "bar",
+  osName: "baz"
+}));
 
 // Mock the Firebase service
 jest.mock("src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service", () => ({
@@ -149,6 +178,10 @@ describe("Testing Login component", () => {
       logout: mockLogout,
     });
 
+    resetAllMethodMocks(MetricsService.getInstance());
+    resetAllMethodMocks(UserPreferencesStateService.getInstance());
+    resetAllMethodMocks(AuthenticationStateService.getInstance());
+
     jest.useFakeTimers(); // Use Jest's fake timers
 
     mockBrowserIsOnLine(true);
@@ -186,11 +219,28 @@ describe("Testing Login component", () => {
     const givenEmail = "foo@bar.baz";
     const givenPassword = "Pa$$word123";
 
-    // AND the email login mock will succeed
+    // AND the email login will succeed
     const loginMock = jest.fn();
     jest.spyOn(FirebaseEmailAuthenticationService, "getInstance").mockReturnValue({
       login: loginMock,
     } as unknown as FirebaseEmailAuthenticationService);
+
+    // AND there is an active session and user
+    const givenSessionId = 123;
+    jest.spyOn(UserPreferencesStateService.getInstance(), "getActiveSessionId").mockReturnValueOnce(givenSessionId);
+    const givenUserId = "foo-id";
+    // AND the user has previously accepted the terms and conditions
+    jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValueOnce({
+      accepted_tc: new Date(),
+      user_id: givenUserId
+    } as unknown as UserPreference);
+
+
+    // AND the metrics service will successfully send metrics
+    const givenCoordinates: [number, number] = [123, 456];
+    jest.spyOn(UserLocationUtils, "getCoordinates").mockResolvedValueOnce(givenCoordinates);
+
+    jest.spyOn(MetricsService.getInstance(), "sendMetricsEvent").mockReturnValueOnce();
 
     render(<Login />);
 
@@ -207,10 +257,96 @@ describe("Testing Login component", () => {
     await waitFor(() => {
       expect(loginMock).toHaveBeenCalledWith(givenEmail, givenPassword);
     });
+
+    // AND device metrics should have been recorded
+    await waitFor(() => {
+      expect(MetricsService.getInstance().sendMetricsEvent).toHaveBeenNthCalledWith(1,
+        expect.objectContaining({
+          event_type: EventType.DEVICE_SPECIFICATION,
+          user_id: givenUserId,
+          browser_type: "foo", // from mock at the top of the file
+          device_type: "bar", // from mock at the top of the file
+          os_type: "baz", // from mock at the top of the file
+          timestamp: expect.any(String)
+        })
+      );
+    });
+
+    // AND location metrics should have been recorded
+    await waitFor(() => {
+      expect(MetricsService.getInstance().sendMetricsEvent).toHaveBeenNthCalledWith(2,
+        expect.objectContaining({
+          event_type: EventType.USER_LOCATION,
+          user_id: givenUserId,
+          coordinates: givenCoordinates,
+          timestamp: expect.any(String)
+        })
+      );
+    });
+
+    // AND should navigate to the home page
+    await waitFor(() => {
+      expect(useNavigate()).toHaveBeenCalledWith(routerPaths.ROOT, { replace: true });
+    });
+
     // AND expect no errors or warnings to be logged
     expect(console.warn).not.toHaveBeenCalled();
     expect(console.error).not.toHaveBeenCalled();
   });
+
+  test("should navigate to consent page and not send metrics if user has not accepted terms and conditions", async () => {
+    // GIVEN an email and password
+    const givenEmail = "foo@bar.baz";
+    const givenPassword = "Pa$$word123";
+
+    // AND the email login will succeed
+    const loginMock = jest.fn();
+    jest.spyOn(FirebaseEmailAuthenticationService, "getInstance").mockReturnValue({
+      login: loginMock,
+    } as unknown as FirebaseEmailAuthenticationService);
+
+    // AND there is an active session and user
+    const givenSessionId = 123;
+    jest.spyOn(UserPreferencesStateService.getInstance(), "getActiveSessionId").mockReturnValueOnce(givenSessionId);
+    const givenUserId = "foo-id";
+    // AND the user has not previously accepted the terms and conditions
+    jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValueOnce({
+      accepted_tc: undefined, // user has not accepted terms and conditions
+      user_id: givenUserId
+    } as unknown as UserPreference);
+
+    // spy on the metrics service
+    jest.spyOn(MetricsService.getInstance(), "sendMetricsEvent");
+
+    render(<Login />);
+
+    // WHEN the user fills in their email and password
+    act(() => {
+      (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnEmailChanged(givenEmail);
+      (LoginWithEmailForm as jest.Mock).mock.calls[0][0].notifyOnPasswordChanged(givenPassword);
+    });
+
+    // AND clicks the login button
+    fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
+
+    // THEN the loginWithEmail function should be called with the correct arguments
+    await waitFor(() => {
+      expect(loginMock).toHaveBeenCalledWith(givenEmail, givenPassword);
+    });
+
+    // AND device metrics should have been recorded
+      expect(MetricsService.getInstance().sendMetricsEvent).not.toHaveBeenCalled();
+
+    // AND should navigate to the home page
+    await waitFor(() => {
+      expect(useNavigate()).toHaveBeenCalledWith(routerPaths.CONSENT, { replace: true });
+    });
+
+    // AND expect no errors or warnings to be logged
+    expect(console.warn).not.toHaveBeenCalled();
+    expect(console.error).not.toHaveBeenCalled();
+  });
+
 
   test("it should handle invitation code login correctly", async () => {
     // GIVEN an invitation code
