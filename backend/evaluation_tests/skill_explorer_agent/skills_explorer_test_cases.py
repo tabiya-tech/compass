@@ -128,4 +128,29 @@ test_cases = [
         country_of_user=Country.SOUTH_AFRICA,
         expected_responsibilities=[],
     ),
+    SkillsExplorerAgentTestCase(
+        skip_force="force",
+        conversation_rounds=10,
+        name='incomplete_experience',
+        simulated_user_prompt=dedent("""
+            You are a person without any personal background.
+            You help your older neighbor with daily tasks for free. 
+            Here are you responsibilities:
+            - Cooked meals
+            - Cleaned the house
+            - Helped with shopping
+            - Took care of the garden
+            When asked about your skills, answer with all the information at the same time. Do not add additional information or invent information.
+            """),
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
+        given_experience=ExperienceEntity(
+            experience_title="",
+            company=None,
+            location=None,
+            timeline=None,
+            work_type=None
+        ),
+        country_of_user=Country.UNSPECIFIED,
+        expected_responsibilities=[],
+    ),
 ]

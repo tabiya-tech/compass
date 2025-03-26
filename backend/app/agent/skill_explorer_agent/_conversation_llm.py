@@ -194,7 +194,7 @@ class _ConversationLLM:
             agent_character=STD_AGENT_CHARACTER,
             language_style=STD_LANGUAGE_STYLE,
             experience_title=experience_title,
-            work_type=work_type.name,
+            work_type=work_type.name if work_type is not None else "UNSPECIFIED"
         )
 
     @staticmethod

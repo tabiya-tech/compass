@@ -15,6 +15,14 @@ from app.conversation_memory.conversation_memory_types import ConversationContex
 from app.countries import Country
 
 
+def _deserialize_work_types(value: list[str] | list[WorkType]) -> list[WorkType]:
+    if isinstance(value, list):
+        # If the value is a list, and the items in the list are strings, we convert the strings to the Enum
+        # Otherwise, we return the value as is
+        return [WorkType[x] if isinstance(x, str) else x for x in value]
+    return value
+
+
 class CollectExperiencesAgentState(BaseModel):
     """
     Stores the user-specific state for this agent. Managed centrally.
@@ -79,11 +87,7 @@ class CollectExperiencesAgentState(BaseModel):
     # Deserialize the explored_types from the enum name
     @field_validator("explored_types", mode='before')
     def deserialize_explored_types(cls, value: list[str] | list[WorkType]) -> list[WorkType]:
-        if isinstance(value, list):
-            # If the value is a list, and the items in the list are strings, we convert the strings to the Enum
-            # Otherwise, we return the value as is
-            return [WorkType[x] if isinstance(x, str) else x for x in value]
-        return value
+        return _deserialize_work_types(value)
 
     # use a field serializer to serialize the unexplored_types
     # we use the name of the Enum instead of the value because that makes the code less brittle
@@ -95,11 +99,7 @@ class CollectExperiencesAgentState(BaseModel):
     # Deserialize the unexplored_types from the enum name
     @field_validator("unexplored_types", mode='before')
     def deserialize_unexplored_types(cls, value: list[str] | list[WorkType]) -> list[WorkType]:
-        if isinstance(value, list):
-            # If the value is a list, and the items in the list are strings, we convert the strings to the Enum
-            # Otherwise, we return the value as is
-            return [WorkType[x] if isinstance(x, str) else x for x in value]
-        return value
+        return _deserialize_work_types(value)
 
     @staticmethod
     def from_document(_doc: Mapping[str, Any]) -> "CollectExperiencesAgentState":
@@ -169,12 +169,17 @@ class CollectExperiencesAgent(Agent):
                                                                logger=self.logger)
         self._state.first_time_visit = False  # The first time visit is over
         if conversation_llm_output.exploring_type_finished:
-            #  The specific work type has been explored, so we remove it from the list
-            #  and we set the conversation to continue
+            # The specific work type has already been explored, so we remove it from the list
+            # and allow the conversation to continue
             explored_type = self._state.unexplored_types.pop(0)
             exploring_type = self._state.unexplored_types[0] if len(self._state.unexplored_types) > 0 else None
             self._state.explored_types.append(explored_type)
-            self.logger.info("Explored work type: %s, remaining types: %s", explored_type, self._state.unexplored_types)
+            self.logger.info(
+                "Explored work type: %s, remaining types: %s | Discovered experiences so far: %s",
+                explored_type,
+                self._state.unexplored_types,
+                self._state.collected_data
+            )
             transition_message: str
             if exploring_type is not None:
                 transition_message = f"Ask me about experiences that include: {exploring_type.value}"

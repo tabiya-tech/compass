@@ -94,7 +94,7 @@ class SkillsExplorerAgent(Agent):
         existing_responsibilities.non_responsibilities = non_responsibilities
         existing_responsibilities.other_peoples_responsibilities = other_peoples_responsibilities
 
-    async def execute(self, *,
+    async def execute(self,
                       user_input: AgentInput,
                       context: ConversationContext
                       ) -> AgentOutput:
@@ -140,14 +140,23 @@ class SkillsExplorerAgent(Agent):
 
         if conversation_llm_output.finished:
             # Once the conversation is finished, add the experience to the list of experiences explored
-            self.state.experiences_explored.append(ExperienceEntity.get_text_summary(
-                experience_title=self.experience_entity.experience_title,
-                work_type=self.experience_entity.work_type,
-                company=self.experience_entity.company,
-                location=self.experience_entity.location,
-                start_date=self.experience_entity.timeline.end,
-                end_date=self.experience_entity.timeline.end
-            ))
+            title = getattr(self.experience_entity, 'experience_title', None)
+            work_type = getattr(self.experience_entity, 'work_type', None)
+            company = getattr(self.experience_entity, 'company', None)
+            location = getattr(self.experience_entity, 'location', None)
+            timeline = getattr(self.experience_entity, 'timeline', None)
+            start_date = getattr(timeline, 'start', None) if timeline else None
+            end_date = getattr(timeline, 'end', None) if timeline else None
+
+            summary = ExperienceEntity.get_text_summary(
+                experience_title=title,
+                work_type=work_type,
+                company=company,
+                location=location,
+                start_date=start_date,
+                end_date=end_date
+            )
+            self.state.experiences_explored.append(summary)
 
         conversation_llm_output.llm_stats = responsibilities_llm_stats + conversation_llm_output.llm_stats
         return conversation_llm_output
