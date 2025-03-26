@@ -1,3 +1,4 @@
+import asyncio
 import base64
 from pydantic import BaseModel, Field
 
@@ -17,6 +18,7 @@ from app.sensitive_filter import sensitive_filter
 from app.server_dependencies.agent_director_dependencies import get_agent_director
 from app.server_dependencies.application_state_dependencies import get_application_state_manager
 from app.server_dependencies.conversation_manager_dependencies import get_conversation_memory_manager
+from app.store.in_memory_application_state_store import InMemoryApplicationStateStore
 from app.users.auth import Authentication
 from app.vector_search.similarity_search_service import SimilaritySearchService
 from app.vector_search.vector_search_dependencies import get_occupation_skill_search_service
@@ -71,6 +73,22 @@ class ConversationResponse(BaseModel):
                                     conversation_context=context)
 
 
+# Lock to ensure that the singleton instance is thread-safe
+_application_state_manager_lock = asyncio.Lock()
+_application_state_manager_singleton: ApplicationStateManager | None = None
+
+
+# instance of the application state manager using an in-memory store
+async def _get_application_state_manager() -> ApplicationStateManager:
+    global _application_state_manager_singleton
+    if _application_state_manager_singleton is None:  # initial check to avoid the lock if the singleton instance is already created (lock is expensive)
+        async with _application_state_manager_lock:  # before modifying the singleton instance, acquire the lock
+            if _application_state_manager_singleton is None:  # double check after acquiring the lock
+                _application_state_manager_singleton = ApplicationStateManager(store=InMemoryApplicationStateStore(),)
+
+    return _application_state_manager_singleton
+
+
 def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
     """
     Add all routes related to the proof of concept to the router.
@@ -99,7 +117,7 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
                            conversation_memory_manager: ConversationMemoryManager = Depends(
                                get_conversation_memory_manager),
                            agent_director: LLMAgentDirector = Depends(get_agent_director),
-                           application_state_manager: ApplicationStateManager = Depends(get_application_state_manager)):
+                           application_state_manager: ApplicationStateManager = Depends(_get_application_state_manager)):
         """
         Endpoint for conducting the conversation with the agent.
         """
@@ -323,7 +341,7 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
             session_id: int,
             conversation_memory_manager: ConversationMemoryManager = Depends(
                 get_conversation_memory_manager),
-                application_state_manager: ApplicationStateManager = Depends(get_application_state_manager)):
+            application_state_manager: ApplicationStateManager = Depends(_get_application_state_manager)):
         """
         Get the conversation context of a user.
         """
