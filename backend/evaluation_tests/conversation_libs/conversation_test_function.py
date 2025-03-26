@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from typing import Optional
 
 import pytest
+from pydantic import model_validator
 from pydantic.main import BaseModel
 from tqdm import tqdm
 
@@ -95,6 +96,13 @@ class ConversationTestConfig(BaseModel):
         """
         Allow arbitrary types for the model as the various callables are custom types.
         """
+
+    @model_validator(mode='before')
+    def set_max_iterations_from_test_case(cls, values):
+        _test_case: EvaluationTestCase = values.get("test_case")
+        if _test_case and _test_case.conversation_rounds:
+            values["max_iterations"] = _test_case.conversation_rounds
+        return values
 
 
 async def conversation_test_function(*, config: ConversationTestConfig):
