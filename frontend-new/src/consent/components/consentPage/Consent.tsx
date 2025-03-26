@@ -19,9 +19,10 @@ import ConfirmModalDialog from "src/theme/confirmModalDialog/ConfirmModalDialog"
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import { isSensitiveDataValid } from "src/app/ProtectedRoute/util";
 import metricsService from "src/metrics/metricsService";
-import { DeviceSpecificationEvent, EventType, UserLocationEvent } from "src/metrics/types";
+import { DeviceSpecificationEvent, EventType, NetworkInformationEvent, UserLocationEvent } from "src/metrics/types";
 import { browserName, deviceType, osName } from "react-device-detect";
 import { getUserLocation } from "src/metrics/utils/getUserLocation";
+import { getNetworkInformation } from "../../../metrics/utils/getNetworkInformation";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
@@ -118,6 +119,19 @@ const Consent: React.FC = () => {
         void metricsService.getInstance().sendMetricsEvent(locationEvent);
       } catch (error) {
         console.error("Failed to get user location:", error);
+      }
+
+      // And get user's network if they allow it
+      try {
+        const networkData = getNetworkInformation();
+        const networkInformation: NetworkInformationEvent = {
+          event_type: EventType.NETWORK_INFORMATION,
+          user_id: prefs.user_id,
+          ...networkData
+        };
+        void metricsService.getInstance().sendMetricsEvent(networkInformation);
+      } catch (error) {
+        console.error("Failed to get user network information:", error);
       }
 
       enqueueSnackbar("Agreement Accepted", { variant: "success" });

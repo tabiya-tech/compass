@@ -27,6 +27,7 @@ import * as ProtectedRouteUtils from "src/app/ProtectedRoute/util";
 import MetricsService from "src/metrics/metricsService";
 import { EventType } from "src/metrics/types";
 import * as UserLocationUtils from "src/metrics/utils/getUserLocation";
+import * as NetworkInformationUtils from "src/metrics/utils/getNetworkInformation";
 
 // Mock the envService module
 jest.mock("src/envService", () => ({
@@ -172,6 +173,11 @@ describe("Testing Consent Page", () => {
           coordinates: givenCoordinates,
         });
 
+        const givenEffectiveConnectionType = "bar-connection-type";
+        jest.spyOn(NetworkInformationUtils, "getNetworkInformation").mockReturnValue({
+          effective_connection_type: givenEffectiveConnectionType
+        });
+
         jest.spyOn(MetricsService.getInstance(), "sendMetricsEvent").mockResolvedValue();
 
         // WHEN the component is rendered
@@ -218,6 +224,15 @@ describe("Testing Consent Page", () => {
             user_id: givenUserPreferences.user_id,
             ip_address: givenIP,
             coordinates: givenCoordinates,
+          })
+        );
+
+        // AND network info metrics should have been recorded
+        expect(MetricsService.getInstance().sendMetricsEvent).toHaveBeenCalledWith(
+          expect.objectContaining({
+            event_type: EventType.NETWORK_INFORMATION,
+            user_id: givenUserPreferences.user_id,
+            effective_connection_type: givenEffectiveConnectionType,
           })
         );
 

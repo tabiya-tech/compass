@@ -49,7 +49,6 @@ export interface NetworkInformationEvent extends BaseMetricsEvent {
   user_id: string;
   event_type: EventType.NETWORK_INFORMATION;
   effective_connection_type: string;
-  connection_type: number;
 }
 
 export type MetricsEventUnion = 

@@ -25,9 +25,10 @@ import { InvitationType } from "src/auth/services/invitationsService/invitations
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import { INVITATIONS_PARAM_NAME } from "src/auth/auth.types";
 import metricsService from "src/metrics/metricsService";
-import { DeviceSpecificationEvent, EventType, UserLocationEvent } from "src/metrics/types";
+import { DeviceSpecificationEvent, EventType, NetworkInformationEvent, UserLocationEvent } from "src/metrics/types";
 import { browserName, deviceType, osName } from "react-device-detect";
 import { getUserLocation } from "src/metrics/utils/getUserLocation";
+import { getNetworkInformation} from "src/metrics/utils/getNetworkInformation";
 
 const uniqueId = "7ce9ba1f-bde0-48e2-88df-e4f697945cc4";
 
@@ -166,6 +167,19 @@ const Login: React.FC = () => {
           void metricsService.getInstance().sendMetricsEvent(locationEvent);
         } catch (error) {
           console.error("Failed to get user location:", error);
+        }
+
+        // And get user's network if they allow it
+        try {
+          const networkData = getNetworkInformation();
+          const networkInformation: NetworkInformationEvent = {
+            event_type: EventType.NETWORK_INFORMATION,
+            user_id: prefs.user_id,
+            ...networkData
+          };
+          void metricsService.getInstance().sendMetricsEvent(networkInformation);
+        } catch (error) {
+          console.error("Failed to get user network information:", error);
         }
       }
     } catch (error) {
