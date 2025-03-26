@@ -38,6 +38,15 @@ class UserInfo(BaseModel):
     email: Optional[str] = None
 
     token: str
+    """
+    The token of the credentials running app API, locally it is user Credentials, on API Gateway, it is the
+    service account token running this API.
+    """
+
+    decoded_token: Optional[Any] = None
+    """
+    Decoded JWT Payload
+    """
 
     sign_in_provider: SignInProvider
     """
@@ -60,6 +69,7 @@ def _get_user_info(decoded_token: Any, token: str) -> UserInfo:
         name=decoded_token["name"] if "name" in decoded_token else None,  # Anon user will not have a name
         email=decoded_token["email"] if "email" in decoded_token else None,  # Anon user will not have an email
         token=token,
+        decoded_token=decoded_token,
         sign_in_provider=decoded_token["firebase"]["sign_in_provider"]
     )
 

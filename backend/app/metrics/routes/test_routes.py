@@ -5,6 +5,9 @@ from http import HTTPStatus
 import random
 from typing import Generator
 
+from app.metrics.utils import encrypt_events_payload
+from firebase_admin.auth import UserInfo
+
 from common_libs.test_utilities import get_random_printable_string, get_random_user_id, get_random_session_id
 from unittest.mock import AsyncMock
 
@@ -24,7 +27,8 @@ from app.metrics.types import (
 )
 
 from common_libs.test_utilities.mock_auth import MockAuth
-from app.metrics.routes.routes import add_metrics_routes, MAX_PAYLOAD_SIZE
+from app.metrics.routes.routes import add_metrics_routes
+from app.metrics.routes.types import MAX_PAYLOAD_SIZE
 from app.metrics.services.get_metrics_service import get_metrics_service
 
 
@@ -105,10 +109,10 @@ def assert_event_fields_match(event: AbstractCompassMetricEvent, request_data: d
         assert getattr(event, field) == value
 
 
-TestClientWithMocks = tuple[TestClient, IMetricsService]
+TestClientWithMocks = tuple[TestClient, IMetricsService, UserInfo]
 
 
-def _create_test_client_with_mocks() -> TestClientWithMocks:
+def _create_test_client_with_mocks(auth: MockAuth) -> TestClientWithMocks:
     """
     Factory function to create a test client with mocked dependencies
     """
@@ -127,12 +131,12 @@ def _create_test_client_with_mocks() -> TestClientWithMocks:
     app.dependency_overrides[get_metrics_service] = lambda: mocked_metrics_service
 
     # Add the metrics routes to the app
-    add_metrics_routes(app)
+    add_metrics_routes(app, auth)
 
     # Create a test client
     client = TestClient(app)
 
-    return client, mocked_metrics_service
+    return client, mocked_metrics_service, auth.mocked_user
 
 
 @pytest.fixture(scope='function')
@@ -142,8 +146,8 @@ def client_with_mocks() -> Generator[TestClientWithMocks, None, None]:
     """
     app = FastAPI()
     _instance_auth = MockAuth()
-    client, service = _create_test_client_with_mocks()
-    yield client, service
+    client, service, authed_user = _create_test_client_with_mocks(_instance_auth)
+    yield client, service, authed_user
     app.dependency_overrides = {}
 
 
@@ -172,7 +176,7 @@ class TestMetricsRoutes:
             event_class: type[AbstractCompassMetricEvent],
             event_type: EventType
     ):
-        client, mocked_service = client_with_mocks
+        client, mocked_service, authed_user = client_with_mocks
         # GIVEN a valid metric request
         given_metric_request = request_factory()
 
@@ -182,7 +186,7 @@ class TestMetricsRoutes:
         # WHEN a POST request is made with the metric request
         response = client.post(
             "/metrics",
-            json=[given_metric_request],
+            json=dict(payload=encrypt_events_payload([given_metric_request], authed_user)),
         )
 
         # THEN the response is ACCEPTED
@@ -201,7 +205,7 @@ class TestMetricsRoutes:
             client_with_mocks: TestClientWithMocks,
             setup_application_config: ApplicationConfig
     ):
-        client, mocked_service = client_with_mocks
+        client, mocked_service, authed_user = client_with_mocks
         # GIVEN multiple valid metric requests
         given_metric_requests = [
             get_cv_downloaded_request(),
@@ -216,7 +220,7 @@ class TestMetricsRoutes:
         # WHEN a POST request is made with the metric requests
         response = client.post(
             "/metrics",
-            json=given_metric_requests,
+            json=dict(payload=encrypt_events_payload(given_metric_requests, authed_user)),
         )
 
         # THEN the response is ACCEPTED
@@ -250,7 +254,7 @@ class TestMetricsRoutes:
             event_class: type[AbstractCompassMetricEvent],
             event_type: EventType
     ):
-        client, mocked_service = client_with_mocks
+        client, mocked_service, authed_user = client_with_mocks
         # GIVEN a valid metric request
         given_metric_request = request_factory()
 
@@ -260,7 +264,7 @@ class TestMetricsRoutes:
         # WHEN a POST request is made with the metric request
         response = client.post(
             "/metrics",
-            json=[given_metric_request],
+            json=dict(payload=encrypt_events_payload([given_metric_request], authed_user)),
         )
 
         # THEN the response is still ACCEPTED despite service failure
@@ -280,7 +284,7 @@ class TestMetricsRoutes:
             setup_application_config: ApplicationConfig,
             caplog: pytest.LogCaptureFixture
     ):
-        client, mocked_service = client_with_mocks
+        client, mocked_service, authed_user = client_with_mocks
         # GIVEN a metric request with a payload that exceeds the maximum size
         given_metric_request = get_cv_downloaded_request()
         given_metric_request['user_id'] = get_random_printable_string(MAX_PAYLOAD_SIZE + 1)
@@ -290,11 +294,11 @@ class TestMetricsRoutes:
         # WHEN a POST request is made with the metric request
         response = client.post(
             "/metrics",
-            json=[given_metric_request],
+            json=dict(payload=encrypt_events_payload([given_metric_request], authed_user)),
         )
 
-        # THEN the response should be REQUEST_ENTITY_TOO_LARGE
-        assert response.status_code == HTTPStatus.REQUEST_ENTITY_TOO_LARGE
+        # THEN the response should be UNPROCESSABLE_ENTITY
+        assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
         # AND the service's record_event method was not called
         mocked_service.record_event.assert_not_called()
         # AND the error is logged

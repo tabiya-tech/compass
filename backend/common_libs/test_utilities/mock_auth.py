@@ -1,4 +1,5 @@
 # Mock the auth dependency
+import random
 from http import HTTPStatus
 from typing import Callable
 
@@ -19,9 +20,15 @@ class MockAuth(Authentication):
     def __init__(self, user: UserInfo | None = None):
         super().__init__()
         if user is None:
+            given_user_id = get_random_user_id()
             self.mocked_user = UserInfo(
-                user_id=get_random_user_id(),
+                user_id=given_user_id,
                 token=get_random_base64_string(10),
+                decoded_token=dict(
+                    sub=given_user_id,
+                    iat=random.randint(1, 100),  # nosec B311 # random is used for testing purposes
+                    exp=random.randint(1, 100)   # nosec B311 # random is used for testing purposes
+                ),
                 sign_in_provider=SignInProvider.ANONYMOUS
             )
         else:

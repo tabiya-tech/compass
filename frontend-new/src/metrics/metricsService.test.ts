@@ -4,6 +4,8 @@ import MetricsService, { METRICS_FLUSH_INTERVAL_MS } from "src/metrics/metricsSe
 import { CVDownloadedEvent, EventType } from "src/metrics/types";
 import { setupFetchSpy } from "src/_test_utilities/fetchSpy";
 import { CVFormat } from "src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown";
+import * as metricsUtilsModule from "src/metrics/utils/encryption"
+import * as CustomFetchModule from "src/utils/customFetch/customFetch";
 
 describe("MetricsService", () => {
   let givenApiServerUrl: string = "/path/to/api";
@@ -50,7 +52,11 @@ describe("MetricsService", () => {
       };
 
       // AND a successful response from the API
-      const fetchSpy = setupFetchSpy(202, undefined, ""); // Backend returns 202 ACCEPTED
+      const customFetchSpy = jest.spyOn(CustomFetchModule, "customFetch").mockResolvedValue(new Response());
+
+      // AND decrypt events will return some payload
+      const givenEncryptedPayload = "givenEncryptedPayload"
+      jest.spyOn(metricsUtilsModule, "encryptEventsPayload").mockReturnValue(givenEncryptedPayload)
 
       // WHEN sending multiple metrics events
       const service = MetricsService.getInstance();
@@ -58,23 +64,29 @@ describe("MetricsService", () => {
       await service.sendMetricsEvent(givenEvent2);
 
       // THEN expect no immediate API calls
-      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(customFetchSpy).not.toHaveBeenCalled();
 
       // WHEN the flush interval passes
       jest.advanceTimersByTime(METRICS_FLUSH_INTERVAL_MS);
       // Let any pending promises resolve
       await Promise.resolve();
 
-      // THEN expect it to make a POST request with all events
+      // THEN expect it to make a POST request with all events.
       await waitFor(() => {
-        expect(fetchSpy).toHaveBeenCalledWith(
+        expect(customFetchSpy).toHaveBeenCalledWith(
           `${givenApiServerUrl}/metrics`,
           {
             method: "POST",
+            expectedStatusCode: 202,
+            serviceFunction: "flushEvents",
+            serviceName: "MetricsService",
+            failureMessage: "Failed to send metrics events",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify([givenEvent1, givenEvent2]),
+            body: JSON.stringify({
+              payload: givenEncryptedPayload
+            })
           }
         );
       })
@@ -90,8 +102,12 @@ describe("MetricsService", () => {
       };
 
       // AND fetch will fail
-      const givenError = new Error("Network error");
-      jest.spyOn(window, "fetch").mockRejectedValueOnce(givenError);
+      const givenError = new Error("given error");
+      jest.spyOn(CustomFetchModule, "customFetch").mockRejectedValue(givenError);
+
+      // AND decrypt events will return some payload
+      const givenEncryptedPayload = "givenEncryptedPayload"
+      jest.spyOn(metricsUtilsModule, "encryptEventsPayload").mockReturnValue(givenEncryptedPayload)
 
       // WHEN sending a metrics event
       const service = MetricsService.getInstance();
@@ -108,7 +124,7 @@ describe("MetricsService", () => {
       })
     });
 
-    test("should log error but not throw when response is not accpted", async () => {
+    test("should log error but not throw when response is not accepted", async () => {
       // GIVEN a metrics event
       const givenEvent: CVDownloadedEvent = {
         event_type: EventType.CV_DOWNLOADED,
@@ -119,7 +135,11 @@ describe("MetricsService", () => {
 
       // AND an unsuccessful response from the API
       const errorResponse = { message: "Something went wrong" };
-      const fetchSpy = setupFetchSpy(400, errorResponse, "application/json;charset=UTF-8");
+      const customFetchSpy = jest.spyOn(CustomFetchModule, "customFetch").mockRejectedValue(errorResponse);
+
+      // AND decrypt events will return some payload
+      const givenEncryptedPayload = "givenEncryptedPayload";
+      jest.spyOn(metricsUtilsModule, "encryptEventsPayload").mockReturnValue(givenEncryptedPayload);
 
       // WHEN sending a metrics event
       const service = MetricsService.getInstance();
@@ -132,11 +152,8 @@ describe("MetricsService", () => {
 
       // THEN expect the error to be logged
       await waitFor(() => {
-        expect(console.error).toHaveBeenCalledWith(
-          "Failed to send metrics events:",
-          JSON.stringify(errorResponse)
-        );
-      })
+        expect(console.error).toHaveBeenCalledWith("Error sending metrics events:", errorResponse);
+      });
 
       // AND GIVEN another event
       const newEvent: CVDownloadedEvent = {
@@ -145,11 +162,6 @@ describe("MetricsService", () => {
         session_id: 124,
         user_id: "456",
       };
-
-      // AND a successful response for the next call
-      fetchSpy.mockImplementationOnce(() =>
-        Promise.resolve(new Response(undefined, { status: 202 }))
-      );
 
       // WHEN sending the new event
       await service.sendMetricsEvent(newEvent);
@@ -160,16 +172,19 @@ describe("MetricsService", () => {
       await Promise.resolve();
 
       // THEN expect only the new event to be sent
-      expect(fetchSpy).toHaveBeenLastCalledWith(
-        `${givenApiServerUrl}/metrics`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify([newEvent]),
-        }
-      );
+      expect(customFetchSpy).toHaveBeenLastCalledWith(`${givenApiServerUrl}/metrics`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        serviceFunction: "flushEvents",
+        serviceName: "MetricsService",
+        expectedStatusCode: 202,
+        failureMessage: "Failed to send metrics events",
+        body: JSON.stringify({
+          payload: givenEncryptedPayload,
+        }),
+      });
     });
 
     test("should not make API calls when buffer is empty", async () => {

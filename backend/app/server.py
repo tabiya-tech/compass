@@ -215,7 +215,7 @@ app.include_router(search_router)
 ############################################
 # Add metrics routes
 ############################################
-add_metrics_routes(app)
+add_metrics_routes(app, auth)
 
 ############################################
 # Add POC chat routes

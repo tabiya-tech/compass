@@ -3,68 +3,52 @@ This module contains functions to add metrics routes to the app router.
 """
 import logging
 from http import HTTPStatus
+from typing import Any
+
+from app.metrics.utils import decrypt_event_payload
+
+from app.metrics.routes.types import MetricsRequestBody
+
+from app.users.auth import Authentication, UserInfo
 
 from app.constants.errors import HTTPErrorResponse
-from fastapi import Request, HTTPException
+from fastapi import HTTPException
 from app.metrics.services.get_metrics_service import get_metrics_service
 from app.metrics.services.service import IMetricsService
 from fastapi import APIRouter, Depends, FastAPI
-from pydantic import BaseModel, Field
 
 from app.metrics.constants import EventType
 from app.metrics.types import AbstractCompassMetricEvent, CVDownloadedEvent, DeviceSpecificationEvent, \
     DemographicsEvent, UserLocationEvent, NetworkInformationEvent
 
 
-class _PayloadTooLargeErrorResponse(HTTPErrorResponse):
-    """
-    Response model for payload size validation errors.
-    """
-    detail: str = Field(
-        description="Error message indicating which field exceeded the size limit",
-    )
-
 logger = logging.getLogger(__name__)
 
-# Maximum allowed payload size in characters (1KB)
-# CVDownloadedEvent: Estimate: 20 (user_id) + 8 (int) + 3 (format) + overhead ≈ 60–100 bytes
-# DemographicsEvent: Estimate: 20 (user_id) + 3 (age) + 10 (gender) + 20 (education) + 50 (employment) + overhead ≈ 100–200 bytes
-# UserLocationEvent: Estimate: 20 + 16 (coords) + overhead ≈ 60–100 bytes
-# DeviceSpecificationEvent: Estimate: 20 (user_id) + 20 (device) + 20 (os) + 20 (browser) + 20 (screen) + overhead ≈ 100–200 bytes
-# single event size ≈ 100–200 bytes, 1KB ≈ 5–10 events
-MAX_PAYLOAD_SIZE = 1024
 
-
-class _MetricRequest(BaseModel):
-    """Request type for metrics endpoint"""
-    event_type: EventType
-
-    class Config:
-        extra = "allow"
-
-
-def _construct_metric_event(request: _MetricRequest) -> AbstractCompassMetricEvent:
+def _construct_metric_event(_event_data: Any) -> AbstractCompassMetricEvent:
     """Constructs the appropriate metric event based on the event type"""
     # Convert the request to a dict and remove event_type
-    event_data = request.model_dump(exclude={'event_type'})
+    event_type = _event_data.pop("event_type")
+    event_data = _event_data
 
-    if request.event_type == EventType.CV_DOWNLOADED:
+    if event_type == EventType.CV_DOWNLOADED.value:
         return CVDownloadedEvent(**event_data)
-    elif request.event_type == EventType.DEMOGRAPHICS:
+    elif event_type == EventType.DEMOGRAPHICS.value:
         return DemographicsEvent(**event_data)
-    elif request.event_type == EventType.USER_LOCATION:
+    elif event_type == EventType.USER_LOCATION.value:
         return UserLocationEvent(**event_data)
-    elif request.event_type == EventType.DEVICE_SPECIFICATION:
+    elif event_type == EventType.DEVICE_SPECIFICATION.value:
         return DeviceSpecificationEvent(**event_data)
-    elif request.event_type == EventType.NETWORK_INFORMATION:
+    elif event_type == EventType.NETWORK_INFORMATION.value:
         return NetworkInformationEvent(**event_data)
     else:
-        raise ValueError(f"Unknown event type: {request.event_type}")
+        raise ValueError(f"Unknown event type: {event_type}")
 
 
-def add_metrics_routes(app_router: FastAPI):
+def add_metrics_routes(app_router: FastAPI, auth: Authentication):
     """
     Add all routes related to metrics
+    :param auth: Authentication Provider
     :param app_router: FastAPI: The router to add the metrics routes to.
     """
     router = APIRouter(prefix="/metrics", tags=["metrics"])
@@ -72,30 +56,30 @@ def add_metrics_routes(app_router: FastAPI):
     @router.post("",
                  status_code=HTTPStatus.ACCEPTED,
                  responses={
-                      HTTPStatus.REQUEST_ENTITY_TOO_LARGE: {"model": _PayloadTooLargeErrorResponse},
                       HTTPStatus.BAD_REQUEST: {"model": HTTPErrorResponse},
                  },
                  name="create metric event",
                  description="create metrics for various events"
                  )
     async def _metrics_handler(
-            request: Request,
-            metrics_requests: list[_MetricRequest],
+            request_body: MetricsRequestBody,
             metrics_service: IMetricsService = Depends(get_metrics_service),
+            user_info: UserInfo = Depends(auth.get_user_info())
     ) -> None:
         """
         Creates or updates metrics for a session.
 
-        :param metrics_requests: The metrics details
+        :param request_body: The request body
         :param metrics_service: Service for managing user metrics
         :return: None
         """
-        if len(await request.body()) > MAX_PAYLOAD_SIZE:
-            raise HTTPException(status_code=HTTPStatus.REQUEST_ENTITY_TOO_LARGE, detail=f"Payload size exceeds {MAX_PAYLOAD_SIZE} characters")
-        
+
         events: list[AbstractCompassMetricEvent] = []
         construction_errors: list[str] = []
-        
+
+        # Decrypt the metric events payload.
+        metrics_requests: list[Any] = decrypt_event_payload(request_body.payload, user_info)
+
         # construct events
         for metrics_request in metrics_requests:
             try:

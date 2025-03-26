@@ -1,5 +1,9 @@
 import { getBackendUrl } from "src/envService";
 import { MetricsEventUnion } from "src/metrics/types";
+import { encryptEventsPayload } from "src/metrics/utils/encryption";
+import { customFetch } from "src/utils/customFetch/customFetch";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+
 
 export const METRICS_FLUSH_INTERVAL_MS = 15000; // 15 seconds
 
@@ -71,12 +75,18 @@ export default class MetricsService {
     const payload = encryptEventsPayload(this._eventBuffer, PersistentStorageService.getToken()!)
 
     try {
-      const response = await fetch(`${this.apiServerUrl}/metrics`, {
+      const response = await customFetch(`${this.apiServerUrl}/metrics`, {
         method: "POST",
+        expectedStatusCode: 202,
+        serviceName: "MetricsService",
+        serviceFunction: "flushEvents",
+        failureMessage: "Failed to send metrics events",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(this._eventBuffer),
+        body: JSON.stringify({
+          payload: payload,
+        }),
       });
 
       if (!response.ok) {
