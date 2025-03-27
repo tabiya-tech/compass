@@ -66,7 +66,7 @@ export const SENSITIVE_DATA_FORM_FIXED_TEXT = {
   FAILED_TO_LOAD_CONFIG: "Failed to load form configuration",
   INVALID_FORM: "Please correct the errors in the form before submitting.",
   HELP_TIP_TEXT: "Your information is encrypted using state-of-the-art, end-to-end encryption and stored securely.",
-}
+};
 
 // Create a function to generate the DATA_TEST_ID object
 const createDataTestId = (fields: FieldDefinition[]): DataTestIdType => {
@@ -403,16 +403,16 @@ const SensitiveDataForm: React.FC = () => {
 
   return (
     <Suspense fallback={<SensitiveDataFormSkeleton />}>
-        {configLoading ? (
-          <SensitiveDataFormSkeleton />
-        ) : (
-          <>
-            <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.SENSITIVE_DATA_CONTAINER}>
-              <Box
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
+      {configLoading ? (
+        <SensitiveDataFormSkeleton />
+      ) : (
+        <>
+          <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.SENSITIVE_DATA_CONTAINER}>
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
               width={"100%"}
               sx={{
                 paddingX: isMobile ? theme.fixedSpacing(theme.tabiyaSpacing.sm) : theme.spacing(0),
@@ -423,7 +423,7 @@ const SensitiveDataForm: React.FC = () => {
                 title={SENSITIVE_DATA_FORM_FIXED_TEXT.TITLE}
                 subtitle={
                   <>
-                    { SENSITIVE_DATA_FORM_FIXED_TEXT.SUBTITLE }
+                    {SENSITIVE_DATA_FORM_FIXED_TEXT.SUBTITLE}
                     {
                       isPIIRequired ? " " + SENSITIVE_DATA_FORM_FIXED_TEXT.UNSKIPPABLE_SUBTITLE : " " + SENSITIVE_DATA_FORM_FIXED_TEXT.SKIPPABLE_SUBTITLE
                     }
@@ -562,12 +562,12 @@ const SensitiveDataForm: React.FC = () => {
             }}
             onConfirm={() => {
               setConfirmingSkip(false);
-              }}
-              cancelButtonText="Yes, skip"
-              confirmButtonText="Share data"
-            />
-        <Backdrop isShown={isSkipping || isRejecting} message={isSkipping ? "Skipping..." : "Logging you out..."} />
-      </>
+            }}
+            cancelButtonText="Yes, skip"
+            confirmButtonText="Share data"
+          />
+          <Backdrop isShown={isSkipping || isRejecting} message={isSkipping ? "Skipping..." : "Logging you out..."} />
+        </>
       )}
     </Suspense>
   );

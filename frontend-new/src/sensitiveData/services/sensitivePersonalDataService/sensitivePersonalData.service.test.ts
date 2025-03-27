@@ -136,7 +136,7 @@ describe("SensitivePersonalDataService", () => {
         headers: {
           "Content-Type": "application/json",
         },
-        expectedStatusCode: 201,
+        expectedStatusCode: [201, 409],
         serviceName: "SensitivePersonalData",
         serviceFunction: "createSensitivePersonalData",
         failureMessage: `Failed to create sensitive personal data for user with id ${givenUserId}`,
@@ -259,7 +259,7 @@ describe("SensitivePersonalDataService", () => {
         headers: {
           "Content-Type": "application/json",
         },
-        expectedStatusCode: 201,
+        expectedStatusCode: [201, 409],
         expectedContentType: "application/json",
         failureMessage: `Failed to skip sensitive personal data for user with id ${givenUserId}`,
         body: JSON.stringify({}),
