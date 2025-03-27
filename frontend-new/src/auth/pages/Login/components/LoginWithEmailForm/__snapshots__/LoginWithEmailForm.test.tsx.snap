@@ -9,7 +9,7 @@ exports[`Testing LoginWithEmailForm component it should show login form 1`] = `
     class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-4c32m-MuiFormControl-root-MuiTextField-root"
   >
     <label
-      class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined css-1ldvnp-MuiFormLabel-root-MuiInputLabel-root"
+      class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined css-qn15mw-MuiFormLabel-root-MuiInputLabel-root"
       data-shrink="true"
       for=":r0:"
       id=":r0:-label"
@@ -46,7 +46,7 @@ exports[`Testing LoginWithEmailForm component it should show login form 1`] = `
     data-testid="b7499b01-8082-4209-8667-c7d559a70cag-text-field"
   >
     <label
-      class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined css-1ldvnp-MuiFormLabel-root-MuiInputLabel-root"
+      class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined css-qn15mw-MuiFormLabel-root-MuiInputLabel-root"
       data-shrink="true"
       for=":r1:"
       id=":r1:-label"
