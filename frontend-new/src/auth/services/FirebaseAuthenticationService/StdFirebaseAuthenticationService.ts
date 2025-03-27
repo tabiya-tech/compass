@@ -107,6 +107,7 @@ class StdFirebaseAuthenticationService {
       const newToken = await firebaseAuth.currentUser.getIdToken(true);
       console.debug("New token obtained", "..." + newToken.slice(-20));
       this.scheduleTokenRefresh(newToken);
+      PersistentStorageService.setToken(newToken);
       return newToken;
     } else {
       console.debug("No current user to refresh token");
