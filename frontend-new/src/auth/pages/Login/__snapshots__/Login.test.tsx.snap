@@ -45,7 +45,7 @@ exports[`Testing Login component it should show login form successfully 1`] = `
         </button>
       </div>
       <h4
-        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-xvfkrl-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1gc7ofh-MuiTypography-root"
         data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
       >
         Welcome to Compass!
@@ -139,7 +139,7 @@ exports[`Testing Login component it should show login form successfully 1`] = `
             class="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
           >
             <h6
-              class="MuiTypography-root MuiTypography-h6 css-j3fu9i-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-h6 css-odley9-MuiTypography-root"
               data-testid="message-91b57774-d50c-4350-882d-363f80ac10e8"
             >
               Logging you in...
@@ -340,7 +340,7 @@ exports[`Testing Login component should handle application login code 1`] = `
         </button>
       </div>
       <h4
-        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-xvfkrl-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1gc7ofh-MuiTypography-root"
         data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
       >
         Welcome to Compass!
@@ -431,7 +431,7 @@ exports[`Testing Login component should handle application login code 1`] = `
             class="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
           >
             <h6
-              class="MuiTypography-root MuiTypography-h6 css-j3fu9i-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-h6 css-odley9-MuiTypography-root"
               data-testid="message-91b57774-d50c-4350-882d-363f80ac10e8"
             >
               Logging you in...

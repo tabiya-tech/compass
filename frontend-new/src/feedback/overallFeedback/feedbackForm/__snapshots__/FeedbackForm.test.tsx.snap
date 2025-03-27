@@ -27,11 +27,11 @@ exports[`FeedbackForm should render component successfully 1`] = `
       role="dialog"
     >
       <div
-        class="MuiTypography-root MuiTypography-h2 MuiDialogTitle-root css-jvm7fr-MuiTypography-root-MuiDialogTitle-root"
+        class="MuiTypography-root MuiTypography-h2 MuiDialogTitle-root css-1l7du2y-MuiTypography-root-MuiDialogTitle-root"
         id=":r0:"
       >
         <h3
-          class="MuiTypography-root MuiTypography-h3 css-1v5dlgx-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-h3 css-xcrvgq-MuiTypography-root"
           data-testid="feedback-form-dialog-title-c6ba52ec-c1de-46ac-950b-f5354c6785ac"
         >
           Help us improve!

@@ -27,12 +27,12 @@ exports[`ConfirmModalDialog should render component correctly 1`] = `
       role="dialog"
     >
       <h2
-        class="MuiTypography-root MuiTypography-h2 MuiDialogTitle-root css-j5ezo9-MuiTypography-root-MuiDialogTitle-root"
+        class="MuiTypography-root MuiTypography-h2 MuiDialogTitle-root css-f196o7-MuiTypography-root-MuiDialogTitle-root"
         data-testid="confirm-modal-title-edc0ac15-67a7-4c1f-9934-94fa65757046"
         id="confirm-modal-title"
       >
         <span
-          class="MuiTypography-root MuiTypography-h6 css-cdd9aw-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
         >
           Sample Title?
         </span>

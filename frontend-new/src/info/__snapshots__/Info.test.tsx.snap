@@ -13,7 +13,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
       data-testid="version-frontend-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-10wel8w-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-nc0cip-MuiTypography-root"
       >
         Frontend
       </h6>
@@ -24,7 +24,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
           class="MuiBox-root css-0"
         >
           <h6
-            class="MuiTypography-root MuiTypography-h6 css-cdd9aw-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
           >
             Date
           </h6>
@@ -38,7 +38,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
           class="MuiBox-root css-0"
         >
           <h6
-            class="MuiTypography-root MuiTypography-h6 css-cdd9aw-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
           >
             Version
           </h6>
@@ -52,7 +52,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
           class="MuiBox-root css-0"
         >
           <h6
-            class="MuiTypography-root MuiTypography-h6 css-cdd9aw-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
           >
             Build Number
           </h6>
@@ -66,7 +66,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
           class="MuiBox-root css-0"
         >
           <h6
-            class="MuiTypography-root MuiTypography-h6 css-cdd9aw-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
           >
             GIT SHA
           </h6>
@@ -83,7 +83,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
       data-testid="version-backend-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-10wel8w-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-nc0cip-MuiTypography-root"
       >
         Backend
       </h6>
@@ -94,7 +94,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
           class="MuiBox-root css-0"
         >
           <h6
-            class="MuiTypography-root MuiTypography-h6 css-cdd9aw-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
           >
             Date
           </h6>
@@ -108,7 +108,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
           class="MuiBox-root css-0"
         >
           <h6
-            class="MuiTypography-root MuiTypography-h6 css-cdd9aw-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
           >
             Version
           </h6>
@@ -122,7 +122,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
           class="MuiBox-root css-0"
         >
           <h6
-            class="MuiTypography-root MuiTypography-h6 css-cdd9aw-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
           >
             Build Number
           </h6>
@@ -136,7 +136,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
           class="MuiBox-root css-0"
         >
           <h6
-            class="MuiTypography-root MuiTypography-h6 css-cdd9aw-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
           >
             GIT SHA
           </h6>
@@ -161,7 +161,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
   data-testid="version-backend-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
 >
   <h6
-    class="MuiTypography-root MuiTypography-h6 css-10wel8w-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-h6 css-nc0cip-MuiTypography-root"
   >
     Backend
   </h6>
@@ -172,7 +172,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
       class="MuiBox-root css-0"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-cdd9aw-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
       >
         Date
       </h6>
@@ -186,7 +186,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
       class="MuiBox-root css-0"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-cdd9aw-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
       >
         Version
       </h6>
@@ -200,7 +200,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
       class="MuiBox-root css-0"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-cdd9aw-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
       >
         Build Number
       </h6>
@@ -214,7 +214,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
       class="MuiBox-root css-0"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-cdd9aw-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
       >
         GIT SHA
       </h6>
@@ -234,7 +234,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
   data-testid="version-frontend-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
 >
   <h6
-    class="MuiTypography-root MuiTypography-h6 css-10wel8w-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-h6 css-nc0cip-MuiTypography-root"
   >
     Frontend
   </h6>
@@ -245,7 +245,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
       class="MuiBox-root css-0"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-cdd9aw-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
       >
         Date
       </h6>
@@ -259,7 +259,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
       class="MuiBox-root css-0"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-cdd9aw-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
       >
         Version
       </h6>
@@ -273,7 +273,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
       class="MuiBox-root css-0"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-cdd9aw-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
       >
         Build Number
       </h6>
@@ -287,7 +287,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
       class="MuiBox-root css-0"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-cdd9aw-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
       >
         GIT SHA
       </h6>
