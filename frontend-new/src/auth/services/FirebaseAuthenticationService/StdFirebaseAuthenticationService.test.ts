@@ -6,6 +6,7 @@ import StdFirebaseAuthenticationService, {
 import { firebaseAuth } from "src/auth/firebaseConfig";
 import { jwtDecode } from "jwt-decode";
 import { FirebaseToken } from "./StdFirebaseAuthenticationService";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
 // Mock jwt-decode
 jest.mock("jwt-decode", () => ({
@@ -25,6 +26,7 @@ jest.mock("src/auth/firebaseConfig", () => ({
 jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => ({
   PersistentStorageService: {
     getToken: jest.fn(),
+    setToken: jest.fn(),
   },
 }));
 
@@ -103,6 +105,10 @@ describe("StdFirebaseAuthenticationService", () => {
 
       // THEN it should return the new token
       expect(result).toBe(mockToken);
+
+      // AND it should set the token into persistent storage
+      expect(PersistentStorageService.setToken).toHaveBeenCalledWith(mockToken);
+
       expect(mockUser.getIdToken).toHaveBeenCalledWith(true);
     });
 
