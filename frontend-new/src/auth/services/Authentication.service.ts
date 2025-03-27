@@ -9,6 +9,8 @@ import { TokenError } from "src/error/commonErrors";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
 
+export const CLOCK_TOLERANCE = 10; // 10 second buffer for expiration and issuance time, in case of clock skew
+
 export enum TokenValidationFailureCause {
   TOKEN_EXPIRED = "TOKEN_EXPIRED",
   TOKEN_NOT_YET_VALID = "TOKEN_NOT_YET_VALID",
@@ -179,16 +181,16 @@ abstract class AuthenticationService {
 
       // Decode the token and validate it
       const decodedToken: Token = jwtDecode(token);
-      const TOLERANCE_BUFFER = 1; // 1 second buffer for expiration and issuance time
+      // The tolerance must be at lest greater than the precision loss by the Math.floor function (1 second)
       const currentTime = Math.floor(Date.now() / 1000);
 
       // Check expiration with buffer
       // ideally this would be a simple check, but since there is a chance that the server and client clocks are not perfectly synchronized,
       // we add a buffer to the expiration time to account for the potential time difference
-      if (decodedToken.exp < currentTime - TOLERANCE_BUFFER) {
+      if (currentTime > decodedToken.exp + CLOCK_TOLERANCE) {
         console.debug("Token is expired: ", { exp: decodedToken.exp, currentTime });
         return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.TOKEN_EXPIRED };
-      } else if (decodedToken.exp < currentTime) {
+      } else if (currentTime > decodedToken.exp) {
         console.warn(
           "Warning: token expiration time has elapsed, but is still within the acceptable tolerance period",
           {
@@ -200,10 +202,10 @@ abstract class AuthenticationService {
 
       // Check issued time with buffer
       // similarly, we add a buffer to the issuance time to account for the potential time difference between the server and client clocks
-      if (decodedToken.iat > currentTime + TOLERANCE_BUFFER) {
+      if (currentTime < decodedToken.iat - CLOCK_TOLERANCE) {
         console.debug("Token issued in the future: ", { iat: decodedToken.iat, currentTime });
         return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.TOKEN_NOT_YET_VALID };
-      } else if (decodedToken.iat > currentTime) {
+      } else if (currentTime < decodedToken.iat) {
         console.warn(
           "Warning: token issued at time was after the current time, but within the acceptable tolerance period ",
           {
