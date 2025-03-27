@@ -1,5 +1,5 @@
 import "src/_test_utilities/consoleMock";
-import AuthenticationService, { TokenValidationFailureCause } from "./Authentication.service";
+import AuthenticationService, { CLOCK_TOLERANCE, TokenValidationFailureCause } from "./Authentication.service";
 import { jwtDecode } from "jwt-decode";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
@@ -25,7 +25,7 @@ jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => ({
     clearToken: jest.fn(),
     clearLoginMethod: jest.fn(),
     clearPersonalInfo: jest.fn(),
-    clearAccountConverted: jest.fn()
+    clearAccountConverted: jest.fn(),
   },
 }));
 
@@ -365,8 +365,8 @@ describe("AuthenticationService", () => {
     });
 
     test.each([
-      ["expired token", { exp: currentTime - 2, iat: currentTime - 3600 }, "TOKEN_EXPIRED"],
-      ["future token", { exp: currentTime + 3600, iat: currentTime + 2 }, "TOKEN_NOT_YET_VALID"],
+      ["expired token", { iat: currentTime - CLOCK_TOLERANCE - 100, exp: currentTime - CLOCK_TOLERANCE - 1 }, "TOKEN_EXPIRED"],
+      ["future token", { iat: currentTime + CLOCK_TOLERANCE + 1, exp: currentTime + CLOCK_TOLERANCE + 100 }, "TOKEN_NOT_YET_VALID"],
     ])("should return false for %s", (_, payload, expectedFailureCause) => {
       // GIVEN a token with invalid timing
       const givenToken = "invalid-token";
