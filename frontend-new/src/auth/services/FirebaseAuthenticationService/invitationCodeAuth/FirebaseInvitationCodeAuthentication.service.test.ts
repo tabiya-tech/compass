@@ -77,7 +77,10 @@ describe("AuthService class tests", () => {
       } as unknown as firebase.auth.UserCredential);
 
       // AND the user preferences can be created\
-      const givenReturnedPreferences = { foo: "bar" } as unknown as UserPreference;
+      const givenReturnedPreferences: UserPreference = {
+        user_id: "foo-id",
+        sessions:[]
+      } as unknown as UserPreference;
       jest.spyOn(UserPreferencesService.getInstance(), "createUserPreferences").mockResolvedValueOnce(givenReturnedPreferences);
       jest.spyOn(UserPreferencesService.getInstance(), "getUserPreferences").mockResolvedValueOnce(givenReturnedPreferences);
 

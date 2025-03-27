@@ -118,8 +118,11 @@ describe("AuthenticationService", () => {
         return null;
       });
       // AND the given user has some preferences
-      const givenPrefs = { foo: "bar" } as unknown as UserPreference; // UserPreference
-      jest.spyOn(UserPreferencesService.getInstance(), "getUserPreferences").mockResolvedValueOnce(givenPrefs);
+      const givenUserPreferences: UserPreference = {
+        user_id: "foo-id",
+        sessions:[]
+      } as unknown as UserPreference;
+      jest.spyOn(UserPreferencesService.getInstance(), "getUserPreferences").mockResolvedValueOnce(givenUserPreferences);
 
       // WHEN onSuccessfulLogin is called
       await service.onSuccessfulLogin(givenToken);
@@ -131,7 +134,7 @@ describe("AuthenticationService", () => {
       // AND the user preferences were fetched for given user
       expect(UserPreferencesService.getInstance().getUserPreferences).toHaveBeenCalledWith(givenUser.id);
       // AND the user preferences should be set in the state
-      expect(UserPreferencesStateService.getInstance().getUserPreferences()).toEqual(givenPrefs);
+      expect(UserPreferencesStateService.getInstance().getUserPreferences()).toEqual(givenUserPreferences);
 
       // AND expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();
@@ -227,7 +230,10 @@ describe("AuthenticationService", () => {
       });
 
       // AND some user preferences will be created for the user
-      const givenReturnedPrefs = { foo: "bar" } as unknown as UserPreference;
+      const givenReturnedPrefs: UserPreference = {
+        user_id: "foo-id",
+        sessions:[]
+      } as unknown as UserPreference;
       jest.spyOn(UserPreferencesService.getInstance(), "createUserPreferences").mockResolvedValueOnce(givenReturnedPrefs);
 
       // WHEN onSuccessfulRegistration is called for the given token and registration code

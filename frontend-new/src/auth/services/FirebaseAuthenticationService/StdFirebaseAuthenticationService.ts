@@ -85,6 +85,7 @@ class StdFirebaseAuthenticationService {
       console.warn("An error occurred while logging out from firebase. Cleaning firebase DB explicitly.", error);
       await this.deleteFirebaseDB();
     } finally {
+      console.debug("Clearing refresh timeout");
       this.clearRefreshTimeout();
       this.unsubscribeAuthListener();
     }
