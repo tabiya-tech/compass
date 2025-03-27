@@ -128,8 +128,12 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setExperiences(data);
         setIsLoading(false);
       } catch (error) {
+        if (error instanceof RestAPIError) {
+          writeRestAPIErrorToLog(error, console.error);
+        }else {
+          console.error(new ChatError("Failed to retrieve experiences", error as Error));
+        }
         enqueueSnackbar("Failed to retrieve experiences", { variant: "error" });
-        console.error(new ChatError("Failed to retrieve experiences", error as Error));
       }
     }, [enqueueSnackbar, activeSessionId]);
 
@@ -174,7 +178,11 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setConversationCompleted(response.conversation_completed);
         setConversationConductedAt(response.conversation_conducted_at);
       } catch (error) {
-        console.error(new ChatError("Failed to send message:", error as Error));
+        if (error instanceof RestAPIError) {
+          writeRestAPIErrorToLog(error, console.error);
+        } else {
+          console.error(new ChatError("Failed to send message:", error as Error));
+        }
         addMessage(generatePleaseRepeatMessage());
       } finally {
         setAiIsTyping(false);

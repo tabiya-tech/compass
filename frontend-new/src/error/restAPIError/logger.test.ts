@@ -12,7 +12,7 @@ describe("Test writeRestAPIErrorToLog", () => {
       400,
       ErrorConstants.ErrorCodes.API_ERROR,
       "message",
-      new Error()
+      new Error("cause of the error", { cause: Error("cause fo the cause") })
     );
     const logFunction = jest.fn();
     writeRestAPIErrorToLog(err, logFunction);

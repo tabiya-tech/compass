@@ -12,6 +12,8 @@ import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import questions from "src/feedback/overallFeedback/feedbackForm/questions-en.json";
 import OverallFeedbackService from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import { RestAPIError } from "src/error/restAPIError/RestAPIError";
+import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
 
 interface CustomerSatisfactionRatingProps {
   notifyOnCustomerSatisfactionRatingSubmitted: () => void;
@@ -27,10 +29,10 @@ export const UI_TEXT = {
   CUSTOMER_SATISFACTION_QUESTION_TEXT: "Finally, we'd love to hear your thoughts on your experience so far! " + questions[QUESTION_KEYS.CUSTOMER_SATISFACTION].question_text,
   RATING_LABEL_LOW: "Unsatisfied",
   RATING_LABEL_HIGH: "Satisfied",
-}
+};
 const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
-  notifyOnCustomerSatisfactionRatingSubmitted,
-}) => {
+                                                                                 notifyOnCustomerSatisfactionRatingSubmitted,
+                                                                               }) => {
   const { enqueueSnackbar } = useSnackbar();
   const isOnline = useContext(IsOnlineContext);
 
@@ -57,7 +59,11 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
       notifyOnCustomerSatisfactionRatingSubmitted();
       enqueueSnackbar("Rating Feedback submitted successfully!", { variant: "success" });
     } catch (error) {
-      console.error("Feedback submission failed:", error);
+      if (error instanceof RestAPIError) {
+        writeRestAPIErrorToLog(error, console.error);
+      } else {
+        console.error("Feedback submission failed:", error);
+      }
       enqueueSnackbar("Failed to submit feedback. Please try again later.", { variant: "error" });
     } finally {
       setIsSubmittingRating(false);

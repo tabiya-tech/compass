@@ -10,6 +10,8 @@ import { FeedbackItem } from "src/feedback/overallFeedback/overallFeedbackServic
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { FeedbackError } from "src/error/commonErrors";
+import { RestAPIError } from "src/error/restAPIError/RestAPIError";
+import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
 
 export interface FeedbackFormProps {
   isOpen: boolean;
@@ -62,7 +64,11 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
 
       enqueueSnackbar("Feedback submitted successfully!", { variant: "success" });
     } catch (error) {
-      console.error(new FeedbackError("Failed to submit feedback", error as Error));
+      if (error instanceof RestAPIError) {
+        writeRestAPIErrorToLog(error, console.error);
+      } else {
+        console.error(new FeedbackError("Failed to submit feedback", error as Error));
+      }
       enqueueSnackbar("Failed to submit feedback. Please try again later.", { variant: "error" });
     } finally {
       setIsSubmitting(false);
