@@ -1,5 +1,6 @@
 name: Deploy
 
+run-name: Deploy to ${{ inputs.env-name }} (${{ inputs.env-type }}) ${{ inputs.target-git-branch }} - ${{ inputs.target-git-sha }}
 on:
   workflow_dispatch:
     # when you want to trigger deployment manually
