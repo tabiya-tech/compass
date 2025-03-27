@@ -22,7 +22,7 @@ class TestDecryptEvents:
         # GIVEN some sample events list of events.
         given_events = [
             dict(
-                event_type=EventType.FEEDBACK_SCORE.value,
+                event_type=EventType.FEEDBACK_RATING_VALUE.value,
                 foo="bar"
             ),
             dict(

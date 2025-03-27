@@ -27,7 +27,7 @@ from .errors import (
     InvalidQuestionError,
     InvalidOptionError, QuestionsFileError
 )
-from app.metrics.service import IMetricsService
+from app.metrics.services.service import IMetricsService
 
 given_feedback_specs_json_file = Path(__file__).parent / "given_feedback_specs-en.json"
 given_feedback_item_specs_json = json.loads(given_feedback_specs_json_file.read_text())

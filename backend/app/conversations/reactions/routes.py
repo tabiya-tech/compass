@@ -10,8 +10,8 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Path
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from app.metrics.get_metrics_service import get_metrics_service
-from app.metrics.service import IMetricsService
+from app.metrics.services.get_metrics_service import get_metrics_service
+from app.metrics.services.service import IMetricsService
 from app.context_vars import session_id_ctx_var, user_id_ctx_var
 from app.application_state import ApplicationStateManager
 from app.constants.errors import HTTPErrorResponse
