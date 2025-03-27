@@ -80,7 +80,10 @@ describe("SocialAuthService class tests", () => {
       jest.spyOn(authService, "getUser").mockReturnValue(givenUser);
 
       // AND the user has some preferences
-      const givenUserPreferences: UserPreference = { foo: "bar" } as unknown as UserPreference;
+      const givenUserPreferences: UserPreference = {
+        user_id: "foo-id",
+        sessions:[]
+      } as unknown as UserPreference;
       jest.spyOn(UserPreferencesService.getInstance(), "getUserPreferences").mockResolvedValueOnce(givenUserPreferences);
 
       // WHEN the Google login is attempted

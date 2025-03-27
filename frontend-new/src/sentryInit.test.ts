@@ -4,10 +4,6 @@ import * as Sentry from "@sentry/react";
 import { initSentry } from "./sentryInit";
 import { getBackendUrl, getSentryDSN } from "./envService";
 import * as EnvServiceModule from "./envService";
-import AuthenticationStateService from "./auth/services/AuthenticationState.service";
-import UserPreferencesStateService from "./userPreferences/UserPreferencesStateService";
-import { TabiyaUser } from "./auth/auth.types";
-import { UserPreference } from "./userPreferences/UserPreferencesService/userPreferences.types";
 
 // Mock all the required dependencies
 jest.mock("@sentry/react", () => ({
@@ -84,8 +80,7 @@ describe("sentryInit", () => {
       tracesSampleRate: 1.0,
       tracePropagationTargets: ["localhost", "https://api.example.com"],
       replaysSessionSampleRate: 0.1,
-      replaysOnErrorSampleRate: 1.0,
-      beforeSend: expect.any(Function),
+      replaysOnErrorSampleRate: 1.0
     });
   });
 
@@ -109,32 +104,6 @@ describe("sentryInit", () => {
     // THEN expect captureConsoleIntegration to be called with correct levels
     expect(Sentry.captureConsoleIntegration).toHaveBeenCalledWith({
       levels: ["error"],
-    });
-  });
-  test("should attach user context to Sentry events", () => {
-    // GIVEN the user preferences and authentication state are available
-    const givenUserPreferences = { sessions: ["foo-session"] };
-    const givenAuthenticationState = { id: "foo-user" };
-
-    jest
-      .spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences")
-      .mockReturnValue(givenUserPreferences as unknown as UserPreference);
-    jest
-      .spyOn(AuthenticationStateService.getInstance(), "getUser")
-      .mockReturnValue(givenAuthenticationState as unknown as TabiyaUser);
-
-    // WHEN initSentry is called
-    initSentry();
-
-    // AND an event triggers the beforeSend callback
-    const beforeSendFn = (Sentry.init as jest.Mock).mock.calls[0][0].beforeSend;
-    const mockEvent = { extra: {} };
-    beforeSendFn(mockEvent);
-
-    // THEN expect the user context to be attached to the event
-    expect(Sentry.setUser).toHaveBeenCalledWith({
-      session_id: givenUserPreferences.sessions[0],
-      user_id: givenAuthenticationState.id,
     });
   });
 });
