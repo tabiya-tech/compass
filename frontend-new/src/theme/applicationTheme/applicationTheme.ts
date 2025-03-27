@@ -295,7 +295,7 @@ export const applicationTheme = (theme: ThemeMode) => {
       },
       MuiFormLabel: {
         styleOverrides: {
-          root:({theme}) => ({
+          root: ({ theme }) => ({
             fontSize: theme.typography.caption.fontSize,
             marginBottom: 8,
           }),
@@ -376,13 +376,16 @@ export const applicationTheme = (theme: ThemeMode) => {
             padding: "0",
             color: activePalette.text!.secondary,
             opacity: 0.7,
+            "&.Mui-focused": {
+              color: activePalette.text!.textBlack,
+            },
           },
         },
       },
       MuiFormControl: {
         styleOverrides: {
           root: {
-            '& .MuiInputLabel-root': {
+            "& .MuiInputLabel-root": {
               color: activePalette.text!.secondary,
               opacity: 0.7,
             },
