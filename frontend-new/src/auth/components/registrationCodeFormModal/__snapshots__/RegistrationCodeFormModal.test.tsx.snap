@@ -44,7 +44,7 @@ exports[`RegistrationCodeFormModal renders correctly when modal is shown and cal
       />
     </button>
     <h4
-      class="MuiTypography-root MuiTypography-h4 css-8n8y9e-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-h4 css-72tyy1-MuiTypography-root"
       data-testid="invitation-code-modal-title-f782907a-6904-482c-b148-3c6682bf7b54"
     >
       Registration code

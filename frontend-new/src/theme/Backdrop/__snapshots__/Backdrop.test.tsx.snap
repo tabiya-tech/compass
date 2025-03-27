@@ -21,7 +21,7 @@ exports[`Backdrop render tests should be shown 1`] = `
           class="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
         >
           <h6
-            class="MuiTypography-root MuiTypography-h6 css-j3fu9i-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h6 css-odley9-MuiTypography-root"
             data-testid="message-91b57774-d50c-4350-882d-363f80ac10e8"
           >
             foo-message
