@@ -211,37 +211,37 @@ export const applicationTheme = (theme: ThemeMode) => {
       h1: {
         fontFamily: "IBM Plex Mono",
         fontWeight: "700",
-        fontSize: CSSClampFnCalculatorRem(1.55, 2.125, screenSizeRem),
+        fontSize: CSSClampFnCalculatorRem(1.45, 2.125, screenSizeRem),
         color: activePalette.text!!.primary,
       },
       h2: {
         fontFamily: "IBM Plex Mono",
         fontWeight: "700",
-        fontSize: CSSClampFnCalculatorRem(1.5, 1.975, screenSizeRem),
+        fontSize: CSSClampFnCalculatorRem(1.40, 1.975, screenSizeRem),
         color: activePalette.text!!.primary,
       },
       h3: {
         fontFamily: "IBM Plex Mono",
         fontWeight: "700",
-        fontSize: CSSClampFnCalculatorRem(1.45, 1.825, screenSizeRem),
+        fontSize: CSSClampFnCalculatorRem(1.35, 1.825, screenSizeRem),
         color: activePalette.text!!.primary,
       },
       h4: {
         fontFamily: "IBM Plex Mono",
         fontWeight: "700",
-        fontSize: CSSClampFnCalculatorRem(1.4, 1.675, screenSizeRem),
+        fontSize: CSSClampFnCalculatorRem(1.30, 1.675, screenSizeRem),
         color: activePalette.text!!.primary,
       },
       h5: {
         fontFamily: "IBM Plex Mono",
         fontWeight: "700",
-        fontSize: CSSClampFnCalculatorRem(1.35, 1.525, screenSizeRem),
+        fontSize: CSSClampFnCalculatorRem(1.25, 1.525, screenSizeRem),
         color: activePalette.text!!.primary,
       },
       h6: {
         fontFamily: "IBM Plex Mono",
         fontWeight: "700",
-        fontSize: CSSClampFnCalculatorRem(1.25, 1.375, screenSizeRem),
+        fontSize: CSSClampFnCalculatorRem(1.20, 1.375, screenSizeRem),
         color: activePalette.text!!.primary,
       },
       subtitle1: {

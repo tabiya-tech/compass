@@ -20,7 +20,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
     />
   </a>
   <h1
-    class="MuiTypography-root MuiTypography-h1 css-74y4cl-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-h1 css-1m1rxeh-MuiTypography-root"
   >
     Compass
   </h1>
@@ -147,7 +147,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
     />
   </a>
   <h1
-    class="MuiTypography-root MuiTypography-h1 css-74y4cl-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-h1 css-1m1rxeh-MuiTypography-root"
   >
     Compass
   </h1>

@@ -45,7 +45,7 @@ exports[`Sensitive Data Form Form validation should enable submit button when al
         </button>
       </div>
       <h4
-        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-xvfkrl-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1gc7ofh-MuiTypography-root"
         data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
       >
         Provide Your Information
@@ -178,7 +178,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should hand
         </button>
       </div>
       <h4
-        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-xvfkrl-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1gc7ofh-MuiTypography-root"
         data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
       >
         Provide Your Information
@@ -292,7 +292,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         </button>
       </div>
       <h4
-        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-xvfkrl-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1gc7ofh-MuiTypography-root"
         data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
       >
         Provide Your Information
@@ -411,7 +411,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         </button>
       </div>
       <h4
-        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-xvfkrl-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1gc7ofh-MuiTypography-root"
         data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
       >
         Provide Your Information
@@ -530,7 +530,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         </button>
       </div>
       <h4
-        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-xvfkrl-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1gc7ofh-MuiTypography-root"
         data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
       >
         Provide Your Information
@@ -661,7 +661,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         </button>
       </div>
       <h4
-        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-xvfkrl-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1gc7ofh-MuiTypography-root"
         data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
       >
         Provide Your Information

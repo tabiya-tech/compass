@@ -23,7 +23,7 @@ exports[`RequestInvitationCodeFormModal should render modal correctly when open 
       class="MuiBox-root css-1yb9fns"
     >
       <h4
-        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-xvfkrl-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1gc7ofh-MuiTypography-root"
         data-testid="request-invitation-code-form-modal-title-54e2f585-4c25-47d5-9414-928cb63d30cd"
       >
         Request access to Compass
