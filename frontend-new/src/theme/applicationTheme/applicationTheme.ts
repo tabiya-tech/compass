@@ -376,6 +376,9 @@ export const applicationTheme = (theme: ThemeMode) => {
             padding: "0",
             color: activePalette.text!.secondary,
             opacity: 0.7,
+            '&.Mui-focused': {
+              color: activePalette.text!.textBlack,
+            }
           },
         },
       },
