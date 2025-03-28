@@ -2,8 +2,9 @@ import { getBackendUrl } from "src/envService";
 import { MetricsEventUnion } from "src/metrics/types";
 import { customFetch } from "src/utils/customFetch/customFetch";
 import { StatusCodes } from "http-status-codes";
-import { writeRestAPIErrorToLog } from "../error/restAPIError/logger";
-import { RestAPIError } from "../error/restAPIError/RestAPIError";
+import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
+import { RestAPIError } from "src/error/restAPIError/RestAPIError";
+import { MetricsError } from "src/error/commonErrors";
 
 export const METRICS_FLUSH_INTERVAL_MS = 30000; // 30 seconds
 
@@ -59,8 +60,12 @@ export default class MetricsService {
    * @param event The metrics event to send
    */
   public sendMetricsEvent(event: MetricsEventUnion): void {
-    console.debug("Adding metrics event to buffer:", event.event_type);
-    this._eventBuffer.push(event);
+    try {
+      console.debug("Adding metrics event to buffer:", event.event_type);
+      this._eventBuffer.push(event);
+    } catch (err) {
+      console.error(new MetricsError("Failed to add metrics event to buffer", err as Error));
+    }
   }
 
   /**
