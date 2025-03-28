@@ -9,7 +9,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Literal
 
-from app.vector_search.vector_search_dependencies import get_gecko_embeddings_service
+from app.vector_search.vector_search_dependencies import get_embeddings_service
 from pydantic import BaseModel, Field
 from pymongo.errors import OperationFailure
 from pymongo.operations import SearchIndexModel
@@ -160,7 +160,7 @@ async def generate_and_save_embeddings(documents: list[dict[str, any]], ctx: Emb
 
     # get reference to the embeddings service, it is a singleton,
     # so we don't worry about getting it multiple times.
-    _embeddings_service = await get_gecko_embeddings_service()
+    _embeddings_service = await get_embeddings_service()
     embeddings = await _embeddings_service.embed_batch(texts)
 
     insertable_documents = []
