@@ -14,6 +14,7 @@ from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, ApiKeyAuth
 from app.vector_search.occupation_search_routes import add_occupation_search_routes
 from app.vector_search.skill_search_routes import add_skill_search_routes
+from app.vector_search.validate_taxonomy_model_id import validate_taxonomy_model_id
 from app.version.version_routes import add_version_routes
 
 from contextlib import asynccontextmanager
@@ -92,6 +93,8 @@ if not os.getenv("USERDATA_DATABASE_NAME"):
     raise ValueError("Mandatory USERDATA_DATABASE_NAME environment variable is not set")
 if not os.getenv('TAXONOMY_MODEL_ID'):
     raise ValueError("Mandatory TAXONOMY_MODEL_ID env variable is not set!")
+if not os.getenv("EMBEDDINGS_SERVICE_VERSION"):
+    raise ValueError("Mandatory EMBEDDINGS_SERVICE_VERSION environment variable is not set")
 
 # set global application configuration
 set_application_config(
@@ -99,7 +102,9 @@ set_application_config(
         environment_name=os.getenv("TARGET_ENVIRONMENT_NAME"),
         version_info=load_version_info(),
         enable_metrics=_metrics_enabled_str.lower() == "true",
-        default_country_of_user=get_country_from_string(_default_country_of_user_str)
+        default_country_of_user=get_country_from_string(_default_country_of_user_str),
+        taxonomy_model_id=os.getenv('TAXONOMY_MODEL_ID'),
+        embeddings_service_version=os.getenv("EMBEDDINGS_SERVICE_VERSION")
     )
 )
 
@@ -116,6 +121,7 @@ async def lifespan(_app: FastAPI):
     logger.info("Starting up...")
 
     application_db = await CompassDBProvider.get_application_db()
+    taxonomy_db = await CompassDBProvider.get_taxonomy_db()
     userdata_db = await CompassDBProvider.get_userdata_db()
     metrics_db = await CompassDBProvider.get_metrics_db()
 
@@ -124,7 +130,8 @@ async def lifespan(_app: FastAPI):
     await asyncio.gather(
         CompassDBProvider.initialize_application_mongo_db(application_db, logger),
         CompassDBProvider.initialize_userdata_mongo_db(userdata_db, logger),
-        CompassDBProvider.initialize_metrics_mongo_db(metrics_db, logger)
+        CompassDBProvider.initialize_metrics_mongo_db(metrics_db, logger),
+        validate_taxonomy_model_id(taxonomy_db=taxonomy_db)
     )
 
     yield

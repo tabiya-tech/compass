@@ -56,6 +56,7 @@ def main():
         userdata_database_name=getenv("USERDATA_DATABASE_NAME"),
         userdata_mongodb_uri=getenv("USERDATA_MONGODB_URI", True),
         vertex_api_region=getenv("VERTEX_API_REGION", True),
+        embeddings_service_version=getenv("EMBEDDINGS_SERVICE_VERSION"),
         target_environment_name=environment_name,
         target_environment_type=environment_type,
         backend_url=backend_url,

@@ -9,6 +9,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Literal
 
+from app.vector_search.embeddings_model import EmbeddingService
 from app.vector_search.vector_search_dependencies import get_embeddings_service
 from pydantic import BaseModel, Field
 from pymongo.errors import OperationFailure
@@ -19,6 +20,7 @@ from bson.objectid import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from _base_data_settings import ScriptSettings, TabiyaDatabaseConfig
+from common_libs.time_utilities import get_now, datetime_to_mongo_date
 
 load_dotenv()
 vertexai.init()
@@ -139,7 +141,9 @@ async def upsert_index(collection, keys, name, **index_options):
         logger.error(f"Failed to create index '{collection.name}.{name}': {e}")
 
 
-async def generate_and_save_embeddings(documents: list[dict[str, any]], ctx: EmbeddingContext):
+async def generate_and_save_embeddings(
+        documents: list[dict[str, any]], ctx: EmbeddingContext,
+        embeddings_service: EmbeddingService):
     """
     Generate the embeddings for the given documents
     :param documents:
@@ -158,10 +162,7 @@ async def generate_and_save_embeddings(documents: list[dict[str, any]], ctx: Emb
     # for empty strings to ensure that we keep the same order
     texts = [text for text in texts if text]
 
-    # get reference to the embeddings service, it is a singleton,
-    # so we don't worry about getting it multiple times.
-    _embeddings_service = await get_embeddings_service()
-    embeddings = await _embeddings_service.embed_batch(texts)
+    embeddings = await embeddings_service.embed_batch(texts)
 
     insertable_documents = []
 
@@ -347,7 +348,7 @@ async def create_skills_indexes():
     await create_vector_search_index(_SKILLS_EMBEDDING_CONTEXT.destination_collection)
 
 
-async def process_schema(ctx: EmbeddingContext):
+async def process_schema(ctx: EmbeddingContext, embeddings_service: EmbeddingService):
     """
     Process the documents collection
     :return:
@@ -410,13 +411,13 @@ async def process_schema(ctx: EmbeddingContext):
         # if it is empty then we don't need to generate embeddings
         # but if it is not empty then we need to generate embeddings
         progress.update(len(documents))
-        await generate_and_save_embeddings(documents, ctx)
+        await generate_and_save_embeddings(documents, ctx, embeddings_service)
 
     # Close the progress bar
     progress.close()
 
 
-async def copy_model_info():
+async def _copy_model_info(embeddings_service: EmbeddingService):
     model_id = SCRIPT_SETTINGS.tabiya_model_id
 
     logger.info("[1/2] Copying the model info")
@@ -425,6 +426,20 @@ async def copy_model_info():
     from_model_info = await PLATFORM_DB[PlatformCollections.MODEL_INFO.value].find_one({"_id": ObjectId(model_id)})
     if not from_model_info:
         raise ValueError(f"Taxonomy model with modelid:{model_id} not found.")
+
+    existing_model_info = await COMPASS_DB[CompassCollections.MODEL_INFO.value].find_one({
+        "modelId": ObjectId(model_id)})
+
+    if existing_model_info:
+        # if the previous embeddings used a different model_version log a warning.
+        previous_embeddings_service = existing_model_info.get('embeddingsService')
+        if previous_embeddings_service is not None:
+            if (previous_embeddings_service.get(
+                    'version') != embeddings_service.version or previous_embeddings_service.get(
+                    'model_name') != embeddings_service.model_name):
+                # TODO: Skip or delete the existing embeddings ???? TBC
+                logger.warning(f"Model info for model_id:{model_id} already exists in the COMPASS_DB with a different "
+                               f"embeddings service version. We recommend deleting and generating embeddings again.")
 
     del from_model_info["_id"]
     from_model_info["modelId"] = ObjectId(model_id)
@@ -438,6 +453,14 @@ async def copy_model_info():
     # add which occupations and skills are excluded
     from_model_info["excludedOccupationCodes"] = SCRIPT_SETTINGS.excluded_occupation_codes
     from_model_info["excludedSkillCodes"] = SCRIPT_SETTINGS.excluded_skill_codes
+
+    from_model_info["embeddingsService"] = dict(
+        model_name=embeddings_service.model_name,
+        version=embeddings_service.version
+    )
+
+    # Add the time the embeddings were generated
+    from_model_info["generatedAt"] = datetime_to_mongo_date(get_now())
 
     # Upsert the model info document in the COMPASS_DB
     # Currently the embeddings of a model are generated only once
@@ -521,20 +544,22 @@ async def main(opts: Options):
     logger.info("Starting the main function")
     logger.info("Using options: " + opts.__str__())
 
+    embeddings_service = await get_embeddings_service(version=SCRIPT_SETTINGS.embeddings_service_version)
+
+    # [1/5] Copy the model info and validate for existing state, if it is compatible with the new state.
+    await _copy_model_info(embeddings_service),
+
     # run the three tasks in parallel
     if opts.generate_embeddings:
         await asyncio.gather(
-            # [1/5] Copy the model info
-            copy_model_info(),
-
             # [2/5] Copy the relations collection
             copy_relations_collection(),
 
             # [3/5] Process the occupations
-            process_schema(_OCCUPATIONS_EMBEDDING_CONTEXT),
+            process_schema(_OCCUPATIONS_EMBEDDING_CONTEXT, embeddings_service),
 
             # [4/5] Process the skills
-            process_schema(_SKILLS_EMBEDDING_CONTEXT),
+            process_schema(_SKILLS_EMBEDDING_CONTEXT, embeddings_service),
         )
 
     # [5/5] Create the indexes

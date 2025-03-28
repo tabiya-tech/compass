@@ -20,6 +20,7 @@ class TestServer:
     @pytest.mark.asyncio
     async def test_server_up(self,
                              in_memory_userdata_database: Awaitable[AsyncIOMotorDatabase],
+                             in_memory_taxonomy_database: Awaitable[AsyncIOMotorDatabase],
                              in_memory_application_database: Awaitable[AsyncIOMotorDatabase],
                              in_memory_metrics_database: Awaitable[AsyncIOMotorDatabase],
                              mocker: pytest_mock.MockFixture,
@@ -38,6 +39,9 @@ class TestServer:
         # Using an in-memory MongoDB server for testing
         _in_mem_application_db = mocker.patch('app.server_dependencies.db_dependencies._get_application_db')
         _in_mem_application_db.return_value = await in_memory_application_database
+
+        _in_mem_taxonomy_db = mocker.patch('app.server_dependencies.db_dependencies._get_taxonomy_db')
+        _in_mem_taxonomy_db.return_value = await in_memory_taxonomy_database
 
         _in_mem_userdata_db = mocker.patch('app.server_dependencies.db_dependencies._get_userdata_db')
         _in_mem_userdata_db.return_value = await in_memory_userdata_database

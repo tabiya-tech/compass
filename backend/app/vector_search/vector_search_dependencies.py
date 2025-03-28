@@ -4,6 +4,7 @@ import logging
 from fastapi import Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from app.app_config import get_application_config
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.vector_search.embeddings_model import GoogleEmbeddingService, \
     EmbeddingService
@@ -19,6 +20,9 @@ logger = logging.getLogger(__name__)
 # Define a singleton instance of the Google VertexAI embeddings
 _embedding_config = EmbeddingConfig()
 
+
+DEFAULT_EMBEDDINGS_SERVICE_VERSION = "text-embedding-005"
+
 # Lock to ensure that the singleton instances are thread-safe
 _lock = asyncio.Lock()
 
@@ -26,18 +30,26 @@ _lock = asyncio.Lock()
 _embeddings_service_singleton = None
 
 
-async def get_embeddings_service() -> EmbeddingService:
+async def get_embeddings_service(version: str | None = DEFAULT_EMBEDDINGS_SERVICE_VERSION) -> EmbeddingService:
     """
     Get the Google VertexAI embeddings singleton instance.
-    :return: GoogleGeckoEmbeddingService
+    :return: EmbeddingService
     """
+
+    # If the version is not provided, use the one from application config.
+    # Because this getter is used by both scripts and application.
+    # For scripts the version is provided as an argument
+    # whereas for the application, it is read from the application config.
+    if version is None:
+        version = get_application_config().embeddings_service_version
+
     global _embeddings_service_singleton
 
     if _embeddings_service_singleton is None:  # initial check to avoid the lock if the instance is already created (lock is expensive)
         async with _lock:  # before modifying the singleton instance, acquire the lock
             if _embeddings_service_singleton is None:  # double check after acquiring the lock
-                logger.info("creating a new instance of the Google VertexAI embeddings.")
-                _embeddings_service_singleton = GoogleEmbeddingService()
+                logger.info(f"creating a new instance of the Google VertexAI embeddings version:{version}.")
+                _embeddings_service_singleton = GoogleEmbeddingService(version=version)
 
     """ Get the Google VertexAI embeddings singleton instance."""
     return _embeddings_service_singleton

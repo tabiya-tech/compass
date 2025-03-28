@@ -38,6 +38,9 @@ class ScriptSettings(BaseSettings):
     compass_taxonomy_db_uri: str
     """ The URI of the database to store the embeddings."""
 
+    embeddings_service_version: str
+    """ The version of the embeddings service to use."""
+
     class Config:
         env_prefix = "EMBEDDINGS_SCRIPT_"
 

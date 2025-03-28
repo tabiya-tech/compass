@@ -12,6 +12,12 @@ from common_libs.llm.models_utils import Retry
 class EmbeddingService(ABC):
     """ An abstract class for a text embedding service."""
 
+    model_name: str
+    """The model name used to for embeddings"""
+
+    version: str
+    """The version of model used for the embeddings"""
+
     @abstractmethod
     async def embed(self, query: str) -> List[float]:
         """
@@ -28,15 +34,17 @@ class EmbeddingService(ABC):
 
 
 class GoogleEmbeddingService(EmbeddingService):
-    """ A text embedding service that uses the Google Gecko model."""
+    """ A text embedding service from Google AI Platform"""
 
     _TASK = "RETRIEVAL_QUERY"
 
-    def __init__(self, version: str = "text-embedding-005"):
+    def __init__(self, version: str):
         if os.getenv("VERTEX_API_REGION") is None:
             raise ValueError("Environment variable 'VERTEX_API_REGION' is not set.")
         self.region = os.getenv("VERTEX_API_REGION")
         self.model = TextEmbeddingModel.from_pretrained(version)
+        self.model_name = "GOOGLE-VERTEX-AI"
+        self.version = version
         self.logger = logging.getLogger(self.__class__.__name__)
 
     async def embed(self, text: str) -> List[float]:
