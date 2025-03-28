@@ -347,16 +347,22 @@ This application uses **MongoDB** for data storage.
     - **Verify the Model ID**:
         - The **Model ID** must exist in one of the **imported models** within the taxonomy database.
         - Refer to the [Generate Embeddings](#step-43-generate-embeddings) section for details.
-
+    - 
     - **Store Credentials in `.env`**:  
       Save the connection details in the `.env` file:
         ```dotenv
         # MongoDB connection string for taxonomy data 
         TAXONOMY_MONGODB_URI=<connection-string>
-        # Database name for taxonomy data
+        # Database name for taxonomy data.
         TAXONOMY_DATABASE_NAME=<database-name>
         # Model ID of an imported model
         TAXONOMY_MODEL_ID=<model-id>
+        # The region of the Vertex API to use for embedding and genrative AI models
+        VERTEX_API_REGION=<REGION>
+        # The name of the embeddings service to use
+        # Currently only Google Vertex AI is supported
+        EMBEDDINGS_SERVICE_NAME=GOOGLE-VERTEX-AI
+        EMBEDDINGS_MODEL_NAME=<EMBEDDINGS_MODEL_NAME>
         ```
 
 4. **Metrics Data**:
@@ -377,6 +383,7 @@ To import embeddings, Either copy them from the **source database** (if availabl
 
 For details on **generating and importing embeddings**, refer to the [Embeddings README](/backend/README.md#generating-embeddings).
 
+> Note: The name of the embeddings model used to generate the embeddings will later be verified by the application startup to ensure that it is the same that will be used to query the embeddings.
 
 ### Step 4.4: Generate Invitation Codes.
 

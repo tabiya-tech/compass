@@ -32,6 +32,21 @@ class ApplicationConfig(BaseModel):
     The default country of the user.
     """
 
+    taxonomy_model_id: str
+    """
+    The taxonomy model id.
+    """
+
+    embeddings_service_name: str
+    """
+    The embeddings service name to use.
+    """
+
+    embeddings_model_name: str
+    """
+    The name of the embeddings model to use.
+    """
+
 
 _application_config: ApplicationConfig | None = None
 

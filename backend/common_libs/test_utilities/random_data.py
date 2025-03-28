@@ -68,4 +68,7 @@ def get_random_application_config() -> ApplicationConfig:
         environment_name=get_random_printable_string(10),
         enable_metrics=random.choice([True, False]),
         default_country_of_user=random.choice([c for c in Country]),
+        taxonomy_model_id=get_random_printable_string(10),
+        embeddings_service_name=get_random_printable_string(10),
+        embeddings_model_name=get_random_printable_string(10)
     )

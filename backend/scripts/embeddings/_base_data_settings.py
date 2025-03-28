@@ -1,17 +1,24 @@
 from enum import Enum
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 from pydantic_settings import BaseSettings
 
 
-class TabiyaDatabaseConfig(BaseModel):
-    """ Settings for where to find the base data to be used to create embeddings. """
-    occupation_collection_name: str = "occupationmodels"
-    skill_collection_name: str = "skillmodels"
-    relation_collection_name: str = 'occupationtoskillrelationmodels'
+class PlatformCollections(Enum):
+    SKILLS = "skillmodels"
+    RELATIONS = "occupationtoskillrelationmodels"
+    OCCUPATIONS = "occupationmodels"
+    MODEL_INFO = "modelinfos"
 
 
-class ScriptSettings(BaseSettings):
+class CompassEmbeddingsCollections(Enum):
+    SKILLS = "skillsmodelsembeddings"
+    RELATIONS = "occupationtoskillrelationmodels"
+    OCCUPATIONS = "occupationmodelsembeddings"
+    MODEL_INFO = "modelinfos"
+
+
+class EmbeddingsScriptSettings(BaseSettings):
     """
     Base settings for generating embeddings.
     All environment variables should be prefixed with EMBEDDINGS_SCRIPT_.
@@ -38,14 +45,14 @@ class ScriptSettings(BaseSettings):
     compass_taxonomy_db_uri: str
     """ The URI of the database to store the embeddings."""
 
+    embeddings_service_name: str
+    """ The name of the embeddings service to use."""
+
+    embeddings_model_name: str
+    """ The name of the embeddings model to use."""
+
     class Config:
         env_prefix = "EMBEDDINGS_SCRIPT_"
-
-
-class EvaluateScriptSettings(ScriptSettings):
-    """ Settings for the scripts. """
-    hf_access_token: str
-    """ The access token to use to download the datasets from Hugging Face."""
 
 
 class Type(Enum):

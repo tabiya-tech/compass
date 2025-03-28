@@ -8,7 +8,6 @@ from pydantic import BaseModel
 from app.vector_search.embeddings_model import EmbeddingService
 from app.vector_search.esco_entities import OccupationEntity, OccupationSkillEntity, AssociatedSkillEntity
 from app.vector_search.esco_entities import SkillEntity
-from app.vector_search.settings import VectorSearchSettings
 from app.vector_search.similarity_search_service import SimilaritySearchService, FilterSpec
 from common_libs.environment_settings.constants import EmbeddingConfig
 
@@ -47,19 +46,19 @@ class AbstractEscoSearchService(SimilaritySearchService[T]):
     to an entity object of type ``T``.
     """
 
-    def __init__(self, db: AsyncIOMotorDatabase, embedding_service: EmbeddingService, config: VectorSearchConfig, settings: VectorSearchSettings):
+    def __init__(self, db: AsyncIOMotorDatabase, embedding_service: EmbeddingService, config: VectorSearchConfig, taxonomy_model_id: str):
         """
         Initialize the OccupationSearch object.
         :param db: The MongoDB database object.
         :param embedding_service: The embedding service to use to embed the queries.
         :param config: The configuration for the vector search.
-        :param settings: The settings for the vector search.
+        :param taxonomy_model_id: The taxonomy model id to use for the search.
         """
 
         self.collection = db.get_collection(config.collection_name)
         self.embedding_service = embedding_service
         self.config = config
-        self._model_id = ObjectId(settings.taxonomy_model_id)
+        self._model_id = ObjectId(taxonomy_model_id)
 
     @abstractmethod
     def _to_entity(self, doc: dict) -> T:
@@ -208,22 +207,22 @@ class SkillSearchService(AbstractEscoSearchService[SkillEntity]):
 
 class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity]):
 
-    def __init__(self, db: AsyncIOMotorDatabase, embedding_service: EmbeddingService, settings: VectorSearchSettings):
+    def __init__(self, db: AsyncIOMotorDatabase, embedding_service: EmbeddingService, taxonomy_model_id: str):
         """
         Initialize the OccupationSkillSearch object.
         :param db: The MongoDB database object.
         :param embedding_service: The embedding service to use to embed the queries.
-        :param settings: The settings for the vector search.
+        :param taxonomy_model_id: The taxonomy model id to use for the search.
         """
         self.embedding_config = EmbeddingConfig()
-        self._model_id = ObjectId(settings.taxonomy_model_id)
+        self._model_id = ObjectId(taxonomy_model_id)
         self.embedding_service = embedding_service
         self.database = db
         occupation_vector_search_config = VectorSearchConfig(
             collection_name=self.embedding_config.occupation_collection_name,
             index_name=self.embedding_config.embedding_index,
             embedding_key=self.embedding_config.embedding_key)
-        self.occupation_search_service = OccupationSearchService(db, embedding_service, occupation_vector_search_config, settings)
+        self.occupation_search_service = OccupationSearchService(db, embedding_service, occupation_vector_search_config, taxonomy_model_id)
 
     async def _find_skills_from_occupation(self, occupation: OccupationEntity):
         """
@@ -236,32 +235,31 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
 
         skills = await self.database.get_collection(
             self.embedding_config.occupation_to_skill_collection_name).aggregate([
-            {"$match": {"modelId": self._model_id, "requiringOccupationId": ObjectId(occupation.id)}},
-            {
-                "$lookup": {
-                    "from": self.embedding_config.skill_collection_name,
-                    "localField": "requiredSkillId",
-                    "foreignField": "skillId",
-                    "as": "skills",
-                    "pipeline": [
-                        {"$match": {"modelId": self._model_id}}
-                    ]
-                }
-            },
-            {"$unwind": "$skills"},
-            {"$group": {"_id": "$skills.skillId",
-                        "modelId": {"$first": "$modelId"},
-                        "skillId": {"$first": "$skills.skillId"},
-                        "UUID": {"$first": "$skills.UUID"},
-                        "preferredLabel": {"$first": "$skills.preferredLabel"},
-                        "description": {"$first": "$skills.description"},
-                        "altLabels": {"$first": "$skills.altLabels"},
-                        "skillType": {"$first": "$skills.skillType"},
-                        "relationType": {"$first": "$relationType"},
-                        }
-             }
-        ]).to_list(length=None)
-        # TODO: Also use embeddings for the skills.
+                {"$match": {"modelId": self._model_id, "requiringOccupationId": ObjectId(occupation.id)}},
+                {
+                    "$lookup": {
+                        "from": self.embedding_config.skill_collection_name,
+                        "localField": "requiredSkillId",
+                        "foreignField": "skillId",
+                        "as": "skills",
+                        "pipeline": [
+                            {"$match": {"modelId": self._model_id}}
+                        ]
+                    }
+                },
+                {"$unwind": "$skills"},
+                {"$group": {"_id": "$skills.skillId",
+                            "modelId": {"$first": "$modelId"},
+                            "skillId": {"$first": "$skills.skillId"},
+                            "UUID": {"$first": "$skills.UUID"},
+                            "preferredLabel": {"$first": "$skills.preferredLabel"},
+                            "description": {"$first": "$skills.description"},
+                            "altLabels": {"$first": "$skills.altLabels"},
+                            "skillType": {"$first": "$skills.skillType"},
+                            "relationType": {"$first": "$relationType"},
+                            }
+                 }
+            ]).to_list(length=None)
         return [AssociatedSkillEntity(
             id=str(skill.get("skillId", "")),
             modelId=str(skill.get("modelId", "")),

@@ -5,8 +5,9 @@ from typing import List, Tuple
 import vertexai
 import pandas as pd
 from motor.motor_asyncio import AsyncIOMotorClient
-from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService, EmbeddingService
+from app.vector_search.embeddings_model import EmbeddingService
 from app.vector_search.esco_entities import OccupationEntity
+from app.vector_search.vector_search_dependencies import get_embeddings_service
 
 # Parameters
 INPUT_FILENAME = "path/to/your/input.csv"
@@ -112,7 +113,6 @@ if __name__ == "__main__":
     vertexai.init()
     compass_db = AsyncIOMotorClient(os.getenv('TAXONOMY_MONGODB_URI')).get_database(DATABASE_NAME)
     collection = compass_db[EMBEDDINGS_COLLECTION]
-    gecko_embedding_service = GoogleGeckoEmbeddingService()
 
     # Load the dataset
     df = pd.read_csv(INPUT_FILENAME)
@@ -125,13 +125,14 @@ if __name__ == "__main__":
 
 
     async def main():
+        embedding_service = await get_embeddings_service()
         for i in range(num_batches):
             start_index = START_ROW + i * batch_size
             print(f"Processing batch {i + 1} of {num_batches} (rows {start_index + 1} to {min(start_index + batch_size, len(df))})")
             end_index = min(start_index + batch_size, len(df))
             batch_df = df.iloc[start_index:end_index]  # Get the current batch
             mode = 'w' if start_index == 0 else 'a'  # Write mode for the first batch, append mode for subsequent batches
-            await process_batch(batch_df, gecko_embedding_service, OUTPUT_FILENAME, mode)
+            await process_batch(batch_df, embedding_service, OUTPUT_FILENAME, mode)
 
 
     asyncio.get_event_loop().run_until_complete(main())

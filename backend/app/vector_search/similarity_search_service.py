@@ -33,7 +33,7 @@ class SimilaritySearchService(ABC, Generic[T]):
     """
 
     @abstractmethod
-    async def search(self, *, query: str, filter_spec: FilterSpec = None, k: int = 5) -> list[T]:
+    async def search(self, *, query: str | list[float], filter_spec: FilterSpec = None, k: int = 5) -> list[T]:
         """
         Perform a similarity search on the vector store.
 
