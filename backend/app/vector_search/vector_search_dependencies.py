@@ -26,7 +26,7 @@ _lock = asyncio.Lock()
 _embeddings_service_singleton = None
 
 
-async def _get_gecko_embeddings() -> GoogleGeckoEmbeddingService:
+async def get_gecko_embeddings_service() -> EmbeddingService:
     """
     Get the Google VertexAI embeddings singleton instance.
     :return: GoogleGeckoEmbeddingService
@@ -48,7 +48,7 @@ _skill_search_service_singleton: SimilaritySearchService[SkillEntity] | None = N
 
 
 async def get_skill_search_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_taxonomy_db),
-                                   embedding_model: EmbeddingService = Depends(_get_gecko_embeddings)) -> SimilaritySearchService[SkillEntity]:
+                                   embedding_model: EmbeddingService = Depends(get_gecko_embeddings_service)) -> SimilaritySearchService[SkillEntity]:
     """ Get the skill search service singleton instance."""
     global _skill_search_service_singleton
     if _skill_search_service_singleton is None:  # initial check
@@ -71,7 +71,7 @@ _occupation_search_service_singleton = None
 
 
 async def get_occupation_search_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_taxonomy_db),
-                                        embedding_model: EmbeddingService = Depends(_get_gecko_embeddings)) -> SimilaritySearchService[OccupationEntity]:
+                                        embedding_model: EmbeddingService = Depends(get_gecko_embeddings_service)) -> SimilaritySearchService[OccupationEntity]:
     """ Get the occupation search service singleton instance."""
     global _occupation_search_service_singleton
     if _occupation_search_service_singleton is None:  # initial check
@@ -93,7 +93,7 @@ _occupation_skill_search_service_singleton = None
 
 
 async def get_occupation_skill_search_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_taxonomy_db),
-                                              embedding_model: EmbeddingService = Depends(_get_gecko_embeddings)) -> (
+                                              embedding_model: EmbeddingService = Depends(get_gecko_embeddings_service)) -> (
         SimilaritySearchService)[OccupationSkillEntity]:
     """ Get the occupation search service singleton instance."""
     global _occupation_skill_search_service_singleton
