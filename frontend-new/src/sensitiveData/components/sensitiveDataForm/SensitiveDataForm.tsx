@@ -1,12 +1,5 @@
-import { useCallback, useState, useEffect, Suspense } from "react";
-import {
-  Box,
-  CircularProgress,
-  Container,
-  useMediaQuery,
-  useTheme,
-  Typography,
-} from "@mui/material";
+import { Suspense, useCallback, useEffect, useState } from "react";
+import { Box, CircularProgress, Container, Typography, useMediaQuery, useTheme } from "@mui/material";
 
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -22,10 +15,7 @@ import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIErro
 import { EncryptedDataTooLarge } from "src/sensitiveData/services/sensitivePersonalDataService/errors";
 import { sensitivePersonalDataService } from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalData.service";
 import TextConfirmModalDialog from "src/theme/textConfirmModalDialog/TextConfirmModalDialog";
-import {
-  FieldType,
-  FieldDefinition,
-} from "src/sensitiveData/components/sensitiveDataForm/config/types";
+import { FieldDefinition, FieldType } from "src/sensitiveData/components/sensitiveDataForm/config/types";
 import { useFieldsConfig } from "src/sensitiveData/components/sensitiveDataForm/config/useFieldsConfig";
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import {
@@ -43,6 +33,8 @@ import EnumField from "src/sensitiveData/components/sensitiveDataForm/components
 import MultipleSelectField from "src/sensitiveData/components/sensitiveDataForm/components/MultipleSelectField";
 import { createEmptySensitivePersonalData, extractPersonalInfo } from "./config/utils";
 import SensitiveDataFormSkeleton from "src/sensitiveData/components/sensitiveDataForm/SensitiveDataFormSkeleton";
+import MetricsService from "src/metrics/metricsService";
+import { EventType } from "src/metrics/types";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d1";
 
@@ -280,6 +272,19 @@ const SensitiveDataForm: React.FC = () => {
         userPreferences!.user_id,
         fields,
       );
+      
+      // save the demographics metrics
+      // hardcoded for now, this information should be coming from the config
+      // we find the data in the sensitiveData object keyed by the field name
+      MetricsService.getInstance().sendMetricsEvent({
+        user_id: userPreferences!.user_id,
+        event_type: EventType.DEMOGRAPHICS,
+        age: sensitiveData.age as string ?? "UNKNOWN",
+        gender: sensitiveData.gender as string ?? "UNKNOWN",
+        education_status: sensitiveData.educationStatus as string ?? "UNKNOWN",
+        main_activity: sensitiveData.mainActivity as string ?? "UNKNOWN",
+        timestamp: new Date().toISOString(),
+      })
 
       // Update user preferences to indicate that the user has sensitive personal data
       // so that the user is not prompted to provide this information again.

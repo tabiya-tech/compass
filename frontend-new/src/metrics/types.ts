@@ -27,8 +27,9 @@ export interface DemographicsEvent extends BaseMetricsEvent {
   event_type: EventType.DEMOGRAPHICS;
   age: string;
   gender: string;
-  education: string;
-  employment_status: string;
+  education_status: string;
+  main_activity: string;
+  timestamp: string;
 }
 
 export interface DeviceSpecificationEvent extends BaseMetricsEvent {

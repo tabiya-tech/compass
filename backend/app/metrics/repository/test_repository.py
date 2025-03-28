@@ -7,7 +7,7 @@ from app.conversations.reactions.types import ReactionKind, DislikeReason
 from app.metrics.types import ConversationPhaseLiteral, ConversationPhaseEvent, UserAccountCreatedEvent, \
     MessageReactionCreatedEvent, MessageCreatedEvent, \
     FeedbackProvidedEvent, FeedbackTypeLiteral, FeedbackRatingValueEvent, MessageCreatedEventSourceLiteral, \
-    CVFormatLiteral, CVDownloadedEvent, DeviceSpecificationEvent, UserLocationEvent
+    CVFormatLiteral, CVDownloadedEvent, DeviceSpecificationEvent, UserLocationEvent, DemographicsEvent
 from common_libs.test_utilities import get_random_user_id, get_random_session_id, get_random_printable_string
 from common_libs.time_utilities import mongo_date_to_datetime, truncate_microseconds, get_now
 
@@ -78,6 +78,7 @@ def get_cv_downloaded_event(cv_format: CVFormatLiteral):
         timestamp=get_now().isoformat()
     )
 
+
 def get_device_specification_event():
     return DeviceSpecificationEvent(
         user_id=get_random_user_id(),
@@ -87,10 +88,22 @@ def get_device_specification_event():
         timestamp=get_now().isoformat()
     )
 
+
 def get_user_location_event():
     return UserLocationEvent(
         user_id=get_random_user_id(),
-        coordinates=(random.uniform(-90.0, 90.0), random.uniform(-180.0, 180.0)), # nosec B311 # random coordinates
+        coordinates=(random.uniform(-90.0, 90.0), random.uniform(-180.0, 180.0)),  # nosec B311 # random coordinates
+        timestamp=get_now().isoformat()
+    )
+
+
+def get_demographics_event():
+    return DemographicsEvent(
+        user_id=get_random_user_id(),
+        age=get_random_printable_string(10),
+        gender=get_random_printable_string(10),
+        education_status=get_random_printable_string(10),
+        main_activity=get_random_printable_string(10),
         timestamp=get_now().isoformat()
     )
 
@@ -123,7 +136,8 @@ class TestRecordEvent:
             lambda: get_message_created_event("USER"),
             lambda: get_message_reaction_created_event(),
             lambda: get_cv_downloaded_event("PDF"),
-            lambda: get_device_specification_event()
+            lambda: get_device_specification_event(),
+            lambda: get_demographics_event()
         ],
         ids=[
             "UserAccountCreatedEvent",
@@ -133,7 +147,8 @@ class TestRecordEvent:
             "MessageCreatedEvent",
             "MessageReactionCreatedEvent",
             "CVDownloadedEvent",
-            "DeviceSpecificationEvent"
+            "DeviceSpecificationEvent",
+            "DemographicsEvent"
         ]
     )
     async def test_record_single_event_success(
@@ -185,7 +200,8 @@ class TestRecordEvent:
             get_message_reaction_created_event(),
             get_cv_downloaded_event("PDF"),
             get_cv_downloaded_event("DOCX"),
-            get_device_specification_event()
+            get_device_specification_event(),
+            get_demographics_event()
         ]
         repository = await get_metrics_repository
 
@@ -215,7 +231,8 @@ class TestRecordEvent:
             lambda: get_message_created_event("COMPASS"),
             lambda: get_message_reaction_created_event(),
             lambda: get_cv_downloaded_event("PDF"),
-            lambda: get_device_specification_event()
+            lambda: get_device_specification_event(),
+            lambda: get_demographics_event()
         ],
         ids=[
             "UserAccountCreatedEvent",
@@ -225,7 +242,8 @@ class TestRecordEvent:
             "MessageCreatedEvent",
             "MessageReactionCreatedEvent",
             "CVDownloadedEvent",
-            "DeviceSpecificationEvent"
+            "DeviceSpecificationEvent",
+            "DemographicsEvent"
         ]
     )
     async def test_record_event_database_bulk_write_failure(
