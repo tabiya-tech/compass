@@ -47,8 +47,9 @@ def get_demographics_request() -> dict:
         "user_id": get_random_user_id(),
         "age": get_random_printable_string(10),
         "gender": get_random_printable_string(10),
-        "education": get_random_printable_string(10),
-        "employment_status": get_random_printable_string(10)
+        "education_status": get_random_printable_string(10),
+        "main_activity": get_random_printable_string(10),
+        "timestamp": datetime.now().isoformat()
     }
 
 

@@ -6,7 +6,7 @@ import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { MetricsError } from "src/error/commonErrors";
 
-export const METRICS_FLUSH_INTERVAL_MS = 15000; // 15 seconds
+export const METRICS_FLUSH_INTERVAL_MS = 30000; // 30 seconds
 
 export default class MetricsService {
   readonly apiServerUrl: string;

@@ -303,23 +303,28 @@ class DemographicsEvent(AbstractUserAccountEvent):
     """
     gender - the gender of the user
     """
-    education: str
+    education_status: str
     """
-    education - the education of the user
+    education_status - the education status of the user
     """
-    employment_status: str
+    main_activity: str
     """
-    employment_status - the employment status of the user
+    main_activity - the main activity of the user
+    """
+    timestamp: datetime
+    """
+    timestamp - an iso string representing the timestamp of the event
     """
 
-    def __init__(self, *, user_id: str, age: int, gender: str, education: str, employment_status: str):
+    def __init__(self, *, user_id: str, age: int, gender: str, education_status: str, main_activity: str, timestamp: str):
         super().__init__(
             user_id=user_id,
             event_type=EventType.DEMOGRAPHICS,
             age=age,
             gender=gender,
-            education=education,
-            employment_status=employment_status
+            education_status=education_status,
+            main_activity=main_activity,
+            timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc)
         )
 
     class Config:

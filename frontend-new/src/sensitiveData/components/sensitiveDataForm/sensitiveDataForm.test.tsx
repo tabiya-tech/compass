@@ -33,6 +33,9 @@ import {
 import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { UserPreferenceError } from "src/error/commonErrors";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import MetricsService from "src/metrics/metricsService";
+import { EventType } from "src/metrics/types";
+import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 
 
 // Mock the field components
@@ -201,6 +204,8 @@ describe("Sensitive Data Form", () => {
     });
 
     (useNavigate as jest.Mock).mockReturnValue(mockNavigate);
+
+    resetAllMethodMocks(MetricsService.getInstance());
 
     jest
       .spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences")
@@ -711,6 +716,168 @@ describe("Sensitive Data Form", () => {
         { variant: "success" }
       );
     });
+
+    it("should send the correct metrics when the form is submitted with the expected fields", async () => {
+      // GIVEN a form with valid fields
+      const user = userEvent.setup();
+      jest.spyOn(sensitivePersonalDataService, "createSensitivePersonalData")
+        .mockResolvedValue(undefined);
+      // AND the metrics service will send the demographics metrics
+      jest.spyOn(MetricsService.getInstance(), "sendMetricsEvent").mockReturnValueOnce()
+
+      // AND we have the fields we need for metrics reporting configured
+      const metricsFields: FieldDefinition[] = [
+        {
+          name: "age", // < -- this is the key we care about for metrics
+          dataKey: "age_key",
+          type: FieldType.String,
+          required: false,
+          label: "Age",
+          questionText: "What is your age?",
+        } as FieldDefinition,
+        {
+          name: "gender", // < -- this is the key we care about for metrics
+          dataKey: "gender_key",
+          type: FieldType.Enum,
+          required: false,
+          label: "Gender",
+          values: ["male", "female"],
+        } as FieldDefinition,
+        {
+          name: "educationStatus", // < -- this is the key we care about for metrics
+          dataKey: "education_status_key",
+          type: FieldType.Enum,
+          required: false,
+          label: "Education Status",
+          values: ["foo", "bar", "baz"],
+        } as FieldDefinition,
+        {
+          name: "mainActivity", // < -- this is the key we care about for metrics
+          dataKey: "main_activity_key",
+          type: FieldType.Enum,
+          required: false,
+          label: "Main Activity",
+          values: ["foo", "bar", "baz"],
+        } as FieldDefinition,
+        {
+          name: "random_extra_field",
+          dataKey: "random_extra_field_key",
+          type: FieldType.MultipleSelect,
+          required: false,
+          label: "Random Extra Field",
+          values: ["option1", "option2", "option3"],
+        } as FieldDefinition,
+      ];
+
+      // AND the useFieldsConfig hook returns our metrics fields
+      jest.spyOn(useFieldsConfigModule, "useFieldsConfig").mockReturnValue({
+        fields: metricsFields,
+        loading: false,
+        error: null,
+      });
+
+      componentRender();
+
+      // WHEN all fields report valid values
+      // Trigger the onChange callbacks with valid values for metrics fields
+      const givenAge = "20";
+      const givenGender = "male";
+      const givenEducationStatus = "foo";
+      const givenMainActivity = "bar";
+      act(() => {
+        (StringField as jest.Mock).mock.calls.at(-1)[0].onChange(givenAge, true); // age
+        (EnumField as jest.Mock).mock.calls[0][0].onChange(givenGender, true); // gender
+        (EnumField as jest.Mock).mock.calls[1][0].onChange(givenEducationStatus, true); // education_status
+        (EnumField as jest.Mock).mock.calls[2][0].onChange(givenMainActivity, true); // main_activity
+        (MultipleSelectField as jest.Mock).mock.calls.at(-1)[0].onChange(["option1", "option2"], true); // random extra field
+      });
+
+      // Wait for the button to be enabled
+      await waitFor(() => {
+        const submitButton = screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON);
+        expect(submitButton).not.toBeDisabled();
+      });
+
+      // AND the user submits the form
+      const submitButton = screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON);
+
+      // Click the button (no need to mock disabled property as it should be enabled)
+      await user.click(submitButton);
+
+      // THEN the metrics service should have been called with the correct data
+      expect(MetricsService.getInstance().sendMetricsEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          event_type: EventType.DEMOGRAPHICS,
+          user_id: givenUserId,
+          age: givenAge,
+          gender: givenGender,
+          education_status: givenEducationStatus,
+          main_activity: givenMainActivity,
+          timestamp: expect.any(String),
+        })
+      );
+
+      // AND no errors or warnings should be logged
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
+    });
+
+    it("should send UNKNOWN for metrics fields that are not provided", async () => {
+      // GIVEN a form with valid fields
+      const user = userEvent.setup();
+      // AND we have the fields we need for metrics reporting are not configured
+      const metricsFields: FieldDefinition[] = [        {
+          name: "random_extra_field",
+          dataKey: "random_extra_field_key",
+          type: FieldType.MultipleSelect,
+          required: false,
+          label: "Random Extra Field",
+          values: ["option1", "option2", "option3"],
+        } as FieldDefinition,
+      ];
+
+      // AND the useFieldsConfig hook returns our metrics fields
+      jest.spyOn(useFieldsConfigModule, "useFieldsConfig").mockReturnValue({
+        fields: metricsFields,
+        loading: false,
+        error: null,
+      });
+
+      componentRender();
+
+      // WHEN all fields report valid values
+      // Get the onChange callbacks from the most recent calls to each component
+      const multipleFieldProps = (MultipleSelectField as jest.Mock).mock.calls.at(-1)[0];
+
+      // Trigger the onChange callbacks with valid values for metrics fields
+      act(() => {
+        multipleFieldProps.onChange(["option1", "option2"], true); // random extra field
+      });
+
+      // Wait for the button to be enabled
+      await waitFor(() => {
+        const submitButton = screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON);
+        expect(submitButton).not.toBeDisabled();
+      });
+
+      // AND the user submits the form
+      const submitButton = screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON);
+
+      // Click the button (no need to mock disabled property as it should be enabled)
+      await user.click(submitButton);
+
+      // THEN the metrics service should have been called with the correct data
+      expect(MetricsService.getInstance().sendMetricsEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          event_type: EventType.DEMOGRAPHICS,
+          age: "UNKNOWN",
+          gender: "UNKNOWN",
+          education_status: "UNKNOWN",
+          main_activity: "UNKNOWN",
+          timestamp: expect.any(String),
+        })
+      );
+    })
 
     it("should handle service errors during submission", async () => {
       // GIVEN a form with valid fields but a service that throws an error
