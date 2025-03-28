@@ -1,9 +1,11 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
+// standard sentry mock
+import "src/_test_utilities/sentryMock";
 
-import ChatHeader, { DATA_TEST_ID, MENU_ITEM_ID } from "./ChatHeader";
+import ChatHeader, { DATA_TEST_ID, FEEDBACK_FORM_TEXT, MENU_ITEM_ID } from "./ChatHeader";
 import { render, screen } from "src/_test_utilities/test-utils";
-import { act, fireEvent, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, waitFor, within, userEvent } from "src/_test_utilities/test-utils";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { testNavigateToPath } from "src/_test_utilities/routeNavigation";
@@ -11,19 +13,21 @@ import ContextMenu, { DATA_TEST_ID as CONTEXT_MENU_DATA_TEST_ID } from "src/them
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { DATA_TEST_ID as ANIMATED_BADGE_DATA_TEST_ID } from "src/theme/AnimatedBadge/AnimatedBadge";
-import userEvent from "@testing-library/user-event";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
-import AnonymousAccountConversionDialog, { DATA_TEST_ID as ANONYMOUS_ACCOUNT_CONVERSION_DIALOG_DATA_TEST_ID } from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
+import AnonymousAccountConversionDialog, {
+  DATA_TEST_ID as ANONYMOUS_ACCOUNT_CONVERSION_DIALOG_DATA_TEST_ID,
+} from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
 import { ChatProvider } from "src/chat/ChatContext";
-import { PersistentStorageService } from "../../app/PersistentStorageService/PersistentStorageService";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import * as Sentry from "@sentry/react";
 
 // Mock PersistentStorageService
 jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => ({
   PersistentStorageService: {
     getAccountConverted: jest.fn(),
     setAccountConverted: jest.fn(),
-    clearAccountConverted: jest.fn()
+    clearAccountConverted: jest.fn(),
   },
 }));
 
@@ -70,25 +74,26 @@ jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSo
 
 // mock the AnonymousAccountConversionDialog
 jest.mock("src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog", () => {
-  const actual = jest.requireActual("src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog");
+  const actual = jest.requireActual(
+    "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog"
+  );
   return {
     __esModule: true,
     ...actual,
-    default: jest.fn(() => <div data-testid={actual.DATA_TEST_ID.DIALOG}/>),
+    default: jest.fn(() => <div data-testid={actual.DATA_TEST_ID.DIALOG} />),
   };
 });
 
 const renderWithChatProvider = (child: React.ReactNode) => {
-  render(
-    <ChatProvider handleOpenExperiencesDrawer={jest.fn}>
-      {child}
-    </ChatProvider>
-  )
-}
+  render(<ChatProvider handleOpenExperiencesDrawer={jest.fn}>{child}</ChatProvider>);
+};
 
 describe("ChatHeader", () => {
   beforeEach(() => {
+    // set sentry as uninitialized by default
+    (Sentry.isInitialized as jest.Mock).mockReturnValue(false);
     (ContextMenu as jest.Mock).mockClear();
+    jest.clearAllMocks()
   });
 
   test.each([
@@ -135,6 +140,31 @@ describe("ChatHeader", () => {
       DATA_TEST_ID.CHAT_HEADER_ICON_EXPERIENCES
     );
     expect(chatHeaderExperiencesIcon).toBeInTheDocument();
+    // AND to match the snapshot
+    expect(screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_CONTAINER)).toMatchSnapshot();
+  });
+
+  test("should show feedback button when sentry is initialized", () => {
+    // GIVEN sentry is initialized
+    (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
+
+    // WHEN the chat header is rendered
+    const givenChatHeader = (
+      <ChatHeader
+        notifyOnLogout={jest.fn()}
+        startNewConversation={jest.fn()}
+        notifyOnExperiencesDrawerOpen={jest.fn()}
+        experiencesExplored={0}
+        exploredExperiencesNotification={false}
+        setExploredExperiencesNotification={jest.fn()}
+      />
+    );
+    renderWithChatProvider(givenChatHeader);
+    // THEN the feedback button to be shown with the feedback icon
+    const chatHeaderFeedbackButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_FEEDBACK);
+    expect(chatHeaderFeedbackButton).toBeInTheDocument();
+    const chatHeaderFeedbackIcon = within(chatHeaderFeedbackButton).getByTestId(DATA_TEST_ID.CHAT_HEADER_ICON_FEEDBACK);
+    expect(chatHeaderFeedbackIcon).toBeInTheDocument();
     // AND to match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_CONTAINER)).toMatchSnapshot();
   });
@@ -389,12 +419,94 @@ describe("ChatHeader", () => {
 
       // WHEN the experiences button is clicked
       const experiencesButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES);
-      fireEvent.click(experiencesButton);
+      userEvent.click(experiencesButton);
 
       // THEN expect notifyOnExperiencesDrawerOpen to be called
-      expect(givenNotifyOnExperiencesDrawerOpen).toHaveBeenCalled();
+      await waitFor(() => {
+        expect(givenNotifyOnExperiencesDrawerOpen).toHaveBeenCalled();
+      })
       // AND expect the notification badge content to be hidden
-      expect(screen.queryByText(givenExploredExperiences)).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.queryByText(givenExploredExperiences)).not.toBeInTheDocument();
+      })
+    });
+
+    test("should open sentry bug report form when report a bug button is clicked", async () => {
+      // GIVEN the browser is online
+      mockBrowserIsOnLine(true);
+      // AND sentry is initialized
+      (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
+      // AND a mock for Sentry.getFeedback
+      const mockForm = {
+        appendToDom: jest.fn(),
+        open: jest.fn(),
+      };
+      const mockCreateForm = jest.fn().mockResolvedValue(mockForm);
+      (Sentry.getFeedback as jest.Mock).mockReturnValue({ createForm: mockCreateForm });
+
+      // WHEN the chat header is rendered
+      const givenChatHeader = (
+        <ChatHeader
+          notifyOnLogout={jest.fn()}
+          startNewConversation={jest.fn()}
+          notifyOnExperiencesDrawerOpen={jest.fn()}
+          experiencesExplored={0}
+          exploredExperiencesNotification={false}
+          setExploredExperiencesNotification={jest.fn()}
+        />
+      );
+      renderWithChatProvider(givenChatHeader);
+      // AND the report a bug button is clicked
+      const reportABugButton = screen.getByTestId(MENU_ITEM_ID.REPORT_BUG_BUTTON);
+      await userEvent.click(reportABugButton);
+
+      // THEN expect the mock create form to be called
+      expect(mockCreateForm).toHaveBeenCalled();
+      // AND the form should be appended to DOM and opened
+      expect(mockForm.appendToDom).toHaveBeenCalled();
+      expect(mockForm.open).toHaveBeenCalled();
+    });
+
+    test("should open sentry feedback form when feedback button is clicked", async () => {
+      // GIVEN the browser is online
+      mockBrowserIsOnLine(true);
+      // AND sentry is initialized
+      (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
+      // AND a mock for Sentry.getFeedback
+      const mockForm = {
+        appendToDom: jest.fn(),
+        open: jest.fn(),
+      };
+      const mockCreateForm = jest.fn().mockResolvedValue(mockForm);
+      (Sentry.getFeedback as jest.Mock).mockReturnValue({ createForm: mockCreateForm });
+
+      // WHEN the chat header is rendered
+      const givenChatHeader = (
+        <ChatHeader
+          notifyOnLogout={jest.fn()}
+          startNewConversation={jest.fn()}
+          notifyOnExperiencesDrawerOpen={jest.fn()}
+          experiencesExplored={0}
+          exploredExperiencesNotification={false}
+          setExploredExperiencesNotification={jest.fn()}
+        />
+      );
+      renderWithChatProvider(givenChatHeader);
+      // AND the sentry feedback button is clicked
+      const feedbackButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_FEEDBACK);
+      await userEvent.click(feedbackButton);
+
+      // THEN expect the create form to be called with the correct parameters
+      expect(mockCreateForm).toHaveBeenCalledWith({
+        formTitle: FEEDBACK_FORM_TEXT.TITLE,
+        messagePlaceholder: FEEDBACK_FORM_TEXT.MESSAGE_PLACEHOLDER,
+        submitButtonLabel: FEEDBACK_FORM_TEXT.SUBMIT_BUTTON_LABEL,
+        successMessageText: FEEDBACK_FORM_TEXT.SUCCESS_MESSAGE,
+        enableScreenshot: false,
+      });
+      // AND the form should be appended to DOM and opened
+      expect(mockForm.appendToDom).toHaveBeenCalled();
+      expect(mockForm.open).toHaveBeenCalled();
     });
   });
 
@@ -517,7 +629,7 @@ describe("ChatHeader", () => {
                 text: "register",
                 disabled: expect.any(Boolean),
               }),
-              expect.anything()
+              expect.anything(),
             ]),
           }),
           {}
@@ -632,6 +744,49 @@ describe("ChatHeader", () => {
 
       // THEN expect the account conversion flag to be set
       expect(PersistentStorageService.setAccountConverted).toHaveBeenCalledWith(true);
+    });
+
+    test("should close conversion dialog when onClose function is called", async () => {
+      // GIVEN an anonymous user
+      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValueOnce(mockAnonymousUser);
+      // AND a ChatHeader component
+      const givenChatHeader = (
+        <ChatProvider handleOpenExperiencesDrawer={jest.fn()}>
+          <ChatHeader
+            notifyOnLogout={jest.fn()}
+            startNewConversation={jest.fn()}
+            notifyOnExperiencesDrawerOpen={jest.fn()}
+            experiencesExplored={0}
+            exploredExperiencesNotification={false}
+            setExploredExperiencesNotification={jest.fn()}
+          />
+        </ChatProvider>
+      );
+
+      // WHEN the chat header is rendered
+      renderWithChatProvider(givenChatHeader);
+      // AND the user button is clicked
+      const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
+      await userEvent.click(userButton);
+      // AND the register button is clicked
+      const registerMenuItem = screen.getByTestId(MENU_ITEM_ID.REGISTER);
+      await userEvent.click(registerMenuItem);
+
+      // THEN expect the conversion dialog to be opened
+      const conversionDialog = screen.getByTestId(ANONYMOUS_ACCOUNT_CONVERSION_DIALOG_DATA_TEST_ID.DIALOG);
+      expect(conversionDialog).toBeInTheDocument();
+
+      // WHEN the onClose function is called
+      const onClose = (AnonymousAccountConversionDialog as jest.Mock).mock.calls[0][0].onClose;
+      act(() => {
+        onClose();
+      });
+
+      // THEN expect the dialog to be hidden
+      expect(AnonymousAccountConversionDialog).toHaveBeenCalledWith(
+        expect.objectContaining({ isOpen: false }),
+        expect.anything()
+      );
     });
   });
 });
