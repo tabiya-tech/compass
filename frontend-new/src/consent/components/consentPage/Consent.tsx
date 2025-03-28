@@ -18,10 +18,10 @@ import { Theme } from "@mui/material/styles";
 import ConfirmModalDialog from "src/theme/confirmModalDialog/ConfirmModalDialog";
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import { isSensitiveDataValid } from "src/app/ProtectedRoute/util";
-import metricsService from "src/metrics/metricsService";
 import { DeviceSpecificationEvent, EventType, UserLocationEvent } from "src/metrics/types";
 import { browserName, deviceType, osName } from "react-device-detect";
 import { getCoordinates } from "src/metrics/utils/getUserLocation";
+import MetricsService from "src/metrics/metricsService";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
@@ -62,6 +62,41 @@ const Consent: React.FC = () => {
 
   const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
 
+  async function sendMetricsEvent(user_id: string): Promise<void> {
+    try {
+      // Get device specifications
+      const deviceEvent: DeviceSpecificationEvent = {
+        event_type: EventType.DEVICE_SPECIFICATION,
+        user_id: user_id,
+        browser_type: browserName,
+        device_type: deviceType,
+        os_type: osName,
+        timestamp: new Date().toISOString(),
+      };
+      MetricsService.getInstance().sendMetricsEvent(deviceEvent);
+    } catch (error) {
+      console.error("An error occurred while trying to send metrics events", error);
+    }
+
+    try {
+      // Get user's location if they allow it
+      const coordinates = await getCoordinates();
+      const locationEvent: UserLocationEvent = {
+        event_type: EventType.USER_LOCATION,
+        user_id: user_id,
+        coordinates: coordinates,
+        timestamp: new Date().toISOString(),
+      };
+      MetricsService.getInstance().sendMetricsEvent(locationEvent);
+    } catch (err) {
+      if (err instanceof GeolocationPositionError) {
+        console.warn("Location could not be retrieved", err);
+      } else {
+        console.error("An error occurred while trying to get user's location", err);
+      }
+    }
+  }
+
   /**
    * Persist the user's chosen preferences to the backend
    */
@@ -93,26 +128,7 @@ const Consent: React.FC = () => {
         navigate(routerPaths.ROOT, { replace: true });
       }
 
-      // once the user has accepted the terms and conditions, send the device specifications, location to the metrics service
-      const deviceEvent: DeviceSpecificationEvent = {
-        event_type: EventType.DEVICE_SPECIFICATION,
-        user_id: prefs.user_id,
-        browser_type: browserName,
-        device_type: deviceType,
-        os_type: osName,
-        timestamp: new Date().toISOString(),
-      };
-      metricsService.getInstance().sendMetricsEvent(deviceEvent);
-
-      // Get user's location if they allow it
-      const coordinates = await getCoordinates();
-      const locationEvent: UserLocationEvent = {
-        event_type: EventType.USER_LOCATION,
-        user_id: prefs.user_id,
-        coordinates: coordinates,
-        timestamp: new Date().toISOString(),
-      };
-      metricsService.getInstance().sendMetricsEvent(locationEvent);
+      await sendMetricsEvent(prefs.user_id);
 
       enqueueSnackbar("Agreement Accepted", { variant: "success" });
     } catch (e) {
