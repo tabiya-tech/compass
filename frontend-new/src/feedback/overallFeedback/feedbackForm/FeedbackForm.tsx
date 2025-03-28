@@ -43,6 +43,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
+  const isShortScreen = useMediaQuery("(max-height: 600px)"); // 600px is the height of the small mobile screen(sm)
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const handleClose = () => {
@@ -82,16 +83,17 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
         onClose={handleClose}
         maxWidth="sm"
         fullWidth={true}
-        fullScreen={isSmallMobile}
+        fullScreen={isSmallMobile || isShortScreen}
         data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG}
         sx={{
           "& .MuiDialog-paper": {
-            height: isSmallMobile ? "100%" : "85%",
+            height: isSmallMobile || isShortScreen ? "100%" : "85%",
             display: "flex",
             flexDirection: "column",
-            gap: isSmallMobile
-              ? theme.fixedSpacing(theme.tabiyaSpacing.md)
-              : theme.fixedSpacing(theme.tabiyaSpacing.lg),
+            gap: theme.fixedSpacing(
+              isShortScreen ? theme.tabiyaSpacing.sm : isSmallMobile ? theme.tabiyaSpacing.md : theme.tabiyaSpacing.lg
+            ),
+            margin: 0,
           },
         }}
       >
@@ -101,10 +103,11 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: isSmallMobile
-              ? theme.fixedSpacing(theme.tabiyaSpacing.sm)
-              : theme.fixedSpacing(theme.tabiyaSpacing.md),
-            paddingBottom: 0
+            padding:
+              isShortScreen || isSmallMobile
+                ? theme.fixedSpacing(theme.tabiyaSpacing.sm)
+                : theme.fixedSpacing(theme.tabiyaSpacing.md),
+            paddingBottom: 0,
           }}
         >
           <Typography variant="h3" data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG_TITLE}>
@@ -122,9 +125,10 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
         <DialogContent
           data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG_CONTENT}
           sx={{
-            padding: isSmallMobile
-              ? theme.fixedSpacing(theme.tabiyaSpacing.sm)
-              : theme.fixedSpacing(theme.tabiyaSpacing.md),
+            padding:
+              isShortScreen || isSmallMobile
+                ? theme.fixedSpacing(theme.tabiyaSpacing.sm)
+                : theme.fixedSpacing(theme.tabiyaSpacing.md),
           }}
         >
           <FeedbackFormContent notifySubmit={handleFeedbackSubmit} />

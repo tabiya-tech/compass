@@ -24,6 +24,7 @@ export const DATA_TEST_ID = {
 const StepsComponent: React.FC<StepProps> = ({ questions, feedbackItems, onChange }) => {
   const theme = useTheme();
   const isSmallMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isShortScreen = useMediaQuery("(max-height: 600px)"); // 600px is the height of the small mobile screen(sm)
 
   const getAnswerByQuestionId = (questionId: string): SimplifiedAnswer | undefined => {
     return feedbackItems.find((item: FeedbackItem) => item.question_id === questionId)?.simplified_answer;
@@ -41,7 +42,7 @@ const StepsComponent: React.FC<StepProps> = ({ questions, feedbackItems, onChang
     <Box
       display="flex"
       flexDirection="column"
-      gap={(theme) => (isSmallMobile ? theme.tabiyaSpacing.xl * 3 : theme.tabiyaSpacing.xl * 1.2)}
+      gap={(theme) => (isSmallMobile || isShortScreen ? theme.tabiyaSpacing.xl * 3 : theme.tabiyaSpacing.xl * 1.2)}
       data-testid={DATA_TEST_ID.STEPS_COMPONENT}
     >
       {questions.map((question) => {

@@ -42,7 +42,7 @@ exports[`should render the SensitiveDataFormSkeleton 1`] = `
       </button>
     </div>
     <h4
-      class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-xvfkrl-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1gc7ofh-MuiTypography-root"
       data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
     >
       Loading form...

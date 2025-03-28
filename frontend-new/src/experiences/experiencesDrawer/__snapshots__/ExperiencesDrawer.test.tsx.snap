@@ -24,7 +24,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
       data-testid="experiences-drawer-header-container-4d3ec79b-1a39-4f4b-9c4a-354a5464a253"
     >
       <h5
-        class="MuiTypography-root MuiTypography-h5 css-1rn8ty8-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h5 css-vmt1ul-MuiTypography-root"
       >
         Experiences and Skills
       </h5>
