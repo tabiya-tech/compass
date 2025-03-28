@@ -125,6 +125,41 @@ const Login: React.FC = () => {
     setInviteCode(code);
   };
 
+  async function sendMetricsEvent(user_id: string): Promise<void> {
+    try {
+      // Get device specifications
+      const deviceEvent: DeviceSpecificationEvent = {
+        event_type: EventType.DEVICE_SPECIFICATION,
+        user_id: user_id,
+        browser_type: browserName,
+        device_type: deviceType,
+        os_type: osName,
+        timestamp: new Date().toISOString(),
+      };
+      MetricsService.getInstance().sendMetricsEvent(deviceEvent);
+    } catch (error) {
+      console.error("An error occurred while trying to send metrics events", error);
+    }
+
+    try {
+      // Get user's location if they allow it
+      const coordinates = await getCoordinates();
+      const locationEvent: UserLocationEvent = {
+        event_type: EventType.USER_LOCATION,
+        user_id: user_id,
+        coordinates: coordinates,
+        timestamp: new Date().toISOString(),
+      };
+      MetricsService.getInstance().sendMetricsEvent(locationEvent);
+    } catch (err) {
+      if (err instanceof GeolocationPositionError) {
+          console.warn("Location could not be retrieved", err);
+      } else {
+        console.error("An error occurred while trying to get user's location", err);
+      }
+    }
+  }
+
   /* ------------------
    * Callbacks to handle successful logins
    */
@@ -139,26 +174,9 @@ const Login: React.FC = () => {
         // if the user has preferences, we can record some metrics about their device and location
         // if not the user will be redirected to the consent page to set their preferences
         // and once they accept the terms and conditions, the metrics will be recorded
-        const deviceEvent: DeviceSpecificationEvent = {
-          event_type: EventType.DEVICE_SPECIFICATION,
-          user_id: prefs.user_id,
-          browser_type: browserName,
-          device_type: deviceType,
-          os_type: osName,
-          timestamp: new Date().toISOString(),
-        };
-        MetricsService.getInstance().sendMetricsEvent(deviceEvent);
-
-        // Get user's location if they allow it
-        const coordinates = await getCoordinates();
-        const locationEvent: UserLocationEvent = {
-          event_type: EventType.USER_LOCATION,
-          user_id: prefs.user_id,
-          coordinates: coordinates,
-          timestamp: new Date().toISOString(),
-        };
-        MetricsService.getInstance().sendMetricsEvent(locationEvent);
-
+        sendMetricsEvent(prefs.user_id).then(() => {
+          // do nothing
+        });
         // and then navigate the user to the root page
         navigate(routerPaths.ROOT, { replace: true });
         enqueueSnackbar("Welcome back!", { variant: "success" });
