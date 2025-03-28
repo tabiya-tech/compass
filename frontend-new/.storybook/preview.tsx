@@ -98,14 +98,6 @@ export const decorators = [
       if (sentryEnabled) {
         // @ts-ignore
         window.tabiyaConfig.FRONTEND_SENTRY_DSN = ORIGINAL_SENTRY_DSN;
-        // @ts-ignore
-        window.tabiyaConfig.FRONTEND_SENTRY_CONFIG = btoa(JSON.stringify({
-          tracesSampleRate: 1.0,
-          replaysSessionSampleRate: 0,
-          replaysOnErrorSampleRate: 1.0,
-          replayIntegration: false,
-          levels: ["error"],
-        }));
         initSentry();
         isSentryInitialized = true;
       } else {

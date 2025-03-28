@@ -15,7 +15,14 @@ const config: StorybookConfig = {
         "BACKEND_URL": btoa("http://foo.bar.com/api"),
         "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY": btoa(\`${key}\`),
         "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID": btoa("1"),
-        "FRONTEND_SENTRY_DSN": btoa("https://foo@bar.sentry.io/baz")
+        "FRONTEND_SENTRY_DSN": btoa("https://foo@bar.sentry.io/baz"),
+        "FRONTEND_SENTRY_CONFIG": btoa(JSON.stringify({
+          tracesSampleRate: 1.0,
+          replaysSessionSampleRate: 0,
+          replaysOnErrorSampleRate: 1.0,
+          replayIntegration: false,
+          levels: ["error"]
+        }))
       };
       //used for chat components
       sessionStorage.setItem("ChatSessionID", "1234")

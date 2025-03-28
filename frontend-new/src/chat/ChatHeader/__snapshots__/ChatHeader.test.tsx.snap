@@ -25,7 +25,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
     Compass
   </h1>
   <div
-    class="MuiBox-root css-cpd3fg"
+    class="MuiBox-root css-1n05jrb"
   >
     <button
       class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-s7wd0n-MuiButtonBase-root-MuiIconButton-root"
@@ -105,11 +105,6 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
       settings
     </div>
     <div
-      data-testid="report-bug-button-7413b63a-887b-4f41-b930-89e9770db12b"
-    >
-      report a bug
-    </div>
-    <div
       data-testid="register-7413b63a-887b-4f41-b930-89e9770db12b"
     >
       register
@@ -152,7 +147,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
     Compass
   </h1>
   <div
-    class="MuiBox-root css-cpd3fg"
+    class="MuiBox-root css-1n05jrb"
   >
     <button
       class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-s7wd0n-MuiButtonBase-root-MuiIconButton-root"
@@ -197,6 +192,156 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
           </span>
         </span>
       </span>
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+    <button
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-s7wd0n-MuiButtonBase-root-MuiIconButton-root"
+      data-testid="chat-header-button-user-7413b63a-887b-4f41-b930-89e9770db12b"
+      tabindex="0"
+      title="user info"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+        data-testid="chat-header-icon-user-7413b63a-887b-4f41-b930-89e9770db12b"
+        focusable="false"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M12 5.9c1.16 0 2.1.94 2.1 2.1s-.94 2.1-2.1 2.1S9.9 9.16 9.9 8s.94-2.1 2.1-2.1m0 9c2.97 0 6.1 1.46 6.1 2.1v1.1H5.9V17c0-.64 3.13-2.1 6.1-2.1M12 4C9.79 4 8 5.79 8 8s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4m0 9c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4"
+        />
+      </svg>
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+  </div>
+  <div
+    data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu"
+  >
+    <div
+      data-testid="start-new-conversation-7413b63a-887b-4f41-b930-89e9770db12b"
+    >
+      start new conversation
+    </div>
+    <div
+      data-testid="settings-selector-7413b63a-887b-4f41-b930-89e9770db12b"
+    >
+      settings
+    </div>
+    <div
+      data-testid="register-7413b63a-887b-4f41-b930-89e9770db12b"
+    >
+      register
+    </div>
+    <div
+      data-testid="logout-button-7413b63a-887b-4f41-b930-89e9770db12b"
+    >
+      logout
+    </div>
+    ;
+  </div>
+  <div
+    data-testid="anonymous-account-conversion-dialog-a4b3c2d1-e5f6-4g7h-8i9j-0k1l2m3n4o5p"
+  />
+</div>
+`;
+
+exports[`ChatHeader should show feedback button when sentry is initialized 1`] = `
+<div
+  class="MuiBox-root css-69i1ev"
+  data-testid="chat-header-container-7413b63a-887b-4f41-b930-89e9770db12b"
+>
+  <a
+    aria-current="page"
+    class="active"
+    data-testid="chat-header-logo-link-7413b63a-887b-4f41-b930-89e9770db12b"
+    href="#/"
+    style="line-height: 0;"
+  >
+    <img
+      alt="Compass Logo"
+      data-testid="chat-header-logo-7413b63a-887b-4f41-b930-89e9770db12b"
+      height="48"
+      src="/compass.svg"
+    />
+  </a>
+  <h1
+    class="MuiTypography-root MuiTypography-h1 css-1m1rxeh-MuiTypography-root"
+  >
+    Compass
+  </h1>
+  <div
+    class="MuiBox-root css-1n05jrb"
+  >
+    <button
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-s7wd0n-MuiButtonBase-root-MuiIconButton-root"
+      data-testid="chat-header-button-experiences-7413b63a-887b-4f41-b930-89e9770db12b"
+      tabindex="0"
+      title="view experiences"
+      type="button"
+    >
+      <span
+        class="MuiBadge-root css-1c32n2y-MuiBadge-root"
+        data-testid="animated-badge-a348462e-a393-4445-9a3b-c9603e878ce7"
+      >
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+          data-testid="chat-header-icon-experiences-7413b63a-887b-4f41-b930-89e9770db12b"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M14 12h4v1.5h-4zm0 3h4v1.5h-4z"
+          />
+          <path
+            d="M20 7h-5V4c0-1.1-.9-2-2-2h-2c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2m-9 0V4h2v5h-2zm9 13H4V9h5c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2h5z"
+          />
+          <circle
+            cx="9"
+            cy="13.5"
+            r="1.5"
+          />
+          <path
+            d="M11.08 16.18c-.64-.28-1.34-.43-2.08-.43s-1.44.15-2.08.43c-.56.24-.92.78-.92 1.39V18h6v-.43c0-.61-.36-1.15-.92-1.39"
+          />
+        </svg>
+        <span
+          class="MuiBadge-badge MuiBadge-standard MuiBadge-invisible MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightRectangular MuiBadge-overlapRectangular css-ohrnoc-MuiBadge-badge"
+        >
+          <span
+            class="css-1tmou61"
+          >
+            0
+          </span>
+        </span>
+      </span>
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+    <button
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-s7wd0n-MuiButtonBase-root-MuiIconButton-root"
+      data-testid="chat-header-button-feedback-7413b63a-887b-4f41-b930-89e9770db12b"
+      tabindex="0"
+      title="give feedback"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+        data-testid="chat-header-icon-feedback-7413b63a-887b-4f41-b930-89e9770db12b"
+        focusable="false"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2m0 14H5.17l-.59.59-.58.58V4h16zm-9-4h2v2h-2zm0-6h2v4h-2z"
+        />
+      </svg>
       <span
         class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
       />
