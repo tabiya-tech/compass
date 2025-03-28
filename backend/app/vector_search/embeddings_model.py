@@ -32,11 +32,11 @@ class GoogleGeckoEmbeddingService(EmbeddingService):
 
     _TASK = "RETRIEVAL_QUERY"
 
-    def __init__(self, version: str = "003"):
+    def __init__(self, version: str = "text-embedding-005"):
         if os.getenv("VERTEX_API_REGION") is None:
             raise ValueError("Environment variable 'VERTEX_API_REGION' is not set.")
         self.region = os.getenv("VERTEX_API_REGION")
-        self.model = TextEmbeddingModel.from_pretrained(f"textembedding-gecko@{version}")
+        self.model = TextEmbeddingModel.from_pretrained(version)
         self.logger = logging.getLogger(self.__class__.__name__)
 
     async def embed(self, text: str) -> List[float]:
