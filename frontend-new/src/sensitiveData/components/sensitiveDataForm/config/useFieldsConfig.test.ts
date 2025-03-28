@@ -11,12 +11,12 @@ import {
 } from "./types";
 
 // Mock the utils functions
-jest.mock('./utils', () => ({
+jest.mock("./utils", () => ({
   parseYamlConfig: jest.fn(),
-  getAllFields: jest.fn()
+  getAllFields: jest.fn(),
 }));
 
-describe('Config Hooks', () => {
+describe("Config Hooks", () => {
   let fetchSpy: jest.SpyInstance;
 
   beforeEach(() => {
@@ -27,8 +27,8 @@ describe('Config Hooks', () => {
     jest.clearAllMocks();
   });
 
-  describe('useFieldsConfig', () => {
-    test('should return default config and loading state initially', () => {
+  describe("useFieldsConfig", () => {
+    test("should return default config and loading state initially", () => {
       // GIVEN the useFieldsConfig hook
       // WHEN it is first rendered
       const { result } = renderHook(() => useFieldsConfig());
@@ -39,7 +39,7 @@ describe('Config Hooks', () => {
       expect(result.current.error).toBe(null);
     });
 
-    test('should fetch and update config on mount for various fields at the same time', async () => {
+    test("should fetch and update config on mount for various fields at the same time", async () => {
       // GIVEN a successful fetch response with yaml with all required fields for the fields
       const givenMultipleSelectFieldWithRequiredFields = `
 multipleFieldName:
@@ -79,7 +79,7 @@ stringFieldName:
           type: FieldType.MultipleSelect,
           required: true,
           label: "Multiple select Field",
-          values: ["value1", "value2"]
+          values: ["value1", "value2"],
         }),
         new EnumFieldDefinition({
           name: "enumFieldName",
@@ -87,55 +87,136 @@ stringFieldName:
           type: FieldType.Enum,
           required: true,
           label: "Enum Field",
-          values: ["value1", "value2"]
+          values: ["value1", "value2"],
         }),
         new StringFieldDefinition({
           name: "stringFieldName",
           dataKey: "string_field_name",
           type: FieldType.String,
           required: true,
-          label: "String Field"
-        })
+          label: "String Field",
+        }),
       ];
-      expect(fetchSpy).toHaveBeenCalledWith('/data/config/fields.yaml');
+      expect(fetchSpy).toHaveBeenCalledWith("/data/config/fields.yaml");
       expect(result.current.fields).toEqual(expect.arrayContaining(expectedFieldDefinitions));
       expect(result.current.loading).toBe(false);
       expect(result.current.error).toBe(null);
     });
 
-    test('should handle config loading errors', async () => {
+    test("should handle config loading errors", async () => {
       // GIVEN a failed fetch response
       fetchSpy = setupFetchSpy(500, undefined, "");
 
       // WHEN the hook is mounted
       const { result, waitForNextUpdate } = renderHook(() => useFieldsConfig());
-      
+
       // THEN it should initially be in loading state
       expect(result.current.loading).toBe(true);
-      
+
       // WHEN the fetch fails
       await waitForNextUpdate();
-      
+
       // THEN it should update the state with the error
       expect(result.current.fields).toEqual([]);
       expect(result.current.loading).toBe(false);
       expect(result.current.error).toBeInstanceOf(Error);
-      expect(result.current.error?.message).toContain('Failed to load fields configuration');
+      expect(result.current.error?.message).toContain("Failed to load fields configuration");
     });
 
-    test('should clean up on unmount', async () => {
+    test("should clean up on unmount", async () => {
       // GIVEN a pending fetch that never resolves
       fetchSpy = setupFetchSpy(200, new Promise(() => {}), "");
 
       // WHEN the hook is mounted and then unmounted
       const { unmount } = renderHook(() => useFieldsConfig());
-      
+
       // AND then unmounted before the fetch completes
       unmount();
-      
+
       // THEN it should not throw any errors
       // This is a negative test - we're verifying that unmounting doesn't cause issues
       expect(true).toBe(true);
     });
+
+    test("should throw an error if the field type is not among the known types", async () => {
+      // GIVEN a fetch response with a field with an unknown type
+      const givenUnknownFieldType = `
+      unknownFieldName: 
+        dataKey: unknown_field_name
+        type: UNKNOWN
+        required: true
+        label: Unknown Field
+      `;
+      fetchSpy = setupFetchSpy(200, givenUnknownFieldType, "");
+
+      // WHEN the hook is mounted
+      const { result, waitForNextUpdate } = renderHook(() => useFieldsConfig());
+
+      // THEN it should initially be in loading state
+      expect(result.current.loading).toBe(true);
+
+      // WHEN the fetch completes
+      await waitForNextUpdate();
+
+      // THEN it should update the state with the error
+      expect(result.current.fields).toEqual([]);
+      expect(result.current.loading).toBe(false);
+      expect(result.current.error).toBeInstanceOf(Error);
+      expect(result.current.error?.message).toContain("Failed to parse fields configuration");
+    });
+
+    test("should throw an error if the field has a duplicate data key", async () => {
+      // GIVEN a fetch response with a field with a duplicate data key
+      const givenDuplicateDataKey = `
+      stringFieldName1:
+        dataKey: string_field_name
+        type: STRING
+        required: true
+        label: String Field 1
+      stringFieldName2:
+        dataKey: string_field_name
+        type: STRING
+        required: true
+        label: String Field 2
+      `;
+      fetchSpy = setupFetchSpy(200, givenDuplicateDataKey, "");
+
+      // WHEN the hook is mounted
+      const { result, waitForNextUpdate } = renderHook(() => useFieldsConfig());
+
+      // THEN it should initially be in loading state
+      expect(result.current.loading).toBe(true);
+
+      // WHEN the fetch completes
+      await waitForNextUpdate();
+
+      // THEN it should update the state with the error
+      expect(result.current.fields).toEqual([]);
+      expect(result.current.loading).toBe(false);
+      expect(result.current.error).toBeInstanceOf(Error);
+      expect(result.current.error?.message).toContain("Failed to parse fields configuration");
+    });
+
+    test("should throw an error when an unexpected error occurs", async () => {
+      // GIVEN a fetch that throws an unexpected non-Error object
+      fetchSpy = jest.spyOn(window, "fetch").mockImplementation(() => {
+        throw Object.create({ message: "Something went wrong" });
+      });
+
+      // WHEN the hook is mounted
+      const { result, waitForNextUpdate } = renderHook(() => useFieldsConfig());
+
+      // THEN it should initially be in loading state
+      expect(result.current.loading).toBe(true);
+
+      // WHEN the fetch completes
+      await waitForNextUpdate();
+
+      // THEN it should update the state with the error
+      expect(result.current.fields).toEqual([]);
+      expect(result.current.loading).toBe(false);
+      expect(result.current.error).toBeInstanceOf(Error);
+      expect(result.current.error?.message).toContain("Unknown error loading configuration");
+    });
   });
-}); 
+});
