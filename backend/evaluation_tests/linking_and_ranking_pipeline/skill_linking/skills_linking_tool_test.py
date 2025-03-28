@@ -8,11 +8,10 @@ from app.agent.linking_and_ranking_pipeline.infer_occupation_tool import InferOc
 from app.agent.linking_and_ranking_pipeline.skill_linking_tool import SkillLinkingTool
 from app.countries import Country
 from app.server_dependencies.db_dependencies import CompassDBProvider
-from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
 from app.vector_search.esco_entities import OccupationSkillEntity
 from app.vector_search.esco_search_service import OccupationSearchService, OccupationSkillSearchService, VectorSearchConfig, SkillSearchService
 from app.vector_search.settings import VectorSearchSettings
-from app.vector_search.vector_search_dependencies import SearchServices
+from app.vector_search.vector_search_dependencies import SearchServices, get_embeddings_service
 from common_libs.environment_settings.constants import EmbeddingConfig
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
@@ -21,7 +20,7 @@ from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 @pytest.fixture(scope='function')
 async def get_search_services():
     db = await CompassDBProvider.get_taxonomy_db()
-    embedding_service = GoogleGeckoEmbeddingService()
+    embedding_service = await get_embeddings_service()
     settings = VectorSearchSettings()
     occupation_skill_search_service = OccupationSkillSearchService(db, embedding_service, settings)
     embedding_config = EmbeddingConfig()

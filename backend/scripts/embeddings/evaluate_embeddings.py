@@ -7,10 +7,10 @@ from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
 from tqdm import tqdm
 
-from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
 from app.vector_search.esco_search_service import VectorSearchConfig, OccupationSearchService, SkillSearchService
 from app.vector_search.settings import VectorSearchSettings
 from app.vector_search.similarity_search_service import SimilaritySearchService
+from app.vector_search.vector_search_dependencies import get_embeddings_service
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
 from common_libs.environment_settings.constants import EmbeddingConfig
 from _base_data_settings import Type, EvaluateScriptSettings
@@ -115,10 +115,11 @@ def _get_vector_search_config(evaluated_type: Type) -> VectorSearchConfig:
     )
 
 
-if __name__ == "__main__":
+async def main():
     vertexai.init()
-    compass_db = AsyncIOMotorClient(MONGO_SETTINGS.taxonomy_mongodb_uri).get_database(MONGO_SETTINGS.taxonomy_database_name)
-    gecko_embedding_service = GoogleGeckoEmbeddingService()
+    compass_db = AsyncIOMotorClient(MONGO_SETTINGS.taxonomy_mongodb_uri).get_database(
+        MONGO_SETTINGS.taxonomy_database_name)
+    gecko_embedding_service = await get_embeddings_service()
     settings = VectorSearchSettings()
     _occupation_search_service = OccupationSearchService(compass_db, gecko_embedding_service,
                                                          _get_vector_search_config(Type.OCCUPATION), settings)
@@ -144,13 +145,15 @@ if __name__ == "__main__":
                                  ),
                                  split="train",
                                  verification_mode=VerificationMode.NO_CHECKS)
-    asyncio.get_event_loop().run_until_complete(
-        asyncio.gather(
-            *[get_metrics(_occupation_search_service,
-                          occupation_dataset["esco_code"],
-                          occupation_dataset["synthetic_query"], Type.OCCUPATION),
-              get_metrics(_skill_search_service,
-                          skill_dataset["label"],
-                          skill_dataset["synthetic_query"], Type.SKILL)
-              ])
-    )
+    await asyncio.gather(
+        *[get_metrics(_occupation_search_service,
+                      occupation_dataset["esco_code"],
+                      occupation_dataset["synthetic_query"], Type.OCCUPATION),
+          get_metrics(_skill_search_service,
+                      skill_dataset["label"],
+                      skill_dataset["synthetic_query"], Type.SKILL)
+          ])
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

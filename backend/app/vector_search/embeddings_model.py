@@ -27,7 +27,7 @@ class EmbeddingService(ABC):
         raise NotImplementedError
 
 
-class GoogleGeckoEmbeddingService(EmbeddingService):
+class GoogleEmbeddingService(EmbeddingService):
     """ A text embedding service that uses the Google Gecko model."""
 
     _TASK = "RETRIEVAL_QUERY"
