@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import vertexai
 import argparse
 import asyncio
 import logging
@@ -8,7 +9,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Literal
 
-import vertexai
+from app.vector_search.vector_search_dependencies import get_gecko_embeddings_service
 from pydantic import BaseModel, Field
 from pymongo.errors import OperationFailure
 from pymongo.operations import SearchIndexModel
@@ -17,7 +18,6 @@ from dotenv import load_dotenv
 from bson.objectid import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
 from _base_data_settings import ScriptSettings, TabiyaDatabaseConfig
 
 load_dotenv()
@@ -29,9 +29,7 @@ logger = logging.getLogger(__name__)
 ##########################
 
 SCRIPT_SETTINGS = ScriptSettings()
-
 TABIYA_CONFIG = TabiyaDatabaseConfig()
-GECKO_EMBEDDING_SERVICE = GoogleGeckoEmbeddingService()
 
 ##########################
 # Connect to the databases
@@ -160,7 +158,10 @@ async def generate_and_save_embeddings(documents: list[dict[str, any]], ctx: Emb
     # for empty strings to ensure that we keep the same order
     texts = [text for text in texts if text]
 
-    embeddings = await GECKO_EMBEDDING_SERVICE.embed_batch(texts)
+    # get reference to the embeddings service, it is a singleton,
+    # so we don't worry about getting it multiple times.
+    _embeddings_service = await get_gecko_embeddings_service()
+    embeddings = await _embeddings_service.embed_batch(texts)
 
     insertable_documents = []
 
