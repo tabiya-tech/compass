@@ -347,7 +347,7 @@ This application uses **MongoDB** for data storage.
     - **Verify the Model ID**:
         - The **Model ID** must exist in one of the **imported models** within the taxonomy database.
         - Refer to the [Generate Embeddings](#step-43-generate-embeddings) section for details.
-
+    - 
     - **Store Credentials in `.env`**:  
       Save the connection details in the `.env` file:
         ```dotenv
@@ -357,6 +357,8 @@ This application uses **MongoDB** for data storage.
         TAXONOMY_DATABASE_NAME=<database-name>
         # Model ID of an imported model
         TAXONOMY_MODEL_ID=<model-id>
+        # The version of the embeddings service that was used to generate the embeddings.
+        EMBEDDINGS_SERVICE_VERSION=<version>
         ```
 
 4. **Metrics Data**:
@@ -377,6 +379,7 @@ To import embeddings, Either copy them from the **source database** (if availabl
 
 For details on **generating and importing embeddings**, refer to the [Embeddings README](/backend/README.md#generating-embeddings).
 
+> Note: The version of the embeddings service used to generate the embeddings will later be used when starting an instance of the application.
 
 ### Step 4.4: Generate Invitation Codes.
 

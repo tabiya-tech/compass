@@ -125,14 +125,14 @@ if __name__ == "__main__":
 
 
     async def main():
-        gecko_embedding_service = await get_embeddings_service()
+        embedding_service = await get_embeddings_service()
         for i in range(num_batches):
             start_index = START_ROW + i * batch_size
             print(f"Processing batch {i + 1} of {num_batches} (rows {start_index + 1} to {min(start_index + batch_size, len(df))})")
             end_index = min(start_index + batch_size, len(df))
             batch_df = df.iloc[start_index:end_index]  # Get the current batch
             mode = 'w' if start_index == 0 else 'a'  # Write mode for the first batch, append mode for subsequent batches
-            await process_batch(batch_df, gecko_embedding_service, OUTPUT_FILENAME, mode)
+            await process_batch(batch_df, embedding_service, OUTPUT_FILENAME, mode)
 
 
     asyncio.get_event_loop().run_until_complete(main())

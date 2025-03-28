@@ -81,7 +81,7 @@ def _get_evaluated_field(entity: Any, evaluated_type: Type) -> str:
 
 async def _get_predictions(search_service: SimilaritySearchService, queries: List[str],
                            evaluated_type: Type, k: int = 10):
-    # We could run predictions in batches to make it quicker, however there is a quota limit on the gecko embeddings
+    # We could run predictions in batches to make it quicker, however there is a quota limit on embedding service.
     # API. We are running it sequentially to avoid hitting the limit.
     predictions = []
     for query in tqdm(queries):
@@ -119,12 +119,12 @@ async def main():
     vertexai.init()
     compass_db = AsyncIOMotorClient(MONGO_SETTINGS.taxonomy_mongodb_uri).get_database(
         MONGO_SETTINGS.taxonomy_database_name)
-    gecko_embedding_service = await get_embeddings_service()
+    embedding_service = await get_embeddings_service()
     settings = VectorSearchSettings()
-    _occupation_search_service = OccupationSearchService(compass_db, gecko_embedding_service,
+    _occupation_search_service = OccupationSearchService(compass_db, embedding_service,
                                                          _get_vector_search_config(Type.OCCUPATION), settings)
     # TODO: Also evaluate the OccupationSkillSearchService.
-    _skill_search_service = SkillSearchService(compass_db, gecko_embedding_service,
+    _skill_search_service = SkillSearchService(compass_db, embedding_service,
                                                _get_vector_search_config(Type.SKILL), settings)
     occupation_dataset = load_dataset(OCCUPATION_REPO_ID, data_files=[OCCUPATION_FILENAME],
                                       token=SCRIPT_SETTINGS.hf_access_token).get("train")

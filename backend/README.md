@@ -158,6 +158,7 @@ The backend uses the following environment variables:
 - `METRICS_MONGODB_URI`: The URI of the MongoDB instance for the metrics database.
 - `METRICS_DATABASE_NAME`: The name of the mongo db database used by the application to store metrics data.
 - `VERTEX_API_REGION`: (optional) The region of the Vertex API to use. If not set defaults to `us-central1`.
+- `EMBEDDINGS_SERVICE_VERSION`: The version of the embeddings service to use.
 - `LOG_CONFIG_FILE`: (Optional) See the [Logging](#logging) section for more information. If not set defaults to `logging.cfg.yaml`.
 - `BACKEND_URL`: The URL of the backend. It is used to correctly configure Swagger UI and the CORS policy.
 - `FRONTEND_URL`: The URL of the frontend. It is used to set the CORS policy.
@@ -185,6 +186,7 @@ USERDATA_DATABASE_NAME=<USERDATA_DATABASE_NAME>
 METRICS_MONGODB_URI=<URI_TO_MONGODB>
 METRICS_DATABASE_NAME=<METRICS_DATABASE_NAME>
 VERTEX_API_REGION=<REGION>
+EMBEDDINGS_SERVICE_VERSION=<VERSION>
 LOG_CONFIG_FILE=<YAML_FILE>
 BACKEND_URL=<URL>
 FRONTEND_URL=<URL>
@@ -267,6 +269,7 @@ METRICS_MONGODB_URI=mongodb://localhost:27017
 METRICS_DATABASE_NAME=<METRICS_DATABASE_NAME>
 GOOGLE_APPLICATION_CREDENTIALS=keys/credentials.json
 VERTEX_API_REGION=<REGION>
+EMBEDDINGS_SERVICE_VERSION=<EMBEDDINGS_SERVICE_VERSION>
 LOG_CONFIG_FILE=logging.cfg.dev.yaml
 # allow all origins
 BACKEND_URL=*
