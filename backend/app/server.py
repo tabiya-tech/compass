@@ -10,10 +10,12 @@ from app.conversations.routes import add_conversation_routes
 from app.countries import Country, get_country_from_string
 from app.invitations import add_user_invitations_routes
 from app.metrics.routes.routes import add_metrics_routes
+from app.sentry_init import init_sentry
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, ApiKeyAuth
 from app.vector_search.occupation_search_routes import add_occupation_search_routes
 from app.vector_search.skill_search_routes import add_skill_search_routes
+from app.vector_search.validate_taxonomy_model import validate_taxonomy_model
 from app.version.version_routes import add_version_routes
 
 from contextlib import asynccontextmanager
@@ -22,12 +24,43 @@ from app.users.routes import add_users_routes
 from app.conversations.poc import add_poc_routes
 from app.app_config import ApplicationConfig, set_application_config, get_application_config
 from app.version.utils import load_version_info
+from common_libs.logging.log_utilities import setup_logging_config
 
-logger = logging.getLogger(__name__)
+def setup_logging():
+    # The configuration is loaded (once) when python imports the module.
+    # If the LOG_CONFIG_FILE environment variable is not set, then fallback to the production logging configuration
+    log_config_file = os.getenv("LOG_CONFIG_FILE", "logging.cfg.yaml")
+    setup_logging_config(log_config_file)
+    logging.debug("Logging initialized")
+
+
+def setup_sentry():
+    # Sentry should only be initialized if the environment variable BACKEND_ENABLE_SENTRY is set to true
+    # This environment will be set to false for local development or the CI/CD pipeline
+    # because the sentry initialization breaks the unit tests (specifically the ones that use the fastapi test client)
+    if os.getenv("BACKEND_ENABLE_SENTRY") == "True":
+        sentry_dsn = os.getenv("BACKEND_SENTRY_DSN")
+        target_environment_name = os.getenv("TARGET_ENVIRONMENT_NAME")
+
+        if sentry_dsn:
+            init_sentry(sentry_dsn, target_environment_name)
+        else:
+            logging.warning("BACKEND_SENTRY_DSN environment variable is not set. Sentry will not be initialized")
+    else:
+        logging.warning("BACKEND_ENABLE_SENTRY environment variable is not set to True.  Sentry will not be initialized")
+
+
 ############################################
 # Load the environment variables
 ############################################
 load_dotenv()
+
+# Setup logging
+setup_logging()
+logger = logging.getLogger(__name__)
+
+# Setup Sentry
+setup_sentry()
 
 # Setup CORS policy
 # Keep the backend, frontend urls and the environment as separate env variables as a failsafe measure,
@@ -92,6 +125,10 @@ if not os.getenv("USERDATA_DATABASE_NAME"):
     raise ValueError("Mandatory USERDATA_DATABASE_NAME environment variable is not set")
 if not os.getenv('TAXONOMY_MODEL_ID'):
     raise ValueError("Mandatory TAXONOMY_MODEL_ID env variable is not set!")
+if not os.getenv("EMBEDDINGS_SERVICE_NAME"):
+    raise ValueError("Mandatory EMBEDDINGS_SERVICE_NAME environment variable is not set")
+if not os.getenv("EMBEDDINGS_MODEL_NAME"):
+    raise ValueError("Mandatory EMBEDDINGS_MODEL_NAME environment variable is not set")
 
 # set global application configuration
 set_application_config(
@@ -99,7 +136,10 @@ set_application_config(
         environment_name=os.getenv("TARGET_ENVIRONMENT_NAME"),
         version_info=load_version_info(),
         enable_metrics=_metrics_enabled_str.lower() == "true",
-        default_country_of_user=get_country_from_string(_default_country_of_user_str)
+        default_country_of_user=get_country_from_string(_default_country_of_user_str),
+        taxonomy_model_id=os.getenv('TAXONOMY_MODEL_ID'),
+        embeddings_service_name=os.getenv("EMBEDDINGS_SERVICE_NAME"),
+        embeddings_model_name=os.getenv("EMBEDDINGS_MODEL_NAME"),
     )
 )
 
@@ -116,15 +156,21 @@ async def lifespan(_app: FastAPI):
     logger.info("Starting up...")
 
     application_db = await CompassDBProvider.get_application_db()
+    taxonomy_db = await CompassDBProvider.get_taxonomy_db()
     userdata_db = await CompassDBProvider.get_userdata_db()
     metrics_db = await CompassDBProvider.get_metrics_db()
 
+    app_cfg = get_application_config()
     # Initialize the MongoDB databases
     # run the initialization in parallel
     await asyncio.gather(
         CompassDBProvider.initialize_application_mongo_db(application_db, logger),
         CompassDBProvider.initialize_userdata_mongo_db(userdata_db, logger),
-        CompassDBProvider.initialize_metrics_mongo_db(metrics_db, logger)
+        CompassDBProvider.initialize_metrics_mongo_db(metrics_db, logger),
+        validate_taxonomy_model(taxonomy_db=taxonomy_db,
+                                taxonomy_model_id=app_cfg.taxonomy_model_id,
+                                embeddings_service_name=app_cfg.embeddings_service_name,
+                                embeddings_model_name=app_cfg.embeddings_model_name),
     )
 
     yield
@@ -170,6 +216,7 @@ if target_environment_type == "dev" or target_environment_type == "local":
 origins = list(set(origins))  # remove duplicates
 logger.info(f"Allowed origins: {origins}")
 
+# noinspection PyTypeChecker
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -201,7 +248,6 @@ add_users_routes(app, auth)
 # Add the user invitations routes
 ############################################
 add_user_invitations_routes(app)
-
 
 ############################################
 # Add routes relevant for esco search

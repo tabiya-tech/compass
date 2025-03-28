@@ -28,6 +28,8 @@ class BackendServiceConfig:
     userdata_mongodb_uri: str
     userdata_database_name: str
     vertex_api_region: str
+    embeddings_service_name: str
+    embeddings_model_name: str
     target_environment_name: str
     target_environment_type: str | pulumi.Output[str]
     backend_url: str | pulumi.Output[str]
@@ -287,6 +289,12 @@ def _deploy_cloud_run_service(
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="VERTEX_API_REGION",
                             value=backend_service_cfg.vertex_api_region),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="EMBEDDINGS_SERVICE_NAME",
+                            value=backend_service_cfg.embeddings_service_name),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="EMBEDDINGS_MODEL_NAME",
+                            value=backend_service_cfg.embeddings_model_name),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="TARGET_ENVIRONMENT_NAME",
                             value=backend_service_cfg.target_environment_name),

@@ -1,26 +1,21 @@
 import json
 import logging
 import random
+from typing import Awaitable
 
 import pytest
 
 from app.agent.linking_and_ranking_pipeline.infer_occupation_tool import InferOccupationTool
-from app.server_dependencies.db_dependencies import CompassDBProvider
-from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
-from app.vector_search.esco_search_service import OccupationSkillSearchService
-from app.vector_search.settings import VectorSearchSettings
+from app.vector_search.vector_search_dependencies import SearchServices
 from .test_occupation_inference_test_case import test_cases
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 from evaluation_tests.linking_and_ranking_pipeline.infer_occupation_tool.test_occupation_inference_test_case import InferOccupationToolTestCase
 
 
 @pytest.fixture(scope="function")
-async def setup_agent_tool():
-    db = await CompassDBProvider.get_taxonomy_db()
-    settings = VectorSearchSettings()
-    embedding_service = GoogleGeckoEmbeddingService()
-    search_service = OccupationSkillSearchService(db, embedding_service, settings)
-    tool = InferOccupationTool(search_service)
+async def setup_agent_tool(setup_search_services: Awaitable[SearchServices]):
+    search_services = await setup_search_services
+    tool = InferOccupationTool(search_services.occupation_skill_search_service)
     return tool
 
 
@@ -29,7 +24,7 @@ async def setup_agent_tool():
 @pytest.mark.parametrize(
     "test_case", get_test_cases_to_run(test_cases),
     ids=[f"{index} - {case.name} - {case.given_experience_title}" for index, case in enumerate(get_test_cases_to_run(test_cases))])
-async def test_occupation_inference_tool(test_case: InferOccupationToolTestCase, setup_agent_tool):
+async def test_occupation_inference_tool(test_case: InferOccupationToolTestCase, setup_agent_tool: Awaitable[InferOccupationTool]):
     tool = await setup_agent_tool
     # GIVEN an experience and a country of interest
     # shuffle the responsibilities to ensure the test is not dependent on the order of the responsibilities

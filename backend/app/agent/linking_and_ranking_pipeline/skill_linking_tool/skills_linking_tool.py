@@ -5,9 +5,9 @@ from typing import List, Coroutine, Any
 from pydantic import BaseModel
 
 from app.vector_search.similarity_search_service import FilterSpec
+from app.vector_search.vector_search_dependencies import get_embeddings_service
 from ._relevant_skills_classifier_llm import _RelevantSkillsClassifierLLM
 from app.agent.agent_types import LLMStats
-from app.vector_search.embeddings_model import GoogleGeckoEmbeddingService
 from app.vector_search.esco_entities import OccupationSkillEntity, SkillEntity
 from app.vector_search.esco_search_service import SkillSearchService
 
@@ -80,7 +80,7 @@ class SkillLinkingTool:
                               "and will not be limited to the skills associated with the occupations provided.")
 
         # 1. Generate the embeddings for the responsibilities (responsibilities_data.responsibilities)
-        embeddings_service = GoogleGeckoEmbeddingService()
+        embeddings_service = await get_embeddings_service()
         responsibilities_embeddings = await embeddings_service.embed_batch(responsibilities)
         # 2. For each responsibility (embedding),
         # Find the top_p most similar skills that are within the list of skills of the esco_occupations and get the top_k most relevant skills

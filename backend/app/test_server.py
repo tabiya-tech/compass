@@ -20,6 +20,7 @@ class TestServer:
     @pytest.mark.asyncio
     async def test_server_up(self,
                              in_memory_userdata_database: Awaitable[AsyncIOMotorDatabase],
+                             in_memory_taxonomy_database: Awaitable[AsyncIOMotorDatabase],
                              in_memory_application_database: Awaitable[AsyncIOMotorDatabase],
                              in_memory_metrics_database: Awaitable[AsyncIOMotorDatabase],
                              mocker: pytest_mock.MockFixture,
@@ -30,6 +31,10 @@ class TestServer:
         It will spin up the FastAPI application with an in memory db for the applications db and test the version endpoint.
         """
 
+        # Mock the validate_taxonomy_model function to succeed
+        # The mock must be created before the import of the app.server module
+        mocker.patch('app.vector_search.validate_taxonomy_model.validate_taxonomy_model', return_value=None)
+
         # NOTE: Import the FastAPI application and the lifespan context manager first. This is crucial because
         # logging is configured during the app.server module's initialization. Logging configuration must be set
         # before any other imports; otherwise, it will not be applied, and logs will not be captured during the test.
@@ -38,6 +43,9 @@ class TestServer:
         # Using an in-memory MongoDB server for testing
         _in_mem_application_db = mocker.patch('app.server_dependencies.db_dependencies._get_application_db')
         _in_mem_application_db.return_value = await in_memory_application_database
+
+        _in_mem_taxonomy_db = mocker.patch('app.server_dependencies.db_dependencies._get_taxonomy_db')
+        _in_mem_taxonomy_db.return_value = await in_memory_taxonomy_database
 
         _in_mem_userdata_db = mocker.patch('app.server_dependencies.db_dependencies._get_userdata_db')
         _in_mem_userdata_db.return_value = await in_memory_userdata_database

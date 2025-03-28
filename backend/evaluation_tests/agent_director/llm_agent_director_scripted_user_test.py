@@ -2,12 +2,12 @@ import asyncio
 import dataclasses
 import logging
 import os
-import random
-from typing import Coroutine, Callable
+from typing import Coroutine, Callable, Awaitable
 
 import pytest
 from _pytest.logging import LogCaptureFixture
 
+from app.vector_search.vector_search_dependencies import SearchServices
 from app.agent.agent_director.abstract_agent_director import AgentDirectorState
 from app.agent.agent_types import AgentType
 from app.agent.collect_experiences_agent import CollectExperiencesAgentState
@@ -21,6 +21,8 @@ from evaluation_tests.agent_director.agent_director_executors import AgentDirect
 from evaluation_tests.conversation_libs.conversation_test_function import conversation_test_function, \
     ConversationTestConfig, ScriptedUserEvaluationTestCase, \
     ScriptedSimulatedUser
+
+from common_libs.test_utilities import get_random_session_id
 
 
 @pytest.fixture(scope="session")
@@ -39,7 +41,7 @@ def event_loop():
 
 
 @pytest.fixture(scope="function")
-def setup_agent_director(setup_search_services) -> tuple[
+async def setup_agent_director(setup_search_services: Awaitable[SearchServices]) -> tuple[
     ConversationMemoryManager,
     Callable[
         [LogCaptureFixture, ScriptedUserEvaluationTestCase],
@@ -51,7 +53,7 @@ def setup_agent_director(setup_search_services) -> tuple[
     conversation_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
     conversation_manager.set_state(state=ConversationMemoryManagerState(session_id=session_id))
     # The Search Services for this test
-    search_services = setup_search_services
+    search_services = await setup_search_services
     agent_director = LLMAgentDirector(conversation_manager, search_services)
     agent_director.set_state(AgentDirectorState(session_id=session_id))
     explore_experiences_agent = agent_director.get_explore_experiences_agent()
@@ -107,7 +109,11 @@ def setup_agent_director(setup_search_services) -> tuple[
 
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test
-async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture, setup_agent_director):
+async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture,
+                                          setup_agent_director: Awaitable[tuple[ConversationMemoryManager, Callable[
+                                              [LogCaptureFixture, ScriptedUserEvaluationTestCase],
+                                              Coroutine[None, None, None]
+                                          ]]]):
     """
     Conversation test, based on a scripted user.
     Asserts that the agent director routes the conversation and does not complete it.
@@ -126,7 +132,7 @@ async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture, setup_agent
         evaluations=[]
     )
 
-    conversation_manager, agent_director_exec = setup_agent_director
+    conversation_manager, agent_director_exec = await setup_agent_director
     await agent_director_exec(caplog, given_test_case)
 
     # Check if the welcome agent completed their task
@@ -137,7 +143,11 @@ async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture, setup_agent
 
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test
-async def test_user_talks_about_occupations(caplog: LogCaptureFixture, setup_agent_director):
+async def test_user_talks_about_occupations(caplog: LogCaptureFixture,
+                                            setup_agent_director: Awaitable[tuple[ConversationMemoryManager, Callable[
+                                                [LogCaptureFixture, ScriptedUserEvaluationTestCase],
+                                                Coroutine[None, None, None]
+                                            ]]]):
     """
     Conversation test, based on a scripted user.
     Asserts that the agent director is able to complete the conversation.
@@ -164,7 +174,7 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture, setup_age
         evaluations=[]
     )
 
-    conversation_manager, agent_director_exec = setup_agent_director
+    conversation_manager, agent_director_exec = await setup_agent_director
     await agent_director_exec(caplog, given_test_case)
 
     # Check if the welcome agent completed their task

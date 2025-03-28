@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 
 import pytest as pytest
 
+from app.vector_search.vector_search_dependencies import SearchServices
 from evaluation_tests.conversation_libs.fake_conversation_context import FakeConversationContext
 from evaluation_tests.conversation_libs.search_service_fixtures import get_search_services
 
@@ -49,5 +50,6 @@ def common_folder_path() -> str:
 
 
 @pytest.fixture(scope="function")
-def setup_search_services():
-    return get_search_services()
+async def setup_search_services() -> SearchServices:
+    search_services = await get_search_services()
+    return search_services
