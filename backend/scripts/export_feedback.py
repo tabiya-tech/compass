@@ -69,7 +69,7 @@ async def export_feedback_to_csv():
             session_id = feedback["session_id"]
             frontend_version = feedback["version"]["frontend"]
             backend_version = feedback["version"]["backend"]
-            feedback_time = feedback.get("feedback_time", datetime.now().isoformat())  # Default to current time if not present
+            created_at = feedback.get("created_at", datetime.now().isoformat())  # Default to current time if not present
 
             # Handle both feedback and feedback_items fields
             feedback_items = feedback.get("feedback", feedback.get("feedback_items", []))
@@ -109,7 +109,7 @@ async def export_feedback_to_csv():
                     comment,
                     frontend_version,
                     backend_version,
-                    feedback_time,
+                    created_at,
                 ])
 
         file.close()

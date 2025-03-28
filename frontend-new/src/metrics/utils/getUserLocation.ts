@@ -8,7 +8,7 @@ export const getCoordinates = async (): Promise<[number, number]> => {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        resolve([position.coords.latitude, position.coords.longitude]);
+        resolve([roundToDecimalPlace(position.coords.latitude), roundToDecimalPlace(position.coords.longitude)]);
       },
       (error) => {
         reject(error);
@@ -16,3 +16,9 @@ export const getCoordinates = async (): Promise<[number, number]> => {
     );
   });
 };
+
+function roundToDecimalPlace(num: number): number {
+  // add some random value to anonymize the location even further
+  const randomValue = Math.random() * 0.8 + 0.1;
+  return Math.round((num + randomValue) * 10) / 10;
+}
