@@ -18,7 +18,7 @@ export const getCoordinates = async (): Promise<[number, number]> => {
 };
 
 function roundToDecimalPlace(num: number): number {
-  // add some random value to anonymize the location even further
-  const randomValue = Math.random() * 0.8 + 0.1;
+  // add some random value to anonymize the location even further +/- 0.3
+  const randomValue = Math.random() * 0.6 - 0.3;
   return Math.round((num + randomValue) * 10) / 10;
 }
