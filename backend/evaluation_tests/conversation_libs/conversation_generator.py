@@ -12,7 +12,8 @@ logger = logging.getLogger()
 async def generate(*, max_iterations: int,
                    execute_evaluated_agent: Callable,
                    execute_simulated_user: Callable,
-                   is_finished: Callable) -> list[ConversationRecord]:
+                   is_finished: Callable
+                   ) -> list[ConversationRecord]:
     """
     Generates a complete conversation between a simulated_user and the actor.
     :param max_iterations: The maximum number of iterations for the conversions.
@@ -20,6 +21,7 @@ async def generate(*, max_iterations: int,
     :param execute_evaluated_agent: A function that is called to get output from the agent.
     :param is_finished: A function to indicate that the conversation finished, based on the output
         from the executed agent.
+    :param caplog: The log capture fixture.
     :return: The full record of the conversation.
     """
     conversation = []

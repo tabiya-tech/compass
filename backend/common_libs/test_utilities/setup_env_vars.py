@@ -76,6 +76,9 @@ This module ensures:
 
 import os
 from contextlib import contextmanager
+
+from bson import ObjectId
+
 from app.countries import Country
 
 # local variable to store the original environment variables
@@ -104,9 +107,11 @@ def setup_env_vars(*, env_vars: dict[str, str] = None):
         'METRICS_DATABASE_NAME': "foo",
         'USERDATA_MONGODB_URI': "foo",
         'USERDATA_DATABASE_NAME': "foo",
-        'TAXONOMY_MODEL_ID': "foo",
+        'TAXONOMY_MODEL_ID': str(ObjectId()),
         'GOOGLE_APPLICATION_CREDENTIALS': "foo",
         'VERTEX_API_REGION': "foo",
+        'EMBEDDINGS_SERVICE_NAME': "foo",
+        'EMBEDDINGS_MODEL_NAME': "foo",
         'LOG_CONFIG_FILE': "logging.cfg.yaml",
         'FRONTEND_URL': "foo",
         'BACKEND_URL': "foo",

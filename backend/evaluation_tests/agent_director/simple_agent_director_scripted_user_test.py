@@ -3,7 +3,7 @@ import dataclasses
 import logging
 import os
 import random
-from typing import Coroutine, Callable
+from typing import Coroutine, Callable, Awaitable
 
 import pytest
 from _pytest.logging import LogCaptureFixture
@@ -16,6 +16,7 @@ from app.agent.explore_experiences_agent_director import ExploreExperiencesAgent
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager, \
     ConversationMemoryManagerState
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
+from app.vector_search.vector_search_dependencies import SearchServices
 from evaluation_tests.agent_director.agent_director_executors import AgentDirectorExecutor, \
     AgentDirectorGetConversationContextExecutor, AgentDirectorIsFinished
 from evaluation_tests.conversation_libs.conversation_test_function import conversation_test_function, \
@@ -38,14 +39,19 @@ def event_loop():
 
 
 @pytest.fixture(scope="function")
-def setup_agent_director(setup_search_services) -> tuple[ConversationMemoryManager, Callable[
-    [LogCaptureFixture, ScriptedUserEvaluationTestCase], Coroutine[None, None, None]]]:
+async def setup_agent_director(setup_search_services: Awaitable[SearchServices]) -> tuple[
+    ConversationMemoryManager,
+    Callable[
+        [LogCaptureFixture, ScriptedUserEvaluationTestCase],
+        Coroutine[None, None, None]
+    ]
+]:
     session_id = session_id = random.randint(10 ** 9, 10 ** 10 - 1)  # nosec B311 # random number for a test session
     # The conversation manager for this test
     conversation_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
     conversation_manager.set_state(state=ConversationMemoryManagerState(session_id=session_id))
     # The Search Services for this test
-    search_services = setup_search_services
+    search_services = await setup_search_services
 
     agent_director = SimpleAgentDirector(conversation_manager, search_services)
     agent_director.set_state(AgentDirectorState(session_id=session_id))
@@ -101,7 +107,11 @@ def setup_agent_director(setup_search_services) -> tuple[ConversationMemoryManag
 
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test
-async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture, setup_agent_director):
+async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture,
+                                          setup_agent_director: Awaitable[tuple[ConversationMemoryManager, Callable[
+                                              [LogCaptureFixture, ScriptedUserEvaluationTestCase],
+                                              Coroutine[None, None, None]
+                                          ]]]):
     """
     Conversation test, based on a scripted user.
     Asserts that the agent director is able to complete the conversation.
@@ -120,7 +130,7 @@ async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture, setup_agent
         evaluations=[]
     )
 
-    conversation_manager, agent_director_exec = setup_agent_director
+    conversation_manager, agent_director_exec = await setup_agent_director
     await agent_director_exec(caplog, given_test_case)
 
     # Check if the welcome agent completed their task
@@ -131,7 +141,11 @@ async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture, setup_agent
 
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test
-async def test_user_talks_about_occupations(caplog: LogCaptureFixture, setup_agent_director):
+async def test_user_talks_about_occupations(caplog: LogCaptureFixture,
+                                            setup_agent_director: Awaitable[tuple[ConversationMemoryManager, Callable[
+                                                [LogCaptureFixture, ScriptedUserEvaluationTestCase],
+                                                Coroutine[None, None, None]
+                                            ]]]):
     """
     Conversation test, based on a scripted user.
     Asserts that the agent director is able to complete the conversation.
@@ -159,16 +173,16 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture, setup_age
         evaluations=[]
     )
 
-    conversation_manager, agent_director_exec = setup_agent_director
+    conversation_manager, agent_director_exec = await setup_agent_director
     await agent_director_exec(caplog, given_test_case)
 
     # Check if the welcome agent completed their task
     context = await conversation_manager.get_conversation_context()
     # Assert that the conversation is finished and we are still at the skills explorer
     expected_agent_states: list[AgentState] = [
-        AgentState(0, AgentType.WELCOME_AGENT, False),  # Welcome Agent say hi
+        AgentState(0, AgentType.WELCOME_AGENT, False),  # Wellcome Agent say hi
         AgentState(1, AgentType.WELCOME_AGENT, False),
-        AgentState(2, AgentType.WELCOME_AGENT, True),  # Welcome Agent completes task
+        AgentState(2, AgentType.WELCOME_AGENT, True),  # Wellcome Agent completes task
         AgentState(3, AgentType.COLLECT_EXPERIENCES_AGENT, False),
         AgentState(4, AgentType.COLLECT_EXPERIENCES_AGENT, False),
         AgentState(5, AgentType.COLLECT_EXPERIENCES_AGENT, False),

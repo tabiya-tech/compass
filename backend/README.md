@@ -158,6 +158,8 @@ The backend uses the following environment variables:
 - `METRICS_MONGODB_URI`: The URI of the MongoDB instance for the metrics database.
 - `METRICS_DATABASE_NAME`: The name of the mongo db database used by the application to store metrics data.
 - `VERTEX_API_REGION`: (optional) The region of the Vertex API to use. If not set defaults to `us-central1`.
+- `EMBEDDINGS_SERVICE_NAME`: The name of the embeddings service to use. Currently, the only supported service is `GOOGLE-VERTEX-AI`.
+- `EMBEDDINGS_MODEL_NAME`: The name of the embeddings model to use. See https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings/get-text-embeddings#supported-models for the list of supported models.
 - `LOG_CONFIG_FILE`: (Optional) See the [Logging](#logging) section for more information. If not set defaults to `logging.cfg.yaml`.
 - `BACKEND_URL`: The URL of the backend. It is used to correctly configure Swagger UI and the CORS policy.
 - `FRONTEND_URL`: The URL of the frontend. It is used to set the CORS policy.
@@ -185,6 +187,8 @@ USERDATA_DATABASE_NAME=<USERDATA_DATABASE_NAME>
 METRICS_MONGODB_URI=<URI_TO_MONGODB>
 METRICS_DATABASE_NAME=<METRICS_DATABASE_NAME>
 VERTEX_API_REGION=<REGION>
+EMBEDDINGS_SERVICE_NAME=<EMBEDDINGS_SERVICE_NAME>
+EMBEDDINGS_MODEL_NAME=<EMBEDDINGS_MODEL_NAME>
 LOG_CONFIG_FILE=<YAML_FILE>
 BACKEND_URL=<URL>
 FRONTEND_URL=<URL>
@@ -267,6 +271,7 @@ METRICS_MONGODB_URI=mongodb://localhost:27017
 METRICS_DATABASE_NAME=<METRICS_DATABASE_NAME>
 GOOGLE_APPLICATION_CREDENTIALS=keys/credentials.json
 VERTEX_API_REGION=<REGION>
+EMBEDDINGS_SERVICE_VERSION=<EMBEDDINGS_SERVICE_VERSION>
 LOG_CONFIG_FILE=logging.cfg.dev.yaml
 # allow all origins
 BACKEND_URL=*
@@ -357,6 +362,15 @@ Run the script use the following command to get the help message:
 
 ```shell
  python3 scripts/embeddings/generate_taxonomy_embeddings.py --help
+```
+### Copy Embeddings
+
+The [copy_embeddings.py](scripts/embeddings/copy_embeddings.py) script facilitates the duplication of embeddings for taxonomy occupations and skills from a source MongoDB database to a target MongoDB database. This method is efficient when you need to replicate embeddings without regenerating them.
+
+The script requires environment variables. Run the script with the following command to see a help message that explains, among other things, which environment variables are needed:
+
+```shell
+ python3 scripts/embeddings/copy_embeddings.py --help
 ```
 
 ## Export users feedback

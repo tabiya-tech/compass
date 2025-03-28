@@ -3,6 +3,7 @@ import platform
 from typing import Generator, Any
 
 import pytest
+from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 from app.countries import Country
@@ -80,13 +81,31 @@ async def in_memory_userdata_database(in_memory_mongo_server) -> AsyncIOMotorDat
 
 
 @pytest.fixture(scope='function')
+async def in_memory_taxonomy_database(in_memory_mongo_server) -> AsyncIOMotorDatabase:
+    """
+    Fixture to create an in-memory taxonomy database.
+
+    This is a re-usable fixture that can be used across multiple test modules.
+    :param in_memory_mongo_server:  The in-memory MongoDB server.
+    :return:  The mocked taxonomy database.
+    """
+
+    taxonomy_db = AsyncIOMotorClient(in_memory_mongo_server.connection_string,
+                                     tlsAllowInvalidCertificates=True).get_database(random_db_name())
+
+    await CompassDBProvider.initialize_application_mongo_db(taxonomy_db, logger=logging.getLogger(__name__))
+    logging.info(f"Created application database: {taxonomy_db.name}")
+    return taxonomy_db
+
+
+@pytest.fixture(scope='function')
 async def in_memory_application_database(in_memory_mongo_server) -> AsyncIOMotorDatabase:
     """
     Fixture to create an in-memory application database.
 
     This is a re-usable fixture that can be used across multiple test modules.
     :param in_memory_mongo_server:  The in-memory MongoDB server.
-    :return:  The mocked =application database.
+    :return:  The mocked application database.
     """
 
     application_db = AsyncIOMotorClient(in_memory_mongo_server.connection_string,
@@ -104,7 +123,7 @@ async def in_memory_metrics_database(in_memory_mongo_server) -> AsyncIOMotorData
 
     This is a re-usable fixture that can be used across multiple test modules.
     :param in_memory_mongo_server:  The in-memory MongoDB server.
-    :return:  The mocked =metrics database.
+    :return:  The mocked metrics database.
     """
     metrics_db = AsyncIOMotorClient(in_memory_mongo_server.connection_string,
                                     tlsAllowInvalidCertificates=True).get_database(random_db_name())
@@ -128,7 +147,11 @@ def setup_application_config() -> Generator[ApplicationConfig, Any, None]:
             buildNumber="foo-build-number",
             sha="foo-sha"),
         default_country_of_user=Country.UNSPECIFIED,
-        enable_metrics=True)
+        enable_metrics=True,
+        taxonomy_model_id=str(ObjectId()),  # get a random object id.
+        embeddings_service_name="foo-service",
+        embeddings_model_name="bar-model"
+    )
 
     set_application_config(config)
     # guard to ensure the config is set

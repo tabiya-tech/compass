@@ -1,78 +1,61 @@
 #!/usr/bin/env python3
+import time
 
 import vertexai
 import argparse
 import asyncio
-import logging
-import re
 from datetime import datetime
-from enum import Enum
-from typing import Literal
 
-from app.vector_search.vector_search_dependencies import get_gecko_embeddings_service
-from pydantic import BaseModel, Field
-from pymongo.errors import OperationFailure
-from pymongo.operations import SearchIndexModel
+from app.vector_search.embeddings_model import EmbeddingService
+from app.vector_search.vector_search_dependencies import get_embeddings_service
+from pydantic import BaseModel
+
 from tqdm import tqdm
+import logging.config
 from dotenv import load_dotenv
 from bson.objectid import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from _base_data_settings import ScriptSettings, TabiyaDatabaseConfig
+from _base_data_settings import EmbeddingsScriptSettings, CompassEmbeddingsCollections, PlatformCollections
+from common_libs.logging.log_utilities import setup_logging_config
+from common_libs.time_utilities import get_now, datetime_to_mongo_date
+from scripts.embeddings._common import EmbeddingContext, generate_indexes, redact_credentials_from_uri
 
 load_dotenv()
 vertexai.init()
-logger = logging.getLogger(__name__)
 
+# Set up logging
+setup_logging_config("logging.cfg.yaml")
+logger = logging.getLogger()
 ##########################
 # Load the settings
 ##########################
 
-SCRIPT_SETTINGS = ScriptSettings()
-TABIYA_CONFIG = TabiyaDatabaseConfig()
+# noinspection PyArgumentList
+SCRIPT_SETTINGS = EmbeddingsScriptSettings()
 
 ##########################
 # Connect to the databases
 ##########################
+# See https://pymongo.readthedocs.io/en/stable/api/pymongo/asynchronous/mongo_client.html#pymongo.asynchronous.mongo_client.AsyncMongoClient
+# for more information about available options
 PLATFORM_DB = AsyncIOMotorClient(
-    SCRIPT_SETTINGS.tabiya_mongodb_uri, tlsAllowInvalidCertificates=True).get_database(SCRIPT_SETTINGS.tabiya_db_name)
-
-
-class PlatformCollections(Enum):
-    SKILLS = "skillmodels"
-    RELATIONS = "occupationtoskillrelationmodels"
-    OCCUPATIONS = "occupationmodels"
-    MODEL_INFO = "modelinfos"
-
+    SCRIPT_SETTINGS.tabiya_mongodb_uri,
+    tlsAllowInvalidCertificates=True,
+    connectTimeoutMS=45000,  # Set to 45 seconds, defaults is 20000 (20 seconds)
+).get_database(SCRIPT_SETTINGS.tabiya_db_name)
 
 COMPASS_DB = (AsyncIOMotorClient(
     SCRIPT_SETTINGS.compass_taxonomy_db_uri, tlsAllowInvalidCertificates=True)
               .get_database(SCRIPT_SETTINGS.compass_taxonomy_db_name))
 
 
-class CompassCollections(Enum):
-    SKILLS = "skillsmodelsembeddings"
-    RELATIONS = "occupationtoskillrelationmodels"
-    OCCUPATIONS = "occupationmodelsembeddings"
-    MODEL_INFO = "modelinfos"
-
-
 ##########################
 # Types
 ##########################
-class EmbeddingContext(BaseModel):
-    collection_schema: Literal["occupation", "skill"]
-    """
-    schema is the name of the schema
-    """
-    source_collection: str
-    destination_collection: str
-    id_field_name: str
-    extra_fields: list[str] = Field(default_factory=list)
-    excluded_codes: list[str] = Field(default_factory=list)
-
 
 class Options(BaseModel):
+    hot_run: bool = False
     generate_embeddings: bool = True
     generate_indexes: bool = True
 
@@ -80,7 +63,7 @@ class Options(BaseModel):
 _OCCUPATIONS_EMBEDDING_CONTEXT = EmbeddingContext(
     collection_schema="occupation",
     source_collection=PlatformCollections.OCCUPATIONS.value,
-    destination_collection=CompassCollections.OCCUPATIONS.value,
+    destination_collection=CompassEmbeddingsCollections.OCCUPATIONS.value,
     id_field_name="occupationId",
     extra_fields=["code"],
     excluded_codes=SCRIPT_SETTINGS.excluded_occupation_codes
@@ -89,61 +72,24 @@ _OCCUPATIONS_EMBEDDING_CONTEXT = EmbeddingContext(
 _SKILLS_EMBEDDING_CONTEXT = EmbeddingContext(
     collection_schema="skill",
     source_collection=PlatformCollections.SKILLS.value,
-    destination_collection=CompassCollections.SKILLS.value,
+    destination_collection=CompassEmbeddingsCollections.SKILLS.value,
     id_field_name="skillId",
     extra_fields=["skillType"],
     excluded_codes=SCRIPT_SETTINGS.excluded_skill_codes
 )
 
 
-def redact_credentials_from_uri(uri: str) -> str:
-    # Regular expression pattern to match username and password
-    pattern = r'//[^@]+@'
-
-    # Replace the matched username and password with asterisks
-    return re.sub(pattern, "//*:*@", uri)
-
-
-async def upsert_index(collection, keys, name, **index_options):
-    """
-    Upserts an index in a MongoDB collection using motor.
-
-    :param collection: The MongoDB collection object
-    :param name: The name of the index
-    :param keys: A list of tuples specifying the index fields and order (e.g., [('field1', 1), ('field2', -1)])
-    :param index_options: Additional options for the index (e.g., unique=True)
-    """
-
-    # Get the existing indexes in the collection
-    existing_indexes = await collection.index_information()
-
-    # Check if the index already exists
-    if name in existing_indexes:
-        logger.info(f"Index '{collection.name}.{name}' already exists")
-
-        # Update the index by dropping it and recreating with new options
-        await collection.drop_index(name)
-        logger.info(f"Dropped existing index '{collection.name}.{name}'")
-
-    # Create the index
-    try:
-        await collection.create_index(keys, name=name, **index_options)
-        logger.info(f"Created index '{collection.name}.{name}' with options {index_options}")
-    except OperationFailure as e:
-        # Error code 85 indicates IndexOptionsConflict, which means even though the name has been updated
-        # the index with the same keys already exists
-        # For more information read: https://www.mongodb.com/docs/manual/reference/error-codes/#mongodb-error-85
-        if e.code == 85:
-            logger.error(f"IndexOptionsConflict: '{collection.name}.{name}': {e}")
-    except Exception as e:
-        logger.error(f"Failed to create index '{collection.name}.{name}': {e}")
-
-
-async def generate_and_save_embeddings(documents: list[dict[str, any]], ctx: EmbeddingContext):
+async def generate_and_save_embeddings(*,
+                                       hot_run: bool,
+                                       documents: list[dict[str, any]],
+                                       ctx: EmbeddingContext,
+                                       embeddings_service: EmbeddingService):
     """
     Generate the embeddings for the given documents
-    :param documents:
-    :param ctx:
+    :param hot_run: bool - if True, the embeddings will be generated and saved
+    :param documents: list[dict[str, any]] - the documents to generate the embeddings for
+    :param ctx: EmbeddingContext - the context
+    :param embeddings_service: EmbeddingService - the embeddings service to use
     :return:
     """
     texts = []
@@ -158,10 +104,18 @@ async def generate_and_save_embeddings(documents: list[dict[str, any]], ctx: Emb
     # for empty strings to ensure that we keep the same order
     texts = [text for text in texts if text]
 
-    # get reference to the embeddings service, it is a singleton,
-    # so we don't worry about getting it multiple times.
-    _embeddings_service = await get_gecko_embeddings_service()
-    embeddings = await _embeddings_service.embed_batch(texts)
+    embeddings: list[list[float]]
+    if hot_run:
+        logger.info(f"Generate embeddings for {len(texts)} texts")
+        start_time = time.time()
+        embeddings = await embeddings_service.embed_batch(texts)
+        end_time = time.time()
+        logger.info(f"Time taken to generate embeddings: {end_time - start_time:.2f} seconds for {len(texts)} texts, "
+                    f"{len(texts) / (end_time - start_time):.2f} texts/seconds")
+    else:
+        # and array of length len(texts) and each element is an empty array
+        embeddings: list[list[float]] = [[] for _ in range(len(texts))]
+        logger.info(f"Would generate embeddings for {len(texts)} texts")
 
     insertable_documents = []
 
@@ -209,145 +163,19 @@ async def generate_and_save_embeddings(documents: list[dict[str, any]], ctx: Emb
             i += 1
 
     if len(texts) != i:
-        raise ValueError("The number of embeddings generated is different from the number of texts")
-
-    await COMPASS_DB[ctx.destination_collection].insert_many(insertable_documents)
-
-
-async def create_std_indexes(ctx: EmbeddingContext):
-    """
-    Create the indexes for the destination collection
-    :param ctx: EmbeddingContext - the context
-    """
-
-    # Unique index for modelId, ctx.id_field_name, embedded_field
-    # For consistency, ensure that the combination of modelId, ctx.id_field_name, embedded_field is unique
-    # This index is used by the pipeline in app.vector_search.esco_search_service.OccupationSkillSearchService._find_skills_from_occupation
-    # Additionally an index based on the modelId is also required by the vector search filter
-    await upsert_index(
-        COMPASS_DB[ctx.destination_collection],
-        {
-            'modelId': 1,
-            ctx.id_field_name: 1,
-            'embedded_field': 1
-        },
-        unique=True,  # Currently the embeddings of a model are generated only once.
-        name=f"model_id_and_{ctx.id_field_name}_index",
-    )
-    # The modelId, UUID index is needed by the vector search filter
-    await upsert_index(
-        COMPASS_DB[ctx.destination_collection],
-        {'modelId': 1, 'UUID': 1},
-        name='UUID_index'
-    )
-
-
-async def create_vector_search_index(collection_name: str):
-    logger.info(f"Creating vector search index for collection:{collection_name}")
-    _collection = COMPASS_DB[collection_name]
-    _index_name = "embedding_index"
-    _vector_index_definition = {
-        "fields": [
-            {
-                "numDimensions": 768,
-                "path": "embedding",
-                "similarity": "cosine",
-                "type": "vector"
-            },
-            {
-                "path": "modelId",
-                "type": "filter"
-            },
-            {
-                "path": "UUID",
-                "type": "filter"
-            },
-        ]
-    }
-
-    # if search index exists, update it.
-    embedding_index_exists: bool = False
-
-    async for index in _collection.list_search_indexes():
-        if index["name"] == _index_name:
-            embedding_index_exists = True
-            break
-
-    if embedding_index_exists:
-        # if it exists, update it
-        await _collection.update_search_index(_index_name, _vector_index_definition)
+        raise ValueError(f"The number of embeddings generated {len(texts)} does not match the number of texts {i}")
+    if hot_run:
+        start_time = time.time()
+        await COMPASS_DB[ctx.destination_collection].insert_many(insertable_documents)
+        end_time = time.time()
+        logger.info(f"Time taken to insert documents in collection {ctx.destination_collection}: {end_time - start_time:.2f} seconds "
+                    f"for {len(insertable_documents)} documents, "
+                    f"{len(insertable_documents) / (end_time - start_time):.2f} documents/seconds")
     else:
-        # if it does not exist, create it
-        search_index_model = SearchIndexModel(
-            definition=_vector_index_definition,
-            name=_index_name,
-            type="vectorSearch",
-        )
-        await _collection.create_search_index(model=search_index_model)
+        logger.info(f"Would insert {len(insertable_documents)} documents in {ctx.destination_collection} collection")
 
 
-async def create_model_info_indexes():
-    logger.info("Creating indexes for model info collection")
-
-    # Currently the embeddings of a model are generated only once
-    # so we can create a unique index on the modelId field
-    await upsert_index(
-        COMPASS_DB[CompassCollections.MODEL_INFO.value],
-        {"modelId": 1},
-        unique=True,
-        name="model_id_index",
-    )
-
-
-async def create_relations_indexes():
-    to_collection = COMPASS_DB[CompassCollections.RELATIONS.value]
-    logger.info("Creating indexes of the relations collection")
-
-    # This index is used by the backend/app.vector_search.esco_search_service.OccupationSkillSearchService._find_skills_from_occupation
-    await upsert_index(
-        to_collection,
-        {"modelId": 1, "requiringOccupationId": 1},
-        name="requiring_occupation_id_index",
-    )
-
-    # Currently we do not offer a search by requiredSkillId
-    # await upsert_index(
-    #     to_collection,
-    #     {"modelId": 1, "requiredSkillId": 1},
-    #     name="required_skill_id_index",
-    # )
-
-    # This index is used from copy_relations_collection() to efficiently search for already copied relations
-    await upsert_index(
-        to_collection,
-        {"modelId": 1, "source_id": 1},
-        unique=True,  # Currently the embeddings of a model are generated only once.
-        name="model_id_and_source_id_index",
-    )
-
-
-async def create_occupations_indexes():
-    # Create the indexes
-    logger.info("Creating indexes for occupations collection")
-    await create_std_indexes(_OCCUPATIONS_EMBEDDING_CONTEXT)
-    # Add an index to efficiently search for a specific occupation code
-    # It is used from backend/app.vector_search.esco_search_service.OccupationSearchService.get_by_esco_code
-    await upsert_index(
-        COMPASS_DB[_OCCUPATIONS_EMBEDDING_CONTEXT.destination_collection],
-        {"modelId": 1, "code": 1},
-        name="model_code_index",
-    )
-    await create_vector_search_index(_OCCUPATIONS_EMBEDDING_CONTEXT.destination_collection)
-
-
-async def create_skills_indexes():
-    # Create the indexes
-    logger.info("Creating indexes for skills collection")
-    await create_std_indexes(_SKILLS_EMBEDDING_CONTEXT)
-    await create_vector_search_index(_SKILLS_EMBEDDING_CONTEXT.destination_collection)
-
-
-async def process_schema(ctx: EmbeddingContext):
+async def process_schema(*, hot_run: bool, ctx: EmbeddingContext, embeddings_service: EmbeddingService):
     """
     Process the documents collection
     :return:
@@ -392,39 +220,46 @@ async def process_schema(ctx: EmbeddingContext):
 
     # Set the batch size
     # The batch size is the amount of documents to insert in one batch.
-    batch_size = 1000
+    batch_size = 500
     cursor = from_collection.find(search_filter).batch_size(batch_size)
-    documents = []
-
-    async for document in cursor:
-        documents.append(document)
-
-        # batch is full, start generating embeddings
-        if len(documents) == batch_size:
-            progress.update(batch_size)
-            await generate_and_save_embeddings(documents, ctx)
-            documents = []
-
-    if len(documents) > 0:
-        # sometimes the last batch is not full
-        # if it is empty then we don't need to generate embeddings
-        # but if it is not empty then we need to generate embeddings
-        progress.update(len(documents))
-        await generate_and_save_embeddings(documents, ctx)
+    documents = await cursor.to_list(length=None)
+    for i in range(0, len(documents), batch_size):
+        batch = documents[i:i + batch_size]
+        if batch:  # double-check just in case
+            progress.update(len(batch))
+            await generate_and_save_embeddings(hot_run=hot_run, documents=batch, ctx=ctx, embeddings_service=embeddings_service)
 
     # Close the progress bar
     progress.close()
 
 
-async def copy_model_info():
+async def _copy_model_info(*, hot_run: bool, embeddings_service: EmbeddingService):
     model_id = SCRIPT_SETTINGS.tabiya_model_id
 
     logger.info("[1/2] Copying the model info")
 
     # Get the model info document for the model_id from the PLATFORM_DB
-    from_model_info = await PLATFORM_DB[PlatformCollections.MODEL_INFO.value].find_one({"_id": ObjectId(model_id)})
+    from_model_info: dict = await PLATFORM_DB[PlatformCollections.MODEL_INFO.value].find_one({"_id": ObjectId(model_id)})
     if not from_model_info:
         raise ValueError(f"Taxonomy model with modelid:{model_id} not found.")
+
+    existing_model_info = await COMPASS_DB[CompassEmbeddingsCollections.MODEL_INFO.value].find_one({
+        "modelId": ObjectId(model_id)})
+
+    if existing_model_info:
+        # if the previous embeddings used a different model_version log and raise an error
+        previous_embeddings_service = existing_model_info.get('embeddingsService')
+        if previous_embeddings_service is not None:
+            previous_service_name = previous_embeddings_service.get('service_name')
+            previous_model_name = previous_embeddings_service.get('model_name')
+            if (previous_service_name != embeddings_service.service_name or
+                    previous_model_name != embeddings_service.model_name):
+                error = ValueError(f"Model info for model_id:{model_id} already exists in the COMPASS_DB with embeddings from a different "
+                                   f"embeddings service: {previous_service_name} or model: {previous_model_name}. "
+                                   f"Use the same service and model as the existing embeddings, "
+                                   f"or delete the existing embeddings and regenerate them.")
+                logger.error(error)
+                raise error
 
     del from_model_info["_id"]
     from_model_info["modelId"] = ObjectId(model_id)
@@ -439,23 +274,35 @@ async def copy_model_info():
     from_model_info["excludedOccupationCodes"] = SCRIPT_SETTINGS.excluded_occupation_codes
     from_model_info["excludedSkillCodes"] = SCRIPT_SETTINGS.excluded_skill_codes
 
-    # Upsert the model info document in the COMPASS_DB
-    # Currently the embeddings of a model are generated only once
-    await COMPASS_DB[CompassCollections.MODEL_INFO.value].update_one(
-        {"modelId": ObjectId(model_id)},
-        {"$set": from_model_info},
-        upsert=True
+    from_model_info["embeddingsService"] = dict(
+        service_name=embeddings_service.service_name,
+        model_name=embeddings_service.model_name,
     )
 
+    # Add the time the embeddings were generated
+    from_model_info["generatedAt"] = datetime_to_mongo_date(get_now())
 
-async def copy_relations_collection():
+    # Upsert the model info document in the COMPASS_DB
+    # Currently the embeddings of a model are generated only once
+    if hot_run:
+        logger.info(f"Upserting the model info document in {CompassEmbeddingsCollections.MODEL_INFO.value} collection")
+        await COMPASS_DB[CompassEmbeddingsCollections.MODEL_INFO.value].update_one(
+            {"modelId": ObjectId(model_id)},
+            {"$set": from_model_info},
+            upsert=True
+        )
+    else:
+        logger.info(f"Would upsert the model info document in {CompassEmbeddingsCollections.MODEL_INFO.value} collection")
+
+
+async def copy_relations_collection(*, hot_run: bool = False):
     """
     Copy the relations collection from the platform database to the compass database
     :return:
     """
 
     from_collection = PLATFORM_DB[PlatformCollections.RELATIONS.value]
-    to_collection = COMPASS_DB[CompassCollections.RELATIONS.value]
+    to_collection = COMPASS_DB[CompassEmbeddingsCollections.RELATIONS.value]
 
     logger.info(f"[1/2] Copying the relations documents from {from_collection.name} to {to_collection.name}")
 
@@ -502,12 +349,20 @@ async def copy_relations_collection():
 
         if len(documents) == batch_size:
             progress.update(batch_size)
-            await to_collection.insert_many(documents)
+            if hot_run:
+                logger.info(f"Inserting a batch of {len(documents)} relations")
+                await to_collection.insert_many(documents)
+            else:
+                logger.info(f"Would insert a batch of {len(documents)} relations")
             documents = []
 
     if len(documents) > 0:
         progress.update(len(documents))
-        await to_collection.insert_many(documents)
+        if hot_run:
+            logger.info(f"Inserting a batch of {len(documents)} relations")
+            await to_collection.insert_many(documents)
+        else:
+            logger.info(f"Would insert a batch of {len(documents)} relations")
 
     progress.close()
 
@@ -521,58 +376,71 @@ async def main(opts: Options):
     logger.info("Starting the main function")
     logger.info("Using options: " + opts.__str__())
 
+    embeddings_service = await get_embeddings_service(service_name=SCRIPT_SETTINGS.embeddings_service_name,
+                                                      model_name=SCRIPT_SETTINGS.embeddings_model_name)
+
+    # [1/5] Copy the model info and validate for existing state, if it is compatible with the new state.
+    await _copy_model_info(hot_run=opts.hot_run, embeddings_service=embeddings_service)
+
     # run the three tasks in parallel
     if opts.generate_embeddings:
         await asyncio.gather(
-            # [1/5] Copy the model info
-            copy_model_info(),
-
             # [2/5] Copy the relations collection
-            copy_relations_collection(),
+            copy_relations_collection(hot_run=opts.hot_run),
 
             # [3/5] Process the occupations
-            process_schema(_OCCUPATIONS_EMBEDDING_CONTEXT),
+            process_schema(hot_run=opts.hot_run, ctx=_OCCUPATIONS_EMBEDDING_CONTEXT, embeddings_service=embeddings_service),
 
             # [4/5] Process the skills
-            process_schema(_SKILLS_EMBEDDING_CONTEXT),
+            process_schema(hot_run=opts.hot_run, ctx=_SKILLS_EMBEDDING_CONTEXT, embeddings_service=embeddings_service),
         )
 
     # [5/5] Create the indexes
     if opts.generate_indexes:
-        await asyncio.gather(
-            create_model_info_indexes(),
-            create_relations_indexes(),
-            create_occupations_indexes(),
-            create_skills_indexes()
-        )
+        await generate_indexes(hot_run=opts.hot_run,
+                               db=COMPASS_DB,
+                               logger=logger)
 
-    logger.info("Script execution completed")
 
+logger.info("Script execution completed")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate Taxonomy Embeddings\n"
-                                                 "The script handles retrying, rate limiting, and processes the data in batches. "
-                                                 "Additionally, if the generation process is interrupted, the script can be re-run, "
-                                                 "and it will continue processing the remaining data from where it left off.",
-                                     formatter_class=argparse.RawTextHelpFormatter)
-    options_group = parser.add_argument_group("Options")
-    options_group.add_argument(
-        "--indexes-only",
-        required=False,
-        action="store_true",
-        help="Create indexes only")
+    try:
+        parser = argparse.ArgumentParser(description="Generate Taxonomy Embeddings\n"
+                                                     "The script handles retrying, rate limiting, and processes the data in batches. "
+                                                     "Additionally, if the generation process is interrupted, the script can be re-run, "
+                                                     "and it will continue processing the remaining data from where it left off.",
+                                         formatter_class=argparse.RawTextHelpFormatter)
+        options_group = parser.add_argument_group("Options")
+        options_group.add_argument(
+            "--hot-run",
+            required=False,
+            action="store_true",
+            help="Run the script in hot run mode")
 
-    args = parser.parse_args()
+        options_group.add_argument(
+            "--indexes-only",
+            required=False,
+            action="store_true",
+            help="Create indexes only")
 
-    # Weather the main function will generate embeddings,
-    # if the user said --indexes-only then we will not generate embeddings.
-    generate_embeddings = not args.indexes_only
+        args = parser.parse_args()
 
-    # Weather the main function will generate indexes.
+        # Whether the main function will generate embeddings,
+        # if the user said --indexes-only then we will not generate embeddings.
+        generate_embeddings = not args.indexes_only
 
-    _options = Options(
-        generate_embeddings=generate_embeddings,
-        generate_indexes=True
-    )
+        # Whether the main function will generate indexes.
 
-    asyncio.run(main(_options))
+        _options = Options(
+            hot_run=args.hot_run,
+            generate_embeddings=generate_embeddings,
+            generate_indexes=True
+        )
+
+        asyncio.run(main(_options))
+    except Exception as e:
+        logger.error(f"Error in the script: {e}", exc_info=True)
+        import traceback
+
+        traceback.print_exc()
