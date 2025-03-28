@@ -25,7 +25,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
     Compass
   </h1>
   <div
-    class="MuiBox-root css-cpd3fg"
+    class="MuiBox-root css-1n05jrb"
   >
     <button
       class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-s7wd0n-MuiButtonBase-root-MuiIconButton-root"
@@ -64,6 +64,28 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
           class="MuiBadge-badge MuiBadge-standard MuiBadge-invisible MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightRectangular MuiBadge-overlapRectangular css-ohrnoc-MuiBadge-badge"
         />
       </span>
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+    <button
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-s7wd0n-MuiButtonBase-root-MuiIconButton-root"
+      data-testid="chat-header-button-feedback-7413b63a-887b-4f41-b930-89e9770db12b"
+      tabindex="0"
+      title="give feedback"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+        data-testid="chat-header-icon-feedback-7413b63a-887b-4f41-b930-89e9770db12b"
+        focusable="false"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2m0 14H5.17l-.59.59-.58.58V4h16zm-9-4h2v2h-2zm0-6h2v4h-2z"
+        />
+      </svg>
       <span
         class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
       />
@@ -152,7 +174,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
     Compass
   </h1>
   <div
-    class="MuiBox-root css-cpd3fg"
+    class="MuiBox-root css-1n05jrb"
   >
     <button
       class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-s7wd0n-MuiButtonBase-root-MuiIconButton-root"
@@ -197,6 +219,28 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
           </span>
         </span>
       </span>
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+    <button
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-s7wd0n-MuiButtonBase-root-MuiIconButton-root"
+      data-testid="chat-header-button-feedback-7413b63a-887b-4f41-b930-89e9770db12b"
+      tabindex="0"
+      title="give feedback"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+        data-testid="chat-header-icon-feedback-7413b63a-887b-4f41-b930-89e9770db12b"
+        focusable="false"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2m0 14H5.17l-.59.59-.58.58V4h16zm-9-4h2v2h-2zm0-6h2v4h-2z"
+        />
+      </svg>
       <span
         class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
       />
