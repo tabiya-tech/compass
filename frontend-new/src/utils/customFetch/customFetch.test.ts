@@ -93,7 +93,7 @@ describe("Api Service tests", () => {
     // THEN expect an error to have been thrown
     expect(error).toBeDefined();
     expect(error).toBeInstanceOf(RestAPIError);
-    expect(error?.message).toBe("fetchWithAuth failed");
+    expect(error?.message).toBe("RestAPIError: fetchWithAuth failed");
     expect(error as RestAPIError).toMatchObject({
       serviceName: givenServiceName,
       serviceFunction: givenServiceFunction,
@@ -101,7 +101,7 @@ describe("Api Service tests", () => {
       path: givenApiUrl,
       statusCode: 404,
       errorCode: ErrorConstants.ErrorCodes.API_ERROR,
-      details: "Not Found",
+      cause: "Not Found",
     });
   });
 
@@ -138,7 +138,7 @@ describe("Api Service tests", () => {
     // THEN expect an error to have been thrown
     expect(error).toBeDefined();
     expect(error).toBeInstanceOf(RestAPIError);
-    expect(error?.message).toBe("Response Content-Type should be 'application/json'");
+    expect(error?.message).toBe("RestAPIError: Response Content-Type should be 'application/json'");
     expect(error as RestAPIError).toMatchObject({
       serviceName: givenServiceName,
       serviceFunction: givenServiceFunction,
@@ -146,7 +146,7 @@ describe("Api Service tests", () => {
       path: givenApiUrl,
       statusCode: 200,
       errorCode: "INVALID_RESPONSE_HEADER",
-      details: "Content-Type header was application/xml;charset=UTF-8",
+      cause: "Content-Type header was application/xml;charset=UTF-8",
     });
   });
 
@@ -209,7 +209,7 @@ describe("Api Service tests", () => {
     // THEN expect an error to have been thrown
     expect(error).toBeDefined();
     expect(error).toBeInstanceOf(RestAPIError);
-    expect(error?.message).toBe("fetchWithAuth failed");
+    expect(error?.message).toBe("RestAPIError: fetchWithAuth failed");
     expect(error as RestAPIError).toMatchObject({
       serviceName: givenServiceName,
       serviceFunction: givenServiceFunction,
@@ -217,7 +217,7 @@ describe("Api Service tests", () => {
       path: givenApiUrl,
       statusCode: 0,
       errorCode: "FAILED_TO_FETCH",
-      details: new Error("Failed to fetch"),
+      cause: new Error("Failed to fetch"),
     });
   });
 });

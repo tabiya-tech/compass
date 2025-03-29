@@ -14,8 +14,6 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Box, useTheme } from "@mui/material";
 import ChatHeader from "./ChatHeader/ChatHeader";
 import ChatMessageField from "./ChatMessageField/ChatMessageField";
-import { RestAPIError } from "src/error/restAPIError/RestAPIError";
-import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -128,11 +126,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setExperiences(data);
         setIsLoading(false);
       } catch (error) {
-        if (error instanceof RestAPIError) {
-          writeRestAPIErrorToLog(error, console.error);
-        }else {
-          console.error(new ChatError("Failed to retrieve experiences", error as Error));
-        }
+        console.error(new ChatError("Failed to retrieve experiences", error));
         enqueueSnackbar("Failed to retrieve experiences", { variant: "error" });
       }
     }, [enqueueSnackbar, activeSessionId]);
@@ -178,11 +172,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setConversationCompleted(response.conversation_completed);
         setConversationConductedAt(response.conversation_conducted_at);
       } catch (error) {
-        if (error instanceof RestAPIError) {
-          writeRestAPIErrorToLog(error, console.error);
-        } else {
-          console.error(new ChatError("Failed to send message:", error as Error));
-        }
+        console.error(new ChatError("Failed to send message:", error));
         addMessage(generatePleaseRepeatMessage());
       } finally {
         setAiIsTyping(false);
@@ -252,11 +242,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setActiveSessionId(sessionId);
         return true;
       } catch (e) {
-        if (e instanceof RestAPIError) {
-          writeRestAPIErrorToLog(e, console.error);
-        } else {
-          console.error(new ChatError("Failed to initialize chat", e as Error));
-        }
+        console.error(new ChatError("Failed to initialize chat", e));
         return false;
       } finally {
         setAiIsTyping(false);

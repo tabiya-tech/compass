@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes/";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
+import { ServiceError } from "src/error/ServiceError";
 
 export type RestAPIErrorObject = {
   errorCode: ErrorConstants.ErrorCodes;
@@ -9,14 +10,11 @@ export type RestAPIErrorObject = {
 
 export type RestAPIErrorDetails = string | RestAPIErrorObject | object | undefined | null;
 
-export class RestAPIError extends Error {
-  serviceName: string;
-  serviceFunction: string;
+export class RestAPIError extends ServiceError {
   method: string;
   path: string;
   statusCode: number;
   errorCode: ErrorConstants.ErrorCodes | string;
-  details: RestAPIErrorDetails;
 
   constructor(
     serviceName: string,
@@ -26,28 +24,17 @@ export class RestAPIError extends Error {
     statusCode: number,
     errorCode: ErrorConstants.ErrorCodes | string,
     message: string,
-    details?: RestAPIErrorDetails
+    cause?: RestAPIErrorDetails,
   ) {
-    super(message);
-    this.serviceName = serviceName;
-    this.serviceFunction = serviceFunction;
+    super(serviceName,
+      serviceFunction,
+      `RestAPIError: ${message}`,
+      cause,
+    );
     this.method = method;
     this.path = path;
     this.statusCode = statusCode;
     this.errorCode = errorCode;
-
-    // if the details is an object, or a JSON representation of an object,
-    // then add it as an object to the details property,
-    // otherwise just add the details as a string
-    if (typeof details === "string") {
-      try {
-        this.details = JSON.parse(details);
-      } catch (e) {
-        this.details = details;
-      }
-    } else {
-      this.details = details;
-    }
   }
 }
 
@@ -56,22 +43,22 @@ export type RestAPIErrorFactory = (
   statusCode: number,
   errorCode: ErrorConstants.ErrorCodes | string,
   message: string,
-  details?: RestAPIErrorDetails
+  cause?: RestAPIErrorDetails,
 ) => RestAPIError;
 
 export function getRestAPIErrorFactory(
   serviceName: string,
   serviceFunction: string,
   method: string,
-  path: string
+  path: string,
 ): RestAPIErrorFactory {
   return (
     statusCode: number,
     errorCode: ErrorConstants.ErrorCodes | string,
     message: string,
-    details?: RestAPIErrorDetails
+    cause?: RestAPIErrorDetails,
   ): RestAPIError => {
-    return new RestAPIError(serviceName, serviceFunction, method, path, statusCode, errorCode, message, details);
+    return new RestAPIError(serviceName, serviceFunction, method, path, statusCode, errorCode, message, cause);
   };
 }
 

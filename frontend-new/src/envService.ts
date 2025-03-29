@@ -29,7 +29,7 @@ export const getEnv = (key: string) => {
     }
     return window.atob(env[key]);
   } catch (e) {
-    console.error(new EnvError(`Error loading environment variable ${key}`, e as Error));
+    console.error(new EnvError(`Error loading environment variable ${key}`, e));
     return "";
   }
 };

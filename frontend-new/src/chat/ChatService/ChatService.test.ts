@@ -128,7 +128,7 @@ describe("ChatService", () => {
             "",
             "",
           ),
-          details: expect.anything(),
+          cause: expect.anything(),
         };
         await expect(sendMessagePromise).rejects.toMatchObject(expectedError);
 
@@ -217,7 +217,7 @@ describe("ChatService", () => {
             "",
             "",
           ),
-          details: expect.anything(),
+          cause: expect.anything(),
         };
         await expect(sendMessagePromise).rejects.toMatchObject(expectedError);
 

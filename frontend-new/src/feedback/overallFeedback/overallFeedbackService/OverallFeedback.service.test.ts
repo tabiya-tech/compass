@@ -163,7 +163,7 @@ describe("OverallFeedbackService", () => {
             "",
             ""
           ),
-          details: expect.anything(),
+          cause: expect.anything(),
         };
         await expect(sendFeedbackPromise).rejects.toMatchObject(expectedError);
       }

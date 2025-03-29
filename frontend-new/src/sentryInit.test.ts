@@ -80,7 +80,8 @@ describe("sentryInit", () => {
       tracesSampleRate: 1.0,
       tracePropagationTargets: ["localhost", "https://api.example.com"],
       replaysSessionSampleRate: 0.1,
-      replaysOnErrorSampleRate: 1.0
+      replaysOnErrorSampleRate: 1.0,
+      beforeSend: expect.any(Function),
     });
   });
 

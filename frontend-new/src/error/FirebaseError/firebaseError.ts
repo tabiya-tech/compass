@@ -1,66 +1,88 @@
-import { RestAPIErrorDetails } from "src/error/restAPIError/RestAPIError";
 import {
-  FirebaseErrorCodes,
+  FirebaseErrorCodes, isFirebaseErrorCode,
   USER_FRIENDLY_FIREBASE_ERROR_MESSAGES,
 } from "src/error/FirebaseError/firebaseError.constants";
+import { ServiceError } from "src/error/ServiceError";
+import { FirebaseError as _FirebaseError } from "@firebase/util";
 
-export class FirebaseError extends Error {
-  serviceName: string;
-  serviceFunction: string;
-  method: string;
-  errorCode: FirebaseErrorCodes;
-  details: RestAPIErrorDetails;
+export class FirebaseError extends ServiceError {
+  errorCode: FirebaseErrorCodes | string;
 
   constructor(
     serviceName: string,
     serviceFunction: string,
-    method: string,
-    errorCode: FirebaseErrorCodes,
+    errorCode: FirebaseErrorCodes | string,
     message: string,
-    details?: RestAPIErrorDetails
+    cause?: unknown,
   ) {
-    super(message);
-    this.serviceName = serviceName;
-    this.serviceFunction = serviceFunction;
-    this.method = method;
+    super(serviceName, serviceFunction, `FirebaseError: ${message}`, cause);
     this.errorCode = errorCode;
-
-    // if the details is an object, or a JSON representation of an object,
-    // then add it as an object to the details property,
-    // otherwise just add the details as a string
-    if (typeof details === "string") {
-      try {
-        this.details = JSON.parse(details);
-      } catch (e) {
-        this.details = details;
-      }
-    } else {
-      this.details = details;
-    }
   }
 }
 
 //factory function
 export type FirebaseErrorFactory = (
-  errorCode: FirebaseErrorCodes,
+  errorCode: FirebaseErrorCodes | string,
   message: string,
-  details?: RestAPIErrorDetails
+  cause?: unknown,
 ) => FirebaseError;
 
 export function getFirebaseErrorFactory(
   serviceName: string,
   serviceFunction: string,
-  method: string,
-  path: string
 ): FirebaseErrorFactory {
-  return (errorCode: FirebaseErrorCodes, message: string, details?: RestAPIErrorDetails): FirebaseError => {
-    return new FirebaseError(serviceName, serviceFunction, method, errorCode, message, details);
+  return (errorCode: FirebaseErrorCodes | string, message: string, cause?: unknown): FirebaseError => {
+    return new FirebaseError(serviceName,
+      serviceFunction,
+      errorCode,
+      message,
+      cause);
   };
 }
 
 export const getUserFriendlyFirebaseErrorMessage = (firebaseError: FirebaseError): string => {
-  return (
-    USER_FRIENDLY_FIREBASE_ERROR_MESSAGES[firebaseError.errorCode] ||
-    USER_FRIENDLY_FIREBASE_ERROR_MESSAGES[FirebaseErrorCodes.INTERNAL_ERROR]
-  );
+
+  // if firebaseError.errorCode not in the USER_FRIENDLY_FIREBASE_ERROR_MESSAGES then return the internal error message
+  if (isFirebaseErrorCode(firebaseError.errorCode)) {
+    return (
+      USER_FRIENDLY_FIREBASE_ERROR_MESSAGES[firebaseError.errorCode] ||
+      USER_FRIENDLY_FIREBASE_ERROR_MESSAGES[FirebaseErrorCodes.INTERNAL_ERROR]
+    );
+  }
+  return USER_FRIENDLY_FIREBASE_ERROR_MESSAGES[FirebaseErrorCodes.INTERNAL_ERROR];
 };
+
+/**
+ *  Cast a FirebaseError from '@firebase/util' to a compass FirebaseError in a safe way.
+ *  The error is expected to have the following properties:
+ *  - code: string
+ *  - message: string
+ *  If the error does not have these properties,
+ *  a compass FirebaseError with errorCode FirebaseErrorCodes.INTERNAL_ERROR is returned
+ *
+ *  It's intended use is in catch block
+ *  try {
+ *    // do something that may throw a firebase.auth.FirebaseError or any other error
+ *  }
+ *  catch (e) {
+ *    throw castToFirebaseError(e, getFirebaseErrorFactory("serviceName", "functionName"));
+ *  }
+ * @param e - the error to cast
+ * @param errorFactory - the factory function to create a FirebaseError
+ */
+export function castToFirebaseError(e: unknown, errorFactory: FirebaseErrorFactory): FirebaseError {
+  if (_isAuthFirebaseError(e)) {
+    return errorFactory(e.code, e.message);
+  } else {
+    return errorFactory(FirebaseErrorCodes.INTERNAL_ERROR, "An unknown error occurred", e);
+  }
+}
+
+function _isAuthFirebaseError(error: unknown): error is _FirebaseError {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    "message" in error
+  );
+}

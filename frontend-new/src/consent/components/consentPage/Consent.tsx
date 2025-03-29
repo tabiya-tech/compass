@@ -3,7 +3,6 @@ import { Box, Container, Checkbox, styled, Typography, useTheme, FormControlLabe
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Language, UpdateUserPreferencesSpec } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
-import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { useNavigate } from "react-router-dom";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
@@ -131,13 +130,12 @@ const Consent: React.FC = () => {
       await sendMetricsEvent(prefs.user_id);
 
       enqueueSnackbar("Agreement Accepted", { variant: "success" });
-    } catch (e) {
+    } catch (e: unknown) {
+      console.error(new AuthenticationError("Failed to update user preferences", e));
       if (e instanceof RestAPIError) {
-        writeRestAPIErrorToLog(e, console.error);
         enqueueSnackbar(getUserFriendlyErrorMessage(e), { variant: "error" });
       } else {
         enqueueSnackbar(`Failed to update user preferences: ${(e as Error).message}`, { variant: "error" });
-        console.error(new AuthenticationError("Failed to update user preferences", e as Error));
       }
     } finally {
       setIsAccepting(false);
@@ -165,7 +163,7 @@ const Consent: React.FC = () => {
       navigate(routerPaths.LOGIN, { replace: true });
       enqueueSnackbar("Successfully logged out.", { variant: "success" });
     } catch (e) {
-      console.error(new AuthenticationError("Failed to log out", e as Error));
+      console.error(new AuthenticationError("Failed to log out", e));
       enqueueSnackbar("Failed to log out.", { variant: "error" });
     } finally {
       setIsRejecting(false);

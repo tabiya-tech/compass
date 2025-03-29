@@ -1,8 +1,6 @@
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { SessionError } from "src/error/commonErrors";
-import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
-import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 
 /**
  * Issue a new session for the user and set the user preferences in the user preferences state service.
@@ -18,11 +16,7 @@ export const issueNewSession = async (user_id: string): Promise<number | null> =
     userPreferencesStateService.setUserPreferences(user_preferences);
     return userPreferencesStateService.getActiveSessionId();
   } catch (e) {
-    if (e instanceof RestAPIError) {
-      writeRestAPIErrorToLog(e, console.error);
-    } else {
-      console.error(new SessionError("Failed to create new session", e as Error));
-    }
+    console.error(new SessionError("Failed to create new session", e));
   }
   return null;
 };

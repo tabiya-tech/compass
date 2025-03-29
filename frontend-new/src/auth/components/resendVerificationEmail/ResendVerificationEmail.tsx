@@ -3,7 +3,6 @@ import { Box, Typography, styled } from "@mui/material";
 import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
-import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 
@@ -69,7 +68,7 @@ const ResendVerificationEmail: React.FC<ResendVerificationEmailProps> = ({
       let errorMessage;
       if (error instanceof FirebaseError) {
         errorMessage = getUserFriendlyFirebaseErrorMessage(error);
-        writeFirebaseErrorToLog(error, console.warn);
+        console.warn(error);
       } else {
         errorMessage = (error as Error).message;
         console.error(error);

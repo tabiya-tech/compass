@@ -5,19 +5,18 @@ import { routerPaths } from "src/app/routerPaths";
 import SocialAuth from "src/auth/components/SocialAuth/SocialAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
-import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
 import LoginWithEmailForm from "src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
-import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
-import FirebaseInvitationCodeAuthenticationService from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
+import FirebaseInvitationCodeAuthenticationService
+  from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
 import { AuthenticationError } from "src/error/commonErrors";
 import ResendVerificationEmail from "src/auth/components/resendVerificationEmail/ResendVerificationEmail";
 import RequestInvitationCode from "src/auth/components/requestInvitationCode/RequestInvitationCode";
@@ -78,16 +77,16 @@ const Login: React.FC = () => {
       let errorMessage;
       if (error instanceof RestAPIError) {
         errorMessage = getUserFriendlyErrorMessage(error);
-        writeRestAPIErrorToLog(error, console.error);
+        console.error(error);
         setShowResendVerification(false);
       } else if (error instanceof FirebaseError) {
         errorMessage = getUserFriendlyFirebaseErrorMessage(error);
         if (error.errorCode === FirebaseErrorCodes.INVALID_INVITATION_CODE) {
           // we want to log errors about invalid invitation codes as errors
           // so that we can track which invitation codes are failing and why
-          writeFirebaseErrorToLog(error, console.error);
+          console.error(error);
         } else {
-          writeFirebaseErrorToLog(error, console.warn);
+          console.warn(error);
         }
         // Show resend verification option if the error is due to unverified email
         if (error.errorCode === FirebaseErrorCodes.EMAIL_NOT_VERIFIED) {
@@ -153,7 +152,7 @@ const Login: React.FC = () => {
       MetricsService.getInstance().sendMetricsEvent(locationEvent);
     } catch (err) {
       if (err instanceof GeolocationPositionError) {
-          console.warn("Location could not be retrieved", err);
+        console.warn("Location could not be retrieved", err);
       } else {
         console.error("An error occurred while trying to get user's location", err);
       }
@@ -181,16 +180,15 @@ const Login: React.FC = () => {
         navigate(routerPaths.ROOT, { replace: true });
         enqueueSnackbar("Welcome back!", { variant: "success" });
       }
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error(
+        new AuthenticationError("An error occurred while trying to get your preferences", error),
+      );
       let errorMessage;
       if (error instanceof RestAPIError) {
-        writeRestAPIErrorToLog(error, console.error);
         errorMessage = getUserFriendlyErrorMessage(error);
       } else {
         errorMessage = (error as Error).message;
-        console.error(
-          new AuthenticationError("An error occurred while trying to get your preferences", error as Error),
-        );
       }
       enqueueSnackbar(`An error occurred while trying to get your preferences: ${errorMessage}`, {
         variant: "error",

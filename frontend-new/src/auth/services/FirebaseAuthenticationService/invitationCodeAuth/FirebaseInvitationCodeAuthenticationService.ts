@@ -1,5 +1,5 @@
 import { firebaseAuth } from "src/auth/firebaseConfig";
-import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
+import { castToFirebaseError, getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import StdFirebaseAuthenticationService, {
   FirebaseToken,
@@ -46,9 +46,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
   async login(code: string): Promise<string> {
     const firebaseErrorFactory = getFirebaseErrorFactory(
       "InvitationCodeAuthService",
-      "handleInvitationCodeLogin",
-      "POST",
-      "signInAnonymously",
+      "handleInvitationCodeLogin"
     );
     let userCredential;
     let invitation;
@@ -66,7 +64,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
     try {
       userCredential = await firebaseAuth.signInAnonymously();
     } catch (error) {
-      throw firebaseErrorFactory((error as any).code, (error as any).message);
+      throw castToFirebaseError(error, firebaseErrorFactory);
     }
 
     if (!userCredential.user) {
@@ -131,7 +129,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
       // call the parent class method once the token is successfully refreshed
       await super.onSuccessfulRefresh(newToken);
     } catch (error) {
-      console.error(new TokenError("error refreshing token", error as Error));
+      console.error(new TokenError("error refreshing token", error));
       // if token refresh fails, log the user out
       await this.logout();
     }

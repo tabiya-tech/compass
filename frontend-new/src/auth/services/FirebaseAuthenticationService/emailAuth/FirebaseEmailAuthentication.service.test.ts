@@ -148,7 +148,6 @@ describe("AuthService class tests", () => {
       await expect(emailLoginPromise).rejects.toThrow(new FirebaseError(
         "EmailAuthService",
         "login",
-        "POST",
         FirebaseErrorCodes.EMAIL_NOT_VERIFIED,
         "Email not verified"
       ));
@@ -192,7 +191,6 @@ describe("AuthService class tests", () => {
       await expect(emailLoginPromise).rejects.toThrow(new FirebaseError(
         "EmailAuthService",
         "signInWithEmailAndPassword",
-        "POST",
         FirebaseErrorCodes.INTERNAL_ERROR,
         "Internal error"
       ));
@@ -226,7 +224,6 @@ describe("AuthService class tests", () => {
       await expect(emailLoginPromise).rejects.toThrow(new FirebaseError(
         "EmailAuthService",
         "logout",
-        "POST",
         FirebaseErrorCodes.INTERNAL_ERROR,
         "Internal error"
       ));
@@ -518,7 +515,6 @@ describe("AuthService class tests", () => {
       await expect(resendPromise).rejects.toThrow(new FirebaseError(
         "EmailAuthService",
         "resendVerificationEmail",
-        "POST",
         FirebaseErrorCodes.EMAIL_ALREADY_VERIFIED,
         "Email already verified"
       ));
@@ -545,7 +541,6 @@ describe("AuthService class tests", () => {
       await expect(resendPromise).rejects.toThrow(new FirebaseError(
         "EmailAuthService",
         "signInWithEmailAndPassword",
-        "POST",
         FirebaseErrorCodes.USER_NOT_FOUND,
         "User not found"
       ));
@@ -573,7 +568,6 @@ describe("AuthService class tests", () => {
       await expect(resendPromise).rejects.toThrow(new FirebaseError(
         "EmailAuthService",
         "signInWithEmailAndPassword",
-        "POST",
         FirebaseErrorCodes.INTERNAL_ERROR,
         "Internal error"
       ));

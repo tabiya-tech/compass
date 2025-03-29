@@ -17,7 +17,6 @@ import {
   Language, UserPreference,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
-import * as RestAPIErrorLoggerModule from "src/error/restAPIError/logger";
 import { DATA_TEST_ID as BACKDROP_TEST_ID } from "src/theme/Backdrop/Backdrop";
 import { AuthenticationError } from "src/error/commonErrors";
 import { DATA_TEST_ID as CONFIRM_MODAL_DIALOG_TEST_ID } from "src/theme/confirmModalDialog/ConfirmModalDialog";
@@ -291,8 +290,6 @@ describe("Testing Consent Page", () => {
       });
 
       it("should log an error if the user is not found", async () => {
-        const writeRestAPIErrorToLog = jest.spyOn(RestAPIErrorLoggerModule, "writeRestAPIErrorToLog");
-
         // GIVEN getUser throws an error
         const givenError = new RestAPIError("mockedService", "mockedFunction", "GET", "/", 400, "foo", "");
         jest.spyOn(authStateService.getInstance(), "getUser").mockImplementation(() => {
@@ -319,9 +316,6 @@ describe("Testing Consent Page", () => {
 
         // THEN expect the error to be logged
         expect(console.error).toHaveBeenCalled();
-
-        // AND the error should be logged
-        expect(writeRestAPIErrorToLog).toHaveBeenCalledWith(givenError, console.error);
       });
 
       test("should redirect user to the login if user is not found", async () => {

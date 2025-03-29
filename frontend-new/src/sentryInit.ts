@@ -2,6 +2,7 @@ import * as Sentry from "@sentry/react";
 import { getBackendUrl, getSentryDSN, getTargetEnvironmentName } from "./envService";
 import React from "react";
 import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from "react-router-dom";
+import { serializeError } from "./error/errorSerializer";
 
 export function initSentry() {
   if (!getSentryDSN()) {
@@ -40,6 +41,19 @@ export function initSentry() {
     // Session Replay
     replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
     replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
+    beforeSend(event, hint) {
+      // This will add the error details to the extra field of the event
+      const originalError = hint?.originalException;
+      if (originalError && typeof originalError === "object") {
+        const serialized = serializeError(originalError);
+        // Attach the entire structure to extra for inspection
+        event.extra = {
+          ...event.extra,
+          errorDetails: serialized,
+        };
+      }
+      return event;
+    },
   });
 }
 

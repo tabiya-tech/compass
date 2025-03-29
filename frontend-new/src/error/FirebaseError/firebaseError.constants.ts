@@ -53,3 +53,7 @@ export const USER_FRIENDLY_FIREBASE_ERROR_MESSAGES: Record<FirebaseErrorCodes, s
     "This operation is not allowed with the current login method.",
   [FirebaseErrorCodes.EMAIL_ALREADY_VERIFIED]: "The email address is already verified.",
 };
+
+export function isFirebaseErrorCode(value: string): value is FirebaseErrorCodes {
+  return Object.values(FirebaseErrorCodes).includes(value as FirebaseErrorCodes);
+}

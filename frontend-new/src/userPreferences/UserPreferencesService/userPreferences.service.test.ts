@@ -123,7 +123,7 @@ describe("UserPreferencesService", () => {
             "",
             "",
           ),
-          details: expect.anything(),
+          cause: expect.anything(),
         };
         const getUserPreferencesCallback = async () => await service.getUserPreferences("1");
 
@@ -208,7 +208,7 @@ describe("UserPreferencesService", () => {
             "",
             "",
           ),
-          details: expect.anything(),
+          cause: expect.anything(),
         };
         const updateUserPreferencesCallback = async () =>
           await service.updateUserPreferences({
@@ -317,7 +317,7 @@ describe("UserPreferencesService", () => {
             "",
             "",
           ),
-          details: expect.anything(),
+          cause: expect.anything(),
         };
         const createUserPreferencesCallback = async () =>
           await service.createUserPreferences({

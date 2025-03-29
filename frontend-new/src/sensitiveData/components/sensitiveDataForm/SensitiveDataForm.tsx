@@ -13,7 +13,6 @@ import { routerPaths } from "src/app/routerPaths";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
-import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
 import { SensitivePersonalData } from "src/sensitiveData/types";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
@@ -297,16 +296,15 @@ const SensitiveDataForm: React.FC = () => {
       enqueueSnackbar("Personal data saved successfully and securely.", { variant: "success" });
       navigate(routerPaths.ROOT);
     } catch (e) {
+      console.error("Failed to save personal data", e);
+      let friendlyErrorMessage = ERROR_MESSAGE.DEFAULT
       if (e instanceof RestAPIError) {
-        writeRestAPIErrorToLog(e, console.error);
-        enqueueSnackbar(getUserFriendlyErrorMessage(e), { variant: "error" });
+        friendlyErrorMessage = getUserFriendlyErrorMessage(e);
       } else if (e instanceof EncryptedDataTooLarge) {
-        console.error("Failed to save personal data", e);
-        enqueueSnackbar(ERROR_MESSAGE.ENCRYPTED_DATA_TOO_LARGE, { variant: "error" });
-      } else {
-        console.error("Failed to save personal data", e);
-        enqueueSnackbar(ERROR_MESSAGE.DEFAULT, { variant: "error" });
+        friendlyErrorMessage = ERROR_MESSAGE.ENCRYPTED_DATA_TOO_LARGE;
       }
+      enqueueSnackbar(friendlyErrorMessage, {variant: "error"});
+
       setIsSavingSensitiveData(false);
       setIsSubmitButtonEnabled(true);
     }
@@ -345,13 +343,13 @@ const SensitiveDataForm: React.FC = () => {
       enqueueSnackbar("Personal data collection skipped.", { variant: "success" });
       navigate(routerPaths.ROOT);
     } catch (e) {
+      console.error("Failed to skip personal data", e);
+      let friendlyErrorMessage = ERROR_MESSAGE.DEFAULT
       if (e instanceof RestAPIError) {
-        writeRestAPIErrorToLog(e, console.error);
-        enqueueSnackbar(getUserFriendlyErrorMessage(e), { variant: "error" });
-      } else {
-        console.error("Failed to skip personal data", e);
-        enqueueSnackbar(ERROR_MESSAGE.DEFAULT, { variant: "error" });
+        friendlyErrorMessage = getUserFriendlyErrorMessage(e);
       }
+      enqueueSnackbar(friendlyErrorMessage, { variant: "error" });
+
     } finally {
       setIsSkipping(false);
     }
@@ -364,8 +362,8 @@ const SensitiveDataForm: React.FC = () => {
     // something is not right, we should have user preferences at this point.
     if (!userPreferences) {
       const error = new UserPreferenceError("User preferences not found");
-      enqueueSnackbar(ERROR_MESSAGE.DEFAULT, { variant: "error" });
       console.error(error);
+      enqueueSnackbar(ERROR_MESSAGE.DEFAULT, { variant: "error" });
       throw error;
     }
   }, [enqueueSnackbar, userPreferences]);

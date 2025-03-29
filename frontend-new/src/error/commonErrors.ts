@@ -17,7 +17,7 @@ enum CommonError {
  * Used for errors related to token generation, decoding and verification
  * */
 export class TokenError extends Error {
-  constructor(message: string, cause?: Error | string) {
+  constructor(message: string, cause?: unknown) {
     super(message);
     this.name = CommonError.TOKEN_ERROR;
     this.cause = cause;
@@ -25,7 +25,7 @@ export class TokenError extends Error {
 }
 
 export class AuthenticationError extends Error {
-  constructor(message: string, cause?: Error | string) {
+  constructor(message: string, cause?: unknown) {
     super(message);
     this.name = CommonError.AUTHENTICATION_ERROR;
     this.cause = cause;
@@ -33,7 +33,7 @@ export class AuthenticationError extends Error {
 }
 
 export class UserPreferenceError extends Error {
-  constructor(message: string, cause?: Error | string) {
+  constructor(message: string, cause?: unknown) {
     super(message);
     this.name = CommonError.USER_PREFERENCE_ERROR;
     this.cause = cause;
@@ -41,7 +41,7 @@ export class UserPreferenceError extends Error {
 }
 
 export class SessionError extends Error {
-  constructor(message: string, cause?: Error | string) {
+  constructor(message: string, cause?: unknown) {
     super(message);
     this.name = CommonError.SESSION_ERROR;
     this.cause = cause;
@@ -49,7 +49,7 @@ export class SessionError extends Error {
 }
 
 export class ChatError extends Error {
-  constructor(message: string, cause?: Error | string) {
+  constructor(message: string, cause?: unknown) {
     super(message);
     this.name = CommonError.CHAT_ERROR;
     this.cause = cause;
@@ -57,7 +57,7 @@ export class ChatError extends Error {
 }
 
 export class ReactionError extends Error {
-  constructor(message: string, cause?: Error | string) {
+  constructor(message: string, cause?: unknown) {
     super(message);
     this.name = CommonError.REACTION_ERROR;
     this.cause = cause;
@@ -65,7 +65,7 @@ export class ReactionError extends Error {
 }
 
 export class FeedbackError extends Error {
-  constructor(message: string, cause?: Error | string) {
+  constructor(message: string, cause?: unknown) {
     super(message);
     this.name = CommonError.FEEDBACK_ERROR;
     this.cause = cause;
@@ -73,7 +73,7 @@ export class FeedbackError extends Error {
 }
 
 export class EnvError extends Error {
-  constructor(message: string, cause?: Error | string) {
+  constructor(message: string, cause?: unknown) {
     super(message);
     this.name = CommonError.ENV_ERROR;
     this.cause = cause;
@@ -81,7 +81,7 @@ export class EnvError extends Error {
 }
 
 export class ComponentError extends Error {
-  constructor(message: string, cause?: Error | string) {
+  constructor(message: string, cause?: unknown) {
     super(message);
     this.name = CommonError.COMPONENT_ERROR;
     this.cause = cause;
@@ -89,7 +89,7 @@ export class ComponentError extends Error {
 }
 
 export class RequestInvitationCodeError extends Error {
-  constructor(message: string, cause?: Error | string) {
+  constructor(message: string, cause?: unknown) {
     super(message);
     this.name = CommonError.REQUEST_INVITATION_CODE_ERROR;
     this.cause = cause;
@@ -97,7 +97,7 @@ export class RequestInvitationCodeError extends Error {
 }
 
 export class ConfigurationError extends Error {
-  constructor(message: string, cause?: Error | string) {
+  constructor(message: string, cause?: unknown) {
     super(message);
     this.name = CommonError.CONFIGURATION_ERROR;
     this.cause = cause;
@@ -105,7 +105,7 @@ export class ConfigurationError extends Error {
 }
 
 export class MetricsError extends Error {
-  constructor(message: string, cause?: Error | string) {
+  constructor(message: string, cause?: unknown) {
     super(message);
     this.name = CommonError.METRICS_ERROR;
     this.cause = cause;

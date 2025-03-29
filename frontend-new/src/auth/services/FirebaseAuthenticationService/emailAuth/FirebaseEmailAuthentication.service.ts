@@ -1,5 +1,5 @@
 import { firebaseAuth } from "src/auth/firebaseConfig";
-import { getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
+import { castToFirebaseError, getFirebaseErrorFactory } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { AuthenticationServices, TabiyaUser } from "src/auth/auth.types";
@@ -16,6 +16,7 @@ import firebase from "firebase/compat/app";
 import { EmailAuthProvider } from "firebase/auth";
 
 type UserCredential = firebase.auth.UserCredential;
+
 
 class FirebaseEmailAuthenticationService extends AuthenticationService {
   private static instance: FirebaseEmailAuthenticationService;
@@ -49,8 +50,6 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     const firebaseErrorFactory = getFirebaseErrorFactory(
       "EmailAuthService",
       "handleLogin",
-      "POST",
-      "signInWithEmailAndPassword"
     );
 
     let userCredential;
@@ -58,7 +57,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     try {
       userCredential = await firebaseAuth.signInWithEmailAndPassword(email, password);
     } catch (error) {
-      throw firebaseErrorFactory((error as any).code, (error as any).message);
+      throw castToFirebaseError(error, firebaseErrorFactory);
     }
 
     if (!userCredential.user) {
@@ -71,7 +70,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
       try {
         await this.logout();
       } catch (signOutError) {
-        throw firebaseErrorFactory((signOutError as any).code, (signOutError as any).message);
+        throw castToFirebaseError(signOutError, firebaseErrorFactory);
       }
       throw firebaseErrorFactory(FirebaseErrorCodes.EMAIL_NOT_VERIFIED, "Email not verified", {});
     }
@@ -102,20 +101,18 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     const firebaseErrorFactory = getFirebaseErrorFactory(
       "EmailAuthService",
       "handleRegister",
-      "POST",
-      "createUserWithEmailAndPassword"
     );
     const invitation = await invitationsService.checkInvitationCodeStatus(registrationCode);
     if (invitation.status === InvitationStatus.INVALID) {
       throw firebaseErrorFactory(
         FirebaseErrorCodes.INVALID_REGISTRATION_CODE,
-        `the registration code is invalid: ${registrationCode}`
+        `the registration code is invalid: ${registrationCode}`,
       );
     }
     if (invitation.invitation_type !== InvitationType.REGISTER) {
       throw firebaseErrorFactory(
         FirebaseErrorCodes.INVALID_REGISTRATION_TYPE,
-        `the invitation code is not for registration: ${registrationCode}`
+        `the invitation code is not for registration: ${registrationCode}`,
       );
     }
 
@@ -124,7 +121,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     try {
       userCredential = await firebaseAuth.createUserWithEmailAndPassword(email, password);
     } catch (error) {
-      throw firebaseErrorFactory((error as any).code, (error as any).message);
+      throw castToFirebaseError(error, firebaseErrorFactory);
     }
 
     if (!userCredential.user) {
@@ -139,7 +136,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
       // send a verification email
       await userCredential.user.sendEmailVerification();
     } catch (error) {
-      throw firebaseErrorFactory((error as any).code, (error as any).message);
+      throw castToFirebaseError(error, firebaseErrorFactory);
     }
 
     // in the case of email login, firebase doesnt give us a way to access the access token directly
@@ -185,7 +182,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
       // call the parent class method once the token is successfully refreshed
       await super.onSuccessfulRefresh(newToken);
     } catch (error) {
-      console.error(new TokenError("Error refreshing token:", error as Error));
+      console.error(new TokenError("Error refreshing token:", error));
       // if token refresh fails, log the user out
       await this.logout();
     }
@@ -232,11 +229,11 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     const { isValid: isValidFirebaseToken, failureCause: firebaseTokenValidationFailureCause } =
       this.stdFirebaseAuthServiceInstance.isFirebaseTokenValid(
         decodedToken as FirebaseToken,
-        FirebaseTokenProvider.PASSWORD
+        FirebaseTokenProvider.PASSWORD,
       );
     if (!isValidFirebaseToken) {
       console.debug(
-        `token is not a valid firebase token: ${firebaseTokenValidationFailureCause} - ${formatTokenForLogging(token)}`
+        `token is not a valid firebase token: ${firebaseTokenValidationFailureCause} - ${formatTokenForLogging(token)}`,
       );
       return { isValid: false, decodedToken: null, failureCause: firebaseTokenValidationFailureCause! };
     }
@@ -256,8 +253,6 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     const firebaseErrorFactory = getFirebaseErrorFactory(
       "EmailAuthService",
       "linkAnonymousAccount",
-      "POST",
-      "linkWithCredential"
     );
 
     const currentUser = firebaseAuth.currentUser;
@@ -276,7 +271,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
       // Link anonymous account with email credential
       userCredential = await currentUser.linkWithCredential(credential);
     } catch (error) {
-      throw firebaseErrorFactory((error as any).code, (error as any).message);
+      throw castToFirebaseError(error, firebaseErrorFactory);
     }
 
     if (!userCredential.user) {
@@ -300,7 +295,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
 
       return token;
     } catch (error) {
-      throw firebaseErrorFactory((error as any).code, (error as any).message);
+      throw castToFirebaseError(error, firebaseErrorFactory);
     }
   }
 
@@ -315,15 +310,13 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     const firebaseErrorFactory = getFirebaseErrorFactory(
       "EmailAuthService",
       "resendVerificationEmail",
-      "POST",
-      "signInWithEmailAndPassword"
     );
 
     let userCredential;
     try {
       userCredential = await firebaseAuth.signInWithEmailAndPassword(email, password);
     } catch (error) {
-      throw firebaseErrorFactory((error as any).code, (error as any).message);
+      throw castToFirebaseError(error, firebaseErrorFactory);
     }
 
     if (!userCredential.user) {
@@ -337,7 +330,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     try {
       await userCredential.user.sendEmailVerification();
     } catch (error) {
-      throw firebaseErrorFactory((error as any).code, (error as any).message);
+      throw castToFirebaseError(error, firebaseErrorFactory);
     }
   }
 }
