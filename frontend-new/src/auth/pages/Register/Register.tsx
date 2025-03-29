@@ -7,10 +7,8 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import RegisterWithEmailForm from "src/auth/pages/Register/components/RegisterWithEmailForm/RegisterWithEmailForm";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
-import { writeFirebaseErrorToLog } from "src/error/FirebaseError/logger";
 import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
-import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
@@ -76,14 +74,14 @@ const Register: React.FC = () => {
     async (error: Error) => {
       let errorMessage;
       if (error instanceof RestAPIError) {
-        writeRestAPIErrorToLog(error, console.error);
+        console.error(error);
         errorMessage = getUserFriendlyErrorMessage(error);
       } else if (error instanceof FirebaseError) {
         errorMessage = getUserFriendlyFirebaseErrorMessage(error);
         if (error.errorCode === FirebaseErrorCodes.INVALID_REGISTRATION_CODE) {
-          writeFirebaseErrorToLog(error, console.error);
+          console.error(error);
         } else {
-          writeFirebaseErrorToLog(error, console.warn);
+          console.warn(error);
         }
       } else {
         console.error(error);

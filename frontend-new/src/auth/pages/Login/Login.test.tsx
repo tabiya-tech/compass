@@ -385,7 +385,6 @@ describe("Testing Login component", () => {
     const loginMock = jest.fn().mockRejectedValue(new FirebaseError(
       "firebaseEmailAuthenticationService",
       "login",
-      "POST",
       FirebaseErrorCodes.EMAIL_NOT_VERIFIED,
       "Email not verified"
       )

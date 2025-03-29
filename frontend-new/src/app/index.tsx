@@ -81,7 +81,7 @@ const App = () => {
             console.error(
               new AuthenticationError(
                 `User has not registered! Preferences could not be found for userId: ${user.id}`,
-                error as Error,
+                error,
               ),
             );
           }
@@ -98,7 +98,7 @@ const App = () => {
       console.debug("User preferences loaded", preferences);
     } catch (error) {
       console.error(
-        new AuthenticationError("Error initializing authentication and user preferences state", error as Error),
+        new AuthenticationError("Error initializing authentication and user preferences state", error),
       );
       await AuthenticationServiceFactory.resetAuthenticationState();
     }
@@ -129,7 +129,7 @@ const App = () => {
         // since we're not sure if the user has logged in or not.
         currentAuthenticationService?.cleanup();
       } catch (error) {
-        console.error(new AuthenticationError("Error cleaning up auth", error as Error));
+        console.error(new AuthenticationError("Error cleaning up auth", error));
       }
     };
   }, []);

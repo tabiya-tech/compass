@@ -2,8 +2,6 @@ import { getBackendUrl } from "src/envService";
 import { MetricsEventUnion } from "src/metrics/types";
 import { customFetch } from "src/utils/customFetch/customFetch";
 import { StatusCodes } from "http-status-codes";
-import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
-import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { MetricsError } from "src/error/commonErrors";
 
 export const METRICS_FLUSH_INTERVAL_MS = 15000; // 15 seconds
@@ -37,8 +35,8 @@ export default class MetricsService {
   private startFlushInterval(): void {
     if (this._flushInterval === null) {
       this._flushInterval = setInterval(() => {
-        this.flushEvents().then(()=> {
-          // do nothing
+        this.flushEvents().then(() => {
+          console.debug("Metrics events flushed successfully");
         });
       }, METRICS_FLUSH_INTERVAL_MS);
     }
@@ -64,7 +62,7 @@ export default class MetricsService {
       console.debug("Adding metrics event to buffer:", event.event_type);
       this._eventBuffer.push(event);
     } catch (err) {
-      console.error(new MetricsError("Failed to add metrics event to buffer", err as Error));
+      console.error(new MetricsError("Failed to add metrics event to buffer", err));
     }
   }
 
@@ -80,19 +78,19 @@ export default class MetricsService {
     console.debug(`Flushing ${this._eventBuffer.length} metrics events`);
 
     try {
-        await customFetch(`${this.apiServerUrl}/metrics`, {
-            method: "POST",
-            expectedStatusCode: StatusCodes.ACCEPTED,
-            serviceName: "MetricsService",
-            serviceFunction: "flushEvents",
-            failureMessage: "Failed to send metrics events",
-            headers: {
-                "Content-Type": "application/json",
-            },
-          body: JSON.stringify(this._eventBuffer)
-        });
+      await customFetch(`${this.apiServerUrl}/metrics`, {
+        method: "POST",
+        expectedStatusCode: StatusCodes.ACCEPTED,
+        serviceName: "MetricsService",
+        serviceFunction: "flushEvents",
+        failureMessage: "Failed to send metrics events",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(this._eventBuffer),
+      });
     } catch (error) {
-      writeRestAPIErrorToLog(error as RestAPIError, console.error)
+      console.error(error);
     } finally {
       // Clear the buffer regardless of the outcome
       this._eventBuffer = [];

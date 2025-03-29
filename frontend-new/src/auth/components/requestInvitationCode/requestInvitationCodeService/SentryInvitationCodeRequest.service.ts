@@ -17,6 +17,6 @@ export function requestInvitationCode(data: InvitationCodeRequestData) {
       includeReplay: false,
     });
   } catch (e) {
-    throw new RequestInvitationCodeError(`Something went wrong while attempting to request new invitation for user with email ${data.email}`, e as Error);
+    throw new RequestInvitationCodeError(`Something went wrong while attempting to request new invitation for user with email ${data.email}`, e);
   }
 }

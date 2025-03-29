@@ -15,77 +15,69 @@ describe("FirebaseError", () => {
       // GIVEN a service name, function, method and path
       const givenServiceName = "service";
       const givenServiceFunction = "function";
-      const givenMethod = "method";
       const givenErrorCode = FirebaseErrorCodes.INTERNAL_ERROR;
       const givenMessage = "message";
-      const givenDetails = "details";
+      const givenCause = "cause";
 
       // WHEN creating a new FirebaseError
       const error = new FirebaseError(
         givenServiceName,
         givenServiceFunction,
-        givenMethod,
         givenErrorCode,
         givenMessage,
-        givenDetails
+        givenCause,
       );
 
       // THEN the FirebaseError should have all the properties
       expect(error.serviceName).toBe(givenServiceName);
       expect(error.serviceFunction).toBe(givenServiceFunction);
-      expect(error.method).toBe(givenMethod);
       expect(error.errorCode).toBe(givenErrorCode);
-      expect(error.message).toBe(givenMessage);
-      expect(error.details).toBe(givenDetails);
+      expect(error.message).toBe(`FirebaseError: ${givenMessage}`);
+      expect(error.cause).toBe(givenCause);
     });
 
     test("should parse the details if it is a stringified JSON", () => {
       // GIVEN a service name, function, method and path
       const givenServiceName = "service";
       const givenServiceFunction = "function";
-      const givenMethod = "method";
       const givenErrorCode = FirebaseErrorCodes.INTERNAL_ERROR;
       const givenMessage = "message";
 
-      const details = { key: "value" };
-      const givenDetails = JSON.stringify(details);
+      const givenCause = { key: "value" };
 
       // WHEN creating a new FirebaseError
       const error = new FirebaseError(
         givenServiceName,
         givenServiceFunction,
-        givenMethod,
         givenErrorCode,
         givenMessage,
-        givenDetails
+        givenCause,
       );
 
       // THEN the FirebaseError should have the parsed details
-      expect(error.details).toEqual(details);
+      expect(error.cause).toEqual(givenCause);
     });
 
     it("should not parse the details if it is not a stringifies JSON but an object", () => {
       // GIVEN a service name, function, method and path
       const givenServiceName = "service";
       const givenServiceFunction = "function";
-      const givenMethod = "method";
       const givenErrorCode = FirebaseErrorCodes.INTERNAL_ERROR;
       const givenMessage = "message";
 
-      const givenDetails = { key: "value" };
+      const givenCause = { key: "value" };
 
       // WHEN creating a new FirebaseError
       const error = new FirebaseError(
         givenServiceName,
         givenServiceFunction,
-        givenMethod,
         givenErrorCode,
         givenMessage,
-        givenDetails
+        givenCause,
       );
 
       // THEN the FirebaseError should have the parsed details
-      expect(error.details).toEqual(givenDetails);
+      expect(error.cause).toEqual(givenCause);
     });
   });
 
@@ -96,7 +88,7 @@ describe("FirebaseError", () => {
     const testCases = Object.values(FirebaseErrorCodes).map((errorCode) => [
       errorCode,
       USER_FRIENDLY_FIREBASE_ERROR_MESSAGES[errorCode] ||
-        USER_FRIENDLY_FIREBASE_ERROR_MESSAGES[FirebaseErrorCodes.INTERNAL_ERROR],
+      USER_FRIENDLY_FIREBASE_ERROR_MESSAGES[FirebaseErrorCodes.INTERNAL_ERROR],
     ]);
 
     testCases.push([
@@ -121,11 +113,9 @@ describe("FirebaseError", () => {
       // GIVEN a service name, function, method and path
       const givenServiceName = "service";
       const givenServiceFunction = "function";
-      const givenMethod = "method";
-      const givenPath = "path";
 
       // WHEN calling getFirebaseErrorFactory
-      const errorFactory = getFirebaseErrorFactory(givenServiceName, givenServiceFunction, givenMethod, givenPath);
+      const errorFactory = getFirebaseErrorFactory(givenServiceName, givenServiceFunction);
 
       // THEN the function should return a FirebaseErrorFactory
       expect(errorFactory).toBeDefined();
@@ -135,17 +125,16 @@ describe("FirebaseError", () => {
       const givenErrorCode = FirebaseErrorCodes.INTERNAL_ERROR;
 
       const givenMessage = "message";
-      const givenDetails = "details";
+      const givenCause = "cause";
 
-      const actualError = errorFactory(givenErrorCode, givenMessage, givenDetails);
+      const actualError = errorFactory(givenErrorCode, givenMessage, givenCause);
 
       // AND the FirebaseError should have the given parameters
       expect(actualError.serviceName).toBe(givenServiceName);
       expect(actualError.serviceFunction).toBe(givenServiceFunction);
-      expect(actualError.method).toBe(givenMethod);
       expect(actualError.errorCode).toBe(givenErrorCode);
-      expect(actualError.message).toBe(givenMessage);
-      expect(actualError.details).toBe(givenDetails);
+      expect(actualError.message).toBe(`FirebaseError: ${givenMessage}`);
+      expect(actualError.cause).toBe(givenCause);
     });
   });
 });

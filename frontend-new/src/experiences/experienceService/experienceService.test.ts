@@ -90,7 +90,7 @@ describe("ExperienceService", () => {
             "",
             ""
           ),
-          details: expect.anything(),
+          cause: expect.anything(),
         };
         await expect(actualExperience).rejects.toMatchObject(expectedError);
       }

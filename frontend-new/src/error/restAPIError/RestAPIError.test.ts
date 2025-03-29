@@ -16,7 +16,7 @@ describe("Test the RestAPIError class", () => {
     ["object", { foo: "bar" } as object],
     ["undefined", undefined],
     ["null", null],
-  ])("should create a RestAPIError object with %s details", (description, detailsValue) => {
+  ])("should create a RestAPIError object with %s details", (description, causeValue) => {
     // GIVEN a service name, function, method, path, status code, error code, message and details as string
     const givenServiceName = "service";
     const givenServiceFunction = "function";
@@ -25,7 +25,7 @@ describe("Test the RestAPIError class", () => {
     const givenStatusCode = 400;
     const givenErrorCode = ErrorConstants.ErrorCodes.API_ERROR;
     const givenMessage = "message";
-    const givenDetails = detailsValue;
+    const givenCause = causeValue;
 
     // WHEN creating a RestAPIError object
     const actual = new RestAPIError(
@@ -36,7 +36,7 @@ describe("Test the RestAPIError class", () => {
       givenStatusCode,
       givenErrorCode,
       givenMessage,
-      givenDetails
+      givenCause
     );
     // THEN the object should be created
     expect(actual).toBeDefined();
@@ -51,8 +51,8 @@ describe("Test the RestAPIError class", () => {
     expect(actual.path).toBe(givenPath);
     expect(actual.statusCode).toBe(givenStatusCode);
     expect(actual.errorCode).toBe(givenErrorCode);
-    expect(actual.message).toBe(givenMessage);
-    expect(actual.details).toBe(givenDetails);
+    expect(actual.message).toBe(`RestAPIError: ${givenMessage}`);
+    expect(actual.cause).toBe(givenCause);
   });
 });
 
@@ -74,8 +74,8 @@ describe("Test the getRestAPIErrorFactory function", () => {
     const givenStatusCode = 400;
     const givenErrorCode = ErrorConstants.ErrorCodes.API_ERROR;
     const givenMessage = "message";
-    const givenDetails = "details";
-    const actualError = errorFactory(givenStatusCode, givenErrorCode, givenMessage, givenDetails);
+    const givenCause = "cause";
+    const actualError = errorFactory(givenStatusCode, givenErrorCode, givenMessage, givenCause);
     // AND the RestAPIError should have the given parameters
     expect(actualError.serviceName).toBe(givenServiceName);
     expect(actualError.serviceFunction).toBe(givenServiceFunction);
@@ -83,8 +83,8 @@ describe("Test the getRestAPIErrorFactory function", () => {
     expect(actualError.path).toBe(givenPath);
     expect(actualError.statusCode).toBe(givenStatusCode);
     expect(actualError.errorCode).toBe(givenErrorCode);
-    expect(actualError.message).toBe(givenMessage);
-    expect(actualError.details).toBe(givenDetails);
+    expect(actualError.message).toBe(`RestAPIError: ${givenMessage}`);
+    expect(actualError.cause).toBe(givenCause);
   });
 });
 

@@ -12,8 +12,6 @@ import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import questions from "src/feedback/overallFeedback/feedbackForm/questions-en.json";
 import OverallFeedbackService from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
-import { RestAPIError } from "src/error/restAPIError/RestAPIError";
-import { writeRestAPIErrorToLog } from "src/error/restAPIError/logger";
 
 interface CustomerSatisfactionRatingProps {
   notifyOnCustomerSatisfactionRatingSubmitted: () => void;
@@ -59,11 +57,7 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
       notifyOnCustomerSatisfactionRatingSubmitted();
       enqueueSnackbar("Rating Feedback submitted successfully!", { variant: "success" });
     } catch (error) {
-      if (error instanceof RestAPIError) {
-        writeRestAPIErrorToLog(error, console.error);
-      } else {
-        console.error("Feedback submission failed:", error);
-      }
+      console.error("Feedback submission failed:", error);
       enqueueSnackbar("Failed to submit feedback. Please try again later.", { variant: "error" });
     } finally {
       setIsSubmittingRating(false);
