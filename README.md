@@ -65,7 +65,9 @@ Happy contributing! 🚀
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
 
+## Special Mentions
+This project is tested with BrowserStack
+
 ## Funders and Partners
 <img src="https://github.com/tabiya-tech/docs/blob/main/.gitbook/assets/logo_Google.org_Support_FullColor_cmyk%20coated_stacked.png" alt="Google.org Logo" width=200/>
-
 
