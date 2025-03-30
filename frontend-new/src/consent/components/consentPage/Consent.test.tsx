@@ -38,7 +38,8 @@ jest.mock("src/envService", () => ({
 jest.mock("react-device-detect", () => ({
   browserName: "foo",
   deviceType: "bar",
-  osName: "baz"
+  osName: "baz",
+  browserVersion: "foo-version",
 }));
 
 // mock the snack bar provider
@@ -86,6 +87,15 @@ describe("Testing Consent Page", () => {
   beforeEach(() => {
     const mockDate = new Date(2023, 5, 14); // June 14, 2023
     jest.spyOn(global, "Date").mockImplementation(() => mockDate);
+    // add the GeolocationPositionError class to the global object since it doesn't
+    // appear to exist in the test context
+    //@ts-ignore
+    global.GeolocationPositionError = class extends Error {
+      constructor(message: string) {
+        super(message);
+        this.name = 'GeolocationPositionError';
+      }
+    };
   });
 
   describe("render tests", () => {
@@ -203,6 +213,7 @@ describe("Testing Consent Page", () => {
             browser_type: "foo", // from mock at the top of the file
             device_type: "bar", // from mock at the top of the file
             os_type: "baz", // from mock at the top of the file
+            browser_version: "foo-version", // from mock at the top of the file
             timestamp: new Date().toISOString(),
           })
         );

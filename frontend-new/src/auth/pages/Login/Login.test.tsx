@@ -43,7 +43,8 @@ jest.mock("react-router-dom", () => {
 jest.mock("react-device-detect", () => ({
   browserName: "foo",
   deviceType: "bar",
-  osName: "baz"
+  osName: "baz",
+  browserVersion: "foo_version"
 }));
 
 // Mock the Firebase service
@@ -266,7 +267,8 @@ describe("Testing Login component", () => {
           user_id: givenUserId,
           browser_type: "foo", // from mock at the top of the file
           device_type: "bar", // from mock at the top of the file
-          os_type: "baz", // from mock at the top of the file
+          os_type: "baz", // from mock at the top of the file,
+          browser_version: "foo_version", // from mock at the top of the file
           timestamp: expect.any(String)
         })
       );
