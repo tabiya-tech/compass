@@ -25,52 +25,64 @@ export const requiredEnvVariables = [
  * Retrieves an environment variable from the global `tabiyaConfig` object.
  *
  * This method provides synchronous access to environment variables defined in `env.js`,
- * which is included via the `index.html`. All values in `tabiyaConfig` are expected to
- * be Base64-encoded strings.
+ * which is included via `index.html`. All values in `tabiyaConfig` are expected to be
+ * Base64-encoded UTF-8 strings, as produced during the build process (e.g., by
+ * `iac/frontend/prepare_frontend.py`).
  *
- * Upon retrieval, this function automatically decodes the Base64 string using `window.atob`.
- * If the variable is missing or any error occurs during decoding, an empty string is returned,
+ * Upon retrieval, this function automatically decodes the Base64 string and interprets it
+ * as UTF-8 using `TextDecoder`, ensuring correct handling of Unicode characters.
+ *
+ * If the variable is missing or an error occurs during decoding, an empty string is returned,
  * and an `EnvError` is logged to the console.
  *
- * Limitations with Unicode Strings:
- * -----------------------------------
- * Since `window.atob` and `window.btoa` only handle binary strings where each character
- * is a single byte (i.e., code points 0–255), this function **cannot natively support
- * Unicode strings** containing characters outside of the Latin-1 character set.
+ * Notes:
+ * - This function is designed to reverse only the Base64 encoding applied for obfuscation.
+ * - It does not attempt to infer or parse the meaning or type of the decoded data.
+ *   The calling code is responsible for handling the data appropriately (e.g. parsing JSON,
+ *   decoding binary data, converting to numbers, etc.).
+ * - Binary content (such as images or files) should be base64-encoded before being written
+ *   to the `.env` file. The consumer must then manually convert the decoded string back
+ *   into a binary format (e.g. a Blob or Uint8Array).
  *
- * If you need to store Unicode (multi-byte) strings in environment variables:
- * - Before setting the variable in `env.js`, encode the Unicode string into a
- *   Base64 string using `TextEncoder` and `Uint8Array` to ensure 1-byte characters.
- * - After retrieving the variable, decode it back using `TextDecoder`.
+ * Examples:
  *
- * It is the developer's responsibility to perform proper encoding and decoding —
- * this function assumes a Base64-encoded single-byte string and does not handle
- * Unicode conversions.
+ * 1. Unicode Text (e.g., Chinese "好运" = "Good Luck")
  *
- * Example: Handling Unicode (e.g., Chinese "好运" = "Good Luck")
+ * // Python encoding step (in prepare_frontend.py):
+ * base64.b64encode("好运".encode("utf-8"))  # Yields: b'5aSn5a2m'
  *
- * // Encoding step (run during build time or in your backend config script):
- * const text = "好运"; // Unicode string
- * const encoded = btoa(String.fromCharCode(...new TextEncoder().encode(text)));
- * // Set `encoded` as the value in `tabiyaConfig` in env.js
+ * // Decoding in frontend (handled internally by getEnv):
+ * const value = getEnv("APP_TITLE");
+ * console.log(value); // "好运"
  *
- * // Decoding step (in the frontend, after getEnv):
- * const raw = getEnv("MY_VAR");
- * const bytes = Uint8Array.from(raw, c => c.charCodeAt(0));
- * const decoded = new TextDecoder().decode(bytes);
- * console.log(decoded); // "好运"
+ * 2. Binary Data (e.g., JPEG Image)
+ *
+ * // Assume a JPEG file was base64-encoded and added to `.env`:
+ * MY_IMAGE="base64-encoded-string-of-jpeg"
+ *
+ * // Retrieve and convert to binary:
+ * const base64String = getEnv("MY_IMAGE");
+ * const binary = Uint8Array.from(atob(base64String), c => c.charCodeAt(0));
+ * const blob = new Blob([binary], { type: "image/jpeg" });
+ * const imageUrl = URL.createObjectURL(blob);
+ *
+ * // Use in an <img> tag:
+ * document.getElementById("preview").src = imageUrl;
  *
  * @param key - The name of the environment variable to retrieve.
- * @returns The decoded environment variable value, or an empty string if not found or invalid.
+ * @returns The decoded UTF-8 string, or an empty string if not found or invalid.
  */
-export const getEnv = (key: string) => {
+export const getEnv = (key: string): string => {
   try {
-    // @ts-ignore
-    const env = window.tabiyaConfig;
-    if (!env?.[key]) {
+    const env = (window as any).tabiyaConfig;
+    const base64Value = env?.[key];
+    if (!base64Value) {
       return "";
     }
-    return window.atob(env[key]);
+
+    const binary = window.atob(base64Value);
+    const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+    return new TextDecoder("utf-8").decode(bytes);
   } catch (e) {
     console.error(new EnvError(`Error loading environment variable ${key}`, e));
     return "";
