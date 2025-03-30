@@ -48,22 +48,26 @@ function check_args() {
   if [ "$#" -ne 4 ]; then
     echo "Usage: $0 <region> <project_id> <report_filename> <build_run>"
     cat << EOF
-  Build and Upload the frontend artifacts to the Google Cloud Artifacts Repository.
-  The artifacts are versioned based on the current git branch/tag name and the commit sha.
+  Build and upload the frontend artifacts to the Google Cloud Artifacts Repository.
+  Artifacts are versioned based on the current Git branch/tag name and commit SHA.
 
-  This script builds the frontend artifacts, compresses them, and uploads them to the Google Cloud Artifacts Repository.
+  This script performs the following steps:
+    1. Builds the frontend artifacts using Yarn.
+    2. Compresses the build output.
+    3. Uploads the artifact to the Google Cloud Artifacts Repository.
+    4. Optionally uploads sourcemaps to Sentry if SENTRY_AUTH_TOKEN is set.
+    5. Writes a versioned report with build info.
 
   Requirements:
-    - this script needs to run from the within the git repository.
-    - the intended branch/tag has been checked out.
-    - yarn install has been run in the frontend module.
+    - Must be run from within a Git repository.
+    - Intended branch or tag should be checked out.
+    - 'yarn install' must have been run in the frontend module directory.
 
   Arguments:
-    region: The region where the artifacts will be uploaded.
-    project_id: The project id where the artifacts will be uploaded.
-                Typically it is the root project id.
-    report_filename: The filename of the report file. Typically it is the GITHUB_STEP_SUMMARY when running in GitHub Actions.
-    build_run: The build run number. Typically it is the GITHUB_RUN_NUMBER when running in GitHub Actions.
+    region          The Google Cloud region to upload the artifacts to.
+    project_id      The Google Cloud project ID (usually the root project ID).
+    report_filename The file to write the summary report to (e.g., \$GITHUB_STEP_SUMMARY).
+    build_run       The build run number (e.g., \$GITHUB_RUN_NUMBER).
 EOF
     exit 1
   fi
