@@ -7,6 +7,8 @@ import {
   getFirebaseAPIKey,
   getFirebaseDomain,
   getSentryDSN,
+  getSentryEnabled,
+  getSentryConfig,
   getSensitivePersonalDataRSAEncryptionKey,
   getSensitivePersonalDataRSAEncryptionKeyId,
   ensureRequiredEnvVars,
@@ -35,6 +37,8 @@ describe.each([
   ["FIREBASE_AUTH_DOMAIN", getFirebaseDomain],
   ["BACKEND_URL", getBackendUrl],
   ["FRONTEND_SENTRY_DSN", getSentryDSN],
+  ["FRONTEND_ENABLE_SENTRY", getSentryEnabled],
+  ["FRONTEND_SENTRY_CONFIG", getSentryConfig],
   ["SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY", getSensitivePersonalDataRSAEncryptionKey],
   ["SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID", getSensitivePersonalDataRSAEncryptionKeyId],
   ["TARGET_ENVIRONMENT_NAME", getTargetEnvironmentName],
@@ -71,19 +75,19 @@ describe.each([
       expect(result).toBe("");
     });
 
-    test(`${getterFn.name} should return the API base URL`, () => {
+    test(`${getterFn.name} should return the correct value`, () => {
       // GIVEN the ENV_KEY environment variable is set to a base64 encoded string
-      const givenUrl = "https://SomeUrl.com/api";
+      const givenValue = `${ENV_KEY}_value`;
       Object.defineProperty(window, "tabiyaConfig", {
         value: {
-          [ENV_KEY]: btoa(givenUrl),
+          [ENV_KEY]: btoa(givenValue),
         },
         writable: true,
       });
       // WHEN getter Function is called
       const expectedValue = getterFn();
       // THEN expect it to return the decoded ENV_KEY
-      expect(expectedValue).toBe(givenUrl);
+      expect(expectedValue).toBe(givenValue);
     });
 
     test("should handle base64 decoding errors gracefully", () => {

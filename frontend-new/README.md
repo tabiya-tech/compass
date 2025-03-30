@@ -38,23 +38,27 @@ To develop this application locally, follow these steps:
 5. Set up the required environment variables:
 
    - Create a `env.js` file in the `public/data` directory. You can use the [`env.example.js`](public/data/env.example.js) file as a template.
-    
-      All the values of these variables should be encoded in base64 format. You can use the following command to encode the values:
+
+     All values of these variables should be encoded in base64 format. You can use the following command to encode the values:
       ```shell
       echo -n "your_value" | base64
       ``` 
-     Or use `btoa()` function in the browser console to encode the values. Since this is a javascript file.
-   
-   - The following environment variables are required:
-     - `FIREBASE_API_KEY`: The API key for Firebase authentication
-     - `FIREBASE_AUTH_DOMAIN`: The Firebase authentication domain
-     - `BACKEND_URL`: The URL of the backend API
-     - `TARGET_ENVIRONMENT_NAME`: The name of the environment (e.g. "dev", "test", "demo", ....)
-     - `FRONTEND_SENTRY_DSN`: The Sentry Data Source Name for error tracking (the frontend DSN is for the project used to track frontend errors)
-     - `FRONTEND_ENABLE_SENTRY`: A boolean value to enable or disable Sentry error tracking
-     - `FRONTEND_ENABLE_METRICS`: A boolean value to enable or disable metrics tracking
-     - `SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY`: The RSA public key used to encrypt sensitive personal data. It is in the [PEM](https://www.rfc-editor.org/rfc/rfc7468) format.
-     - `SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID`: The ID of the RSA public key. This is used to identify the key used to encrypt the sensitive personal data as it may be rotated over time.
+     Alternatively, you can use the `btoa()` function in the browser console, since this is a JavaScript file.
+
+     Make sure to also read the documentation for the [getEnv()](./src/envService.ts) function, especially regarding the encoding of Unicode strings.
+   - `SENTRY_AUTH_TOKEN`: (**Optional**) The Sentry authentication token, used to upload source maps
+
+   - The following environment variables can be set in the `env.js` file:
+     - `FIREBASE_API_KEY`: (**Mandatory**) The API key for Firebase authentication
+     - `FIREBASE_AUTH_DOMAIN`: (**Mandatory**) The Firebase authentication domain
+     - `BACKEND_URL`: (**Mandatory**) The URL of the backend API
+     - `TARGET_ENVIRONMENT_NAME`: (Mandatory) The name of the environment (e.g. "dev", "test", "demo", ....)
+     - `FRONTEND_SENTRY_DSN`: (**Optional**) The Sentry Data Source Name for error tracking (the frontend DSN is for the project used to track frontend errors)
+     - `FRONTEND_ENABLE_SENTRY`: (**Optional**) A boolean value to enable or disable Sentry error tracking
+     - `FRONTEND_SENTRY_CONFIG`: (**Optional**) A json object containing the Sentry configuration. This is used to configure Sentry for the frontend application. See [SentryConfig](./src/sentryInit.ts) for more details.
+     - `FRONTEND_ENABLE_METRICS`: (**Optional**) A boolean value to enable or disable metrics tracking
+     - `SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY`:(**Mandatory**) The RSA public key used to encrypt sensitive personal data. It is in the [PEM](https://www.rfc-editor.org/rfc/rfc7468) format.
+     - `SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID`: (**Mandatory**) The ID of the RSA public key. This is used to identify the key used to encrypt the sensitive personal data as it may be rotated over time.
 
    Please request the necessary environment variable values from the project team.
    
