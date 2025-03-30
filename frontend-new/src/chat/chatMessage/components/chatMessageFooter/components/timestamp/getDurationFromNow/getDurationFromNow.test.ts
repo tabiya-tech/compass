@@ -1,11 +1,18 @@
 import "src/_test_utilities/consoleMock";
 import { getDurationFromNow } from "./getDurationFromNow";
 
+function timeAgo({ days = 0, hours = 0, minutes = 0, seconds = 0 }) {
+  const now = Date.now();
+  const totalMilliseconds =
+    (((days * 24 + hours) * 60 + minutes) * 60 + seconds) * 1000;
+  return new Date(now - totalMilliseconds);
+}
+
 describe("getDurationFromNow", () => {
   describe("durations below a week", () => {
     test("should return the expected duration in days", () => {
       // GIVEN a date 5 days ago
-      const givenDate = new Date(new Date().setDate(new Date().getDate() - 5));
+      const givenDate = timeAgo({ days: 5 });
 
       // WHEN getDurationFromNow is called with the given date
       const result = getDurationFromNow(givenDate);
@@ -16,7 +23,7 @@ describe("getDurationFromNow", () => {
 
     test("should return the expected duration in hours", () => {
       // GIVEN a date 10 hours ago
-      const givenDate = new Date(new Date().getTime() - 10 * 60 * 60 * 1000);
+      const givenDate = timeAgo({ hours: 10 });
 
       // WHEN getDurationFromNow is called with the given date
       const result = getDurationFromNow(givenDate);
@@ -27,7 +34,7 @@ describe("getDurationFromNow", () => {
 
     test("should return the expected duration in minutes", () => {
       // GIVEN a date 10 minutes ago
-      const givenDate = new Date(new Date().getTime() - 10 * 60 * 1000);
+      const givenDate = timeAgo({ minutes: 10 });
 
       // WHEN getDurationFromNow is called with the given date
       const result = getDurationFromNow(givenDate);
@@ -38,9 +45,7 @@ describe("getDurationFromNow", () => {
 
     test("should return the expected duration in days, hours and minutes", () => {
       // GIVEN a date 5 days, 10 hours and 10 minutes ago
-      const givenDate = new Date(
-        new Date().getTime() - (5 * 24 * 60 * 60 * 1000 + 10 * 60 * 60 * 1000 + 10 * 60 * 1000)
-      );
+      const givenDate = timeAgo({ days: 5, hours: 10, minutes: 10 });
 
       // WHEN getDurationFromNow is called with the given date
       const result = getDurationFromNow(givenDate);
@@ -50,8 +55,8 @@ describe("getDurationFromNow", () => {
     });
 
     test("should return yesterday when the duration is 1 day", () => {
-      // GIVEN a date 1 day ago
-      const givenDate = new Date(new Date().setDate(new Date().getDate() - 1));
+      // GIVEN a date 24 hours ago
+      const givenDate = timeAgo({ hours: 24 });
 
       // WHEN getDurationFromNow is called with the given date
       const result = getDurationFromNow(givenDate);
@@ -62,7 +67,7 @@ describe("getDurationFromNow", () => {
 
     test("should return the expected duration in 'hour'", () => {
       // GIVEN a date 1 hour ago
-      const givenDate = new Date(new Date().getTime() - 1 * 60 * 60 * 1000);
+      const givenDate = timeAgo({ hours: 1 });
 
       // WHEN getDurationFromNow is called with the given date
       const result = getDurationFromNow(givenDate);
@@ -73,7 +78,7 @@ describe("getDurationFromNow", () => {
 
     test("should return the expected duration in 'minute'", () => {
       // GIVEN a date 1 minute ago
-      const givenDate = new Date(new Date().getTime() - 1 * 60 * 1000);
+      const givenDate = timeAgo({ minutes: 1 });
 
       // WHEN getDurationFromNow is called with the given date
       const result = getDurationFromNow(givenDate);
@@ -86,7 +91,7 @@ describe("getDurationFromNow", () => {
   describe("durations above a week", () => {
     test("should return the formatted date when the duration is more than a week", () => {
       // GIVEN a date 10 days ago
-      const givenDate = new Date(new Date().setDate(new Date().getDate() - 10));
+      const givenDate = timeAgo({ days: 10 });
 
       // WHEN getDurationFromNow is called with the given date
       const result = getDurationFromNow(givenDate);
@@ -97,7 +102,7 @@ describe("getDurationFromNow", () => {
 
     test("should return the formatted date when the duration is more than a month", () => {
       // GIVEN a date 30 days ago
-      const givenDate = new Date(new Date().setDate(new Date().getDate() - 30));
+      const givenDate = timeAgo({ days: 30 });
 
       // WHEN getDurationFromNow is called with the given date
       const result = getDurationFromNow(givenDate);
