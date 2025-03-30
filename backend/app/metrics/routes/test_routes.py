@@ -60,6 +60,7 @@ def get_device_specification_request() -> dict:
         "device_type": get_random_printable_string(10),
         "os_type": get_random_printable_string(10),
         "browser_type": get_random_printable_string(10),
+        "browser_version": get_random_printable_string(10),
         "timestamp": datetime.now().isoformat()
     }
 

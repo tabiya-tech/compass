@@ -127,7 +127,11 @@ class AbstractConversationEvent(AbstractUserAccountEvent):
     class Config:
         extra = "forbid"
 
-
+# INTRO: The agent director is in the intro phase.
+# COUNSELING: The agent director is in the counseling phase.
+# CHECKOUT: The agent director is in the checkout phase.
+# ENDED: The agent director has ended the conversation.
+# EXPERIENCE_EXPLORED: An experience has entered the PROCESSED phase and has top skills.
 ConversationPhaseLiteral = Literal["INTRO", "COUNSELING", "CHECKOUT", "ENDED", "EXPERIENCE_EXPLORED", "UNKNOWN"]
 
 
@@ -367,18 +371,23 @@ class DeviceSpecificationEvent(AbstractUserAccountEvent):
     """
     browser_type - the browser the user is using
     """
+    browser_version: str
+    """
+    browser_version - the version of the browser the user is using
+    """
     timestamp: datetime
     """
     timestamp - an iso string representing the timestamp of the event
     """
 
-    def __init__(self, *, user_id: str, device_type: str, os_type: str, browser_type: str, timestamp: str):
+    def __init__(self, *, user_id: str, device_type: str, os_type: str, browser_type: str, timestamp: str, browser_version: str):
         super().__init__(
             user_id=user_id,
             event_type=EventType.DEVICE_SPECIFICATION,
             device_type=device_type,
             os_type=os_type,
             browser_type=browser_type,
+            browser_version=browser_version,
             timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc)
         )
 
