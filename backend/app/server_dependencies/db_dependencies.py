@@ -255,7 +255,7 @@ class CompassDBProvider:
                     # Create the database instance
                     cls._taxonomy_mongo_db = _get_taxonomy_db(cls._get_settings().taxonomy_mongodb_uri,
                                                               cls._get_settings().taxonomy_database_name)
-                    cls._logger.info("Connected to MongoDB database: %s",
+                    cls._logger.info("Connected to Taxonomy MongoDB database: %s",
                                      await _get_database_connection_info(cls._taxonomy_mongo_db))
                     if not await check_mongo_health(cls._taxonomy_mongo_db.client):
                         raise RuntimeError("MongoDB health check failed for Taxonomy database")
@@ -271,7 +271,7 @@ class CompassDBProvider:
                     # Create the database instance
                     cls._metrics_mongo_db = _get_metrics_db(cls._get_settings().metrics_mongodb_uri,
                                                             cls._get_settings().metrics_database_name)
-                    cls._logger.info("Connected to MongoDB database: %s",
+                    cls._logger.info("Connected to Metrics MongoDB database: %s",
                                      await _get_database_connection_info(cls._metrics_mongo_db))
                     if not await check_mongo_health(cls._metrics_mongo_db.client):
                         raise RuntimeError("MongoDB health check failed for Metrics database")
