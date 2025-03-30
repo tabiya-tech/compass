@@ -106,6 +106,7 @@ def download_frontend_bundle(
 def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     sentry_dsn: str = getenv("FRONTEND_SENTRY_DSN", True, False)
     enable_sentry: str = getenv("FRONTEND_ENABLE_SENTRY", False, False)
+    sentry_config: str = getenv("FRONTEND_SENTRY_CONFIG", False, False)
     enable_metrics: str = getenv("FRONTEND_ENABLE_METRICS", False, False)
 
     sensitive_personal_data_rsa_encryption_key: str = getenv("SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY")
@@ -128,6 +129,7 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
         "TARGET_ENVIRONMENT_NAME": base64_encode(env_name),
         "FRONTEND_ENABLE_SENTRY": base64_encode(enable_sentry),
         "FRONTEND_SENTRY_DSN": base64_encode(sentry_dsn),
+        "FRONTEND_SENTRY_CONFIG": base64_encode(sentry_config),
         "FRONTEND_ENABLE_METRICS": base64_encode(enable_metrics),
         "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY": base64_encode(sensitive_personal_data_rsa_encryption_key),
         "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID": base64_encode(sensitive_personal_data_rsa_encryption_key_id),
