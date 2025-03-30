@@ -1,7 +1,7 @@
 /**
  * Serializes an unknown error into a plain object, handling various data types,
  * circular references, and nested errors. It captures essential properties of Error objects
- * such as name, message, stack trace, and class name. It also builds a `messageChain` string
+ * such as name, message, and stack trace. It also builds a `messageChain` string
  * that traces nested error messages for easier debugging.
  *
  * The returned object is safe for logging and transmission (e.g., for json serialization)
@@ -56,7 +56,6 @@ function _serializeError(error: any, seen: WeakSet<any>, depth: number, isRoot: 
         name: error.name,
         message: error.message,
         stack: truncateStack(error.stack, 10),
-        class: error.constructor?.name ?? error.name,
       };
 
       // Add current error to the message chain
@@ -64,7 +63,7 @@ function _serializeError(error: any, seen: WeakSet<any>, depth: number, isRoot: 
       if (depth > 0) {
         indent = " ".repeat(depth) + "↳ ";
       }
-      messageChain.push(`${indent}${serialized.class || serialized.name || "Error"}: ${serialized.message || ""}`);
+      messageChain.push(`${indent}${serialized.name || "Error"}: ${serialized.message || ""}`);
       // Iterate own properties only
       for (const key of Object.getOwnPropertyNames(error)) {
         if (!(key in serialized)) {

@@ -34,7 +34,6 @@ describe("serializeError", () => {
       message: "Test error",
       messageChain: expect.stringContaining("Error: Test error"),
       stack: expect.any(String),
-      class: "Error",
     });
   });
 
@@ -51,18 +50,15 @@ describe("serializeError", () => {
       name: "Error",
       message: "Root error",
       stack: expect.any(String),
-      class: "Error",
       messageChain: expect.stringContaining("Error: Root error\n ↳ Error: Child error\n  ↳ Error: Grandchild error"),
       cause: {
         name: "Error",
         message: "Child error",
         stack: expect.any(String),
-        class: "Error",
         cause: {
           name: "Error",
           message: "Grandchild error",
           stack: expect.any(String),
-          class: "Error",
         },
       },
     });
