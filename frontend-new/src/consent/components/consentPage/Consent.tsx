@@ -18,7 +18,7 @@ import ConfirmModalDialog from "src/theme/confirmModalDialog/ConfirmModalDialog"
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import { isSensitiveDataValid } from "src/app/ProtectedRoute/util";
 import { DeviceSpecificationEvent, EventType, UserLocationEvent } from "src/metrics/types";
-import { browserName, deviceType, osName } from "react-device-detect";
+import { browserName, deviceType, osName, browserVersion } from "react-device-detect";
 import { getCoordinates } from "src/metrics/utils/getUserLocation";
 import MetricsService from "src/metrics/metricsService";
 
@@ -61,39 +61,43 @@ const Consent: React.FC = () => {
 
   const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
 
-  async function sendMetricsEvent(user_id: string): Promise<void> {
-    try {
-      // Get device specifications
-      const deviceEvent: DeviceSpecificationEvent = {
-        event_type: EventType.DEVICE_SPECIFICATION,
-        user_id: user_id,
-        browser_type: browserName,
-        device_type: deviceType,
-        os_type: osName,
-        timestamp: new Date().toISOString(),
-      };
-      MetricsService.getInstance().sendMetricsEvent(deviceEvent);
-    } catch (error) {
-      console.error("An error occurred while trying to send metrics events", error);
-    }
-
-    try {
-      // Get user's location if they allow it
-      const coordinates = await getCoordinates();
-      const locationEvent: UserLocationEvent = {
-        event_type: EventType.USER_LOCATION,
-        user_id: user_id,
-        coordinates: coordinates,
-        timestamp: new Date().toISOString(),
-      };
-      MetricsService.getInstance().sendMetricsEvent(locationEvent);
-    } catch (err) {
-      if (err instanceof GeolocationPositionError) {
-        console.warn("Location could not be retrieved", err);
-      } else {
-        console.error("An error occurred while trying to get user's location", err);
+  function sendMetricsEvent(user_id: string): void {
+    setTimeout(async () => {
+      // we put the metrics gathering and reporting in an immediate setTimeout to avoid blocking the main thread
+      try {
+        // Get device specifications
+        const deviceEvent: DeviceSpecificationEvent = {
+          event_type: EventType.DEVICE_SPECIFICATION,
+          user_id: user_id,
+          browser_type: browserName,
+          device_type: deviceType,
+          os_type: osName,
+          browser_version: browserVersion,
+          timestamp: new Date().toISOString(),
+        };
+        MetricsService.getInstance().sendMetricsEvent(deviceEvent);
+      } catch (error) {
+        console.error("An error occurred while trying to send metrics events", error);
       }
-    }
+
+      try {
+        // Get user's location if they allow it
+        const coordinates = await getCoordinates();
+        const locationEvent: UserLocationEvent = {
+          event_type: EventType.USER_LOCATION,
+          user_id: user_id,
+          coordinates: coordinates,
+          timestamp: new Date().toISOString(),
+        };
+        MetricsService.getInstance().sendMetricsEvent(locationEvent);
+      } catch (err) {
+        if (err instanceof GeolocationPositionError) {
+          console.warn("Location could not be retrieved", err);
+        } else {
+          console.error("An error occurred while trying to get user's location", err);
+        }
+      }
+    })
   }
 
   /**
@@ -127,7 +131,7 @@ const Consent: React.FC = () => {
         navigate(routerPaths.ROOT, { replace: true });
       }
 
-      await sendMetricsEvent(prefs.user_id);
+      sendMetricsEvent(prefs.user_id);
 
       enqueueSnackbar("Agreement Accepted", { variant: "success" });
     } catch (e: unknown) {
