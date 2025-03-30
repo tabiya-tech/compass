@@ -15,6 +15,7 @@ import {
   requiredEnvVariables,
   getTargetEnvironmentName,
 } from "./envService";
+import { getRandomString } from "./_test_utilities/specialCharacters";
 
 test("getEnv should return the decoded environment variable value", () => {
   // GIVEN a key for an environment variable
@@ -76,11 +77,14 @@ describe.each([
     });
 
     test(`${getterFn.name} should return the correct value`, () => {
-      // GIVEN the ENV_KEY environment variable is set to a base64 encoded string
-      const givenValue = `${ENV_KEY}_value`;
+      // GIVEN the ENV_KEY environment variable is set to a base64 encoded unicode string
+      const givenValue = `${ENV_KEY}_${getRandomString(10)}`;
+      const utf8Bytes = new TextEncoder().encode(givenValue);
+      const binary = String.fromCharCode(...utf8Bytes);
+
       Object.defineProperty(window, "tabiyaConfig", {
         value: {
-          [ENV_KEY]: btoa(givenValue),
+          [ENV_KEY]: btoa(binary),
         },
         writable: true,
       });
