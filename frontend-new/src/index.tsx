@@ -56,13 +56,21 @@ const waitForRoot = (): Promise<HTMLElement> => {
   });
 };
 
+function fadeOutAndHide(el: HTMLElement, duration: number) {
+  el.style.transition = `opacity ${duration}ms ease`;
+  el.style.opacity = "0";
+  setTimeout(() => {
+    el.style.display = "none";
+  }, duration);
+}
+
 // Initialize React after root element is available
 waitForRoot()
   .then((rootElement) => {
     // At this point, the root element is in the DOM and the loading screen can be hidden.
     const loadingScreen = document.getElementById("loading");
     if (loadingScreen) {
-      loadingScreen.style.display = "none";
+      fadeOutAndHide(loadingScreen, 500);// fade out the loading screen over 500ms
     }
     const root = ReactDOM.createRoot(rootElement);
     root.render(
