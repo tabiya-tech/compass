@@ -178,12 +178,11 @@
         }
 
         setTimeout(() => {
-          // hide the loading screen
           clearTimeout(_tolerance_timer); // since the app has started, clear the tolerance timer
-          document.getElementById('loading').style.display = 'none';
+          // Create the root element for the React app.
+          // In index.tsx, make sure the root element is created before mounting the app
+          // and hiding the loading screen.
           const root = document.createElement('div');
-          // create root element for the React app
-          // make sure in the index.tsx file, to wait for the root element to be created before mounting the app
           root.id = 'root';
           document.body.appendChild(root);
         }, delay);
