@@ -20,13 +20,15 @@ initSentry();
 // Ensure all required environment variables are set
 ensureRequiredEnvVars();
 
-export const MAX_WAIT_TIME_FOR_ROOT_ELEMENT = 5000; // it should be greater than the minimum time
-                                                    // the loading screen will be shown (see public/index.html)
+export const MAX_WAIT_TIME_FOR_ROOT_ELEMENT = 10000; // it should be greater than the minimum time
+// the loading screen will be shown (see public/index.html)
 export const ROOT_ELEMENT_POLL_INTERVAL = 250;
 // Wait for the root element to be available in the DOM.
-// The root element is added only after the loading screen is removed (see public/index.html).
+// The root element is added if the app loads within a certain time frame,
+// or after the loading screen has been shown for the minimum required time (see public/index.html),
+// whichever happens first.
 const waitForRoot = (): Promise<HTMLElement> => {
-  const MAX_ATTEMPTS =  MAX_WAIT_TIME_FOR_ROOT_ELEMENT / ROOT_ELEMENT_POLL_INTERVAL;
+  const MAX_ATTEMPTS = MAX_WAIT_TIME_FOR_ROOT_ELEMENT / ROOT_ELEMENT_POLL_INTERVAL;
   return new Promise((resolve, reject) => {
     let attempts = 0;
     let timeoutId: NodeJS.Timeout;
@@ -57,6 +59,11 @@ const waitForRoot = (): Promise<HTMLElement> => {
 // Initialize React after root element is available
 waitForRoot()
   .then((rootElement) => {
+    // At this point, the root element is in the DOM and the loading screen can be hidden.
+    const loadingScreen = document.getElementById("loading");
+    if (loadingScreen) {
+      loadingScreen.style.display = "none";
+    }
     const root = ReactDOM.createRoot(rootElement);
     root.render(
       <React.StrictMode>
