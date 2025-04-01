@@ -122,7 +122,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
 
     // Check for special characters in original input
     if (inputValue !== filteredValue) {
-      errorMessage = `${ERROR_MESSAGES.INVALID_SPECIAL_CHARACTERS}: ${invalidChar}`;
+      errorMessage = `${ERROR_MESSAGES.INVALID_SPECIAL_CHARACTERS} ${invalidChar}`;
     }
 
     setErrorMessage(errorMessage);
