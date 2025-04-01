@@ -131,8 +131,10 @@ class AbstractConversationEvent(AbstractUserAccountEvent):
 # COUNSELING: The agent director is in the counseling phase.
 # CHECKOUT: The agent director is in the checkout phase.
 # ENDED: The agent director has ended the conversation.
+# COLLECT_EXPERIENCES: The user is being prompted to collect experiences.
+# DIVE_IN: The user has entered the exploration phase for an experience.
 # EXPERIENCE_EXPLORED: An experience has entered the PROCESSED phase and has top skills.
-ConversationPhaseLiteral = Literal["INTRO", "COUNSELING", "CHECKOUT", "ENDED", "EXPERIENCE_EXPLORED", "UNKNOWN"]
+ConversationPhaseLiteral = Literal["INTRO", "COUNSELING", "CHECKOUT", "ENDED", "COLLECT_EXPERIENCES", "DIVE_IN", "EXPERIENCE_EXPLORED", "EXPERIENCE_DISCOVERED", "UNKNOWN"]
 
 
 class ConversationPhaseEvent(AbstractConversationEvent):

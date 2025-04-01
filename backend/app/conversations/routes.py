@@ -21,6 +21,7 @@ from app.conversations.service import ConversationAlreadyConcludedError, IConver
 from app.conversations.types import ConversationResponse, ConversationInput
 from app.errors.constants import NO_PERMISSION_FOR_SESSION
 from app.errors.errors import UnauthorizedSessionAccessError
+from app.metrics.application_state_metrics_recorder.recorder import ApplicationStateMetricsRecorder
 from app.metrics.services.get_metrics_service import get_metrics_service
 from app.server_dependencies.agent_director_dependencies import get_agent_director
 from app.server_dependencies.application_state_dependencies import get_application_state_manager
@@ -39,10 +40,11 @@ async def get_conversation_service(agent_director: LLMAgentDirector = Depends(ge
                                    db: AsyncIOMotorDatabase = Depends(
                                        CompassDBProvider.get_application_db),
                                    metrics_service: IMetricsService = Depends(get_metrics_service)) -> IConversationService:
-    return ConversationService(agent_director=agent_director, application_state_manager=application_state_manager,
+    return ConversationService(agent_director=agent_director,
+                               application_state_metrics_recorder=ApplicationStateMetricsRecorder(
+                                   application_state_manager=application_state_manager, metrics_service=metrics_service),
                                conversation_memory_manager=conversation_memory_manager,
-                               reaction_repository=ReactionRepository(db),
-                               metrics_service=metrics_service)
+                               reaction_repository=ReactionRepository(db))
 
 
 def add_conversation_routes(app: FastAPI, authentication: Authentication):
