@@ -13,7 +13,7 @@ export const DATA_TEST_ID = {
 
 export interface AuthHeaderProps {
   title: string;
-  subtitle: React.ReactElement;
+  subtitle?: React.ReactElement;
 }
 
 const AuthHeader: React.FC<Readonly<AuthHeaderProps>> = ({ title, subtitle }) => {
@@ -37,9 +37,12 @@ const AuthHeader: React.FC<Readonly<AuthHeaderProps>> = ({ title, subtitle }) =>
       <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.AUTH_HEADER_TITLE}>
         {title}
       </Typography>
-      <Typography variant="body2" gutterBottom data-testid={DATA_TEST_ID.AUTH_HEADER_SUBTITLE}>
-        {subtitle}
-      </Typography>
+      {/* Only show a subtitle if needed */}
+      {subtitle && (
+        <Typography variant="body2" gutterBottom data-testid={DATA_TEST_ID.AUTH_HEADER_SUBTITLE}>
+          {subtitle}
+        </Typography>
+      )}
     </Box>
   );
 };

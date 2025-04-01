@@ -1,5 +1,5 @@
 // standard sentry mock
-import "src/_test_utilities/sentryMock"
+import "src/_test_utilities/sentryMock";
 import "src/_test_utilities/consoleMock";
 import React from "react";
 import { render, screen, waitFor, act, fireEvent } from "src/_test_utilities/test-utils";
@@ -16,13 +16,15 @@ import {
   Language,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import authStateService from "src/auth/services/AuthenticationState.service";
-import { TabiyaUser } from "src/auth/auth.types";
+import { INVITATIONS_PARAM_NAME, TabiyaUser } from "src/auth/auth.types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import * as AuthenticationServiceFactoryModule from "src/auth/services/Authentication.service.factory";
 import { DATA_TEST_ID as BUG_REPORT_DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import * as Sentry from "@sentry/react";
-import { DATA_TEST_ID as REQUEST_INVITATION_CODE_DATA_TEST_ID} from "src/auth/components/requestInvitationCode/RequestInvitationCode";
+import { DATA_TEST_ID as REQUEST_INVITATION_CODE_DATA_TEST_ID } from "src/auth/components/requestInvitationCode/RequestInvitationCode";
 import * as ReactRouterDomModule from "react-router-dom";
+import * as EnvServiceModule from "src/envService"
+import SocialAuth from "src/auth/components/SocialAuth/SocialAuth";
 
 //mock the SocialAuth component
 jest.mock("src/auth/components/SocialAuth/SocialAuth", () => {
@@ -146,9 +148,7 @@ jest.mock("src/feedback/bugReport/bugReportButton/BugReportButton", () => {
 
 // mock the RequestInvitationCode component
 jest.mock("src/auth/components/requestInvitationCode/RequestInvitationCode", () => {
-  const actual = jest.requireActual(
-    "src/auth/components/requestInvitationCode/RequestInvitationCode"
-  );
+  const actual = jest.requireActual("src/auth/components/requestInvitationCode/RequestInvitationCode");
   return {
     ...actual,
     __esModule: true,
@@ -195,7 +195,6 @@ describe("Testing Register component", () => {
 
     // WHEN the component is rendered within the AuthContext and Router
     render(<Register />);
-
 
     // THEN the component should be rendered
     expect(screen.getByTestId(DATA_TEST_ID.REGISTER_CONTAINER)).toBeInTheDocument();
@@ -379,4 +378,102 @@ describe("Testing Register component", () => {
     // AND expect no warning to have occurred
     expect(console.warn).not.toHaveBeenCalled();
   });
+
+  test("should handle application registration code", async () => {
+    // GIVEN the application registration code is set
+    const givenApplicationRegistrationCode = "app-reg-code";
+    jest.spyOn(EnvServiceModule, "getApplicationRegistrationCode").mockReturnValue(givenApplicationRegistrationCode)
+
+    // AND no application login code
+    jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue("")
+
+    // AND there is no registration code in the url
+    const mockLocation = {
+      pathname: "/register",
+      search: ``,
+    };
+    // @ts-ignore
+    jest.spyOn(ReactRouterDomModule, "useLocation").mockReturnValue(mockLocation);
+
+    // AND some user credentials.
+    const givenPassword = "password";
+    const givenEmail = "email"
+
+    // AND the register function returns a token
+    const registerMock = jest.fn().mockResolvedValue("foo-bar-token");
+    jest.spyOn(FirebaseEmailAuthenticationService, "getInstance").mockReturnValue({
+      register: registerMock,
+      login: jest.fn(),
+      logout: jest.fn(),
+    } as unknown as FirebaseEmailAuthenticationService);
+
+    // WHEN the component is rendered
+    render(<Register />);
+
+    // THEN the invitation code input should not be present
+    expect(screen.queryByTestId(DATA_TEST_ID.REGISTRATION_CODE_INPUT)).not.toBeInTheDocument();
+
+    // AND the social auth should be called with the correct arguments.
+    expect((SocialAuth as unknown as jest.Mock)).toHaveBeenCalledWith({
+      disabled: false,
+      isLoading: false,
+      label: "Sign up with Google",
+      notifyOnLoading: expect.any(Function),
+      postLoginHandler: expect.any(Function),
+      registrationCode: givenApplicationRegistrationCode,
+    }, {})
+
+    // AND the register form should match snapshot
+    expect(screen.getByTestId(DATA_TEST_ID.REGISTER_CONTAINER)).toMatchSnapshot();
+
+    // AND WHEN the register form is submitted
+    await act(async () => {
+      const calls = (RegisterWithEmailForm as jest.Mock).mock.calls;
+      await calls[calls.length - 1][0].notifyOnRegister(givenEmail, givenPassword);
+    });
+
+
+    // THEN expect the register function to have been called with the correct arguments
+    await waitFor(() => {
+      expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenEmail, givenApplicationRegistrationCode);
+    });
+  })
+
+  test("should prefer the url registration code over the application default registration code", async () => {
+    // GIVEN a default application code
+    const givenDefaultApplicationCode = "given-application-default-registration-code"
+    jest.spyOn(EnvServiceModule, "getApplicationRegistrationCode").mockReturnValue(givenDefaultApplicationCode)
+
+    // AND an invite code is in the url param
+    const givenURLParamRegistrationCode = "given-url-registration-code"
+    const mockLocation = {
+      pathname: "/register",
+      search: `?${INVITATIONS_PARAM_NAME}=${givenURLParamRegistrationCode}`,
+    };
+    // @ts-ignore
+    jest.spyOn(ReactRouterDomModule, "useLocation").mockReturnValue(mockLocation);
+
+    // WHEN the user registers the account.
+    const givenPassword = "password";
+    const givenEmail = "email"
+
+    // AND the register function returns a token
+    const registerMock = jest.fn().mockResolvedValue("foo-bar-token");
+    jest.spyOn(FirebaseEmailAuthenticationService, "getInstance")
+      .mockReturnValue({ register: registerMock} as unknown as FirebaseEmailAuthenticationService);
+
+    // WHEN the component is rendered
+    render(<Register />);
+
+    // AND WHEN the register form is submitted
+    await act(async () => {
+      const calls = (RegisterWithEmailForm as jest.Mock).mock.calls;
+      await calls[calls.length - 1][0].notifyOnRegister(givenEmail, givenPassword);
+    });
+
+    // THEN expect the register function to have been called with the correct arguments.
+    await waitFor(() => {
+      expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenEmail, givenURLParamRegistrationCode);
+    });
+  })
 });

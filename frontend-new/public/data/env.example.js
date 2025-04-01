@@ -21,4 +21,8 @@ window.tabiyaConfig = {
   "FRONTEND_ENABLE_METRICS": btoa("false"),
   "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY": btoa("sensitive-data-encryption-key"),
   "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID": btoa("key_id"),
+
+  // Application default invitation codes.
+  "FRONTEND_LOGIN_CODE": btoa("login_code"),
+  "FRONTEND_REGISTRATION_CODE": btoa("registration_code"),
 };
