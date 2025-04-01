@@ -8,10 +8,8 @@ import ChatMessageField, {
   ERROR_MESSAGES,
   PLACEHOLDER_TEXTS,
 } from "./ChatMessageField";
-import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
+import { render, screen, fireEvent, act, userEvent, waitFor } from "src/_test_utilities/test-utils";
 import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
-import userEvent from "@testing-library/user-event";
-import { waitFor } from "@testing-library/react";
 
 describe("ChatMessageField", () => {
   beforeEach(() => {
@@ -71,7 +69,7 @@ describe("ChatMessageField", () => {
     fireEvent.change(ChatMessageFieldInput, { target: { value: invalidMessage } });
 
     // THEN expect the error message to be in the document
-    expect(screen.getByText(`${ERROR_MESSAGES.INVALID_SPECIAL_CHARACTERS}: ${invalidChar}`)).toBeInTheDocument();
+    expect(screen.getByText(`${ERROR_MESSAGES.INVALID_SPECIAL_CHARACTERS}${invalidChar}`)).toBeInTheDocument();
     // AND the send button should be enabled
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON)).toBeEnabled();
     // AND the input field should be enabled
@@ -98,6 +96,40 @@ describe("ChatMessageField", () => {
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON)).toBeEnabled();
     // AND the input field should be enabled
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD)).toBeEnabled();
+    // AND no errors or warnings to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
+  });
+
+  test("should maintain caret position when adding invalid characters in the middle of the message", async () => {
+    // GIVEN the ChatMessageField is rendered
+    render(<ChatMessageField aiIsTyping={false} isChatFinished={false} handleSend={jest.fn()} />);
+
+    // AND the chat message field
+    const chatMessageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD) as HTMLInputElement;
+
+    // WHEN the user types a valid message
+    await userEvent.type(chatMessageField, "Hello");
+
+    // AND user moves caret to the middle of the text (after "Hello")
+    chatMessageField.setSelectionRange(2, 2);
+
+    // AND Record the caret position before invalid character input
+    const initialCaretPosition = chatMessageField.selectionStart;
+
+    // AND user types an invalid character at that position
+    // We need to use act to make sure the input updates and caret position are handled before the test checks them.
+    // eslint-disable-next-line testing-library/no-unnecessary-act
+    act(() => {
+      userEvent.type(chatMessageField, "*");
+    });
+
+    // THEN expect the invalid characters to be removed
+    expect(chatMessageField).toHaveValue("Hello");
+
+    // AND expect the caret to be at the correct position
+    expect(chatMessageField.selectionStart).toBe(initialCaretPosition);
+
     // AND no errors or warnings to have occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
