@@ -382,6 +382,14 @@ For details on **generating and importing embeddings**, refer to the [Embeddings
 
 Refer to the [Invitation Codes README](/invitations.md) for instructions on importing invitation codes.
 
+If the application is public, you can create global invitation and registration codes and store them in the `.env` file:
+
+```dotenv
+FRONTEND_LOGIN_CODE=<login-code>
+FRONTEND_REGISTRATION_CODE=<registration-code>
+```
+
+> Note: Occasionally monitor their capacity and timeframe and update if needed.
 
 ### Step 4.5: Generate Encryption Keys.
 

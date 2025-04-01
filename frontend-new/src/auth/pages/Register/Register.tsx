@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Container, Divider, TextField, Typography, useTheme } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -18,6 +18,7 @@ import { InvitationType } from "src/auth/services/invitationsService/invitations
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import { INVITATIONS_PARAM_NAME } from "src/auth/auth.types";
+import { getApplicationRegistrationCode } from "src/envService";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -61,7 +62,7 @@ const Register: React.FC = () => {
           pathname: location.pathname,
           search: newSearchParams.toString(),
         },
-        { replace: true },
+        { replace: true }
       );
     }
   }, [location, navigate]);
@@ -89,8 +90,12 @@ const Register: React.FC = () => {
       }
       enqueueSnackbar(`Registration Failed: ${errorMessage}`, { variant: "error" });
     },
-    [enqueueSnackbar],
+    [enqueueSnackbar]
   );
+
+  const applicationRegistrationCode = useMemo(() => {
+    return getApplicationRegistrationCode();
+  }, []);
 
   /* -----------
    * callbacks to pass to the child components
@@ -135,8 +140,10 @@ const Register: React.FC = () => {
       setIsLoading(true);
       try {
         const firebaseEmailAuthServiceInstance = FirebaseEmailAuthService.getInstance();
+        // if the instance has application registration code set, we should use that instead of the one entered by the user.
+        const registrationCodeToUse = registrationCode || applicationRegistrationCode;
         // We're using the mail as the username for now, since we don't have any use case in the app for it
-        await firebaseEmailAuthServiceInstance.register(email, password, email, registrationCode);
+        await firebaseEmailAuthServiceInstance.register(email, password, email, registrationCodeToUse);
         enqueueSnackbar("Verification Email Sent!", { variant: "success" });
         // IMPORTANT NOTE: after the preferences are added, or fail to be added, we should log the user out immediately,
         // since if we don't do that, the user may be able to access the application without verifying their email
@@ -150,7 +157,7 @@ const Register: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [navigate, enqueueSnackbar, setIsLoading, registrationCode, handleError],
+    [navigate, enqueueSnackbar, setIsLoading, registrationCode, handleError, applicationRegistrationCode]
   );
 
   /**
@@ -175,33 +182,39 @@ const Register: React.FC = () => {
         width={"100%"}
       >
         <AuthHeader title={"Welcome to Compass!"} subtitle={<>We need some information to get started</>} />
-        <Typography variant="subtitle2">Enter your registration code to sign up</Typography>
-        <TextField
-          fullWidth
-          label="Registration code"
-          variant="outlined"
-          required
-          value={registrationCode}
-          onChange={(e) => handleRegistrationCodeChanged(e)}
-          inputProps={{ "data-testid": DATA_TEST_ID.REGISTRATION_CODE_INPUT }}
-        />
-        <Divider textAlign="center" style={{ width: "100%" }}>
-          <Typography variant="subtitle2" padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-            and either continue with
-          </Typography>
-        </Divider>
+        {!applicationRegistrationCode && (
+          <React.Fragment>
+            <Typography variant="subtitle2">Enter your registration code to sign up</Typography>
+            <TextField
+              fullWidth
+              label="Registration code"
+              variant="outlined"
+              required
+              value={registrationCode}
+              onChange={(e) => handleRegistrationCodeChanged(e)}
+              inputProps={{ "data-testid": DATA_TEST_ID.REGISTRATION_CODE_INPUT }}
+            />
+          </React.Fragment>
+        )}
+        {!applicationRegistrationCode &&  (
+          <Divider textAlign="center" style={{ width: "100%" }}>
+            <Typography variant="subtitle2" padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
+              and either continue with
+            </Typography>
+          </Divider>
+        )}
         <RegisterWithEmailForm
-          disabled={!registrationCode}
+          disabled={!registrationCode && !applicationRegistrationCode}
           notifyOnRegister={handleRegister}
           isRegistering={isLoading}
         />
         <SocialAuth
           postLoginHandler={handlePostLogin}
           isLoading={isLoading}
-          disabled={!registrationCode}
+          disabled={!registrationCode && !applicationRegistrationCode}
           label={"Sign up with Google"}
           notifyOnLoading={notifyOnSocialLoading}
-          registrationCode={registrationCode}
+          registrationCode={registrationCode || applicationRegistrationCode}
         />
         <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>
           Already have an account? <CustomLink onClick={() => navigate(routerPaths.LOGIN)}>Login</CustomLink>

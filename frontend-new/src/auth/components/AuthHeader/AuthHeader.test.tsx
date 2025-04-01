@@ -24,4 +24,19 @@ describe("AuthHeader tests", () => {
     // AND expect the component to match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.AUTH_HEADER_CONTAINER)).toMatchSnapshot();
   });
+
+  test("should not render subtitle if not passed", () => {
+    // GIVEN that the component is rendered without a subtitle
+    const givenTitle = "Only title";
+    render(<AuthHeader title={givenTitle} />);
+
+    // THEN expect the subtitle to not be in the document
+    expect(screen.queryByTestId(DATA_TEST_ID.AUTH_HEADER_SUBTITLE)).toBeNull();
+
+    // AND only title to be in the document
+    expect(screen.getByTestId(DATA_TEST_ID.AUTH_HEADER_TITLE)).toBeInTheDocument();
+
+    // AND expect the component to match the snapshot
+    expect(screen.getByTestId(DATA_TEST_ID.AUTH_HEADER_CONTAINER)).toMatchSnapshot();
+  })
 });

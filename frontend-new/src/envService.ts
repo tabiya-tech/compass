@@ -10,6 +10,8 @@ export enum EnvVariables {
   TARGET_ENVIRONMENT_NAME = "TARGET_ENVIRONMENT_NAME",
   SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY = "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY",
   SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID = "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID",
+  FRONTEND_LOGIN_CODE = "FRONTEND_LOGIN_CODE",
+  FRONTEND_REGISTRATION_CODE = "FRONTEND_REGISTRATION_CODE",
 }
 
 export const requiredEnvVariables = [
@@ -81,7 +83,7 @@ export const getEnv = (key: string): string => {
     }
 
     const binary = window.atob(base64Value);
-    const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
     return new TextDecoder("utf-8").decode(bytes);
   } catch (e) {
     console.error(new EnvError(`Error loading environment variable ${key}`, e));
@@ -123,6 +125,14 @@ export const getSensitivePersonalDataRSAEncryptionKey = () => {
 
 export const getSensitivePersonalDataRSAEncryptionKeyId = () => {
   return getEnv(EnvVariables.SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID);
+};
+
+export const getApplicationLoginCode = () => {
+  return getEnv(EnvVariables.FRONTEND_LOGIN_CODE);
+};
+
+export const getApplicationRegistrationCode = () => {
+  return getEnv(EnvVariables.FRONTEND_REGISTRATION_CODE);
 };
 
 export const ensureRequiredEnvVars = () => {
