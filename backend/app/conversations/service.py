@@ -10,15 +10,14 @@ from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.agent.agent_types import AgentInput
 from app.agent.experience import ExperienceEntity
 from app.agent.explore_experiences_agent_director import DiveInPhase
-from app.application_state import IApplicationStateManager
 from app.conversation_memory.conversation_memory_manager import IConversationMemoryManager
 from app.conversations.reactions.repository import IReactionRepository
 from app.conversations.types import ConversationResponse
-from app.conversations.utils import get_messages_from_conversation_manager, filter_conversation_history, get_total_explored_experiences, cast_conversation_phase_to_metrics_event_phase, get_messages_metric_events_to_record
+from app.conversations.utils import get_messages_from_conversation_manager, filter_conversation_history, \
+    get_total_explored_experiences
 from app.sensitive_filter import sensitive_filter
 from app.types import Experience, Skill
-from app.metrics.services.service import IMetricsService
-from app.metrics.types import ConversationPhaseEvent, AbstractCompassMetricEvent
+from app.metrics.application_state_metrics_recorder.recorder import IApplicationStateMetricsRecorder
 
 
 class ConversationAlreadyConcludedError(Exception):
@@ -78,22 +77,20 @@ class IConversationService(ABC):
 
 class ConversationService(IConversationService):
     def __init__(self, *,
-                 application_state_manager: IApplicationStateManager,
+                 application_state_metrics_recorder: IApplicationStateMetricsRecorder,
                  agent_director: LLMAgentDirector,
                  conversation_memory_manager: IConversationMemoryManager,
-                 reaction_repository: IReactionRepository,
-                 metrics_service: IMetricsService):
+                 reaction_repository: IReactionRepository):
         self._logger = logging.getLogger(ConversationService.__name__)
         self._agent_director = agent_director
-        self._application_state_manager = application_state_manager
+        self._application_state_metrics_recorder = application_state_metrics_recorder
         self._conversation_memory_manager = conversation_memory_manager
         self._reaction_repository = reaction_repository
-        self._metrics_service = metrics_service
 
     async def send(self, user_id: str, session_id: int, user_input: str, clear_memory: bool,
                    filter_pii: bool) -> ConversationResponse:
         if clear_memory:
-            await self._application_state_manager.delete_state(session_id)
+            await self._application_state_metrics_recorder.delete_state(session_id)
         if filter_pii:
             user_input = await sensitive_filter.obfuscate(user_input)
 
@@ -101,27 +98,11 @@ class ConversationService(IConversationService):
         user_input = AgentInput(message=user_input, sent_at=datetime.now(timezone.utc))
 
         # set the state of the agent director, the conversation memory manager and all the agents
-        state = await self._application_state_manager.get_state(session_id)
+        state = await self._application_state_metrics_recorder.get_state(session_id)
 
         # Check if the conversation has ended
         if state.agent_director_state.current_phase == ConversationPhase.ENDED:
             raise ConversationAlreadyConcludedError(session_id)
-
-        metric_events: list[AbstractCompassMetricEvent] = []
-
-        # get the previous state of the experiences before any changes happen to compare for transitions
-        previous_explored_experiences = get_total_explored_experiences(state)
-        previous_conversation_phase = state.agent_director_state.current_phase
-
-        # If the agent director state is in intro phase, and we don't have any messages in the message history turns.
-        # It is the first message of the conversation. Record the conversation has started event.
-        if state.agent_director_state.current_phase == ConversationPhase.INTRO and len(
-                state.conversation_memory_manager_state.all_history.turns) == 0:
-            metric_events.append(ConversationPhaseEvent(
-                user_id=user_id,
-                session_id=session_id,
-                phase="INTRO"
-            ))
 
         self._agent_director.set_state(state.agent_director_state)
         self._agent_director.get_explore_experiences_agent().set_state(state.explore_experiences_director_state)
@@ -141,48 +122,19 @@ class ConversationService(IConversationService):
         response = await get_messages_from_conversation_manager(context, from_index=current_index)
         # get the date when the conversation was conducted
         state.agent_director_state.conversation_conducted_at = datetime.now(timezone.utc)
-        # Count for number of experiences explored in the conversation
-        experiences_explored = get_total_explored_experiences(state)
-        current_conversation_phase = state.agent_director_state.current_phase
-
-        # if the length of experiences explored has changed, record the event.
-        if previous_explored_experiences != experiences_explored:
-            metric_events.append(
-                ConversationPhaseEvent(
-                    user_id=user_id,
-                    session_id=session_id,
-                    phase="EXPERIENCE_EXPLORED"
-                )
-            )
-
-        # Record events related to the sending of message.
-        metric_events.extend(get_messages_metric_events_to_record(user_id, session_id, user_input, response))
-
-        # if the conversation phase has changed, record the event.
-        if previous_conversation_phase != current_conversation_phase:
-            metric_events.append(
-                ConversationPhaseEvent(
-                    user_id=user_id,
-                    session_id=session_id,
-                    phase=cast_conversation_phase_to_metrics_event_phase(current_conversation_phase, self._logger)
-                )
-            )
 
         # save the state, before responding to the user
-        await self._application_state_manager.save_state(state)
-
-        # record the metric events
-        await self._metrics_service.bulk_record_events(metric_events)
+        await self._application_state_metrics_recorder.save_state(state, user_id)
 
         return ConversationResponse(
             messages=response,
             conversation_completed=state.agent_director_state.current_phase == ConversationPhase.ENDED,
             conversation_conducted_at=state.agent_director_state.conversation_conducted_at,
-            experiences_explored=experiences_explored
+            experiences_explored=get_total_explored_experiences(state)
         )
 
     async def get_history_by_session_id(self, user_id: str, session_id: int) -> ConversationResponse:
-        state = await self._application_state_manager.get_state(session_id)
+        state = await self._application_state_metrics_recorder.get_state(session_id)
         self._conversation_memory_manager.set_state(state.conversation_memory_manager_state)
         context = await self._conversation_memory_manager.get_conversation_context()
         reactions_for_session = await self._reaction_repository.get_reactions(session_id)
@@ -205,7 +157,7 @@ class ConversationService(IConversationService):
 
     async def get_experiences_by_session_id(self, user_id: str, session_id: int) -> list[Experience]:
         # Get the experiences from the application state
-        state = await self._application_state_manager.get_state(session_id)
+        state = await self._application_state_metrics_recorder.get_state(session_id)
 
         experiences: list[Experience] = []
 
