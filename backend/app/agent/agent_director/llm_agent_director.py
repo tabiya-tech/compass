@@ -12,7 +12,7 @@ from app.agent.welcome_agent import WelcomeAgent
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.vector_search.vector_search_dependencies import SearchServices
-from common_libs.llm.models_utils import LLMConfig
+from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, DEFAULT_GENERATION_CONFIG
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 
 DEFAULT_AGENT = "DefaultAgent"
@@ -106,7 +106,7 @@ class LLMAgentDirector(AbstractAgentDirector):
             ConversationPhase.CHECKOUT: [farewell_agent_tasks, default_agent_tasks]
         }
         # initialize the router model
-        self._model = GeminiGenerativeLLM(config=LLMConfig())
+        self._model = GeminiGenerativeLLM(config=LLMConfig(generation_config=DEFAULT_GENERATION_CONFIG | JSON_GENERATION_CONFIG))
         self._llm_caller: LLMCaller[RouterModelResponse] = LLMCaller[RouterModelResponse](
             model_response_type=RouterModelResponse)
 
