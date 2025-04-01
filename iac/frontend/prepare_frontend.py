@@ -1,5 +1,7 @@
 import json
 import os
+from typing import Optional
+
 import sys
 import shutil
 import subprocess
@@ -108,6 +110,8 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     enable_sentry: str = getenv("FRONTEND_ENABLE_SENTRY", False, False)
     sentry_config: str = getenv("FRONTEND_SENTRY_CONFIG", False, False)
     enable_metrics: str = getenv("FRONTEND_ENABLE_METRICS", False, False)
+    login_code: Optional[str] = getenv("FRONTEND_LOGIN_CODE", False, False)
+    registration_code: Optional[str] = getenv("FRONTEND_REGISTRATION_CODE", False, False)
 
     sensitive_personal_data_rsa_encryption_key: str = getenv("SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY")
     sensitive_personal_data_rsa_encryption_key_id: str = getenv("SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID")
@@ -133,6 +137,8 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
         "FRONTEND_ENABLE_METRICS": base64_encode(enable_metrics),
         "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY": base64_encode(sensitive_personal_data_rsa_encryption_key),
         "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID": base64_encode(sensitive_personal_data_rsa_encryption_key_id),
+        "FRONTEND_LOGIN_CODE": base64_encode(login_code),
+        "FRONTEND_REGISTRATION_CODE": base64_encode(registration_code)
     }
 
     env_json_content = f"""window.tabiyaConfig = {json.dumps(frontend_env_json, indent=4)};"""

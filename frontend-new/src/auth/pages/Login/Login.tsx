@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Box, CircularProgress, Container, Divider, Typography, useTheme } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -15,8 +15,7 @@ import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationSe
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
-import FirebaseInvitationCodeAuthenticationService
-  from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
+import FirebaseInvitationCodeAuthenticationService from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
 import { AuthenticationError } from "src/error/commonErrors";
 import ResendVerificationEmail from "src/auth/components/resendVerificationEmail/ResendVerificationEmail";
 import RequestInvitationCode from "src/auth/components/requestInvitationCode/RequestInvitationCode";
@@ -27,6 +26,7 @@ import MetricsService from "src/metrics/metricsService";
 import { DeviceSpecificationEvent, EventType, UserLocationEvent } from "src/metrics/types";
 import { browserName, deviceType, osName, browserVersion } from "react-device-detect";
 import { getCoordinates } from "src/metrics/utils/getUserLocation";
+import { getApplicationLoginCode, getApplicationRegistrationCode } from "src/envService";
 
 const uniqueId = "7ce9ba1f-bde0-48e2-88df-e4f697945cc4";
 
@@ -44,6 +44,7 @@ export const DATA_TEST_ID = {
   LOGIN_LINK: `login-login-link-${uniqueId}`,
   LANGUAGE_SELECTOR: `login-language-selector-${uniqueId}`,
   REQUEST_LOGIN_CODE_LINK: `login-request-login-code-link-${uniqueId}`,
+  START_NEW_CONVERSATION_BUTTON: `login-start-new-conversation-button-${uniqueId}`,
 };
 
 enum ActiveForm {
@@ -105,7 +106,7 @@ const Login: React.FC = () => {
       const firebaseEmailAuthServiceInstance = FirebaseEmailAuthService.getInstance();
       await firebaseEmailAuthServiceInstance.logout();
     },
-    [enqueueSnackbar],
+    [enqueueSnackbar]
   );
 
   /* ------------------
@@ -155,13 +156,21 @@ const Login: React.FC = () => {
         MetricsService.getInstance().sendMetricsEvent(locationEvent);
       } catch (err) {
         if (err instanceof GeolocationPositionError) {
-        console.warn("Location could not be retrieved", err);
+          console.warn("Location could not be retrieved", err);
         } else {
           console.error("An error occurred while trying to get user's location", err);
         }
       }
-    })
+    });
   }
+
+  const applicationLoginCode = useMemo(() => {
+    return getApplicationLoginCode();
+  }, []);
+
+  const applicationRegistrationCode = useMemo(() => {
+    return getApplicationRegistrationCode();
+  }, []);
 
   /* ------------------
    * Callbacks to handle successful logins
@@ -177,15 +186,13 @@ const Login: React.FC = () => {
         // if the user has preferences, we can record some metrics about their device and location
         // if not the user will be redirected to the consent page to set their preferences
         // and once they accept the terms and conditions, the metrics will be recorded
-        sendMetricsEvent(prefs.user_id)
+        sendMetricsEvent(prefs.user_id);
         // and then navigate the user to the root page
         navigate(routerPaths.ROOT, { replace: true });
         enqueueSnackbar("Welcome back!", { variant: "success" });
       }
     } catch (error: unknown) {
-      console.error(
-        new AuthenticationError("An error occurred while trying to get your preferences", error),
-      );
+      console.error(new AuthenticationError("An error occurred while trying to get your preferences", error));
       let errorMessage;
       if (error instanceof RestAPIError) {
         errorMessage = getUserFriendlyErrorMessage(error);
@@ -223,7 +230,7 @@ const Login: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [handleError, handlePostLogin],
+    [handleError, handlePostLogin]
   );
 
   /**
@@ -244,7 +251,7 @@ const Login: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [enqueueSnackbar, handleError, handlePostLogin],
+    [enqueueSnackbar, handleError, handlePostLogin]
   );
 
   /**
@@ -271,8 +278,12 @@ const Login: React.FC = () => {
         enqueueSnackbar("Please fill in the email and password fields", { variant: "error" });
       }
     },
-    [email, handleLoginWithInvitationCode, handleLoginWithEmail, activeLoginForm, inviteCode, password, enqueueSnackbar],
+    [email, handleLoginWithInvitationCode, handleLoginWithEmail, activeLoginForm, inviteCode, password, enqueueSnackbar]
   );
+
+  const handleStartNewConversation = useCallback(() => {
+    handleLoginWithInvitationCode(applicationLoginCode).then(() => {});
+  }, [handleLoginWithInvitationCode, applicationLoginCode]);
 
   /* ------------------
    * side effects, like checking the invite code in the URL
@@ -298,7 +309,7 @@ const Login: React.FC = () => {
     const inviteCodeParam = params.get(INVITATIONS_PARAM_NAME);
     if (inviteCodeParam) {
       handleLoginWithInvitationCode(inviteCodeParam).then(() =>
-        console.info("Invitation code login successful: " + inviteCodeParam),
+        console.info("Invitation code login successful: " + inviteCodeParam)
       );
       // Remove the invite code from the URL
       const newSearchParams = new URLSearchParams(location.search);
@@ -308,7 +319,7 @@ const Login: React.FC = () => {
           pathname: location.pathname,
           search: newSearchParams.toString(),
         },
-        { replace: true },
+        { replace: true }
       );
     }
   }, [handleLoginWithInvitationCode, location, navigate]);
@@ -325,6 +336,14 @@ const Login: React.FC = () => {
   const isLoginButtonDisabled =
     isLoading || activeLoginForm === ActiveForm.NONE || ((!email || !password) && !inviteCode);
 
+  const invitationCodeAndEmailFormDividerText = useMemo(() => {
+    if (applicationLoginCode) {
+      return "Or login to your account to continue";
+    } else {
+      return "or"
+    }
+  }, [applicationLoginCode])
+
   return (
     <Container
       maxWidth="xs"
@@ -339,7 +358,7 @@ const Login: React.FC = () => {
         gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
         width={"100%"}
       >
-        <AuthHeader title={"Welcome to Compass!"} subtitle={<>Login to your account to continue</>} />
+        <AuthHeader title={"Welcome to Compass!"}/>
         <Box
           component="form"
           onSubmit={handleLoginSubmit}
@@ -350,21 +369,37 @@ const Login: React.FC = () => {
           width={"100%"}
           gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
         >
-          <Typography variant="subtitle2" data-testid={DATA_TEST_ID.SUBTITLE}>
-            Login using
-          </Typography>
-          <LoginWithInviteCodeForm
-            inviteCode={inviteCode}
-            notifyOnInviteCodeChanged={handleInviteCodeChanged}
-            isDisabled={isLoading}
-          />
+          {applicationLoginCode ? (
+            <PrimaryButton
+              disabled={isLoading}
+              disableWhenOffline={true}
+              onClick={handleStartNewConversation}
+              data-testid={DATA_TEST_ID.START_NEW_CONVERSATION_BUTTON}
+            >
+              Start a new conversation
+            </PrimaryButton>
+          ) : (
+            <React.Fragment>
+              <Typography variant="body2">
+                Login to your account to continue
+              </Typography>
+              <Typography variant="subtitle2" data-testid={DATA_TEST_ID.SUBTITLE}>
+                Login using
+              </Typography>
+              <LoginWithInviteCodeForm
+                inviteCode={inviteCode}
+                notifyOnInviteCodeChanged={handleInviteCodeChanged}
+                isDisabled={isLoading}
+              />
+            </React.Fragment>
+          )}
           <Divider textAlign="center" style={{ width: "100%" }}>
             <Typography
               variant="subtitle2"
               padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
               data-testid={DATA_TEST_ID.SUBTITLE}
             >
-              Or
+              {invitationCodeAndEmailFormDividerText}
             </Typography>
           </Divider>
 
@@ -406,6 +441,7 @@ const Login: React.FC = () => {
           postLoginHandler={handlePostLogin}
           isLoading={isLoading}
           notifyOnLoading={notifyOnSocialLoading}
+          registrationCode={applicationRegistrationCode}
         />
         <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>
           Don't have an account? <CustomLink onClick={() => navigate(routerPaths.REGISTER)}>Register</CustomLink>
