@@ -306,7 +306,9 @@ class _ConversationLLM:
                 Respond with something similar to this:
                     Explain that during this step you will only gather basic information about all my experiences, 
                     later we will move to the next step and explore each experience separately in detail.
-                    <add new line to separate the section>
+                    
+                    Add new line to separate explanation from the question.
+                    
                     {question_to_ask}.  
                 """)
         return replace_placeholders_with_indent(first_time_generative_prompt,
