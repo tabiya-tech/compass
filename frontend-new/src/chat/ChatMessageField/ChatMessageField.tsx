@@ -108,8 +108,12 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
 
   // Handle change in the input field and validate the message
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputElement = e.target;
     const inputValue = e.target.value;
     let errorMessage = "";
+
+    // Save caret position before changes, if it is null, use the end of the input value.
+    const previousCaretPosition = inputElement.selectionStart ?? inputValue.length;
 
     // Filter out disallowed characters
     let filteredValue = inputValue.replace(DISALLOWED_CHARACTERS, "");
@@ -126,7 +130,18 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     }
 
     setErrorMessage(errorMessage);
+
+    // Manually update input to keep caret position
+    inputElement.value = filteredValue;
+    // restore the message to the filtered value without invalid characters
     setMessage(filteredValue);
+
+    // Restore caret position after removing characters
+    const removedChars = inputValue.length - filteredValue.length;
+    // if the user has added new characters, the caret position should be moved to the right with the same count.
+    const newCaretPosition = previousCaretPosition - removedChars;
+    // Restore the caret position to the new caret position
+    inputElement.setSelectionRange(newCaretPosition, newCaretPosition);
   };
 
   // Handle Enter key press to send message or add new line depending on the platform
