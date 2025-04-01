@@ -1,5 +1,6 @@
 import argparse
 import os
+import re
 import sys
 
 import yaml
@@ -396,6 +397,13 @@ def add_select_environments_arguments(*, parser: argparse.ArgumentParser):
     )
 
 
+def _is_regex(template_value: str):
+    """
+    Check if the value is a regex pattern.
+    """
+    return template_value.startswith("/") and template_value.endswith("/")
+
+
 def compare_to_template(*, template: dict, actual_cfg: dict, parent: str = "root", strict: bool = False) -> bool:
     """
     Compare the keys of the template dict with the actual_cfg dict.
@@ -405,6 +413,7 @@ def compare_to_template(*, template: dict, actual_cfg: dict, parent: str = "root
     - If a value in `template` is a dictionary, its corresponding value in `actual_cfg` must also be a dictionary.
     - The function recursively verifies nested dictionaries.
     - If `strict=True`, the presence of extra keys in `actual_cfg` will cause failure.
+    - if the template value is between / and / then we validate regex considering /.*/ means optional value.
 
     :param template: The template dictionary (expected structure).
     :param actual_cfg: The actual configuration dictionary.
@@ -415,16 +424,26 @@ def compare_to_template(*, template: dict, actual_cfg: dict, parent: str = "root
 
     try:
         # Check for missing keys
-        for key, value in template.items():
-            if key not in actual_cfg:
-                print(f"Error: {parent}.{key} is missing in the actual configuration.")
-                return False
+        for key, template_value in template.items():
+            actual_value = actual_cfg.get(key, "")
+            if isinstance(template_value, str) and _is_regex(template_value):
+                regex_pattern = re.compile(template_value[1:-1])  # Extract regex pattern
+            else:
+                # otherwise it is required,
+                # At least one character, including new lines support.
+                regex_pattern = r"[\s\S]+"
 
-            if isinstance(value, dict):
+            if isinstance(template_value, dict):
                 if not isinstance(actual_cfg[key], dict):
                     print(f"Error: {parent}.{key} should be a dictionary in actual_cfg but is not.")
                     return False
-                if not compare_to_template(template=value, actual_cfg=actual_cfg[key], parent=f"{parent}.{key}", strict=strict):
+                if not compare_to_template(template=template_value, actual_cfg=actual_cfg[key], parent=f"{parent}.{key}", strict=strict):
+                    return False
+
+            # Handle regex validation
+            elif isinstance(template_value, str):
+                if not re.fullmatch(regex_pattern, str(actual_value)):
+                    print(f"Error: {parent}.{key} ({actual_value}) does not match the expected pattern {regex_pattern}.")
                     return False
 
         # Check for extra keys if strict mode is enabled
