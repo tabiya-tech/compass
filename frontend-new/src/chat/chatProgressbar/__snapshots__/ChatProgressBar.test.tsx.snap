@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ChatProgresBar render tests should render the progress bar with the correct phase and percentage 1`] = `
+<div
+  class="MuiBox-root css-156iqjm"
+  data-testid="chat-progress-bar-container-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
+>
+  <div
+    data-testid="chat-progress-bar-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
+    style="background-color: rgb(0, 255, 145); height: 100%; grid-row: 1; border-radius: 4px; grid-column: 1; width: 75%;"
+  />
+  <div
+    class="MuiBox-root css-1d3l42j"
+  >
+    <span
+      class="MuiTypography-root MuiTypography-progressBarText css-110x8ue-MuiTypography-root"
+      data-testid="chat-progress-bar-text-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
+    >
+      given-returned-user-friendly-phase-name
+    </span>
+    <div
+      class="MuiBox-root css-0"
+      data-testid="chat-progress-bar-label-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
+    >
+      75%
+    </div>
+  </div>
+</div>
+`;

@@ -95,4 +95,20 @@ declare module "@mui/material/styles" {
     tabiyaBlue?: PaletteColorOptions;
     tabiyaYellow?: PaletteColorOptions;
   }
+
+  interface TypographyVariants {
+    progressBarText: React.CSSProperties;
+  }
+
+  // allow configuration using `createTheme`
+  interface TypographyVariantsOptions {
+    progressBarText?: React.CSSProperties;
+  }
+}
+
+// Update the Typography's variant prop options
+declare module "@mui/material/Typography" {
+  interface TypographyPropsVariantOverrides {
+    progressBarText: true;
+  }
 }
