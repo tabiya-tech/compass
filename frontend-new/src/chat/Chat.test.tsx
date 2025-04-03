@@ -41,7 +41,8 @@ import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import { nanoid } from "nanoid";
 import { ReactionKind } from "src/chat/reaction/reaction.types";
 import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
-
+import { ConversationPhase } from "./chatProgressbar/types";
+import ChatProgressBar, { DATA_TEST_ID as CHAT_PROGRESS_BAR_DATA_TEST_ID } from "src/chat/chatProgressbar/ChatProgressBar";
 // Mock Components ----------
 // mock the snackbar
 jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
@@ -156,6 +157,21 @@ jest.mock("src/utils/preloadableComponent/PreloadableComponent", () => {
   };
 });
 
+// mock the ChatProgressBar component
+jest.mock("src/chat/chatProgressbar/ChatProgressBar", () => {
+  const actual = jest.requireActual("src/chat/chatProgressbar/ChatProgressBar");
+  return {
+    __esModule: true,
+    ...actual,
+    default: jest.fn().mockImplementation((props) => (
+      <div data-testid={actual.DATA_TEST_ID.CONTAINER}>
+        {props.phase} - {props.percentage}%
+      </div>
+    )),
+  };
+});
+
+
 describe("Chat", () => {
   // ExperienceService methods to be mocked
   const mockGetExperiences = jest.fn();
@@ -230,12 +246,16 @@ describe("Chat", () => {
     };
   }
 
-  function getMockConversationResponse(messages: ConversationMessage[]): ConversationResponse {
+  function getMockConversationResponse(messages: ConversationMessage[], phase: ConversationPhase, percentage: number): ConversationResponse {
     return {
       messages: messages,
       conversation_completed: false,
       conversation_conducted_at: null,
       experiences_explored: 0,
+      current_phase: {
+        percentage: percentage,
+        phase: phase
+      }
     };
   }
 
@@ -280,10 +300,10 @@ describe("Chat", () => {
           sender: ConversationMessageSender.COMPASS,
           reaction: null
         },
-      ]);
+      ], ConversationPhase.COLLECT_EXPERIENCES, 50);
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenChatHistoryResponse);
       // AND when a chat message is sent, it returns some message
-      jest.spyOn(ChatService.getInstance(), "sendMessage").mockResolvedValueOnce(getMockConversationResponse([]));
+      jest.spyOn(ChatService.getInstance(), "sendMessage").mockResolvedValueOnce(getMockConversationResponse([], ConversationPhase.COLLECT_EXPERIENCES, 0));
 
       // WHEN the Chat component is rendered
       render(<Chat />);
@@ -298,6 +318,13 @@ describe("Chat", () => {
       expect(screen.getByTestId(CHAT_LIST_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
       // AND expect the chat message field to be visible
       expect(screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER)).toBeInTheDocument();
+      // AND expect the chat progress bar to be visible
+      expect(screen.getByTestId(CHAT_PROGRESS_BAR_DATA_TEST_ID.CONTAINER)).toBeInTheDocument();
+      // AND expect the chat progress bar to be rendered with the correct phase and percentage
+      expect(ChatProgressBar as jest.Mock).toHaveBeenCalledWith(
+        expect.objectContaining({ phase: givenChatHistoryResponse.current_phase.phase, percentage: givenChatHistoryResponse.current_phase.percentage }),
+        {}
+      );
       // AND expect no console errors
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
@@ -315,6 +342,7 @@ describe("Chat", () => {
 
   describe("chat initialization", () => {
     describe("should initialize chat for a user with an active session", () => {
+
       test("should initialize chat and fetch history on mount when the user has an existing conversation that is not concluded", async () => {
         // GIVEN a logged-in user
         const givenUser: TabiyaUser = getMockUser();
@@ -343,10 +371,10 @@ describe("Chat", () => {
               kind: ReactionKind.LIKED
             }
           },
-        ]);
+        ], ConversationPhase.COLLECT_EXPERIENCES, 50);
         jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenChatHistoryResponse);
         // AND when a chat message is sent, it returns some message
-        jest.spyOn(ChatService.getInstance(), "sendMessage").mockResolvedValueOnce(getMockConversationResponse([]));
+        jest.spyOn(ChatService.getInstance(), "sendMessage").mockResolvedValueOnce(getMockConversationResponse([], ConversationPhase.COLLECT_EXPERIENCES, 0));
 
         // WHEN the component is rendered
         render(<Chat />);
@@ -404,10 +432,15 @@ describe("Chat", () => {
           conversation_completed: true, // completed conversation
           conversation_conducted_at: new Date().toISOString(),
           experiences_explored: 2,
+          current_phase:
+            {
+              percentage: 0,
+              phase: ConversationPhase.INTRO
+            }
         };
         jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenChatHistoryResponse);
         // AND when a chat message is sent, it returns some messages and a conversation completed flag
-        jest.spyOn(ChatService.getInstance(), "sendMessage").mockResolvedValueOnce(getMockConversationResponse([]));
+        jest.spyOn(ChatService.getInstance(), "sendMessage").mockResolvedValueOnce(getMockConversationResponse([], ConversationPhase.COLLECT_EXPERIENCES, 0));
 
         // WHEN the component is rendered
         render(<Chat />);
@@ -458,7 +491,7 @@ describe("Chat", () => {
             getMockUserPreferences(givenUser, givenActiveSessionId)
           );
           // AND the conversation history has some messages
-          const givenChatHistoryResponse: ConversationResponse = getMockConversationResponse([]);
+          const givenChatHistoryResponse: ConversationResponse = getMockConversationResponse([], ConversationPhase.INTRO, 0);
           jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenChatHistoryResponse);
           // AND when a chat message is sent, it returns a message
           const givenSendMessageResponse: ConversationResponse = getMockConversationResponse([
@@ -469,7 +502,7 @@ describe("Chat", () => {
               sender: ConversationMessageSender.COMPASS,
               reaction: null
             },
-          ]);
+          ], ConversationPhase.COLLECT_EXPERIENCES, 25);
           jest.spyOn(ChatService.getInstance(), "sendMessage").mockResolvedValue(givenSendMessageResponse);
 
           // WHEN the component is mounted
@@ -510,7 +543,7 @@ describe("Chat", () => {
             getMockUserPreferences(givenUser, givenActiveSessionId)
           );
           // AND the conversation history is empty
-          const givenChatHistoryResponse: ConversationResponse = getMockConversationResponse([]);
+          const givenChatHistoryResponse: ConversationResponse = getMockConversationResponse([], ConversationPhase.INTRO, 0);
           jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenChatHistoryResponse);
           // AND an error is thrown when sending a message
           const givenError = new Error("Failed to send message");
@@ -635,12 +668,12 @@ describe("Chat", () => {
             sender: ConversationMessageSender.COMPASS,
             reaction: null
           },
-        ]);
+        ], ConversationPhase.COLLECT_EXPERIENCES, 50);
         jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenChatHistoryResponse);
         // AND the conversation is completed
         givenChatHistoryResponse.conversation_completed = true;
         // AND when a chat message is sent, it returns some message
-        jest.spyOn(ChatService.getInstance(), "sendMessage").mockResolvedValueOnce(getMockConversationResponse([]));
+        jest.spyOn(ChatService.getInstance(), "sendMessage").mockResolvedValueOnce(getMockConversationResponse([], ConversationPhase.COLLECT_EXPERIENCES, 0));
 
         // WHEN the component is mounted
         render(<Chat />);
@@ -688,7 +721,7 @@ describe("Chat", () => {
         };
         jest.spyOn(UserPreferencesService.getInstance(), "getNewSession").mockResolvedValueOnce(givenUserPreferences);
         // AND the conversation history is empty
-        const givenChatHistoryResponse: ConversationResponse = getMockConversationResponse([]);
+        const givenChatHistoryResponse: ConversationResponse = getMockConversationResponse([], ConversationPhase.INTRO, 0);
         jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenChatHistoryResponse);
         // AND when a chat message is sent, it returns a message
         const givenSendMessageResponse: ConversationResponse = getMockConversationResponse([
@@ -699,7 +732,7 @@ describe("Chat", () => {
             sender: ConversationMessageSender.COMPASS,
             reaction: null
           },
-        ]);
+        ], ConversationPhase.COLLECT_EXPERIENCES, 25);
         jest.spyOn(ChatService.getInstance(), "sendMessage").mockResolvedValueOnce(givenSendMessageResponse);
 
         // WHEN the component is mounted
@@ -863,7 +896,7 @@ describe("Chat", () => {
         jest.spyOn(UserPreferencesService.getInstance(), "getNewSession").mockResolvedValueOnce(givenUserPreferences);
 
         // AND the chat history is empty
-        const givenChatHistoryResponse: ConversationResponse = getMockConversationResponse([]);
+        const givenChatHistoryResponse: ConversationResponse = getMockConversationResponse([], ConversationPhase.INTRO, 0);
         jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenChatHistoryResponse);
 
         // AND the sending a message fails
@@ -945,7 +978,7 @@ describe("Chat", () => {
           sender: ConversationMessageSender.COMPASS,
           reaction: null
         },
-      ]);
+      ], ConversationPhase.DIVE_IN, 75);
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenPreviousConversation);
       // AND a chat service that can sends a message successfully
       const givenSendMessageResponse: ConversationResponse = {
@@ -968,6 +1001,10 @@ describe("Chat", () => {
         conversation_completed: false,
         conversation_conducted_at: null,
         experiences_explored: 0,
+        current_phase: {
+            percentage: 0,
+            phase: ConversationPhase.INTRO
+          }
       };
       let resolveSendMessage!: (value: ConversationResponse) => void;
       const sendMessagePromise = new Promise<ConversationResponse>((resolve) => {
@@ -1115,7 +1152,7 @@ describe("Chat", () => {
           sender: ConversationMessageSender.COMPASS,
           reaction: null
         },
-      ]);
+      ], ConversationPhase.DIVE_IN, 75);
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenPreviousConversation);
       // AND a chat service that can sends a message successfully
       const givenSendMessageResponse: ConversationResponse = {
@@ -1138,6 +1175,11 @@ describe("Chat", () => {
         conversation_completed: true,
         conversation_conducted_at: new Date().toISOString(),
         experiences_explored: 3,
+        current_phase:
+          {
+            percentage: 0,
+            phase: ConversationPhase.INTRO
+          }
       };
       let resolveSendMessage!: (value: ConversationResponse) => void;
       const sendMessagePromise = new Promise<ConversationResponse>((resolve) => {
@@ -1292,7 +1334,7 @@ describe("Chat", () => {
           sender: ConversationMessageSender.COMPASS,
           reaction: null
         },
-      ]);
+      ], ConversationPhase.DIVE_IN, 75);
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenPreviousConversation);
 
       // AND sending a message will fail
@@ -1374,7 +1416,7 @@ describe("Chat", () => {
           sender: ConversationMessageSender.COMPASS,
           reaction: null
         },
-      ]);
+      ], ConversationPhase.COLLECT_EXPERIENCES, 50);
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenPreviousConversation);
       // AND the user has some experiences
       const givenExperiences = [
@@ -1453,6 +1495,11 @@ describe("Chat", () => {
         conversation_completed: false,
         conversation_conducted_at: null,
         experiences_explored: 0,
+        current_phase:
+          {
+            percentage: 0,
+            phase: ConversationPhase.INTRO
+          }
       };
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenPreviousConversation);
       // AND fetching experiences will fail
@@ -1523,8 +1570,8 @@ describe("Chat", () => {
           sender: ConversationMessageSender.USER,
           reaction: null
         },
-      ]);
-      const givenNewSessionChatHistoryResponse: ConversationResponse = getMockConversationResponse([]);
+      ], ConversationPhase.DIVE_IN, 75);
+      const givenNewSessionChatHistoryResponse: ConversationResponse = getMockConversationResponse([], ConversationPhase.INTRO, 0);
       const mockGetChatHistoryFn = (sessionId: number) => {
         if (sessionId === givenNewSessionId) {
           return Promise.resolve(givenNewSessionChatHistoryResponse);
@@ -1543,7 +1590,7 @@ describe("Chat", () => {
           sender: ConversationMessageSender.COMPASS,
           reaction: null
         },
-      ]);
+      ], ConversationPhase.COLLECT_EXPERIENCES, 25);
       jest.spyOn(ChatService.getInstance(), "sendMessage").mockResolvedValueOnce(givenSendMessageResponse);
 
       // AND the component is mounted
@@ -1638,7 +1685,7 @@ describe("Chat", () => {
             kind: ReactionKind.DISLIKED,
           },
         },
-      ]);
+      ], ConversationPhase.DIVE_IN, 75);
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenPreviousConversation);
 
       // AND the component is mounted
@@ -1701,7 +1748,7 @@ describe("Chat", () => {
             kind: ReactionKind.LIKED,
           },
         },
-      ]);
+      ], ConversationPhase.DIVE_IN, 75);
 
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenPreviousConversation);
 
@@ -1790,7 +1837,7 @@ describe("Chat", () => {
           sender: ConversationMessageSender.USER,
           reaction: null,
         },
-      ]);
+      ], ConversationPhase.DIVE_IN, 75);
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenMessages);
 
       // WHEN the component is mounted
@@ -1838,7 +1885,7 @@ describe("Chat", () => {
           sender: ConversationMessageSender.USER,
           reaction: null,
         },
-      ]);
+      ], ConversationPhase.DIVE_IN, 75);
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenMessages);
 
       // WHEN the component is mounted with disableInactivityCheck
@@ -1908,7 +1955,7 @@ describe("Chat", () => {
           sender: ConversationMessageSender.USER,
           reaction: null,
         },
-      ]);
+      ], ConversationPhase.DIVE_IN, 75);
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenMessages);
 
       // AND the component is mounted

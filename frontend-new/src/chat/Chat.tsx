@@ -4,11 +4,11 @@ import ChatList from "src/chat/chatList/ChatList";
 import { IChatMessage } from "./Chat.types";
 import {
   generateCompassMessage,
+  generateConversationConclusionMessage,
   generatePleaseRepeatMessage,
   generateSomethingWentWrongMessage,
   generateTypingMessage,
   generateUserMessage,
-  generateConversationConclusionMessage,
 } from "./util";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Box, useTheme } from "@mui/material";
@@ -31,6 +31,8 @@ import authenticationStateService from "src/auth/services/AuthenticationState.se
 import { issueNewSession } from "./issueNewSession";
 import { ChatProvider } from "src/chat/ChatContext";
 import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
+import ChatProgressBar from "./chatProgressbar/ChatProgressBar";
+import { CurrentPhase } from "./chatProgressbar/types";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -79,6 +81,8 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
   const initializingRef = useRef(false);
   const [initialized, setInitialized] = useState<boolean>(false);
+
+  const [currentPhase, setCurrentPhase] = useState<CurrentPhase>();
 
   /**
    * --- Utility functions ---
@@ -171,6 +175,9 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
         setConversationCompleted(response.conversation_completed);
         setConversationConductedAt(response.conversation_conducted_at);
+
+        // Set the current conversation phase
+        setCurrentPhase(response.current_phase)
       } catch (error) {
         console.error(new ChatError("Failed to send message:", error));
         addMessage(generatePleaseRepeatMessage());
@@ -240,6 +247,9 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
         // Set the active session id state
         setActiveSessionId(sessionId);
+
+        // Set the current conversation phase
+        setCurrentPhase(history.current_phase)
         return true;
       } catch (e) {
         console.error(new ChatError("Failed to initialize chat", e));
@@ -377,7 +387,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
             // This technique can solve the "Warning: An update to Chat inside a test was not wrapped in act(...)" warning.
             is-initialized={`${initialized}`}
           >
-            <Box padding={theme.spacing(theme.tabiyaSpacing.xl)}>
+            <Box padding={theme.spacing(theme.tabiyaSpacing.lg)}>
               <ChatHeader
                 notifyOnLogout={handleLogout}
                 startNewConversation={() => setNewConversationDialog(true)}
@@ -387,7 +397,10 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
                 setExploredExperiencesNotification={setExploredExperiencesNotification}
               />
             </Box>
-            <Box sx={{ flex: 1, overflowY: "auto", paddingX: theme.tabiyaSpacing.lg }}>
+            <Box paddingBottom={theme.spacing(theme.tabiyaSpacing.lg)} paddingX={theme.spacing(theme.tabiyaSpacing.md)}>
+              {currentPhase && <ChatProgressBar percentage={currentPhase.percentage} phase={currentPhase.phase} />}
+            </Box>
+            <Box sx={{ flex: 1, overflowY: "auto", paddingX: theme.spacing(theme.tabiyaSpacing.lg) }}>
               <ChatList messages={messages} />
             </Box>
             {showBackdrop && <InactiveBackdrop isShown={showBackdrop} />}
