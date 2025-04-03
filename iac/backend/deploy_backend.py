@@ -35,6 +35,7 @@ class BackendServiceConfig:
     sentry_dsn: str
     enable_sentry: str
     enable_metrics: str
+    default_country_of_user: str
     gcp_oauth_client_id: str
     cloudrun_max_instance_request_concurrency: int
     cloudrun_min_instance_count: int
@@ -307,7 +308,9 @@ def _deploy_cloud_run_service(
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="BACKEND_ENABLE_METRICS",
                             value=backend_service_cfg.enable_metrics),
-
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="DEFAULT_COUNTRY_OF_USER",
+                            value=backend_service_cfg.default_country_of_user),
                         # Add more environment variables here
                     ],
                 )
