@@ -4,7 +4,7 @@ from typing import cast
 
 from app.application_state import ApplicationState, IApplicationStateManager
 from app.metrics.services.service import IMetricsService
-from app.metrics.types import ConversationPhaseEvent, MessageCreatedEvent, \
+from app.metrics.types import ConversationPhaseEvent, ConversationTurnEvent, \
     AbstractCompassMetricEvent, ConversationPhaseLiteral
 from app.metrics.application_state_metrics_recorder.types import ApplicationStatesOfInterest
 
@@ -111,6 +111,15 @@ class ApplicationStateMetricsRecorder(IApplicationStateMetricsRecorder):
         """
         events: list[AbstractCompassMetricEvent] = []
 
+        # Record count changes
+        if current_state.user_message_count != previous_state.user_message_count or current_state.compass_message_count != previous_state.compass_message_count:
+            events.append(ConversationTurnEvent(
+                user_id=user_id,
+                session_id=session_id,
+                user_message_count=current_state.user_message_count,
+                compass_message_count=current_state.compass_message_count
+            ))
+
         # Record experience exploration changes
         experience_explored_diff = current_state.experiences_explored_count - previous_state.experiences_explored_count
         if experience_explored_diff > 0:
@@ -125,7 +134,7 @@ class ApplicationStateMetricsRecorder(IApplicationStateMetricsRecorder):
         experiences_discovered_diff = current_state.experiences_discovered_count - previous_state.experiences_discovered_count
         if previous_state.experiences_discovered_count != current_state.experiences_discovered_count:
             if experiences_discovered_diff > 0:
-                # right now the experiences_discovered count is going to change all at once when we get into the
+                # right now the experiences_discovered count is going to change all at once when we get into
                 # the dive in phase, so we need to record the events for each experience discovered together
                 for _ in range(experiences_discovered_diff):
                     events.append(ConversationPhaseEvent(
@@ -152,44 +161,6 @@ class ApplicationStateMetricsRecorder(IApplicationStateMetricsRecorder):
                 phase=cast(ConversationPhaseLiteral, current_state.counseling_phase)
             ))
 
-        # Record user message count changes first (to preserve the order of events)
-        user_message_diff = current_state.user_message_count - previous_state.user_message_count
-        if user_message_diff > 0:
-            for _ in range(user_message_diff):
-                events.append(MessageCreatedEvent(
-                    user_id=user_id,
-                    session_id=session_id,
-                    message_source="USER"
-                ))
-        elif user_message_diff < 0:
-            self.logger.warning(
-                "User message count decreased from %d to %d for user %s in session %s",
-                previous_state.user_message_count,
-                current_state.user_message_count,
-                user_id,
-                session_id
-            )
-
-        # Record compass message count changes
-        compass_message_diff = current_state.compass_message_count - previous_state.compass_message_count
-        if compass_message_diff > 0:
-            for _ in range(compass_message_diff):
-                events.append(MessageCreatedEvent(
-                    user_id=user_id,
-                    session_id=session_id,
-                    message_source="COMPASS"
-                ))
-        elif compass_message_diff < 0:
-            self.logger.warning(
-                "Compass message count decreased from %d to %d for user %s in session %s",
-                previous_state.compass_message_count,
-                current_state.compass_message_count,
-                user_id,
-                session_id
-            )
-
         # Record all events if there are any
         if events:
             await self._metrics_service.bulk_record_events(events)
-
-

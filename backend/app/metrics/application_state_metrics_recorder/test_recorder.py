@@ -1,6 +1,8 @@
+import random
+
 import pytest
 from unittest.mock import AsyncMock
-from typing import Literal, cast
+from typing import cast
 from datetime import datetime, timezone
 
 from app.agent.agent_director.abstract_agent_director import AgentDirectorState, ConversationPhase
@@ -22,7 +24,7 @@ from app.metrics.application_state_metrics_recorder.types import ApplicationStat
 from app.metrics.services.service import IMetricsService
 from app.metrics.types import (
     ConversationPhaseEvent,
-    MessageCreatedEvent,
+    ConversationTurnEvent,
     AbstractCompassMetricEvent
 )
 from common_libs.test_utilities import get_random_session_id, get_random_user_id, get_random_printable_string
@@ -67,9 +69,6 @@ def mock_application_state_manager() -> IApplicationStateManager:
             raise NotImplementedError()
 
     manager = MockedApplicationStateManager()
-    # mock the get_state and save_state methods
-    manager.get_state = AsyncMock()
-    manager.save_state = AsyncMock()
     return manager
 
 
@@ -95,6 +94,8 @@ class TestRecorderFlow:
         # AND the application state manager returns an empty state
         mock_application_state_manager.get_state = AsyncMock(
             return_value=get_empty_application_state(given_session_id))
+        # AND the application state manager's save_state method will succeed
+        mock_application_state_manager.save_state = AsyncMock()
 
         # WHEN get state is called for a session with no previous state
         recorder = ApplicationStateMetricsRecorder(
@@ -108,6 +109,9 @@ class TestRecorderFlow:
 
         # THEN expect the metrics service to have been called with events
         mock_metrics_service.bulk_record_events.assert_called_once()
+
+        # AND  the application state manager save_state method to have been called
+        mock_application_state_manager.save_state.assert_called_once_with(given_new_state)
 
     @pytest.mark.asyncio
     async def test_multiple_changes_recorded_together(
@@ -126,6 +130,9 @@ class TestRecorderFlow:
         # AND the application state manager returns an empty state
         mock_application_state_manager.get_state = AsyncMock(
             return_value=get_empty_application_state(given_session_id))
+
+        # AND the application state manager's save_state method will succeed
+        mock_application_state_manager.save_state = AsyncMock()
 
         # WHEN the recorder is asked to get a state for a session with no previous state
         recorder = ApplicationStateMetricsRecorder(
@@ -158,7 +165,7 @@ class TestRecorderFlow:
         given_new_state.agent_director_state.current_phase = ConversationPhase.COUNSELING
         # Change counseling phase
         given_new_state.explore_experiences_director_state.conversation_phase = CounselingPhase.DIVE_IN
-        # Add an discovered experience
+        # Add a discovered experience
         given_experience = ExperienceEntity(
             uuid=get_random_printable_string(10),
             experience_title="Test Experience",
@@ -177,21 +184,19 @@ class TestRecorderFlow:
         events = mock_metrics_service.bulk_record_events.call_args[0][0]
 
         # AND the metrics service should have recorded the following events:
-        # - 2 message events (one for the user message and one for the compass message)
+        # - 1 conversation turn event
         # - 2 conversation phase events (one for the main conversation phase and one for the counseling phase)
         # - 1 experience exploration event (one for the dive in phase)
-        assert len(events) == 6
-        message_events = [e for e in events if isinstance(e, MessageCreatedEvent)]
+        assert len(events) == 5
         conversation_phase_events = [e for e in events if isinstance(e, ConversationPhaseEvent)]
 
-        # AND there should be 2 message events (1 for COMPASS and 1 for the USER)
-        assert len(message_events) == 2
-        # AND a user message should be recorded
-        assert message_events[0].message_source == "USER"
-        # AND a compass message should be recorded
-        assert message_events[1].message_source == "COMPASS"
+        # AND a conversation turn event should be recorded
+        assert isinstance(events[0], ConversationTurnEvent)
+        assert events[0].compass_message_count == 1
+        assert events[0].user_message_count == 1
 
-        # AND there should be 4 conversation phase events (1 for the main conversation phase, 1 for the counseling phase, 1 for the experience exploration and one for the experience discovered)
+        # AND there should be 4 conversation phase events (1 for the main conversation phase, 1 for the counseling phase,
+        #   1 for the experience exploration and one for the experience discovered)
         assert len(conversation_phase_events) == 4
         # AND there should be 1 experience exploration event
         assert conversation_phase_events[0].phase == "EXPERIENCE_EXPLORED"
@@ -226,6 +231,8 @@ class TestRecorderFlow:
             application_state_manager=mock_application_state_manager,
             metrics_service=mock_metrics_service
         )
+        # AND the application state manager's save_state method will succeed
+        mock_application_state_manager.save_state = AsyncMock()
 
         # WHEN the recorder is asked to get a state for a session with no previous state
         await recorder.get_state(given_session_id)
@@ -254,6 +261,9 @@ class TestRecorderFlow:
         mock_application_state_manager.get_state = AsyncMock(
             return_value=get_empty_application_state(given_session_id))
 
+        # AND the application state manager's save_state method will succeed
+        mock_application_state_manager.save_state = AsyncMock()
+
         # WHEN the recorder is asked to get a state for a session with no previous state
         recorder = ApplicationStateMetricsRecorder(
             application_state_manager=mock_application_state_manager,
@@ -263,6 +273,7 @@ class TestRecorderFlow:
 
         # AND a save state happens with an invalid state that will cause the ApplicationStatesOfInterest.from_state method to raise an error
         given_new_state = get_empty_application_state(given_session_id)
+        # noinspection PyTypeChecker
         given_new_state.agent_director_state.current_phase = "INVALID_PHASE"
         await recorder.save_state(given_new_state, given_user_id)
 
@@ -272,10 +283,8 @@ class TestRecorderFlow:
 
 class TestRecordMetricEventsFunction:
     @pytest.mark.asyncio
-    @pytest.mark.parametrize("given_message_source", ["USER", "COMPASS"])
-    async def test_record_metric_events_message_created_from_empty_state(
+    async def test_record_metric_events_conversation_turn_event_from_empty_state(
             self,
-            given_message_source: Literal["USER", "COMPASS"],
             mock_metrics_service: IMetricsService,
             mock_application_state_manager: IApplicationStateManager,
             setup_application_config: ApplicationConfig):
@@ -290,8 +299,8 @@ class TestRecordMetricEventsFunction:
         given_previous_state = ApplicationStatesOfInterest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
-            compass_message_count=0,
-            user_message_count=0,
+            compass_message_count=1,
+            user_message_count=1,
             experiences_explored_count=0,
             experiences_discovered_count=0
         )
@@ -299,8 +308,8 @@ class TestRecordMetricEventsFunction:
         given_current_state = ApplicationStatesOfInterest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
-            compass_message_count=1 if given_message_source == "COMPASS" else 0,
-            user_message_count=1 if given_message_source == "USER" else 0,
+            compass_message_count=given_previous_state.compass_message_count + random.randint(1, 10),  # nosec B311 # random is used for testing purposes
+            user_message_count=given_previous_state.user_message_count + random.randint(1, 10),  # nosec B311 # random is used for testing purposes
             experiences_explored_count=0,
             experiences_discovered_count=0
         )
@@ -316,7 +325,96 @@ class TestRecordMetricEventsFunction:
         # AND there should be 1 message event
         assert len(events) == 1
         # AND the first event should be the user message
-        assert events[0].message_source == given_message_source
+        assert events[0].compass_message_count == given_current_state.compass_message_count
+        assert events[0].user_message_count == given_current_state.user_message_count
+
+    @pytest.mark.asyncio
+    async def test_record_metric_events_conversation_turn_event_from_previous_state_with_messages(
+            self,
+            mock_metrics_service: IMetricsService,
+            mock_application_state_manager: IApplicationStateManager,
+            setup_application_config: ApplicationConfig
+    ):
+        # GIVEN a metrics service that successfully records events
+        mock_metrics_service.bulk_record_events = AsyncMock()
+        # AND a session_id
+        session_id = get_random_session_id()
+        # AND a user_id
+        user_id = get_random_user_id()
+
+        # AND a previous state with 1 user message and 1 compass message
+        given_previous_state = ApplicationStatesOfInterest(
+            conversation_phase="NOT_STARTED",
+            counseling_phase="NOT_STARTED",
+            compass_message_count=1,
+            user_message_count=2,
+            experiences_explored_count=0,
+            experiences_discovered_count=0
+        )
+        # AND a current state with 2 user messages and 2 compass messages
+        given_current_state = ApplicationStatesOfInterest(
+            conversation_phase="NOT_STARTED",
+            counseling_phase="NOT_STARTED",
+            compass_message_count=3,
+            user_message_count=4,
+            experiences_explored_count=0,
+            experiences_discovered_count=0
+        )
+        # WHEN the record_metric_events function is called with a previous state, current state, session_id and user_id
+        recorder = ApplicationStateMetricsRecorder(
+            application_state_manager=mock_application_state_manager,
+            metrics_service=mock_metrics_service
+        )
+        await recorder.record_metric_events(given_previous_state, given_current_state, session_id, user_id)
+        # THEN the metrics service should have been called with the expected events
+        mock_metrics_service.bulk_record_events.assert_called_once()
+        events = mock_metrics_service.bulk_record_events.call_args[0][0]
+        # AND there should be 1 conversation turn event
+        assert len(events) == 1
+        # AND the conversation turn event should have 2 user messages and 2 compass messages
+        assert events[0].compass_message_count == 3
+        assert events[0].user_message_count == 4
+
+    @pytest.mark.asyncio
+    async def test_record_metric_events_conversation_turn_event_from_previous_state_with_no_changes(
+            self,
+            mock_metrics_service: IMetricsService,
+            mock_application_state_manager: IApplicationStateManager,
+            setup_application_config: ApplicationConfig
+    ):
+        # GIVEN a metrics service that successfully records events
+        mock_metrics_service.bulk_record_events = AsyncMock()
+        # AND a session_id
+        session_id = get_random_session_id()
+        # AND a user_id
+        user_id = get_random_user_id()
+
+        # AND a previous state with 1 user message and 1 compass message
+        given_previous_state = ApplicationStatesOfInterest(
+            conversation_phase="NOT_STARTED",
+            counseling_phase="NOT_STARTED",
+            compass_message_count=1,
+            user_message_count=2,
+            experiences_explored_count=0,
+            experiences_discovered_count=0
+        )   
+        # AND a current state with 1 user message and 1 compass message
+        given_current_state = ApplicationStatesOfInterest(
+            conversation_phase="NOT_STARTED",
+            counseling_phase="NOT_STARTED",
+            compass_message_count=1, # no change
+            user_message_count=2, # no change
+            experiences_explored_count=0, 
+            experiences_discovered_count=0 
+        )
+        # WHEN the record_metric_events function is called with a previous state, current state, session_id and user_id
+        recorder = ApplicationStateMetricsRecorder(
+            application_state_manager=mock_application_state_manager,
+            metrics_service=mock_metrics_service
+        )
+        await recorder.record_metric_events(given_previous_state, given_current_state, session_id, user_id)
+        # THEN the metrics service should not have been called
+        mock_metrics_service.bulk_record_events.assert_not_called()
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize("given_conversation_phase", ["INTRO", "COUNSELING", "CHECKOUT", "ENDED"])
@@ -385,7 +483,7 @@ class TestRecordMetricEventsFunction:
 
         # AND an empty previous state
         given_previous_state = ApplicationStatesOfInterest(
-            conversation_phase="COUNSELING", # we should start out as counseling to isolate the counseling phase change
+            conversation_phase="COUNSELING",  # we should start out as counseling to isolate the counseling phase change
             counseling_phase="NOT_STARTED",
             compass_message_count=0,
             user_message_count=0,
@@ -490,7 +588,7 @@ class TestRecordMetricEventsFunction:
         # AND a current state with an explored experience
         given_current_state = ApplicationStatesOfInterest(
             conversation_phase="NOT_STARTED",
-            counseling_phase="DIVE_IN", # we only count the discovered experiences when we are in the DIVE_IN phase
+            counseling_phase="DIVE_IN",  # we only count the discovered experiences when we are in the DIVE_IN phase
             compass_message_count=0,
             user_message_count=0,
             experiences_explored_count=0,
@@ -510,4 +608,3 @@ class TestRecordMetricEventsFunction:
         # AND there should be 2 events ( one for moving to dive in and one for the experience discovered)
         assert len(events) == 2
         assert events[0].phase == "EXPERIENCE_DISCOVERED"
-

@@ -65,6 +65,17 @@ class MetricsRepository(IMetricsRepository):
                     },
                     upsert=True
                 ))
+            elif event.event_type == EventType.CONVERSATION_TURN:
+                commands.append(UpdateOne(
+                    {
+                        "event_type": {"$eq": EventType.CONVERSATION_TURN.value},
+                        "anonymized_user_id": {"$eq": event.anonymized_user_id},
+                        "anonymized_session_id": {"$eq": event.anonymized_session_id},
+                    },
+                    # upsert the compass and user counts and increment the turn count (not in the passed event object)
+                    {"$set": self._to_db_doc(event), "$inc": {"turn_count": 1}},
+                    upsert=True
+                ))
             else:
                 commands.append(InsertOne(self._to_db_doc(event)))
         return await self.collection.bulk_write(commands)
