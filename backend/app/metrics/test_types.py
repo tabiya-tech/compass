@@ -2,7 +2,6 @@
 Tests for the metric type models.
 """
 import random
-from typing import cast
 
 from app.app_config import ApplicationConfig, set_application_config
 import pytest
@@ -15,10 +14,10 @@ from app.metrics.types import (
     AbstractConversationEvent,
     UserAccountCreatedEvent,
     ConversationPhaseEvent,
-    MessageCreatedEvent,
+    ConversationTurnEvent,
     FeedbackProvidedEvent,
     FeedbackRatingValueEvent,
-    MessageReactionCreatedEvent, MessageCreatedEventSourceLiteral,
+    MessageReactionCreatedEvent,
 )
 from app.conversations.reactions.types import ReactionKind, DislikeReason
 from app.metrics.constants import EventType
@@ -306,16 +305,9 @@ class TestFeedbackRatingValueEvent:
                                      user_id=given_user_id, extra_field=given_extra_field)  # type:ignore
 
 
-class TestMessageCreatedEvent:
-    @pytest.mark.parametrize(
-        "given_source",
-        [
-            "USER",
-            "COMPASS"
-        ],
-    )
+class TestConversationTurnEvent:
     def test_fields_are_set_correctly(self, setup_application_config: ApplicationConfig,
-                                      mocker: pytest_mock.MockerFixture, given_source):
+                                      mocker: pytest_mock.MockerFixture):
         # datetime.now returns a fixed time
         fixed_time = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)
         mocker.patch('common_libs.time_utilities._time_utils.datetime', new=mocker.Mock(now=lambda tz=None: fixed_time))
@@ -324,12 +316,19 @@ class TestMessageCreatedEvent:
         given_session_id = get_random_session_id()
         given_user_id = get_random_user_id()
 
+        # AND a random compass message count and user message count
+        given_compass_message_count = random.randint(1, 10)  # nosec B311 # random is used for testing purposes
+        given_user_message_count = random.randint(1, 10)  # nosec B311 # random is used for testing purposes
+
         # WHEN creating an instance of the event
-        actual_event = MessageCreatedEvent(session_id=given_session_id, user_id=given_user_id,
-                                           message_source=cast(MessageCreatedEventSourceLiteral, given_source))
+        actual_event = ConversationTurnEvent(
+            session_id=given_session_id, user_id=given_user_id,
+            compass_message_count=given_compass_message_count,  # nosec B311 # random is used for testing purposes
+            user_message_count=given_user_message_count,  # nosec B311 # random is used for testing purposes
+        )
 
         # THEN the fields should be set correctly
-        assert_basic_event_fields_are_set(actual_event, EventType.MESSAGE_CREATED, setup_application_config, fixed_time)
+        assert_basic_event_fields_are_set(actual_event, EventType.CONVERSATION_TURN, setup_application_config, fixed_time)
 
         # AND the session id should be anonymized
         assert actual_event.anonymized_session_id is not None
@@ -339,14 +338,10 @@ class TestMessageCreatedEvent:
         assert actual_event.anonymized_user_id is not None
         assert actual_event.anonymized_user_id != given_user_id
 
-    def test_should_raise_validation_error_if_source_is_not_valid(self, setup_application_config: ApplicationConfig):
-        # GIVEN an invalid source
-        given_invalid_source = "INVALID"
-
-        # WHEN creating an instance of the event
-        with pytest.raises(ValidationError, match="Input should be 'USER' or 'COMPASS'"):
-            MessageCreatedEvent(session_id=get_random_session_id(), user_id=get_random_user_id(),
-                                message_source=cast(MessageCreatedEventSourceLiteral, given_invalid_source))
+        # AND the compass message count should match the given value
+        assert actual_event.compass_message_count == given_compass_message_count
+        # AND the user message count
+        assert actual_event.user_message_count == given_user_message_count
 
     def test_extra_fields_are_not_allowed(self, setup_application_config: ApplicationConfig):
         # GIVEN all required fields
@@ -359,7 +354,7 @@ class TestMessageCreatedEvent:
         # WHEN creating an instance of the event
         # THEN it should raise a TypeError indicating that the extra field is not allowed.
         with pytest.raises(TypeError, match="got an unexpected keyword argument 'extra_field'"):
-            MessageCreatedEvent(
+            ConversationTurnEvent(
                 session_id=given_session_id,
                 user_id=given_user_id,
                 extra_field=given_extra_field)  # type:ignore

@@ -208,21 +208,20 @@ class FeedbackRatingValueEvent(AbstractConversationEvent):
         extra = "forbid"
 
 
-MessageCreatedEventSourceLiteral = Literal["USER", "COMPASS"]
-
-
-class MessageCreatedEvent(AbstractConversationEvent):
+class ConversationTurnEvent(AbstractConversationEvent):
     """
-    A metric event representing the creation of a message in a conversation
+    A metric event representing the counts of user and compass turns in a conversation
     """
-    message_source: MessageCreatedEventSourceLiteral
+    compass_message_count: int
+    user_message_count: int
 
-    def __init__(self, *, user_id: str, session_id: int, message_source: MessageCreatedEventSourceLiteral):
+    def __init__(self, *, user_id: str, session_id: int, compass_message_count: int, user_message_count: int):
         super().__init__(
             user_id=user_id,
             session_id=session_id,
-            event_type=EventType.MESSAGE_CREATED,
-            message_source=message_source
+            event_type=EventType.CONVERSATION_TURN,
+            compass_message_count=compass_message_count,
+            user_message_count=user_message_count
         )
 
     class Config:
