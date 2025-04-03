@@ -7,11 +7,23 @@ exports[`Chat render tests should render the Chat component with all its childre
   is-initialized="true"
 >
   <div
-    class="MuiBox-root css-j1qbo8"
+    class="MuiBox-root css-1bzbenu"
   >
     <div
       data-testid="chat-header-container-7413b63a-887b-4f41-b930-89e9770db12b"
     />
+  </div>
+  <div
+    class="MuiBox-root css-1q9e775"
+  >
+    <div
+      data-testid="chat-progress-bar-container-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
+    >
+      COLLECT_EXPERIENCES
+       - 
+      50
+      %
+    </div>
   </div>
   <div
     class="MuiBox-root css-pkmnlt"

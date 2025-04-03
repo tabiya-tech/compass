@@ -14,7 +14,7 @@ from app.conversation_memory.conversation_memory_manager import IConversationMem
 from app.conversations.reactions.repository import IReactionRepository
 from app.conversations.types import ConversationResponse
 from app.conversations.utils import get_messages_from_conversation_manager, filter_conversation_history, \
-    get_total_explored_experiences
+    get_total_explored_experiences, get_current_conversation_phase_response
 from app.sensitive_filter import sensitive_filter
 from app.types import Experience, Skill
 from app.metrics.application_state_metrics_recorder.recorder import IApplicationStateMetricsRecorder
@@ -130,7 +130,8 @@ class ConversationService(IConversationService):
             messages=response,
             conversation_completed=state.agent_director_state.current_phase == ConversationPhase.ENDED,
             conversation_conducted_at=state.agent_director_state.conversation_conducted_at,
-            experiences_explored=get_total_explored_experiences(state)
+            experiences_explored=get_total_explored_experiences(state),
+            current_phase=get_current_conversation_phase_response(state, self._logger)
         )
 
     async def get_history_by_session_id(self, user_id: str, session_id: int) -> ConversationResponse:
@@ -152,7 +153,8 @@ class ConversationService(IConversationService):
             messages=messages,
             conversation_completed=state.agent_director_state.current_phase == ConversationPhase.ENDED,
             conversation_conducted_at=state.agent_director_state.conversation_conducted_at,
-            experiences_explored=experiences_explored
+            experiences_explored=experiences_explored,
+            current_phase=get_current_conversation_phase_response(state, self._logger)
         )
 
     async def get_experiences_by_session_id(self, user_id: str, session_id: int) -> list[Experience]:

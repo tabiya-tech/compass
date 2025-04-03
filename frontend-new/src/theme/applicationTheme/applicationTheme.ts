@@ -286,6 +286,12 @@ export const applicationTheme = (theme: ThemeMode) => {
         fontWeight: "400",
         fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem),
       },
+      progressBarText: {
+        fontFamily: "IBM Plex Mono",
+        fontWeight: "700",
+        fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem),
+        color: activePalette.text!!.primary,
+      }
     },
     components: {
       MuiDialogTitle: {

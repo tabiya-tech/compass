@@ -9,7 +9,7 @@ import pytest_mock
 from app.agent.experience import WorkType
 from app.conversations.reactions.routes import get_user_preferences_repository
 from app.conversations.types import ConversationResponse, ConversationMessage, ConversationInput, \
-    ConversationMessageSender
+    ConversationMessageSender, ConversationPhaseResponse, CurrentConversationPhaseResponse
 from app.conversations.constants import MAX_MESSAGE_LENGTH
 from app.conversations.routes import get_conversation_service, add_conversation_routes
 from app.conversations.service import IConversationService, ConversationAlreadyConcludedError
@@ -142,7 +142,11 @@ class TestConversationsRoutes:
             ],
             conversation_completed=False,
             conversation_conducted_at=datetime.now().isoformat(),
-            experiences_explored=0
+            experiences_explored=0,
+            current_phase=ConversationPhaseResponse(
+                percentage=0,
+                phase=CurrentConversationPhaseResponse.INTRO
+            )
         )
 
         # AND mock the repository and service responses
@@ -391,7 +395,11 @@ class TestConversationsRoutes:
             ],
             conversation_completed=False,
             conversation_conducted_at=datetime.now().isoformat(),
-            experiences_explored=0
+            experiences_explored=0,
+            current_phase=ConversationPhaseResponse(
+                percentage=0,
+                phase=CurrentConversationPhaseResponse.INTRO
+            )
         )
         mocked_service.get_history_by_session_id = AsyncMock(return_value=expected_response)
         service_spy = mocker.spy(mocked_service, "get_history_by_session_id")
