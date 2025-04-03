@@ -35,8 +35,8 @@ test_cases = [
         conversation_rounds=100,
         name='minimal_user_e2e',
         simulated_user_prompt=dedent("""
-            You're a Gen Y living alone. You have one year of experience in a job as shoe salesperson. 
-            You are have never had another job experience beside the shoe salesperson job. Also never
+            You're a Gen Y living alone. You have one year of experience in a job as a shoe salesperson. 
+            You have never had another job experience beside the shoe salesperson job. Also never
             did any internship, never run your own business, never volunteered, never did any freelance work.
             """) + system_instruction_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
