@@ -91,6 +91,8 @@ const ChatList: React.FC<ChatListProps> = ({ messages }) => {
           width: "100%",
           display: "flex",
           flexDirection: "column",
+          padding: 0,
+          margin: 0,
           gap: theme.fixedSpacing(theme.tabiyaSpacing.md),
         }}
       >
@@ -105,7 +107,7 @@ const ChatList: React.FC<ChatListProps> = ({ messages }) => {
               variants={messageVariants}
               disablePadding={true}
               transition={{ duration: 0.3 }}
-              sx={{ width: "100%", padding: theme.tabiyaSpacing.xs }}
+              sx={{ width: "100%", paddingY: theme.tabiyaSpacing.xs, paddingX: 0 }}
             >
               {getChatMessageFlavorFromType(message)}
             </ListItem>

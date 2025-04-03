@@ -41,6 +41,7 @@ import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import { nanoid } from "nanoid";
 import { ReactionKind } from "src/chat/reaction/reaction.types";
 import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
+import { ConversationPhase } from "./chatProgressbar/types";
 
 // Mock Components ----------
 // mock the snackbar
@@ -236,6 +237,10 @@ describe("Chat", () => {
       conversation_completed: false,
       conversation_conducted_at: null,
       experiences_explored: 0,
+      current_phase: {
+        percentage: 0,
+        phase: ConversationPhase.INTRO
+      }
     };
   }
 
@@ -404,6 +409,11 @@ describe("Chat", () => {
           conversation_completed: true, // completed conversation
           conversation_conducted_at: new Date().toISOString(),
           experiences_explored: 2,
+          current_phase:
+            {
+              percentage: 0,
+              phase: ConversationPhase.INTRO
+            }
         };
         jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenChatHistoryResponse);
         // AND when a chat message is sent, it returns some messages and a conversation completed flag
@@ -968,6 +978,10 @@ describe("Chat", () => {
         conversation_completed: false,
         conversation_conducted_at: null,
         experiences_explored: 0,
+        current_phase: {
+            percentage: 0,
+            phase: ConversationPhase.INTRO
+          }
       };
       let resolveSendMessage!: (value: ConversationResponse) => void;
       const sendMessagePromise = new Promise<ConversationResponse>((resolve) => {
@@ -1138,6 +1152,11 @@ describe("Chat", () => {
         conversation_completed: true,
         conversation_conducted_at: new Date().toISOString(),
         experiences_explored: 3,
+        current_phase:
+          {
+            percentage: 0,
+            phase: ConversationPhase.INTRO
+          }
       };
       let resolveSendMessage!: (value: ConversationResponse) => void;
       const sendMessagePromise = new Promise<ConversationResponse>((resolve) => {
@@ -1453,6 +1472,11 @@ describe("Chat", () => {
         conversation_completed: false,
         conversation_conducted_at: null,
         experiences_explored: 0,
+        current_phase:
+          {
+            percentage: 0,
+            phase: ConversationPhase.INTRO
+          }
       };
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenPreviousConversation);
       // AND fetching experiences will fail

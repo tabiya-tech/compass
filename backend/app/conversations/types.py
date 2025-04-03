@@ -76,6 +76,35 @@ class ConversationMessage(BaseModel):
         extra = "forbid"
 
 
+# The current phase of the conversation.
+# There should be a contract between this enum with the frontend.
+# Refer to the file frontend-new/src/chat/chatProgressbar/types.ts#ConversationPhase.
+# And the user-friendly message is located in the frontend on this module.
+# If you are adding a new phase, please add it to the frontend as well.
+class CurrentConversationPhaseResponse(Enum):
+    INTRO = "INTRO"
+    COLLECT_EXPERIENCES = "COLLECT_EXPERIENCES"
+    DIVE_IN = "DIVE_IN"
+    ENDED = "ENDED"
+
+    # An unknown phase, used for error handling and fallbacks.
+    UNKNOWN = "UNKNOWN"
+
+
+class ConversationPhaseResponse(BaseModel):
+    # current_experience_index: int
+
+    percentage: float
+    """The percentage of the conversation completed, from 0 to 100"""
+
+    phase: CurrentConversationPhaseResponse
+    """The current phase of the conversation. Used for getting a user-friendly message in the frontend"""
+
+    class Config:
+        extra = "forbid"
+        use_enum_values = True
+
+
 class ConversationResponse(BaseModel):
     messages: list[ConversationMessage]
     """The messages in the conversation"""
@@ -85,6 +114,8 @@ class ConversationResponse(BaseModel):
     """The time the conversation was conducted"""
     experiences_explored: int = 0
     """The number of experiences explored"""
+    current_phase: ConversationPhaseResponse
+    """The current phase of the conversation"""
 
     @field_serializer('conversation_conducted_at')
     def serialize_conversation_conducted_at(self, value: datetime | None) -> str | None:
