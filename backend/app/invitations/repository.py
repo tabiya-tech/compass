@@ -7,7 +7,10 @@ from pymongo import ReturnDocument, UpdateOne
 from app.server_dependencies.database_collections import Collections
 from app.invitations.types import UserInvitation, InvitationType
 from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
-from common_libs.time_utilities import get_now,  datetime_to_mongo_date, mongo_date_to_datetime
+from common_libs.time_utilities import get_now, datetime_to_mongo_date, mongo_date_to_datetime
+
+# The threshold to log a warning when the remaining usage is less than 10% of the allowed usage
+REMAINING_USAGE_WARNING_THRESHOLD = 0.1  # 10%
 
 
 class UserInvitationRepository:
@@ -143,9 +146,15 @@ class UserInvitationRepository:
             if not _doc:
                 return False
 
+            # If the remaining usage is < than 10% of te allowed usage, log a warning
+            remaining_usage = _doc.get("remaining_usage")
+            if remaining_usage < (_doc.get("allowed_usage") * REMAINING_USAGE_WARNING_THRESHOLD):
+                self._logger.warning(
+                    f"Invitation '{_doc.get('invitation_type')}' with code '{invitation_code}' has less than 10% remaining usage: ({remaining_usage})")
+
             # If the remaining usage is less than 0, know that the invitation is invalid and return False
             # This is for an edge case, when the two requests are made at the same time and the remaining usage gets reduced to -1.
-            if _doc.get("remaining_usage") < 0:
+            if remaining_usage < 0:
                 return False
 
             return True
