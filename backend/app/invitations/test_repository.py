@@ -328,22 +328,15 @@ class TestReduceCapacity:
         _assert_invitation_matches(actual_invitation, given_invitation)
 
     @pytest.mark.asyncio
-    async def test_find_one_and_update_is_not_atomic(
+    async def test_reduce_capacity_returns_false_for_negative_remaining_usage(
             self,
-            mocker: pytest_mock.MockerFixture,
             get_user_invitation_data_repository: Awaitable[UserInvitationRepository]):
         repository = await get_user_invitation_data_repository
 
-        # GIVEN an invitation is already saved in the database.
+        # GIVEN an invitation with a negative remaining usage is already saved in the database.
         given_invitation = _get_new_invitation()
+        given_invitation.remaining_usage = -1
         await repository.upsert_many_invitations([given_invitation])
-
-        # AND repository._collection.find_one_and_update will return a negative remaining usage.
-        _find_one_and_update_spy = mocker.patch.object(
-            repository._collection,
-            'find_one_and_update',
-            new_callable=pytest_mock.AsyncMockType,
-            return_value={"remaining_usage": -1})
 
         # WHEN the reduce capacity function is called.
         actual_is_reduced = await repository.reduce_capacity(given_invitation.invitation_code)
