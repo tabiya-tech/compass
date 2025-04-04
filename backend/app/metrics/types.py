@@ -127,6 +127,7 @@ class AbstractConversationEvent(AbstractUserAccountEvent):
     class Config:
         extra = "forbid"
 
+
 # INTRO: The agent director is in the intro phase.
 # COUNSELING: The agent director is in the counseling phase.
 # CHECKOUT: The agent director is in the checkout phase.
@@ -134,7 +135,8 @@ class AbstractConversationEvent(AbstractUserAccountEvent):
 # COLLECT_EXPERIENCES: The user is being prompted to collect experiences.
 # DIVE_IN: The user has entered the exploration phase for an experience.
 # EXPERIENCE_EXPLORED: An experience has entered the PROCESSED phase and has top skills.
-ConversationPhaseLiteral = Literal["INTRO", "COUNSELING", "CHECKOUT", "ENDED", "COLLECT_EXPERIENCES", "DIVE_IN", "EXPERIENCE_EXPLORED", "EXPERIENCE_DISCOVERED", "UNKNOWN"]
+ConversationPhaseLiteral = Literal[
+    "INTRO", "COUNSELING", "CHECKOUT", "ENDED", "COLLECT_EXPERIENCES", "DIVE_IN", "UNKNOWN"]
 
 
 class ConversationPhaseEvent(AbstractConversationEvent):
@@ -152,6 +154,47 @@ class ConversationPhaseEvent(AbstractConversationEvent):
             session_id=session_id,
             event_type=EventType.CONVERSATION_PHASE,
             phase=phase
+        )
+
+    class Config:
+        extra = "forbid"
+
+class ExperienceDiscoveredEvent(AbstractConversationEvent):
+    """
+    A metric event representing the number of experiences discovered by a user
+    """
+    experience_count: int
+    """
+    experience_count - the number of experiences discovered by a user
+    """
+
+    def __init__(self, *, user_id: str, session_id: int, experience_count: int):
+        super().__init__(
+            user_id=user_id,
+            session_id=session_id,
+            event_type=EventType.EXPERIENCE_DISCOVERED,
+            experience_count=experience_count
+        )
+
+    class Config:
+        extra = "forbid"
+
+
+class ExperienceExploredEvent(AbstractConversationEvent):
+    """
+    A metric event representing the number of experiences explored by a user
+    """
+    experience_count: int
+    """
+    experience_count - the number of experiences explored by a user
+    """
+
+    def __init__(self, *, user_id: str, session_id: int, experience_count: int):
+        super().__init__(
+            user_id=user_id,
+            session_id=session_id,
+            event_type=EventType.EXPERIENCE_EXPLORED,
+            experience_count=experience_count
         )
 
     class Config:
@@ -381,7 +424,8 @@ class DeviceSpecificationEvent(AbstractUserAccountEvent):
     timestamp - an iso string representing the timestamp of the event
     """
 
-    def __init__(self, *, user_id: str, device_type: str, os_type: str, browser_type: str, timestamp: str, browser_version: str):
+    def __init__(self, *, user_id: str, device_type: str, os_type: str, browser_type: str, timestamp: str,
+                 browser_version: str):
         super().__init__(
             user_id=user_id,
             event_type=EventType.DEVICE_SPECIFICATION,

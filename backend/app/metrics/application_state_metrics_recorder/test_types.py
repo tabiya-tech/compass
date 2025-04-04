@@ -342,10 +342,9 @@ class TestExperienceExploration:
 class TestExperienceDiscovery:
     """Tests for experience discovery counting"""
     
-    def test_experiences_discovered_count_in_dive_in(self):
+    def test_experiences_discovered_count(self):
         # GIVEN a state in DIVE_IN phase with one discovered experience
         state = get_empty_state()
-        state.explore_experiences_director_state.conversation_phase = CounselingPhase.DIVE_IN
         
         # Discovered experience
         discovered_experience = ExperienceEntity(
@@ -366,28 +365,3 @@ class TestExperienceDiscovery:
         
         # THEN the experiences discovered count should be 1
         assert result.experiences_discovered_count == 1
-
-    def test_experiences_discovered_count_not_in_dive_in(self):
-        # GIVEN a state not in DIVE_IN phase with one discovered experience
-        state = get_empty_state()
-        state.explore_experiences_director_state.conversation_phase = CounselingPhase.COLLECT_EXPERIENCES
-        
-        # Discovered experience
-        discovered_experience = ExperienceEntity(
-            uuid=str(uuid.uuid4()),
-            experience_title="Discovered Experience",
-        )
-        discovered_experience_state = ExperienceState(
-            dive_in_phase=DiveInPhase.NOT_STARTED,
-            experience=discovered_experience
-        )
-        
-        state.explore_experiences_director_state.experiences_state = {
-            discovered_experience.uuid: discovered_experience_state
-        }
-        
-        # WHEN creating an ApplicationStatesOfInterest from the state
-        result = ApplicationStatesOfInterest.from_state(state)
-        
-        # THEN the experiences discovered count should be 0 since we're not in DIVE_IN phase
-        assert result.experiences_discovered_count == 0

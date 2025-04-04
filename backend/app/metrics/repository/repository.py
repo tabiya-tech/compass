@@ -76,6 +76,26 @@ class MetricsRepository(IMetricsRepository):
                     {"$set": self._to_db_doc(event), "$inc": {"turn_count": 1}},
                     upsert=True
                 ))
+            elif event.event_type == EventType.EXPERIENCE_DISCOVERED:
+                commands.append(UpdateOne(
+                    {
+                        "event_type": {"$eq": EventType.EXPERIENCE_DISCOVERED.value},
+                        "anonymized_user_id": {"$eq": event.anonymized_user_id},
+                        "anonymized_session_id": {"$eq": event.anonymized_session_id},
+                    },
+                    {"$set": self._to_db_doc(event)},
+                    upsert=True
+                ))
+            elif event.event_type == EventType.EXPERIENCE_EXPLORED:
+                commands.append(UpdateOne(
+                    {
+                        "event_type": {"$eq": EventType.EXPERIENCE_EXPLORED.value},
+                        "anonymized_user_id": {"$eq": event.anonymized_user_id},
+                        "anonymized_session_id": {"$eq": event.anonymized_session_id},
+                    },
+                    {"$set": self._to_db_doc(event)},
+                    upsert=True
+                ))
             else:
                 commands.append(InsertOne(self._to_db_doc(event)))
         return await self.collection.bulk_write(commands)

@@ -10,6 +10,8 @@ class EventType(Enum):
     FEEDBACK_RATING_VALUE = 100004
     CONVERSATION_TURN = 100005
     MESSAGE_REACTION_CREATED = 100006
+    EXPERIENCE_DISCOVERED = 100007
+    EXPERIENCE_EXPLORED = 100008
 
     # Frontend events
     # As a convention, all events created on the frontend should start with 20000
