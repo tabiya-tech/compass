@@ -15,10 +15,14 @@ from fastapi.responses import JSONResponse
 
 from app.application_state import ApplicationStateManager
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
+from app.metrics.application_state_metrics_recorder.recorder import ApplicationStateMetricsRecorder
+from app.metrics.repository.repository import MetricsRepository
+from app.metrics.services.service import MetricsService
 from app.sensitive_filter import sensitive_filter
 from app.server_dependencies.agent_director_dependencies import get_agent_director
 from app.server_dependencies.application_state_dependencies import get_application_state_manager
 from app.server_dependencies.conversation_manager_dependencies import get_conversation_memory_manager
+from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.store.in_memory_application_state_store import InMemoryApplicationStateStore
 from app.users.auth import Authentication
 from app.vector_search.similarity_search_service import SimilaritySearchService
@@ -116,6 +120,8 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
                 description="""The main conversation route used to interact with the agent.""", )
     async def conversation(request: Request, user_input: str, clear_memory: bool = False, filter_pii: bool = False,
                            session_id: int = 1,
+                           record_metrics: bool = False,
+                           user_id: str = None,
                            conversation_memory_manager: ConversationMemoryManager = Depends(
                                get_conversation_memory_manager),
                            agent_director: LLMAgentDirector = Depends(get_agent_director),
@@ -134,6 +140,15 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
             raise HTTPException(status_code=413, detail="Too long user input")
 
         try:
+            if record_metrics:
+                application_state_manager = ApplicationStateMetricsRecorder(
+                    application_state_manager=application_state_manager,
+                    metrics_service=MetricsService(
+                        repository=MetricsRepository(
+                            db=await CompassDBProvider.get_metrics_db()
+                        )
+                    )
+                )
             if clear_memory:
                 await application_state_manager.delete_state(session_id)
                 return {"msg": f"Memory cleared for session {session_id}!"}
@@ -159,7 +174,11 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
             context = await conversation_memory_manager.get_conversation_context()
             response = await ConversationResponse.from_conversation_manager(context, from_index=current_index)
             # save the state, before responding to the user
-            await application_state_manager.save_state(state)
+            if isinstance(application_state_manager, ApplicationStateMetricsRecorder):
+                # save the state in the metrics recorder needs a user_id (the signatures diverge)
+                await application_state_manager.save_state(state, user_id=user_id)
+            else:
+                await application_state_manager.save_state(state)
             return response
         except Exception as e:  # pylint: disable=broad-except
             logger.exception(
