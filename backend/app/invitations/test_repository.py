@@ -9,6 +9,7 @@ import pytest_mock
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from app.invitations import REMAINING_USAGE_WARNING_THRESHOLD
 from app.invitations.repository import UserInvitationRepository
 from app.invitations.types import UserInvitation, InvitationType
 from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
@@ -373,3 +374,34 @@ class TestReduceCapacity:
 
         # AND the logger.exception should be called with given_error.message.
         assert str(given_error) in caplog.text
+
+    # test that when the remain usage is < REMAINING_USAGE_WARNING_THRESHOLD% of the allowed usage, a warning is logged
+    @pytest.mark.asyncio
+    async def test_remaining_usage_warning(
+            self,
+            caplog: pytest.LogCaptureFixture,
+            get_user_invitation_data_repository: Awaitable[UserInvitationRepository]):
+        repository = await get_user_invitation_data_repository
+
+        # GIVEN an invitation with remaining usage < REMAINING_USAGE_WARNING_THRESHOLD% of the allowed usage
+        given_invitation = _get_new_invitation()
+        given_invitation.remaining_usage = int(given_invitation.allowed_usage * REMAINING_USAGE_WARNING_THRESHOLD)
+        # guard clause to ensure the remaining usage is less than 10% of the allowed usage
+        await repository.upsert_many_invitations([given_invitation])
+
+        # WHEN the reduce capacity function is called.
+        await repository.reduce_capacity(given_invitation.invitation_code)
+
+        # THEN a log message should be logged with the warning level
+        # "Invitation with code '{invitation_code}' has less than 10% remaining usage: ({remaining_usage})"
+        expected_remaining_usage = given_invitation.remaining_usage - 1
+        if expected_remaining_usage < 0:
+            expected_remaining_usage = 0
+
+        assert any(
+            record.levelname == "WARNING" and
+            record.message == f"Invitation '{given_invitation.invitation_type.value}' "
+                              f"with code '{given_invitation.invitation_code}' "
+                              f"has less than 10% remaining usage: ({expected_remaining_usage})"
+            for record in caplog.records
+        )
