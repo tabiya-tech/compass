@@ -104,20 +104,18 @@ describe("ChatMessageField", () => {
   test("should maintain caret position when adding invalid characters in the middle of the message", async () => {
     // GIVEN the ChatMessageField is rendered
     render(<ChatMessageField aiIsTyping={false} isChatFinished={false} handleSend={jest.fn()} />);
-
     // AND the chat message field
     const chatMessageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD) as HTMLInputElement;
 
     // WHEN the user types a valid message
     await userEvent.type(chatMessageField, "Hello");
-
     // AND user moves caret to the middle of the text (after "Hello")
     chatMessageField.setSelectionRange(2, 2);
 
-    // AND Record the caret position before invalid character input
-    const initialCaretPosition = chatMessageField.selectionStart;
+    // THEN except the caret position to be at 2
+    expect(chatMessageField.selectionStart).toBe(2);
 
-    // AND user types an invalid character at that position
+    // WHEN user types an invalid character at that position
     // We need to use act to make sure the input updates and caret position are handled before the test checks them.
     // eslint-disable-next-line testing-library/no-unnecessary-act
     act(() => {
@@ -126,10 +124,8 @@ describe("ChatMessageField", () => {
 
     // THEN expect the invalid characters to be removed
     expect(chatMessageField).toHaveValue("Hello");
-
     // AND expect the caret to be at the correct position
-    expect(chatMessageField.selectionStart).toBe(initialCaretPosition);
-
+    expect(chatMessageField.selectionStart).toBe(2);
     // AND no errors or warnings to have occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
