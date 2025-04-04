@@ -86,10 +86,4 @@ def _get_experiences_explored_count(state: ApplicationState) -> int:
 
 def _get_experiences_discovered_count(state: ApplicationState) -> int:
     """Get the current number of experiences discovered"""
-    # The number of experiences discovered can increase or decrease during the exploration phase,
-    # so we need to wait until the user is in the DIVE_IN phase to count them
-    # this has the disadvantage of not preserving the precise time that the experience was discovered,
-    # but perhaps in the future we can have a more sophisticated way of tracking this
-    if state.explore_experiences_director_state.conversation_phase.name == "DIVE_IN":
-        return len(state.explore_experiences_director_state.experiences_state)
-    return 0
+    return len(state.explore_experiences_director_state.experiences_state)

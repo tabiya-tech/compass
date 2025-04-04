@@ -12,12 +12,14 @@ from app.metrics.types import (
     AbstractCompassMetricEvent,
     AbstractUserAccountEvent,
     AbstractConversationEvent,
+    ExperienceDiscoveredEvent,
     UserAccountCreatedEvent,
     ConversationPhaseEvent,
     ConversationTurnEvent,
     FeedbackProvidedEvent,
     FeedbackRatingValueEvent,
     MessageReactionCreatedEvent,
+    ExperienceExploredEvent,
 )
 from app.conversations.reactions.types import ReactionKind, DislikeReason
 from app.metrics.constants import EventType
@@ -197,6 +199,83 @@ class TestConversationPhaseEvent:
         with pytest.raises(TypeError, match="got an unexpected keyword argument 'extra_field'"):
             ConversationPhaseEvent(phase=given_conversation_phase, session_id=given_session_id, user_id=given_user_id,
                                    extra_field=given_extra_field)  # type:ignore
+
+
+class TestExperienceDiscoveredEvent:
+    def test_fields_are_set_correctly(self, setup_application_config: ApplicationConfig,
+                                      mocker: pytest_mock.MockerFixture):
+        # datetime.now returns a fixed time
+        fixed_time = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)
+        mocker.patch('common_libs.time_utilities._time_utils.datetime', new=mocker.Mock(now=lambda tz=None: fixed_time))
+
+        # GIVEN a session id and user id
+        given_session_id = get_random_session_id()
+        given_user_id = get_random_user_id()
+        given_experience_count = random.randint(1, 10)  # nosec B311 # random is used for testing purposes
+        # WHEN creating an instance of the event
+        actual_event = ExperienceDiscoveredEvent(session_id=given_session_id, user_id=given_user_id,
+                                               experience_count=given_experience_count)
+
+        # THEN the basic event fields should be set correctly
+        assert_basic_event_fields_are_set(actual_event, EventType.EXPERIENCE_DISCOVERED, setup_application_config,
+                                          fixed_time)
+
+        # AND the session id should be anonymized
+        assert actual_event.anonymized_session_id is not None
+        assert actual_event.anonymized_session_id != given_session_id
+
+        # AND the user id should be anonymized
+        assert actual_event.anonymized_user_id is not None
+        assert actual_event.anonymized_user_id != given_user_id
+
+        # AND the experience count should be set correctly
+        assert actual_event.experience_count == given_experience_count
+
+    def test_extra_fields_are_not_allowed(self, setup_application_config: ApplicationConfig):
+        # GIVEN all required fields
+        given_session_id = get_random_session_id()
+        given_user_id = get_random_user_id()
+        given_experience_count = random.randint(1, 10)  # nosec B311 # random is used for testing purposes
+
+        # AND an extra field
+        given_extra_field = "extra_field"
+
+        # WHEN creating an instance of the event
+        # THEN it should raise a TypeError indicating that the extra field is not allowed.
+        with pytest.raises(TypeError, match="got an unexpected keyword argument 'extra_field'"):
+            ExperienceDiscoveredEvent(session_id=given_session_id, user_id=given_user_id,
+                                   experience_count=given_experience_count, extra_field=given_extra_field)  # type:ignore
+
+
+class TestExperienceExploredEvent:
+    def test_fields_are_set_correctly(self, setup_application_config: ApplicationConfig,
+                                      mocker: pytest_mock.MockerFixture):
+        # datetime.now returns a fixed time
+        fixed_time = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)
+        mocker.patch('common_libs.time_utilities._time_utils.datetime', new=mocker.Mock(now=lambda tz=None: fixed_time))
+
+        # GIVEN a session id and user id
+        given_session_id = get_random_session_id()
+        given_user_id = get_random_user_id()
+        given_experience_count = random.randint(1, 10)  # nosec B311 # random is used for testing purposes
+        # WHEN creating an instance of the event
+        actual_event = ExperienceExploredEvent(session_id=given_session_id, user_id=given_user_id,
+                                             experience_count=given_experience_count)
+
+        # THEN the basic event fields should be set correctly
+        assert_basic_event_fields_are_set(actual_event, EventType.EXPERIENCE_EXPLORED, setup_application_config,
+                                          fixed_time)
+
+        # AND the session id should be anonymized
+        assert actual_event.anonymized_session_id is not None
+        assert actual_event.anonymized_session_id != given_session_id
+
+        # AND the user id should be anonymized
+        assert actual_event.anonymized_user_id is not None
+        assert actual_event.anonymized_user_id != given_user_id
+
+        # AND the experience count should be set correctly
+        assert actual_event.experience_count == given_experience_count
 
 
 class TestFeedbackProvidedEvent:

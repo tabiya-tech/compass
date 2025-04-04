@@ -5,7 +5,7 @@ from typing import cast
 from app.application_state import ApplicationState, IApplicationStateManager
 from app.metrics.services.service import IMetricsService
 from app.metrics.types import ConversationPhaseEvent, ConversationTurnEvent, \
-    AbstractCompassMetricEvent, ConversationPhaseLiteral
+    AbstractCompassMetricEvent, ConversationPhaseLiteral, ExperienceDiscoveredEvent, ExperienceExploredEvent
 from app.metrics.application_state_metrics_recorder.types import ApplicationStatesOfInterest
 
 
@@ -120,28 +120,22 @@ class ApplicationStateMetricsRecorder(IApplicationStateMetricsRecorder):
                 compass_message_count=current_state.compass_message_count
             ))
 
-        # Record experience exploration changes
-        experience_explored_diff = current_state.experiences_explored_count - previous_state.experiences_explored_count
-        if experience_explored_diff > 0:
-            for _ in range(experience_explored_diff):
-                events.append(ConversationPhaseEvent(
-                    user_id=user_id,
-                    session_id=session_id,
-                    phase="EXPERIENCE_EXPLORED"
-                ))
-
         # Record experience discovered changes
-        experiences_discovered_diff = current_state.experiences_discovered_count - previous_state.experiences_discovered_count
         if previous_state.experiences_discovered_count != current_state.experiences_discovered_count:
-            if experiences_discovered_diff > 0:
-                # right now the experiences_discovered count is going to change all at once when we get into
-                # the dive in phase, so we need to record the events for each experience discovered together
-                for _ in range(experiences_discovered_diff):
-                    events.append(ConversationPhaseEvent(
-                        user_id=user_id,
-                        session_id=session_id,
-                        phase="EXPERIENCE_DISCOVERED"
-                    ))
+            events.append(ExperienceDiscoveredEvent(
+                user_id=user_id,
+                session_id=session_id,
+                experience_count=current_state.experiences_discovered_count
+            ))
+
+        # Record experience exploration changes
+        # Record experience explored changes
+        if previous_state.experiences_explored_count != current_state.experiences_explored_count:
+            events.append(ExperienceExploredEvent(
+                user_id=user_id,
+                session_id=session_id,
+                experience_count=current_state.experiences_explored_count
+            ))
 
         # Record conversation phase changes
         if previous_state.conversation_phase != current_state.conversation_phase:

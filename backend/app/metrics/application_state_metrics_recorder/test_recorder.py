@@ -25,7 +25,7 @@ from app.metrics.services.service import IMetricsService
 from app.metrics.types import (
     ConversationPhaseEvent,
     ConversationTurnEvent,
-    AbstractCompassMetricEvent
+    AbstractCompassMetricEvent, ExperienceDiscoveredEvent, ExperienceExploredEvent
 )
 from common_libs.test_utilities import get_random_session_id, get_random_user_id, get_random_printable_string
 
@@ -195,17 +195,20 @@ class TestRecorderFlow:
         assert events[0].compass_message_count == 1
         assert events[0].user_message_count == 1
 
-        # AND there should be 4 conversation phase events (1 for the main conversation phase, 1 for the counseling phase,
-        #   1 for the experience exploration and one for the experience discovered)
-        assert len(conversation_phase_events) == 4
-        # AND there should be 1 experience exploration event
-        assert conversation_phase_events[0].phase == "EXPERIENCE_EXPLORED"
-        # AND there should be 1 experience exploration event
-        assert conversation_phase_events[1].phase == "EXPERIENCE_DISCOVERED"
+        # AND there should be 1 experience discovered event
+        assert isinstance(events[1], ExperienceDiscoveredEvent)
+        assert events[1].experience_count == 1
+
+        # AND there should be 1 experience explored event
+        assert isinstance(events[2], ExperienceExploredEvent)
+        assert events[2].experience_count == 1
+
+        # AND there should be 2 conversation phase events (1 for the main conversation phase, 1 for the counseling phase)
+        assert len(conversation_phase_events) == 2
         # AND the main conversation phase should be recorded
-        assert conversation_phase_events[2].phase == given_new_state.agent_director_state.current_phase.name
+        assert conversation_phase_events[0].phase == given_new_state.agent_director_state.current_phase.name
         # AND the counseling phase should be recorded
-        assert conversation_phase_events[3].phase == given_new_state.explore_experiences_director_state.conversation_phase.name
+        assert conversation_phase_events[1].phase == given_new_state.explore_experiences_director_state.conversation_phase.name
 
         # AND the application state should be saved
         mock_application_state_manager.save_state.assert_called_once_with(given_new_state)
@@ -560,7 +563,52 @@ class TestRecordMetricEventsFunction:
         events = mock_metrics_service.bulk_record_events.call_args[0][0]
         # AND there should be 1 experience exploration event
         assert len(events) == 1
-        assert events[0].phase == "EXPERIENCE_EXPLORED"
+        assert isinstance(events[0], ExperienceExploredEvent)
+        assert events[0].experience_count == 1
+
+    @pytest.mark.asyncio
+    async def test_record_metric_events_experience_explored_with_no_change(
+            self,
+            mock_metrics_service: IMetricsService,
+            mock_application_state_manager: IApplicationStateManager,
+            setup_application_config: ApplicationConfig
+    ):
+        # GIVEN a metrics service that successfully records events
+        mock_metrics_service.bulk_record_events = AsyncMock()
+        # AND a session_id
+        session_id = get_random_session_id()
+        # AND a user_id
+        user_id = get_random_user_id()
+
+        # AND a previous state with an explored experience
+        given_previous_state = ApplicationStatesOfInterest(
+            conversation_phase="NOT_STARTED",
+            counseling_phase="NOT_STARTED",
+            compass_message_count=0,
+            user_message_count=0,
+            experiences_explored_count=5,
+            experiences_discovered_count=0
+        )
+        # AND a current state with the same explored experience
+        given_current_state = ApplicationStatesOfInterest(
+            conversation_phase="NOT_STARTED",
+            counseling_phase="NOT_STARTED",
+            compass_message_count=0,
+            user_message_count=0,
+            experiences_explored_count=5, # no change
+            experiences_discovered_count=0
+        )
+        # WHEN the record_metric_events function is called with a previous state, current state, session_id and user_id
+        recorder = ApplicationStateMetricsRecorder(
+            application_state_manager=mock_application_state_manager,
+            metrics_service=mock_metrics_service
+        )
+        await recorder.record_metric_events(given_previous_state, given_current_state, session_id, user_id)
+
+        # THEN the metrics service should not have been called
+        mock_metrics_service.bulk_record_events.assert_not_called()
+        
+        
 
     @pytest.mark.asyncio
     async def test_record_metric_events_experiences_discovered_from_empty_state(
@@ -607,4 +655,45 @@ class TestRecordMetricEventsFunction:
         events = mock_metrics_service.bulk_record_events.call_args[0][0]
         # AND there should be 2 events ( one for moving to dive in and one for the experience discovered)
         assert len(events) == 2
-        assert events[0].phase == "EXPERIENCE_DISCOVERED"
+        assert isinstance(events[0], ExperienceDiscoveredEvent)
+        assert events[0].experience_count == given_current_state.experiences_discovered_count
+
+    @pytest.mark.asyncio
+    async def test_record_experience_discovered_event_with_no_change(self, mock_metrics_service: IMetricsService,
+            mock_application_state_manager: IApplicationStateManager,
+            setup_application_config: ApplicationConfig
+    ):
+        # GIVEN a metrics service that successfully records events
+        mock_metrics_service.bulk_record_events = AsyncMock()
+        # AND a session_id
+        session_id = get_random_session_id()
+        # AND a user_id
+        user_id = get_random_user_id()
+
+        # AND a previous state with an experience discovered
+        given_previous_state = ApplicationStatesOfInterest(
+            conversation_phase="NOT_STARTED",
+            counseling_phase="NOT_STARTED",
+            compass_message_count=0,
+            user_message_count=0,
+            experiences_explored_count=0,
+            experiences_discovered_count=3
+        )
+        # AND a current state with the same experience discovered
+        given_current_state = ApplicationStatesOfInterest(
+            conversation_phase="NOT_STARTED",
+            counseling_phase="NOT_STARTED",
+            compass_message_count=0,
+            user_message_count=0,
+            experiences_explored_count=0,
+            experiences_discovered_count=3 # no change
+        )
+        # WHEN the record_metric_events function is called with a previous state, current state, session_id and user_id
+        recorder = ApplicationStateMetricsRecorder(
+            application_state_manager=mock_application_state_manager,
+            metrics_service=mock_metrics_service
+        )
+        await recorder.record_metric_events(given_previous_state, given_current_state, session_id, user_id)
+
+        # THEN the metrics service should not have been called
+        mock_metrics_service.bulk_record_events.assert_not_called()

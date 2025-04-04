@@ -7,7 +7,7 @@ from app.conversations.reactions.types import ReactionKind, DislikeReason
 from app.metrics.types import ConversationPhaseLiteral, ConversationPhaseEvent, UserAccountCreatedEvent, \
     MessageReactionCreatedEvent, ConversationTurnEvent, \
     FeedbackProvidedEvent, FeedbackTypeLiteral, FeedbackRatingValueEvent, \
-    CVFormatLiteral, CVDownloadedEvent, DeviceSpecificationEvent, UserLocationEvent
+    CVFormatLiteral, CVDownloadedEvent, DeviceSpecificationEvent, UserLocationEvent, ExperienceDiscoveredEvent, ExperienceExploredEvent
 from common_libs.test_utilities import get_random_user_id, get_random_session_id, get_random_printable_string
 from common_libs.time_utilities import mongo_date_to_datetime, truncate_microseconds, get_now
 
@@ -59,6 +59,22 @@ def get_conversation_phase_event(conversation_phase: ConversationPhaseLiteral):
         phase=conversation_phase,
         user_id=get_random_user_id(),
         session_id=get_random_session_id()
+    )
+
+
+def get_experience_discovered_event(*, experience_count: int):
+    return ExperienceDiscoveredEvent(
+        user_id=get_random_user_id(),
+        session_id=get_random_session_id(),
+        experience_count=experience_count
+    )
+
+
+def get_experience_explored_event(*, experience_count: int):
+    return ExperienceExploredEvent(
+        user_id=get_random_user_id(),
+        session_id=get_random_session_id(),
+        experience_count=experience_count
     )
 
 
@@ -122,6 +138,8 @@ class TestRecordEvent:
         [
             lambda: get_user_account_created_event(),
             lambda: get_conversation_phase_event("ENDED"),
+            lambda: get_experience_discovered_event(experience_count=3),
+            lambda: get_experience_explored_event(experience_count=5),
             lambda: get_feedback_provided_event(),
             lambda: get_feedback_rating_value_event("NPS"),
             lambda: get_conversation_turn_event(compass_count=1, user_count=2),
@@ -132,6 +150,8 @@ class TestRecordEvent:
         ids=[
             "UserAccountCreatedEvent",
             "ConversationPhaseEvent",
+            "ExperienceDiscoveredEvent",
+            "ExperienceExploredEvent",
             "FeedbackProvidedEvent",
             "FeedbackRatingValueEvent",
             "ConversationTurnEvent",
@@ -181,8 +201,6 @@ class TestRecordEvent:
             get_conversation_phase_event("ENDED"),
             get_conversation_phase_event("DIVE_IN"),
             get_conversation_phase_event("COLLECT_EXPERIENCES"),
-            get_conversation_phase_event("EXPERIENCE_EXPLORED"),
-            get_conversation_phase_event("EXPERIENCE_DISCOVERED"),
             get_feedback_provided_event(),
             get_feedback_rating_value_event("NPS"),
             get_feedback_rating_value_event("CSAT"),
@@ -216,6 +234,7 @@ class TestRecordEvent:
         [
             lambda: get_user_account_created_event(),
             lambda: get_conversation_phase_event("ENDED"),
+            lambda: get_experience_discovered_event(experience_count=3),
             lambda: get_feedback_rating_value_event("NPS"),
             lambda: get_feedback_provided_event(),
             lambda: get_conversation_turn_event(user_count=3, compass_count=7),
@@ -226,6 +245,7 @@ class TestRecordEvent:
         ids=[
             "UserAccountCreatedEvent",
             "ConversationPhaseEvent",
+            "ExperienceDiscoveredEvent",
             "FeedbackRatingValueEvent",
             "FeedbackProvidedEvent",
             "MessageCreatedEvent",
@@ -455,3 +475,135 @@ class TestRecordEvent:
                 _assert_metric_event_fields_match(given_event_dict, actual_stored_event)
                 # AND the turn count is 1 for each event
                 assert actual_stored_event["turn_count"] == 1
+
+        @pytest.mark.asyncio
+        async def test_record_experience_discovered_events_for_same_user(
+                self,
+                get_metrics_repository: Awaitable[MetricsRepository],
+                setup_application_config: ApplicationConfig
+        ):
+            # GIVEN a experience discovered event
+            given_event = get_experience_discovered_event(experience_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes
+            repository = await get_metrics_repository
+
+            # WHEN the event is recorded
+            await repository.record_event([given_event])
+
+            # THEN the event is recorded in the database
+            assert await repository.collection.count_documents({}) == 1
+
+            # AND the event data matches what we expect
+            actual_stored_event = await repository.collection.find_one({})
+            _assert_metric_event_fields_match(given_event.model_dump(), actual_stored_event)
+
+            # WHEN the event is recorded again for the same user
+            given_second_event = get_experience_discovered_event(experience_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes
+
+            given_second_event.anonymized_user_id = given_event.anonymized_user_id
+            given_second_event.anonymized_session_id = given_event.anonymized_session_id
+
+            # guard: ensure the two events are not identical
+            assert given_event.model_dump() != given_second_event.model_dump()
+
+            # WHEN we attempt to record the event again
+            await repository.record_event([given_second_event])
+
+            # THEN the event is updated rather than recorded again
+            assert await repository.collection.count_documents({}) == 1
+
+            # AND the event data matches what we expect
+            actual_second_stored_event = await repository.collection.find_one({})
+            _assert_metric_event_fields_match(given_second_event.model_dump(), actual_second_stored_event)
+
+        @pytest.mark.asyncio
+        async def test_record_multiple_experience_discovered_event_for_different_users(
+                self,
+                get_metrics_repository: Awaitable[MetricsRepository],
+                setup_application_config: ApplicationConfig
+        ):
+            # GIVEN a list of message reaction created events for different users
+            given_events = [
+                get_experience_discovered_event(experience_count=random.randint(1, 10)),  # nosec B311 # random is used for testing purposes
+                get_experience_discovered_event(experience_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes
+            ]
+            repository = await get_metrics_repository
+
+            # WHEN the events are recorded
+            await repository.record_event(given_events)
+
+            # THEN the events are recorded in the database
+            assert await repository.collection.count_documents({}) == len(given_events)
+
+            # AND the event data matches what we expect
+            actual_stored_events = await repository.collection.find({}).to_list(length=len(given_events))
+            for actual_stored_event, given_event in zip(actual_stored_events, given_events):
+                given_event_dict = given_event.model_dump()
+                _assert_metric_event_fields_match(given_event_dict, actual_stored_event)
+
+    @pytest.mark.asyncio
+    async def test_record_experience_explored_events_for_same_user(
+            self,
+            get_metrics_repository: Awaitable[MetricsRepository],
+            setup_application_config: ApplicationConfig
+    ):
+        # GIVEN a experience explored event
+        given_event = get_experience_explored_event(experience_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes
+        repository = await get_metrics_repository
+
+        # WHEN the event is recorded
+        await repository.record_event([given_event])
+
+        # THEN the event is recorded in the database
+        assert await repository.collection.count_documents({}) == 1
+
+        # AND the event data matches what we expect
+        actual_stored_event = await repository.collection.find_one({})
+        _assert_metric_event_fields_match(given_event.model_dump(), actual_stored_event)
+
+        # WHEN the event is recorded again for the same user
+        given_second_event = get_experience_explored_event(experience_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes
+
+        given_second_event.anonymized_user_id = given_event.anonymized_user_id
+        given_second_event.anonymized_session_id = given_event.anonymized_session_id
+
+        # guard: ensure the two events are not identical
+        assert given_event.model_dump() != given_second_event.model_dump()
+
+        # WHEN we attempt to record the event again
+        await repository.record_event([given_second_event])
+
+        # THEN the event is updated rather than recorded again
+        assert await repository.collection.count_documents({}) == 1
+
+        # AND the event data matches what we expect
+        actual_second_stored_event = await repository.collection.find_one({})
+        _assert_metric_event_fields_match(given_second_event.model_dump(), actual_second_stored_event)  
+        
+    @pytest.mark.asyncio
+    async def test_record_multiple_experience_explored_event_for_different_users(
+            self,
+            get_metrics_repository: Awaitable[MetricsRepository],
+            setup_application_config: ApplicationConfig
+    ):
+        # GIVEN a list of experience explored events for different users
+        given_events = [
+            get_experience_explored_event(experience_count=random.randint(1, 10)),  # nosec B311 # random is used for testing purposes
+            get_experience_explored_event(experience_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes
+        ]
+        repository = await get_metrics_repository   
+
+        # WHEN the events are recorded
+        await repository.record_event(given_events)
+
+        # THEN the events are recorded in the database
+        assert await repository.collection.count_documents({}) == len(given_events)
+
+        # AND the event data matches what we expect
+        actual_stored_events = await repository.collection.find({}).to_list(length=len(given_events))
+        for actual_stored_event, given_event in zip(actual_stored_events, given_events):
+            given_event_dict = given_event.model_dump()
+            _assert_metric_event_fields_match(given_event_dict, actual_stored_event)
+
+        
+        
+
