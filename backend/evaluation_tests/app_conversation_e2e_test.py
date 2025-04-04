@@ -4,7 +4,7 @@ import sys
 from typing import Generator, Any
 from fastapi import FastAPI
 
-from common_libs.test_utilities import get_random_session_id
+from common_libs.test_utilities import get_random_session_id, get_random_user_id
 from common_libs.test_utilities.setup_env_vars import setup_env_vars, teardown_env_vars
 
 import pytest
@@ -41,9 +41,11 @@ logger = logging.getLogger()
 
 
 class _AppChatExecutor:
-    def __init__(self, session_id: int, app: FastAPI):
+    def __init__(self, *, session_id: int, app: FastAPI, record_metrics: bool = False, user_id: str = None):
         self._session_id = session_id
         self._app = app
+        self._record_metrics = record_metrics
+        self._user_id = user_id
 
     async def __call__(self, agent_input: AgentInput) -> AgentOutput:
         """
@@ -51,7 +53,9 @@ class _AppChatExecutor:
         """
         async with AsyncClient(app=self._app, base_url="http://test") as ac:
             response = await ac.get('/poc/conversation', params={'user_input': agent_input.message,
-                                                                 'session_id': self._session_id})
+                                                                 'session_id': self._session_id,
+                                                                 'record_metrics': self._record_metrics,
+                                                                 'user_id': self._user_id})
         if response.is_error:
             logger.error(f"Error in response: {response.text}", exc_info=True)
             raise Exception(f"Error in response: {response.text}")
@@ -88,7 +92,10 @@ def app_setup_and_teardown(current_test_case: EvaluationTestCase) -> Generator[F
         # Set the taxonomy db env vars as they required for this test for the search service
         'TAXONOMY_MONGODB_URI': os.getenv('TAXONOMY_MONGODB_URI'),
         'TAXONOMY_DATABASE_NAME': os.getenv('TAXONOMY_DATABASE_NAME'),
-        'TAXONOMY_MODEL_ID': os.getenv('TAXONOMY_MODEL_ID')
+        'TAXONOMY_MODEL_ID': os.getenv('TAXONOMY_MODEL_ID'),
+        # Set the metrics db env vars as they will be required if the test is run with metrics
+        'METRICS_MONGODB_URI': os.getenv('METRICS_MONGODB_URI'),
+        'METRICS_DATABASE_NAME': os.getenv('METRICS_DATABASE_NAME'),
     })
 
     # Clean up modules cache before importing, to ensure that the app is reloaded with the new environment variables
@@ -126,6 +133,8 @@ async def test_main_app_chat(
     _app = app_setup_and_teardown
 
     session_id = get_random_session_id()
+    user_id = get_random_user_id()
+    record_metrics = False  # change this value to run with or without metrics
     evaluation_result = ConversationEvaluationRecord(simulated_user_prompt=current_test_case.simulated_user_prompt,
                                                      test_case=current_test_case.name)
     try:
@@ -134,7 +143,7 @@ async def test_main_app_chat(
                 max_iterations=current_test_case.conversation_rounds if current_test_case.conversation_rounds else max_iterations,
                 execute_simulated_user=LLMSimulatedUser(
                     system_instructions=current_test_case.simulated_user_prompt),
-                execute_evaluated_agent=_AppChatExecutor(session_id=session_id, app=_app),
+                execute_evaluated_agent=_AppChatExecutor(session_id=session_id, app=_app, user_id=user_id, record_metrics=record_metrics),
                 is_finished=_AppChatIsFinished()))
 
         for evaluation in tqdm(current_test_case.evaluations, desc='Evaluating'):
