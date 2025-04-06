@@ -23,17 +23,38 @@ from evaluation_tests.core_e2e_tests_cases import test_cases
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 from httpx import AsyncClient
 
-# Mute the logging of the httpx and httpcore
 LOGGING_CONFIG = {
     "version": 1,
-    'loggers': {
-        'httpx': {
-            'level': 'WARN',
+    "disable_existing_loggers": False,
+    "formatters": {
+        "default": {
+            "format": "%(name)s - %(levelname)s - %(message)s",
         },
-        'httpcore': {
-            'level': 'WARN',
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "default",
         },
-    }
+    },
+    "loggers": {
+        # Mute the logging of the httpx and httpcore
+        "httpx": {
+            "level": "WARN",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "httpcore": {
+            "level": "WARN",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        # All other loggers will be set to INFO level
+        "": {  # root logger
+            "level": "INFO",
+            "handlers": ["console"],
+        },
+    },
 }
 
 logging.config.dictConfig(LOGGING_CONFIG)
@@ -145,6 +166,7 @@ async def test_main_app_chat(
                     system_instructions=current_test_case.simulated_user_prompt),
                 execute_evaluated_agent=_AppChatExecutor(session_id=session_id, app=_app, user_id=user_id, record_metrics=record_metrics),
                 is_finished=_AppChatIsFinished()))
+    logger.info(f"Running test case {current_test_case.name}")
 
         for evaluation in tqdm(current_test_case.evaluations, desc='Evaluating'):
             output = await create_evaluator(evaluation.type).evaluate(evaluation_result)
