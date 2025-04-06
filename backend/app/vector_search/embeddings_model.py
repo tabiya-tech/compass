@@ -1,26 +1,26 @@
 import logging
 import os
 from abc import ABC, abstractmethod
-from typing import List
+from typing import Coroutine, Any
 
 import vertexai
 from vertexai.language_models import TextEmbeddingInput, TextEmbeddingModel, TextEmbedding
 
-from common_libs.llm.models_utils import Retry
+from common_libs.retry import Retry
 
 
 class EmbeddingService(ABC):
     """ An abstract class for a text embedding service."""
 
     @abstractmethod
-    async def embed(self, query: str) -> List[float]:
+    async def embed(self, query: str) -> list[float]:
         """
         Embeds the given query text.
         """
         raise NotImplementedError
 
     @abstractmethod
-    async def embed_batch(self, queries: List[str]) -> List[List[float]]:
+    async def embed_batch(self, queries: list[str]) -> list[list[float]]:
         """
         Embeds the given batch of query texts.
         """
@@ -39,14 +39,14 @@ class GoogleGeckoEmbeddingService(EmbeddingService):
         self.model = TextEmbeddingModel.from_pretrained(f"textembedding-gecko@{version}")
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    async def embed(self, text: str) -> List[float]:
+    async def embed(self, text: str) -> list[float]:
         """
          Generates embeddings for a text input.
          Retries the embedding generation in case of errors.
          """
         return (await self.embed_batch([text]))[0]
 
-    async def embed_batch(self, text_list: List[str]) -> List[List[float]]:
+    async def embed_batch(self, text_list: list[str]) -> list[list[float]]:
         """
         Generates embeddings for a list of texts.
         Splits the texts into batches, according to the region's maximum batch size, and processes them.
@@ -63,12 +63,15 @@ class GoogleGeckoEmbeddingService(EmbeddingService):
             batch_size = 5
         embeddings = []
         for i in range(0, len(text_list), batch_size):
-            inputs = [TextEmbeddingInput(query, self._TASK) for query in text_list[i:i + batch_size]]
-            batch_embeddings = await Retry[str].call_with_exponential_backoff(lambda: self._run_batch(inputs))
+            def _callback() -> Coroutine[Any, Any, list[TextEmbedding]]:
+                inputs: list[TextEmbeddingInput] = [TextEmbeddingInput(query, self._TASK) for query in text_list[i:i + batch_size]]
+                return self._run_batch(inputs)
+
+            batch_embeddings: list[TextEmbedding] = await Retry[list[TextEmbedding]].call_with_exponential_backoff(_callback)
             embeddings.extend(batch_embeddings)
         return [embedding.values for embedding in embeddings]
 
-    async def _run_batch(self, inputs: List[TextEmbeddingInput]) -> list[TextEmbedding]:
+    async def _run_batch(self, inputs: list[TextEmbeddingInput]) -> list[TextEmbedding]:
         try:
             return await self.model.get_embeddings_async(inputs)
         except Exception as e:  # pylint: disable=broad-except
