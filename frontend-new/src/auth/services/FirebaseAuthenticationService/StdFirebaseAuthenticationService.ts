@@ -96,7 +96,7 @@ class StdFirebaseAuthenticationService {
    * It retrieves the current user's token, updates the authentication state with the new token,
    * and schedules the next token refresh.
    *
-   * @returns {Promise<void>} A promise that resolves when the token refresh process is complete.
+   * @returns {Promise<string>} A promise that resolves with the new token when the token refresh process is complete.
    * @throws {Error} If an error occurs during the token refresh process.
    */
   public async refreshToken(): Promise<string> {
@@ -104,16 +104,31 @@ class StdFirebaseAuthenticationService {
     const oldToken = PersistentStorageService.getToken();
     console.debug("Old token", "..." + oldToken?.slice(-20));
 
-    if (firebaseAuth.currentUser) {
-      const newToken = await firebaseAuth.currentUser.getIdToken(true);
-      console.debug("New token obtained", "..." + newToken.slice(-20));
-      this.scheduleTokenRefresh(newToken);
-      PersistentStorageService.setToken(newToken);
-      return newToken;
-    } else {
-      console.debug("No current user to refresh token");
-      throw new Error("No current user to refresh token");
-    }
+    // We need to use a one-time auth state listener because firebaseAuth.currentUser
+    // might not be available immediately on page load
+    return new Promise<string>((resolve, reject) => {
+      // Create a one-time listener that will be removed after the first auth state change
+      const unsubscribeFunction = firebaseAuth.onAuthStateChanged(async (currentUser) => {
+        if (currentUser) {
+          try {
+            const newToken = await currentUser.getIdToken(true);
+            console.debug("New token obtained", "..." + newToken.slice(-20));
+            this.scheduleTokenRefresh(newToken);
+            PersistentStorageService.setToken(newToken);
+            
+            resolve(newToken);
+          } catch (error) {
+            console.error("Error refreshing token:", error);
+            reject(error as Error);
+          }
+        } else {
+          console.debug("No current user to refresh token");
+          reject(new Error("No current user to refresh token"));
+        }
+
+        unsubscribeFunction();
+      });
+    });
   }
 
   /**

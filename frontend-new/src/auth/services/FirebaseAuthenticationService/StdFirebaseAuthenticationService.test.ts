@@ -98,7 +98,14 @@ describe("StdFirebaseAuthenticationService", () => {
       const mockUser = {
         getIdToken: jest.fn().mockResolvedValue(mockToken),
       };
-      firebaseAuth.currentUser = mockUser as any;
+      
+      // AND the auth state listener is set up to return the user
+      const mockUnsubscribe = jest.fn();
+      (firebaseAuth.onAuthStateChanged as jest.Mock).mockImplementation((callback) => {
+        // Simulate the callback being called with the mock user
+        callback(mockUser);
+        return mockUnsubscribe;
+      });
 
       // WHEN refreshToken is called
       const result = await service.refreshToken();
@@ -109,18 +116,36 @@ describe("StdFirebaseAuthenticationService", () => {
       // AND it should set the token into persistent storage
       expect(PersistentStorageService.setToken).toHaveBeenCalledWith(mockToken);
 
+      // AND it should call getIdToken with force refresh
       expect(mockUser.getIdToken).toHaveBeenCalledWith(true);
-    });
 
-    test("should throw error when no current user exists", async () => {
-      // GIVEN no current user exists
-      firebaseAuth.currentUser = null;
+      // AND it should call the unsubscribe function
+      expect(mockUnsubscribe).toHaveBeenCalled();
+    });
+    
+    test("should handle errors during token refresh", async () => {
+      // GIVEN a current user exists
+      const mockError = new Error("Token refresh failed");
+      const mockUser = {
+        getIdToken: jest.fn().mockRejectedValue(mockError),
+      };
+      
+      // AND the auth state listener is set up to return the user
+      const mockUnsubscribe = jest.fn();
+      (firebaseAuth.onAuthStateChanged as jest.Mock).mockImplementation((callback) => {
+        // Simulate the callback being called with the mock user
+        callback(mockUser);
+        return mockUnsubscribe;
+      });
 
       // WHEN refreshToken is called
       const refreshPromise = service.refreshToken();
 
-      // THEN it should throw an error
-      await expect(refreshPromise).rejects.toThrow("No current user to refresh token");
+      // THEN it should reject with the error
+      await expect(refreshPromise).rejects.toThrow("Token refresh failed");
+      
+      // AND it should call the unsubscribe function
+      expect(mockUnsubscribe).toHaveBeenCalled();
     });
   });
 

@@ -21,6 +21,7 @@ import { AuthenticationError } from "src/error/commonErrors";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
 import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
+import { TokenValidationFailureCause } from "src/auth/services/Authentication.service";
 
 const LazyLoadedSensitiveDataForm = lazyWithPreload(() => import("src/sensitiveData/components/sensitiveDataForm/SensitiveDataForm"));
 const LazyLoadedChat = lazyWithPreload(() => import("src/chat/Chat"));
@@ -50,7 +51,7 @@ const App = () => {
   const loadApplicationState = async () => {
     try {
       const authenticationServiceInstance = AuthenticationServiceFactory.getCurrentAuthenticationService();
-      const token = PersistentStorageService.getToken();
+      let token = PersistentStorageService.getToken();
 
       if (!authenticationServiceInstance || !token) {
         console.debug("No authentication service instance found. User is not logged in");
@@ -59,8 +60,20 @@ const App = () => {
         return;
       }
 
+      // validate token first. if the token is expired, refresh it
+      if( authenticationServiceInstance.isTokenValid(token).failureCause === TokenValidationFailureCause.TOKEN_EXPIRED) {
+        console.debug("Token is expired getting new token for user...");
+        await authenticationServiceInstance.refreshToken()
+        token = PersistentStorageService.getToken();
+      }
+      // the token may be null if something went wrong during the refresh
+      if(!token) {
+        console.warn("Token could not be refreshed. User is not logged in");
+        return;
+      }
+      // get the user from the token (validating again internally)
       const user = authenticationServiceInstance.getUser(token);
-      if (!user || !authenticationServiceInstance.isTokenValid(token).isValid) {
+      if (!user) {
         console.debug("Authentication token is not valid or user could not be extracted from token");
         await authenticationServiceInstance.logout();
         return;
