@@ -137,7 +137,7 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
     const { isValid: isValidFirebaseToken, failureCause: firebaseTokenValidationFailureCause } =
       this.stdFirebaseAuthServiceInstance.isFirebaseTokenValid(
         decodedToken as FirebaseToken,
-        FirebaseTokenProvider.GOOGLE
+        FirebaseTokenProvider.GOOGLE,
       );
     if (!isValidFirebaseToken) {
       console.debug(

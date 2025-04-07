@@ -14,12 +14,12 @@ import { Backdrop } from "src/theme/Backdrop/Backdrop";
 
 import * as Sentry from "@sentry/react";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
-import { PersistentStorageService } from "./PersistentStorageService/PersistentStorageService";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { AuthenticationError } from "src/error/commonErrors";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
 import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
+import { TokenValidationFailureCause } from "src/auth/services/Authentication.service";
 
 const LazyLoadedSensitiveDataForm = lazyWithPreload(
   () => import("src/sensitiveData/components/sensitiveDataForm/SensitiveDataForm")
@@ -51,24 +51,47 @@ const App = () => {
   const loadApplicationState = async () => {
     try {
       const authenticationServiceInstance = AuthenticationServiceFactory.getCurrentAuthenticationService();
-      const token = PersistentStorageService.getToken();
+      const authenticationStateService = AuthenticationStateService.getInstance();
+
+      // load token from persistent storage to authentication state
+      authenticationStateService.loadToken();
+
+      // get the token from authentication state
+      let token = authenticationStateService.getToken();
 
       if (!authenticationServiceInstance || !token) {
-        console.debug("No authentication service instance found. User is not logged in");
-        // Clear the user state on app start if there is no authentication service instance or token
+        // reset to clean state and exit if there is no authentication service instance or token.
+        console.debug("No authentication service instance or token found. User is not logged in");
+        // Clear the user state on app start if there is no authentication service instance or token.
         await AuthenticationServiceFactory.resetAuthenticationState();
         return;
       }
 
+      // if the token is expired, refresh it.
+      if(authenticationServiceInstance.isTokenValid(token).failureCause === TokenValidationFailureCause.TOKEN_EXPIRED) {
+        console.debug("Token is expired getting new token for user...");
+        await authenticationServiceInstance.refreshToken()
+        token = authenticationStateService.getToken()
+      }
+
+      // the token may be null if something went wrong during the refresh.
+      if(!token) {
+        console.warn("Token could not be refreshed. User is not logged in");
+        return;
+      }
+
+      // get the user from the token (validating again internally)
       const user = authenticationServiceInstance.getUser(token);
-      if (!user || !authenticationServiceInstance.isTokenValid(token).isValid) {
+      if (!user) {
         console.debug("Authentication token is not valid or user could not be extracted from token");
         await authenticationServiceInstance.logout();
         return;
       }
 
       console.debug("Valid token found in storage");
-      AuthenticationStateService.getInstance().setUser(user);
+
+      authenticationStateService.setUser(user);
+      authenticationStateService.setToken(token);
 
       const preferences = await UserPreferencesService.getInstance()
         .getUserPreferences(user.id)
@@ -106,6 +129,8 @@ const App = () => {
   };
 
   useEffect(() => {
+    const authenticationStateService = AuthenticationStateService.getInstance();
+
     const initializeAuth = async () => {
       setLoading(true);
       await loadApplicationState();
@@ -116,9 +141,22 @@ const App = () => {
       console.debug(
         "Auth initialized successfully",
         UserPreferencesStateService.getInstance().getUserPreferences(),
-        AuthenticationStateService.getInstance().getUser()
+        authenticationStateService.getUser()
       );
     });
+
+    // Add visibility change event set the persistent storage token with the one from the state.
+    const handleVisibilityChange = async () => {
+      console.debug("Visibility change, setting token to persistent storage and state");
+
+      const token = authenticationStateService.getToken();
+      // If no token from authenticationStateService, we don't need to update it again.
+      if(token) {
+        authenticationStateService.setToken(token);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       const currentAuthenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
@@ -129,6 +167,8 @@ const App = () => {
         // the currentAuthenticationService may be null,
         // since we're not sure if the user has logged in or not.
         currentAuthenticationService?.cleanup();
+        // Remove the visibility change event listener
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
       } catch (error) {
         console.error(new AuthenticationError("Error cleaning up auth", error));
       }

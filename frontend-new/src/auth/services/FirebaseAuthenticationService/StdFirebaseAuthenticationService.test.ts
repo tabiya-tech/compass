@@ -6,7 +6,8 @@ import StdFirebaseAuthenticationService, {
 import { firebaseAuth } from "src/auth/firebaseConfig";
 import { jwtDecode } from "jwt-decode";
 import { FirebaseToken } from "./StdFirebaseAuthenticationService";
-import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
+import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 
 // Mock jwt-decode
 jest.mock("jwt-decode", () => ({
@@ -19,14 +20,6 @@ jest.mock("src/auth/firebaseConfig", () => ({
     signOut: jest.fn(),
     currentUser: null,
     onAuthStateChanged: jest.fn(),
-  },
-}));
-
-// Mock PersistentStorageService
-jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => ({
-  PersistentStorageService: {
-    getToken: jest.fn(),
-    setToken: jest.fn(),
   },
 }));
 
@@ -91,6 +84,9 @@ describe("StdFirebaseAuthenticationService", () => {
   });
 
   describe("refreshToken", () => {
+    beforeEach(() => {
+      resetAllMethodMocks(AuthenticationStateService.getInstance());
+    })
     test("should successfully refresh token when user exists", async () => {
       // GIVEN a current user exists with a token
       const mockToken = "new-token";
@@ -98,7 +94,17 @@ describe("StdFirebaseAuthenticationService", () => {
       const mockUser = {
         getIdToken: jest.fn().mockResolvedValue(mockToken),
       };
-      firebaseAuth.currentUser = mockUser as any;
+      
+      // AND the auth state listener is set up to return the user
+      const mockUnsubscribe = jest.fn();
+      (firebaseAuth.onAuthStateChanged as jest.Mock).mockImplementation((callback) => {
+        // Simulate the callback being called with the mock user
+        callback(mockUser);
+        return mockUnsubscribe;
+      });
+
+      // AND setting the token into state will succeed
+      jest.spyOn(AuthenticationStateService.getInstance(), "setToken")
 
       // WHEN refreshToken is called
       const result = await service.refreshToken();
@@ -106,21 +112,39 @@ describe("StdFirebaseAuthenticationService", () => {
       // THEN it should return the new token
       expect(result).toBe(mockToken);
 
-      // AND it should set the token into persistent storage
-      expect(PersistentStorageService.setToken).toHaveBeenCalledWith(mockToken);
+      // AND it should set the token into state
+      expect(AuthenticationStateService.getInstance().setToken).toHaveBeenCalledWith(mockToken);
 
+      // AND it should call getIdToken with force refresh
       expect(mockUser.getIdToken).toHaveBeenCalledWith(true);
-    });
 
-    test("should throw error when no current user exists", async () => {
-      // GIVEN no current user exists
-      firebaseAuth.currentUser = null;
+      // AND it should call the unsubscribe function
+      expect(mockUnsubscribe).toHaveBeenCalled();
+    });
+    
+    test("should handle errors during token refresh", async () => {
+      // GIVEN a current user exists
+      const mockError = new Error("Token refresh failed");
+      const mockUser = {
+        getIdToken: jest.fn().mockRejectedValue(mockError),
+      };
+      
+      // AND the auth state listener is set up to return the user
+      const mockUnsubscribe = jest.fn();
+      (firebaseAuth.onAuthStateChanged as jest.Mock).mockImplementation((callback) => {
+        // Simulate the callback being called with the mock user
+        callback(mockUser);
+        return mockUnsubscribe;
+      });
 
       // WHEN refreshToken is called
       const refreshPromise = service.refreshToken();
 
-      // THEN it should throw an error
-      await expect(refreshPromise).rejects.toThrow("No current user to refresh token");
+      // THEN it should reject with the error
+      await expect(refreshPromise).rejects.toThrow("Token refresh failed");
+      
+      // AND it should call the unsubscribe function
+      expect(mockUnsubscribe).toHaveBeenCalled();
     });
   });
 

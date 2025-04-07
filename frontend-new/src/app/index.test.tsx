@@ -15,6 +15,7 @@ import {
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { DATA_TEST_ID as BACKDROP_DATA_TEST_ID } from "src/theme/Backdrop/Backdrop";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
+import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 
 
 // mock the snackbar
@@ -93,9 +94,11 @@ describe("index", () => {
   });
   describe("main compass app test", () => {
     test("should render app successfully", async () => {
+      // GIVEN AuthenticationStateService.loadToken will successfully load the token
+      jest.spyOn(AuthenticationStateService.prototype, "loadToken").mockImplementation(() => {})
+
       // WHEN the app is rendered
       render(<App />);
-
 
       // THEN wait for the app to finish loading
       await waitForAppLoadingToFinish();
