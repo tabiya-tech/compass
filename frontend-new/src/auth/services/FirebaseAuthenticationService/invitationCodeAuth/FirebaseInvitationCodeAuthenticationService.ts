@@ -88,9 +88,13 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
       );
     }
 
+    // Update the token in the state with the new valid token.
+    // `super.onSuccessfulLogin` also sets the token,
+    // We are setting it here because we want to createUserPreferences before calling
+    // super.onSuccessfulLogin, otherwise creating will fail.
+    this.authenticationStateService.setToken(token)
+
     // create user preferences for the first time.
-    // in order to do this, there needs to be a logged in user in the persistent storage
-    PersistentStorageService.setToken(token);
     const prefs = await UserPreferencesService.getInstance().createUserPreferences({
       user_id: _user.id,
       invitation_code: invitation.invitation_code,
