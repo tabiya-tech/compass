@@ -1,6 +1,5 @@
 import { StatusCodes } from "http-status-codes/";
 import { expectCorrectFetchRequest, setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
-import { UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import OverallFeedbackService from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
@@ -12,23 +11,8 @@ import {
 } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import InfoService from "src/info/info.service";
-
-// mock the user preferences service
-jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => {
-  const mockUserPreference: UserPreference = {
-    user_id: "001",
-    language: "en",
-    accepted_tc: new Date(),
-    sessions: [1234],
-  } as UserPreference;
-  return {
-    __esModule: true,
-    PersistentStorageService: {
-      getUserPreferences: jest.fn().mockReturnValue(JSON.stringify(mockUserPreference)),
-      getToken: jest.fn().mockReturnValue("foo token"),
-    },
-  };
-});
+import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
+import { TabiyaUser } from "src/auth/auth.types";
 
 // mock the authentication state service
 jest.mock("src/auth/services/AuthenticationState.service", () => {
@@ -37,6 +21,7 @@ jest.mock("src/auth/services/AuthenticationState.service", () => {
     default: {
       getInstance: jest.fn().mockReturnValue({
         getUser: jest.fn().mockReturnValue({ id: "001" }),
+        getToken: jest.fn().mockReturnValue("foo token"),
       }),
     },
   };
@@ -48,6 +33,7 @@ describe("OverallFeedbackService", () => {
     jest.spyOn(require("src/envService"), "getBackendUrl").mockReturnValue(givenApiServerUrl);
     // clear all method mocks
     resetAllMethodMocks(InfoService.getInstance());
+    resetAllMethodMocks(AuthenticationStateService.getInstance());
   });
   afterEach(() => {
     jest.clearAllMocks();
@@ -75,6 +61,8 @@ describe("OverallFeedbackService", () => {
           },
         },
       ];
+      // AND the authentication state service returns a user with an ID
+      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue({ id: "001" } as unknown as TabiyaUser);
       // AND the info service will return the correct version
       const givenFrontendInfoData = {
         date: "fooFrontend",
@@ -141,6 +129,8 @@ describe("OverallFeedbackService", () => {
           throw givenFetchError;
         });
       });
+      // AND the authentication state service returns a user with an ID
+      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue({ id: "001" } as unknown as TabiyaUser);
       // AND the info service will return the correct version
       const givenFrontendInfoData = {
         date: "fooFrontend",
@@ -167,6 +157,18 @@ describe("OverallFeedbackService", () => {
       await expect(service.sendFeedback(givenSessionId, [])).rejects.toMatchObject(givenFetchError);
     });
 
+    test("should fail with user not found if the authentication state service doesnt return a user with an ID", async () => {
+      // GIVEN the authentication state service returns a user without an ID
+      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue({ id: null } as unknown as TabiyaUser);
+
+      // WHEN calling sendFeedback method
+      const givenSessionId = 1234;
+      const service = OverallFeedbackService.getInstance();
+
+      // THEN expected it to reject with user not found error
+      await expect(service.sendFeedback(givenSessionId, [])).rejects.toThrow(new Error("User not found"));
+    });
+
     test.each([
       ["is a malformed json", "{"],
       ["is a string", "foo"],
@@ -175,6 +177,9 @@ describe("OverallFeedbackService", () => {
       async (_description, givenResponse) => {
         // GIVEN fetch resolves with a response that has invalid JSON
         setupAPIServiceSpy(StatusCodes.OK, givenResponse, "application/json;charset=UTF-8");
+        // AND the authentication state service returns a user with an ID
+        jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue({ id: "001" } as unknown as TabiyaUser);
+
         // AND the info service will return the correct version
         const givenFrontendInfoData = {
           date: "fooFrontend",

@@ -97,8 +97,8 @@ describe("AuthenticationService", () => {
       // AND the user preferences state should be cleared
       expect(UserPreferencesStateService.getInstance().clearUserPreferences).toHaveBeenCalled();
 
-      // AND the login method should be cleared from persistent storage
-      expect(PersistentStorageService.clearLoginMethod).toHaveBeenCalled();
+      // AND the login method should not be cleared from persistent storage and should be preserved for other logins
+      expect(PersistentStorageService.clearLoginMethod).not.toHaveBeenCalled();
 
       // AND the account conversion flag should be cleared from persistent storage
       expect(PersistentStorageService.clearAccountConverted).toHaveBeenCalled();

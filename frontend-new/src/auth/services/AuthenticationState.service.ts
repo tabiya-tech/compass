@@ -1,6 +1,7 @@
 import { TabiyaUser } from "src/auth/auth.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import * as Sentry from "@sentry/react";
+
 /**
  * AuthenticationStateService manages the authentication state of the application.
  * It provides methods to get, set, and clear the current user, as well as to update
@@ -20,8 +21,8 @@ import * as Sentry from "@sentry/react";
  * Boundaries:
  * - Does not perform authentication operations (login, logout, etc.).
  * - Does not interact directly with authentication providers (e.g., Firebase).
- * - Does not manage user sessions beyond storing the current user object.
- * - Relies on PersistentStorageService for token storage.
+ * - Does not manage user sessions beyond storing the current user and token.
+ * - Relies on PersistentStorageService for initial token retrieval.
  *
  * Usage:
  * This service should be used whenever the application needs to access or modify
@@ -31,6 +32,7 @@ import * as Sentry from "@sentry/react";
 export default class AuthenticationStateService {
   private static instance: AuthenticationStateService;
   private user: TabiyaUser | null = null;
+  private token: string | null = null;
 
   private constructor() {}
 
@@ -66,7 +68,7 @@ export default class AuthenticationStateService {
     // Set the session context for Sentry so that we can track the user id in errors
     try {
       Sentry.setUser({
-        user_id: user?.id ?? "UNKNOWN"
+        user_id: user?.id ?? "UNKNOWN",
       });
     } catch (err) {
       console.error("Error setting Sentry user context", err);
@@ -79,7 +81,52 @@ export default class AuthenticationStateService {
    */
   public clearUser() {
     console.debug("AuthenticationStateService: Clearing user");
-    PersistentStorageService.clearToken();
+    this.clearToken();
     this.setUser(null);
+  }
+
+  /**
+   * Retrieves the current authentication token from state.
+   *
+   * @returns {string | null} The current authentication token or null if no token is present.
+   */
+  public getToken(): string | null {
+    return this.token;
+  }
+
+  /**
+   * Loads the token from persistent storage into state.
+   *
+   * @returns {void}
+   */
+  public loadToken(): void {
+    this.token = PersistentStorageService.getToken();
+    if (!this.token) {
+      console.warn("AuthenticationStateService: No token found in persistent storage");
+    }
+  }
+
+  /**
+   * Sets the authentication token in both state and persistent storage.
+   * Use clearToken() to remove the token from both state and storage.
+   *
+   * @param {string} token - The token to set.
+   */
+  public setToken(token: string): void {
+    if (!token) {
+      console.warn("AuthenticationStateService: Attempted to set an empty token");
+    }
+
+    this.token = token;
+    PersistentStorageService.setToken(token);
+  }
+
+  /**
+   * Clears the token from both state and persistent storage.
+   */
+  public clearToken(): void {
+    console.debug("AuthenticationStateService: Clearing token");
+    this.token = null;
+    PersistentStorageService.clearToken();
   }
 }
