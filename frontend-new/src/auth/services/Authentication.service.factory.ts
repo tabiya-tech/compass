@@ -76,8 +76,10 @@ class AuthenticationServiceFactory {
     // since we currently only have firebase, we can go to the stdFirebaseAuthenticationService and logout
     await stdFirebaseAuthenticationService.getInstance().logout();
     AuthenticationStateService.getInstance().clearUser();
+    AuthenticationStateService.getInstance().clearToken();
     UserPreferencesStateService.getInstance().clearUserPreferences();
-    PersistentStorageService.clearLoginMethod();
+    // Don't clear login method, we want to preserve the login method for other logins (e.g on a different tab)
+    // the login method will be overwritten by the next login (doesnt need to be cleared)
     PersistentStorageService.clearPersonalInfo();
     PersistentStorageService.clearAccountConverted();
     PersistentStorageService.clearToken();

@@ -20,8 +20,8 @@ import * as Sentry from "@sentry/react";
  * Boundaries:
  * - Does not perform authentication operations (login, logout, etc.).
  * - Does not interact directly with authentication providers (e.g., Firebase).
- * - Does not manage user sessions beyond storing the current user object.
- * - Relies on PersistentStorageService for token storage.
+ * - Does not manage user sessions beyond storing the current user and token.
+ * - Relies on PersistentStorageService for initial token retrieval.
  *
  * Usage:
  * This service should be used whenever the application needs to access or modify
@@ -31,6 +31,7 @@ import * as Sentry from "@sentry/react";
 export default class AuthenticationStateService {
   private static instance: AuthenticationStateService;
   private user: TabiyaUser | null = null;
+  private token: string | null = null;
 
   private constructor() {}
 
@@ -75,11 +76,50 @@ export default class AuthenticationStateService {
   }
 
   /**
+   * Retrieves the current authentication token.
+   * If the token is not in state, it will try to get it from persistent storage.
+   * 
+   * @returns {string | null} The current authentication token or null if no token is present.
+   */
+  public getToken(): string | null {
+    if (!this.token) {
+      this.token = PersistentStorageService.getToken();
+    }
+    return this.token;
+  }
+
+  /**
+   * Sets the authentication token in both state and persistent storage.
+   * Use clearToken() to remove the token from both state and storage.
+   * 
+   * @param {string} token - The token to set.
+   * @returns {string} The token that was set.
+   */
+  public setToken(token: string): string {
+    if (!token) {
+      console.warn("AuthenticationStateService: Attempted to set an empty token");
+    }
+    
+    this.token = token;
+    PersistentStorageService.setToken(token);
+    return this.token;
+  }
+
+  /**
+   * Clears the token from both state and persistent storage.
+   */
+  public clearToken(): void {
+    console.debug("AuthenticationStateService: Clearing token");
+    this.token = null;
+    PersistentStorageService.clearToken();
+  }
+
+  /**
    * Clears the current user and removes the authentication token from storage.
    */
   public clearUser() {
     console.debug("AuthenticationStateService: Clearing user");
-    PersistentStorageService.clearToken();
+    this.clearToken();
     this.setUser(null);
   }
 }

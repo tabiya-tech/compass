@@ -54,6 +54,7 @@ const App = () => {
       let token = PersistentStorageService.getToken();
 
       if (!authenticationServiceInstance || !token) {
+        // reset to clean state and exit if there is no authentication service instance or token
         console.debug("No authentication service instance found. User is not logged in");
         // Clear the user state on app start if there is no authentication service instance or token
         await AuthenticationServiceFactory.resetAuthenticationState();
@@ -64,7 +65,7 @@ const App = () => {
       if( authenticationServiceInstance.isTokenValid(token).failureCause === TokenValidationFailureCause.TOKEN_EXPIRED) {
         console.debug("Token is expired getting new token for user...");
         await authenticationServiceInstance.refreshToken()
-        token = PersistentStorageService.getToken();
+        token = AuthenticationStateService.getInstance().getToken()
       }
       // the token may be null if something went wrong during the refresh
       if(!token) {
@@ -81,6 +82,7 @@ const App = () => {
 
       console.debug("Valid token found in storage");
       AuthenticationStateService.getInstance().setUser(user);
+      AuthenticationStateService.getInstance().setToken(token);
 
       const preferences = await UserPreferencesService.getInstance().getUserPreferences(user.id).catch((error) => {
         console.log(error, "init");
@@ -132,6 +134,17 @@ const App = () => {
       );
     });
 
+    // Add visibility change event set the persistent storage token with the one from the state.
+    const handleVisibilityChange = async () => {
+      console.debug("Visibility changed, setting token to persistent storage");
+      const token = AuthenticationStateService.getInstance().getToken();
+      if (token) {
+        PersistentStorageService.setToken(token);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
       const currentAuthenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
       try {
@@ -141,6 +154,8 @@ const App = () => {
         // the currentAuthenticationService may be null,
         // since we're not sure if the user has logged in or not.
         currentAuthenticationService?.cleanup();
+        // Remove the visibility change event listener
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
       } catch (error) {
         console.error(new AuthenticationError("Error cleaning up auth", error));
       }

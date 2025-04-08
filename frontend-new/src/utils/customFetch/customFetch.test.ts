@@ -3,10 +3,13 @@ import { setupFetchSpy } from "src/_test_utilities/fetchSpy";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
+import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 
 describe("Api Service tests", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    resetAllMethodMocks(AuthenticationStateService.getInstance())
   });
 
   test("fetchWithAuth should add Authorization header when authToken is present", async () => {
@@ -14,6 +17,7 @@ describe("Api Service tests", () => {
     const givenApiUrl = "https://api.example.com/data";
     const givenToken = "someAuthToken";
 
+    // AND PersistentStorageService.getToken is will return the given token
     jest.spyOn(PersistentStorageService, "getToken").mockReturnValueOnce(givenToken);
 
     // AND the server responds with a 200 status code
@@ -43,7 +47,8 @@ describe("Api Service tests", () => {
     // GIVEN an API URL and no auth token in sessionStorage
     const givenApiUrl = "https://api.example.com/data";
 
-    jest.spyOn(PersistentStorageService, "getToken").mockReturnValueOnce(null);
+    // AND PersistentStorageService.getToken is will return null
+    jest.spyOn(AuthenticationStateService.getInstance(), "getToken").mockReturnValueOnce(null);
 
     // AND the server responds with a 200 status code
     setupFetchSpy(200, "fetch response", "application/json;charset=UTF-8");
@@ -71,7 +76,8 @@ describe("Api Service tests", () => {
     const givenMethod = "GET";
     const givenFailureMessage = "fetchWithAuth failed";
 
-    jest.spyOn(PersistentStorageService, "getToken").mockReturnValueOnce(givenAuthToken);
+    // AND PersistentStorageService.getToken is will return givenAuthToken
+    jest.spyOn(AuthenticationStateService.getInstance(), "getToken").mockReturnValueOnce(givenAuthToken);
 
     // AND the server responds with a 404 status code
     setupFetchSpy(404, "Not Found", "application/json;charset=UTF-8");
@@ -114,7 +120,8 @@ describe("Api Service tests", () => {
     const givenMethod = "GET";
     const givenFailureMessage = "fetchWithAuth failed";
 
-    jest.spyOn(PersistentStorageService, "getToken").mockReturnValueOnce(givenAuthToken);
+    // AND PersistentStorageService.getToken is will return givenAuthToken
+    jest.spyOn(AuthenticationStateService.getInstance(), "getToken").mockReturnValueOnce(givenAuthToken);
 
     // AND the server responds with an XML response
     // @ts-ignore
@@ -159,7 +166,7 @@ describe("Api Service tests", () => {
     const givenMethod = "GET";
     const givenFailureMessage = "fetchWithAuth failed";
 
-    jest.spyOn(PersistentStorageService, "getToken").mockReturnValueOnce(givenAuthToken);
+    jest.spyOn(AuthenticationStateService.getInstance(), "getToken").mockReturnValueOnce(givenAuthToken);
 
     // AND the server responds with an XML response
     // @ts-ignore
@@ -187,7 +194,7 @@ describe("Api Service tests", () => {
     const givenMethod = "GET";
     const givenFailureMessage = "fetchWithAuth failed";
 
-    jest.spyOn(PersistentStorageService, "getToken").mockReturnValueOnce(givenAuthToken);
+    jest.spyOn(AuthenticationStateService.getInstance(), "getToken").mockReturnValueOnce(givenAuthToken);
 
     // AND fetch fails
     jest.spyOn(global, "fetch").mockRejectedValue(new Error("Failed to fetch"));

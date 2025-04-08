@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import { getRestAPIErrorFactory } from "src/error/restAPIError/RestAPIError";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
-import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 
 // This function is used to make authenticated fetch requests
 // It adds the Authorization header with the Token from the session storage
@@ -34,7 +34,7 @@ export const customFetch = async (
 
   const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, init.method ?? "Unknown method", apiUrl);
   let response: Response;
-  const token = PersistentStorageService.getToken();
+  const token = AuthenticationStateService.getInstance().getToken()
 
   try {
     const headers = new Headers(init.headers || {});
