@@ -8,9 +8,11 @@ import {
   generatePleaseRepeatMessage,
   generateSomethingWentWrongMessage,
   generateTypingMessage,
-  generateUserMessage,
+  generateUserMessage, parseConversationPhase,
 } from "./util";
 import { ReactionKind } from "./reaction/reaction.types";
+import { ConversationPhase } from "./chatProgressbar/types";
+import { InvalidConversationPhasePercentage } from "./errors";
 
 // Mock nanoid to return a fixed value for testing
 jest.mock("nanoid", () => ({
@@ -207,5 +209,98 @@ describe("Chat Utils", () => {
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
     });
+  });
+
+  describe("parseConversationPhase", () => {
+    test("should log an error if newPhase.percentage is greater than 100 and set it to 100", () => {
+      // GIVEN the newPhase with percentage greater than 100
+      const previousPhase = { phase: ConversationPhase.UNKNOWN, percentage: 50 };
+      const newPhase = { phase: ConversationPhase.UNKNOWN, percentage: 150 };
+
+      // WHEN parsing the conversation phase
+      const result = parseConversationPhase(newPhase, previousPhase);
+
+      // THEN expect the result to be the new phase with percentage set to 100
+      expect(result).toEqual({
+        phase: ConversationPhase.UNKNOWN,
+        percentage: 100,
+      });
+
+      // AND console.error to have been called with the correct error message
+      expect(console.error).toHaveBeenCalledWith(
+        new InvalidConversationPhasePercentage(newPhase.percentage, "greater than 100")
+      );
+    })
+
+    test("should log an error if newPhase.percentage is less than previousPhase.percentage and set it to previousPhase.percentage", () => {
+      // GIVEN the newPhase with percentage less than previousPhase.percentage
+      const previousPhase = { phase: ConversationPhase.UNKNOWN, percentage: 50 };
+      const newPhase = { phase: ConversationPhase.UNKNOWN, percentage: 30 };
+
+      // WHEN parsing the conversation phase
+      const result = parseConversationPhase(newPhase, previousPhase);
+
+      // THEN expect the result to be the new phase with percentage set to previousPhase.percentage
+      expect(result).toEqual({
+        phase: ConversationPhase.UNKNOWN,
+        percentage: newPhase.percentage,
+      });
+
+      // AND console.error to have been called with the correct error message
+      expect(console.error).toHaveBeenCalledWith(
+        new InvalidConversationPhasePercentage(newPhase.percentage, "less than previous percentage 50")
+      );
+    })
+
+    test("should log an error if newPhase.percentage is less than 0 and set it to 0", () => {
+      // GIVEN the newPhase with percentage less than 0
+      const previousPhase = { phase: ConversationPhase.UNKNOWN, percentage: 50 };
+      const newPhase = { phase: ConversationPhase.UNKNOWN, percentage: -10 };
+
+      // WHEN parsing the conversation phase
+      const result = parseConversationPhase(newPhase, previousPhase);
+
+      // THEN expect the result to be the new phase with percentage set to 0
+      expect(result).toEqual({
+        phase: ConversationPhase.UNKNOWN,
+        percentage: 0,
+      });
+
+      // AND console.error to have been called with the correct error message
+      expect(console.error).toHaveBeenCalledWith(
+        new InvalidConversationPhasePercentage(newPhase.percentage, "less than 0")
+      );
+    })
+
+    test("should return the new phase if percentage is valid", () => {
+      // GIVEN the newPhase with valid percentage
+      const previousPhase = { phase: ConversationPhase.UNKNOWN, percentage: 50 };
+      const newPhase = { phase: ConversationPhase.UNKNOWN, percentage: 80 };
+
+      // WHEN parsing the conversation phase
+      const result = parseConversationPhase(newPhase, previousPhase);
+
+      // THEN expect the result to be the new phase
+      expect(result).toEqual(newPhase);
+
+      // AND expect no errors or warnings to have been logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    })
+
+    test("it should not fail if no previous phase is provided", () => {
+      // GIVEN the newPhase with valid percentage
+      const newPhase = { phase: ConversationPhase.UNKNOWN, percentage: 80 };
+
+      // WHEN parsing the conversation phase without previous phase
+      const result = parseConversationPhase(newPhase);
+
+      // THEN expect the result to be the new phase
+      expect(result).toEqual(newPhase);
+
+      // AND expect no errors or warnings to have been logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    })
   });
 });

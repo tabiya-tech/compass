@@ -1,6 +1,7 @@
 from datetime import timezone, datetime
 from logging import Logger
-from typing import cast
+from typing import Optional
+
 from app.agent.explore_experiences_agent_director import DiveInPhase
 from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.explore_experiences_agent_director import ConversationPhase as CounselingConversationPhase
@@ -9,6 +10,8 @@ from app.conversation_memory.conversation_memory_types import ConversationHistor
 from app.conversations.types import ConversationMessage, ConversationMessageSender, MessageReaction, \
     ConversationPhaseResponse, CurrentConversationPhaseResponse
 from app.conversations.reactions.types import Reaction
+from app.conversations.constants import BEGINNING_CONVERSATION_PERCENTAGE, FINISHED_CONVERSATION_PERCENTAGE, \
+    DIVE_IN_EXPERIENCES_PERCENTAGE, COLLECT_EXPERIENCES_PERCENTAGE
 
 
 def _convert_to_message_reaction(reaction: Reaction | None) -> MessageReaction | None:
@@ -87,12 +90,21 @@ async def get_messages_from_conversation_manager(context: 'ConversationContext',
     return messages
 
 
-def get_total_explored_experiences(state: ApplicationState) -> int:
+def get_total_explored_experiences(state: ApplicationState, with_skills: Optional[bool] = True) -> int:
+    """
+    Get the total number of experiences explored in the current conversation.
+
+    :param state: ApplicationState the application state.
+    :param with_skills: bool - if True, only count experiences with top skills.
+    :return:
+    """
+
     experiences_explored = 0
 
     for exp in state.explore_experiences_director_state.experiences_state.values():
-        # Check if the experience has been processed and has top skills
-        if exp.dive_in_phase == DiveInPhase.PROCESSED and exp.experience and len(exp.experience.top_skills) > 0:
+        # Check if the experience has been processed and has top skills.
+        if exp.dive_in_phase == DiveInPhase.PROCESSED and (
+                not with_skills or exp.experience and len(exp.experience.top_skills) > 0):
             experiences_explored += 1
 
     return experiences_explored
@@ -105,8 +117,9 @@ def get_current_conversation_phase_response(state: ApplicationState, logger: Log
     :param state: ApplicationState the application state.
     :return:
     """
+
     current_phase: CurrentConversationPhaseResponse = CurrentConversationPhaseResponse.UNKNOWN
-    current_phase_percentage: float = 0
+    current_phase_percentage: float = BEGINNING_CONVERSATION_PERCENTAGE
 
     current_conversation_phase = state.agent_director_state.current_phase
     if current_conversation_phase == ConversationPhase.INTRO:
@@ -114,7 +127,7 @@ def get_current_conversation_phase_response(state: ApplicationState, logger: Log
         #   1 Introduction phase.
         ##############################
         current_phase = CurrentConversationPhaseResponse.INTRO
-        current_phase_percentage = 0
+        current_phase_percentage = BEGINNING_CONVERSATION_PERCENTAGE
     elif current_conversation_phase == ConversationPhase.COUNSELING:
         ##############################
         #    2. Counseling phase.
@@ -125,24 +138,55 @@ def get_current_conversation_phase_response(state: ApplicationState, logger: Log
             #    2.1 Collecting/Discovering experiences phase.
             ##############################
             current_phase = CurrentConversationPhaseResponse.COLLECT_EXPERIENCES
-            current_phase_percentage = 5
+
+            # The percentage of the collect experience will be calculated based on the work types explored.
+            # The formula is the number of explored work types divided by the total number of work types to explore,
+            # and then scope it to the collect experiences progress percentage.
+            explored_work_types = len(state.collect_experience_state.explored_types)
+            unexplored_work_types = len(state.collect_experience_state.unexplored_types)
+            total_work_types_to_explore = explored_work_types + unexplored_work_types
+            if total_work_types_to_explore == 0:
+                # If no work types to explore, we set the percentage to 0.
+                current_phase_percentage = 0
+            else:
+                collect_experiences_gap = DIVE_IN_EXPERIENCES_PERCENTAGE - COLLECT_EXPERIENCES_PERCENTAGE
+                current_phase_percentage = (explored_work_types / total_work_types_to_explore) * collect_experiences_gap
+
+            # Round to the nearest integer and add the introduction phase percentage.
+            current_phase_percentage = round(current_phase_percentage + COLLECT_EXPERIENCES_PERCENTAGE)
         elif counseling_phase == CounselingConversationPhase.DIVE_IN:
             ##############################
             #    2.2 Diving into experiences phase, for each discovered experience.
             ##############################
             current_phase = CurrentConversationPhaseResponse.DIVE_IN
-            current_phase_percentage = 30
+
+            # The percentage of the dive in experience will be calculated based on the total number of experiences
+            # explored divided by the total number of experiences to explore, and then scope it to the dive in
+            # experiences progress percentage.
+            total_experiences_to_explore = len(state.explore_experiences_director_state.experiences_state.keys())
+
+            if total_experiences_to_explore == 0:
+                # If no experiences to explore, we set the percentage to 0.
+                current_phase_percentage = 0
+            else:
+                total_explored_experiences = get_total_explored_experiences(state, with_skills=False)
+                dive_in_experiences_gap = FINISHED_CONVERSATION_PERCENTAGE - DIVE_IN_EXPERIENCES_PERCENTAGE
+                current_phase_percentage = ((total_explored_experiences / total_experiences_to_explore)
+                                            * dive_in_experiences_gap)
+
+            # Round to the nearest integer and add the dive in phase percentage.
+            current_phase_percentage = round(current_phase_percentage + DIVE_IN_EXPERIENCES_PERCENTAGE)
     elif current_conversation_phase in (ConversationPhase.ENDED, ConversationPhase.CHECKOUT):
         ##############################
         #    3. Farewell phase.
         ##############################
         current_phase = CurrentConversationPhaseResponse.ENDED
-        current_phase_percentage = 100
+        current_phase_percentage = FINISHED_CONVERSATION_PERCENTAGE
     else:
         # If the phase is not recognized, we set it to UNKNOWN.
         logger.error(f"Unknown conversation phase: {current_conversation_phase}")
         current_phase = CurrentConversationPhaseResponse.UNKNOWN
-        current_phase_percentage = 0
+        current_phase_percentage = BEGINNING_CONVERSATION_PERCENTAGE
 
     return ConversationPhaseResponse(
         percentage=current_phase_percentage,

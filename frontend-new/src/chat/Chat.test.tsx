@@ -171,6 +171,15 @@ jest.mock("src/chat/chatProgressbar/ChatProgressBar", () => {
   };
 });
 
+// mock utils
+jest.mock("src/chat/util", () => {
+  const actual = jest.requireActual("src/chat/util");
+  return {
+    ...actual,
+    parseConversationPhase: jest.fn().mockImplementation((arg1, _arg2) => arg1)
+  };
+});
+
 
 describe("Chat", () => {
   // ExperienceService methods to be mocked
@@ -305,6 +314,9 @@ describe("Chat", () => {
       // AND when a chat message is sent, it returns some message
       jest.spyOn(ChatService.getInstance(), "sendMessage").mockResolvedValueOnce(getMockConversationResponse([], ConversationPhase.COLLECT_EXPERIENCES, 0));
 
+      // AND parse conversation phase function is mocked
+      const parseConversationPhaseMock = jest.spyOn(require("src/chat/util"), "parseConversationPhase")
+
       // WHEN the Chat component is rendered
       render(<Chat />);
 
@@ -320,7 +332,11 @@ describe("Chat", () => {
       expect(screen.getByTestId(CHAT_MESSAGE_FIELD_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER)).toBeInTheDocument();
       // AND expect the chat progress bar to be visible
       expect(screen.getByTestId(CHAT_PROGRESS_BAR_DATA_TEST_ID.CONTAINER)).toBeInTheDocument();
-      // AND expect the chat progress bar to be rendered with the correct phase and percentage
+
+      // AND parseConversationFn should be called with the right conversation phase.
+      expect(parseConversationPhaseMock).toHaveBeenCalledWith(givenChatHistoryResponse.current_phase, undefined);
+
+      // AND expect the chat progress bar to be rendered with the correct phase and percentage.
       expect(ChatProgressBar as jest.Mock).toHaveBeenCalledWith(
         expect.objectContaining({ phase: givenChatHistoryResponse.current_phase.phase, percentage: givenChatHistoryResponse.current_phase.percentage }),
         {}
