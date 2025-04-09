@@ -1,19 +1,229 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Testing Info component it should show frontend info successfully: version-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc 1`] = `
+exports[`Testing Info component it should show frontend info successfully 1`] = `
 <div
-  data-testid="version-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
-  style="width: 100%; height: 100%;"
+  class="MuiDrawer-root MuiDrawer-modal MuiModal-root css-1u2w381-MuiModal-root-MuiDrawer-root"
+  data-testid="version-drawer-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
+  role="presentation"
 >
   <div
-    class="MuiBox-root css-c4dei4"
+    aria-hidden="true"
+    class="MuiBackdrop-root MuiModal-backdrop css-i9fmh8-MuiBackdrop-root-MuiModal-backdrop"
+    style="opacity: 1; webkit-transition: opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms; transition: opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;"
+  />
+  <div
+    data-testid="sentinelStart"
+    tabindex="0"
+  />
+  <div
+    class="MuiPaper-root MuiPaper-elevation MuiPaper-elevation16 MuiDrawer-paper MuiDrawer-paperAnchorRight css-37n9rn-MuiPaper-root-MuiDrawer-paper"
+    tabindex="-1"
+  >
+    <div
+      class="MuiBox-root css-1qocf1k"
+      data-testid="version-drawer-header-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
+    >
+      <h5
+        class="MuiTypography-root MuiTypography-h5 css-vmt1ul-MuiTypography-root"
+      >
+        Application Information
+      </h5>
+      <button
+        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1j68g3m-MuiButtonBase-root-MuiIconButton-root"
+        data-testid="version-drawer-header-button-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
+        tabindex="0"
+        title="Close application information"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+          data-testid="version-drawer-header-icon-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+          />
+        </svg>
+        <span
+          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+        />
+      </button>
+    </div>
+    <div
+      class="MuiBox-root css-0"
+      data-testid="version-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
+    >
+      <div
+        class="MuiBox-root css-x9cgh6"
+        tabindex="0"
+      >
+        <div
+          class="MuiBox-root css-1c0x74f"
+          data-testid="version-frontend-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
+        >
+          <h6
+            class="MuiTypography-root MuiTypography-h6 css-17m7f8p-MuiTypography-root"
+          >
+            Frontend
+          </h6>
+          <div
+            class="MuiBox-root css-1w00lo4"
+          >
+            <div
+              class="MuiBox-root css-0"
+            >
+              <h6
+                class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
+              >
+                Date
+              </h6>
+              <p
+                class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+              >
+                fooFrontend
+              </p>
+            </div>
+            <div
+              class="MuiBox-root css-0"
+            >
+              <h6
+                class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
+              >
+                Version
+              </h6>
+              <p
+                class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+              >
+                barFrontend
+              </p>
+            </div>
+            <div
+              class="MuiBox-root css-0"
+            >
+              <h6
+                class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
+              >
+                Build Number
+              </h6>
+              <p
+                class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+              >
+                bazFrontend
+              </p>
+            </div>
+            <div
+              class="MuiBox-root css-0"
+            >
+              <h6
+                class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
+              >
+                GIT SHA
+              </h6>
+              <p
+                class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+              >
+                gooFrontend
+              </p>
+            </div>
+          </div>
+        </div>
+        <div
+          class="MuiBox-root css-1c0x74f"
+          data-testid="version-backend-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
+        >
+          <h6
+            class="MuiTypography-root MuiTypography-h6 css-17m7f8p-MuiTypography-root"
+          >
+            Backend
+          </h6>
+          <div
+            class="MuiBox-root css-1w00lo4"
+          >
+            <div
+              class="MuiBox-root css-0"
+            >
+              <h6
+                class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
+              >
+                Date
+              </h6>
+              <p
+                class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+              >
+                fooBackend
+              </p>
+            </div>
+            <div
+              class="MuiBox-root css-0"
+            >
+              <h6
+                class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
+              >
+                Version
+              </h6>
+              <p
+                class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+              >
+                barBackend
+              </p>
+            </div>
+            <div
+              class="MuiBox-root css-0"
+            >
+              <h6
+                class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
+              >
+                Build Number
+              </h6>
+              <p
+                class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+              >
+                bazBackend
+              </p>
+            </div>
+            <div
+              class="MuiBox-root css-0"
+            >
+              <h6
+                class="MuiTypography-root MuiTypography-h6 css-1o3m3rb-MuiTypography-root"
+              >
+                GIT SHA
+              </h6>
+              <p
+                class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+              >
+                gooBackend
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    data-testid="sentinelEnd"
+    tabindex="0"
+  />
+</div>
+`;
+
+exports[`Testing Info component it should show frontend info successfully: version-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc 1`] = `
+<div
+  class="MuiBox-root css-0"
+  data-testid="version-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
+>
+  <div
+    class="MuiBox-root css-x9cgh6"
+    tabindex="0"
   >
     <div
       class="MuiBox-root css-1c0x74f"
       data-testid="version-frontend-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-nc0cip-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-17m7f8p-MuiTypography-root"
       >
         Frontend
       </h6>
@@ -83,7 +293,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
       data-testid="version-backend-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-nc0cip-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-17m7f8p-MuiTypography-root"
       >
         Backend
       </h6>
@@ -149,9 +359,6 @@ exports[`Testing Info component it should show frontend info successfully: versi
       </div>
     </div>
   </div>
-  <span
-    data-testid="bug-report-button-container-31d2b110-8308-4035-90a6-519e89e7f6fa"
-  />
 </div>
 `;
 
@@ -161,7 +368,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
   data-testid="version-backend-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
 >
   <h6
-    class="MuiTypography-root MuiTypography-h6 css-nc0cip-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-h6 css-17m7f8p-MuiTypography-root"
   >
     Backend
   </h6>
@@ -234,7 +441,7 @@ exports[`Testing Info component it should show frontend info successfully: versi
   data-testid="version-frontend-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
 >
   <h6
-    class="MuiTypography-root MuiTypography-h6 css-nc0cip-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-h6 css-17m7f8p-MuiTypography-root"
   >
     Frontend
   </h6>
