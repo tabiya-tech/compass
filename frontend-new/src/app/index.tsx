@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { createHashRouter, RouterProvider } from "react-router-dom";
-import Info from "src/info/Info";
 import Login from "src/auth/pages/Login/Login";
 import ErrorPage from "src/error/errorPage/ErrorPage";
 import Register from "src/auth/pages/Register/Register";
@@ -22,7 +21,9 @@ import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
 import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
 
-const LazyLoadedSensitiveDataForm = lazyWithPreload(() => import("src/sensitiveData/components/sensitiveDataForm/SensitiveDataForm"));
+const LazyLoadedSensitiveDataForm = lazyWithPreload(
+  () => import("src/sensitiveData/components/sensitiveDataForm/SensitiveDataForm")
+);
 const LazyLoadedChat = lazyWithPreload(() => import("src/chat/Chat"));
 
 // Wrap the createHashRouter function with Sentry to capture errors that occur during router initialization
@@ -69,24 +70,26 @@ const App = () => {
       console.debug("Valid token found in storage");
       AuthenticationStateService.getInstance().setUser(user);
 
-      const preferences = await UserPreferencesService.getInstance().getUserPreferences(user.id).catch((error) => {
-        console.log(error, "init");
-        if (error instanceof RestAPIError) {
-          // if the user is not registered, but has a valid token, log an error and continue log the user out
-          if (
-            error.serviceName === UserPreferencesService.serviceName &&
-            error.statusCode === StatusCodes.NOT_FOUND &&
-            error.method === "GET"
-          ) {
-            console.error(
-              new AuthenticationError(
-                `User has not registered! Preferences could not be found for userId: ${user.id}`,
-                error,
-              ),
-            );
+      const preferences = await UserPreferencesService.getInstance()
+        .getUserPreferences(user.id)
+        .catch((error) => {
+          console.log(error, "init");
+          if (error instanceof RestAPIError) {
+            // if the user is not registered, but has a valid token, log an error and continue log the user out
+            if (
+              error.serviceName === UserPreferencesService.serviceName &&
+              error.statusCode === StatusCodes.NOT_FOUND &&
+              error.method === "GET"
+            ) {
+              console.error(
+                new AuthenticationError(
+                  `User has not registered! Preferences could not be found for userId: ${user.id}`,
+                  error
+                )
+              );
+            }
           }
-        }
-      });
+        });
       if (!preferences) {
         console.debug("User has not registered !", user.id);
         await authenticationServiceInstance.logout();
@@ -97,9 +100,7 @@ const App = () => {
 
       console.debug("User preferences loaded", preferences);
     } catch (error) {
-      console.error(
-        new AuthenticationError("Error initializing authentication and user preferences state", error),
-      );
+      console.error(new AuthenticationError("Error initializing authentication and user preferences state", error));
       await AuthenticationServiceFactory.resetAuthenticationState();
     }
   };
@@ -115,7 +116,7 @@ const App = () => {
       console.debug(
         "Auth initialized successfully",
         UserPreferencesStateService.getInstance().getUserPreferences(),
-        AuthenticationStateService.getInstance().getUser(),
+        AuthenticationStateService.getInstance().getUser()
       );
     });
 
@@ -142,14 +143,6 @@ const App = () => {
       element: (
         <ProtectedRoute key={ProtectedRouteKeys.ROOT}>
           <LazyLoadedChat />
-        </ProtectedRoute>
-      ),
-    },
-    {
-      path: routerPaths.SETTINGS,
-      element: (
-        <ProtectedRoute key={ProtectedRouteKeys.SETTINGS}>
-          <Info />
         </ProtectedRoute>
       ),
     },

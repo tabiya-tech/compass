@@ -6,7 +6,6 @@ import "src/_test_utilities/sentryMock";
 import ChatHeader, { DATA_TEST_ID, FEEDBACK_FORM_TEXT, MENU_ITEM_ID } from "./ChatHeader";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { act, fireEvent, waitFor, within, userEvent } from "src/_test_utilities/test-utils";
-import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { testNavigateToPath } from "src/_test_utilities/routeNavigation";
 import ContextMenu, { DATA_TEST_ID as CONTEXT_MENU_DATA_TEST_ID } from "src/theme/ContextMenu/ContextMenu";
@@ -18,6 +17,7 @@ import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import AnonymousAccountConversionDialog, {
   DATA_TEST_ID as ANONYMOUS_ACCOUNT_CONVERSION_DIALOG_DATA_TEST_ID,
 } from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
+import { DATA_TEST_ID as INFO_DRAWER_DATA_TEST_ID } from "src/info/Info";
 import { ChatProvider } from "src/chat/ChatContext";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import * as Sentry from "@sentry/react";
@@ -93,7 +93,7 @@ describe("ChatHeader", () => {
     // set sentry as uninitialized by default
     (Sentry.isInitialized as jest.Mock).mockReturnValue(false);
     (ContextMenu as jest.Mock).mockClear();
-    jest.clearAllMocks()
+    jest.clearAllMocks();
   });
 
   test.each([
@@ -221,7 +221,7 @@ describe("ChatHeader", () => {
       });
     });
 
-    test("should navigate to settings when the settings menu item is clicked", async () => {
+    test("should open info drawer when the settings menu item is clicked", async () => {
       // GIVEN a ChatHeader component
       const givenNotifyOnLogout = jest.fn();
       const givenChatHeader = (
@@ -238,7 +238,7 @@ describe("ChatHeader", () => {
       renderWithChatProvider(givenChatHeader);
       // AND the user button is clicked
       const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
-      fireEvent.click(userButton);
+      await userEvent.click(userButton);
       // AND the context menu is opened
       await waitFor(() => {
         expect(ContextMenu).toHaveBeenCalledWith(
@@ -252,7 +252,7 @@ describe("ChatHeader", () => {
 
       // WHEN the settings menu item is clicked
       const settingsMenuItem = screen.getByTestId(MENU_ITEM_ID.SETTINGS_SELECTOR);
-      fireEvent.click(settingsMenuItem);
+      await userEvent.click(settingsMenuItem);
       // AND the context menu is closed
       await waitFor(() => {
         expect(ContextMenu).toHaveBeenCalledWith(
@@ -264,9 +264,9 @@ describe("ChatHeader", () => {
         );
       });
 
-      // THEN expect the user to navigate to the settings page
-      const navigate = useNavigate();
-      expect(navigate).toHaveBeenCalledWith(routerPaths.SETTINGS);
+      // THEN expect info drawer to be opened
+      const infoDrawer = screen.getByTestId(INFO_DRAWER_DATA_TEST_ID.INFO_DRAWER_CONTAINER);
+      expect(infoDrawer).toBeInTheDocument();
     });
 
     test("should call start new conversation when the start new conversation menu item is clicked", async () => {
@@ -424,11 +424,11 @@ describe("ChatHeader", () => {
       // THEN expect notifyOnExperiencesDrawerOpen to be called
       await waitFor(() => {
         expect(givenNotifyOnExperiencesDrawerOpen).toHaveBeenCalled();
-      })
+      });
       // AND expect the notification badge content to be hidden
       await waitFor(() => {
         expect(screen.queryByText(givenExploredExperiences)).not.toBeInTheDocument();
-      })
+      });
     });
 
     test("should open sentry bug report form when report a bug button is clicked", async () => {
