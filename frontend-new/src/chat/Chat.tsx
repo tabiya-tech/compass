@@ -9,6 +9,7 @@ import {
   generateSomethingWentWrongMessage,
   generateTypingMessage,
   generateUserMessage,
+  parseConversationPhase,
 } from "./util";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Box, useTheme } from "@mui/material";
@@ -177,7 +178,9 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setConversationConductedAt(response.conversation_conducted_at);
 
         // Set the current conversation phase
-        setCurrentPhase(response.current_phase)
+        setCurrentPhase(_previousCurrentPhase => {
+          return parseConversationPhase(response.current_phase, _previousCurrentPhase);
+        })
       } catch (error) {
         console.error(new ChatError("Failed to send message:", error));
         addMessage(generatePleaseRepeatMessage());
@@ -206,6 +209,8 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
             // Clear the messages if a new session is issued
             //  and add a typing message as the previous one will be removed
             setMessages([generateTypingMessage()]);
+            // AND clear the current phase
+            setCurrentPhase(undefined)
           } else {
             console.debug("Failed to issue new session");
             return false;
@@ -249,7 +254,9 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setActiveSessionId(sessionId);
 
         // Set the current conversation phase
-        setCurrentPhase(history.current_phase)
+        setCurrentPhase(_previousCurrentPhase => {
+          return parseConversationPhase(history.current_phase, _previousCurrentPhase);
+        })
         return true;
       } catch (e) {
         console.error(new ChatError("Failed to initialize chat", e));
