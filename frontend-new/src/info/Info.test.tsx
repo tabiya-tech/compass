@@ -1,5 +1,5 @@
 // standard sentry mock
-import "src/_test_utilities/sentryMock"
+import "src/_test_utilities/sentryMock";
 // mute the console
 import "src/_test_utilities/consoleMock";
 
@@ -8,8 +8,8 @@ import { act } from "react";
 import { render, screen } from "src/_test_utilities/test-utils";
 import InfoService from "./info.service";
 import React from "react";
-import { DATA_TEST_ID as BUG_REPORT_DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import * as Sentry from "@sentry/react";
+import userEvent from "@testing-library/user-event";
 
 // Mock the info service
 jest.mock("./info.service", () => {
@@ -62,7 +62,7 @@ describe("Testing Info component", () => {
     (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
 
     // WHEN the component is rendered
-    render(<Info />);
+    render(<Info isOpen={true} notifyOnClose={jest.fn()} />);
     await act(async () => {
       await infoDataPromise;
     });
@@ -70,16 +70,41 @@ describe("Testing Info component", () => {
     // THEN expect no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
-    // AND the component should be rendered
+    // AND the info drawer to be displayed
+    const infoDrawer = screen.getByTestId(DATA_TEST_ID.INFO_DRAWER_CONTAINER);
+    expect(infoDrawer).toBeDefined();
+    // AND the info drawer header to be displayed
+    expect(screen.getByTestId(DATA_TEST_ID.INFO_DRAWER_HEADER)).toBeDefined();
+    // AND the info drawer header text to be displayed
+    expect(screen.getByText("Application Information")).toBeDefined();
+    // AND the info drawer header button to be displayed
+    expect(screen.getByTestId(DATA_TEST_ID.INFO_DRAWER_HEADER_BUTTON)).toBeDefined();
+    // AND the info drawer header icon to be displayed
+    expect(screen.getByTestId(DATA_TEST_ID.INFO_DRAWER_HEADER_ICON)).toBeDefined();
+    // AND the application info to be displayed
     expect(screen.getByTestId(DATA_TEST_ID.INFO_ROOT)).toBeDefined();
     expect(screen.getByTestId(DATA_TEST_ID.INFO_ROOT)).toMatchSnapshot(DATA_TEST_ID.INFO_ROOT);
-    // AND expect the bug report button to be rendered
-    expect(screen.getByTestId(BUG_REPORT_DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER)).toBeInTheDocument();
     // AND the frontend info should be displayed
     expect(screen.getByTestId(DATA_TEST_ID.VERSION_FRONTEND_ROOT)).toBeDefined();
     expect(screen.getByTestId(DATA_TEST_ID.VERSION_FRONTEND_ROOT)).toMatchSnapshot(DATA_TEST_ID.VERSION_FRONTEND_ROOT);
     // AND the backend info should be displayed
     expect(screen.getByTestId(DATA_TEST_ID.VERSION_BACKEND_ROOT)).toBeDefined();
     expect(screen.getByTestId(DATA_TEST_ID.VERSION_BACKEND_ROOT)).toMatchSnapshot(DATA_TEST_ID.VERSION_BACKEND_ROOT);
+    // AND the component to match the snapshot
+    expect(infoDrawer).toMatchSnapshot();
+  });
+
+  test("should call notifyOnClose when the close button is clicked", async () => {
+    // GIVEN the notifyOnClose
+    const givenNotifyOnClose = jest.fn();
+    // AND the Info component is rendered
+    render(<Info isOpen={true} notifyOnClose={givenNotifyOnClose} />);
+
+    // WHEN the close button is clicked
+    const closeButton = screen.getByTestId(DATA_TEST_ID.INFO_DRAWER_HEADER_BUTTON);
+    await userEvent.click(closeButton);
+
+    // THEN expect notifyOnClose to have been called
+    expect(givenNotifyOnClose).toHaveBeenCalled();
   });
 });

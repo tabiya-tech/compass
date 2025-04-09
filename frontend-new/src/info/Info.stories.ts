@@ -6,7 +6,9 @@ const meta: Meta<typeof Info> = {
   title: "Application/Info",
   component: Info,
   tags: ["autodocs"],
-  argTypes: {},
+  argTypes: {
+    notifyOnClose: { action: "notifyOnClose" },
+  },
 };
 
 export default meta;
@@ -15,7 +17,7 @@ type Story = StoryObj<typeof Info>;
 const API_URL = "http://dev.compass.tabiya.tech/api/version";
 
 export const Shown: Story = {
-  args: {},
+  args: { isOpen: true },
   parameters: {
     mockData: [
       {
@@ -35,7 +37,7 @@ export const Shown: Story = {
 };
 
 export const ShownFetchIsSlow: Story = {
-  args: {},
+  args: { isOpen: true },
   parameters: {
     mockData: [
       {

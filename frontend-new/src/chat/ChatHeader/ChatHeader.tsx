@@ -1,6 +1,6 @@
 import React, { SetStateAction, useContext, useEffect, useMemo, useState } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
@@ -11,10 +11,10 @@ import AnimatedBadge from "src/theme/AnimatedBadge/AnimatedBadge";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import * as Sentry from "@sentry/react";
-import AnonymousAccountConversionDialog
-  from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
+import AnonymousAccountConversionDialog from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import { useChatContext } from "src/chat/ChatContext";
+import InfoDrawer from "src/info/Info";
 
 export type ChatHeaderProps = {
   notifyOnLogout: () => void;
@@ -71,9 +71,9 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   setExploredExperiencesNotification,
 }) => {
   const theme = useTheme();
-  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [showConversionDialog, setShowConversionDialog] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 
   const isOnline = useContext(IsOnlineContext);
   const user = authenticationStateService.getInstance().getUser();
@@ -98,14 +98,13 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
     try {
       const feedback = Sentry.getFeedback();
       if (feedback) {
-        const form = await feedback
-          .createForm({
-            formTitle: FEEDBACK_FORM_TEXT.TITLE,
-            messagePlaceholder: FEEDBACK_FORM_TEXT.MESSAGE_PLACEHOLDER,
-            submitButtonLabel: FEEDBACK_FORM_TEXT.SUBMIT_BUTTON_LABEL,
-            successMessageText: FEEDBACK_FORM_TEXT.SUCCESS_MESSAGE,
-            enableScreenshot: false,
-          });
+        const form = await feedback.createForm({
+          formTitle: FEEDBACK_FORM_TEXT.TITLE,
+          messagePlaceholder: FEEDBACK_FORM_TEXT.MESSAGE_PLACEHOLDER,
+          submitButtonLabel: FEEDBACK_FORM_TEXT.SUBMIT_BUTTON_LABEL,
+          successMessageText: FEEDBACK_FORM_TEXT.SUCCESS_MESSAGE,
+          enableScreenshot: false,
+        });
         form.appendToDom();
         form.open();
       }
@@ -126,27 +125,28 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         id: MENU_ITEM_ID.SETTINGS_SELECTOR,
         text: MENU_ITEM_TEXT.SETTINGS,
         disabled: !isOnline,
-        action: () => {
-          navigate(routerPaths.SETTINGS);
-        },
+        action: () => setIsDrawerOpen(true),
       },
-      ...(sentryEnabled ? [
-        {
-          id: MENU_ITEM_ID.REPORT_BUG_BUTTON,
-          text: MENU_ITEM_TEXT.REPORT_BUG,
-          disabled: !isOnline,
-          action: () => {
-            const feedback = Sentry.getFeedback();
-            if (feedback) {
-              feedback.createForm().then((form) => {
-                if (form) {
-                  form.appendToDom();
-                  form.open();
+      ...(sentryEnabled
+        ? [
+            {
+              id: MENU_ITEM_ID.REPORT_BUG_BUTTON,
+              text: MENU_ITEM_TEXT.REPORT_BUG,
+              disabled: !isOnline,
+              action: () => {
+                const feedback = Sentry.getFeedback();
+                if (feedback) {
+                  feedback.createForm().then((form) => {
+                    if (form) {
+                      form.appendToDom();
+                      form.open();
+                    }
+                  });
                 }
-              });
-            }
-          },
-        }] : []),
+              },
+            },
+          ]
+        : []),
       ...(isAnonymous
         ? [
             {
@@ -164,7 +164,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         action: notifyOnLogout,
       },
     ],
-    [isAnonymous, isOnline, navigate, notifyOnLogout, startNewConversation, sentryEnabled]
+    [isAnonymous, isOnline, notifyOnLogout, startNewConversation, sentryEnabled]
   );
 
   return (
@@ -204,17 +204,19 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
             <BadgeOutlinedIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_EXPERIENCES} />
           </AnimatedBadge>
         </PrimaryIconButton>
-        {sentryEnabled && <PrimaryIconButton
-          sx={{
-            color: theme.palette.common.black,
-          }}
-          onClick={handleGiveFeedback}
-          data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_FEEDBACK}
-          title="give feedback"
-          disabled={!isOnline}
-        >
-          <FeedbackOutlinedIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_FEEDBACK} />
-        </PrimaryIconButton>}
+        {sentryEnabled && (
+          <PrimaryIconButton
+            sx={{
+              color: theme.palette.common.black,
+            }}
+            onClick={handleGiveFeedback}
+            data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_FEEDBACK}
+            title="give feedback"
+            disabled={!isOnline}
+          >
+            <FeedbackOutlinedIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_FEEDBACK} />
+          </PrimaryIconButton>
+        )}
         <PrimaryIconButton
           sx={{
             color: theme.palette.common.black,
@@ -239,6 +241,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
           setIsAccountConverted(true);
         }}
       />
+      <InfoDrawer isOpen={isDrawerOpen} notifyOnClose={() => setIsDrawerOpen(false)} />
     </Box>
   );
 };
