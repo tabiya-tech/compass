@@ -405,7 +405,12 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
               />
             </Box>
             <Box paddingBottom={theme.spacing(theme.tabiyaSpacing.lg)} paddingX={theme.spacing(theme.tabiyaSpacing.md)}>
-              <ChatProgressBar percentage={currentPhase.percentage} phase={currentPhase.phase} />
+              <ChatProgressBar
+                percentage={currentPhase.percentage}
+                phase={currentPhase.phase}
+                current={currentPhase.current}
+                total={currentPhase.total}
+              />
             </Box>
             <Box sx={{ flex: 1, overflowY: "auto", paddingX: theme.spacing(theme.tabiyaSpacing.lg) }}>
               <ChatList messages={messages} />

@@ -214,8 +214,8 @@ describe("Chat Utils", () => {
   describe("parseConversationPhase", () => {
     test("should log an error if newPhase.percentage is greater than 100 and set it to 100", () => {
       // GIVEN the newPhase with percentage greater than 100
-      const previousPhase = { phase: ConversationPhase.UNKNOWN, percentage: 50 };
-      const newPhase = { phase: ConversationPhase.UNKNOWN, percentage: 150 };
+      const previousPhase = { phase: ConversationPhase.UNKNOWN, percentage: 50, current: null, total: null };
+      const newPhase = { phase: ConversationPhase.UNKNOWN, percentage: 150, current: null, total: null };
 
       // WHEN parsing the conversation phase
       const result = parseConversationPhase(newPhase, previousPhase);
@@ -224,6 +224,8 @@ describe("Chat Utils", () => {
       expect(result).toEqual({
         phase: ConversationPhase.UNKNOWN,
         percentage: 100,
+        current: null,
+        total: null
       });
 
       // AND console.error to have been called with the correct error message
@@ -234,8 +236,8 @@ describe("Chat Utils", () => {
 
     test("should log an error if newPhase.percentage is less than previousPhase.percentage and set it to previousPhase.percentage", () => {
       // GIVEN the newPhase with percentage less than previousPhase.percentage
-      const previousPhase = { phase: ConversationPhase.UNKNOWN, percentage: 50 };
-      const newPhase = { phase: ConversationPhase.UNKNOWN, percentage: 30 };
+      const previousPhase = { phase: ConversationPhase.UNKNOWN, percentage: 50, current: null, total: null };
+      const newPhase = { phase: ConversationPhase.UNKNOWN, percentage: 30, current: null, total: null };
 
       // WHEN parsing the conversation phase
       const result = parseConversationPhase(newPhase, previousPhase);
@@ -244,6 +246,8 @@ describe("Chat Utils", () => {
       expect(result).toEqual({
         phase: ConversationPhase.UNKNOWN,
         percentage: newPhase.percentage,
+        current: null,
+        total: null
       });
 
       // AND console.error to have been called with the correct error message
@@ -254,8 +258,8 @@ describe("Chat Utils", () => {
 
     test("should log an error if newPhase.percentage is less than 0 and set it to 0", () => {
       // GIVEN the newPhase with percentage less than 0
-      const previousPhase = { phase: ConversationPhase.UNKNOWN, percentage: 50 };
-      const newPhase = { phase: ConversationPhase.UNKNOWN, percentage: -10 };
+      const previousPhase = { phase: ConversationPhase.UNKNOWN, percentage: 50, current: null, total: null };
+      const newPhase = { phase: ConversationPhase.UNKNOWN, percentage: -10, current: null, total: null };
 
       // WHEN parsing the conversation phase
       const result = parseConversationPhase(newPhase, previousPhase);
@@ -264,6 +268,8 @@ describe("Chat Utils", () => {
       expect(result).toEqual({
         phase: ConversationPhase.UNKNOWN,
         percentage: 0,
+        current: null,
+        total: null
       });
 
       // AND console.error to have been called with the correct error message
@@ -274,8 +280,8 @@ describe("Chat Utils", () => {
 
     test("should return the new phase if percentage is valid", () => {
       // GIVEN the newPhase with valid percentage
-      const previousPhase = { phase: ConversationPhase.UNKNOWN, percentage: 50 };
-      const newPhase = { phase: ConversationPhase.UNKNOWN, percentage: 80 };
+      const previousPhase = { phase: ConversationPhase.UNKNOWN, percentage: 50, current: null, total: null };
+      const newPhase = { phase: ConversationPhase.UNKNOWN, percentage: 80, current: null, total: null };
 
       // WHEN parsing the conversation phase
       const result = parseConversationPhase(newPhase, previousPhase);
@@ -290,7 +296,7 @@ describe("Chat Utils", () => {
 
     test("it should not fail if no previous phase is provided", () => {
       // GIVEN the newPhase with valid percentage
-      const newPhase = { phase: ConversationPhase.UNKNOWN, percentage: 80 };
+      const newPhase = { phase: ConversationPhase.UNKNOWN, percentage: 80, current: null, total: null };
 
       // WHEN parsing the conversation phase without previous phase
       const result = parseConversationPhase(newPhase);

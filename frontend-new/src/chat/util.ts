@@ -97,6 +97,8 @@ export const parseConversationPhase = (newPhase: CurrentPhase, previousPhase?: C
   let validPhase: CurrentPhase = {
     phase: newPhase.phase,
     percentage: newPhase.percentage,
+    current: newPhase.current,
+    total: newPhase.total,
   }
 
   if (previousPhase && newPhase.percentage < previousPhase.percentage) {

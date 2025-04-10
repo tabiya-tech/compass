@@ -22,8 +22,8 @@ type Story = StoryObj<typeof ChatProgressBar>;
 
 export const Shown: Story = {
   args: {
-    percentage: 75,
-    phase: ConversationPhase.DIVE_IN
+    percentage: 0,
+    phase: ConversationPhase.INTRO,
   },
 };
 
@@ -44,14 +44,18 @@ export const Introduction: Story = {
 export const CollectExperiences: Story = {
   args: {
     percentage: 5,
-    phase: ConversationPhase.COLLECT_EXPERIENCES
+    phase: ConversationPhase.COLLECT_EXPERIENCES,
+    current: 1,
+    total: 4,
   },
 };
 
 export const DiveIn: Story = {
   args: {
-    percentage: 30,
-    phase: ConversationPhase.DIVE_IN
+    percentage: 40,
+    phase: ConversationPhase.DIVE_IN,
+    current: 2,
+    total: 6,
   },
 };
 

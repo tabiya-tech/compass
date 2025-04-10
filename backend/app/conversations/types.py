@@ -92,13 +92,21 @@ class CurrentConversationPhaseResponse(Enum):
 
 
 class ConversationPhaseResponse(BaseModel):
-    # current_experience_index: int
-
     percentage: float
     """The percentage of the conversation completed, from 0 to 100"""
 
     phase: CurrentConversationPhaseResponse
     """The current phase of the conversation. Used for getting a user-friendly message in the frontend"""
+
+    current: int | None = None
+    """
+    The current entity (work type/experience) in the conversation.
+    """
+
+    total: int | None = None
+    """
+    Total number of entities (work types/experiences) in the conversation.
+    """
 
     class Config:
         extra = "forbid"

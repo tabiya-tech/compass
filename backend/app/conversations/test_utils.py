@@ -110,28 +110,16 @@ class TestConversationPhase:
         conversation_phase = get_current_conversation_phase_response(application_state, logger)
 
         # THEN the conversation phase is the collect experiences phase, and changed based on the explored work types.
+        expected_current_work_type = explored_work_types + 1
+        if expected_current_work_type > len(all_work_types):
+            # if we have explored all work types, we should not count the current work type.
+            expected_current_work_type = len(all_work_types)
+
         assert conversation_phase == ConversationPhaseResponse(
             phase=CurrentConversationPhaseResponse.COLLECT_EXPERIENCES,
-            percentage=expected_percentage
-        )
-
-    def test_diving_in_phase(self):
-        # GIVEN a random session id
-        given_session_id = get_random_session_id()
-
-        # AND we are in dive in phase with zero explored experiences.
-        application_state = _get_application_state(given_session_id)
-        application_state.agent_director_state.current_phase = ConversationPhase.COUNSELING
-        application_state.explore_experiences_director_state.conversation_phase = CounselingConversationPhase.DIVE_IN
-        application_state.collect_experience_state.explored_types = []
-
-        # WHEN the conversation phase is calculated
-        conversation_phase = get_current_conversation_phase_response(application_state, logger)
-
-        # THEN the conversation phase is the collect experiences phase, and the percentage is 0.
-        assert conversation_phase == ConversationPhaseResponse(
-            phase=CurrentConversationPhaseResponse.DIVE_IN,
-            percentage=DIVE_IN_EXPERIENCES_PERCENTAGE
+            percentage=expected_percentage,
+            current=expected_current_work_type,
+            total=len(all_work_types)
         )
 
     @pytest.mark.parametrize("explored, total, expected_percentage", [
@@ -173,5 +161,7 @@ class TestConversationPhase:
         # THEN the conversation phase is the collect experiences phase, and changed based on the explored work types.
         assert conversation_phase == ConversationPhaseResponse(
             phase=CurrentConversationPhaseResponse.DIVE_IN,
-            percentage=expected_percentage
+            percentage=expected_percentage,
+            current=explored + 1,
+            total=total
         )
