@@ -8,8 +8,8 @@ describe("ChatProgresBar", () => {
   describe("render tests", () => {
     it("should render the progress bar with the correct phase and percentage", async () => {
       // GIVEN a percentage and phase
-      const percentage = 75;
-      const phase = ConversationPhase.INTRO;
+      const givenPercentage = 75;
+      const givenPhase = ConversationPhase.INTRO;
 
       // AND getUserFriendlyConversationPhaseName is mocked
       const givenReturnedUserFriendlyPhaseName = "given-returned-user-friendly-phase-name";
@@ -18,10 +18,15 @@ describe("ChatProgresBar", () => {
           .mockReturnValue(givenReturnedUserFriendlyPhaseName)
 
       // WHEN the ChatProgressBar is rendered
-      render(<ChatProgressBar percentage={percentage} phase={phase} />);
+      render(<ChatProgressBar percentage={givenPercentage} phase={givenPhase} current={null} total={null} />);
 
       // THEN the getUserFriendlyConversationPhaseName function should be called with the correct phase.
-      expect(mockedGetUserFriendlyConversationPhase).toHaveBeenCalledWith(phase);
+      expect(mockedGetUserFriendlyConversationPhase).toHaveBeenCalledWith({
+        phase: givenPhase,
+        percentage: givenPercentage,
+        current: null,
+        total: null,
+      });
 
       // AND the container should be in the document
       const container = screen.getByTestId(DATA_TEST_ID.CONTAINER);
@@ -34,7 +39,7 @@ describe("ChatProgresBar", () => {
       // AND the progress bar label should be in the document
       const progressBarLabel = screen.getByTestId(DATA_TEST_ID.PROGRESS_BAR_LABEL);
       expect(progressBarLabel).toBeInTheDocument();
-      expect(progressBarLabel).toHaveTextContent(`${percentage}%`);
+      expect(progressBarLabel).toHaveTextContent(`${givenPercentage}%`);
 
       // AND the width of the progress bar should be set to the percentage
       // Wait for it because of the animation.
@@ -42,7 +47,7 @@ describe("ChatProgresBar", () => {
       const progressBarElement = screen.getByTestId(DATA_TEST_ID.PROGRESS_BAR);
       expect(progressBarElement).toBeInTheDocument();
       await waitFor(() => {
-        expect(progressBarElement).toHaveStyle(`width: ${percentage}%`);
+        expect(progressBarElement).toHaveStyle(`width: ${givenPercentage}%`);
       })
 
       // AND container should match snapshot.

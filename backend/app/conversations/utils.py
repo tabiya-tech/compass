@@ -120,6 +120,8 @@ def get_current_conversation_phase_response(state: ApplicationState, logger: Log
 
     current_phase: CurrentConversationPhaseResponse = CurrentConversationPhaseResponse.UNKNOWN
     current_phase_percentage: float = BEGINNING_CONVERSATION_PERCENTAGE
+    current: int | None = None
+    total: int | None = None
 
     current_conversation_phase = state.agent_director_state.current_phase
     if current_conversation_phase == ConversationPhase.INTRO:
@@ -154,6 +156,15 @@ def get_current_conversation_phase_response(state: ApplicationState, logger: Log
 
             # Round to the nearest integer and add the introduction phase percentage.
             current_phase_percentage = round(current_phase_percentage + COLLECT_EXPERIENCES_PERCENTAGE)
+
+            # set the current work type number to the number of work types explored.
+            total = total_work_types_to_explore
+            current = explored_work_types + 1
+
+            if current > total_work_types_to_explore:
+                # If the current work type number is greater than the total work types to explore, set it to total.
+                current = total_work_types_to_explore
+
         elif counseling_phase == CounselingConversationPhase.DIVE_IN:
             ##############################
             #    2.2 Diving into experiences phase, for each discovered experience.
@@ -164,7 +175,7 @@ def get_current_conversation_phase_response(state: ApplicationState, logger: Log
             # explored divided by the total number of experiences to explore, and then scope it to the dive in
             # experiences progress percentage.
             total_experiences_to_explore = len(state.explore_experiences_director_state.experiences_state.keys())
-
+            total_explored_experiences = 0
             if total_experiences_to_explore == 0:
                 # If no experiences to explore, we set the percentage to 0.
                 current_phase_percentage = 0
@@ -176,6 +187,12 @@ def get_current_conversation_phase_response(state: ApplicationState, logger: Log
 
             # Round to the nearest integer and add the dive in phase percentage.
             current_phase_percentage = round(current_phase_percentage + DIVE_IN_EXPERIENCES_PERCENTAGE)
+
+            # set the current experience number to the number of experiences explored.
+            total = total_experiences_to_explore
+
+            # add one because we start from 0, and 0 is not user-friendly.
+            current = total_explored_experiences + 1
     elif current_conversation_phase in (ConversationPhase.ENDED, ConversationPhase.CHECKOUT):
         ##############################
         #    3. Farewell phase.
@@ -190,5 +207,7 @@ def get_current_conversation_phase_response(state: ApplicationState, logger: Log
 
     return ConversationPhaseResponse(
         percentage=current_phase_percentage,
-        phase=current_phase
+        phase=current_phase,
+        current=current,
+        total=total
     )

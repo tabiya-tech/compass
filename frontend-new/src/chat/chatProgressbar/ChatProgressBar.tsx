@@ -13,10 +13,10 @@ export const DATA_TEST_ID = {
   PROGRESS_BAR_LABEL: `chat-progress-bar-label-${uniqueId}`,
 };
 
-const ChatProgressBar: React.FC<CurrentPhase> = ({ percentage, phase }) => {
+const ChatProgressBar: React.FC<CurrentPhase> = (currentPhase) => {
   const theme = useTheme();
-  const percentageInText = `${percentage}%`;
-  const userFriendlyConversationPhaseText = getUserFriendlyConversationPhaseName(phase);
+  const percentageInText = `${currentPhase.percentage}%`;
+  const userFriendlyConversationPhaseText = getUserFriendlyConversationPhaseName(currentPhase);
 
   return (
     <Box sx={{
