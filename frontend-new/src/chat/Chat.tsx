@@ -33,7 +33,7 @@ import { issueNewSession } from "./issueNewSession";
 import { ChatProvider } from "src/chat/ChatContext";
 import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
 import ChatProgressBar from "./chatProgressbar/ChatProgressBar";
-import { CurrentPhase } from "./chatProgressbar/types";
+import { CurrentPhase, defaultCurrentPhase } from "./chatProgressbar/types";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -83,7 +83,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const initializingRef = useRef(false);
   const [initialized, setInitialized] = useState<boolean>(false);
 
-  const [currentPhase, setCurrentPhase] = useState<CurrentPhase>();
+  const [currentPhase, setCurrentPhase] = useState<CurrentPhase>(defaultCurrentPhase);
 
   /**
    * --- Utility functions ---
@@ -210,7 +210,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
             //  and add a typing message as the previous one will be removed
             setMessages([generateTypingMessage()]);
             // AND clear the current phase
-            setCurrentPhase(undefined)
+            setCurrentPhase(defaultCurrentPhase)
           } else {
             console.debug("Failed to issue new session");
             return false;
@@ -405,7 +405,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
               />
             </Box>
             <Box paddingBottom={theme.spacing(theme.tabiyaSpacing.lg)} paddingX={theme.spacing(theme.tabiyaSpacing.md)}>
-              {currentPhase && <ChatProgressBar percentage={currentPhase.percentage} phase={currentPhase.phase} />}
+              <ChatProgressBar percentage={currentPhase.percentage} phase={currentPhase.phase} />
             </Box>
             <Box sx={{ flex: 1, overflowY: "auto", paddingX: theme.spacing(theme.tabiyaSpacing.lg) }}>
               <ChatList messages={messages} />

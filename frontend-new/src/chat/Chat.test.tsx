@@ -41,7 +41,7 @@ import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import { nanoid } from "nanoid";
 import { ReactionKind } from "src/chat/reaction/reaction.types";
 import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
-import { ConversationPhase } from "./chatProgressbar/types";
+import { ConversationPhase, defaultCurrentPhase } from "./chatProgressbar/types";
 import ChatProgressBar, { DATA_TEST_ID as CHAT_PROGRESS_BAR_DATA_TEST_ID } from "src/chat/chatProgressbar/ChatProgressBar";
 // Mock Components ----------
 // mock the snackbar
@@ -334,7 +334,7 @@ describe("Chat", () => {
       expect(screen.getByTestId(CHAT_PROGRESS_BAR_DATA_TEST_ID.CONTAINER)).toBeInTheDocument();
 
       // AND parseConversationFn should be called with the right conversation phase.
-      expect(parseConversationPhaseMock).toHaveBeenCalledWith(givenChatHistoryResponse.current_phase, undefined);
+      expect(parseConversationPhaseMock).toHaveBeenCalledWith(givenChatHistoryResponse.current_phase, defaultCurrentPhase);
 
       // AND expect the chat progress bar to be rendered with the correct phase and percentage.
       expect(ChatProgressBar as jest.Mock).toHaveBeenCalledWith(

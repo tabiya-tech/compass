@@ -27,6 +27,13 @@ export const Shown: Story = {
   },
 };
 
+export const Initializing: Story = {
+  args: {
+    percentage: 0,
+    phase: ConversationPhase.INITIALIZING
+  },
+};
+
 export const Introduction: Story = {
   args: {
     percentage: 0,
