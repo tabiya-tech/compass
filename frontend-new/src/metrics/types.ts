@@ -38,6 +38,7 @@ export interface DeviceSpecificationEvent extends BaseMetricsEvent {
   os_type: string;
   browser_type: string;
   browser_version: string;
+  user_agent: string;
   timestamp: string;
 }
 

@@ -103,6 +103,7 @@ def get_device_specification_event():
         os_type=get_random_printable_string(10),
         browser_type=get_random_printable_string(10),
         browser_version=get_random_printable_string(10),
+        user_agent=get_random_printable_string(10),
         timestamp=get_now().isoformat()
     )
 
