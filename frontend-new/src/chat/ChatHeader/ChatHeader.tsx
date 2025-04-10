@@ -1,4 +1,4 @@
-import React, { SetStateAction, useContext, useEffect, useMemo, useState } from "react";
+import React, { SetStateAction, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import { NavLink, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -11,10 +11,14 @@ import AnimatedBadge from "src/theme/AnimatedBadge/AnimatedBadge";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import * as Sentry from "@sentry/react";
-import AnonymousAccountConversionDialog
-  from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
+import AnonymousAccountConversionDialog from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import { useChatContext } from "src/chat/ChatContext";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import CustomLink from "src/theme/CustomLink/CustomLink";
+import { Experience } from "src/experiences/experienceService/experiences.types";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
 export type ChatHeaderProps = {
   notifyOnLogout: () => void;
@@ -23,6 +27,10 @@ export type ChatHeaderProps = {
   experiencesExplored: number;
   exploredExperiencesNotification: boolean;
   setExploredExperiencesNotification: React.Dispatch<SetStateAction<boolean>>;
+  experiences: Experience[];
+  conversationCompleted: boolean;
+  conversationConductedAt: string | null;
+  conversationState?: number;
 };
 
 const uniqueId = "7413b63a-887b-4f41-b930-89e9770db12b";
@@ -36,6 +44,7 @@ export const DATA_TEST_ID = {
   CHAT_HEADER_BUTTON_EXPERIENCES: `chat-header-button-experiences-${uniqueId}`,
   CHAT_HEADER_BUTTON_FEEDBACK: `chat-header-button-feedback-${uniqueId}`,
   CHAT_HEADER_ICON_FEEDBACK: `chat-header-icon-feedback-${uniqueId}`,
+  CHAT_HEADER_FEEDBACK_LINK: `chat-header-feedback-link-${uniqueId}`,
 };
 
 export const MENU_ITEM_ID = {
@@ -62,6 +71,9 @@ export const FEEDBACK_FORM_TEXT = {
   SUCCESS_MESSAGE: "Thank you for your feedback!",
 };
 
+const isStorybook = !!process.env.STORYBOOK;
+export const FEEDBACK_NOTIFICATION_DELAY = isStorybook ? 1000 : 3 * 60 * 1000;
+
 const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   notifyOnLogout,
   startNewConversation,
@@ -69,11 +81,18 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   experiencesExplored,
   exploredExperiencesNotification,
   setExploredExperiencesNotification,
+  experiences,
+  conversationCompleted,
+  conversationConductedAt,
+  conversationState,
 }) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [showConversionDialog, setShowConversionDialog] = useState(false);
+  const feedbackTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  const previousSessionIdRef = React.useRef<number | null>(null);
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const isOnline = useContext(IsOnlineContext);
   const user = authenticationStateService.getInstance().getUser();
@@ -90,7 +109,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
     setSentryEnabled(Sentry.isInitialized());
   }, []);
 
-  const handleGiveFeedback = async () => {
+  const handleGiveFeedback = useCallback(async () => {
     if (!sentryEnabled) {
       console.warn("Sentry is not initialized, feedback form cannot be created.");
       return;
@@ -98,21 +117,99 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
     try {
       const feedback = Sentry.getFeedback();
       if (feedback) {
-        const form = await feedback
-          .createForm({
-            formTitle: FEEDBACK_FORM_TEXT.TITLE,
-            messagePlaceholder: FEEDBACK_FORM_TEXT.MESSAGE_PLACEHOLDER,
-            submitButtonLabel: FEEDBACK_FORM_TEXT.SUBMIT_BUTTON_LABEL,
-            successMessageText: FEEDBACK_FORM_TEXT.SUCCESS_MESSAGE,
-            enableScreenshot: false,
-          });
+        const form = await feedback.createForm({
+          formTitle: FEEDBACK_FORM_TEXT.TITLE,
+          messagePlaceholder: FEEDBACK_FORM_TEXT.MESSAGE_PLACEHOLDER,
+          submitButtonLabel: FEEDBACK_FORM_TEXT.SUBMIT_BUTTON_LABEL,
+          successMessageText: FEEDBACK_FORM_TEXT.SUCCESS_MESSAGE,
+          enableScreenshot: false,
+        });
         form.appendToDom();
         form.open();
       }
     } catch (error) {
       console.error("Error creating feedback form:", error);
     }
-  };
+  }, [sentryEnabled]);
+
+  // Show notification after 30 minutes if conversation is not completed
+  useEffect(() => {
+    const sessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
+    if (!sessionId) return;
+
+    // Clear previous feedback notification if session ID changes
+    if (previousSessionIdRef.current && previousSessionIdRef.current !== sessionId) {
+      PersistentStorageService.clearFeedbackNotification(previousSessionIdRef.current);
+    }
+    previousSessionIdRef.current = sessionId;
+
+    // Clean up any existing timer
+    if (feedbackTimerRef.current) {
+      clearTimeout(feedbackTimerRef.current);
+      feedbackTimerRef.current = null;
+    }
+
+    // Don't set timer if conversation is completed, timestamp is missing, or notification already shown
+    if (
+      conversationCompleted ||
+      !conversationConductedAt ||
+      PersistentStorageService.getFeedbackNotification(sessionId)
+    ) {
+      return;
+    }
+
+    // Calculate time until notification should appear (30 min after conversation started)
+    const conversationStartTime = new Date(conversationConductedAt).getTime();
+    const targetTime = conversationStartTime + FEEDBACK_NOTIFICATION_DELAY;
+    const currentTime = Date.now();
+    const timeUntilNotification = Math.max(0, targetTime - currentTime);
+
+    feedbackTimerRef.current = setTimeout(() => {
+      if (!conversationCompleted) {
+        // Check if phase progress is 66% or less
+        const shouldPrompt: boolean = (conversationState ?? 0) <= 66;
+
+        if (shouldPrompt) {
+          const snackbarKey = enqueueSnackbar(
+            <Typography variant="body1">
+              We'd love to hear your feedback on your experience so far!{" "}
+              <CustomLink
+                onClick={async () => {
+                  closeSnackbar(snackbarKey);
+                  await handleGiveFeedback();
+                }}
+                data-testid={DATA_TEST_ID.CHAT_HEADER_FEEDBACK_LINK}
+              >
+                Give Feedback
+              </CustomLink>
+            </Typography>,
+            {
+              variant: "info",
+              persist: true,
+              autoHideDuration: null,
+            }
+          );
+        }
+        PersistentStorageService.setFeedbackNotification(sessionId);
+      }
+    }, timeUntilNotification);
+
+    return () => {
+      if (feedbackTimerRef.current) {
+        clearTimeout(feedbackTimerRef.current);
+        feedbackTimerRef.current = null;
+      }
+    };
+  }, [
+    enqueueSnackbar,
+    closeSnackbar,
+    conversationCompleted,
+    conversationConductedAt,
+    experiences,
+    experiencesExplored,
+    handleGiveFeedback,
+    conversationState,
+  ]);
 
   const contextMenuItems: MenuItemConfig[] = useMemo(
     () => [
@@ -130,23 +227,26 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
           navigate(routerPaths.SETTINGS);
         },
       },
-      ...(sentryEnabled ? [
-        {
-          id: MENU_ITEM_ID.REPORT_BUG_BUTTON,
-          text: MENU_ITEM_TEXT.REPORT_BUG,
-          disabled: !isOnline,
-          action: () => {
-            const feedback = Sentry.getFeedback();
-            if (feedback) {
-              feedback.createForm().then((form) => {
-                if (form) {
-                  form.appendToDom();
-                  form.open();
+      ...(sentryEnabled
+        ? [
+            {
+              id: MENU_ITEM_ID.REPORT_BUG_BUTTON,
+              text: MENU_ITEM_TEXT.REPORT_BUG,
+              disabled: !isOnline,
+              action: () => {
+                const feedback = Sentry.getFeedback();
+                if (feedback) {
+                  feedback.createForm().then((form) => {
+                    if (form) {
+                      form.appendToDom();
+                      form.open();
+                    }
+                  });
                 }
-              });
-            }
-          },
-        }] : []),
+              },
+            },
+          ]
+        : []),
       ...(isAnonymous
         ? [
             {
@@ -204,17 +304,19 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
             <BadgeOutlinedIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_EXPERIENCES} />
           </AnimatedBadge>
         </PrimaryIconButton>
-        {sentryEnabled && <PrimaryIconButton
-          sx={{
-            color: theme.palette.common.black,
-          }}
-          onClick={handleGiveFeedback}
-          data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_FEEDBACK}
-          title="give feedback"
-          disabled={!isOnline}
-        >
-          <FeedbackOutlinedIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_FEEDBACK} />
-        </PrimaryIconButton>}
+        {sentryEnabled && (
+          <PrimaryIconButton
+            sx={{
+              color: theme.palette.common.black,
+            }}
+            onClick={handleGiveFeedback}
+            data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_FEEDBACK}
+            title="give feedback"
+            disabled={!isOnline}
+          >
+            <FeedbackOutlinedIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_FEEDBACK} />
+          </PrimaryIconButton>
+        )}
         <PrimaryIconButton
           sx={{
             color: theme.palette.common.black,

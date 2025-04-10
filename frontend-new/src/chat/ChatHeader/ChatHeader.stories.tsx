@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import ChatHeader from "./ChatHeader";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import ChatHeader from "src/chat/ChatHeader/ChatHeader";
+import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 
 const meta: Meta<typeof ChatHeader> = {
   title: "Chat/ChatHeader",
@@ -10,6 +13,15 @@ const meta: Meta<typeof ChatHeader> = {
     notifyOnExperiencesDrawerOpen: { action: "notifyOnExperiencesDrawerOpen" },
     setExploredExperiencesNotification: { action: "setExploredExperiencesNotification" },
   },
+  decorators: [
+    (Story) => {
+      UserPreferencesStateService.getInstance().getActiveSessionId = () => 1234;
+      // Mock the methods to always show the feedback notification
+      PersistentStorageService.getFeedbackNotification = () => false;
+      PersistentStorageService.setFeedbackNotification = () => {};
+      return Story();
+    },
+  ],
 };
 
 export default meta;
@@ -17,12 +29,26 @@ export default meta;
 type Story = StoryObj<typeof ChatHeader>;
 
 export const Shown: Story = {
-  args: {},
+  args: {
+    experiences: mockExperiences,
+    experiencesExplored: mockExperiences.length,
+  },
 };
 
-export const ShownWithNotification: Story = {
+export const ShownWithExperiencesNotification: Story = {
   args: {
     exploredExperiencesNotification: true,
-    experiencesExplored: 3,
+    experiencesExplored: mockExperiences.length,
+    experiences: mockExperiences,
+  },
+};
+
+export const ShownWithFeedbackNotification: Story = {
+  args: {
+    conversationCompleted: false,
+    experiencesExplored: 0,
+    experiences: mockExperiences,
+    conversationConductedAt: new Date(Date.now() - 1500).toISOString(),
+    conversationState: 10,
   },
 };

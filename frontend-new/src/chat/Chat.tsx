@@ -402,6 +402,10 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
                 experiencesExplored={exploredExperiences}
                 exploredExperiencesNotification={exploredExperiencesNotification}
                 setExploredExperiencesNotification={setExploredExperiencesNotification}
+                experiences={experiences}
+                conversationCompleted={conversationCompleted}
+                conversationConductedAt={conversationConductedAt}
+                conversationState={currentPhase?.percentage}
               />
             </Box>
             <Box paddingBottom={theme.spacing(theme.tabiyaSpacing.lg)} paddingX={theme.spacing(theme.tabiyaSpacing.md)}>

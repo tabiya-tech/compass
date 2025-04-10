@@ -3,7 +3,7 @@ import "src/_test_utilities/consoleMock";
 // standard sentry mock
 import "src/_test_utilities/sentryMock";
 
-import ChatHeader, { DATA_TEST_ID, FEEDBACK_FORM_TEXT, MENU_ITEM_ID } from "./ChatHeader";
+import ChatHeader, { DATA_TEST_ID, FEEDBACK_FORM_TEXT, FEEDBACK_NOTIFICATION_DELAY, MENU_ITEM_ID } from "./ChatHeader";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { act, fireEvent, waitFor, within, userEvent } from "src/_test_utilities/test-utils";
 import { useNavigate } from "react-router-dom";
@@ -21,15 +21,13 @@ import AnonymousAccountConversionDialog, {
 import { ChatProvider } from "src/chat/ChatContext";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import * as Sentry from "@sentry/react";
+import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import React from "react";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 
 // Mock PersistentStorageService
-jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => ({
-  PersistentStorageService: {
-    getAccountConverted: jest.fn(),
-    setAccountConverted: jest.fn(),
-    clearAccountConverted: jest.fn(),
-  },
-}));
+jest.mock("src/app/PersistentStorageService/PersistentStorageService");
 
 // mock the ContextMenu
 jest.mock("src/theme/ContextMenu/ContextMenu", () => {
@@ -84,6 +82,19 @@ jest.mock("src/auth/components/anonymousAccountConversionDialog/AnonymousAccount
   };
 });
 
+// mock the snackbar
+jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
+  const actual = jest.requireActual("src/theme/SnackbarProvider/SnackbarProvider");
+  return {
+    ...actual,
+    __esModule: true,
+    useSnackbar: jest.fn().mockReturnValue({
+      enqueueSnackbar: jest.fn(),
+      closeSnackbar: jest.fn(),
+    }),
+  };
+});
+
 const renderWithChatProvider = (child: React.ReactNode) => {
   render(<ChatProvider handleOpenExperiencesDrawer={jest.fn}>{child}</ChatProvider>);
 };
@@ -93,7 +104,7 @@ describe("ChatHeader", () => {
     // set sentry as uninitialized by default
     (Sentry.isInitialized as jest.Mock).mockReturnValue(false);
     (ContextMenu as jest.Mock).mockClear();
-    jest.clearAllMocks()
+    jest.clearAllMocks();
   });
 
   test.each([
@@ -113,6 +124,9 @@ describe("ChatHeader", () => {
         experiencesExplored={givenNumberOfExploredExperiences}
         exploredExperiencesNotification={givenExploredExperiencesNotification}
         setExploredExperiencesNotification={jest.fn()}
+        experiences={[]}
+        conversationCompleted={false}
+        conversationConductedAt="2025-04-10T09:23:21.958000+00:00"
       />
     );
 
@@ -157,6 +171,9 @@ describe("ChatHeader", () => {
         experiencesExplored={0}
         exploredExperiencesNotification={false}
         setExploredExperiencesNotification={jest.fn()}
+        experiences={[]}
+        conversationCompleted={false}
+        conversationConductedAt={null}
       />
     );
     renderWithChatProvider(givenChatHeader);
@@ -182,6 +199,9 @@ describe("ChatHeader", () => {
           experiencesExplored={0}
           exploredExperiencesNotification={true}
           setExploredExperiencesNotification={jest.fn()}
+          experiences={[]}
+          conversationCompleted={false}
+          conversationConductedAt={null}
         />
       </ChatProvider>
     );
@@ -198,6 +218,9 @@ describe("ChatHeader", () => {
           experiencesExplored={0}
           exploredExperiencesNotification={true}
           setExploredExperiencesNotification={jest.fn()}
+          experiences={[]}
+          conversationCompleted={false}
+          conversationConductedAt={null}
         />
       );
       // AND the chat header is rendered
@@ -232,6 +255,9 @@ describe("ChatHeader", () => {
           experiencesExplored={0}
           exploredExperiencesNotification={true}
           setExploredExperiencesNotification={jest.fn()}
+          experiences={[]}
+          conversationCompleted={false}
+          conversationConductedAt={null}
         />
       );
       // AND the chat header is rendered
@@ -281,6 +307,9 @@ describe("ChatHeader", () => {
           experiencesExplored={0}
           exploredExperiencesNotification={true}
           setExploredExperiencesNotification={jest.fn()}
+          experiences={[]}
+          conversationCompleted={false}
+          conversationConductedAt={null}
         />
       );
 
@@ -321,6 +350,9 @@ describe("ChatHeader", () => {
           experiencesExplored={0}
           exploredExperiencesNotification={false}
           setExploredExperiencesNotification={jest.fn()}
+          experiences={[]}
+          conversationCompleted={false}
+          conversationConductedAt={null}
         />
       );
       // AND the chat header is rendered
@@ -355,6 +387,9 @@ describe("ChatHeader", () => {
           experiencesExplored={0}
           exploredExperiencesNotification={true}
           setExploredExperiencesNotification={jest.fn()}
+          experiences={[]}
+          conversationCompleted={false}
+          conversationConductedAt={null}
         />
       );
       // AND the chat header is rendered
@@ -383,6 +418,9 @@ describe("ChatHeader", () => {
           experiencesExplored={givenExploredExperiences}
           exploredExperiencesNotification={givenExploredExperiencesNotification}
           setExploredExperiencesNotification={jest.fn()}
+          experiences={[]}
+          conversationCompleted={false}
+          conversationConductedAt={null}
         />
       );
       renderWithChatProvider(givenChatHeader);
@@ -413,6 +451,9 @@ describe("ChatHeader", () => {
           experiencesExplored={givenExploredExperiences}
           exploredExperiencesNotification={givenExploredExperiencesNotification}
           setExploredExperiencesNotification={jest.fn()}
+          experiences={[]}
+          conversationCompleted={false}
+          conversationConductedAt={null}
         />
       );
       renderWithChatProvider(givenChatHeader);
@@ -424,11 +465,11 @@ describe("ChatHeader", () => {
       // THEN expect notifyOnExperiencesDrawerOpen to be called
       await waitFor(() => {
         expect(givenNotifyOnExperiencesDrawerOpen).toHaveBeenCalled();
-      })
+      });
       // AND expect the notification badge content to be hidden
       await waitFor(() => {
         expect(screen.queryByText(givenExploredExperiences)).not.toBeInTheDocument();
-      })
+      });
     });
 
     test("should open sentry bug report form when report a bug button is clicked", async () => {
@@ -453,6 +494,9 @@ describe("ChatHeader", () => {
           experiencesExplored={0}
           exploredExperiencesNotification={false}
           setExploredExperiencesNotification={jest.fn()}
+          experiences={[]}
+          conversationCompleted={false}
+          conversationConductedAt={null}
         />
       );
       renderWithChatProvider(givenChatHeader);
@@ -489,6 +533,9 @@ describe("ChatHeader", () => {
           experiencesExplored={0}
           exploredExperiencesNotification={false}
           setExploredExperiencesNotification={jest.fn()}
+          experiences={[]}
+          conversationCompleted={false}
+          conversationConductedAt={null}
         />
       );
       renderWithChatProvider(givenChatHeader);
@@ -530,6 +577,9 @@ describe("ChatHeader", () => {
             experiencesExplored={0}
             exploredExperiencesNotification={false}
             setExploredExperiencesNotification={jest.fn()}
+            experiences={[]}
+            conversationCompleted={false}
+            conversationConductedAt={null}
           />
         );
         // AND the chat header is rendered
@@ -607,6 +657,9 @@ describe("ChatHeader", () => {
           experiencesExplored={0}
           exploredExperiencesNotification={false}
           setExploredExperiencesNotification={jest.fn()}
+          experiences={[]}
+          conversationCompleted={false}
+          conversationConductedAt={null}
         />
       );
 
@@ -650,6 +703,9 @@ describe("ChatHeader", () => {
           experiencesExplored={0}
           exploredExperiencesNotification={false}
           setExploredExperiencesNotification={jest.fn()}
+          experiences={[]}
+          conversationCompleted={false}
+          conversationConductedAt={null}
         />
       );
 
@@ -692,6 +748,9 @@ describe("ChatHeader", () => {
           experiencesExplored={0}
           exploredExperiencesNotification={false}
           setExploredExperiencesNotification={jest.fn()}
+          experiences={[]}
+          conversationCompleted={false}
+          conversationConductedAt={null}
         />
       );
 
@@ -724,6 +783,9 @@ describe("ChatHeader", () => {
             experiencesExplored={0}
             exploredExperiencesNotification={false}
             setExploredExperiencesNotification={jest.fn()}
+            experiences={[]}
+            conversationCompleted={false}
+            conversationConductedAt={null}
           />
         </ChatProvider>
       );
@@ -759,6 +821,9 @@ describe("ChatHeader", () => {
             experiencesExplored={0}
             exploredExperiencesNotification={false}
             setExploredExperiencesNotification={jest.fn()}
+            experiences={[]}
+            conversationCompleted={false}
+            conversationConductedAt={null}
           />
         </ChatProvider>
       );
@@ -787,6 +852,94 @@ describe("ChatHeader", () => {
         expect.objectContaining({ isOpen: false }),
         expect.anything()
       );
+    });
+  });
+
+  describe("Feedback notification", () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      mockBrowserIsOnLine(true);
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    test("should show feedback notification after 30 minutes when conversation is not completed", () => {
+      // GIVEN mock active session ID
+      const givenSessionId = 12345;
+      jest.spyOn(UserPreferencesStateService.getInstance(), "getActiveSessionId").mockReturnValue(givenSessionId);
+      // AND mock feedback notification to return false
+      jest.spyOn(PersistentStorageService, "getFeedbackNotification").mockReturnValue(false);
+      // AND experiences explored
+      const givenExploredExperiences = 4;
+
+      // WHEN the component is rendered
+      renderWithChatProvider(
+        <ChatHeader
+          notifyOnLogout={jest.fn()}
+          startNewConversation={jest.fn()}
+          notifyOnExperiencesDrawerOpen={jest.fn()}
+          experiencesExplored={givenExploredExperiences}
+          exploredExperiencesNotification={false}
+          setExploredExperiencesNotification={jest.fn()}
+          experiences={mockExperiences}
+          conversationCompleted={false}
+          conversationConductedAt={new Date().toISOString()}
+          conversationState={50}
+        />
+      );
+      // AND after FEEDBACK_NOTIFICATION_DELAY
+      jest.advanceTimersByTime(FEEDBACK_NOTIFICATION_DELAY);
+
+      // THEN expect the feedback notification to be shown
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          variant: "info",
+          persist: true,
+          autoHideDuration: null,
+        })
+      );
+      // AND expect the feedback notification state to be stored
+      expect(PersistentStorageService.setFeedbackNotification).toHaveBeenCalledWith(givenSessionId);
+      // AND no errors or warnings to be shown
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
+    });
+
+    test("should not show feedback notification if it is already shown for current session", () => {
+      // GIVEN mock active session ID
+      const givenSessionId = 1234;
+      jest.spyOn(UserPreferencesStateService.getInstance(), "getActiveSessionId").mockReturnValue(givenSessionId);
+      // AND mock feedback notification to return true (already shown)
+      jest.spyOn(PersistentStorageService, "getFeedbackNotification").mockReturnValue(true);
+      // AND experiences explored
+      const givenExploredExperiences = 4;
+
+      // WHEN the component is rendered
+      renderWithChatProvider(
+        <ChatHeader
+          notifyOnLogout={jest.fn()}
+          startNewConversation={jest.fn()}
+          notifyOnExperiencesDrawerOpen={jest.fn()}
+          experiencesExplored={givenExploredExperiences}
+          exploredExperiencesNotification={false}
+          setExploredExperiencesNotification={jest.fn()}
+          experiences={mockExperiences}
+          conversationCompleted={false}
+          conversationConductedAt={new Date().toISOString()}
+          conversationState={50}
+        />
+      );
+      // AND after FEEDBACK_NOTIFICATION_DELAY
+      jest.advanceTimersByTime(FEEDBACK_NOTIFICATION_DELAY);
+
+      // THEN expect no notification to be shown
+      expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalled();
+      // AND no errors or warnings to be shown
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
     });
   });
 });

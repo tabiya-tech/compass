@@ -15,6 +15,8 @@ export const OVERALL_FEEDBACK_KEY = `overall_feedback_${PERSISTENT_STORAGE_VERSI
 
 export const ACCOUNT_CONVERTED_KEY = `account_converted_${PERSISTENT_STORAGE_VERSION}`;
 
+export const FEEDBACK_NOTIFICATION_KEY = `feedback_notification_${PERSISTENT_STORAGE_VERSION}`;
+
 /**
  * This class is used to store the tokens in the session storage.
  *   eg: refresh token
@@ -160,6 +162,30 @@ export class PersistentStorageService {
    */
   static clearAccountConverted(): void {
     this.storage.removeItem(ACCOUNT_CONVERTED_KEY);
+  }
+
+  /**
+   * Returns the feedback notification from the storage
+   * @param sessionId - ID of the session
+   * @returns boolean - Whether the feedback notification has been shown
+   */
+  static getFeedbackNotification(sessionId: number): boolean {
+    return this.storage.getItem(`${FEEDBACK_NOTIFICATION_KEY}_${sessionId}`) === "true";
+  }
+
+  /**
+   * Sets the feedback notification in the storage
+   * @param sessionId - ID of the session
+   */
+  static setFeedbackNotification(sessionId: number): void {
+    this.storage.setItem(`${FEEDBACK_NOTIFICATION_KEY}_${sessionId}`, "true");
+  }
+
+  /**
+   * Clears the feedback notification from the storage
+   */
+  static clearFeedbackNotification(sessionId: number): void {
+    this.storage.removeItem(`${FEEDBACK_NOTIFICATION_KEY}_${sessionId}`);
   }
 
   /**

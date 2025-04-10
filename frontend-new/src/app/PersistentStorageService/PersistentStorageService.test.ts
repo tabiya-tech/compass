@@ -277,7 +277,7 @@ describe("AuthPersistentStorage class tests", () => {
           question_id: "foo",
           simplified_answer: {
             rating_numeric: 5,
-          }
+          },
         },
       ];
       PersistentStorageService.setOverallFeedback(givenFeedback);
@@ -338,6 +338,45 @@ describe("AuthPersistentStorage class tests", () => {
       // THEN The account conversion should be stored
       const accountConversion = PersistentStorageService.getAccountConverted();
       expect(accountConversion).toEqual(givenAccountConversion);
+    });
+  });
+
+  describe("feedback notification tests", () => {
+    test("return correct previously set feedback notification", () => {
+      // GIVEN The feedback notification is stored in the local storage
+      const sessionId = 1234;
+      PersistentStorageService.setFeedbackNotification(sessionId);
+
+      // WHEN The feedback notification is retrieved
+      const feedbackNotification = PersistentStorageService.getFeedbackNotification(sessionId);
+
+      // THEN true should be returned
+      expect(feedbackNotification).toEqual(true);
+    });
+
+    test("return false if feedback notification is not set", () => {
+      // GIVEN The feedback notification is not stored in the local storage
+      // Nothing set
+
+      // WHEN The feedback notification is retrieved
+      const sessionId = 1234;
+      const feedbackNotification = PersistentStorageService.getFeedbackNotification(sessionId);
+
+      // THEN false should be returned
+      expect(feedbackNotification).toBe(false);
+    });
+
+    test("clear feedback notification", () => {
+      // GIVEN The feedback notification is stored in the local storage
+      const sessionId = 1234;
+      PersistentStorageService.setFeedbackNotification(sessionId);
+
+      // WHEN The feedback notification is cleared
+      PersistentStorageService.clearFeedbackNotification(sessionId);
+
+      // THEN The feedback notification should be cleared
+      const feedbackNotification = PersistentStorageService.getFeedbackNotification(sessionId);
+      expect(feedbackNotification).toBe(false);
     });
   });
 
