@@ -10,9 +10,13 @@ export enum ConversationPhase {
 export type CurrentPhase = {
   percentage: number
   phase: ConversationPhase
+  current: number | null
+  total: number | null
 }
 
-export const defaultCurrentPhase = {
+export const defaultCurrentPhase: CurrentPhase = {
   phase: ConversationPhase.INITIALIZING,
-  percentage: 0
+  percentage: 0,
+  current: null,
+  total: null,
 }

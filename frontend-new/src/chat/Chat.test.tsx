@@ -263,7 +263,9 @@ describe("Chat", () => {
       experiences_explored: 0,
       current_phase: {
         percentage: percentage,
-        phase: phase
+        phase: phase,
+        current: null,
+        total: null,
       }
     };
   }
@@ -451,7 +453,9 @@ describe("Chat", () => {
           current_phase:
             {
               percentage: 0,
-              phase: ConversationPhase.INTRO
+              phase: ConversationPhase.INTRO,
+              current: null,
+              total: null,
             }
         };
         jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenChatHistoryResponse);
@@ -1019,7 +1023,9 @@ describe("Chat", () => {
         experiences_explored: 0,
         current_phase: {
             percentage: 0,
-            phase: ConversationPhase.INTRO
+            phase: ConversationPhase.INTRO,
+            current: null,
+            total: null,
           }
       };
       let resolveSendMessage!: (value: ConversationResponse) => void;
@@ -1194,7 +1200,9 @@ describe("Chat", () => {
         current_phase:
           {
             percentage: 0,
-            phase: ConversationPhase.INTRO
+            phase: ConversationPhase.INTRO,
+            current: null,
+            total: null,
           }
       };
       let resolveSendMessage!: (value: ConversationResponse) => void;
@@ -1514,7 +1522,9 @@ describe("Chat", () => {
         current_phase:
           {
             percentage: 0,
-            phase: ConversationPhase.INTRO
+            phase: ConversationPhase.INTRO,
+            current: null,
+            total: null
           }
       };
       jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenPreviousConversation);
