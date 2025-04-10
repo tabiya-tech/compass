@@ -137,6 +137,7 @@ const Login: React.FC = () => {
           device_type: deviceType,
           os_type: osName,
           browser_version: browserVersion,
+          user_agent: navigator.userAgent,
           timestamp: new Date().toISOString(),
         };
         MetricsService.getInstance().sendMetricsEvent(deviceEvent);
