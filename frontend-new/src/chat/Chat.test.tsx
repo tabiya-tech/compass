@@ -35,7 +35,7 @@ import ConfirmModalDialog, {
 import { DATA_TEST_ID as INACTIVE_BACKDROP_DATA_TEST_ID } from "src/theme/Backdrop/InactiveBackdrop";
 import userEvent, { UserEvent } from "@testing-library/user-event";
 import { ChatMessageType, IChatMessage } from "./Chat.types";
-import { FIXED_MESSAGES_TEXT } from "./util";
+import { FIXED_MESSAGES_TEXT, parseWelcomeMessage } from "./util";
 import { TabiyaUser } from "src/auth/auth.types";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import { nanoid } from "nanoid";
@@ -176,7 +176,8 @@ jest.mock("src/chat/util", () => {
   const actual = jest.requireActual("src/chat/util");
   return {
     ...actual,
-    parseConversationPhase: jest.fn().mockImplementation((arg1, _arg2) => arg1)
+    parseConversationPhase: jest.fn().mockImplementation((arg1, _arg2) => arg1),
+    parseWelcomeMessage: jest.fn().mockImplementation(arg1 => arg1)
   };
 });
 

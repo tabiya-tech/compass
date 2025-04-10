@@ -9,7 +9,7 @@ import {
   generateSomethingWentWrongMessage,
   generateTypingMessage,
   generateUserMessage,
-  parseConversationPhase,
+  parseConversationPhase, parseWelcomeMessage,
 } from "./util";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Box, useTheme } from "@mui/material";
@@ -167,10 +167,15 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           setExploredExperiencesNotification(true);
         }
 
-        response.messages.forEach((messageItem) => {
-          const message = response.conversation_completed && messageItem === response.messages[response.messages.length - 1]
+        response.messages.forEach((messageItem, index) => {
+          let message = response.conversation_completed && messageItem === response.messages[response.messages.length - 1]
             ? generateConversationConclusionMessage(messageItem.message_id, messageItem.message, messageItem.sent_at)
             : generateCompassMessage(messageItem.message_id, messageItem.message, messageItem.sent_at, messageItem.reaction);
+
+          if (messages.length === 0 && index === 0) {
+            message = parseWelcomeMessage(message);
+          }
+
           addMessage(message);
         });
 
@@ -224,7 +229,11 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         // Set the messages from the chat history
         if (history.messages.length) {
           setMessages(
-            history.messages.map((message: ConversationMessage) => {
+            history.messages.map((message: ConversationMessage, index) => {
+              if(index === 0) {
+                message = parseWelcomeMessage(message);
+              }
+
               if (message.sender === ConversationMessageSender.USER) {
                 return generateUserMessage(message.message, message.sent_at);
               }

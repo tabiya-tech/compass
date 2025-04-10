@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import { ChatMessageType, IChatMessage } from "src/chat/Chat.types";
-import { ConversationMessageSender, MessageReaction } from "./ChatService/ChatService.types";
+import { ConversationMessage, ConversationMessageSender, MessageReaction } from "./ChatService/ChatService.types";
 import { CurrentPhase } from "src/chat/chatProgressbar/types";
 import { InvalidConversationPhasePercentage } from "./errors";
 
@@ -11,6 +11,7 @@ export const FIXED_MESSAGES_TEXT = {
   SOMETHING_WENT_WRONG:
     "I'm sorry, Something seems to have gone wrong on my end... Can you please refresh the page and try again?",
   PLEASE_REPEAT: "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
+  WELCOME: "I will begin by asking about your experiences to get a general understanding. As we proceed, your CV will be created. This may take some time, and you can save your progress by creating an account. Afterward, we will discuss your work history and skills in more detail."
 };
 
 export const generateUserMessage = (message: string, sent_at: string, message_id?: string): IChatMessage => {
@@ -39,6 +40,15 @@ export const generateCompassMessage = (
     reaction: reaction,
   };
 };
+
+export const parseWelcomeMessage = <T extends ConversationMessage>(message: T): T => {
+  return {
+    ...message,
+    message: ` ${message.message}
+    
+    ${FIXED_MESSAGES_TEXT.WELCOME}`
+  }
+}
 
 export const generateErrorMessage = (message: string): IChatMessage => {
   return {

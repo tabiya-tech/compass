@@ -97,7 +97,7 @@ const ChatList: React.FC<ChatListProps> = ({ messages }) => {
         }}
       >
         <AnimatePresence initial={false}>
-          {messages.map((message, index) => (
+          {messages.map((message) => (
             <ListItem
               key={message.message_id}
               component={motion.li}
