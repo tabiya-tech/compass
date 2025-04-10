@@ -6,6 +6,7 @@ import { ConversationPhase } from "./types";
 
 describe("getUserFriendlyConversationPhaseName", () => {
   test.each([
+    [USER_FRIENDLY_PHASE_NAMES[ConversationPhase.INITIALIZING], ConversationPhase.INITIALIZING],
     [USER_FRIENDLY_PHASE_NAMES[ConversationPhase.INTRO], ConversationPhase.INTRO],
     [USER_FRIENDLY_PHASE_NAMES[ConversationPhase.COLLECT_EXPERIENCES], ConversationPhase.COLLECT_EXPERIENCES],
     [USER_FRIENDLY_PHASE_NAMES[ConversationPhase.DIVE_IN], ConversationPhase.DIVE_IN],

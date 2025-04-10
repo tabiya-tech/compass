@@ -1,6 +1,7 @@
 import { ConversationPhase } from "./types";
 
 export const USER_FRIENDLY_PHASE_NAMES: Record<ConversationPhase, string> = {
+  [ConversationPhase.INITIALIZING]: "Initializing...",
   [ConversationPhase.INTRO]: "Introduction",
   [ConversationPhase.COLLECT_EXPERIENCES]: "Collecting experiences",
   [ConversationPhase.DIVE_IN]: "Exploring skills",
