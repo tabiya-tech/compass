@@ -423,9 +423,13 @@ class DeviceSpecificationEvent(AbstractUserAccountEvent):
     """
     timestamp - an iso string representing the timestamp of the event
     """
+    user_agent: str
+    """
+    str - the user agent of the browser the user is using
+    """
 
     def __init__(self, *, user_id: str, device_type: str, os_type: str, browser_type: str, timestamp: str,
-                 browser_version: str):
+                 browser_version: str, user_agent: str):
         super().__init__(
             user_id=user_id,
             event_type=EventType.DEVICE_SPECIFICATION,
@@ -433,6 +437,7 @@ class DeviceSpecificationEvent(AbstractUserAccountEvent):
             os_type=os_type,
             browser_type=browser_type,
             browser_version=browser_version,
+            user_agent=user_agent,
             timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc)
         )
 
