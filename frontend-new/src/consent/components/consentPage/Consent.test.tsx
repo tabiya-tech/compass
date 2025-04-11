@@ -32,6 +32,7 @@ jest.mock("src/envService", () => ({
   getFirebaseAPIKey: jest.fn(() => "mock-api-key"),
   getFirebaseDomain: jest.fn(() => "mock-auth-domain"),
   getBackendUrl: jest.fn(() => "mock-backend-url"),
+  getMetricsEnabled: jest.fn(() => "true"),
 }));
 
 // mock react-device-detect

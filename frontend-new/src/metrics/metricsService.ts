@@ -1,4 +1,4 @@
-import { getBackendUrl } from "src/envService";
+import { getBackendUrl, getMetricsEnabled } from "src/envService";
 import { MetricsEventUnion } from "src/metrics/types";
 import { customFetch } from "src/utils/customFetch/customFetch";
 import { StatusCodes } from "http-status-codes";
@@ -9,13 +9,21 @@ export const METRICS_FLUSH_INTERVAL_MS = 15000; // 15 seconds
 export default class MetricsService {
   readonly apiServerUrl: string;
   private static instance: MetricsService | null;
+  private readonly _metricsEnabled: boolean;
   private _eventBuffer: MetricsEventUnion[] = [];
   private _flushInterval: NodeJS.Timeout | null = null;
 
   private constructor() {
     this.apiServerUrl = getBackendUrl();
-    // Start the flush interval immediately after the service is created
-    this.startFlushInterval();
+    this._metricsEnabled = getMetricsEnabled().toLowerCase() === "true";
+
+    if (!this._metricsEnabled) {
+      // Log warning if metrics are disabled
+      console.warn("Metrics are disabled. No metrics will be sent.");
+    } else {
+      // Start the flush interval only if metrics are enabled
+      this.startFlushInterval();
+    }
   }
 
   /**
@@ -33,7 +41,7 @@ export default class MetricsService {
    * Starts the interval that periodically flushes the event buffer
    */
   private startFlushInterval(): void {
-    if (this._flushInterval === null) {
+    if (this._flushInterval === null && this._metricsEnabled) {
       this._flushInterval = setInterval(() => {
         this.flushEvents().then(() => {
           console.debug("Metrics events flushed successfully");
@@ -58,6 +66,11 @@ export default class MetricsService {
    * @param event The metrics event to send
    */
   public sendMetricsEvent(event: MetricsEventUnion): void {
+    // Skip adding events if metrics are disabled
+    if (!this._metricsEnabled) {
+      return;
+    }
+
     try {
       console.debug("Adding metrics event to buffer:", event.event_type);
       this._eventBuffer.push(event);
@@ -71,7 +84,7 @@ export default class MetricsService {
    * @returns {Promise<void>}
    */
   private async flushEvents(): Promise<void> {
-    if (this._eventBuffer.length === 0) {
+    if (!this._metricsEnabled || this._eventBuffer.length === 0) {
       return;
     }
 

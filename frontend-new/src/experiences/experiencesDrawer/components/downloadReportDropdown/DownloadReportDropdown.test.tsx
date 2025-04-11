@@ -79,6 +79,14 @@ jest.mock("src/experiences/report/reportDocx/provider", () => {
   };
 });
 
+// mock the envService
+jest.mock("src/envService.ts", () => ({
+  getFirebaseAPIKey: jest.fn(() => "mock-api-key"),
+  getFirebaseDomain: jest.fn(() => "mock-auth-domain"),
+  getBackendUrl: jest.fn(() => "mock-backend-url"),
+  getMetricsEnabled: jest.fn(() => "true"),
+}));
+
 describe("DownloadReportDropdown", () => {
   const mockData = {
     name: "John Doe",

@@ -63,6 +63,7 @@ jest.mock("src/envService", () => ({
   getBackendUrl: jest.fn(() => "mock-backend-url"),
   getApplicationLoginCode: jest.fn(() => ""),
   getApplicationRegistrationCode: jest.fn(() => ""),
+  getMetricsEnabled: jest.fn(() => "true"),
 }));
 
 jest.mock("src/auth/components/SocialAuth/SocialAuth", () => {

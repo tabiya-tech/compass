@@ -12,6 +12,7 @@ export enum EnvVariables {
   SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID = "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID",
   FRONTEND_LOGIN_CODE = "FRONTEND_LOGIN_CODE",
   FRONTEND_REGISTRATION_CODE = "FRONTEND_REGISTRATION_CODE",
+  FRONTEND_ENABLE_METRICS = "FRONTEND_ENABLE_METRICS",
 }
 
 export const requiredEnvVariables = [
@@ -21,6 +22,7 @@ export const requiredEnvVariables = [
   EnvVariables.TARGET_ENVIRONMENT_NAME,
   EnvVariables.SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY,
   EnvVariables.SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID,
+  EnvVariables.FRONTEND_ENABLE_METRICS,
 ];
 
 /**
@@ -133,6 +135,10 @@ export const getApplicationLoginCode = () => {
 
 export const getApplicationRegistrationCode = () => {
   return getEnv(EnvVariables.FRONTEND_REGISTRATION_CODE);
+};
+
+export const getMetricsEnabled = () => {
+  return getEnv(EnvVariables.FRONTEND_ENABLE_METRICS);
 };
 
 export const ensureRequiredEnvVars = () => {
