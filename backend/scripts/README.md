@@ -11,12 +11,20 @@ python export_import_conversation.py --source-session-id 123 --target-session-id
 
 # Export from DB to JSON (using same session ID)
 python export_import_conversation.py --source-session-id 123 --target JSON
+
+# Export latest session from a user to JSON
+python export_import_conversation.py --source-user-id user123 --target JSON
+
+# Copy latest session between users (DB to DB)
+python export_import_conversation.py --source-user-id user123 --target-user-id user456
 ```
 
 #### Arguments
 
-- `--source-session-id`: The source session ID to export conversation from
-- `--target-session-id`: The target session ID to import conversation to (optional when exporting to JSON, defaults to source session ID)
+- `--source-session-id`: The source session ID to export conversation from (required if --source-user-id not provided)
+- `--source-user-id`: The source user ID to get the latest session from (only valid when source is DB)
+- `--target-session-id`: The target session ID to import conversation to (required if --target-user-id not provided)
+- `--target-user-id`: The target user ID to get the latest session from (only valid when target is DB)
 - `--source`: The source store type (either "JSON" or "DB", defaults to "DB")
 - `--target`: The target store type (either "JSON" or "DB", defaults to "DB")
 
@@ -47,6 +55,14 @@ python export_import_conversation.py --source-session-id 123 --target-session-id
 # Creates file: exported-conversations/export-456.json
 ```
 
+### Export latest session from a user to JSON
+
+```bash
+python export_import_conversation.py --source-user-id user123 --target JSON
+# Gets latest session ID from user preferences
+# Creates file: exported-conversations/export-{latest_session_id}.json
+```
+
 ### Import from JSON to DB
 
 ```bash
@@ -58,6 +74,13 @@ python export_import_conversation.py --source-session-id 123 --target-session-id
 
 ```bash
 python export_import_conversation.py --source-session-id 123 --target-session-id 456
+```
+
+### Copy latest session between users (DB to DB)
+
+```bash
+python export_import_conversation.py --source-user-id user123 --target-user-id user456
+# Gets latest session IDs from both users' preferences
 ```
 
 ### Export from JSON to JSON (copy)

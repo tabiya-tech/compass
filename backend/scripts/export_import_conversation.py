@@ -4,10 +4,11 @@ import logging
 from typing import Optional
 
 from dotenv import load_dotenv
-from motor.motor_asyncio import AsyncIOMotorClient
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from pydantic_settings import BaseSettings
 
 from app.application_state import ApplicationStateStore
+from app.server_dependencies.database_collections import Collections
 from app.store.database_application_state_store import DatabaseApplicationStateStore
 from app.store.json_application_state_store import JSONApplicationStateStore
 
@@ -31,6 +32,38 @@ class Settings(BaseSettings):
 
     class Config:
         env_prefix = "EXPORT_IMPORT_"
+
+
+async def get_latest_session_id(db: AsyncIOMotorDatabase, user_id: str) -> Optional[int]:
+    """
+    Get the latest session ID from a user's preferences.
+    
+    Args:
+        db: The database connection
+        user_id: The user ID to look up
+        
+    Returns:
+        The latest session ID, or None if not found
+    """
+    try:
+        # Get the user preferences document
+        user_prefs = await db.get_collection(Collections.USER_PREFERENCES).find_one(
+            {"user_id": user_id},
+            projection={"sessions": 1}
+        )
+
+        if not user_prefs or "sessions" not in user_prefs or not user_prefs["sessions"]:
+            logger.error(f"No sessions found for user {user_id}")
+            return None
+
+        # Get the latest session ID (first item in the array)
+        latest_session_id = user_prefs["sessions"][0]
+        logger.info(f"Found latest session ID {latest_session_id} for user {user_id}")
+        return latest_session_id
+
+    except Exception as e:
+        logger.error(f"Error getting latest session ID for user {user_id}: {e}")
+        return None
 
 
 async def export_state(
@@ -166,33 +199,75 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Export and import conversation states")
 
     # Add arguments for export/import
-    parser.add_argument("--source-session-id", type=int, required=True, help="The source session ID")
+    parser.add_argument("--source-session-id", type=int,
+                        help="The source session ID (required if --source-user-id not provided)")
+    parser.add_argument("--source-user-id", type=str,
+                        help="The source user ID to get the latest session from (only valid when source is DB)")
     parser.add_argument("--target-session-id", type=int,
-                        help="The target session ID (defaults to source session ID when exporting to JSON)")
+                        help="The target session ID (required if --target-user-id not provided)")
+    parser.add_argument("--target-user-id", type=str,
+                        help="The target user ID to get the latest session from (only valid when target is DB)")
     parser.add_argument("--source", type=str, choices=["JSON", "DB"], help="Source store type (defaults to DB)")
     parser.add_argument("--target", type=str, default="DB", choices=["JSON", "DB"],
                         help="Target store type (default: DB)")
 
-    return parser.parse_args()
+    args = parser.parse_args()
+
+    # Validate arguments
+    if not args.source_session_id and not args.source_user_id:
+        parser.error("Either --source-session-id or --source-user-id must be provided")
+    if not args.target_session_id and not args.target_user_id:
+        parser.error("Either --target-session-id or --target-user-id must be provided")
+    if args.source_user_id and args.source and args.source != "DB":
+        parser.error("--source-user-id can only be used when source is DB")
+    if args.target_user_id and args.target != "DB":
+        parser.error("--target-user-id can only be used when target is DB")
+
+    return args
 
 
-if __name__ == "__main__":
+async def main():
     args = parse_args()
 
     # Set default source type to DB if not provided
     source_type = args.source if args.source else "DB"
 
-    # Set default target session ID to source session ID if exporting to JSON and target session ID not provided
+    # Get source session ID from user preferences if user ID is provided
+    source_session_id = args.source_session_id
+    if args.source_user_id and source_type == "DB":
+        settings = Settings()
+        if not settings.source_mongodb_uri or not settings.source_database_name:
+            raise ValueError("Source MongoDB URI and database name are required for user preferences lookup")
+        source_client = AsyncIOMotorClient(settings.source_mongodb_uri, tlsAllowInvalidCertificates=True)
+        source_db = source_client.get_database(settings.source_database_name)
+        source_session_id = await get_latest_session_id(source_db, args.source_user_id)
+        if source_session_id is None:
+            raise ValueError(f"Could not find latest session ID for user {args.source_user_id}")
+
+    # Get target session ID from user preferences if user ID is provided
     target_session_id = args.target_session_id
-    if target_session_id is None and args.target == "JSON":
-        target_session_id = args.source_session_id
+    if args.target_user_id and args.target == "DB":
+        settings = Settings()
+        if not settings.target_mongodb_uri or not settings.target_database_name:
+            raise ValueError("Target MongoDB URI and database name are required for user preferences lookup")
+        target_client = AsyncIOMotorClient(settings.target_mongodb_uri, tlsAllowInvalidCertificates=True)
+        target_db = target_client.get_database(settings.target_database_name)
+        target_session_id = await get_latest_session_id(target_db, args.target_user_id)
+        if target_session_id is None:
+            raise ValueError(f"Could not find latest session ID for user {args.target_user_id}")
+    elif target_session_id is None and args.target == "JSON":
+        target_session_id = source_session_id
         logger.info(f"Using source session ID {target_session_id} as target session ID for JSON export")
     elif target_session_id is None:
         raise ValueError("Target session ID is required when not exporting to JSON")
 
-    asyncio.run(export_import_conversation(
-        args.source_session_id,
+    await export_import_conversation(
+        source_session_id,
         target_session_id,
         source_type,
         args.target
-    ))
+    )
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
