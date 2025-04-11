@@ -1,4 +1,6 @@
 import "src/_test_utilities/consoleMock";
+import "src/_test_utilities/envServiceMock";
+
 import { waitFor } from "src/_test_utilities/test-utils";
 import MetricsService, { METRICS_FLUSH_INTERVAL_MS } from "src/metrics/metricsService";
 import { CVDownloadedEvent, EventType } from "src/metrics/types";
@@ -71,21 +73,18 @@ describe("MetricsService", () => {
 
       // THEN expect it to make a POST request with all events
       await waitFor(() => {
-        expect(fetchSpy).toHaveBeenCalledWith(
-          `${givenApiServerUrl}/metrics`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            serviceName: "MetricsService",
-            serviceFunction: "flushEvents",
-            failureMessage: "Failed to send metrics events",
-            expectedStatusCode: StatusCodes.ACCEPTED,
-            body: JSON.stringify([givenEvent1, givenEvent2]),
-          }
-        );
-      })
+        expect(fetchSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/metrics`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          serviceName: "MetricsService",
+          serviceFunction: "flushEvents",
+          failureMessage: "Failed to send metrics events",
+          expectedStatusCode: StatusCodes.ACCEPTED,
+          body: JSON.stringify([givenEvent1, givenEvent2]),
+        });
+      });
     });
 
     test("should log error but continue when API call fails", async () => {
@@ -114,7 +113,7 @@ describe("MetricsService", () => {
       // THEN expect the error to be logged but not thrown
       await waitFor(() => {
         expect(console.error).toHaveBeenCalledOnce();
-      })
+      });
     });
 
     test("should log error but not throw when response is not accpted", async () => {
@@ -142,8 +141,8 @@ describe("MetricsService", () => {
 
       // THEN expect the error to be logged
       await waitFor(() => {
-        expect(console.error).toHaveBeenCalledOnce()
-      })
+        expect(console.error).toHaveBeenCalledOnce();
+      });
 
       // AND GIVEN another event
       const newEvent: CVDownloadedEvent = {
@@ -155,9 +154,7 @@ describe("MetricsService", () => {
       };
 
       // AND a successful response for the next call
-      fetchSpy.mockImplementationOnce(() =>
-        Promise.resolve(new Response(undefined, { status: 202 }))
-      );
+      fetchSpy.mockImplementationOnce(() => Promise.resolve(new Response(undefined, { status: 202 })));
 
       // WHEN sending the new event
       service.sendMetricsEvent(newEvent);
@@ -168,20 +165,17 @@ describe("MetricsService", () => {
       await Promise.resolve();
 
       // THEN expect only the new event to be sent
-      expect(fetchSpy).toHaveBeenLastCalledWith(
-        `${givenApiServerUrl}/metrics`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          serviceName: "MetricsService",
-          serviceFunction: "flushEvents",
-          failureMessage: "Failed to send metrics events",
-          expectedStatusCode: StatusCodes.ACCEPTED,
-          body: JSON.stringify([newEvent]),
-        }
-      );
+      expect(fetchSpy).toHaveBeenLastCalledWith(`${givenApiServerUrl}/metrics`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        serviceName: "MetricsService",
+        serviceFunction: "flushEvents",
+        failureMessage: "Failed to send metrics events",
+        expectedStatusCode: StatusCodes.ACCEPTED,
+        body: JSON.stringify([newEvent]),
+      });
     });
 
     test("should not make API calls when buffer is empty", async () => {
@@ -196,5 +190,27 @@ describe("MetricsService", () => {
       // THEN expect no API calls
       expect(fetchSpy).not.toHaveBeenCalled();
     });
+
+    test("should not add events if metrics are disabled and log a warning", () => {
+      // GIVEN the metrics are disabled
+      jest.spyOn(require("src/envService"), "getMetricsEnabled").mockReturnValueOnce("false");
+      // AND a metrics event
+      const givenEvent: CVDownloadedEvent = {
+        event_type: EventType.CV_DOWNLOADED,
+        cv_format: CVFormat.PDF,
+        session_id: 123,
+        user_id: "456",
+        timestamp: new Date().toISOString(),
+      };
+
+      // WHEN sending a metrics event
+      const service = MetricsService.getInstance();
+      service.sendMetricsEvent(givenEvent);
+
+      // THEN expect the event not to be added to the buffer
+      expect(service["_eventBuffer"]).toHaveLength(0);
+      // AND the warning to be logged
+      expect(console.warn).toHaveBeenCalledWith("Metrics are disabled. No metrics will be sent.");
+    });
   });
-}); 
+});

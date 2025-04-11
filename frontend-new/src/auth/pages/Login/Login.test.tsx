@@ -1,6 +1,8 @@
 // standard sentry mock
 import "src/_test_utilities/sentryMock";
 import "src/_test_utilities/consoleMock";
+import "src/_test_utilities/envServiceMock";
+
 import React from "react";
 import { render, screen, waitFor, fireEvent, act } from "src/_test_utilities/test-utils";
 import Login, { DATA_TEST_ID } from "./Login";
@@ -55,14 +57,6 @@ jest.mock("react-device-detect", () => ({
 // Mock the Firebase service
 jest.mock("src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service", () => ({
   getInstance: jest.fn(),
-}));
-
-jest.mock("src/envService", () => ({
-  getFirebaseAPIKey: jest.fn(() => "mock-api-key"),
-  getFirebaseDomain: jest.fn(() => "mock-auth-domain"),
-  getBackendUrl: jest.fn(() => "mock-backend-url"),
-  getApplicationLoginCode: jest.fn(() => ""),
-  getApplicationRegistrationCode: jest.fn(() => ""),
 }));
 
 jest.mock("src/auth/components/SocialAuth/SocialAuth", () => {
