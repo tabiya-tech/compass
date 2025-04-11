@@ -175,12 +175,81 @@ async def export_analysis(state, session_id: int) -> None:
     logger.info(f"Analysis saved to {markdown_path}")
 
 
+async def bulk_export(
+        source_store: ApplicationStateStore,
+        target_store: ApplicationStateStore,
+        analyze: bool = False,
+        queue_size: int = 5
+) -> None:
+    """
+    Export all sessions with an analysis step in between.
+    """
+    fetch_queue = asyncio.Queue(maxsize=queue_size)
+    analysis_queue = asyncio.Queue(maxsize=queue_size)
+    
+    async def fetcher():
+        async for session_id in source_store.get_all_session_ids():
+            await fetch_queue.put(session_id)
+            logger.info(f"Queued session {session_id} for fetching")
+        await fetch_queue.put(None)
+    
+    async def processor():
+        while True:
+            session_id = await fetch_queue.get()
+            if session_id is None:
+                await analysis_queue.put(None)
+                break
+            
+            try:
+                state = await source_store.get_state(session_id)
+                if state is None:
+                    logger.error(f"No state found for session {session_id}")
+                    continue
+                
+                # Pass both ID and state to next stage
+                await analysis_queue.put((session_id, state))
+                logger.info(f"Processed session {session_id}")
+            finally:
+                fetch_queue.task_done()
+    
+    async def analyzer_saver():
+        while True:
+            item = await analysis_queue.get()
+            if item is None:
+                break
+                
+            try:
+                session_id, state = item
+                
+                if analyze:
+                    # Do analysis before saving
+                    await export_analysis(state, session_id)
+                    logger.info(f"Analyzed session {session_id}")
+                
+                # Save to target store
+                success = await export_state(source_store, session_id, target_store, session_id)
+                if success:
+                    logger.info(f"Saved session {session_id}")
+                else:
+                    logger.error(f"Failed to save session {session_id}")
+            finally:
+                analysis_queue.task_done()
+    
+    # Run all stages concurrently
+    await asyncio.gather(
+        fetcher(),
+        processor(),
+        analyzer_saver()
+    )
+
+
 async def export_import_conversation(
         source_session_id: int,
         target_session_id: int,
         source_type: str,
         target_type: str,
-        analyze: bool = False
+        analyze: bool = False,
+        bulk: bool = False
 ):
     """
     Export/import a conversation between different stores.
@@ -191,6 +260,7 @@ async def export_import_conversation(
         source_type: The type of source store ('json' or 'db')
         target_type: The type of target store ('json' or 'db')
         analyze: Whether to also export to markdown for analysis
+        bulk: Whether to export all sessions from source to target
     """
     try:
         # Initialize settings
@@ -218,23 +288,29 @@ async def export_import_conversation(
             target_db = target_client.get_database(settings.target_database_name)
             target_store = create_store('db', db=target_db)
 
-        # Get the state from source store
-        state = await source_store.get_state(source_session_id)
-        if state is None:
-            raise ValueError(f"No state found for session ID {source_session_id}")
-
-        # If analysis is requested, export to markdown
-        if analyze:
-            await export_analysis(state, source_session_id)
-
-        # Export the state
-        success = await export_state(source_store, source_session_id, target_store, target_session_id)
-        if success:
-            logger.info(f"Successfully exported conversation from {source_session_id} to {target_session_id}")
+        if bulk:
+            # Handle bulk export
+            await bulk_export(source_store, target_store, analyze)
             return True
         else:
-            logger.error(f"Failed to export conversation from {source_session_id} to {target_session_id}")
-            return False
+            # Handle single session export
+            # Get the state from source store
+            state = await source_store.get_state(source_session_id)
+            if state is None:
+                raise ValueError(f"No state found for session ID {source_session_id}")
+
+            # If analysis is requested, export to markdown
+            if analyze:
+                await export_analysis(state, source_session_id)
+
+            # Export the state
+            success = await export_state(source_store, source_session_id, target_store, target_session_id)
+            if success:
+                logger.info(f"Successfully exported conversation from {source_session_id} to {target_session_id}")
+                return True
+            else:
+                logger.error(f"Failed to export conversation from {source_session_id} to {target_session_id}")
+                return False
 
     except Exception as e:
         logger.error(f"Error during export/import: {e}")
@@ -246,11 +322,11 @@ def parse_args():
 
     # Add arguments for export/import
     parser.add_argument("--source-session-id", type=int,
-                        help="The source session ID (required if --source-user-id not provided)")
+                        help="The source session ID (required if --source-user-id not provided and not using --bulk)")
     parser.add_argument("--source-user-id", type=str,
                         help="The source user ID to get the latest session from (only valid when source is DB)")
     parser.add_argument("--target-session-id", type=int,
-                        help="The target session ID (required if --target-user-id not provided)")
+                        help="The target session ID (required if --target-user-id not provided and not using --bulk)")
     parser.add_argument("--target-user-id", type=str,
                         help="The target user ID to get the latest session from (only valid when target is DB)")
     parser.add_argument("--source", type=str, choices=["JSON", "DB"], help="Source store type (defaults to DB)")
@@ -258,14 +334,17 @@ def parse_args():
                         help="Target store type (default: DB)")
     parser.add_argument("--analyze", action="store_true",
                         help="Export conversation to markdown for analysis")
+    parser.add_argument("--bulk", action="store_true",
+                        help="Export all sessions from source to target")
 
     args = parser.parse_args()
 
     # Validate arguments
-    if not args.source_session_id and not args.source_user_id:
-        parser.error("Either --source-session-id or --source-user-id must be provided")
-    if not args.target_session_id and not args.target_user_id:
-        parser.error("Either --target-session-id or --target-user-id must be provided")
+    if not args.bulk:
+        if not args.source_session_id and not args.source_user_id:
+            parser.error("Either --source-session-id or --source-user-id must be provided when not using --bulk")
+        if not args.target_session_id and not args.target_user_id:
+            parser.error("Either --target-session-id or --target-user-id must be provided when not using --bulk")
     if args.source_user_id and args.source and args.source != "DB":
         parser.error("--source-user-id can only be used when source is DB")
     if args.target_user_id and args.target != "DB":
@@ -282,7 +361,7 @@ async def main():
 
     # Get source session ID from user preferences if user ID is provided
     source_session_id = args.source_session_id
-    if args.source_user_id and source_type == "DB":
+    if args.source_user_id and source_type == "DB" and not args.bulk:
         settings = Settings()
         if not settings.source_mongodb_uri or not settings.source_database_name:
             raise ValueError("Source MongoDB URI and database name are required for user preferences lookup")
@@ -294,7 +373,7 @@ async def main():
 
     # Get target session ID from user preferences if user ID is provided
     target_session_id = args.target_session_id
-    if args.target_user_id and args.target == "DB":
+    if args.target_user_id and args.target == "DB" and not args.bulk:
         settings = Settings()
         if not settings.target_mongodb_uri or not settings.target_database_name:
             raise ValueError("Target MongoDB URI and database name are required for user preferences lookup")
@@ -303,10 +382,10 @@ async def main():
         target_session_id = await get_latest_session_id(target_db, args.target_user_id)
         if target_session_id is None:
             raise ValueError(f"Could not find latest session ID for user {args.target_user_id}")
-    elif target_session_id is None and args.target == "JSON":
+    elif target_session_id is None and args.target == "JSON" and not args.bulk:
         target_session_id = source_session_id
         logger.info(f"Using source session ID {target_session_id} as target session ID for JSON export")
-    elif target_session_id is None:
+    elif target_session_id is None and not args.bulk:
         raise ValueError("Target session ID is required when not exporting to JSON")
 
     await export_import_conversation(
@@ -314,7 +393,8 @@ async def main():
         target_session_id,
         source_type,
         args.target,
-        args.analyze
+        args.analyze,
+        args.bulk
     )
 
 
