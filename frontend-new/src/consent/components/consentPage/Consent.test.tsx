@@ -1,4 +1,6 @@
 import "src/_test_utilities/consoleMock";
+import "src/_test_utilities/envServiceMock";
+
 import React from "react";
 import { userEvent, render, screen, waitFor } from "src/_test_utilities/test-utils";
 import Consent, { DATA_TEST_ID } from "./Consent";
@@ -26,13 +28,6 @@ import * as ProtectedRouteUtils from "src/app/ProtectedRoute/util";
 import MetricsService from "src/metrics/metricsService";
 import { EventType } from "src/metrics/types";
 import * as UserLocationUtils from "src/metrics/utils/getUserLocation";
-
-// Mock the envService module
-jest.mock("src/envService", () => ({
-  getFirebaseAPIKey: jest.fn(() => "mock-api-key"),
-  getFirebaseDomain: jest.fn(() => "mock-auth-domain"),
-  getBackendUrl: jest.fn(() => "mock-backend-url"),
-}));
 
 // mock react-device-detect
 jest.mock("react-device-detect", () => ({
