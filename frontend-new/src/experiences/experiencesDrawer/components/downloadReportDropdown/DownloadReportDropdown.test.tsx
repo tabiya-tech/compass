@@ -1,5 +1,6 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
+import "src/_test_utilities/envServiceMock";
 
 import React from "react";
 import DownloadReportDropdown, { CVFormat, MENU_ITEM_ID } from "./DownloadReportDropdown";
