@@ -47,9 +47,9 @@ export default class OverallFeedbackService {
       throw new Error("User not found");
     }
 
-    const infoService = new InfoService();
-    const [frontendInfo] = await infoService.loadInfo();
-    const versionString = `${frontendInfo.branch}-${frontendInfo.buildNumber}`;
+    const infoService = InfoService.getInstance();
+    const { frontend } = await infoService.loadInfo();
+    const versionString = `${frontend.branch}-${frontend.buildNumber}`;
 
     const feedbackRequest: FeedbackRequest = {
       version: {

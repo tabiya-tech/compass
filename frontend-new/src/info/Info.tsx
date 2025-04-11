@@ -4,6 +4,7 @@ import InfoService from "src/info/info.service";
 import PrimaryIconButton from "../theme/PrimaryIconButton/PrimaryIconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import { Theme } from "@mui/material/styles";
+import { VersionItem } from "./info.types";
 
 const uniqueId = "37d307ae-4f1e-4d8d-bafe-fd642f8af4dc";
 export const DATA_TEST_ID = {
@@ -27,7 +28,7 @@ const VersionInfoItem = ({ title, value, skeleton }: { title: string; value: str
   );
 };
 
-const VersionContainer = ({ dataTestId, title, info }: { dataTestId: string; title: string; info: InfoProps }) => {
+const VersionContainer = ({ dataTestId, title, info }: { dataTestId: string; title: string; info: VersionItem }) => {
   const theme = useTheme();
   return (
     <Box display="flex" gap={theme.tabiyaSpacing.xl} data-testid={dataTestId}>
@@ -53,13 +54,6 @@ const VersionContainer = ({ dataTestId, title, info }: { dataTestId: string; tit
   );
 };
 
-export interface InfoProps {
-  date: string;
-  branch: string;
-  buildNumber: string;
-  sha: string;
-}
-
 export interface InfoDrawerProps {
   isOpen: boolean;
   notifyOnClose: (event: CloseEvent) => void;
@@ -71,7 +65,7 @@ export enum CloseEventName {
 
 export type CloseEvent = { name: CloseEventName };
 
-const ApplicationInfoMain = (props: { versions: InfoProps[] }) => {
+const ApplicationInfoMain = (props: { versions: VersionItem[] }) => {
   const theme = useTheme();
   return (
     <Box
@@ -91,14 +85,14 @@ const ApplicationInfoMain = (props: { versions: InfoProps[] }) => {
 };
 
 const InfoDrawer: React.FC<InfoDrawerProps> = ({ isOpen, notifyOnClose }) => {
-  const [versions, setVersions] = useState<InfoProps[]>([]);
-  const infoService = useMemo(() => new InfoService(), []);
+  const [versions, setVersions] = useState<VersionItem[]>([]);
+  const infoService = useMemo(() => InfoService.getInstance(), []);
   const theme = useTheme();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
 
   useEffect(() => {
     if (isOpen) {
-      infoService.loadInfo().then((data) => setVersions(data));
+      infoService.loadInfo().then((data) => setVersions([data.frontend, data.backend]));
     }
   }, [infoService, isOpen]);
 
