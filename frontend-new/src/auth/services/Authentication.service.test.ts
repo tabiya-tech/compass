@@ -97,8 +97,8 @@ describe("AuthenticationService", () => {
       // AND the user preferences state should be cleared
       expect(UserPreferencesStateService.getInstance().clearUserPreferences).toHaveBeenCalled();
 
-      // AND the login method should be cleared from persistent storage
-      expect(PersistentStorageService.clearLoginMethod).toHaveBeenCalled();
+      // AND the login method should not be cleared from persistent storage and should be preserved for other logins
+      expect(PersistentStorageService.clearLoginMethod).not.toHaveBeenCalled();
 
       // AND the account conversion flag should be cleared from persistent storage
       expect(PersistentStorageService.clearAccountConverted).toHaveBeenCalled();
@@ -131,7 +131,9 @@ describe("AuthenticationService", () => {
       expect(PersistentStorageService.setToken).toHaveBeenCalledWith(givenToken);
       // AND the user should be set in the authentication state
       expect(AuthenticationStateService.getInstance().getUser()).toEqual(givenUser);
-      // AND the user preferences were fetched for given user
+      // AND the token should be set in the authentication state.
+      expect(AuthenticationStateService.getInstance().getToken()).toEqual(givenToken);
+      // AND the user preferences were fetched for given user,
       expect(UserPreferencesService.getInstance().getUserPreferences).toHaveBeenCalledWith(givenUser.id);
       // AND the user preferences should be set in the state
       expect(UserPreferencesStateService.getInstance().getUserPreferences()).toEqual(givenUserPreferences);
@@ -244,6 +246,9 @@ describe("AuthenticationService", () => {
 
       // AND the user should be set in the authentication state
       expect(AuthenticationStateService.getInstance().getUser()).toEqual(givenUser);
+
+      // AND the authentication state should be set with the token
+      expect(AuthenticationStateService.getInstance().getToken()).toEqual(givenToken);
 
       // AND new user preferences should be created for the user with the registration code
       expect((UserPreferencesService.getInstance().createUserPreferences)).toHaveBeenCalledWith({

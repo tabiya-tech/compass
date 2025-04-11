@@ -78,12 +78,14 @@ abstract class AuthenticationService {
   async onSuccessfulLogout(): Promise<void> {
     // clear the user from the context, and the persistent storage
     this.authenticationStateService.clearUser();
+    this.authenticationStateService.clearToken();
     // clear the userPreferences from the "state"
     this.userPreferencesStateService.clearUserPreferences();
-    // clear the login method and personal info from the persistent storage only if the user is successfully logged out
-    PersistentStorageService.clearLoginMethod();
+    // clear the personal info from the persistent storage only if the user is successfully logged out
     PersistentStorageService.clearPersonalInfo();
     PersistentStorageService.clearAccountConverted();
+    // Dont clear the login method, we want to preserve the login method for other logins (e.g on a different tab)
+    // the login method will be overwritten by the next login (doesnt need to be cleared)
   }
 
   /**
@@ -96,7 +98,10 @@ abstract class AuthenticationService {
       throw Error("User not found in the token");
     }
     PersistentStorageService.setToken(token);
+
     this.authenticationStateService.setUser(user);
+    this.authenticationStateService.setToken(token);
+
     let prefs = null;
     try {
       prefs = await UserPreferencesService.getInstance().getUserPreferences(user.id);
@@ -127,7 +132,9 @@ abstract class AuthenticationService {
       throw Error("User not found in the token");
     }
     PersistentStorageService.setToken(token);
+
     this.authenticationStateService.setUser(user);
+    this.authenticationStateService.setToken(token);
 
     // create user preferences for the first time.
     // in order to do this, there needs to be a logged-in user in the persistent storage
@@ -150,6 +157,7 @@ abstract class AuthenticationService {
     }
     PersistentStorageService.setToken(token);
     this.authenticationStateService.setUser(user);
+    this.authenticationStateService.setToken(token)
   }
 
   /**
