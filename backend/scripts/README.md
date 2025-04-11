@@ -1,7 +1,7 @@
 # Conversation Export/Import Scripts
 ## Usage
 
-The `export_import_conversation.py` script allows you to export/import conversations between different stores (JSON or DB). When using JSON storage, each conversation is stored in a separate file named `export-{session_id}.json` in the `exported-conversations` directory.
+The `export_import_conversation.py` script allows you to export/import conversations between different stores (JSON or DB). When using JSON storage, each conversation is stored in a separate file named `export-{session_id}.json` in the `exports` directory. Analysis files are stored in the `exports/analysis` directory.
 
 ### Export/Import Conversation
 
@@ -17,6 +17,9 @@ python export_import_conversation.py --source-user-id user123 --target JSON
 
 # Copy latest session between users (DB to DB)
 python export_import_conversation.py --source-user-id user123 --target-user-id user456
+
+# Export and analyze a conversation
+python export_import_conversation.py --source-session-id 123 --target JSON --analyze
 ```
 
 #### Arguments
@@ -27,6 +30,7 @@ python export_import_conversation.py --source-user-id user123 --target-user-id u
 - `--target-user-id`: The target user ID to get the latest session from (only valid when target is DB)
 - `--source`: The source store type (either "JSON" or "DB", defaults to "DB")
 - `--target`: The target store type (either "JSON" or "DB", defaults to "DB")
+- `--analyze`: Export conversation to markdown for analysis (creates a file in the exports/analysis directory)
 
 ## Environment Variables
 
@@ -45,14 +49,14 @@ You can set these variables in a `.env` file in the same directory as the script
 
 ```bash
 python export_import_conversation.py --source-session-id 123 --target JSON
-# Creates file: exported-conversations/export-123.json
+# Creates file: exports/export-123.json
 ```
 
 ### Export from DB to JSON (with different session ID)
 
 ```bash
 python export_import_conversation.py --source-session-id 123 --target-session-id 456 --target JSON
-# Creates file: exported-conversations/export-456.json
+# Creates file: exports/export-456.json
 ```
 
 ### Export latest session from a user to JSON
@@ -60,14 +64,14 @@ python export_import_conversation.py --source-session-id 123 --target-session-id
 ```bash
 python export_import_conversation.py --source-user-id user123 --target JSON
 # Gets latest session ID from user preferences
-# Creates file: exported-conversations/export-{latest_session_id}.json
+# Creates file: exports/export-{latest_session_id}.json
 ```
 
 ### Import from JSON to DB
 
 ```bash
 python export_import_conversation.py --source-session-id 123 --target-session-id 456 --source JSON
-# Reads from: exported-conversations/export-123.json
+# Reads from: exports/export-123.json
 ```
 
 ### Copy between databases (DB to DB)
@@ -87,6 +91,28 @@ python export_import_conversation.py --source-user-id user123 --target-user-id u
 
 ```bash
 python export_import_conversation.py --source-session-id 123 --target-session-id 456 --source JSON --target JSON
-# Reads from: exported-conversations/export-123.json
-# Creates file: exported-conversations/export-456.json
+# Reads from: exports/export-123.json
+# Creates file: exports/export-456.json
 ```
+
+### Export and analyze a conversation
+
+```bash
+python export_import_conversation.py --source-session-id 123 --target JSON --analyze
+# Creates file: exports/export-123.json
+# Creates file: exports/analysis/analysis-123.md
+```
+
+The analysis markdown file includes:
+- Conversation title
+- Conversation summary
+- Recent history (last 5 turns)
+- Full conversation history
+- For each turn:
+  - Turn number
+  - User message
+  - Agent type and message
+  - Finished status
+  - Additional fields from AgentOutput
+  - Agent response time
+  - LLM call stats

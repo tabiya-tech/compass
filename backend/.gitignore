@@ -6,4 +6,4 @@ test_output/
 .idea/
 logs/
 feedback-reports/
-exported-conversations/
+exports/

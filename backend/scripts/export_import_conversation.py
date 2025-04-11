@@ -1,6 +1,7 @@
 import argparse
 import asyncio
 import logging
+import os
 from typing import Optional
 
 from dotenv import load_dotenv
@@ -8,6 +9,8 @@ from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from pydantic_settings import BaseSettings
 
 from app.application_state import ApplicationStateStore
+from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory
+from app.conversation_memory.save_conversation_context import save_conversation_context_to_markdown
 from app.server_dependencies.database_collections import Collections
 from app.store.database_application_state_store import DatabaseApplicationStateStore
 from app.store.json_application_state_store import JSONApplicationStateStore
@@ -18,7 +21,8 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 # Hardcoded directory for JSON files
-JSON_STORE_DIRECTORY = "exported-conversations"
+JSON_STORE_DIRECTORY = "exports"
+ANALYSIS_DIRECTORY = os.path.join(JSON_STORE_DIRECTORY, "analysis")
 
 
 class Settings(BaseSettings):
@@ -140,11 +144,43 @@ def create_store(store_type: str, **kwargs) -> ApplicationStateStore:
         raise ValueError(f"Unsupported store type: {store_type}")
 
 
+async def export_analysis(state, session_id: int) -> None:
+    """
+    Export a conversation to markdown for analysis.
+    
+    Args:
+        state: The application state containing the conversation
+        session_id: The session ID of the conversation
+    """
+    # Get the conversation context from the state
+    memory_state = state.conversation_memory_manager_state
+    context = ConversationContext(
+        all_history=memory_state.all_history,
+        history=ConversationHistory(
+            turns=(memory_state.to_be_summarized_history.turns + memory_state.unsummarized_history.turns)
+        ),
+        summary=memory_state.summary
+    )
+    
+    # Create analysis directory if it doesn't exist
+    os.makedirs(ANALYSIS_DIRECTORY, exist_ok=True)
+    
+    # Save to markdown
+    markdown_path = os.path.join(ANALYSIS_DIRECTORY, f"analysis-{session_id}.md")
+    save_conversation_context_to_markdown(
+        title=f"Analysis of Conversation {session_id}",
+        context=context,
+        file_path=markdown_path
+    )
+    logger.info(f"Analysis saved to {markdown_path}")
+
+
 async def export_import_conversation(
         source_session_id: int,
         target_session_id: int,
         source_type: str,
-        target_type: str
+        target_type: str,
+        analyze: bool = False
 ):
     """
     Export/import a conversation between different stores.
@@ -154,6 +190,7 @@ async def export_import_conversation(
         target_session_id: The target session ID
         source_type: The type of source store ('json' or 'db')
         target_type: The type of target store ('json' or 'db')
+        analyze: Whether to also export to markdown for analysis
     """
     try:
         # Initialize settings
@@ -180,6 +217,15 @@ async def export_import_conversation(
             target_client = AsyncIOMotorClient(settings.target_mongodb_uri, tlsAllowInvalidCertificates=True)
             target_db = target_client.get_database(settings.target_database_name)
             target_store = create_store('db', db=target_db)
+
+        # Get the state from source store
+        state = await source_store.get_state(source_session_id)
+        if state is None:
+            raise ValueError(f"No state found for session ID {source_session_id}")
+
+        # If analysis is requested, export to markdown
+        if analyze:
+            await export_analysis(state, source_session_id)
 
         # Export the state
         success = await export_state(source_store, source_session_id, target_store, target_session_id)
@@ -210,6 +256,8 @@ def parse_args():
     parser.add_argument("--source", type=str, choices=["JSON", "DB"], help="Source store type (defaults to DB)")
     parser.add_argument("--target", type=str, default="DB", choices=["JSON", "DB"],
                         help="Target store type (default: DB)")
+    parser.add_argument("--analyze", action="store_true",
+                        help="Export conversation to markdown for analysis")
 
     args = parser.parse_args()
 
@@ -265,7 +313,8 @@ async def main():
         source_session_id,
         target_session_id,
         source_type,
-        args.target
+        args.target,
+        args.analyze
     )
 
 
