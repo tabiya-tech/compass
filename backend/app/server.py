@@ -26,10 +26,17 @@ from app.app_config import ApplicationConfig, set_application_config, get_applic
 from app.version.utils import load_version_info
 from common_libs.logging.log_utilities import setup_logging_config
 
+
 def setup_logging():
     # The configuration is loaded (once) when python imports the module.
     # If the LOG_CONFIG_FILE environment variable is not set, then fallback to the production logging configuration
     log_config_file = os.getenv("LOG_CONFIG_FILE", "logging.cfg.yaml")
+
+    # If absolute path is not set, then use the relative path to this module
+    # As we do not know how the module will be run. It may be started from the __main__ module or from the command line
+    # or via uvicorn.
+    if not os.path.isabs(log_config_file):
+        log_config_file = os.path.join(os.path.dirname(__file__), log_config_file)
     setup_logging_config(log_config_file)
     logging.debug("Logging initialized")
 

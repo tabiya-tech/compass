@@ -49,6 +49,12 @@ def _get_configuration_filename(file: str):
 
 
 def setup_logging_config(cfg_file: str):
+    """
+    Set up the logging configuration from a YAML file.
+    if the file is not an absolute path, it will be resolved in the same directory as the __main__ module or the
+    current working directory if the module is not available.
+    :param cfg_file: str - The path to the YAML configuration file.
+    """
     configuration_file = _get_configuration_filename(cfg_file)
     try:
         with (open(configuration_file, 'r', encoding="utf-8") as stream):
