@@ -6,22 +6,21 @@ import logging
 from http import HTTPStatus
 from typing import Annotated
 
-from app.metrics.services.get_metrics_service import get_metrics_service
-from app.metrics.services.service import IMetricsService
 from fastapi import APIRouter, Depends, HTTPException, Request, Path
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pydantic import Field
 
-from app.context_vars import session_id_ctx_var, user_id_ctx_var
 from app.constants.errors import HTTPErrorResponse
-from app.server_dependencies.db_dependencies import CompassDBProvider
-from app.users.auth import Authentication, UserInfo
-from app.conversations.feedback.services import IUserFeedbackService, UserFeedbackService, NewFeedbackSpec, \
-    InvalidQuestionError, InvalidOptionError, QuestionsFileError
-from app.users.repositories import IUserPreferenceRepository, UserPreferenceRepository
+from app.context_vars import session_id_ctx_var, user_id_ctx_var
+from app.conversations.feedback.services.errors import InvalidOptionError, InvalidQuestionError, QuestionsFileError
+from app.conversations.feedback.services.service import IUserFeedbackService, UserFeedbackService, NewFeedbackSpec
 from app.errors.constants import NO_PERMISSION_FOR_SESSION
 from app.errors.errors import UnauthorizedSessionAccessError
-
+from app.metrics.services.get_metrics_service import get_metrics_service
+from app.metrics.services.service import IMetricsService
+from app.server_dependencies.db_dependencies import CompassDBProvider
+from app.users.auth import Authentication, UserInfo
+from app.users.repositories import IUserPreferenceRepository, UserPreferenceRepository
 from ._types import FeedbackResponse
 from ..repository import UserFeedbackRepository
 
@@ -45,7 +44,8 @@ _user_preferences_repository_lock = asyncio.Lock()
 _user_preferences_repository_singleton: IUserFeedbackService | None = None
 
 
-async def _get_user_preferences_repository(application_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)) -> IUserPreferenceRepository:
+async def _get_user_preferences_repository(application_db: AsyncIOMotorDatabase = Depends(
+    CompassDBProvider.get_application_db)) -> IUserPreferenceRepository:
     global _user_preferences_repository_singleton
     if _user_preferences_repository_singleton is None:  # initial check to avoid the lock if the singleton instance is already created (lock is expensive)
         async with _user_preferences_repository_lock:  # before modifying the singleton instance, acquire the lock
@@ -59,7 +59,9 @@ _user_feedback_service_lock = asyncio.Lock()
 _user_feedback_service_singleton: IUserFeedbackService | None = None
 
 
-async def _get_user_feedback_service(application_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db), metrics_service: IMetricsService = Depends(get_metrics_service)) -> IUserFeedbackService:
+async def _get_user_feedback_service(
+        application_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db),
+        metrics_service: IMetricsService = Depends(get_metrics_service)) -> IUserFeedbackService:
     global _user_feedback_service_singleton
     if _user_feedback_service_singleton is None:  # initial check to avoid the lock if the singleton instance is already created (lock is expensive)
         async with _user_feedback_service_lock:  # before modifying the singleton instance, acquire the lock

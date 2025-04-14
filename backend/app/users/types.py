@@ -1,10 +1,10 @@
 from dataclasses import field
+from datetime import datetime
 from typing import Optional, Mapping
 
 from pydantic import BaseModel, Field
-from datetime import datetime
 
-from app.conversations.feedback.services import AnsweredQuestions
+from app.conversations.feedback.services.types import AnsweredQuestions
 from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
 
 

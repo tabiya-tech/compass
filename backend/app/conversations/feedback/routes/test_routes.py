@@ -2,8 +2,8 @@
 Tests for the feedback routes
 """
 import json
-from http import HTTPStatus
 from datetime import datetime
+from http import HTTPStatus
 from typing import Generator
 from unittest.mock import AsyncMock
 
@@ -12,16 +12,19 @@ import pytest_mock
 from fastapi import FastAPI, APIRouter
 from fastapi.testclient import TestClient
 
-from app.conversations.feedback.services import IUserFeedbackService, NewFeedbackItemSpec, Answer
-from app.conversations.feedback.services import Feedback, Version, FeedbackItem, NewFeedbackSpec, NewFeedbackVersionSpec
-from app.conversations.feedback.services import InvalidQuestionError, InvalidOptionError
+from app.conversations.feedback.services.errors import InvalidQuestionError, InvalidOptionError
+from app.conversations.feedback.services.service import IUserFeedbackService
+from app.conversations.feedback.services.types import NewFeedbackSpec, NewFeedbackVersionSpec, NewFeedbackItemSpec, \
+    Feedback, \
+    Version, FeedbackItem, Answer
+from app.users.auth import UserInfo
 from app.users.repositories import IUserPreferenceRepository
 from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
 from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest
-from app.users.auth import UserInfo
 from common_libs.test_utilities.mock_auth import MockAuth, UnauthenticatedMockAuth
 from ._types import SimplifiedAnswer, FeedbackResponse
-from .routes import add_user_feedback_routes, _get_user_feedback_service, _get_user_preferences_repository, MAX_PAYLOAD_SIZE
+from .routes import add_user_feedback_routes, _get_user_feedback_service, _get_user_preferences_repository, \
+    MAX_PAYLOAD_SIZE
 
 TestClientWithMocks = tuple[TestClient, IUserFeedbackService, IUserPreferenceRepository, UserInfo | None]
 
@@ -153,7 +156,8 @@ class TestFeedbackRoutes:
         given_feedback_request = _get_new_feedback_spec()
 
         # AND the user has a valid session
-        mocked_preferences.get_user_preference_by_user_id = AsyncMock(return_value=_get_mock_user_preferences(given_session_id))
+        mocked_preferences.get_user_preference_by_user_id = AsyncMock(
+            return_value=_get_mock_user_preferences(given_session_id))
 
         # AND the service's upsert_user_feedback method will return some feedback object it upserted in the database
         given_upserted_feedback = _def_feedback()
@@ -166,7 +170,8 @@ class TestFeedbackRoutes:
         )
 
         # THEN the service's upsert_user_feedback method was called with given request
-        mocked_service.upsert_user_feedback.assert_called_once_with(mocked_user.user_id, given_session_id, given_feedback_request)
+        mocked_service.upsert_user_feedback.assert_called_once_with(mocked_user.user_id, given_session_id,
+                                                                    given_feedback_request)
 
         # AND the response is a FeedbackResponse object
         actual_feedback_response = FeedbackResponse(**actual_response.json())
@@ -176,7 +181,8 @@ class TestFeedbackRoutes:
         assert actual_feedback_response.id == given_upserted_feedback.id
         assert actual_feedback_response.version == given_upserted_feedback.version
         assert len(actual_feedback_response.feedback_items) == len(given_upserted_feedback.feedback_items)
-        for actual_item, expected_item in zip(actual_feedback_response.feedback_items, given_upserted_feedback.feedback_items):
+        for actual_item, expected_item in zip(actual_feedback_response.feedback_items,
+                                              given_upserted_feedback.feedback_items):
             assert actual_item.question_id == expected_item.question_id
             assert actual_item.question_text == expected_item.question_text
             assert actual_item.description == expected_item.description
