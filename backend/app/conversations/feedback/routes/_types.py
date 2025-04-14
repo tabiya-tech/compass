@@ -5,7 +5,7 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from app.conversations.feedback.services import FeedbackItem, Feedback, Version, SimplifiedAnswer
+from app.conversations.feedback.services.types import FeedbackItem, Feedback, Version, SimplifiedAnswer
 
 
 class FeedbackItemResponse(BaseModel):

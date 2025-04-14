@@ -14,7 +14,7 @@ from app.constants.errors import HTTPErrorResponse
 from app.context_vars import session_id_ctx_var, user_id_ctx_var
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversations.constants import MAX_MESSAGE_LENGTH, UNEXPECTED_FAILURE_MESSAGE
-from app.conversations.feedback import add_user_feedback_routes
+from app.conversations.feedback.routes.routes import add_user_feedback_routes
 from app.conversations.reactions.repository import ReactionRepository
 from app.conversations.reactions.routes import add_reaction_routes, get_user_preferences_repository
 from app.conversations.service import ConversationAlreadyConcludedError, IConversationService, ConversationService
@@ -23,13 +23,13 @@ from app.errors.constants import NO_PERMISSION_FOR_SESSION
 from app.errors.errors import UnauthorizedSessionAccessError
 from app.metrics.application_state_metrics_recorder.recorder import ApplicationStateMetricsRecorder
 from app.metrics.services.get_metrics_service import get_metrics_service
+from app.metrics.services.service import IMetricsService
 from app.server_dependencies.agent_director_dependencies import get_agent_director
 from app.server_dependencies.application_state_dependencies import get_application_state_manager
 from app.server_dependencies.conversation_manager_dependencies import get_conversation_memory_manager
+from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.types import Experience
 from app.users.auth import Authentication, UserInfo
-from app.metrics.services.service import IMetricsService
-from app.server_dependencies.db_dependencies import CompassDBProvider
 
 
 async def get_conversation_service(agent_director: LLMAgentDirector = Depends(get_agent_director),
@@ -39,10 +39,12 @@ async def get_conversation_service(agent_director: LLMAgentDirector = Depends(ge
                                        get_conversation_memory_manager),
                                    db: AsyncIOMotorDatabase = Depends(
                                        CompassDBProvider.get_application_db),
-                                   metrics_service: IMetricsService = Depends(get_metrics_service)) -> IConversationService:
+                                   metrics_service: IMetricsService = Depends(
+                                       get_metrics_service)) -> IConversationService:
     return ConversationService(agent_director=agent_director,
                                application_state_metrics_recorder=ApplicationStateMetricsRecorder(
-                                   application_state_manager=application_state_manager, metrics_service=metrics_service),
+                                   application_state_manager=application_state_manager,
+                                   metrics_service=metrics_service),
                                conversation_memory_manager=conversation_memory_manager,
                                reaction_repository=ReactionRepository(db))
 
