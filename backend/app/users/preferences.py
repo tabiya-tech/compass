@@ -1,25 +1,25 @@
 import asyncio
+import logging
 
 from fastapi import APIRouter, HTTPException, Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.constants.errors import ErrorService, HTTPErrorResponse
 from app.conversations.feedback.repository import UserFeedbackRepository
+from app.conversations.feedback.services.service import UserFeedbackService, IUserFeedbackService
 from app.invitations.repository import UserInvitationRepository
 from app.invitations.types import InvitationType
 from app.metrics.services.get_metrics_service import get_metrics_service
-from app.users.sensitive_personal_data.routes import get_sensitive_personal_data_service
-from app.users.sensitive_personal_data.service import ISensitivePersonalDataService
+from app.metrics.services.service import IMetricsService
+from app.metrics.types import UserAccountCreatedEvent
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, UserInfo, SignInProvider
-from app.conversations.feedback.services import UserFeedbackService, IUserFeedbackService
 from app.users.repositories import UserPreferenceRepository
+from app.users.sensitive_personal_data.routes import get_sensitive_personal_data_service
+from app.users.sensitive_personal_data.service import ISensitivePersonalDataService
 from app.users.sessions import generate_new_session_id, SessionsService
 from app.users.types import UserPreferencesUpdateRequest, UserPreferences, \
     CreateUserPreferencesRequest, UserPreferencesRepositoryUpdateRequest, UsersPreferencesResponse
-from app.metrics.services.service import IMetricsService
-from app.metrics.types import UserAccountCreatedEvent
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -248,7 +248,9 @@ _user_feedback_service_lock = asyncio.Lock()
 _user_feedback_service_singleton: IUserFeedbackService | None = None
 
 
-async def _get_user_feedback_service(application_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db), metrics_service = Depends(get_metrics_service)) -> IUserFeedbackService:
+async def _get_user_feedback_service(
+        application_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db),
+        metrics_service=Depends(get_metrics_service)) -> IUserFeedbackService:
     global _user_feedback_service_singleton
     if _user_feedback_service_singleton is None:  # initial check to avoid the lock if the singleton instance is already created (lock is expensive)
         async with _user_feedback_service_lock:  # before modifying the singleton instance, acquire the lock
@@ -285,7 +287,8 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     async def _get_user_preferences_handler(
             user_id: str, user_info: UserInfo = Depends(auth.get_user_info()),
             user_preference_repository: UserPreferenceRepository = Depends(_get_user_preferences_service),
-            sensitive_personal_data_service: ISensitivePersonalDataService = Depends(get_sensitive_personal_data_service),
+            sensitive_personal_data_service: ISensitivePersonalDataService = Depends(
+                get_sensitive_personal_data_service),
             user_feedback_service: UserFeedbackService = Depends(_get_user_feedback_service)
     ) -> UsersPreferencesResponse:
         return await _get_user_preferences(
@@ -309,11 +312,14 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
                  )
     async def _create_handler(body: CreateUserPreferencesRequest,
                               user_info: UserInfo = Depends(auth.get_user_info()),
-                              user_invitation_repository: UserInvitationRepository = Depends(_get_user_invitations_repository),
+                              user_invitation_repository: UserInvitationRepository = Depends(
+                                  _get_user_invitations_repository),
                               user_preference_repository: UserPreferenceRepository = Depends(
                                   _get_user_preferences_service),
-                              metrics_service: IMetricsService = Depends(get_metrics_service)) -> UsersPreferencesResponse:
-        return await _create_user_preferences(user_invitation_repository, user_preference_repository, body, user_info, metrics_service)
+                              metrics_service: IMetricsService = Depends(
+                                  get_metrics_service)) -> UsersPreferencesResponse:
+        return await _create_user_preferences(user_invitation_repository, user_preference_repository, body, user_info,
+                                              metrics_service)
 
     #########################
     # PATCH /users/preferences - Create a user preferences
@@ -329,7 +335,8 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
             request: UserPreferencesUpdateRequest,
             user_info: UserInfo = Depends(auth.get_user_info()),
             user_preference_repository: UserPreferenceRepository = Depends(_get_user_preferences_service),
-            sensitive_personal_data_service: ISensitivePersonalDataService = Depends(get_sensitive_personal_data_service),
+            sensitive_personal_data_service: ISensitivePersonalDataService = Depends(
+                get_sensitive_personal_data_service),
             user_feedback_service: UserFeedbackService = Depends(_get_user_feedback_service)
     ) -> UsersPreferencesResponse:
         return await _update_user_preferences(
@@ -349,8 +356,10 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
                 responses={403: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
                 description="""Endpoint for starting a new conversation session.""")
     async def _get_new_session_handler(user_id: str, user_info: UserInfo = Depends(auth.get_user_info()),
-                                       user_preference_repository: UserPreferenceRepository = Depends(_get_user_preferences_service),
-                                       sensitive_personal_data_service: ISensitivePersonalDataService = Depends(get_sensitive_personal_data_service),
+                                       user_preference_repository: UserPreferenceRepository = Depends(
+                                           _get_user_preferences_service),
+                                       sensitive_personal_data_service: ISensitivePersonalDataService = Depends(
+                                           get_sensitive_personal_data_service),
                                        user_feedback_service: UserFeedbackService = Depends(_get_user_feedback_service)
                                        ) -> UsersPreferencesResponse:
         """

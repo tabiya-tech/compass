@@ -2,32 +2,31 @@
 Tests for the feedback service
 """
 import json
+import random
 from datetime import datetime, timezone
 from pathlib import Path
-from unittest.mock import AsyncMock, patch
-import random
 from typing import Any
+from unittest.mock import AsyncMock, patch
 from uuid import uuid4
 
 import pytest
 import pytest_mock
 
-from app.conversations.feedback.repository import IUserFeedbackRepository
-from app.users.sessions import generate_new_session_id
-from app.metrics.types import FeedbackProvidedEvent, FeedbackRatingValueEvent
-from app.metrics.constants import EventType
-
 from app.app_config import ApplicationConfig
-from common_libs.test_utilities import get_random_user_id, get_random_printable_string, get_random_session_id
-from . import SimplifiedAnswer
-from .service import UserFeedbackService
-from .types import Feedback, FeedbackItem, Version, Answer, NewFeedbackSpec, NewFeedbackItemSpec, NewFeedbackVersionSpec
-from app.conversations.feedback.services.service import questions_cache
-from .errors import (
+from app.conversations.feedback.repository import IUserFeedbackRepository
+from app.conversations.feedback.services.errors import (
     InvalidQuestionError,
     InvalidOptionError, QuestionsFileError
 )
+from app.conversations.feedback.services.service import UserFeedbackService
+from app.conversations.feedback.services.service import questions_cache
+from app.conversations.feedback.services.types import Feedback, FeedbackItem, Version, Answer, NewFeedbackSpec, \
+    NewFeedbackItemSpec, NewFeedbackVersionSpec, SimplifiedAnswer
+from app.metrics.constants import EventType
 from app.metrics.services.service import IMetricsService
+from app.metrics.types import FeedbackProvidedEvent, FeedbackRatingValueEvent
+from app.users.sessions import generate_new_session_id
+from common_libs.test_utilities import get_random_user_id, get_random_printable_string, get_random_session_id
 
 given_feedback_specs_json_file = Path(__file__).parent / "given_feedback_specs-en.json"
 given_feedback_item_specs_json = json.loads(given_feedback_specs_json_file.read_text())

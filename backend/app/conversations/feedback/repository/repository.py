@@ -7,8 +7,9 @@ from typing import Mapping
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo import ReturnDocument
+
+from app.conversations.feedback.services.types import Feedback, FeedbackItem, Answer
 from app.server_dependencies.database_collections import Collections
-from app.conversations.feedback.services import Feedback, FeedbackItem, Answer
 from common_libs.time_utilities import mongo_date_to_datetime, datetime_to_mongo_date
 
 logger = logging.getLogger(__name__)
@@ -149,7 +150,8 @@ class UserFeedbackRepository(IUserFeedbackRepository):
             else:  # Update the existing feedback with the new feedback items
                 for item in feedback.feedback_items:
                     # replace the existing item with the new item if it exists, other append it
-                    existing_item = existing_feedback.find_feedback_item_by_question_id(item.question_id) if existing_feedback else None
+                    existing_item = existing_feedback.find_feedback_item_by_question_id(
+                        item.question_id) if existing_feedback else None
                     if existing_item:
                         existing_feedback.feedback_items.remove(existing_item)
                     existing_feedback.feedback_items.append(item)
@@ -182,7 +184,7 @@ class UserFeedbackRepository(IUserFeedbackRepository):
             # Get cursor and convert to list of documents
             cursor = self._collection.find({"user_id": {"$eq": user_id}})
             feedback_sessions = await cursor.to_list(length=None)
-            
+
             if not feedback_sessions:
                 self._logger.warning(f"Feedback for user_id '{user_id}' not found")
                 return {}

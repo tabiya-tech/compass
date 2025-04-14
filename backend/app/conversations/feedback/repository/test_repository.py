@@ -2,19 +2,19 @@
 Tests for the feedback repository.
 It uses the userdata_mocked database, and tests if repository methods work as expected with actual data.
 """
-from typing import Awaitable
-from datetime import datetime, timezone
 import random
+from datetime import datetime, timezone
+from typing import Awaitable
 
+import bson
 import pytest
 import pytest_mock
-import bson
 
 from app.conversations.feedback.repository import UserFeedbackRepository
-from app.conversations.feedback.services import Feedback, FeedbackItem, Answer, Version
-from common_libs.time_utilities import datetime_to_mongo_date, get_now
-from common_libs.test_utilities import get_random_printable_string, get_random_user_id
+from app.conversations.feedback.services.types import Feedback, FeedbackItem, Answer, Version
 from app.users.sessions import generate_new_session_id
+from common_libs.test_utilities import get_random_printable_string, get_random_user_id
+from common_libs.time_utilities import datetime_to_mongo_date, get_now
 
 
 def _assert_feedback_matches(doc, expected_feedback):
@@ -82,7 +82,8 @@ def _get_feedback(*, with_id: bool, question_ids: list[str]) -> Feedback:
 
 
 def _get_random_feedback(*, with_id: bool, feedback_items_count: int) -> Feedback:
-    return _get_feedback(with_id=with_id, question_ids=[get_random_printable_string(10) for _ in range(feedback_items_count)])
+    return _get_feedback(with_id=with_id,
+                         question_ids=[get_random_printable_string(10) for _ in range(feedback_items_count)])
 
 
 def _get_new_feedback_doc() -> dict:
@@ -169,7 +170,8 @@ class TestDocumentMapping:
         assert actual_feedback.version.frontend == given_feedback_doc["version"]["frontend"]
         assert actual_feedback.version.backend == given_feedback_doc["version"]["backend"]
         assert actual_feedback.feedback_items[0].question_id == given_feedback_doc["feedback_items"][0]["question_id"]
-        assert actual_feedback.feedback_items[0].question_text == given_feedback_doc["feedback_items"][0]["question_text"]
+        assert actual_feedback.feedback_items[0].question_text == given_feedback_doc["feedback_items"][0][
+            "question_text"]
         assert actual_feedback.feedback_items[0].description == given_feedback_doc["feedback_items"][0]["description"]
         assert actual_feedback.feedback_items[0].answer.selected_options == {}
         assert actual_feedback.feedback_items[0].answer.rating_numeric is None
@@ -181,9 +183,11 @@ class TestDocumentMapping:
 class TestUpsertFeedback:
     @pytest.mark.asyncio
     @pytest.mark.parametrize("given_feedback",
-                             [_get_random_feedback(with_id=True, feedback_items_count=2), _get_random_feedback(with_id=False, feedback_items_count=2)],
+                             [_get_random_feedback(with_id=True, feedback_items_count=2),
+                              _get_random_feedback(with_id=False, feedback_items_count=2)],
                              ids=["with_id", "without_id"])
-    async def test_insert_feedback_success_for_new_feedback(self, given_feedback, get_feedback_repository: Awaitable[UserFeedbackRepository]):
+    async def test_insert_feedback_success_for_new_feedback(self, given_feedback,
+                                                            get_feedback_repository: Awaitable[UserFeedbackRepository]):
         repository = await get_feedback_repository
 
         # AND there is no previous feedback for this session
@@ -208,7 +212,8 @@ class TestUpsertFeedback:
         _assert_feedback_matches(doc, given_feedback)
 
     @pytest.mark.asyncio
-    async def test_update_document_and_feedback_have_same_question_ids(self, get_feedback_repository: Awaitable[UserFeedbackRepository],
+    async def test_update_document_and_feedback_have_same_question_ids(self, get_feedback_repository: Awaitable[
+        UserFeedbackRepository],
                                                                        mocker: pytest_mock.MockerFixture):
         repository = await get_feedback_repository
         # datetime.now returns a fixed time
@@ -223,7 +228,8 @@ class TestUpsertFeedback:
         assert await repository._collection.find_one({'session_id': existing_feedback.session_id}) is not None
 
         # AND a new feedback entry for the same session that answers the same question as the existing feedback
-        given_feedback = _get_feedback(with_id=False, question_ids=[item.question_id for item in existing_feedback.feedback_items])
+        given_feedback = _get_feedback(with_id=False,
+                                       question_ids=[item.question_id for item in existing_feedback.feedback_items])
         given_feedback.session_id = existing_feedback.session_id
         given_feedback.user_id = existing_feedback.user_id
 
@@ -248,7 +254,8 @@ class TestUpsertFeedback:
         _assert_feedback_matches(doc, given_feedback)
 
     @pytest.mark.asyncio
-    async def test_update_feedback_has_all_questions_from_document_and_more(self, get_feedback_repository: Awaitable[UserFeedbackRepository],
+    async def test_update_feedback_has_all_questions_from_document_and_more(self, get_feedback_repository: Awaitable[
+        UserFeedbackRepository],
                                                                             mocker: pytest_mock.MockerFixture):
         repository = await get_feedback_repository
         # datetime.now returns a fixed time
@@ -263,7 +270,8 @@ class TestUpsertFeedback:
         assert await repository._collection.find_one({'session_id': existing_feedback.session_id}) is not None
 
         # AND a new feedback entry for the same session that answers all of the questions in the existing feedback and more
-        given_feedback = _get_feedback(with_id=False, question_ids=[item.question_id for item in existing_feedback.feedback_items])
+        given_feedback = _get_feedback(with_id=False,
+                                       question_ids=[item.question_id for item in existing_feedback.feedback_items])
         given_feedback.session_id = existing_feedback.session_id
         given_feedback.user_id = existing_feedback.user_id
         # add a random question to the new feedback
@@ -273,7 +281,8 @@ class TestUpsertFeedback:
         assert existing_feedback != given_feedback
         # guard assert that all the question ids in the existing feedback are in the new feedback
         given_feedback_question_ids = [item.question_id for item in given_feedback.feedback_items]
-        assert all(existing_item.question_id in given_feedback_question_ids for existing_item in existing_feedback.feedback_items)
+        assert all(existing_item.question_id in given_feedback_question_ids for existing_item in
+                   existing_feedback.feedback_items)
         # guard assert that the new feedback has more items than the existing feedback
         assert len(given_feedback.feedback_items) > len(existing_feedback.feedback_items)
 
@@ -292,7 +301,8 @@ class TestUpsertFeedback:
         _assert_feedback_matches(doc, given_feedback)
 
     @pytest.mark.asyncio
-    async def test_update_document_has_all_questions_from_feedback_and_more(self, get_feedback_repository: Awaitable[UserFeedbackRepository],
+    async def test_update_document_has_all_questions_from_feedback_and_more(self, get_feedback_repository: Awaitable[
+        UserFeedbackRepository],
                                                                             mocker: pytest_mock.MockerFixture):
         repository = await get_feedback_repository
         # datetime.now returns a fixed time
@@ -341,7 +351,8 @@ class TestUpsertFeedback:
         _assert_feedback_matches(doc, actual_expected_feedback)
 
     @pytest.mark.asyncio
-    async def test_update_feedback_and_document_have_some_in_common_and_some_differences(self, get_feedback_repository: Awaitable[UserFeedbackRepository],
+    async def test_update_feedback_and_document_have_some_in_common_and_some_differences(self, get_feedback_repository:
+    Awaitable[UserFeedbackRepository],
                                                                                          mocker: pytest_mock.MockerFixture):
         repository = await get_feedback_repository
         # datetime.now returns a fixed time
@@ -398,7 +409,8 @@ class TestUpsertFeedback:
         _assert_feedback_matches(doc, actual_expected_feedback)
 
     @pytest.mark.asyncio
-    async def test_update_feedback_and_document_have_no_questions_in_common(self, get_feedback_repository: Awaitable[UserFeedbackRepository],
+    async def test_update_feedback_and_document_have_no_questions_in_common(self, get_feedback_repository: Awaitable[
+        UserFeedbackRepository],
                                                                             mocker: pytest_mock.MockerFixture):
         repository = await get_feedback_repository
         # datetime.now returns a fixed time
@@ -444,7 +456,8 @@ class TestUpsertFeedback:
         _assert_feedback_matches(doc, actual_expected_feedback)
 
     @pytest.mark.asyncio
-    async def test_update_feedback_successfully_for_no_existing_feedback(self, get_feedback_repository: Awaitable[UserFeedbackRepository]):
+    async def test_update_feedback_successfully_for_no_existing_feedback(self, get_feedback_repository: Awaitable[
+        UserFeedbackRepository]):
         repository = await get_feedback_repository
 
         # GIVEN a new feedback entry for a user and session that does not exist in the database
@@ -468,7 +481,9 @@ class TestUpsertFeedback:
         _assert_feedback_matches(doc, given_feedback)
 
     @pytest.mark.asyncio
-    async def test_should_update_feedback_for_given_user_and_leave_others_untouched(self, get_feedback_repository: Awaitable[UserFeedbackRepository]):
+    async def test_should_update_feedback_for_given_user_and_leave_others_untouched(self,
+                                                                                    get_feedback_repository: Awaitable[
+                                                                                        UserFeedbackRepository]):
         repository = await get_feedback_repository
 
         # GIVEN a feedback entry to add for a user and session
@@ -496,7 +511,8 @@ class TestUpsertFeedback:
         _assert_feedback_matches(doc, other_feedback)
 
     @pytest.mark.asyncio
-    async def test_user_should_fail_to_update_feedback_for_another_user(self, get_feedback_repository: Awaitable[UserFeedbackRepository]):
+    async def test_user_should_fail_to_update_feedback_for_another_user(self, get_feedback_repository: Awaitable[
+        UserFeedbackRepository]):
         repository = await get_feedback_repository
 
         # GIVEN a feedback entry for a user and session exists in the database
@@ -564,7 +580,8 @@ class TestGetFeedbackBySessionId:
         assert feedback.feedback_items == given_feedback.feedback_items
 
     @pytest.mark.asyncio
-    async def test_get_feedback_by_session_id_not_found(self, get_feedback_repository: Awaitable[UserFeedbackRepository]):
+    async def test_get_feedback_by_session_id_not_found(self,
+                                                        get_feedback_repository: Awaitable[UserFeedbackRepository]):
         repository = await get_feedback_repository
 
         # GIVEN a session id that doesn't exist
@@ -613,7 +630,8 @@ class TestGetAllFeedbackForUser:
         assert len(result) == 0
 
     @pytest.mark.asyncio
-    async def test_feedback_for_user_with_a_session_that_has_feedback(self, get_feedback_repository: Awaitable[UserFeedbackRepository]):
+    async def test_feedback_for_user_with_a_session_that_has_feedback(self, get_feedback_repository: Awaitable[
+        UserFeedbackRepository]):
         repository = await get_feedback_repository
 
         # GIVEN feedback exists for a user in a single session
@@ -638,7 +656,8 @@ class TestGetAllFeedbackForUser:
         assert all(item in given_feedback.feedback_items for item in result[given_feedback.session_id].feedback_items)
 
     @pytest.mark.asyncio
-    async def test_feedback_for_user_with_multiple_sessions_that_have_feedback(self, get_feedback_repository: Awaitable[UserFeedbackRepository]):
+    async def test_feedback_for_user_with_multiple_sessions_that_have_feedback(self, get_feedback_repository: Awaitable[
+        UserFeedbackRepository]):
         repository = await get_feedback_repository
 
         # GIVEN multiple feedback exists for a user across different sessions
@@ -664,11 +683,14 @@ class TestGetAllFeedbackForUser:
         assert given_feedback_2.session_id in result
         assert isinstance(result[given_feedback_2.session_id], Feedback)
         # AND the feedback items should match for each session
-        assert all(item in given_feedback_1.feedback_items for item in result[given_feedback_1.session_id].feedback_items)
-        assert all(item in given_feedback_2.feedback_items for item in result[given_feedback_2.session_id].feedback_items)
+        assert all(
+            item in given_feedback_1.feedback_items for item in result[given_feedback_1.session_id].feedback_items)
+        assert all(
+            item in given_feedback_2.feedback_items for item in result[given_feedback_2.session_id].feedback_items)
 
     @pytest.mark.asyncio
-    async def test_get_all_feedback_for_user_ignores_other_users(self, get_feedback_repository: Awaitable[UserFeedbackRepository]):
+    async def test_get_all_feedback_for_user_ignores_other_users(self, get_feedback_repository: Awaitable[
+        UserFeedbackRepository]):
         repository = await get_feedback_repository
 
         # GIVEN feedback exists for two different users
@@ -693,7 +715,8 @@ class TestGetAllFeedbackForUser:
         assert other_feedback.session_id not in result
 
     @pytest.mark.asyncio
-    async def test_get_all_feedback_for_user_db_find_throws(self, get_feedback_repository: Awaitable[UserFeedbackRepository],
+    async def test_get_all_feedback_for_user_db_find_throws(self,
+                                                            get_feedback_repository: Awaitable[UserFeedbackRepository],
                                                             mocker: pytest_mock.MockerFixture):
         repository = await get_feedback_repository
 
@@ -715,7 +738,8 @@ class TestGetAllFeedbackForUser:
 
 class TestUniqueIndex:
     @pytest.mark.asyncio
-    async def test_not_allow_more_than_one_feedback_per_session(self, get_feedback_repository: Awaitable[UserFeedbackRepository]):
+    async def test_not_allow_more_than_one_feedback_per_session(self, get_feedback_repository: Awaitable[
+        UserFeedbackRepository]):
         repository = await get_feedback_repository
 
         # GIVEN a new feedback entry for a user and session that does not exist in the database
