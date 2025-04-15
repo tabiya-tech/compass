@@ -21,7 +21,7 @@ from app.application_state import ApplicationState
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState, ConversationHistory, \
     ConversationTurn
 from app.store.database_application_state_store import DatabaseApplicationStateStore
-from app.users.sessions import generate_new_session_id
+from app.users.generate_session_id import generate_new_session_id
 from app.vector_search.esco_entities import SkillEntity
 from conftest import random_db_name
 

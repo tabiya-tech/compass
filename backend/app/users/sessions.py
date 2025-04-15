@@ -3,19 +3,9 @@ import random
 from fastapi import HTTPException
 
 from app.constants.errors import ErrorService
+from app.users.generate_session_id import generate_new_session_id
 from app.users.repositories import UserPreferenceRepository
 from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest
-
-
-def generate_new_session_id():
-    """
-    Generate a new session ID
-    :return: a new session ID
-    """
-
-    # TODO: Ensure that the session ID is unique in the database.
-
-    return random.randint(0, (1 << 48) - 1)  # nosec
 
 
 class SessionsService:

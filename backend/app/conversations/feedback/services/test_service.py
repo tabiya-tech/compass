@@ -11,7 +11,6 @@ from uuid import uuid4
 
 import pytest
 import pytest_mock
-
 from app.app_config import ApplicationConfig
 from app.conversations.feedback.repository import IUserFeedbackRepository
 from app.conversations.feedback.services.errors import (
@@ -25,7 +24,7 @@ from app.conversations.feedback.services.types import Feedback, FeedbackItem, Ve
 from app.metrics.constants import EventType
 from app.metrics.services.service import IMetricsService
 from app.metrics.types import FeedbackProvidedEvent, FeedbackRatingValueEvent
-from app.users.sessions import generate_new_session_id
+from app.users.generate_session_id import generate_new_session_id
 from common_libs.test_utilities import get_random_user_id, get_random_printable_string, get_random_session_id
 
 given_feedback_specs_json_file = Path(__file__).parent / "given_feedback_specs-en.json"
