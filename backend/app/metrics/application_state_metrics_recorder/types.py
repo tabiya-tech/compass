@@ -20,6 +20,7 @@ class ApplicationStatesOfInterest(BaseModel):
     user_message_count: int
     experiences_explored_count: int
     experiences_discovered_count: int
+    work_types_discovered: list[str]
 
     @classmethod
     def from_state(cls, state: ApplicationState) -> "ApplicationStatesOfInterest":
@@ -31,6 +32,7 @@ class ApplicationStatesOfInterest(BaseModel):
             user_message_count=_get_user_message_count(state),
             experiences_explored_count=_get_experiences_explored_count(state),
             experiences_discovered_count=_get_experiences_discovered_count(state),
+            work_types_discovered=_get_work_types_discovered(state)
         )
 
 
@@ -87,3 +89,8 @@ def _get_experiences_explored_count(state: ApplicationState) -> int:
 def _get_experiences_discovered_count(state: ApplicationState) -> int:
     """Get the current number of experiences discovered"""
     return len(state.explore_experiences_director_state.experiences_state)
+
+
+def _get_work_types_discovered(state: ApplicationState) -> list[str]:
+    """Get the current work types discovered"""
+    return [work_type.name for work_type in state.collect_experience_state.explored_types]

@@ -2,12 +2,16 @@
 Tests for the metric type models.
 """
 import random
+from datetime import datetime, timezone
 
-from app.app_config import ApplicationConfig, set_application_config
 import pytest
 import pytest_mock
-from datetime import datetime, timezone
 from pydantic import ValidationError
+
+from app.agent.experience import WorkType
+from app.app_config import ApplicationConfig, set_application_config
+from app.conversations.reactions.types import ReactionKind, DislikeReason
+from app.metrics.constants import EventType
 from app.metrics.types import (
     AbstractCompassMetricEvent,
     AbstractUserAccountEvent,
@@ -21,8 +25,6 @@ from app.metrics.types import (
     MessageReactionCreatedEvent,
     ExperienceExploredEvent,
 )
-from app.conversations.reactions.types import ReactionKind, DislikeReason
-from app.metrics.constants import EventType
 from common_libs.test_utilities import get_random_user_id, get_random_session_id, get_random_application_config
 
 
@@ -211,10 +213,15 @@ class TestExperienceDiscoveredEvent:
         # GIVEN a session id and user id
         given_session_id = get_random_session_id()
         given_user_id = get_random_user_id()
+        # AND an experience count
         given_experience_count = random.randint(1, 10)  # nosec B311 # random is used for testing purposes
+        # AND some work types discovered
+        given_work_types_discovered = random.choices(list(WorkType), k=random.randint(1,
+                                                                                      len(ReactionKind)))  # nosec B311 # random is used for testing purposes
         # WHEN creating an instance of the event
         actual_event = ExperienceDiscoveredEvent(session_id=given_session_id, user_id=given_user_id,
-                                               experience_count=given_experience_count)
+                                                 experience_count=given_experience_count,
+                                                 work_types_discovered=given_work_types_discovered)
 
         # THEN the basic event fields should be set correctly
         assert_basic_event_fields_are_set(actual_event, EventType.EXPERIENCE_DISCOVERED, setup_application_config,
@@ -244,7 +251,8 @@ class TestExperienceDiscoveredEvent:
         # THEN it should raise a TypeError indicating that the extra field is not allowed.
         with pytest.raises(TypeError, match="got an unexpected keyword argument 'extra_field'"):
             ExperienceDiscoveredEvent(session_id=given_session_id, user_id=given_user_id,
-                                   experience_count=given_experience_count, extra_field=given_extra_field)  # type:ignore
+                                      experience_count=given_experience_count,
+                                      extra_field=given_extra_field)  # type:ignore
 
 
 class TestExperienceExploredEvent:
@@ -260,7 +268,7 @@ class TestExperienceExploredEvent:
         given_experience_count = random.randint(1, 10)  # nosec B311 # random is used for testing purposes
         # WHEN creating an instance of the event
         actual_event = ExperienceExploredEvent(session_id=given_session_id, user_id=given_user_id,
-                                             experience_count=given_experience_count)
+                                               experience_count=given_experience_count)
 
         # THEN the basic event fields should be set correctly
         assert_basic_event_fields_are_set(actual_event, EventType.EXPERIENCE_EXPLORED, setup_application_config,
@@ -339,7 +347,8 @@ class TestFeedbackRatingValueEvent:
                                                 session_id=given_session_id, user_id=given_user_id)
 
         # THEN the basic event fields should be set correctly
-        assert_basic_event_fields_are_set(actual_event, EventType.FEEDBACK_RATING_VALUE, setup_application_config, fixed_time)
+        assert_basic_event_fields_are_set(actual_event, EventType.FEEDBACK_RATING_VALUE, setup_application_config,
+                                          fixed_time)
 
         # AND the feedback type should be set correctly
         assert actual_event.feedback_type == given_feedback_type
@@ -407,7 +416,8 @@ class TestConversationTurnEvent:
         )
 
         # THEN the fields should be set correctly
-        assert_basic_event_fields_are_set(actual_event, EventType.CONVERSATION_TURN, setup_application_config, fixed_time)
+        assert_basic_event_fields_are_set(actual_event, EventType.CONVERSATION_TURN, setup_application_config,
+                                          fixed_time)
 
         # AND the session id should be anonymized
         assert actual_event.anonymized_session_id is not None
