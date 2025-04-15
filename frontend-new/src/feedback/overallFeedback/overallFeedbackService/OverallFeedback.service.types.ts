@@ -30,5 +30,5 @@ export interface FeedbackItem {
 
 export const QUESTION_KEYS: Record<string, keyof typeof questions> = {
   CUSTOMER_SATISFACTION: "satisfaction_with_compass",
-  OVERALL_SATISFACTION: "satisfaction_with_compass"
-}
+  OVERALL_SATISFACTION: "satisfaction_with_compass",
+};

@@ -1,11 +1,17 @@
 import InfoService from "src/info/info.service";
 import infoURL from "./info.constants";
-import { InfoProps } from "./Info";
+
+import { VersionItem } from "./info.types";
+import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 
 describe("InfoService", () => {
   describe("Test the loadInfoFromUrl function", () => {
     afterEach(() => {
       jest.restoreAllMocks();
+      // reset the instance cache
+      InfoService.getInstance().clearCache();
+      // reset method mocks
+      resetAllMethodMocks(InfoService.getInstance());
     });
 
     function setupFetchMock(expectedBody: any): jest.Mock {
@@ -18,7 +24,7 @@ describe("InfoService", () => {
     test("should fetch and return the infoProps object from the provided URL", async () => {
       // GIVEN some URL that returns some info data structure
       const someURL: string = "url";
-      const expectedData: InfoProps = {
+      const expectedData: VersionItem = {
         date: "foo",
         branch: "bar",
         buildNumber: "baz",
@@ -27,7 +33,7 @@ describe("InfoService", () => {
       const mockFetch = setupFetchMock(JSON.stringify(expectedData));
 
       // WHEN the loadInfoFromUrl function is called for that URL
-      const service = new InfoService();
+      const service = InfoService.getInstance();
       const actualResult = await service.loadInfoFromUrl(someURL);
 
       // THEN it returns that data structure from the given url
@@ -42,7 +48,7 @@ describe("InfoService", () => {
       const mockFetch = setupFetchMock(malformedJSON);
 
       // WHEN the loadInfoFromUrl function is called for that URL
-      const service = new InfoService();
+      const service = InfoService.getInstance();
       const actualResult = await service.loadInfoFromUrl(someURL);
 
       // THEN it returns info object with empty values
@@ -58,7 +64,7 @@ describe("InfoService", () => {
         const mockFetch = setupFetchMock(JSON.stringify(jsonData));
 
         // WHEN the loadInfoFromUrl function is called for that URL
-        const service = new InfoService();
+        const service = InfoService.getInstance();
         const actualResult = await service.loadInfoFromUrl(someURL);
 
         // THEN it returns info object with empty values
@@ -81,7 +87,7 @@ describe("InfoService", () => {
       jest.spyOn(window, "fetch").mockImplementation(mockFetch);
 
       // WHEN the loadInfoFromUrl function is called for that URL
-      const service = new InfoService();
+      const service = InfoService.getInstance();
       const actualResult = await service.loadInfoFromUrl(someURL);
 
       // THEN it returns info object with empty values
@@ -94,14 +100,14 @@ describe("InfoService", () => {
     test("should fetch and return the frontend and backend info data", async () => {
       // GIVEN the backend info url responds with the expected backend info data
       // AND the frontend info url responds with the expected frontend info data
-      const service = new InfoService();
-      const expectedFrontendInfoData: InfoProps = {
+      const service = InfoService.getInstance();
+      const expectedFrontendInfoData: VersionItem = {
         date: "fooFrontend",
         branch: "barFrontend",
         buildNumber: "bazFrontend",
         sha: "gooFrontend",
       };
-      const expectedBackendInfoData: InfoProps = {
+      const expectedBackendInfoData: VersionItem = {
         date: "fooBackend",
         branch: "barBackend",
         buildNumber: "bazBackend",
@@ -118,13 +124,17 @@ describe("InfoService", () => {
         }
       });
       // WHEN the loadInfo function is called
+      const result = await service.loadInfo();
       // THEN it returns the expected frontend and backend info data in the expected order
-      await expect(service.loadInfo()).resolves.toMatchObject([expectedFrontendInfoData, expectedBackendInfoData]);
+      expect(result).toEqual({
+        frontend: expectedFrontendInfoData,
+        backend: expectedBackendInfoData,
+      });
     });
 
     test("should call the correct frontend and backend urls", async () => {
       // WHEN the loadInfo function is called
-      const service = new InfoService();
+      const service = InfoService.getInstance();
       jest.spyOn(service, "loadInfoFromUrl").mockImplementation(() =>
         Promise.resolve({
           date: "",
