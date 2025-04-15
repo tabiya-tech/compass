@@ -1,11 +1,24 @@
 import infoURL from "./info.constants";
-import { InfoProps } from "./Info";
+
+import { VersionItem, Versions } from "./info.types";
 
 export default class InfoService {
-  async loadInfoFromUrl(url: string): Promise<InfoProps> {
+  private static instance: InfoService;
+  private cachedInfo: Versions | null = null;
+
+  private constructor() {}
+
+  public static getInstance(): InfoService {
+    if (!InfoService.instance) {
+      InfoService.instance = new InfoService();
+    }
+    return InfoService.instance;
+  }
+
+  public async loadInfoFromUrl(url: string): Promise<VersionItem> {
     try {
       return await fetch(url).then(async (response) => {
-        const data: InfoProps = await response.json();
+        const data: VersionItem = await response.json();
         if (data === null) {
           throw new Error("No data");
         }
@@ -22,8 +35,26 @@ export default class InfoService {
     }
   }
 
-  async loadInfo() {
+  public async loadInfo() {
+    if (this.cachedInfo) {
+      return this.cachedInfo;
+    }
+
     // Make API calls concurrently
-    return await Promise.all([this.loadInfoFromUrl(infoURL.frontend), this.loadInfoFromUrl(infoURL.backend)]);
+    const [frontendInfo, backendInfo] = await Promise.all([
+      this.loadInfoFromUrl(infoURL.frontend),
+      this.loadInfoFromUrl(infoURL.backend),
+    ]);
+
+    this.cachedInfo = {
+      frontend: frontendInfo,
+      backend: backendInfo,
+    };
+
+    return this.cachedInfo;
+  }
+
+  public clearCache() {
+    this.cachedInfo = null;
   }
 }
