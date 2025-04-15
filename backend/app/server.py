@@ -10,7 +10,7 @@ from app.conversations.routes import add_conversation_routes
 from app.countries import Country, get_country_from_string
 from app.invitations import add_user_invitations_routes
 from app.metrics.routes.routes import add_metrics_routes
-from app.sentry_init import init_sentry
+from app.sentry_init import init_sentry, set_sentry_contexts
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, ApiKeyAuth
 from app.vector_search.occupation_search_routes import add_occupation_search_routes
@@ -150,6 +150,11 @@ set_application_config(
     )
 )
 
+##################
+# Set Sentry Context, after setting application config.
+# because: some contexts depend on the application config variables.
+#################
+set_sentry_contexts()
 
 ############################################
 # Initiate the FastAPI app

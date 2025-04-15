@@ -3,6 +3,7 @@ import { getBackendUrl, getSentryDSN, getSentryEnabled, getTargetEnvironmentName
 import React from "react";
 import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from "react-router-dom";
 import { serializeError } from "./error/errorSerializer";
+import InfoService from "./info/info.service";
 
 export interface SentryConfig {
   // See https://docs.sentry.io/platforms/javascript/configuration/options/
@@ -22,11 +23,11 @@ export const SENTRY_CONFIG_DEFAULT: SentryConfig = {
 };
 
 export interface SentryConfigResult {
-  dsn: string,
-  enabled: boolean,
-  cfg: SentryConfig,
-  errors: Error[],
-  warnings: string[],
+  dsn: string;
+  enabled: boolean;
+  cfg: SentryConfig;
+  errors: Error[];
+  warnings: string[];
 }
 
 export function loadSentryConfig(): SentryConfigResult {
@@ -102,9 +103,7 @@ export function initSentry() {
   ];
   // This will allow errors logged to Sentry to have a video replay of the user's session
   if (cfg.replayIntegration) {
-    integrations.push(
-      Sentry.replayIntegration(),
-    );
+    integrations.push(Sentry.replayIntegration());
   }
   Sentry.init({
     dsn: dsn,
@@ -132,9 +131,14 @@ export function initSentry() {
       return event;
     },
   });
+  InfoService.getInstance()
+    .loadInfo()
+    .then(({ frontend }) => {
+      // Set the frontend version in Sentry
+      Sentry.setContext("Frontend Version", frontend);
+    });
   // Log any errors and warning that occurred while loading Sentry
   // Do this at the end, so that if sentry is initialized, the errors are sent to Sentry
   warnings.forEach((w) => console.warn(`Warning loading Sentry: ${w}`));
   errors.forEach((e) => console.error(`Error loading Sentry: ${e.message}`, e));
 }
-
