@@ -12,7 +12,7 @@ import pytest_mock
 
 from app.conversations.feedback.repository import UserFeedbackRepository
 from app.conversations.feedback.services.types import Feedback, FeedbackItem, Answer, Version
-from app.users.sessions import generate_new_session_id
+from app.users.generate_session_id import generate_new_session_id
 from common_libs.test_utilities import get_random_printable_string, get_random_user_id
 from common_libs.time_utilities import datetime_to_mongo_date, get_now
 

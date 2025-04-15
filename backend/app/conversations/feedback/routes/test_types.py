@@ -3,7 +3,7 @@ import random
 
 from app.conversations.feedback.services.types import Answer, FeedbackItem, Feedback, Version
 from app.conversations.feedback.routes._types import FeedbackItemResponse, FeedbackResponse
-from app.users.sessions import generate_new_session_id
+from app.users.generate_session_id import generate_new_session_id
 from common_libs.test_utilities import get_random_printable_string
 
 
