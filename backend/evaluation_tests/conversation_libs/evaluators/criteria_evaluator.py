@@ -27,7 +27,7 @@ class CriteriaEvaluator(BaseEvaluator):
         self.criteria = criteria
         # Use GeminiGenerativeLLM as the LLM for evaluation
         # as we are not interested in conducting a conversation, with an in-memory state (history).
-        self.llm = GeminiGenerativeLLM(config=LLMConfig(model_name="gemini-1.5-pro-preview-0409"))
+        self.llm = GeminiGenerativeLLM(config=LLMConfig(language_model_name="gemini-2.0-flash-001"))
 
     async def evaluate(self, actual: ConversationEvaluationRecord) -> EvaluationResult:
         prompt = PromptGenerator.generate_prompt(conversation=actual.generate_conversation(),
