@@ -4,6 +4,9 @@ import * as Sentry from "@sentry/react";
 import { initSentry, SENTRY_CONFIG_DEFAULT, SentryConfig } from "./sentryInit";
 import { getBackendUrl, getSentryDSN, getSentryEnabled, getSentryConfig } from "./envService";
 import * as EnvServiceModule from "./envService";
+import InfoService from "./info/info.service";
+import { VersionItem } from "./info/info.types";
+import { getRandomString } from "./_test_utilities/specialCharacters";
 
 // Mock all the required dependencies
 jest.mock("@sentry/react", () => ({
@@ -14,6 +17,7 @@ jest.mock("@sentry/react", () => ({
   captureConsoleIntegration: jest.fn(),
   reactRouterV6BrowserTracingIntegration: jest.fn(),
   setUser: jest.fn(),
+  setContext: jest.fn(),
 }));
 
 jest.mock("./envService", () => ({
@@ -23,6 +27,15 @@ jest.mock("./envService", () => ({
   getSentryEnabled: jest.fn(),
   getSentryConfig: jest.fn(),
 }));
+
+function getRandomVersion(): VersionItem {
+  return {
+    date: getRandomString(10),
+    branch: getRandomString(10),
+    sha: getRandomString(40),
+    buildNumber: getRandomString(10),
+  };
+}
 
 describe("sentryInit", () => {
   beforeEach(() => {
@@ -60,7 +73,9 @@ describe("sentryInit", () => {
       expect(Sentry.init).not.toHaveBeenCalled();
 
       // AND log a warning message
-      expect(console.warn).toHaveBeenCalledWith("Sentry is enabled but DSN is not available. Sentry will not be initialized.");
+      expect(console.warn).toHaveBeenCalledWith(
+        "Sentry is enabled but DSN is not available. Sentry will not be initialized."
+      );
     });
 
     test("should not initialize Sentry if sentry is disabled", () => {
@@ -78,9 +93,27 @@ describe("sentryInit", () => {
 
       // AND log an info message
       expect(console.info).toHaveBeenCalledWith("Sentry is not enabled. Sentry will not be initialized.");
+    });
 
+    test("should set the context/Frontend version on init", async () => {
+      // GIVEN infoService.loadInfo has both frontend/backend version.
+      const givenFrontendVersion = getRandomVersion();
+      const givenBackendVersion = getRandomVersion();
+      jest
+        .spyOn(InfoService.prototype, "loadInfo")
+        .mockResolvedValue({ frontend: givenFrontendVersion, backend: givenBackendVersion });
+
+      // WHEN sentry is initialized.
+      initSentry();
+
+      // AND all promises are resolved
+      await Promise.resolve();
+
+      // THEN sentry_sdk.set_context should be called with the frontend version.
+      expect(Sentry.setContext).toHaveBeenCalledWith("Frontend Version", givenFrontendVersion);
     });
   });
+
   describe("Sentry config", () => {
     // Set up mocks
     const mockBrowserTracing = { name: "browserTracing" };
@@ -94,15 +127,8 @@ describe("sentryInit", () => {
     (Sentry.captureConsoleIntegration as jest.Mock).mockReturnValue(mockConsole);
     (Sentry.reactRouterV6BrowserTracingIntegration as jest.Mock).mockReturnValue(mockRouter);
 
-    function assertSentryInitCalledWithCorrectConfig(
-      expectedConfig: SentryConfig,
-    ) {
-      const expectedIntegrations = [
-        mockBrowserTracing,
-        mockFeedback,
-        mockConsole,
-        mockRouter,
-      ];
+    function assertSentryInitCalledWithCorrectConfig(expectedConfig: SentryConfig) {
+      const expectedIntegrations = [mockBrowserTracing, mockFeedback, mockConsole, mockRouter];
       if (expectedConfig.replayIntegration) {
         expectedIntegrations.push(mockReplay);
       }
@@ -139,7 +165,6 @@ describe("sentryInit", () => {
 
     // Should use default config if json is not available and log a warning
     test("should use default config if json is not available", () => {
-
       // GIVEN the necessary configuration values are available
       const givenTargetEnvironmentName = "given-target-environment-name";
       (EnvServiceModule.getTargetEnvironmentName as jest.Mock).mockReturnValue(givenTargetEnvironmentName);
@@ -154,14 +179,15 @@ describe("sentryInit", () => {
       // AND a warning should be logged after the init
       // to indicate that the default config is being used
       expect(console.warn).toHaveBeenCalledAfter(Sentry.init as jest.Mock);
-      expect(console.warn).toHaveBeenCalledWith("Warning loading Sentry: Sentry config is not available, reverting to default config");
+      expect(console.warn).toHaveBeenCalledWith(
+        "Warning loading Sentry: Sentry config is not available, reverting to default config"
+      );
       // AND no error should be logged
       expect(console.error).not.toHaveBeenCalled();
     });
 
     // Should use default config if json is not available and log a warning
     test("should use default config if json could not be parsed", () => {
-
       // GIVEN the necessary configuration values are available
       const givenTargetEnvironmentName = "given-target-environment-name";
       (EnvServiceModule.getTargetEnvironmentName as jest.Mock).mockReturnValue(givenTargetEnvironmentName);
@@ -176,30 +202,57 @@ describe("sentryInit", () => {
       // AND an error should be logged after the init
       // to indicate that the default config is being used
       expect(console.error).toHaveBeenCalledAfter(Sentry.init as jest.Mock);
-      expect(console.error).toHaveBeenCalledWith("Error loading Sentry: Error parsing Sentry config JSON, reverting to default config", expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith(
+        "Error loading Sentry: Error parsing Sentry config JSON, reverting to default config",
+        expect.any(Error)
+      );
       // AND no warning should be logged
       expect(console.warn).not.toHaveBeenCalled();
     });
 
     test.each([
-      ["All set", JSON.stringify({
-        tracesSampleRate: 0.1,
-        replaysSessionSampleRate: 0.2,
-        replaysOnErrorSampleRate: 0.3,
-        replayIntegration: true,
-        levels: ["error", "warn", "info", "debug"],
-      }), {
-        tracesSampleRate: 0.1,
-        replaysSessionSampleRate: 0.2,
-        replaysOnErrorSampleRate: 0.3,
-        replayIntegration: true,
-        levels: ["error", "warn", "info", "debug"],
-      }],
-      ["Only Replay Integration (true)", JSON.stringify({ replayIntegration: true }), { ...SENTRY_CONFIG_DEFAULT, replayIntegration: true }],
-      ["Only Replay Integration (false)", JSON.stringify({ replayIntegration: false }), { ...SENTRY_CONFIG_DEFAULT, replayIntegration: false }],
-      ["Only Traces Sample Rate", JSON.stringify({ tracesSampleRate: 0.5 }), { ...SENTRY_CONFIG_DEFAULT, tracesSampleRate: 0.5 }],
-      ["Only Replays Session Sample Rate", JSON.stringify({ replaysSessionSampleRate: 0.6 }), { ...SENTRY_CONFIG_DEFAULT, replaysSessionSampleRate: 0.6 }],
-      ["Only Replays On Error Sample Rate", JSON.stringify({ replaysOnErrorSampleRate: 0.7 }), { ...SENTRY_CONFIG_DEFAULT, replaysOnErrorSampleRate: 0.7 }],
+      [
+        "All set",
+        JSON.stringify({
+          tracesSampleRate: 0.1,
+          replaysSessionSampleRate: 0.2,
+          replaysOnErrorSampleRate: 0.3,
+          replayIntegration: true,
+          levels: ["error", "warn", "info", "debug"],
+        }),
+        {
+          tracesSampleRate: 0.1,
+          replaysSessionSampleRate: 0.2,
+          replaysOnErrorSampleRate: 0.3,
+          replayIntegration: true,
+          levels: ["error", "warn", "info", "debug"],
+        },
+      ],
+      [
+        "Only Replay Integration (true)",
+        JSON.stringify({ replayIntegration: true }),
+        { ...SENTRY_CONFIG_DEFAULT, replayIntegration: true },
+      ],
+      [
+        "Only Replay Integration (false)",
+        JSON.stringify({ replayIntegration: false }),
+        { ...SENTRY_CONFIG_DEFAULT, replayIntegration: false },
+      ],
+      [
+        "Only Traces Sample Rate",
+        JSON.stringify({ tracesSampleRate: 0.5 }),
+        { ...SENTRY_CONFIG_DEFAULT, tracesSampleRate: 0.5 },
+      ],
+      [
+        "Only Replays Session Sample Rate",
+        JSON.stringify({ replaysSessionSampleRate: 0.6 }),
+        { ...SENTRY_CONFIG_DEFAULT, replaysSessionSampleRate: 0.6 },
+      ],
+      [
+        "Only Replays On Error Sample Rate",
+        JSON.stringify({ replaysOnErrorSampleRate: 0.7 }),
+        { ...SENTRY_CONFIG_DEFAULT, replaysOnErrorSampleRate: 0.7 },
+      ],
       ["Only Levels", JSON.stringify({ levels: ["error"] }), { ...SENTRY_CONFIG_DEFAULT, levels: ["error"] }],
     ])("should use given config %s", (_, givenJsonConfig: string, expectedConfig: SentryConfig) => {
       // GIVEN the necessary configuration values are available

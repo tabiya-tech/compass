@@ -1,19 +1,22 @@
-import math
-
 import pytest
 from unittest.mock import patch, MagicMock
-import sentry_sdk
-from app.sentry_init import init_sentry
+
+from app.app_config import ApplicationConfig
+from app.sentry_init import init_sentry, set_sentry_contexts
 from app.context_vars import session_id_ctx_var, user_id_ctx_var
+
 
 @pytest.fixture
 def mock_sentry():
     with patch('sentry_sdk.init') as mock_init, \
-         patch('sentry_sdk.set_user') as mock_set_user:
+            patch('sentry_sdk.set_user') as mock_set_user, \
+            patch('sentry_sdk.set_context') as mock_set_context:
         yield {
             'init': mock_init,
-            'set_user': mock_set_user
+            'set_user': mock_set_user,
+            'set_context': mock_set_context
         }
+
 
 def test_init_sentry_with_environment(mock_sentry):
     """
@@ -33,6 +36,7 @@ def test_init_sentry_with_environment(mock_sentry):
     assert init_args['environment'] == environment
     assert init_args['send_default_pii'] is False
 
+
 def test_init_sentry_without_environment(mock_sentry):
     """
     Test sentry initialization without environment parameter
@@ -49,6 +53,7 @@ def test_init_sentry_without_environment(mock_sentry):
     assert init_args['dsn'] == dsn
     assert init_args['environment'] is None
 
+
 def test_sentry_integrations_configured(mock_sentry):
     """
     Test that sentry is initialized with the correct integrations
@@ -63,14 +68,15 @@ def test_sentry_integrations_configured(mock_sentry):
     mock_sentry['init'].assert_called_once()
     init_args = mock_sentry['init'].call_args[1]
     integrations = init_args['integrations']
-    
+
     # Check that we have exactly 2 integrations
     assert len(integrations) == 2
-    
+
     # Check integration types
     integration_types = [type(integration) for integration in integrations]
     assert 'FastApiIntegration' in str(integration_types[0])
     assert 'LoggingIntegration' in str(integration_types[1])
+
 
 def test_before_send_hook(mock_sentry):
     """
@@ -96,3 +102,15 @@ def test_before_send_hook(mock_sentry):
         "session_id": session_id_ctx_var.get(),
         "user_id": user_id_ctx_var.get()
     })
+
+
+def test_set_sentry_contexts(mock_sentry , setup_application_config: ApplicationConfig):
+    # GIVEN application is loaded,
+    # AND set_sentry_contexts is called.
+    set_sentry_contexts()
+
+    # AND the set_context should be called with the right backend version from application_config
+    mock_sentry['set_context'].assert_called_once()
+    mock_sentry['set_context'].assert_called_with(
+        'Backend Version',  setup_application_config.version_info.model_dump()
+    )
