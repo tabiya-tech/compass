@@ -5,7 +5,13 @@ import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import OverallFeedbackService from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import authStateService from "src/auth/services/AuthenticationState.service";
-import { FeedbackItem, FeedbackRequest, FeedbackResponse } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
+import {
+  FeedbackItem,
+  FeedbackRequest,
+  FeedbackResponse,
+} from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
+import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
+import InfoService from "src/info/info.service";
 
 // mock the user preferences service
 jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => {
@@ -19,7 +25,7 @@ jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => {
     __esModule: true,
     PersistentStorageService: {
       getUserPreferences: jest.fn().mockReturnValue(JSON.stringify(mockUserPreference)),
-      getToken: jest.fn().mockReturnValue("foo token")
+      getToken: jest.fn().mockReturnValue("foo token"),
     },
   };
 });
@@ -36,22 +42,12 @@ jest.mock("src/auth/services/AuthenticationState.service", () => {
   };
 });
 
-// mock the info service
-jest.mock("src/info/info.service", () => {
-  return {
-    __esModule: true,
-    default: jest.fn().mockImplementation(() => {
-      return {
-        loadInfo: jest.fn().mockReturnValue([{ branch: "foo", buildNumber: "1234" }]),
-      };
-    }),
-  };
-});
-
 describe("OverallFeedbackService", () => {
   let givenApiServerUrl: string = "/path/to/api";
   beforeEach(() => {
     jest.spyOn(require("src/envService"), "getBackendUrl").mockReturnValue(givenApiServerUrl);
+    // clear all method mocks
+    resetAllMethodMocks(InfoService.getInstance());
   });
   afterEach(() => {
     jest.clearAllMocks();
@@ -79,12 +75,23 @@ describe("OverallFeedbackService", () => {
           },
         },
       ];
-      const givenFeedbackRequest : FeedbackRequest = {
-        version: {
-          frontend: "foo-1234",
-        },
-        feedback_items_specs: givenFeedbackData,
-      }
+      // AND the info service will return the correct version
+      const givenFrontendInfoData = {
+        date: "fooFrontend",
+        branch: "barFrontend",
+        buildNumber: "bazFrontend",
+        sha: "gooFrontend",
+      };
+      const givenBackendInfoData = {
+        date: "fooBackend",
+        branch: "barBackend",
+        buildNumber: "bazBackend",
+        sha: "gooBackend",
+      };
+      jest.spyOn(InfoService.getInstance(), "loadInfo").mockResolvedValueOnce({
+        frontend: givenFrontendInfoData,
+        backend: givenBackendInfoData,
+      });
       // AND the REST API will respond with CREATED status
       const expectedResponse: FeedbackResponse = {
         id: "1234",
@@ -103,12 +110,18 @@ describe("OverallFeedbackService", () => {
       const actualResponse = await service.sendFeedback(givenSessionId, givenFeedbackData);
 
       // THEN expect it to make a PATCH request with correct headers and payload
-      expectCorrectFetchRequest(fetchSpy,`${givenApiServerUrl}/conversations/${givenSessionId}/feedback`, {
+      const expectedFeedbackRequest: FeedbackRequest = {
+        version: {
+          frontend: `${givenFrontendInfoData.branch}-${givenFrontendInfoData.buildNumber}`,
+        },
+        feedback_items_specs: givenFeedbackData,
+      };
+      expectCorrectFetchRequest(fetchSpy, `${givenApiServerUrl}/conversations/${givenSessionId}/feedback`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(givenFeedbackRequest),
+        body: JSON.stringify(expectedFeedbackRequest),
         expectedStatusCode: StatusCodes.OK,
         serviceName: "OverallFeedbackService",
         serviceFunction: "sendFeedback",
@@ -128,6 +141,23 @@ describe("OverallFeedbackService", () => {
           throw givenFetchError;
         });
       });
+      // AND the info service will return the correct version
+      const givenFrontendInfoData = {
+        date: "fooFrontend",
+        branch: "barFrontend",
+        buildNumber: "bazFrontend",
+        sha: "gooFrontend",
+      };
+      const givenBackendInfoData = {
+        date: "fooBackend",
+        branch: "barBackend",
+        buildNumber: "bazBackend",
+        sha: "gooBackend",
+      };
+      jest.spyOn(InfoService.getInstance(), "loadInfo").mockResolvedValueOnce({
+        frontend: givenFrontendInfoData,
+        backend: givenBackendInfoData,
+      });
 
       // WHEN calling sendFeedback method
       const givenSessionId = 1234;
@@ -145,7 +175,23 @@ describe("OverallFeedbackService", () => {
       async (_description, givenResponse) => {
         // GIVEN fetch resolves with a response that has invalid JSON
         setupAPIServiceSpy(StatusCodes.OK, givenResponse, "application/json;charset=UTF-8");
-
+        // AND the info service will return the correct version
+        const givenFrontendInfoData = {
+          date: "fooFrontend",
+          branch: "barFrontend",
+          buildNumber: "bazFrontend",
+          sha: "gooFrontend",
+        };
+        const givenBackendInfoData = {
+          date: "fooBackend",
+          branch: "barBackend",
+          buildNumber: "bazBackend",
+          sha: "gooBackend",
+        };
+        jest.spyOn(InfoService.getInstance(), "loadInfo").mockResolvedValueOnce({
+          frontend: givenFrontendInfoData,
+          backend: givenBackendInfoData,
+        });
         // WHEN the sendFeedback method is called
         const givenSessionId = 1234;
         const service = OverallFeedbackService.getInstance();
@@ -173,6 +219,23 @@ describe("OverallFeedbackService", () => {
       // Mock the authStateService to return a user without an ID
       // @ts-ignore
       jest.spyOn(authStateService.getInstance(), "getUser").mockReturnValue({ id: null });
+      // AND the info service will return the correct version
+      const givenFrontendInfoData = {
+        date: "fooFrontend",
+        branch: "barFrontend",
+        buildNumber: "bazFrontend",
+        sha: "gooFrontend",
+      };
+      const givenBackendInfoData = {
+        date: "fooBackend",
+        branch: "barBackend",
+        buildNumber: "bazBackend",
+        sha: "gooBackend",
+      };
+      jest.spyOn(InfoService.getInstance(), "loadInfo").mockResolvedValueOnce({
+        frontend: givenFrontendInfoData,
+        backend: givenBackendInfoData,
+      });
 
       // GIVEN feedback data
       const givenFeedbackData: FeedbackItem[] = [

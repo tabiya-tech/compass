@@ -3,22 +3,14 @@ import "src/_test_utilities/sentryMock";
 // mute the console
 import "src/_test_utilities/consoleMock";
 
-import Info, { DATA_TEST_ID, InfoProps } from "./Info";
-import { act } from "react";
+import Info, { DATA_TEST_ID } from "./Info";
 import { render, screen } from "src/_test_utilities/test-utils";
 import InfoService from "./info.service";
 import React from "react";
 import * as Sentry from "@sentry/react";
 import userEvent from "@testing-library/user-event";
-
-// Mock the info service
-jest.mock("./info.service", () => {
-  const mockInfoService = jest.fn();
-  mockInfoService.prototype.loadInfo = jest.fn().mockImplementation(() => {
-    return Promise.resolve([]);
-  });
-  return mockInfoService;
-});
+import { VersionItem } from "./info.types";
+import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 
 // mock the bugReport component
 jest.mock("src/feedback/bugReport/bugReportButton/BugReportButton", () => {
@@ -33,29 +25,28 @@ jest.mock("src/feedback/bugReport/bugReportButton/BugReportButton", () => {
 });
 
 describe("Testing Info component", () => {
+  beforeEach(() => {
+    // clear all method mocks
+    resetAllMethodMocks(InfoService.getInstance());
+  });
   test("it should show frontend info successfully", async () => {
     // GIVEN some frontend and backend info data are available and loaded
-    const expectedFrontendInfoData: InfoProps = {
+    const expectedFrontendInfoData: VersionItem = {
       date: "fooFrontend",
       branch: "barFrontend",
       buildNumber: "bazFrontend",
       sha: "gooFrontend",
     };
-    const expectedBackendInfoData: InfoProps = {
+    const expectedBackendInfoData: VersionItem = {
       date: "fooBackend",
       branch: "barBackend",
       buildNumber: "bazBackend",
       sha: "gooBackend",
     };
-    const infoDataPromise = Promise.resolve([expectedFrontendInfoData, expectedBackendInfoData]);
 
-    // @ts-ignore
-    InfoService.mockImplementationOnce(() => {
-      return {
-        loadInfo: () => {
-          return infoDataPromise;
-        },
-      };
+    jest.spyOn(InfoService.getInstance(), "loadInfo").mockResolvedValueOnce({
+      frontend: expectedFrontendInfoData,
+      backend: expectedBackendInfoData,
     });
 
     // AND sentry is initialized
@@ -63,9 +54,6 @@ describe("Testing Info component", () => {
 
     // WHEN the component is rendered
     render(<Info isOpen={true} notifyOnClose={jest.fn()} />);
-    await act(async () => {
-      await infoDataPromise;
-    });
 
     // THEN expect no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
@@ -97,6 +85,23 @@ describe("Testing Info component", () => {
   test("should call notifyOnClose when the close button is clicked", async () => {
     // GIVEN the notifyOnClose
     const givenNotifyOnClose = jest.fn();
+    // AND the Info service will return the correct version
+    const expectedFrontendInfoData: VersionItem = {
+      date: "fooFrontend",
+      branch: "barFrontend",
+      buildNumber: "bazFrontend",
+      sha: "gooFrontend",
+    };
+    const expectedBackendInfoData: VersionItem = {
+      date: "fooBackend",
+      branch: "barBackend",
+      buildNumber: "bazBackend",
+      sha: "gooBackend",
+    };
+    jest.spyOn(InfoService.getInstance(), "loadInfo").mockResolvedValueOnce({
+      frontend: expectedFrontendInfoData,
+      backend: expectedBackendInfoData,
+    });
     // AND the Info component is rendered
     render(<Info isOpen={true} notifyOnClose={givenNotifyOnClose} />);
 

@@ -2,7 +2,8 @@ import { StatusCodes } from "http-status-codes";
 import { customFetch } from "src/utils/customFetch/customFetch";
 import { getBackendUrl } from "src/envService";
 import {
-  FeedbackItem, FeedbackRequest,
+  FeedbackItem,
+  FeedbackRequest,
   FeedbackResponse,
 } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
@@ -39,7 +40,7 @@ export default class OverallFeedbackService {
     const serviceName = "OverallFeedbackService";
     const serviceFunction = "sendFeedback";
     const method = "PATCH";
-    const feedbackURL =  `${this.apiServerUrl}/conversations/${sessionId}/feedback`;
+    const feedbackURL = `${this.apiServerUrl}/conversations/${sessionId}/feedback`;
     const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, feedbackURL);
 
     const user = authStateService.getInstance().getUser();
@@ -47,9 +48,9 @@ export default class OverallFeedbackService {
       throw new Error("User not found");
     }
 
-    const infoService = new InfoService();
-    const [frontendInfo] = await infoService.loadInfo();
-    const versionString = `${frontendInfo.branch}-${frontendInfo.buildNumber}`;
+    const infoService = InfoService.getInstance();
+    const { frontend } = await infoService.loadInfo();
+    const versionString = `${frontend.branch}-${frontend.buildNumber}`;
 
     const feedbackRequest: FeedbackRequest = {
       version: {
@@ -71,7 +72,7 @@ export default class OverallFeedbackService {
       expectedContentType: "application/json",
     });
 
-    let feedbackResponse : FeedbackResponse;
+    let feedbackResponse: FeedbackResponse;
     try {
       feedbackResponse = JSON.parse(await response.text());
     } catch (e: any) {
