@@ -1,12 +1,12 @@
-from abc import ABC, abstractmethod
 import logging
+from abc import ABC, abstractmethod
 from typing import cast
 
 from app.application_state import ApplicationState, IApplicationStateManager
+from app.metrics.application_state_metrics_recorder.types import ApplicationStatesOfInterest
 from app.metrics.services.service import IMetricsService
 from app.metrics.types import ConversationPhaseEvent, ConversationTurnEvent, \
     AbstractCompassMetricEvent, ConversationPhaseLiteral, ExperienceDiscoveredEvent, ExperienceExploredEvent
-from app.metrics.application_state_metrics_recorder.types import ApplicationStatesOfInterest
 
 
 class IApplicationStateMetricsRecorder(ABC):
@@ -121,11 +121,12 @@ class ApplicationStateMetricsRecorder(IApplicationStateMetricsRecorder):
             ))
 
         # Record experience discovered changes
-        if previous_state.experiences_discovered_count != current_state.experiences_discovered_count:
+        if previous_state.experiences_discovered_count != current_state.experiences_discovered_count or previous_state.work_types_discovered != current_state.work_types_discovered:
             events.append(ExperienceDiscoveredEvent(
                 user_id=user_id,
                 session_id=session_id,
-                experience_count=current_state.experiences_discovered_count
+                experience_count=current_state.experiences_discovered_count,
+                work_types_discovered=current_state.work_types_discovered
             ))
 
         # Record experience exploration changes

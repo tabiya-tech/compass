@@ -1,19 +1,19 @@
 import random
 from typing import Awaitable, Dict, Any
 from unittest.mock import AsyncMock
+
 import pytest
 
+from app.app_config import ApplicationConfig
 from app.conversations.reactions.types import ReactionKind, DislikeReason
+from app.metrics.repository.repository import MetricsRepository
 from app.metrics.types import ConversationPhaseLiteral, ConversationPhaseEvent, UserAccountCreatedEvent, \
     MessageReactionCreatedEvent, ConversationTurnEvent, \
     FeedbackProvidedEvent, FeedbackTypeLiteral, FeedbackRatingValueEvent, \
-    CVFormatLiteral, CVDownloadedEvent, DeviceSpecificationEvent, UserLocationEvent, ExperienceDiscoveredEvent, ExperienceExploredEvent
+    CVFormatLiteral, CVDownloadedEvent, DeviceSpecificationEvent, UserLocationEvent, ExperienceDiscoveredEvent, \
+    ExperienceExploredEvent
 from common_libs.test_utilities import get_random_user_id, get_random_session_id, get_random_printable_string
 from common_libs.time_utilities import mongo_date_to_datetime, truncate_microseconds, get_now
-
-from app.metrics.repository.repository import MetricsRepository
-
-from app.app_config import ApplicationConfig
 
 
 @pytest.fixture(scope="function")
@@ -66,7 +66,8 @@ def get_experience_discovered_event(*, experience_count: int):
     return ExperienceDiscoveredEvent(
         user_id=get_random_user_id(),
         session_id=get_random_session_id(),
-        experience_count=experience_count
+        experience_count=experience_count,
+        work_types_discovered=[get_random_printable_string(10) for _ in range(experience_count)]  # nosec B311 # random is used for testing purposes
     )
 
 
@@ -604,7 +605,3 @@ class TestRecordEvent:
         for actual_stored_event, given_event in zip(actual_stored_events, given_events):
             given_event_dict = given_event.model_dump()
             _assert_metric_event_fields_match(given_event_dict, actual_stored_event)
-
-        
-        
-
