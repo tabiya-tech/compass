@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
 
+from app.agent.welcome_agent import WelcomeAgentState
 from app.store.database_application_state_store import DatabaseApplicationStateStore
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType
 from app.agent.agent_director.abstract_agent_director import AgentDirectorState, ConversationPhase
@@ -73,6 +74,7 @@ async def populate_sample_conversation(*, mongo_uri: str, database_name: str, _s
 
         # Create application state components
         agent_director_state = create_agent_director_state(_session_id)
+        welcome_agent_state = create_welcome_agent_state(_session_id)
         explore_experiences_director_state = create_explore_experiences_director_state(_session_id)
         conversation_memory_manager_state = create_conversation_memory_manager_state(_session_id, conversation_history)
         collect_experience_state = create_collect_experience_state(_session_id)
@@ -82,6 +84,7 @@ async def populate_sample_conversation(*, mongo_uri: str, database_name: str, _s
         application_state = ApplicationState(
             session_id=_session_id,
             agent_director_state=agent_director_state,
+            welcome_agent_state=welcome_agent_state,
             explore_experiences_director_state=explore_experiences_director_state,
             conversation_memory_manager_state=conversation_memory_manager_state,
             collect_experience_state=collect_experience_state,
@@ -156,7 +159,15 @@ def create_agent_director_state(_session_id: int) -> AgentDirectorState:
     )
 
 
-def create_explore_experiences_director_state(session_id: int) -> ExploreExperiencesAgentDirectorState:
+def create_welcome_agent_state(_session_id: int) -> WelcomeAgentState:
+    """Create a sample welcome agent state for a completed conversation."""
+    return WelcomeAgentState(
+        session_id=_session_id,
+        is_first_encounter=False,
+    )
+
+
+def create_explore_experiences_director_state(_session_id: int) -> ExploreExperiencesAgentDirectorState:
     """Create a sample explore experiences director state for a completed conversation."""
     # Create sample experiences
     bakery_experience = ExperienceEntity(
