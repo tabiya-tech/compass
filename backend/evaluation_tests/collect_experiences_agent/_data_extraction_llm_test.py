@@ -1,4 +1,5 @@
 import logging
+from textwrap import dedent
 
 import pytest
 
@@ -67,6 +68,24 @@ test_cases_data_extraction = [
         expected_last_referenced_experience_index=0,
         expected_collected_data_count=1
     ),
+    # Add two experiences at once
+    _TestCaseDataExtraction(
+        name="add_two_experiences_at_once",
+        summary="",
+        turns=[
+            ("(silence)",
+             "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
+        ],
+        user_input=dedent("""Ja, I have.
+        * Software Architect at ProUbis GmbH in Berlin (2010-2018) - Full-time.
+        * Project Manager at the University of Oxford (2018-2020) - Remote, paid job.
+        """),
+        collected_data_so_far=[
+        ],
+        expected_last_referenced_experience_index=0,
+        expected_collected_data_count=1
+    ),
+
     # Do not add twice
     _TestCaseDataExtraction(
         name="do_not_add_twice",
@@ -123,6 +142,33 @@ test_cases_data_extraction = [
         ],
         expected_last_referenced_experience_index=-1,  # The experience should be deleted
         expected_collected_data_count=0
+    ),
+    # Delete an experience from two similar experiences
+    _TestCaseDataExtraction(
+        name="delete_experience_from_two_similar",
+        summary="I provided the names of the organizations I volunteered for: Mombasa Youth Empowerment Network, the Kenya Red Cross Society, "
+                "and the Mombasa County Government. "
+                "You acknowledged the information and summarized my volunteer experience from 2016 to 2022 in Mombasa. "
+                "You then asked if I wanted to add or change anything.",
+        turns=[
+            ("No.",
+             dedent("""
+             Let's recap the information we have collected so far:
+             • Volunteer Peer mentor, Educator and a mentor manager, 2016 - 2022, Mombasa Youth Empowerment Network, the Kenya Red Cross Society, and the Mombasa County Government, Mombasa
+
+             • Volunteering (Volunteer/Unpaid)
+
+            Is there anything you would like to add or change?
+            """)),
+        ],
+        user_input="You got it wrong, I only have one experience. Figure out which one should be deleted.",
+        collected_data_so_far=[CollectedData(index=0, defined_at_turn_number=3, experience_title='Volunteer Peer mentor, Educator and a mentor manager',
+                                             company='Mombasa Youth Empowerment Network, the Kenya Red Cross Society, and the Mombasa County Government',
+                                             location='Mombasa', start_date='2016', end_date='2022', paid_work=False, work_type='None'),
+                               CollectedData(index=1, defined_at_turn_number=9, experience_title='Volunteering', company=None, location=None, start_date='',
+                                             end_date='', paid_work=False, work_type='UNSEEN_UNPAID')],
+        expected_last_referenced_experience_index=-1,  # The experience should be deleted
+        expected_collected_data_count=1
     ),
     # Complex Test cases based on failing e2e tests of the collect experiences agent
     _TestCaseDataExtraction(
