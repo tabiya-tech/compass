@@ -193,7 +193,7 @@ class _DataExtractionLLM:
             if CollectedData.all_fields_empty(_data):
                 self.logger.error("Experience data is empty: %s", _data)
                 # todo: del collected_experience_data_so_far[i]
-            # Sometimes the LLM may add an duplicate experience, so we remove it
+            # Sometimes the LLM may add a duplicate experience, so we remove it
             elif find_duplicate(_data, collected_experience_data_so_far[:i] + collected_experience_data_so_far[i + 1:]) >= 0:
                 # todo: del collected_experience_data_so_far[i]
                 self.logger.error("Duplicate experience data detected: %s", _data)
@@ -432,17 +432,17 @@ def format_history_for_prompt(collected_experience_data_so_far: list[CollectedDa
     if context.summary != "":
         _output += f"{ConversationHistoryFormatter.USER}: '{ConversationHistoryFormatter.SUMMARY_TITLE}\n{context.summary}'"
 
-        for turn in context.history.turns:
-            # if there is a collected experience data that was defined at that turn,
-            # then add a reference to help the model associate the experience data with that turn.
-            # This help the model to connect the dots between the user's last input --> conversation history --> experience data
-            # And follow the associations that it inferred in previous turns.
-            _experience_ref = ""
-            for _data in collected_experience_data_so_far:
-                if _data.defined_at_turn_number == turn.index:
-                    _experience_ref = f" (see <Previously Extracted Experience Data> index={_data.index})"
-                    break
+    for turn in context.history.turns:
+        # if there is a collected experience data that was defined at that turn,
+        # then add a reference to help the model associate the experience data with that turn.
+        # This help the model to connect the dots between the user's last input --> conversation history --> experience data
+        # And follow the associations that it inferred in previous turns.
+        _experience_ref = ""
+        for _data in collected_experience_data_so_far:
+            if _data.defined_at_turn_number == turn.index:
+                _experience_ref = f" (see <Previously Extracted Experience Data> index={_data.index})"
+                break
 
-            _output += (f"{ConversationHistoryFormatter.USER}: '{sanitize_input(turn.input.message, _TAGS_TO_FILTER)}{_experience_ref}'\n"
-                        f"{ConversationHistoryFormatter.MODEL}: '{sanitize_input(turn.output.message_for_user, _TAGS_TO_FILTER)}'\n")
-        return _output
+        _output += (f"{ConversationHistoryFormatter.USER}: '{sanitize_input(turn.input.message, _TAGS_TO_FILTER)}{_experience_ref}'\n"
+                    f"{ConversationHistoryFormatter.MODEL}: '{sanitize_input(turn.output.message_for_user, _TAGS_TO_FILTER)}'\n")
+    return _output
