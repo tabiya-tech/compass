@@ -82,7 +82,7 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
         diff_len = len(llm_output.most_relevant) + len(llm_output.remaining) - len(entities_to_classify)
         if diff_len != 0:
             self._logger.warning(
-                f"The list of {self._entity_types_plural} returned by the LLM is the same as the original list of {self._entity_types_plural}. "
+                f"The list of {self._entity_types_plural} returned by the LLM is not the same as the original list of {self._entity_types_plural}. "
                 f"There is a difference of %d {self._entity_types_plural}.",
                 diff_len)
 
@@ -115,8 +115,8 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
         most_relevant_entities = most_relevant_entities[:top_k]  # Get the top_k most relevant entities
         if self._logger.isEnabledFor(logging.INFO):
             self._logger.info(f"For job titles: '%s'  and responsibilities: '%s'  relevant {self._entity_types_plural} response is: %s",
-                              json.dumps(job_titles),
-                              json.dumps(responsibilities),
+                              json.dumps(job_titles, ensure_ascii=False),
+                              json.dumps(responsibilities, ensure_ascii=False),
                               llm_output)
         return RelevantEntityClassifierOutput(
             most_relevant=most_relevant_entities,
@@ -145,7 +145,7 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
                 The input structure is composed of: 
                 'Job Titles': A list of job titles 
                 'Responsibilities' : The list of responsibilities/activities/skills/behaviours
-                '{entity_types_plural_capitalized}': The list of {entity_types_plural} title with their descriptions to be classified
+                '{entity_types_plural_capitalized}': A json array of {entity_types_plural} to be classified with their titles and descriptions 
                 'Number of {entity_types_plural} to return': The number of the most relevant {entity_types_plural} to return
             #JSON Output instructions
                 Your response must always be a JSON object with the following schema:
@@ -183,10 +183,12 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
 
         _entities_to_classify = [{f'{entity_type_singular} title': entity.preferredLabel, f'{entity_type_singular} description': entity.description} for entity
                                  in entities_to_classify]
+        # When json.dumps is used ensure_ascii is False to avoid escaping non-ascii characters
+        # otherwise the entities in the response will not match the entities in the input
         return replace_placeholders_with_indent(prompt_template,
                                                 entity_types_plural=entity_types_plural,
                                                 entity_types_plural_capitalized=entity_types_plural_capitalized,
-                                                job_titles=json.dumps(job_titles),
-                                                responsibilities=json.dumps(responsibilities),
-                                                entities_to_classify=json.dumps(_entities_to_classify, indent=4),
+                                                job_titles=json.dumps(job_titles, ensure_ascii=False),
+                                                responsibilities=json.dumps(responsibilities, ensure_ascii=False),
+                                                entities_to_classify=json.dumps(_entities_to_classify, indent=4, ensure_ascii=False),
                                                 top_k=f"{top_k}")
