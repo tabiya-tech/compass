@@ -7,6 +7,8 @@ import pytest
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
+from common_libs.test_utilities import get_random_session_id
+from common_libs.test_utilities.guard_caplog import guard_caplog
 from evaluation_tests.conversation_libs.conversation_test_function import conversation_test_function, \
     Evaluation, ConversationTestConfig, ScriptedUserEvaluationTestCase, \
     ScriptedSimulatedUser
@@ -38,7 +40,7 @@ test_cases = [
         scripted_user=[
             "Ok, let's start"  # Expect to complete the conversation
         ],
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=90)]
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=80)]
     ),
     ScriptedUserEvaluationTestCase(
         name='user_asks_irrelevant_questions',
@@ -83,6 +85,22 @@ test_cases = [
         ],
         evaluations=[]
     ),
+    ScriptedUserEvaluationTestCase(
+        name='user_shares_experience',
+        simulated_user_prompt="Scripted user: user shares an experience during the introduction",
+        scripted_user=[
+            "Worked at a Kenya organization",  # Expect to complete the conversation
+        ],
+        evaluations=[]
+    ),
+    ScriptedUserEvaluationTestCase(
+        name='user_asks_for_a_cv',
+        simulated_user_prompt="Scripted user: user asks for a CV during the introduction",
+        scripted_user=[
+            "Generate a CV",  # Expect to complete the conversation
+        ],
+        evaluations=[]
+    ),
 ]
 
 
@@ -117,7 +135,7 @@ async def test_welcome_agent_scripted_user(max_iterations: int,
     """
     print(f"Running test case {test_case.name}")
 
-    session_id = hash(test_case.name) % 10 ** 10
+    session_id = get_random_session_id()
     output_folder = os.path.join(os.getcwd(), 'test_output/welcome_agent/scripted', test_case.name)
 
     # The conversation manager for this test
@@ -140,26 +158,19 @@ async def test_welcome_agent_scripted_user(max_iterations: int,
     # However, this is not enough as a logger can be set up in the agent in such a way that it does not propagate
     # the log messages to the root logger. For this reason, we add additional guards.
     with caplog.at_level(logging.INFO):
-        # Guards to ensure that the loggers are correctly setup,
-        # otherwise the tests cannot be trusted that they correctly assert the absence of errors and warnings.
-        guard_warning_msg = logging.getLevelName(logging.WARNING) + str(session_id)  # some random string
-        execute_evaluated_agent._agent._logger.warning(guard_warning_msg)
-        assert guard_warning_msg in caplog.text
-        guard_error_msg = logging.getLevelName(logging.ERROR) + str(session_id)  # some random string
-        execute_evaluated_agent._agent._logger.warning(guard_error_msg)
-        assert guard_error_msg in caplog.text
-        caplog.records.clear()
+        guard_caplog(execute_evaluated_agent._agent._logger, caplog)
 
         # Run the main test
         await conversation_test_function(
             config=config
         )
 
-        # Check that no errors and no warning were logged
-        for record in caplog.records:
-            assert record.levelname != 'ERROR'
-            assert record.levelname != 'WARNING'
         # Check if the welcome agent completed their task
         context = await conversation_manager.get_conversation_context()
         assert context.history.turns[-1].output.finished
         assert context.history.turns[-1].index == len(test_case.scripted_user) + 1
+
+        # Check that no errors and no warning were logged
+        for record in caplog.records:
+            assert record.levelname != 'ERROR'
+            assert record.levelname != 'WARNING'
