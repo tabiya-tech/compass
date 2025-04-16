@@ -1,5 +1,7 @@
 from textwrap import dedent
 
+from pydantic import BaseModel
+
 
 def get_conversation_finish_instructions(condition: str) -> str:
     """
@@ -37,19 +39,29 @@ MODEL_RESPONSE_INSTRUCTIONS = dedent("""\
     """)
 
 
-def get_json_response_instructions(examples=None) -> str:
+def get_json_response_instructions(examples: list[BaseModel] | None = None) -> str:
     """
-    Get the instructions so that the model can return a json. This can be added to the prompt.
-    :param examples: A list of examples of responses for a few-shot learning task. The list can be empty
-    :return: A string with the instructions for the model to return a json.
+    Get the instructions so that the model can return a JSON. This can be added to the prompt.
+    :param examples: A list of example responses for a few-shot learning task. The list can be empty
+    :return: A string with the instructions for the model to return a JSON.
     """
-    if examples is None:
-        examples = []
+    return MODEL_RESPONSE_INSTRUCTIONS.format(response_examples=get_json_examples_instructions(examples=examples))
+
+
+def get_json_examples_instructions(examples: list[BaseModel] | None = None) -> str:
+    """
+    Constructs the example instructions for the model to return a JSON.
+    :param examples: A list of example responses for a few-shot learning task. The list can be empty
+    :return: A string with the examples.
+    """
+    if examples is None or len(examples) == 0:
+        return ""
+
     examples_part = []
     if len(examples) > 0:
         examples_part.append("\nExample responses. Treat them as examples, do not repeat them exactly as they are:")
         for example in examples:
-            part = example.json()
+            part = example.model_dump_json()
             examples_part.append(part)
 
-    return MODEL_RESPONSE_INSTRUCTIONS.format(response_examples="\n".join(examples_part))
+    return "\n".join(examples_part)

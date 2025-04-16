@@ -65,6 +65,9 @@ def _update_state_session_id(state: ApplicationState, new_session_id: int) -> Ap
     if hasattr(state, 'agent_director_state') and state.agent_director_state:
         state.agent_director_state.session_id = new_session_id
 
+    if hasattr(state, 'welcome_agent_state') and state.welcome_agent_state:
+        state.welcome_agent_state.session_id = new_session_id
+
     if hasattr(state, 'explore_experiences_director_state') and state.explore_experiences_director_state:
         state.explore_experiences_director_state.session_id = new_session_id
 

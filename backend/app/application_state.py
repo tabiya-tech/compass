@@ -7,6 +7,7 @@ from app.agent.agent_director.abstract_agent_director import AgentDirectorState
 from app.agent.collect_experiences_agent import CollectExperiencesAgentState
 from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState
 from app.agent.skill_explorer_agent import SkillsExplorerAgentState
+from app.agent.welcome_agent import WelcomeAgentState
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
 from app.countries import Country
 
@@ -18,6 +19,7 @@ class ApplicationState(BaseModel):
     """
     session_id: int
     agent_director_state: AgentDirectorState
+    welcome_agent_state: WelcomeAgentState
     explore_experiences_director_state: ExploreExperiencesAgentDirectorState
     conversation_memory_manager_state: ConversationMemoryManagerState
     collect_experience_state: CollectExperiencesAgentState
@@ -26,12 +28,15 @@ class ApplicationState(BaseModel):
     def __init__(self, *,
                  session_id: int,
                  agent_director_state: AgentDirectorState,
+                 welcome_agent_state: WelcomeAgentState,
                  explore_experiences_director_state: ExploreExperiencesAgentDirectorState,
                  conversation_memory_manager_state: ConversationMemoryManagerState,
                  collect_experience_state: CollectExperiencesAgentState,
                  skills_explorer_agent_state: SkillsExplorerAgentState):
         if session_id != agent_director_state.session_id:
             raise ValueError("Session ID mismatch in Agent Director State")
+        if session_id != welcome_agent_state.session_id:
+            raise ValueError("Session ID mismatch in Welcome Agent State")
         if session_id != explore_experiences_director_state.session_id:
             raise ValueError("Session ID mismatch in Explore Experiences Director State")
         if session_id != conversation_memory_manager_state.session_id:
@@ -43,6 +48,7 @@ class ApplicationState(BaseModel):
 
         super().__init__(session_id=session_id,
                          agent_director_state=agent_director_state,
+                         welcome_agent_state=welcome_agent_state,
                          explore_experiences_director_state=explore_experiences_director_state,
                          conversation_memory_manager_state=conversation_memory_manager_state,
                          collect_experience_state=collect_experience_state,
@@ -59,6 +65,7 @@ class ApplicationState(BaseModel):
         return cls(
             session_id=session_id,
             agent_director_state=AgentDirectorState(session_id=session_id),
+            welcome_agent_state=WelcomeAgentState(session_id=session_id),
             explore_experiences_director_state=ExploreExperiencesAgentDirectorState(session_id=session_id),
             conversation_memory_manager_state=ConversationMemoryManagerState(session_id=session_id),
             collect_experience_state=CollectExperiencesAgentState(session_id=session_id),
@@ -160,6 +167,7 @@ class ApplicationStateManager(IApplicationStateManager):
             state = ApplicationState(
                 session_id=session_id,
                 agent_director_state=AgentDirectorState(session_id=session_id),
+                welcome_agent_state=WelcomeAgentState(session_id=session_id),
                 explore_experiences_director_state=ExploreExperiencesAgentDirectorState(session_id=session_id, country_of_user=self._default_country_of_user),
                 conversation_memory_manager_state=ConversationMemoryManagerState(session_id=session_id),
                 collect_experience_state=CollectExperiencesAgentState(session_id=session_id, country_of_user=self._default_country_of_user),

@@ -3,6 +3,7 @@ import os
 
 import pytest
 
+from app.agent.welcome_agent import WelcomeAgentState
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
@@ -46,7 +47,14 @@ async def test_welcome_agent_simulated_user(max_iterations: int, test_case: Eval
     # The conversation manager for this test
     conversation_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
     conversation_manager.set_state(state=ConversationMemoryManagerState(session_id=session_id))
-    execute_evaluated_agent = WelcomeAgentExecutor(conversation_manager=conversation_manager)
+    welcome_agent_state = WelcomeAgentState(
+        session_id=session_id,
+        is_first_encounter= True,
+        user_started_discovery= False,
+        country_of_user=test_case.country_of_user
+    )
+
+    execute_evaluated_agent = WelcomeAgentExecutor(state=welcome_agent_state, conversation_manager=conversation_manager)
 
     # Run the conversation test
     config = ConversationTestConfig(

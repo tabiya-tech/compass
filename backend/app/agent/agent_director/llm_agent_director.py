@@ -110,6 +110,13 @@ class LLMAgentDirector(AbstractAgentDirector):
         self._llm_caller: LLMCaller[RouterModelResponse] = LLMCaller[RouterModelResponse](
             model_response_type=RouterModelResponse)
 
+    def get_welcome_agent(self) -> WelcomeAgent:
+        # cast the agent to the WelcomeAgent
+        agent = self._agents[AgentType.WELCOME_AGENT]
+        if not isinstance(agent, WelcomeAgent):
+            raise ValueError("The agent is not an instance of WelcomeAgent")
+        return agent
+
     def get_explore_experiences_agent(self) -> ExploreExperiencesAgentDirector:
         #  cast the agent to the ExploreExperiencesAgentDirector
         agent = self._agents[AgentType.EXPLORE_EXPERIENCES_AGENT]

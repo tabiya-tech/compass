@@ -33,8 +33,10 @@ class LLMCaller(Generic[RESPONSE_T]):
                        logger: logging.Logger
                        ) -> Tuple[RESPONSE_T | None, list[LLMStats]]:
         """
-        Call the LLM to generate a response of a specific type.
+        Call the LLM to generate a specific response.
         The method retries multiple times if the LLM fails to respond with a JSON object that is of the expected type.
+        It never raises an exception, but it logs errors and captures the statistics of the LLM calls.
+        If all attempts fail, it returns None and the statistics of the LLM calls.
         :param llm: The LLM to call
         :param llm_input: The input to the LLM
         :param logger: The logger to log messages

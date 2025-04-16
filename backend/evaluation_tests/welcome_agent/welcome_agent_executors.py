@@ -1,5 +1,5 @@
 from app.agent.agent_types import AgentInput, AgentOutput
-from app.agent.welcome_agent import WelcomeAgent
+from app.agent.welcome_agent import WelcomeAgent, WelcomeAgentState
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationContext
 
@@ -9,8 +9,9 @@ class WelcomeAgentExecutor:
     Executes the welcome agent
     """
 
-    def __init__(self, conversation_manager: ConversationMemoryManager):
+    def __init__(self, state: WelcomeAgentState, conversation_manager: ConversationMemoryManager):
         self._agent = WelcomeAgent()
+        self._agent.set_state(state)
         self._conversation_manager = conversation_manager
 
     async def __call__(self, agent_input: AgentInput) -> AgentOutput:

@@ -5,6 +5,12 @@
     "current_phase": "ENDED",
     "conversation_conducted_at": "2025-04-10T15:50:42.210000Z"
   },
+  "welcome_agent_state": {
+    "session_id": 1,
+    "is_first_encounter": false,
+    "country_of_user": "UNSPECIFIED",
+    "user_started_discovery": true
+  },
   "explore_experiences_director_state": {
     "session_id": 1,
     "country_of_user": "UNSPECIFIED",
