@@ -184,12 +184,12 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture,
         AgentState(0, AgentType.WELCOME_AGENT, False),  # WelcomeAgent say hi
         AgentState(1, AgentType.WELCOME_AGENT, False),
         AgentState(2, AgentType.WELCOME_AGENT, True),  # WelcomeAgent completes task
-        AgentState(3, AgentType.EXPLORE_EXPERIENCES_AGENT, False),  # Start of Skill Explore
-        AgentState(4, AgentType.EXPLORE_EXPERIENCES_AGENT, False),  # Job 1
-        AgentState(5, AgentType.EXPLORE_EXPERIENCES_AGENT, False),  # skills
-        AgentState(6, AgentType.EXPLORE_EXPERIENCES_AGENT, False),  # No more to say
+        AgentState(3, AgentType.COLLECT_EXPERIENCES_AGENT, False),  # Start of Skill Explore
+        AgentState(4, AgentType.COLLECT_EXPERIENCES_AGENT, False),  # Job 1
+        AgentState(5, AgentType.COLLECT_EXPERIENCES_AGENT, False),  # skills
+        AgentState(6, AgentType.COLLECT_EXPERIENCES_AGENT, False),  # No more to say
         AgentState(7, AgentType.WELCOME_AGENT, False),  # WelcomeAgent explains
-        AgentState(8, AgentType.EXPLORE_EXPERIENCES_AGENT, True),  # SkillsAgent completes task
+        AgentState(8, AgentType.COLLECT_EXPERIENCES_AGENT, True),  # SkillsAgent completes task
         AgentState(9, AgentType.FAREWELL_AGENT, True)  # FarewellAgent completes task
     ]
     for i, expected_state in enumerate(expected_agent_states):
