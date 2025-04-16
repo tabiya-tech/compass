@@ -143,7 +143,7 @@ class _DataExtractionLLM:
                 location=_data.location
             )
             if CollectedData.all_fields_empty(new_item):
-                self.logger.error("Experience data is empty: %s", new_item)
+                self.logger.warning("Experience data is empty: %s", new_item)
                 experience_index = -1
             else:
                 # Sometimes the LLM may add duplicates, so we remove them

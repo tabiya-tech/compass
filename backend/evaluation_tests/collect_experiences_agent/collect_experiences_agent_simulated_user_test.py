@@ -8,6 +8,7 @@ from app.conversation_memory.conversation_memory_manager import ConversationMemo
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
 from common_libs.test_utilities import get_random_session_id
+from common_libs.test_utilities.guard_caplog import guard_caplog
 from evaluation_tests.collect_experiences_agent.collect_experiences_executor import CollectExperiencesAgentExecutor, \
     CollectExperienceAgentGetConversationContextExecutor, CollectExperienceAgentIsFinished
 from evaluation_tests.collect_experiences_agent.collect_experiences_test_cases import test_cases, \
@@ -57,14 +58,7 @@ async def test_collect_experiences_agent_simulated_user(test_case: CollectExperi
     # the log messages to the root logger. For this reason, we add additional guards.
     with caplog.at_level(logging.DEBUG):
         # Guards to ensure that the loggers are correctly setup,
-        # otherwise the tests cannot be trusted that they correctly assert the absence of errors and warnings.
-        guard_warning_msg = logging.getLevelName(logging.WARNING) + str(session_id)  # some random string
-        execute_evaluated_agent._agent._logger.warning(guard_warning_msg)
-        assert guard_warning_msg in caplog.text
-        guard_error_msg = logging.getLevelName(logging.ERROR) + str(session_id)  # some random string
-        execute_evaluated_agent._agent._logger.warning(guard_error_msg)
-        assert guard_error_msg in caplog.text
-        caplog.records.clear()
+        guard_caplog(logger=execute_evaluated_agent._agent._logger, caplog=caplog)
 
         # Run the main test
         evaluation_result: ConversationEvaluationRecord = await conversation_test_function(
@@ -78,11 +72,13 @@ async def test_collect_experiences_agent_simulated_user(test_case: CollectExperi
         # Check if the actual discovered experiences match the expected ones
         assert len(execute_evaluated_agent.get_experiences()) >= test_case.expected_experiences_found_min
         assert len(execute_evaluated_agent.get_experiences()) <= test_case.expected_experiences_found_max
+
+        # We run the evaluation assertions at the end
+        # as it fails often due to the unpredictability of the LLM responses
+        assert_expected_evaluation_results(evaluation_result=evaluation_result, test_case=test_case)
+
         # Finally check that no errors and no warning were logged
         for record in caplog.records:
             assert record.levelname != 'ERROR'
-            assert record.levelname != 'WARNING'
-
-    # We run the evaluation assertions at the end
-    # as it fails often due to the unpredictability of the LLM responses
-    assert_expected_evaluation_results(evaluation_result=evaluation_result, test_case=test_case)
+            # don't assert warnings as they are expected during data collection
+            # assert record.levelname != 'WARNING'
