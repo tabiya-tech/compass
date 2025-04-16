@@ -37,23 +37,23 @@ class RelevantSkillsClassifierLLMTestCase(CompassTestCase):
 test_cases = [
     RelevantSkillsClassifierLLMTestCase(
         name="Special characters",
-        given_job_titles=["Baker"],
-        given_responsibility="I clean my work place",
+        given_job_titles=["Baker ✅"],
+        given_responsibility="I clean my work place ✨",
         given_skills=[
-            _get_skill_entity(preferred_label="perform one's cleaning duties", score=0.9),
-            _get_skill_entity(preferred_label="ensure \"sanitation\"", score=0.8),
-            _get_skill_entity(preferred_label="clean animals", score=0.8),
-            _get_skill_entity(preferred_label="let's not think about it", score=0.7),
-            _get_skill_entity(preferred_label="*_@§\"$%\"':", score=0.6),
+            _get_skill_entity(preferred_label="perform one's cleaning duties ✨", score=0.9),
+            _get_skill_entity(preferred_label="ensure \"sanitation\" 🛁", score=0.8),
+            _get_skill_entity(preferred_label="clean \t\n animals 🌭", score=0.8),
+            _get_skill_entity(preferred_label="let's not think about it 💩", score=0.7),
+            _get_skill_entity(preferred_label="*_@§\"$%\"':🤬", score=0.6),
         ],
         given_top_k=2,
-        expected_relevant_skills=["perform one's cleaning duties",
-                                  "ensure \"sanitation\"",
+        expected_relevant_skills=["perform one's cleaning duties ✨",
+                                  "ensure \"sanitation\" 🛁",
                                   ],
         expected_remaining_skills=[
-            "clean animals",
-            "let's not think about it",
-            "*_@§\"$%\"':",
+            "clean \t\n animals 🌭",
+            "let's not think about it 💩",
+            "*_@§\"$%\"':🤬",
         ]
     ),
 
