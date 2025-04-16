@@ -5,36 +5,39 @@ from uuid import uuid4
 
 import pytest
 from bson import ObjectId
-from motor.motor_asyncio import AsyncIOMotorClient
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
-from app.agent.agent_director.abstract_agent_director import AgentDirectorState, \
-    ConversationPhase as AgentDirectorConversationPhase
+from app.agent.agent_director.abstract_agent_director import ConversationPhase as AgentDirectorConversationPhase
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType, LLMStats
-from app.agent.collect_experiences_agent import CollectExperiencesAgentState, CollectedData
+from app.agent.collect_experiences_agent import CollectedData
 from app.agent.experience import ExperienceEntity, Timeline, WorkType
 from app.agent.experience.experience_entity import ResponsibilitiesData
-from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState, \
-    ConversationPhase as ExploreExperiencesConversationPhase, \
+from app.agent.explore_experiences_agent_director import ConversationPhase as ExploreExperiencesConversationPhase, \
     ExperienceState, DiveInPhase
-from app.agent.skill_explorer_agent import SkillsExplorerAgentState
 from app.application_state import ApplicationState
-from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState, ConversationHistory, \
-    ConversationTurn
+from app.conversation_memory.conversation_memory_types import ConversationHistory, ConversationTurn
+from app.server_dependencies.database_collections import Collections
 from app.store.database_application_state_store import DatabaseApplicationStateStore
 from app.users.generate_session_id import generate_new_session_id
 from app.vector_search.esco_entities import SkillEntity
+from common_libs.test_utilities.guard_caplog import guard_caplog
 from conftest import random_db_name
 
 logger = logging.getLogger()
 
 
 @pytest.fixture(scope='function')
-def database_application_state_store(in_memory_mongo_server):
+def in_memory_db(in_memory_mongo_server) -> AsyncIOMotorDatabase:
     in_memory_db = AsyncIOMotorClient(
         in_memory_mongo_server.connection_string,
         tlsAllowInvalidCertificates=True
     ).get_database(random_db_name())
 
+    return in_memory_db
+
+
+@pytest.fixture(scope='function')
+def database_application_state_store(in_memory_db) -> DatabaseApplicationStateStore:
     return DatabaseApplicationStateStore(in_memory_db)
 
 
@@ -144,113 +147,174 @@ def update_skills_explorer_agent_state(application_state: ApplicationState):
     application_state.skills_explorer_agent_state.experiences_explored = [str(uuid4()) for _ in range(5)]
 
 
-@pytest.mark.asyncio
-@pytest.mark.parametrize('update_state_callback', [
-    update_agent_director_state,
-    update_explore_experiences_director_state,
-    update_conversation_memory_manager_state,
-    update_collect_experience_state,
-    update_skills_explorer_agent_state
-], ids=[
-    "updated_agent_director_state",
-    "updated_explore_experiences_director_state",
-    "updated_conversation_memory_manager_state",
-    "updated_collect_experience_state",
-    "updated_skills_explorer_agent_state"
-])
-async def test_database_application_state_roundtrip(update_state_callback, database_application_state_store):
-    # (1) Initialize state in Memory-> (2) Save state in DB -> (3) Read state from DB ->
-    # (4) Update state In Memory-> (5) Save state in DB -> (6) Read state frm DB
-
-    # (1) Initial state
-    # GIVEN some initial application state
-    given_state_id = generate_new_session_id()
-    given_initial_application_state = ApplicationState(
-        session_id=given_state_id,
-        agent_director_state=AgentDirectorState(session_id=given_state_id),
-        explore_experiences_director_state=ExploreExperiencesAgentDirectorState(session_id=given_state_id),
-        conversation_memory_manager_state=ConversationMemoryManagerState(session_id=given_state_id),
-        collect_experience_state=CollectExperiencesAgentState(session_id=given_state_id),
-        skills_explorer_agent_state=SkillsExplorerAgentState(session_id=given_state_id)
-    )
-    given_initial_application_state_model_dump = given_initial_application_state.model_dump()
-    # (2) Save state from step (1) in DB
-    # WHEN that initial state is saved in the database, the state is saved successfully
-    await database_application_state_store.save_state(given_initial_application_state)
-
-    # (3) Read state from DB
-    # AND WHEN the state is be read back from the database
-    actual_fetched_state = await database_application_state_store.get_state(given_state_id)
-    # make sure we make model dump to get a snapshot of the state, as the state object is mutable
-    actual_fetched_state_model_dump = actual_fetched_state.model_dump()
-    # THEN the state from step (3) is the same as the initial state from step (1)
-    assert given_initial_application_state_model_dump == actual_fetched_state_model_dump
-
-    # (4) Update the state from step (3) in ,emory
-    # AND WHEN the newly retrieved state is updated in memory
-    # update is updating the state object in memory
-    update_state_callback(application_state=actual_fetched_state)
-    # make sure we make model dump to get a snapshot of the state, as the state object is mutable
-    updated_actual_fetched_state_model_dump = actual_fetched_state.model_dump()
-    # (5) Save the state updated in step (4) in the DB
-    # AND saved again in the database, the state is saved successfully
-    await database_application_state_store.save_state(actual_fetched_state)
-
-    # (6) Read state from DB
-    # AND WHEN the state read from the database
-    newly_actual_fetched_state = await database_application_state_store.get_state(given_state_id)
-    # THEN the state from (6) is the same as the one updated in memory in step (4)
-    assert updated_actual_fetched_state_model_dump == newly_actual_fetched_state.model_dump()
+def get_test_application_state(given_session_id: int) -> ApplicationState:
+    # Create a state with unique data
+    state = ApplicationState.new_state(session_id=given_session_id)
+    # Update all state components to have unique data
+    update_agent_director_state(state)
+    update_explore_experiences_director_state(state)
+    update_conversation_memory_manager_state(state)
+    update_collect_experience_state(state)
+    update_skills_explorer_agent_state(state)
+    return state
 
 
-@pytest.mark.asyncio
-async def test_init_state(database_application_state_store):
-    # GIVEN a session_id that does not exist in the database
-    given_session_id = 1234
-    # WHEN the Default is called
-    given_actual = await database_application_state_store.get_state(given_session_id)
-    # THEN the returned state is None
-    assert given_actual is None
+class TestDatabaseApplicationStateStore:
+    """
+    Test class for the DatabaseApplicationStateStore.
+    """
 
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize('update_state_callback', [
+        update_agent_director_state,
+        update_explore_experiences_director_state,
+        update_conversation_memory_manager_state,
+        update_collect_experience_state,
+        update_skills_explorer_agent_state
+    ], ids=[
+        "updated_agent_director_state",
+        "updated_explore_experiences_director_state",
+        "updated_conversation_memory_manager_state",
+        "updated_collect_experience_state",
+        "updated_skills_explorer_agent_state"
+    ])
+    async def test_database_application_state_roundtrip(self, update_state_callback, database_application_state_store):
+        # (1) Initialize state in Memory-> (2) Save state in DB -> (3) Read state from DB ->
+        # (4) Update state In Memory-> (5) Save state in DB -> (6) Read state frm DB
 
-@pytest.mark.asyncio
-async def test_get_state_for_all_sessions(database_application_state_store):
-    # GIVEN multiple application states saved in the database
-    given_session_ids = [generate_new_session_id() for _ in range(3)]
-    given_states = []
+        # (1) Initial state
+        # GIVEN some initial application state
+        given_state_id = generate_new_session_id()
+        given_initial_application_state = ApplicationState.new_state(session_id=given_state_id)
+        given_initial_application_state_model_dump = given_initial_application_state.model_dump()
+        # (2) Save state from step (1) in DB
+        # WHEN that initial state is saved in the database, the state is saved successfully
+        await database_application_state_store.save_state(given_initial_application_state)
 
-    for session_id in given_session_ids:
+        # (3) Read state from DB
+        # AND WHEN the state is be read back from the database
+        actual_fetched_state = await database_application_state_store.get_state(given_state_id)
+        # make sure we make model dump to get a snapshot of the state, as the state object is mutable
+        actual_fetched_state_model_dump = actual_fetched_state.model_dump()
+        # THEN the state from step (3) is the same as the initial state from step (1)
+        assert given_initial_application_state_model_dump == actual_fetched_state_model_dump
+
+        # (4) Update the state from step (3) in ,emory
+        # AND WHEN the newly retrieved state is updated in memory
+        # update is updating the state object in memory
+        update_state_callback(application_state=actual_fetched_state)
+        # make sure we make model dump to get a snapshot of the state, as the state object is mutable
+        updated_actual_fetched_state_model_dump = actual_fetched_state.model_dump()
+        # (5) Save the state updated in step (4) in the DB
+        # AND saved again in the database, the state is saved successfully
+        await database_application_state_store.save_state(actual_fetched_state)
+
+        # (6) Read state from DB
+        # AND WHEN the state read from the database
+        newly_actual_fetched_state = await database_application_state_store.get_state(given_state_id)
+        # THEN the state from (6) is the same as the one updated in memory in step (4)
+        assert updated_actual_fetched_state_model_dump == newly_actual_fetched_state.model_dump()
+
+    @pytest.mark.asyncio
+    async def test_init_state(self, database_application_state_store):
+        # GIVEN a session_id that does not exist in the database
+        given_session_id = 1234
+        # WHEN the Default is called
+        given_actual = await database_application_state_store.get_state(given_session_id)
+        # THEN the returned state is None
+        assert given_actual is None
+
+    @pytest.mark.asyncio
+    async def test_get_state_for_all_sessions(self, database_application_state_store):
+        # GIVEN multiple application states saved in the database
+        given_session_ids = [generate_new_session_id() for _ in range(3)]
+        given_states = []
+
+        for session_id in given_session_ids:
+            # Create a state with unique data
+            state = ApplicationState.new_state(session_id=session_id)
+            # Update all state components to have unique data
+            update_agent_director_state(state)
+            update_explore_experiences_director_state(state)
+            update_conversation_memory_manager_state(state)
+            update_collect_experience_state(state)
+            update_skills_explorer_agent_state(state)
+
+            given_states.append(state)
+            # Save the state
+            await database_application_state_store.save_state(state)
+
+        # WHEN get_state_for_all_sessions is called
+        actual_state_ids = []
+        async for state_id in database_application_state_store.get_all_session_ids():
+            actual_state_ids.append(state_id)
+
+        # THEN all saved states are retrieved
+        assert len(actual_state_ids) == len(given_states)
+
+        # AND each retrieved state matches its corresponding saved state
+        # Sort both lists by session_id to ensure consistent comparison
+        given_session_ids.sort()
+        actual_state_ids.sort()
+
+        assert given_session_ids == actual_state_ids
+
+    @pytest.mark.asyncio
+    async def test_delete_state(self, database_application_state_store):
+        # GIVEN a session_id that exists in the database
+        given_session_id = generate_new_session_id()
         # Create a state with unique data
-        state = ApplicationState(
-            session_id=session_id,
-            agent_director_state=AgentDirectorState(session_id=session_id),
-            explore_experiences_director_state=ExploreExperiencesAgentDirectorState(session_id=session_id),
-            conversation_memory_manager_state=ConversationMemoryManagerState(session_id=session_id),
-            collect_experience_state=CollectExperiencesAgentState(session_id=session_id),
-            skills_explorer_agent_state=SkillsExplorerAgentState(session_id=session_id)
-        )
-        # Update all state components to have unique data
-        update_agent_director_state(state)
-        update_explore_experiences_director_state(state)
-        update_conversation_memory_manager_state(state)
-        update_collect_experience_state(state)
-        update_skills_explorer_agent_state(state)
+        state = get_test_application_state(given_session_id)
 
-        given_states.append(state)
         # Save the state
         await database_application_state_store.save_state(state)
 
-    # WHEN get_state_for_all_sessions is called
-    actual_state_ids = []
-    async for state_id in database_application_state_store.get_all_session_ids():
-        actual_state_ids.append(state_id)
+        # WHEN delete_state is called
+        await database_application_state_store.delete_state(given_session_id)
 
-    # THEN all saved states are retrieved
-    assert len(actual_state_ids) == len(given_states)
+        # THEN the state is deleted from the database
+        actual_fetched_state = await database_application_state_store.get_state(given_session_id)
+        assert actual_fetched_state is None
 
-    # AND each retrieved state matches its corresponding saved state
-    # Sort both lists by session_id to ensure consistent comparison
-    given_session_ids.sort()
-    actual_state_ids.sort()
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("collection_name", [
+        Collections.AGENT_DIRECTOR_STATE,
+        Collections.EXPLORE_EXPERIENCES_DIRECTOR_STATE,
+        Collections.CONVERSATION_MEMORY_MANAGER_STATE,
+        Collections.COLLECT_EXPERIENCE_STATE,
+        Collections.SKILLS_EXPLORER_AGENT_STATE
+    ], ids=[
+        "agent_director_state",
+        "explore_experiences_agent_director_state",
+        "conversation_memory_manager_state",
+        "collect_experience_state",
+        "skills_explorer_agent_state"
+    ])
+    async def test_missing_partial_state(self, in_memory_db: AsyncIOMotorDatabase, database_application_state_store: DatabaseApplicationStateStore,
+                                         collection_name: str,
+                                         caplog: pytest.LogCaptureFixture):
+        with caplog.at_level(logging.WARNING):
+            guard_caplog(database_application_state_store._logger, caplog)
 
-    assert given_session_ids == actual_state_ids
+            # GIVEN a session_id that exists in the database
+            given_session_id = generate_new_session_id()
+            # Create a state with unique data
+            state = get_test_application_state(given_session_id)
+            # Save the state
+            await database_application_state_store.save_state(state)
+
+            # AND a state is missing for the given particular collection
+            # Delete the state for the given collection
+            await in_memory_db.get_collection(collection_name).delete_one({"session_id": given_session_id})
+
+            # WHEN getting the state for that session_id
+            actual_fetched_state = await database_application_state_store.get_state(given_session_id)
+
+            # THEN the returned state is None
+            assert actual_fetched_state is None
+
+            # AND an error is logged
+            assert len(caplog.records) == 1
+            assert caplog.records[0].levelname == "ERROR"
+            assert caplog.records[
+                       0].message == f"Missing application state for session ID {given_session_id}: ['{collection_name}']. A new session will be created."

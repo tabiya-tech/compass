@@ -46,16 +46,20 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
                 # If any of the states are None, return None
                 # but log which ones are None
                 collection_names = [
-                    'Agent Director',
-                    'Explore Experiences Director State',
-                    'Conversation Memory Manager State',
-                    'Collect Experience State',
-                    'Skills Explorer Agent State'
+                    Collections.AGENT_DIRECTOR_STATE,
+                    Collections.EXPLORE_EXPERIENCES_DIRECTOR_STATE,
+                    Collections.CONVERSATION_MEMORY_MANAGER_STATE,
+                    Collections.COLLECT_EXPERIENCE_STATE,
+                    Collections.SKILLS_EXPLORER_AGENT_STATE
                 ]
                 # log the ones that are none
+                _log_missing = []
                 for i, result in enumerate(results):
                     if result is None:
-                        self._logger.info("No state found in the database for component %s with session ID %s", collection_names[i], session_id)
+                        _log_missing.append(collection_names[i])
+
+                self._logger.error("Missing application state for session ID %s: %s. A new session will be created.", session_id, _log_missing)
+
                 return None
 
             (agent_director_state,
