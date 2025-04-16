@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import asyncio
 import logging
 import argparse
@@ -23,8 +25,9 @@ from app.metrics.types import (
     ConversationPhaseLiteral
 )
 from app.version.utils import load_version_info
+from common_libs.logging.log_utilities import setup_logging_config
 
-logging.basicConfig(level=logging.INFO)
+setup_logging_config(os.path.join("logging.cfg.yaml"))
 logger = logging.getLogger(__name__)
 
 
@@ -286,14 +289,25 @@ class ExperienceDiscoveredEventExporter(EventExporter):
         events: list[AbstractCompassMetricEvent] = []
         skipped_count = 0
         experience_count: int = 0
+        work_types_discovered: list[str] = [
+            work_type.name for work_type in state.collect_experience_state.explored_types
+        ]
+
         # go through the experiences and count the number of experiences that have been discovered
         for _ in state.explore_experiences_director_state.experiences_state.keys():
             experience_count += 1
+
+        if experience_count == 0 and len(work_types_discovered) == 0:
+            # if there are no experiences discovered and no work types discovered, skip the event
+            self.skipped_count = 1
+            return []
+
         # create an event for the number of experiences discovered
         event = ExperienceDiscoveredEvent(
             user_id=user_id,
             session_id=session_id,
-            experience_count=experience_count
+            experience_count=experience_count,
+            work_types_discovered=work_types_discovered
         )
         
         # Check if this event already exists
@@ -305,6 +319,34 @@ class ExperienceDiscoveredEventExporter(EventExporter):
             
         self.skipped_count = skipped_count
         return events
+
+
+class DiscoveredWorkTypesEventExporter(ExperienceDiscoveredEventExporter):
+    """
+    For existing ExperienceDiscovered Events without work types, Add the discovered work types.
+    """
+
+    async def get_existing_metrics_events_in_target(self) -> Set[Tuple[str, str]]:
+        try:
+            # Get the existing experience discovered events, And with work types.
+            cursor = self.metrics_repository.collection.find(
+                {
+                    "event_type": EventType.EXPERIENCE_DISCOVERED.value,
+                    "work_types_discovered": {"$exists": True}
+                },
+                {
+                    "anonymized_user_id": 1,
+                    "anonymized_session_id": 1
+                }
+            )
+
+            self.existing_events = {
+                (event["anonymized_user_id"], event["anonymized_session_id"]) for event in
+                await cursor.to_list(length=None)}
+            return self.existing_events
+        except Exception as err:
+            logger.error(f"Error getting existing experience discovered events: {str(err)}")
+            return set()
 
 
 async def get_user_preferences_map(db: AsyncIOMotorDatabase) -> Dict[int, str]:
@@ -357,7 +399,10 @@ async def export_metrics(*, input_mongo_uri: str, input_database_name: str, outp
                 environment_name=os.getenv("TARGET_ENVIRONMENT_NAME"),
                 version_info=load_version_info(),
                 enable_metrics=True,
-                default_country_of_user=Country.UNSPECIFIED
+                default_country_of_user=Country.UNSPECIFIED,
+                taxonomy_model_id=os.getenv("TAXONOMY_MODEL_ID"),
+                embeddings_model_name=os.getenv("EMBEDDINGS_MODEL_NAME"),
+                embeddings_service_name=os.getenv("EMBEDDINGS_SERVICE_NAME")
             )
         )
 
@@ -376,7 +421,8 @@ async def export_metrics(*, input_mongo_uri: str, input_database_name: str, outp
             ConversationPhaseEventExporter(metrics_repository, EventType.CONVERSATION_PHASE),
             ConversationTurnEventExporter(metrics_repository, EventType.CONVERSATION_TURN),
             ExperienceDiscoveredEventExporter(metrics_repository, EventType.EXPERIENCE_DISCOVERED),
-            ExploreExperiencesEventExporter(metrics_repository, EventType.EXPERIENCE_EXPLORED)
+            ExploreExperiencesEventExporter(metrics_repository, EventType.EXPERIENCE_EXPLORED),
+            DiscoveredWorkTypesEventExporter(metrics_repository, EventType.EXPERIENCE_DISCOVERED)
         ]
 
         # Pre-fetch user preferences
@@ -421,6 +467,10 @@ async def export_metrics(*, input_mongo_uri: str, input_database_name: str, outp
                 for exporter in exporters:
                     # Generate events - event key checking is handled inside generate_events
                     events = await exporter.generate_events(state, user_id, session_id)
+
+                    for event in events:
+                        logger.debug("Event to save event:")
+                        logger.debug(event.model_dump())
                     
                     # Update skipped count
                     skipped_existing += exporter.skipped_count
