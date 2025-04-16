@@ -5,17 +5,14 @@ from unittest.mock import AsyncMock
 from typing import cast
 from datetime import datetime, timezone
 
-from app.agent.agent_director.abstract_agent_director import AgentDirectorState, ConversationPhase
+from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.experience import ExperienceEntity
 from app.agent.explore_experiences_agent_director import ConversationPhase as CounselingPhase, ExperienceState
 from app.agent.agent_types import AgentInput, AgentOutput
-from app.agent.collect_experiences_agent import CollectExperiencesAgentState
-from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState, DiveInPhase
-from app.agent.skill_explorer_agent import SkillsExplorerAgentState
+from app.agent.explore_experiences_agent_director import DiveInPhase
 from app.app_config import ApplicationConfig
 from app.application_state import ApplicationState, IApplicationStateManager
 from app.conversation_memory.conversation_memory_types import (
-    ConversationMemoryManagerState,
     ConversationTurn
 )
 from app.metrics.application_state_metrics_recorder.recorder import ApplicationStateMetricsRecorder
@@ -37,18 +34,6 @@ def mock_metrics_service() -> IMetricsService:
             raise NotImplementedError()
 
     return MockedMetricsService()
-
-
-def get_empty_application_state(session_id: int) -> ApplicationState:
-    """Returns a clean application state"""
-    return ApplicationState(
-        session_id=session_id,
-        agent_director_state=AgentDirectorState(session_id=session_id),
-        explore_experiences_director_state=ExploreExperiencesAgentDirectorState(session_id=session_id),
-        conversation_memory_manager_state=ConversationMemoryManagerState(session_id=session_id),
-        collect_experience_state=CollectExperiencesAgentState(session_id=session_id),
-        skills_explorer_agent_state=SkillsExplorerAgentState(session_id=session_id)
-    )
 
 
 @pytest.fixture
@@ -88,12 +73,12 @@ class TestRecorderFlow:
         given_session_id = get_random_session_id()
 
         # AND a new state with some change
-        given_new_state = get_empty_application_state(given_session_id)
+        given_new_state = ApplicationState.new_state(given_session_id)
         given_new_state.agent_director_state.current_phase = ConversationPhase.COUNSELING
 
         # AND the application state manager returns an empty state
         mock_application_state_manager.get_state = AsyncMock(
-            return_value=get_empty_application_state(given_session_id))
+            return_value=ApplicationState.new_state(given_session_id))
         # AND the application state manager's save_state method will succeed
         mock_application_state_manager.save_state = AsyncMock()
 
@@ -129,7 +114,7 @@ class TestRecorderFlow:
 
         # AND the application state manager returns an empty state
         mock_application_state_manager.get_state = AsyncMock(
-            return_value=get_empty_application_state(given_session_id))
+            return_value=ApplicationState.new_state(given_session_id))
 
         # AND the application state manager's save_state method will succeed
         mock_application_state_manager.save_state = AsyncMock()
@@ -142,7 +127,7 @@ class TestRecorderFlow:
         await recorder.get_state(given_session_id)
 
         # AND a save state happens with multiple changes
-        given_new_state = get_empty_application_state(given_session_id)
+        given_new_state = ApplicationState.new_state(given_session_id)
         # Add a message turn with a user and compass message
         given_new_state.conversation_memory_manager_state.all_history.turns.append(
             ConversationTurn(
@@ -229,7 +214,7 @@ class TestRecorderFlow:
 
         # AND the application state manager returns an empty state
         mock_application_state_manager.get_state = AsyncMock(
-            return_value=get_empty_application_state(given_session_id))
+            return_value=ApplicationState.new_state(given_session_id))
         recorder = ApplicationStateMetricsRecorder(
             application_state_manager=mock_application_state_manager,
             metrics_service=mock_metrics_service
@@ -241,7 +226,7 @@ class TestRecorderFlow:
         await recorder.get_state(given_session_id)
 
         # AND a save state happens with a new state
-        given_new_state = get_empty_application_state(given_session_id)
+        given_new_state = ApplicationState.new_state(given_session_id)
         given_new_state.agent_director_state.current_phase = ConversationPhase.COUNSELING
         await recorder.save_state(given_new_state, given_user_id)
 
@@ -262,7 +247,7 @@ class TestRecorderFlow:
 
         # AND the application state manager returns an empty state
         mock_application_state_manager.get_state = AsyncMock(
-            return_value=get_empty_application_state(given_session_id))
+            return_value=ApplicationState.new_state(given_session_id))
 
         # AND the application state manager's save_state method will succeed
         mock_application_state_manager.save_state = AsyncMock()
@@ -275,7 +260,7 @@ class TestRecorderFlow:
         await recorder.get_state(given_session_id)
 
         # AND a save state happens with an invalid state that will cause the ApplicationStatesOfInterest.from_state method to raise an error
-        given_new_state = get_empty_application_state(given_session_id)
+        given_new_state = ApplicationState.new_state(given_session_id)
         # noinspection PyTypeChecker
         given_new_state.agent_director_state.current_phase = "INVALID_PHASE"
         await recorder.save_state(given_new_state, given_user_id)
@@ -405,14 +390,14 @@ class TestRecordMetricEventsFunction:
             experiences_explored_count=0,
             experiences_discovered_count=0,
             work_types_discovered=[]
-        )   
+        )
         # AND a current state with 1 user message and 1 compass message
         given_current_state = ApplicationStatesOfInterest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
-            compass_message_count=1, # no change
-            user_message_count=2, # no change
-            experiences_explored_count=0, 
+            compass_message_count=1,  # no change
+            user_message_count=2,  # no change
+            experiences_explored_count=0,
             experiences_discovered_count=0,
             work_types_discovered=[]
         )
@@ -608,7 +593,7 @@ class TestRecordMetricEventsFunction:
             counseling_phase="NOT_STARTED",
             compass_message_count=0,
             user_message_count=0,
-            experiences_explored_count=5, # no change
+            experiences_explored_count=5,  # no change
             experiences_discovered_count=0,
             work_types_discovered=[]
         )
@@ -621,8 +606,6 @@ class TestRecordMetricEventsFunction:
 
         # THEN the metrics service should not have been called
         mock_metrics_service.bulk_record_events.assert_not_called()
-        
-        
 
     @pytest.mark.asyncio
     async def test_record_metric_events_experiences_discovered_from_empty_state(
@@ -677,9 +660,9 @@ class TestRecordMetricEventsFunction:
 
     @pytest.mark.asyncio
     async def test_record_experience_discovered_event_with_no_change(self, mock_metrics_service: IMetricsService,
-            mock_application_state_manager: IApplicationStateManager,
-            setup_application_config: ApplicationConfig
-    ):
+                                                                     mock_application_state_manager: IApplicationStateManager,
+                                                                     setup_application_config: ApplicationConfig
+                                                                     ):
         # GIVEN a metrics service that successfully records events
         mock_metrics_service.bulk_record_events = AsyncMock()
         # AND a session_id
@@ -704,7 +687,7 @@ class TestRecordMetricEventsFunction:
             compass_message_count=0,
             user_message_count=0,
             experiences_explored_count=0,
-            experiences_discovered_count=3, # no change
+            experiences_discovered_count=3,  # no change
             work_types_discovered=[]
         )
         # WHEN the record_metric_events function is called with a previous state, current state, session_id and user_id

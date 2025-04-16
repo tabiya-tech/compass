@@ -5,7 +5,6 @@ from datetime import datetime, timezone, timedelta
 from unittest.mock import AsyncMock, Mock
 
 import pytest
-import pytest_mock
 
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.app_config import ApplicationConfig
@@ -19,7 +18,6 @@ from app.conversations.reactions.types import ReactionKind, DislikeReason, React
 from app.metrics.services.service import IMetricsService
 from app.metrics.types import MessageReactionCreatedEvent
 from common_libs.test_utilities import get_random_user_id
-from common_libs.test_utilities.mock_application_state import get_mock_application_state
 
 
 def get_mock_conversation_context(message_id: str) -> ConversationContext:
@@ -45,12 +43,12 @@ def get_mock_conversation_context(message_id: str) -> ConversationContext:
     )
 
 
-def _get_new_reaction(*, 
-    session_id: int | None = None, 
-    message_id: str | None = None,
-    kind: ReactionKind | None = None,
-    reasons: list[DislikeReason] | None = None
-) -> Reaction:
+def _get_new_reaction(*,
+                      session_id: int | None = None,
+                      message_id: str | None = None,
+                      kind: ReactionKind | None = None,
+                      reasons: list[DislikeReason] | None = None
+                      ) -> Reaction:
     """
     Returns a new reaction object with random data for testing purposes.
     If any parameters are provided, they will be used instead of random values.
@@ -63,15 +61,15 @@ def _get_new_reaction(*,
     """
     import random
     import uuid
-    
+
     # Generate random session ID if not provided
     _session_id = session_id if session_id is not None else random.randint(1, 10000)  # nosec B311 # random is used for testing purposes
     # Generate random message ID if not provided 
     _message_id = message_id if message_id is not None else str(uuid.uuid4())
-    
+
     # Use provided kind or randomly choose one
     _kind = kind if kind is not None else random.choice(list(ReactionKind))  # nosec B311 # random is used for testing purposes
-    
+
     # Handle reasons based on kind
     _reasons = []
     if _kind == ReactionKind.DISLIKED:
@@ -81,14 +79,14 @@ def _get_new_reaction(*,
             # Choose 1-3 random reasons
             num_reasons = random.randint(1, min(3, len(list(DislikeReason))))  # nosec B311 # random is used for testing purposes
             _reasons = random.sample(list(DislikeReason), num_reasons)  # nosec B311 # random is used for testing purposes
-    
+
     # Generate a random creation timestamp within the last day
     _created_at = datetime.now(timezone.utc) - timedelta(
         hours=random.randint(0, 23),  # nosec B311 # random is used for testing purposes
         minutes=random.randint(0, 59),  # nosec B311 # random is used for testing purposes
         seconds=random.randint(0, 59)  # nosec B311 # random is used for testing purposes
     )
-    
+
     return Reaction(
         message_id=_message_id,
         session_id=_session_id,
@@ -180,7 +178,7 @@ class TestAdd:
 
         # AND the message with the given message_id is a COMPASS message in the conversation context
         _mock_application_state_manager.get_state = AsyncMock(
-            return_value=get_mock_application_state(self._given_session_id))
+            return_value=ApplicationState.new_state(self._given_session_id))
         given_conversation_context = get_mock_conversation_context(self._given_message_id)
         _mock_conversation_memory_manager.get_conversation_context = AsyncMock(return_value=given_conversation_context)
         _mock_conversation_memory_manager.set_state = Mock(return_value=None)
@@ -231,7 +229,7 @@ class TestAdd:
 
         # AND the message with the given message_id is a COMPASS message in the conversation context
         _mock_application_state_manager.get_state = AsyncMock(
-            return_value=get_mock_application_state(self._given_session_id))
+            return_value=ApplicationState.new_state(self._given_session_id))
         given_conversation_context = get_mock_conversation_context(self._given_message_id)
         _mock_conversation_memory_manager.get_conversation_context = AsyncMock(return_value=given_conversation_context)
         _mock_conversation_memory_manager.set_state = Mock(return_value=None)
@@ -270,8 +268,7 @@ class TestAdd:
     async def test_add_reaction_to_user_message_raises_error(self, _mock_reaction_repository: IReactionRepository,
                                                              _mock_application_state_manager: IApplicationStateManager,
                                                              _mock_conversation_memory_manager: IConversationMemoryManager,
-                                                             _mock_metrics_service: IMetricsService,
-                                                             mocker: pytest_mock.MockerFixture):
+                                                             _mock_metrics_service: IMetricsService):
         # GIVEN a liked reaction
         given_reaction = _get_new_reaction(
             session_id=self._given_session_id,
@@ -283,7 +280,7 @@ class TestAdd:
 
         # AND the message with the given message_id is a USER message in the conversation context
         _mock_application_state_manager.get_state = AsyncMock(
-            return_value=get_mock_application_state(self._given_session_id))
+            return_value=ApplicationState.new_state(self._given_session_id))
         _mock_conversation_memory_manager.set_state = Mock(return_value=None)
         _mock_conversation_memory_manager.is_user_message = AsyncMock(return_value=True)
 
@@ -305,8 +302,7 @@ class TestAdd:
     async def test_add_repository_throws_an_error(self, _mock_reaction_repository: IReactionRepository,
                                                   _mock_application_state_manager: IApplicationStateManager,
                                                   _mock_conversation_memory_manager: IConversationMemoryManager,
-                                                  _mock_metrics_service: IMetricsService,
-                                                  mocker: pytest_mock.MockerFixture):
+                                                  _mock_metrics_service: IMetricsService):
         # GIVEN the repository.add throws some error
         given_error = Exception("Some error")
         _mock_reaction_repository.add = AsyncMock(side_effect=given_error)
@@ -322,7 +318,7 @@ class TestAdd:
 
         # AND the message with the given message_id is a COMPASS message in the conversation context
         _mock_application_state_manager.get_state = AsyncMock(
-            return_value=get_mock_application_state(self._given_session_id))
+            return_value=ApplicationState.new_state(self._given_session_id))
         _mock_conversation_memory_manager.set_state = Mock(return_value=None)
         _mock_conversation_memory_manager.is_user_message = AsyncMock(return_value=False)
 
@@ -347,8 +343,7 @@ class TestAdd:
     async def test_add_application_state_manager_throws_an_error(self, _mock_reaction_repository: IReactionRepository,
                                                                  _mock_application_state_manager: IApplicationStateManager,
                                                                  _mock_conversation_memory_manager: IConversationMemoryManager,
-                                                                 _mock_metrics_service: IMetricsService,
-                                                                 mocker: pytest_mock.MockerFixture):
+                                                                 _mock_metrics_service: IMetricsService):
         # GIVEN the application_state_manager.get_state throws some error
         given_error = Exception("Some error")
         _mock_application_state_manager.get_state = AsyncMock(side_effect=given_error)
@@ -389,8 +384,7 @@ class TestDelete:
     async def test_delete_success(self, _mock_reaction_repository: IReactionRepository,
                                   _mock_application_state_manager: IApplicationStateManager,
                                   _mock_conversation_memory_manager: IConversationMemoryManager,
-                                  _mock_metrics_service: IMetricsService,
-                                  mocker: pytest_mock.MockerFixture):
+                                  _mock_metrics_service: IMetricsService):
         # GIVEN the repository will delete successfully
         _mock_reaction_repository.delete = AsyncMock()
 

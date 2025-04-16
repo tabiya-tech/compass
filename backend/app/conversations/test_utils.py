@@ -2,19 +2,14 @@ import logging
 
 import pytest
 
-from app.agent.agent_director.abstract_agent_director import AgentDirectorState, ConversationPhase
-from app.agent.collect_experiences_agent import CollectExperiencesAgentState
+from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.experience import WorkType, ExperienceEntity
-from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState, ExperienceState, \
-    DiveInPhase
-from app.agent.skill_explorer_agent import SkillsExplorerAgentState
+from app.agent.explore_experiences_agent_director import ExperienceState, DiveInPhase
 from app.application_state import ApplicationState
-from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
 from app.conversations.constants import BEGINNING_CONVERSATION_PERCENTAGE, FINISHED_CONVERSATION_PERCENTAGE, \
     COLLECT_EXPERIENCES_PERCENTAGE, DIVE_IN_EXPERIENCES_PERCENTAGE
 from app.conversations.types import ConversationPhaseResponse, CurrentConversationPhaseResponse
 from app.conversations.utils import get_current_conversation_phase_response
-from app.countries import Country
 from app.agent.explore_experiences_agent_director import ConversationPhase as CounselingConversationPhase
 from common_libs.test_utilities import get_random_session_id
 
@@ -26,23 +21,6 @@ all_work_types = [
     WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK,
     WorkType.UNSEEN_UNPAID
 ]
-
-
-def _get_application_state(session_id: int) -> ApplicationState:
-    return ApplicationState(
-        session_id=session_id,
-        agent_director_state=AgentDirectorState(session_id=session_id),
-        explore_experiences_director_state=ExploreExperiencesAgentDirectorState(
-            session_id=session_id,
-            country_of_user=Country.UNSPECIFIED),
-        conversation_memory_manager_state=ConversationMemoryManagerState(session_id=session_id),
-        collect_experience_state=CollectExperiencesAgentState(
-            session_id=session_id,
-            country_of_user=Country.UNSPECIFIED),
-        skills_explorer_agent_state=SkillsExplorerAgentState(
-            session_id=session_id,
-            country_of_user=Country.UNSPECIFIED)
-    )
 
 
 def _get_experience_entity() -> ExperienceEntity:
@@ -57,7 +35,7 @@ class TestConversationPhase:
         given_session_id = get_random_session_id()
 
         # AND a brand-new application sate
-        application_state = _get_application_state(given_session_id)
+        application_state = ApplicationState.new_state(session_id=given_session_id)
 
         # WHEN the conversation phase is calculated
         conversation_phase = get_current_conversation_phase_response(application_state, logger)
@@ -73,7 +51,7 @@ class TestConversationPhase:
         given_session_id = get_random_session_id()
 
         # AND a completed conversation state
-        application_state = _get_application_state(given_session_id)
+        application_state = ApplicationState.new_state(session_id=given_session_id)
         application_state.agent_director_state.current_phase = ConversationPhase.ENDED
 
         # WHEN the conversation phase is calculated
@@ -97,7 +75,7 @@ class TestConversationPhase:
         given_session_id = get_random_session_id()
 
         # AND a collect experiences phase with n explored work types
-        application_state = _get_application_state(given_session_id)
+        application_state = ApplicationState.new_state(session_id=given_session_id)
         application_state.agent_director_state.current_phase = ConversationPhase.COUNSELING
         application_state.collect_experience_state.explored_types = all_work_types[:explored_work_types]
 
@@ -150,7 +128,7 @@ class TestConversationPhase:
             )
 
         # and we are in dive in phase with n explored and (10 - n) unexplored experiences.
-        application_state = _get_application_state(given_session_id)
+        application_state = ApplicationState.new_state(session_id=given_session_id)
         application_state.agent_director_state.current_phase = ConversationPhase.COUNSELING
         application_state.explore_experiences_director_state.conversation_phase = CounselingConversationPhase.DIVE_IN
         application_state.explore_experiences_director_state.experiences_state = given_experiences_state
