@@ -19,9 +19,8 @@ async def generate(*, max_iterations: int,
     :param max_iterations: The maximum number of iterations for the conversions.
     :param execute_simulated_user: A function that is called to get output from the simulated user.
     :param execute_evaluated_agent: A function that is called to get output from the agent.
-    :param is_finished: A function to indicate that the conversation finished, based on the output
+    :param is_finished: A function to indicate that the conversation is finished, based on the output
         from the executed agent.
-    :param caplog: The log capture fixture.
     :return: The full record of the conversation.
     """
     conversation = []
@@ -31,8 +30,9 @@ async def generate(*, max_iterations: int,
         agent_output = await execute_evaluated_agent(agent_input=AgentInput(message=simulated_user_output))
         message_for_user = agent_output.message_for_user
         logger.info(f'Evaluated Agent: {message_for_user}')
-        conversation.append(
-            ConversationRecord(message=message_for_user, actor=Actor.EVALUATED_AGENT))
+        if message_for_user is None or message_for_user.strip() == "":
+            raise ValueError('The evaluated agent did not return a message for the user.')
+        conversation.append(ConversationRecord(message=message_for_user, actor=Actor.EVALUATED_AGENT))
         # Checks whether the chatbot is done. And finishes the loop if so.
         if is_finished(agent_output=agent_output):
             logger.info(f'Conversation finished earlier, after {i} out of {max_iterations} iterations.')
