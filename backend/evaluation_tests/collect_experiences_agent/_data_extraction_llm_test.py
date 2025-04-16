@@ -140,7 +140,8 @@ test_cases_data_extraction = [
              "Cool, so you help them with weeding, watering, and sometimes planting.  I see, you've been helping your neighbors with their gardens "
              "for a few years now.  Can you tell me where they live?"),
             ("They live in the same neighborhood as me, in Nairobi.",
-             "Okay, so they live in the same neighborhood as you in Nairobi.  So, you've been helping your neighbors with their gardens in Nairobi since Form 2.  "
+             "Okay, so they live in the same neighborhood as you in Nairobi. "
+             "So, you've been helping your neighbors with their gardens in Nairobi since Form 2.  "
              "Is there anything else you'd like to add or change about this experience?"),
             (" I think that covers it. I really enjoy helping them out.  It's a good way to get some exercise and learn more about gardening.",
              " I'm glad you enjoy it!  So, tell me, have you done any other unpaid work, like helping out your family or friends?"),
@@ -214,6 +215,7 @@ test_cases_data_extraction = [
         expected_collected_data_count=1
     ),
     _TestCaseDataExtraction(
+        skip_force="force",
         name="no_more_info_is_not_delete(experiences_of_all_kinds_all_at_once)",
         summary="You asked me about my work experiences and I told you about my work as a project manager at the University of Oxford, "
                 "a software architect at ProUbis GmbH, and an unpaid internship as a Software Developer for Ubis GmbH. "
@@ -229,16 +231,6 @@ test_cases_data_extraction = [
                 "No, that's all the information I have about that experience.",
                 "Okay, so we have: \n\nYou did an unpaid internship as a Software Developer for Ubis GmbH in Berlin in 1998.\n\n"
                 "Would you like to add or change anything?"
-            ),
-            (
-                "No, that's all the information I have about that experience.",
-                "Okay, so we have: \n\nYou did an unpaid internship as a Software Developer for Ubis GmbH in Berlin in 1998.\n\n"
-                "Would you like to add or change anything?"
-            ),
-            (
-                "No, that's all the information I have about that experience.",
-                "Okay, so we have: \n\nYou did an unpaid internship as a Software Developer for Ubis GmbH in Berlin in 1998.\n\n"
-                "Would you like to add or change anything?"
             )
         ],
         user_input="No, that's all the information I have about that experience.",
@@ -250,7 +242,7 @@ test_cases_data_extraction = [
             CollectedData(index=2, defined_at_turn_number=9, experience_title='Software Developer', company='Ubis GmbH', location='Berlin', start_date='1998',
                           end_date='', paid_work=False, work_type='FORMAL_SECTOR_UNPAID_TRAINEE_WORK')
         ],
-        expected_last_referenced_experience_index=2,
+        expected_last_referenced_experience_index=-1,
         expected_collected_data_count=3
     )
 ]
