@@ -8,6 +8,7 @@ from app.agent.agent_director.abstract_agent_director import AgentDirectorState
 from app.agent.collect_experiences_agent import CollectExperiencesAgentState
 from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState
 from app.agent.skill_explorer_agent import SkillsExplorerAgentState
+from app.agent.welcome_agent import WelcomeAgentState
 from app.application_state import ApplicationState, ApplicationStateStore
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
 
@@ -52,6 +53,7 @@ class JSONApplicationStateStore(ApplicationStateStore):
                 return ApplicationState(
                     session_id=session_id,
                     agent_director_state=AgentDirectorState.from_document(state_dict['agent_director_state']),
+                    welcome_agent_state=WelcomeAgentState.from_document(state_dict['welcome_agent_state']),
                     explore_experiences_director_state=ExploreExperiencesAgentDirectorState.from_document(
                         state_dict['explore_experiences_director_state']),
                     conversation_memory_manager_state=ConversationMemoryManagerState.from_document(
