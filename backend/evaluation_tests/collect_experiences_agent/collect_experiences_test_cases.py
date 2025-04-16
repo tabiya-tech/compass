@@ -224,7 +224,6 @@ test_cases = [
         country_of_user=Country.KENYA
     ),
     CollectExperiencesAgentTestCase(
-        skip_force="force",
         name='hobbyist_e2e',
         simulated_user_prompt=dedent("""
             You have a single hobby, blogging about your travels. You have been doing this since 2018 and have a small following.
