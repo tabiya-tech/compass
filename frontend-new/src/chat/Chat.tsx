@@ -1,4 +1,4 @@
-import React, { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ChatService from "src/chat/ChatService/ChatService";
 import ChatList from "src/chat/chatList/ChatList";
 import { IChatMessage } from "./Chat.types";
@@ -39,6 +39,9 @@ export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
 // so in worst case scenario the inactivity backdrop will show after TIMEOUT + TIMEOUT/3 of inactivity
 export const CHECK_INACTIVITY_INTERVAL = INACTIVITY_TIMEOUT + INACTIVITY_TIMEOUT / 3;
+
+export const FEEDBACK_NOTIFICATION_DELAY = 30 * 60 * 1000; // In milliseconds
+
 const uniqueId = "b7ea1e82-0002-432d-a768-11bdcd186e1d";
 export const DATA_TEST_ID = {
   CONTAINER: `container-${uniqueId}`,
@@ -111,6 +114,20 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       setMessages((prevMessages) => prevMessages.filter((message) => message.type !== ChatMessageType.TYPING));
     }
   };
+
+  const timeUntilFeedbackNotification : number | null = useMemo(() => {
+    // If there are no messages, we can't calculate the time
+    if (messages.length === 0) return null;
+
+    // Get timestamp from the first message in the conversation
+    const firstMessageTimestamp = messages[0].sent_at;
+    if (!firstMessageTimestamp) return null;
+
+    const conversationStartTime = new Date(firstMessageTimestamp).getTime();
+    const targetTime = conversationStartTime + FEEDBACK_NOTIFICATION_DELAY;
+    const currentTime = Date.now();
+    return Math.max(0, targetTime - currentTime);
+  }, [messages]);
 
   /**
    * --- Service handlers ---
@@ -398,10 +415,12 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
               <ChatHeader
                 notifyOnLogout={handleLogout}
                 startNewConversation={() => setNewConversationDialog(true)}
-                notifyOnExperiencesDrawerOpen={handleOpenExperiencesDrawer}
                 experiencesExplored={exploredExperiences}
                 exploredExperiencesNotification={exploredExperiencesNotification}
                 setExploredExperiencesNotification={setExploredExperiencesNotification}
+                conversationCompleted={conversationCompleted}
+                timeUntilNotification={timeUntilFeedbackNotification}
+                progressPercentage={currentPhase.percentage}
               />
             </Box>
             <Box paddingBottom={theme.spacing(theme.tabiyaSpacing.lg)} paddingX={theme.spacing(theme.tabiyaSpacing.md)}>
