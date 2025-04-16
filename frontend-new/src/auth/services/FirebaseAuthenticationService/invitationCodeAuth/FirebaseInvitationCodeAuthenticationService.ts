@@ -44,10 +44,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
    * @throws {RestAPIError} If the invitation code is invalid or has wrong type
    */
   async login(code: string): Promise<string> {
-    const firebaseErrorFactory = getFirebaseErrorFactory(
-      "InvitationCodeAuthService",
-      "handleInvitationCodeLogin"
-    );
+    const firebaseErrorFactory = getFirebaseErrorFactory("InvitationCodeAuthService", "handleInvitationCodeLogin");
     let userCredential;
     let invitation;
 
@@ -58,7 +55,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
     if (invitation.invitation_type !== InvitationType.LOGIN) {
       throw firebaseErrorFactory(
         FirebaseErrorCodes.INVALID_INVITATION_TYPE,
-        `the invitation code is not for login: ${code}`,
+        `the invitation code is not for login: ${code}`
       );
     }
     try {
@@ -84,7 +81,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
     if (!_user) {
       throw firebaseErrorFactory(
         FirebaseErrorCodes.USER_NOT_FOUND,
-        `user could not be extracted from token: ...${token.slice(-20)}`,
+        `user could not be extracted from token: ...${token.slice(-20)}`
       );
     }
 
@@ -120,6 +117,11 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
    */
   async logout(): Promise<void> {
     await this.stdFirebaseAuthServiceInstance.logout();
+    // Clear feedback notification on logout since anonymous users can't log in with the same user id again.
+    const user = this.authenticationStateService.getUser();
+    if (user) {
+      PersistentStorageService.clearSeenFeedbackNotification(user.id);
+    }
     await super.onSuccessfulLogout();
   }
 
@@ -175,11 +177,11 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
     const { isValid: isValidFirebaseToken, failureCause: firebaseTokenValidationFailureCause } =
       this.stdFirebaseAuthServiceInstance.isFirebaseTokenValid(
         decodedToken as FirebaseToken,
-        FirebaseTokenProvider.ANONYMOUS,
+        FirebaseTokenProvider.ANONYMOUS
       );
     if (!isValidFirebaseToken) {
       console.debug(
-        `token is not a valid firebase token: ${firebaseTokenValidationFailureCause} - ${formatTokenForLogging(token)}`,
+        `token is not a valid firebase token: ${firebaseTokenValidationFailureCause} - ${formatTokenForLogging(token)}`
       );
       return { isValid: false, decodedToken: null, failureCause: firebaseTokenValidationFailureCause! };
     }

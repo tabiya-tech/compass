@@ -21,15 +21,14 @@ import { DATA_TEST_ID as INFO_DRAWER_DATA_TEST_ID } from "src/info/Info";
 import { ChatProvider } from "src/chat/ChatContext";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import * as Sentry from "@sentry/react";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import React from "react";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import { FEEDBACK_NOTIFICATION_DELAY } from "src/chat/Chat";
+import { SessionError } from "src/error/commonErrors";
 
 // Mock PersistentStorageService
-jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => ({
-  PersistentStorageService: {
-    getAccountConverted: jest.fn(),
-    setAccountConverted: jest.fn(),
-    clearAccountConverted: jest.fn(),
-  },
-}));
+jest.mock("src/app/PersistentStorageService/PersistentStorageService");
 
 // mock the ContextMenu
 jest.mock("src/theme/ContextMenu/ContextMenu", () => {
@@ -84,6 +83,19 @@ jest.mock("src/auth/components/anonymousAccountConversionDialog/AnonymousAccount
   };
 });
 
+// mock the snackbar
+jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
+  const actual = jest.requireActual("src/theme/SnackbarProvider/SnackbarProvider");
+  return {
+    ...actual,
+    __esModule: true,
+    useSnackbar: jest.fn().mockReturnValue({
+      enqueueSnackbar: jest.fn(),
+      closeSnackbar: jest.fn(),
+    }),
+  };
+});
+
 const renderWithChatProvider = (child: React.ReactNode) => {
   render(<ChatProvider handleOpenExperiencesDrawer={jest.fn}>{child}</ChatProvider>);
 };
@@ -93,6 +105,7 @@ describe("ChatHeader", () => {
     // set sentry as uninitialized by default
     (Sentry.isInitialized as jest.Mock).mockReturnValue(false);
     (ContextMenu as jest.Mock).mockClear();
+    resetAllMethodMocks(UserPreferencesStateService.getInstance());
     jest.clearAllMocks();
   });
 
@@ -103,18 +116,22 @@ describe("ChatHeader", () => {
     // GIVEN a ChatHeader component
     const givenNotifyOnLogout = jest.fn();
     const givenStartNewConversation = jest.fn();
-    const givenNotifyOnExperiencesDrawerOpen = jest.fn();
     const givenNumberOfExploredExperiences = 1;
     const givenChatHeader = (
       <ChatHeader
         notifyOnLogout={givenNotifyOnLogout}
         startNewConversation={givenStartNewConversation}
-        notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
         experiencesExplored={givenNumberOfExploredExperiences}
         exploredExperiencesNotification={givenExploredExperiencesNotification}
         setExploredExperiencesNotification={jest.fn()}
+        conversationCompleted={false}
+        progressPercentage={0}
+        timeUntilNotification={null}
       />
     );
+    // AND a user is logged in
+    const mockUser = { id: "123", name: "Foo Bar", email: "foo@bar.baz" };
+    jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue(mockUser);
 
     // WHEN the chat header is rendered
     renderWithChatProvider(givenChatHeader);
@@ -153,10 +170,12 @@ describe("ChatHeader", () => {
       <ChatHeader
         notifyOnLogout={jest.fn()}
         startNewConversation={jest.fn()}
-        notifyOnExperiencesDrawerOpen={jest.fn()}
         experiencesExplored={0}
         exploredExperiencesNotification={false}
         setExploredExperiencesNotification={jest.fn()}
+        conversationCompleted={false}
+        progressPercentage={0}
+        timeUntilNotification={null}
       />
     );
     renderWithChatProvider(givenChatHeader);
@@ -172,16 +191,17 @@ describe("ChatHeader", () => {
   describe("chatHeader action tests", () => {
     const givenNotifyOnLogout = jest.fn();
     const givenStartNewConversation = jest.fn();
-    const givenNotifyOnExperiencesDrawerOpen = jest.fn();
     const givenChatHeader = (
       <ChatProvider handleOpenExperiencesDrawer={jest.fn}>
         <ChatHeader
           notifyOnLogout={givenNotifyOnLogout}
           startNewConversation={givenStartNewConversation}
-          notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
           experiencesExplored={0}
           exploredExperiencesNotification={true}
           setExploredExperiencesNotification={jest.fn()}
+          conversationCompleted={false}
+          progressPercentage={0}
+          timeUntilNotification={null}
         />
       </ChatProvider>
     );
@@ -194,10 +214,12 @@ describe("ChatHeader", () => {
         <ChatHeader
           notifyOnLogout={givenNotifyOnLogout}
           startNewConversation={givenStartNewConversation}
-          notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
           experiencesExplored={0}
           exploredExperiencesNotification={true}
           setExploredExperiencesNotification={jest.fn()}
+          conversationCompleted={false}
+          progressPercentage={0}
+          timeUntilNotification={null}
         />
       );
       // AND the chat header is rendered
@@ -228,10 +250,12 @@ describe("ChatHeader", () => {
         <ChatHeader
           notifyOnLogout={givenNotifyOnLogout}
           startNewConversation={givenStartNewConversation}
-          notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
           experiencesExplored={0}
           exploredExperiencesNotification={true}
           setExploredExperiencesNotification={jest.fn()}
+          conversationCompleted={false}
+          progressPercentage={0}
+          timeUntilNotification={null}
         />
       );
       // AND the chat header is rendered
@@ -277,10 +301,12 @@ describe("ChatHeader", () => {
         <ChatHeader
           notifyOnLogout={givenNotifyOnLogout}
           startNewConversation={givenStartNewConversation}
-          notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
           experiencesExplored={0}
           exploredExperiencesNotification={true}
           setExploredExperiencesNotification={jest.fn()}
+          conversationCompleted={false}
+          progressPercentage={0}
+          timeUntilNotification={null}
         />
       );
 
@@ -317,10 +343,12 @@ describe("ChatHeader", () => {
         <ChatHeader
           notifyOnLogout={givenNotifyOnLogout}
           startNewConversation={givenStartNewConversation}
-          notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
           experiencesExplored={0}
           exploredExperiencesNotification={false}
           setExploredExperiencesNotification={jest.fn()}
+          conversationCompleted={false}
+          progressPercentage={0}
+          timeUntilNotification={null}
         />
       );
       // AND the chat header is rendered
@@ -351,14 +379,18 @@ describe("ChatHeader", () => {
         <ChatHeader
           notifyOnLogout={jest.fn()}
           startNewConversation={jest.fn()}
-          notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
           experiencesExplored={0}
           exploredExperiencesNotification={true}
           setExploredExperiencesNotification={jest.fn()}
+          conversationCompleted={false}
+          progressPercentage={0}
+          timeUntilNotification={null}
         />
       );
       // AND the chat header is rendered
-      renderWithChatProvider(givenChatHeader);
+      render(
+        <ChatProvider handleOpenExperiencesDrawer={givenNotifyOnExperiencesDrawerOpen}>{givenChatHeader}</ChatProvider>
+      );
 
       // WHEN the experiences button is clicked
       const experiencesButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES);
@@ -379,10 +411,12 @@ describe("ChatHeader", () => {
         <ChatHeader
           notifyOnLogout={jest.fn()}
           startNewConversation={jest.fn()}
-          notifyOnExperiencesDrawerOpen={jest.fn()}
           experiencesExplored={givenExploredExperiences}
           exploredExperiencesNotification={givenExploredExperiencesNotification}
           setExploredExperiencesNotification={jest.fn()}
+          conversationCompleted={false}
+          progressPercentage={0}
+          timeUntilNotification={null}
         />
       );
       renderWithChatProvider(givenChatHeader);
@@ -409,13 +443,18 @@ describe("ChatHeader", () => {
         <ChatHeader
           notifyOnLogout={jest.fn()}
           startNewConversation={jest.fn()}
-          notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
           experiencesExplored={givenExploredExperiences}
           exploredExperiencesNotification={givenExploredExperiencesNotification}
           setExploredExperiencesNotification={jest.fn()}
+          conversationCompleted={false}
+          progressPercentage={0}
+          timeUntilNotification={null}
         />
       );
-      renderWithChatProvider(givenChatHeader);
+      // renderWithChatProvider(givenChatHeader);
+      render(
+        <ChatProvider handleOpenExperiencesDrawer={givenNotifyOnExperiencesDrawerOpen}>{givenChatHeader}</ChatProvider>
+      );
 
       // WHEN the experiences button is clicked
       const experiencesButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES);
@@ -449,10 +488,12 @@ describe("ChatHeader", () => {
         <ChatHeader
           notifyOnLogout={jest.fn()}
           startNewConversation={jest.fn()}
-          notifyOnExperiencesDrawerOpen={jest.fn()}
           experiencesExplored={0}
           exploredExperiencesNotification={false}
           setExploredExperiencesNotification={jest.fn()}
+          conversationCompleted={false}
+          progressPercentage={0}
+          timeUntilNotification={null}
         />
       );
       renderWithChatProvider(givenChatHeader);
@@ -485,10 +526,12 @@ describe("ChatHeader", () => {
         <ChatHeader
           notifyOnLogout={jest.fn()}
           startNewConversation={jest.fn()}
-          notifyOnExperiencesDrawerOpen={jest.fn()}
           experiencesExplored={0}
           exploredExperiencesNotification={false}
           setExploredExperiencesNotification={jest.fn()}
+          conversationCompleted={false}
+          progressPercentage={0}
+          timeUntilNotification={null}
         />
       );
       renderWithChatProvider(givenChatHeader);
@@ -521,15 +564,16 @@ describe("ChatHeader", () => {
         // GIVEN a ChatHeader component
         const givenNotifyOnLogout = jest.fn();
         const givenStartNewConversation = jest.fn();
-        const givenNotifyOnExperiencesDrawerOpen = jest.fn();
         const givenChatHeader = (
           <ChatHeader
             notifyOnLogout={givenNotifyOnLogout}
             startNewConversation={givenStartNewConversation}
-            notifyOnExperiencesDrawerOpen={givenNotifyOnExperiencesDrawerOpen}
             experiencesExplored={0}
             exploredExperiencesNotification={false}
             setExploredExperiencesNotification={jest.fn()}
+            conversationCompleted={false}
+            progressPercentage={0}
+            timeUntilNotification={null}
           />
         );
         // AND the chat header is rendered
@@ -603,10 +647,12 @@ describe("ChatHeader", () => {
         <ChatHeader
           notifyOnLogout={jest.fn()}
           startNewConversation={jest.fn()}
-          notifyOnExperiencesDrawerOpen={jest.fn()}
           experiencesExplored={0}
           exploredExperiencesNotification={false}
           setExploredExperiencesNotification={jest.fn()}
+          conversationCompleted={false}
+          progressPercentage={0}
+          timeUntilNotification={null}
         />
       );
 
@@ -646,10 +692,12 @@ describe("ChatHeader", () => {
         <ChatHeader
           notifyOnLogout={jest.fn()}
           startNewConversation={jest.fn()}
-          notifyOnExperiencesDrawerOpen={jest.fn()}
           experiencesExplored={0}
           exploredExperiencesNotification={false}
           setExploredExperiencesNotification={jest.fn()}
+          conversationCompleted={false}
+          progressPercentage={0}
+          timeUntilNotification={null}
         />
       );
 
@@ -688,10 +736,12 @@ describe("ChatHeader", () => {
         <ChatHeader
           notifyOnLogout={jest.fn()}
           startNewConversation={jest.fn()}
-          notifyOnExperiencesDrawerOpen={jest.fn()}
           experiencesExplored={0}
           exploredExperiencesNotification={false}
           setExploredExperiencesNotification={jest.fn()}
+          conversationCompleted={false}
+          progressPercentage={0}
+          timeUntilNotification={null}
         />
       );
 
@@ -720,10 +770,12 @@ describe("ChatHeader", () => {
           <ChatHeader
             notifyOnLogout={jest.fn()}
             startNewConversation={jest.fn()}
-            notifyOnExperiencesDrawerOpen={jest.fn()}
             experiencesExplored={0}
             exploredExperiencesNotification={false}
             setExploredExperiencesNotification={jest.fn()}
+            conversationCompleted={false}
+            progressPercentage={0}
+            timeUntilNotification={null}
           />
         </ChatProvider>
       );
@@ -755,10 +807,12 @@ describe("ChatHeader", () => {
           <ChatHeader
             notifyOnLogout={jest.fn()}
             startNewConversation={jest.fn()}
-            notifyOnExperiencesDrawerOpen={jest.fn()}
             experiencesExplored={0}
             exploredExperiencesNotification={false}
             setExploredExperiencesNotification={jest.fn()}
+            conversationCompleted={false}
+            progressPercentage={0}
+            timeUntilNotification={null}
           />
         </ChatProvider>
       );
@@ -787,6 +841,151 @@ describe("ChatHeader", () => {
         expect.objectContaining({ isOpen: false }),
         expect.anything()
       );
+    });
+  });
+
+  describe("Feedback notification", () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      mockBrowserIsOnLine(true);
+      // Reset mocks
+      jest.clearAllMocks();
+      // Mock PersistentStorageService
+      jest.spyOn(PersistentStorageService, "hasSeenFeedbackNotification").mockReturnValue(false);
+      jest.spyOn(PersistentStorageService, "setSeenFeedbackNotification").mockImplementation();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    test("should log an error and exit if no current user exists", () => {
+      // GIVEN no active user
+      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue(null);
+      // AND experiences explored
+      const givenExploredExperiences = 4;
+      // AND the time until notification
+      const givenTimeUntilNotification = FEEDBACK_NOTIFICATION_DELAY;
+      // WHEN the component is rendered
+      renderWithChatProvider(
+        <ChatHeader
+          notifyOnLogout={jest.fn()}
+          startNewConversation={jest.fn()}
+          experiencesExplored={givenExploredExperiences}
+          exploredExperiencesNotification={false}
+          setExploredExperiencesNotification={jest.fn()}
+          conversationCompleted={false}
+          progressPercentage={50}
+          timeUntilNotification={givenTimeUntilNotification}
+        />
+      );
+      // AND the time is advanced by the given time until notification
+      jest.advanceTimersByTime(givenTimeUntilNotification);
+      // THEN expect no feedback notification to be shown
+      expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalled();
+      // AND expect an error to be logged
+      expect(console.error).toHaveBeenCalledWith(new SessionError("User is not available"));
+    });
+
+    test("should show feedback notification after 30 minutes when conversation progress is <= 66%", () => {
+      // GIVEN mock user
+      const mockUser = { id: "123", name: "Foo Bar", email: "foo@bar.baz" };
+      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue(mockUser);
+      // AND experiences explored
+      const givenExploredExperiences = 4;
+      // AND the time until notification
+      const givenTimeUntilNotification = FEEDBACK_NOTIFICATION_DELAY;
+
+      // WHEN the component is rendered
+      renderWithChatProvider(
+        <ChatHeader
+          notifyOnLogout={jest.fn()}
+          startNewConversation={jest.fn()}
+          experiencesExplored={givenExploredExperiences}
+          exploredExperiencesNotification={false}
+          setExploredExperiencesNotification={jest.fn()}
+          conversationCompleted={false}
+          progressPercentage={50}
+          timeUntilNotification={givenTimeUntilNotification}
+        />
+      );
+      // AND the time is advanced by the given time until notification
+      jest.advanceTimersByTime(givenTimeUntilNotification);
+
+      // THEN expect the feedback notification to be shown
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          variant: "info",
+          persist: true,
+          autoHideDuration: null,
+        })
+      );
+      // AND no errors or warnings to be shown
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
+    });
+
+    test("should not show feedback notification if conversation progress is > 66%", () => {
+      // GIVEN mock user
+      const mockUser = { id: "123", name: "", email: "" };
+      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue(mockUser);
+      // AND experiences explored
+      const givenExploredExperiences = 4;
+      // AND the time until notification
+      const givenTimeUntilNotification = FEEDBACK_NOTIFICATION_DELAY;
+
+      // WHEN the component is rendered
+      renderWithChatProvider(
+        <ChatHeader
+          notifyOnLogout={jest.fn()}
+          startNewConversation={jest.fn()}
+          experiencesExplored={givenExploredExperiences}
+          exploredExperiencesNotification={false}
+          setExploredExperiencesNotification={jest.fn()}
+          conversationCompleted={false}
+          progressPercentage={70}
+          timeUntilNotification={givenTimeUntilNotification}
+        />
+      );
+      // AND the time is advanced by the given time until notification
+      jest.advanceTimersByTime(givenTimeUntilNotification);
+
+      // THEN expect no notification to be shown
+      expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalled();
+      // AND no errors or warnings to be shown
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
+    });
+
+    test("should not show feedback notification if it is already shown for current user", () => {
+      // GIVEN mock user
+      const mockUser = { id: "123", name: "", email: "" };
+      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue(mockUser);
+      // AND mock feedback notification to return true (already shown)
+      jest.spyOn(PersistentStorageService, "hasSeenFeedbackNotification").mockReturnValue(true);
+      // AND experiences explored
+      const givenExploredExperiences = 4;
+
+      // WHEN the component is rendered
+      renderWithChatProvider(
+        <ChatHeader
+          notifyOnLogout={jest.fn()}
+          startNewConversation={jest.fn()}
+          experiencesExplored={givenExploredExperiences}
+          exploredExperiencesNotification={false}
+          setExploredExperiencesNotification={jest.fn()}
+          conversationCompleted={false}
+          progressPercentage={50}
+          timeUntilNotification={0}
+        />
+      );
+
+      // THEN expect no notification to be shown
+      expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalled();
+      // AND no errors or warnings to be shown
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
     });
   });
 });

@@ -1,4 +1,4 @@
-import React, { SetStateAction, useContext, useEffect, useMemo, useState } from "react";
+import React, { SetStateAction, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -15,14 +15,20 @@ import AnonymousAccountConversionDialog from "src/auth/components/anonymousAccou
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import { useChatContext } from "src/chat/ChatContext";
 import InfoDrawer from "src/info/Info";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import CustomLink from "src/theme/CustomLink/CustomLink";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import { SessionError } from "src/error/commonErrors";
 
 export type ChatHeaderProps = {
   notifyOnLogout: () => void;
   startNewConversation: () => void;
-  notifyOnExperiencesDrawerOpen: () => void;
   experiencesExplored: number;
   exploredExperiencesNotification: boolean;
   setExploredExperiencesNotification: React.Dispatch<SetStateAction<boolean>>;
+  conversationCompleted: boolean;
+  timeUntilNotification: number | null;
+  progressPercentage: number;
 };
 
 const uniqueId = "7413b63a-887b-4f41-b930-89e9770db12b";
@@ -36,6 +42,7 @@ export const DATA_TEST_ID = {
   CHAT_HEADER_BUTTON_EXPERIENCES: `chat-header-button-experiences-${uniqueId}`,
   CHAT_HEADER_BUTTON_FEEDBACK: `chat-header-button-feedback-${uniqueId}`,
   CHAT_HEADER_ICON_FEEDBACK: `chat-header-icon-feedback-${uniqueId}`,
+  CHAT_HEADER_FEEDBACK_LINK: `chat-header-feedback-link-${uniqueId}`,
 };
 
 export const MENU_ITEM_ID = {
@@ -65,24 +72,28 @@ export const FEEDBACK_FORM_TEXT = {
 const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   notifyOnLogout,
   startNewConversation,
-  notifyOnExperiencesDrawerOpen,
   experiencesExplored,
   exploredExperiencesNotification,
   setExploredExperiencesNotification,
+  conversationCompleted,
+  timeUntilNotification,
+  progressPercentage,
 }) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [showConversionDialog, setShowConversionDialog] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const feedbackTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const isOnline = useContext(IsOnlineContext);
   const user = authenticationStateService.getInstance().getUser();
   const isAnonymous = !user?.name || !user?.email;
-  const { setIsAccountConverted } = useChatContext();
+  const { setIsAccountConverted, handleOpenExperiencesDrawer } = useChatContext();
   const [sentryEnabled, setSentryEnabled] = useState(false);
 
   const handleViewExperiences = () => {
-    notifyOnExperiencesDrawerOpen();
+    handleOpenExperiencesDrawer();
     setExploredExperiencesNotification(false);
   };
 
@@ -90,7 +101,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
     setSentryEnabled(Sentry.isInitialized());
   }, []);
 
-  const handleGiveFeedback = async () => {
+  const handleGiveFeedback = useCallback(async () => {
     if (!sentryEnabled) {
       console.warn("Sentry is not initialized, feedback form cannot be created.");
       return;
@@ -107,11 +118,86 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         });
         form.appendToDom();
         form.open();
+        // Set feedback notification as seen when user opens the feedback form
+        const user = authenticationStateService.getInstance().getUser();
+        if (user) {
+          PersistentStorageService.setSeenFeedbackNotification(user.id);
+        }
       }
     } catch (error) {
       console.error("Error creating feedback form:", error);
     }
-  };
+  }, [sentryEnabled]);
+
+  // Show notification after 30 minutes if conversation is not completed
+  useEffect(() => {
+    const user = authenticationStateService.getInstance().getUser();
+    if (!user) {
+      console.error(new SessionError("User is not available"));
+      return;
+    }
+
+    // Clean up any existing timer
+    if (feedbackTimerRef.current) {
+      clearTimeout(feedbackTimerRef.current);
+      feedbackTimerRef.current = null;
+    }
+
+    // Don't set timer if conversation is completed, notification already shown, or no time was given
+    if (
+      conversationCompleted ||
+      PersistentStorageService.hasSeenFeedbackNotification(user.id) ||
+      timeUntilNotification === null
+    ) {
+      return;
+    }
+
+    feedbackTimerRef.current = setTimeout(() => {
+      if(conversationCompleted) {
+        // Don't show a notification if the conversation is completed
+        return;
+      }
+
+      // Check if phase progress is 66% or less
+      const shouldPrompt: boolean = (progressPercentage ?? 0) <= 66;
+
+      if (shouldPrompt) {
+        const snackbarKey = enqueueSnackbar(
+          <Typography variant="body1">
+            We'd love to hear your feedback on your experience so far!{" "}
+            <CustomLink
+              onClick={async () => {
+                closeSnackbar(snackbarKey);
+                await handleGiveFeedback();
+              }}
+              data-testid={DATA_TEST_ID.CHAT_HEADER_FEEDBACK_LINK}
+            >
+              Give Feedback
+            </CustomLink>
+          </Typography>,
+          {
+            variant: "info",
+            persist: true,
+            autoHideDuration: null,
+          }
+        );
+      }
+    }, timeUntilNotification);
+
+    return () => {
+      if (feedbackTimerRef.current) {
+        clearTimeout(feedbackTimerRef.current);
+        feedbackTimerRef.current = null;
+      }
+    };
+  }, [
+    enqueueSnackbar,
+    closeSnackbar,
+    conversationCompleted,
+    handleGiveFeedback,
+    timeUntilNotification,
+    progressPercentage,
+  ]);
 
   const contextMenuItems: MenuItemConfig[] = useMemo(
     () => [

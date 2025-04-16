@@ -15,6 +15,8 @@ export const OVERALL_FEEDBACK_KEY = `overall_feedback_${PERSISTENT_STORAGE_VERSI
 
 export const ACCOUNT_CONVERTED_KEY = `account_converted_${PERSISTENT_STORAGE_VERSION}`;
 
+export const FEEDBACK_NOTIFICATION_KEY = `feedback_notification_${PERSISTENT_STORAGE_VERSION}`;
+
 /**
  * This class is used to store the tokens in the session storage.
  *   eg: refresh token
@@ -160,6 +162,50 @@ export class PersistentStorageService {
    */
   static clearAccountConverted(): void {
     this.storage.removeItem(ACCOUNT_CONVERTED_KEY);
+  }
+
+  /**
+   * Returns whether feedback notification has been shown for the user
+   * @param userId - ID of the user
+   * @returns boolean - Whether the feedback notification has been shown
+   */
+  static hasSeenFeedbackNotification(userId: string): boolean {
+    const usersStr = this.storage.getItem(FEEDBACK_NOTIFICATION_KEY);
+    if (!usersStr) return false;
+    const userIds: string[] = JSON.parse(usersStr);
+    return userIds.includes(userId);
+  }
+
+  /**
+   * Sets the feedback notification in the storage
+   * @param userId - ID of the user
+   */
+  static setSeenFeedbackNotification(userId: string): void {
+    const usersStr = this.storage.getItem(FEEDBACK_NOTIFICATION_KEY);
+    const userIds: string[] = usersStr ? JSON.parse(usersStr) : [];
+
+    if (!userIds.includes(userId)) {
+      userIds.push(userId);
+      this.storage.setItem(FEEDBACK_NOTIFICATION_KEY, JSON.stringify(userIds));
+    }
+  }
+
+  /**
+   * Clears the feedback notification from the storage
+   * @param userId - ID of the user
+   */
+  static clearSeenFeedbackNotification(userId: string): void {
+    const usersStr = this.storage.getItem(FEEDBACK_NOTIFICATION_KEY)
+    if (!usersStr) return;
+
+    const userIds: string[] = JSON.parse(usersStr);
+    const updatedUserIds = userIds.filter(id => id !== userId);
+
+    if (updatedUserIds.length === 0){
+      this.storage.removeItem(FEEDBACK_NOTIFICATION_KEY);
+    } else if (userIds.length !== updatedUserIds.length) {
+      this.storage.setItem(FEEDBACK_NOTIFICATION_KEY, JSON.stringify(updatedUserIds));
+    }
   }
 
   /**
