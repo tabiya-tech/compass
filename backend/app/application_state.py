@@ -49,6 +49,22 @@ class ApplicationState(BaseModel):
                          skills_explorer_agent_state=skills_explorer_agent_state
                          )
 
+    @classmethod
+    def new_state(cls, session_id: int) -> "ApplicationState":
+        """
+        Create a new application state for the given session ID.
+        All the states are initialized with the session ID and their default values.
+        :param session_id:
+        """
+        return cls(
+            session_id=session_id,
+            agent_director_state=AgentDirectorState(session_id=session_id),
+            explore_experiences_director_state=ExploreExperiencesAgentDirectorState(session_id=session_id),
+            conversation_memory_manager_state=ConversationMemoryManagerState(session_id=session_id),
+            collect_experience_state=CollectExperiencesAgentState(session_id=session_id),
+            skills_explorer_agent_state=SkillsExplorerAgentState(session_id=session_id)
+        )
+
 
 class ApplicationStateStore(ABC):
     """
