@@ -43,6 +43,8 @@ import { ReactionKind } from "src/chat/reaction/reaction.types";
 import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
 import { ConversationPhase, defaultCurrentPhase } from "./chatProgressbar/types";
 import ChatProgressBar, { DATA_TEST_ID as CHAT_PROGRESS_BAR_DATA_TEST_ID } from "src/chat/chatProgressbar/ChatProgressBar";
+import { ChatProvider } from "src/chat/ChatContext";
+
 // Mock Components ----------
 // mock the snackbar
 jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
@@ -92,19 +94,6 @@ jest.mock("src/chat/ChatMessageField/ChatMessageField", () => {
   return {
     __esModule: true,
     default: mockChatMessageField,
-    DATA_TEST_ID: actual.DATA_TEST_ID,
-  };
-});
-
-// mock the ChatHeader component
-jest.mock("src/chat/ChatHeader/ChatHeader", () => {
-  const actual = jest.requireActual("src/chat/ChatHeader/ChatHeader");
-  const mockChatHeader = jest
-    .fn()
-    .mockImplementation(() => <div data-testid={actual.DATA_TEST_ID.CHAT_HEADER_CONTAINER}></div>);
-  return {
-    __esModule: true,
-    default: mockChatHeader,
     DATA_TEST_ID: actual.DATA_TEST_ID,
   };
 });
@@ -180,6 +169,14 @@ jest.mock("src/chat/util", () => {
   };
 });
 
+//  mock the chat context
+jest.mock("src/chat/ChatContext", () => {
+  const actual = jest.requireActual("src/chat/ChatContext");
+  return {
+    ...actual,
+    ChatProvider: jest.fn().mockImplementation(({ children }) => <div>{children}</div>)
+  }
+})
 
 describe("Chat", () => {
   // ExperienceService methods to be mocked
@@ -1459,15 +1456,16 @@ describe("Chat", () => {
 
       // WHEN the component is rendered
       render(<Chat />);
+
       // THEN expect the Chat component to be initialized
       await assertChatInitialized();
 
       // AND the experiences button is clicked
-      // we are using the last call to the ChatHeader mock because the first one is the initial call
+      // we are using the last call to the ChatProvider mock because the first one is the initial call
       // and a bunch of calls are made when the component is re-rendered,
       // for example, due to the chat initialization
       act(() => {
-        (ChatHeader as jest.Mock).mock.calls.at(-1)[0].notifyOnExperiencesDrawerOpen();
+        (ChatProvider as jest.Mock).mock.calls.at(-1)[0].handleOpenExperiencesDrawer();
       });
 
       // THEN expect the drawer to open
@@ -1539,12 +1537,13 @@ describe("Chat", () => {
       await assertChatInitialized();
 
       // AND the experiences button is clicked
-      // we are using the last call to the ChatHeader mock because the first one is the initial call
+      // we are using the last call to the ChatProvider mock because the first one is the initial call
       // and a bunch of calls are made when the component is re-rendered,
       // for example, due to the chat initialization
       act(() => {
-        (ChatHeader as jest.Mock).mock.calls.at(-1)[0].notifyOnExperiencesDrawerOpen();
+        (ChatProvider as jest.Mock).mock.calls.at(-1)[0].handleOpenExperiencesDrawer();
       });
+
       // THEN expect error notification
       await waitFor(() => {
         expect(console.error).toHaveBeenCalledWith(new ChatError("Failed to retrieve experiences", givenError));
