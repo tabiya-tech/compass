@@ -4,8 +4,6 @@ import pytest
 from datetime import datetime, timezone
 import uuid
 
-from websockets import InvalidState
-
 from app.agent.agent_director.abstract_agent_director import AgentDirectorState, ConversationPhase
 from app.agent.experience import ExperienceEntity, WorkType, Timeline
 from app.agent.explore_experiences_agent_director import ConversationPhase as CounselingPhase, ExperienceState
@@ -25,15 +23,7 @@ from app.agent.experience.experience_entity import SkillEntity
 
 def get_empty_state() -> ApplicationState:
     """Returns a clean application state"""
-    _session_id = get_random_session_id()
-    return ApplicationState(
-        session_id=_session_id,
-        agent_director_state=AgentDirectorState(session_id=_session_id),
-        explore_experiences_director_state=ExploreExperiencesAgentDirectorState(session_id=_session_id),
-        conversation_memory_manager_state=ConversationMemoryManagerState(session_id=_session_id),
-        collect_experience_state=CollectExperiencesAgentState(session_id=_session_id),
-        skills_explorer_agent_state=SkillsExplorerAgentState(session_id=_session_id)
-    )
+    return ApplicationState.new_state(session_id=get_random_session_id())
 
 
 class TestInitialState:
