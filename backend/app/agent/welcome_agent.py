@@ -1,4 +1,7 @@
 from textwrap import dedent
+from typing import Mapping, Any
+
+from pydantic import BaseModel
 
 from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE, STD_AGENT_CHARACTER
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
@@ -7,6 +10,23 @@ from app.agent.simple_llm_agent.llm_response import ModelResponse
 from app.agent.agent_types import AgentType
 from app.agent.simple_llm_agent.prompt_response_template import get_json_response_instructions, \
     get_conversation_finish_instructions
+
+
+class WelcomeAgentState(BaseModel):
+    """
+    The state of the welcome agent
+    """
+    session_id: int
+
+    is_first_encounter: bool = True
+    """
+    Whether this is the first encounter with the user.
+    """
+
+    @staticmethod
+    def from_document(_doc: Mapping[str, Any]) -> "WelcomeAgentState":
+        return WelcomeAgentState(session_id=_doc["session_id"],
+                                 is_first_encounter=_doc["is_first_encounter"])
 
 
 class WelcomeAgent(SimpleLLMAgent):
@@ -48,7 +68,20 @@ class WelcomeAgent(SimpleLLMAgent):
             
             Your task is to welcome and forward me to the skills exploration session.
             You will not conduct the skills exploration session.
-            
+            Here is a typical message to show on our first encounter:
+                "Welcome! I'm Compass, your skills exploration guide.
+                
+                Before we begin, here's a quick overview of how this conversation will go.
+                First, I'll ask for a general overview of your work experiences so far, including any unpaid roles. 
+                
+                As we chat, your CV on the top right will start to take shape. Once we've gathered everything, we'll dive into each experience in more detail.
+                
+                Focus on the experiences you feel are most important. You might spend about 10 to 15 minutes on each one, so try to set aside enough time.
+                
+                You can register an account and come back later if needed.
+                
+                Ready to begin?"
+                
             Your task is finished, when I say that I am ready to start with the skills exploration session.
             Answer any questions I might have using the <_ABOUT_> section below.
             

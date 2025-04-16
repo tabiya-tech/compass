@@ -8,6 +8,7 @@ from app.agent.agent_director.abstract_agent_director import AgentDirectorState
 from app.agent.collect_experiences_agent import CollectExperiencesAgentState
 from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState
 from app.agent.skill_explorer_agent import SkillsExplorerAgentState
+from app.agent.welcome_agent import WelcomeAgentState
 from app.application_state import ApplicationStateStore, ApplicationState
 from app.server_dependencies.database_collections import Collections
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
@@ -20,6 +21,7 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
 
     def __init__(self, db: AsyncIOMotorDatabase):
         self._agent_director_collection = db.get_collection(Collections.AGENT_DIRECTOR_STATE)
+        self._welcome_agent_state = db.get_collection(Collections.WELCOME_AGENT_STATE)
         self._explore_experiences_director_state_collection = db.get_collection(Collections.EXPLORE_EXPERIENCES_DIRECTOR_STATE)
         self._conversation_memory_manager_state_collection = db.get_collection(Collections.CONVERSATION_MEMORY_MANAGER_STATE)
         self._collect_experience_state_collection = db.get_collection(Collections.COLLECT_EXPERIENCE_STATE)
@@ -36,6 +38,7 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
             # Using $eq to prevent NoSQL injection
             results = await asyncio.gather(
                 self._agent_director_collection.find_one({"session_id": {"$eq": session_id}}, {'_id': False}),
+                self._welcome_agent_state.find_one({"session_id": {"$eq": session_id}}, {'_id': False}),
                 self._explore_experiences_director_state_collection.find_one({"session_id": {"$eq": session_id}}, {'_id': False}),
                 self._conversation_memory_manager_state_collection.find_one({"session_id": {"$eq": session_id}}, {'_id': False}),
                 self._collect_experience_state_collection.find_one({"session_id": {"$eq": session_id}}, {'_id': False}),
@@ -47,6 +50,7 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
                 # but log which ones are None
                 collection_names = [
                     Collections.AGENT_DIRECTOR_STATE,
+                    Collections.WELCOME_AGENT_STATE,
                     Collections.EXPLORE_EXPERIENCES_DIRECTOR_STATE,
                     Collections.CONVERSATION_MEMORY_MANAGER_STATE,
                     Collections.COLLECT_EXPERIENCE_STATE,
@@ -63,6 +67,7 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
                 return None
 
             (agent_director_state,
+             welcome_agent_state,
              explore_experiences_director_state,
              conversation_memory_manager_state,
              collect_experience_state,
@@ -70,6 +75,7 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
 
             return ApplicationState(session_id=session_id,
                                     agent_director_state=AgentDirectorState.from_document(agent_director_state),
+                                    welcome_agent_state=WelcomeAgentState.from_document(welcome_agent_state),
                                     explore_experiences_director_state=ExploreExperiencesAgentDirectorState.from_document(explore_experiences_director_state),
                                     conversation_memory_manager_state=ConversationMemoryManagerState.from_document(conversation_memory_manager_state),
                                     collect_experience_state=CollectExperiencesAgentState.from_document(collect_experience_state),
@@ -88,6 +94,7 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
             # here we use the agent_director_state.session_id
             session_id = state.agent_director_state.session_id
             if not all([state.explore_experiences_director_state.session_id == session_id,
+                        state.welcome_agent_state.session_id == session_id,
                         state.conversation_memory_manager_state.session_id == session_id,
                         state.collect_experience_state.session_id == session_id,
                         state.skills_explorer_agent_state.session_id == session_id]):
@@ -96,6 +103,7 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
             # Using $eq to prevent NoSQL injection
             await asyncio.gather(
                 self._agent_director_collection.update_one({"session_id": {"$eq": session_id}}, {"$set": state.agent_director_state.model_dump()}, upsert=True),
+                self._welcome_agent_state.update_one({"session_id": {"$eq": session_id}}, {"$set": state.welcome_agent_state.model_dump()}, upsert=True),
                 self._explore_experiences_director_state_collection.update_one({"session_id": {"$eq": session_id}},
                                                                                {"$set": state.explore_experiences_director_state.model_dump()}, upsert=True),
                 self._conversation_memory_manager_state_collection.update_one({"session_id": {"$eq": session_id}},
@@ -120,6 +128,7 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
             # Using $eq to prevent NoSQL injection
             await asyncio.gather(
                 self._agent_director_collection.delete_one({"session_id": {"$eq": session_id}}),
+                self._welcome_agent_state.delete_one({"session_id": {"$eq": session_id}}),
                 self._explore_experiences_director_state_collection.delete_one({"session_id": {"$eq": session_id}}),
                 self._conversation_memory_manager_state_collection.delete_one({"session_id": {"$eq": session_id}}),
                 self._collect_experience_state_collection.delete_one({"session_id": {"$eq": session_id}}),
