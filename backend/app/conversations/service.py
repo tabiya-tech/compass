@@ -105,6 +105,7 @@ class ConversationService(IConversationService):
             raise ConversationAlreadyConcludedError(session_id)
 
         self._agent_director.set_state(state.agent_director_state)
+        self._agent_director.get_welcome_agent().set_state(state.welcome_agent_state)
         self._agent_director.get_explore_experiences_agent().set_state(state.explore_experiences_director_state)
         self._agent_director.get_explore_experiences_agent().get_collect_experiences_agent().set_state(
             state.collect_experience_state)

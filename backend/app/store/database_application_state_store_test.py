@@ -41,6 +41,10 @@ def database_application_state_store(in_memory_db) -> DatabaseApplicationStateSt
     return DatabaseApplicationStateStore(in_memory_db)
 
 
+def update_welcome_agent_state(application_state: ApplicationState):
+    application_state.welcome_agent_state.is_first_encounter = random.choice([True, False])  # nosec B311 # random is used for testing purposes
+
+
 def update_agent_director_state(application_state: ApplicationState):
     application_state.agent_director_state.current_phase = random.choice(
         list(AgentDirectorConversationPhase))  # nosec B311 # random is used for testing purposes
@@ -152,6 +156,7 @@ def get_test_application_state(given_session_id: int) -> ApplicationState:
     state = ApplicationState.new_state(session_id=given_session_id)
     # Update all state components to have unique data
     update_agent_director_state(state)
+    update_welcome_agent_state(state)
     update_explore_experiences_director_state(state)
     update_conversation_memory_manager_state(state)
     update_collect_experience_state(state)
@@ -167,12 +172,14 @@ class TestDatabaseApplicationStateStore:
     @pytest.mark.asyncio
     @pytest.mark.parametrize('update_state_callback', [
         update_agent_director_state,
+        update_welcome_agent_state,
         update_explore_experiences_director_state,
         update_conversation_memory_manager_state,
         update_collect_experience_state,
         update_skills_explorer_agent_state
     ], ids=[
         "updated_agent_director_state",
+        "updated_welcome_agent_state",
         "updated_explore_experiences_director_state",
         "updated_conversation_memory_manager_state",
         "updated_collect_experience_state",
@@ -235,6 +242,7 @@ class TestDatabaseApplicationStateStore:
             state = ApplicationState.new_state(session_id=session_id)
             # Update all state components to have unique data
             update_agent_director_state(state)
+            update_welcome_agent_state(state)
             update_explore_experiences_director_state(state)
             update_conversation_memory_manager_state(state)
             update_collect_experience_state(state)
@@ -279,12 +287,14 @@ class TestDatabaseApplicationStateStore:
     @pytest.mark.asyncio
     @pytest.mark.parametrize("collection_name", [
         Collections.AGENT_DIRECTOR_STATE,
+        Collections.WELCOME_AGENT_STATE,
         Collections.EXPLORE_EXPERIENCES_DIRECTOR_STATE,
         Collections.CONVERSATION_MEMORY_MANAGER_STATE,
         Collections.COLLECT_EXPERIENCE_STATE,
         Collections.SKILLS_EXPLORER_AGENT_STATE
     ], ids=[
         "agent_director_state",
+        "welcome_agent_state",
         "explore_experiences_agent_director_state",
         "conversation_memory_manager_state",
         "collect_experience_state",
