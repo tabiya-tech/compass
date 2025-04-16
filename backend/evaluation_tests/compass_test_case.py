@@ -18,8 +18,21 @@ class CompassTestCase(BaseModel):
     If set to 'force', only this test case will be run.
     """
 
-    class Config:
-        """
-        Disallow extra fields in the model
-        """
-        extra = "forbid"
+    expect_errors_in_logs: bool = False
+    """
+    If set to True, the test case will expect errors in the logs.
+    Can be used to conditionally assert errors in the logs.
+    """
+
+    expect_warnings_in_logs: bool = False
+    """
+    If set to True, the test case will expect warnings in the logs.
+    Can be used to conditionally assert warnings in the logs.
+    """
+
+
+class Config:
+    """
+    Disallow extra fields in the model
+    """
+    extra = "forbid"
