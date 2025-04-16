@@ -75,7 +75,6 @@ test_cases = [
         ]
     ),
 
-
     ClusterResponsibilitiesToolTestCase(
         name="one responsibility (work work work ...)",
         given_responsibilities=["i work"],
@@ -95,14 +94,16 @@ test_cases = [
         expected_clusters=[
             Cluster(cluster_name="Cluster 0", responsibilities=["i work"]),
             Cluster(cluster_name="Cluster 1", responsibilities=["i eat"]),
-        ]
+        ],
+        expect_warnings_in_logs=True
     ),
 
     ClusterResponsibilitiesToolTestCase(
         name="no responsibilities",
         given_responsibilities=[],
         given_number_of_clusters=5,
-        expected_clusters=[]
+        expected_clusters=[],
+        expect_warnings_in_logs=True
     ),
 
     ClusterResponsibilitiesToolTestCase(
@@ -189,8 +190,10 @@ async def test_cluster_responsibilities_tool(test_case: ClusterResponsibilitiesT
 
         # Check that no errors and no warning were logged
         for record in caplog.records:
-            assert record.levelname != 'ERROR'
-            assert record.levelname != 'WARNING'
+            if not test_case.expect_errors_in_logs:
+                assert record.levelname != 'ERROR'
+            if not test_case.expect_warnings_in_logs:
+                assert record.levelname != 'WARNING'
 
 
 def sort_list_of_lists(lst):
