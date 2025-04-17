@@ -212,10 +212,14 @@ class _ConversationLLM:
             
             Respond with something similar to this:
                 Explain that we will explore my experience as '{experience_title}'.
-                <add new line to separate the section>     
+                
+                Add new line to separate the above from the next part.
+                     
                 Explicitly explain that you will ask me questions and that I should try to be as descriptive as possible in my responses 
                                 and that the more I talk about my experience the more accurate the results will be.
-                <add new line to separate the section>
+                
+                Add new line to separate the above from the following question.
+                
                 Ask me to describe a typical day at work.
             
         {language_style}
