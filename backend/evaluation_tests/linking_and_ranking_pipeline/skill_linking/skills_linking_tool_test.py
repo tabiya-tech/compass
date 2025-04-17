@@ -10,6 +10,7 @@ from app.agent.linking_and_ranking_pipeline.skill_linking_tool import SkillLinki
 from app.countries import Country
 from app.vector_search.esco_entities import OccupationSkillEntity
 from app.vector_search.vector_search_dependencies import SearchServices
+from common_libs.test_utilities.guard_caplog import guard_caplog
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 
@@ -58,7 +59,8 @@ test_cases = [
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test
 @pytest.mark.parametrize("test_case", get_test_cases_to_run(test_cases), ids=[test_case.name for test_case in get_test_cases_to_run(test_cases)])
-async def test_skill_linking_tool(test_case: SkillLinkingToolTestCase, setup_search_services: Awaitable[SearchServices]):
+async def test_skill_linking_tool(test_case: SkillLinkingToolTestCase, setup_search_services: Awaitable[SearchServices], caplog):
+
     search_services = await setup_search_services
     # Given the occupation with it's associated skills
     given_job_titles: list[str] = []
@@ -89,19 +91,32 @@ async def test_skill_linking_tool(test_case: SkillLinkingToolTestCase, setup_sea
 
     # When the skill linking tool is called with the given occupation and responsibilities
     skill_linking_tool = SkillLinkingTool(search_services.skill_search_service)
-    response = await skill_linking_tool.execute(
-        job_titles=given_job_titles,
-        esco_occupations=given_occupations_with_skills,
-        responsibilities=test_case.given_responsibilities,
-        top_k=5,
-        top_p=10)
-    # Then the expected skills are returned
-    # get the preferred labels fo the found skills
-    actual_skills_labels = [skill.preferredLabel.lower() for skill in response.top_skills]
-    # assert the expected skills are in the actual skills
-    # Find missing skills
-    missing_skills = [skill for skill in test_case.expected_skills if skill not in actual_skills_labels]
 
-    # Assert all expected skills are in the actual skills list
-    logging.getLogger().info(f"Found skills: {actual_skills_labels}")
-    assert not missing_skills, f"Missing skills: {missing_skills}"
+    with caplog.at_level(logging.WARNING):
+
+        guard_caplog(skill_linking_tool._logger, caplog)
+
+        response = await skill_linking_tool.execute(
+            job_titles=given_job_titles,
+            esco_occupations=given_occupations_with_skills,
+            responsibilities=test_case.given_responsibilities,
+            top_k=5,
+            top_p=5)
+        # Then the expected skills are returned
+        # get the preferred labels fo the found skills
+        actual_skills_labels = sorted([skill.preferredLabel.lower() for skill in response.top_skills])
+        # assert the expected skills are in the actual skills
+        # Find missing skills
+        missing_skills = sorted([skill for skill in test_case.expected_skills if skill not in actual_skills_labels])
+
+        # Assert there are no ERROR entries in the logs
+        for record in caplog.records:
+            assert record.levelname != 'ERROR'
+
+        # Assert all expected skills are in the actual skills list
+        logging.getLogger().info(f"Found skills: {actual_skills_labels}")
+        if missing_skills:
+            logging.getLogger().info(f"Missing skills: {missing_skills}")
+            # do the assertion in a way that the test fails and the diff can be shown in the IDE
+            assert actual_skills_labels == sorted(test_case.expected_skills)
+
