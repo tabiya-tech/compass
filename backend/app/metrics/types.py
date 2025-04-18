@@ -469,3 +469,29 @@ class NetworkInformationEvent(AbstractUserAccountEvent):
 
     class Config:
         extra = "forbid"
+
+
+class UIInteractionEvent(AbstractConversationEvent):
+    """
+    A Frontend only metric event representing a UI interaction
+    """
+    interaction_id: str
+    """
+    interaction_id - the ID of the UI element that was interacted with
+    """
+    timestamp: datetime
+    """
+    timestamp - an iso string representing the timestamp of the event
+    """
+
+    def __init__(self, *, user_id: str, session_id: int, interaction_id: str, timestamp: str):
+        super().__init__(
+            user_id=user_id,
+            session_id=session_id,
+            event_type=EventType.UI_INTERACTION,
+            interaction_id=interaction_id,
+            timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc)
+        )
+
+    class Config:
+        extra = "forbid"

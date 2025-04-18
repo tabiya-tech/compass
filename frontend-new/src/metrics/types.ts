@@ -8,6 +8,7 @@ export enum EventType {
   USER_LOCATION = 200003,
   DEVICE_SPECIFICATION = 200004,
   NETWORK_INFORMATION = 200005,
+  UI_INTERACTION = 200006,
 }
 
 interface BaseMetricsEvent {
@@ -56,9 +57,18 @@ export interface NetworkInformationEvent extends BaseMetricsEvent {
   connection_type: number;
 }
 
+export interface UIInteractionEvent extends BaseMetricsEvent {
+  user_id: string;
+  session_id: number;
+  event_type: EventType.UI_INTERACTION;
+  interaction_id: string;
+  timestamp: string;
+}
+
 export type MetricsEventUnion = 
   | CVDownloadedEvent 
   | DemographicsEvent 
   | DeviceSpecificationEvent 
   | UserLocationEvent
-  | NetworkInformationEvent;
+  | NetworkInformationEvent
+  | UIInteractionEvent;

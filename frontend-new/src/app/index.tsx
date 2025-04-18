@@ -119,6 +119,7 @@ const App = () => {
         return;
       }
       console.debug("User authenticated: Welcome,", user.email);
+      UserPreferencesStateService.getInstance().loadABTestGroup();
       UserPreferencesStateService.getInstance().setUserPreferences(preferences);
 
       console.debug("User preferences loaded", preferences);

@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 
 from app.metrics.constants import EventType
 from app.metrics.types import AbstractCompassMetricEvent, CVDownloadedEvent, DeviceSpecificationEvent, \
-    DemographicsEvent, UserLocationEvent, NetworkInformationEvent
+    DemographicsEvent, UserLocationEvent, NetworkInformationEvent, UIInteractionEvent
 
 
 class _PayloadTooLargeErrorResponse(HTTPErrorResponse):
@@ -58,6 +58,8 @@ def _construct_metric_event(request: _MetricRequest) -> AbstractCompassMetricEve
         return DeviceSpecificationEvent(**event_data)
     elif request.event_type == EventType.NETWORK_INFORMATION:
         return NetworkInformationEvent(**event_data)
+    elif request.event_type == EventType.UI_INTERACTION:
+        return UIInteractionEvent(**event_data)
     else:
         raise ValueError(f"Unknown event type: {request.event_type}")
 

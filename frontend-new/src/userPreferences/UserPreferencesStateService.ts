@@ -1,8 +1,9 @@
-import { SensitivePersonalDataRequirement, UserPreference, Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { SensitivePersonalDataRequirement, UserPreference, Language, ABTestIds } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import {
   QUESTION_KEYS,
 } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 import * as Sentry from "@sentry/react";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
 export default class UserPreferencesStateService {
   private static instance: UserPreferencesStateService;
@@ -48,6 +49,43 @@ export default class UserPreferencesStateService {
       });
     } catch (err) {
       console.error(new Error(`Failed to set sentry context`, { cause: err }));
+    }
+  }
+
+  /**
+   * Load the A/B test group from persistent storage
+   * @returns The A/B test group or null if not found
+   */
+  public loadABTestGroup(): string | null {
+    const abTestGroup = PersistentStorageService.getABTestGroup();
+    if (!abTestGroup) return null;
+
+    const preferences = this.getUserPreferences();
+    if (!preferences) return abTestGroup;
+
+    preferences.abClassification = preferences.abClassification || [];
+    if (!preferences.abClassification.includes(abTestGroup)) {
+      preferences.abClassification.push(abTestGroup);
+      this.setUserPreferences(preferences);
+    }
+
+    return abTestGroup;
+  }
+
+  /**
+   * Set the A/B test group in persistent storage
+   * @param abTestGroup The A/B test group to set
+   */
+  public setAbTestGroup(abTestGroup: string): void {
+    PersistentStorageService.setABTestGroup(abTestGroup);
+
+    const preferences = this.getUserPreferences();
+    if (!preferences) return;
+
+    preferences.abClassification = preferences.abClassification || [];
+    if (!preferences.abClassification.includes(abTestGroup)) {
+      preferences.abClassification.push(abTestGroup);
+      this.setUserPreferences(preferences);
     }
   }
 
@@ -105,5 +143,34 @@ export default class UserPreferencesStateService {
       }
       return value;
     });
+  }
+
+  public getShowIconVariant(): boolean {
+    const preferences = this.getUserPreferences();
+    if (!preferences) {
+      return false;
+    }
+
+    this.loadABTestGroup();
+
+    // Check if we already have a variant assigned
+    const hasIconVariant = preferences.abClassification?.includes(ABTestIds.LINK_STYLE) || false;
+    
+    if (!hasIconVariant) {
+      const showIcon = Math.random() < 0.5;
+      if (showIcon) {
+        preferences.abClassification = preferences.abClassification || [];
+        preferences.abClassification.push(ABTestIds.LINK_STYLE);
+        this.setUserPreferences(preferences);
+        this.setAbTestGroup(ABTestIds.LINK_STYLE);
+        
+        console.log(`User assigned to icon variant for A/B test: ${ABTestIds.LINK_STYLE}`);
+      } else {
+        console.log(`User assigned to text-only variant for A/B test: ${ABTestIds.LINK_STYLE}`);
+      }
+      return showIcon;
+    }
+
+    return hasIconVariant;
   }
 }

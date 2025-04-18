@@ -15,6 +15,8 @@ export const OVERALL_FEEDBACK_KEY = `overall_feedback_${PERSISTENT_STORAGE_VERSI
 
 export const ACCOUNT_CONVERTED_KEY = `account_converted_${PERSISTENT_STORAGE_VERSION}`;
 
+export const AB_TEST_GROUP_KEY = `ab_test_group_${PERSISTENT_STORAGE_VERSION}`;
+
 /**
  * This class is used to store the tokens in the session storage.
  *   eg: refresh token
@@ -160,6 +162,29 @@ export class PersistentStorageService {
    */
   static clearAccountConverted(): void {
     this.storage.removeItem(ACCOUNT_CONVERTED_KEY);
+  }
+
+  /**
+   * Returns the A/B test group from the storage
+   * @returns string | null - The A/B test group
+   */
+  static getABTestGroup(): string | null {
+    return this.storage.getItem(AB_TEST_GROUP_KEY);
+  }
+
+  /**
+   * Sets the A/B test group in the storage
+   * @param group - The A/B test group to set
+   */
+  static setABTestGroup(group: string): void {
+    this.storage.setItem(AB_TEST_GROUP_KEY, group);
+  }
+
+  /**
+   * Clears the A/B test group from the storage
+   */
+  static clearABTestGroup(): void {
+    this.storage.removeItem(AB_TEST_GROUP_KEY);
   }
 
   /**

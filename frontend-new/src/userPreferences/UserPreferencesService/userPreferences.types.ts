@@ -13,6 +13,7 @@ export type UserPreference = {
   language: Language;
   accepted_tc?: Date;
   sessions: number[];
+  abClassification?: string[];
   user_feedback_answered_questions: AnsweredQuestions;
   sensitive_personal_data_requirement: SensitivePersonalDataRequirement;
   has_sensitive_personal_data: boolean;
@@ -35,4 +36,8 @@ export type UpdateUserPreferencesSpec = {
 export enum Language {
   en = "en",
   // fr = 'fr', // French in the future
+}
+
+export enum ABTestIds {
+  LINK_STYLE = "link_style",
 }

@@ -8,7 +8,7 @@ exports[`ConversationConclusionFooter render tests should render component succe
   <p
     class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
   >
-    You can now
+    You can now view and
      
     <a
       aria-disabled="false"
@@ -16,12 +16,13 @@ exports[`ConversationConclusionFooter render tests should render component succe
       data-testid="feedback-form-experiences-drawer-button-41675f8b-257c-4a63-9563-3fe9feb6a850"
     >
       <span
-        style="white-space: normal;"
+        style="display: flex; align-items: center; white-space: normal;"
       >
-        view and download your CV here
+         download your CV
+         
       </span>
     </a>
-    . 
+    here. 
   </p>
   <span
     class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
