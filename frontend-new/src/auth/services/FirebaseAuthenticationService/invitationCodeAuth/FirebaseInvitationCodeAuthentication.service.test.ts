@@ -1,15 +1,19 @@
 // mute chatty console
 import "src/_test_utilities/consoleMock";
-import FirebaseInvitationCodeAuthenticationService
-  from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
+import FirebaseInvitationCodeAuthenticationService from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
 import firebase from "firebase/compat/app";
 import { invitationsService } from "src/auth/services/invitationsService/invitations.service";
 import { Invitation, InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
-import { Language, SensitivePersonalDataRequirement, UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import {
+  Language,
+  SensitivePersonalDataRequirement,
+  UserPreference,
+} from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
 jest.mock("jwt-decode");
 
@@ -79,11 +83,14 @@ describe("AuthService class tests", () => {
       // AND the user preferences can be created\
       const givenReturnedPreferences: UserPreference = {
         user_id: "foo-id",
-        sessions:[]
+        sessions: [],
       } as unknown as UserPreference;
-      jest.spyOn(UserPreferencesService.getInstance(), "createUserPreferences").mockResolvedValueOnce(givenReturnedPreferences);
-      jest.spyOn(UserPreferencesService.getInstance(), "getUserPreferences").mockResolvedValueOnce(givenReturnedPreferences);
-
+      jest
+        .spyOn(UserPreferencesService.getInstance(), "createUserPreferences")
+        .mockResolvedValueOnce(givenReturnedPreferences);
+      jest
+        .spyOn(UserPreferencesService.getInstance(), "getUserPreferences")
+        .mockResolvedValueOnce(givenReturnedPreferences);
 
       // AND the token is decoded into a user
       jest.spyOn(authService, "getUser").mockReturnValue(givenUser);
@@ -175,6 +182,20 @@ describe("AuthService class tests", () => {
 
       // THEN the error callback should be called with Invalid invitation code
       await expect(anonymousLoginPromise).rejects.toThrow("invalid invitation code: " + givenCode);
+    });
+
+    test("should clear feedback notification when anonymous user logout", async () => {
+      // GIVEN the anonymous user is logged in
+      const mockUser = { id: "123", name: "Foo Bar", email: "foo@bar.baz" };
+      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue(mockUser);
+      // AND a spy on PersistentStorageService.clearFeedbackNotification
+      const clearFeedbackSpy = jest.spyOn(PersistentStorageService, "clearSeenFeedbackNotification");
+
+      // WHEN the user logs out
+      await authService.logout();
+
+      // THEN expect the feedback notification to be cleared
+      expect(clearFeedbackSpy).toHaveBeenCalledWith(mockUser.id);
     });
   });
 });

@@ -277,7 +277,7 @@ describe("AuthPersistentStorage class tests", () => {
           question_id: "foo",
           simplified_answer: {
             rating_numeric: 5,
-          }
+          },
         },
       ];
       PersistentStorageService.setOverallFeedback(givenFeedback);
@@ -338,6 +338,59 @@ describe("AuthPersistentStorage class tests", () => {
       // THEN The account conversion should be stored
       const accountConversion = PersistentStorageService.getAccountConverted();
       expect(accountConversion).toEqual(givenAccountConversion);
+    });
+  });
+
+  describe("feedback notification tests", () => {
+    test("return correct previously set feedback notification", () => {
+      // GIVEN the userId with feedback notification is stored in the local storage
+      const userId = "user-1234";
+      PersistentStorageService.setSeenFeedbackNotification(userId);
+
+      // WHEN The userId with feedback notification is retrieved
+      const feedbackNotification = PersistentStorageService.hasSeenFeedbackNotification(userId);
+
+      // THEN true should be returned
+      expect(feedbackNotification).toEqual(true);
+    });
+
+    test("return false if feedback notification is not set", () => {
+      // GIVEN there no userId with feedback notification is stored in the local storage
+      // Nothing set
+
+      // WHEN The feedback notification is retrieved
+      const userId = "user-1234";
+      const feedbackNotification = PersistentStorageService.hasSeenFeedbackNotification(userId);
+
+      // THEN false should be returned
+      expect(feedbackNotification).toBe(false);
+    });
+
+    test("clear feedback notification", () => {
+      // GIVEN a userId with feedback notification is stored in the local storage
+      const userId = "user-1234";
+      PersistentStorageService.setSeenFeedbackNotification(userId);
+
+      // WHEN a userId with feedback notification is cleared
+      PersistentStorageService.clearSeenFeedbackNotification(userId);
+
+      // THEN expect that userId with feedback notification is cleared
+      expect(PersistentStorageService.hasSeenFeedbackNotification(userId)).toBe(false);
+    });
+
+    test("clear one feedback notification keeps others", () => {
+      // GIVEN multiple userIds with feedback notification are stored in the local storage
+      const userId1 = "user-1234";
+      const userId2 = "user-5678";
+      PersistentStorageService.setSeenFeedbackNotification(userId1);
+      PersistentStorageService.setSeenFeedbackNotification(userId2);
+
+      // WHEN one userId with feedback notification is cleared
+      PersistentStorageService.clearSeenFeedbackNotification(userId1);
+
+      // THEN only that one should be cleared
+      expect(PersistentStorageService.hasSeenFeedbackNotification(userId1)).toBe(false);
+      expect(PersistentStorageService.hasSeenFeedbackNotification(userId2)).toBe(true);
     });
   });
 
