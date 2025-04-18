@@ -2,6 +2,7 @@ import json
 import logging
 from textwrap import dedent
 from collections import Counter
+from typing import Callable
 
 from pydantic import BaseModel
 
@@ -10,6 +11,7 @@ from app.agent.llm_caller import LLMCaller
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import ZERO_TEMPERATURE_GENERATION_CONFIG, LLMConfig, JSON_GENERATION_CONFIG
+from common_libs.retry import Retry, TemperatureRetryConfig
 
 
 class Cluster(BaseModel):
@@ -93,7 +95,7 @@ class ClusterResponsibilitiesTool:
             *,
             responsibilities: list[str],
             number_of_clusters: int = 5
-    ) -> ClusterResponsibilitiesResponse:
+    ) -> ClusterResponsibilitiesResponse: 
         """
         Cluster responsibilities into the given number of clusters based on their similarity.
         If the number of responsibilities is less than the requested number of clusters,
@@ -142,38 +144,54 @@ class ClusterResponsibilitiesTool:
             # It happens when there are K even responsibilities and the number of clusters is a multiple of K, + 1
             _prefilled_clusters.append(Cluster(cluster_name=f"Cluster {number_of_clusters - 1}", responsibilities=_responsibilities))
         if _number_of_clusters > 1:  # We don't need to cluster if the number of clusters is 1
-            # Call the LLM to cluster the responsibilities
-            prompt = _get_prompt(_responsibilities, _number_of_clusters)
-            llm_response, llm_stats = await self._llm_caller.call_llm(llm=self._llm, llm_input=prompt, logger=self._logger)
-            if not llm_response:
-                # This may happen if the LLM fails to return a JSON object
-                # Instead of completely failing, we log a warning and return the input responsibilities in each of the requested clusters
-                self._logger.warning("The LLM did not return any output and the responsibilities will be returned as a single cluster")
-                return ClusterResponsibilitiesResponse(
-                    clusters=[Cluster(cluster_name=f"Cluster {i}", responsibilities=_responsibilities) for i in range(_number_of_clusters)],
-                    llm_stats=llm_stats
-                )
+            async def _cluster_responsibilities(retry: Callable[[str], None]):
+                prompt = _get_prompt(_responsibilities, _number_of_clusters)
+                llm_response, stats = await self._llm_caller.call_llm(llm=self._llm, llm_input=prompt, logger=self._logger)
+                
+                if not llm_response:
+                    # This may happen if the LLM fails to return a JSON object
+                    # Instead of completely failing, we log a warning and return the input responsibilities in each of the requested clusters
+                    self._logger.warning("The LLM did not return any output and the responsibilities will be returned as a single cluster")
+                    return ClusterResponsibilitiesResponse(
+                        clusters=[Cluster(cluster_name=f"Cluster {i}", responsibilities=_responsibilities) for i in range(_number_of_clusters)],
+                        llm_stats=stats
+                    ), stats
+
+                if self._logger.isEnabledFor(logging.INFO):
+                    self._logger.info("LLM Response: %s", llm_response)
+
+                # retry if the number of clusters returned is different from the requested number of clusters
+                if len(llm_response.clusters) != _number_of_clusters:
+                    retry(f"Number of clusters mismatch. Expected {_number_of_clusters}, got {len(llm_response.clusters)}")
+
+                llm_clusters, clustered_responsibilities = _filter_empty_clusters_and_responsibilities(llm_response.clusters)
+
+                 # retry if all the responsibilities are not clustered
+                counter_responsibilities = Counter(_responsibilities)
+                counter_clustered_responsibilities = Counter(clustered_responsibilities)
+                only_in_responsibilities = counter_responsibilities - counter_clustered_responsibilities
+                if len(only_in_responsibilities) > 0:
+                    retry(f"Not all responsibilities are clustered. Missing: {list(only_in_responsibilities.elements())}")
+
+                # retry if a responsibility is clustered more than once
+                for resp, count in counter_clustered_responsibilities.items():
+                    if count > 1:
+                        retry(f"Responsibility '{resp}' is clustered more than once")
+
+                return llm_response, stats
+
+            # Use the temperature adjustment retry
+            llm_response, llm_stats = await Retry.call_with_temperature_adjustment(
+                callback=_cluster_responsibilities,
+                generation_config=self._llm._model._generation_config._raw_generation_config,
+                retry_config=TemperatureRetryConfig(max_retries=3, temperature_step=0.1, max_temperature=1.0),
+                logger=self._logger
+            )
 
             if self._logger.isEnabledFor(logging.INFO):
                 self._logger.info("LLM Response: %s", llm_response)
-            # log a warning if the number of clusters returned is different from the requested number of clusters
-            if len(llm_response.clusters) != _number_of_clusters:
-                self._logger.warning(
-                    "The number of clusters returned by the LLM is different from the requested number of clusters. Requested: %d, Returned: %d",
-                    _number_of_clusters, len(llm_response.clusters))
 
             llm_clusters, clustered_responsibilities = _filter_empty_clusters_and_responsibilities(llm_response.clusters)
-            # log a warning if all the responsibilities are not clustered
-            counter_responsibilities = Counter(_responsibilities)
-            counter_clustered_responsibilities = Counter(clustered_responsibilities)
-            only_in_responsibilities = counter_responsibilities - counter_clustered_responsibilities
-            if len(only_in_responsibilities) > 0:
-                self._logger.warning("Not all responsibilities are clustered. The responsibilities that are not clustered are: %s",
-                                     list(only_in_responsibilities.elements()))
-
-            for cnt in counter_clustered_responsibilities.items():
-                if cnt[1] > 1:
-                    self._logger.warning("Responsibility '%s' is clustered more than once", cnt[0])
 
         _prefilled_clusters, _ = _filter_empty_clusters_and_responsibilities(_prefilled_clusters)
         clusters = _prefilled_clusters + llm_clusters
