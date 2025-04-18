@@ -201,7 +201,7 @@ async def test_relevant_occupations_classifier_llm(test_case: RelevantOccupation
         actual_remaining_occupations_labels = [occupation.preferredLabel for occupation in actual_result.remaining]
         assert set(actual_remaining_occupations_labels) == set(test_case.expected_remaining_occupations)
 
-        # Check that no errors and no warning were logged
+        # Check that no errors were logged ( warnings trigger retries and are expected )
         for record in caplog.records:
             assert record.levelname != 'ERROR'
-            assert record.levelname != 'WARNING'
+            # assert record.levelname != 'WARNING'

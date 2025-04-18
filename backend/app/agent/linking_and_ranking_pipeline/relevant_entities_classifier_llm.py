@@ -1,7 +1,7 @@
 import json
 import logging
 from textwrap import dedent
-from typing import Optional, TypeVar, Generic, Literal
+from typing import Optional, TypeVar, Generic, Literal, Callable
 
 from pydantic import BaseModel
 
@@ -11,9 +11,11 @@ from app.agent.prompt_template.format_prompt import replace_placeholders_with_in
 from app.vector_search.esco_entities import BaseEntity
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import ZERO_TEMPERATURE_GENERATION_CONFIG, LLMConfig, JSON_GENERATION_CONFIG
+from common_libs.retry import Retry, TemperatureRetryConfig
 
 T = TypeVar('T', bound=BaseEntity)
 
+_MAX_ATTEMPTS = 3
 
 class _RelevantEntityClassifierLLMOutput(BaseModel):
     reasoning: Optional[str]
@@ -61,33 +63,60 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
         for entity in entities_to_classify:
             _entities_dict[entity.preferredLabel] = entity
 
-        prompt = RelevantEntitiesClassifierLLM._get_prompt(
-            entity_type_singular=self._entity_type_singular,
-            job_titles=job_titles,
-            responsibilities=responsibilities,
-            entities_to_classify=entities_to_classify,
-            top_k=top_k)
-        llm_output, llm_stats = await self._llm_caller.call_llm(llm=self._llm, llm_input=prompt, logger=self._logger)
-        if not llm_output:
-            # This may happen if the LLM fails to return a JSON object
-            # Instead of completely failing, we will return all the entities as relevant. This is suboptimal but better than failing
-            self._logger.warning(
-                f"The RelevantEntitiesClassifier could not return any {self._entity_types_plural}. Setting all {self._entity_types_plural} as relevant.")
-            return RelevantEntityClassifierOutput(
-                most_relevant=entities_to_classify,
-                remaining=[],
-                llm_stats=llm_stats)
+        async def _classify_entities(retry: Callable[[str], None]):
+            prompt = RelevantEntitiesClassifierLLM._get_prompt(
+                entity_type_singular=self._entity_type_singular,
+                job_titles=job_titles,
+                responsibilities=responsibilities,
+                entities_to_classify=entities_to_classify,
+                top_k=top_k)
 
-        # log a warning if the two lists are disjoint and the union is the original list
-        diff_len = len(llm_output.most_relevant) + len(llm_output.remaining) - len(entities_to_classify)
-        if diff_len != 0:
-            self._logger.warning(
-                f"The list of {self._entity_types_plural} returned by the LLM is not the same as the original list of {self._entity_types_plural}. "
-                f"There is a difference of %d {self._entity_types_plural}.",
-                diff_len)
+            llm_output, llm_stats = await self._llm_caller.call_llm(llm=self._llm, llm_input=prompt, logger=self._logger)
 
-        if len(set(llm_output.most_relevant).intersection(set(llm_output.remaining))) != 0:
-            self._logger.warning(f"The most relevant {self._entity_types_plural} and the remaining {self._entity_types_plural} are not disjoint.")
+            if not llm_output:
+                # This may happen if the LLM fails to return a JSON object
+                # Instead of completely failing, we will return all the entities as relevant. This is suboptimal but better than failing
+                self._logger.warning(
+                    f"The RelevantEntitiesClassifier could not return any {self._entity_types_plural}. Setting all {self._entity_types_plural} as relevant.")
+                return RelevantEntityClassifierOutput(
+                    most_relevant=entities_to_classify,
+                    remaining=[],
+                    llm_stats=llm_stats), llm_stats
+
+            # Check if the lists are disjoint and the union is the original list
+            diff_len = len(llm_output.most_relevant) + len(llm_output.remaining) - len(entities_to_classify)
+            has_overlap = len(set(llm_output.most_relevant).intersection(set(llm_output.remaining))) != 0
+            has_correct_top_k = len(llm_output.most_relevant) == top_k
+
+            # Check if all entities in the output exist in the original list
+            all_entities_exist = True
+            missing_entities = []
+            for entity_list in [llm_output.most_relevant, llm_output.remaining]:
+                for entity_from_output in entity_list:
+                    entity_from_output = entity_from_output.strip('\'"')
+                    if entity_from_output not in _entities_dict:
+                        all_entities_exist = False
+                        missing_entities.append(entity_from_output)
+
+            if diff_len != 0 or has_overlap or not has_correct_top_k or not all_entities_exist:
+                error_msg = (
+                    f"Sanity check failed: \n"
+                    f"disjointed={diff_len != 0}, disjointed_len={diff_len}, \n"
+                    f"has_overlap={has_overlap}, \n"
+                    f"has_incorrect_top_k={not has_correct_top_k}, expected_top_k={top_k}, actual_top_k={len(llm_output.most_relevant)}, \n"
+                    f"entities_missing={len(missing_entities) > 0}, missing_entities={missing_entities}"
+                )
+                retry(error_msg)
+
+            return llm_output, llm_stats
+
+        # Use the temperature adjustment retry
+        llm_output, llm_stats = await Retry.call_with_temperature_adjustment(
+            callback=_classify_entities,
+            generation_config=self._llm._model._generation_config._raw_generation_config,
+            retry_config=TemperatureRetryConfig(max_retries=3, temperature_step=0.1, max_temperature=1.0),
+            logger=self._logger
+        )
 
         # Since we cannot trust the LLM to always return the correct entities
         # We will return the original entities removing the ones that have been classified as "remaining"
@@ -95,29 +124,22 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
         remaining_entities_uuids = []
         if llm_output:
             for entity_from_output in llm_output.remaining:
-                entity_from_output = entity_from_output.strip(
-                    '\'"')  # The llm sometimes returns the entity with quotes, especially if the entity contains a single quote
-                entity = _entities_dict.get(entity_from_output, None)
-                if entity:
-                    remaining_entities.append(entity)
-                    remaining_entities_uuids.append(entity.UUID)
-                else:
-                    self._logger.warning(f"The {self._entity_type_singular} %s is not in the original list of {self._entity_types_plural}.", entity_from_output)
+                entity_from_output = entity_from_output.strip('\'"')
+                entity = _entities_dict[entity_from_output]  # We can safely access this now since we've verified it exists
+                remaining_entities.append(entity)
+                remaining_entities_uuids.append(entity.UUID)
 
         # Create the most relevant entities list by removing the remaining entities from the original list of entities
         # use the UUID to compare if the entities are the same
         most_relevant_entities = [entity for entity in entities_to_classify if entity.UUID not in remaining_entities_uuids]
         # Get the top_k most relevant entities
-        if len(most_relevant_entities) != top_k:
-            self._logger.warning(f"The LLM returned %d most relevant {self._entity_types_plural} instead of the requested %d.", len(most_relevant_entities),
-                                 top_k)
-
         most_relevant_entities = most_relevant_entities[:top_k]  # Get the top_k most relevant entities
         if self._logger.isEnabledFor(logging.INFO):
             self._logger.info(f"For job titles: '%s'  and responsibilities: '%s'  relevant {self._entity_types_plural} response is: %s",
                               json.dumps(job_titles, ensure_ascii=False),
                               json.dumps(responsibilities, ensure_ascii=False),
                               llm_output)
+
         return RelevantEntityClassifierOutput(
             most_relevant=most_relevant_entities,
             remaining=remaining_entities,
