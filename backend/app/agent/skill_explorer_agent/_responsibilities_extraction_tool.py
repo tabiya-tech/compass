@@ -26,18 +26,18 @@ class _ResponsibilitiesExtractionTool:
         sentence_decomposition_output, sentence_decomposition_stats = await self._sentence_decomposition_llm.execute(
             last_user_input=last_user_input, context=context)
         self.logger.debug("Sentence decomposition output: %s", sentence_decomposition_output.model_dump())
-        if len(sentence_decomposition_output.resolved_pronouns) == 0:
-            self.logger.debug("No resolved pronouns found in the user's input. Skipping responsibilities extraction.")
+        if len(sentence_decomposition_output.decomposed_and_dereferenced) == 0:
+            self.logger.debug("No decomposed sentences found in the user's input. Skipping responsibilities extraction.")
             return ResponsibilitiesData(
                 responsibilities=[],
                 non_responsibilities=[],
                 other_peoples_responsibilities=[]
             ), sentence_decomposition_stats
 
-        resolved_pronouns = "\n".join(sentence_decomposition_output.resolved_pronouns)
+        decomposed_and_dereferenced = "\n".join(sentence_decomposition_output.decomposed_and_dereferenced)
         responsibilities_extraction_output, responsibilities_extraction_stats = \
             await self._responsibilities_extraction_llm.execute(
-                last_user_input=resolved_pronouns, context=context)
+                last_user_input=decomposed_and_dereferenced, context=context)
         llm_stats = sentence_decomposition_stats + responsibilities_extraction_stats
         return ResponsibilitiesData(
             responsibilities=responsibilities_extraction_output.responsibilities,
