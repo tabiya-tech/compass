@@ -38,6 +38,20 @@ class SkillsExplorerAgentState(BaseModel):
     The list of experiences already explored with the user.
     """
 
+    question_asked_until_now: list[str] = Field(default_factory=list)
+    """
+    Tracks questions asked during the conversation to help the model maintain context.
+
+    This is needed because when many questions are asked, some may fall outside the
+    unsummarized history window or may not be clearly included in the summary. If
+    user responses dominate the summary, the questions may be underrepresented, causing
+    the model to lose track and potentially repeat questions.
+    
+    By keeping a local record of asked questions and injecting it into the prompt, the
+    model can better retain the conversation flow regardless of summarizer performance
+    or history window size.
+    """
+
     class Config:
         extra = "forbid"
 
@@ -109,6 +123,7 @@ class SkillsExplorerAgent(Agent):
         _first_time_for_experience = self.state.first_time_for_experience.get(self.experience_entity.uuid, True)
         if _first_time_for_experience:
             self.state.first_time_for_experience[self.experience_entity.uuid] = False
+            self.state.question_asked_until_now = []  # Reset the questions asked until now for this experience
 
         responsibilities_llm_stats = []
         if user_input.message == "":
@@ -131,6 +146,7 @@ class SkillsExplorerAgent(Agent):
         conversion_llm = _ConversationLLM()
         conversation_llm_output = await conversion_llm.execute(experiences_explored=self.state.experiences_explored,
                                                                first_time_for_experience=_first_time_for_experience,
+                                                               question_asked_until_now=self.state.question_asked_until_now,
                                                                user_input=user_input,
                                                                country_of_user=self.state.country_of_user,
                                                                context=context,
@@ -138,6 +154,7 @@ class SkillsExplorerAgent(Agent):
                                                                work_type=self.experience_entity.work_type,
                                                                logger=self.logger)
 
+        self.state.question_asked_until_now.append(conversation_llm_output.message_for_user)
         if conversation_llm_output.finished:
             # Once the conversation is finished, add the experience to the list of experiences explored
             title = getattr(self.experience_entity, 'experience_title', None)

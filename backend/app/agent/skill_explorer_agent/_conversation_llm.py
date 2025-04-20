@@ -21,6 +21,7 @@ class _ConversationLLM:
     async def execute(*,
                       experiences_explored: list[str],
                       first_time_for_experience: bool,
+                      question_asked_until_now: list[str],
                       user_input: AgentInput,
                       country_of_user: Country,
                       context: ConversationContext,
@@ -68,6 +69,7 @@ class _ConversationLLM:
 
             llm = GeminiGenerativeLLM(
                 system_instructions=_ConversationLLM._create_conversation_system_instructions(
+                    question_asked_until_now=question_asked_until_now,
                     country_of_user=country_of_user,
                     experience_title=experience_title,
                     work_type=work_type),
@@ -103,6 +105,7 @@ class _ConversationLLM:
 
     @staticmethod
     def _create_conversation_system_instructions(*,
+                                                 question_asked_until_now: list[str],
                                                  country_of_user: Country,
                                                  experience_title: str,
                                                  work_type: WorkType) -> str:
@@ -138,7 +141,12 @@ class _ConversationLLM:
                 - {get_question_c}
 
             Make sure you ask all the above questions from (a), (b), (c) to get a comprehensive understanding of the experience and what is important to me in that role.
+            Here are the questions you have asked me until now:
+            <question_asked_until_now>
+                {question_asked_until_now}
+            </question_asked_until_now>
 
+            
             Encourage me to be as descriptive as possible in my responses, because this will help you to better understand the experience.
 
             Do not ask me question about any tasks I might mention, stick to the general questions as explained above.
@@ -190,6 +198,7 @@ class _ConversationLLM:
             system_instructions_template,
             country_of_user_segment=_get_country_of_user_segment(country_of_user),
             get_question_c=_get_question_c(work_type),
+            question_asked_until_now="\n".join(f"- \"{s}\"" for s in question_asked_until_now),
             agent_character=STD_AGENT_CHARACTER,
             language_style=STD_LANGUAGE_STYLE,
             experience_title=f"'{experience_title}'",
