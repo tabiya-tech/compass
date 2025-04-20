@@ -59,7 +59,7 @@ test_cases = [
             - Managed the budget
             - Reported on the project's progress
             - Ensured the project was completed on time
-            When asked about your skills, answer with all the information at the same time. Do not add additional information or invent information.
+            Do not add additional information or invent information.
             """) + sa_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
         given_experience=ExperienceEntity(
@@ -85,9 +85,9 @@ test_cases = [
             - Prepared meals
             - Cleaned the kitchen
             - Managed the inventory
-            When asked about your skills, answer with all the information at the same time. Do not add additional information or invent information.
+            Do not add additional information or invent information.
             """) + sa_prompt,
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=10)],
         given_experience=ExperienceEntity(
             experience_title="Cook",
             company="Dinner for Two",
@@ -99,7 +99,7 @@ test_cases = [
             work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT
         ),
         country_of_user=Country.KENYA,
-        expected_responsibilities=[],
+        expected_responsibilities=[]
     ),
     SkillsExplorerAgentTestCase(
         conversation_rounds=10,
@@ -112,9 +112,9 @@ test_cases = [
             - Cleaned the house
             - Helped with shopping
             - Took care of the garden
-            When asked about your skills, answer with all the information at the same time. Do not add additional information or invent information.
+            Do not add additional information or invent information.
             """) + sa_prompt,
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=10)],
         given_experience=ExperienceEntity(
             experience_title="Helping an older neighbor",
             company="Neighbor",
@@ -123,13 +123,15 @@ test_cases = [
                 start="2018",
                 end="2020"
             ),
-            work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT
+            work_type=WorkType.UNSEEN_UNPAID
         ),
         country_of_user=Country.SOUTH_AFRICA,
-        expected_responsibilities=[],
+        expected_responsibilities=['I cleaned the house',
+                                   'I cooked meals',
+                                   'I helped with shopping',
+                                   'I took care of the garden'],
     ),
     SkillsExplorerAgentTestCase(
-        skip_force="force",
         conversation_rounds=10,
         name='incomplete_experience',
         simulated_user_prompt=dedent("""
@@ -140,9 +142,9 @@ test_cases = [
             - Cleaned the house
             - Helped with shopping
             - Took care of the garden
-            When asked about your skills, answer with all the information at the same time. Do not add additional information or invent information.
+            Do not add additional information or invent information.
             """),
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=10)],
         given_experience=ExperienceEntity(
             experience_title="",
             company=None,
@@ -151,6 +153,9 @@ test_cases = [
             work_type=None
         ),
         country_of_user=Country.UNSPECIFIED,
-        expected_responsibilities=[],
+        expected_responsibilities=['I cleaned the house',
+                                   'I cooked meals',
+                                   'I helped with shopping',
+                                   'I took care of the garden'],
     ),
 ]
