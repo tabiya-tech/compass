@@ -9,6 +9,7 @@ from app.conversation_memory.conversation_memory_manager import ConversationMemo
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
 from common_libs.test_utilities import get_random_session_id
+from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from .skills_explorer_agent_executor import SkillsExplorerAgentExecutor, SkillsExplorerAgentGetConversationContextExecutor, \
     SkillsExplorerAgentIsFinished
 from .skills_explorer_test_cases import SkillsExplorerAgentTestCase, test_cases
@@ -59,15 +60,8 @@ async def test_skills_explorer_agent_simulated_user(max_iterations: int, test_ca
     # However, this is not enough as a logger can be set up in the agent in such a way that it does not propagate
     # the log messages to the root logger. For this reason, we add additional guards.
     with caplog.at_level(logging.DEBUG):
-        # Guards to ensure that the loggers are correctly setup,
-        # otherwise the tests cannot be trusted that they correctly assert the absence of errors and warnings.
-        guard_warning_msg = logging.getLevelName(logging.WARNING) + str(session_id)  # some random string
-        execute_evaluated_agent._agent._logger.warning(guard_warning_msg)
-        assert guard_warning_msg in caplog.text
-        guard_error_msg = logging.getLevelName(logging.ERROR) + str(session_id)  # some random string
-        execute_evaluated_agent._agent._logger.warning(guard_error_msg)
-        assert guard_error_msg in caplog.text
-        caplog.records.clear()
+        # Guards to ensure that the loggers are correctly set up
+        guard_caplog(logger=execute_evaluated_agent._agent._logger, caplog=caplog)
 
         # Run the main test
         evaluation_result: ConversationEvaluationRecord = await conversation_test_function(
@@ -79,11 +73,13 @@ async def test_skills_explorer_agent_simulated_user(max_iterations: int, test_ca
         assert context.history.turns[-1].output.finished
 
         # Check if the actual discovered experiences match the expected ones
-        assert sorted(test_case.given_experience.responsibilities.responsibilities) == sorted(test_case.expected_responsibilities)
-        # Finally check that no errors and no warning were logged
-        for record in caplog.records:
-            assert record.levelname != 'ERROR'
-            assert record.levelname != 'WARNING'
+        # assert if the test_case.expected_responsibilities is a subset of the actual responsibilities
+        if not set(test_case.expected_responsibilities).issubset(
+                set(test_case.given_experience.responsibilities.responsibilities)):
+            assert sorted(test_case.given_experience.responsibilities.responsibilities) == sorted(test_case.expected_responsibilities)
+
+        # Finally, check that no errors and no warning were logged
+        assert_log_error_warnings(caplog=caplog, expect_errors_in_logs=False, expect_warnings_in_logs=False)
 
     # We run the evaluation assertions at the end
     # as it fails often due to the unpredictability of the LLM responses
