@@ -20,12 +20,25 @@ def get_test_cases_to_run(all_test_cases: list[T]) -> list[T]:
         cases_to_run = [case for case in cases_to_run if case.name not in cases_to_exclude_str]
 
     _cases_to_run = []
+    _force_cases = []
+    _skip_cases = []
     for tc in cases_to_run:
         if hasattr(tc, 'skip_force'):
             if tc.skip_force == "force":
-                return [tc]  # if there is a test case with force then run only that test case
-            elif tc.skip_force != "skip":
-                _cases_to_run.append(tc)  # gather all test cases that are not skipped
+                _force_cases.append(tc)
+            elif tc.skip_force == "skip":
+                _skip_cases.append(tc)
+            else:
+                _cases_to_run.append(tc)
+        else:
+            _cases_to_run.append(tc)
 
-    # if there are no test case with force then run all test cases that are not skipped
+    # If there are any test cases that are forced to run, we ignore the rest.
+    if _force_cases:
+        return _force_cases
+
+    # Exclude test cases that are marked to be skipped.
+    if _skip_cases:
+        _cases_to_run = [tc for tc in _cases_to_run if tc not in _skip_cases]
+
     return _cases_to_run
