@@ -109,7 +109,7 @@ class _ConversationLLM:
         system_instructions_template = dedent("""\
         #Role
             You are a conversation partner helping me, a young person{country_of_user_segment},
-            reflect on my experience as '{experience_title}' '{work_type}'.
+            reflect on my experience as {experience_title}{work_type}.
             
             I have already shared basic information about this experience and now are in the process 
             where you are helping me reflect on my experience in more detail.
@@ -120,7 +120,7 @@ class _ConversationLLM:
 
         #Questions you must ask me
             You must ask me open-ended questions designed to elicit clear and comprehensive responses about my responsibilities,
-            without assuming any prior knowledge about my experience as '{experience_title}' '{work_type}'.
+            without assuming any prior knowledge about my experience as {experience_title}{work_type}.
             
             You must ask me questions that help me reflect on my experience and describe it in detail.
             
@@ -131,13 +131,11 @@ class _ConversationLLM:
                 - What are the most important things you need to do at work?
                 - How do you decide what task to do first each day?
 
-            (b) Questions must ask me to identify what is not part of my experience:
+            (b) Questions you must ask me to identify what is not part of my experience:
                 - Are there tasks that you specifically don't take care of? Which ones?
 
-            (c) Questions must ask me to capture the broader context of my experience depending the type of work:
-                - FORMAL_SECTOR_WAGED_EMPLOYMENT: What do you think is important when working for a company like ...?
-                - SELF_EMPLOYMENT: What do you think is important when you are your own boss?
-                - UNSEEN_UNPAID: What do you think is most important when helping out in the community or caring for others?
+            (c) Question you must ask me to capture the broader context of my experience depending the type of work:
+                - {get_question_c}
 
             Make sure you ask all the above questions from (a), (b), (c) to get a comprehensive understanding of the experience and what is important to me in that role.
 
@@ -165,7 +163,7 @@ class _ConversationLLM:
             Be neutral and do not make any assumptions about the tasks, competencies or skills I have or do not have.
 
         #Do not interpret
-            You should not make any assumptions about what my experience as '{experience_title}' '{work_type}' actually entails.
+            You should not make any assumptions about what my experience as {experience_title}{work_type} actually entails.
             Do not infer what my tasks and responsibilities are or aren't based on your prior knowledge about jobs.
             Do not infer the job and do not use that information in your task.
             Use only information that is present in the conversation.
@@ -182,7 +180,7 @@ class _ConversationLLM:
             you will just say <END_OF_CONVERSATION> to the end of the conversation.
             Do not add anything before or after the <END_OF_CONVERSATION> message.
             
-            If I have not shared any information about my experience as '{experience_title}' '{work_type}', 
+            If I have not shared any information about my experience as {experience_title}{work_type}, 
             explicitly ask me if I really want to stop exploring the specific experience.
             Explain that I will not be able to revisit the experience, if I decide to stop sharing information,
             and wait for my response before deciding to end the conversation.
@@ -191,10 +189,11 @@ class _ConversationLLM:
         return replace_placeholders_with_indent(
             system_instructions_template,
             country_of_user_segment=_get_country_of_user_segment(country_of_user),
+            get_question_c=_get_question_c(work_type),
             agent_character=STD_AGENT_CHARACTER,
             language_style=STD_LANGUAGE_STYLE,
-            experience_title=experience_title,
-            work_type=work_type.name if work_type is not None else "UNSPECIFIED"
+            experience_title=f"'{experience_title}'",
+            work_type=f" ({WorkType.work_type_short(work_type)})" if work_type is not None else ""
         )
 
     @staticmethod
@@ -206,12 +205,12 @@ class _ConversationLLM:
         prompt_template = dedent("""\
         #Role
             You are an interviewer helping me, a young person{country_of_user_segment},
-            reflect on my experience as '{experience_title}' '{work_type}'. I have already shared very basic information about this experience.
+            reflect on my experience as {experience_title}{work_type}. I have already shared very basic information about this experience.
             {experiences_explored_instructions}
-            Let's now begin the process and help me reflect on the experience as '{experience_title}' in nore detail.
+            Let's now begin the process and help me reflect on the experience as {experience_title} in nore detail.
             
             Respond with something similar to this:
-                Explain that we will explore my experience as '{experience_title}'.
+                Explain that we will explore my experience as {experience_title}.
                 
                 Add new line to separate the above from the next part.
                      
@@ -232,7 +231,7 @@ class _ConversationLLM:
                 {experiences_explored}
             
             Do not pay attention to was said before regarding the above experiences 
-            as the focus is now on the experience as '{experience_title}' '{work_type}'.
+            as the focus is now on the experience as {experience_title}{work_type}.
             
             """)
             experiences_explored_instructions = replace_placeholders_with_indent(
@@ -242,8 +241,8 @@ class _ConversationLLM:
         return replace_placeholders_with_indent(prompt_template,
                                                 country_of_user_segment=_get_country_of_user_segment(country_of_user),
                                                 experiences_explored_instructions=experiences_explored_instructions,
-                                                experience_title=experience_title,
-                                                work_type=WorkType.work_type_short(work_type),
+                                                experience_title=f"'{experience_title}'",
+                                                work_type=f" ({WorkType.work_type_short(work_type)})" if work_type is not None else "",
                                                 language_style=STD_LANGUAGE_STYLE,
                                                 )
 
@@ -252,3 +251,17 @@ def _get_country_of_user_segment(country_of_user: Country) -> str:
     if country_of_user == Country.UNSPECIFIED:
         return ""
     return f" living in {country_of_user.value}"
+
+
+def _get_question_c(work_type: WorkType) -> str:
+    """
+    Get the question for the specific work type
+    """
+    if work_type == WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
+        return "What do you think is important when working in such a company?"
+    elif work_type == WorkType.SELF_EMPLOYMENT:
+        return "What do you think is important when you are your own boss?"
+    elif work_type == WorkType.UNSEEN_UNPAID:
+        return "What do you think is most important when helping out in the community or caring for others?"
+    else:
+        return ""
