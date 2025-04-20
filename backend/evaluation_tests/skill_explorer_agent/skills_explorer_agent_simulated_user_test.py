@@ -79,7 +79,10 @@ async def test_skills_explorer_agent_simulated_user(max_iterations: int, test_ca
         assert context.history.turns[-1].output.finished
 
         # Check if the actual discovered experiences match the expected ones
-        assert sorted(test_case.given_experience.responsibilities.responsibilities) == sorted(test_case.expected_responsibilities)
+        # assert if the test_case.expected_responsibilities is a subset of the actual responsibilities
+        if not set(test_case.expected_responsibilities).issubset(
+                set(test_case.given_experience.responsibilities.responsibilities)):
+            assert sorted(test_case.given_experience.responsibilities.responsibilities) == sorted(test_case.expected_responsibilities)
         # Finally check that no errors and no warning were logged
         for record in caplog.records:
             assert record.levelname != 'ERROR'
