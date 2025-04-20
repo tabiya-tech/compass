@@ -53,14 +53,16 @@ LOGGING_CONFIG = {
             "handlers": ["console"],
             "propagate": False,
         },
-        # All other loggers will be set to INFO level
-        "": {  # root logger
-            "level": "INFO",
-            "handlers": ["console"],
-        },
+        # Mute 'foo' logger by setting the level to WARN and propagate to False
+        # "foo": {
+        #    "level": "WARN",
+        #    "handlers": ["console"],
+        #    "propagate": False,
+        # },
     },
 }
-
+# The logging is configured in the pytest.ini file
+# An additional config is added here to mute specific loggers
 logging.config.dictConfig(LOGGING_CONFIG)
 logger = logging.getLogger()
 
@@ -111,7 +113,10 @@ def current_test_case(request) -> EvaluationTestCase:
 async def app_setup_and_teardown(current_test_case: EvaluationTestCase) -> AsyncGenerator[FastAPI, None]:
     logger.info("Setting up app for test")
     setup_env_vars(env_vars={
-        'LOG_CONFIG_FILE': "logging.cfg.dev.yaml",
+        # Set the LOG_CONFIG_FILE to "null" so that the pytest loggers are preserved.
+        # None does not work as it this will lead to the default config being used
+        # The log level during the tests is declared in the pytest.ini file
+        'LOG_CONFIG_FILE': "null",
         'VERTEX_API_REGION': 'us-central1',
         'DEFAULT_COUNTRY_OF_USER': current_test_case.country_of_user.value,
         # Set the path to the credentials file otherwise the app will not be able to authenticate with the GCP services
