@@ -16,6 +16,7 @@ describe("protected route util", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
         sessions: [],
         user_feedback_answered_questions: {},
+        experiments: {},
       };
 
       // WHEN checking if sensitive data is valid
@@ -35,6 +36,7 @@ describe("protected route util", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
         sessions: [],
         user_feedback_answered_questions: {},
+        experiments: {},
       };
 
       // WHEN checking if sensitive data is valid
@@ -54,6 +56,7 @@ describe("protected route util", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_AVAILABLE,
         sessions: [],
         user_feedback_answered_questions: {},
+        experiments: {},
       };
 
       // WHEN checking if sensitive data is valid
@@ -75,6 +78,7 @@ describe("protected route util", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_AVAILABLE,
         sessions: [],
         user_feedback_answered_questions: {},
+        experiments: {},
       };
 
       // WHEN checking if accepted_tc is valid
@@ -114,6 +118,7 @@ describe("protected route util", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_AVAILABLE,
         sessions: [],
         user_feedback_answered_questions: {},
+        experiments: {},
       };
 
       // WHEN checking if accepted_tc is valid
