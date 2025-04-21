@@ -76,6 +76,7 @@ const getUserPreferences = (acceptedTC: Date | undefined, hasSensitiveData: bool
     sensitive_personal_data_requirement: sensitiveDataRequirement,
     sessions: [],
     user_feedback_answered_questions: {},
+    experiments: {},
   };
   jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue(givenPreferences);
 }

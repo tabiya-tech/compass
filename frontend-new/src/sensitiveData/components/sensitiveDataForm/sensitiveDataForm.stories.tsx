@@ -39,6 +39,7 @@ export const Shown: StoryObj<typeof SensitiveDataForm> = {
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
       user_feedback_answered_questions: {},
       language: Language.en,
+      experiments: {},
     });
     return () => {
       UserPreferencesStateService.getInstance().clearUserPreferences();
@@ -57,6 +58,7 @@ export const ShownWhenSkipping: StoryObj<typeof SensitiveDataForm> = {
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       user_feedback_answered_questions: {},
       language: Language.en,
+      experiments: {},
     });
     return () => {
       UserPreferencesStateService.getInstance().clearUserPreferences();
@@ -75,6 +77,7 @@ export const ShownWithInvalidConfiguration: StoryObj<typeof SensitiveDataForm> =
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       user_feedback_answered_questions: {},
       language: Language.en,
+      experiments: {},
     });
     return () => {
       UserPreferencesStateService.getInstance().clearUserPreferences();

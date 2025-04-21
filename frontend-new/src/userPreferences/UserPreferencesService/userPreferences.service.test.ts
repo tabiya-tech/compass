@@ -55,6 +55,7 @@ describe("UserPreferencesService", () => {
         user_feedback_answered_questions: {},
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+        experiments: {},
       };
 
       const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, givenResponseBody, "application/json;charset=UTF-8");
@@ -241,6 +242,7 @@ describe("UserPreferencesService", () => {
         accepted_tc: undefined,
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+        experiments: {},
       };
       const fetchSpy = setupAPIServiceSpy(StatusCodes.CREATED, mockResponseFormBackend, "application/json;charset=UTF-8");
 
@@ -270,6 +272,7 @@ describe("UserPreferencesService", () => {
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
         accepted_tc: undefined,
+        experiments: {},
       };
 
       expect(actualUserPreferences).toEqual(expectedUserPreferences);

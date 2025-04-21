@@ -50,6 +50,7 @@ const mockUserPreferences: UserPreference = {
   sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
   has_sensitive_personal_data: false,
   accepted_tc: new Date(),
+  experiments: {},
 };
 
 const mockFeedbackResponse: FeedbackResponse = {

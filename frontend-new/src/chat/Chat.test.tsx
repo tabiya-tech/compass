@@ -249,6 +249,7 @@ describe("Chat", () => {
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       sessions: givenSessionId !== null ? [givenSessionId] : [],
       user_feedback_answered_questions: {},
+      experiments: {},
     };
   }
 
@@ -735,6 +736,7 @@ describe("Chat", () => {
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
           sessions: [givenNewSessionId],
           user_feedback_answered_questions: {},
+          experiments: {},
         };
         jest.spyOn(UserPreferencesService.getInstance(), "getNewSession").mockResolvedValueOnce(givenUserPreferences);
         // AND the conversation history is empty
@@ -847,6 +849,7 @@ describe("Chat", () => {
           user_feedback_answered_questions: {},
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
           language: Language.en,
+          experiments: {},
         };
         jest.spyOn(UserPreferencesService.getInstance(), "getNewSession").mockResolvedValueOnce(givenUserPreferences);
 
@@ -909,6 +912,7 @@ describe("Chat", () => {
           sessions: [givenNewSessionId],
           user_feedback_answered_questions: {},
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+          experiments: {},
         };
         jest.spyOn(UserPreferencesService.getInstance(), "getNewSession").mockResolvedValueOnce(givenUserPreferences);
 
@@ -1576,6 +1580,7 @@ describe("Chat", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
         sessions: [givenNewSessionId, givenActiveSessionId],
         user_feedback_answered_questions: {},
+        experiments: {},
       };
       jest.spyOn(UserPreferencesService.getInstance(), "getNewSession").mockResolvedValueOnce(givenUserPreferences);
 

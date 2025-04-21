@@ -20,6 +20,7 @@ function getMockUserPreference(): UserPreference {
     user_feedback_answered_questions: {
       [randomSessions[0]]: ["question1", "question2"]
     },
+    experiments: {},
   };
 }
 

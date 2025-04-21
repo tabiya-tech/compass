@@ -24,6 +24,26 @@ class IUserPreferenceRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
+    async def get_experiments_by_user_id(self, user_id: str) -> dict[str, str]:
+        """
+        Get the experiments for a user by user_id
+        :param user_id: str - The user_id to get experiments for
+        :return: dict[str, str] - A dictionary mapping experiment IDs to their corresponding groups
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_class: str) -> None:
+        """
+        Set an experiment class for a given experiment ID in the user preferences
+        :param user_id: str - The user_id to set the experiment for
+        :param experiment_id: str - The ID of the experiment
+        :param experiment_class: str - The class/group of the experiment
+        :return: None
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
     async def insert_user_preference(self, user_id: str, user_preference: UserPreferences) -> UserPreferences:
         """
         Insert a new user preference
@@ -64,6 +84,31 @@ class UserPreferenceRepository(IUserPreferenceRepository):
         except Exception as e:
             logger.exception(e)
             raise Exception("Failed to get user preferences")
+
+    async def get_experiments_by_user_id(self, user_id: str) -> dict[str, str]:
+        try:
+            _doc = await self.collection.find_one({"user_id": {"$eq": user_id}})
+
+            if not _doc:
+                return {}
+
+            user_preferences = UserPreferences.from_document(_doc)
+            return user_preferences.experiments
+
+        except Exception as e:
+            logger.exception(e)
+            raise Exception("Failed to get user experiments")
+
+    async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_class: str) -> None:
+        try:
+            # Use $set with dot notation to update a specific field in the experiments dictionary
+            await self.collection.update_one(
+                {"user_id": {"$eq": user_id}},
+                {"$set": {f"experiments.{experiment_id}": experiment_class}}
+            )
+        except Exception as e:
+            logger.exception(e)
+            raise Exception("Failed to set experiment")
 
     async def insert_user_preference(self, user_id: str, user_preference: UserPreferences) -> UserPreferences:
         try:

@@ -78,6 +78,7 @@ const StorybookWrapper = ({
     },
     sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
     has_sensitive_personal_data: false,
+    experiments: {}
   });
 
   // we need a wrapper for the children to set the feedback status

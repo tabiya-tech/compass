@@ -25,6 +25,7 @@ describe("issueNewSession", () => {
       user_feedback_answered_questions: {},
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       has_sensitive_personal_data: false,
+      experiments: {},
     };
     const givenUserPreferencesServiceInstance = UserPreferencesService.getInstance();
     jest.spyOn(givenUserPreferencesServiceInstance, "getNewSession").mockResolvedValueOnce(givenUserPreferences);
@@ -56,6 +57,7 @@ describe("issueNewSession", () => {
       user_feedback_answered_questions: {},
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       has_sensitive_personal_data: false,
+      experiments: {},
     };
     // AND the user preferences state service has the given user preferences
     const givenUserPrefStateServiceInstance = UserPreferencesStateService.getInstance();
