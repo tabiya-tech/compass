@@ -65,6 +65,15 @@ def _create_test_client_with_mocks(auth) -> TestClientWithMocks:
         async def insert_user_preference(self, user_id: str, user_preference: UserPreferences) -> UserPreferences:
             raise NotImplementedError()
 
+        async def get_experiments_by_user_id(self, user_id: str) -> dict[str, str]:
+            raise NotImplementedError()
+
+        async def get_experiments_by_user_ids(self, user_ids: list[str]) -> dict[str, dict[str, str]]:
+            raise NotImplementedError()
+
+        async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_class: str) -> None:
+            raise NotImplementedError()
+
     mocked_user_preferences_repository = MockedUserPreferencesRepository()
 
     # Set up the FastAPI app with the mocked dependencies

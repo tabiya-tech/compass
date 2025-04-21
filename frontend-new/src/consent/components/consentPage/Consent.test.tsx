@@ -154,6 +154,7 @@ describe("Testing Consent Page", () => {
           user_feedback_answered_questions: {},
           has_sensitive_personal_data: false,
           sensitive_personal_data_requirement: givenSensitiveDataRequirement,
+          experiments: {},
         }
         UserPreferencesStateService.getInstance().setUserPreferences(givenUserPreferences)
 
@@ -479,6 +480,7 @@ describe("Testing Consent Page", () => {
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_AVAILABLE,
           sessions: [],
           user_feedback_answered_questions: {},
+          experiments: {},
         });
 
         // AND the authStateService  returns an actual user
@@ -527,6 +529,7 @@ describe("Testing Consent Page", () => {
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
           sessions: [],
           user_feedback_answered_questions: {},
+          experiments: {},
         });
 
         // AND the authStateService  returns an actual user
@@ -545,6 +548,7 @@ describe("Testing Consent Page", () => {
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
           sessions: [],
           user_feedback_answered_questions: {},
+          experiments: {},
         });
 
         // AND canAccessPIIPage function to return true

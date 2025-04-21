@@ -156,6 +156,7 @@ describe("FeedbackForm", () => {
         user_feedback_answered_questions: {},
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+        experiments: {},
       });
 
       // WHEN the component is rendered

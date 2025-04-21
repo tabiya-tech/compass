@@ -45,13 +45,22 @@ def _mock_sensitive_personal_data_repository() -> ISensitivePersonalDataReposito
 def _mock_user_preference_repository() -> IUserPreferenceRepository:
     class MockedUserPreferenceRepository(IUserPreferenceRepository):
         async def get_user_preference_by_user_id(self, user_id: str) -> Optional[UserPreferences]:
-            return None
+            raise NotImplementedError
 
         async def update_user_preference(self, user_id: str, request: UserPreferencesRepositoryUpdateRequest) -> Optional[UserPreferences]:
-            return None
+            raise NotImplementedError
 
         async def insert_user_preference(self, user_id: str, user_preference: UserPreferences) -> UserPreferences:
-            return user_preference
+            raise NotImplementedError
+
+        async def get_experiments_by_user_id(self, user_id: str) -> dict[str, str]:
+            raise NotImplementedError
+
+        async def get_experiments_by_user_ids(self, user_ids: list[str]) -> dict[str, dict[str, str]]:
+            raise NotImplementedError()
+
+        async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_class: str) -> None:
+            raise NotImplementedError
 
     return MockedUserPreferenceRepository()
 

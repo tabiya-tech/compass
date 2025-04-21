@@ -44,13 +44,13 @@ def _create_test_client_with_mocks(auth) -> TestClientWithMocks:
     # mock the conversation service
     class MockConversationService(IConversationService):
         async def send(self, user_id: str, session_id: int, user_input: str, clear_memory: bool, filter_pii: bool):
-            return None
+            raise NotImplementedError
 
         async def get_history_by_session_id(self, user_id: str, session_id: int):
-            return None
+            raise NotImplementedError
 
         async def get_experiences_by_session_id(self, user_id: str, session_id: int):
-            return None
+            raise NotImplementedError
 
     _instance_conversation_service = MockConversationService()
 
@@ -59,13 +59,22 @@ def _create_test_client_with_mocks(auth) -> TestClientWithMocks:
 
     class MockUserPreferencesRepository(IUserPreferenceRepository):
         async def get_user_preference_by_user_id(self, user_id):
-            return None
+            raise NotImplementedError
 
         async def insert_user_preference(self, user_id: str, user_preference: UserPreferences):
-            return None
+            raise NotImplementedError
 
         async def update_user_preference(self, user_id: str, update: UserPreferencesRepositoryUpdateRequest):
-            return None
+            raise NotImplementedError
+
+        async def get_experiments_by_user_id(self, user_id: str) -> dict[str, str]:
+            raise NotImplementedError
+
+        async def get_experiments_by_user_ids(self, user_ids: list[str]) -> dict[str, dict[str, str]]:
+            raise NotImplementedError()
+
+        async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_class: str) -> None:
+            raise NotImplementedError()
 
     _instance_user_preferences_repository = MockUserPreferencesRepository()
 
@@ -203,7 +212,7 @@ class TestConversationsRoutes:
 
     @pytest.mark.asyncio
     async def test_send_forbidden(self, authenticated_client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
-        client, _, mocked_preferences_repository, _ = authenticated_client_with_mocks
+        client, mocked_conversation_service, mocked_preferences_repository, _ = authenticated_client_with_mocks
         # GIVEN a payload to send a message
         given_user_message = ConversationInput(
             user_input="foo"
@@ -212,11 +221,14 @@ class TestConversationsRoutes:
         # AND the user has a valid session
         given_session_id = 123
 
+        # AND the conversation service will successfully send a message
+        mocked_conversation_service.send = AsyncMock()
+
         # AND the user doesnt have the given session_id in their sessions array
         mock_user_preferences = get_mock_user_preferences(given_session_id)
         mock_user_preferences.sessions = [999]  # sessions doesnt include the given session id
-        user_preferences_spy = mocker.spy(mocked_preferences_repository, "get_user_preference_by_user_id")
-        user_preferences_spy.return_value = AsyncMock(return_value=mock_user_preferences)
+        mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(
+            return_value=mock_user_preferences)
 
         # WHEN a POST request where the session_id is in the Path
         response = client.post(
@@ -437,15 +449,18 @@ class TestConversationsRoutes:
     @pytest.mark.asyncio
     async def test_get_history_forbidden(self, authenticated_client_with_mocks: TestClientWithMocks,
                                          mocker: pytest_mock.MockerFixture):
-        client, _, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
+        client, mocked_conversation_service, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
         # GIVEN a valid session id
         given_session_id = 123
+
+        # AND the conversation get history will successfully get the history
+        mocked_conversation_service.get_history_by_session_id = AsyncMock()
 
         # AND the user doesnt have the given session_id in their sessions array
         mock_user_preferences = get_mock_user_preferences(given_session_id)
         mock_user_preferences.sessions = [999]  # sessions doesnt include the given session id
-        user_preferences_spy = mocker.spy(mocked_preferences_repository, "get_user_preference_by_user_id")
-        user_preferences_spy.return_value = AsyncMock(return_value=mock_user_preferences)
+        mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(
+            return_value=mock_user_preferences)
 
         # WHEN a GET request where the session_id is in the Path
         response = client.get(f"/conversations/{given_session_id}/messages")
@@ -454,7 +469,7 @@ class TestConversationsRoutes:
         assert response.status_code == HTTPStatus.FORBIDDEN
 
         # AND the user preferences repository was called with the correct user_id
-        user_preferences_spy.assert_called_once_with(mocked_user.user_id)
+        mocked_preferences_repository.get_user_preference_by_user_id.assert_called_once_with(mocked_user.user_id)
 
     @pytest.mark.asyncio
     async def test_get_history_service_internal_server_error(self, authenticated_client_with_mocks: TestClientWithMocks,
@@ -579,8 +594,8 @@ class TestConversationsRoutes:
         # AND the user doesnt have the given session_id in their sessions array
         mock_user_preferences = get_mock_user_preferences(given_session_id)
         mock_user_preferences.sessions = [999]  # sessions doesnt include the given session id
-        user_preferences_spy = mocker.spy(mocked_preferences_repository, "get_user_preference_by_user_id")
-        user_preferences_spy.return_value = AsyncMock(return_value=mock_user_preferences)
+        mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(
+            return_value=mock_user_preferences)
 
         # WHEN a GET request where the session_id is in the Path
         response = client.get(f"/conversations/{given_session_id}/experiences")
@@ -589,7 +604,7 @@ class TestConversationsRoutes:
         assert response.status_code == HTTPStatus.FORBIDDEN
 
         # AND the user preferences repository was called with the correct user_id
-        user_preferences_spy.assert_called_once_with(mocked_user.user_id)
+        mocked_preferences_repository.get_user_preference_by_user_id.assert_called_once_with(mocked_user.user_id)
 
     @pytest.mark.asyncio
     async def test_get_experiences_service_internal_server_error(self,
