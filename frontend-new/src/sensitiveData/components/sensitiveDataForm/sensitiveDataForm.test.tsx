@@ -174,6 +174,7 @@ const SAMPLE_USER_PREFERENCES = {
   user_feedback_answered_questions: {},
   sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
   has_sensitive_personal_data: false,
+  experiments: {},
 };
 
 const componentRender = () => {
@@ -227,6 +228,7 @@ describe("Sensitive Data Form", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
         sessions: [],
         user_feedback_answered_questions: {},
+        experiments: {},
       });
 
       // WHEN the form is rendered
@@ -279,6 +281,7 @@ describe("Sensitive Data Form", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
         sessions: [],
         user_feedback_answered_questions: {},
+        experiments: {},
       });
 
       // WHEN the form is rendered
@@ -331,6 +334,7 @@ describe("Sensitive Data Form", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
         sessions: [],
         user_feedback_answered_questions: {},
+        experiments: {},
       });
 
       // WHEN the form is rendered
@@ -383,6 +387,7 @@ describe("Sensitive Data Form", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
         sessions: [],
         user_feedback_answered_questions: {},
+        experiments: {},
       });
 
       // WHEN the form is rendered
@@ -436,6 +441,7 @@ describe("Sensitive Data Form", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
         sessions: [],
         user_feedback_answered_questions: {},
+        experiments: {},
       });
 
       // WHEN the form is rendered
@@ -488,6 +494,7 @@ describe("Sensitive Data Form", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
         sessions: [],
         user_feedback_answered_questions: {},
+        experiments: {},
       });
 
       // WHEN the form is rendered
@@ -523,6 +530,7 @@ describe("Sensitive Data Form", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
         sessions: [],
         user_feedback_answered_questions: {},
+        experiments: {},
       });
 
       // WHEN the form is rendered
@@ -556,6 +564,7 @@ describe("Sensitive Data Form", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
         sessions: [],
         user_feedback_answered_questions: {},
+        experiments: {},
       });
 
       // WHEN the form is rendered
@@ -827,6 +836,7 @@ describe("Sensitive Data Form", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
         sessions: [],
         user_feedback_answered_questions: {},
+        experiments: {},
       });
 
       // WHEN the form is rendered
@@ -953,6 +963,7 @@ describe("Sensitive Data Form", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
         sessions: [],
         user_feedback_answered_questions: {},
+        experiments: {},
       });
     });
 
@@ -1001,6 +1012,7 @@ describe("Sensitive Data Form", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
         sessions: [],
         user_feedback_answered_questions: {},
+        experiments: {},
       });
     });
 
@@ -1027,6 +1039,7 @@ describe("Sensitive Data Form", () => {
         user_id: "given user id",
         language: Language.en,
         accepted_tc: expect.any(Date),
+        experiments: {},
         has_sensitive_personal_data: true,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
         sessions: [],
@@ -1054,6 +1067,7 @@ describe("Sensitive Data Form", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
         sessions: [],
         user_feedback_answered_questions: {},
+        experiments: {},
       };
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue(givenUserPreferences);
       // AND skipping sensitive personal data method
@@ -1091,6 +1105,7 @@ describe("Sensitive Data Form", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
         sessions: [],
         user_feedback_answered_questions: {},
+        experiments: {},
       };
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue(givenUserPreferences);
 

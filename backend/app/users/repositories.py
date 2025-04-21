@@ -10,6 +10,16 @@ from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequ
 logger = logging.getLogger(__name__)
 
 
+class UserPreferenceRepositoryError(Exception):
+    """
+    Custom exception for user preference repository errors.
+    """
+
+    def __init__(self, message: str):
+        super().__init__(message)
+        self.message = message
+
+
 class IUserPreferenceRepository(ABC):
     @abstractmethod
     async def get_user_preference_by_user_id(self, user_id) -> UserPreferences | None:
@@ -20,6 +30,35 @@ class IUserPreferenceRepository(ABC):
             The user_id to search for
         :return: UserPreferences | None
             The user preferences if found, else None
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def get_experiments_by_user_id(self, user_id: str) -> dict[str, str]:
+        """
+        Get the experiments for a user by user_id
+        :param user_id: str - The user_id to get experiments for
+        :return: dict[str, str] - A dictionary mapping experiment IDs to their corresponding groups
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def get_experiments_by_user_ids(self, user_ids: list[str]) -> dict[str, dict[str, str]]:
+        """
+        Get the experiments for a user by user_id
+        :param user_ids: str - The user_ids to get experiments for
+        :return: dict[str, dict[str, str]] - A dictionary mapping user IDs to their corresponding experiments
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_class: str) -> None:
+        """
+        Set an experiment class for a given experiment ID in the user preferences
+        :param user_id: str - The user_id to set the experiment for
+        :param experiment_id: str - The ID of the experiment
+        :param experiment_class: str - The class/group of the experiment
+        :return: None
         """
         raise NotImplementedError()
 
@@ -63,7 +102,44 @@ class UserPreferenceRepository(IUserPreferenceRepository):
 
         except Exception as e:
             logger.exception(e)
-            raise Exception("Failed to get user preferences")
+            raise UserPreferenceRepositoryError("Failed to get user preferences") from e
+
+    async def get_experiments_by_user_id(self, user_id: str) -> dict[str, str]:
+        experiments = await self.get_experiments_by_user_ids([user_id])
+        return experiments.get(user_id, {})
+
+    async def get_experiments_by_user_ids(self, user_ids: list[str]) -> dict[str, dict[str, str]]:
+        try:
+            # Convert list to set to remove duplicates
+            unique_user_ids = set(user_ids)
+            cursor = self.collection.find({"user_id": {"$in": list(unique_user_ids)}})
+            docs = await cursor.to_list(length=None)
+
+            if not docs:
+                return {}
+
+            experiments: dict[str, dict[str, str]] = {}
+            for doc in docs:
+                if "experiments" not in doc:
+                    doc["experiments"] = {}
+                experiments[doc.get("user_id", None)] = UserPreferences.from_document(doc).experiments
+
+            return experiments
+
+        except Exception as e:
+            logger.exception(e)
+            raise UserPreferenceRepositoryError("Failed to get user experiments") from e
+
+    async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_class: str) -> None:
+        try:
+            # Use $set with dot notation to update a specific field in the experiments dictionary
+            await self.collection.update_one(
+                {"user_id": {"$eq": user_id}},
+                {"$set": {f"experiments.{experiment_id}": experiment_class}}
+            )
+        except Exception as e:
+            logger.exception(e)
+            raise UserPreferenceRepositoryError("Failed to set experiment") from e
 
     async def insert_user_preference(self, user_id: str, user_preference: UserPreferences) -> UserPreferences:
         try:
@@ -75,7 +151,7 @@ class UserPreferenceRepository(IUserPreferenceRepository):
             return await self.get_user_preference_by_user_id(user_id=user_id)
         except Exception as e:
             logger.exception(e)
-            raise e
+            raise UserPreferenceRepositoryError("Failed to insert user preferences") from e
 
     async def update_user_preference(self, user_id: str,
                                      update: UserPreferencesRepositoryUpdateRequest) -> UserPreferences:
@@ -87,4 +163,4 @@ class UserPreferenceRepository(IUserPreferenceRepository):
             return await self.get_user_preference_by_user_id(user_id=user_id)
         except Exception as e:
             logger.exception(e)
-            raise e
+            raise UserPreferenceRepositoryError("Failed to update user preferences") from e

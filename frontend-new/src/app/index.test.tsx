@@ -213,6 +213,7 @@ describe("index", () => {
         getActiveSessionId: jest.fn().mockReturnValue(123),
         user_feedback_answered_questions: {},
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+        experiments: {},
       };
 
       jest.spyOn(UserPreferencesService.getInstance(), "getUserPreferences").mockReturnValueOnce(preferencesPromise);
@@ -248,6 +249,7 @@ describe("index", () => {
         accepted_tc: new Date(),
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+        experiments: {},
       };
 
       jest.spyOn(UserPreferencesService.getInstance(), "getUserPreferences").mockResolvedValue(mockPreferences);

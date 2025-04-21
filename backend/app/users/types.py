@@ -1,6 +1,6 @@
 from dataclasses import field
 from datetime import datetime
-from typing import Optional, Mapping
+from typing import Mapping
 
 from pydantic import BaseModel, Field
 
@@ -17,24 +17,29 @@ class UpdateUserLanguageRequest(BaseModel):
 
 
 class UserPreferencesRepositoryUpdateRequest(BaseModel):
-    language: Optional[str] = None
+    language: str | None = None
     """
     Language - The language of the user
     """
 
-    accepted_tc: Optional[datetime] = None
+    accepted_tc: datetime | None = None
     """
     time - The time the user accepted the terms and conditions
     """
 
-    sessions: Optional[list[int]] = None  # not required
+    sessions: list[int] | None = None  # not required
     """
     sessions - The sessions of the user
     """
 
-    invitation_code: Optional[str] = None
+    invitation_code: str | None = None
     """
     invitation_code - The invitation code of the user
+    """
+
+    experiments: dict[str, str] = Field(default_factory=dict)
+    """
+    experiments - a key value pair of all the experiment ids(labels) the user is a part and with the a/b test class they've been assigned
     """
 
     class Config:
@@ -47,14 +52,18 @@ class UserPreferencesUpdateRequest(BaseModel):
     User ID - The user ID to update
     """
 
-    language: Optional[str] = None
+    language: str | None = None
     """
     Language - The language of the user
     """
 
-    accepted_tc: Optional[datetime] = None
+    accepted_tc: datetime | None = None
     """
     time - The time the user accepted the terms and conditions
+    """
+    experiments: dict[str, str] = Field(default_factory=dict)
+    """
+    experiments - A key value pair of all the experiment ids(labels) the user is a part and with the a/b test class they've been assigned
     """
 
     class Config:
@@ -62,11 +71,12 @@ class UserPreferencesUpdateRequest(BaseModel):
 
 
 class UserPreferences(BaseModel):
-    language: Optional[str] = None
-    invitation_code: Optional[str] = None
-    accepted_tc: Optional[datetime] = None
+    language: str | None = None
+    invitation_code: str | None = None
+    accepted_tc: datetime | None = None
     sessions: list[int] = Field(default_factory=list)  # not required
     sensitive_personal_data_requirement: SensitivePersonalDataRequirement
+    experiments: dict[str, str] = Field(default_factory=dict)
 
     @staticmethod
     def from_document(doc: Mapping[str, any]) -> "UserPreferences":
@@ -86,6 +96,7 @@ class UserPreferences(BaseModel):
                 "sensitive_personal_data_requirement",
                 SensitivePersonalDataRequirement.NOT_AVAILABLE
             ),
+            experiments=doc.get("experiments", {}),
         )
 
     class Config:
@@ -140,12 +151,12 @@ class UpdateUserPreferencesRequest(BaseModel):
     User ID
     """
 
-    language: Optional[str] = None
+    language: str | None = None
     """
     The language of the user
     """
 
-    accepted_tc: Optional[datetime] = None
+    accepted_tc: datetime | None = None
     """
     Accepted terms and conditions date
     """

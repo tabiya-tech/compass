@@ -118,6 +118,7 @@ describe("SocialAuth tests", () => {
         accepted_tc: tc,
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+        experiments: {},
       });
 
       // WHEN the component is rendered

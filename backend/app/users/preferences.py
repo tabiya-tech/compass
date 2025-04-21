@@ -14,6 +14,7 @@ from app.metrics.services.service import IMetricsService
 from app.metrics.types import UserAccountCreatedEvent
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, UserInfo, SignInProvider
+from app.users.get_user_preferences_repository import get_user_preferences_repository
 from app.users.repositories import UserPreferenceRepository
 from app.users.sensitive_personal_data.routes import get_sensitive_personal_data_service
 from app.users.sensitive_personal_data.service import ISensitivePersonalDataService
@@ -218,6 +219,7 @@ async def _update_user_preferences(
             repository.update_user_preference(preferences.user_id, UserPreferencesRepositoryUpdateRequest(
                 language=preferences.language,
                 accepted_tc=preferences.accepted_tc,
+                experiments=preferences.experiments
             )),
             user_feedback_service.get_answered_questions(preferences.user_id),
             sensitive_personal_data_service.exists_by_user_id(preferences.user_id)
@@ -231,11 +233,6 @@ async def _update_user_preferences(
 
     except Exception as e:
         ErrorService.handle(__name__, e)
-
-
-# TODO: should be a singleton
-async def _get_user_preferences_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)):
-    return UserPreferenceRepository(db)
 
 
 # TODO: should be a singleton
@@ -286,11 +283,11 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
                 description="Get user preferences, (language and time when they accepted terms and conditions)")
     async def _get_user_preferences_handler(
             user_id: str, user_info: UserInfo = Depends(auth.get_user_info()),
-            user_preference_repository: UserPreferenceRepository = Depends(_get_user_preferences_service),
+            user_preference_repository: UserPreferenceRepository = Depends(get_user_preferences_repository),
             sensitive_personal_data_service: ISensitivePersonalDataService = Depends(
                 get_sensitive_personal_data_service),
             user_feedback_service: UserFeedbackService = Depends(_get_user_feedback_service)
-    ) -> UsersPreferencesResponse:
+            ) -> UsersPreferencesResponse:
         return await _get_user_preferences(
             user_preference_repository,
             user_feedback_service,
@@ -315,7 +312,7 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
                               user_invitation_repository: UserInvitationRepository = Depends(
                                   _get_user_invitations_repository),
                               user_preference_repository: UserPreferenceRepository = Depends(
-                                  _get_user_preferences_service),
+                                  get_user_preferences_repository),
                               metrics_service: IMetricsService = Depends(
                                   get_metrics_service)) -> UsersPreferencesResponse:
         return await _create_user_preferences(user_invitation_repository, user_preference_repository, body, user_info,
@@ -334,7 +331,7 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
     async def _update_user_preferences_handler(
             request: UserPreferencesUpdateRequest,
             user_info: UserInfo = Depends(auth.get_user_info()),
-            user_preference_repository: UserPreferenceRepository = Depends(_get_user_preferences_service),
+            user_preference_repository: UserPreferenceRepository = Depends(get_user_preferences_repository),
             sensitive_personal_data_service: ISensitivePersonalDataService = Depends(
                 get_sensitive_personal_data_service),
             user_feedback_service: UserFeedbackService = Depends(_get_user_feedback_service)
@@ -357,7 +354,7 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
                 description="""Endpoint for starting a new conversation session.""")
     async def _get_new_session_handler(user_id: str, user_info: UserInfo = Depends(auth.get_user_info()),
                                        user_preference_repository: UserPreferenceRepository = Depends(
-                                           _get_user_preferences_service),
+                                           get_user_preferences_repository),
                                        sensitive_personal_data_service: ISensitivePersonalDataService = Depends(
                                            get_sensitive_personal_data_service),
                                        user_feedback_service: UserFeedbackService = Depends(_get_user_feedback_service)

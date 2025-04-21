@@ -55,6 +55,8 @@ export default class UserPreferencesService {
     // parse the response body
     let userPreferencesResponse: UserPreference;
     try {
+      // TODO: we should not be accepting the json payload as passed here without validation
+      // we should at least validate the types are as expected i.e if(!jsonPayload.sessions instanceof Array ...)
       const jsonPayload: UserPreference = JSON.parse(await response.text());
       userPreferencesResponse = {
         user_id: userId,
@@ -64,6 +66,7 @@ export default class UserPreferencesService {
         has_sensitive_personal_data: jsonPayload.has_sensitive_personal_data,
         accepted_tc: this.formatAcceptedTC(jsonPayload.accepted_tc),
         user_feedback_answered_questions: jsonPayload.user_feedback_answered_questions,
+        experiments: jsonPayload.experiments
       };
     } catch (error) {
       throw errorFactory(
