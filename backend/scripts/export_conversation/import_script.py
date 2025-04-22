@@ -5,13 +5,15 @@ import asyncio
 import logging
 import os
 from textwrap import dedent
+from typing import Optional
 
 from dotenv import load_dotenv
+from pydantic_settings import BaseSettings
 
 from app.application_state import ApplicationStateStore, ApplicationState
 from app.users.repositories import UserPreferenceRepository
 from app.users.sessions import SessionsService
-from _common import Settings, StoreType, create_store, get_db_connection
+from _common import StoreType, create_store, get_db_connection
 from common_libs.logging.log_utilities import setup_logging_config
 from scripts.export_conversation.constants import SCRIPT_DIR, DEFAULT_EXPORTS_DIR
 
@@ -20,6 +22,25 @@ setup_logging_config(os.path.join(SCRIPT_DIR, "logging.cfg.yaml"))
 logger = logging.getLogger(__name__)
 
 load_dotenv()
+
+
+class Settings(BaseSettings):
+    """
+    Settings for the import script.
+
+    All the fields are optional, because they are required depending on user's needs.
+    """
+
+    # source database
+    source_mongodb_uri: Optional[str] = None
+    source_database_name: Optional[str] = None
+
+    # destination database
+    target_mongodb_uri: str
+    target_database_name: str
+
+    class Config:
+        env_prefix = "IMPORT_CONVERSATION_"
 
 
 def _get_source_store(settings: Settings, source_type: StoreType, source_directory: str) -> ApplicationStateStore:
@@ -67,15 +88,15 @@ def _parse_args():
         epilog=dedent("""
         Environment Variables:
           Target database (required):
-            EXPORT_IMPORT_TARGET_MONGODB_URI    MongoDB connection URI for target database
-            EXPORT_IMPORT_TARGET_DATABASE_NAME  Database name for target
+            IMPORT_CONVERSATION_TARGET_MONGODB_URI    MongoDB connection URI for target database
+            IMPORT_CONVERSATION_TARGET_DATABASE_NAME  Database name for target
 
           Source database (required if source is DB):
-            EXPORT_IMPORT_SOURCE_MONGODB_URI    MongoDB connection URI for source database
-            EXPORT_IMPORT_SOURCE_DATABASE_NAME  Database name for source
+            IMPORT_CONVERSATION_SOURCE_MONGODB_URI    MongoDB connection URI for source database
+            IMPORT_CONVERSATION_SOURCE_DATABASE_NAME  Database name for source
 
         Notes:
-          - When importing from JSON, files are read from the 'exports' directory
+          - When importing from JSON, files are read from the 'exports/{{ session-id }}/state.json' file
           - A new session will be created for the target user
           - All agent states within the session are updated with the new session ID
           - The script will exit with code 1 if the import fails
@@ -106,7 +127,7 @@ def _parse_args():
 
     # Source type
     parser.add_argument(
-        "--source-type",
+        "--source",
         type=str,
         choices=["DB", "JSON"],
         required=True,

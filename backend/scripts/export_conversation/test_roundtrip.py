@@ -67,10 +67,15 @@ async def get_user_preferences_repository(
 
     setup_env_vars(
         env_vars=dict(
-            EXPORT_IMPORT_SOURCE_MONGODB_URI=f"mongodb://{host}:{port}",
-            EXPORT_IMPORT_SOURCE_DATABASE_NAME=application_db.name,
-            EXPORT_IMPORT_TARGET_MONGODB_URI=f"mongodb://{host}:{port}",
-            EXPORT_IMPORT_TARGET_DATABASE_NAME=application_db.name
+            # Export script.
+            EXPORT_CONVERSATION_SOURCE_MONGODB_URI=f"mongodb://{host}:{port}",
+            EXPORT_CONVERSATION_SOURCE_DATABASE_NAME=application_db.name,
+
+            # Import script.
+            IMPORT_CONVERSATION_SOURCE_MONGODB_URI=f"mongodb://{host}:{port}",
+            IMPORT_CONVERSATION_SOURCE_DATABASE_NAME=application_db.name,
+            IMPORT_CONVERSATION_TARGET_MONGODB_URI=f"mongodb://{host}:{port}",
+            IMPORT_CONVERSATION_TARGET_DATABASE_NAME=application_db.name
         )
     )
 

@@ -5,13 +5,16 @@ import asyncio
 import logging
 import os.path
 from textwrap import dedent
+from typing import Optional
+
 from dotenv import load_dotenv
+from pydantic_settings import BaseSettings
 
 from app.application_state import ApplicationStateStore
 from common_libs.logging.log_utilities import setup_logging_config
 
 from constants import SCRIPT_DIR, DEFAULT_EXPORTS_DIR
-from _common import Settings, StoreType, create_store, get_db_connection
+from _common import StoreType, create_store, get_db_connection
 from _application_state_queue import ApplicationStateQueue, _fetcher, _saver
 
 # set up the logging
@@ -19,6 +22,21 @@ setup_logging_config(os.path.join(SCRIPT_DIR, "logging.cfg.yaml"))
 logger = logging.getLogger(__name__)
 
 load_dotenv()
+
+
+class Settings(BaseSettings):
+    """
+    Settings for the export script.
+
+    All the fields are optional, because they are required depending on user's needs.
+    """
+
+    # source database
+    source_mongodb_uri: Optional[str] = None
+    source_database_name: Optional[str] = None
+
+    class Config:
+        env_prefix = "EXPORT_CONVERSATION_"
 
 
 def _get_source_store(settings: Settings, output_directory: str, source_type: StoreType) -> ApplicationStateStore:
@@ -58,12 +76,12 @@ def _parse_args():
         epilog=dedent("""
         Environment Variables:
           Source database (required if source is DB):
-            EXPORT_IMPORT_SOURCE_MONGODB_URI    MongoDB connection URI for source database
-            EXPORT_IMPORT_SOURCE_DATABASE_NAME  Database name for source
+            EXPORT_CONVERSATION_SOURCE_MONGODB_URI    MongoDB connection URI for source database
+            EXPORT_CONVERSATION_SOURCE_DATABASE_NAME  Database name for source
 
         Notes:
-          - When exporting to JSON, files are saved in the 'exports/json' directory
-          - When exporting to MD, files are saved in the 'exports/markdown' directory
+          - When exporting to JSON, files are saved in the 'output_dir/{{ session-id }}/state.json' directory
+          - When exporting to MD, files are saved in the 'output_dir/{{ session-id }}/conversation.md' directory
           - The script will exit with code 1 if the export fails
         """)
     )
@@ -85,6 +103,7 @@ def _parse_args():
         required=True,
         help="Source store type (DB or JSON)"
     )
+
     parser.add_argument(
         "--target",
         type=str,
