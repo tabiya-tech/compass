@@ -58,6 +58,7 @@ def main():
         vertex_api_region=getenv("VERTEX_API_REGION", True),
         embeddings_service_name=getenv("EMBEDDINGS_SERVICE_NAME"),
         embeddings_model_name=getenv("EMBEDDINGS_MODEL_NAME"),
+        enable_skills_ranking=getenv("BACKEND_ENABLE_SKILLS_RANKING"),
         target_environment_name=environment_name,
         target_environment_type=environment_type,
         backend_url=backend_url,

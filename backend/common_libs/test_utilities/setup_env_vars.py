@@ -121,6 +121,7 @@ def setup_env_vars(*, env_vars: dict[str, str] = None):
         'BACKEND_ENABLE_SENTRY': "false",
         'BACKEND_ENABLE_METRICS': "false",
         'DEFAULT_COUNTRY_OF_USER': Country.UNSPECIFIED.value,
+        "BACKEND_ENABLE_SKILLS_RANKING": "false"
         # Add more environment variables as needed here
     }
 

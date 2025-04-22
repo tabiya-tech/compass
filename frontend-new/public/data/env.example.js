@@ -25,4 +25,7 @@ window.tabiyaConfig = {
   // Application default invitation codes.
   "FRONTEND_LOGIN_CODE": btoa("login_code"),
   "FRONTEND_REGISTRATION_CODE": btoa("registration_code"),
+
+  // Skills Ranking feature.
+  "FRONTEND_ENABLE_SKILLS_RANKING": btoa("false"),
 };

@@ -122,6 +122,11 @@ def unauthenticated_client_with_mocks() -> Generator[TestClientWithMocks, None, 
 
 # ----- send message tests -----
 class TestConversationsRoutes:
+    @pytest.fixture(scope="function", autouse=True)
+    def setup_class(self, setup_application_config):
+        """Set-up TestConversationsRoutes for all tests, since we need the app config to check if skill ranking routes are enabled."""
+        pass
+
     @pytest.mark.asyncio
     async def test_send_successful(self, authenticated_client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
         client, mocked_service, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks

@@ -407,7 +407,8 @@ async def export_metrics(*, input_mongo_uri: str, input_database_name: str, outp
                 default_country_of_user=Country.UNSPECIFIED,
                 taxonomy_model_id=os.getenv("TAXONOMY_MODEL_ID"),
                 embeddings_model_name=os.getenv("EMBEDDINGS_MODEL_NAME"),
-                embeddings_service_name=os.getenv("EMBEDDINGS_SERVICE_NAME")
+                embeddings_service_name=os.getenv("EMBEDDINGS_SERVICE_NAME"),
+                enable_skills_ranking=False
             )
         )
 

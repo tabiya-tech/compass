@@ -136,6 +136,8 @@ if not os.getenv("EMBEDDINGS_SERVICE_NAME"):
     raise ValueError("Mandatory EMBEDDINGS_SERVICE_NAME environment variable is not set")
 if not os.getenv("EMBEDDINGS_MODEL_NAME"):
     raise ValueError("Mandatory EMBEDDINGS_MODEL_NAME environment variable is not set")
+if not os.getenv("BACKEND_ENABLE_SKILLS_RANKING"):
+    raise ValueError("Mandatory BACKEND_ENABLE_SKILLS_RANKING environment variable is not set")
 
 # set global application configuration
 set_application_config(
@@ -147,6 +149,7 @@ set_application_config(
         taxonomy_model_id=os.getenv('TAXONOMY_MODEL_ID'),
         embeddings_service_name=os.getenv("EMBEDDINGS_SERVICE_NAME"),
         embeddings_model_name=os.getenv("EMBEDDINGS_MODEL_NAME"),
+        enable_skills_ranking=os.getenv("BACKEND_ENABLE_SKILLS_RANKING").lower() == "true"
     )
 )
 

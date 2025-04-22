@@ -8,6 +8,7 @@ from typing import List, Annotated
 from fastapi import FastAPI, APIRouter, Request, Depends, HTTPException, Path
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from app.app_config import get_application_config
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.application_state import ApplicationStateManager
 from app.constants.errors import HTTPErrorResponse
@@ -18,6 +19,7 @@ from app.conversations.feedback.routes.routes import add_user_feedback_routes
 from app.conversations.reactions.repository import ReactionRepository
 from app.conversations.reactions.routes import add_reaction_routes, get_user_preferences_repository
 from app.conversations.service import ConversationAlreadyConcludedError, IConversationService, ConversationService
+from app.conversations.skills_ranking.routes.routes import add_skills_ranking_routes
 from app.conversations.types import ConversationResponse, ConversationInput
 from app.errors.constants import NO_PERMISSION_FOR_SESSION
 from app.errors.errors import UnauthorizedSessionAccessError
@@ -57,6 +59,7 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
     :param authentication: Authentication Module Dependency: The authentication instance to use for the routes.
     """
     logger = logging.getLogger(__name__)
+    application_config = get_application_config()
 
     conversation_router = APIRouter(prefix="/conversations/{session_id}", tags=["conversations"])
 
@@ -193,5 +196,11 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
     # Add the user feedback routes
     ############################################
     add_user_feedback_routes(conversation_router, authentication)
+
+    ############################################
+    # Add skills ranking routes
+    ############################################
+    if application_config.enable_skills_ranking:
+        add_skills_ranking_routes(conversation_router, authentication)
 
     app.include_router(conversation_router)

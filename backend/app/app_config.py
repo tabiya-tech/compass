@@ -47,6 +47,11 @@ class ApplicationConfig(BaseModel):
     The name of the embeddings model to use.
     """
 
+    enable_skills_ranking: bool
+    """
+    flag to enable or disable skills ranking.
+    """
+
 
 _application_config: ApplicationConfig | None = None
 
