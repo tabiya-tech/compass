@@ -31,7 +31,7 @@ class _DataOperation(Enum):
     ADD = "ADD"
     UPDATE = "UPDATE"
     DELETE = "DELETE"
-    NONE = "NONE"
+    NOOP = "NOOP"
 
     @staticmethod
     def from_string_key(key: str | None) -> Optional['_DataOperation']:
@@ -120,24 +120,39 @@ class _DataExtractionLLM:
 
         _data = response_data.collected_experience_data
         logging.debug("Response data from LLM: %s", response_data.model_dump_json(indent=2))
-        _data.data_operation = _DataOperation.from_string_key(_data.data_operation)
+
+        data_operation = _DataOperation.from_string_key(_data.data_operation)
+
+        if data_operation is None:
+            # This may happen if the LLM fails to return a valid data operation string
+            self.logger.error("Invalid data operation:%s", _data.data_operation)
+
+            return -1, llm_stats
+
+        if _data.data_operation is None or data_operation == _DataOperation.NOOP:
+            # Either the LLM did not return a data operation or the LLM returned NOOP
+            self.logger.info("No operation to be performed on the experience data")
+            return -1, llm_stats
+
         experience_index: int
         experience_index = -1
-        if _data.data_operation is None:
-            self.logger.error("Invalid data operation:%s", _data.data_operation)
-            return experience_index, llm_stats
 
-        if _data.data_operation == _DataOperation.ADD:
+        if data_operation == _DataOperation.ADD:
             # add the new experience to the collected experience data
             self.logger.info("Adding new experience with index:%s", len(collected_experience_data_so_far))
             # The latest user input will be added after the last turn in the conversation history
             next_turn_index = context.history.turns[-1].index + 1
+
+            # Ensure the work type is a valid enum value
+            work_type = WorkType.from_string_key(_data.work_type)
+            work_type = work_type.name if work_type is not None else None
+
             new_item = CollectedData(
                 index=len(collected_experience_data_so_far),
                 defined_at_turn_number=next_turn_index,
                 experience_title=_data.experience_title,
                 paid_work=_data.paid_work,
-                work_type=_data.work_type,
+                work_type=work_type,
                 start_date=_data.start_date,
                 end_date=_data.end_date,
                 company=_data.company,
@@ -156,8 +171,9 @@ class _DataExtractionLLM:
                 else:
                     collected_experience_data_so_far.append(new_item)
                     experience_index = len(collected_experience_data_so_far) - 1
-
-        if _data.data_operation == _DataOperation.UPDATE:
+                    self.logger.info("Experience data added with index:%s\n"
+                                     "  - data:%s", experience_index, new_item.model_dump())
+        elif data_operation == _DataOperation.UPDATE:
             # update the experience in the collected experience data
             if 0 <= _data.index < len(collected_experience_data_so_far):
                 to_update = collected_experience_data_so_far[_data.index]
@@ -186,14 +202,15 @@ class _DataExtractionLLM:
                                  dict_diff(before_update, after_update))
             else:
                 self.logger.error("Invalid index:%s for updating experience", _data.index)
-
-        if _data.data_operation == _DataOperation.DELETE:
+        elif data_operation == _DataOperation.DELETE:
             # delete the experience from the collected experience data
             if 0 <= _data.index < len(collected_experience_data_so_far):
                 self.logger.info("Deleting experience with index:%s", _data.index)
                 del collected_experience_data_so_far[_data.index]
             else:
                 self.logger.error("Invalid index:%s for deleting experience", _data.index)
+        else:
+            self.logger.error("Invalid data operation:%s", _data.data_operation)
 
         for i, _data in enumerate(collected_experience_data_so_far):
             # Sometimes the LLM may add an empty experience, so we skip it
@@ -269,7 +286,8 @@ class _DataExtractionLLM:
                     Make sure you are extracting information about experiences that should be added to the 'collected_experience_data' 
                     and not information that should be ignored.
                     For each experience, you will collect information for the following fields:
-                    - experience_title 
+                    - experience_title
+                    - paid_work 
                     - work_type
                     - start_date
                     - end_date
@@ -290,9 +308,9 @@ class _DataExtractionLLM:
                         `null` It was not provided by the user and the user was not explicitly asked for this information yet.
                         Empty string if the user was asked and explicitly chose to not provide this information. 
                     ##'work_type' instructions
-                        Classify the type of work of the experience.
+                        Classify the type of work of the work experience.
                         Use the '<User's Last Input>' and relate it to the'<Conversation History>' to determine the type of work.
-                        Choose one of the following values and criteria:
+                        Choose one of the following values:
                             {work_type_definitions}   
                     ##Timeline instructions
                         The user may provide the beginning and end of an experience at any order, 
@@ -317,14 +335,15 @@ class _DataExtractionLLM:
                             For reference, my current date is {current_date}    
                     ##'company' instructions
                         What the company does or name of the company depending on the context.
-                        For unpaid work, use the receiver of the work (e.g. "Family", "Community", "Self" etc).
-                        String value containing the type or name of the company.
+                        For unpaid work, use the receiver of the work (e.g. "My Family", "Community", "Self" etc).
+                        String value containing the type, or name of the company, or the receiver of the work.
                         `null` It was not provided by the user and the user was not explicitly asked for this information yet.
                         Empty string if the user was asked and explicitly chose to not provide this information. 
                         Do not insist on the user providing this information if they do not provide it. 
                     ##'location' instructions 
-                        The location (e.g City, Region, District) where the job was performed or the company is located any
-                        one of them. In case of remote work or work from home use (Remote, Home Office etc) as the location.
+                        The location (e.g City, Region, District) where the job was performed or the company is located any one of them. 
+                        In case of paid remote work or work from home use (Remote, Home Office etc) as the location.
+                        For unpaid work, use the receiver's location.
                         String value containing the location.
                         `null` It was not provided by the user and the user was not explicitly asked for this information yet.
                         Empty string if the user was asked and explicitly chose to not provide this information.   
@@ -332,12 +351,11 @@ class _DataExtractionLLM:
                 #JSON Output instructions
                     Your response must always be a JSON object with the following schema:
                     - ignored_experiences: A detailed, step-by-step explanation in prose of the experiences referenced by the user that will not be added to the 
-                                           'collected_experience_data' and why. These are experiences that were ignored.
-                                           Follow the instructions in '#New Experience handling', '#Update Experience handling' and '#Delete Experience handling'.
-                                            to determine which experience you will be ignoring.
+                                           'collected_experience_data' and why. These are experiences that will be ignored.
+                                           Follow the instructions in '#New Experience handling', '#Update Experience handling' and '#Delete Experience handling' to determine which experience you will be ignoring.
                                            An empty string "" if no experiences will be ignored. 
-                                           e.g. Experience was not referred to in the '<User's Last Input>'.
-                                           Formatted as a json string      
+                                           e.g. Experience was not referred in the '<User's Last Input>'.
+                                           Formatted as a json string.      
                     - experience_references: Provide a brief explanation (up to 100 words) about which experience you will update or delete or add. 
                                 This field should not contain any ignored experiences. This field should not contain any ignored experiences.
                                 Follow the instructions in '#New Experience handling', '#Update Experience handling' and '#Delete Experience handling' 
@@ -371,7 +389,7 @@ class _DataExtractionLLM:
                                     - paid_work_references:
                                     }}
                                 - data_operation: The operation that should be performed to the experience data, choose one of the following values:
-                                    'ADD', 'UPDATE', 'DELETE', 'None'.
+                                    'ADD', 'UPDATE', 'DELETE', 'NOOP'. The value 'NOOP' means that no operation should be performed.
                                 - index: For an experience that exists in the <Previously Extracted Experience Data>, the index of that experience. 
                                          For a new experience, the next index in the <Previously Extracted Experience Data> list.
                                          Formatted as a json integer.
