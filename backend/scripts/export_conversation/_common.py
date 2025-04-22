@@ -2,31 +2,11 @@ import os
 from typing import Optional, Literal
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
-from pydantic_settings import BaseSettings
 
 from app.application_state import ApplicationStateStore
 from app.store.database_application_state_store import DatabaseApplicationStateStore
 from app.store.json_application_state_store import JSONApplicationStateStore
 from app.store.markdown_conversation_state_store import MarkdownConversationStateStore
-
-
-class Settings(BaseSettings):
-    """
-    Settings for the export-import script.
-
-    All the fields are optional, because they are required depending on user's needs.
-    """
-
-    # source database
-    source_mongodb_uri: Optional[str] = None
-    source_database_name: Optional[str] = None
-
-    # destination database
-    target_mongodb_uri: Optional[str] = None
-    target_database_name: Optional[str] = None
-
-    class Config:
-        env_prefix = "EXPORT_IMPORT_"
 
 
 StoreType = Literal["JSON", "DB", "MD"]
