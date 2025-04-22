@@ -54,5 +54,6 @@ async def _saver(*,
             logger.info(f"Exported conversation with session id: {state.session_id}")
         except Exception as e:
             logger.error(f"Error saving conversation with session id: {state.session_id}: {e}")
+            logger.exception(e)
         finally:
             queue.task_done()
