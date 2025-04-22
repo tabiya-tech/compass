@@ -4,6 +4,7 @@ from textwrap import dedent
 from typing import AsyncIterator, Optional
 from datetime import datetime
 
+from app.agent.agent_types import AgentType
 from app.application_state import ApplicationState, ApplicationStateStore
 
 MarkdownOnlyForExportError = Exception("MarkdownConversationStateStore is only for exporting")
@@ -34,6 +35,13 @@ class MarkdownConversationStateStore(ApplicationStateStore):
     def _format_message(self, message: str):
         """Format a message for markdown"""
         return message.replace("\n", "<br/>")
+
+    def _format_agent_type(self, agent_type: Optional[AgentType]):
+        """Format the Optional Agent Type"""
+        if agent_type is None:
+            return ""
+
+        return agent_type.value
 
     def _formatted_duration(self, first_timestamp: datetime, second_timestamp: datetime):
         """Get formatted duration, eg: 1 hour, 4 minutes and 2 seconds """
@@ -84,14 +92,14 @@ class MarkdownConversationStateStore(ApplicationStateStore):
                 markdown_lines.append(f"| {turn_count} | "
                                       f"| {self._format_message(turn.input.message)} "
                                       f"| {self._formatted_duration(previous_time_stamp, turn.input.sent_at)} "
-                                      f"| {turn.output.agent_type.value} |")
+                                      f"| {self._format_agent_type(turn.output.agent_type)} |")
                 turn_count += 1
                 previous_time_stamp = turn.input.sent_at
 
             markdown_lines.append(dedent(f"| {turn_count} "
                                          f"| {self._format_message(turn.output.message_for_user)} "
                                          f"| | {self._formatted_duration(previous_time_stamp, turn.output.sent_at)} "
-                                         f"| {turn.output.agent_type.value} |"))
+                                         f"| {self._format_agent_type(turn.output.agent_type)} |"))
             previous_time_stamp = turn.output.sent_at
 
         # Write to file
