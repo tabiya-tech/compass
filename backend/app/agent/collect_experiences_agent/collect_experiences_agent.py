@@ -183,13 +183,9 @@ class CollectExperiencesAgent(Agent):
                 self._state.collected_data
             )
             transition_message: str
-            if exploring_type is not None:
-                transition_message = f"Ask me about experiences that include: {exploring_type.value}"
-            else:
-                transition_message = "Let's recap, and give me a chance to correct any mistakes."
             conversation_llm_output = await conversion_llm.execute(first_time_visit=self._state.first_time_visit,
                                                                    context=context,
-                                                                   user_input=AgentInput(message=transition_message, is_artificial=True),
+                                                                   user_input=AgentInput(message=user_input.message, is_artificial=True),
                                                                    country_of_user=self._state.country_of_user,
                                                                    collected_data=collected_data,
                                                                    last_referenced_experience_index=last_referenced_experience_index,
