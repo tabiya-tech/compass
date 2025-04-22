@@ -73,7 +73,7 @@ class MarkdownConversationStateStore(ApplicationStateStore):
         Conversation duration: {self._formatted_duration(conversation_started_at, conversation_ended_at)}
         
         ## Messages
-        | turn | Compass | User | Timestamp (After previous message) | Agent |
+        | turn | Compass | User | Time elapsed (since previous message) | Agent |
         |------|---------|------|-----------|-------|"""))
 
         # Write conversation turns
