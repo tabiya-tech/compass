@@ -137,7 +137,7 @@ class _DataExtractionLLM:
                 defined_at_turn_number=next_turn_index,
                 experience_title=_data.experience_title,
                 paid_work=_data.paid_work,
-                work_type=_data.work_type,
+                work_type=WorkType.from_string_key(_data.work_type),
                 start_date=_data.start_date,
                 end_date=_data.end_date,
                 company=_data.company,
@@ -156,6 +156,8 @@ class _DataExtractionLLM:
                 else:
                     collected_experience_data_so_far.append(new_item)
                     experience_index = len(collected_experience_data_so_far) - 1
+                    self.logger.info("Experience data added with index:%s\n"
+                                     "  - data:%s", experience_index, new_item.model_dump())
 
         if _data.data_operation == _DataOperation.UPDATE:
             # update the experience in the collected experience data
@@ -269,7 +271,8 @@ class _DataExtractionLLM:
                     Make sure you are extracting information about experiences that should be added to the 'collected_experience_data' 
                     and not information that should be ignored.
                     For each experience, you will collect information for the following fields:
-                    - experience_title 
+                    - experience_title
+                    - paid_work 
                     - work_type
                     - start_date
                     - end_date
