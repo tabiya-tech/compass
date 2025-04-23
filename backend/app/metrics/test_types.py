@@ -215,13 +215,15 @@ class TestExperienceDiscoveredEvent:
         given_user_id = get_random_user_id()
         # AND an experience count
         given_experience_count = random.randint(1, 10)  # nosec B311 # random is used for testing purposes
-        # AND some work types discovered
-        given_work_types_discovered = random.choices(list(WorkType), k=random.randint(1,
-                                                                                      len(ReactionKind)))  # nosec B311 # random is used for testing purposes
+        # AND some work types discovered with their counts
+        given_experiences_by_work_type = {
+            work_type.name: random.randint(1, 5)  # nosec B311 # random is used for testing purposes
+            for work_type in random.choices(list(WorkType), k=random.randint(1, len(WorkType)))  # nosec B311 # random is used for testing purposes
+        }
         # WHEN creating an instance of the event
         actual_event = ExperienceDiscoveredEvent(session_id=given_session_id, user_id=given_user_id,
                                                  experience_count=given_experience_count,
-                                                 work_types_discovered=given_work_types_discovered)
+                                                 experiences_by_work_type=given_experiences_by_work_type)
 
         # THEN the basic event fields should be set correctly
         assert_basic_event_fields_are_set(actual_event, EventType.EXPERIENCE_DISCOVERED, setup_application_config,
@@ -237,6 +239,9 @@ class TestExperienceDiscoveredEvent:
 
         # AND the experience count should be set correctly
         assert actual_event.experience_count == given_experience_count
+
+        # AND the experience by work type should be set correctly
+        assert actual_event.experiences_by_work_type == given_experiences_by_work_type
 
     def test_extra_fields_are_not_allowed(self, setup_application_config: ApplicationConfig):
         # GIVEN all required fields

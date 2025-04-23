@@ -121,12 +121,12 @@ class ApplicationStateMetricsRecorder(IApplicationStateMetricsRecorder):
             ))
 
         # Record experience discovered changes
-        if previous_state.experiences_discovered_count != current_state.experiences_discovered_count or previous_state.work_types_discovered != current_state.work_types_discovered:
+        if previous_state.experiences_by_work_type != current_state.experiences_by_work_type:
             events.append(ExperienceDiscoveredEvent(
                 user_id=user_id,
                 session_id=session_id,
                 experience_count=current_state.experiences_discovered_count,
-                work_types_discovered=current_state.work_types_discovered
+                experiences_by_work_type=current_state.experiences_by_work_type
             ))
 
         # Record experience exploration changes

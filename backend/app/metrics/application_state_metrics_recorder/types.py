@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from typing import cast
 
 from app.agent.agent_director.abstract_agent_director import ConversationPhase
+from app.agent.experience import WorkType
 from app.agent.explore_experiences_agent_director import DiveInPhase
 from app.application_state import ApplicationState
 
@@ -20,7 +21,7 @@ class ApplicationStatesOfInterest(BaseModel):
     user_message_count: int
     experiences_explored_count: int
     experiences_discovered_count: int
-    work_types_discovered: list[str]
+    experiences_by_work_type: dict[str, int]
 
     @classmethod
     def from_state(cls, state: ApplicationState) -> "ApplicationStatesOfInterest":
@@ -32,7 +33,7 @@ class ApplicationStatesOfInterest(BaseModel):
             user_message_count=_get_user_message_count(state),
             experiences_explored_count=_get_experiences_explored_count(state),
             experiences_discovered_count=_get_experiences_discovered_count(state),
-            work_types_discovered=_get_work_types_discovered(state)
+            experiences_by_work_type=_get_experience_by_work_type(state)
         )
 
 
@@ -91,6 +92,11 @@ def _get_experiences_discovered_count(state: ApplicationState) -> int:
     return len(state.explore_experiences_director_state.experiences_state)
 
 
-def _get_work_types_discovered(state: ApplicationState) -> list[str]:
-    """Get the current work types discovered"""
-    return [work_type.name for work_type in state.collect_experience_state.explored_types]
+def _get_experience_by_work_type(state: ApplicationState) -> dict[str, int]:
+    """Get the current number of experiences discovered by work type"""
+    experiences_discovered = {}
+    for data in state.collect_experience_state.collected_data:
+        if data.work_type:
+            work_type = WorkType[data.work_type].name
+            experiences_discovered[work_type] = experiences_discovered.get(work_type, 0) + 1
+    return experiences_discovered
