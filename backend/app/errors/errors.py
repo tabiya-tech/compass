@@ -7,3 +7,7 @@ class UnauthorizedSessionAccessError(Exception):
         super().__init__(message)
 
 
+class NoDBUpdateException(Exception):
+    """
+    Exception raised when no update to the database.
+    """

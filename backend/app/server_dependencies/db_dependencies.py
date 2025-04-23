@@ -180,6 +180,10 @@ class CompassDBProvider:
                 ("message_id", 1)
             ], unique=True)
 
+            await application_db.get_collection(Collections.SKILLS_RANKING_STATE).create_index([
+                ("session_id", 1)
+            ], unique=True)
+
             logger.info("Finished creating indexes for the application database")
         except Exception as e:
             logger.exception(e)
