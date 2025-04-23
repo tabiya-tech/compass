@@ -18,12 +18,13 @@ from app.conversations.feedback.services.types import NewFeedbackSpec, NewFeedba
     Feedback, \
     Version, FeedbackItem, Answer
 from app.users.auth import UserInfo
+from app.users.get_user_preferences_repository import get_user_preferences_repository
 from app.users.repositories import IUserPreferenceRepository
 from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
 from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest
 from common_libs.test_utilities.mock_auth import MockAuth, UnauthenticatedMockAuth
 from ._types import SimplifiedAnswer, FeedbackResponse
-from .routes import add_user_feedback_routes, _get_user_feedback_service, _get_user_preferences_repository, \
+from .routes import add_user_feedback_routes, _get_user_feedback_service, \
     MAX_PAYLOAD_SIZE
 
 TestClientWithMocks = tuple[TestClient, IUserFeedbackService, IUserPreferenceRepository, UserInfo | None]
@@ -104,7 +105,7 @@ def _create_test_client_with_mocks(auth) -> TestClientWithMocks:
 
     # Set up the app dependency override
     app.dependency_overrides[_get_user_feedback_service] = lambda: mocked_feedback_service
-    app.dependency_overrides[_get_user_preferences_repository] = lambda: mocked_user_preferences_repository
+    app.dependency_overrides[get_user_preferences_repository] = lambda: mocked_user_preferences_repository
 
     conversations_router = APIRouter(
         prefix="/conversations/{session_id}",
