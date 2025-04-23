@@ -168,18 +168,18 @@ class ExperienceDiscoveredEvent(AbstractConversationEvent):
     """
     experience_count - the number of experiences discovered by a user
     """
-    work_types_discovered: list[str]
+    experiences_by_work_type: dict[str, int]
     """
-    work_types_discovered - the work types discovered by the user
+    experiences_by_work_type - a dictionary mapping {work types : the number of experiences discovered for each type }
     """
 
-    def __init__(self, *, user_id: str, session_id: int, experience_count: int, work_types_discovered: list[str]):
+    def __init__(self, *, user_id: str, session_id: int, experience_count: int, experiences_by_work_type: dict[str, int]):
         super().__init__(
             user_id=user_id,
             session_id=session_id,
             event_type=EventType.EXPERIENCE_DISCOVERED,
             experience_count=experience_count,
-            work_types_discovered=work_types_discovered
+            experiences_by_work_type=experiences_by_work_type
         )
 
     class Config:

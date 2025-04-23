@@ -62,12 +62,13 @@ def get_conversation_phase_event(conversation_phase: ConversationPhaseLiteral):
     )
 
 
-def get_experience_discovered_event(*, experience_count: int):
+def get_experience_discovered_event(*, experience_count: int, work_type: str | None = None):
+    work_type = work_type or get_random_printable_string(10)  # nosec B311 # random is used for testing purposes
     return ExperienceDiscoveredEvent(
         user_id=get_random_user_id(),
         session_id=get_random_session_id(),
         experience_count=experience_count,
-        work_types_discovered=[get_random_printable_string(10) for _ in range(experience_count)]  # nosec B311 # random is used for testing purposes
+        experiences_by_work_type={work_type: experience_count}
     )
 
 
@@ -484,8 +485,13 @@ class TestRecordEvent:
                 get_metrics_repository: Awaitable[MetricsRepository],
                 setup_application_config: ApplicationConfig
         ):
-            # GIVEN a experience discovered event
-            given_event = get_experience_discovered_event(experience_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes
+            # GIVEN a experience discovered event with a specific work type
+            work_type = "foo-type"
+            initial_count = 3
+            given_event = get_experience_discovered_event(
+                experience_count=initial_count,
+                work_type=work_type
+            )
             repository = await get_metrics_repository
 
             # WHEN the event is recorded
@@ -498,9 +504,12 @@ class TestRecordEvent:
             actual_stored_event = await repository.collection.find_one({})
             _assert_metric_event_fields_match(given_event.model_dump(), actual_stored_event)
 
-            # WHEN the event is recorded again for the same user
-            given_second_event = get_experience_discovered_event(experience_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes
-
+            # WHEN we record another event for the same work type
+            new_count = 2
+            given_second_event = get_experience_discovered_event(
+                experience_count=new_count,
+                work_type=work_type
+            )
             given_second_event.anonymized_user_id = given_event.anonymized_user_id
             given_second_event.anonymized_session_id = given_event.anonymized_session_id
 
@@ -513,8 +522,11 @@ class TestRecordEvent:
             # THEN the event is updated rather than recorded again
             assert await repository.collection.count_documents({}) == 1
 
-            # AND the event data matches what we expect
+            # AND the work type count is overridden with the new count
             actual_second_stored_event = await repository.collection.find_one({})
+            assert actual_second_stored_event["experiences_by_work_type"][work_type] == new_count
+
+            # AND all other fields match the second event
             _assert_metric_event_fields_match(given_second_event.model_dump(), actual_second_stored_event)
 
         @pytest.mark.asyncio
