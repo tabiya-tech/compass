@@ -13,6 +13,25 @@ import { PersistentStorageService } from "src/app/PersistentStorageService/Persi
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import AnonymousAccountConversionDialog from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
 import CustomerSatisfactionRating from "src/feedback/overallFeedback/feedbackForm/components/customerSatisfactionRating/CustomerSatisfaction";
+import PermIdentityIcon from "@mui/icons-material/PermIdentity";
+import FeedbackOutlinedIcon from "@mui/icons-material/FeedbackOutlined";
+import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
+
+const StyledCustomLink: React.FC<React.ComponentProps<typeof CustomLink>> = (props) => {
+  const theme = useTheme();
+  return (
+    <CustomLink
+      {...props}
+      style={{
+        display: "inline-flex",
+        flexDirection: "row",
+        gap: theme.spacing(theme.tabiyaSpacing.xs),
+        verticalAlign: "bottom",
+        ...props.style
+      }}
+    />
+  );
+};
 
 const uniqueId = "41675f8b-257c-4a63-9563-3fe9feb6a850";
 
@@ -100,24 +119,28 @@ const ConversationConclusionFooter: React.FC = () => {
       >
         <Typography variant="body1">
           You can now{" "}
-          <CustomLink
+          <StyledCustomLink
             onClick={handleOpenExperiencesDrawer}
             disableWhenOffline
             data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_BUTTON}
           >
-            <span style={{ whiteSpace: "normal" }}>view and download your CV here</span>
-          </CustomLink>
-          . {/* Show anonymous user registration link if the user is anonymous and hasn't already converted */}
+            <BadgeOutlinedIcon />
+            View and
+            Download your CV
+          </StyledCustomLink>{" "}
+          here.
+          {/* Show anonymous user registration link if the user is anonymous and hasn't already converted */}
           {isAnonymous && !isAccountConverted && (
             <span data-testid={DATA_TEST_ID.CREATE_ACCOUNT_MESSAGE}>
               If you would like to explore your skills and experiences in the future, you can{" "}
-              <CustomLink
+              <StyledCustomLink
                 onClick={() => setShowConversionDialog(true)}
                 disableWhenOffline
                 data-testid={DATA_TEST_ID.CREATE_ACCOUNT_LINK}
               >
-                Create an account
-              </CustomLink>
+                <PermIdentityIcon />
+                Create an Account
+              </StyledCustomLink>
             </span>
           )}
           {/* Show the verification reminder if the user has already converted their account */}
@@ -147,13 +170,14 @@ const ConversationConclusionFooter: React.FC = () => {
           {hasSubmittedCustomerSatisfactionRating &&
             feedbackStatus === FeedbackStatus.NOT_STARTED &&
               <span data-testid={DATA_TEST_ID.FEEDBACK_MESSAGE_TEXT}>{" "}We'd love to get more{" "}
-                <CustomLink
+                <StyledCustomLink
                   onClick={() => setIsFeedbackFormOpen(true)}
                   disableWhenOffline
                   data-testid={DATA_TEST_ID.FEEDBACK_FORM_BUTTON}
                 >
-                feedback
-              </CustomLink>{" "}
+                  <FeedbackOutlinedIcon />
+                Feedback
+              </StyledCustomLink>{" "}
                 from you. It only takes 5 minutes and helps us improve!
             </span>
           }
@@ -161,13 +185,14 @@ const ConversationConclusionFooter: React.FC = () => {
           {hasSubmittedCustomerSatisfactionRating && feedbackStatus === FeedbackStatus.STARTED && (
             <span data-testid={DATA_TEST_ID.FEEDBACK_IN_PROGRESS_MESSAGE}>
               Please{" "}
-              <CustomLink
+              <StyledCustomLink
                 onClick={() => setIsFeedbackFormOpen(true)}
                 disableWhenOffline
                 data-testid={DATA_TEST_ID.FEEDBACK_IN_PROGRESS_BUTTON}
               >
-                complete your feedback
-              </CustomLink>{" "}
+                <FeedbackOutlinedIcon />
+                Complete your Feedback
+              </StyledCustomLink>{" "}
               to help us improve your experience!
             </span>
           )}
@@ -191,4 +216,3 @@ const ConversationConclusionFooter: React.FC = () => {
 };
 
 export default ConversationConclusionFooter;
-
