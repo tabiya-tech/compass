@@ -12,7 +12,7 @@ import {
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { getBackendUrl } from "src/envService";
-import { FeedbackStatus } from "../../../../feedback/overallFeedback/feedbackForm/FeedbackForm";
+import { FeedbackStatus } from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
 
 // Mock feedback data
 const mockFeedbackInProgress: FeedbackItem[] = [

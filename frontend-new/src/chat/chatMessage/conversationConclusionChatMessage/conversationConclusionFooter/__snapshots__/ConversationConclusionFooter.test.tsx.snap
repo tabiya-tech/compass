@@ -8,20 +8,40 @@ exports[`ConversationConclusionFooter render tests should render component succe
   <p
     class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
   >
-    You can now
+    You can now view and
      
     <a
       aria-disabled="false"
       class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
       data-testid="feedback-form-experiences-drawer-button-41675f8b-257c-4a63-9563-3fe9feb6a850"
     >
-      <span
-        style="white-space: normal;"
+      <svg
+        aria-hidden="true"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+        data-testid="BadgeOutlinedIcon"
+        focusable="false"
+        style="vertical-align: bottom;"
+        viewBox="0 0 24 24"
       >
-        view and download your CV here
-      </span>
+        <path
+          d="M14 12h4v1.5h-4zm0 3h4v1.5h-4z"
+        />
+        <path
+          d="M20 7h-5V4c0-1.1-.9-2-2-2h-2c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2m-9 0V4h2v5h-2zm9 13H4V9h5c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2h5z"
+        />
+        <circle
+          cx="9"
+          cy="13.5"
+          r="1.5"
+        />
+        <path
+          d="M11.08 16.18c-.64-.28-1.34-.43-2.08-.43s-1.44.15-2.08.43c-.56.24-.92.78-.92 1.39V18h6v-.43c0-.61-.36-1.15-.92-1.39"
+        />
+      </svg>
+      Download your CV
     </a>
-    . 
+     
+    here.
   </p>
   <span
     class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
