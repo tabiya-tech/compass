@@ -42,6 +42,8 @@ class TestInitialState:
         assert result.compass_message_count == 0
         assert result.user_message_count == 0
         assert result.experiences_explored_count == 0
+        assert result.experiences_discovered_count == 0
+        assert result.experiences_by_work_type == {}
 
 
 class TestMessageCounting:
