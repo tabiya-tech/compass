@@ -133,6 +133,23 @@ async def in_memory_metrics_database(in_memory_mongo_server) -> AsyncIOMotorData
     return metrics_db
 
 
+@pytest.fixture(scope='function')
+async def in_memory_skills_ranking_database(in_memory_mongo_server) -> AsyncIOMotorDatabase:
+    """
+    Fixture to create an in-memory skills_ranking database.
+
+    This is a re-usable fixture that can be used across multiple test modules.
+    :param in_memory_mongo_server:  The in-memory MongoDB server.
+    :return:  The mocked skills_ranking database.
+    """
+    skills_ranking_db = AsyncIOMotorClient(in_memory_mongo_server.connection_string,
+                                           tlsAllowInvalidCertificates=True).get_database(random_db_name())
+
+    await CompassDBProvider.initialize_metrics_mongo_db(skills_ranking_db, logger=logging.getLogger(__name__))
+    logging.info(f"Created skills_ranking database: {skills_ranking_db.name}")
+    return skills_ranking_db
+
+
 @pytest.fixture(scope="function")
 def setup_application_config() -> Generator[ApplicationConfig, Any, None]:
     """

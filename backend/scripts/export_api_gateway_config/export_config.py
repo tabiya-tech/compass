@@ -11,11 +11,12 @@ def export():
     # This is necessary because the app is initialized at the module level and doesn't currently support passing a configuration.
     # If these values are not set, the app won't start and will throw an error due to missing required environment variables.
     from common_libs.test_utilities.setup_env_vars import env_context
-    with env_context(dict(
-        # Set the Skills Ranking to True, so that the API Gateway Schema contains the paths
-        # Though, this will not be displayed on the swagger and no actual implementation will be generated.
-        BACKEND_ENABLE_SKILLS_RANKING="True"
-    )):
+    with env_context(
+            env_vars=dict(
+                # Set the Skills Ranking to True, so that the API Gateway Schema contains the paths
+                # Though, this will not be displayed on the swagger and no actual implementation will be generated.
+                BACKEND_ENABLE_SKILLS_RANKING="True"
+            )):
         from app.server import app
         # Generate the OpenAPI 3.1 schema
         openapi3 = get_openapi(

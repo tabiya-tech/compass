@@ -10,3 +10,4 @@ class Collections:
     USER_FEEDBACK = "user_feedback"
     REACTIONS = "reactions"
     COMPASS_METRICS = "metric_events"
+    SKILLS_RANKING_STATE = "skills_ranking_state"
