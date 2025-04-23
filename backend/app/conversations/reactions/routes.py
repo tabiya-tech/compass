@@ -25,6 +25,7 @@ from app.conversations.reactions.repository import ReactionRepository
 from app.conversations.reactions.service import ReactionService, IReactionService, ReactingToUserMessageError
 from app.conversations.reactions.types import Reaction, ReactionKind, DislikeReason
 from app.users.auth import UserInfo, Authentication
+from app.users.get_user_preferences_repository import get_user_preferences_repository
 from app.users.repositories import IUserPreferenceRepository, UserPreferenceRepository
 
 logger = logging.getLogger(__name__)
@@ -43,12 +44,6 @@ async def get_reaction_service(db: AsyncIOMotorDatabase = Depends(CompassDBProvi
         application_state_manager=application_state_manager,
         metrics_service=metrics_service
     )
-
-
-async def get_user_preferences_repository(
-        db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db)) -> IUserPreferenceRepository:
-    return UserPreferenceRepository(db)
-
 
 class _ReactionRequest(BaseModel):
     """

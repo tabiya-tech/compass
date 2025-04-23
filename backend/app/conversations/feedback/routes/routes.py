@@ -20,7 +20,8 @@ from app.metrics.services.get_metrics_service import get_metrics_service
 from app.metrics.services.service import IMetricsService
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, UserInfo
-from app.users.repositories import IUserPreferenceRepository, UserPreferenceRepository
+from app.users.get_user_preferences_repository import get_user_preferences_repository
+from app.users.repositories import IUserPreferenceRepository
 from ._types import FeedbackResponse
 from ..repository import UserFeedbackRepository
 
@@ -42,16 +43,6 @@ class _PayloadTooLargeErrorResponse(HTTPErrorResponse):
 # Lock to ensure that the singleton instance is thread-safe
 _user_preferences_repository_lock = asyncio.Lock()
 _user_preferences_repository_singleton: IUserFeedbackService | None = None
-
-
-async def _get_user_preferences_repository(application_db: AsyncIOMotorDatabase = Depends(
-    CompassDBProvider.get_application_db)) -> IUserPreferenceRepository:
-    global _user_preferences_repository_singleton
-    if _user_preferences_repository_singleton is None:  # initial check to avoid the lock if the singleton instance is already created (lock is expensive)
-        async with _user_preferences_repository_lock:  # before modifying the singleton instance, acquire the lock
-            if _user_preferences_repository_singleton is None:  # double check after acquiring the lock
-                _user_preferences_repository_singleton = UserPreferenceRepository(application_db)
-    return _user_preferences_repository_singleton
 
 
 # Lock to ensure that the singleton instance is thread-safe
@@ -99,7 +90,7 @@ def add_user_feedback_routes(users_router: APIRouter, auth: Authentication):
             session_id: Annotated[int, Path(description="the unique identifier of the session", examples=[123])],
             user_info: UserInfo = Depends(auth.get_user_info()),
             user_feedback_service: IUserFeedbackService = Depends(_get_user_feedback_service),
-            user_preferences_repository: IUserPreferenceRepository = Depends(_get_user_preferences_repository)
+            user_preferences_repository: IUserPreferenceRepository = Depends(get_user_preferences_repository)
     ) -> FeedbackResponse:
         """
         Creates or updates feedback for a session.
