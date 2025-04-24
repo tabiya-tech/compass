@@ -22,7 +22,7 @@ exports[`RegistrationCodeFormModal renders correctly when modal is shown and cal
     tabindex="-1"
   >
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1k5lmk5-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-cdx41z-MuiButtonBase-root-MuiIconButton-root"
       data-testid="invitation-code-close-icon-f782907a-6904-482c-b148-3c6682bf7b54"
       tabindex="0"
       title="Close registration code form"
