@@ -10,12 +10,15 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
   padding: theme.spacing(theme.tabiyaSpacing.xs),
   color: theme.palette.primary.main,
   ":hover": {
-    backgroundColor: theme.palette.secondary.dark,
-    color: theme.palette.secondary.contrastText,
-  },
-  ":active": {
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.primary.contrastText,
+  },
+  ":active": {
+    backgroundColor: theme.palette.primary.dark,
+    color: theme.palette.primary.contrastText,
+  },
+  "& .MuiTouchRipple-root": {
+    display: "none",
   },
 }));
 
