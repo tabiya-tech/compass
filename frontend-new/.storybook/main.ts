@@ -7,27 +7,8 @@ const config: StorybookConfig = {
     const key = await exportCryptoPublicKey((await generateRSACryptoPairKey(2048)).publicKey)
     return `
     ${head}
-    <script>{
-      // used for auth components  
-      window.tabiyaConfig = {
-        "FIREBASE_API_KEY": btoa("some-key"),
-        "FIREBASE_AUTH_DOMAIN": btoa("some-domain"),
-        "BACKEND_URL": btoa("http://foo.bar.com/api"),
-        "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY": btoa(\`${key}\`),
-        "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID": btoa("1"),
-        "FRONTEND_SENTRY_DSN": btoa("https://foo@bar.sentry.io/baz"),
-        "FRONTEND_SENTRY_CONFIG": btoa(JSON.stringify({
-          tracesSampleRate: 1.0,
-          replaysSessionSampleRate: 0,
-          replaysOnErrorSampleRate: 1.0,
-          replayIntegration: false,
-          levels: ["error"]
-        }))
-      };
-      //used for chat components
-      sessionStorage.setItem("ChatSessionID", "1234")
-    }
-    </script>
+    <!-- loading the env.js from the public directory here so that storybook has access to all the environment variables-->
+    <script defer src="/data/env.js"></script>
   `
   },
   // Define story locations
