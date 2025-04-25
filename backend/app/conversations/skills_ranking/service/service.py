@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 
 from app.conversations.skills_ranking.errors import InvalidNewPhaseError
-from app.conversations.skills_ranking.repository import ISkillsRankingRepository
-from app.conversations.skills_ranking.state import SkillsRankingState, StatesNavigationGraph
+from app.conversations.skills_ranking.repository.repository import ISkillsRankingRepository
+from app.conversations.skills_ranking.service.types import SkillsRankingState
+from app.conversations.skills_ranking.utils import get_possible_next_states
 
 
 class ISkillsRankingService(ABC):
@@ -37,10 +38,11 @@ class SkillsRankingService(ISkillsRankingService):
             return saved_state
 
         # validate the new state against the existing state
-        if new_state.current_state not in StatesNavigationGraph[existing_state.current_state]:
+        possible_next_states = get_possible_next_states(existing_state.current_state)
+        if new_state.current_state not in possible_next_states:
             raise InvalidNewPhaseError(
                 current_phase=existing_state.current_state,
-                expected_phases=StatesNavigationGraph[existing_state.current_state])
+                expected_phases=possible_next_states)
 
         # update the existing state
         saved_state = await self._repository.update(new_state)

@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from app.conversations.skills_ranking.state import SkillsRankingState, SkillsRankingCurrentState
+from app.conversations.skills_ranking.service.types import SkillsRankingState, SkillsRankingCurrentState
 
 
 class SkillsRankingResponse(SkillsRankingState):

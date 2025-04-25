@@ -8,11 +8,12 @@ from fastapi.params import Depends, Path
 from app.constants.errors import HTTPErrorResponse
 from app.context_vars import user_id_ctx_var, session_id_ctx_var
 from app.conversations.skills_ranking.errors import SkillsRankingStateNotFound, InvalidNewPhaseError
-from app.conversations.skills_ranking.repository import ISkillsRankingRepository
+from app.conversations.skills_ranking.repository.repository import ISkillsRankingRepository
 from app.conversations.skills_ranking.routes.types import SkillsRankingResponse, UpsertSkillsRankingRequest
-from app.conversations.skills_ranking.service import ISkillsRankingService
-from app.conversations.skills_ranking.dependencies import get_skills_ranking_service, get_skills_ranking_repository
-from app.conversations.skills_ranking.state import SkillsRankingState
+from app.conversations.skills_ranking.service.service import ISkillsRankingService
+from app.conversations.skills_ranking.service.get_skills_ranking_service import get_skills_ranking_service
+from app.conversations.skills_ranking.repository.get_skills_ranking_repository import get_skills_ranking_repository
+from app.conversations.skills_ranking.service.types import SkillsRankingState
 from app.errors.errors import UnauthorizedSessionAccessError, NoDBUpdateException
 
 from app.users.auth import Authentication, UserInfo

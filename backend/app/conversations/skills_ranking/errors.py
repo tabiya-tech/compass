@@ -1,4 +1,4 @@
-from app.conversations.skills_ranking.state import SkillsRankingCurrentState
+from app.conversations.skills_ranking.service.types import SkillsRankingCurrentState
 
 
 class SkillsRankingStateNotFound(Exception):

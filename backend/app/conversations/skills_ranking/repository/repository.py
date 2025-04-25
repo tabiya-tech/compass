@@ -3,7 +3,7 @@ from typing import Mapping, Any
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from app.conversations.skills_ranking.state import SkillsRankingState
+from app.conversations.skills_ranking.service.types import SkillsRankingState
 from app.errors.errors import NoDBUpdateException
 from app.server_dependencies.database_collections import Collections
 

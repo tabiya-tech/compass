@@ -11,24 +11,6 @@ class SkillsRankingCurrentState(Enum):
     EVALUATED = "EVALUATED"
 
 
-"""
-States navigation graph for the skills ranking process.
-The graph defines the possible transitions between states in the skills ranking process.
-
-For the states that are terminal, the list is empty.
-"""
-StatesNavigationGraph = {
-    SkillsRankingCurrentState.INITIAL: [
-        SkillsRankingCurrentState.SELF_EVALUATING,
-        SkillsRankingCurrentState.SKIPPED,
-    ],
-    SkillsRankingCurrentState.SKIPPED: [],
-    SkillsRankingCurrentState.SELF_EVALUATING: [
-        SkillsRankingCurrentState.EVALUATED
-    ],
-    SkillsRankingCurrentState.EVALUATED: []
-}
-
 ExperimentGroup = Literal['GROUP_A', 'GROUP_B']
 
 
