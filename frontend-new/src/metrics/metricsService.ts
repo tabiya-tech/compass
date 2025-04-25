@@ -43,9 +43,12 @@ export default class MetricsService {
   private startFlushInterval(): void {
     if (this._flushInterval === null) {
       this._flushInterval = setInterval(() => {
-        this.flushEvents().then(() => {
-          console.debug("Metrics events flushed successfully");
-        });
+        // only flush events if there are events to send
+        if (this._eventBuffer.length > 0) {
+          this.flushEvents().then(() => {
+            console.debug("Metrics events flushed successfully");
+          });
+        }
       }, METRICS_FLUSH_INTERVAL_MS);
     }
   }
