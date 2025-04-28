@@ -207,7 +207,7 @@ class UserFeedbackService(IUserFeedbackService):
         # Record feedback provided event
         try:
             # Record feedback provided event
-            metrics_events = [
+            metrics_events: list[FeedbackProvidedEvent | FeedbackRatingValueEvent] = [
                 FeedbackProvidedEvent(
                     user_id=user_id,
                     session_id=session_id

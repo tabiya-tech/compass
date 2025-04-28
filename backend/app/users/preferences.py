@@ -131,7 +131,7 @@ async def _create_user_preferences(
         # Record user account creation metric
         await metrics_service.record_event(UserAccountCreatedEvent(
             user_id=preferences.user_id
-        ))
+        ), preferences.user_id)
 
         return UsersPreferencesResponse(
             **newly_created.model_dump(),

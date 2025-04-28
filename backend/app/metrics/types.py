@@ -60,9 +60,19 @@ class AbstractUserAccountEvent(AbstractCompassMetricEvent):
             raise TypeError(f"{cls.__name__} is an abstract class and cannot be instantiated directly")
         return super().__new__(cls)
 
+    user_id: str | None = None
+    """
+    user_id - the actual user_id of the user, kept for use downstream and should be deleted before saving
+    """
     anonymized_user_id: str
     """
     anonymized_user_id - a hex representation of the md5 hash of the user_id for the user whose request triggered the event
+    """
+
+    relevant_experiments: dict[str, str] | None = Field(default_factory=dict)
+    """
+    relevant_experiments - a dictionary mapping experiment IDs to their corresponding groups,
+    will be empty for frontend events until the service populates the field with values from user preferences
     """
 
     # using a model_validator instead of an __init__ to obfuscate user_id without needing to pass extra fields to the parent constructor
@@ -72,7 +82,6 @@ class AbstractUserAccountEvent(AbstractCompassMetricEvent):
     def obfuscate_user_id(cls, values):
         if 'user_id' in values:
             values['anonymized_user_id'] = hashlib.md5(values['user_id'].encode(), usedforsecurity=False).hexdigest()
-            del values['user_id']
         return values
 
     class Config:
@@ -84,11 +93,11 @@ class UserAccountCreatedEvent(AbstractUserAccountEvent):
     """
     A metric event representing a user account creation.
     """
-
-    def __init__(self, *, user_id: str):
+    def __init__(self, *, user_id: str, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
             event_type=EventType.USER_ACCOUNT_CREATED,
+            relevant_experiments=relevant_experiments or {}
         )
 
     class Config:
@@ -108,6 +117,10 @@ class AbstractConversationEvent(AbstractUserAccountEvent):
             raise TypeError(f"{cls.__name__} is an abstract class and cannot be instantiated directly")
         return super().__new__(cls)
 
+    session_id: int
+    """
+    session_id - the actual session_id of the session, kept for use downstream and should be deleted before saving
+    """
     anonymized_session_id: str
     """
     anonymized_session_id - a hex representation of the md5 hash of the session_id for the session that triggered the event
@@ -121,7 +134,6 @@ class AbstractConversationEvent(AbstractUserAccountEvent):
         if 'session_id' in values:
             values['anonymized_session_id'] = hashlib.md5(str(values['session_id']).encode(),
                                                           usedforsecurity=False).hexdigest()
-            del values['session_id']
         return values
 
     class Config:
@@ -148,12 +160,13 @@ class ConversationPhaseEvent(AbstractConversationEvent):
     phase - the phase of the conversation
     """
 
-    def __init__(self, *, user_id: str, session_id: int, phase: ConversationPhaseLiteral):
+    def __init__(self, *, user_id: str, session_id: int, phase: ConversationPhaseLiteral, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
             session_id=session_id,
             event_type=EventType.CONVERSATION_PHASE,
-            phase=phase
+            phase=phase,
+            relevant_experiments=relevant_experiments or {}
         )
 
     class Config:
@@ -173,7 +186,7 @@ class ExperienceDiscoveredEvent(AbstractConversationEvent):
     experiences_by_work_type - a dictionary mapping {work types : the number of experiences discovered for each type }
     """
 
-    def __init__(self, *, user_id: str, session_id: int, experience_count: int, experiences_by_work_type: dict[str, int], timestamp: str | None = None):
+    def __init__(self, *, user_id: str, session_id: int, experience_count: int, experiences_by_work_type: dict[str, int], relevant_experiments: dict[str, str] = None, timestamp: str | None = None):
         # construct a dict with a timestamp field only if the timestamp is provided
         # we do this to avoid having to pass None to the super constructor
         timestamp_argument = dict(timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc)) if timestamp else {}
@@ -183,6 +196,7 @@ class ExperienceDiscoveredEvent(AbstractConversationEvent):
             event_type=EventType.EXPERIENCE_DISCOVERED,
             experience_count=experience_count,
             experiences_by_work_type=experiences_by_work_type,
+            relevant_experiments=relevant_experiments or {},
             **timestamp_argument
         )
 
@@ -199,12 +213,13 @@ class ExperienceExploredEvent(AbstractConversationEvent):
     experience_count - the number of experiences explored by a user
     """
 
-    def __init__(self, *, user_id: str, session_id: int, experience_count: int):
+    def __init__(self, *, user_id: str, session_id: int, experience_count: int, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
             session_id=session_id,
             event_type=EventType.EXPERIENCE_EXPLORED,
-            experience_count=experience_count
+            experience_count=experience_count,
+            relevant_experiments=relevant_experiments or {}
         )
 
     class Config:
@@ -219,11 +234,12 @@ class FeedbackProvidedEvent(AbstractConversationEvent):
     A metric event representing the provision of feedback by a user
     """
 
-    def __init__(self, *, user_id: str, session_id: int):
+    def __init__(self, *, user_id: str, session_id: int, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
             session_id=session_id,
             event_type=EventType.FEEDBACK_PROVIDED,
+            relevant_experiments=relevant_experiments or {}
         )
 
     class Config:
@@ -248,13 +264,14 @@ class FeedbackRatingValueEvent(AbstractConversationEvent):
         - For CES, the value is 0 or 1, with 1 being the of respondents who select the highest 2 options on a 1–5 ease scale and 0 being the rest.
     """
 
-    def __init__(self, *, user_id: str, session_id: int, feedback_type: FeedbackTypeLiteral, value: int):
+    def __init__(self, *, user_id: str, session_id: int, feedback_type: FeedbackTypeLiteral, value: int, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
             session_id=session_id,
             event_type=EventType.FEEDBACK_RATING_VALUE,
             feedback_type=feedback_type,
-            value=value
+            value=value,
+            relevant_experiments=relevant_experiments or {}
         )
 
     class Config:
@@ -268,13 +285,14 @@ class ConversationTurnEvent(AbstractConversationEvent):
     compass_message_count: int
     user_message_count: int
 
-    def __init__(self, *, user_id: str, session_id: int, compass_message_count: int, user_message_count: int):
+    def __init__(self, *, user_id: str, session_id: int, compass_message_count: int, user_message_count: int, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
             session_id=session_id,
             event_type=EventType.CONVERSATION_TURN,
             compass_message_count=compass_message_count,
-            user_message_count=user_message_count
+            user_message_count=user_message_count,
+            relevant_experiments=relevant_experiments or {}
         )
 
     class Config:
@@ -302,14 +320,15 @@ class MessageReactionCreatedEvent(AbstractConversationEvent):
     """
 
     def __init__(self, *, user_id: str, session_id: int, message_id: str, kind: ReactionKind,
-                 reasons: list[DislikeReason]):
+                 reasons: list[DislikeReason], relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
             session_id=session_id,
             event_type=EventType.MESSAGE_REACTION_CREATED,
             message_id=message_id,
             kind=kind.name,
-            reasons=[reason.name for reason in reasons]
+            reasons=[reason.name for reason in reasons],
+            relevant_experiments=relevant_experiments or {}
         )
 
     class Config:
@@ -336,13 +355,14 @@ class CVDownloadedEvent(AbstractConversationEvent):
     timestamp - an iso string representing the timestamp of the event
     """
 
-    def __init__(self, *, user_id: str, session_id: int, cv_format: CVFormatLiteral, timestamp: str):
+    def __init__(self, *, user_id: str, session_id: int, cv_format: CVFormatLiteral, timestamp: str, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
             session_id=session_id,
             event_type=EventType.CV_DOWNLOADED,
             cv_format=cv_format,
-            timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc)
+            timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc),
+            relevant_experiments=relevant_experiments or {}
         )
 
     class Config:
@@ -370,14 +390,15 @@ class DemographicsEvent(AbstractUserAccountEvent):
     employment_status - the employment status of the user
     """
 
-    def __init__(self, *, user_id: str, age: int, gender: str, education: str, employment_status: str):
+    def __init__(self, *, user_id: str, age: int, gender: str, education: str, employment_status: str, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
             event_type=EventType.DEMOGRAPHICS,
             age=age,
             gender=gender,
             education=education,
-            employment_status=employment_status
+            employment_status=employment_status,
+            relevant_experiments=relevant_experiments or {}
         )
 
     class Config:
@@ -397,12 +418,13 @@ class UserLocationEvent(AbstractUserAccountEvent):
     timestamp - an iso string representing the timestamp of the event
     """
 
-    def __init__(self, *, user_id: str, coordinates: tuple[float, float], timestamp: str):
+    def __init__(self, *, user_id: str, coordinates: tuple[float, float], timestamp: str, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
             event_type=EventType.USER_LOCATION,
             coordinates=coordinates,
-            timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc)
+            timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc),
+            relevant_experiments=relevant_experiments or {}
         )
 
     class Config:
@@ -439,7 +461,7 @@ class DeviceSpecificationEvent(AbstractUserAccountEvent):
     """
 
     def __init__(self, *, user_id: str, device_type: str, os_type: str, browser_type: str, timestamp: str,
-                 browser_version: str, user_agent: str):
+                 browser_version: str, user_agent: str, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
             event_type=EventType.DEVICE_SPECIFICATION,
@@ -448,7 +470,8 @@ class DeviceSpecificationEvent(AbstractUserAccountEvent):
             browser_type=browser_type,
             browser_version=browser_version,
             user_agent=user_agent,
-            timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc)
+            timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc),
+            relevant_experiments=relevant_experiments or {}
         )
 
     class Config:
@@ -464,11 +487,12 @@ class NetworkInformationEvent(AbstractUserAccountEvent):
     effective_connection_type - the network classification of the user's connection: 2g, 3g, 4g, 5g...
     """
 
-    def __init__(self, *, user_id: str, effective_connection_type: str):
+    def __init__(self, *, user_id: str, effective_connection_type: str, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
             event_type=EventType.NETWORK_INFORMATION,
             effective_connection_type=effective_connection_type,
+            relevant_experiments=relevant_experiments or {}
         )
 
     class Config:
