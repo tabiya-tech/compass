@@ -9,7 +9,7 @@ from app.agent.agent_types import LLMStats
 from app.agent.experience.work_type import WorkType
 from app.agent.linking_and_ranking_pipeline.cluster_responsibilities_tool import ClusterResponsibilitiesTool
 from .infer_occupation_tool import InferOccupationTool
-from .pick_one_skill_tool import PickOneSkillTool
+from .pick_top_skills_tool import PickTopSkillsTool
 from .skill_linking_tool import SkillLinkingTool
 from app.vector_search.esco_entities import SkillEntity, OccupationSkillEntity
 from app.vector_search.vector_search_dependencies import SearchServices
@@ -22,8 +22,20 @@ class ExperiencePipelineConfig(BaseModel):
     Default is 5
     
     The number of clusters to group the responsibilities. 
-    Each cluster of responsibilities will contribute to one top skill.
+    Each cluster of responsibilities will contribute to N top skills (where N = number_of_top_skills_to_pick_per_cluster).
+    """
 
+    number_of_top_skills_to_pick_per_cluster: int = 1
+    """
+    Default is 1
+    The number of top skills to pick for each cluster among the top skills candidates of the cluster.
+    """
+
+    top_skills_threshold: int = 7
+    """
+    Default is 7
+    When scoring the top skills of each cluster, the top skills with a score lower than this threshold will be ignored.
+    See PickTopSkillsTool for more details.
     """
 
     number_of_occupation_alt_titles: int = 5
@@ -47,11 +59,11 @@ class ExperiencePipelineConfig(BaseModel):
     This refers to the number of occupations retrieved from the search service for each alternative title.
     """
 
-    number_of_skills_per_cluster: int = 5
+    number_of_top_skills_candidates_per_cluster: int = 5
     """
     Default is 5
-    The number of top skills to return for each cluster.
-    It also corresponds to the number of skills selected from each responsibility among the skill candidates returned by the search service.
+    The number of top skills candidates to return for each cluster.
+    It also corresponds to the number of skills selected from each responsibility among all the skill candidates returned by the search service.
     """
 
     number_of_skill_candidates_per_responsibility: int = 15
@@ -106,7 +118,7 @@ class ExperiencePipeline:
         self._cluster_responsibilities_tool = ClusterResponsibilitiesTool()
         self._infer_occupations_tool = InferOccupationTool(search_services.occupation_skill_search_service)
         self._skills_linking_tool = SkillLinkingTool(search_services.skill_search_service)
-        self._top_skills_picker = PickOneSkillTool()
+        self._top_skills_picker = PickTopSkillsTool()
         self._logger = logging.getLogger(__class__.__name__)
         if self._logger.isEnabledFor(logging.INFO):
             self._logger.info("ExperiencePipeline initialized with config: %s", config.model_dump_json())
@@ -169,21 +181,49 @@ class ExperiencePipeline:
         for cluster_result in cluster_results:
             # exclude the skills that have already been picked
             skills_to_consider = ExperiencePipeline._exclude_skills_from_list(top_skills, cluster_result.skills)
-            # get the top skill of the cluster
+            if len(skills_to_consider) == 0:
+                top_skills_labels = [skill.preferredLabel for skill in skills_to_consider]
+                skills_to_rank_labels = [skill.preferredLabel for skill in cluster_result.skills]
+                self._logger.warning("No skills to pick for"
+                                     "\n  - responsibilities group: '%s'"
+                                     "\n  - with responsibilities: %s"
+                                     "\n  - job titles: %s"
+                                     "\n  - skills to rank: %s"
+                                     "\nAlready picked skills: %s",
+                                     cluster_result.responsibilities_cluster_name,
+                                     json.dumps(cluster_result.responsibilities, ensure_ascii=False),
+                                     json.dumps(cluster_result.contextual_titles, ensure_ascii=False),
+                                     json.dumps(skills_to_rank_labels, ensure_ascii=False),
+                                     json.dumps(top_skills_labels, ensure_ascii=False)
+                                     )
+
+                continue
+
+            # get the top skills of the cluster
             picker_result = await self._top_skills_picker.execute(
                 job_titles=cluster_result.contextual_titles,
                 responsibilities_group_name=cluster_result.responsibilities_cluster_name,
                 responsibilities=cluster_result.responsibilities,
-                skills=skills_to_consider,
+                skills_to_rank=skills_to_consider,
+                top_k=self._config.number_of_top_skills_to_pick_per_cluster,
+                threshold=self._config.top_skills_threshold,
             )
-            if picker_result.picked_skill is None:
-                self._logger.error("No top skill found for cluster %s with responsibilities: %s",
+            if len(picker_result.picked_skills) == 0:
+                skills_to_consider_labels = [skill.preferredLabel for skill in skills_to_consider]
+                self._logger.error("No skills picked for"
+                                   "\n  - responsibilities group: '%s'"
+                                   "\n  - with responsibilities: %s"
+                                   "\n  - job titles: %s"
+                                   "\n  - skills to rank: %s"
+                                   "\n  - threshold: %s",
                                    cluster_result.responsibilities_cluster_name,
-                                   json.dumps(cluster_result.responsibilities))
-                continue
+                                   json.dumps(cluster_result.responsibilities, ensure_ascii=False),
+                                   json.dumps(cluster_result.contextual_titles, ensure_ascii=False),
+                                   json.dumps(skills_to_consider_labels, ensure_ascii=False),
+                                   self._config.top_skills_threshold
+                                   )
 
-            top_skill = picker_result.picked_skill
-            top_skills.append(top_skill)
+            top_skills.extend(picker_result.picked_skills)
             llm_stats.extend(cluster_result.llm_stats)
             llm_stats.extend(picker_result.llm_stats)
 
@@ -240,19 +280,25 @@ class ExperiencePipeline:
             responsibilities=responsibilities,
             only_essential=config.only_essential_skills,
             ignore_occupations=config.ignore_occupations,
-            top_k=config.number_of_skills_per_cluster,
+            top_k=config.number_of_top_skills_candidates_per_cluster,
             top_p=config.number_of_skill_candidates_per_responsibility
         )
         top_skills = top_skills_response.top_skills
         llm_stats.extend(top_skills_response.llm_stats)
         top_skills_labels = [skill.preferredLabel for skill in top_skills]
         if self._logger.isEnabledFor(logging.INFO):
-            self._logger.info("Top skills: %s based on inferred job titles: %s, linked occupations: %s for responsibilities group: %s responsibilities : %s",
-                              top_skills_labels,
-                              json.dumps(inferred_occupations_response.contextual_titles),
-                              json.dumps(occupation_labels),
+            self._logger.info("Skills_linking_tool for:"
+                              "\n  - responsibilities group: %s "
+                              "\n  - responsibilities: %s"
+                              "\n  - job titles: %s"
+                              "\n  - linked occupations: %s "
+                              "\nreturned top skills: %s",
                               responsibilities_cluster_name,
-                              json.dumps(responsibilities))
+                              json.dumps(responsibilities, ensure_ascii=False),
+                              json.dumps(inferred_occupations_response.contextual_titles, ensure_ascii=False),
+                              json.dumps(occupation_labels, ensure_ascii=False),
+                              json.dumps(top_skills_labels, ensure_ascii=False)
+                              )
         # 2.3 Rank the skills to get the top skill of the cluster
         # For now, just return the unranked skills
         return ClusterPipelineResult(

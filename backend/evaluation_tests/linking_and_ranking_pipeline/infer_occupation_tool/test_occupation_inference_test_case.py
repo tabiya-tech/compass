@@ -25,8 +25,7 @@ test_cases = [
         given_company="",
         given_responsibilities=["I bake bread", "I clean my work place", "I order supplies", "I sell bread"],
         given_country_of_interest=Country.SOUTH_AFRICA,
-        expected_occupations_found=["baker", "bakery shop manager", "pastry maker"])
-    ,
+        expected_occupations_found=["baker", "bakery shop manager", "pastry maker"]),
     InferOccupationToolTestCase(
         name="Title is not useful, infer from responsibilities",
         given_experience_title="Foo",
@@ -494,7 +493,8 @@ test_cases = [
         given_company="home",
         given_country_of_interest=Country.SOUTH_AFRICA,
         given_responsibilities=[],
-        expected_occupations_found=["unpaid volunteer work on road/building repair, clearing and preparing land, cleaning (streets, markets, etc.), and construction"],
+        expected_occupations_found=["unpaid volunteer work on road/building repair, clearing and preparing land, "
+                                    "cleaning (streets, markets, etc.), and construction"],
         ),
     InferOccupationToolTestCase(
         name="Icatus I51_0_4",
@@ -541,5 +541,4 @@ test_cases = [
         given_responsibilities=[],
         expected_occupations_found=["unpaid volunteer unpaid help in enterprises owned by other households"],
         ),
-    # Add more test cases as needed
 ]
