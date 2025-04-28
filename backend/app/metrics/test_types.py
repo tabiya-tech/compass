@@ -140,6 +140,7 @@ class TestUserAccountCreatedEvent:
 
         # AND the user_id should be present and anonymized
         assert actual_event.anonymized_user_id is not None
+        assert actual_event.user_id == given_user_id
         assert actual_event.anonymized_user_id != given_user_id
 
     def test_extra_fields_are_not_allowed(self, setup_application_config: ApplicationConfig):
