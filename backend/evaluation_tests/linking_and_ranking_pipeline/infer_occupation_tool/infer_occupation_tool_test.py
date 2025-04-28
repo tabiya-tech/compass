@@ -36,7 +36,7 @@ async def test_occupation_inference_tool(test_case: InferOccupationToolTestCase,
     # However, this is not enough as a logger can be set up in the agent in such a way that it does not propagate
     # the log messages to the root logger. For this reason, we add additional guards.
     with caplog.at_level(logging.INFO):
-        # Guards to ensure that the loggers are correctly setup,
+        # Guards to ensure that the loggers are correctly set up,
         guard_caplog(logger=tool._logger, caplog=caplog)
         result = await tool.execute(
             experience_title=test_case.given_experience_title,
@@ -46,7 +46,7 @@ async def test_occupation_inference_tool(test_case: InferOccupationToolTestCase,
             country_of_interest=test_case.given_country_of_interest,
             top_k=test_case.given_top_k,
             top_p=test_case.given_top_p,
-            number_of_titles=test_case.number_of_titles
+            number_of_titles=test_case.given_number_of_titles
         )
         logging.log(logging.INFO, "Given Title '%s' -> Contextual Titles: %s", test_case.given_experience_title,
                     json.dumps(result.contextual_titles))
@@ -65,7 +65,7 @@ async def test_occupation_inference_tool(test_case: InferOccupationToolTestCase,
             assert sorted(labels) == sorted(test_case.expected_occupations_found)
 
         # AND the number of contextual titles is equal to the number of titles
-        assert len(result.contextual_titles) == test_case.number_of_titles
+        assert len(result.contextual_titles) == test_case.given_number_of_titles
 
         # AND a list of ESCO occupations is given_top_k
         assert len(result.esco_occupations) == test_case.given_top_k
