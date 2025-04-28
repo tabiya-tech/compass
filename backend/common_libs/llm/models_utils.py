@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel
 from vertexai.generative_models import HarmCategory, HarmBlockThreshold, SafetySetting
 
-from common_libs.retry import RetryConfig, DEFAULT_RETRY_CONFIG, Retry
+from common_libs.retry import RetryConfigWithExponentialBackOff, DEFAULT_RETRY_CONFIG_WITH_EXP_BACKOFF, Retry
 
 logger = logging.getLogger(__name__)
 
@@ -98,6 +98,50 @@ SAFETY_OFF_SETTINGS: frozenset[SafetySetting] = frozenset([
 ])
 
 
+def get_config_variation(
+        start_temperature: float,
+        end_temperature: float,
+        start_top_p: float,
+        end_top_p: float,
+        attempt: int,
+        max_retries: int
+) -> dict:
+    """
+    Exponentially change temperature and top_p over retry attempts.
+    The temperature and top_p are adjusted using a soft exponential curve to control the randomness and
+    diversity of the model's responses.
+
+    Typical is to start with a low temperature and top_p, and increase them with each retry attempt if the previous attempt failed.
+    This allows the model to start with more focused responses and gradually increase the randomness and diversity.
+
+    :param start_temperature: The starting temperature.
+    :param end_temperature: The ending temperature.
+    :param start_top_p: The starting top_p value.
+    :param end_top_p: The ending top_p value.
+    :param attempt: The current retry attempt.
+    :param max_retries: The maximum number of retries.
+    """
+    progress = (attempt - 1) / max(max_retries - 1, 1)  # Normalize to [0, 1]
+    exponent = 2  # Adjust curve steepness, 2 offer a soft exponential increase for 3–4 retries
+    factor = progress ** exponent
+
+    # Change temperature progressively to adjust randomness on each retry.
+    # A soft exponential curve is used to smoothly transition between the starting and ending values,
+    # helping control the level of diversity in the model’s responses across retries.
+    temperature = round(start_temperature + (end_temperature - start_temperature) * factor, 2)
+
+    # Adjust top_p progressively to control the range of tokens the LLM considers on each retry.
+    # This gradual change helps balance variability and coherence, depending on how start and end are configured.
+    # A soft exponential curve works well for 3–4 retries to shift the sampling behavior meaningfully but smoothly.
+    top_p = round(start_top_p + (end_top_p - start_top_p) * factor, 2)
+
+    return {
+        "temperature": temperature,
+        "top_p": top_p,
+        "candidate_count": 1,
+    }
+
+
 class LLMConfig(BaseModel):
     """
     Configuration for the LLM.
@@ -108,7 +152,7 @@ class LLMConfig(BaseModel):
     location: str = DEFAULT_VERTEX_API_REGION
     generation_config: dict = DEFAULT_GENERATION_CONFIG
     safety_settings: frozenset[SafetySetting] = DEFAULT_SAFETY_SETTINGS
-    retry_config: RetryConfig = DEFAULT_RETRY_CONFIG
+    retry_config: RetryConfigWithExponentialBackOff = DEFAULT_RETRY_CONFIG_WITH_EXP_BACKOFF
 
     class Config:
         """
