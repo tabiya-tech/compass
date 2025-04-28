@@ -265,7 +265,7 @@ async def test_experience_pipeline(test_case: ExperiencePipelineTestCase, setup_
     # However, this is not enough as a logger can be set up in the agent in such a way that it does not propagate
     # the log messages to the root logger. For this reason, we add additional guards.
     with caplog.at_level(logging.INFO):
-        # Guards to ensure that the loggers are correctly setup,
+        # Guards to ensure that the loggers are correctly set up,
         guard_caplog(logger=experience_pipeline._logger, caplog=caplog)
         # When the skill linking tool is called with the given occupation and responsibilities
         response = await experience_pipeline.execute(
