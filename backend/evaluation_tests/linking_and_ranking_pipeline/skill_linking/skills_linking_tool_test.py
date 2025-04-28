@@ -10,7 +10,7 @@ from app.agent.linking_and_ranking_pipeline.skill_linking_tool import SkillLinki
 from app.countries import Country
 from app.vector_search.esco_entities import OccupationSkillEntity
 from app.vector_search.vector_search_dependencies import SearchServices
-from common_libs.test_utilities.guard_caplog import guard_caplog
+from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 
@@ -92,9 +92,12 @@ async def test_skill_linking_tool(test_case: SkillLinkingToolTestCase, setup_sea
     # When the skill linking tool is called with the given occupation and responsibilities
     skill_linking_tool = SkillLinkingTool(search_services.skill_search_service)
 
-    with caplog.at_level(logging.WARNING):
-
-        guard_caplog(skill_linking_tool._logger, caplog)
+    # Set the capl-og at the level in question - 1 to ensure that the root logger is set to the correct level.
+    # However, this is not enough as a logger can be set up in the agent in such a way that it does not propagate
+    # the log messages to the root logger. For this reason, we add additional guards.
+    with caplog.at_level(logging.INFO):
+        # Guards to ensure that the loggers are correctly setup,
+        guard_caplog(logger=skill_linking_tool._logger, caplog=caplog)
 
         response = await skill_linking_tool.execute(
             job_titles=given_job_titles,
@@ -109,10 +112,6 @@ async def test_skill_linking_tool(test_case: SkillLinkingToolTestCase, setup_sea
         # Find missing skills
         missing_skills = sorted([skill for skill in test_case.expected_skills if skill not in actual_skills_labels])
 
-        # Assert there are no ERROR entries in the logs
-        for record in caplog.records:
-            assert record.levelname != 'ERROR'
-
         # Assert all expected skills are in the actual skills list
         logging.getLogger().info(f"Found skills: {actual_skills_labels}")
         if missing_skills:
@@ -120,3 +119,5 @@ async def test_skill_linking_tool(test_case: SkillLinkingToolTestCase, setup_sea
             # do the assertion in a way that the test fails and the diff can be shown in the IDE
             assert actual_skills_labels == sorted(test_case.expected_skills)
 
+        # AND the logs should not contain any errors
+        assert_log_error_warnings(caplog=caplog, expect_errors_in_logs=False, expect_warnings_in_logs=True)

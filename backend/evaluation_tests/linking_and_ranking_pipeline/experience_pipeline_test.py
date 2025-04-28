@@ -7,6 +7,7 @@ from app.agent.experience.work_type import WorkType
 from app.agent.linking_and_ranking_pipeline import ExperiencePipeline, ExperiencePipelineConfig
 from app.countries import Country
 from app.vector_search.vector_search_dependencies import SearchServices
+from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 
@@ -252,32 +253,42 @@ test_cases = [
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test
 @pytest.mark.parametrize("test_case", get_test_cases_to_run(test_cases), ids=[test_case.name for test_case in get_test_cases_to_run(test_cases)])
-async def test_experience_pipeline(test_case: ExperiencePipelineTestCase, setup_search_services: Awaitable[SearchServices]):
+async def test_experience_pipeline(test_case: ExperiencePipelineTestCase, setup_search_services: Awaitable[SearchServices], caplog: pytest.LogCaptureFixture):
     search_services = await setup_search_services
-    # When the skill linking tool is called with the given occupation and responsibilities
     given_config = ExperiencePipelineConfig()
     experience_pipeline = ExperiencePipeline(
         config=given_config,
         search_services=search_services
     )
-    response = await experience_pipeline.execute(
-        experience_title=test_case.given_experience_title,
-        responsibilities=test_case.given_responsibilities,
-        company_name=test_case.given_company_name,
-        country_of_interest=test_case.given_country_of_interest,
-        work_type=test_case.given_work_type
-    )
 
-    # Then the expected top skills are returned
-    actual_top_skill_preferred_labels = [skill.preferredLabel for skill in response.top_skills]
+    # Set the capl-og at the level in question - 1 to ensure that the root logger is set to the correct level.
+    # However, this is not enough as a logger can be set up in the agent in such a way that it does not propagate
+    # the log messages to the root logger. For this reason, we add additional guards.
+    with caplog.at_level(logging.INFO):
+        # Guards to ensure that the loggers are correctly setup,
+        guard_caplog(logger=experience_pipeline._logger, caplog=caplog)
+        # When the skill linking tool is called with the given occupation and responsibilities
+        response = await experience_pipeline.execute(
+            experience_title=test_case.given_experience_title,
+            responsibilities=test_case.given_responsibilities,
+            company_name=test_case.given_company_name,
+            country_of_interest=test_case.given_country_of_interest,
+            work_type=test_case.given_work_type
+        )
 
-    logging.log(logging.INFO, "Found Skills Occupations (labels): \n -%s", "\n -".join(sorted(actual_top_skill_preferred_labels)))
-    logging.log(logging.INFO, "Expected Skills (labels): \n -%s", "\n -".join(sorted(test_case.expected_top_skills)))
+        # Then the expected top skills are returned
+        actual_top_skill_preferred_labels = [skill.preferredLabel for skill in response.top_skills]
 
-    # AND the expected top skills are in the actual top skills
-    if not set(test_case.expected_top_skills).issubset(set(actual_top_skill_preferred_labels)):
-        # do the assertion in a way that the test fails and the diff can be shown in the IDE
-        assert sorted(actual_top_skill_preferred_labels) == sorted(test_case.expected_top_skills)
+        logging.log(logging.INFO, "Found Skills Occupations (labels): \n -%s", "\n -".join(sorted(actual_top_skill_preferred_labels)))
+        logging.log(logging.INFO, "Expected Skills (labels): \n -%s", "\n -".join(sorted(test_case.expected_top_skills)))
 
-    # AND the number of skills returned is equal to the number of configured clusters
-    assert len(actual_top_skill_preferred_labels) == given_config.number_of_clusters
+        # AND the expected top skills are in the actual top skills
+        if not set(test_case.expected_top_skills).issubset(set(actual_top_skill_preferred_labels)):
+            # do the assertion in a way that the test fails and the diff can be shown in the IDE
+            assert sorted(actual_top_skill_preferred_labels) == sorted(test_case.expected_top_skills)
+
+        # AND the number of skills returned is equal to the number of configured clusters
+        assert len(actual_top_skill_preferred_labels) == given_config.number_of_clusters
+
+        # AND the logs should not contain any errors
+        assert_log_error_warnings(caplog=caplog, expect_errors_in_logs=False, expect_warnings_in_logs=True)
