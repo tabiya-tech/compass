@@ -2,11 +2,12 @@ import json
 import logging
 import os
 from enum import Enum
+from textwrap import dedent
 from typing import Callable, TextIO
 
 from pydantic import BaseModel, Field
 
-from app.conversation_memory.save_conversation_context import format_for_markdown, MD_NEW_LINE
+from app.conversation_memory.save_conversation_context import format_for_markdown
 
 logger = logging.getLogger()
 
@@ -126,14 +127,18 @@ class EvaluationRecord(BaseModel):
         create a markdown representation of the evaluation results
         :return:
         """
-        formatted_conversation = ""
+        # save to a table format with the columns: Actor, Message
+        markdown_lines = [dedent(f"""
+                | Turn | Compass | Simulated User |
+                |------|---------|----------------|\n""")]
         for i, record in enumerate(self.conversation, start=1):
-            if i % 2 == 0:
-                suffix = "\n\n"
-            else:
-                suffix = f"{MD_NEW_LINE}"
-            formatted_conversation += f"**{record.actor.value}**: {format_for_markdown(record.message)}{suffix}"
-        return formatted_conversation
+            if i % 2 != 0:  # every odd message marks the beginning of a new conversation turn as perceived by the simulated user
+                markdown_lines.append(f"|{i}")
+            markdown_lines.append(f"| {format_for_markdown(record.message)} ")
+            if i % 2 == 0:  # every even message marks the end of a conversation turn as perceived by the simulated user
+                markdown_lines.append("|\n")
+
+        return ''.join(markdown_lines)
 
 
 class ConversationEvaluationRecord(EvaluationRecord):
