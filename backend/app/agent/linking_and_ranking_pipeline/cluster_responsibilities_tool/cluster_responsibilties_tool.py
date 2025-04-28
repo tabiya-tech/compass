@@ -7,9 +7,11 @@ from pydantic import BaseModel
 
 from app.agent.agent_types import LLMStats
 from app.agent.llm_caller import LLMCaller
+from app.agent.penalty import get_penalty, get_penalty_for_multiple_errors
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import ZERO_TEMPERATURE_GENERATION_CONFIG, LLMConfig, JSON_GENERATION_CONFIG
+from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, get_config_variation
+from common_libs.retry import Retry
 
 
 class Cluster(BaseModel):
@@ -41,23 +43,26 @@ def _get_system_instructions():
         <System Instructions>
             You are an expert in clustering.
             You will be given a list of responsibilities and a specified number of clusters.
-            Your task is to group the responsibilities into the exact number of clusters based on their similarities. 
-            Each cluster has a name that is representative to the responsibilities it contains.
+            Your task is to group the responsibilities into the exact number of clusters based on their similarities.
+            The more similar the responsibilities are, the more likely they are to be in the same cluster.
+            The more different the responsibilities are, the more likely they are to be in different clusters.
+            The clusters should be as balanced as possible, meaning that the number of responsibilities in each cluster should be similar if possible.
+            Each cluster must have a name that is representative of the responsibilities it contains.
             Each cluster must contain at least one responsibility.
             Each responsibility must belong to only one cluster, and every responsibility must be included in a cluster.
             
-            #Input Structure
+            # Input Structure
             The input structure is composed of: 
-            'Responsibilities' : A list of responsibilities 
-            'Number of clusters': The number of clusters to return
-            #JSON Output instructions
+            'Responsibilities': A list of responsibilities 
+            'Number of Clusters': The number of clusters to return
+            # JSON Output Instructions
                 Your response must always be a JSON object with the following schema:
                 {
-                    "reasoning": why the items are similar
-                    "clusters": the array of clusters, each cluster is a dictionary with the following schema:
+                    "reasoning": The detailed, step-by-step explanation of why the responsibilities are similar and clustered together, as JSON string,
+                    "clusters": The array of clusters, each cluster is a dictionary with the following schema:
                         [{ 
-                            cluster_name: The name for the cluster, as JSON string
-                            responsibilities: The responsibilities of the cluster, as an array of JSON strings
+                            "cluster_name": The name for the cluster, as JSON string,
+                            "responsibilities": The responsibilities of the cluster, as an array of JSON strings
                         }] 
                 }
         </System Instructions>
@@ -69,7 +74,7 @@ def _get_prompt(responsibilities: list[str], number_of_clusters: int = 5):
     prompt_template = dedent("""\
                             <Input>
                             'Responsibilities': {responsibilities}
-                            'Number of clusters': {number_of_clusters}
+                            'Number of Clusters': {number_of_clusters}
                             </Input>
                             """)
     # make json array from list of strings
@@ -78,12 +83,20 @@ def _get_prompt(responsibilities: list[str], number_of_clusters: int = 5):
                                             number_of_clusters=f"{number_of_clusters}")
 
 
+def _get_llm(temperature_config: dict) -> GeminiGenerativeLLM:
+    """
+    Get the LLM to use for clustering.
+    As we do not know how the ClusterResponsibilitiesTool will be used in the async context,
+    and to any avoid race conditions, we create a new LLM instance for each call.
+    """
+    return GeminiGenerativeLLM(
+        system_instructions=_get_system_instructions(),
+        config=LLMConfig(generation_config=temperature_config | JSON_GENERATION_CONFIG)
+    )
+
+
 class ClusterResponsibilitiesTool:
     def __init__(self):
-        self._llm = GeminiGenerativeLLM(
-            system_instructions=_get_system_instructions(),
-            config=LLMConfig(generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG)
-        )
         self._llm_caller: LLMCaller[ClusterResponsibilitiesLLMResponse] = LLMCaller[ClusterResponsibilitiesLLMResponse](
             model_response_type=ClusterResponsibilitiesLLMResponse)
         self._logger = logging.getLogger(self.__class__.__name__)
@@ -95,19 +108,43 @@ class ClusterResponsibilitiesTool:
             number_of_clusters: int = 5
     ) -> ClusterResponsibilitiesResponse:
         """
-        Cluster responsibilities into the given number of clusters based on their similarity.
-        If the number of responsibilities is less than the requested number of clusters,
-        then the clusters will be prefilled with one responsibility each, and the remaining clusters are filled with the result of the clustering algorithm
-        that will be called with the number of clusters remaining
+        Group the responsibilities into the specified number of clusters based on similarity.
+        If there are fewer responsibilities than the requested number of clusters, assign one responsibility to each cluster first.
+        Then, use the clustering algorithm to fill the remaining clusters with the leftover responsibilities.
+        The LLM will be called using a retry mechanism that makes the best effort to return a valid result.
+        A penalty is applied if the responsibilities are not clustered correctly.
+        After the maximum number of retries is reached, the function will return the response with the lowest penalty (i.e., the highest quality).
         """
-        # filter the empty responsibilities and log warnings if there are any empty responsibilities
-        _responsibilities = []
-        for responsibility in responsibilities:
-            _responsibility_stripped = responsibility.strip().lower()
-            if _responsibility_stripped:
-                _responsibilities.append(_responsibility_stripped)
-            else:
-                logging.getLogger().warning("Empty responsibility detected")
+        _responsibilities = _normalize_responsibilities(responsibilities, logger=self._logger)
+
+        async def _callback(attempt: int, max_retries: int) -> tuple[ClusterResponsibilitiesResponse, float, BaseException | None]:
+            # Call the LLM to cluster the responsibilities
+            # Add some temperature and top_p variation to prompt the LLM to return different results on each retry.
+            # Exponentially increase the temperature and top_p to avoid the LLM to return the same result every time.
+            temperature_config = get_config_variation(start_temperature=0.0, end_temperature=1,
+                                                      start_top_p=0.8, end_top_p=1,
+                                                      attempt=attempt, max_retries=max_retries)
+            llm = _get_llm(temperature_config=temperature_config)
+            self._logger.debug("Calling LLM with temperature: %s, top_p: %s",
+                               temperature_config["temperature"],
+                               temperature_config["top_p"])
+            return await self._internal_execute(llm=llm, responsibilities=_responsibilities, number_of_clusters=number_of_clusters)
+
+        result, _result_penalty, _error = await Retry[ClusterResponsibilitiesResponse].call_with_penalty(callback=_callback)
+        return result
+
+    async def _internal_execute(
+            self,
+            *,
+            llm: GeminiGenerativeLLM,
+            responsibilities: list[str],
+            number_of_clusters: int = 5
+    ) -> tuple[ClusterResponsibilitiesResponse, float, BaseException | None]:
+        # Penalty levels, the higher the level, the more severe the penalty
+        no_llm_output_penalty_level = 3
+        number_of_clusters_mismatch_penalty_level = 2
+        responsibilities_not_clustered_penalty_level = 1
+        responsibilities_clustered_more_than_once_penalty_level = 0
 
         _number_of_clusters = number_of_clusters
         _prefilled_clusters: list[Cluster] = []
@@ -115,19 +152,19 @@ class ClusterResponsibilitiesTool:
         if len(responsibilities) == 0:
             self._logger.warning("The list of responsibilities is empty.")
             # construct n empty clusters
-            return ClusterResponsibilitiesResponse(clusters=[], llm_stats=[])
+            return ClusterResponsibilitiesResponse(clusters=[], llm_stats=[]), 0, None
 
         # Handle the case where the number of responsibilities is less than the requested number of clusters
-        if len(_responsibilities) <= number_of_clusters:
+        if len(responsibilities) <= number_of_clusters:
             self._logger.debug(
                 "The number of responsibilities is less or equal to the requested number of clusters. Requested: %d, Number of responsibilities: %d",
-                number_of_clusters, len(_responsibilities))
+                number_of_clusters, len(responsibilities))
 
             # while the number of responsibilities is less than the requested number of clusters
             # prefill the clusters with one responsibility each
             _index: int = 0
-            while len(_responsibilities) <= _number_of_clusters:
-                for responsibility in _responsibilities:
+            while len(responsibilities) <= _number_of_clusters:
+                for responsibility in responsibilities:
                     _cluster = Cluster(cluster_name=f"Cluster {_index}", responsibilities=[responsibility])
                     _prefilled_clusters.append(_cluster)
                     _number_of_clusters = _number_of_clusters - 1
@@ -135,60 +172,154 @@ class ClusterResponsibilitiesTool:
 
         llm_clusters = []
         llm_stats = []
-
+        errors: list[Exception] = []
+        result_penalty: float = 0.0
         if _number_of_clusters == 1:
             # Return all the responsibilities as a single cluster
             # This edge case is handled separately to avoid calling the LLM
             # It happens when there are K even responsibilities and the number of clusters is a multiple of K, + 1
-            _prefilled_clusters.append(Cluster(cluster_name=f"Cluster {number_of_clusters - 1}", responsibilities=_responsibilities))
+            _prefilled_clusters.append(Cluster(cluster_name=f"Cluster {number_of_clusters - 1}", responsibilities=responsibilities))
         if _number_of_clusters > 1:  # We don't need to cluster if the number of clusters is 1
             # Call the LLM to cluster the responsibilities
-            prompt = _get_prompt(_responsibilities, _number_of_clusters)
-            llm_response, llm_stats = await self._llm_caller.call_llm(llm=self._llm, llm_input=prompt, logger=self._logger)
+            prompt = _get_prompt(responsibilities, _number_of_clusters)
+            llm_response, llm_stats = await self._llm_caller.call_llm(llm=llm, llm_input=prompt, logger=self._logger)
             if not llm_response:
                 # This may happen if the LLM fails to return a JSON object
                 # Instead of completely failing, we log a warning and return the input responsibilities in each of the requested clusters
-                self._logger.warning("The LLM did not return any output and the responsibilities will be returned as a single cluster")
-                return ClusterResponsibilitiesResponse(
-                    clusters=[Cluster(cluster_name=f"Cluster {i}", responsibilities=_responsibilities) for i in range(_number_of_clusters)],
-                    llm_stats=llm_stats
+                penalty = get_penalty(no_llm_output_penalty_level)
+                self._logger.warning(f"The LLM did not return any output and all the responsibilities will be returned in each cluster."
+                                     f"\n  - Penalty incurred: {penalty}."
+                                     f"\n  - Updated total penalty: {penalty}.")
+                return (
+                    ClusterResponsibilitiesResponse(
+                        clusters=[Cluster(cluster_name=f"Cluster {i}", responsibilities=responsibilities) for i in range(_number_of_clusters)],
+                        llm_stats=llm_stats),
+                    penalty,
+                    ValueError("The LLM did not return any output and all the responsibilities will be returned in each cluster.")
                 )
 
             if self._logger.isEnabledFor(logging.INFO):
-                self._logger.info("LLM Response: %s", llm_response)
+                self._logger.info("LLM Response:\n%s", llm_response.model_dump_json(indent=2))
             # log a warning if the number of clusters returned is different from the requested number of clusters
             if len(llm_response.clusters) != _number_of_clusters:
+                errors.append(ValueError("The number of clusters returned by the LLM is different from the requested number of clusters"))
+                penalty = get_penalty_for_multiple_errors(
+                    level=number_of_clusters_mismatch_penalty_level,
+                    # use abs as the number of clusters can more than the requested number of clusters
+                    actual_errors_counted=abs(_number_of_clusters - len(llm_response.clusters)),
+                    # the number of clusters is the maximum number of errors expected
+                    # if the number of errors is more than the number of requested of clusters
+                    # the penalty function will cap the penalty to the maximum number of errors expected
+                    max_number_of_errors_expected=_number_of_clusters
+                )
+                result_penalty += penalty
                 self._logger.warning(
-                    "The number of clusters returned by the LLM is different from the requested number of clusters. Requested: %d, Returned: %d",
-                    _number_of_clusters, len(llm_response.clusters))
+                    f"The number of clusters returned by the LLM is different from the requested number of clusters."
+                    f"\n  - Requested: {_number_of_clusters}, Returned: {len(llm_response.clusters)}."
+                    f"\n  - Penalty incurred: {penalty}."
+                    f"\n  - Updated total penalty: {result_penalty}."
+                )
 
             llm_clusters, clustered_responsibilities = _filter_empty_clusters_and_responsibilities(llm_response.clusters)
             # log a warning if all the responsibilities are not clustered
-            counter_responsibilities = Counter(_responsibilities)
+            counter_responsibilities = Counter(responsibilities)
             counter_clustered_responsibilities = Counter(clustered_responsibilities)
             only_in_responsibilities = counter_responsibilities - counter_clustered_responsibilities
             if len(only_in_responsibilities) > 0:
                 self._logger.warning("Not all responsibilities are clustered. The responsibilities that are not clustered are: %s",
                                      list(only_in_responsibilities.elements()))
+                errors.append(ValueError("Not all responsibilities are clustered"))
+                penalty = get_penalty_for_multiple_errors(
+                    level=responsibilities_not_clustered_penalty_level,
+                    actual_errors_counted=len(only_in_responsibilities),
+                    max_number_of_errors_expected=len(responsibilities)
+                )
+                result_penalty += penalty
+                self._logger.warning(
+                    f"{len(only_in_responsibilities)} responsibilities are not clustered."
+                    f"\n  - Penalty incurred: {penalty}."
+                    f"\n  - Updated total penalty: {result_penalty}."
+                )
 
+            clustered_more_than_once = 0
             for cnt in counter_clustered_responsibilities.items():
                 if cnt[1] > 1:
                     self._logger.warning("Responsibility '%s' is clustered more than once", cnt[0])
+                    clustered_more_than_once = clustered_more_than_once + 1
+            if clustered_more_than_once > 0:
+                penalty = get_penalty_for_multiple_errors(
+                    level=responsibilities_clustered_more_than_once_penalty_level,
+                    actual_errors_counted=clustered_more_than_once,
+                    max_number_of_errors_expected=len(responsibilities)
+                )
+                result_penalty += penalty
+                self._logger.warning(
+                    f"{clustered_more_than_once} responsibilities have been clustered more than once."
+                    f"\n  - Penalty incurred: {penalty}."
+                    f"\n  - Updated total penalty: {result_penalty}."
+                )
+                errors.append(ValueError(f"{clustered_more_than_once} responsibilities have been clustered more than once."))
 
         _prefilled_clusters, _ = _filter_empty_clusters_and_responsibilities(_prefilled_clusters)
         clusters = _prefilled_clusters + llm_clusters
         if self._logger.isEnabledFor(logging.INFO):
             self._logger.info("Clustered responsibilities into the following clusters: %s", clusters)
 
+        _return_error = None
+        if errors:
+            if len(errors) > 1:
+                _return_error = ExceptionGroup("Multiple errors occurred", errors)
+            else:
+                _return_error = errors[0]
+
         return ClusterResponsibilitiesResponse(
             clusters=clusters,
             llm_stats=llm_stats
-        )
+        ), result_penalty, _return_error
+
+
+def _normalize_responsibilities(responsibilities: list[str], logger: logging.Logger):
+    """
+    Normalize a list of responsibilities:
+    - Strip whitespace
+    - Convert to lowercase
+    - Remove duplicates (after cleaning)
+    - Warn on empty or duplicate entries
+
+    Args:
+        responsibilities (list of str): The raw responsibilities.
+        logger (optional): Logger object with .warning() method. Falls back to print if None.
+
+    Returns:
+        list of str: Unique, cleaned responsibilities in original order.
+    """
+
+    seen = set()
+    result = []
+    warnings = []
+    for original in responsibilities:
+        stripped = original.strip()
+        if not stripped:
+            warnings.append("Empty responsibility detected")
+            continue
+
+        cleaned = stripped.lower()
+        if cleaned in seen:
+            warnings.append(f"Duplicate responsibility detected (after normalization): '{original}' -> '{cleaned}'")
+            continue
+
+        seen.add(cleaned)
+        result.append(cleaned)
+
+    if warnings:
+        logger.warning(warnings)
+
+    return result
 
 
 def _filter_empty_clusters_and_responsibilities(clusters: list[Cluster]) -> tuple[list[Cluster], list[str]]:
     """
-    Filter out the empty clusters and  empty responsibilities and log warnings if there are any empty clusters or responsibilities
+    Filter out the empty clusters and empty responsibilities and log warnings if there are any empty clusters or responsibilities
     Return the filtered clusters and all the responsibilities that were added to the clusters
     """
     _filtered_clusters = []
