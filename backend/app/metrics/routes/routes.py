@@ -106,9 +106,9 @@ def add_metrics_routes(app_router: FastAPI):
                 construction_errors.append(str(e))
         
         # record successfully constructed events
-        for event in events:
+        for index, event in enumerate(events):
             try:
-                await metrics_service.record_event(event)
+                await metrics_service.record_event(event, metrics_requests[index].user_id)
             except Exception as e:
                 # we dont respond to the user with any HTTP error code as this endpoint should be
                 # fire-and-forget, we simply log the error and move on

@@ -30,7 +30,7 @@ from common_libs.test_utilities import get_random_session_id, get_random_user_id
 @pytest.fixture
 def mock_metrics_service() -> IMetricsService:
     class MockedMetricsService(IMetricsService):
-        async def bulk_record_events(self, events: list[AbstractCompassMetricEvent]):
+        async def bulk_record_events(self, events: list[AbstractCompassMetricEvent], user_id: str):
             raise NotImplementedError()
 
     return MockedMetricsService()

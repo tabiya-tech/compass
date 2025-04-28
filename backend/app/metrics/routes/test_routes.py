@@ -81,7 +81,7 @@ def get_user_location_request() -> dict:
     return {
         "event_type": EventType.USER_LOCATION.value,
         "user_id": get_random_user_id(),
-        "coordinates": (random.uniform(-90.0, 90.0), random.uniform(-180.0, 180.0)), # nosec B311 # random is used for testing purposes
+        "coordinates": (random.uniform(-90.0, 90.0), random.uniform(-180.0, 180.0)),  # nosec B311 # random is used for testing purposes
         "timestamp": datetime.now().isoformat()
     }
 
@@ -125,7 +125,7 @@ def _create_test_client_with_mocks() -> TestClientWithMocks:
 
     # Mock the metrics service
     class MockedMetricsService(IMetricsService):
-        async def record_event(self, event: AbstractCompassMetricEvent) -> None:
+        async def record_event(self, event: AbstractCompassMetricEvent, user_id: str) -> None:
             raise NotImplementedError()
 
     mocked_metrics_service = MockedMetricsService()
@@ -170,7 +170,7 @@ class TestMetricsRoutes:
             "CV Downloaded",
             "Demographics",
             "Device Specification",
-            "User Location"
+            "User Location",
         ]
     )
     @pytest.mark.asyncio
@@ -204,6 +204,7 @@ class TestMetricsRoutes:
         assert isinstance(event, event_class)
         assert event.event_type == event_type
         assert_event_fields_match(event, given_metric_request)
+        assert mocked_service.record_event.call_args[0][1] == given_metric_request['user_id']
 
     @pytest.mark.asyncio
     async def test_record_multiple_metric_events_successful(
@@ -248,7 +249,7 @@ class TestMetricsRoutes:
             "CV Downloaded",
             "Demographics",
             "Device Specification",
-            "User Location"
+            "User Location",
         ]
     )
     @pytest.mark.asyncio
@@ -282,6 +283,7 @@ class TestMetricsRoutes:
         assert isinstance(event, event_class)
         assert event.event_type == event_type
         assert_event_fields_match(event, given_metric_request)
+        assert mocked_service.record_event.call_args[0][1] == given_metric_request['user_id']
 
     @pytest.mark.asyncio
     async def test_record_metric_event_payload_too_large(

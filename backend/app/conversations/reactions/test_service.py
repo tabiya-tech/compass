@@ -211,6 +211,9 @@ class TestAdd:
         assert recorded_event.kind == given_reaction.kind.name
         assert recorded_event.reasons == [reason.name for reason in given_reaction.reasons]
 
+        # AND the metrics service should have been called with the correct user id
+        assert _mock_metrics_service.record_event.call_args[1]['user_id'] == given_user_id
+
     @pytest.mark.asyncio
     async def test_add_disliked_reaction_success(self, _mock_reaction_repository: IReactionRepository,
                                                  _mock_application_state_manager: IApplicationStateManager,
@@ -263,6 +266,9 @@ class TestAdd:
         assert recorded_event.message_id == given_reaction.message_id
         assert recorded_event.kind == given_reaction.kind.name
         assert recorded_event.reasons == [reason.name for reason in given_reaction.reasons]
+
+        # AND the metrics service should have been called with the correct user id
+        assert _mock_metrics_service.record_event.call_args[1]['user_id'] == given_user_id
 
     @pytest.mark.asyncio
     async def test_add_reaction_to_user_message_raises_error(self, _mock_reaction_repository: IReactionRepository,

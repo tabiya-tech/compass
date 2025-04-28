@@ -207,7 +207,7 @@ class UserFeedbackService(IUserFeedbackService):
         # Record feedback provided event
         try:
             # Record feedback provided event
-            metrics_events = [
+            metrics_events: list[FeedbackProvidedEvent | FeedbackRatingValueEvent] = [
                 FeedbackProvidedEvent(
                     user_id=user_id,
                     session_id=session_id
@@ -246,6 +246,6 @@ class UserFeedbackService(IUserFeedbackService):
                         value=value
                     )
                 )
-            await self._metrics_service.bulk_record_events(metrics_events)
+            await self._metrics_service.bulk_record_events(metrics_events, user_id)
         except Exception as _:
             self._logger.exception("Failed to record feedback metric events")

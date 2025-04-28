@@ -158,4 +158,4 @@ class ApplicationStateMetricsRecorder(IApplicationStateMetricsRecorder):
 
         # Record all events if there are any
         if events:
-            await self._metrics_service.bulk_record_events(events)
+            await self._metrics_service.bulk_record_events(events, user_id)

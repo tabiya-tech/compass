@@ -23,7 +23,7 @@ from app.conversations.feedback.services.types import Feedback, FeedbackItem, Ve
     NewFeedbackItemSpec, NewFeedbackVersionSpec, SimplifiedAnswer
 from app.metrics.constants import EventType
 from app.metrics.services.service import IMetricsService
-from app.metrics.types import FeedbackProvidedEvent, FeedbackRatingValueEvent
+from app.metrics.types import FeedbackProvidedEvent, FeedbackRatingValueEvent, AbstractCompassMetricEvent
 from app.users.generate_session_id import generate_new_session_id
 from common_libs.test_utilities import get_random_user_id, get_random_printable_string, get_random_session_id
 
@@ -97,7 +97,7 @@ def _mock_metrics_service() -> IMetricsService:
     """
 
     class MockedMetricsService(IMetricsService):
-        async def bulk_record_events(self, event):
+        async def bulk_record_events(self, event: list[AbstractCompassMetricEvent], user_id: str):
             raise NotImplementedError()
 
     return MockedMetricsService()
@@ -378,6 +378,9 @@ class TestMetricsRecording:
         assert isinstance(event[0], FeedbackProvidedEvent)
         assert len(event) == 1
         assert event[0].event_type == EventType.FEEDBACK_PROVIDED
+
+        # AND the metrics service should be called with the user id
+        assert _mock_metrics_service.bulk_record_events.call_args[0][1] == given_user_id
 
     @pytest.mark.parametrize("feedback_type,question_id,answer,expected_score", [
         # NPS tests

@@ -147,7 +147,7 @@ class TestRecordEvent:
             lambda: get_conversation_turn_event(compass_count=1, user_count=2),
             lambda: get_message_reaction_created_event(),
             lambda: get_cv_downloaded_event("PDF"),
-            lambda: get_device_specification_event()
+            lambda: get_device_specification_event(),
         ],
         ids=[
             "UserAccountCreatedEvent",
@@ -159,7 +159,7 @@ class TestRecordEvent:
             "ConversationTurnEvent",
             "MessageReactionCreatedEvent",
             "CVDownloadedEvent",
-            "DeviceSpecificationEvent"
+            "DeviceSpecificationEvent",
         ]
     )
     async def test_record_single_event_success(
@@ -242,7 +242,7 @@ class TestRecordEvent:
             lambda: get_conversation_turn_event(user_count=3, compass_count=7),
             lambda: get_message_reaction_created_event(),
             lambda: get_cv_downloaded_event("PDF"),
-            lambda: get_device_specification_event()
+            lambda: get_device_specification_event(),
         ],
         ids=[
             "UserAccountCreatedEvent",
@@ -253,7 +253,7 @@ class TestRecordEvent:
             "MessageCreatedEvent",
             "MessageReactionCreatedEvent",
             "CVDownloadedEvent",
-            "DeviceSpecificationEvent"
+            "DeviceSpecificationEvent",
         ]
     )
     async def test_record_event_database_bulk_write_failure(
@@ -278,330 +278,336 @@ class TestRecordEvent:
         assert await repository.collection.count_documents({}) == 0
 
     class TestUpsertedEvents:
-        @pytest.mark.asyncio
-        async def test_upsert_feedback_provided_event_success(
-                self,
-                get_metrics_repository: Awaitable[MetricsRepository],
-                setup_application_config: ApplicationConfig
-        ):
-            # GIVEN a feedback provided event
-            given_event = get_feedback_provided_event()
-            repository = await get_metrics_repository
+        class TestFeedbackProvidedEvent:
+            @pytest.mark.asyncio
+            async def test_upsert_feedback_provided_event_success(
+                    self,
+                    get_metrics_repository: Awaitable[MetricsRepository],
+                    setup_application_config: ApplicationConfig
+            ):
+                # GIVEN a feedback provided event
+                given_event = get_feedback_provided_event()
+                repository = await get_metrics_repository
 
-            # WHEN the event is recorded
-            await repository.record_event([given_event])
+                # WHEN the event is recorded
+                await repository.record_event([given_event])
 
-            # THEN the event is recorded in the database
-            assert await repository.collection.count_documents({}) == 1
+                # THEN the event is recorded in the database
+                assert await repository.collection.count_documents({}) == 1
 
-            # AND the event data matches what we expect
-            actual_stored_event = await repository.collection.find_one({})
-            _assert_metric_event_fields_match(given_event.model_dump(), actual_stored_event)
+                # AND the event data matches what we expect
+                actual_stored_event = await repository.collection.find_one({})
+                _assert_metric_event_fields_match(given_event.model_dump(), actual_stored_event)
 
-            # WHEN the event is recorded  for the same session and user
-            given_second_event = get_feedback_provided_event()
-            given_second_event.anonymized_user_id = given_event.anonymized_user_id
-            given_second_event.anonymized_session_id = given_event.anonymized_session_id
-            await repository.record_event([given_second_event])
+                # WHEN the event is recorded  for the same session and user
+                given_second_event = get_feedback_provided_event()
+                given_second_event.anonymized_user_id = given_event.anonymized_user_id
+                given_second_event.anonymized_session_id = given_event.anonymized_session_id
+                await repository.record_event([given_second_event])
 
-            # guard: ensure the two events are not identical
-            assert given_event.model_dump() != given_second_event.model_dump()
+                # guard: ensure the two events are not identical
+                assert given_event.model_dump() != given_second_event.model_dump()
 
-            # THEN the event is not recorded again
-            assert await repository.collection.count_documents({}) == 1
+                # THEN the event is not recorded again
+                assert await repository.collection.count_documents({}) == 1
 
-            # AND the event data matches what we expect
-            actual_second_stored_event = await repository.collection.find_one({})
-            _assert_metric_event_fields_match(given_second_event.model_dump(), actual_second_stored_event)
+                # AND the event data matches what we expect
+                actual_second_stored_event = await repository.collection.find_one({})
+                _assert_metric_event_fields_match(given_second_event.model_dump(), actual_second_stored_event)
 
-        @pytest.mark.asyncio
-        async def test_record_multiple_feedback_provided_event_for_different_users(
-                self,
-                get_metrics_repository: Awaitable[MetricsRepository],
-                setup_application_config: ApplicationConfig
-        ):
-            # GIVEN a list of feedback provided events for different users
-            given_events = [
-                get_feedback_provided_event(),
-                get_feedback_provided_event()
-            ]
-            repository = await get_metrics_repository
+            @pytest.mark.asyncio
+            async def test_record_multiple_feedback_provided_event_for_different_users(
+                    self,
+                    get_metrics_repository: Awaitable[MetricsRepository],
+                    setup_application_config: ApplicationConfig
+            ):
+                # GIVEN a list of feedback provided events for different users
+                given_events = [
+                    get_feedback_provided_event(),
+                    get_feedback_provided_event()
+                ]
+                repository = await get_metrics_repository
 
-            # WHEN the events are recorded
-            await repository.record_event(given_events)
+                # WHEN the events are recorded
+                await repository.record_event(given_events)
 
-            # THEN the events are recorded in the database
-            assert await repository.collection.count_documents({}) == len(given_events)
+                # THEN the events are recorded in the database
+                assert await repository.collection.count_documents({}) == len(given_events)
 
-            # AND the event data matches what we expect
-            actual_stored_events = await repository.collection.find({}).to_list(length=len(given_events))
-            for actual_stored_event, given_event in zip(actual_stored_events, given_events):
-                given_event_dict = given_event.model_dump()
-                _assert_metric_event_fields_match(given_event_dict, actual_stored_event)
+                # AND the event data matches what we expect
+                actual_stored_events = await repository.collection.find({}).to_list(length=len(given_events))
+                for actual_stored_event, given_event in zip(actual_stored_events, given_events):
+                    given_event_dict = given_event.model_dump()
+                    _assert_metric_event_fields_match(given_event_dict, actual_stored_event)
 
-        @pytest.mark.asyncio
-        async def test_record_multiple_message_reaction_created_event_for_same_user(
-                self,
-                get_metrics_repository: Awaitable[MetricsRepository],
-                setup_application_config: ApplicationConfig
-        ):
-            # GIVEN a message reaction created event
-            given_event = get_message_reaction_created_event()
-            given_event.kind = ReactionKind.DISLIKED
-            given_event.reasons = [DislikeReason.CONFUSING, DislikeReason.INAPPROPRIATE_TONE]
-            repository = await get_metrics_repository
+        class TestMessageReactionCreatedEvent:
+            @pytest.mark.asyncio
+            async def test_record_multiple_message_reaction_created_event_for_same_user(
+                    self,
+                    get_metrics_repository: Awaitable[MetricsRepository],
+                    setup_application_config: ApplicationConfig
+            ):
+                # GIVEN a message reaction created event
+                given_event = get_message_reaction_created_event()
+                given_event.kind = ReactionKind.DISLIKED
+                given_event.reasons = [DislikeReason.CONFUSING, DislikeReason.INAPPROPRIATE_TONE]
+                repository = await get_metrics_repository
 
-            # WHEN the event is recorded
-            await repository.record_event([given_event])
+                # WHEN the event is recorded
+                await repository.record_event([given_event])
 
-            # THEN the event is recorded in the database
-            assert await repository.collection.count_documents({}) == 1
+                # THEN the event is recorded in the database
+                assert await repository.collection.count_documents({}) == 1
 
-            # AND the event data matches what we expect
-            actual_stored_event = await repository.collection.find_one({})
-            _assert_metric_event_fields_match(given_event.model_dump(), actual_stored_event)
+                # AND the event data matches what we expect
+                actual_stored_event = await repository.collection.find_one({})
+                _assert_metric_event_fields_match(given_event.model_dump(), actual_stored_event)
 
-            # WHEN the event is recorded for the same user
-            given_second_event = get_message_reaction_created_event()
-            given_second_event.anonymized_user_id = given_event.anonymized_user_id
-            given_second_event.anonymized_session_id = given_event.anonymized_session_id
-            given_second_event.message_id = given_event.message_id
-            given_second_event.kind = ReactionKind.LIKED
-            given_second_event.reasons = []
+                # WHEN the event is recorded for the same user
+                given_second_event = get_message_reaction_created_event()
+                given_second_event.anonymized_user_id = given_event.anonymized_user_id
+                given_second_event.anonymized_session_id = given_event.anonymized_session_id
+                given_second_event.message_id = given_event.message_id
+                given_second_event.kind = ReactionKind.LIKED
+                given_second_event.reasons = []
 
-            # guard: ensure the two events are not identical
-            assert given_event.model_dump() != given_second_event.model_dump()
+                # guard: ensure the two events are not identical
+                assert given_event.model_dump() != given_second_event.model_dump()
 
-            # WHEN we attempt to record the event again
-            await repository.record_event([given_second_event])
+                # WHEN we attempt to record the event again
+                await repository.record_event([given_second_event])
 
-            # THEN the event is updated rather than recorded again
-            assert await repository.collection.count_documents({}) == 1
+                # THEN the event is updated rather than recorded again
+                assert await repository.collection.count_documents({}) == 1
 
-            # AND the event data matches what we expect
-            actual_second_stored_event = await repository.collection.find_one({})
-            _assert_metric_event_fields_match(given_second_event.model_dump(), actual_second_stored_event)
+                # AND the event data matches what we expect
+                actual_second_stored_event = await repository.collection.find_one({})
+                _assert_metric_event_fields_match(given_second_event.model_dump(), actual_second_stored_event)
 
-        @pytest.mark.asyncio
-        async def test_record_multiple_message_reaction_created_event_for_different_users(
-                self,
-                get_metrics_repository: Awaitable[MetricsRepository],
-                setup_application_config: ApplicationConfig
-        ):
-            # GIVEN a list of message reaction created events for different users
-            given_events = [
-                get_message_reaction_created_event(),
-                get_message_reaction_created_event()
-            ]
-            repository = await get_metrics_repository
+            @pytest.mark.asyncio
+            async def test_record_multiple_message_reaction_created_event_for_different_users(
+                    self,
+                    get_metrics_repository: Awaitable[MetricsRepository],
+                    setup_application_config: ApplicationConfig
+            ):
+                # GIVEN a list of message reaction created events for different users
+                given_events = [
+                    get_message_reaction_created_event(),
+                    get_message_reaction_created_event()
+                ]
+                repository = await get_metrics_repository
 
-            # WHEN the events are recorded
-            await repository.record_event(given_events)
+                # WHEN the events are recorded
+                await repository.record_event(given_events)
 
-            # THEN the events are recorded in the database
-            assert await repository.collection.count_documents({}) == len(given_events)
+                # THEN the events are recorded in the database
+                assert await repository.collection.count_documents({}) == len(given_events)
 
-            # AND the event data matches what we expect
-            actual_stored_events = await repository.collection.find({}).to_list(length=len(given_events))
-            for actual_stored_event, given_event in zip(actual_stored_events, given_events):
-                given_event_dict = given_event.model_dump()
-                _assert_metric_event_fields_match(given_event_dict, actual_stored_event)
+                # AND the event data matches what we expect
+                actual_stored_events = await repository.collection.find({}).to_list(length=len(given_events))
+                for actual_stored_event, given_event in zip(actual_stored_events, given_events):
+                    given_event_dict = given_event.model_dump()
+                    _assert_metric_event_fields_match(given_event_dict, actual_stored_event)
 
-        @pytest.mark.asyncio
-        async def test_record_multiple_conversation_turn_events_for_same_user(
-                self,
-                get_metrics_repository: Awaitable[MetricsRepository],
-                setup_application_config: ApplicationConfig
-        ):
-            # GIVEN a conversation turn event
-            given_event = get_conversation_turn_event(user_count=random.randint(1, 10),  # nosec B311 # random is used for testing purposes
-                                                      compass_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes for user and compass count
-            repository = await get_metrics_repository
+        class TestConversationTurnEvent:
+            @pytest.mark.asyncio
+            async def test_record_multiple_conversation_turn_events_for_same_user(
+                    self,
+                    get_metrics_repository: Awaitable[MetricsRepository],
+                    setup_application_config: ApplicationConfig
+            ):
+                # GIVEN a conversation turn event
+                given_event = get_conversation_turn_event(user_count=random.randint(1, 10),  # nosec B311 # random is used for testing purposes
+                                                        compass_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes for user and compass count
+                repository = await get_metrics_repository
 
-            # WHEN the event is recorded
-            await repository.record_event([given_event])
+                # WHEN the event is recorded
+                await repository.record_event([given_event])
 
-            # THEN the event is recorded in the database
-            assert await repository.collection.count_documents({}) == 1
+                # THEN the event is recorded in the database
+                assert await repository.collection.count_documents({}) == 1
 
-            # AND the event data matches what we expect
-            actual_stored_event = await repository.collection.find_one({})
-            _assert_metric_event_fields_match(given_event.model_dump(), actual_stored_event)
-            # AND the turn count is 1
-            assert actual_stored_event["turn_count"] == 1
-
-            # WHEN the event is recorded again for the same user
-            given_second_event = get_conversation_turn_event(user_count=random.randint(1, 10),  # nosec B311 # random is used for testing purposes
-                                                            compass_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes for user and compass count
-            given_second_event.anonymized_user_id = given_event.anonymized_user_id
-            given_second_event.anonymized_session_id = given_event.anonymized_session_id
-
-            # guard: ensure the two events are not identical
-            assert given_event.model_dump() != given_second_event.model_dump()
-
-            # WHEN we attempt to record the event again
-            await repository.record_event([given_second_event])
-
-            # THEN the event is updated rather than recorded again
-            assert await repository.collection.count_documents({}) == 1
-
-            # AND the event data matches what we expect
-            actual_second_stored_event = await repository.collection.find_one({})
-            _assert_metric_event_fields_match(given_second_event.model_dump(), actual_second_stored_event)
-            # AND the turn count is incremented to 2
-            assert actual_second_stored_event["turn_count"] == 2
-
-        @pytest.mark.asyncio
-        async def test_record_multiple_conversation_turn_event_for_different_users(
-                self,
-                get_metrics_repository: Awaitable[MetricsRepository],
-                setup_application_config: ApplicationConfig
-        ):
-            # GIVEN a list of message reaction created events for different users
-            given_events = [
-                get_conversation_turn_event(user_count=random.randint(1, 10), compass_count=random.randint(1, 10)),  # nosec B311 # random is used for testing purposes for user and compass count
-                get_conversation_turn_event(user_count=random.randint(1, 10), compass_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes for user and compass count
-            ]
-            repository = await get_metrics_repository
-
-            # WHEN the events are recorded
-            await repository.record_event(given_events)
-
-            # THEN the events are recorded in the database
-            assert await repository.collection.count_documents({}) == len(given_events)
-
-            # AND the event data matches what we expect
-            actual_stored_events = await repository.collection.find({}).to_list(length=len(given_events))
-            for actual_stored_event, given_event in zip(actual_stored_events, given_events):
-                given_event_dict = given_event.model_dump()
-                _assert_metric_event_fields_match(given_event_dict, actual_stored_event)
-                # AND the turn count is 1 for each event
+                # AND the event data matches what we expect
+                actual_stored_event = await repository.collection.find_one({})
+                _assert_metric_event_fields_match(given_event.model_dump(), actual_stored_event)
+                # AND the turn count is 1
                 assert actual_stored_event["turn_count"] == 1
 
-        @pytest.mark.asyncio
-        async def test_record_experience_discovered_events_for_same_user(
-                self,
-                get_metrics_repository: Awaitable[MetricsRepository],
-                setup_application_config: ApplicationConfig
-        ):
-            # GIVEN a experience discovered event
-            given_event = get_experience_discovered_event(experience_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes
-            repository = await get_metrics_repository
+                # WHEN the event is recorded again for the same user
+                given_second_event = get_conversation_turn_event(user_count=random.randint(1, 10),  # nosec B311 # random is used for testing purposes
+                                                                compass_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes for user and compass count
+                given_second_event.anonymized_user_id = given_event.anonymized_user_id
+                given_second_event.anonymized_session_id = given_event.anonymized_session_id
 
-            # WHEN the event is recorded
-            await repository.record_event([given_event])
+                # guard: ensure the two events are not identical
+                assert given_event.model_dump() != given_second_event.model_dump()
 
-            # THEN the event is recorded in the database
-            assert await repository.collection.count_documents({}) == 1
+                # WHEN we attempt to record the event again
+                await repository.record_event([given_second_event])
 
-            # AND the event data matches what we expect
-            actual_stored_event = await repository.collection.find_one({})
-            _assert_metric_event_fields_match(given_event.model_dump(), actual_stored_event)
+                # THEN the event is updated rather than recorded again
+                assert await repository.collection.count_documents({}) == 1
 
-            # WHEN the event is recorded again for the same user
-            given_second_event = get_experience_discovered_event(experience_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes
+                # AND the event data matches what we expect
+                actual_second_stored_event = await repository.collection.find_one({})
+                _assert_metric_event_fields_match(given_second_event.model_dump(), actual_second_stored_event)
+                # AND the turn count is incremented to 2
+                assert actual_second_stored_event["turn_count"] == 2
 
-            given_second_event.anonymized_user_id = given_event.anonymized_user_id
-            given_second_event.anonymized_session_id = given_event.anonymized_session_id
+            @pytest.mark.asyncio
+            async def test_record_multiple_conversation_turn_event_for_different_users(
+                    self,
+                    get_metrics_repository: Awaitable[MetricsRepository],
+                    setup_application_config: ApplicationConfig
+            ):
+                # GIVEN a list of message reaction created events for different users
+                given_events = [
+                    get_conversation_turn_event(user_count=random.randint(1, 10), compass_count=random.randint(1, 10)),  # nosec B311 # random is used for testing purposes for user and compass count
+                    get_conversation_turn_event(user_count=random.randint(1, 10), compass_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes for user and compass count
+                ]
+                repository = await get_metrics_repository
 
-            # guard: ensure the two events are not identical
-            assert given_event.model_dump() != given_second_event.model_dump()
+                # WHEN the events are recorded
+                await repository.record_event(given_events)
 
-            # WHEN we attempt to record the event again
-            await repository.record_event([given_second_event])
+                # THEN the events are recorded in the database
+                assert await repository.collection.count_documents({}) == len(given_events)
 
-            # THEN the event is updated rather than recorded again
-            assert await repository.collection.count_documents({}) == 1
+                # AND the event data matches what we expect
+                actual_stored_events = await repository.collection.find({}).to_list(length=len(given_events))
+                for actual_stored_event, given_event in zip(actual_stored_events, given_events):
+                    given_event_dict = given_event.model_dump()
+                    _assert_metric_event_fields_match(given_event_dict, actual_stored_event)
+                    # AND the turn count is 1 for each event
+                    assert actual_stored_event["turn_count"] == 1
 
-            # AND the event data matches what we expect
-            actual_second_stored_event = await repository.collection.find_one({})
-            _assert_metric_event_fields_match(given_second_event.model_dump(), actual_second_stored_event)
+        class TestExperienceDiscoveredEvent:
+            @pytest.mark.asyncio
+            async def test_record_experience_discovered_events_for_same_user(
+                    self,
+                    get_metrics_repository: Awaitable[MetricsRepository],
+                    setup_application_config: ApplicationConfig
+            ):
+                # GIVEN a experience discovered event
+                given_event = get_experience_discovered_event(experience_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes
+                repository = await get_metrics_repository
 
-        @pytest.mark.asyncio
-        async def test_record_multiple_experience_discovered_event_for_different_users(
-                self,
-                get_metrics_repository: Awaitable[MetricsRepository],
-                setup_application_config: ApplicationConfig
-        ):
-            # GIVEN a list of message reaction created events for different users
-            given_events = [
-                get_experience_discovered_event(experience_count=random.randint(1, 10)),  # nosec B311 # random is used for testing purposes
-                get_experience_discovered_event(experience_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes
-            ]
-            repository = await get_metrics_repository
+                # WHEN the event is recorded
+                await repository.record_event([given_event])
 
-            # WHEN the events are recorded
-            await repository.record_event(given_events)
+                # THEN the event is recorded in the database
+                assert await repository.collection.count_documents({}) == 1
 
-            # THEN the events are recorded in the database
-            assert await repository.collection.count_documents({}) == len(given_events)
+                # AND the event data matches what we expect
+                actual_stored_event = await repository.collection.find_one({})
+                _assert_metric_event_fields_match(given_event.model_dump(), actual_stored_event)
 
-            # AND the event data matches what we expect
-            actual_stored_events = await repository.collection.find({}).to_list(length=len(given_events))
-            for actual_stored_event, given_event in zip(actual_stored_events, given_events):
-                given_event_dict = given_event.model_dump()
-                _assert_metric_event_fields_match(given_event_dict, actual_stored_event)
+                # WHEN the event is recorded again for the same user
+                given_second_event = get_experience_discovered_event(experience_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes
 
-    @pytest.mark.asyncio
-    async def test_record_experience_explored_events_for_same_user(
-            self,
-            get_metrics_repository: Awaitable[MetricsRepository],
-            setup_application_config: ApplicationConfig
-    ):
-        # GIVEN a experience explored event
-        given_event = get_experience_explored_event(experience_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes
-        repository = await get_metrics_repository
+                given_second_event.anonymized_user_id = given_event.anonymized_user_id
+                given_second_event.anonymized_session_id = given_event.anonymized_session_id
 
-        # WHEN the event is recorded
-        await repository.record_event([given_event])
+                # guard: ensure the two events are not identical
+                assert given_event.model_dump() != given_second_event.model_dump()
 
-        # THEN the event is recorded in the database
-        assert await repository.collection.count_documents({}) == 1
+                # WHEN we attempt to record the event again
+                await repository.record_event([given_second_event])
 
-        # AND the event data matches what we expect
-        actual_stored_event = await repository.collection.find_one({})
-        _assert_metric_event_fields_match(given_event.model_dump(), actual_stored_event)
+                # THEN the event is updated rather than recorded again
+                assert await repository.collection.count_documents({}) == 1
 
-        # WHEN the event is recorded again for the same user
-        given_second_event = get_experience_explored_event(experience_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes
+                # AND the event data matches what we expect
+                actual_second_stored_event = await repository.collection.find_one({})
+                _assert_metric_event_fields_match(given_second_event.model_dump(), actual_second_stored_event)
 
-        given_second_event.anonymized_user_id = given_event.anonymized_user_id
-        given_second_event.anonymized_session_id = given_event.anonymized_session_id
+            @pytest.mark.asyncio
+            async def test_record_multiple_experience_discovered_event_for_different_users(
+                    self,
+                    get_metrics_repository: Awaitable[MetricsRepository],
+                    setup_application_config: ApplicationConfig
+            ):
+                # GIVEN a list of message reaction created events for different users
+                given_events = [
+                    get_experience_discovered_event(experience_count=random.randint(1, 10)),  # nosec B311 # random is used for testing purposes
+                    get_experience_discovered_event(experience_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes
+                ]
+                repository = await get_metrics_repository
 
-        # guard: ensure the two events are not identical
-        assert given_event.model_dump() != given_second_event.model_dump()
+                # WHEN the events are recorded
+                await repository.record_event(given_events)
 
-        # WHEN we attempt to record the event again
-        await repository.record_event([given_second_event])
+                # THEN the events are recorded in the database
+                assert await repository.collection.count_documents({}) == len(given_events)
 
-        # THEN the event is updated rather than recorded again
-        assert await repository.collection.count_documents({}) == 1
+                # AND the event data matches what we expect
+                actual_stored_events = await repository.collection.find({}).to_list(length=len(given_events))
+                for actual_stored_event, given_event in zip(actual_stored_events, given_events):
+                    given_event_dict = given_event.model_dump()
+                    _assert_metric_event_fields_match(given_event_dict, actual_stored_event)
 
-        # AND the event data matches what we expect
-        actual_second_stored_event = await repository.collection.find_one({})
-        _assert_metric_event_fields_match(given_second_event.model_dump(), actual_second_stored_event)  
-        
-    @pytest.mark.asyncio
-    async def test_record_multiple_experience_explored_event_for_different_users(
-            self,
-            get_metrics_repository: Awaitable[MetricsRepository],
-            setup_application_config: ApplicationConfig
-    ):
-        # GIVEN a list of experience explored events for different users
-        given_events = [
-            get_experience_explored_event(experience_count=random.randint(1, 10)),  # nosec B311 # random is used for testing purposes
-            get_experience_explored_event(experience_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes
-        ]
-        repository = await get_metrics_repository   
+        class TestExperienceExploredEvent:
+            @pytest.mark.asyncio
+            async def test_record_experience_explored_events_for_same_user(
+                    self,
+                    get_metrics_repository: Awaitable[MetricsRepository],
+                    setup_application_config: ApplicationConfig
+            ):
+                # GIVEN a experience explored event
+                given_event = get_experience_explored_event(experience_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes
+                repository = await get_metrics_repository
 
-        # WHEN the events are recorded
-        await repository.record_event(given_events)
+                # WHEN the event is recorded
+                await repository.record_event([given_event])
 
-        # THEN the events are recorded in the database
-        assert await repository.collection.count_documents({}) == len(given_events)
+                # THEN the event is recorded in the database
+                assert await repository.collection.count_documents({}) == 1
 
-        # AND the event data matches what we expect
-        actual_stored_events = await repository.collection.find({}).to_list(length=len(given_events))
-        for actual_stored_event, given_event in zip(actual_stored_events, given_events):
-            given_event_dict = given_event.model_dump()
-            _assert_metric_event_fields_match(given_event_dict, actual_stored_event)
+                # AND the event data matches what we expect
+                actual_stored_event = await repository.collection.find_one({})
+                _assert_metric_event_fields_match(given_event.model_dump(), actual_stored_event)
+
+                # WHEN the event is recorded again for the same user
+                given_second_event = get_experience_explored_event(experience_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes
+
+                given_second_event.anonymized_user_id = given_event.anonymized_user_id
+                given_second_event.anonymized_session_id = given_event.anonymized_session_id
+
+                # guard: ensure the two events are not identical
+                assert given_event.model_dump() != given_second_event.model_dump()
+
+                # WHEN we attempt to record the event again
+                await repository.record_event([given_second_event])
+
+                # THEN the event is updated rather than recorded again
+                assert await repository.collection.count_documents({}) == 1
+
+                # AND the event data matches what we expect
+                actual_second_stored_event = await repository.collection.find_one({})
+                _assert_metric_event_fields_match(given_second_event.model_dump(), actual_second_stored_event)  
+                
+            @pytest.mark.asyncio
+            async def test_record_multiple_experience_explored_event_for_different_users(
+                    self,
+                    get_metrics_repository: Awaitable[MetricsRepository],
+                    setup_application_config: ApplicationConfig
+            ):
+                # GIVEN a list of experience explored events for different users
+                given_events = [
+                    get_experience_explored_event(experience_count=random.randint(1, 10)),  # nosec B311 # random is used for testing purposes
+                    get_experience_explored_event(experience_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes
+                ]
+                repository = await get_metrics_repository   
+
+                # WHEN the events are recorded
+                await repository.record_event(given_events)
+
+                # THEN the events are recorded in the database
+                assert await repository.collection.count_documents({}) == len(given_events)
+
+                # AND the event data matches what we expect
+                actual_stored_events = await repository.collection.find({}).to_list(length=len(given_events))
+                for actual_stored_event, given_event in zip(actual_stored_events, given_events):
+                    given_event_dict = given_event.model_dump()
+                    _assert_metric_event_fields_match(given_event_dict, actual_stored_event)
+                

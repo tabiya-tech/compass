@@ -88,7 +88,8 @@ class ReactionService(IReactionService):
                 message_id=reaction.message_id,
                 kind=reaction.kind,
                 reasons=reaction.reasons or []
-            )
+            ),
+            user_id=user_id
         )
 
         return stored_reaction
