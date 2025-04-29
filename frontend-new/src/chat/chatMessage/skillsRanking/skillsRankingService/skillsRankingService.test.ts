@@ -18,13 +18,15 @@ describe("SkillsRankingService", () => {
       [false, "bar"],
     ])("should return '%s' for '%s'", (expected, input) => {
       // GIVEN envService.getSkillsRankingEnabled is mocked to return input
-      const getSkillsRankingEnabledMock = jest.spyOn(EnvServiceModule, "getSkillsRankingEnabled").mockReturnValue(input);
+      const getSkillsRankingEnabledMock = jest
+        .spyOn(EnvServiceModule, "getSkillsRankingEnabled")
+        .mockReturnValue(input);
 
       // WHEN isSkillsRankingFeatureEnabled is called
       const isSkillsRankingEnabled = SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled();
 
       // THEN envService.getSkillsRankingEnabled should be called
-      expect(getSkillsRankingEnabledMock).toHaveBeenCalled()
+      expect(getSkillsRankingEnabledMock).toHaveBeenCalled();
 
       // AND the result should be as expected
       expect(isSkillsRankingEnabled).toBe(expected);
