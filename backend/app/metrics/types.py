@@ -173,13 +173,17 @@ class ExperienceDiscoveredEvent(AbstractConversationEvent):
     experiences_by_work_type - a dictionary mapping {work types : the number of experiences discovered for each type }
     """
 
-    def __init__(self, *, user_id: str, session_id: int, experience_count: int, experiences_by_work_type: dict[str, int]):
+    def __init__(self, *, user_id: str, session_id: int, experience_count: int, experiences_by_work_type: dict[str, int], timestamp: str | None = None):
+        # construct a dict with a timestamp field only if the timestamp is provided
+        # we do this to avoid having to pass None to the super constructor
+        timestamp_argument = dict(timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc)) if timestamp else {}
         super().__init__(
             user_id=user_id,
             session_id=session_id,
             event_type=EventType.EXPERIENCE_DISCOVERED,
             experience_count=experience_count,
-            experiences_by_work_type=experiences_by_work_type
+            experiences_by_work_type=experiences_by_work_type,
+            **timestamp_argument
         )
 
     class Config:
