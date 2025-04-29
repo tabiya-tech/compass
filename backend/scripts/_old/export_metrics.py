@@ -6,8 +6,10 @@ import argparse
 import os
 import hashlib
 from abc import ABC, abstractmethod
+from datetime import timezone
 
 from app.agent.agent_director.abstract_agent_director import ConversationPhase
+from app.agent.collect_experiences_agent import CollectedData
 from app.agent.explore_experiences_agent_director import DiveInPhase, ConversationPhase as CounselingPhase
 from app.application_state import ApplicationState
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
@@ -87,13 +89,13 @@ class ConversationPhaseEventExporter(EventExporter):
 
         def add_phase_event(phase: str) -> None:
             phase_key = self.create_event_key(user_id, session_id, phase)
-            
+
             # Check if this phase event is already in the existing events
             if phase_key in self.existing_events:
                 nonlocal skipped_count
                 skipped_count += 1
                 return
-                
+
             # Add the new phase event
             events.append(ConversationPhaseEvent(
                 user_id=user_id,
@@ -136,7 +138,7 @@ class ConversationPhaseEventExporter(EventExporter):
 
         for event in events:
             event.timestamp = state.agent_director_state.conversation_conducted_at
-            
+
         self.skipped_count = skipped_count
         return events
 
@@ -171,18 +173,18 @@ class ConversationTurnEventExporter(EventExporter):
         skipped_count = 0
         compass_message_count: int = 0
         user_message_count: int = 0
-        
+
         # Helper function to add a turn event if not already added
         def add_turn_event() -> None:
             # Create a unique key for this turn
             event_key = self.create_event_key(user_id, session_id)
-            
+
             # Check if this turn event is already in the existing events
             if event_key in self.existing_events:
                 nonlocal skipped_count
                 skipped_count += 1
                 return
-                
+
             # Add the new turn event
             events.append(ConversationTurnEvent(
                 user_id=user_id,
@@ -250,14 +252,14 @@ class ExploreExperiencesEventExporter(EventExporter):
             session_id=session_id,
             experience_count=experience_count
         )
-        
+
         # Check if this event already exists
         event_key = self.create_event_key(user_id, session_id)
         if event_key in self.existing_events:
             skipped_count += 1
         else:
             events.append(event)
-            
+
         self.skipped_count = skipped_count
         return events
 
@@ -289,13 +291,15 @@ class ExperienceDiscoveredEventExporter(EventExporter):
         events: list[AbstractCompassMetricEvent] = []
         skipped_count = 0
         experience_count: int = 0
-        work_types_discovered: list[str] = [
-            work_type.name for work_type in state.collect_experience_state.explored_types
-        ]
+        work_types_discovered: dict[str, int] = {}
 
         # go through the experiences and count the number of experiences that have been discovered
-        for _ in state.explore_experiences_director_state.experiences_state.keys():
-            experience_count += 1
+        for data in state.collect_experience_state.collected_data:
+            if data.work_type:
+                # count the number of experiences discovered by work type
+                work_types_discovered[data.work_type] = work_types_discovered.get(data.work_type, 0) + 1
+            if not CollectedData.all_fields_empty(data):
+                experience_count += 1
 
         if experience_count == 0 and len(work_types_discovered) == 0:
             # if there are no experiences discovered and no work types discovered, skip the event
@@ -307,7 +311,8 @@ class ExperienceDiscoveredEventExporter(EventExporter):
             user_id=user_id,
             session_id=session_id,
             experience_count=experience_count,
-            work_types_discovered=work_types_discovered
+            experiences_by_work_type=work_types_discovered,
+            timestamp=state.agent_director_state.conversation_conducted_at.astimezone(timezone.utc).isoformat()
         )
         
         # Check if this event already exists
