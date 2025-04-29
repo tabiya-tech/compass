@@ -5,6 +5,7 @@ export enum ChatMessageType {
   CONVERSATION_CONCLUSION = "conversation_conclusion",
   TYPING = "typing",
   ERROR = "error",
+  SKILLS_RANKING = "skills_ranking",
 }
 
 export type IChatMessage = ConversationMessage & {
