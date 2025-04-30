@@ -46,6 +46,7 @@ class BackendServiceConfig:
     cloudrun_memory_limit: str
     cloudrun_cpu_limit: str
     api_gateway_timeout: str
+    features: str
 
 
 """
@@ -319,6 +320,9 @@ def _deploy_cloud_run_service(
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="DEFAULT_COUNTRY_OF_USER",
                             value=backend_service_cfg.default_country_of_user),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="BACKEND_FEATURES",
+                            value=backend_service_cfg.features),
                         # Add more environment variables here
                     ],
                 )

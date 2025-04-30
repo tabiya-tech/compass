@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 import os
 
@@ -26,6 +27,7 @@ from app.app_config import ApplicationConfig, set_application_config, get_applic
 from app.version.utils import load_version_info
 from common_libs.logging.log_utilities import setup_logging_config
 
+from modules.loader import FeatureLoader
 
 def setup_logging():
     # The configuration is loaded (once) when python imports the module.
@@ -136,6 +138,8 @@ if not os.getenv("EMBEDDINGS_SERVICE_NAME"):
     raise ValueError("Mandatory EMBEDDINGS_SERVICE_NAME environment variable is not set")
 if not os.getenv("EMBEDDINGS_MODEL_NAME"):
     raise ValueError("Mandatory EMBEDDINGS_MODEL_NAME environment variable is not set")
+if not os.getenv("BACKEND_FEATURES"):
+    raise ValueError("Mandatory BACKEND_FEATURES environment variable is not set")
 
 # set global application configuration
 set_application_config(
@@ -147,6 +151,7 @@ set_application_config(
         taxonomy_model_id=os.getenv('TAXONOMY_MODEL_ID'),
         embeddings_service_name=os.getenv("EMBEDDINGS_SERVICE_NAME"),
         embeddings_model_name=os.getenv("EMBEDDINGS_MODEL_NAME"),
+        features=json.loads(os.getenv("BACKEND_FEATURES", "{}")),
     )
 )
 
@@ -155,6 +160,14 @@ set_application_config(
 # because: some contexts depend on the application config variables.
 #################
 set_sentry_contexts()
+
+
+
+############################################
+# Initialize Feature Loader
+############################################
+feature_loader = FeatureLoader()
+
 
 ############################################
 # Initiate the FastAPI app
@@ -185,6 +198,9 @@ async def lifespan(_app: FastAPI):
                                 embeddings_model_name=app_cfg.embeddings_model_name),
     )
 
+    # We are initializing the feature loader here, so that plugins will be loaded after the application is initialized.
+    await feature_loader.init()
+
     yield
 
     # Shutdown logic
@@ -194,6 +210,8 @@ async def lifespan(_app: FastAPI):
     application_db.client.close()
     userdata_db.client.close()
     metrics_db.client.close()
+
+    await feature_loader.tear_down()
 
 
 # Retrieve the backend URL from the environment variables,
@@ -279,6 +297,12 @@ add_metrics_routes(app)
 # Add POC chat routes
 ############################################
 add_poc_routes(app, auth)
+
+
+############################################
+# Add other features routes
+############################################
+feature_loader.add_routes(app, auth)
 
 if __name__ == "__main__":
     import uvicorn

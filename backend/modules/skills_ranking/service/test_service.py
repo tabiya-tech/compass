@@ -4,10 +4,10 @@ import pytest
 from unittest.mock import AsyncMock
 
 from app.app_config import ApplicationConfig
-from app.conversations.skills_ranking.repository.repository import ISkillsRankingRepository
-from app.conversations.skills_ranking.service.service import SkillsRankingService
-from app.conversations.skills_ranking.service.types import SkillsRankingState, SkillsRankingCurrentState, ExperimentGroup
-from app.conversations.skills_ranking.errors import InvalidNewPhaseError
+from modules.skills_ranking.repository.repository import ISkillsRankingRepository
+from modules.skills_ranking.service.service import SkillsRankingService
+from modules.skills_ranking.service.types import SkillsRankingState, SkillsRankingCurrentState, ExperimentGroup
+from modules.skills_ranking.errors import InvalidNewPhaseError
 
 
 @pytest.fixture(scope="function")

@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from app.countries import Country
 from app.version.types import Version
 
+from modules.types import FeatureConfig
 
 class ApplicationConfig(BaseModel):
     """
@@ -46,6 +47,8 @@ class ApplicationConfig(BaseModel):
     """
     The name of the embeddings model to use.
     """
+
+    features: dict[str, FeatureConfig]
 
 
 _application_config: ApplicationConfig | None = None

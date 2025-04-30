@@ -5,30 +5,31 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Response
 from fastapi.params import Depends, Path
 
+from app.users.auth import Authentication, UserInfo
 from app.constants.errors import HTTPErrorResponse
+from app.users.repositories import IUserPreferenceRepository
 from app.context_vars import user_id_ctx_var, session_id_ctx_var
-from app.conversations.skills_ranking.errors import SkillsRankingStateNotFound, InvalidNewPhaseError
-from app.conversations.skills_ranking.repository.repository import ISkillsRankingRepository
-from app.conversations.skills_ranking.routes.types import SkillsRankingResponse, UpsertSkillsRankingRequest
-from app.conversations.skills_ranking.service.service import ISkillsRankingService
-from app.conversations.skills_ranking.service.get_skills_ranking_service import get_skills_ranking_service
-from app.conversations.skills_ranking.repository.get_skills_ranking_repository import get_skills_ranking_repository
-from app.conversations.skills_ranking.service.types import SkillsRankingState
+from app.users.dependencies import get_user_preferences_repository
 from app.errors.errors import UnauthorizedSessionAccessError, NoDBUpdateException
 
-from app.users.auth import Authentication, UserInfo
-from app.users.dependencies import get_user_preferences_repository
-from app.users.repositories import IUserPreferenceRepository
+from modules.skills_ranking.errors import SkillsRankingStateNotFound, InvalidNewPhaseError
+from modules.skills_ranking.repository.repository import ISkillsRankingRepository
+from modules.skills_ranking.routes.types import SkillsRankingResponse, UpsertSkillsRankingRequest
+from modules.skills_ranking.service.service import ISkillsRankingService
+from modules.skills_ranking.service.get_skills_ranking_service import get_skills_ranking_service
+from modules.skills_ranking.repository.get_skills_ranking_repository import get_skills_ranking_repository
+from modules.skills_ranking.service.types import SkillsRankingState
+
 
 logger = logging.getLogger(__name__)
 
 
-def add_skills_ranking_routes(conversation_router: APIRouter, auth: Authentication):
+def get_skills_ranking_router(auth: Authentication) -> APIRouter:
     """
     Add the skills ranking routes on the conversation router.
     """
 
-    router = APIRouter(prefix="/skills-ranking", tags=["skills-ranking"])
+    router = APIRouter(prefix="/conversations/{session_id}/skills-ranking", tags=["skills-ranking", "conversations"])
 
     @router.get("")
     async def _get_skills_ranking(
@@ -120,4 +121,4 @@ def add_skills_ranking_routes(conversation_router: APIRouter, auth: Authenticati
             logger.exception(e)
             raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Opps! Something went wrong.")
 
-    conversation_router.include_router(router)
+    return router

@@ -20,6 +20,7 @@ import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
 import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
 import { TokenValidationFailureCause } from "src/auth/services/Authentication.service";
+import { getFeatures } from "../envService";
 
 const LazyLoadedSensitiveDataForm = lazyWithPreload(
   () => import("src/sensitiveData/components/sensitiveDataForm/SensitiveDataForm")
@@ -129,6 +130,8 @@ const App = () => {
   };
 
   useEffect(() => {
+    console.log(getFeatures())
+
     const authenticationStateService = AuthenticationStateService.getInstance();
 
     const initializeAuth = async () => {

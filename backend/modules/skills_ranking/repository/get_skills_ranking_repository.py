@@ -3,7 +3,7 @@ import asyncio
 from fastapi import Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from app.conversations.skills_ranking.repository.repository import ISkillsRankingRepository, SkillsRankingRepository
+from modules.skills_ranking.repository.repository import ISkillsRankingRepository, SkillsRankingRepository
 from app.server_dependencies.db_dependencies import CompassDBProvider
 
 _skills_ranking_repository_singleton: ISkillsRankingRepository | None = None

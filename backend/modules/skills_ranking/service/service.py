@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 
-from app.conversations.skills_ranking.errors import InvalidNewPhaseError
-from app.conversations.skills_ranking.repository.repository import ISkillsRankingRepository
-from app.conversations.skills_ranking.service.types import SkillsRankingState
-from app.conversations.skills_ranking.utils import get_possible_next_states
+from modules.skills_ranking.errors import InvalidNewPhaseError
+from modules.skills_ranking.repository.repository import ISkillsRankingRepository
+from modules.skills_ranking.service.types import SkillsRankingState
+from modules.skills_ranking.utils import get_possible_next_states
 
 
 class ISkillsRankingService(ABC):

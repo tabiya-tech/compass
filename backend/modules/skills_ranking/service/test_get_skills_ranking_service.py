@@ -3,15 +3,15 @@ import asyncio
 import pytest
 import pytest_mock
 
-from app.conversations.skills_ranking.repository.repository import ISkillsRankingRepository
-from app.conversations.skills_ranking.service.get_skills_ranking_service import get_skills_ranking_service
+from modules.skills_ranking.repository.repository import ISkillsRankingRepository
+from modules.skills_ranking.service.get_skills_ranking_service import get_skills_ranking_service
 
 
 @pytest.mark.asyncio
 class TestGetSkillsRankingService:
     def teardown_method(self):
-        import app.conversations.skills_ranking.service.get_skills_ranking_service
-        app.conversations.skills_ranking.service.get_skills_ranking_service._skills_ranking_service_singleton = None
+        import modules.skills_ranking.service.get_skills_ranking_service
+        modules.skills_ranking.service.get_skills_ranking_service._skills_ranking_service_singleton = None
 
     async def test_get_skills_ranking_service_concurrent_calls(self, mocker: pytest_mock.MockFixture):
         # GIVEN a mocked repository

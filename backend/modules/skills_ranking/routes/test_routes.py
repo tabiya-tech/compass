@@ -5,18 +5,19 @@ from unittest.mock import AsyncMock
 from datetime import datetime
 
 from app.app_config import ApplicationConfig
-from app.conversations.skills_ranking.service import get_skills_ranking_service
-from app.conversations.skills_ranking.routes.routes import add_skills_ranking_routes, get_user_preferences_repository
-from app.conversations.skills_ranking.service.service import ISkillsRankingService
-from app.conversations.skills_ranking.service.types import SkillsRankingState, SkillsRankingCurrentState, ExperimentGroup
-from app.conversations.skills_ranking.errors import InvalidNewPhaseError
-from app.conversations.skills_ranking.repository.repository import ISkillsRankingRepository
-from app.conversations.skills_ranking.repository.get_skills_ranking_repository import get_skills_ranking_repository
 from app.errors.errors import NoDBUpdateException
 from app.users.auth import UserInfo
 from app.users.repositories import IUserPreferenceRepository
 from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest
 from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
+
+from modules.skills_ranking.service import get_skills_ranking_service
+from modules.skills_ranking.routes.routes import add_skills_ranking_routes, get_user_preferences_repository
+from modules.skills_ranking.service.service import ISkillsRankingService
+from modules.skills_ranking.service.types import SkillsRankingState, SkillsRankingCurrentState, ExperimentGroup
+from modules.skills_ranking.errors import InvalidNewPhaseError
+from modules.skills_ranking.repository.repository import ISkillsRankingRepository
+from modules.skills_ranking.repository.get_skills_ranking_repository import get_skills_ranking_repository
 
 from common_libs.test_utilities.mock_auth import MockAuth
 from fastapi import FastAPI, APIRouter

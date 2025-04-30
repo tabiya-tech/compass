@@ -1,4 +1,4 @@
-import { getSkillsRankingEnabled } from "src/envService";
+import { getFeatures } from "src/envService";
 
 /**
  * Service to manage the skills ranking feature.
@@ -21,7 +21,7 @@ export class SkillsRankingService {
    * Check if the skills ranking feature is enabled.
    */
   isSkillsRankingFeatureEnabled(): boolean {
-    return getSkillsRankingEnabled().toLowerCase() === "true"
+    return JSON.parse(getFeatures())?.skillRanking?.enabled.toLowerCase() === "true";
   }
 
   /**
@@ -31,6 +31,6 @@ export class SkillsRankingService {
    * @returns {Promise<string>} The ranking class for the session.
    */
   async getRanking(sessionId: string): Promise<string> {
-    return "foo"
+    return "foo";
   }
 }

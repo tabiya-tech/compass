@@ -15,8 +15,19 @@ def export():
             env_vars=dict(
                 # Set the Skills Ranking to True, so that the API Gateway Schema contains the paths
                 # Though, this will not be displayed on the swagger and no actual implementation will be generated.
-                BACKEND_ENABLE_SKILLS_RANKING="True"
+                BACKEND_FEATURES="""
+                {
+                    "skills_ranking": {
+                        "enabled": false,
+                        "class_path": "modules.skills_ranking.feature",
+                        "config": {
+                            "extra_field": "some extra field"
+                        }
+                    }
+                }
+                """
             )):
+
         from app.server import app
         # Generate the OpenAPI 3.1 schema
         openapi3 = get_openapi(

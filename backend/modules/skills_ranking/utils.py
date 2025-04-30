@@ -1,4 +1,4 @@
-from app.conversations.skills_ranking.service.types import SkillsRankingCurrentState
+from modules.skills_ranking.service.types import SkillsRankingCurrentState
 
 
 def get_possible_next_states(current_state: SkillsRankingCurrentState) -> list[SkillsRankingCurrentState]:

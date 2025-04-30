@@ -1,10 +1,9 @@
 import pytest
 from typing import Awaitable
-from unittest.mock import AsyncMock
 
 from app.app_config import ApplicationConfig
-from app.conversations.skills_ranking.repository.repository import SkillsRankingRepository
-from app.conversations.skills_ranking.service.types import SkillsRankingState, SkillsRankingCurrentState
+from modules.skills_ranking.repository.repository import SkillsRankingRepository
+from modules.skills_ranking.service.types import SkillsRankingState, SkillsRankingCurrentState
 from app.errors.errors import NoDBUpdateException
 
 

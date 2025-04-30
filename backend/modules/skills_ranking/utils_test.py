@@ -1,5 +1,5 @@
-from app.conversations.skills_ranking.service.types import SkillsRankingCurrentState
-from app.conversations.skills_ranking.utils import get_possible_next_states
+from modules.skills_ranking.service.types import SkillsRankingCurrentState
+from modules.skills_ranking.utils import get_possible_next_states
 
 
 def test_get_possible_next_states():

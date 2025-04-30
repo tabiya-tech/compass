@@ -2,9 +2,9 @@ import asyncio
 
 from fastapi import Depends
 
-from app.conversations.skills_ranking.repository.get_skills_ranking_repository import get_skills_ranking_repository
-from app.conversations.skills_ranking.repository.repository import ISkillsRankingRepository
-from app.conversations.skills_ranking.service.service import ISkillsRankingService, SkillsRankingService
+from modules.skills_ranking.repository.get_skills_ranking_repository import get_skills_ranking_repository
+from modules.skills_ranking.repository.repository import ISkillsRankingRepository
+from modules.skills_ranking.service.service import ISkillsRankingService, SkillsRankingService
 
 _skills_ranking_service_singleton: ISkillsRankingService | None = None
 _skills_ranking_service_lock = asyncio.Lock()
