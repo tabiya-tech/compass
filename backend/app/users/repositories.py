@@ -48,6 +48,8 @@ class IUserPreferenceRepository(ABC):
         Get the experiments for a user by user_id
         :param user_ids: str - The user_ids to get experiments for
         :return: dict[str, dict[str, str]] - A dictionary mapping user IDs to their corresponding experiments
+                example {"user_id": {"experiment_id": "experiment_class"}}
+                returns an empty dict if no experiments are found for a user_id {"user_id": {}}
         """
         raise NotImplementedError()
 

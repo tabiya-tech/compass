@@ -68,20 +68,22 @@ class AbstractUserAccountEvent(AbstractCompassMetricEvent):
     """
     anonymized_user_id - a hex representation of the md5 hash of the user_id for the user whose request triggered the event
     """
-
-    relevant_experiments: dict[str, str] | None = Field(default_factory=dict)
+    relevant_experiments: dict[str, str] = Field(default_factory=dict)
     """
     relevant_experiments - a dictionary mapping experiment IDs to their corresponding groups,
     will be empty for frontend events until the service populates the field with values from user preferences
     """
 
+
     # using a model_validator instead of an __init__ to obfuscate user_id without needing to pass extra fields to the parent constructor
     # because the __init__ method of the parent class would be called before the __init__ method of the child class
     # and the parent class doesn't know about the user_id field
     @model_validator(mode="before")
-    def obfuscate_user_id(cls, values):
+    def validator(cls, values):
         if 'user_id' in values:
             values['anonymized_user_id'] = hashlib.md5(values['user_id'].encode(), usedforsecurity=False).hexdigest()
+        if 'relevant_experiments' in values and values['relevant_experiments'] is None:
+            values['relevant_experiments'] = {}
         return values
 
     class Config:
