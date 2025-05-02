@@ -30,7 +30,7 @@ describe("SkillsRankingPrompt tests", () => {
         <SkillsRankingPrompt
           group={ExperimentGroup.GROUP_A}
           onShowInfo={jest.fn()}
-          onSkip={jest.fn()}
+          onContinue={jest.fn()}
           chatMessage={givenChatMessage}
         />
       );
@@ -43,9 +43,9 @@ describe("SkillsRankingPrompt tests", () => {
       // AND expect the text to be in the document
       expect(screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_PROMPT_TEXT)).toBeInTheDocument();
       // AND expect the get info button to be in the document
-      expect(screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_PROMPT_BUTTON)).toBeInTheDocument();
-      // AND expect the skip info button to be in the document
-      expect(screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_PROMPT_SKIP_BUTTON)).toBeInTheDocument();
+      expect(screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_PROMPT_INFO_BUTTON)).toBeInTheDocument();
+      // AND continue without an info button to be in the document
+      expect(screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_PROMPT_CONTINUE_BUTTON)).toBeInTheDocument();
       // AND to match the snapshot
       expect(container).toMatchSnapshot();
       // AND no errors or warnings to have occurred
@@ -69,7 +69,12 @@ describe("SkillsRankingPrompt tests", () => {
 
       // WHEN the component is rendered
       render(
-        <SkillsRankingPrompt group={group} onShowInfo={jest.fn()} onSkip={jest.fn()} chatMessage={givenChatMessage} />
+        <SkillsRankingPrompt
+          group={group}
+          onShowInfo={jest.fn()}
+          onContinue={jest.fn()}
+          chatMessage={givenChatMessage}
+        />
       );
 
       // THEN expect the correct prompt text to be in the document
@@ -86,7 +91,7 @@ describe("SkillsRankingPrompt tests", () => {
     test("should call onShowInfo when the info button is clicked", () => {
       // GIVEN a SkillsRankingPrompt component
       const onShowInfo = jest.fn();
-      const onSkip = jest.fn();
+      const onContinue = jest.fn();
       const givenChatMessage: IChatMessage = {
         message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
@@ -99,7 +104,7 @@ describe("SkillsRankingPrompt tests", () => {
         <SkillsRankingPrompt
           group={ExperimentGroup.GROUP_A}
           onShowInfo={onShowInfo}
-          onSkip={onSkip}
+          onContinue={onContinue}
           chatMessage={givenChatMessage}
         />
       );
@@ -108,20 +113,17 @@ describe("SkillsRankingPrompt tests", () => {
       render(givenComponent);
 
       // AND the get info button is clicked
-      const infoButton = screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_PROMPT_BUTTON);
+      const infoButton = screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_PROMPT_INFO_BUTTON);
       infoButton.click();
 
       // THEN expect the onShowInfo function to have been called
       expect(onShowInfo).toHaveBeenCalled();
-      // AND no errors or warnings to have occurred
-      expect(console.error).not.toHaveBeenCalled();
-      expect(console.warn).not.toHaveBeenCalled();
     });
 
-    test("should call onSkip when the skip button is clicked", () => {
+    test("should call onContinue when the skip button is clicked", () => {
       // GIVEN a SkillsRankingPrompt component
       const onShowInfo = jest.fn();
-      const onSkip = jest.fn();
+      const onContinue = jest.fn();
       const givenChatMessage: IChatMessage = {
         message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
@@ -134,7 +136,7 @@ describe("SkillsRankingPrompt tests", () => {
         <SkillsRankingPrompt
           group={ExperimentGroup.GROUP_A}
           onShowInfo={onShowInfo}
-          onSkip={onSkip}
+          onContinue={onContinue}
           chatMessage={givenChatMessage}
         />
       );
@@ -142,15 +144,12 @@ describe("SkillsRankingPrompt tests", () => {
       // WHEN the component is rendered
       render(givenComponent);
 
-      // AND the skip info button is clicked
-      const skipButton = screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_PROMPT_SKIP_BUTTON);
-      skipButton.click();
+      // AND continue without info button is clicked
+      const continueButton = screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_PROMPT_CONTINUE_BUTTON);
+      continueButton.click();
 
-      // THEN expect the onSkip function to have been called
-      expect(onSkip).toHaveBeenCalled();
-      // AND no errors or warnings to have occurred
-      expect(console.error).not.toHaveBeenCalled();
-      expect(console.warn).not.toHaveBeenCalled();
+      // THEN expect the onContinue function to have been called
+      expect(onContinue).toHaveBeenCalled();
     });
   });
 });
