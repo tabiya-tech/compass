@@ -3,6 +3,11 @@ export enum ExperimentGroup {
   GROUP_B = "GROUP_B",
 }
 
+export enum ButtonPositionGroup {
+  CONTINUE_BUTTON_FIRST = "CONTINUE_BUTTON_FIRST",
+  INFO_BUTTON_FIRST = "INFO_BUTTON_FIRST",
+}
+
 export enum SkillsRankingState {
   INITIAL = "INITIAL",
   SKIPPED = "SKIPPED",
