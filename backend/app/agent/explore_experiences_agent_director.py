@@ -368,7 +368,7 @@ class ExploreExperiencesAgentDirector(Agent):
 
         end = time.time()
         agent_output: AgentOutput = AgentOutput(
-            message_for_user=f"After examining the information you provided, "
+            message_for_user=f"After reviewing the information you provided about your experience as '{current_experience.experience_title}', "
                              f"I identified the following skills:"
                              f"{skills_summary}",
             finished=False,
