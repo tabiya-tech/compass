@@ -19,7 +19,7 @@ RESPONSE_T = TypeVar('RESPONSE_T', bound=BaseModel)
 class LLMCaller(Generic[RESPONSE_T]):
     """
     A class that calls the LLM to generate a response to an input.
-    It has the ability to retry multiple times if the LLM fails to respond with a JSON object that
+    It can retry multiple times if the LLM fails to respond with a JSON object that
     complies with the model_response_type.
     Additionally, it logs errors it captures the statistics of the LLM calls.
     """
@@ -63,8 +63,7 @@ class LLMCaller(Generic[RESPONSE_T]):
                 model_response = extract_json(response_text, self._model_response_type)
                 success = True
             except ExtractJSONError as e:
-                log_message = (f"Attempt {attempt_count} failed to extract JSON "
-                               f"from conversation content: '{response_text}' - {e}")
+                log_message = f"Attempt {attempt_count} failed to extract JSON caused by: {e}"
                 llm_stats.error = log_message
                 if attempt_count == _MAX_ATTEMPTS:
                     # The agent failed to respond with a JSON object after the last attempt,
@@ -75,9 +74,9 @@ class LLMCaller(Generic[RESPONSE_T]):
                     if llm_stats.response_token_count == generation_config.max_output_tokens:
                         # Most-likely we run into a "repetition trap". This happens often with prompts that have Chain Of Thought reasoning tasks.
                         # We will increase the frequency_penalty and the temperature and return the model to avoid repetition.
-                        # However, higher frequency_penalty might cause the model to penalize punctuation and json format characters,
-                        # and in combination with the higher the temperature will most likely result in an invalid json.
-                        # Therefore, there is no guarantee that the result is a valid json.
+                        # However, higher frequency_penalty might cause the model to penalize punctuation and JSON format characters,
+                        # and in combination with the higher the temperature will most likely result in an invalid JSON.
+                        # Therefore, there is no guarantee that the result is a valid JSON.
                         # However, we must perform this process to get unstuck from the repetition trap as experiments have
                         # shown that just rerunning the model will not solve the problem on its own, but changing the parameters will.
                         generation_config.frequency_penalty += 0.1
