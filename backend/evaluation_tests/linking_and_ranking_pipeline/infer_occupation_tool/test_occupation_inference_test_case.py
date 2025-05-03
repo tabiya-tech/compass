@@ -13,7 +13,7 @@ class InferOccupationToolTestCase(CompassTestCase):
     given_country_of_interest: Country
     given_top_k: int = 10
     given_top_p: int = 20
-    number_of_titles: int = 5
+    given_number_of_titles: int = 5
     expected_occupations_found: list[str]
 
 
@@ -26,6 +26,18 @@ test_cases = [
         given_responsibilities=["I bake bread", "I clean my work place", "I order supplies", "I sell bread"],
         given_country_of_interest=Country.SOUTH_AFRICA,
         expected_occupations_found=["baker", "bakery shop manager", "pastry maker"]),
+    InferOccupationToolTestCase(
+        name="Baker at the limits of LLM response Context size ",
+        given_experience_title="Baker",
+        given_work_type=WorkType.SELF_EMPLOYMENT,
+        given_company="",
+        given_responsibilities=["I bake bread", "I clean my work place", "I order supplies", "I sell bread"],
+        given_country_of_interest=Country.SOUTH_AFRICA,
+        expected_occupations_found=["baker", "bakery shop manager", "pastry maker", "microentrepreneur"],
+        given_top_k=15,
+        given_top_p=100,
+        given_number_of_titles=15
+    ),
     InferOccupationToolTestCase(
         name="Title is not useful, infer from responsibilities",
         given_experience_title="Foo",
