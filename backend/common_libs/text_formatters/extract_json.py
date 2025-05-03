@@ -1,10 +1,13 @@
 import json
-from typing import TypeVar, Type
+from typing import TypeVar, Type, Any
 import re
 
 from pydantic import BaseModel
+import fix_busted_json
+import json_repair
+import logging
 
-from fix_busted_json import repair_json
+logger = logging.getLogger(__name__)
 
 T = TypeVar('T', bound=BaseModel)
 
@@ -27,23 +30,51 @@ def extract_json(text: str, model: Type[T]) -> T:
     """
     match = re.search(_JSON_REGEX, text, re.DOTALL)
     if not match:
-        raise NoJSONFound("No JSON object found in the text")
+        raise NoJSONFound(f"No JSON object found in the text: {text}")
 
     extracted_text = match.group(0)
+
+    # First, try to get the JSON using fix_busted_json
+    # If that fails, try the json_repair library as a second option
+    data: Any = None
     try:
-        # Parse the JSON text and validate it with the Pydantic model
-        cleaned_json = repair_json(extracted_text)
-    except Exception as e:  # pylint: disable=broad-except
-        raise InvalidJSON(f"Failed to clean JSON: {e}") from e
+        data = try_fix_busted_json(extracted_text)
+    except InvalidJSON:
+        try:
+            data = try_json_repair(extracted_text)
+            if data == {}:
+                logger.warning("Empty JSON object found, after trying to repair with fix_busted_json for text: %s", text)
+        except InvalidJSON:
+            raise InvalidJSON("Failed to repair JSON with both json_repair and fix_busted_json")
 
     try:
-        # Parse the JSON text and validate it with the Pydantic model
-        data = json.loads(cleaned_json)
         return model(**data)
-    except json.JSONDecodeError as e:
-        raise InvalidJSON(f"Failed to decode JSON: {e}") from e
     except Exception as e:  # pylint: disable=broad-except
-        raise ValidationError(f"Failed to validate JSON: {e}") from e
+        raise ExtractedDataValidationError(f"Failed to construct model: {model.__name__}"
+                                           f"\n  - with data: {data}") from e
+
+
+def try_json_repair(txt: str) -> Any:
+    try:
+        cleaned_json = json_repair.repair_json(txt, skip_json_loads=True)
+        return json.loads(cleaned_json)
+    except Exception as e:  # pylint: disable=broad-except
+        logger.warning("Failed to repair JSON with json_repair:"
+                       "\n  - error: %s"
+                       "\n  - text to repair: %s", e, txt)
+        raise InvalidJSON(f"Failed to clean JSON with json_repair: {e}") from e
+
+
+def try_fix_busted_json(txt: str) -> Any:
+    try:
+        # Parse the JSON text and validate it with the Pydantic model
+        cleaned_json = fix_busted_json.repair_json(txt)
+        return json.loads(cleaned_json)
+    except Exception as e:  # pylint: disable=broad-except
+        logger.warning("Failed to repair JSON with fix_busted_json:"
+                       "\n  - error: %s"
+                       "\n  - text to repair: %s", e, txt)
+        raise InvalidJSON(f"Failed to clean JSON with fix_busted_json: {e}") from e
 
 
 class ExtractJSONError(Exception):
@@ -58,5 +89,5 @@ class NoJSONFound(ExtractJSONError):
     """Raised when no JSON is found in the text"""
 
 
-class ValidationError(ExtractJSONError):
+class ExtractedDataValidationError(ExtractJSONError):
     """Raised when the extracted JSON does not conform to the model"""
