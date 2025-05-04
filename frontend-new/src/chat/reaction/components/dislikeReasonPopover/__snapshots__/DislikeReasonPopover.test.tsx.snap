@@ -15,7 +15,7 @@ exports[`ReactionReasonPopover render tests should render the popover with disab
       Please tell us what the issue is?
     </h6>
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1soxa02-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-pawek1-MuiButtonBase-root-MuiIconButton-root"
       data-testid="dislike-reason-popover-close-icon-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
       tabindex="0"
       title="close feedback"
@@ -125,7 +125,7 @@ exports[`ReactionReasonPopover render tests should render the reaction reason po
       Please tell us what the issue is?
     </h6>
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1soxa02-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-pawek1-MuiButtonBase-root-MuiIconButton-root"
       data-testid="dislike-reason-popover-close-icon-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
       tabindex="0"
       title="close feedback"

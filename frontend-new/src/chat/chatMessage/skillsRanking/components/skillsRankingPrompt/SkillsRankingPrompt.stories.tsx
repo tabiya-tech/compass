@@ -11,7 +11,7 @@ const meta: Meta<typeof SkillsRankingPrompt> = {
   tags: ["autodocs"],
   argTypes: {
     onShowInfo: { action: "onShowInfo" },
-    onSkip: { action: "onSkip" },
+    onContinue: { action: "onContinue" },
   },
   args: {
     group: ExperimentGroup.GROUP_A,

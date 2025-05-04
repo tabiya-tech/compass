@@ -4,7 +4,7 @@ import { ExperimentGroup } from "./types";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { ChatMessageType } from "src/chat/Chat.types";
 import { nanoid } from "nanoid";
-import { SkillsRankingService } from "src/skillsRanking/skillsRankingService/skillsRankingService";
+import { SkillsRankingService } from "src/chat/chatMessage/skillsRanking/skillsRankingService/skillsRankingService";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 
 const meta: Meta<typeof SkillsRankingChatMessage> = {

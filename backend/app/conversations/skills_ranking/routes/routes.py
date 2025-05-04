@@ -17,7 +17,7 @@ from app.conversations.skills_ranking.service.types import SkillsRankingState
 from app.errors.errors import UnauthorizedSessionAccessError, NoDBUpdateException
 
 from app.users.auth import Authentication, UserInfo
-from app.users.dependencies import get_user_preferences_repository
+from app.users.get_user_preferences_repository import get_user_preferences_repository
 from app.users.repositories import IUserPreferenceRepository
 
 logger = logging.getLogger(__name__)
