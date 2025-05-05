@@ -1,4 +1,5 @@
 import asyncio
+from unittest.mock import AsyncMock
 
 import pytest
 import pytest_mock
@@ -9,7 +10,7 @@ from modules.skills_ranking.service.get_skills_ranking_service import get_skills
 
 @pytest.mark.asyncio
 class TestGetSkillsRankingService:
-    def teardown_method(self):
+    def setup_method(self):
         import modules.skills_ranking.service.get_skills_ranking_service
         modules.skills_ranking.service.get_skills_ranking_service._skills_ranking_service_singleton = None
 

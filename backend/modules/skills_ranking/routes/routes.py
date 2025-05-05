@@ -5,12 +5,12 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Response
 from fastapi.params import Depends, Path
 
+from app.users.get_user_preferences_repository import get_user_preferences_repository
 from app.users.auth import Authentication, UserInfo
 from app.constants.errors import HTTPErrorResponse
 from app.users.repositories import IUserPreferenceRepository
 from app.context_vars import user_id_ctx_var, session_id_ctx_var
-from app.users.dependencies import get_user_preferences_repository
-from app.errors.errors import UnauthorizedSessionAccessError, NoDBUpdateException
+from app.errors.errors import UnauthorizedSessionAccessError
 
 from modules.skills_ranking.errors import SkillsRankingStateNotFound, InvalidNewPhaseError
 from modules.skills_ranking.repository.repository import ISkillsRankingRepository
@@ -102,10 +102,6 @@ def get_skills_ranking_router(auth: Authentication) -> APIRouter:
 
             await skills_ranking_service.upsert_state(state)
 
-            return None
-        except NoDBUpdateException:
-            logger.warning("No DB update occurred for the skills ranking state.")
-            response.status_code = HTTPStatus.NOT_MODIFIED
             return None
         except InvalidNewPhaseError as e:
             logger.error("Invalid new phase error occurred.")

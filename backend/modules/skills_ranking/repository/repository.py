@@ -5,7 +5,6 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from modules.skills_ranking.repository.collections import Collections
 from modules.skills_ranking.service.types import SkillsRankingState
-from app.errors.errors import NoDBUpdateException
 
 
 def _to_db_doc(state: SkillsRankingState) -> dict:
@@ -63,16 +62,11 @@ class SkillsRankingRepository(ISkillsRankingRepository):
         await self._collection.insert_one(_doc)
         return state
 
-    async def update(self, state: SkillsRankingState) -> SkillsRankingState:
+    async def update(self, state: SkillsRankingState):
         _doc = _to_db_doc(state)
         _doc.pop("session_id")
 
-        update_result = await self._collection.update_one(
+        await self._collection.update_one(
             {"session_id": state.session_id},
-            {"$set": _doc, },
+            {"$set": _doc},
         )
-
-        if update_result.modified_count == 0:
-            raise NoDBUpdateException()
-
-        return state

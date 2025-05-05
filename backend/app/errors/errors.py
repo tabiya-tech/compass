@@ -5,9 +5,3 @@ class UnauthorizedSessionAccessError(Exception):
     def __init__(self, user_id: str, session_id: int):
         message = f"User {user_id} is not authorized to access session {session_id}"
         super().__init__(message)
-
-
-class NoDBUpdateException(Exception):
-    """
-    Exception raised when no update to the database.
-    """

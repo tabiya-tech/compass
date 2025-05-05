@@ -4,7 +4,6 @@ from typing import Awaitable
 from app.app_config import ApplicationConfig
 from modules.skills_ranking.repository.repository import SkillsRankingRepository
 from modules.skills_ranking.service.types import SkillsRankingState, SkillsRankingCurrentState
-from app.errors.errors import NoDBUpdateException
 
 
 @pytest.fixture(scope="function")
@@ -128,20 +127,3 @@ class TestSkillsRankingRepository:
         # AND the state data matches what we expect
         actual_stored_state = await repository._collection.find_one({})
         _assert_skills_ranking_state_fields_match(new_state, actual_stored_state)
-
-    @pytest.mark.asyncio
-    async def test_update_not_found(
-        self,
-        get_skills_ranking_repository: Awaitable[SkillsRankingRepository],
-        setup_application_config: ApplicationConfig
-    ):
-        # GIVEN a repository
-        repository = await get_skills_ranking_repository
-
-        # AND a state that doesn't exist
-        given_state = get_skills_ranking_state()
-
-        # WHEN updating the state
-        # THEN a NoDBUpdateException is raised
-        with pytest.raises(NoDBUpdateException):
-            await repository.update(given_state) 
