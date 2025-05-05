@@ -167,6 +167,7 @@ The backend uses the following environment variables:
 - `BACKEND_ENABLE_SENTRY`: Set to `True` to enable Sentry error tracking. Set to `False`to disable locally or on CI/CD pipeline so that the unit tests can run successfully.
 - `BACKEND_SENTRY_DSN`: (optional) The Sentry Data Source Name used to track backend errors.
 - `TARGET_ENVIRONMENT`: (optional) The target environment where the backend is running. When set to `dev` or `local`, CORS will be set to allow all origins.
+- `BACKEND_FEATURES`: (optional) A JSON like dictionary with the features enabled status and configurations specific to each feature.
   > Note: The `FRONTEND_URL` should be set irrespective of the `TARGET_ENVIRONMENT` value.
 
 
@@ -197,6 +198,7 @@ TARGET_ENVIRONMENT_TYPE=<TARGET_ENVIRONMENT_TYPE>
 BACKEND_ENABLE_METRICS=False|True
 BACKEND_ENABLE_SENTRY=False|True
 BACKEND_SENTRY_DSN=<BACKEND_SENTRY_DSN>
+BACKEND_FEATURES=<BACKEND_FEATURES>
 ```
 
 > ATTENTION: The .env file should be kept secure and not shared with others as it contains sensitive information.
@@ -283,6 +285,7 @@ TARGET_ENVIRONMENT_NAME=local
 TARGET_ENVIRONMENT_TYPE=local
 BACKEND_ENABLE_SENTRY=False
 BACKEND_SENTRY_DSN=<BACKEND_SENTRY_DSN>
+BACKEND_FEATURES='{}'
 ```
 
 Run the image using the following command:

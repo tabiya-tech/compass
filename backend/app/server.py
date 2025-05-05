@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 import os
 
@@ -25,7 +26,7 @@ from app.conversations.poc import add_poc_routes
 from app.app_config import ApplicationConfig, set_application_config, get_application_config
 from app.version.utils import load_version_info
 from common_libs.logging.log_utilities import setup_logging_config
-
+from modules.loader import FeatureLoader
 
 def setup_logging():
     # The configuration is loaded (once) when python imports the module.
@@ -137,24 +138,37 @@ if not os.getenv("EMBEDDINGS_SERVICE_NAME"):
 if not os.getenv("EMBEDDINGS_MODEL_NAME"):
     raise ValueError("Mandatory EMBEDDINGS_MODEL_NAME environment variable is not set")
 
+# backend features environment variable is optional
+# if not provided it will be set to an empty dictionary
+backend_features_config = os.getenv("BACKEND_FEATURES", "{}")
+
 # set global application configuration
-set_application_config(
-    ApplicationConfig(
-        environment_name=os.getenv("TARGET_ENVIRONMENT_NAME"),
-        version_info=load_version_info(),
-        enable_metrics=_metrics_enabled_str.lower() == "true",
-        default_country_of_user=get_country_from_string(_default_country_of_user_str),
-        taxonomy_model_id=os.getenv('TAXONOMY_MODEL_ID'),
-        embeddings_service_name=os.getenv("EMBEDDINGS_SERVICE_NAME"),
-        embeddings_model_name=os.getenv("EMBEDDINGS_MODEL_NAME"),
-    )
+application_config = ApplicationConfig(
+    environment_name=os.getenv("TARGET_ENVIRONMENT_NAME"),
+    version_info=load_version_info(),
+    enable_metrics=_metrics_enabled_str.lower() == "true",
+    default_country_of_user=get_country_from_string(_default_country_of_user_str),
+    taxonomy_model_id=os.getenv('TAXONOMY_MODEL_ID'),
+    embeddings_service_name=os.getenv("EMBEDDINGS_SERVICE_NAME"),
+    embeddings_model_name=os.getenv("EMBEDDINGS_MODEL_NAME"),
+    features=json.loads(backend_features_config) if backend_features_config else {}
 )
+
+set_application_config(application_config)
 
 ##################
 # Set Sentry Context, after setting application config.
 # because: some contexts depend on the application config variables.
 #################
 set_sentry_contexts()
+
+
+
+############################################
+# Initialize Feature Loader
+############################################
+feature_loader = FeatureLoader(application_config=application_config)
+
 
 ############################################
 # Initiate the FastAPI app
@@ -185,7 +199,16 @@ async def lifespan(_app: FastAPI):
                                 embeddings_model_name=app_cfg.embeddings_model_name),
     )
 
+    # We are initializing the feature loader here,
+    # so that plugins will be loaded after the application is initialized.
+    await feature_loader.init(application_db)
+
     yield
+
+    # Tear down features before shutting down the application
+    # this is important to ensure that the features are properly cleaned up
+    # and any resources they hold (which may need database connections) are released.
+    await feature_loader.tear_down()
 
     # Shutdown logic
     logger.info("Shutting down...")
@@ -279,6 +302,11 @@ add_metrics_routes(app)
 # Add POC chat routes
 ############################################
 add_poc_routes(app, auth)
+
+############################################
+# Add other features routes
+############################################
+feature_loader.add_routes(app, auth)
 
 if __name__ == "__main__":
     import uvicorn

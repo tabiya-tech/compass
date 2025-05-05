@@ -13,6 +13,7 @@ export enum EnvVariables {
   FRONTEND_LOGIN_CODE = "FRONTEND_LOGIN_CODE",
   FRONTEND_REGISTRATION_CODE = "FRONTEND_REGISTRATION_CODE",
   FRONTEND_ENABLE_METRICS = "FRONTEND_ENABLE_METRICS",
+  FRONTEND_FEATURES = "FRONTEND_FEATURES"
 }
 
 export const requiredEnvVariables = [
@@ -139,6 +140,10 @@ export const getApplicationRegistrationCode = () => {
 export const getMetricsEnabled = () => {
   return getEnv(EnvVariables.FRONTEND_ENABLE_METRICS);
 };
+
+export const getFeatures = () => {
+  return getEnv(EnvVariables.FRONTEND_FEATURES)
+}
 
 export const ensureRequiredEnvVars = () => {
   requiredEnvVariables.forEach((key: EnvVariables) => {
