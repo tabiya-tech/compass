@@ -1,24 +1,21 @@
+import uuid
+from datetime import datetime, timezone
 from enum import Enum
 
 import pytest
-from datetime import datetime, timezone
-import uuid
 
-from app.agent.agent_director.abstract_agent_director import AgentDirectorState, ConversationPhase
-from app.agent.experience import ExperienceEntity, WorkType, Timeline
-from app.agent.explore_experiences_agent_director import ConversationPhase as CounselingPhase, ExperienceState
+from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_types import AgentInput, AgentOutput
-from app.agent.collect_experiences_agent import CollectExperiencesAgentState
-from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState, DiveInPhase
-from app.agent.skill_explorer_agent import SkillsExplorerAgentState
+from app.agent.collect_experiences_agent import CollectedData
+from app.agent.experience import ExperienceEntity, WorkType
+from app.agent.explore_experiences_agent_director import ConversationPhase as CounselingPhase, ExperienceState
+from app.agent.explore_experiences_agent_director import DiveInPhase
 from app.application_state import ApplicationState
 from app.conversation_memory.conversation_memory_types import (
-    ConversationMemoryManagerState, 
     ConversationTurn
 )
 from app.metrics.application_state_metrics_recorder.types import ApplicationStatesOfInterest
 from common_libs.test_utilities import get_random_session_id
-from app.agent.experience.experience_entity import SkillEntity
 
 
 def get_empty_state() -> ApplicationState:
@@ -330,7 +327,8 @@ class TestExperienceExploration:
         
         # THEN the experiences explored count should be 1 (only the processed one)
         assert result.experiences_explored_count == 1
-        
+
+
 class TestExperienceDiscovery:
     """Tests for experience discovery counting"""
     
@@ -357,3 +355,64 @@ class TestExperienceDiscovery:
         
         # THEN the experiences discovered count should be 1
         assert result.experiences_discovered_count == 1
+
+    def test_multiple_experiences_discovered(self):
+        # GIVEN a state with multiple discovered experiences
+        state = get_empty_state()
+
+        # Discovered experiences
+        discovered_experience1 = ExperienceEntity(
+            uuid=str(uuid.uuid4()),
+            experience_title="Discovered Experience 1",
+        )
+
+        discovered_experience2 = ExperienceEntity(
+            uuid=str(uuid.uuid4()),
+            experience_title="Discovered Experience 2",
+        )
+
+        state.explore_experiences_director_state.experiences_state = {
+            discovered_experience1.uuid: ExperienceState(
+                dive_in_phase=DiveInPhase.NOT_STARTED,
+                experience=discovered_experience1
+            ),
+            discovered_experience2.uuid: ExperienceState(
+                dive_in_phase=DiveInPhase.NOT_STARTED,
+                experience=discovered_experience2
+            )
+        }
+
+        state.collect_experience_state.collected_data = [
+            CollectedData(
+                index=0,
+                experience_title=discovered_experience1.experience_title,
+                company=None,
+                location=None,
+                paid_work=None,
+                work_type=None,
+                end_date=None,
+                start_date=None
+            ),
+            CollectedData(
+                index=1,
+                experience_title=discovered_experience2.experience_title,
+                company=None,
+                location=None,
+                paid_work=None,
+                work_type=WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK.name,
+                end_date=None,
+                start_date=None
+            )
+        ]
+
+        # WHEN creating an ApplicationStatesOfInterest from the state
+        result = ApplicationStatesOfInterest.from_state(state)
+
+        # THEN the experiences discovered count should be 2
+        assert result.experiences_discovered_count == 2
+
+        # AND the experiences by work type should be empty
+        assert result.experiences_by_work_type == {
+            "None": 1,
+            WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK.name: 1
+        }
