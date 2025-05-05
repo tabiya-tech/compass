@@ -74,7 +74,9 @@ def main():
         cloudrun_request_timeout=cloudrun_request_timeout,
         cloudrun_memory_limit=cloudrun_memory_limit,
         cloudrun_cpu_limit=cloudrun_cpu_limit,
-        api_gateway_timeout=api_gateway_timeout
+        api_gateway_timeout=api_gateway_timeout,
+
+        features=getenv("BACKEND_FEATURES", False, False)
     )
 
     # version of the artifacts to deploy

@@ -116,6 +116,9 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     sensitive_personal_data_rsa_encryption_key: str = getenv("SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY")
     sensitive_personal_data_rsa_encryption_key_id: str = getenv("SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID")
 
+    # features
+    features = getenv("FRONTEND_FEATURES", False, False)
+
     # validations, apart from the keys are required, some values also need to be validated
     # the sensitive encryption key should be a valid RSA public key.
     _validate_rsa_public_key(sensitive_personal_data_rsa_encryption_key.encode("utf-8"))
@@ -138,7 +141,8 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
         "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY": base64_encode(sensitive_personal_data_rsa_encryption_key),
         "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID": base64_encode(sensitive_personal_data_rsa_encryption_key_id),
         "FRONTEND_LOGIN_CODE": base64_encode(login_code),
-        "FRONTEND_REGISTRATION_CODE": base64_encode(registration_code)
+        "FRONTEND_REGISTRATION_CODE": base64_encode(registration_code),
+        "FRONTEND_FEATURES": base64_encode(features),
     }
 
     env_json_content = f"""window.tabiyaConfig = {json.dumps(frontend_env_json, indent=4)};"""

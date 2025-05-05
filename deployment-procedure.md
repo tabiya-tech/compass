@@ -439,6 +439,34 @@ FRONTEND_ENABLE_SENTRY=<True/False>
 # Enable or Disable Metrics for this environment.
 BACKEND_ENABLE_METRICS=<True/False>
 FRONTEND_ENABLE_METRICS=<True/False>
+
+# JSON like configurations of the optional features on frontend.
+# {
+#   "feature_id": {
+#     "enabled": <true/false>,
+#     "config": {
+#       "key": "<value>",
+#        ..... other configurations for the feature.
+#      }
+#    }
+# }
+
+FRONTEND_FEATURES='{}'
+
+
+# JSON like configurations of the available features.
+# {
+#   "feature_id": {
+#     "enabled": <true/false>,
+#     "class_path": "<class path to the feature>",
+#     "class_name": "<class name of the feature>",
+#     "config": {
+#       "key": "<value>",
+#        ..... other configurations for the feature.
+#      }
+#    }
+# }
+BACKEND_FEATURES='{}'
 ```  
 
 - **For the final `.env` file structure**, refer to the [env.template](/iac/templates/env.template).
