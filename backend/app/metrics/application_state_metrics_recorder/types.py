@@ -96,7 +96,10 @@ def _get_experience_by_work_type(state: ApplicationState) -> dict[str, int]:
     """Get the current number of experiences discovered by work type"""
     experiences_discovered = {}
     for data in state.collect_experience_state.collected_data:
-        if data.work_type:
-            work_type = WorkType[data.work_type].name
-            experiences_discovered[work_type] = experiences_discovered.get(work_type, 0) + 1
+        # if the work type is not in the enum, we count it as unknown.
+        if WorkType.from_string_key(data.work_type) is None:
+            experiences_discovered["None"] = experiences_discovered.get("None", 0) + 1
+        else:
+            experiences_discovered[data.work_type] = experiences_discovered.get(data.work_type, 0) + 1
+
     return experiences_discovered
