@@ -1,6 +1,6 @@
 import React from "react";
 import { ExperimentGroup, RankValue } from "src/chat/chatMessage/skillsRanking/types";
-import { Box, CircularProgress, Typography, useTheme } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { IChatMessage } from "src/chat/Chat.types";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
@@ -39,7 +39,7 @@ export const RESULT_MESSAGES = {
 
 const SkillsRankingResult: React.FC<SkillsRankingResultProps> = ({ 
   group, 
-  chatMessage, 
+  chatMessage,
   rank,
   isLoading = false,
   error 

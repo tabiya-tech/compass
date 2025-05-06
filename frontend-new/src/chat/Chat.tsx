@@ -9,6 +9,7 @@ import {
   generateSomethingWentWrongMessage,
   generateTypingMessage,
   generateUserMessage,
+  generateSkillsRankingMessage,
   parseConversationPhase,
 } from "./util";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -184,12 +185,35 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           setExploredExperiencesNotification(true);
         }
 
-        response.messages.forEach((messageItem) => {
-          const message = response.conversation_completed && messageItem === response.messages[response.messages.length - 1]
-            ? generateConversationConclusionMessage(messageItem.message_id, messageItem.message, messageItem.sent_at)
-            : generateCompassMessage(messageItem.message_id, messageItem.message, messageItem.sent_at, messageItem.reaction);
+        // Add all messages except the last one if conversation is completed
+        const messagesToAdd = response.conversation_completed 
+          ? response.messages.slice(0, -1) 
+          : response.messages;
+
+        messagesToAdd.forEach((messageItem) => {
+          const message = generateCompassMessage(
+            messageItem.message_id, 
+            messageItem.message, 
+            messageItem.sent_at, 
+            messageItem.reaction
+          );
           addMessage(message);
         });
+
+        // If conversation is completed, add skills ranking message before the conclusion
+        if (response.conversation_completed) {
+          const skillsRankingMessage = generateSkillsRankingMessage();
+          addMessage(skillsRankingMessage);
+
+          // Add the conclusion message last
+          const lastMessage = response.messages[response.messages.length - 1];
+          const conclusionMessage = generateConversationConclusionMessage(
+            lastMessage.message_id,
+            lastMessage.message,
+            lastMessage.sent_at
+          );
+          addMessage(conclusionMessage);
+        }
 
         setConversationCompleted(response.conversation_completed);
         setConversationConductedAt(response.conversation_conducted_at);
@@ -197,7 +221,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         // Set the current conversation phase
         setCurrentPhase(_previousCurrentPhase => {
           return parseConversationPhase(response.current_phase, _previousCurrentPhase);
-        })
+        });
       } catch (error) {
         console.error(new ChatError("Failed to send message:", error));
         addMessage(generatePleaseRepeatMessage());
@@ -241,16 +265,19 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         // Set the messages from the chat history
         if (history.messages.length) {
           setMessages(
-            history.messages.map((message: ConversationMessage) => {
+            history.messages.flatMap((message: ConversationMessage) => {
               if (message.sender === ConversationMessageSender.USER) {
                 return generateUserMessage(message.message, message.sent_at);
               }
-              // If this is the last message and conversation is completed, make it a conclusion message
+              // If this is the last message and conversation is completed, return both skills ranking and conclusion messages
               if (history.conversation_completed && message === history.messages[history.messages.length - 1]) {
-                return generateConversationConclusionMessage(message.message_id, message.message, message.sent_at);
+                return [
+                  generateSkillsRankingMessage(),
+                  generateConversationConclusionMessage(message.message_id, message.message, message.sent_at)
+                ];
               }
               return generateCompassMessage(message.message_id, message.message, message.sent_at, message.reaction);
-            }),
+            })
           );
 
           setConversationCompleted(history.conversation_completed);

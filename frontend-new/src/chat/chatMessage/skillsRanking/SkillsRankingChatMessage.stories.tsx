@@ -12,7 +12,6 @@ const meta: Meta<typeof SkillsRankingChatMessage> = {
   component: SkillsRankingChatMessage,
   tags: ["autodocs"],
   args: {
-    group: ExperimentGroup.GROUP_A,
     chatMessage: {
       message_id: nanoid(),
       sender: ConversationMessageSender.COMPASS,

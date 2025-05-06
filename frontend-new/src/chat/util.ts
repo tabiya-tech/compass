@@ -85,6 +85,17 @@ export const generatePleaseRepeatMessage = () => {
   return generateErrorMessage(FIXED_MESSAGES_TEXT.PLEASE_REPEAT);
 };
 
+export const generateSkillsRankingMessage = (
+): IChatMessage => {
+  return {
+    message_id: nanoid(),
+    message: "", // no message is needed, since the skills ranking will show the appropriate component based on the state
+    sender: ConversationMessageSender.COMPASS,
+    sent_at: new Date().toISOString(),
+    type: ChatMessageType.SKILLS_RANKING,
+    reaction: null, // reactions are not applicable for skills ranking messages
+  };
+};
 
 /**
  * Parses the conversation phase and ensures that the percentage is valid, if not valid

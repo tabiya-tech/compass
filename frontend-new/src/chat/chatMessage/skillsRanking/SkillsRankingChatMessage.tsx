@@ -13,20 +13,25 @@ import SkillsRankingResult from "src/chat/chatMessage/skillsRanking/components/s
 import { SkillsRankingService } from "src/chat/chatMessage/skillsRanking/skillsRankingService/skillsRankingService";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
-import { Box, useTheme } from "@mui/material";
+import { Box } from "@mui/material";
 
 interface SkillsRankingChatMessageProps {
-  group: ExperimentGroup;
   chatMessage: IChatMessage;
 }
 
-export const SkillsRankingChatMessage: React.FC<SkillsRankingChatMessageProps> = ({ group, chatMessage }) => {
-  const theme = useTheme();
+export const SkillsRankingChatMessage: React.FC<SkillsRankingChatMessageProps> = ({ chatMessage }) => {
   const [state, setState] = useState<SkillsRankingStateResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState<SkillsRankingError | null>(null);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+  const [experimentGroup, setExperimentGroup] = useState<ExperimentGroup>(ExperimentGroup.GROUP_A);
+
+  useEffect(() => {
+    const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
+    const group = userPreferences?.experiments?.SKILLS_RANKING_EXPERIMENT as ExperimentGroup || ExperimentGroup.GROUP_A;
+    setExperimentGroup(group);
+  }, []);
 
   useEffect(() => {
     const fetchState = async () => {
@@ -110,7 +115,7 @@ export const SkillsRankingChatMessage: React.FC<SkillsRankingChatMessageProps> =
         return (
           <Box key={stepKey}>
             <SkillsRankingPrompt
-              group={group}
+              group={experimentGroup}
               chatMessage={chatMessage}
               onShowInfo={() => handleStateChange(SkillsRankingState.SELF_EVALUATING, 0)}
               onContinue={() => handleStateChange(SkillsRankingState.SKIPPED, 0)}
@@ -124,7 +129,7 @@ export const SkillsRankingChatMessage: React.FC<SkillsRankingChatMessageProps> =
         return (
           <Box key={stepKey}>
             <SkillsRankingVote
-              group={group}
+              group={experimentGroup}
               chatMessage={chatMessage}
               onRankSelect={(rank) => handleStateChange(SkillsRankingState.EVALUATED, 0, rank)}
               disabled={isTyping || isStepCompleted}
@@ -136,7 +141,7 @@ export const SkillsRankingChatMessage: React.FC<SkillsRankingChatMessageProps> =
         return (
           <Box key={stepKey}>
             <SkillsRankingResult 
-              group={group} 
+              group={experimentGroup} 
               chatMessage={chatMessage} 
               rank={state.ranking}
               isLoading={isTyping}
