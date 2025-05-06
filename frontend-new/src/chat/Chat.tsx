@@ -96,6 +96,10 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     setMessages((prevMessages) => [...prevMessages, message]);
   };
 
+  const removeMessage = (messageId: string) => {
+    setMessages((prevMessages) => prevMessages.filter(msg => msg.message_id !== messageId));
+  };
+
   // Depending on the typing state, add or remove the typing message from the messages list
   const addOrRemoveTypingMessage = (userIsTyping: boolean) => {
     if (userIsTyping) {
@@ -197,7 +201,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         // Set the current conversation phase
         setCurrentPhase(_previousCurrentPhase => {
           return parseConversationPhase(response.current_phase, _previousCurrentPhase);
-        })
+        });
       } catch (error) {
         console.error(new ChatError("Failed to send message:", error));
         addMessage(generatePleaseRepeatMessage());
@@ -393,7 +397,11 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       {isLoggingOut ? (
         <Backdrop isShown={isLoggingOut} message={"Logging you out, wait a moment..."} />
       ) : (
-        <ChatProvider handleOpenExperiencesDrawer={handleOpenExperiencesDrawer}>
+        <ChatProvider
+          handleOpenExperiencesDrawer={handleOpenExperiencesDrawer}
+          removeMessage={removeMessage}
+          addMessage={addMessage}
+        >
           <Box
             width="100%"
             height="100%"
