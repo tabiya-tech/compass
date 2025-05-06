@@ -19,7 +19,7 @@ export interface SkillsRankingResultProps {
   chatMessage: IChatMessage;
   rank: RankValue;
   isLoading?: boolean;
-  error?: string;
+  error: string | null;
 }
 
 export const RESULT_MESSAGES = {

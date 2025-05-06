@@ -24,9 +24,3 @@ export interface SkillsRankingStateResponse {
   ranking: RankValue;
   self_ranking: RankValue | null;
 }
-
-export interface SkillsRankingError {
-  message: string;
-  code: string;
-  timestamp: string;
-}

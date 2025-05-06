@@ -28,7 +28,7 @@ describe("SkillsRankingVote tests", () => {
 
       // WHEN the component is rendered
       render(
-        <SkillsRankingVote group={ExperimentGroup.GROUP_A} onRankSelect={jest.fn()} chatMessage={givenChatMessage} />
+        <SkillsRankingVote group={ExperimentGroup.GROUP_A} onRankSelect={jest.fn()} chatMessage={givenChatMessage} error={null} />
       );
 
       // THEN expect the container to be in the document
@@ -66,7 +66,7 @@ describe("SkillsRankingVote tests", () => {
       };
 
       // WHEN the component is rendered
-      render(<SkillsRankingVote group={group} onRankSelect={jest.fn()} chatMessage={givenChatMessage} />);
+      render(<SkillsRankingVote group={group} onRankSelect={jest.fn()} chatMessage={givenChatMessage} error={null} />);
 
       // THEN expect the correct question text to be in the document
       const questionText = screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_VOTE_TEXT);
@@ -94,7 +94,7 @@ describe("SkillsRankingVote tests", () => {
 
       // WHEN the component is rendered
       render(
-        <SkillsRankingVote group={ExperimentGroup.GROUP_A} onRankSelect={onRankSelect} chatMessage={givenChatMessage} />
+        <SkillsRankingVote group={ExperimentGroup.GROUP_A} onRankSelect={onRankSelect} chatMessage={givenChatMessage} error={null} />
       );
 
       // AND the first rank icon is clicked
@@ -106,6 +106,28 @@ describe("SkillsRankingVote tests", () => {
       // AND no errors or warnings to have occurred
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("error tests", () => {
+    test("should render error message when error prop is provided", () => {
+      // GIVEN a chat message
+      const givenChatMessage: IChatMessage = {
+        message_id: nanoid(),
+        sender: ConversationMessageSender.COMPASS,
+        message: "",
+        sent_at: new Date().toISOString(),
+        type: ChatMessageType.SKILLS_RANKING,
+        reaction: null,
+      };
+      // AND an error message
+      const givenErrorMessage = "An error occurred";
+
+      // WHEN the component is rendered
+      render(<SkillsRankingVote group={ExperimentGroup.GROUP_A} onRankSelect={jest.fn()} chatMessage={givenChatMessage} error={givenErrorMessage} />);
+
+      // THEN expect the error message to be in the document
+      expect(screen.getByText(givenErrorMessage)).toBeInTheDocument();
     });
   });
 });

@@ -47,7 +47,7 @@ describe("SkillsRankingResult tests", () => {
       };
 
       // WHEN the component is rendered
-      render(<SkillsRankingResult rank={"10%"} group={ExperimentGroup.GROUP_A} chatMessage={givenChatMessage} />);
+      render(<SkillsRankingResult rank={"10%"} group={ExperimentGroup.GROUP_A} chatMessage={givenChatMessage} error={null} />);
 
       // THEN expect the container to be in the document
       const container = screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_RESULT_CONTAINER);
@@ -80,7 +80,7 @@ describe("SkillsRankingResult tests", () => {
       };
 
       // WHEN the component is rendered
-      render(<SkillsRankingResult rank={"10%"} group={group} chatMessage={givenChatMessage} />);
+      render(<SkillsRankingResult rank={"10%"} group={group} chatMessage={givenChatMessage} error={null} />);
 
       // THEN expect the result text to be in the document
       await waitFor(() => {
@@ -113,7 +113,7 @@ describe("SkillsRankingResult tests", () => {
       };
 
       // WHEN the component is rendered
-      render(<SkillsRankingResult rank={"10%"} group={ExperimentGroup.GROUP_A} chatMessage={givenChatMessage} />);
+      render(<SkillsRankingResult rank={"10%"} group={ExperimentGroup.GROUP_A} chatMessage={givenChatMessage} error={null} />);
 
       // THEN expect the error to be logged
       await waitFor(() => {
@@ -149,7 +149,7 @@ describe("SkillsRankingResult tests", () => {
       };
 
       // WHEN the component is rendered
-      render(<SkillsRankingResult rank={"10%"} group={ExperimentGroup.GROUP_A} chatMessage={givenChatMessage} />);
+      render(<SkillsRankingResult rank={"10%"} group={ExperimentGroup.GROUP_A} chatMessage={givenChatMessage} error={null} />);
 
       // THEN expect the ranking service to be called with the correct session ID
       expect(mockGetSkillsRankingState).toHaveBeenCalledWith(givenSessionId);
@@ -163,4 +163,26 @@ describe("SkillsRankingResult tests", () => {
       expect(console.warn).not.toHaveBeenCalled();
     });
   });
+
+  describe("error tests", () => {
+    test("should render error message when error prop is provided", () => {
+      // GIVEN a chat message
+      const givenChatMessage: IChatMessage = {
+        message_id: nanoid(),
+        sender: ConversationMessageSender.COMPASS,
+        message: "",
+        sent_at: new Date().toISOString(),
+        type: ChatMessageType.SKILLS_RANKING,
+        reaction: null,
+      };
+      // AND an error message
+      const givenErrorMessage = "An error occurred";
+      // WHEN the component is rendered
+      render(<SkillsRankingResult rank={"10%"} group={ExperimentGroup.GROUP_A} chatMessage={givenChatMessage} error={givenErrorMessage} />);
+
+      // THEN expect the error message to be in the document
+      expect(screen.getByText(givenErrorMessage)).toBeInTheDocument();
+    });
+  });
+  
 });

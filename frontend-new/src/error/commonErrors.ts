@@ -11,6 +11,7 @@ enum CommonError {
   COMPONENT_ERROR = "ComponentError",
   CONFIGURATION_ERROR = "ConfigurationError",
   METRICS_ERROR = "MetricsError",
+  SKILLS_RANKING_ERROR = "SkillsRankingError",
 }
 
 /**
@@ -108,6 +109,14 @@ export class MetricsError extends Error {
   constructor(message: string, cause?: unknown) {
     super(message);
     this.name = CommonError.METRICS_ERROR;
+    this.cause = cause;
+  }
+}
+
+export class SkillsRankingError extends Error {
+  constructor(message: string, cause?: unknown) {
+    super(message);
+    this.name = CommonError.SKILLS_RANKING_ERROR;
     this.cause = cause;
   }
 }

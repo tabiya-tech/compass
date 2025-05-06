@@ -20,7 +20,7 @@ export interface SkillsRankingVoteProps {
   onRankSelect: (rank: RankValue) => void;
   chatMessage: IChatMessage;
   disabled?: boolean;
-  error?: string;
+  error: string | null;
 }
 
 export const RANK_OPTIONS: Array<{ value: RankValue; opacity: number }> = [

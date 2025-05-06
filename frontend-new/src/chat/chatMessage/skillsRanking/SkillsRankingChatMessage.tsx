@@ -3,9 +3,9 @@ import {
   ExperimentGroup,
   SkillsRankingState,
   SkillsRankingStateResponse,
-  SkillsRankingError,
   RankValue,
 } from "src/chat/chatMessage/skillsRanking/types";
+import { SkillsRankingError } from "src/error/commonErrors";
 import { IChatMessage } from "src/chat/Chat.types";
 import SkillsRankingPrompt from "src/chat/chatMessage/skillsRanking/components/skillsRankingPrompt/SkillsRankingPrompt";
 import SkillsRankingVote from "src/chat/chatMessage/skillsRanking/components/skillsRankingVote/SkillsRankingVote";
@@ -23,8 +23,7 @@ export const SkillsRankingChatMessage: React.FC<SkillsRankingChatMessageProps> =
   const [state, setState] = useState<SkillsRankingStateResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
-  const [error, setError] = useState<SkillsRankingError | null>(null);
-  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+  const [error, setError] = useState<string | null>(null);
   const [experimentGroup, setExperimentGroup] = useState<ExperimentGroup>(ExperimentGroup.GROUP_A);
 
   useEffect(() => {
@@ -47,12 +46,8 @@ export const SkillsRankingChatMessage: React.FC<SkillsRankingChatMessageProps> =
         const response = await skillsRankingService.getSkillsRankingState(sessionId);
         setState(response);
       } catch (error) {
-        console.error("Failed to fetch skills ranking state", error);
-        setError({
-          message: "Failed to load skills ranking. Please try again.",
-          code: "FETCH_ERROR",
-          timestamp: new Date().toISOString()
-        });
+        console.error(new SkillsRankingError("Failed to fetch skills ranking state", error));
+        setError("Failed to load skills ranking. Please try again.");
       } finally {
         setIsLoading(false);
       }
@@ -61,19 +56,15 @@ export const SkillsRankingChatMessage: React.FC<SkillsRankingChatMessageProps> =
     fetchState();
   }, []);
 
-  const handleStateChange = async (newState: SkillsRankingState, stepIndex: number, rank?: RankValue) => {
+  const handleStateChange = async (newState: SkillsRankingState, rank?: RankValue) => {
     try {
       const sessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
       if (sessionId === null) {
         throw new Error("No active session found");
       }
 
-      // Mark the current step as completed
-      setCompletedSteps((prev) => new Set([...prev, stepIndex]));
-
       const skillsRankingService = SkillsRankingService.getInstance();
       const response = await skillsRankingService.updateSkillsRankingState(sessionId, newState, rank ?? null);
-      setState(response);
       setError(null);
 
       setIsTyping(true);
@@ -82,44 +73,30 @@ export const SkillsRankingChatMessage: React.FC<SkillsRankingChatMessageProps> =
       const delay = Math.random() * 2000 + 3000;
       setTimeout(() => {
         setIsTyping(false);
+        setState(response);
       }, delay);
     } catch (error) {
-      console.error("Failed to update skills ranking state", error);
-      setError({
-        message: "Failed to update skills ranking. Please try again.",
-        code: "UPDATE_ERROR",
-        timestamp: new Date().toISOString()
-      });
+      console.error(new SkillsRankingError("Failed to update skills ranking state", error));
+      setError("Failed to update skills ranking. Please try again.");
       setIsTyping(false);
     }
   };
 
-  const getStepKey = (state: SkillsRankingState, index: number) => {
-    return `${state.toLowerCase()}-step-${index}`;
-  };
-
   const renderContent = () => {
-    if (isLoading) {
+    if (isLoading || !state) {
       return null;
     }
-
-    if (!state) {
-      return null;
-    }
-
-    const isStepCompleted = completedSteps.has(0);
-    const stepKey = getStepKey(state.current_state, 0);
 
     switch (state.current_state) {
       case SkillsRankingState.INITIAL:
         return (
-          <Box key={stepKey}>
+          <Box>
             <SkillsRankingPrompt
               group={experimentGroup}
               chatMessage={chatMessage}
-              onShowInfo={() => handleStateChange(SkillsRankingState.SELF_EVALUATING, 0)}
-              onContinue={() => handleStateChange(SkillsRankingState.SKIPPED, 0)}
-              disabled={isTyping || isStepCompleted}
+              onShowInfo={() => handleStateChange(SkillsRankingState.SELF_EVALUATING)}
+              onContinue={() => handleStateChange(SkillsRankingState.SKIPPED)}
+              disabled={isTyping}
             />
           </Box>
         );
@@ -127,25 +104,25 @@ export const SkillsRankingChatMessage: React.FC<SkillsRankingChatMessageProps> =
         return null;
       case SkillsRankingState.SELF_EVALUATING:
         return (
-          <Box key={stepKey}>
+          <Box>
             <SkillsRankingVote
               group={experimentGroup}
               chatMessage={chatMessage}
-              onRankSelect={(rank) => handleStateChange(SkillsRankingState.EVALUATED, 0, rank)}
-              disabled={isTyping || isStepCompleted}
-              error={error?.message}
+              onRankSelect={(rank) => handleStateChange(SkillsRankingState.EVALUATED, rank)}
+              disabled={isTyping}
+              error={error}
             />
           </Box>
         );
       case SkillsRankingState.EVALUATED:
         return (
-          <Box key={stepKey}>
+          <Box>
             <SkillsRankingResult 
               group={experimentGroup} 
               chatMessage={chatMessage} 
               rank={state.ranking}
               isLoading={isTyping}
-              error={error?.message}
+              error={error}
             />
           </Box>
         );
