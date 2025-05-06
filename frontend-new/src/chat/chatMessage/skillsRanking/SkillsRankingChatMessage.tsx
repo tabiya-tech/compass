@@ -63,13 +63,12 @@ export const SkillsRankingChatMessage: React.FC<SkillsRankingChatMessageProps> =
         throw new Error("No active session found");
       }
 
+      setIsTyping(true);
       const skillsRankingService = SkillsRankingService.getInstance();
       const response = await skillsRankingService.updateSkillsRankingState(sessionId, newState, rank ?? null);
       setError(null);
 
-      setIsTyping(true);
-
-      // Add a new state after delay
+      // Add a delay before showing the new state
       const delay = Math.random() * 2000 + 3000;
       setTimeout(() => {
         setIsTyping(false);
@@ -87,48 +86,52 @@ export const SkillsRankingChatMessage: React.FC<SkillsRankingChatMessageProps> =
       return null;
     }
 
-    switch (state.current_state) {
-      case SkillsRankingState.INITIAL:
-        return (
-          <Box>
-            <SkillsRankingPrompt
-              group={experimentGroup}
-              chatMessage={chatMessage}
-              onShowInfo={() => handleStateChange(SkillsRankingState.SELF_EVALUATING)}
-              onContinue={() => handleStateChange(SkillsRankingState.SKIPPED)}
-              disabled={isTyping}
-            />
-          </Box>
-        );
-      case SkillsRankingState.SKIPPED:
-        return null;
-      case SkillsRankingState.SELF_EVALUATING:
-        return (
-          <Box>
-            <SkillsRankingVote
-              group={experimentGroup}
-              chatMessage={chatMessage}
-              onRankSelect={(rank) => handleStateChange(SkillsRankingState.EVALUATED, rank)}
-              disabled={isTyping}
-              error={error}
-            />
-          </Box>
-        );
-      case SkillsRankingState.EVALUATED:
-        return (
-          <Box>
-            <SkillsRankingResult 
-              group={experimentGroup} 
-              chatMessage={chatMessage} 
-              rank={state.ranking}
-              isLoading={isTyping}
-              error={error}
-            />
-          </Box>
-        );
-      default:
-        return null;
+    const components = [];
+
+    // Always show the prompt
+    components.push(
+      <Box key="prompt">
+        <SkillsRankingPrompt
+          group={experimentGroup}
+          chatMessage={chatMessage}
+          onShowInfo={() => handleStateChange(SkillsRankingState.SELF_EVALUATING)}
+          onContinue={() => handleStateChange(SkillsRankingState.SKIPPED)}
+          disabled={isTyping || state.current_state !== SkillsRankingState.INITIAL}
+        />
+      </Box>
+    );
+
+    // Show vote component if we're in or past the self-evaluating state
+    if (state.current_state === SkillsRankingState.SELF_EVALUATING || state.current_state === SkillsRankingState.EVALUATED) {
+      components.push(
+        <Box key="vote">
+          <SkillsRankingVote
+            group={experimentGroup}
+            chatMessage={chatMessage}
+            onRankSelect={(rank) => handleStateChange(SkillsRankingState.EVALUATED, rank)}
+            disabled={isTyping || state.current_state === SkillsRankingState.EVALUATED}
+            error={error}
+          />
+        </Box>
+      );
     }
+
+    // Show result component if we're in the evaluated state
+    if (state.current_state === SkillsRankingState.EVALUATED) {
+      components.push(
+        <Box key="result">
+          <SkillsRankingResult 
+            group={experimentGroup} 
+            chatMessage={chatMessage} 
+            rank={state.ranking}
+            isLoading={isTyping}
+            error={error}
+          />
+        </Box>
+      );
+    }
+
+    return components;
   };
 
   // If all states are SKIPPED, don't render anything
