@@ -4,7 +4,6 @@ import ChatList from "src/chat/chatList/ChatList";
 import { IChatMessage } from "./Chat.types";
 import {
   generateCompassMessage,
-  generateConversationConclusionMessage,
   generatePleaseRepeatMessage,
   generateSomethingWentWrongMessage,
   generateTypingMessage,
@@ -95,6 +94,10 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
   const addMessage = (message: IChatMessage) => {
     setMessages((prevMessages) => [...prevMessages, message]);
+  };
+
+  const removeMessage = (messageId: string) => {
+    setMessages((prevMessages) => prevMessages.filter(msg => msg.message_id !== messageId));
   };
 
   // Depending on the typing state, add or remove the typing message from the messages list
@@ -201,18 +204,10 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         });
 
         // If conversation is completed, add skills ranking message before the conclusion
+        // The conclusion message will be added when the skills ranking message decides that it is done with its own flow
         if (response.conversation_completed) {
           const skillsRankingMessage = generateSkillsRankingMessage();
           addMessage(skillsRankingMessage);
-
-          // Add the conclusion message last
-          const lastMessage = response.messages[response.messages.length - 1];
-          const conclusionMessage = generateConversationConclusionMessage(
-            lastMessage.message_id,
-            lastMessage.message,
-            lastMessage.sent_at
-          );
-          addMessage(conclusionMessage);
         }
 
         setConversationCompleted(response.conversation_completed);
@@ -269,12 +264,10 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
               if (message.sender === ConversationMessageSender.USER) {
                 return generateUserMessage(message.message, message.sent_at);
               }
-              // If this is the last message and conversation is completed, return both skills ranking and conclusion messages
+              // If this is the last message and conversation is completed, return skills ranking message
+              // The conclusion message will be added when the skills ranking message decides that it is done with its own flow
               if (history.conversation_completed && message === history.messages[history.messages.length - 1]) {
-                return [
-                  generateSkillsRankingMessage(),
-                  generateConversationConclusionMessage(message.message_id, message.message, message.sent_at)
-                ];
+                return generateSkillsRankingMessage();
               }
               return generateCompassMessage(message.message_id, message.message, message.sent_at, message.reaction);
             })
@@ -420,7 +413,11 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       {isLoggingOut ? (
         <Backdrop isShown={isLoggingOut} message={"Logging you out, wait a moment..."} />
       ) : (
-        <ChatProvider handleOpenExperiencesDrawer={handleOpenExperiencesDrawer}>
+        <ChatProvider 
+          handleOpenExperiencesDrawer={handleOpenExperiencesDrawer} 
+          removeMessage={removeMessage}
+          addMessage={addMessage}
+        >
           <Box
             width="100%"
             height="100%"
@@ -428,14 +425,6 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
             flexDirection="column"
             position="relative"
             data-testid={DATA_TEST_ID.CHAT_CONTAINER}
-            // The "is-initialized" attribute helps make the component testable.
-            // When the component mounts, an initialization function runs, changing the state and causing a rerender.
-            // Tests need to wait for the component to "settle" after mounting, but they don't know when that happens.
-            // To check if the component is settled, tests can wait for the "is-initialized" attribute to be true:
-            //   await waitFor(() => {
-            //     expect(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER)).toHaveAttribute("is-initialized", "true");
-            //   });
-            // This technique can solve the "Warning: An update to Chat inside a test was not wrapped in act(...)" warning.
             is-initialized={`${initialized}`}
           >
             <Box padding={theme.spacing(theme.tabiyaSpacing.lg)}>

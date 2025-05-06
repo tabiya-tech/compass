@@ -32,11 +32,13 @@ jest.mock("src/feedback/overallFeedback/feedbackForm/components/customerSatisfac
 
 describe("ConversationConclusionFooter", () => {
   const givenMockHandleOpenExperiencesDrawer = jest.fn();
+  const givenMockRemoveMessage = jest.fn();
+  const givenMockAddMessage = jest.fn();
   const givenMockSetFeedbackStatus = jest.fn();
 
   const renderWithChatProvider = () => {
     return render(
-      <ChatProvider handleOpenExperiencesDrawer={givenMockHandleOpenExperiencesDrawer}>
+      <ChatProvider handleOpenExperiencesDrawer={givenMockHandleOpenExperiencesDrawer} removeMessage={givenMockRemoveMessage} addMessage={givenMockAddMessage}>
         <ConversationConclusionFooter />
       </ChatProvider>,
     );

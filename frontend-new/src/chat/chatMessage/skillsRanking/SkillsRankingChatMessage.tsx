@@ -14,6 +14,8 @@ import { SkillsRankingService } from "src/chat/chatMessage/skillsRanking/skillsR
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
 import { Box } from "@mui/material";
+import { useChatContext } from "src/chat/ChatContext";
+import { generateConversationConclusionMessage } from "src/chat/util";
 
 interface SkillsRankingChatMessageProps {
   chatMessage: IChatMessage;
@@ -25,6 +27,7 @@ export const SkillsRankingChatMessage: React.FC<SkillsRankingChatMessageProps> =
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [experimentGroup, setExperimentGroup] = useState<ExperimentGroup>(ExperimentGroup.GROUP_A);
+  const { removeMessage, addMessage } = useChatContext();
 
   useEffect(() => {
     const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
@@ -73,6 +76,32 @@ export const SkillsRankingChatMessage: React.FC<SkillsRankingChatMessageProps> =
       setTimeout(() => {
         setIsTyping(false);
         setState(response);
+
+        // If this was a skip, remove the skills ranking message and add conclusion
+        if (newState === SkillsRankingState.SKIPPED) {
+          removeMessage(chatMessage.message_id);
+          const conclusionMessage = generateConversationConclusionMessage(
+            `conclusion-${Date.now()}`,
+            "Thank you for sharing your experiences with me. I hope I was able to help you reflect on your work journey.",
+            new Date().toISOString()
+          );
+          addMessage(conclusionMessage);
+        }
+        // If this was the final evaluation, add conclusion after a delay
+        else if (newState === SkillsRankingState.EVALUATED) {
+          setTimeout(() => {
+            setIsTyping(true);
+            setTimeout(() => {
+              setIsTyping(false);
+              const conclusionMessage = generateConversationConclusionMessage(
+                `conclusion-${Date.now()}`,
+                "Thank you for sharing your experiences with me. I hope I was able to help you reflect on your work journey.",
+                new Date().toISOString()
+              );
+              addMessage(conclusionMessage);
+            }, Math.random() * 2000 + 3000);
+          }, 1000);
+        }
       }, delay);
     } catch (error) {
       console.error(new SkillsRankingError("Failed to update skills ranking state", error));

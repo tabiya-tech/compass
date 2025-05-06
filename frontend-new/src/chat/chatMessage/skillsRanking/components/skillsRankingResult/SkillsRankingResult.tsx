@@ -1,6 +1,6 @@
 import React from "react";
 import { ExperimentGroup, RankValue } from "src/chat/chatMessage/skillsRanking/types";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { IChatMessage } from "src/chat/Chat.types";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
@@ -45,14 +45,6 @@ const SkillsRankingResult: React.FC<SkillsRankingResultProps> = ({
   error 
 }) => {
   const renderContent = () => {
-    if (isLoading) {
-      return (
-        <Box display="flex" justifyContent="center" data-testid={DATA_TEST_ID.SKILLS_RANKING_RESULT_LOADING}>
-          <CircularProgress size={24} />
-        </Box>
-      );
-    }
-
     if (error) {
       return (
         <Typography 
