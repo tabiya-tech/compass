@@ -90,6 +90,8 @@ describe("ChatList", () => {
   });
 
   const mockHandleOpenExperiencesDrawer = jest.fn();
+  const mockRemoveMessage = jest.fn();
+  const mockAddMessage = jest.fn();
 
   test("should render the Chat List and show the appropriate message type for each message", () => {
     // GIVEN a message list
@@ -151,7 +153,7 @@ describe("ChatList", () => {
 
     // WHEN the chat list is rendered
     render(
-      <ChatProvider handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer}>
+      <ChatProvider handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer} removeMessage={mockRemoveMessage} addMessage={mockAddMessage}>
         <ChatList messages={givenMessages} />
       </ChatProvider>
     );
