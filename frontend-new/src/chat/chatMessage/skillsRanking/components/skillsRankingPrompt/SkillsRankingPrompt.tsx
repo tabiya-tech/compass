@@ -56,7 +56,7 @@ const SkillsRankingPrompt: React.FC<SkillsRankingPromptProps> = ({
     UserPreferencesStateService.getInstance().getUserPreferences()?.experiments?.[
       SKILLS_RANKING_BUTTON_POSITION_EXPERIMENT
     ];
-  const isContinueButtonFirst = buttonPositionExperiment === ButtonPositionGroup.CONTINUE_BUTTON_FIRST;
+  const isInfoButtonFirst = buttonPositionExperiment === ButtonPositionGroup.INFO_BUTTON_FIRST;
 
   const handleButtonClick = (action: SkillsRankingPromptAction) => {
     const userId = AuthenticationStateService.getInstance().getUser()?.id;
@@ -118,7 +118,7 @@ const SkillsRankingPrompt: React.FC<SkillsRankingPromptProps> = ({
             {promptText}
           </Typography>
           <Box display="flex" justifyContent="flex-end" gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}>
-            {isContinueButtonFirst ? buttons : [...buttons].reverse()}
+            {isInfoButtonFirst ? [...buttons].reverse() : buttons}
           </Box>
         </Box>
       </ChatBubble>

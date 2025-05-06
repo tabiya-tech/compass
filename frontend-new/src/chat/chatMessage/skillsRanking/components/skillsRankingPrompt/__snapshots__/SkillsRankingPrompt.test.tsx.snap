@@ -33,22 +33,22 @@ exports[`SkillsRankingPrompt tests render tests should render component successf
         >
           <button
             class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
-            data-testid="skills-ranking-prompt-info-button-1e13ec58-2931-47ef-b1a9-30550519707b"
+            data-testid="skills-ranking-prompt-continue-button-1e13ec58-2931-47ef-b1a9-30550519707b"
             tabindex="0"
             type="button"
           >
-            Get information
+            Continue without information
             <span
               class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
             />
           </button>
           <button
             class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
-            data-testid="skills-ranking-prompt-continue-button-1e13ec58-2931-47ef-b1a9-30550519707b"
+            data-testid="skills-ranking-prompt-info-button-1e13ec58-2931-47ef-b1a9-30550519707b"
             tabindex="0"
             type="button"
           >
-            Continue without information
+            Get information
             <span
               class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
             />

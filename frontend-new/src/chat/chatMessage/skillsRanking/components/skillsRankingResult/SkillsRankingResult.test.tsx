@@ -54,9 +54,6 @@ describe("SkillsRankingResult tests", () => {
       expect(container).toBeInTheDocument();
       // AND expect the message bubble to be visible
       expect(screen.getByTestId(CHAT_BUBBLE_DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER)).toBeInTheDocument();
-      // AND expect the loading text and indicator to be in the document initially
-      expect(screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_LOADING_TEXT)).toBeInTheDocument();
-      expect(screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_LOADING_INDICATOR)).toBeInTheDocument();
       // AND expect the text to be in the document
       await waitFor(() => {
         expect(screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_RESULT_TEXT)).toBeInTheDocument();
@@ -122,12 +119,48 @@ describe("SkillsRankingResult tests", () => {
       await waitFor(() => {
         expect(console.error).toHaveBeenCalledWith("Failed to fetch ranking", mockError);
       });
-      // AND expect the loading state to be removed
-      expect(screen.queryByTestId(DATA_TEST_ID.SKILLS_RANKING_LOADING_TEXT)).not.toBeInTheDocument();
-      expect(screen.queryByTestId(DATA_TEST_ID.SKILLS_RANKING_LOADING_INDICATOR)).not.toBeInTheDocument();
       // AND expect the result text to be empty
       const resultText = screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_RESULT_TEXT);
       expect(resultText.textContent).toBe(" ");
+    });
+
+    test("should successfully fetch and display ranking", async () => {
+      // GIVEN a ranking service that returns a successful response
+      const mockRanking = "85%";
+      const givenSessionId = 1234;
+      const mockGetSkillsRankingState = jest.fn().mockResolvedValueOnce({
+        session_id: givenSessionId,
+        experiment_group: "GROUP_A",
+        current_state: "EVALUATED",
+        ranking: mockRanking,
+        self_ranking: null,
+      });
+      (SkillsRankingService.getInstance as jest.Mock).mockReturnValueOnce({
+        getSkillsRankingState: mockGetSkillsRankingState,
+      });
+      // AND a chat message
+      const givenChatMessage: IChatMessage = {
+        message_id: nanoid(),
+        sender: ConversationMessageSender.COMPASS,
+        message: "",
+        sent_at: new Date().toISOString(),
+        type: ChatMessageType.SKILLS_RANKING,
+        reaction: null,
+      };
+
+      // WHEN the component is rendered
+      render(<SkillsRankingResult group={ExperimentGroup.GROUP_A} chatMessage={givenChatMessage} />);
+
+      // THEN expect the ranking service to be called with the correct session ID
+      expect(mockGetSkillsRankingState).toHaveBeenCalledWith(givenSessionId);
+      // AND expect the result text to contain the ranking
+      await waitFor(() => {
+        const resultText = screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_RESULT_TEXT);
+        expect(resultText.textContent).toContain(mockRanking);
+      });
+      // AND expect no errors to be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
   });
 });

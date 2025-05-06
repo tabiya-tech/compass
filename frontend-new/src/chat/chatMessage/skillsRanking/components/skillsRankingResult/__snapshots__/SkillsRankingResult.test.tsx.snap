@@ -19,20 +19,16 @@ exports[`SkillsRankingResult tests render tests should render component successf
       class="MuiBox-root css-0"
       data-testid="chat-message-bubble-message-footer-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
     >
-      <div
-        class="MuiBox-root css-0"
+      <p
+        class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+        data-testid="skills-ranking-result-text-3fb55364-3b63-48db-b1ef-818a4daa5862"
       >
-        <p
-          class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
-          data-testid="skills-ranking-result-text-3fb55364-3b63-48db-b1ef-818a4daa5862"
-        >
-          Based on how important your skills are for a variety of occupations you currently rank 
-          <b>
-            foobar
-          </b>
-          . Do note that this can always change as you continue learning!
-        </p>
-      </div>
+        Based on how important your skills are for a variety of occupations you currently rank 
+        <b>
+          foobar
+        </b>
+        . Do note that this can always change as you continue learning!
+      </p>
     </div>
   </div>
 </div>
