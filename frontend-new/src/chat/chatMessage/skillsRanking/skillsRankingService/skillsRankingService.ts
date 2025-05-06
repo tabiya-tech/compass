@@ -1,6 +1,6 @@
 import { getSkillsRankingEnabled } from "src/envService";
 import {
-  ExperimentGroup,
+  ExperimentGroup, RankValue,
   SkillsRankingState,
   SkillsRankingStateResponse,
 } from "src/chat/chatMessage/skillsRanking/types";
@@ -56,7 +56,7 @@ export class SkillsRankingService {
   async updateSkillsRankingState(
     sessionId: number,
     currentState: SkillsRankingState,
-    self_ranking: string
+    self_ranking: RankValue | null
   ): Promise<SkillsRankingStateResponse> {
     return {
       session_id: sessionId,

@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
-import { ExperimentGroup } from "src/chat/chatMessage/skillsRanking/types";
+import { ExperimentGroup, RankValue } from "src/chat/chatMessage/skillsRanking/types";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { IChatMessage } from "src/chat/Chat.types";
@@ -17,12 +17,13 @@ export const DATA_TEST_ID = {
 
 export interface SkillsRankingVoteProps {
   group: ExperimentGroup;
-  onRankSelect: (rank: string) => void;
+  onRankSelect: (rank: RankValue) => void;
   chatMessage: IChatMessage;
   disabled?: boolean;
+  error?: string;
 }
 
-export const RANK_OPTIONS = [
+export const RANK_OPTIONS: Array<{ value: RankValue; opacity: number }> = [
   { value: "10%", opacity: 0.1 },
   { value: "20%", opacity: 0.2 },
   { value: "30%", opacity: 0.3 },
@@ -46,6 +47,7 @@ const SkillsRankingVote: React.FC<SkillsRankingVoteProps> = ({
   onRankSelect,
   disabled = false,
   chatMessage,
+  error,
 }) => {
   const theme = useTheme();
   const questionText = QUESTION_TEXTS[group];
@@ -57,6 +59,11 @@ const SkillsRankingVote: React.FC<SkillsRankingVoteProps> = ({
           <Typography variant="body1" data-testid={DATA_TEST_ID.SKILLS_RANKING_VOTE_TEXT}>
             {questionText}
           </Typography>
+          {error && (
+            <Typography color="error" variant="caption">
+              {error}
+            </Typography>
+          )}
           <Box display="grid" gridTemplateColumns="repeat(5, 1fr)" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
             {RANK_OPTIONS.map((option) => (
               <Box key={option.value} display="flex" flexDirection="column" alignItems="center">

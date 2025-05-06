@@ -47,7 +47,7 @@ describe("SkillsRankingResult tests", () => {
       };
 
       // WHEN the component is rendered
-      render(<SkillsRankingResult group={ExperimentGroup.GROUP_A} chatMessage={givenChatMessage} />);
+      render(<SkillsRankingResult rank={"10%"} group={ExperimentGroup.GROUP_A} chatMessage={givenChatMessage} />);
 
       // THEN expect the container to be in the document
       const container = screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_RESULT_CONTAINER);
@@ -80,7 +80,7 @@ describe("SkillsRankingResult tests", () => {
       };
 
       // WHEN the component is rendered
-      render(<SkillsRankingResult group={group} chatMessage={givenChatMessage} />);
+      render(<SkillsRankingResult rank={"10%"} group={group} chatMessage={givenChatMessage} />);
 
       // THEN expect the result text to be in the document
       await waitFor(() => {
@@ -113,7 +113,7 @@ describe("SkillsRankingResult tests", () => {
       };
 
       // WHEN the component is rendered
-      render(<SkillsRankingResult group={ExperimentGroup.GROUP_A} chatMessage={givenChatMessage} />);
+      render(<SkillsRankingResult rank={"10%"} group={ExperimentGroup.GROUP_A} chatMessage={givenChatMessage} />);
 
       // THEN expect the error to be logged
       await waitFor(() => {
@@ -149,7 +149,7 @@ describe("SkillsRankingResult tests", () => {
       };
 
       // WHEN the component is rendered
-      render(<SkillsRankingResult group={ExperimentGroup.GROUP_A} chatMessage={givenChatMessage} />);
+      render(<SkillsRankingResult rank={"10%"} group={ExperimentGroup.GROUP_A} chatMessage={givenChatMessage} />);
 
       // THEN expect the ranking service to be called with the correct session ID
       expect(mockGetSkillsRankingState).toHaveBeenCalledWith(givenSessionId);

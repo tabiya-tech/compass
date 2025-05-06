@@ -15,10 +15,18 @@ export enum SkillsRankingState {
   EVALUATED = "EVALUATED",
 }
 
+export type RankValue = "10%" | "20%" | "30%" | "40%" | "50%" | "60%" | "70%" | "80%" | "90%" | "100%";
+
 export interface SkillsRankingStateResponse {
   session_id: number;
   experiment_group: ExperimentGroup;
   current_state: SkillsRankingState;
-  ranking: string;
-  self_ranking: string | null;
+  ranking: RankValue;
+  self_ranking: RankValue | null;
+}
+
+export interface SkillsRankingError {
+  message: string;
+  code: string;
+  timestamp: string;
 }
