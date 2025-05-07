@@ -54,12 +54,12 @@ class WorkType(Enum):
         elif work_type == WorkType.UNSEEN_UNPAID:
             return dedent("""\
             Represents all unseen economy, including:
-            - Unpaid domestic services for household and family members.
-            - Unpaid caregiving services for household and family members.
-            - Unpaid direct volunteering for other households.
-            - Unpaid community- and organization-based volunteering.
+                - Unpaid domestic services for household and family members.
+                - Unpaid caregiving services for household and family members.
+                - Unpaid direct volunteering for other households.
+                - Unpaid community- and organization-based volunteering.
             excluding:
-            - Unpaid trainee work.
+                - Unpaid trainee work.
             """)
         elif work_type is None:
             return "When there isn't adequate information to classify the work type in any of the categories below."
@@ -68,9 +68,9 @@ class WorkType(Enum):
 
 
 WORK_TYPE_DEFINITIONS_FOR_PROMPT = dedent(f"""\
-None: {WorkType.work_type_long(None)}   
-{WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name}:{WorkType.work_type_long(WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT)}
-{WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK.name}: {WorkType.work_type_long(WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK)}
-{WorkType.SELF_EMPLOYMENT.name}: {WorkType.work_type_long(WorkType.SELF_EMPLOYMENT)}
-{WorkType.UNSEEN_UNPAID.name}: {WorkType.work_type_long(WorkType.UNSEEN_UNPAID)}
+- None: {WorkType.work_type_long(None)}   
+- {WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name}:{WorkType.work_type_long(WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT)}
+- {WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK.name}: {WorkType.work_type_long(WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK)}
+- {WorkType.SELF_EMPLOYMENT.name}: {WorkType.work_type_long(WorkType.SELF_EMPLOYMENT)}
+- {WorkType.UNSEEN_UNPAID.name}: {WorkType.work_type_long(WorkType.UNSEEN_UNPAID)}
 """)
