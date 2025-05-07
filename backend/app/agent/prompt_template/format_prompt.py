@@ -6,6 +6,9 @@ def replace_placeholders_with_indent(template_string: str, **replacements: str):
     Replace multiple placeholders in the template string with their corresponding replacements,
     maintaining the indentation of each placeholder if it starts a line with spaces.
 
+    Lines starting with "///" after trimming are omitted from the final output.
+    Use them to comment out lines in the prompt template string.
+
     :param template_string: The original template string containing placeholders
     :param replacements: Keyword arguments where keys are placeholders (without curly braces) and values are the replacement strings
     :return: The modified string with the placeholders replaced
@@ -19,6 +22,11 @@ def replace_placeholders_with_indent(template_string: str, **replacements: str):
     pattern = re.compile(r'{(.*?)}')
     while len(lines):
         current_line = lines.pop(0)
+
+        # Skip commented-out lines before processing
+        if current_line.strip().startswith("///"):
+            continue
+
         start_pos = 0
         match = pattern.search(current_line, pos=start_pos)
         if not match:
