@@ -1,5 +1,5 @@
 from typing import List, Optional, Any
-import uuid as uuidObj
+from uuid import uuid4
 
 from pydantic import BaseModel, Field, field_serializer, field_validator
 
@@ -12,7 +12,7 @@ class ResponsibilitiesData(BaseModel):
     """
     A model for the collected data of the Skill Explorer Agent.
     The data are collected during the conversation and stored in the agent's state.
-    They represent the following type of entities:
+    They represent the following types of entities:
         - responsibilities:
         - skills
         - duties
@@ -130,13 +130,13 @@ class ExperienceEntity(BaseModel):
                  location: Optional[str] = None,
                  timeline: Optional[Timeline] = None,
                  work_type: Optional[WorkType] = None,
-                 uuid: Optional[str] = None, #TODO check this
+                 uuid: Optional[str] = None,
                  responsibilities: Optional[ResponsibilitiesData] = None,
                  esco_occupations: Optional[List[OccupationSkillEntity]] = None,
                  top_skills: Optional[List[SkillEntity]] = None
                  ):
         super().__init__(
-            uuid=uuid if uuid is not None else str(uuidObj.uuid4()),  # Generate a unique UUID for each instance
+            uuid=uuid if uuid is not None else str(uuid4()),  # Generate a unique UUID for each instance
             experience_title=experience_title,
             company=company,
             location=location,
