@@ -429,7 +429,7 @@ def _get_not_missing_fields(collected_data: list[CollectedData], index: int) -> 
         not_missing_fields.append("experience_title")
     if experience_data.paid_work is not None:
         not_missing_fields.append("paid_work")
-    if experience_data.work_type is not None:
+    if WorkType.from_string_key(experience_data.work_type) is not None :
         not_missing_fields.append("work_type")
     if experience_data.start_date is not None:
         not_missing_fields.append("start_date")
