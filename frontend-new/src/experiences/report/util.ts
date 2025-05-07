@@ -22,20 +22,28 @@ export const formatDate = (dateString: string | null): string => {
 // Utility function to group experiences by work type
 export const groupExperiencesByWorkType = (experiences: Experience[]) => {
   const selfEmploymentExperiences = experiences.filter(
-    (experience) => experience.work_type === WorkType.SELF_EMPLOYMENT,
+    (experience) => experience.work_type === WorkType.SELF_EMPLOYMENT
   );
 
   const salaryWorkExperiences = experiences.filter(
-    (experience) => experience.work_type === WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+    (experience) => experience.work_type === WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT
   );
 
   const unpaidWorkExperiences = experiences.filter((experience) => experience.work_type === WorkType.UNSEEN_UNPAID);
 
   const traineeWorkExperiences = experiences.filter(
-    (experience) => experience.work_type === WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK,
+    (experience) => experience.work_type === WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK
   );
 
-  return { selfEmploymentExperiences, salaryWorkExperiences, unpaidWorkExperiences, traineeWorkExperiences };
+  const uncategorizedExperiences = experiences.filter((experience) => experience.work_type === null);
+
+  return {
+    selfEmploymentExperiences,
+    salaryWorkExperiences,
+    unpaidWorkExperiences,
+    traineeWorkExperiences,
+    uncategorizedExperiences,
+  };
 };
 
 // Convert local image to base64

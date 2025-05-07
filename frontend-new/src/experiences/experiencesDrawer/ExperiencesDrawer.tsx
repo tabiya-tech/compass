@@ -14,9 +14,12 @@ import StoreIcon from "@mui/icons-material/Store";
 import WorkIcon from "@mui/icons-material/Work";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import SchoolIcon from "@mui/icons-material/School";
+import QuizIcon from "@mui/icons-material/Quiz";
 import ExperienceCategory from "src/experiences/experiencesDrawer/components/experienceCategory/ExperienceCategory";
 import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
-const LazyLoadedDownloadDropdown = lazyWithPreload(() => import("src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown"));
+const LazyLoadedDownloadDropdown = lazyWithPreload(
+  () => import("src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown")
+);
 
 export interface ExperiencesDrawerProps {
   isOpen: boolean;
@@ -119,7 +122,9 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
       <ExperiencesDrawerHeader notifyOnClose={handleClose} />
       <Box display="flex" flexDirection="column" gap={2}>
         <Box display="flex" flexDirection="column" gap={1} alignItems="end" justifyContent="flex-end">
-          <Suspense fallback={<Skeleton variant="rectangular" height={40} width={theme.spacing(20)} sx={{ borderRadius: 1 }} />}>
+          <Suspense
+            fallback={<Skeleton variant="rectangular" height={40} width={theme.spacing(20)} sx={{ borderRadius: 1 }} />}
+          >
             <LazyLoadedDownloadDropdown
               name={personalInfo.fullName}
               email={personalInfo.contactEmail}
@@ -204,6 +209,12 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
                 icon={<SchoolIcon />}
                 title={ReportContent.TRAINEE_WORK_TITLE}
                 experiences={groupedExperiences.traineeWorkExperiences}
+              />
+              <ExperienceCategory
+                icon={<QuizIcon />}
+                title={ReportContent.UNCATEGORIZED_TITLE}
+                experiences={groupedExperiences.uncategorizedExperiences}
+                tooltipText="Based on the conversation, these experiences couldn’t be automatically categorized."
               />
             </Box>
           )}

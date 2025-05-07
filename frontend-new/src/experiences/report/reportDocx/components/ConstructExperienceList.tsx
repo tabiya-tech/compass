@@ -1,11 +1,7 @@
 import { Paragraph, TextRun, ImageRun, HeadingLevel, AlignmentType } from "docx";
 import { Experience } from "src/experiences/experienceService/experiences.types";
 import { generateExperience } from "./experiencesReportContent/ExperiencesReportContent";
-import {
-  COLORS,
-  getBase64Image,
-  groupExperiencesByWorkType,
-} from "src/experiences/report/util";
+import { COLORS, getBase64Image, groupExperiencesByWorkType } from "src/experiences/report/util";
 import { ReportContent } from "src/experiences/report/reportContent";
 import { TabiyaBasicColors } from "src/theme/applicationTheme/applicationTheme";
 
@@ -35,19 +31,21 @@ const createParagraphWithImageAndText = async (text: string, imageUrl: string) =
 
 // Construct the experiences section header
 const constructExperiencesSectionHeader = (paragraphs: Paragraph[]): void => {
-  paragraphs.push(new Paragraph({
-    children: [
-      new TextRun({
-        text: ReportContent.EXPERIENCES_TITLE,
-        bold: true,
-        size: 28,
-        color: TabiyaBasicColors.DarkBlue,
-      }),
-    ],
-    heading: HeadingLevel.HEADING_5,
-    alignment: AlignmentType.LEFT,
-    spacing: { before: 100 },
-  }));
+  paragraphs.push(
+    new Paragraph({
+      children: [
+        new TextRun({
+          text: ReportContent.EXPERIENCES_TITLE,
+          bold: true,
+          size: 28,
+          color: TabiyaBasicColors.DarkBlue,
+        }),
+      ],
+      heading: HeadingLevel.HEADING_5,
+      alignment: AlignmentType.LEFT,
+      spacing: { before: 100 },
+    })
+  );
 };
 
 // Construct the work type section
@@ -63,15 +61,20 @@ const constructWorkTypeSection = async (
 
   paragraphs.push(
     await createParagraphWithImageAndText(title, iconUrl),
-    ...experiences.flatMap((experience) => generateExperience(experience)),
+    ...experiences.flatMap((experience) => generateExperience(experience))
   );
 };
 
 export const constructExperienceList = async (paragraphs: Paragraph[], experiences: Experience[]) => {
   constructExperiencesSectionHeader(paragraphs);
   // Group experiences by work type
-  const { selfEmploymentExperiences, salaryWorkExperiences, unpaidWorkExperiences, traineeWorkExperiences } =
-    groupExperiencesByWorkType(experiences);
+  const {
+    selfEmploymentExperiences,
+    salaryWorkExperiences,
+    unpaidWorkExperiences,
+    traineeWorkExperiences,
+    uncategorizedExperiences,
+  } = groupExperiencesByWorkType(experiences);
 
   // Add work sections for each work type
   await constructWorkTypeSection(
@@ -101,4 +104,11 @@ export const constructExperienceList = async (paragraphs: Paragraph[], experienc
     ReportContent.TRAINEE_WORK_TITLE,
     ReportContent.IMAGE_URLS.TRAINEE_WORK_ICON
   );
-}
+
+  await constructWorkTypeSection(
+    paragraphs,
+    uncategorizedExperiences,
+    ReportContent.UNCATEGORIZED_TITLE,
+    ReportContent.IMAGE_URLS.QUIZ_ICON
+  );
+};
