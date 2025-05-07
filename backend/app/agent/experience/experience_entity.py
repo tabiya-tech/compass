@@ -161,6 +161,7 @@ class ExperienceEntity(BaseModel):
             date_part = f", until {end_date}" if end_date is not None and end_date != "" else ""
         company_part = f", {company}" if company is not None and company != "" else ""
         location_part = f", {location}" if location is not None and location != "" else ""
-        work_type_part = f" ({WorkType.work_type_short(WorkType.from_string_key(work_type))})" if work_type is not None and work_type != "" else ""
+        _work_type = WorkType.from_string_key(work_type)
+        work_type_part = f" ({WorkType.work_type_short(_work_type)})" if _work_type is not None else ""
         experience_title_part = experience_title if experience_title is not None else "No title provided yet"
         return experience_title_part + work_type_part + date_part + company_part + location_part + "\n"
