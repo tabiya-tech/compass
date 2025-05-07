@@ -4,6 +4,7 @@ import ChatList from "src/chat/chatList/ChatList";
 import { IChatMessage } from "./Chat.types";
 import {
   generateCompassMessage,
+  generateConversationConclusionMessage,
   generatePleaseRepeatMessage,
   generateSomethingWentWrongMessage,
   generateTypingMessage,
@@ -92,13 +93,13 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
    * --- Utility functions ---
    */
 
-  const addMessage = (message: IChatMessage) => {
+  const addMessage = useCallback((message: IChatMessage) => {
     setMessages((prevMessages) => [...prevMessages, message]);
-  };
+  }, []);
 
-  const removeMessage = (messageId: string) => {
-    setMessages((prevMessages) => prevMessages.filter(msg => msg.message_id !== messageId));
-  };
+  const removeMessage = useCallback((messageId: string) => {
+    setMessages((prevMessages) => prevMessages.filter((message) => message.message_id !== messageId));
+  }, []);
 
   // Depending on the typing state, add or remove the typing message from the messages list
   const addOrRemoveTypingMessage = (userIsTyping: boolean) => {
@@ -204,7 +205,8 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         });
 
         // If conversation is completed, add skills ranking message before the conclusion
-        // The conclusion message will be added when the skills ranking message decides that it is done with its own flow
+        // TODO: show the skills ranking message if the feature is enabled. if not, show the conclusion message
+        // the skills ranking message will show the conclusion message when its flow is finished
         if (response.conversation_completed) {
           const skillsRankingMessage = generateSkillsRankingMessage();
           addMessage(skillsRankingMessage);
@@ -264,10 +266,13 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
               if (message.sender === ConversationMessageSender.USER) {
                 return generateUserMessage(message.message, message.sent_at);
               }
-              // If this is the last message and conversation is completed, return skills ranking message
-              // The conclusion message will be added when the skills ranking message decides that it is done with its own flow
+              // If this is the last message and conversation is completed, return both skills ranking and conclusion messages
+              // TODO: show the skills ranking message if the feature is enabled. if not, show the conclusion message
+              // the skills ranking message will show the conclusion message when its flow is finished
               if (history.conversation_completed && message === history.messages[history.messages.length - 1]) {
-                return generateSkillsRankingMessage();
+                return [
+                  generateSkillsRankingMessage()
+                ];
               }
               return generateCompassMessage(message.message_id, message.message, message.sent_at, message.reaction);
             })
@@ -373,21 +378,22 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     return () => clearInterval(interval);
   }, [lastActivityTime, disableInactivityCheck, conversationCompleted]);
 
+  const resetTimer = useCallback(() => {
+    setLastActivityTime(Date.now());
+    setShowBackdrop(false);
+  }, [setLastActivityTime, setShowBackdrop]);
+
   // Close backdrop when user interacts with the page
   useEffect(() => {
     if (disableInactivityCheck) return;
 
-    // Reset the timer when the user interacts with the page
-    const resetTimer = () => {
-      setLastActivityTime(Date.now());
-      setShowBackdrop(false);
-    };
-
     const events = ["mousedown", "keydown"];
-    events.forEach((event) => document.addEventListener(event, resetTimer));
+    events.forEach((event) => document.addEventListener(event, resetTimer, { passive: true }));
 
-    return () => events.forEach((event) => document.removeEventListener(event, resetTimer));
-  }, [disableInactivityCheck]);
+    return () => {
+      events.forEach((event) => document.removeEventListener(event, resetTimer));
+    };
+  }, [disableInactivityCheck, resetTimer]);
 
   // Preload the "Download Report" button when experiences are explored.
   // The button is loaded lazily, so this is a good opportunity to load it manually.
@@ -413,10 +419,11 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       {isLoggingOut ? (
         <Backdrop isShown={isLoggingOut} message={"Logging you out, wait a moment..."} />
       ) : (
-        <ChatProvider 
-          handleOpenExperiencesDrawer={handleOpenExperiencesDrawer} 
+        <ChatProvider
+          handleOpenExperiencesDrawer={handleOpenExperiencesDrawer}
           removeMessage={removeMessage}
           addMessage={addMessage}
+          messages={messages}
         >
           <Box
             width="100%"

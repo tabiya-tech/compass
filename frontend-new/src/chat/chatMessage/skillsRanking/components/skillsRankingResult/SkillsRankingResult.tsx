@@ -1,8 +1,8 @@
 import React from "react";
-import { ExperimentGroup, RankValue } from "src/chat/chatMessage/skillsRanking/types";
-import { Typography } from "@mui/material";
+import { ExperimentGroup } from "src/chat/chatMessage/skillsRanking/types";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
-import { IChatMessage } from "src/chat/Chat.types";
+import { ISkillsRankingResultMessage } from "src/chat/Chat.types";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 
 const uniqueId = "3fb55364-3b63-48db-b1ef-818a4daa5862";
@@ -15,21 +15,21 @@ export const DATA_TEST_ID = {
 };
 
 export interface SkillsRankingResultProps {
+  chatMessage: ISkillsRankingResultMessage;
   group: ExperimentGroup;
-  chatMessage: IChatMessage;
-  rank: RankValue;
+  rank: string;
   isLoading?: boolean;
   error: string | null;
 }
 
 export const RESULT_MESSAGES = {
-  [ExperimentGroup.GROUP_A]: (rank: RankValue) => (
+  [ExperimentGroup.GROUP_A]: (rank: string) => (
     <>
       Based on how important your skills are for a variety of occupations you currently rank <b>{rank}</b>. Do note that
       this can always change as you continue learning!
     </>
   ),
-  [ExperimentGroup.GROUP_B]: (rank: RankValue) => (
+  [ExperimentGroup.GROUP_B]: (rank: string) => (
     <>
       Based on how important your skills are for a variety of jobs you currently rank <b>{rank}</b>. Do note that this
       can always change as you continue learning!
@@ -38,28 +38,36 @@ export const RESULT_MESSAGES = {
 };
 
 const SkillsRankingResult: React.FC<SkillsRankingResultProps> = ({ 
-  group, 
   chatMessage,
+  group, 
   rank,
   isLoading = false,
   error 
 }) => {
   const renderContent = () => {
-    if (error) {
+    if (isLoading) {
+      return (
+        <Box display="flex" justifyContent="center" data-testid={DATA_TEST_ID.SKILLS_RANKING_RESULT_LOADING}>
+          <CircularProgress size={24} />
+        </Box>
+      );
+    }
+
+    if (chatMessage.error) {
       return (
         <Typography 
           color="error" 
           variant="body2" 
           data-testid={DATA_TEST_ID.SKILLS_RANKING_RESULT_ERROR}
         >
-          {error}
+          {chatMessage.error}
         </Typography>
       );
     }
 
     return (
       <Typography variant="body1" data-testid={DATA_TEST_ID.SKILLS_RANKING_RESULT_TEXT}>
-        {RESULT_MESSAGES[group](rank)}
+        {RESULT_MESSAGES[group](chatMessage.rank)}
       </Typography>
     );
   };

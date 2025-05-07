@@ -38,7 +38,7 @@ describe("ConversationConclusionFooter", () => {
 
   const renderWithChatProvider = () => {
     return render(
-      <ChatProvider handleOpenExperiencesDrawer={givenMockHandleOpenExperiencesDrawer} removeMessage={givenMockRemoveMessage} addMessage={givenMockAddMessage}>
+      <ChatProvider handleOpenExperiencesDrawer={givenMockHandleOpenExperiencesDrawer} removeMessage={givenMockRemoveMessage} addMessage={givenMockAddMessage} messages={[]}>
         <ConversationConclusionFooter />
       </ChatProvider>,
     );

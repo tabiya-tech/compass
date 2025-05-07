@@ -3,9 +3,8 @@ import { Box, Typography, useTheme } from "@mui/material";
 import { ExperimentGroup, RankValue } from "src/chat/chatMessage/skillsRanking/types";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
-import { IChatMessage } from "src/chat/Chat.types";
-import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
-import SignalCellularAltIcon from "@mui/icons-material/SignalCellularAlt";
+import { ISkillsRankingVoteMessage } from "src/chat/Chat.types";
+import BucketLevel from "src/theme/BucketLevel/BucketLevel";
 
 const uniqueId = "cb5e9e43-c288-4597-b6f4-a268623c9e61";
 
@@ -16,9 +15,9 @@ export const DATA_TEST_ID = {
 };
 
 export interface SkillsRankingVoteProps {
+  chatMessage: ISkillsRankingVoteMessage;
   group: ExperimentGroup;
   onRankSelect: (rank: RankValue) => void;
-  chatMessage: IChatMessage;
   disabled?: boolean;
   error: string | null;
 }
@@ -43,14 +42,20 @@ export const QUESTION_TEXTS = {
 };
 
 const SkillsRankingVote: React.FC<SkillsRankingVoteProps> = ({
+  chatMessage,
   group,
   onRankSelect,
   disabled = false,
-  chatMessage,
   error,
 }) => {
   const theme = useTheme();
   const questionText = QUESTION_TEXTS[group];
+  const [selectedRank, setSelectedRank] = React.useState<RankValue | undefined>(undefined);
+
+  const handleRankSelect = (rank: RankValue) => {
+    setSelectedRank(rank);
+    chatMessage.onRankSelect(rank);
+  };
 
   return (
     <MessageContainer origin={chatMessage.sender} data-testid={DATA_TEST_ID.SKILLS_RANKING_VOTE_CONTAINER}>
@@ -68,23 +73,13 @@ const SkillsRankingVote: React.FC<SkillsRankingVoteProps> = ({
             {RANK_OPTIONS.map((option) => (
               <Box key={option.value} display="flex" flexDirection="column" alignItems="center">
                 <Typography variant="caption">{option.value}</Typography>
-                <PrimaryIconButton
-                  onClick={() => onRankSelect(option.value)}
+                <BucketLevel
+                  fillLevel={parseInt(option.value)}
+                  onClick={() => handleRankSelect(option.value)}
                   disabled={disabled}
-                  title={option.value}
-                  sx={{
-                    color: theme.palette.tabiyaBlue.main,
-                  }}
+                  selected={selectedRank === option.value}
                   data-testid={DATA_TEST_ID.SKILLS_RANKING_VOTE_ICON}
-                >
-                  <SignalCellularAltIcon
-                    sx={{
-                      fontSize: "48px",
-                      opacity: option.opacity,
-                      transform: "rotate(90deg)",
-                    }}
-                  />
-                </PrimaryIconButton>
+                />
               </Box>
             ))}
           </Box>

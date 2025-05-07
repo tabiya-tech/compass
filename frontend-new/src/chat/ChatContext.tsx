@@ -11,6 +11,7 @@ interface ChatContextType {
   setFeedbackStatus: (status: FeedbackStatus) => void;
   isAccountConverted: boolean;
   setIsAccountConverted: (converted: boolean) => void;
+  messages: IChatMessage[];
 }
 
 export const ChatContext = createContext<ChatContextType | null>(null);
@@ -20,9 +21,16 @@ interface ChatProviderProps {
   handleOpenExperiencesDrawer: () => void;
   removeMessage: (messageId: string) => void;
   addMessage: (message: IChatMessage) => void;
+  messages: IChatMessage[];
 }
 
-export const ChatProvider: React.FC<ChatProviderProps> = ({ children, handleOpenExperiencesDrawer, removeMessage, addMessage }) => {
+export const ChatProvider: React.FC<ChatProviderProps> = ({ 
+  children, 
+  handleOpenExperiencesDrawer, 
+  removeMessage, 
+  addMessage,
+  messages 
+}) => {
   const [feedbackStatus, setFeedbackStatus] = useState<FeedbackStatus>(FeedbackStatus.NOT_STARTED);
   const [isAccountConverted, setIsAccountConverted] = useState<boolean>(PersistentStorageService.getAccountConverted());
 
@@ -37,7 +45,8 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children, handleOpen
       PersistentStorageService.setAccountConverted(converted);
       setIsAccountConverted(converted);
     },
-  }), [feedbackStatus, handleOpenExperiencesDrawer, isAccountConverted, removeMessage, addMessage]);
+    messages,
+  }), [feedbackStatus, handleOpenExperiencesDrawer, isAccountConverted, removeMessage, addMessage, messages]);
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 };

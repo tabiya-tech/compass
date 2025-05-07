@@ -4,7 +4,7 @@ import { Box, Typography, useTheme } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
-import { IChatMessage } from "src/chat/Chat.types";
+import { ISkillsRankingPromptMessage } from "src/chat/Chat.types";
 import { EventType } from "src/metrics/types";
 import MetricsService from "src/metrics/metricsService";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -22,10 +22,10 @@ export const DATA_TEST_ID = {
 };
 
 interface SkillsRankingPromptProps {
+  chatMessage: ISkillsRankingPromptMessage;
   group: ExperimentGroup;
   onShowInfo: () => void;
   onContinue: () => void;
-  chatMessage: IChatMessage;
   disabled?: boolean;
 }
 
@@ -42,11 +42,11 @@ export const PROMPT_TEXTS = {
 };
 
 const SkillsRankingPrompt: React.FC<SkillsRankingPromptProps> = ({
-  group,
-  onShowInfo,
-  onContinue,
-  disabled = false,
   chatMessage,
+  group,
+  onShowInfo, // TODO: cleanup
+  onContinue, // TODO: cleanup
+  disabled = false,
 }) => {
   const theme = useTheme();
 
@@ -81,9 +81,9 @@ const SkillsRankingPrompt: React.FC<SkillsRankingPromptProps> = ({
     }
 
     if (action === SkillsRankingPromptAction.INFO) {
-      onShowInfo();
+      chatMessage.onShowInfo();
     } else {
-      onContinue();
+      chatMessage.onContinue();
     }
   };
 

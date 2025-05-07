@@ -39,7 +39,7 @@ describe("ChatContext", () => {
       setIsAccountConverted,
     } = useChatContext();
 
-    return (
+        return (
       <div>
         <button onClick={() => handleOpenExperiencesDrawer()}>Open Drawer</button>
         <button onClick={() => removeMessage("test-message")}>Remove Message</button>
@@ -55,24 +55,25 @@ describe("ChatContext", () => {
         <button onClick={() => setIsAccountConverted(true)}>Convert Account</button>
         <div data-testid="feedback-status">{feedbackStatus}</div>
         <div data-testid="account-converted">{isAccountConverted.toString()}</div>
-      </div>
-    );
-  };
+          </div>
+        );
+      };
 
   it("should provide context values to children", () => {
-    render(
+      render(
       <ChatProvider
         handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer}
         removeMessage={mockRemoveMessage}
         addMessage={mockAddMessage}
+        messages={[]}
       >
         <TestComponent />
-      </ChatProvider>
-    );
+        </ChatProvider>
+      );
 
     expect(screen.getByTestId("feedback-status")).toHaveTextContent(FeedbackStatus.NOT_STARTED);
     expect(screen.getByTestId("account-converted")).toHaveTextContent("false");
-  });
+    });
 
   it("should call handleOpenExperiencesDrawer when button is clicked", async () => {
     render(
@@ -80,6 +81,7 @@ describe("ChatContext", () => {
         handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer}
         removeMessage={mockRemoveMessage}
         addMessage={mockAddMessage}
+        messages={[]}
       >
         <TestComponent />
       </ChatProvider>
@@ -90,15 +92,16 @@ describe("ChatContext", () => {
   });
 
   it("should call removeMessage when button is clicked", () => {
-    render(
+      render(
       <ChatProvider
         handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer}
         removeMessage={mockRemoveMessage}
         addMessage={mockAddMessage}
+        messages={[]}
       >
         <TestComponent />
-      </ChatProvider>
-    );
+        </ChatProvider>
+      );
 
     fireEvent.click(screen.getByText("Remove Message"));
     expect(mockRemoveMessage).toHaveBeenCalledWith("test-message");
@@ -119,6 +122,7 @@ describe("ChatContext", () => {
         handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer}
         removeMessage={mockRemoveMessage}
         addMessage={mockAddMessage}
+        messages={[]}
       >
         <TestComponent />
       </ChatProvider>
@@ -126,7 +130,7 @@ describe("ChatContext", () => {
 
     fireEvent.click(screen.getByText("Add Message"));
     expect(mockAddMessage).toHaveBeenCalledWith(testMessage);
-  });
+    });
 
   it("should update feedback status when setFeedbackStatus is called", () => {
     render(
@@ -134,14 +138,15 @@ describe("ChatContext", () => {
         handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer}
         removeMessage={mockRemoveMessage}
         addMessage={mockAddMessage}
+        messages={[]}
       >
         <TestComponent />
-      </ChatProvider>
+          </ChatProvider>
     );
 
     fireEvent.click(screen.getByText("Set Feedback"));
     expect(screen.getByTestId("feedback-status")).toHaveTextContent(FeedbackStatus.SUBMITTED);
-  });
+    });
 
   it("should update account converted status and persist it", () => {
     render(
@@ -149,19 +154,21 @@ describe("ChatContext", () => {
         handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer}
         removeMessage={mockRemoveMessage}
         addMessage={mockAddMessage}
+        messages={[]}
       >
         <TestComponent />
-      </ChatProvider>
+          </ChatProvider>
     );
 
     fireEvent.click(screen.getByText("Convert Account"));
     expect(screen.getByTestId("account-converted")).toHaveTextContent("true");
     expect(PersistentStorageService.setAccountConverted).toHaveBeenCalledWith(true);
-  });
+      });
 
   it("should throw error when useChatContext is used outside provider", () => {
     const consoleError = jest.spyOn(console, "error").mockImplementation(() => {});
     expect(() => render(<TestComponent />)).toThrow("useChatContext must be used within a ChatProvider");
     consoleError.mockRestore();
   });
+  test.todo("add tests for messages")
 }); 

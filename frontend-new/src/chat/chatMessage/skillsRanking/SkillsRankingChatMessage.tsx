@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
   ExperimentGroup,
   SkillsRankingState,
@@ -6,16 +6,17 @@ import {
   RankValue,
 } from "src/chat/chatMessage/skillsRanking/types";
 import { SkillsRankingError } from "src/error/commonErrors";
-import { IChatMessage } from "src/chat/Chat.types";
-import SkillsRankingPrompt from "src/chat/chatMessage/skillsRanking/components/skillsRankingPrompt/SkillsRankingPrompt";
-import SkillsRankingVote from "src/chat/chatMessage/skillsRanking/components/skillsRankingVote/SkillsRankingVote";
-import SkillsRankingResult from "src/chat/chatMessage/skillsRanking/components/skillsRankingResult/SkillsRankingResult";
+import { 
+  IChatMessage, 
+  ChatMessageType,
+  ISkillsRankingPromptMessage,
+  ISkillsRankingVoteMessage,
+  ISkillsRankingResultMessage
+} from "src/chat/Chat.types";
 import { SkillsRankingService } from "src/chat/chatMessage/skillsRanking/skillsRankingService/skillsRankingService";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
-import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
-import { Box } from "@mui/material";
 import { useChatContext } from "src/chat/ChatContext";
-import { generateConversationConclusionMessage } from "src/chat/util";
+import { generateConversationConclusionMessage, generateTypingMessage } from "src/chat/util";
 
 interface SkillsRankingChatMessageProps {
   chatMessage: IChatMessage;
@@ -24,10 +25,15 @@ interface SkillsRankingChatMessageProps {
 export const SkillsRankingChatMessage: React.FC<SkillsRankingChatMessageProps> = ({ chatMessage }) => {
   const [state, setState] = useState<SkillsRankingStateResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [experimentGroup, setExperimentGroup] = useState<ExperimentGroup>(ExperimentGroup.GROUP_A);
-  const { removeMessage, addMessage } = useChatContext();
+  const { removeMessage, addMessage, messages } = useChatContext();
+  const isInitialMount = useRef(true);
+
+  // Helper function to check if a message type exists in the chat history
+  const hasMessageOfType = useCallback((type: ChatMessageType) => {
+    return messages.some(msg => msg.type === type);
+  }, [messages]);
 
   useEffect(() => {
     const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
@@ -35,8 +41,115 @@ export const SkillsRankingChatMessage: React.FC<SkillsRankingChatMessageProps> =
     setExperimentGroup(group);
   }, []);
 
+  const handleStateChange = useCallback(async (newState: SkillsRankingState, rank?: RankValue) => {
+    try {
+      const sessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
+      if (sessionId === null) {
+        throw new Error("No active session found");
+      }
+
+      const skillsRankingService = SkillsRankingService.getInstance();
+      const response = await skillsRankingService.updateSkillsRankingState(sessionId, newState, rank ?? null);
+      setError(null);
+
+      // If this was a skip, remove all skills ranking messages and add conclusion
+      if (newState === SkillsRankingState.SKIPPED) {
+        // Remove all skills ranking related messages
+        messages
+          .filter(msg => [
+            ChatMessageType.SKILLS_RANKING_PROMPT,
+            ChatMessageType.SKILLS_RANKING_VOTE,
+            ChatMessageType.SKILLS_RANKING_RESULT
+          ].includes(msg.type as ChatMessageType))
+          .forEach(msg => removeMessage(msg.message_id));
+
+        const conclusionMessage = generateConversationConclusionMessage(
+          `conclusion-${Date.now()}`,
+          "Thank you for sharing your experiences with me. I hope I was able to help you reflect on your work journey.",
+          new Date().toISOString()
+        );
+        addMessage(conclusionMessage);
+        return;
+      }
+
+      // If moving to self-evaluating state and no vote message exists
+      if (newState === SkillsRankingState.SELF_EVALUATING && !hasMessageOfType(ChatMessageType.SKILLS_RANKING_VOTE)) {
+        const typingMessage = generateTypingMessage();
+        addMessage(typingMessage);
+        
+        const timeoutId = setTimeout(() => {
+          removeMessage(typingMessage.message_id);
+          const voteMessage: ISkillsRankingVoteMessage = {
+            ...chatMessage,
+            message_id: `skills-ranking-vote-${Date.now()}`,
+            type: ChatMessageType.SKILLS_RANKING_VOTE,
+            message: "Please rate your skills",
+            experimentGroup: experimentGroup,
+            onRankSelect: (newRank: RankValue) => handleStateChange(SkillsRankingState.EVALUATED, newRank),
+            error: null,
+          };
+          addMessage(voteMessage);
+        }, Math.random() * 2000 + 3000);
+
+        return () => clearTimeout(timeoutId);
+      }
+
+      // If moving to evaluated state and no result message exists
+      if (newState === SkillsRankingState.EVALUATED && !hasMessageOfType(ChatMessageType.SKILLS_RANKING_RESULT)) {
+        const typingMessage = generateTypingMessage();
+        addMessage(typingMessage);
+        
+        const timeoutId = setTimeout(() => {
+          removeMessage(typingMessage.message_id);
+          const resultMessage: ISkillsRankingResultMessage = {
+            ...chatMessage,
+            message_id: `skills-ranking-result-${Date.now()}`,
+            type: ChatMessageType.SKILLS_RANKING_RESULT,
+            message: "Here's what we found",
+            experimentGroup: experimentGroup,
+            rank: response.ranking,
+            error: null,
+          };
+          addMessage(resultMessage);
+
+          // Add conclusion after a delay if it doesn't exist
+          if (!hasMessageOfType(ChatMessageType.CONVERSATION_CONCLUSION)) {
+            const conclusionTimeoutId = setTimeout(() => {
+              const typingMessage = generateTypingMessage();
+              addMessage(typingMessage);
+              
+              const finalTimeoutId = setTimeout(() => {
+                removeMessage(typingMessage.message_id);
+                const conclusionMessage = generateConversationConclusionMessage(
+                  `conclusion-${Date.now()}`,
+                  "Thank you for sharing your experiences with me. I hope I was able to help you reflect on your work journey.",
+                  new Date().toISOString()
+                );
+                addMessage(conclusionMessage);
+              }, Math.random() * 2000 + 3000);
+
+              return () => clearTimeout(finalTimeoutId);
+            }, 1000);
+
+            return () => clearTimeout(conclusionTimeoutId);
+          }
+        }, Math.random() * 2000 + 3000);
+
+        return () => clearTimeout(timeoutId);
+      }
+
+      setState(response);
+    } catch (error) {
+      console.error(new SkillsRankingError("Failed to update skills ranking state", error));
+      setError("Failed to update skills ranking. Please try again.");
+    }
+  }, [chatMessage, experimentGroup, addMessage, removeMessage, messages, hasMessageOfType]);
+
   useEffect(() => {
     const fetchState = async () => {
+      if (!isInitialMount.current) return;
+      isInitialMount.current = false;
+      
       setIsLoading(true);
       setError(null);
       try {
@@ -48,6 +161,20 @@ export const SkillsRankingChatMessage: React.FC<SkillsRankingChatMessageProps> =
         const skillsRankingService = SkillsRankingService.getInstance();
         const response = await skillsRankingService.getSkillsRankingState(sessionId);
         setState(response);
+
+        // If we're in the initial state and no prompt exists yet
+        if (response.current_state === SkillsRankingState.INITIAL && !hasMessageOfType(ChatMessageType.SKILLS_RANKING_PROMPT)) {
+          const promptMessage: ISkillsRankingPromptMessage = {
+            ...chatMessage,
+            message_id: `skills-ranking-prompt-${Date.now()}`,
+            type: ChatMessageType.SKILLS_RANKING_PROMPT,
+            message: "Would you like to share information about your skills?",
+            experimentGroup: experimentGroup,
+            onShowInfo: () => handleStateChange(SkillsRankingState.SELF_EVALUATING),
+            onContinue: () => handleStateChange(SkillsRankingState.SKIPPED),
+          };
+          addMessage(promptMessage);
+        }
       } catch (error) {
         console.error(new SkillsRankingError("Failed to fetch skills ranking state", error));
         setError("Failed to load skills ranking. Please try again.");
@@ -57,129 +184,18 @@ export const SkillsRankingChatMessage: React.FC<SkillsRankingChatMessageProps> =
     };
 
     fetchState();
-  }, []);
-
-  const handleStateChange = async (newState: SkillsRankingState, rank?: RankValue) => {
-    try {
-      const sessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
-      if (sessionId === null) {
-        throw new Error("No active session found");
-      }
-
-      setIsTyping(true);
-      const skillsRankingService = SkillsRankingService.getInstance();
-      const response = await skillsRankingService.updateSkillsRankingState(sessionId, newState, rank ?? null);
-      setError(null);
-
-      // Add a delay before showing the new state
-      const delay = Math.random() * 2000 + 3000;
-      setTimeout(() => {
-        setIsTyping(false);
-        setState(response);
-
-        // If this was a skip, remove the skills ranking message and add conclusion
-        if (newState === SkillsRankingState.SKIPPED) {
-          removeMessage(chatMessage.message_id);
-          const conclusionMessage = generateConversationConclusionMessage(
-            `conclusion-${Date.now()}`,
-            "Thank you for sharing your experiences with me. I hope I was able to help you reflect on your work journey.",
-            new Date().toISOString()
-          );
-          addMessage(conclusionMessage);
-        }
-        // If this was the final evaluation, add conclusion after a delay
-        else if (newState === SkillsRankingState.EVALUATED) {
-          setTimeout(() => {
-            setIsTyping(true);
-            setTimeout(() => {
-              setIsTyping(false);
-              const conclusionMessage = generateConversationConclusionMessage(
-                `conclusion-${Date.now()}`,
-                "Thank you for sharing your experiences with me. I hope I was able to help you reflect on your work journey.",
-                new Date().toISOString()
-              );
-              addMessage(conclusionMessage);
-            }, Math.random() * 2000 + 3000);
-          }, 1000);
-        }
-      }, delay);
-    } catch (error) {
-      console.error(new SkillsRankingError("Failed to update skills ranking state", error));
-      setError("Failed to update skills ranking. Please try again.");
-      setIsTyping(false);
-    }
-  };
-
-  const renderContent = () => {
-    if (isLoading || !state) {
-      return null;
-    }
-
-    const components = [];
-
-    // Always show the prompt
-    components.push(
-      <Box key="prompt">
-        <SkillsRankingPrompt
-          group={experimentGroup}
-          chatMessage={chatMessage}
-          onShowInfo={() => handleStateChange(SkillsRankingState.SELF_EVALUATING)}
-          onContinue={() => handleStateChange(SkillsRankingState.SKIPPED)}
-          disabled={isTyping || state.current_state !== SkillsRankingState.INITIAL}
-        />
-      </Box>
-    );
-
-    // Show vote component if we're in or past the self-evaluating state
-    if (state.current_state === SkillsRankingState.SELF_EVALUATING || state.current_state === SkillsRankingState.EVALUATED) {
-      components.push(
-        <Box key="vote">
-          <SkillsRankingVote
-            group={experimentGroup}
-            chatMessage={chatMessage}
-            onRankSelect={(rank) => handleStateChange(SkillsRankingState.EVALUATED, rank)}
-            disabled={isTyping || state.current_state === SkillsRankingState.EVALUATED}
-            error={error}
-          />
-        </Box>
-      );
-    }
-
-    // Show result component if we're in the evaluated state
-    if (state.current_state === SkillsRankingState.EVALUATED) {
-      components.push(
-        <Box key="result">
-          <SkillsRankingResult 
-            group={experimentGroup} 
-            chatMessage={chatMessage} 
-            rank={state.ranking}
-            isLoading={isTyping}
-            error={error}
-          />
-        </Box>
-      );
-    }
-
-    return components;
-  };
+  }, [experimentGroup, addMessage, chatMessage, handleStateChange, hasMessageOfType]);
 
   // If all states are SKIPPED, don't render anything
   if (state?.current_state === SkillsRankingState.SKIPPED) {
     return null;
   }
 
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-      }}
-    >
-      {renderContent()}
-      {isTyping && <TypingChatMessage />}
-    </Box>
-  );
+  // The main component now only manages state and doesn't render any UI
+  return null;
 };
 
 export default SkillsRankingChatMessage;
+
+
+

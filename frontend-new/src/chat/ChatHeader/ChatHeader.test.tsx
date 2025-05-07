@@ -97,7 +97,7 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
 });
 
 const renderWithChatProvider = (child: React.ReactNode) => {
-  render(<ChatProvider handleOpenExperiencesDrawer={jest.fn} removeMessage={jest.fn} addMessage={jest.fn}>{child}</ChatProvider>);
+  render(<ChatProvider handleOpenExperiencesDrawer={jest.fn} removeMessage={jest.fn} addMessage={jest.fn} messages={[]}>{child}</ChatProvider>);
 };
 
 describe("ChatHeader", () => {
@@ -194,7 +194,7 @@ describe("ChatHeader", () => {
     const givenRemoveMessage = jest.fn();
     const givenAddMessage = jest.fn();
     const givenChatHeader = (
-      <ChatProvider handleOpenExperiencesDrawer={jest.fn} removeMessage={givenRemoveMessage} addMessage={givenAddMessage}>
+      <ChatProvider handleOpenExperiencesDrawer={jest.fn} removeMessage={givenRemoveMessage} addMessage={givenAddMessage} messages={[]}>
         <ChatHeader
           notifyOnLogout={givenNotifyOnLogout}
           startNewConversation={givenStartNewConversation}
@@ -377,8 +377,6 @@ describe("ChatHeader", () => {
     test("should call notifyOnExperiencesDrawerOpen when the experiences button is clicked", async () => {
       // GIVEN a ChatHeader component
       const givenNotifyOnExperiencesDrawerOpen = jest.fn();
-      const givenRemoveMessage = jest.fn();
-      const givenAddMessage = jest.fn();
       const givenChatHeader = (
         <ChatHeader
           notifyOnLogout={jest.fn()}
@@ -392,9 +390,7 @@ describe("ChatHeader", () => {
         />
       );
       // AND the chat header is rendered
-      render(
-        <ChatProvider handleOpenExperiencesDrawer={givenNotifyOnExperiencesDrawerOpen} removeMessage={givenRemoveMessage} addMessage={givenAddMessage}>{givenChatHeader}</ChatProvider>
-      );
+      renderWithChatProvider(givenChatHeader);
 
       // WHEN the experiences button is clicked
       const experiencesButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES);
@@ -442,8 +438,6 @@ describe("ChatHeader", () => {
       const givenExploredExperiencesNotification = false;
       // AND the notifyOnExperiencesDrawerOpen function
       const givenNotifyOnExperiencesDrawerOpen = jest.fn();
-      const givenRemoveMessage = jest.fn();
-      const givenAddMessage = jest.fn();
       // AND the component is rendered
       const givenChatHeader = (
         <ChatHeader
@@ -457,10 +451,7 @@ describe("ChatHeader", () => {
           timeUntilNotification={null}
         />
       );
-      // renderWithChatProvider(givenChatHeader);
-      render(
-        <ChatProvider handleOpenExperiencesDrawer={givenNotifyOnExperiencesDrawerOpen} removeMessage={givenRemoveMessage} addMessage={givenAddMessage}>{givenChatHeader}</ChatProvider>
-      );
+      renderWithChatProvider(givenChatHeader);
 
       // WHEN the experiences button is clicked
       const experiencesButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES);
@@ -772,7 +763,6 @@ describe("ChatHeader", () => {
 
       // AND a ChatHeader component
       const givenChatHeader = (
-        <ChatProvider handleOpenExperiencesDrawer={jest.fn()} removeMessage={jest.fn()} addMessage={jest.fn()}>
           <ChatHeader
             notifyOnLogout={jest.fn()}
             startNewConversation={jest.fn()}
@@ -783,7 +773,6 @@ describe("ChatHeader", () => {
             progressPercentage={0}
             timeUntilNotification={null}
           />
-        </ChatProvider>
       );
 
       // WHEN the chat header is rendered
@@ -809,18 +798,16 @@ describe("ChatHeader", () => {
       jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValueOnce(mockAnonymousUser);
       // AND a ChatHeader component
       const givenChatHeader = (
-        <ChatProvider handleOpenExperiencesDrawer={jest.fn()} removeMessage={jest.fn()} addMessage={jest.fn()}>
-          <ChatHeader
-            notifyOnLogout={jest.fn()}
-            startNewConversation={jest.fn()}
-            experiencesExplored={0}
-            exploredExperiencesNotification={false}
-            setExploredExperiencesNotification={jest.fn()}
+        <ChatHeader
+          notifyOnLogout={jest.fn()}
+          startNewConversation={jest.fn()}
+          experiencesExplored={0}
+          exploredExperiencesNotification={false}
+          setExploredExperiencesNotification={jest.fn()}
             conversationCompleted={false}
             progressPercentage={0}
-            timeUntilNotification={null}
-          />
-        </ChatProvider>
+          timeUntilNotification={null}
+        />
       );
 
       // WHEN the chat header is rendered

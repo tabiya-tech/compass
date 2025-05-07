@@ -1,5 +1,11 @@
 import React, { useEffect, useRef } from "react";
-import { ChatMessageType, IChatMessage } from "src/chat/Chat.types";
+import { 
+  ChatMessageType, 
+  IChatMessage, 
+  ISkillsRankingPromptMessage,
+  ISkillsRankingVoteMessage,
+  ISkillsRankingResultMessage
+} from "src/chat/Chat.types";
 import { Box, List, ListItem, useTheme } from "@mui/material";
 import { styled } from "@mui/system";
 import { AnimatePresence, motion } from "framer-motion";
@@ -10,6 +16,9 @@ import UserChatMessage from "src/chat/chatMessage/userChatMessage/UserChatMessag
 import CompassChatMessage from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
 import SkillsRankingChatMessage from "src/chat/chatMessage/skillsRanking/SkillsRankingChatMessage";
+import SkillsRankingPrompt from "src/chat/chatMessage/skillsRanking/components/skillsRankingPrompt/SkillsRankingPrompt";
+import SkillsRankingVote from "src/chat/chatMessage/skillsRanking/components/skillsRankingVote/SkillsRankingVote";
+import SkillsRankingResult from "src/chat/chatMessage/skillsRanking/components/skillsRankingResult/SkillsRankingResult";
 
 const uniqueId = "0397ee51-f637-4453-9e2f-5cc8900c9554";
 export const DATA_TEST_ID = {
@@ -84,6 +93,33 @@ const ChatList: React.FC<ChatListProps> = ({ messages }) => {
         return <ChatBubble message={chatMessage.message} sender={chatMessage.sender} />;
       case ChatMessageType.SKILLS_RANKING:
         return <SkillsRankingChatMessage chatMessage={chatMessage} />;
+      case ChatMessageType.SKILLS_RANKING_PROMPT: {
+        const promptMessage = chatMessage as ISkillsRankingPromptMessage;
+        return <SkillsRankingPrompt 
+          chatMessage={promptMessage}
+          group={promptMessage.experimentGroup}
+          onShowInfo={promptMessage.onShowInfo}
+          onContinue={promptMessage.onContinue}
+        />;
+      }
+      case ChatMessageType.SKILLS_RANKING_VOTE: {
+        const voteMessage = chatMessage as ISkillsRankingVoteMessage;
+        return <SkillsRankingVote 
+          chatMessage={voteMessage}
+          group={voteMessage.experimentGroup}
+          onRankSelect={voteMessage.onRankSelect}
+          error={voteMessage.error}
+        />;
+      }
+      case ChatMessageType.SKILLS_RANKING_RESULT: {
+        const resultMessage = chatMessage as ISkillsRankingResultMessage;
+        return <SkillsRankingResult 
+          chatMessage={resultMessage}
+          group={resultMessage.experimentGroup}
+          rank={resultMessage.rank}
+          error={resultMessage.error}
+        />;
+      }
       default:
         return null;
     }

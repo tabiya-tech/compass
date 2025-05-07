@@ -18,8 +18,11 @@ const meta: Meta<typeof SkillsRankingResult> = {
       sender: ConversationMessageSender.COMPASS,
       sent_at: new Date().toISOString(),
       message: "",
-      type: ChatMessageType.SKILLS_RANKING,
+      type: ChatMessageType.SKILLS_RANKING_RESULT,
       reaction: null,
+      experimentGroup: ExperimentGroup.GROUP_A,
+      rank: "80%",
+      error: null,
     },
   },
   decorators: [

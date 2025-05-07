@@ -88,7 +88,7 @@ export const generatePleaseRepeatMessage = () => {
 export const generateSkillsRankingMessage = (
 ): IChatMessage => {
   return {
-    message_id: nanoid(),
+    message_id: "skills-ranking-message", // The id needs to be fixed, so that the message can be removed later
     message: "", // no message is needed, since the skills ranking will show the appropriate component based on the state
     sender: ConversationMessageSender.COMPASS,
     sent_at: new Date().toISOString(),

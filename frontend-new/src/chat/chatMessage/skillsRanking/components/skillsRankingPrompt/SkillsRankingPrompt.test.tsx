@@ -10,7 +10,7 @@ import SkillsRankingPrompt, {
 } from "src/chat/chatMessage/skillsRanking/components/skillsRankingPrompt/SkillsRankingPrompt";
 import { nanoid } from "nanoid";
 import { ButtonPositionGroup, ExperimentGroup } from "src/chat/chatMessage/skillsRanking/types";
-import { ChatMessageType, IChatMessage } from "src/chat/Chat.types";
+import { ChatMessageType, IChatMessage, ISkillsRankingPromptMessage } from "src/chat/Chat.types";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { DATA_TEST_ID as CHAT_BUBBLE_DATA_TEST_ID } from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
@@ -32,13 +32,16 @@ describe("SkillsRankingPrompt tests", () => {
   describe("render tests", () => {
     test("should render component successfully", () => {
       // GIVEN a chat message
-      const givenChatMessage: IChatMessage = {
+      const givenChatMessage: ISkillsRankingPromptMessage = {
         message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
         message: "",
         sent_at: new Date().toISOString(),
-        type: ChatMessageType.SKILLS_RANKING,
+        type: ChatMessageType.SKILLS_RANKING_PROMPT,
         reaction: null,
+        experimentGroup: ExperimentGroup.GROUP_A,
+        onShowInfo: jest.fn(),
+        onContinue: jest.fn(),
       };
 
       // WHEN the component is rendered
@@ -74,13 +77,16 @@ describe("SkillsRankingPrompt tests", () => {
       [ExperimentGroup.GROUP_B, PROMPT_TEXTS[ExperimentGroup.GROUP_B]],
     ])("should render correct prompt text for %s", (group, expectedText) => {
       // GIVEN a chat message
-      const givenChatMessage: IChatMessage = {
+      const givenChatMessage: ISkillsRankingPromptMessage = {
         message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
         message: "",
         sent_at: new Date().toISOString(),
-        type: ChatMessageType.SKILLS_RANKING,
+        type: ChatMessageType.SKILLS_RANKING_PROMPT,
         reaction: null,
+        experimentGroup: group,
+        onShowInfo: jest.fn(),
+        onContinue: jest.fn(),
       };
 
       // WHEN the component is rendered
@@ -132,13 +138,16 @@ describe("SkillsRankingPrompt tests", () => {
       // AND the component is rendered
       const onShowInfo = jest.fn();
       const onContinue = jest.fn();
-      const givenChatMessage: IChatMessage = {
+      const givenChatMessage: ISkillsRankingPromptMessage = {
         message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
         message: "",
         sent_at: new Date().toISOString(),
-        type: ChatMessageType.SKILLS_RANKING,
+        type: ChatMessageType.SKILLS_RANKING_PROMPT,
         reaction: null,
+        experimentGroup: ExperimentGroup.GROUP_A,
+        onShowInfo: jest.fn(),
+        onContinue: jest.fn(),
       };
       const givenComponent = (
         <SkillsRankingPrompt
@@ -199,13 +208,16 @@ describe("SkillsRankingPrompt tests", () => {
       // AND the component is rendered
       const onShowInfo = jest.fn();
       const onContinue = jest.fn();
-      const givenChatMessage: IChatMessage = {
+      const givenChatMessage: ISkillsRankingPromptMessage = {
         message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
         message: "",
         sent_at: new Date().toISOString(),
-        type: ChatMessageType.SKILLS_RANKING,
+        type: ChatMessageType.SKILLS_RANKING_PROMPT,
         reaction: null,
+        experimentGroup: ExperimentGroup.GROUP_A,
+        onShowInfo: jest.fn(),
+        onContinue: jest.fn(),
       };
       const givenComponent = (
         <SkillsRankingPrompt
@@ -245,13 +257,16 @@ describe("SkillsRankingPrompt tests", () => {
       // spy on the metrics service
       jest.spyOn(MetricsService.getInstance(), "sendMetricsEvent");
       // AND the component is rendered
-      const givenChatMessage: IChatMessage = {
+      const givenChatMessage: ISkillsRankingPromptMessage = {
         message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
         message: "",
         sent_at: new Date().toISOString(),
-        type: ChatMessageType.SKILLS_RANKING,
+        type: ChatMessageType.SKILLS_RANKING_PROMPT,
         reaction: null,
+        experimentGroup: ExperimentGroup.GROUP_A,
+        onShowInfo: jest.fn(),
+        onContinue: jest.fn(),
       };
       const givenComponent = (
         <SkillsRankingPrompt

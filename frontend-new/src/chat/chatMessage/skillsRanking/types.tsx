@@ -21,6 +21,8 @@ export interface SkillsRankingStateResponse {
   session_id: number;
   experiment_group: ExperimentGroup;
   current_state: SkillsRankingState;
-  ranking: RankValue;
+  ranking: string;
   self_ranking: RankValue | null;
 }
+
+export const DEFAULT_SKILLS_RANKING_STATE = SkillsRankingState.INITIAL;

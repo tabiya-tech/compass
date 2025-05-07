@@ -153,7 +153,7 @@ describe("ChatList", () => {
 
     // WHEN the chat list is rendered
     render(
-      <ChatProvider handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer} removeMessage={mockRemoveMessage} addMessage={mockAddMessage}>
+      <ChatProvider handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer} removeMessage={mockRemoveMessage} addMessage={mockAddMessage} messages={givenMessages}>
         <ChatList messages={givenMessages} />
       </ChatProvider>
     );

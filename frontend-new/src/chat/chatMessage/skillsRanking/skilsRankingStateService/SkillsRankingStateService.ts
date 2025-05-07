@@ -1,11 +1,11 @@
-import { SkillsRankingState } from "../types";
+import { DEFAULT_SKILLS_RANKING_STATE, SkillsRankingState } from "../types";
 
 export default class SkillsRankingStateService {
     private static instance: SkillsRankingStateService;
-    private state: SkillsRankingState | null;
+    private state: SkillsRankingState;
 
     private constructor() {
-        this.state = null;
+        this.state = DEFAULT_SKILLS_RANKING_STATE;
     }
 
     public static getInstance(): SkillsRankingStateService {
@@ -15,7 +15,7 @@ export default class SkillsRankingStateService {
         return SkillsRankingStateService.instance;
     }
 
-    public getSkillsRankingState(): SkillsRankingState | null {
+    public getSkillsRankingState(): SkillsRankingState {
         return this.state;
     }
 

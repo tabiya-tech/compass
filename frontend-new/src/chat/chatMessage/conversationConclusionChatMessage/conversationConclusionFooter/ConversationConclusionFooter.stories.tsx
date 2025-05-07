@@ -98,7 +98,7 @@ const StorybookWrapper = ({
     return <>{children}</>;
   }
 
-  return <ChatProvider handleOpenExperiencesDrawer={() => {}} removeMessage={() => {}} addMessage={() => {}}><StoryContent/></ChatProvider>;
+  return <ChatProvider handleOpenExperiencesDrawer={() => {}} removeMessage={() => {}} addMessage={() => {}} messages={[]}><StoryContent/></ChatProvider>;
 };
 
 const meta : Meta<typeof ConversationConclusionFooter> = {

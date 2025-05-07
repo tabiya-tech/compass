@@ -21,8 +21,11 @@ const meta: Meta<typeof SkillsRankingPrompt> = {
       sender: ConversationMessageSender.COMPASS,
       sent_at: new Date().toISOString(),
       message: "",
-      type: ChatMessageType.SKILLS_RANKING,
+      type: ChatMessageType.SKILLS_RANKING_PROMPT,
       reaction: null,
+      experimentGroup: ExperimentGroup.GROUP_A,
+      onShowInfo: () => {},
+      onContinue: () => {},
     },
   },
 };
