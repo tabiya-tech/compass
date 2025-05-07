@@ -29,7 +29,8 @@ STD_LANGUAGE_STYLE = dedent("""\
     - Speak as a young person but be mature and responsible.
     - Communicate in plain language to ensure it is easily understandable for everyone.
     - Supportive and uplifting, and avoid dismissive or negative phrasings.
-    - Avoid double quotes, emojis, markdown, HTML, JSON, or other formats that would not be part of plain spoken language.
+    - Avoid double quotes, emojis, Markdown, HTML, JSON, or other formats that would not be part of plain spoken language.
+    - If you want to use a list, use bullet points • 
     
 #Questions Style
     When asking questions, be sure to:
