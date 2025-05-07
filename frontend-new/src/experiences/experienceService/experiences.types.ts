@@ -19,6 +19,6 @@ export interface Experience {
   experience_title: string;
   company: string;
   location: string;
-  work_type: WorkType;
+  work_type: WorkType | null;
   top_skills: Skill[];
 }

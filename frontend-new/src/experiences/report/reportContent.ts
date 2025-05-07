@@ -6,6 +6,7 @@ export const ReportContent = {
   SALARY_WORK_TITLE: "Salary Work",
   UNPAID_WORK_TITLE: "Unpaid Work",
   TRAINEE_WORK_TITLE: "Trainee Work",
+  UNCATEGORIZED_TITLE: "Uncategorized",
   TOP_SKILLS_TITLE: "Top Skills: ",
   SKILLS_DESCRIPTION_TEXT:
     "Below, you will find a list of the skills discovered during your conversation with Compass, along with their descriptions.",
@@ -32,5 +33,6 @@ export const ReportContent = {
     COMMUNITY_WORK_ICON: `${process.env.PUBLIC_URL}/community-work.png`,
     TRAINEE_WORK_ICON: `${process.env.PUBLIC_URL}/trainee-work.png`,
     WARNING_ICON: `${process.env.PUBLIC_URL}/warning.png`,
+    QUIZ_ICON: `${process.env.PUBLIC_URL}/quiz.png`,
   },
 };
