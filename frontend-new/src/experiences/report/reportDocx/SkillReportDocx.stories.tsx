@@ -55,6 +55,24 @@ export const ShownWithManyExperiences = () => {
   );
 };
 
+export const ShownWithUncategorizedExperiences = () => {
+  return (
+    <PrimaryButton
+      onClick={() =>
+        reportDownloadProvider.download({
+          ...mockedData,
+          experiences: generateRandomExperiences(2).map((experience) => ({
+            ...experience,
+            work_type: null,
+          })),
+        })
+      }
+    >
+      Download Report Docx
+    </PrimaryButton>
+  );
+};
+
 export const ShowWithNoPersonalInfo = () => {
   return (
     <PrimaryButton

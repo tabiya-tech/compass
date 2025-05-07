@@ -77,3 +77,15 @@ export const ShownWhenConversationCompleted = {
     conversationCompleted: true,
   },
 };
+
+const ShownWithUncategorized_experiences = generateRandomExperiences(1);
+ShownWithUncategorized_experiences.forEach((experience) => {
+  experience.work_type = null;
+});
+export const ShownWithUncategorizedExperiences = {
+  args: {
+    isOpen: true,
+    experiences: ShownWithUncategorized_experiences,
+    conversationCompleted: true,
+  },
+};
