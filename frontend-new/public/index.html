@@ -16,6 +16,7 @@
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <link rel="stylesheet" href="%PUBLIC_URL%/styles/sentry.css" />
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
@@ -121,22 +122,6 @@
         }
         .compass-logo {
             height: 60px;
-        }
-        #sentry-feedback {
-            --font-family: Inter, sans-serif;
-            --accent-background: #00FF91;
-            --accent-foreground: #000000;
-            --input-placeholder-color: rgba(0, 33, 71, 0.5);
-            --button-primary-border: none;
-            --button-border-radius: 32px;
-            --button-primary-border-radius: 32px;
-            --form-width: 300px;
-        }
-
-        @media (max-width: 600px) {
-            #sentry-feedback {
-                --form-width: 100%;
-            }
         }
     </style>
   </head>
