@@ -28,7 +28,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
     class="MuiBox-root css-1n05jrb"
   >
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-e66naw-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1672xf7-MuiButtonBase-root-MuiIconButton-root"
       data-testid="chat-header-button-experiences-7413b63a-887b-4f41-b930-89e9770db12b"
       tabindex="0"
       title="view experiences"
@@ -69,7 +69,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
       />
     </button>
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-e66naw-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1672xf7-MuiButtonBase-root-MuiIconButton-root"
       data-testid="chat-header-button-user-7413b63a-887b-4f41-b930-89e9770db12b"
       tabindex="0"
       title="user info"
@@ -145,7 +145,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
     class="MuiBox-root css-1n05jrb"
   >
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-e66naw-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1672xf7-MuiButtonBase-root-MuiIconButton-root"
       data-testid="chat-header-button-experiences-7413b63a-887b-4f41-b930-89e9770db12b"
       tabindex="0"
       title="view experiences"
@@ -192,7 +192,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
       />
     </button>
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-e66naw-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1672xf7-MuiButtonBase-root-MuiIconButton-root"
       data-testid="chat-header-button-user-7413b63a-887b-4f41-b930-89e9770db12b"
       tabindex="0"
       title="user info"
@@ -268,7 +268,7 @@ exports[`ChatHeader should show feedback button when sentry is initialized 1`] =
     class="MuiBox-root css-1n05jrb"
   >
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-e66naw-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1672xf7-MuiButtonBase-root-MuiIconButton-root"
       data-testid="chat-header-button-experiences-7413b63a-887b-4f41-b930-89e9770db12b"
       tabindex="0"
       title="view experiences"
@@ -315,7 +315,7 @@ exports[`ChatHeader should show feedback button when sentry is initialized 1`] =
       />
     </button>
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-e66naw-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1672xf7-MuiButtonBase-root-MuiIconButton-root"
       data-testid="chat-header-button-feedback-7413b63a-887b-4f41-b930-89e9770db12b"
       tabindex="0"
       title="give feedback"
@@ -337,7 +337,7 @@ exports[`ChatHeader should show feedback button when sentry is initialized 1`] =
       />
     </button>
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-e66naw-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1672xf7-MuiButtonBase-root-MuiIconButton-root"
       data-testid="chat-header-button-user-7413b63a-887b-4f41-b930-89e9770db12b"
       tabindex="0"
       title="user info"

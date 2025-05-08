@@ -887,7 +887,7 @@ describe("ChatHeader", () => {
       expect(console.error).toHaveBeenCalledWith(new SessionError("User is not available"));
     });
 
-    test("should show feedback notification after 30 minutes when conversation progress is <= 66%", () => {
+    test("should show feedback notification after 30 minutes when conversation progress is <= 66%", async () => {
       // GIVEN mock user
       const mockUser = { id: "123", name: "Foo Bar", email: "foo@bar.baz" };
       jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue(mockUser);
@@ -912,15 +912,19 @@ describe("ChatHeader", () => {
       // AND the time is advanced by the given time until notification
       jest.advanceTimersByTime(givenTimeUntilNotification);
 
-      // THEN expect the feedback notification to be shown
+      // THEN expect the feedback notification to be shown once
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledTimes(1);
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        expect.anything(),
+        expect.any(Object), // since the message is a react element
         expect.objectContaining({
           variant: "info",
           persist: true,
           autoHideDuration: null,
+          preventDuplicate: true,
         })
       );
+      // AND expect the feedback notification to be marked as seen
+      jest.spyOn(PersistentStorageService, "hasSeenFeedbackNotification").mockReturnValue(true);
       // AND no errors or warnings to be shown
       expect(console.warn).not.toHaveBeenCalled();
       expect(console.error).not.toHaveBeenCalled();

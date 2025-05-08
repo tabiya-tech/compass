@@ -84,6 +84,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   const [showConversionDialog, setShowConversionDialog] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const feedbackTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  const notificationShownRef = React.useRef<boolean>(false);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const isOnline = useContext(IsOnlineContext);
@@ -147,13 +148,14 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
     if (
       conversationCompleted ||
       PersistentStorageService.hasSeenFeedbackNotification(user.id) ||
-      timeUntilNotification === null
+      timeUntilNotification === null ||
+      notificationShownRef.current
     ) {
       return;
     }
 
     feedbackTimerRef.current = setTimeout(() => {
-      if(conversationCompleted) {
+      if (conversationCompleted) {
         // Don't show a notification if the conversation is completed
         return;
       }
@@ -161,7 +163,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
       // Check if phase progress is 66% or less
       const shouldPrompt: boolean = (progressPercentage ?? 0) <= 66;
 
-      if (shouldPrompt) {
+      if (shouldPrompt && !notificationShownRef.current) {
         const snackbarKey = enqueueSnackbar(
           <Typography variant="body1">
             We'd love to hear your feedback on your experience so far!{" "}
@@ -179,8 +181,11 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
             variant: "info",
             persist: true,
             autoHideDuration: null,
+            preventDuplicate: true
           }
         );
+        // Mark the notification as shown
+        notificationShownRef.current = true;
       }
     }, timeUntilNotification);
 
