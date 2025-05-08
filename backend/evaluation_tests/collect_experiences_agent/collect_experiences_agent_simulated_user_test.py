@@ -8,7 +8,7 @@ from app.conversation_memory.conversation_memory_manager import ConversationMemo
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
 from common_libs.test_utilities import get_random_session_id
-from common_libs.test_utilities.guard_caplog import guard_caplog
+from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from evaluation_tests.collect_experiences_agent.collect_experiences_executor import CollectExperiencesAgentExecutor, \
     CollectExperienceAgentGetConversationContextExecutor, CollectExperienceAgentIsFinished
 from evaluation_tests.collect_experiences_agent.collect_experiences_test_cases import test_cases, \
@@ -69,16 +69,45 @@ async def test_collect_experiences_agent_simulated_user(test_case: CollectExperi
         context = await conversation_manager.get_conversation_context()
         assert context.history.turns[-1].output.finished
 
+        failures = []
+
         # Check if the actual discovered experiences match the expected ones
-        assert len(execute_evaluated_agent.get_experiences()) >= test_case.expected_experiences_found_min
-        assert len(execute_evaluated_agent.get_experiences()) <= test_case.expected_experiences_found_max
+        failures.append(
+            f"Expected at least {test_case.expected_experiences_count_min} experiences, but got {len(execute_evaluated_agent.get_experiences())}"
+        ) if len(execute_evaluated_agent.get_experiences()) < test_case.expected_experiences_count_min else None
+        failures.append(
+            f"Expected at most {test_case.expected_experiences_count_max} experiences, but got {len(execute_evaluated_agent.get_experiences())}"
+        ) if len(execute_evaluated_agent.get_experiences()) > test_case.expected_experiences_count_max else None
+
+        # assert that the experiences are in the expected work types test_case.expected_minimum_work_types
+        # build a dictionary with the work types and their counts
+        actual_work_types_count = {}
+        for experience in execute_evaluated_agent.get_experiences():
+            work_type = experience.work_type
+            if work_type in actual_work_types_count:
+                actual_work_types_count[work_type] += 1
+            else:
+                actual_work_types_count[work_type] = 1
+
+        # check that the actual work types are in the expected work types
+        for expected_work_type, expected_min_max_count in test_case.expected_work_types.items():
+            expected_minimum_count = expected_min_max_count[0]
+            expected_maximum_count = expected_min_max_count[1]
+            actual_work_type_count = actual_work_types_count.get(expected_work_type, 0)
+            failures.append(
+                f"Expected at least {expected_minimum_count} experiences of type {expected_work_type}, but got {actual_work_type_count}"
+            ) if actual_work_type_count < expected_minimum_count else None
+            failures.append(
+                f"Expected at most {expected_maximum_count} experiences of type {expected_work_type}, but got {actual_work_type_count}"
+            ) if actual_work_type_count > expected_maximum_count else None
+        if len(failures) > 0:
+            pytest.fail(
+                '\n'.join(failures)
+            )
 
         # We run the evaluation assertions at the end
         # as it fails often due to the unpredictability of the LLM responses
         assert_expected_evaluation_results(evaluation_result=evaluation_result, test_case=test_case)
 
-        # Finally check that no errors and no warning were logged
-        for record in caplog.records:
-            assert record.levelname != 'ERROR'
-            # don't assert warnings as they are expected during data collection
-            # assert record.levelname != 'WARNING'
+        # Finally, check that no errors and no warning were logged
+        assert_log_error_warnings(caplog=caplog, expect_errors_in_logs=False, expect_warnings_in_logs=True)
