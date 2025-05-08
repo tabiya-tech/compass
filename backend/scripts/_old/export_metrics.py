@@ -190,7 +190,7 @@ class ConversationTurnEventExporter(EventExporter):
                 user_id=user_id,
                 session_id=session_id,
                 user_message_count=user_message_count,
-                compass_message_count=compass_message_count
+                compass_message_count=compass_message_count,
             ))
         user_artificial_messages = 0
 
@@ -298,6 +298,11 @@ class ExperienceDiscoveredEventExporter(EventExporter):
             if data.work_type:
                 # count the number of experiences discovered by work type
                 work_types_discovered[data.work_type] = work_types_discovered.get(data.work_type, 0) + 1
+            else:
+                # if the work type is None, that means the model was not able to categorize the experience
+                # count the experience as discovered under the "None" work type
+                work_types_discovered["None"] = work_types_discovered.get("None", 0) + 1
+
             if not CollectedData.all_fields_empty(data):
                 experience_count += 1
 
@@ -337,7 +342,7 @@ class DiscoveredWorkTypesEventExporter(ExperienceDiscoveredEventExporter):
             cursor = self.metrics_repository.collection.find(
                 {
                     "event_type": EventType.EXPERIENCE_DISCOVERED.value,
-                    "work_types_discovered": {"$exists": True}
+                    "experiences_by_work_type": {"$exists": True}
                 },
                 {
                     "anonymized_user_id": 1,
