@@ -3,22 +3,5 @@
 @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,500;0,600;0,700;1,300&display=swap");
 /*This css is used in the MuiIconsElements story to display the icons.*/
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
-
-/*This css is for styling the sentry feedback ui. It is a copy of the style in the /public/index.html
-If you change the style in the index.html, you need to change it here too. */
-#sentry-feedback {
-    --font-family: Inter, sans-serif;
-    --accent-background: #00FF91;
-    --accent-foreground: #000000;
-    --input-placeholder-color: rgba(0, 33, 71, 0.5);
-    --button-primary-border: none;
-    --button-border-radius: 32px;
-    --button-primary-border-radius: 32px;
-    --form-width: 300px;
-}
-
-@media (max-width: 600px) {
-    #sentry-feedback {
-        --form-width: 100%;
-    }
-}
+/*Sentry feedback widget styles*/
+@import "../public/styles/sentry.css";
