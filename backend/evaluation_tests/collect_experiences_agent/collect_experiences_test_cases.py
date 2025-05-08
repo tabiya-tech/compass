@@ -1,6 +1,7 @@
 from textwrap import dedent
 from typing import Any
 
+from app.agent.experience import WorkType
 from app.countries import Country
 from evaluation_tests.conversation_libs.conversation_test_function import EvaluationTestCase, Evaluation
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import EvaluationType
@@ -32,14 +33,27 @@ france_prompt = system_instruction_prompt + dedent("""
 
 
 class CollectExperiencesAgentTestCase(EvaluationTestCase):
-    expected_experiences_found_min: int
-    expected_experiences_found_max: int
+    expected_experiences_count_min: int
+    """
+    The minimum number of experiences that should be found.
+    """
+
+    expected_experiences_count_max: int
+    """
+    The maximum number of experiences that should be found.
+    """
+
+    expected_work_types: dict[WorkType, tuple[int, int]] = {}
+    """
+    The minimum and maximum number of experiences that should be found for each work type.
+    """
+
     country_of_user: Country = Country.UNSPECIFIED
 
     def __init__(self, *, name: str, simulated_user_prompt: str, evaluations: list[Evaluation],
-                 expected_experiences_found_min: int, expected_experiences_found_max: int, **data: Any):
+                 expected_experiences_count_min: int, expected_experiences_count_max: int, **data: Any):
         super().__init__(name=name, simulated_user_prompt=simulated_user_prompt, evaluations=evaluations,
-                         expected_experiences_found_min=expected_experiences_found_min, expected_experiences_found_max=expected_experiences_found_max,
+                         expected_experiences_count_min=expected_experiences_count_min, expected_experiences_count_max=expected_experiences_count_max,
                          **data)
 
 
@@ -67,8 +81,9 @@ test_cases = [
             Do not add additional information or invent information.
             """) + kenya_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
-        expected_experiences_found_min=1,
-        expected_experiences_found_max=1,
+        expected_experiences_count_min=1,
+        expected_experiences_count_max=1,
+        expected_work_types={WorkType.UNSEEN_UNPAID: (1, 1)},
         country_of_user=Country.KENYA
     ),
     CollectExperiencesAgentTestCase(
@@ -82,8 +97,9 @@ test_cases = [
             When asked about your experiences, answer with all the information at the same time. Do not add additional information or invent information.
             """) + sa_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
-        expected_experiences_found_min=1,
-        expected_experiences_found_max=1
+        expected_experiences_count_min=1,
+        expected_experiences_count_max=1,
+        expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (1, 1)},
     ),
     CollectExperiencesAgentTestCase(
         name='no_experiences_at_all',
@@ -95,9 +111,13 @@ test_cases = [
             Do not add additional information or invent information.
             """) + sa_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
-        expected_experiences_found_min=0,
-        expected_experiences_found_max=0,
-        country_of_user=Country.UNSPECIFIED
+        expected_experiences_count_min=0,
+        expected_experiences_count_max=0,
+        country_of_user=Country.UNSPECIFIED,
+        expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (0, 0),
+                             WorkType.SELF_EMPLOYMENT: (0, 0),
+                             WorkType.UNSEEN_UNPAID: (0, 0),
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0)},
     ),
     CollectExperiencesAgentTestCase(
         name='experiences_of_all_kinds',
@@ -113,13 +133,17 @@ test_cases = [
             7. Helped your elderly neighbor with groceries and cleaning every week since 2019.
             You have no other experiences than the above 7.
             You reply in the most concise way possible.
-            When asked about your experiences, answer with all the information for each experience at the same time. 
+            When asked about your experiences, answer with one experience at a time, but give all the information of the experience at once.
             Do not add additional information or invent information.
             Make sure you mention all the experiences during the conversation.
             """) + sa_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
-        expected_experiences_found_min=7,
-        expected_experiences_found_max=7,
+        expected_experiences_count_min=7,
+        expected_experiences_count_max=7,
+        expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (2, 2),
+                             WorkType.SELF_EMPLOYMENT: (2, 2),
+                             WorkType.UNSEEN_UNPAID: (1, 1),
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (2, 2)},
         country_of_user=Country.UNSPECIFIED
     ),
     CollectExperiencesAgentTestCase(
@@ -140,8 +164,12 @@ test_cases = [
             Do not add additional information or invent information.
             """) + sa_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
-        expected_experiences_found_min=7,
-        expected_experiences_found_max=7,
+        expected_experiences_count_min=7,
+        expected_experiences_count_max=7,
+        expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (2, 2),
+                             WorkType.SELF_EMPLOYMENT: (2, 2),
+                             WorkType.UNSEEN_UNPAID: (1, 1),
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (2, 2)},
         country_of_user=Country.UNSPECIFIED
     ),
     CollectExperiencesAgentTestCase(
@@ -154,8 +182,31 @@ test_cases = [
             You are resistant to getting help from the agent and withhold information when doing so.
             """) + sa_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
-        expected_experiences_found_min=3,
-        expected_experiences_found_max=3,
+        expected_experiences_count_min=3,
+        expected_experiences_count_max=3,
+        expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (0, 0),
+                             WorkType.SELF_EMPLOYMENT: (1, 1),
+                             WorkType.UNSEEN_UNPAID: (2, 2),
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0)},
+        country_of_user=Country.SOUTH_AFRICA
+    ),
+    CollectExperiencesAgentTestCase(
+        name='mentions_type_first_student_e2e',
+        simulated_user_prompt=dedent("""
+            You are a Gen Z student living with your mom and three brothers in Johannesburg. You have the following experiences:
+            1. Freelance graphic design teacher online, since June 2020.
+            2. Volunteer English teacher during high-school in a Community Center of Johannesburg, between January 2017 and August 2020.
+            3. Assist elderly people in nursing home without pay, every summer since 2020.
+            When asked about your experiences, you will mention the type of experience first (e.g. "Yes, I freelanced", "I volunteered", or simply "Yes") and then the rest of the information.
+            You are resistant to getting help from the agent and withhold information when doing so.
+            """) + sa_prompt,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
+        expected_experiences_count_min=3,
+        expected_experiences_count_max=3,
+        expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (0, 0),
+                             WorkType.SELF_EMPLOYMENT: (1, 1),
+                             WorkType.UNSEEN_UNPAID: (2, 2),
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0)},
         country_of_user=Country.SOUTH_AFRICA
     ),
     CollectExperiencesAgentTestCase(
@@ -167,8 +218,12 @@ test_cases = [
             """) + kenya_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
         # The simulated user seems to report 3 experiences (help parent, drove grandma, helped neighbors)
-        expected_experiences_found_min=2,
-        expected_experiences_found_max=3,
+        expected_experiences_count_min=2,
+        expected_experiences_count_max=3,
+        expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (0, 0),
+                             WorkType.SELF_EMPLOYMENT: (0, 0),
+                             WorkType.UNSEEN_UNPAID: (2, 3),
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0)},
         country_of_user=Country.KENYA
     ),
     CollectExperiencesAgentTestCase(
@@ -176,12 +231,18 @@ test_cases = [
         simulated_user_prompt=dedent("""
             You are a young person from Paris, France looking for a job. You would like to work in retail and your previous experiences are as follows:
             1. Delivery job for Uber Eats in Paris, from Janary 2021 to March 2023. This was a paid job with a contract.
-            2. Selling old furniture at the Flea Market of rue Jean Henri Fabre, every Wednesday and Friday. You started in 2019 with your older brother and are still doing it today. This is informal labor, as you only get 100 euros at the end of the day, without any formal contract.
+            2. Selling old furniture at the Flea Market of rue Jean Henri Fabre, every Wednesday and Friday.
+               You started in 2019 with your older brother and are still doing it today.
+               This is informal labor, as you only get 100 euros at the end of the day, without any formal contract.
             You write with typos.
             """) + france_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
-        expected_experiences_found_min=2,
-        expected_experiences_found_max=3,
+        expected_experiences_count_min=2,
+        expected_experiences_count_max=3,
+        expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (1, 1),
+                             WorkType.SELF_EMPLOYMENT: (1, 1),
+                             WorkType.UNSEEN_UNPAID: (0, 0),
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0)},
         country_of_user=Country.FRANCE
     ),
     CollectExperiencesAgentTestCase(
@@ -193,8 +254,12 @@ test_cases = [
             When asked about your experiences, answer with all the information at the same time. Do not add additional information or invent information.
             """) + france_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
-        expected_experiences_found_min=2,
-        expected_experiences_found_max=3,
+        expected_experiences_count_min=2,
+        expected_experiences_count_max=3,
+        expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (1, 1),
+                             WorkType.SELF_EMPLOYMENT: (1, 1),
+                             WorkType.UNSEEN_UNPAID: (0, 0),
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0)},
         country_of_user=Country.FRANCE
     ),
     CollectExperiencesAgentTestCase(
@@ -205,8 +270,12 @@ test_cases = [
             Do not add additional information or invent information. You have never done volunteering or helped your community.
             """) + kenya_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
-        expected_experiences_found_min=1,
-        expected_experiences_found_max=1,
+        expected_experiences_count_min=1,
+        expected_experiences_count_max=1,
+        expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (1, 1),
+                             WorkType.SELF_EMPLOYMENT: (0, 0),
+                             WorkType.UNSEEN_UNPAID: (0, 0),
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0)},
         country_of_user=Country.KENYA
     ),
     CollectExperiencesAgentTestCase(
@@ -217,13 +286,20 @@ test_cases = [
             Do not add additional information or invent information. You have never done volunteering or helped your community.
             When first asked about your experience, you mistake the dates and say that you have been working there since 2009. Only when asked about more information,
             you correct your mistake.
+            Also when you initially talk about your experience, you lie and say that is was a volunteering experience. 
+            When given an opportunity to correct yourself, you say that it was a paid contract job.
             """) + france_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
-        expected_experiences_found_min=1,
-        expected_experiences_found_max=1,
+        expected_experiences_count_min=1,
+        expected_experiences_count_max=1,
+        expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (1, 1),
+                             WorkType.SELF_EMPLOYMENT: (0, 0),
+                             WorkType.UNSEEN_UNPAID: (0, 0),
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0)},
         country_of_user=Country.KENYA
     ),
     CollectExperiencesAgentTestCase(
+        skip_force="force",
         name='hobbyist_e2e',
         simulated_user_prompt=dedent("""
             You have a single hobby, blogging about your travels. You have been doing this since 2018 and have a small following.
@@ -233,8 +309,12 @@ test_cases = [
             Let your conversation partner initially believe that you are a professional blogger and then explain it is a hobby and not a job.
             """),
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
-        expected_experiences_found_min=1,
-        expected_experiences_found_max=1,
+        expected_experiences_count_min=1,
+        expected_experiences_count_max=1,
+        expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (0, 0),
+                             WorkType.SELF_EMPLOYMENT: (0, 0),
+                             WorkType.UNSEEN_UNPAID: (1, 1),
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0)},
         country_of_user=Country.UNSPECIFIED
     ),
 ]
