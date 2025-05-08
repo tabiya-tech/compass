@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from app.agent.agent_types import AgentInput, LLMStats
 from app.agent.collect_experiences_agent._types import CollectedData
-from app.agent.experience.work_type import WORK_TYPE_DEFINITIONS_FOR_PROMPT
+from app.agent.experience.work_type import WORK_TYPE_DEFINITIONS_FOR_PROMPT, WorkType
 from app.agent.llm_caller import LLMCaller
 from app.agent.prompt_template import sanitize_input
 from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE, STD_AGENT_CHARACTER
@@ -79,12 +79,12 @@ class _DataExtractionLLM:
         Extracts the experience data from the user input and conversation history and
         updates the collected experience data.
 
-        :param user_input:  The last user input
+        :param user_input:  The user's last input
         :param context: The conversation context with the conversation history
         :param collected_experience_data_so_far: The collected experience data so far
         :return: The extracted experience data and the LLM stats
         """
-        # collected_experience_data_so_far.sort(key=lambda x: x.index)  # sort the collected experience data by index
+        # collected_experience_data_so_far.sort(key=lambda x: x.index) # sort the collected experience data by index
         # remove the property defined_at_turn_number
         _data = []
         for _d in collected_experience_data_so_far:
@@ -119,6 +119,7 @@ class _DataExtractionLLM:
             return -1, llm_stats
 
         _data = response_data.collected_experience_data
+        logging.debug("Response data from LLM: %s", response_data.model_dump_json(indent=2))
         _data.data_operation = _DataOperation.from_string_key(_data.data_operation)
         experience_index: int
         experience_index = -1
@@ -160,23 +161,29 @@ class _DataExtractionLLM:
             # update the experience in the collected experience data
             if 0 <= _data.index < len(collected_experience_data_so_far):
                 to_update = collected_experience_data_so_far[_data.index]
+                before_update = to_update.model_dump()
                 self.logger.info("Updating experience with index:%s", _data.index)
                 # once a value is set, it should not be set to None again
                 if _data.experience_title is not None:
                     to_update.experience_title = _data.experience_title
                 if _data.paid_work is not None:
                     to_update.paid_work = _data.paid_work
-                if _data.paid_work is not None:
+                if WorkType.from_string_key(_data.work_type) is not None:
                     to_update.work_type = _data.work_type
-                if _data.paid_work is not None:
+                if _data.start_date is not None:
                     to_update.start_date = _data.start_date
-                if _data.paid_work is not None:
+                if _data.end_date is not None:
                     to_update.end_date = _data.end_date
-                if _data.paid_work is not None:
+                if _data.company is not None:
                     to_update.company = _data.company
-                if _data.paid_work is not None:
+                if _data.location is not None:
                     to_update.location = _data.location
                 experience_index = _data.index
+                after_update = to_update.model_dump()
+                self.logger.info("Experience data with index:%s updated:"
+                                 "\n  - diff:%s",
+                                 _data.index,
+                                 dict_diff(before_update, after_update))
             else:
                 self.logger.error("Invalid index:%s for updating experience", _data.index)
 
@@ -283,9 +290,9 @@ class _DataExtractionLLM:
                         `null` It was not provided by the user and the user was not explicitly asked for this information yet.
                         Empty string if the user was asked and explicitly chose to not provide this information. 
                     ##'work_type' instructions
-                        Classify the type of work the experience refers to.
-                        Use the '<User's Last Input>' related it to the'<Conversation History>' to determine the type of work.
-                        Choose one of the following values and apply the criteria:
+                        Classify the type of work of the experience.
+                        Use the '<User's Last Input>' and relate it to the'<Conversation History>' to determine the type of work.
+                        Choose one of the following values and criteria:
                             {work_type_definitions}   
                     ##Timeline instructions
                         The user may provide the beginning and end of an experience at any order, 
@@ -324,7 +331,7 @@ class _DataExtractionLLM:
                         Do not insist on the user providing this information if they do not provide it.
                 #JSON Output instructions
                     Your response must always be a JSON object with the following schema:
-                    - ignored_experiences: An explanation in prose of the experiences referenced by the user that will not be added to the 
+                    - ignored_experiences: A detailed, step-by-step explanation in prose of the experiences referenced by the user that will not be added to the 
                                            'collected_experience_data' and why. These are experiences that were ignored.
                                            Follow the instructions in '#New Experience handling', '#Update Experience handling' and '#Delete Experience handling'.
                                             to determine which experience you will be ignoring.
@@ -350,7 +357,7 @@ class _DataExtractionLLM:
                                     what information you intend to collect based on the '<User's Last Input>' and the '<Conversation History>'.
                                     Remember that only one new experience can be collected at a time.
                                     Constrain the explanation to the data relevant for the fields 'experience_title', 
-                                    'dates_mentioned', 'company' and 'location' and 'paid_work'. 
+                                    'dates_mentioned', 'company', 'location' and 'paid_work'. 
                                     Make sure the user is actually referring to an experience they have.
                                     Do not conduct date calculations, or work type classification. 
                                     Explain where you found the information e.g in '<User's Last Input>'.
@@ -363,8 +370,8 @@ class _DataExtractionLLM:
                                     - location_references:
                                     - paid_work_references:
                                     }}
-                                - data_operation: Give a short explanation of what kind operation should be performed to the experience:
-                                    'ADD', 'UPDATE', 'DELETE'.
+                                - data_operation: The operation that should be performed to the experience data, choose one of the following values:
+                                    'ADD', 'UPDATE', 'DELETE', 'None'.
                                 - index: For an experience that exists in the <Previously Extracted Experience Data>, the index of that experience. 
                                          For a new experience, the next index in the <Previously Extracted Experience Data> list.
                                          Formatted as a json integer.
@@ -373,20 +380,16 @@ class _DataExtractionLLM:
                                 - location: The location in which the job was performed. Formatted as a json string.
                                 - paid_work: A boolean value indicating whether the work was paid or not. 
                                              Formatted as a json boolean.
-                                - work_type_classification_reasoning: Give a short explanation of how the information collected 
-                                            until now is evaluated based on the instructions of 'work_type' 
-                                            to classify the type of work of the experience.
-                                            The explanation must be in the form:
-                                                "Classified as <VALUE> because <REASONING>".
-                                                "Not classified as <VALUE> because <REASONING>".
-                                                Formatted as a json string.    
+                                - work_type_classification_reasoning: A detailed, step-by-step explanation of how the information collected 
+                                            until now, is evaluated based on the instructions of 'work_type', to classify the type of work of the experience.
+                                            Formatted as a JSON string.
                                 - work_type: type of work of the experience, 'FORMAL_SECTOR_WAGED_EMPLOYMENT', 
                                              'FORMAL_SECTOR_UNPAID_TRAINEE_WORK', 'SELF_EMPLOYMENT', 'UNSEEN_UNPAID' or 'None'. 
                                              Other values are not permitted.
                                 - dates_mentioned: The experience dates mentioned in the conversation. 
                                                    Empty string "" If you could not find any.
                                                    Formatted as a json string.                                    
-                                - dates_calculations: A detailed explanation of any date calculations done to 
+                                - dates_calculations: A detailed, step-by-step explanation of any date calculations done to 
                                                     produce the start_date, and end_date values. 
                                                     Empty string "" If you did not perform any calculations.
                                                     Formatted as a json string.         
@@ -433,10 +436,10 @@ def format_history_for_prompt(collected_experience_data_so_far: list[CollectedDa
         _output += f"{ConversationHistoryFormatter.USER}: '{ConversationHistoryFormatter.SUMMARY_TITLE}\n{context.summary}'"
 
     for turn in context.history.turns:
-        # if there is a collected experience data that was defined at that turn,
-        # then add a reference to help the model associate the experience data with that turn.
-        # This help the model to connect the dots between the user's last input --> conversation history --> experience data
-        # And follow the associations that it inferred in previous turns.
+        # If experience data was collected at this turn,
+        # add a reference to help the model associate the data with this specific turn.
+        # This helps the model connect the dots between the user's last input --> the conversation history --> and the relevant experience data,
+        # allowing it to follow associations inferred in previous turns.
         _experience_ref = ""
         for _data in collected_experience_data_so_far:
             if _data.defined_at_turn_number == turn.index:
@@ -446,3 +449,22 @@ def format_history_for_prompt(collected_experience_data_so_far: list[CollectedDa
         _output += (f"{ConversationHistoryFormatter.USER}: '{sanitize_input(turn.input.message, _TAGS_TO_FILTER)}{_experience_ref}'\n"
                     f"{ConversationHistoryFormatter.MODEL}: '{sanitize_input(turn.output.message_for_user, _TAGS_TO_FILTER)}'\n")
     return _output
+
+
+def dict_diff(old_dict: dict[str, str], new_dict: dict[str, str]) -> list[str]:
+    diff_logs = []
+
+    # Detect added keys
+    for key in new_dict.keys() - old_dict.keys():
+        diff_logs.append(f"+ {key}: {new_dict[key]}")
+
+    # Detect removed keys
+    for key in old_dict.keys() - new_dict.keys():
+        diff_logs.append(f"- {key}: {old_dict[key]}")
+
+    # Detect modified keys
+    for key in old_dict.keys() & new_dict.keys():
+        if old_dict[key] != new_dict[key]:
+            diff_logs.append(f"~ {key}: {old_dict[key]} -> {new_dict[key]}")
+
+    return diff_logs
