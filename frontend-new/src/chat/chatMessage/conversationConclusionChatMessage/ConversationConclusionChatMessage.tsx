@@ -11,7 +11,7 @@ export const DATA_TEST_ID = {
 };
 
 interface ConversationConclusionChatMessageProps {
-  chatMessage: IChatMessage;
+  chatMessage: Omit<IChatMessage, "component">;
 }
 
 const ConversationConclusionChatMessage: React.FC<ConversationConclusionChatMessageProps> = ({
