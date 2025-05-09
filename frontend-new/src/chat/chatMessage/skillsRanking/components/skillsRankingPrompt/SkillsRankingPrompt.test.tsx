@@ -45,8 +45,8 @@ describe("SkillsRankingPrompt tests", () => {
       render(
         <SkillsRankingPrompt
           group={ExperimentGroup.GROUP_A}
-          onShowInfo={jest.fn()}
-          onContinue={jest.fn()}
+          onView={jest.fn()}
+          onSkip={jest.fn()}
           chatMessage={givenChatMessage}
         />
       );
@@ -58,10 +58,10 @@ describe("SkillsRankingPrompt tests", () => {
       expect(screen.getByTestId(CHAT_BUBBLE_DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER)).toBeInTheDocument();
       // AND expect the text to be in the document
       expect(screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_PROMPT_TEXT)).toBeInTheDocument();
-      // AND expect the get info button to be in the document
-      expect(screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_PROMPT_INFO_BUTTON)).toBeInTheDocument();
-      // AND continue without an info button to be in the document
-      expect(screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_PROMPT_CONTINUE_BUTTON)).toBeInTheDocument();
+      // AND expect the view comparison button to be in the document
+      expect(screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_PROMPT_VIEW_BUTTON)).toBeInTheDocument();
+      // AND the skip comparison button to be in the document
+      expect(screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_PROMPT_SKIP_BUTTON)).toBeInTheDocument();
       // AND to match the snapshot
       expect(container).toMatchSnapshot();
       // AND no errors or warnings to have occurred
@@ -85,12 +85,7 @@ describe("SkillsRankingPrompt tests", () => {
 
       // WHEN the component is rendered
       render(
-        <SkillsRankingPrompt
-          group={group}
-          onShowInfo={jest.fn()}
-          onContinue={jest.fn()}
-          chatMessage={givenChatMessage}
-        />
+        <SkillsRankingPrompt group={group} onView={jest.fn()} onSkip={jest.fn()} chatMessage={givenChatMessage} />
       );
 
       // THEN expect the correct prompt text to be in the document
@@ -104,7 +99,7 @@ describe("SkillsRankingPrompt tests", () => {
   });
 
   describe("action tests", () => {
-    test("should call onShowInfo and send metrics when the info button is clicked", async () => {
+    test("should call onView and send metrics when the view comparison button is clicked", async () => {
       // GIVEN there is an active session and user
       const givenSessionId = 123;
       jest.spyOn(UserPreferencesStateService.getInstance(), "getActiveSessionId").mockReturnValueOnce(givenSessionId);
@@ -130,8 +125,8 @@ describe("SkillsRankingPrompt tests", () => {
       jest.spyOn(MetricsService.getInstance(), "sendMetricsEvent").mockReturnValueOnce();
 
       // AND the component is rendered
-      const onShowInfo = jest.fn();
-      const onContinue = jest.fn();
+      const onView = jest.fn();
+      const onSkip = jest.fn();
       const givenChatMessage: IChatMessage = {
         message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
@@ -143,19 +138,19 @@ describe("SkillsRankingPrompt tests", () => {
       const givenComponent = (
         <SkillsRankingPrompt
           group={ExperimentGroup.GROUP_A}
-          onShowInfo={onShowInfo}
-          onContinue={onContinue}
+          onView={onView}
+          onSkip={onSkip}
           chatMessage={givenChatMessage}
         />
       );
       render(givenComponent);
 
-      // WHEN the get info button is clicked
-      const infoButton = screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_PROMPT_INFO_BUTTON);
-      await userEvent.click(infoButton);
+      // WHEN the view comparison button is clicked
+      const viewButton = screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_PROMPT_VIEW_BUTTON);
+      await userEvent.click(viewButton);
 
-      // THEN expect the onShowInfo function to have been called
-      expect(onShowInfo).toHaveBeenCalled();
+      // THEN expect the onView function to have been called
+      expect(onView).toHaveBeenCalled();
       // AND expect metrics to have been sent
       expect(MetricsService.getInstance().sendMetricsEvent).toHaveBeenCalledWith({
         event_type: EventType.UI_INTERACTION,
@@ -163,7 +158,7 @@ describe("SkillsRankingPrompt tests", () => {
         session_id: givenSessionId,
         experiment_id: SKILLS_RANKING_BUTTON_POSITION_EXPERIMENT,
         experiment_group: ButtonPositionGroup.INFO_BUTTON_FIRST,
-        clicked_component_ids: ["skills_ranking_INFO_button"],
+        clicked_component_ids: ["skills_ranking_VIEW_button"],
         timestamp: expect.any(String),
       });
       // AND no errors or warnings to have occurred
@@ -171,7 +166,7 @@ describe("SkillsRankingPrompt tests", () => {
       expect(console.warn).not.toHaveBeenCalled();
     });
 
-    test("should call onContinue and send metrics when the continue button is clicked", async () => {
+    test("should call onSkip and send metrics when the skip comparison button is clicked", async () => {
       // GIVEN there is an active session and user
       const givenSessionId = 123;
       jest.spyOn(UserPreferencesStateService.getInstance(), "getActiveSessionId").mockReturnValueOnce(givenSessionId);
@@ -197,8 +192,8 @@ describe("SkillsRankingPrompt tests", () => {
       jest.spyOn(MetricsService.getInstance(), "sendMetricsEvent").mockReturnValueOnce();
 
       // AND the component is rendered
-      const onShowInfo = jest.fn();
-      const onContinue = jest.fn();
+      const onView = jest.fn();
+      const onSkip = jest.fn();
       const givenChatMessage: IChatMessage = {
         message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
@@ -210,19 +205,19 @@ describe("SkillsRankingPrompt tests", () => {
       const givenComponent = (
         <SkillsRankingPrompt
           group={ExperimentGroup.GROUP_A}
-          onShowInfo={onShowInfo}
-          onContinue={onContinue}
+          onView={onView}
+          onSkip={onSkip}
           chatMessage={givenChatMessage}
         />
       );
       render(givenComponent);
 
-      // WHEN continue without info button is clicked
-      const continueButton = screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_PROMPT_CONTINUE_BUTTON);
-      await userEvent.click(continueButton);
+      // WHEN the skip comparison button is clicked
+      const skipButton = screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_PROMPT_SKIP_BUTTON);
+      await userEvent.click(skipButton);
 
-      // THEN expect the onContinue function to have been called
-      expect(onContinue).toHaveBeenCalled();
+      // THEN expect the onSkip function to have been called
+      expect(onSkip).toHaveBeenCalled();
       // AND expect metrics to have been sent
       expect(MetricsService.getInstance().sendMetricsEvent).toHaveBeenCalledWith({
         event_type: EventType.UI_INTERACTION,
@@ -230,7 +225,7 @@ describe("SkillsRankingPrompt tests", () => {
         session_id: givenSessionId,
         experiment_id: SKILLS_RANKING_BUTTON_POSITION_EXPERIMENT,
         experiment_group: ButtonPositionGroup.CONTINUE_BUTTON_FIRST,
-        clicked_component_ids: ["skills_ranking_CONTINUE_button"],
+        clicked_component_ids: ["skills_ranking_SKIP_button"],
         timestamp: expect.any(String),
       });
       // AND no errors or warnings to have occurred
@@ -256,16 +251,16 @@ describe("SkillsRankingPrompt tests", () => {
       const givenComponent = (
         <SkillsRankingPrompt
           group={ExperimentGroup.GROUP_A}
-          onShowInfo={jest.fn()}
-          onContinue={jest.fn()}
+          onView={jest.fn()}
+          onSkip={jest.fn()}
           chatMessage={givenChatMessage}
         />
       );
       render(givenComponent);
 
-      // WHEN the get info button is clicked
-      const infoButton = screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_PROMPT_INFO_BUTTON);
-      await userEvent.click(infoButton);
+      // WHEN the view comparison button is clicked
+      const viewButton = screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_PROMPT_VIEW_BUTTON);
+      await userEvent.click(viewButton);
 
       // THEN expect metrics to not have been sent
       expect(MetricsService.getInstance().sendMetricsEvent).not.toHaveBeenCalled();

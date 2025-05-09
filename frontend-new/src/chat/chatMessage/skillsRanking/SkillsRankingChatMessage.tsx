@@ -86,8 +86,8 @@ export const SkillsRankingChatMessage: React.FC<SkillsRankingChatMessageProps> =
               <SkillsRankingPrompt
                 group={group}
                 chatMessage={chatMessage}
-                onShowInfo={() => handleStateChange(SkillsRankingState.SELF_EVALUATING, index)}
-                onContinue={() => handleStateChange(SkillsRankingState.SKIPPED, index)}
+                onView={() => handleStateChange(SkillsRankingState.SELF_EVALUATING, index)}
+                onSkip={() => handleStateChange(SkillsRankingState.SKIPPED, index)}
                 disabled={isTyping || isStepCompleted}
               />
             </Box>

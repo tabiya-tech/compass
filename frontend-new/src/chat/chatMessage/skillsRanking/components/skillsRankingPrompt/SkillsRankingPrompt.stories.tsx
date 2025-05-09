@@ -10,8 +10,8 @@ const meta: Meta<typeof SkillsRankingPrompt> = {
   component: SkillsRankingPrompt,
   tags: ["autodocs"],
   argTypes: {
-    onShowInfo: { action: "onShowInfo" },
-    onContinue: { action: "onContinue" },
+    onView: { action: "onView" },
+    onSkip: { action: "onSkip" },
   },
   args: {
     group: ExperimentGroup.GROUP_A,

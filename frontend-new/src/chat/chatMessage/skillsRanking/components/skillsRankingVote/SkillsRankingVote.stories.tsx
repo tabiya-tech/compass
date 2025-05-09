@@ -35,3 +35,10 @@ export const Shown: Story = {
     group: ExperimentGroup.GROUP_A,
   },
 };
+
+export const ShownWhenDisabled: Story = {
+  args: {
+    group: ExperimentGroup.GROUP_A,
+    disabled: true,
+  },
+};

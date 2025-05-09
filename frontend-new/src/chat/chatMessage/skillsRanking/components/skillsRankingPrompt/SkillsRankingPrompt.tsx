@@ -17,34 +17,34 @@ export const SKILLS_RANKING_BUTTON_POSITION_EXPERIMENT = "SKILLS_RANKING_BUTTON_
 export const DATA_TEST_ID = {
   SKILLS_RANKING_PROMPT_CONTAINER: `skills-ranking-prompt-container-${uniqueId}`,
   SKILLS_RANKING_PROMPT_TEXT: `skills-ranking-prompt-text-${uniqueId}`,
-  SKILLS_RANKING_PROMPT_INFO_BUTTON: `skills-ranking-prompt-info-button-${uniqueId}`,
-  SKILLS_RANKING_PROMPT_CONTINUE_BUTTON: `skills-ranking-prompt-continue-button-${uniqueId}`,
+  SKILLS_RANKING_PROMPT_VIEW_BUTTON: `skills-ranking-prompt-view-button-${uniqueId}`,
+  SKILLS_RANKING_PROMPT_SKIP_BUTTON: `skills-ranking-prompt-skip-button-${uniqueId}`,
 };
 
 interface SkillsRankingPromptProps {
   group: ExperimentGroup;
-  onShowInfo: () => void;
-  onContinue: () => void;
+  onView: () => void;
+  onSkip: () => void;
   chatMessage: IChatMessage;
   disabled?: boolean;
 }
 
 enum SkillsRankingPromptAction {
-  INFO = "INFO",
-  CONTINUE = "CONTINUE",
+  VIEW = "VIEW",
+  SKIP = "SKIP",
 }
 
 export const PROMPT_TEXTS = {
   [ExperimentGroup.GROUP_A]:
-    "Based on the skills we have found, I can tell you how your skillset compares to other jobseekers. If you want to learn how competitive your skillset is compared to other job seekers similar to you, you click the button below. Otherwise, you can choose to continue without viewing the comparison.",
+    "Based on the skills we have found, I can tell you how your skillset compares to other jobseekers. If you want to learn how competitive your skillset is compared to other job seekers similar to you, you click the button below. Otherwise, you can choose to skip without viewing the comparison.",
   [ExperimentGroup.GROUP_B]:
-    "Based on the skills we have found, I can tell you how your skillset compares to the skills demanded by jobs on the SAYouth.mobi platform. If you want to learn how competitive your skillset is compared to available jobs, you click the button below. Otherwise, you can choose to continue without viewing the comparison.",
+    "Based on the skills we have found, I can tell you how your skillset compares to the skills demanded by jobs on the SAYouth.mobi platform. If you want to learn how competitive your skillset is compared to available jobs, you click the button below. Otherwise, you can choose to skip without viewing the comparison.",
 };
 
 const SkillsRankingPrompt: React.FC<SkillsRankingPromptProps> = ({
   group,
-  onShowInfo,
-  onContinue,
+  onView,
+  onSkip,
   disabled = false,
   chatMessage,
 }) => {
@@ -80,33 +80,33 @@ const SkillsRankingPrompt: React.FC<SkillsRankingPromptProps> = ({
       );
     }
 
-    if (action === SkillsRankingPromptAction.INFO) {
-      onShowInfo();
+    if (action === SkillsRankingPromptAction.VIEW) {
+      onView();
     } else {
-      onContinue();
+      onSkip();
     }
   };
 
   const buttons = [
     <PrimaryButton
-      key="continue"
-      onClick={() => handleButtonClick(SkillsRankingPromptAction.CONTINUE)}
+      key="skip"
+      onClick={() => handleButtonClick(SkillsRankingPromptAction.SKIP)}
       style={{ fontSize: theme.typography.body2.fontSize }}
-      data-testid={DATA_TEST_ID.SKILLS_RANKING_PROMPT_CONTINUE_BUTTON}
+      data-testid={DATA_TEST_ID.SKILLS_RANKING_PROMPT_SKIP_BUTTON}
       disabled={disabled}
       disableWhenOffline
     >
-      Continue without information
+      Skip comparison
     </PrimaryButton>,
     <PrimaryButton
-      key="info"
-      onClick={() => handleButtonClick(SkillsRankingPromptAction.INFO)}
+      key="view"
+      onClick={() => handleButtonClick(SkillsRankingPromptAction.VIEW)}
       style={{ fontSize: theme.typography.body2.fontSize }}
-      data-testid={DATA_TEST_ID.SKILLS_RANKING_PROMPT_INFO_BUTTON}
+      data-testid={DATA_TEST_ID.SKILLS_RANKING_PROMPT_VIEW_BUTTON}
       disabled={disabled}
       disableWhenOffline
     >
-      Get information
+      View comparison
     </PrimaryButton>,
   ];
 

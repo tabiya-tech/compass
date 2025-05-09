@@ -20,7 +20,7 @@ exports[`SkillsRankingVote tests render tests should render component successful
       data-testid="chat-message-bubble-message-footer-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
     >
       <div
-        class="MuiBox-root css-1821gv5"
+        class="MuiBox-root css-1kkt86i"
       >
         <p
           class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
@@ -29,318 +29,136 @@ exports[`SkillsRankingVote tests render tests should render component successful
           Before I tell you, how do your current skillset ranks compared to other job seekers?
         </p>
         <div
-          class="MuiBox-root css-1gtqijj"
+          class="MuiBox-root css-1mi3tt8"
         >
           <div
-            class="MuiBox-root css-dvxtzn"
+            class="MuiBox-root css-z7mtfw"
           >
             <span
-              class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-caption css-1urcc0-MuiTypography-root"
             >
-              10%
+              0%
             </span>
-            <button
-              class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-17c96du-MuiButtonBase-root-MuiIconButton-root"
-              data-testid="skills-ranking-vote-icon-cb5e9e43-c288-4597-b6f4-a268623c9e61"
-              tabindex="0"
-              title="10%"
-              type="button"
-            >
-              <svg
-                aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1ksrqgn-MuiSvgIcon-root"
-                data-testid="SignalCellularAltIcon"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M17 4h3v16h-3zM5 14h3v6H5zm6-5h3v11h-3z"
-                />
-              </svg>
-              <span
-                class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-              />
-            </button>
-          </div>
-          <div
-            class="MuiBox-root css-dvxtzn"
-          >
             <span
-              class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
-            >
-              20%
-            </span>
-            <button
-              class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-17c96du-MuiButtonBase-root-MuiIconButton-root"
-              data-testid="skills-ranking-vote-icon-cb5e9e43-c288-4597-b6f4-a268623c9e61"
-              tabindex="0"
-              title="20%"
-              type="button"
-            >
-              <svg
-                aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-14vl49q-MuiSvgIcon-root"
-                data-testid="SignalCellularAltIcon"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M17 4h3v16h-3zM5 14h3v6H5zm6-5h3v11h-3z"
-                />
-              </svg>
-              <span
-                class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-              />
-            </button>
-          </div>
-          <div
-            class="MuiBox-root css-dvxtzn"
-          >
-            <span
-              class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
-            >
-              30%
-            </span>
-            <button
-              class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-17c96du-MuiButtonBase-root-MuiIconButton-root"
-              data-testid="skills-ranking-vote-icon-cb5e9e43-c288-4597-b6f4-a268623c9e61"
-              tabindex="0"
-              title="30%"
-              type="button"
-            >
-              <svg
-                aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-4y2gky-MuiSvgIcon-root"
-                data-testid="SignalCellularAltIcon"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M17 4h3v16h-3zM5 14h3v6H5zm6-5h3v11h-3z"
-                />
-              </svg>
-              <span
-                class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-              />
-            </button>
-          </div>
-          <div
-            class="MuiBox-root css-dvxtzn"
-          >
-            <span
-              class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
-            >
-              40%
-            </span>
-            <button
-              class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-17c96du-MuiButtonBase-root-MuiIconButton-root"
-              data-testid="skills-ranking-vote-icon-cb5e9e43-c288-4597-b6f4-a268623c9e61"
-              tabindex="0"
-              title="40%"
-              type="button"
-            >
-              <svg
-                aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-ttxhex-MuiSvgIcon-root"
-                data-testid="SignalCellularAltIcon"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M17 4h3v16h-3zM5 14h3v6H5zm6-5h3v11h-3z"
-                />
-              </svg>
-              <span
-                class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-              />
-            </button>
-          </div>
-          <div
-            class="MuiBox-root css-dvxtzn"
-          >
-            <span
-              class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
-            >
-              50%
-            </span>
-            <button
-              class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-17c96du-MuiButtonBase-root-MuiIconButton-root"
-              data-testid="skills-ranking-vote-icon-cb5e9e43-c288-4597-b6f4-a268623c9e61"
-              tabindex="0"
-              title="50%"
-              type="button"
-            >
-              <svg
-                aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-eoiuer-MuiSvgIcon-root"
-                data-testid="SignalCellularAltIcon"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M17 4h3v16h-3zM5 14h3v6H5zm6-5h3v11h-3z"
-                />
-              </svg>
-              <span
-                class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-              />
-            </button>
-          </div>
-          <div
-            class="MuiBox-root css-dvxtzn"
-          >
-            <span
-              class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
-            >
-              60%
-            </span>
-            <button
-              class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-17c96du-MuiButtonBase-root-MuiIconButton-root"
-              data-testid="skills-ranking-vote-icon-cb5e9e43-c288-4597-b6f4-a268623c9e61"
-              tabindex="0"
-              title="60%"
-              type="button"
-            >
-              <svg
-                aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1g1r0lj-MuiSvgIcon-root"
-                data-testid="SignalCellularAltIcon"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M17 4h3v16h-3zM5 14h3v6H5zm6-5h3v11h-3z"
-                />
-              </svg>
-              <span
-                class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-              />
-            </button>
-          </div>
-          <div
-            class="MuiBox-root css-dvxtzn"
-          >
-            <span
-              class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
-            >
-              70%
-            </span>
-            <button
-              class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-17c96du-MuiButtonBase-root-MuiIconButton-root"
-              data-testid="skills-ranking-vote-icon-cb5e9e43-c288-4597-b6f4-a268623c9e61"
-              tabindex="0"
-              title="70%"
-              type="button"
-            >
-              <svg
-                aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-114uuv6-MuiSvgIcon-root"
-                data-testid="SignalCellularAltIcon"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M17 4h3v16h-3zM5 14h3v6H5zm6-5h3v11h-3z"
-                />
-              </svg>
-              <span
-                class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-              />
-            </button>
-          </div>
-          <div
-            class="MuiBox-root css-dvxtzn"
-          >
-            <span
-              class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
-            >
-              80%
-            </span>
-            <button
-              class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-17c96du-MuiButtonBase-root-MuiIconButton-root"
-              data-testid="skills-ranking-vote-icon-cb5e9e43-c288-4597-b6f4-a268623c9e61"
-              tabindex="0"
-              title="80%"
-              type="button"
-            >
-              <svg
-                aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1htoatr-MuiSvgIcon-root"
-                data-testid="SignalCellularAltIcon"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M17 4h3v16h-3zM5 14h3v6H5zm6-5h3v11h-3z"
-                />
-              </svg>
-              <span
-                class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-              />
-            </button>
-          </div>
-          <div
-            class="MuiBox-root css-dvxtzn"
-          >
-            <span
-              class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
-            >
-              90%
-            </span>
-            <button
-              class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-17c96du-MuiButtonBase-root-MuiIconButton-root"
-              data-testid="skills-ranking-vote-icon-cb5e9e43-c288-4597-b6f4-a268623c9e61"
-              tabindex="0"
-              title="90%"
-              type="button"
-            >
-              <svg
-                aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-5mtona-MuiSvgIcon-root"
-                data-testid="SignalCellularAltIcon"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M17 4h3v16h-3zM5 14h3v6H5zm6-5h3v11h-3z"
-                />
-              </svg>
-              <span
-                class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-              />
-            </button>
-          </div>
-          <div
-            class="MuiBox-root css-dvxtzn"
-          >
-            <span
-              class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-caption css-1urcc0-MuiTypography-root"
             >
               100%
             </span>
-            <button
-              class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-17c96du-MuiButtonBase-root-MuiIconButton-root"
-              data-testid="skills-ranking-vote-icon-cb5e9e43-c288-4597-b6f4-a268623c9e61"
-              tabindex="0"
-              title="100%"
-              type="button"
-            >
-              <svg
-                aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1o1454z-MuiSvgIcon-root"
-                data-testid="SignalCellularAltIcon"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M17 4h3v16h-3zM5 14h3v6H5zm6-5h3v11h-3z"
-                />
-              </svg>
-              <span
-                class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-              />
-            </button>
           </div>
+          <div
+            class="MuiBox-root css-9rojrl"
+          >
+            <div
+              data-testid="skills-ranking-vote-item"
+            >
+              <div
+                data-testid="skills-ranking-vote-item-radio"
+              />
+              <div
+                data-testid="skills-ranking-vote-item-divider"
+              />
+            </div>
+            <div
+              data-testid="skills-ranking-vote-item"
+            >
+              <div
+                data-testid="skills-ranking-vote-item-radio"
+              />
+              <div
+                data-testid="skills-ranking-vote-item-divider"
+              />
+            </div>
+            <div
+              data-testid="skills-ranking-vote-item"
+            >
+              <div
+                data-testid="skills-ranking-vote-item-radio"
+              />
+              <div
+                data-testid="skills-ranking-vote-item-divider"
+              />
+            </div>
+            <div
+              data-testid="skills-ranking-vote-item"
+            >
+              <div
+                data-testid="skills-ranking-vote-item-radio"
+              />
+              <div
+                data-testid="skills-ranking-vote-item-divider"
+              />
+            </div>
+            <div
+              data-testid="skills-ranking-vote-item"
+            >
+              <div
+                data-testid="skills-ranking-vote-item-radio"
+              />
+              <div
+                data-testid="skills-ranking-vote-item-divider"
+              />
+            </div>
+            <div
+              data-testid="skills-ranking-vote-item"
+            >
+              <div
+                data-testid="skills-ranking-vote-item-radio"
+              />
+              <div
+                data-testid="skills-ranking-vote-item-divider"
+              />
+            </div>
+            <div
+              data-testid="skills-ranking-vote-item"
+            >
+              <div
+                data-testid="skills-ranking-vote-item-radio"
+              />
+              <div
+                data-testid="skills-ranking-vote-item-divider"
+              />
+            </div>
+            <div
+              data-testid="skills-ranking-vote-item"
+            >
+              <div
+                data-testid="skills-ranking-vote-item-radio"
+              />
+              <div
+                data-testid="skills-ranking-vote-item-divider"
+              />
+            </div>
+            <div
+              data-testid="skills-ranking-vote-item"
+            >
+              <div
+                data-testid="skills-ranking-vote-item-radio"
+              />
+              <div
+                data-testid="skills-ranking-vote-item-divider"
+              />
+            </div>
+            <div
+              data-testid="skills-ranking-vote-item"
+            >
+              <div
+                data-testid="skills-ranking-vote-item-radio"
+              />
+              <div
+                data-testid="skills-ranking-vote-item-divider"
+              />
+            </div>
+            <div
+              data-testid="skills-ranking-vote-item"
+            >
+              <div
+                data-testid="skills-ranking-vote-item-radio"
+              />
+            </div>
+          </div>
+          <div
+            class="MuiBox-root css-1f1jesu"
+          />
         </div>
       </div>
     </div>
