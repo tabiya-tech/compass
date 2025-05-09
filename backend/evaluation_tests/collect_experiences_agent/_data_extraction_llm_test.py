@@ -7,6 +7,7 @@ from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.collect_experiences_agent import CollectedData
 from app.agent.collect_experiences_agent._dataextraction_llm import _DataExtractionLLM
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory, ConversationTurn
+from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 
@@ -261,7 +262,6 @@ test_cases_data_extraction = [
         expected_collected_data_count=1
     ),
     _TestCaseDataExtraction(
-        skip_force="force",
         name="no_more_info_is_not_delete(experiences_of_all_kinds_all_at_once)",
         summary="You asked me about my work experiences and I told you about my work as a project manager at the University of Oxford, "
                 "a software architect at ProUbis GmbH, and an unpaid internship as a Software Developer for Ubis GmbH. "
@@ -298,32 +298,50 @@ test_cases_data_extraction = [
 @pytest.mark.evaluation_test
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases_data_extraction),
                          ids=[case.name for case in get_test_cases_to_run(test_cases_data_extraction)])
-async def test_data_extraction(test_case: _TestCaseDataExtraction):
-    context: ConversationContext = ConversationContext(
-        all_history=ConversationHistory(turns=[]),
-        history=ConversationHistory(turns=[]),
-        summary="")
-    # GIVEN the previous conversation context
-    for turn in test_case.turns:
-        _add_turn_to_context(turn[0], turn[1], context)
-    # AND the context summary
-    context.summary = test_case.summary
+async def test_data_extraction(test_case: _TestCaseDataExtraction, caplog: pytest.LogCaptureFixture):
+    logger = logging.getLogger()
+    with caplog.at_level(logging.DEBUG):
+        guard_caplog(logger=logger, caplog=caplog)
 
-    # AND the user input
-    user_input = AgentInput(message=test_case.user_input)
-    # AND the collected data so far
-    collected_data: list[CollectedData] = test_case.collected_data_so_far
+        # GIVEN the previous conversation context
+        context: ConversationContext = ConversationContext(
+            all_history=ConversationHistory(turns=[]),
+            history=ConversationHistory(turns=[]),
+            summary="")
+        for turn in test_case.turns:
+            _add_turn_to_context(turn[0], turn[1], context)
+        # AND the context summary
+        context.summary = test_case.summary
 
-    # WHEN the data extraction LLM is executed
-    data_extraction_llm = _DataExtractionLLM(logging.getLogger())
-    last_referenced_experience_index, _ = await data_extraction_llm.execute(user_input=user_input,
-                                                                            context=context,
-                                                                            collected_experience_data_so_far=collected_data)
-    # THEN the last referenced experience index should be the expected one
-    assert last_referenced_experience_index == test_case.expected_last_referenced_experience_index
+        # AND the user input
+        user_input = AgentInput(message=test_case.user_input)
+        # AND the collected data so far
+        collected_data: list[CollectedData] = test_case.collected_data_so_far
 
-    # AND the collected data should be the expected one
-    assert len(collected_data) == test_case.expected_collected_data_count
+        # WHEN the data extraction LLM is executed
+        data_extraction_llm = _DataExtractionLLM(logger)
+        last_referenced_experience_index, _ = await data_extraction_llm.execute(user_input=user_input,
+                                                                                context=context,
+                                                                                collected_experience_data_so_far=collected_data)
+
+        failures = []
+        # THEN the last referenced experience index should be the expected one
+        if last_referenced_experience_index != test_case.expected_last_referenced_experience_index:
+            failures.append(
+                f"Expected last referenced experience index {test_case.expected_last_referenced_experience_index}, but got {last_referenced_experience_index}"
+            )
+        # AND the collected data should be the expected one
+        if len(collected_data) != test_case.expected_collected_data_count:
+            failures.append(
+                f"Expected {test_case.expected_collected_data_count} collected data, but got {len(collected_data)}"
+            )
+
+        if len(failures) > 0:
+            pytest.fail(
+                '\n'.join(failures)
+            )
+        # AND the log messages should not contain any errors
+        assert_log_error_warnings(caplog=caplog, expect_errors_in_logs=False, expect_warnings_in_logs=True)
 
 
 def _add_turn_to_context(user_input: str, agent_output: str, context: ConversationContext):
