@@ -19,7 +19,7 @@ const withChatContext = (feedbackStatus: FeedbackStatus) => (Story: any) => {
   };
 
   return (
-    <ChatProvider handleOpenExperiencesDrawer={() => {}}>
+    <ChatProvider handleOpenExperiencesDrawer={() => {}} removeMessage={() => {}} addMessage={() => {}}>
       <Wrapper />
     </ChatProvider>
   );

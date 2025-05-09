@@ -43,13 +43,17 @@ describe("render tests", () => {
   test("should render the Chat message", () => {
     // GIVEN a basic chat message sent at a given time
     const givenDate = new Date().toISOString();
-    const givenMessage: IChatMessage = {
+    const messageData = {
       message_id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       message: "Thanks for having a conversation with me.",
       sent_at: givenDate,
-      type: ChatMessageType.CONVERSATION_CONCLUSION, // This component is designed for use with the Conversation conclusion chat type
-      reaction: null, // Conversation Conclusion message cant have a reaction
+      type: ChatMessageType.CONVERSATION_CONCLUSION,
+      reaction: null
+    };
+    const givenMessage: IChatMessage = {
+      ...messageData,
+      component: <ConversationConclusionChatMessage chatMessage={messageData} />
     };
 
     // WHEN the conversation conclusion chat message is rendered
@@ -74,13 +78,17 @@ describe("render tests", () => {
   test("should render with feedback in progress", () => {
     // GIVEN a basic chat message sent at a given time
     const givenDate = new Date().toISOString();
-    const givenMessage: IChatMessage = {
+    const messageData = {
       message_id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       message: "Thanks for having a conversation with me.",
       sent_at: givenDate,
       type: ChatMessageType.CONVERSATION_CONCLUSION,
       reaction: null
+    };
+    const givenMessage: IChatMessage = {
+      ...messageData,
+      component: <ConversationConclusionChatMessage chatMessage={messageData} />
     };
 
     // WHEN the conversation conclusion chat message is rendered
@@ -97,13 +105,17 @@ describe("render tests", () => {
   test("should render with feedback submitted", () => {
     // GIVEN a basic chat message sent at a given time
     const givenDate = new Date().toISOString();
-    const givenMessage: IChatMessage = {
+    const messageData = {
       message_id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       message: "Thanks for having a conversation with me.",
       sent_at: givenDate,
       type: ChatMessageType.CONVERSATION_CONCLUSION,
       reaction: null
+    };
+    const givenMessage: IChatMessage = {
+      ...messageData,
+      component: <ConversationConclusionChatMessage chatMessage={messageData} />
     };
 
     // WHEN the conversation conclusion chat message is rendered

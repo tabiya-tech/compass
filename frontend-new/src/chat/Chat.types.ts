@@ -1,4 +1,5 @@
-import { ConversationMessage, MessageReaction } from "./ChatService/ChatService.types";
+import { ConversationMessage } from "./ChatService/ChatService.types";
+import { ReactElement } from "react";
 
 export enum ChatMessageType {
   BASIC_CHAT = "basic_chat",
@@ -9,5 +10,5 @@ export enum ChatMessageType {
 
 export type IChatMessage = ConversationMessage & {
   type: ChatMessageType;
-  reaction: MessageReaction | null;
+  component: ReactElement;
 };

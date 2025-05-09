@@ -3,6 +3,11 @@ import { ChatMessageType, IChatMessage } from "src/chat/Chat.types";
 import { ConversationMessageSender, MessageReaction } from "./ChatService/ChatService.types";
 import { CurrentPhase } from "src/chat/chatProgressbar/types";
 import { InvalidConversationPhasePercentage } from "./errors";
+import UserChatMessage from "src/chat/chatMessage/userChatMessage/UserChatMessage";
+import CompassChatMessage from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
+import ConversationConclusionChatMessage from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
+import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
+import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 
 export const FIXED_MESSAGES_TEXT = {
   AI_IS_TYPING: "Typing...",
@@ -14,13 +19,17 @@ export const FIXED_MESSAGES_TEXT = {
 };
 
 export const generateUserMessage = (message: string, sent_at: string, message_id?: string): IChatMessage => {
-  return {
+  const messageObj = {
     message_id: message_id ? message_id : nanoid(),
     sender: ConversationMessageSender.USER,
     message: message,
     sent_at: sent_at,
     type: ChatMessageType.BASIC_CHAT,
     reaction: null,
+  };
+  return {
+    ...messageObj,
+    component: <UserChatMessage chatMessage={messageObj} />,
   };
 };
 
@@ -30,7 +39,7 @@ export const generateCompassMessage = (
   sent_at: string,
   reaction: MessageReaction | null
 ): IChatMessage => {
-  return {
+  const messageObj = {
     message_id: message_id,
     sender: ConversationMessageSender.COMPASS,
     message: message,
@@ -38,10 +47,14 @@ export const generateCompassMessage = (
     type: ChatMessageType.BASIC_CHAT,
     reaction: reaction,
   };
+  return {
+    ...messageObj,
+    component: <CompassChatMessage chatMessage={messageObj} />,
+  };
 };
 
 export const generateErrorMessage = (message: string): IChatMessage => {
-  return {
+  const messageObj = {
     message_id: nanoid(),
     sender: ConversationMessageSender.COMPASS,
     message: message,
@@ -49,16 +62,24 @@ export const generateErrorMessage = (message: string): IChatMessage => {
     type: ChatMessageType.ERROR,
     reaction: null,
   };
+  return {
+    ...messageObj,
+    component: <ChatBubble message={message} sender={messageObj.sender} />,
+  };
 };
 
 export const generateTypingMessage = (): IChatMessage => {
-  return {
+  const messageObj = {
     message_id: nanoid(),
     sender: ConversationMessageSender.COMPASS,
     message: FIXED_MESSAGES_TEXT.AI_IS_TYPING,
     sent_at: new Date().toISOString(),
     type: ChatMessageType.TYPING,
     reaction: null,
+  };
+  return {
+    ...messageObj,
+    component: <TypingChatMessage />,
   };
 };
 
@@ -67,13 +88,17 @@ export const generateConversationConclusionMessage = (
   message: string,
   sent_at: string
 ): IChatMessage => {
-  return {
+  const messageObj = {
     message_id: message_id,
     sender: ConversationMessageSender.COMPASS,
     message: message,
     sent_at: sent_at,
     type: ChatMessageType.CONVERSATION_CONCLUSION,
     reaction: null,
+  };
+  return {
+    ...messageObj,
+    component: <ConversationConclusionChatMessage chatMessage={messageObj} />,
   };
 };
 
