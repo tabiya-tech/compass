@@ -480,6 +480,32 @@ class DeviceSpecificationEvent(AbstractUserAccountEvent):
         extra = "forbid"
 
 
+class UIInteractionEvent(AbstractUserAccountEvent):
+    """
+    A Frontend only metric event representing UI interactions by a user
+    """
+    interaction_ids: list[str]
+    """
+    interaction_ids - list of interaction identifiers like "clicked_cv_button" or "swiped_feedback"
+    """
+    timestamp: datetime
+    """
+    timestamp - an iso string representing the timestamp of the event
+    """
+
+    def __init__(self, *, user_id: str, interaction_ids: list[str], timestamp: str, relevant_experiments: dict[str, str] = None):
+        super().__init__(
+            user_id=user_id,
+            event_type=EventType.UI_INTERACTION,
+            interaction_ids=interaction_ids,
+            timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc),
+            relevant_experiments=relevant_experiments or {}
+        )
+
+    class Config:
+        extra = "forbid"
+
+
 class NetworkInformationEvent(AbstractUserAccountEvent):
     """
     A Frontend only metric event representing the network information of a user
