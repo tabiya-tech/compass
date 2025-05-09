@@ -352,10 +352,6 @@ class CVDownloadedEvent(AbstractConversationEvent):
     """
     format - the format of the CV
     """
-    timestamp: datetime
-    """
-    timestamp - an iso string representing the timestamp of the event
-    """
 
     def __init__(self, *, user_id: str, session_id: int, cv_format: CVFormatLiteral, timestamp: str, relevant_experiments: dict[str, str] = None):
         super().__init__(
@@ -415,10 +411,6 @@ class UserLocationEvent(AbstractUserAccountEvent):
     """
     coordinates - the coordinates of the user
     """
-    timestamp: datetime
-    """
-    timestamp - an iso string representing the timestamp of the event
-    """
 
     def __init__(self, *, user_id: str, coordinates: tuple[float, float], timestamp: str, relevant_experiments: dict[str, str] = None):
         super().__init__(
@@ -453,10 +445,6 @@ class DeviceSpecificationEvent(AbstractUserAccountEvent):
     """
     browser_version - the version of the browser the user is using
     """
-    timestamp: datetime
-    """
-    timestamp - an iso string representing the timestamp of the event
-    """
     user_agent: str
     """
     str - the user agent of the browser the user is using
@@ -472,6 +460,33 @@ class DeviceSpecificationEvent(AbstractUserAccountEvent):
             browser_type=browser_type,
             browser_version=browser_version,
             user_agent=user_agent,
+            timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc),
+            relevant_experiments=relevant_experiments or {}
+        )
+
+    class Config:
+        extra = "forbid"
+
+
+class UIInteractionEvent(AbstractUserAccountEvent):
+    """
+    A Frontend only metric event representing UI interactions by a user
+    """
+    element_id: str
+    """
+    element_id: a unique id for the element the interaction was performed on
+    """
+    actions: list[str]
+    """
+    action: any arbitrary actions on an element. Could be ["clicked", "seen"] or ["seen_twice"] or ["swiped"]
+    """
+
+    def __init__(self, *, user_id: str, element_id: str, actions: list[str], timestamp: str, relevant_experiments: dict[str, str] = None):
+        super().__init__(
+            user_id=user_id,
+            event_type=EventType.UI_INTERACTION,
+            element_id=element_id,
+            actions=actions,
             timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc),
             relevant_experiments=relevant_experiments or {}
         )

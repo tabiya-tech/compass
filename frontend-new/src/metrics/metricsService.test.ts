@@ -3,7 +3,7 @@ import "src/_test_utilities/envServiceMock";
 
 import { waitFor } from "src/_test_utilities/test-utils";
 import MetricsService, { METRICS_FLUSH_INTERVAL_MS } from "src/metrics/metricsService";
-import { CVDownloadedEvent, EventType } from "src/metrics/types";
+import { CVDownloadedEvent, EventType, MetricsEventUnion } from "src/metrics/types";
 import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 import { CVFormat } from "src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown";
 import { StatusCodes } from "http-status-codes";
@@ -83,6 +83,75 @@ describe("MetricsService", () => {
           failureMessage: "Failed to send metrics events",
           expectedStatusCode: StatusCodes.ACCEPTED,
           body: JSON.stringify([givenEvent1, givenEvent2]),
+        });
+      });
+    });
+
+    test("should handle different event types correctly", async () => {
+      const givenEvents: MetricsEventUnion[] = [
+        {
+          event_type: EventType.CV_DOWNLOADED,
+          cv_format: CVFormat.PDF,
+          session_id: 123,
+          user_id: "456",
+          timestamp: new Date().toISOString(),
+        },
+        {
+          event_type: EventType.USER_LOCATION,
+          user_id: "456",
+          coordinates: [123.456, 78.910],
+          timestamp: new Date().toISOString(),
+        },
+        {
+          event_type: EventType.DEVICE_SPECIFICATION,
+          user_id: "user123",
+          device_type: "desktop",
+          os_type: "Windows",
+          browser_type: "Chrome",
+          browser_version: "1.0.0",
+          user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          timestamp: new Date().toISOString(),
+        },
+        {
+          event_type: EventType.NETWORK_INFORMATION,
+          user_id: "456",
+          effective_connection_type: "4G",
+          connection_type: 5,
+        },
+        {
+          event_type: EventType.UI_INTERACTION,
+          user_id: "user123",
+          actions: ["foo", "bar"],
+          element_id: "foo_element",
+          timestamp: new Date().toISOString(),
+          relevant_experiments: { "exp1": "group1", "exp2": "group2" }
+        },
+      ];
+
+      // AND a successful response from the API
+      const fetchSpy = setupAPIServiceSpy(StatusCodes.ACCEPTED, undefined, "");
+
+      // WHEN sending the events
+      const service = MetricsService.getInstance();
+      givenEvents.forEach(event => service.sendMetricsEvent(event));
+
+      // AND the flush interval passes
+      jest.advanceTimersByTime(METRICS_FLUSH_INTERVAL_MS);
+      // Let any pending promises resolve
+      await Promise.resolve();
+
+      // THEN expect it to make a POST request with the events
+      await waitFor(() => {
+        expect(fetchSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/metrics`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          serviceName: "MetricsService",
+          serviceFunction: "flushEvents",
+          failureMessage: "Failed to send metrics events",
+          expectedStatusCode: StatusCodes.ACCEPTED,
+          body: JSON.stringify(givenEvents),
         });
       });
     });

@@ -11,7 +11,7 @@ from app.metrics.types import ConversationPhaseLiteral, ConversationPhaseEvent, 
     MessageReactionCreatedEvent, ConversationTurnEvent, \
     FeedbackProvidedEvent, FeedbackTypeLiteral, FeedbackRatingValueEvent, \
     CVFormatLiteral, CVDownloadedEvent, DeviceSpecificationEvent, UserLocationEvent, ExperienceDiscoveredEvent, \
-    ExperienceExploredEvent
+    ExperienceExploredEvent, UIInteractionEvent
 from common_libs.test_utilities import get_random_user_id, get_random_session_id, get_random_printable_string
 from common_libs.time_utilities import mongo_date_to_datetime, truncate_microseconds, get_now
 
@@ -118,6 +118,16 @@ def get_user_location_event():
     )
 
 
+def get_ui_interaction_event():
+    return UIInteractionEvent(
+        user_id=get_random_user_id(),
+        element_id=get_random_printable_string(10),
+        actions=[get_random_printable_string(10), get_random_printable_string(10)],
+        timestamp=get_now().isoformat(),
+        relevant_experiments={"exp1": "group1", "exp2": "group2"}
+    )
+
+
 def _assert_metric_event_fields_match(given_event_dict: Dict[str, Any], actual_stored_event: Dict[str, Any]) -> None:
     # Remove MongoDB _id if present
     given_event_dict.pop("_id", None)
@@ -152,6 +162,7 @@ class TestRecordEvent:
             lambda: get_message_reaction_created_event(),
             lambda: get_cv_downloaded_event("PDF"),
             lambda: get_device_specification_event(),
+            lambda: get_ui_interaction_event(),
         ],
         ids=[
             "UserAccountCreatedEvent",
@@ -164,6 +175,7 @@ class TestRecordEvent:
             "MessageReactionCreatedEvent",
             "CVDownloadedEvent",
             "DeviceSpecificationEvent",
+            "UIInteractionEvent",
         ]
     )
     async def test_record_single_event_success(
@@ -215,7 +227,8 @@ class TestRecordEvent:
             get_message_reaction_created_event(),
             get_cv_downloaded_event("PDF"),
             get_cv_downloaded_event("DOCX"),
-            get_device_specification_event()
+            get_device_specification_event(),
+            get_ui_interaction_event()
         ]
         repository = await get_metrics_repository
 
@@ -247,6 +260,7 @@ class TestRecordEvent:
             lambda: get_message_reaction_created_event(),
             lambda: get_cv_downloaded_event("PDF"),
             lambda: get_device_specification_event(),
+            lambda: get_ui_interaction_event(),
         ],
         ids=[
             "UserAccountCreatedEvent",
@@ -258,6 +272,7 @@ class TestRecordEvent:
             "MessageReactionCreatedEvent",
             "CVDownloadedEvent",
             "DeviceSpecificationEvent",
+            "UIInteractionEvent",
         ]
     )
     async def test_record_event_database_bulk_write_failure(
@@ -308,7 +323,8 @@ class TestRecordEvent:
             get_device_specification_event(),
             get_user_location_event(),
             get_experience_discovered_event(experience_count=3),
-            get_experience_explored_event(experience_count=3)
+            get_experience_explored_event(experience_count=3),
+            get_ui_interaction_event()
         ]
         repository = await get_metrics_repository
 
