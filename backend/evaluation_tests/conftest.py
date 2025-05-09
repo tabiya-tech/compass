@@ -1,12 +1,10 @@
 import asyncio
-import os
-from datetime import datetime, timezone
-
-import pytest as pytest
+import datetime
 
 from app.vector_search.vector_search_dependencies import SearchServices
 from evaluation_tests.conversation_libs.fake_conversation_context import FakeConversationContext
 from evaluation_tests.conversation_libs.search_service_fixtures import get_search_services
+from evaluation_tests.evalution_metrics import *
 
 
 def pytest_addoption(parser):
@@ -45,7 +43,7 @@ def fake_conversation_context() -> FakeConversationContext:
 @pytest.fixture()
 def common_folder_path() -> str:
     """ Returns a common folder path that should be used in tests. """
-    time_now = datetime.now(timezone.utc).isoformat()
+    time_now = datetime.now(datetime.timezone.utc).isoformat()
     return os.path.join(os.path.dirname(__file__), 'test_output', time_now + '_')
 
 
