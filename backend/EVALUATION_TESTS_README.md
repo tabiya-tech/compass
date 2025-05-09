@@ -16,6 +16,34 @@ def test_foo_evaluation():
     ...
 ```
 
+### Test Logging and Aggregation
+
+All tests annotated with `@pytest.mark.evaluation_test` capture and aggregate their results in the `test_output/` directory, generating both JSON (`test_results.json`) and CSV (`test_results.csv`) files.
+
+To aggregate and summarize this data across multiple test runs, you can execute:
+
+```
+python evaluation_metrics.py
+```
+
+This command creates a comprehensive summary (`test_summary.csv`) that aggregates results, grouped by both test name and label. It supports both parameterized and non-parameterized tests.
+
+The `evaluation_test` annotation accepts a version label, for example:
+
+```python
+@pytest.mark.evaluation_test("foo")
+def some_test_evaluation():
+    ...
+```
+
+This label is used to tag the test results, making it easier to track performance across different code versions.
+
+**Limitations:**
+
+* **Label Management:** The version label should not be checked into the repository, so you need to remember to update it before each run.
+* **Pass/Fail Granularity:** The evaluation tests only capture a basic pass/fail result, which means they aren't detailed enough to measure accuracy, precision, or other nuanced metrics. However, this approach is a straightforward and practical way to debug and test LLM-based agents.
+
+
 ## Running the tests
 
 To run the tests navigate to the `backend/` directory and run:
