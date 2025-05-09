@@ -1,19 +1,23 @@
 import "src/_test_utilities/consoleMock";
 import { nanoid } from "nanoid";
 import { ChatMessageType } from "src/chat/Chat.types";
-import { ConversationMessageSender } from "./ChatService/ChatService.types";
+import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import {
   FIXED_MESSAGES_TEXT,
   generateCompassMessage,
   generatePleaseRepeatMessage,
   generateSomethingWentWrongMessage,
   generateTypingMessage,
-  generateUserMessage, parseConversationPhase,
-} from "./util";
+  generateUserMessage,
+  parseConversationPhase,
+} from "src/chat/util";
 import { ReactionKind } from "./reaction/reaction.types";
 import { ConversationPhase } from "./chatProgressbar/types";
 import { InvalidConversationPhasePercentage } from "./errors";
-
+import UserChatMessage from "src/chat/chatMessage/userChatMessage/UserChatMessage";
+import CompassChatMessage from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
+import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
+import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 // Mock nanoid to return a fixed value for testing
 jest.mock("nanoid", () => ({
   nanoid: jest.fn().mockReturnValue("foo-nanoid"),
@@ -45,7 +49,11 @@ describe("Chat Utils", () => {
         sent_at: expect.any(String),
         type: ChatMessageType.BASIC_CHAT,
         reaction: null,
+        component: expect.any(Object)
       });
+
+      // AND expect the component to be UserChatMessage
+      expect(result.component.type).toBe(UserChatMessage);
       // AND expect nanoid to have been called
       expect(nanoid).toHaveBeenCalled();
       // AND expect no errors or warnings to have been logged
@@ -72,7 +80,10 @@ describe("Chat Utils", () => {
         sent_at: expect.any(String),
         type: ChatMessageType.BASIC_CHAT,
         reaction: null,
+        component: expect.any(Object)
       });
+      // AND expect the component to be UserChatMessage
+      expect(result.component.type).toBe(UserChatMessage);
       // AND expect nanoid to have not been called
       expect(nanoid).not.toHaveBeenCalled();
       // AND expect no errors or warnings to have been logged
@@ -105,7 +116,10 @@ describe("Chat Utils", () => {
         sent_at: givenSentAt,
         type: ChatMessageType.BASIC_CHAT,
         reaction: givenReaction,
+        component: expect.any(Object)
       });
+      // AND expect the component to be CompassChatMessage
+      expect(result.component.type).toBe(CompassChatMessage);
       // AND expect no errors or warnings to have been logged
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
@@ -129,7 +143,10 @@ describe("Chat Utils", () => {
         sent_at: givenSentAt,
         type: ChatMessageType.BASIC_CHAT,
         reaction: null,
+        component: expect.any(Object)
       });
+      // AND expect the component to be CompassChatMessage
+      expect(result.component.type).toBe(CompassChatMessage);
       // AND expect no errors or warnings to have been logged
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
@@ -152,7 +169,10 @@ describe("Chat Utils", () => {
         sent_at: expect.any(String),
         type: ChatMessageType.TYPING,
         reaction: null,
+        component: expect.any(Object)
       });
+      // AND expect the component to be TypingChatMessage
+      expect(result.component.type).toBe(TypingChatMessage);
       // AND expect nanoid to have been called
       expect(nanoid).toHaveBeenCalled();
       // AND expect no errors or warnings to have been logged
@@ -177,7 +197,10 @@ describe("Chat Utils", () => {
         sent_at: expect.any(String),
         type: ChatMessageType.ERROR,
         reaction: null,
+        component: expect.any(Object)
       });
+      // AND expect the component to be a ChatBubble
+      expect(result.component.type).toBe(ChatBubble);
       // AND expect nanoid to have been called
       expect(nanoid).toHaveBeenCalled();
       // AND expect no errors or warnings to have been logged
@@ -202,7 +225,10 @@ describe("Chat Utils", () => {
         sent_at: expect.any(String),
         type: ChatMessageType.ERROR,
         reaction: null,
+        component: expect.any(Object)
       });
+      // AND expect the component to be a ChatBubble
+      expect(result.component.type).toBe(ChatBubble);
       // AND expect nanoid to have been called
       expect(nanoid).toHaveBeenCalled();
       // AND expect no errors or warnings to have been logged
@@ -225,7 +251,7 @@ describe("Chat Utils", () => {
         phase: ConversationPhase.UNKNOWN,
         percentage: 100,
         current: null,
-        total: null
+        total: null,
       });
 
       // AND console.error to have been called with the correct error message

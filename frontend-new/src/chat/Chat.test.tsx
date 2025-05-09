@@ -191,6 +191,7 @@ describe("Chat", () => {
         ...message,
         message_id: expect.any(String), // the id is not sent by the server, so its not part of the given messages
         type: expect.any(String), // the message type is not part of the given messages we get from the backend
+        component: expect.any(Object),
       })),
       areLastMessages
     );
@@ -586,7 +587,8 @@ describe("Chat", () => {
                   sent_at: expect.any(String),
                   sender: ConversationMessageSender.COMPASS,
                   type: ChatMessageType.ERROR,
-                  reaction: null
+                  reaction: null,
+                  component: expect.any(Object)
                 },
               ],
             }),
@@ -645,7 +647,8 @@ describe("Chat", () => {
               message: FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG,
               sent_at: expect.any(String),
               sender: ConversationMessageSender.COMPASS,
-              reaction: null
+              reaction: null,
+              component: expect.any(Object),
             },
           ],
           true
@@ -813,7 +816,8 @@ describe("Chat", () => {
               message: FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG,
               sent_at: expect.any(String),
               sender: ConversationMessageSender.COMPASS,
-              reaction: null
+              reaction: null,
+              component: expect.any(Object),
             },
           ],
           true
@@ -875,7 +879,8 @@ describe("Chat", () => {
               message: FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG,
               sent_at: expect.any(String),
               sender: ConversationMessageSender.COMPASS,
-              reaction: null
+              reaction: null,
+              component: expect.any(Object),
             },
           ],
           true
@@ -943,6 +948,7 @@ describe("Chat", () => {
               sender: ConversationMessageSender.COMPASS,
               reaction: null,
               type: ChatMessageType.ERROR,
+              component: expect.any(Object),
             },
           ],
           true
@@ -1060,6 +1066,7 @@ describe("Chat", () => {
               ...message,
               message_id: expect.any(String),
               type: ChatMessageType.BASIC_CHAT,
+              component: expect.any(Object),
             })),
             {
               message_id: expect.any(String),
@@ -1067,7 +1074,8 @@ describe("Chat", () => {
             sent_at: expect.any(String),
             sender: ConversationMessageSender.USER,
             type: ChatMessageType.BASIC_CHAT,
-            reaction: null
+            reaction: null,
+            component: expect.any(Object),
             },
             {
               message_id: expect.any(String),
@@ -1075,7 +1083,8 @@ describe("Chat", () => {
             sent_at: expect.any(String),
             sender: ConversationMessageSender.COMPASS,
             type: ChatMessageType.TYPING,
-            reaction: null
+            reaction: null,
+            component: expect.any(Object),
             },
           ],
           true
@@ -1100,6 +1109,7 @@ describe("Chat", () => {
               ...message,
               message_id: expect.any(String),
               type: ChatMessageType.BASIC_CHAT,
+              component: expect.any(Object),
             })),
             {
               message_id: expect.any(String),
@@ -1107,12 +1117,14 @@ describe("Chat", () => {
             sent_at: expect.any(String),
             sender: ConversationMessageSender.USER,
             type: ChatMessageType.BASIC_CHAT,
-            reaction: null
+            reaction: null,
+            component: expect.any(Object),
             },
             ...givenSendMessageResponse.messages.map((message) => ({
               ...message,
               message_id: expect.any(String),
               type: ChatMessageType.BASIC_CHAT,
+              component: expect.any(Object),
             })),
           ],
           true
@@ -1237,6 +1249,7 @@ describe("Chat", () => {
               ...message,
               message_id: expect.any(String),
               type: ChatMessageType.BASIC_CHAT,
+              component: expect.any(Object),
             })),
             {
               message_id: expect.any(String),
@@ -1244,7 +1257,8 @@ describe("Chat", () => {
               sent_at: expect.any(String),
               sender: ConversationMessageSender.USER,
               type: ChatMessageType.BASIC_CHAT,
-              reaction: null
+              reaction: null,
+              component: expect.any(Object),
             },
             {
               message_id: expect.any(String),
@@ -1252,7 +1266,8 @@ describe("Chat", () => {
               sent_at: expect.any(String),
               sender: ConversationMessageSender.COMPASS,
               type: ChatMessageType.TYPING,
-              reaction: null
+              reaction: null,
+              component: expect.any(Object),
             },
           ],
           true
@@ -1277,6 +1292,7 @@ describe("Chat", () => {
               ...message,
               message_id: expect.any(String),
               type: expect.any(String),
+              component: expect.any(Object),
             })),
             {
               message_id: expect.any(String),
@@ -1284,12 +1300,14 @@ describe("Chat", () => {
               sent_at: expect.any(String),
               sender: ConversationMessageSender.USER,
               type: ChatMessageType.BASIC_CHAT,
-              reaction: null
+              reaction: null,
+              component: expect.any(Object),
             },
             ...givenSendMessageResponse.messages.map((message) => ({
               ...message,
               message_id: expect.any(String),
               type: expect.any(String),
+              component: expect.any(Object),
             })),
           ],
           true
@@ -1395,14 +1413,16 @@ describe("Chat", () => {
               sent_at: expect.any(String),
               message_id: expect.any(String),
               type: ChatMessageType.BASIC_CHAT,
+              component: expect.any(Object),
             })),
             {
               message_id: expect.any(String),
-            type: ChatMessageType.ERROR,
-            message: FIXED_MESSAGES_TEXT.PLEASE_REPEAT,
-            sent_at: expect.any(String),
-            sender: ConversationMessageSender.COMPASS,
-            reaction: null
+              type: ChatMessageType.ERROR,
+              message: FIXED_MESSAGES_TEXT.PLEASE_REPEAT,
+              sent_at: expect.any(String),
+              sender: ConversationMessageSender.COMPASS,
+              reaction: null,
+              component: expect.any(Object),
             },
           ],
           true
@@ -1750,6 +1770,7 @@ describe("Chat", () => {
             ...message,
             message_id: expect.any(String),
             type: ChatMessageType.BASIC_CHAT,
+            component: expect.any(Object),
           })),
         ],
         true
@@ -1815,7 +1836,8 @@ describe("Chat", () => {
               message: FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG,
               sender: ConversationMessageSender.COMPASS,
               sent_at: expect.any(String),
-              reaction: null
+              reaction: null,
+              component: expect.any(Object),
             },
           ],
           true

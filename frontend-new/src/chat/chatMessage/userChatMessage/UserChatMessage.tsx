@@ -21,7 +21,7 @@ export const MessageContainer = styled(Box)<{ origin: ConversationMessageSender 
 }));
 
 type BasicChatMessageProps = {
-  chatMessage: IChatMessage;
+  chatMessage: Omit<IChatMessage, "component">;
 };
 
 const UserChatMessage: React.FC<BasicChatMessageProps> = ({ chatMessage }) => {

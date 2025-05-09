@@ -22,7 +22,7 @@ export const MessageContainer = styled(Box)<{ origin: ConversationMessageSender 
 }));
 
 type CompassChatMessageProps = {
-  chatMessage: IChatMessage;
+  chatMessage: Omit<IChatMessage, "component">;
 };
 
 const CompassChatMessage: React.FC<CompassChatMessageProps> = ({ chatMessage }) => {
