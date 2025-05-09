@@ -9,6 +9,7 @@ import { PersistentStorageService } from "src/app/PersistentStorageService/Persi
 import { IChatMessage } from "src/chat/Chat.types";
 import { ChatMessageType } from "src/chat/Chat.types";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
+import CompassChatMessage from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 
 // Mock PersistentStorageService
 jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => ({
@@ -22,6 +23,7 @@ describe("ChatContext", () => {
   const mockHandleOpenExperiencesDrawer = jest.fn();
   const mockRemoveMessage = jest.fn();
   const mockAddMessage = jest.fn();
+  const FIXED_TIMESTAMP = "2025-05-09T15:17:09.080Z";
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -39,17 +41,22 @@ describe("ChatContext", () => {
       setIsAccountConverted,
     } = useChatContext();
 
+    const messageData = {
+      message_id: "test-message",
+      message: "Test message",
+      sender: ConversationMessageSender.COMPASS,
+      sent_at: FIXED_TIMESTAMP,
+      type: ChatMessageType.BASIC_CHAT,
+      reaction: null
+    };
+
     return (
       <div>
         <button onClick={() => handleOpenExperiencesDrawer()}>Open Drawer</button>
         <button onClick={() => removeMessage("test-message")}>Remove Message</button>
         <button onClick={() => addMessage({
-          message_id: "test-message",
-          message: "Test message",
-          sender: ConversationMessageSender.COMPASS,
-          sent_at: new Date().toISOString(),
-          type: ChatMessageType.BASIC_CHAT,
-          reaction: null
+          ...messageData,
+          component: <CompassChatMessage chatMessage={messageData} />
         })}>Add Message</button>
         <button onClick={() => setFeedbackStatus(FeedbackStatus.SUBMITTED)}>Set Feedback</button>
         <button onClick={() => setIsAccountConverted(true)}>Convert Account</button>
@@ -105,13 +112,17 @@ describe("ChatContext", () => {
   });
 
   test("should call addMessage when button is clicked", () => {
-    const testMessage: IChatMessage = {
+    const messageData = {
       message_id: "test-message",
-      message: "Test message",
       sender: ConversationMessageSender.COMPASS,
-      sent_at: new Date().toISOString(),
+      message: "Test message",
+      sent_at: FIXED_TIMESTAMP,
       type: ChatMessageType.BASIC_CHAT,
       reaction: null
+    };
+    const givenMessage: IChatMessage = {
+      ...messageData,
+      component: <CompassChatMessage chatMessage={messageData} />
     };
 
     render(
@@ -125,7 +136,7 @@ describe("ChatContext", () => {
     );
 
     fireEvent.click(screen.getByText("Add Message"));
-    expect(mockAddMessage).toHaveBeenCalledWith(testMessage);
+    expect(mockAddMessage).toHaveBeenCalledWith(givenMessage);
   });
 
   test("should update feedback status when setFeedbackStatus is called", () => {

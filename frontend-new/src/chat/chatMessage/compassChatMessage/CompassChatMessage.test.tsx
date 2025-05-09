@@ -37,13 +37,17 @@ describe("render tests", () => {
   test("should render the Compass Chat message with a timestamp", () => {
     // GIVEN a compass chat message sent at a given time
     const givenDate = new Date(2024, 6, 25).toISOString();
-    const givenMessage: IChatMessage = {
+    const messageData = {
       message_id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
       message: "Hello, I'm Compass",
       sent_at: givenDate,
-      type: ChatMessageType.BASIC_CHAT, // This component is designed for use with the BASIC chat type,
-      reaction: null, // User messages can never have a reaction
+      type: ChatMessageType.BASIC_CHAT,
+      reaction: null
+    };
+    const givenMessage: IChatMessage = {
+      ...messageData,
+      component: <CompassChatMessage chatMessage={messageData} />
     };
     // WHEN the user chat message is rendered
     render(<CompassChatMessage chatMessage={givenMessage} />);
