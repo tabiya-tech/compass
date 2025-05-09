@@ -1,24 +1,25 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
 
-import ChatList, { DATA_TEST_ID } from "./ChatList";
+import React from "react";
 import { render, screen } from "src/_test_utilities/test-utils";
-import UserChatMessage, {
-  DATA_TEST_ID as USER_CHAT_MESSAGE_DATA_TEST_ID,
-} from "src/chat/chatMessage/userChatMessage/UserChatMessage";
+import { ChatProvider } from "src/chat/ChatContext";
+import ChatList, { DATA_TEST_ID } from "./ChatList";
+import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
+import { ChatMessageType, IChatMessage } from "src/chat/Chat.types";
+import { nanoid } from "nanoid";
 import CompassChatMessage, {
   DATA_TEST_ID as COMPASS_CHAT_MESSAGE_DATA_TEST_ID,
 } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
-import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
-import { nanoid } from "nanoid";
-import { ChatMessageType } from "src/chat/Chat.types";
+import UserChatMessage, {
+  DATA_TEST_ID as USER_CHAT_MESSAGE_DATA_TEST_ID,
+} from "src/chat/chatMessage/userChatMessage/UserChatMessage";
 import ChatBubble, {
   DATA_TEST_ID as CHAT_BUBBLE_DATA_TEST_ID,
 } from "src/chat/chatMessage/components/chatBubble/ChatBubble";
-import ConversationConclusionChatMessage from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import { ReactionKind } from "src/chat/reaction/reaction.types";
-import { ChatProvider } from "src/chat/ChatContext";
-import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
+import TypingChatMessage from "../chatMessage/typingChatMessage/TypingChatMessage";
+import ConversationConclusionChatMessage from "../chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 
 // mock the chat message component
 jest.mock("src/chat/chatMessage/userChatMessage/UserChatMessage", () => {
@@ -94,66 +95,107 @@ describe("ChatList", () => {
   const mockAddMessage = jest.fn();
 
   test("should render the Chat List and show the appropriate message type for each message", () => {
-    // GIVEN a message list
-    const givenMessages = [
-      {
-        message_id: nanoid(),
-        sender: ConversationMessageSender.USER,
-        message: "Hello",
-        sent_at: new Date().toISOString(),
-        type: ChatMessageType.BASIC_CHAT,
-        reaction: null,
-      },
-      {
-        message_id: nanoid(),
-        sender: ConversationMessageSender.COMPASS,
-        message: "Hi, I'm Compass",
-        sent_at: new Date().toISOString(),
-        type: ChatMessageType.BASIC_CHAT,
-        reaction: {
-          id: nanoid(),
-          kind: ReactionKind.DISLIKED,
-        },
-      },
-      {
-        message_id: nanoid(),
-        sender: ConversationMessageSender.COMPASS,
-        message: "Let's explore your experiences!",
-        sent_at: new Date().toISOString(),
-        type: ChatMessageType.BASIC_CHAT,
-        reaction: null,
-      },
-      {
-        message_id: nanoid(),
-        sender: ConversationMessageSender.COMPASS,
-        message: "Typing...",
-        sent_at: new Date().toString(),
-        type: ChatMessageType.TYPING,
-        reaction: null,
-      },
-      {
-        message_id: nanoid(),
-        sender: ConversationMessageSender.COMPASS,
-        message: "Thank you for using compass",
-        sent_at: new Date().toString(),
-        type: ChatMessageType.CONVERSATION_CONCLUSION,
-        reaction: null,
-      },
-      {
-        message_id: nanoid(),
-        sender: ConversationMessageSender.COMPASS,
-        message: "Error message",
-        sent_at: new Date().toString(),
-        type: ChatMessageType.ERROR,
-        reaction: null,
-      }
-    ];
+    // GIVEN message data for different types of messages
+    const givenDate = new Date().toISOString();
+    
+    // AND user message data
+    const userMessageData = {
+      message_id: nanoid(),
+      sender: ConversationMessageSender.USER,
+      message: "Hello",
+      sent_at: givenDate,
+      type: ChatMessageType.BASIC_CHAT,
+      reaction: null,
+    };
 
-    // AND a function to notify when the reaction changes
+    // AND compass message data with reaction
+    const compassMessageData = {
+      message_id: nanoid(),
+      sender: ConversationMessageSender.COMPASS,
+      message: "Hi, I'm Compass",
+      sent_at: givenDate,
+      type: ChatMessageType.BASIC_CHAT,
+      reaction: {
+        id: nanoid(),
+        kind: ReactionKind.DISLIKED,
+      },
+    };
+
+    // AND another compass message data
+    const compassMessageData2 = {
+      message_id: nanoid(),
+      sender: ConversationMessageSender.COMPASS,
+      message: "Let's explore your experiences!",
+      sent_at: givenDate,
+      type: ChatMessageType.BASIC_CHAT,
+      reaction: null,
+    };
+
+    // AND typing message data
+    const typingMessageData = {
+      message_id: nanoid(),
+      sender: ConversationMessageSender.COMPASS,
+      message: "Typing...",
+      sent_at: givenDate,
+      type: ChatMessageType.TYPING,
+      reaction: null,
+    };
+
+    // AND conclusion message data
+    const conclusionMessageData = {
+      message_id: nanoid(),
+      sender: ConversationMessageSender.COMPASS,
+      message: "Thank you for using compass",
+      sent_at: givenDate,
+      type: ChatMessageType.CONVERSATION_CONCLUSION,
+      reaction: null,
+    };
+
+    // AND error message data
+    const errorMessageData = {
+      message_id: nanoid(),
+      sender: ConversationMessageSender.COMPASS,
+      message: "Error message",
+      sent_at: givenDate,
+      type: ChatMessageType.ERROR,
+      reaction: null,
+    };
+
+    // AND create full messages with components
+    const givenMessages: IChatMessage[] = [
+      {
+        ...userMessageData,
+        component: <UserChatMessage chatMessage={userMessageData} />,
+      },
+      {
+        ...compassMessageData,
+        component: <CompassChatMessage chatMessage={compassMessageData} />,
+      },
+      {
+        ...compassMessageData2,
+        component: <CompassChatMessage chatMessage={compassMessageData2} />,
+      },
+      {
+        ...typingMessageData,
+        component: <TypingChatMessage waitBeforeThinking={15000} />,
+      },
+      {
+        ...conclusionMessageData,
+        component: <ConversationConclusionChatMessage chatMessage={conclusionMessageData} />,
+      },
+      {
+        ...errorMessageData,
+        component: <ChatBubble message={errorMessageData.message} sender={errorMessageData.sender} />,
+      },
+    ];
 
     // WHEN the chat list is rendered
     render(
-      <ChatProvider handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer} removeMessage={mockRemoveMessage} addMessage={mockAddMessage}>
+      <ChatProvider
+        handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer}
+        removeMessage={mockRemoveMessage}
+        addMessage={mockAddMessage}
+      >
         <ChatList messages={givenMessages} />
       </ChatProvider>
     );
@@ -161,7 +203,7 @@ describe("ChatList", () => {
     // THEN expect the chat list container to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_LIST_CONTAINER)).toBeInTheDocument();
 
-    // AND expect the User Chat message component to be shown for each of the User chat messages
+    // AND expect the User Chat message component to be shown
     const userChatMessages = screen.getAllByTestId(USER_CHAT_MESSAGE_DATA_TEST_ID.CHAT_MESSAGE_CONTAINER);
     expect(userChatMessages).toHaveLength(1);
     userChatMessages.forEach((chatMessage) => {
@@ -172,41 +214,48 @@ describe("ChatList", () => {
     expect(UserChatMessage).toHaveBeenNthCalledWith(
       1,
       {
-        chatMessage: givenMessages[0],
+        chatMessage: {
+          message_id: expect.any(String),
+          sender: ConversationMessageSender.USER,
+          message: "Hello",
+          sent_at: givenDate,
+          type: ChatMessageType.BASIC_CHAT,
+          reaction: null,
+        },
       },
       {}
     );
 
-    // AND expect the Compass Chat message component to be shown for each of the compass chat messages
+    // AND expect the Compass Chat message components to be shown
     const compassChatMessages = screen.getAllByTestId(COMPASS_CHAT_MESSAGE_DATA_TEST_ID.CHAT_MESSAGE_CONTAINER);
     expect(compassChatMessages).toHaveLength(2);
     compassChatMessages.forEach((chatMessage) => {
       expect(chatMessage).toBeInTheDocument();
     });
-    // AND expect the Compass Chat message component to be called with the correct messages
+
+    // AND expect the Compass Chat message components to be called with the correct messages
     expect(CompassChatMessage).toHaveBeenNthCalledWith(
       1,
       {
-        chatMessage: givenMessages[1],
+        chatMessage: compassMessageData,
       },
       {}
     );
     expect(CompassChatMessage).toHaveBeenNthCalledWith(
       2,
       {
-        chatMessage: givenMessages[2],
+        chatMessage: compassMessageData2,
       },
       {}
     );
 
-    // AND expect the Typing Chat Message component to be rendered for the typing message
-    expect(TypingChatMessage).toHaveBeenNthCalledWith(1, {}, {});
+    // AND expect the Typing Chat Message component to be rendered
+    expect(TypingChatMessage).toHaveBeenCalledWith({ waitBeforeThinking: 15000 }, {});
 
-    // AND expect the Conversation Conclusion Chat Message component to be rendered for the conversation conclusion message
-    expect(ConversationConclusionChatMessage).toHaveBeenNthCalledWith(
-      1,
+    // AND expect the Conversation Conclusion Chat Message component to be rendered
+    expect(ConversationConclusionChatMessage).toHaveBeenCalledWith(
       {
-        chatMessage: givenMessages[4],
+        chatMessage: conclusionMessageData,
       },
       {}
     );
@@ -233,29 +282,47 @@ describe("ChatList", () => {
   });
 
   test("should call resizeChatMessage when the window is resized", () => {
-    // GIVEN a message list
-    const givenMessages = [
+    // GIVEN a message list with one message
+    const givenDate = new Date().toISOString();
+    const givenUserMessageData = {
+      message_id: nanoid(),
+      sender: ConversationMessageSender.USER,
+      message: "Hello",
+      sent_at: givenDate,
+      type: ChatMessageType.BASIC_CHAT,
+      reaction: null
+    }
+    const givenCompassMessageData = {
+      message_id: nanoid(),
+      sender: ConversationMessageSender.COMPASS,
+      message: "Hi",
+      sent_at: new Date().toISOString(),
+      type: ChatMessageType.BASIC_CHAT,
+      reaction: null,
+    }
+    const givenMessages: IChatMessage[] = [
       {
-        message_id: nanoid(),
-        sender: ConversationMessageSender.USER,
-        message: "Hello",
-        sent_at: new Date().toISOString(),
-        type: ChatMessageType.BASIC_CHAT,
-        reaction: null,
+        ...givenUserMessageData,
+        component: <UserChatMessage chatMessage={givenUserMessageData} />
       },
       {
-        message_id: nanoid(),
-        sender: ConversationMessageSender.COMPASS,
-        message: "Hi",
-        sent_at: new Date().toISOString(),
-        type: ChatMessageType.BASIC_CHAT,
-        reaction: null,
-      },
+        ...givenCompassMessageData,
+        component: <CompassChatMessage chatMessage={givenCompassMessageData} />
+      }
     ];
-    // AND the chat list is rendered
-    render(<ChatList messages={givenMessages} />);
 
-    // WHEN the window is resized
+    // WHEN the chat list is rendered
+    render(
+      <ChatProvider
+        handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer}
+        removeMessage={mockRemoveMessage}
+        addMessage={mockAddMessage}
+      >
+        <ChatList messages={givenMessages} />
+      </ChatProvider>
+    );
+
+    // AND the window is resized
     window.dispatchEvent(new Event("resize"));
 
     // THEN expect the scrollIntoView function to be called
