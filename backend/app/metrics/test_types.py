@@ -24,6 +24,7 @@ from app.metrics.types import (
     FeedbackRatingValueEvent,
     MessageReactionCreatedEvent,
     ExperienceExploredEvent,
+    UIInteractionEvent,
 )
 from common_libs.test_utilities import get_random_user_id, get_random_session_id, get_random_application_config
 
@@ -514,3 +515,65 @@ class TestMessageReactionCreatedEvent:
             MessageReactionCreatedEvent(message_id=given_message_id, kind=given_reaction_kind, reasons=given_reasons,
                                         session_id=given_session_id, user_id=given_user_id,
                                         extra_field=given_extra_field)  # type:ignore
+
+
+class TestUIInteractionEvent:
+    def test_fields_are_set_correctly(self, setup_application_config: ApplicationConfig,
+                                    mocker: pytest_mock.MockerFixture):
+        # datetime.now returns a fixed time
+        fixed_time = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)
+        mocker.patch('common_libs.time_utilities._time_utils.datetime', new=mocker.Mock(now=lambda tz=None: fixed_time))
+
+        # GIVEN interaction ids, timestamp, user id and relevant experiments
+        given_element_id = "cv_button"
+        given_actions = ["foo", "bar"]
+        given_timestamp = "2025-03-04T06:45:00+00:00"
+        given_user_id = get_random_user_id()
+        given_relevant_experiments = {"exp1": "group1", "exp2": "group2"}
+
+        # WHEN creating an instance of the event
+        actual_event = UIInteractionEvent(
+            element_id=given_element_id,
+            actions=given_actions,
+            timestamp=given_timestamp,
+            user_id=given_user_id,
+            relevant_experiments=given_relevant_experiments
+        )
+
+        # THEN the basic event fields should be set
+        assert_basic_event_fields_are_set(actual_event, EventType.UI_INTERACTION, setup_application_config, fixed_time)
+
+        # AND the interaction ids should be set correctly
+        assert actual_event.element_id == given_element_id
+        assert actual_event.actions == given_actions
+
+        # AND the timestamp should be set correctly
+        assert actual_event.timestamp == datetime.fromisoformat(given_timestamp).astimezone(timezone.utc)
+
+        # AND the user id should be anonymized
+        assert actual_event.anonymized_user_id is not None
+        assert actual_event.anonymized_user_id != given_user_id
+
+        # AND the relevant experiments should be set correctly
+        assert actual_event.relevant_experiments == given_relevant_experiments
+
+    def test_extra_fields_are_not_allowed(self, setup_application_config: ApplicationConfig):
+        # GIVEN all required fields
+        given_element_id = "cv_button"
+        given_actions = ["foo", "bar"]
+        given_timestamp = "2025-03-04T06:45:00+00:00"
+        given_user_id = get_random_user_id()
+
+        # AND an extra field
+        given_extra_field = "extra_field"
+
+        # WHEN creating an instance of the event
+        # THEN it should raise a TypeError indicating that the extra field is not allowed
+        with pytest.raises(TypeError, match="got an unexpected keyword argument 'extra_field'"):
+            UIInteractionEvent(
+                element_id=given_element_id,
+                actions=given_actions,
+                timestamp=given_timestamp,
+                user_id=given_user_id,
+                extra_field=given_extra_field  # type: ignore
+            )

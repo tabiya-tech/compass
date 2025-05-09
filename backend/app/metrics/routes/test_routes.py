@@ -21,7 +21,8 @@ from app.metrics.types import (
     CVDownloadedEvent,
     DemographicsEvent,
     DeviceSpecificationEvent,
-    UserLocationEvent
+    UserLocationEvent,
+    UIInteractionEvent
 )
 
 from common_libs.test_utilities.mock_auth import MockAuth
@@ -83,6 +84,18 @@ def get_user_location_request() -> dict:
         "user_id": get_random_user_id(),
         "coordinates": (random.uniform(-90.0, 90.0), random.uniform(-180.0, 180.0)), # nosec B311 # random is used for testing purposes
         "timestamp": datetime.now().isoformat()
+    }
+
+
+def get_ui_interaction_request() -> dict:
+    """Helper method to create a UI interaction event request"""
+    return {
+        "event_type": EventType.UI_INTERACTION.value,
+        "user_id": get_random_user_id(),
+        "actions": [get_random_printable_string(10), get_random_printable_string(10)],
+        "element_id": get_random_printable_string(10),
+        "timestamp": datetime.now().isoformat(),
+        "relevant_experiments": {"exp1": "group1", "exp2": "group2"}
     }
 
 
@@ -165,12 +178,14 @@ class TestMetricsRoutes:
             (get_demographics_request, DemographicsEvent, EventType.DEMOGRAPHICS),
             (get_device_specification_request, DeviceSpecificationEvent, EventType.DEVICE_SPECIFICATION),
             (get_user_location_request, UserLocationEvent, EventType.USER_LOCATION),
+            (get_ui_interaction_request, UIInteractionEvent, EventType.UI_INTERACTION),
         ],
         ids=[
             "CV Downloaded",
             "Demographics",
             "Device Specification",
-            "User Location"
+            "User Location",
+            "UI Interaction"
         ]
     )
     @pytest.mark.asyncio
@@ -217,7 +232,8 @@ class TestMetricsRoutes:
             get_cv_downloaded_request(),
             get_demographics_request(),
             get_device_specification_request(),
-            get_user_location_request()
+            get_user_location_request(),
+            get_ui_interaction_request()
         ]
 
         # AND the service's record_event method is mocked to succeed
@@ -243,12 +259,14 @@ class TestMetricsRoutes:
             (get_demographics_request, DemographicsEvent, EventType.DEMOGRAPHICS),
             (get_device_specification_request, DeviceSpecificationEvent, EventType.DEVICE_SPECIFICATION),
             (get_user_location_request, UserLocationEvent, EventType.USER_LOCATION),
+            (get_ui_interaction_request, UIInteractionEvent, EventType.UI_INTERACTION),
         ],
         ids=[
             "CV Downloaded",
             "Demographics",
             "Device Specification",
-            "User Location"
+            "User Location",
+            "UI Interaction"
         ]
     )
     @pytest.mark.asyncio
