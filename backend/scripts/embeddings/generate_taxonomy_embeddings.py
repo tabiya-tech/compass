@@ -1,22 +1,20 @@
 #!/usr/bin/env python3
-import time
-
-import vertexai
 import argparse
 import asyncio
+import logging.config
+import time
 from datetime import datetime
 
-from app.vector_search.embeddings_model import EmbeddingService
-from app.vector_search.vector_search_dependencies import get_embeddings_service
-from pydantic import BaseModel
-
-from tqdm import tqdm
-import logging.config
-from dotenv import load_dotenv
+import vertexai
 from bson.objectid import ObjectId
+from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
+from pydantic import BaseModel
+from tqdm import tqdm
 
 from _base_data_settings import EmbeddingsScriptSettings, CompassEmbeddingsCollections, PlatformCollections
+from app.vector_search.embeddings_model import EmbeddingService
+from app.vector_search.vector_search_dependencies import get_embeddings_service
 from common_libs.logging.log_utilities import setup_logging_config
 from common_libs.time_utilities import get_now, datetime_to_mongo_date
 from scripts.embeddings._common import EmbeddingContext, generate_indexes, redact_credentials_from_uri
@@ -128,6 +126,8 @@ async def generate_and_save_embeddings(*,
             "altLabels": document["altLabels"],
             "description": document["description"],
             "updatedAt": datetime.now(),
+            "UUIDHistory": document["UUIDHistory"],
+            "originUUID": document["UUIDHistory"][-1],
             ctx.id_field_name: document["_id"]
         }
 
