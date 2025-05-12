@@ -1,6 +1,8 @@
 from textwrap import dedent
 from typing import Any
 
+from pydantic import ConfigDict
+
 from app.agent.experience import WorkType
 from app.countries import Country
 from evaluation_tests.conversation_libs.conversation_test_function import EvaluationTestCase, Evaluation
@@ -55,6 +57,8 @@ class CollectExperiencesAgentTestCase(EvaluationTestCase):
         super().__init__(name=name, simulated_user_prompt=simulated_user_prompt, evaluations=evaluations,
                          expected_experiences_count_min=expected_experiences_count_min, expected_experiences_count_max=expected_experiences_count_max,
                          **data)
+
+    model_config = ConfigDict(extra="forbid")
 
 
 test_cases = [
