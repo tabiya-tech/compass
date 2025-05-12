@@ -59,6 +59,41 @@ class CollectExperiencesAgentTestCase(EvaluationTestCase):
 
 test_cases = [
     CollectExperiencesAgentTestCase(
+        name='monther_of_two__e2e',
+        simulated_user_prompt=dedent("""
+            You are a young monther from Kenya Nairobi.
+            You have never had a formal job, but you have been a stay-at-home mom since your first child was born in 2018.
+            You have two children, and you have been taking care of them since they were born.
+            You obviously also do household chores and general housework for your family but consider all of it as part of the same work experience.
+            You have never done volunteering or helped your community or other families or friends.
+            """) + kenya_prompt,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
+        expected_experiences_count_min=1,
+        expected_experiences_count_max=2,
+        expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (0, 0),
+                             WorkType.SELF_EMPLOYMENT: (0, 0),
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+                             WorkType.UNSEEN_UNPAID: (1, 2)},
+        country_of_user=Country.KENYA
+    ),
+    CollectExperiencesAgentTestCase(
+        name='taking_care_of_siblings_e2e',
+        simulated_user_prompt=dedent("""
+                    You are a young person from Mombasa.
+                    You have never had a formal job, but you have been a taking care of your baby sister when your mother is ar work.
+                    You obviously also do household chores and general housework for your family.
+                    You have never done volunteering or helped your community.
+                    """) + kenya_prompt,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
+        expected_experiences_count_min=1,
+        expected_experiences_count_max=2,
+        expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (0, 0),
+                             WorkType.SELF_EMPLOYMENT: (0, 0),
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+                             WorkType.UNSEEN_UNPAID: (1, 2)},
+        country_of_user=Country.KENYA
+    ),
+    CollectExperiencesAgentTestCase(
         name='mentor_kenya_disabled',
         simulated_user_prompt=dedent("""
             You are a young from Kenya Mombasa.
@@ -299,7 +334,6 @@ test_cases = [
         country_of_user=Country.KENYA
     ),
     CollectExperiencesAgentTestCase(
-        skip_force="force",
         name='hobbyist_e2e',
         simulated_user_prompt=dedent("""
             You have a single hobby, blogging about your travels. You have been doing this since 2018 and have a small following.
